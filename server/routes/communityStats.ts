@@ -22,11 +22,11 @@ ORDER BY seq.date DESC;`);
     return models.sequelize.query(`SELECT seq.date, COUNT(${table}.*) AS new_items
 FROM ( SELECT CURRENT_DATE - seq.date AS date FROM generate_series(0, 14) AS seq(date) ) seq
 LEFT JOIN ${table} ON ${table}.created_at::date = seq.date
-WHERE ${chain ? chainParam : communityParam} = ?
+WHERE ${chain ? chainParam : communityParam} = :chainOrCommunity
 GROUP BY seq.date
 ORDER BY seq.date DESC;`, {
       type: QueryTypes.SELECT,
-      replacements: chain ? [ chain.id ] : [ community.id ]
+      replacements: { chainOrCommunity: chain ? chain.id : community.id },
     });
   };
   const roles = await newObjectsQuery('"Roles"');
@@ -36,9 +36,9 @@ ORDER BY seq.date DESC;`, {
   // get total number of roles, threads, and comments as of today
   const totalObjectsQuery = async (table, chainParam = 'chain_id', communityParam = 'offchain_community_id') => {
     return models.sequelize.query(
-      `SELECT COUNT(id) AS new_items FROM ${table} WHERE ${chain ? chainParam : communityParam} = ?;`, {
+      `SELECT COUNT(id) AS new_items FROM ${table} WHERE ${chain ? chainParam : communityParam} = :chainOrCommunity;`, {
         type: QueryTypes.SELECT,
-        replacements: chain ? [ chain.id ] : [ community.id ]
+        replacements: { chainOrCommunity: chain ? chain.id : community.id },
       }
     );
   };
@@ -52,20 +52,20 @@ SELECT seq.date, COUNT(DISTINCT objs.address_id) AS new_items
 FROM ( SELECT CURRENT_DATE - seq.date AS date FROM generate_series(0, 14) AS seq(date) ) seq
 LEFT JOIN (
   SELECT address_id, created_at FROM "OffchainThreads" WHERE created_at > CURRENT_DATE - 14
-    AND ${chain ? 'chain' : 'community'} = ?
+    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "OffchainComments" WHERE created_at > CURRENT_DATE - 14
-    AND ${chain ? 'chain' : 'community'} = ?
+    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "OffchainReactions" WHERE created_at > CURRENT_DATE - 14
-    AND ${chain ? 'chain' : 'community'} = ?
+    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
 ) objs
 ON objs.created_at::date = seq.date
 GROUP BY seq.date
 ORDER BY seq.date DESC;
 `, {
     type: QueryTypes.SELECT,
-    replacements: chain ? [ chain.id, chain.id, chain.id ] : [ community.id, community.id, community.id ]
+    replacements: { chainOrCommunity: chain ? chain.id : community.id },
   });
 
   return res.json({

@@ -5,7 +5,7 @@ import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 
 export const Errors = {
-  MustBeAdminOrAuthor: 'Must be admin or author',
+  InsufficientPermissions: 'Must be author, collaborator, admin or author to link',
   MustHaveLinkingThreadId: 'Must have linking thread id',
   MustHaveLinkedThreadId: 'Must have linked thread id',
   ThreadsMustShareCommunity: 'Threads do not share community or do not exist'
@@ -23,6 +23,7 @@ const updateLinkedThreads = async (
     req.user
   );
   if (error) return next(new Error(error));
+
   const { linked_thread_id, linking_thread_id, remove_link } = req.body;
   if (!linked_thread_id) {
     return next(new Error(Errors.MustHaveLinkedThreadId));
@@ -30,23 +31,37 @@ const updateLinkedThreads = async (
   if (!linking_thread_id) {
     return next(new Error(Errors.MustHaveLinkingThreadId));
   }
+
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
+  if (authorError) return next(new Error(authorError));
+
+  const userOwnedAddresses = await req.user.getAddresses();
+  const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const isAuthor = await models.OffchainThread.findOne({
+    where: {
+      id: linking_thread_id,
+      address_id: { [Op.in]: userOwnedAddressIds },
+    },
+  });
+
   try {
-    if (authorError) {
-      const adminAddress = await models.Address.findOne({
+    if (!isAuthor) {
+      const collaboration = await models.Collaboration.findOne({
         where: {
-          address: req.body.address,
-          user_id: req.user.id,
-        },
+          offchain_thread_id: linking_thread_id,
+          address_id: { [Op.in]: userOwnedAddressIds }
+        }
       });
-      const requesterIsAdminOrMod = await models.Role.findAll({
-        where: {
-          address_id: adminAddress.id,
-          permission: ['admin', 'moderator'],
-        },
-      });
-      if (!requesterIsAdminOrMod) {
-        return next(new Error(Errors.MustBeAdminOrAuthor));
+      if (!collaboration) {
+        const requesterIsAdminOrMod = await models.Role.findAll({
+          where: {
+            address_id: { [Op.in]: userOwnedAddressIds },
+            permission: ['admin', 'moderator'],
+          },
+        });
+        if (!requesterIsAdminOrMod) {
+          return next(new Error(Errors.InsufficientPermissions));
+        }
       }
     }
 

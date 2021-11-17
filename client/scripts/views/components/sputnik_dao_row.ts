@@ -1,18 +1,7 @@
 import 'components/sputnik_dao_row.scss';
 
-import m, { Vnode } from 'mithril';
-
-interface IDaoInfo {
-    contractId: string;
-    amount: string;
-    name: string;
-    purpose: string;
-    proposalBond: string;
-    proposalPeriod: string;
-    bountyBond: string;
-    bountyPeriod: string;
-    council: string[];
-}
+import m from 'mithril';
+import { IDaoInfo } from 'views/pages/sputnikdaos';
 
 const SputnikDaoRow: m.Component<{
     dao: IDaoInfo;
@@ -22,7 +11,7 @@ const SputnikDaoRow: m.Component<{
         const { dao, clickable } = vnode.attrs;
         return m('tr.nearRow', {
             onclick: (e) => {
-                if(clickable){
+                if (clickable){
                     e.preventDefault();
                     m.route.set(`/${dao.contractId}`);
                 }

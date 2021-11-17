@@ -1,0 +1,31 @@
+@import 'client/styles/facelift';
+
+@mixin SVGIcon($color, $enabled: 'true') {
+    path,
+    circle,
+    rect {
+        stroke: $color;
+    }
+    @if $enabled == 'false' {
+        cursor: default !important;
+    }
+}
+
+svg.Icon {
+    cursor: pointer;
+    &.primary {
+        @include SVGIcon($black);
+    }
+    &.primary:hover {
+        @include SVGIcon($dark-purp);
+    }
+    &.secondary {
+        @include SVGIcon($lite-gray)
+    }
+    &.secondary:hover {
+        @include SVGIcon($black);
+    }
+    &.disabled {
+        @include SVGIcon($disable-gray, 'false');
+    }
+}
