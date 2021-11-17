@@ -309,11 +309,9 @@ export default (
               log.error('Signature verification failed.');
             }
           } else {
-            log.error(`Sign doc not matched. Generated: ${
-              JSON.stringify(generatedSignDoc)
-            }, found: ${
-              JSON.stringify(signed)
-            }.`);
+            log.error(`Sign doc not matched. Generated: ${JSON.stringify(generatedSignDoc)
+              }, found: ${JSON.stringify(signed)
+              }.`);
             isValid = false;
           }
         } else {
@@ -351,6 +349,9 @@ export default (
         Buffer.from(sigObj, 'base64'),
         Buffer.from(publicKey, 'base64'),
       );
+    } else if (chain.base === ChainBase.Solana) {
+      // TODO
+      isValid = false;
     } else {
       // invalid network
       log.error(`invalid network: ${chain.network}`);

@@ -119,6 +119,9 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
     valid = checkCosmosAddress(address);
   } else if (chainInfo?.base === ChainBase.NEAR) {
     valid = true;
+  } else if (chainInfo?.base === ChainBase.Solana) {
+    // TODO: check address
+    valid = true;
   }
   if (!valid) {
     return;
@@ -220,6 +223,8 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
           user_id: null,
         };
       }
+    } else if (chainInfo?.base === ChainBase.Solana) {
+      // TODO: check address
     }
     state.loaded = true;
     state.loading = false;
