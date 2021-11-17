@@ -68,7 +68,6 @@ const createChain = async (
   if (!existingBaseChain) {
     return next(new Error(Errors.InvalidBase));
   }
-  let url: string = req.body.node_url;
   let eth_chain_id: number = null;
   if (req.body.base === ChainBase.Ethereum) {
     if (!Web3.utils.isAddress(req.body.address)) {
@@ -79,9 +78,10 @@ const createChain = async (
     }
     eth_chain_id = +req.body.eth_chain_id;
 
-    // ignore the provided URL for eth chains (typically ERC20) and used stored
+    // ignore the provided URL for eth chains (typically ERC20) and used stored, unless none found
+    let url = await getUrlForEthChainId(models, eth_chain_id);
     if (!url) {
-      url = await getUrlForEthChainId(models, eth_chain_id);
+      url = req.body.node_url;
       if (!url) {
         return next(new Error(Errors.InvalidChainIdOrUrl));
       }

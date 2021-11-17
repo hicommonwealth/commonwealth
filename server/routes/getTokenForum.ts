@@ -26,9 +26,9 @@ const getTokenForum = async (
       chain_id,
     }
   });
-  let url = req.query.url;
+  let url = await getUrlForEthChainId(models, chain_id);
   if (!url) {
-    url = await getUrlForEthChainId(models, chain_id);
+    url = req.query.url;
     if (!url) {
       return res.json({ status: 'Failure', message: 'Unsupported chain' });
     }
