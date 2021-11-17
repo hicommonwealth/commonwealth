@@ -11,7 +11,7 @@ const SputnikDaoRow: m.Component<{
         const { dao, clickable } = vnode.attrs;
         return m('tr.nearRow', {
             onclick: (e) => {
-                if(clickable){
+                if (clickable){
                     e.preventDefault();
                     m.route.set(`/${dao.contractId}`);
                 }
