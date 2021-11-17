@@ -13,7 +13,7 @@ import Sublayout from 'views/sublayout';
 import { CommunityOptionsPopover } from './discussions';
 import Near from 'controllers/chain/near/main';
 
-interface IDaoInfo {
+export interface IDaoInfo {
   contractId: string;
   amount: string;
   name: string;

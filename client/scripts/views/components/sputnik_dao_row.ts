@@ -1,18 +1,7 @@
 import 'components/sputnik_dao_row.scss';
 
 import m from 'mithril';
-
-interface IDaoInfo {
-    contractId: string;
-    amount: string;
-    name: string;
-    purpose: string;
-    proposalBond: string;
-    proposalPeriod: string;
-    bountyBond: string;
-    bountyPeriod: string;
-    council: string[];
-}
+import { IDaoInfo } from 'views/pages/sputnikdaos';
 
 const SputnikDaoRow: m.Component<{
     dao: IDaoInfo;
