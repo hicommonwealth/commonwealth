@@ -7,10 +7,9 @@ import { Input, ListItem, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
 import {
-  DiscussionIcon,
-  CommunityIcon,
-  MemberIcon
-} from 'helpers/search';
+  ReplyIcon,
+  AccountIcon
+} from '../components/component_kit/icons';
 import app from 'state';
 import { AddressInfo, Profile } from 'models';
 
@@ -36,7 +35,7 @@ export const getMemberResult = (addr, searchTerm) => {
   const userLink = `/${scope || addr.chain}/account/${addr.address}?base=${addr.chain}`;
 
   return m(ListItem, {
-    contentLeft: m(MemberIcon),
+    contentLeft: m(AccountIcon),
     label: m('a.search-results-item', [
       m(UserBlock, {
         user: profile,
@@ -157,7 +156,7 @@ export const getDiscussionResult = (thread, searchTerm) => {
         ]),
       ]
     ]),
-    contentLeft: m(DiscussionIcon)
+    contentLeft: m(ReplyIcon)
   });
 };
 
