@@ -60,8 +60,8 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
       })
     }
 
-    if (!vnode.state.daosList){
-      if(app.activeId() === 'near')
+    if (!vnode.state.daosList) {
+      if (app.activeId() === 'near') {
         return m(PageLoading, {
           message: 'Loading Sputnik DAOs',
           title: [
@@ -70,8 +70,7 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
           ],
           showNewProposalButton: true,
         });
-      else
-        return m(PageLoading, {message: 'Redirecting...'});
+      } else return m(PageLoading, {message: 'Redirecting...'});
     }
 
     return m(Sublayout, {
