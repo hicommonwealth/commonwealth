@@ -1,6 +1,6 @@
 import 'components/sputnik_dao_row.scss';
 
-import m, { Vnode } from 'mithril';
+import m from 'mithril';
 
 interface IDaoInfo {
     contractId: string;
