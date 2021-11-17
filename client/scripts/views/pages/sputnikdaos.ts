@@ -49,8 +49,8 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
       (app.chain as Near).chain.viewDaoList().then((daos) => {
         vnode.state.daosList = daos;
         vnode.state.daosList.sort((d1, d2) => {
-          const d1Exist = allCommunities.filter(c => c.id === d1.name).length;
-          const d2Exist = allCommunities.filter(c => c.id === d2.name).length;
+          const d1Exist = allCommunities.filter(c => c.id === `${d1.name}.sputnik-dao.near`).length;
+          const d2Exist = allCommunities.filter(c => c.id === `${d2.name}.sputnik-dao.near`).length;
           if(d1Exist !== d2Exist)
             return d2Exist - d1Exist;
           else
@@ -91,7 +91,8 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
           m('th', {style: {width: "17%"}}, 'Vote Period'),
         ]),
         vnode.state.daosList.map((dao) => {
-          return m(SputnikDaoRow, { dao, clickable: allCommunities.filter(c => c.id === dao.name).length > 0 });
+          return m(SputnikDaoRow,
+            { dao, clickable: allCommunities.findIndex(c => c.id === `${dao.name}.sputnik-dao.near`) !== -1 });
         })
       ]),
     ]);
