@@ -70,7 +70,7 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
           ],
           showNewProposalButton: true,
         });
-      } else return m(PageLoading, {message: 'Redirecting...'});
+      } else return m(PageLoading, { message: 'Redirecting...' });
     }
 
     return m(Sublayout, {
