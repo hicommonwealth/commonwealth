@@ -1,3 +1,5 @@
+declare let window: any;
+
 import { ChainBase } from 'types';
 import { Account, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
@@ -13,8 +15,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   public readonly chain = ChainBase.Solana;
 
   public get available() {
-    // TODO
-    return false;
+    return window.solana && window.solana.isPhantom;
   }
 
   public get enabled() {
@@ -29,20 +30,31 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async signMessage(message: string): Promise<string> {
-    // TODO
-    return '';
-  }
-
   public async validateWithAccount(account: Account<any>): Promise<void> {
-    // TODO
+    const encodedMessage = new TextEncoder().encode(account.validationToken);
+    const { signature } = await window.solana.signMessage(encodedMessage, 'utf8');
+    const signedMessage = Buffer.from(signature as Uint8Array).toString('base64');
+    return account.validate(signedMessage);
   }
 
   // ACTIONS
   public async enable() {
     console.log('Attempting to enable Phantom');
-    this._enabled = true;
-    this._enabling = false;
+    this._enabling = true;
+    if (!this.available) {
+      this._enabling = false;
+      throw new Error('Phantom wallet not installed!');
+    }
+    try {
+      const resp = await window.solana.connect();
+      const key = resp.publicKey.toString();
+      this._accounts = [key];
+      this._enabling = false;
+      this._enabled = true;
+    } catch (err) {
+      this._enabling = false;
+      throw new Error('Could not connect to Phantom wallet!');
+    }
   }
 }
 

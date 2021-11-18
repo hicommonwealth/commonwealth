@@ -22,6 +22,8 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
       return ChainNetwork.Ethereum;
     case ChainBase.NEAR:
       return ChainNetwork.NEAR;
+    case ChainBase.Solana:
+      return ChainNetwork.SolanaDevnet; // TODO: mainnet
     default:
       return null;
   }
