@@ -178,6 +178,7 @@
             .CommunitySelector,
             .sublayout-header-heading {
                 display: flex;
+                align-items: baseline;
             }
             h3 {
                 font-size: 1.15rem;
@@ -202,7 +203,9 @@
                 }
                 .cui-icon {
                     position: relative;
-                    top: -1px;
+                    &.cui-icon-chevron-down {
+                        top: 1px;
+                    }
                     &::before {
                         content: ' ';
                         width: 5px;
