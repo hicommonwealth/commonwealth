@@ -117,11 +117,13 @@ SELECT * FROM (
       "Addresses".chain as address_chain,
       "OffchainThreads".created_at,
       "OffchainThreads".chain,
-      "OffchainThreads".community
+      "OffchainThreads".community,
+      ts_rank_cd(${communityOptions} "OffchainThreads"._search, query) as rank
     FROM "OffchainThreads"
-    JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id
-    WHERE ${communityOptions} "OffchainThreads"._search @@ plainto_tsquery('english', :searchTerm)
-    ORDER BY "OffchainThreads".created_at DESC LIMIT :limit)
+    JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id, 
+    websearch_to_tsquery('english', :searchTerm) as query
+    WHERE query @@ ${communityOptions} "OffchainThreads"._search
+    ORDER BY rank DESC LIMIT :limit)
   UNION ALL
   (SELECT
       "OffchainThreads".title,
@@ -133,15 +135,17 @@ SELECT * FROM (
       "Addresses".chain as address_chain,
       "OffchainComments".created_at,
       "OffchainThreads".chain,
-      "OffchainThreads".community
+      "OffchainThreads".community,
+      ts_rank_cd(${communityOptions2} "OffchainComments"._search, query) as rank
     FROM "OffchainComments"
     JOIN "OffchainThreads" ON "OffchainThreads".id =
         CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
-    JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id
-    WHERE ${communityOptions2} "OffchainComments"._search @@ plainto_tsquery('english', :searchTerm)
-    ORDER BY "OffchainComments".created_at DESC LIMIT :limit)
-) s
-ORDER BY created_at DESC LIMIT :limit;
+    JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id, 
+    websearch_to_tsquery('english', :searchTerm) as query
+    WHERE query @@ ${communityOptions2} "OffchainComments"._search
+    ORDER BY rank DESC LIMIT :limit)
+)
+ORDER BY rank DESC LIMIT :limit;
 `,
       {
         replacements,
