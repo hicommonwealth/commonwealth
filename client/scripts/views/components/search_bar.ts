@@ -6,14 +6,14 @@ import _, { capitalize } from 'lodash';
 import { ControlGroup, Icon, Icons, Input, List, ListItem, Spinner } from 'construct-ui';
 import {
   searchMentionableAddresses,
-  searchDiscussions,
-  SearchIcon,
+  searchDiscussions
 } from 'helpers/search';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, CommunityInfo } from 'models';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
+import { IconIntent, SearchIcon } from "./component_kit/icons";
 import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
@@ -450,7 +450,10 @@ export const SearchBar : m.Component<{}, {
         autofocus: false, // !isMobile,
         fluid: true,
         tabIndex: -10,
-        contentLeft: m(SearchIcon, { isMobile }),
+        contentLeft: m(SearchIcon, {
+          isMobile,
+          intent: IconIntent.Primary,
+        }),
         contentRight: cancelInputIcon || chainOrCommIcon,
         defaultValue: m.route.param('q') || vnode.state.searchTerm,
         value: vnode.state.searchTerm,

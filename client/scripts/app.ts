@@ -602,6 +602,7 @@ Promise.all([
       '/discussions':            redirectRoute((attrs) => `/${attrs.scope}/`),
       '/discussions/:topic':     importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/members':                importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/sputnik-daos':           importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/chat':                   importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/new/thread':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
@@ -652,6 +653,7 @@ Promise.all([
       '/:scope/discussions/:topic': redirectRoute((attrs) => `/discussions/${attrs.topic}/`),
       '/:scope/search':             redirectRoute(() => '/search'),
       '/:scope/members':            redirectRoute(() => '/members'),
+      '/:scope/sputnik-daos':       redirectRoute(() => '/sputnik-daos'),
       '/:scope/chat':               redirectRoute(() => '/chat'),
       '/:scope/new/thread':         redirectRoute(() => '/new/thread'),
       '/:scope/account/:address':   redirectRoute((attrs) => `/account/${attrs.address}/`),
@@ -715,6 +717,7 @@ Promise.all([
       '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
       '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/:scope/sputnik-daos':      importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
