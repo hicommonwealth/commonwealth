@@ -138,7 +138,7 @@ export const TogglePropertyRow: m.Component<{
   view: (vnode) => {
     return m('tr.TogglePropertyRow', [
       m('td', vnode.attrs.title),
-      m('td', [
+      m('td', { class: 'ToggleContent' }, [
         m(Switch, {
           checked: vnode.state.checked,
           disabled: vnode.attrs.disabled || false,

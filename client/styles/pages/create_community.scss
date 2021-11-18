@@ -40,6 +40,11 @@
             @include success-text();
         }
     }
+    .TogglePropertyRow {
+        .ToggleContent {
+            display: flex;
+        }
+    }
 }
 .CompactModalExitButton {
     color: $text-color-medium;

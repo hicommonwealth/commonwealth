@@ -81,7 +81,7 @@ const OffchainCommunityForm: m.Component<
       .map((_) => _.id)
       .filter((chain) => app.user.getAllRolesInCommunity({ chain }).length > 0);
 
-    return m('.class', [
+    return m('.offchain-community-creation-form', [
       m('.CommunityMetadataManagementTable', [
         m(
           Table,
@@ -180,6 +180,7 @@ const OffchainCommunityForm: m.Component<
           ]
         ),
         m(Button, {
+          class: 'mt-3',
           label: 'Save changes',
           intent: 'primary',
           disabled: vnode.state.saving,
@@ -266,7 +267,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
     vnode.state.saving = false;
   },
   view: (vnode) => {
-    return m('.class', [
+    return m('.substrate-creation-form', [
       m('.CommunityMetadataManagementTable', [
         m(
           Table,
@@ -389,6 +390,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           },
         }),
         m(Button, {
+          class: 'mt-3',
           label: 'Save changes',
           intent: 'primary',
           disabled: vnode.state.saving,
@@ -473,6 +475,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
         },
       }),
       m(Button, {
+        class: 'mt-3',
         label: 'Save changes',
         intent: 'primary',
         disabled: vnode.state.saving,
@@ -609,7 +612,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
       }
     }
 
-    return m('.class', [
+    return m('.erc20-creation-form', [
       m('.CommunityMetadataManagementTable', [
         m(
           Table,
@@ -737,6 +740,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           ]
         ),
         m(Button, {
+          class: 'mt-3',
           label: 'Save changes',
           intent: 'primary',
           disabled: vnode.state.saving || !validAddress || !vnode.state.loaded,
@@ -823,7 +827,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
     vnode.state.saving = false;
   },
   view: (vnode) => {
-    return m('.class', [
+    return m('.sputnik-creation-form', [
       m('.CommunityMetadataManagementTable', [
         m(
           Table,
@@ -921,6 +925,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
           ]
         ),
         m(Button, {
+          class: 'mt-3',
           label: 'Save changes',
           intent: 'primary',
           disabled: vnode.state.saving,
@@ -1015,12 +1020,6 @@ const CreateCommunity: m.Component<
   CreateCommunityAttrs,
   CreateCommunityState
 > = {
-  oncreate: () => {
-    // mixpanel.track('New Community', {
-    //   'Step No': 1,
-    //   Step: 'Modal Opened',
-    // });
-  },
   oninit: (vnode) => {
     vnode.state.activeForm = CommunityType.OffchainCommunity;
   },
