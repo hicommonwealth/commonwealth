@@ -62,7 +62,6 @@ export interface IApp {
   wallets: WebWalletController;
 
   recentActivity: RecentActivityController;
-  searchCache: any;
   searchAddressCache: any;
 
   // XXX: replace this with some app.chain helper
@@ -132,8 +131,6 @@ const app: IApp = {
   wallets: new WebWalletController(),
 
   recentActivity: new RecentActivityController(),
-
-  searchCache: {},
 
   searchAddressCache: {},
 

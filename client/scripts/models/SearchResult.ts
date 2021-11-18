@@ -1,16 +1,17 @@
+import { SearchQuery } from '.';
 import { IUniqueId } from './interfaces';
-
 export default class SearchResult implements IUniqueId   {
-    public readonly term: string;
+    public readonly query: SearchQuery;
     public loaded: boolean;
-    public results: Record<string, Array<Record<string, unknown>>>
+    public results: Record<string, Array<any>>
     public readonly identifier: string;
     public readonly uniqueIdentifier: string;
     public readonly slug: string;
     public readonly id: number;
 
     constructor(term: string){
-        this.term = term
+        this.query = new SearchQuery(term)
+        this.results = {}
         this.loaded = false
         this.identifier = term
         this.uniqueIdentifier = term

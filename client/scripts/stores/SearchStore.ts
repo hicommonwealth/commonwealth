@@ -1,13 +1,13 @@
 import { SearchResult } from '../models'
-import { IdStore } from '.';
+import { Store } from '.';
 
-class SearchStore extends IdStore<SearchResult> {
-  private _storeSearch: { [term: string]: SearchResult } = {};
+class SearchStore extends Store<SearchResult> {
+  private _storeSearch: { [query: string]: SearchResult } = {};
 
   public add(search: SearchResult) {
-    if (!this._storeSearch[search.term]) {
+    if (!this._storeSearch[search.query.queryString]) {
       super.add(search);
-      this._storeSearch[search.term] = search;
+      this._storeSearch[search.query.queryString] = search;
     }
     return this;
   }
@@ -21,10 +21,10 @@ class SearchStore extends IdStore<SearchResult> {
 
   public remove(search: SearchResult) {
     super.remove(search);
-    if (!this._storeSearch[search.term]) {
-      throw new Error('Reaction not in proposals store');
+    if (!this._storeSearch[search.query.queryString]) {
+      throw new Error('Search is not in store');
     } else {
-      delete this._storeSearch[search.term]
+      delete this._storeSearch[search.query.queryString]
     }
     return this;
   }
