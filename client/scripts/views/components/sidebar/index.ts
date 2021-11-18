@@ -102,6 +102,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       || p === `/${app.activeId()}/discussions/${f}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);
+    const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeId()}/sputnik-daos`);
 
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
       return { id, name, featuredInSidebar };
@@ -157,6 +158,19 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           navigateToSubpage('/members');
         },
       }),
+      (app.activeId() == 'near'
+      ? m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onSputnikDaosPage(m.route.get())
+          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        label: 'Sputnik DAOs',
+        onclick: (e) => {
+          e.preventDefault();
+          navigateToSubpage('/sputnik-daos');
+        },
+      })
+      : '')
       // m(Button, {
       //   rounded: true,
       //   fluid: true,
