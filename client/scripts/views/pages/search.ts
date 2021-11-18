@@ -3,7 +3,7 @@ import 'pages/search.scss';
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
-import { Input, ListItem, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
+import { Card, Input, ListItem, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
 import {
@@ -12,18 +12,18 @@ import {
   MemberIcon
 } from 'helpers/search';
 import app from 'state';
-import { AddressInfo, Profile } from 'models';
+import { AddressInfo, Profile, SearchResult } from 'models';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
+import { ContentType, SearchType, ALL_RESULTS_KEY } from 'controllers/server/search'
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
-import { ContentType, initializeSearch, search, SearchType } from '../components/search_bar';
+import { search } from '../components/search_bar';
 
-export const ALL_RESULTS_KEY = 'COMMONWEALTH_ALL_RESULTS';
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
 export const getMemberResult = (addr, searchTerm) => {
@@ -95,6 +95,9 @@ export const getDiscussionResult = (thread, searchTerm) => {
     },
     label: m('a.search-results-item', [
       thread.type === 'thread' ? [
+        m('.search-results-thread-header disabled', [
+          `discussion - ${thread.chain || thread.community}`
+        ]),
         m('.search-results-thread-title', [
           decodeURIComponent(thread.title),
         ]),
@@ -125,8 +128,10 @@ export const getDiscussionResult = (thread, searchTerm) => {
           })(),
         ])
       ] : [
+        m('.search-results-thread-header disabled', [
+          `comment - ${thread.chain || thread.community}`
+        ]),
         m('.search-results-thread-title', [
-          'Comment on ',
           decodeURIComponent(thread.title),
         ]),
         m('.search-results-thread-subtitle', [
@@ -206,9 +211,6 @@ const SearchPage : m.Component<{
   pageCount: number,
   errorText: string
 }> = {
-  oncreate: () => {
-    initializeSearch();
-  },
   view: (vnode) => {
     const LoadingPage = m(PageLoading, {
       narrow: true,
@@ -232,23 +234,16 @@ const SearchPage : m.Component<{
       });
     }
 
-    if (!app.searchCache[ALL_RESULTS_KEY]?.loaded) {
-      return LoadingPage;
-    }
-
     // re-fetch results for new search if search term or URI has changed
     if (searchTerm !== vnode.state.searchTerm || vnode.state.refreshResults) {
       vnode.state.searchTerm = searchTerm;
       vnode.state.refreshResults = false;
       vnode.state.results = {};
-      if (!app.searchCache[vnode.state.searchTerm]) {
-        app.searchCache[vnode.state.searchTerm] = { loaded: false };
-      }
       search(searchTerm, { communityScope, chainScope }, vnode.state);
       return LoadingPage;
     }
 
-    if (!app.searchCache[searchTerm].loaded) {
+    if (!app.search.getByTerm(vnode.state.searchTerm).loaded) {
       return LoadingPage;
     }
 
@@ -315,7 +310,7 @@ const SearchPage : m.Component<{
       }),
     ]),
     m('.search-results-wrapper', [
-      !app.searchCache[searchTerm].loaded ? m('.search-loading', [
+      !app.search.getByTerm(vnode.state.searchTerm)?.loaded ? m('.search-loading', [
         m(Spinner, {
           active: true,
           fill: true,

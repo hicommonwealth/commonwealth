@@ -16,7 +16,7 @@ import { SearchIcon } from 'helpers/search';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo } from 'models';
-import { ContentType, SearchType, SearchParams } from 'client/scripts/controllers/server/search';
+import { ContentType, SearchType, SearchParams } from 'controllers/server/search';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
@@ -196,7 +196,7 @@ export const getDiscussionPreview = (
 };
 
 const getBalancedContentListing = (
-  unfilteredResults: any[],
+  unfilteredResults: Record<any, any>,
   types: SearchType[]
 ) => {
   const results = {};
@@ -229,13 +229,13 @@ const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
   const { communityScope, chainScope, isHomepageSearch } = params;
   if (communityScope || chainScope) {
     types = [SearchType.Discussion, SearchType.Member];
-    results = getBalancedContentListing(app.searchCache[searchTerm], types);
+    results = getBalancedContentListing(app.search.getByTerm(searchTerm).results, types);
   } else if (isHomepageSearch) {
     types = [SearchType.Community];
-    results = getBalancedContentListing(app.searchCache[searchTerm], types);
+    results = getBalancedContentListing(app.search.getByTerm(searchTerm).results, types);
   } else {
     types = [SearchType.Discussion, SearchType.Member, SearchType.Community];
-    results = getBalancedContentListing(app.searchCache[searchTerm], types);
+    results = getBalancedContentListing(app.search.getByTerm(searchTerm).results, types);
   }
   const organizedResults = [];
   let tabIndex = 1;
@@ -274,23 +274,23 @@ const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
   return organizedResults;
 };
 
-const search = (
+export const search = async (
   searchTerm: string,
   params: SearchParams,
   state,
 ) => {
-  let results;
   try {
-    results = app.search.search(searchTerm, params)
+    await app.search.search(searchTerm, params)
   }
   catch (err) {
+    console.error(err)
     state.results = {};
     state.errorText =
       err.responseJSON?.error || err.responseText || err.toString();
   }
   state.results = params.isSearchPreview
     ? getResultsPreview(searchTerm, state, params)
-    : results;
+    : app.search.getByTerm(searchTerm).results;
   m.redraw();
 };
 
@@ -342,12 +342,37 @@ export const SearchBar: m.Component<
     );
     const searchResults =
       !results || results?.length === 0
-        ? app.searchCache[searchTerm]?.loaded
+        ? app.search.getByTerm(searchTerm)?.loaded
           ? m(List, [m(emptySearchPreview, { searchTerm })])
           : LoadingPreview
         : vnode.state.isTyping
         ? LoadingPreview
         : m(List, { class: 'search-results-list' }, results);
+
+    const instructions =
+      m(List, { class: 'search-results-list' }, [
+        app.activeId() && m(ListItem, {
+          label: m('a.search-results-item', `Search inside ${app.activeId()}`),
+          onclick: () => {vnode.state.searchTerm += `in-community: ${app.activeId()}`}
+        }),
+        m(ListItem, {
+          class: 'disabled',
+          label: "looking for something specific? filter by adding terms to your search"
+        }),
+        m(ListItem, {
+          label: "by: <user>",
+          onclick: () => {vnode.state.searchTerm += "by: "}
+        }),
+        m(ListItem, {
+          label: "in-community: <chain/community id>",
+          onclick: () => {vnode.state.searchTerm += "in-community: "}
+        }),
+        m(ListItem, {
+          label: "since: <date>",
+          onclick: () => {vnode.state.searchTerm += "since: "}
+        }),
+      ])
+
     vnode.state.closeResults = () => {
       vnode.state.hideResults = true;
     };
@@ -373,6 +398,34 @@ export const SearchBar: m.Component<
           },
         })
       : null;
+
+    const executeSearch = () => {
+      if (
+        !searchTerm ||
+        !searchTerm.toString().trim() ||
+        !searchTerm.match(/[A-Za-z]+/)
+      ) {
+        notifyError('Enter a valid search term');
+        return;
+      }
+      if (searchTerm.length < 4) {
+        notifyError('Query must be at least 4 characters');
+      }
+      const params = `q=${encodeURIComponent(
+        vnode.state.searchTerm.toString().trim()
+      )}`;
+      m.route.set(`/search?${params}`);
+    }
+
+    const searchIcon = vnode.state.searchTerm
+      ? m(Icon, {
+          name: Icons.CORNER_DOWN_LEFT,
+          onclick: () => {
+            executeSearch()
+          },
+        })
+      : null;
+
     return m(
       ControlGroup,
       {
@@ -386,7 +439,7 @@ export const SearchBar: m.Component<
           fluid: true,
           tabIndex: -10,
           contentLeft: m(SearchIcon, { isMobile }),
-          contentRight: cancelInputIcon || chainOrCommIcon,
+          contentRight: vnode.state.searchTerm ? m(ControlGroup, {}, [searchIcon, cancelInputIcon]) : chainOrCommIcon,
           defaultValue: m.route.param('q') || vnode.state.searchTerm,
           value: vnode.state.searchTerm,
           autocomplete: 'off',
@@ -395,7 +448,12 @@ export const SearchBar: m.Component<
           },
           onclick: async (e) => {
             vnode.state.focused = true;
+            vnode.state.hideResults = false;
           },
+          // onfocusout: () => {
+          //   vnode.state.focused = false;
+          //   vnode.state.hideResults = true;
+          // },
           oninput: (e) => {
             e.stopPropagation();
             vnode.state.isTyping = true;
@@ -403,47 +461,18 @@ export const SearchBar: m.Component<
             if (vnode.state.hideResults) {
               vnode.state.hideResults = false;
             }
-            if (!app.searchCache[vnode.state.searchTerm]) {
-              app.searchCache[vnode.state.searchTerm] = { loaded: false };
-            }
             if (e.target.value?.length > 3) {
-              const params: SearchParams = {
-                isSearchPreview: true,
-                communityScope: app.activeCommunityId(),
-                chainScope: app.activeChainId()
-              };
               clearTimeout(vnode.state.inputTimeout);
               vnode.state.inputTimeout = setTimeout(() => {
                 vnode.state.isTyping = false;
-                return search(vnode.state.searchTerm, params, vnode.state);
+                return search(vnode.state.searchTerm, { isSearchPreview: true }, vnode.state);
               }, 500);
             }
           },
           onkeyup: (e) => {
             e.stopPropagation();
             if (e.key === 'Enter') {
-              if (
-                !searchTerm ||
-                !searchTerm.toString().trim() ||
-                !searchTerm.match(/[A-Za-z]+/)
-              ) {
-                notifyError('Enter a valid search term');
-                return;
-              }
-              if (searchTerm.length < 4) {
-                notifyError('Query must be at least 4 characters');
-              }
-              if (app.searchCache[searchTerm]?.loaded) {
-                app.searchCache[searchTerm].loaded = false;
-              }
-              let params = `q=${encodeURIComponent(
-                vnode.state.searchTerm.toString().trim()
-              )}`;
-              if (app.activeCommunityId())
-                params += `&comm=${app.activeCommunityId()}`;
-              else if (app.activeChainId())
-                params += `&chain=${app.activeChainId()}`;
-              m.route.set(`/search?${params}`);
+              executeSearch()
             }
           },
         }),
@@ -451,6 +480,7 @@ export const SearchBar: m.Component<
           showDropdownPreview &&
           !vnode.state.hideResults &&
           searchResults,
+        vnode.state.focused && !vnode.state.hideResults && searchTerm.length < 3 && instructions
       ]
     );
   },
