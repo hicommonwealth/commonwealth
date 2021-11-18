@@ -22,7 +22,6 @@ import {
   SelectPropertyRow,
 } from './manage_community/metadata_rows';
 import { initAppState } from '../../app';
-import { ALIGN_CENTER } from 'construct-ui/lib/esm/components/icon/generated/IconNames';
 
 enum CommunityType {
   OffchainCommunity = 'offchain',
