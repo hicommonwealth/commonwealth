@@ -81,48 +81,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// const setupErrorHandlers = () => {
-//   // Handle 404 errors
-//   app.use((req, res, next) => {
-//     console.log('inside original 404 handler');
-//     res.status(400);
-//     res.json({
-//       status: 404,
-//       message: 'The server can not find the requested resource.',
-//     });
-//   });
-
-//   // Handle server and application errors.
-//   // 401 Unauthorized errors are handled by Express' middleware and returned
-//   // before this handler.
-//   // Errors that hit the final condition should be either (1) thrown as
-//   // ServerErrors or AppErrors or (2) triaged as a bug.
-//   app.use((error, req, res, next) => {
-//     console.log('hit error handler');
-//     if (error instanceof ServerError) {
-//       console.log('ServerError', error);
-//       res.status(error.status).send({
-//         status: error.status,
-//         // Use external facing error message
-//         message: 'Server error, please try again later.',
-//       });
-//     } else if (error instanceof AppError) {
-//       console.log('AppError', error);
-//       res.status(error.status).send({
-//         error: error.message,
-//         status: error.status,
-//         // message: error.message,
-//       });
-//     } else {
-//       console.log('Other Error', error);
-//       res.status(500).send({
-//         error: error.message || 'Unknown server error. Please try again later.',
-//         status: error.status,
-//       });
-//     }
-//   });
-// };
-
 const resetServer = (debug = false): Promise<void> => {
   if (debug) console.log('Resetting database...');
 
