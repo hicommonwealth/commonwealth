@@ -2,13 +2,16 @@ import moment from 'moment';
 import Web3 from 'web3';
 import BN from 'bn.js';
 import { providers } from 'ethers';
+import { WhereOptions } from 'sequelize/types';
 
 import { ERC20__factory } from '../../shared/eth/types';
 
 import JobRunner from './cacheJobRunner';
 
+import { ChainAttributes } from '../models/chain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import { ChainType } from '../../shared/types';
 import { getUrlForEthChainId } from './supportedEthChains';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -76,15 +79,20 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
             model: this.models.Chain,
             required: true,
             as: 'chain',
+            where: {
+              // only support thresholds on token forums
+              // TODO: can we support for token-backed DAOs as well?
+              type: ChainType.Token,
+            } as WhereOptions<ChainAttributes>
           },
         ]
       });
       if (!topic?.chain) {
-        // if associated with an offchain community, always allow
+        // if associated with an offchain community, or if not token forum, always allow
         return true;
       }
       const threshold = topic.token_threshold;
-      if (threshold) {
+      if (threshold && threshold > 0) {
         const nodes = await this.models.ChainNode.findAll({ where: { chain: topic.chain.id } });
         if (!nodes || !nodes[0].eth_chain_id) {
           throw new Error('Could not find chain node.');
