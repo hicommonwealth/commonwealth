@@ -49,7 +49,7 @@ export default class CosmosAccount extends Account<CosmosToken> {
 
   public updateBalance = _.throttle(async () => {
     try {
-      const bal = await this._Chain.api.bank.balance(this.address, this._Chain.denom);
+      const bal = await this._Chain.api.bank.balance(this.address, this._Chain.stakingDenom);
       this._balance = this._Chain.coins(new BN(bal.amount));
     } catch (e) {
       // if coins is null, they have a zero balance
