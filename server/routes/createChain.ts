@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Web3 from 'web3';
 import { Op } from 'sequelize';
-import { urlHasValidHTTPPrefix, wsToHttp } from '../../shared/utils';
+import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 import { getUrlForEthChainId } from '../util/supportedEthChains';
 
@@ -21,6 +21,7 @@ export const Errors = {
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
+  InvalidChainIdOrUrl: 'Could not determine a valid endpoint for provided chain',
   ChainAddressExists: 'The address already exists',
   ChainIDExists: 'The id for this chain already exists, please choose another id',
   ChainNameExists: 'The name for this chain already exists, please choose another name',
@@ -67,8 +68,8 @@ const createChain = async (
   if (!existingBaseChain) {
     return next(new Error(Errors.InvalidBase));
   }
-  let url: string = req.body.node_url;
   let eth_chain_id: number = null;
+  let url = req.body.node_url;
   if (req.body.base === ChainBase.Ethereum) {
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
@@ -78,14 +79,19 @@ const createChain = async (
     }
     eth_chain_id = +req.body.eth_chain_id;
 
-    // ignore the provided URL for eth chains (typically ERC20) and used stored
-    url = await getUrlForEthChainId(models, eth_chain_id);
-    if (!url) {
-      return next(new Error(Errors.InvalidChainId));
+    // override provided URL for eth chains (typically ERC20) with stored, unless none found
+    const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
+    if (ethChainUrl) {
+      url = ethChainUrl;
     }
-    const httpNode = wsToHttp(url);
-    const web3 = new Web3(new Web3.providers.HttpProvider(httpNode));
+    if (!url) {
+      return next(new Error(Errors.InvalidChainIdOrUrl));
+    }
+
+    const provider = new Web3.providers.WebsocketProvider(url);
+    const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
+    provider.disconnect(1000, 'finished');
     if (code === '0x') {
       return next(new Error(Errors.InvalidAddress));
     }
