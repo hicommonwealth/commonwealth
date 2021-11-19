@@ -1,0 +1,116 @@
+@import 'shared.scss';
+
+$black: #000000;
+$dark-gray: #333333;
+$midi-gray: #666666;
+$lite-gray: #999999;
+$disable-gray: #DDDDDD;
+$background-gray: #F4F4F4;
+$white: #FFFFFF;
+
+$dark-purp: #4723AD;
+$midi-purp: #9075DC;
+$lite-purp: #C7B9EF;
+$xlite-purp: #F7F4FF;
+
+$purp-blue: #6300FF;
+$purp-blue-lite: #F3EBFF;
+
+$hype-red: #FF002E;
+$pinky: #FFAFBE;
+$flesh-pink: #FFEBEE;
+
+$dark-green: #008676;
+$carrib-green: #00C0A9;
+$foam-green: #B4F1EA;
+$mint-green: #F3FFF9;
+
+$cream-yellow: #FFFBA1;
+
+title {
+    font-family: $fonts;
+    font-size: 72px;
+    font-style: normal;
+    font-weight: 600;
+}
+
+@mixin header {
+    font-family: $fonts;
+    font-style: normal;
+    font-weight: 500;
+}
+
+h1 {
+    @include header;
+    font-size: 48px;
+}
+
+h2 {
+    @include header;
+    font-size: 32px;
+}
+
+h3 {
+    @include header;
+    font-size: 24px;
+}
+
+@mixin body {
+    font-family: $fonts;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+}
+
+@mixin body-paragraph {
+    @include body;
+    p {
+        margin-bottom: 10px;
+    }
+}
+
+@mixin link {
+    @include body;
+    font-weight: 500;
+    color: #140994;
+}
+
+@mixin button-label {
+    @include body;
+    font-weight: 600;
+}
+
+@mixin form-label {
+    @include body;
+    font-size: 14px;
+    line-height: 16.8px;
+    color: #666666;
+}
+
+@mixin rainbow-gradient-horizontal {
+    background: linear-gradient(
+        90deg,
+        #91BFFF,
+        #91FFA0,
+        #FBFF91,
+        #FF9191
+    );
+}
+
+@mixin rainbow-gradient-diagonal {
+    background: linear-gradient(
+        45deg,
+        #91BFFF,
+        #91FFA0,
+        #FBFF91,
+        #FF9191
+    );
+}
+
+@mixin shadow-gradient {
+    background: linear-gradient(
+        270deg, 
+        #17161E,
+        #07060D)
+}
+
