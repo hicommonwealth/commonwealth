@@ -2,14 +2,21 @@
 
 .nearRow {
     border: 0px;
-    cursor: pointer;
 
     td {
         border: 0;
     }
+
+    td.link {
+        color: $text-color-primary;
+    }
+}
+
+.clickable {
+    cursor: pointer;
 }
 
 .nearRow:hover {
-    background: #F7F4FF;
+    background: $background-color-white-hover;
 }
 
