@@ -24,7 +24,7 @@ import { ProposalType } from 'types';
 import CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain, { CosmosApiType } from './chain';
-import CosmosGovernance from './governance';
+import CosmosGovernance, { marshalTally } from './governance';
 
 export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
   if (typeof voteOption === 'number') {
@@ -92,7 +92,7 @@ export class CosmosProposal extends Proposal<
   public get depositorsAsVotes(): Array<DepositVote<CosmosToken>> {
     return this.data.state.depositors.map(([a, n]) => new DepositVote(
       this._Accounts.fromAddress(a),
-      this._Chain.coins(n, false, this._Governance.govDenom)
+      this._Chain.coins(n)
     ));
   }
 
@@ -149,7 +149,7 @@ export class CosmosProposal extends Proposal<
           }
         }
         if (tallyResp?.tally) {
-          this.data.state.tally = this._Governance.marshalTally(tallyResp?.tally);
+          this.data.state.tally = marshalTally(tallyResp?.tally);
         }
       } catch (err) {
         console.error(`Cosmos query failed: ${err.message}`);
@@ -167,7 +167,7 @@ export class CosmosProposal extends Proposal<
   // see: https://blog.chorus.one/an-overview-of-cosmos-hub-governance/
   get support() {
     if (this.status === 'DepositPeriod') {
-      return this._Chain.coins(this.data.state.totalDeposit, false, this._Governance.govDenom);
+      return this._Chain.coins(this.data.state.totalDeposit);
     }
     if (!this.data.state.tally) return 0;
     const nonAbstainingPower = this.data.state.tally.no
