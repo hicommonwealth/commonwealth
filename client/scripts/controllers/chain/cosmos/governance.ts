@@ -31,24 +31,6 @@ const stateEnumToString = (status: ProposalStatus): CosmosProposalState => {
 const isCompleted = (status: string): boolean => {
   return status === 'Passed' || status === 'Rejected' || status === 'Failed';
 };
-
-const asciiLiteralToDecimal = (n: Uint8Array) => {
-  // 500000000000000000 = 0.5
-  // dividing by 1000000000000000 gives 3 decimal digits of precision
-  const nStr = fromAscii(n);
-  return +((new BN(nStr)).div(new BN('1000000000000000'))) / 1000;
-};
-
-export const marshalTally = (tally: TallyResult): ICosmosProposalTally => {
-  if (!tally) return null;
-  return {
-    yes: new BN(tally.yes),
-    abstain: new BN(tally.abstain),
-    no: new BN(tally.no),
-    noWithVeto: new BN(tally.noWithVeto),
-  };
-};
-
 class CosmosGovernance extends ProposalModule<
   CosmosApiType,
   ICosmosProposal,
@@ -59,14 +41,23 @@ class CosmosGovernance extends ProposalModule<
   private _vetoThreshold: number;
   private _maxDepositPeriodS: number;
   private _minDeposit: CosmosToken;
+  private _govDenom: string;
   public get votingPeriodNs() { return this._votingPeriodS; }
   public get yesThreshold() { return this._yesThreshold; }
   public get vetoThreshold() { return this._vetoThreshold; }
   public get maxDepositPeriodNs() { return this._maxDepositPeriodS; }
   public get minDeposit() { return this._minDeposit; }
+  public get govDenom() { return this._govDenom; }
 
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
+
+  private asciiLiteralToDecimal(n: Uint8Array) {
+    // 500000000000000000 = 0.5
+    // dividing by 1000000000000000 gives 3 decimal digits of precision
+    const nStr = fromAscii(n);
+    return +((new BN(nStr)).div(this._Chain.decimals)) / 1000;
+  }
 
   public async init(ChainInfo: CosmosChain, Accounts: CosmosAccounts): Promise<void> {
     this._Chain = ChainInfo;
@@ -77,25 +68,28 @@ class CosmosGovernance extends ProposalModule<
     const { tallyParams } = await this._Chain.api.gov.params('tallying');
     const { votingParams } = await this._Chain.api.gov.params('voting');
     this._votingPeriodS = votingParams.votingPeriod.seconds.toNumber();
-    this._yesThreshold = asciiLiteralToDecimal(tallyParams.threshold);
-    this._vetoThreshold = asciiLiteralToDecimal(tallyParams.vetoThreshold);
+    this._yesThreshold = this.asciiLiteralToDecimal(tallyParams.threshold);
+    this._vetoThreshold = this.asciiLiteralToDecimal(tallyParams.vetoThreshold);
     this._maxDepositPeriodS = depositParams.maxDepositPeriod.seconds.toNumber();
 
     // TODO: support off-denom deposits
-    const depositCoins = depositParams.minDeposit.find(({ denom }) => denom === this._Chain.denom);
-    if (depositCoins) {
-      this._minDeposit = new CosmosToken(
-        depositCoins.denom,
-        new BN(depositCoins.amount),
-      );
-    } else {
-      console.error('Gov minDeposit in wrong denom:', depositParams.minDeposit);
-      this._minDeposit = new CosmosToken(this._Chain.denom, 0);
-    }
+    const [depositCoins] = depositParams.minDeposit;
+    this._govDenom = depositCoins.denom;
+    this._minDeposit = this._Chain.coins(new BN(depositCoins.amount), false, this.govDenom);
 
     // query existing proposals
     await this._initProposals();
     this._initialized = true;
+  }
+
+  public marshalTally(tally: TallyResult): ICosmosProposalTally {
+    if (!tally) return null;
+    return {
+      yes: this._Chain.coins(new BN(tally.yes), false, this.govDenom),
+      abstain: this._Chain.coins(new BN(tally.abstain), false, this.govDenom),
+      no: this._Chain.coins(new BN(tally.no), false, this.govDenom),
+      noWithVeto: this._Chain.coins(new BN(tally.noWithVeto), false, this.govDenom),
+    };
   }
 
   private async _initProposals(proposalId?: number): Promise<void> {
@@ -122,7 +116,7 @@ class CosmosGovernance extends ProposalModule<
           totalDeposit: p.totalDeposit && p.totalDeposit[0] ? new BN(p.totalDeposit[0].amount) : new BN(0),
           depositors: [],
           voters: [],
-          tally: p.finalTallyResult && marshalTally(p.finalTallyResult),
+          tally: p.finalTallyResult && this.marshalTally(p.finalTallyResult),
         }
       };
     };
@@ -155,7 +149,11 @@ class CosmosGovernance extends ProposalModule<
   }
 
   public createTx(
-    sender: CosmosAccount, title: string, description: string, initialDeposit: CosmosToken, memo: string = ''
+    sender: CosmosAccount,
+    title: string,
+    description: string,
+    initialDeposit: CosmosToken,
+    memo: string,
   ): ITXModalData {
     throw new Error('unsupported');
   }
