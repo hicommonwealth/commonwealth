@@ -13,7 +13,7 @@ module.exports = {
             name: 'Euler Finance',
             type: 'dao',
             network: 'compound',
-            base: 'binance', // TODO: BinanceSmartChain integration
+            base: 'ethereum',
             active: true,
             has_chain_events_listener: true,
           },
@@ -26,9 +26,9 @@ module.exports = {
         [
           {
             chain: 'euler-finance',
-            url: '', // TODO: Find provider for BSC
+            url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr', 
             address: '', // GovernorAlpha
-            token_name: 'note', // for alpha/bravo
+            token_name: 'EUL', // for alpha/bravo
           },
         ],
         { transaction: t }
