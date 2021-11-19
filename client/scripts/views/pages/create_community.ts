@@ -558,7 +558,7 @@ interface ERC20FormState {
 const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
   oninit: (vnode) => {
     vnode.state.chain_id = '1';
-    vnode.state.url = 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
+    vnode.state.url = '';
     vnode.state.address = '';
     vnode.state.id = '';
     vnode.state.name = '';
@@ -580,12 +580,16 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
 
     const updateTokenForum = async () => {
       if (!vnode.state.address || !vnode.state.chain_id) return;
+      const args = {
+        address: vnode.state.address,
+        chain_id: vnode.state.chain_id,
+        allowUncached: true,
+      };
+      if (vnode.state.url) {
+        args['url'] = vnode.state.url;
+      }
       try {
-        const res = await $.get(`${app.serverUrl()}/getTokenForum`, {
-          address: vnode.state.address,
-          chain_id: vnode.state.chain_id,
-          allowUncached: true,
-        });
+        const res = await $.get(`${app.serverUrl()}/getTokenForum`, args);
         if (res.status === 'Success') {
           vnode.state.name = res?.result?.chain?.name || '';
           vnode.state.id = slugify(vnode.state.name);
@@ -630,9 +634,15 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               onChangeHandler: async (v) => {
                 vnode.state.chain_id = v;
                 vnode.state.loaded = false;
-                if (+v) {
-                  updateTokenForum();
-                }
+              }
+            }),
+            m(InputPropertyRow, {
+              title: 'Websocket URL',
+              defaultValue: vnode.state.url,
+              placeholder: 'wss://... (leave empty for default)',
+              onChangeHandler: async (v) => {
+                vnode.state.url = v;
+                vnode.state.loaded = false;
               }
             }),
             m(InputPropertyRow, {
@@ -642,9 +652,6 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               onChangeHandler: (v) => {
                 vnode.state.address = v;
                 vnode.state.loaded = false;
-                if (isAddress(v)) {
-                  updateTokenForum();
-                }
               },
             }),
             m(InputPropertyRow, {
@@ -739,6 +746,14 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             }),
           ]
         ),
+        m(Button, {
+          label: 'Test fields',
+          intent: 'primary',
+          disabled: vnode.state.saving || !validAddress || !vnode.state.chain_id,
+          onclick: async (e) => {
+            await updateTokenForum();
+          },
+        }),
         m(Button, {
           class: 'mt-3',
           label: 'Save changes',
