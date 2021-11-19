@@ -1,6 +1,5 @@
 import { ITXModalData, NodeInfo, IChainModule } from 'models';
 import { ApiStatus, IApp } from 'state';
-import moment from 'moment';
 import m from 'mithril';
 import BN from 'bn.js';
 import * as solw3 from '@solana/web3.js';

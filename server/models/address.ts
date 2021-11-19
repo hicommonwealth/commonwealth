@@ -5,11 +5,11 @@ import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import Web3 from 'web3';
 import { bech32 } from 'bech32';
+import bs58 from 'bs58';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringOptions } from '@polkadot/keyring/types';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
-import { base58Decode } from '@polkadot/util-crypto';
 import { KeypairType } from '@polkadot/util-crypto/types';
 import * as ethUtil from 'ethereumjs-util';
 
@@ -359,13 +359,21 @@ export default (
       // solana address handling
       //
 
-      // reuse polkadot crypto call because same format (ed25519 in base58)
-      const decodedAddress = base58Decode(addressModel.address);
-      isValid = nacl.sign.detached.verify(
-        Buffer.from(`${addressModel.verification_token}`),
-        Buffer.from(signatureString, 'base64'),
-        decodedAddress,
-      );
+      // ensure address is base58 string length 32, cf @solana/web3 impl
+      try {
+        const decodedAddress = bs58.decode(addressModel.address);
+        if (decodedAddress.length === 32) {
+          isValid = nacl.sign.detached.verify(
+            Buffer.from(`${addressModel.verification_token}`),
+            Buffer.from(signatureString, 'base64'),
+            decodedAddress,
+          );
+        } else {
+          isValid = false;
+        }
+      } catch (e) {
+        isValid = false;
+      }
     } else {
       // invalid network
       log.error(`invalid network: ${chain.network}`);

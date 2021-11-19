@@ -5,6 +5,7 @@ import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
+import bs58 from 'bs58';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -105,6 +106,15 @@ const checkCosmosAddress = (address: string): boolean => {
   }
 };
 
+const checkSolanaAddress = (address: string): boolean => {
+  try {
+    const decoded = bs58.decode(address);
+    return decoded.length === 32;
+  } catch (e) {
+    return false;
+  }
+}
+
 const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) => {
   const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
   const { address } = attrs;
@@ -120,8 +130,7 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
   } else if (chainInfo?.base === ChainBase.NEAR) {
     valid = true;
   } else if (chainInfo?.base === ChainBase.Solana) {
-    // TODO: check address
-    valid = true;
+    valid = checkSolanaAddress(address);
   }
   if (!valid) {
     return;
@@ -224,7 +233,16 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
         };
       }
     } else if (chainInfo?.base === ChainBase.Solana) {
-      // TODO: check address
+      if (checkSolanaAddress(address)) {
+        state.account = {
+          profile: null,
+          chain,
+          address,
+          id: null,
+          name: null,
+          user_id: null,
+        };
+      }
     }
     state.loaded = true;
     state.loading = false;
