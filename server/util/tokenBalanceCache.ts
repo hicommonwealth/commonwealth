@@ -2,14 +2,16 @@ import moment from 'moment';
 import Web3 from 'web3';
 import BN from 'bn.js';
 import { providers } from 'ethers';
+import { WhereOptions } from 'sequelize/types';
 
 import { ERC20__factory } from '../../shared/eth/types';
 
 import JobRunner from './cacheJobRunner';
 
+import { ChainAttributes } from '../models/chain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { wsToHttp } from '../../shared/utils';
+import { ChainType } from '../../shared/types';
 import { getUrlForEthChainId } from './supportedEthChains';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -29,10 +31,11 @@ interface CacheT {
 // Uses a tiny class so it's mockable for testing
 export class TokenBalanceProvider {
   public async getBalance(url: string, tokenAddress: string, userAddress: string): Promise<BN> {
-    const provider = new Web3.providers.HttpProvider(url);
+    const provider = new Web3.providers.WebsocketProvider(url);
     const api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider));
     await api.deployed();
     const balanceBigNum = await api.balanceOf(userAddress);
+    provider.disconnect(1000, 'finished');
     return new BN(balanceBigNum.toString());
   }
 }
@@ -76,15 +79,20 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
             model: this.models.Chain,
             required: true,
             as: 'chain',
+            where: {
+              // only support thresholds on token forums
+              // TODO: can we support for token-backed DAOs as well?
+              type: ChainType.Token,
+            } as WhereOptions<ChainAttributes>
           },
         ]
       });
       if (!topic?.chain) {
-        // if associated with an offchain community, always allow
+        // if associated with an offchain community, or if not token forum, always allow
         return true;
       }
       const threshold = topic.token_threshold;
-      if (threshold) {
+      if (threshold && threshold > 0) {
         const nodes = await this.models.ChainNode.findAll({ where: { chain: topic.chain.id } });
         if (!nodes || !nodes[0].eth_chain_id) {
           throw new Error('Could not find chain node.');
@@ -143,11 +151,10 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     if (!url) {
       throw new Error(`unsupported eth chain id ${chainId}`);
     }
-    const tokenUrlHttp = wsToHttp(url);
 
     let balance: BN;
     try {
-      balance = await this._balanceProvider.getBalance(tokenUrlHttp, contractAddress, address);
+      balance = await this._balanceProvider.getBalance(url, contractAddress, address);
     } catch (e) {
       throw new Error(`Could not fetch token balance: ${e.message}`);
     }

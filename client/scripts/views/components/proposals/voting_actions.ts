@@ -311,7 +311,11 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       } else if (proposal instanceof CosmosProposal) {
         if (proposal.status === 'DepositPeriod') {
           // TODO: configure deposit amount
-          proposal.submitDepositTx(user, (app.chain as Cosmos).chain.coins(vnode.state.amount))
+          proposal.submitDepositTx(user, (app.chain as Cosmos).chain.coins(
+            vnode.state.amount,
+            false,
+            (app.chain as Cosmos).governance.govDenom)
+          )
             .then(() => m.redraw())
             .catch((err) => notifyError(err.toString()));
         } else {
