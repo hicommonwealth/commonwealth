@@ -14,6 +14,7 @@ import { constructSubstrateUrl } from 'substrate';
 import { NearAccount } from 'controllers/chain/near/account';
 import Near from 'controllers/chain/near/main';
 import { isAddress } from 'web3-utils';
+import Sublayout from 'views/sublayout';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
@@ -1024,7 +1025,10 @@ const CreateCommunity: m.Component<
     vnode.state.activeForm = CommunityType.OffchainCommunity;
   },
   view: (vnode: m.VnodeDOM<CreateCommunityAttrs, CreateCommunityState>) => {
-    return m('div', { class: 'container CreateCommunity' }, [
+    return m(Sublayout, {
+        hideSidebar: true
+      },
+      [m('div', { class: 'container CreateCommunity' }, [
       m('h3', 'New Commonwealth Community'),
       m(
         Tabs,
@@ -1080,6 +1084,7 @@ const CreateCommunity: m.Component<
       vnode.state.activeForm === CommunityType.SubstrateCommunity &&
         m(SubstrateForm),
       vnode.state.activeForm === CommunityType.SputnikDao && m(SputnikForm),
+    ])
     ]);
   },
 };
