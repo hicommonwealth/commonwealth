@@ -47,9 +47,11 @@ export default class CosmosAccount extends Account<CosmosToken> {
     throw new Error('unsupported');
   }
 
+  // for now, we are betting that staking denom === governance denom,
+  // but if this not true in the future then we should separate the balances somehow
   public updateBalance = _.throttle(async () => {
     try {
-      const bal = await this._Chain.api.bank.balance(this.address, this._Chain.denom);
+      const bal = await this._Chain.api.bank.balance(this.address, this._Chain.stakingDenom);
       this._balance = this._Chain.coins(new BN(bal.amount));
     } catch (e) {
       // if coins is null, they have a zero balance

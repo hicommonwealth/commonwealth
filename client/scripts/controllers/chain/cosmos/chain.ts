@@ -55,6 +55,13 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return this._denom;
   }
 
+  private _stakingDenom: string;
+  public get stakingDenom() { return this._stakingDenom; }
+
+  // only applies to governance tokens
+  private _decimals: BN;
+  public get decimals() { return this._decimals; }
+
   private _staked: CosmosToken;
   public get staked(): CosmosToken {
     return this._staked;
@@ -67,9 +74,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     this._app = app;
   }
 
-  public coins(n: number | BN, inDollars?: boolean) {
-    // never interpret a CosmosToken in dollars
-    return new CosmosToken(this.denom, n);
+  public coins(n: number | BN, inDollars = false, overrideDenom?: string) {
+    return new CosmosToken(overrideDenom || this.denom, n, inDollars, this.decimals);
   }
 
   private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();
@@ -81,6 +87,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     // that forwards the requests to it, and adds the header 'Access-Control-Allow-Origin: *'
     /* eslint-disable prefer-template */
     this._url = node.url;
+
+    // do not fetch symbol from chain -- use stored version + decimals
+    // denom here should be the standard denomination of governance token (i.e. OSMO not uosmo)
+    this._denom = node.chain.symbol;
+    this._decimals = new BN(10).pow(new BN(node.chain.decimals || 1));
 
     console.log(`Starting Tendermint RPC API at ${this._url}...`);
     // TODO: configure broadcast mode
@@ -109,11 +120,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     await fetchBlockJob();
     this._blockSubscription = setInterval(fetchBlockJob, 6000);
 
-    const { pool: { bondedTokens } } = await this._api.staking.pool();
-    this._staked = this.coins(new BN(bondedTokens));
-
     const { params: { bondDenom } } = await this._api.staking.params();
-    this._denom = bondDenom;
+    const { pool: { bondedTokens } } = await this._api.staking.pool();
+    this._stakingDenom = bondDenom;
+    this._staked = this.coins(new BN(bondedTokens), false, bondDenom);
+
     this.app.chain.networkStatus = ApiStatus.Connected;
     m.redraw();
   }

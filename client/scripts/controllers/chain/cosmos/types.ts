@@ -4,24 +4,10 @@ import { Coin } from 'adapters/currency';
 import { IIdentifiable, ICompletable } from 'adapters/shared';
 
 export class CosmosToken extends Coin {
-  constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {
-    if (typeof n === 'string') {
-      n = parseInt(n, 10);
-    }
-    if (inDollars) {
-      throw new Error('cannot create cosmos token in dollars!');
-    }
-    super(denom, n, inDollars);
-  }
-
-  get inDollars(): number {
-    return +this;
-  }
-
   public toCoinObject() {
     return {
       denom: this.denom,
-      amount: this.toString(),
+      amount: this.asBN.toString(),
     };
   }
 }
@@ -30,10 +16,10 @@ export type CosmosProposalType = 'text' | 'upgrade' | 'parameter';
 export type CosmosVoteChoice = 'Yes' | 'No' | 'NoWithVeto' | 'Abstain';
 export type CosmosProposalState = 'DepositPeriod' | 'VotingPeriod' | 'Passed' | 'Rejected' | 'Failed';
 export interface ICosmosProposalTally {
-  yes: BN;
-  abstain: BN;
-  no: BN;
-  noWithVeto: BN;
+  yes: CosmosToken;
+  abstain: CosmosToken;
+  no: CosmosToken;
+  noWithVeto: CosmosToken;
 }
 
 // TODO: note that these vote number values are in terms of _stake_
