@@ -20,15 +20,16 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
   public get app() { return this._app; }
 
   private _connection: solw3.Connection;
-  private _slotCallbackId: number;
+  public get connection() { return this._connection; }
+  private _blockSubscription: NodeJS.Timeout;
 
   constructor(app: IApp) {
     this._app = app;
   }
 
   public async init(node: NodeInfo, reset = false) {
-    // default to 6 decimals
-    this._decimals = new BN(10).pow(new BN(node.chain.decimals || 6));
+    // default to 9 decimals
+    this._decimals = new BN(10).pow(new BN(node.chain.decimals || 9));
     this._denom = node.chain.symbol;
 
     let url: string;
@@ -41,14 +42,17 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
     // TODO: validate config here -- maybe we want ws?
     this._connection = new solw3.Connection(url, 'confirmed');
 
-    const onSlotChange = async ({ slot }: solw3.SlotInfo) => {
+    const SLOT_UPDATE_INTERVAL = 6000;
+    const updateSlot = async () => {
       // slots are approx equal to block heights
+      const slot = await this._connection.getSlot();
+      const prevSlot = this.app.chain.block.height;
       this.app.chain.block.height = slot;
-      const timestamp = await this._connection.getBlockTime(slot);
-      const prevTime = this.app.chain.block.lastTime;
-      this.app.chain.block.lastTime = moment.unix(timestamp);
-      if (prevTime) {
-        this.app.chain.block.duration = timestamp - prevTime.unix();
+      if (prevSlot) {
+        // compute approx duration based on # of slots elapsed in update interval
+        const nSlotsElapsed = slot - prevSlot;
+        const msPerSlot = SLOT_UPDATE_INTERVAL / nSlotsElapsed;
+        this.app.chain.block.duration = msPerSlot / 1000;
       }
       m.redraw();
     }
@@ -58,22 +62,16 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
     }
 
     // load current slot
-    const currentSlot = await this._connection.getSlot();
-    await onSlotChange({
-      slot: currentSlot,
-      parent: 0,
-      root: 0,
-    });
-
+    await updateSlot();
     this.app.chain.networkStatus = ApiStatus.Connected;
 
     // subscribe to new slots
-    this._slotCallbackId = this._connection.onSlotChange(onSlotChange);
+    this._blockSubscription = setInterval(updateSlot, SLOT_UPDATE_INTERVAL);
   }
 
   public async deinit() {
-    if (this._connection && this._slotCallbackId) {
-      this._connection.removeSlotChangeListener(this._slotCallbackId);
+    if (this._connection && this._blockSubscription) {
+      clearInterval(this._blockSubscription);
     }
 
     this.app.chain.networkStatus = ApiStatus.Disconnected;

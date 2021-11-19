@@ -29,7 +29,6 @@ export default class SolanaAccounts implements IAccountsModule<SolanaToken, Sola
   }
 
   public fromAddress(address: string): SolanaAccount {
-    // TODO
     let acct;
     try {
       acct = this._store.getByAddress(address);

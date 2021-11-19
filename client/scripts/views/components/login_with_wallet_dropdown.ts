@@ -23,7 +23,7 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
     case ChainBase.NEAR:
       return ChainNetwork.NEAR;
     case ChainBase.Solana:
-      return ChainNetwork.SolanaDevnet; // TODO: mainnet
+      return ChainNetwork.Solana;
     default:
       return null;
   }

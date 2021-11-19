@@ -86,7 +86,9 @@ export enum ChainNetwork {
   Crust = 'crust',
   Sputnik = 'sputnik',
   Commonwealth = 'commonwealth',
-  SolanaDevnet = 'solana-devnet'
+  SolanaDevnet = 'solana-devnet',
+  SolanaTestnet = 'solana-testnet',
+  Solana = 'solana',
 }
 
 export enum WebsocketEventType {
