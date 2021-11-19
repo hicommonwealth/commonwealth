@@ -18,7 +18,7 @@ const setupErrorHandlers = (app) => {
 
   // Handle 404 errors
   app.use((req, res, next) => {
-    res.status(400);
+    res.status(404);
     res.json({
       status: 404,
       error: 'The server can not find the requested resource.',
