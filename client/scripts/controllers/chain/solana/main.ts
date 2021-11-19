@@ -7,7 +7,7 @@ import SolanaAccount from './account';
 import SolanaAccounts from './accounts';
 import SolanaChain from './chain';
 
-class Cosmos extends IChainAdapter<SolanaToken, SolanaAccount> {
+class Solana extends IChainAdapter<SolanaToken, SolanaAccount> {
   public chain: SolanaChain;
   public accounts: SolanaAccounts;
   public readonly base = ChainBase.Solana;
@@ -39,4 +39,4 @@ class Cosmos extends IChainAdapter<SolanaToken, SolanaAccount> {
   }
 }
 
-export default Cosmos;
+export default Solana;
