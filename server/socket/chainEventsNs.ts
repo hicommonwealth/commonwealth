@@ -41,5 +41,5 @@ export function createCeNamespace(io: Server) {
  * @param notification A Notification model instance
  */
 export function publishToCERoom(this: Server, notification: any) {
-	this.to(notification.chainEventType).emit(WebsocketMessageType.ChainEventNotification, notification);
+	this.to(notification.ChainEvent.ChainEventType.id).emit(WebsocketMessageType.ChainEventNotification, notification);
 }

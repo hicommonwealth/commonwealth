@@ -29,14 +29,17 @@ export class ChainEventsNamespace {
 		this.ceNs.emit('deleteSubscriptions', subs.map(x => x.ChainEventType));
 	}
 
-	private onChainEvent(notification: Notification) {
-		console.log('Notification received:', notification)
-		app.user.notifications.update(notification)
+	private onChainEvent(notification: any) {
+		const subscription = app.user.notifications.subscriptions.find(
+			sub => sub.ChainEventType === notification.ChainEvent.ChainEventType.id
+		);
+		const notificationObj = Notification.fromJSON(notification, subscription)
+		app.user.notifications.update(notificationObj)
 	}
 
 	private onconnect() {
 		this._isConnected = true;
-		this.ceNs.emit('newSubscriptions', app.user.notifications.subscriptions)
+		this.addChainEventSubscriptions(app.user.notifications.subscriptions)
 		console.log('Chain events namespace connected!')
 	}
 

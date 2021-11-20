@@ -63,13 +63,14 @@ export default class extends IEventHandler {
         (x) => {
           // add chainEventType to published message since chainEventType is used to determine room to emit to
           x = JSON.parse(JSON.stringify(x));
-          x.chainEventType = dbEventType.id;
+          x.ChainEvent = event;
+          x.ChainEvent.ChainEventType = dbEventType;
           return this._rabbitMqController.publish(x, 'ChainEventsNotificationsPublication')
         }
       )
       const results = Promise.allSettled(promises)
       // TODO: how to react to publishing failure
-      log.info(`Emitted ${dbNotifications.length} notifications.`);
+      log.trace(`Emitted ${dbNotifications.length} notifications.`);
 
       return dbEvent;
     } catch (e) {
