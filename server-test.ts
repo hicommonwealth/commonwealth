@@ -24,6 +24,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
+import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 
 require('express-async-errors');
 
@@ -78,20 +79,6 @@ app.use((req, res, next) => {
   req['wss'] = wss;
   next();
 });
-
-const setupErrorHandlers = () => {
-  // catch 404 and forward to error handler
-  app.use((req, res, next) => {
-    const err: any = new Error('Not Found');
-    err.status = 404;
-    next(err);
-  });
-
-  app.use((err, req, res, next) => {
-    res.status(err.status || 500);
-    res.json({ error: err.message });
-  });
-};
 
 const resetServer = (debug = false): Promise<void> => {
   if (debug) console.log('Resetting database...');
@@ -268,30 +255,40 @@ const resetServer = (debug = false): Promise<void> => {
 
       const nodes = [
         ['mainnet1.edgewa.re', 'edgeware', null, '0'],
-        ['wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr', 'ethereum', null, '1'],
+        [
+          'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+          'ethereum',
+          null,
+          '1',
+        ],
         [
           'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
           'alex',
           '0xFab46E002BbF0b4509813474841E0716E6730136',
-          '3'
+          '3',
         ],
         [
           'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
           'yearn',
           '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
-          '1'
+          '1',
         ],
         [
           'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
           'sushi',
           '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
-          '1'
+          '1',
         ],
       ];
 
       await Promise.all(
-        nodes.map(([url, chain, address, eth_chain_id, ]) =>
-          models['ChainNode'].create({ chain, url, address, eth_chain_id: +eth_chain_id || null })
+        nodes.map(([url, chain, address, eth_chain_id]) =>
+          models['ChainNode'].create({
+            chain,
+            url,
+            address,
+            eth_chain_id: +eth_chain_id || null,
+          })
         )
       );
 
@@ -339,7 +336,8 @@ const setupServer = () => {
 
 setupPassport(models);
 setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
-setupErrorHandlers();
+setupErrorHandlers(app);
+
 setupServer();
 
 export const resetDatabase = () => resetServer();
