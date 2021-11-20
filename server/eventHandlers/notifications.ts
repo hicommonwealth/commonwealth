@@ -10,6 +10,7 @@ import {
 import { NotificationCategories } from '../../shared/types';
 
 import { addPrefix, factory, formatFilename } from '../../shared/logging';
+import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
@@ -18,7 +19,8 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _wss?: WebSocket.Server,
-    private readonly _excludedEvents: IChainEventKind[] = []
+    private readonly _excludedEvents: IChainEventKind[] = [],
+    private readonly _rabbitMqController?: RabbitMQController
   ) {
     super();
   }
@@ -57,6 +59,13 @@ export default class extends IEventHandler {
         event.includeAddresses
       );
       log.trace(`Emitted ${dbNotifications.length} notifications.`);
+
+      const promises = dbNotifications.map(
+        x => this._rabbitMqController.publish(x, 'ChainEventsNotificationsPublication')
+      )
+      const results = Promise.allSettled(promises)
+      // TODO: how to react to publishing failure
+
       return dbEvent;
     } catch (e) {
       log.error(`Failed to generate notification: ${e.message}!`);

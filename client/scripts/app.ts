@@ -860,7 +860,8 @@ Promise.all([
       // If the user updates their email
       handleUpdateEmailConfirmation();
 
-      app.socket = new WebSocketController("ws//localhost:3002")
+      app.socket = new WebSocketController("ws://localhost:3002");
+
       // subscribe to notifications
       // const wsUrl = document.location.origin
       //   .replace('http://', 'ws://')

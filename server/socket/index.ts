@@ -15,11 +15,15 @@ const io = new Server({ serveClient: false, transports: ['websocket'], cors: {
 	}});
 
 io.on('connection', (socket) => {
-	console.log('a user has connected')
+	console.log(`${socket.id} connected`)
 	socket.on('disconnect', () => {
-		console.log('user disconnected');
+		console.log(`${socket.id} disconnected`);
 	});
 });
+
+// start websocket server to generate Engine.IO instance
+io.listen(3002)
+console.log('Websocket server started on port', 3002)
 
 io.engine.on('connection_error', (err) => {
 	console.log(err.req);      // the request object
@@ -35,8 +39,6 @@ const ceNamespace = createCeNamespace(io);
 instrument(io, {
 	auth: false,
 })
-
-io.listen(3002)
 
 const rabbitController = new RabbitMQController(<BrokerConfig>RabbitMQConfig)
 rabbitController.init()

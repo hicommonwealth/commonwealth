@@ -1,5 +1,4 @@
 import Rascal from 'rascal';
-import { CWEvent } from '@commonwealth/chain-events';
 import { factory, formatFilename } from '../../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -58,7 +57,7 @@ export class RabbitMQController {
    * @param subscriptionName The name of the subscription from the RabbitMQ/Rascal config file to start
    */
   public async startSubscription(
-    messageProcessor: (event: CWEvent) => Promise<void>,
+    messageProcessor: (data: any) => Promise<void>,
     subscriptionName: string
   ): Promise<any> {
     let subscription: Rascal.SubscriberSessionAsPromised;

@@ -5,16 +5,16 @@ export class WebSocketController {
 
 	private _socket;
 	private _isConnected = false;
-	private chainEventsNs;
+	public readonly chainEventsNs: ChainEventsNamespace;
 
 	public constructor(domain: string) {
-		this._socket = io(domain);
+		this._socket = io(domain, {transports: ['websocket']});
 		this._socket.on('connect', this.onconnect.bind(this))
 		this._socket.on('connect_error', this.onconnect_error.bind(this))
 		this._socket.on('disconnect', this.ondisconnect.bind(this))
 
 		// add all custom namespaces i.e. chain-event notifications, chat, thread notifications
-		this.chainEventsNs = new ChainEventsNamespace(io, domain)
+		this.chainEventsNs = new ChainEventsNamespace(domain)
 	}
 
 	public async addListener(eventName: string, listener: (any) => void) {

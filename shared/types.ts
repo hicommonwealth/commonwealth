@@ -87,9 +87,22 @@ export enum ChainNetwork {
   Commonwealth = 'commonwealth',
 }
 
+export enum WebsocketEventType {
+  Connection = 'connection',
+  Message = 'message',
+  Upgrade = 'upgrade',
+  Close = 'close',
+}
 
 export enum WebsocketMessageType {
-  ChainEventNotification = 'chain-event-notification'
+  ChainEventNotification = 'chain-event-notification',
+  Message = 'message',
+  Heartbeat = 'heartbeat',
+  HeartbeatPong = 'heartbeat-pong',
+  InitializeScrollback = 'scrollback',
+  Typing = 'typing',
+  Notification = 'notification',
+  ChainEntity = 'chain-entity',
 }
 
 export enum WebsocketNamespaces {

@@ -35,6 +35,8 @@ class NotificationsController {
         'category': category, 'object_id': objectId, 'is_active': true
       }, (result) => {
         const newSubscription = NotificationSubscription.fromJSON(result);
+        if (newSubscription.category === 'chain-event')
+          app.socket.chainEventsNs.addChainEventSubscriptions([newSubscription])
         this._subscriptions.push(newSubscription);
       });
     }
@@ -45,9 +47,12 @@ class NotificationsController {
     return post('/enableSubscriptions', {
       'subscription_ids[]': subscriptions.map((n) => n.id),
     }, (result) => {
+      const ceSubs = []
       for (const s of subscriptions) {
         s.enable();
+        if (s.category === 'chain-event') ceSubs.push(s)
       }
+      app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs)
     });
   }
 
@@ -56,9 +61,12 @@ class NotificationsController {
     return post('/disableSubscriptions', {
       'subscription_ids[]': subscriptions.map((n) => n.id),
     }, (result) => {
+      const ceSubs = []
       for (const s of subscriptions) {
         s.disable();
+        if (s.category === 'chain-event') ceSubs.push(s);
       }
+      app.socket.chainEventsNs.deleteChainEventSubscriptions(ceSubs);
     });
   }
 
@@ -94,6 +102,8 @@ class NotificationsController {
         throw new Error('subscription not found!');
       }
       this._subscriptions.splice(idx, 1);
+      if (subscription.category === 'chain-event')
+        app.socket.chainEventsNs.deleteChainEventSubscriptions([subscription]);
     });
   }
 
@@ -147,6 +157,7 @@ class NotificationsController {
   }
 
   public clearSubscriptions() {
+    app.socket?.chainEventsNs.deleteChainEventSubscriptions(this._subscriptions)
     this._subscriptions = [];
   }
 
@@ -158,6 +169,7 @@ class NotificationsController {
     return post('/viewNotifications', { }, (result) => {
       this._store.clear();
       this._subscriptions = [];
+      const ceSubs = []
       for (const subscriptionJSON of result) {
         const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
         this._subscriptions.push(subscription);
@@ -165,7 +177,9 @@ class NotificationsController {
           const notification = Notification.fromJSON(notificationJSON, subscription);
           this._store.add(notification);
         }
+        if (subscription.category === 'chain-event') ceSubs.push(subscription);
       }
+      app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
     });
   }
 }
