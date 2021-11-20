@@ -18,14 +18,19 @@ export class ChainEventsNamespace {
 	}
 
 	public addChainEventSubscriptions(subs: NotificationSubscription[]) {
-		this.ceNs.emit('newSubscriptions', subs.map(x => x.ChainEventType));
+		const eventTypes = subs.map(x => x.ChainEventType).filter(x => !!x);
+		console.log('Adding Websocket subscriptions for:', eventTypes)
+		this.ceNs.emit('newSubscriptions', eventTypes);
 	}
 
 	public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
+		const eventTypes = subs.map(x => x.ChainEventType).filter(x => !!x);
+		console.log('Deleting Websocket subscriptions for:', eventTypes)
 		this.ceNs.emit('deleteSubscriptions', subs.map(x => x.ChainEventType));
 	}
 
 	private onChainEvent(notification: Notification) {
+		console.log('Notification received:', notification)
 		app.user.notifications.update(notification)
 	}
 

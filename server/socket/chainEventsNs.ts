@@ -1,8 +1,6 @@
 import { Server } from 'socket.io';
-import { CWEvent } from '@commonwealth/chain-events';
 import { addPrefix, factory } from '../../shared/logging';
 import { WebsocketEngineEvents, WebsocketMessageType, WebsocketNamespaces } from '../../shared/types';
-import { Notification } from '../../client/scripts/models';
 
 const log = factory.getLogger(addPrefix(__filename));
 
@@ -16,13 +14,9 @@ export function createCeNamespace(io: Server) {
 			log.info(`${socket.id} disconnected from Chain-Events`);
 		});
 
-		socket.on('updateSubscriptions', () => {
-			const rooms = [];
-			socket.join(rooms);
-		})
-
 		socket.on('newSubscriptions', (chainEventTypes: string[]) => {
-			socket.join(chainEventTypes);
+			log.info(`${socket.id} joining ${JSON.stringify(chainEventTypes)}`)
+			if (chainEventTypes.length > 0) socket.join(chainEventTypes);
 		})
 
 		socket.on('deleteSubscriptions', (chainEventTypes: string[]) => {
@@ -46,6 +40,6 @@ export function createCeNamespace(io: Server) {
  * received from the queue to the appropriate room. The context (this) should be the chain-events namespace
  * @param notification A Notification model instance
  */
-export function publishToCERoom(this: Server, notification: Notification) {
-	this.to(notification.subscription.ChainEventType).emit(WebsocketMessageType.ChainEventNotification, notification);
+export function publishToCERoom(this: Server, notification: any) {
+	this.to(notification.chainEventType).emit(WebsocketMessageType.ChainEventNotification, notification);
 }
