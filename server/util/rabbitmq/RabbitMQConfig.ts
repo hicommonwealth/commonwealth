@@ -106,7 +106,7 @@ const config = {
           },
           'prefetch': 10,
         },
-        'ChainEventsNotificationsPublication': {
+        'ChainEventsNotificationsSubscription': {
           'queue': 'ChainEventsNotificationsQueue',
           'contentType': 'application/json',
           'retry': {
