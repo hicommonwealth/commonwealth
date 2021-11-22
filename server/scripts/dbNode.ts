@@ -13,10 +13,11 @@ import {
   SupportedNetwork,
 } from '@commonwealth/chain-events';
 
+import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
-import { RabbitMqHandler } from '../eventHandlers/rabbitmqPlugin';
+import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { addPrefix, factory, formatFilename } from '../../shared/logging';
-import { DATABASE_URI, HANDLE_IDENTITY } from '../config';
+import { DATABASE_URI } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -46,23 +47,32 @@ async function handleFatalError(
   chain?: string,
   type?: string
 ): Promise<void> {
-  log.error(`${chain ? `[${chain}]: ` : ''}${JSON.stringify(error)}`);
+  switch (type) {
+    case 'rabbitmq':
+      log.error(`Rascal broker setup failed. Check the Rascal configuration file for errors.\n${error.stack}`);
+      // TODO: shutdown dyno with heroku api
+      process.exit(1);
+      break;
+    default:
+      log.error(`${chain ? `[${chain}]: ` : ''}${JSON.stringify(error)}`);
 
-  if (chain && chain.indexOf('erc20') === -1 && chainErrors[chain] >= 4) {
-    listeners[chain].unsubscribe();
-    delete listeners[chain];
+      if (chain && chain.indexOf('erc20') === -1 && chainErrors[chain] >= 4) {
+        listeners[chain].unsubscribe();
+        delete listeners[chain];
 
-    // TODO: email notification for this
-    const query = format(
-      'UPDATE "Chains" SET "has_chain_events_listener"=\'false\' WHERE "id"=%L',
-      chain
-    );
-    try {
-      pool.query(query);
-    } catch (err) {
-      log.fatal(`Unable to disable ${chain}`);
-    }
-  } else if (chain) ++chainErrors[chain];
+        // TODO: email notification for this
+        const query = format(
+          'UPDATE "Chains" SET "has_chain_events_listener"=\'false\' WHERE "id"=%L',
+          chain
+        );
+        try {
+          pool.query(query);
+        } catch (err) {
+          log.fatal(`Unable to disable ${chain}`);
+        }
+      } else if (chain) ++chainErrors[chain];
+      break;
+  }
 }
 
 class Erc20LoggingHandler extends IEventHandler {
@@ -98,16 +108,18 @@ async function mainProcess(
     ++runCount;
   }
 
-  const activeChains: string[] = Object.keys(listeners).map((chainName): string => {
-    if (chainName !== 'erc20') return chainName;
+  const activeChains: string[] = Object.keys(listeners).map((listenerName): string => {
+    if (!listenerName.startsWith('erc20')) return listenerName;
     else {
-      return listeners['erc20'].tokenNames;
+      return listeners[listenerName].options.tokenNames;
     }
   });
-
-  log.info(
-    `Starting scheduled process. Active chains: ${JSON.stringify(activeChains)}`
-  );
+  if (activeChains.length > 0)
+    log.info(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      `Starting scheduled process. Active chains: ${JSON.stringify(activeChains.flat())}`
+    );
 
   let query =
     'SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network", "ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
@@ -347,18 +359,6 @@ async function mainProcess(
       listeners[chain.id].eventHandlers['logger'] = null;
   }
 
-  if (HANDLE_IDENTITY == null) {
-    log.info('Finished scheduled process.');
-    if (process.env.TESTING) {
-      const listenerOptions = {};
-      for (const chain of Object.keys(listeners)) {
-        listenerOptions[chain] = listeners[chain].options;
-      }
-      log.info(`Listener Validation:${JSON.stringify(listenerOptions)}`);
-    }
-    return;
-  }
-
   // loop through chains that have active listeners again this time dealing with identity
   for (const chain of myChainData) {
     // skip chains that aren't Substrate chains
@@ -411,7 +411,7 @@ async function mainProcess(
 
     for (const event of identityEvents) {
       event.chain = chain.id; // augment event with chain
-      await producer.publish(event, 'identityPub');
+      await producer.publish(event, 'SubstrateIdentityEventsPublication');
     }
 
     // clear the identity cache for this chain
@@ -536,11 +536,15 @@ async function initializer(): Promise<void> {
     numWorkers = process.env.NUM_WORKERS ? Number(process.env.NUM_WORKERS) : 1;
   }
 
-  log.info(`Worker Number: ${workerNumber}\nNumber of Workers: ${numWorkers}`);
+  log.info(`Worker Number: ${workerNumber}\tNumber of Workers: ${numWorkers}`);
 
-  producer = new RabbitMqHandler(RabbitMQConfig);
+  producer = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
   erc20Logger = new Erc20LoggingHandler([]);
-  await producer.init();
+  try {
+    await producer.init();
+  } catch (e) {
+    handleFatalError(e, pool, null, 'rabbitmq')
+  }
 }
 
 initializer()
@@ -560,5 +564,5 @@ initializer()
   })
   .catch((err) => {
     // TODO: any error caught here is critical - no events will be produced
-    handleFatalError(err, pool, null, 'unknown');
+    handleFatalError(err, pool, null, null);
   });
