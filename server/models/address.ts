@@ -9,6 +9,7 @@ import { bech32 } from 'bech32';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 import { KeypairType } from '@polkadot/util-crypto/types';
+import * as ethUtil from 'ethereumjs-util';
 
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
 import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature } from '@cosmjs/amino';
@@ -25,9 +26,6 @@ import { RoleAttributes, RoleInstance } from './role';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
-
-// tslint:disable-next-line
-const ethUtil = require('ethereumjs-util');
 
 export interface AddressAttributes {
   address: string;
@@ -253,8 +251,7 @@ export default (
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
       // toBuffer() doesn't work if there is a newline
       const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-      const ethSignatureBuffer = ethUtil.toBuffer(signatureString.trim());
-      const ethSignatureParams = ethUtil.fromRpcSig(ethSignatureBuffer);
+      const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
       const publicKey = ethUtil.ecrecover(
         msgHash,
         ethSignatureParams.v,
@@ -328,16 +325,15 @@ export default (
       //
       // ethereum address handling
       //
+
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
-      // toBuffer() doesn't work if there is a newline
       const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-      const ethSignatureBuffer = ethUtil.toBuffer(signatureString.trim());
-      const ethSignatureParams = ethUtil.fromRpcSig(ethSignatureBuffer);
+      const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
       const publicKey = ethUtil.ecrecover(
         msgHash,
         ethSignatureParams.v,
         ethSignatureParams.r,
-        ethSignatureParams.s
+        ethSignatureParams.s,
       );
       const addressBuffer = ethUtil.publicToAddress(publicKey);
       const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);

@@ -30,24 +30,22 @@ async function addTokenListsToDatabase(models: DB): Promise<void> {
   const tokens: TokenResponse[] = _.flatten(responseData.map((d) => d.tokens));
 
   for (const token of tokens) {
-    if (token.chainId === 1) {
-      // only support eth mainnet tokens
-      const where: TokenAttributes = {
-        id: slugify(token.name),
-        name: token.name,
-        address: token.address,
-        symbol: token.symbol,
-        decimals: token.decimals,
-      };
-      if (token.logoURI) {
-        where.icon_url = token.logoURI;
-      }
-      try {
-        await models.Token.findOrCreate({ where });
-      } catch (e) {
-        log.info(`Could not add ${token.name}: ${e.message}`);
-        log.info(JSON.stringify(where, null, 2));
-      }
+    const where: TokenAttributes = {
+      id: slugify(token.name),
+      name: token.name,
+      address: token.address,
+      symbol: token.symbol,
+      decimals: token.decimals,
+      chain_id: token.chainId,
+    };
+    if (token.logoURI) {
+      where.icon_url = token.logoURI;
+    }
+    try {
+      await models.Token.findOrCreate({ where });
+    } catch (e) {
+      log.info(`Could not add ${token.name}: ${e.message}`);
+      log.info(JSON.stringify(where, null, 2));
     }
   }
 }

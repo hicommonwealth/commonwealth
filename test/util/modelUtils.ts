@@ -4,18 +4,14 @@ import 'chai/register-should';
 import Web3 from 'web3';
 import BN from 'bn.js';
 import wallet from 'ethereumjs-wallet';
+import * as ethUtil from 'ethereumjs-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { factory, formatFilename } from '../../shared/logging';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
-import {
-  TokenBalanceProvider,
-  TokenForumMeta,
-} from '../../server/util/tokenBalanceCache';
-
-const ethUtil = require('ethereumjs-util');
+import { TokenBalanceProvider } from '../../server/util/tokenBalanceCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -341,19 +337,6 @@ export const createInvite = async (args: InviteArgs) => {
     .send({ ...args });
   const invite = res.body;
   return invite;
-};
-
-export const createTokenMeta = (): TokenForumMeta[] => {
-  return [
-    {
-      id: 'alex',
-      address: '0xFab46E002BbF0b4509813474841E0716E6730136',
-      symbol: 'alex',
-      name: 'Alex',
-      iconUrl: '',
-      decimals: 18,
-    },
-  ];
 };
 
 export class MockTokenBalanceProvider extends TokenBalanceProvider {

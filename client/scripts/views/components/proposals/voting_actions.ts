@@ -28,7 +28,7 @@ import MolochProposal, {
 } from 'controllers/chain/ethereum/moloch/proposal';
 import CompoundProposal, {
   CompoundProposalVote,
-  CompoundVote
+  BravoVote
 } from 'controllers/chain/ethereum/compound/proposal';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
@@ -324,7 +324,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof CompoundProposal) {
-        proposal.submitVoteWebTx(new CompoundProposalVote(user, CompoundVote.YES))
+        proposal.submitVoteWebTx(new CompoundProposalVote(user, BravoVote.YES))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
@@ -376,7 +376,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
       } else if (proposal instanceof CompoundProposal) {
-        proposal.submitVoteWebTx(new CompoundProposalVote(user, CompoundVote.NO))
+        proposal.submitVoteWebTx(new CompoundProposalVote(user, BravoVote.NO))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
@@ -452,7 +452,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof CompoundProposal && (app.chain as Compound).governance.supportsAbstain) {
-        proposal.submitVoteWebTx(new CompoundProposalVote(user, CompoundVote.ABSTAIN))
+        proposal.submitVoteWebTx(new CompoundProposalVote(user, BravoVote.ABSTAIN))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
@@ -543,11 +543,11 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         .filter((vote) => vote.choice === MolochVote.NO && vote.account.address === user.address).length > 0;
     } else if (proposal instanceof CompoundProposal) {
       hasVotedYes = user && proposal.getVotes()
-        .filter((vote) => vote.choice === CompoundVote.YES && vote.account.address === user.address).length > 0;
+        .filter((vote) => vote.choice === BravoVote.YES && vote.account.address === user.address).length > 0;
       hasVotedNo = user && proposal.getVotes()
-        .filter((vote) => vote.choice === CompoundVote.NO && vote.account.address === user.address).length > 0;
+        .filter((vote) => vote.choice === BravoVote.NO && vote.account.address === user.address).length > 0;
       hasVotedAbstain = user && proposal.getVotes()
-        .filter((vote) => vote.choice === CompoundVote.ABSTAIN && vote.account.address === user.address).length > 0;
+        .filter((vote) => vote.choice === BravoVote.ABSTAIN && vote.account.address === user.address).length > 0;
     } else if (proposal instanceof AaveProposal) {
       hasVotedYes = user && proposal.getVotes()
         .find((vote) => vote.choice && vote.account.address === user.address);

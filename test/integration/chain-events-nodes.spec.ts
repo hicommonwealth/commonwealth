@@ -43,7 +43,6 @@ const fetchedIdentities = {
 };
 
 // list all the listeners we want to test and their associated settings
-// the settings here should be the same as those used in production
 const listenerOptions = {
   polkadot: {
     archival: false,
@@ -174,13 +173,13 @@ const listenerOptions = {
     enricherConfig: { balanceTransferThresholdPermill: 10_000 },
   },
   moloch: {
-    url: 'wss://mainnet.infura.io/ws',
+    url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
     skipCatchup: false,
     contractAddress: '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1',
     contractVersion: 2,
   },
   marlin: {
-    url: 'wss://mainnet.infura.io/ws',
+    url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
     skipCatchup: false,
     contractAddresses: {
       comp: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // TESTNET
@@ -189,7 +188,7 @@ const listenerOptions = {
     },
   },
   susd: {
-    url: 'wss://mainnet.infura.io/ws',
+    url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
     tokenAddresses: ['0x57ab1ec28d129707052df4df418d58a2d46d5f51'],
   },
 };
@@ -236,32 +235,21 @@ async function clearDB(pool) {
 }
 
 // clears the rabbitmq events and identity queues
-async function clearQueues(): Promise<void> {
-  let res = await fetch(
-    'http://localhost:15672/api/queues/%2F/identityQueue/contents',
-    {
-      method: 'DELETE',
-      headers: {
-        Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q=',
-      },
-    }
-  );
-  if (res.status === 404) console.log('No eventsQueue to clear');
-  else if (res.status !== 204)
-    throw new Error('Could not clear the identity queue');
-
-  res = await fetch(
-    'http://localhost:15672/api/queues/%2F/eventsQueue/contents',
-    {
-      method: 'DELETE',
-      headers: {
-        Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q=',
-      },
-    }
-  );
-  if (res.status === 404) console.log('No eventsQueue to clear');
-  else if (res.status !== 204)
-    throw new Error('Could not clear the events queue');
+async function clearQueues(queueNames: string[]): Promise<void> {
+  for (const name of queueNames) {
+    const res = await fetch(
+      `http://localhost:15672/api/queues/%2F/${name}/contents`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q=',
+        },
+      }
+    );
+    if (res.status === 404) console.log(`The ${name} queue does not exist!`);
+    else if (res.status !== 204)
+      throw new Error(`Failed to clear queue: ${name}`);
+  }
 }
 
 // populates the Address, OffchainProfiles, and IdentityCaches tables with test data
@@ -389,7 +377,7 @@ setTimeout(async () => {
         'database'
     );
   await clearDB(pool);
-  await clearQueues();
+  await clearQueues(["ChainEventsHandlersQueue", "SubstrateIdentityEventsQueue"]);
   await prepareDB(client);
 
   describe('Tests for single chain per node', () => {
@@ -410,9 +398,7 @@ setTimeout(async () => {
                 ...process.env,
                 TESTING: 'true',
                 WORKER_NUMBER: String(chainIndex),
-                NUM_WORKERS: String(chains.length),
-                HANDLE_IDENTITY: 'publish',
-                INFURA_API_KEY: '8e25780c4d574b3cbf53c306a841d09f',
+                NUM_WORKERS: String(chains.length)
               },
             }
           );
@@ -513,7 +499,6 @@ setTimeout(async () => {
             {
               env: {
                 ...process.env,
-                HANDLE_IDENTITY: 'publish',
                 USE_NEW_IDENTITY_CACHE: 'true',
               },
             }
@@ -560,10 +545,10 @@ setTimeout(async () => {
               },
             });
             const data = await res.json();
-            const identityQueue = data.filter(
-              (obj) => obj.name === 'identityQueue'
+            const SubstrateIdentityEventsQueue = data.filter(
+              (obj) => obj.name === 'SubstrateIdentityEventsQueue'
             )[0];
-            assert.equal(identityQueue.messages, 0);
+            assert.equal(SubstrateIdentityEventsQueue.messages, 0);
           });
         }
       });

@@ -1,0 +1,19 @@
+@import 'client/styles/shared';
+
+.SputnikDAOsPage {
+    .title {
+        font-size: 32px;
+        margin-top: 32px;
+        padding-left: 12px;
+    }
+
+    .nearBadge {
+        display: inline-block;
+        height: 20px;
+        font-size: 14px;
+    }
+
+    th {
+        border: 0px;
+    }
+}
