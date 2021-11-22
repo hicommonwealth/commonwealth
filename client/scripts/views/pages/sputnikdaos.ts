@@ -11,18 +11,7 @@ import PageLoading from 'views/pages/loading';
 import SputnikDaoRow from 'views/components/sputnik_dao_row';
 import Sublayout from 'views/sublayout';
 import Near from 'controllers/chain/near/main';
-
-export interface IDaoInfo {
-  contractId: string;
-  amount: string;
-  name: string;
-  purpose: string;
-  proposalBond: string;
-  proposalPeriod: string;
-  bountyBond: string;
-  bountyPeriod: string;
-  council: string[];
-}
+import { IDaoInfo } from 'controllers/chain/near/chain';
 
 const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDaoInfo[] }> = {
   view: (vnode) => {
@@ -100,20 +89,23 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
           m('th', {
             style: { width: '20%' }
           }, 'Dao Funds ', [
-            m('span.nearBadge', 'NEAR')
+            m('span.nearBadge', 'Ⓝ')
           ]),
           m('th', {
             style: { width: '17%' }
-          }, 'Council'),
+          }, 'Council Size'),
           m('th', {
             style: { width: '19%' }
-          }, 'Bond ', [ m('span.nearBadge', 'NEAR') ]),
+          }, 'Bond ', [m('span.nearBadge', 'Ⓝ') ]),
           m('th', {
             style: { width: '17%' }
           }, 'Vote Period'),
         ]),
         vnode.state.daosList.map((dao) => {
-          return m(SputnikDaoRow, { dao, clickable: allCommunities.filter(c => c.id === dao.name).length > 0 });
+          return m(SputnikDaoRow, {
+            dao,
+            clickable: allCommunities.some((c) => c.id === dao.contractId),
+          });
         })
       ]),
     ]);
