@@ -52,13 +52,12 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   }
 
   private _api: Web3;
-  private _eventHandlers = {};
-  private _metadataInitialized: boolean = false;
+  private _metadataInitialized = false;
   private _totalbalance: EthereumCoin;
   public get metadataInitialized() { return this._metadataInitialized; }
   public get totalbalance() { return this._totalbalance; }
 
-  public async initApi(node?: NodeInfo): Promise<any> {
+  public async initApi(node?: NodeInfo): Promise<Web3> {
     this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
     try {
       // TODO: support http?
@@ -124,78 +123,12 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
 
   public initEventLoop() {
     if (!this._api) throw new Error('Ethereum Web3 API uninitialized');
-    // Demonstrate adding an event handler
-    this.addEventHandler(
-      'newBlockHeaders',
-      (data) => data,
-      (err) => { throw new Error(`EthereumChain.eventHandlers.newBlockHeaders err ${err}`); },
-    );
   }
 
   public deinitEventLoop() {
-    if (this._api) {
-      console.log('deinitEventLoop');
-      console.log(this._eventHandlers);
-
-      for (const event of Object.keys(this._eventHandlers)) {
-        if (this._eventHandlers[event]) {
-          this.removeEventHandler(this._eventHandlers[event]);
-        }
-      }
+    if (this._api?.givenProvider && this._api.givenProvider.connected) {
+      this._api.givenProvider.disconnect(1000, 'finished');
     }
-  }
-
-  public addEventHandler(eventName: string, onData: (data: any) => void, onErr: (err: any) => void): number {
-    console.log('EthereumChain.addEventHandler', eventName);
-
-    // Map event name to Web3 EventEmitter object
-    this._eventHandlers[eventName] = this._api.eth.subscribe(eventName as any, (err, res) => {
-      if (!err) return;
-      console.error(err);
-    });
-
-    this._eventHandlers[eventName].on('data', onData);
-    this._eventHandlers[eventName].on('error', onErr);
-
-    return this._eventHandlers[eventName];
-  }
-
-  public removeEventHandler(eventName: string): boolean {
-    console.log('EthereumChain.removeEventHandler', eventName);
-
-    if (!this._eventHandlers[eventName]) {
-      return false;
-    }
-    // Unsubscribe the Web3 EventEmiteter obj and remove from handler map
-    (this._eventHandlers[eventName]).unsubscribe((err, success) => {
-      if (err) {
-        console.log('Unsubscribe err for', eventName, err);
-      } else {
-        console.log('Successfully unsubscribed from', eventName);
-      }
-      // TODO: maybe have removeEventHandler return Promise<Boolean>
-    });
-    delete this._eventHandlers[eventName];
-    return true;
-  }
-
-  public isHandler(eventName: string, id: number): boolean {
-    return this._eventHandlers[eventName];
-  }
-
-  public async sendTransactionWrapper(transactionObject, callback) {
-    if (!this._api) throw new Error('Ethereum Web3 API uninitialized');
-
-    console.log('EthereumChain.sendTransaction', transactionObject);
-
-    this._api.eth.sendTransaction(transactionObject, (err, result) => {
-      if (err) {
-        throw new Error(`Error in EthereumChain.sendTransaction ${err}`);
-      }
-      console.log('EthereumChain.sendTransaction result', result);
-
-      callback(err, result);
-    });
   }
 }
 
