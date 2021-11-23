@@ -8,14 +8,13 @@ import { formatCoin, formatNumberLong } from 'adapters/currency'; // TODO: remov
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { CosmosVoteChoice, ICosmosProposalTally } from 'controllers/chain/cosmos/types';
+import { CosmosVoteChoice } from 'controllers/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { CompoundProposalVote, BravoVote } from 'controllers/chain/ethereum/compound/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
-import Cosmos from 'client/scripts/controllers/chain/cosmos/main';
 
 const COLLAPSE_VOTERS_AFTER = 6; // if there are >6 voters, collapse remaining under "Show more"
 
@@ -304,16 +303,10 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
         ])
       ]);
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
-      // use tally for cosmos votes rather than num voters
-      if (!(proposal instanceof CosmosProposal)) {
-        throw new Error('voting type YesNoAbstainVeto corresponds to cosmos proposal!');
-      }
-      const tally = proposal.data.state.tally;
-      const denom = (app.chain as Cosmos).chain.denom;
       return m('.VotingResults', [
         m('.results-column', [
-          m('.results-header', `Voted yes (${formatNumberLong(tally.yes.inDollars)} ${denom})`),
-          !proposal.completed && m('.results-cell', [
+          m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`),
+          m('.results-cell', [
             m(VoteListing, {
               proposal,
               votes: votes.filter((v) => v.choice === 'Yes')
@@ -321,8 +314,8 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted no (${formatNumberLong(tally.no.inDollars)} ${denom})`),
-          !proposal.completed && m('.results-cell', [
+          m('.results-header', `Voted no (${votes.filter((v) => v.choice === 'No').length})`),
+          m('.results-cell', [
             m(VoteListing, {
               proposal,
               votes: votes.filter((v) => v.choice === 'No')
@@ -330,8 +323,8 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted abstain (${formatNumberLong(tally.abstain.inDollars)} ${denom})`),
-          !proposal.completed && m('.results-cell', [
+          m('.results-header', `Voted abstain (${votes.filter((v) => v.choice === 'Abstain').length})`),
+          m('.results-cell', [
             m(VoteListing, {
               proposal,
               votes: votes.filter((v) => v.choice === 'Abstain')
@@ -339,8 +332,8 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           ]),
         ]),
         m('.results-column', [
-          m('.results-header', `Voted veto (${formatNumberLong(tally.noWithVeto.inDollars)} ${denom})`),
-          !proposal.completed && m('.results-cell', [
+          m('.results-header', `Voted veto (${votes.filter((v) => v.choice === 'NoWithVeto').length})`),
+          m('.results-cell', [
             m(VoteListing, {
               proposal,
               votes: votes.filter((v) => v.choice === 'NoWithVeto')
