@@ -8,9 +8,9 @@ module.exports = {
         'Chains',
         [
           {
-            id: 'euler-finance',
+            id: 'euler-finance-testnet',
             symbol: 'EUL',
-            name: 'Euler Finance',
+            name: 'Euler Finance Testnet',
             type: 'dao',
             network: 'compound',
             base: 'ethereum',
@@ -25,7 +25,7 @@ module.exports = {
         'ChainNodes',
         [
           {
-            chain: 'euler-finance',
+            chain: 'euler-finance-testnet',
             eth_chain_id: 3,
             url: 'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
             address: '0xD2B07E433e4F9dda20E4a523b2A60c23c7b1344C', // Testnet OZ gov contract
@@ -41,12 +41,12 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkDelete(
         'ChainNodes',
-        { chain: 'euler-finance' },
+        { chain: 'euler-finance-testnet' },
         { transaction: t }
       );
       await queryInterface.bulkDelete(
         'Chains',
-        { id: 'euler-finance' },
+        { id: 'euler-finance-testnet' },
         { transaction: t }
       );
     });
