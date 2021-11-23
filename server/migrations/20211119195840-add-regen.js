@@ -17,7 +17,7 @@ module.exports = {
 
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'regen-network',
-        url: 'https://main.rpc.althea.net:443/', // TODO: Check
+        url: 'http://public-rpc.regen.vitwit.com:26657/',
       }], { transaction: t });
     });
   },
