@@ -55,8 +55,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   public get denom() {
     return this.app.chain.currency;
   }
-  public coins(n: number | string | BN, inDollars?: boolean) {
-    return new NearToken(n, inDollars);
+  private _decimals: BN;
+  public coins(n: number | string | BN, inDollars = false) {
+    return new NearToken(n, inDollars, this._decimals);
   }
 
   private _config: ConnectConfig;
@@ -90,6 +91,8 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   public async init(node: NodeInfo, accounts: NearAccounts): Promise<void> {
+    const decimalPlaces = node.chain.decimals || 24;
+    this._decimals = new BN(10).pow(new BN(decimalPlaces));
     const networkSuffix = node.chain.id.split('.').pop();
     this._networkId =
       node.chain.id === 'near-testnet' || networkSuffix === 'testnet'
@@ -238,8 +241,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       // initial council
       policy: [creator.address],
     };
-    const yoktoNear = new BN('1000000000000000000000000');
-    const attachedDeposit = value.mul(yoktoNear).toString();
+    const attachedDeposit = this.coins(value, true).asBN.toString();
     const args = Buffer.from(JSON.stringify(argsList)).toString('base64');
     const propArgs = {
       name,
