@@ -17,7 +17,7 @@ module.exports = {
 
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'gravity-bridge-testnet',
-        url: '',
+        url: 'http://chainripper-2.althea.net:26656/',
       }], { transaction: t });
     });
   },
