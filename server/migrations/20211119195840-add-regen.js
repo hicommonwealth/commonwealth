@@ -12,7 +12,7 @@ module.exports = {
         base: 'cosmos',
         active: true,
         description: 'Regen Network is a sovereign, proof-of-stake blockchain built to ensure utility for ecological data and climate markets.',
-        bech32_prefix: 'regen' // TODO: Check
+        bech32_prefix: 'regen'
       }], { transaction: t });
 
       await queryInterface.bulkInsert('ChainNodes', [{
