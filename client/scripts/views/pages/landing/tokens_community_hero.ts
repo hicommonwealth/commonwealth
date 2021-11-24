@@ -1,7 +1,7 @@
 import m from 'mithril';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { ALL_RESULTS_KEY, SearchType } from 'controllers/server/search';
+import { ALL_RESULTS_QUERY, SearchType } from 'controllers/server/search';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
@@ -40,8 +40,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
     vnode.state.chainsAndTokens = [];
   },
   view: (vnode) => {
-    const stillLoadingTokens = !app.search.getByTerm(ALL_RESULTS_KEY).loaded;
-    console.log(app.search.getByTerm(ALL_RESULTS_KEY))
+    const stillLoadingTokens = !app.search.getByQuery(ALL_RESULTS_QUERY).loaded;
     if (!stillLoadingTokens) {
       vnode.state.chainsAndTokens = [
         {
@@ -52,7 +51,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
           placeholder: true,
         },
         ...vnode.attrs.chains,
-        ...app.search.getByTerm(ALL_RESULTS_KEY).results[SearchType.Community]
+        ...app.search.getByQuery(ALL_RESULTS_QUERY).results[SearchType.Community]
       ];
     }
     const mappedCommunities = [

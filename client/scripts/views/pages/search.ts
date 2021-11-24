@@ -12,14 +12,14 @@ import {
   MemberIcon
 } from 'helpers/search';
 import app from 'state';
-import { AddressInfo, Profile, SearchResult } from 'models';
+import { AddressInfo, Profile, SearchQuery } from 'models';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import { ContentType, SearchType, ALL_RESULTS_KEY } from 'controllers/server/search'
+import { ContentType, SearchType } from 'controllers/server/search'
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
 import { search } from '../components/search_bar';
@@ -141,7 +141,7 @@ export const getDiscussionResult = (thread, searchTerm) => {
         m('.search-results-comment', [
           (() => {
             try {
-              const doc = JSON.parse(decodeURIComponent(thread.body));
+              const doc = JSON.parse(decodeURIComponent(thread.text));
               if (!doc.ops) throw new Error();
               return m(QuillFormattedText, {
                 doc,
@@ -150,7 +150,7 @@ export const getDiscussionResult = (thread, searchTerm) => {
                 searchTerm,
               });
             } catch (e) {
-              const doc = decodeURIComponent(thread.body);
+              const doc = decodeURIComponent(thread.text);
               return m(MarkdownFormattedText, {
                 doc,
                 hideFormatting: true,
@@ -204,12 +204,10 @@ const SearchPage : m.Component<{
 }, {
   activeTab: SearchType,
   results: any,
-  searchTerm: string,
-  searchPrefix: string,
   refreshResults: boolean,
-  overridePrefix: boolean,
   pageCount: number,
-  errorText: string
+  errorText: string,
+  searchQuery: SearchQuery
 }> = {
   view: (vnode) => {
     const LoadingPage = m(PageLoading, {
@@ -221,11 +219,11 @@ const SearchPage : m.Component<{
       ],
     });
 
-    const communityScope = m.route.param('comm');
-    const chainScope = m.route.param('chain');
+    const searchQuery = SearchQuery.fromUrlParams(m.route.param())
+
+    const { communityScope, chainScope, searchTerm } = searchQuery
     const scope = app.isCustomDomain() ? app.customDomainId() : (communityScope || chainScope);
 
-    const searchTerm = m.route.param('q')?.toLowerCase();
     if (!searchTerm) {
       vnode.state.errorText = 'Must enter query to begin searching';
       return m(PageNotFound, {
@@ -235,15 +233,15 @@ const SearchPage : m.Component<{
     }
 
     // re-fetch results for new search if search term or URI has changed
-    if (searchTerm !== vnode.state.searchTerm || vnode.state.refreshResults) {
-      vnode.state.searchTerm = searchTerm;
+    if (!_.isEqual(searchQuery, vnode.state.searchQuery) || vnode.state.refreshResults) {
+      vnode.state.searchQuery = searchQuery;
       vnode.state.refreshResults = false;
       vnode.state.results = {};
-      search(searchTerm, { communityScope, chainScope }, vnode.state);
+      search(searchQuery, vnode.state);
       return LoadingPage;
     }
 
-    if (!app.search.getByTerm(vnode.state.searchTerm).loaded) {
+    if (!app.search.getByQuery(searchQuery).loaded) {
       return LoadingPage;
     }
 
@@ -310,7 +308,7 @@ const SearchPage : m.Component<{
       }),
     ]),
     m('.search-results-wrapper', [
-      !app.search.getByTerm(vnode.state.searchTerm)?.loaded ? m('.search-loading', [
+      !app.search.getByQuery(searchQuery)?.loaded ? m('.search-loading', [
         m(Spinner, {
           active: true,
           fill: true,
@@ -322,7 +320,7 @@ const SearchPage : m.Component<{
         m('.search-results-caption', [
           resultCount,
           ' matching \'',
-          vnode.state.searchTerm,
+          vnode.state.searchQuery.searchTerm,
           '\'',
           scope
             ? ` in ${capitalize(scope)}.`
@@ -334,7 +332,9 @@ const SearchPage : m.Component<{
               m('a.search-all-communities', {
                 href: '#',
                 onclick: (e) => {
-                  m.route.set(`/search?q=${searchTerm}`);
+                  searchQuery.chainScope = undefined
+                  searchQuery.communityScope = undefined
+                  m.route.set(`/search?q=${searchQuery.toUrlParams}`);
                   setTimeout(() => {
                     vnode.state.refreshResults = true;
                   }, 0);

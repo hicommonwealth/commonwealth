@@ -2,10 +2,11 @@ import $ from 'jquery';
 import moment from 'moment';
 import SearchStore from "stores/SearchStore";
 import app from 'state';
-import { OffchainThread, CommunityInfo } from "../../models";
+import { SearchScope } from '../../models/SearchQuery';
+import { OffchainThread, CommunityInfo, SearchQuery } from "../../models";
 import { modelFromServer } from './threads';
 
-export const ALL_RESULTS_KEY = 'COMMONWEALTH_ALL_RESULTS';
+export const ALL_RESULTS_QUERY = new SearchQuery('COMMONWEALTH_ALL_RESULTS');
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -36,13 +37,16 @@ class SearchContoller {
   private _store: SearchStore = new SearchStore();
   public store() { return this._store; }
 
-  public getByTerm(term: string){
-    return this._store.getByTerm(term)
+  public getByQuery(query: SearchQuery){
+    if(query.searchTerm.length > 3){
+      return this._store.getByQueryString(query.toEncodedString())
+    }
+    return null
   }
 
   public async initialize() {
-    const allCommunitiesSearch = this._store.getOrAdd(ALL_RESULTS_KEY)
-    if(!this._store.getByTerm[ALL_RESULTS_KEY]?.loaded) {
+    const allCommunitiesSearch = this._store.getOrAdd(ALL_RESULTS_QUERY)
+    if(!this.getByQuery(ALL_RESULTS_QUERY)?.loaded) {
         try {
             const getTokens = () =>
                 $.getJSON('/api/getTokensFromLists').then((response) => {
@@ -63,75 +67,104 @@ class SearchContoller {
     }
   }
 
-  public async search(searchTerm: string, params) {
-    searchTerm = searchTerm.toLowerCase();
-    if (this._store.getByTerm(searchTerm)?.loaded) {
-      return this._store.getByTerm(searchTerm)
-  }
-    const searchCache = this._store.getOrAdd(searchTerm)
-    const { isSearchPreview } = params
-    const { communityScope, chainScope } = searchCache.query;
+  public async search(searchQuery: SearchQuery) {
+    if (this.getByQuery(searchQuery)?.loaded) {
+      return this.getByQuery(searchQuery)
+    }
+    const searchCache = this._store.getOrAdd(searchQuery)
+    const { searchTerm, communityScope, chainScope, isSearchPreview, searchScope } = searchQuery;
     const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
+    const getAllResults = searchScope.includes(SearchScope.ALL)
 
-    if (!this._store.getByTerm(ALL_RESULTS_KEY)?.loaded){
+    if (!this.getByQuery(ALL_RESULTS_QUERY)?.loaded){
       await this.initialize()
     }
 
     try {
-      const [discussions, addrs] = await Promise.all([
-          this.searchDiscussions(searchTerm, {
+      if(getAllResults ||
+        searchScope.includes(SearchScope.THREADS) || searchScope.includes(SearchScope.PROPOSALS)){
+
+        const discussions = await this.searchDiscussions(searchTerm, {
           resultSize,
           communityScope,
           chainScope,
-          }),
-          this.searchMentionableAddresses(
-          searchTerm,
-          { resultSize, communityScope, chainScope },
-          ['created_at', 'DESC']
-          ),
-      ]);
+        })
 
-      searchCache.results[SearchType.Discussion] = discussions
-      .map((discussion) => {
-          discussion.contentType = discussion.root_id
-          ? ContentType.Comment
-          : ContentType.Thread;
-          discussion.searchType = SearchType.Discussion;
-          return discussion;
-      })
-      .sort(this.sortResults);
+        searchCache.results[SearchType.Discussion] = discussions
+        .map((discussion) => {
+            discussion.contentType = ContentType.Thread;
+            discussion.searchType = SearchType.Discussion;
+            return discussion;
+        })
+      }
 
-      searchCache.results[SearchType.Member] = addrs
-      .map((addr) => {
-          addr.contentType = ContentType.Member;
-          addr.searchType = SearchType.Member;
-          return addr;
-      })
-      .sort(this.sortResults);
+      if (getAllResults || searchScope.includes(SearchScope.MEMBERS)){
+        const addrs = await this.searchMentionableAddresses(
+            searchTerm,
+            { resultSize, communityScope, chainScope },
+            ['created_at', 'DESC']
+          )
 
-      const unfilteredTokens = this._store.getByTerm(ALL_RESULTS_KEY).results[SearchType.Community];
-      const tokens = unfilteredTokens.filter((token) =>
-          token.name?.toLowerCase().includes(searchTerm)
-      );
-      searchCache.results[SearchType.Community] = tokens.map((token) => {
-          token.contentType = ContentType.Token;
-          token.searchType = SearchType.Community;
-          return token;
-      });
+        searchCache.results[SearchType.Member] = addrs
+        .map((addr) => {
+            addr.contentType = ContentType.Member;
+            addr.searchType = SearchType.Member;
+            return addr;
+        })
+        .sort(this.sortResults);
+      }
 
-      const allComms = (app.config.chains.getAll() as any).concat(app.config.communities.getAll() as any);
-      const filteredComms = allComms.filter((comm) => {
-          return (
-              comm.name?.toLowerCase().includes(searchTerm) ||
-              comm.symbol?.toLowerCase().includes(searchTerm)
-          );
-      });
-      searchCache.results[SearchType.Community] = searchCache.results[SearchType.Community]
-          .concat(filteredComms.map((commOrChain) => {
-          commOrChain.contentType = commOrChain instanceof CommunityInfo ?
-              ContentType.Community : ContentType.Chain;
-          return commOrChain;
-          })).sort(this.sortResults);
+      if (getAllResults || searchScope.includes(SearchScope.COMMENTS)) {
+        const comments = await this.searchComments(searchTerm, {
+          resultSize,
+          communityScope,
+          chainScope,
+        })
+
+        comments.map(comment => {
+          comment.contentType = ContentType.Comment
+          comment.searchType = SearchType.Discussion
+          return comment
+        })
+
+        if(getAllResults || searchScope.includes(SearchScope.THREADS)){
+          console.log(searchCache.results[SearchType.Discussion])
+          console.log(comments)
+          searchCache.results[SearchType.Discussion] = searchCache.results[SearchType.Discussion]
+            .concat(comments)
+            .sort(({rank : a}, {rank : b}) => b-a)
+            .slice(0, resultSize)
+        } else {
+          searchCache.results[SearchType.Discussion] = comments
+        }
+      }
+
+      if (getAllResults || searchScope.includes(SearchScope.COMMUNITIES)){
+        const unfilteredTokens = this.getByQuery(ALL_RESULTS_QUERY).results[SearchType.Community];
+        const tokens = unfilteredTokens.filter((token) =>
+            token.name?.toLowerCase().includes(searchTerm)
+        );
+        searchCache.results[SearchType.Community] = tokens.map((token) => {
+            token.contentType = ContentType.Token;
+            token.searchType = SearchType.Community;
+            return token;
+        });
+
+        const allComms = (app.config.chains.getAll() as any).concat(app.config.communities.getAll() as any);
+        const filteredComms = allComms.filter((comm) => {
+            return (
+                comm.name?.toLowerCase().includes(searchTerm) ||
+                comm.symbol?.toLowerCase().includes(searchTerm)
+            );
+        });
+        searchCache.results[SearchType.Community] = searchCache.results[SearchType.Community]
+            .concat(filteredComms.map((commOrChain) => {
+              commOrChain.contentType = commOrChain instanceof CommunityInfo ?
+                ContentType.Community : ContentType.Chain;
+              commOrChain.searchType = SearchType.Community;
+              return commOrChain;
+            })).sort(this.sortResults);
+      }
     } finally {
       searchCache.loaded = true
       this._store.update(searchCache)
@@ -144,7 +177,30 @@ class SearchContoller {
   ) => {
     const { resultSize, chainScope, communityScope } = params;
     try {
-        const response = await $.get(`${app.serverUrl()}/search`, {
+        const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
+        chain: chainScope,
+        community: communityScope,
+        cutoff_date: null, // cutoffDate.toISOString(),
+        search: searchTerm,
+        results_size: resultSize,
+        });
+        if (response.status !== 'Success') {
+        throw new Error(`Got unsuccessful status: ${response.status}`);
+        }
+        return response.result;
+    } catch (e) {
+        console.error(e);
+        return [];
+    }
+  }
+
+  private searchComments = async (
+    searchTerm: string,
+    params: SearchParams
+  ) => {
+    const { resultSize, chainScope, communityScope } = params;
+    try {
+        const response = await $.get(`${app.serverUrl()}/searchComments`, {
         chain: chainScope,
         community: communityScope,
         cutoff_date: null, // cutoffDate.toISOString(),
@@ -167,7 +223,7 @@ class SearchContoller {
   ): Promise<OffchainThread[]> => {
     const { resultSize, chainScope, communityScope } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/search`, {
+      const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
         chain: chainScope,
         community: communityScope,
         search: searchTerm,

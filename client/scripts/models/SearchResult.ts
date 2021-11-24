@@ -9,15 +9,16 @@ export default class SearchResult implements IUniqueId   {
     public readonly slug: string;
     public readonly id: number;
 
-    constructor(term: string){
-        this.query = new SearchQuery(term)
+    constructor(searchQuery: SearchQuery){
+        this.query = searchQuery
         this.results = {}
         this.loaded = false
-        this.identifier = term
-        this.uniqueIdentifier = term
-        this.slug = term
+        const queryString = searchQuery.toEncodedString()
+        this.identifier = queryString
+        this.uniqueIdentifier = queryString
+        this.slug = queryString
         // Hash term into number id which seems to be required for IUniqueId interface
         // eslint-disable-next-line no-bitwise
-        this.id = term.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0)
+        this.id = queryString.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0)
     }
 }

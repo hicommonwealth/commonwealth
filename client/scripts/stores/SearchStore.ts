@@ -1,30 +1,30 @@
-import { SearchResult } from '../models'
+import { SearchResult, SearchQuery } from '../models'
 import { Store } from '.';
 
 class SearchStore extends Store<SearchResult> {
-  private _storeSearch: { [query: string]: SearchResult } = {};
+  private _storeSearch: { [encodedQueryString: string]: SearchResult } = {};
 
   public add(search: SearchResult) {
-    if (!this._storeSearch[search.query.queryString]) {
+    if (!this._storeSearch[search.query.toEncodedString()]) {
       super.add(search);
-      this._storeSearch[search.query.queryString] = search;
+      this._storeSearch[search.query.toEncodedString()] = search;
     }
     return this;
   }
 
-  public getOrAdd(term: string){
-    if (!this._storeSearch[term]) {
-      this.add(new SearchResult(term))
+  public getOrAdd(query: SearchQuery){
+    if (!this._storeSearch[query.toEncodedString()]) {
+      this.add(new SearchResult(query))
     }
-    return this.getByTerm(term)
+    return this.getByQueryString(query.toEncodedString())
   }
 
   public remove(search: SearchResult) {
     super.remove(search);
-    if (!this._storeSearch[search.query.queryString]) {
+    if (!this._storeSearch[search.query.toEncodedString()]) {
       throw new Error('Search is not in store');
     } else {
-      delete this._storeSearch[search.query.queryString]
+      delete this._storeSearch[search.query.toEncodedString()]
     }
     return this;
   }
@@ -34,8 +34,8 @@ class SearchStore extends Store<SearchResult> {
     this._storeSearch = {};
   }
 
-  public getByTerm(term: string) {
-    return this._storeSearch[term] || null
+  public getByQueryString(queryString: string) {
+    return this._storeSearch[queryString] || null
   }
 }
 
