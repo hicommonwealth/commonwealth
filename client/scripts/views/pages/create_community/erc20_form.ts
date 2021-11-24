@@ -25,6 +25,7 @@ interface ERC20FormState extends ChainFormState {
   symbol: string;
   saving: boolean;
   loaded: boolean;
+  loading: boolean;
   error: string;
 }
 
@@ -39,6 +40,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
     initChainForm(vnode.state);
     vnode.state.saving = false;
     vnode.state.loaded = false;
+    vnode.state.loading = false;
     vnode.state.error = '';
   },
   view: (vnode) => {
@@ -47,6 +49,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
 
     const updateTokenForum = async () => {
       if (!vnode.state.address || !vnode.state.chain_id) return;
+      vnode.state.loading = true;
       const args = {
         address: vnode.state.address,
         chain_id: vnode.state.chain_id,
@@ -63,6 +66,9 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           vnode.state.symbol = res?.result?.chain?.symbol || '';
           vnode.state.icon_url =
             res?.result?.chain?.icon_url || '';
+          if (vnode.state.icon_url.startsWith('/')) {
+            vnode.state.icon_url = `https://commonwealth.im${vnode.state.icon_url}`;
+          }
           vnode.state.description =
             res?.result?.chain?.description || '';
           vnode.state.website = res?.result?.chain?.website || '';
@@ -81,6 +87,8 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           'Failed to load Token Information'
         );
       }
+      vnode.state.loading = false;
+      m.redraw();
     }
 
     return m('.CommunityMetadataManagementTable', [
@@ -120,6 +128,17 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               vnode.state.loaded = false;
             },
           }),
+          m('tr.InputPropertyRow', [
+            m('td', { class: 'title-column', }, ''),
+            m(Button, {
+              label: 'Populate fields',
+              intent: 'primary',
+              disabled: vnode.state.saving || !validAddress || !vnode.state.chain_id || vnode.state.loading,
+              onclick: async (e) => {
+                await updateTokenForum();
+              },
+            }),
+          ]),
           m(InputPropertyRow, {
             title: 'Name',
             defaultValue: vnode.state.name,
@@ -150,14 +169,6 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           ...defaultChainRows(vnode.state, disableField),
         ]
       ),
-      m(Button, {
-        label: 'Test fields',
-        intent: 'primary',
-        disabled: vnode.state.saving || !validAddress || !vnode.state.chain_id,
-        onclick: async (e) => {
-          await updateTokenForum();
-        },
-      }),
       m(Button, {
         class: 'mt-3',
         label: 'Save changes',

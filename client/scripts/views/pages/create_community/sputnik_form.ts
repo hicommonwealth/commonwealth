@@ -45,13 +45,14 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
         },
         [
           m(InputPropertyRow, {
-            title: 'Name',
+            title: 'DAO Name',
             defaultValue: vnode.state.name,
             onChangeHandler: (v) => {
               vnode.state.name = v.toLowerCase();
             },
             placeholder: 'genesis',
           }),
+          /*
           m(TogglePropertyRow, {
             title: 'Deploy',
             defaultValue: vnode.state.createNew,
@@ -79,6 +80,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
             },
             placeholder: '5',
           }),
+          */
           // TODO: add divider to distinguish on-chain data
           ...defaultChainRows(vnode.state),
         ]

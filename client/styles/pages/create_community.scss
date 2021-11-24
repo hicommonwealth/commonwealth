@@ -6,46 +6,41 @@
         width: initial;
     }
 
+    .community-creation-form {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
     .create-community-wrapper {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
 
         .CommunityMetadataManagementTable {
             td {
                 padding: 11px 20px;
             }
             .cui-button {
-                margin: 26px 28px;
+                display: block;
+                width: 40%;
+                min-width: 150px;
+                margin: 26px auto;
             }
             .cui-tabs {
                 margin-top: 0 !important;
             }
         }
 
-        .ChainMetadataManagementTable,
-        .CommunityMetadataManagementTable {
-            .button-wrap {
-                display: flex;
-                justify-content: flex-end;
-                button {
-                    margin-right: 0;
-                }
-            }
-        }
-
         .cui-table.metadata-management-table {
             td {
                 line-height: 1.1;
-                padding: 5px 0 0 28px !important;
+                padding: 5px 0 5px 28px !important;
                 border-bottom: none !important;
             }
             tr:first-child td {
                 padding-top: 18px !important;
             }
-        }
-        .cui-button.save-changes-button {
-            margin: 24px 28px;
         }
         .cui-tabs {
             margin-top: 2px !important;
@@ -55,41 +50,9 @@
             }
         }
 
-        h3 {
-            text-align: center;
-            margin: 24px 0 20px;
-        }
-        h4 {
-            margin: 4px 0;
-        }
-        p {
-            text-align: center;
-        }
         input[type="text"] {
             @include formfield-text;
             margin: 10px 0;
-        }
-        button, a.btn {
-            display: block;
-            width: 100%;
-            text-align: center;
-        }
-        form {
-            margin: 10px auto 20px;
-        }
-        .auth-features {
-            margin: 10px 0 26px;
-            width: 440px;
-        }
-        .create-community-message {
-            text-align: center;
-            margin: 20px 0;
-            &.error {
-                @include error-text();
-            }
-            &.success {
-                @include success-text();
-            }
         }
 
         .AvatarUpload {
@@ -127,17 +90,15 @@
                 top: 1px;
             }
         }
-        .TogglePropertyRow + .TogglePropertyRow {
+        .SelectPropertyRow {
+            td:first-child {
+                padding-top: 7px !important;
+            }
             td {
-                padding-bottom: 0 !important;
+                padding-top: 14px !important;
+                padding-bottom: 4px !important;
             }
         }
-    }
-
-    .community-creation-form {
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
     }
 }
 .CompactModalExitButton {

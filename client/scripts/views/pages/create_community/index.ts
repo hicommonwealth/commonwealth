@@ -1,6 +1,7 @@
 import 'pages/create_community.scss';
 
 import m from 'mithril';
+import app from 'state';
 import { Tabs, TabItem } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import OffchainCommunityForm from './offchain_community_form';
@@ -18,6 +19,12 @@ enum CommunityType {
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
 }
+
+const ADMIN_ONLY_TABS = [
+  CommunityType.SubstrateCommunity,
+  CommunityType.Cosmos,
+  CommunityType.EthDao,
+];
 
 type CreateCommunityAttrs = Record<string, unknown>;
 
@@ -65,16 +72,20 @@ const CreateCommunity: m.Component<
             bordered: false,
             fluid: true,
           },
-          Object.values(CommunityType).map((t) => {
-            return m(TabItem, {
-              label: t.toString(),
-              active: vnode.state.activeForm === t,
-              onclick: () => {
-                vnode.state.activeForm = t;
-              },
-              style: 'text-align: center'
+          Object.values(CommunityType)
+            .filter((t) => {
+              return !ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin;
             })
-          }),
+            .map((t) => {
+              return m(TabItem, {
+                label: t.toString(),
+                active: vnode.state.activeForm === t,
+                onclick: () => {
+                  vnode.state.activeForm = t;
+                },
+                style: 'text-align: center'
+              })
+            }),
         ),
         m('.community-creation-form', [ m(getActiveForm()) ]),
       ])
