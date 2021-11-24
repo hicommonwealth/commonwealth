@@ -34,6 +34,7 @@ export const CHAINBASE_SHORT = {
   [ChainBase.Ethereum]: 'ETH',
   [ChainBase.NEAR]: 'NEAR',
   [ChainBase.Substrate]: 'Substrate',
+  [ChainBase.Solana]: 'Solana',
 };
 
 const CommunityLabel: m.Component<{
