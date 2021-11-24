@@ -88,6 +88,7 @@
     "@popperjs/core": "^2.0.6",
     "@sendgrid/mail": "^6.5.0",
     "@snapshot-labs/snapshot.js": "^0.3.4",
+    "@solana/web3.js": "^1.30.2",
     "@terra-money/terra.js": "^2.0.4",
     "@typechain/ethers-v5": "^6.0.0",
     "@types/bluebird": "^3.5.36",

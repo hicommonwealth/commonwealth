@@ -15,7 +15,7 @@ import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import { ITXModalData, ProposalModule, OffchainThreadKind, OffchainThreadStage } from 'models';
 import { proposalSlugToClass } from 'identifiers';
-import { formatCoin, formatNumberLong } from 'adapters/currency';
+import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 
@@ -304,11 +304,7 @@ const NewProposalForm = {
         });
       } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
         const deposit = vnode.state.deposit
-          ? (app.chain as Cosmos).chain.coins(
-            new BN(vnode.state.deposit),
-            true,
-            (app.chain as Cosmos).governance.govDenom
-          )
+          ? new CosmosToken((app.chain as Cosmos).governance.minDeposit.denom, vnode.state.deposit, false)
           : (app.chain as Cosmos).governance.minDeposit;
         // TODO: add disabled / loading
         (app.chain as Cosmos).governance.submitProposalTx(
@@ -652,15 +648,15 @@ const NewProposalForm = {
             m(FormGroup, [
               m(FormLabel, `Deposit (${app.chain.base === ChainBase.Substrate
                 ? app.chain.currency
-                : (app.chain as Cosmos).chain.denom})`),
+                : (app.chain as Cosmos).governance.minDeposit.denom})`),
               m(Input, {
                 name: 'deposit',
                 placeholder: `Min: ${app.chain.base === ChainBase.Substrate
                   ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
-                  : formatNumberLong((app.chain as Cosmos).governance.minDeposit.inDollars)}`,
+                  : +(app.chain as Cosmos).governance.minDeposit}`,
                 oncreate: (vvnode) => $(vvnode.dom).val(app.chain.base === ChainBase.Substrate
                   ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
-                  : formatNumberLong((app.chain as Cosmos).governance.minDeposit.inDollars)),
+                  : +(app.chain as Cosmos).governance.minDeposit),
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.deposit = parseFloat(result);
