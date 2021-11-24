@@ -1,48 +1,128 @@
 @import 'client/styles/shared';
 
-.CreateCommunity {
-    max-width: 600px;
-    padding: 6px 28px 10px;
+.CreateCommunityPage {
+    width: 100%;
+    @include sm-max {
+        width: initial;
+    }
 
-    h3 {
-        text-align: center;
-        margin: 24px 0 20px;
-    }
-    h4 {
-        margin: 4px 0;
-    }
-    p {
-        text-align: center;
-    }
-    input[type="text"] {
-        @include formfield-text;
-        margin: 10px 0;
-    }
-    button, a.btn {
-        display: block;
-        width: 100%;
-        text-align: center;
-    }
-    form {
-        margin: 10px auto 20px;
-    }
-    .auth-features {
-        margin: 10px 0 26px;
-        width: 440px;
-    }
-    .create-community-message {
-        text-align: center;
-        margin: 20px 0;
-        &.error {
-            @include error-text();
+    .create-community-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .CommunityMetadataManagementTable {
+            td {
+                padding: 11px 20px;
+            }
+            .cui-button {
+                margin: 26px 28px;
+            }
+            .cui-tabs {
+                margin-top: 0 !important;
+            }
         }
-        &.success {
-            @include success-text();
+
+        .ChainMetadataManagementTable,
+        .CommunityMetadataManagementTable {
+            .button-wrap {
+                display: flex;
+                justify-content: flex-end;
+                button {
+                    margin-right: 0;
+                }
+            }
         }
-    }
-    .TogglePropertyRow {
-        .ToggleContent {
-            display: flex;
+
+        .cui-table.metadata-management-table {
+            td {
+                line-height: 1.1;
+                padding: 5px 0 0 28px !important;
+                border-bottom: none !important;
+            }
+            tr:first-child td {
+                padding-top: 18px !important;
+            }
+        }
+        .cui-button.save-changes-button {
+            margin: 24px 28px;
+        }
+        .cui-tabs {
+            margin-top: 2px !important;
+            border-bottom-color: $background-color-light;
+            > :first-child {
+                margin-left: 15px !important;
+            }
+        }
+
+        h3 {
+            text-align: center;
+            margin: 24px 0 20px;
+        }
+        h4 {
+            margin: 4px 0;
+        }
+        p {
+            text-align: center;
+        }
+        input[type="text"] {
+            @include formfield-text;
+            margin: 10px 0;
+        }
+        button, a.btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+        form {
+            margin: 10px auto 20px;
+        }
+        .auth-features {
+            margin: 10px 0 26px;
+            width: 440px;
+        }
+        .create-community-message {
+            text-align: center;
+            margin: 20px 0;
+            &.error {
+                @include error-text();
+            }
+            &.success {
+                @include success-text();
+            }
+        }
+        .InputPropertyRow {
+            width: 100%;
+            .title-column {
+                width: 110px;
+            }
+        }
+        .TogglePropertyRow {
+            td:first-child {
+                padding-top: 7px !important;
+            }
+            td {
+                padding-top: 14px !important;
+                padding-bottom: 4px !important;
+            }
+            .cui-switch {
+                display: inline-block;
+                margin-right: 5px;
+                position: relative;
+                top: -2px;
+            }
+            .switch-caption {
+                display: inline-block;
+                color: $text-color-light;
+                font-size: 94%;
+                position: relative;
+                top: 1px;
+            }
+        }
+        .TogglePropertyRow + .TogglePropertyRow {
+            td {
+                padding-bottom: 0 !important;
+            }
         }
     }
 }
