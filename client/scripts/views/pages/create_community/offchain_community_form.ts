@@ -62,6 +62,9 @@ const OffchainCommunityForm: m.Component<
       .getAll()
       .map((_) => _.id)
       .filter((chain) => app.user.getAllRolesInCommunity({ chain }).length > 0);
+    if (!defaultChains.includes('ethereum')) {
+      defaultChains.splice(0, 0, 'ethereum');
+    }
 
     return m('.offchain-community-creation-form', [
       m('.CommunityMetadataManagementTable', [
