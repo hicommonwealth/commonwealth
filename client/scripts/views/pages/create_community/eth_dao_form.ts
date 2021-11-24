@@ -37,7 +37,7 @@ const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
     vnode.state.error = '';
   },
   view: (vnode) => {
-    return m('.cosmos-creation-form', [
+    return m('.eth-dao-creation-form', [
       m('.CommunityMetadataManagementTable', [
         m(
           Table,

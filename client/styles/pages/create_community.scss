@@ -125,6 +125,15 @@
             }
         }
     }
+
+    .offchain-community-creation-form,
+    .sputnik-creation-form,
+    .substrate-creation-form,
+    .cosmos-creation-form,
+    .erc20-creation-form,
+    .eth-dao-creation-form {
+        width: 100%;
+    }
 }
 .CompactModalExitButton {
     color: $text-color-medium;
