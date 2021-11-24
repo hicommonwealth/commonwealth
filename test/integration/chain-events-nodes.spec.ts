@@ -43,7 +43,6 @@ const fetchedIdentities = {
 };
 
 // list all the listeners we want to test and their associated settings
-// the settings here should be the same as those used in production
 const listenerOptions = {
   polkadot: {
     archival: false,
@@ -236,32 +235,21 @@ async function clearDB(pool) {
 }
 
 // clears the rabbitmq events and identity queues
-async function clearQueues(): Promise<void> {
-  let res = await fetch(
-    'http://localhost:15672/api/queues/%2F/identityQueue/contents',
-    {
-      method: 'DELETE',
-      headers: {
-        Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q=',
-      },
-    }
-  );
-  if (res.status === 404) console.log('No eventsQueue to clear');
-  else if (res.status !== 204)
-    throw new Error('Could not clear the identity queue');
-
-  res = await fetch(
-    'http://localhost:15672/api/queues/%2F/eventsQueue/contents',
-    {
-      method: 'DELETE',
-      headers: {
-        Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q=',
-      },
-    }
-  );
-  if (res.status === 404) console.log('No eventsQueue to clear');
-  else if (res.status !== 204)
-    throw new Error('Could not clear the events queue');
+async function clearQueues(queueNames: string[]): Promise<void> {
+  for (const name of queueNames) {
+    const res = await fetch(
+      `http://localhost:15672/api/queues/%2F/${name}/contents`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q=',
+        },
+      }
+    );
+    if (res.status === 404) console.log(`The ${name} queue does not exist!`);
+    else if (res.status !== 204)
+      throw new Error(`Failed to clear queue: ${name}`);
+  }
 }
 
 // populates the Address, OffchainProfiles, and IdentityCaches tables with test data
@@ -389,7 +377,7 @@ setTimeout(async () => {
         'database'
     );
   await clearDB(pool);
-  await clearQueues();
+  await clearQueues(["ChainEventsHandlersQueue", "SubstrateIdentityEventsQueue"]);
   await prepareDB(client);
 
   describe('Tests for single chain per node', () => {
@@ -410,8 +398,7 @@ setTimeout(async () => {
                 ...process.env,
                 TESTING: 'true',
                 WORKER_NUMBER: String(chainIndex),
-                NUM_WORKERS: String(chains.length),
-                HANDLE_IDENTITY: 'publish',
+                NUM_WORKERS: String(chains.length)
               },
             }
           );
@@ -512,7 +499,6 @@ setTimeout(async () => {
             {
               env: {
                 ...process.env,
-                HANDLE_IDENTITY: 'publish',
                 USE_NEW_IDENTITY_CACHE: 'true',
               },
             }
@@ -559,10 +545,10 @@ setTimeout(async () => {
               },
             });
             const data = await res.json();
-            const identityQueue = data.filter(
-              (obj) => obj.name === 'identityQueue'
+            const SubstrateIdentityEventsQueue = data.filter(
+              (obj) => obj.name === 'SubstrateIdentityEventsQueue'
             )[0];
-            assert.equal(identityQueue.messages, 0);
+            assert.equal(SubstrateIdentityEventsQueue.messages, 0);
           });
         }
       });

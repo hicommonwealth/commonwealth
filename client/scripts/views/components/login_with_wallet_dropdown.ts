@@ -22,6 +22,8 @@ function baseToNetwork(n: ChainBase): ChainNetwork {
       return ChainNetwork.Ethereum;
     case ChainBase.NEAR:
       return ChainNetwork.NEAR;
+    case ChainBase.Solana:
+      return ChainNetwork.Solana;
     default:
       return null;
   }
@@ -68,7 +70,7 @@ const LoginWithWalletDropdown: m.Component<{
 
     const allChains = app.config.chains.getAll();
     const sortedChainBases = [
-      ChainBase.CosmosSDK, ChainBase.Ethereum, ChainBase.NEAR, ChainBase.Substrate
+      ChainBase.CosmosSDK, ChainBase.Ethereum, ChainBase.NEAR, ChainBase.Substrate, ChainBase.Solana
     ].filter((base) => allChains.find((chain) => chain.base === base));
     const sortedChainBasesWithCLI = sortedChainBases.filter((b) => CHAINBASE_WITH_CLI.includes(b));
 
