@@ -83,137 +83,135 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
       }
     }
 
-    return m('.erc20-creation-form', [
-      m('.CommunityMetadataManagementTable', [
-        m(
-          Table,
-          {
-            bordered: false,
-            interactive: false,
-            striped: false,
-            class: 'metadata-management-table',
-          },
-          [
-            m(InputPropertyRow, {
-              title: 'Chain ID',
-              defaultValue: vnode.state.chain_id,
-              placeholder: '1',
-              onChangeHandler: async (v) => {
-                vnode.state.chain_id = v;
-                vnode.state.loaded = false;
-              }
-            }),
-            m(InputPropertyRow, {
-              title: 'Websocket URL',
-              defaultValue: vnode.state.url,
-              placeholder: 'wss://... (leave empty for default)',
-              onChangeHandler: async (v) => {
-                vnode.state.url = v;
-                vnode.state.loaded = false;
-              }
-            }),
-            m(InputPropertyRow, {
-              title: 'Address',
-              defaultValue: vnode.state.address,
-              placeholder: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
-              onChangeHandler: (v) => {
-                vnode.state.address = v;
-                vnode.state.loaded = false;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Name',
-              defaultValue: vnode.state.name,
-              disabled: disableField,
-              onChangeHandler: (v) => {
-                vnode.state.name = v;
-                vnode.state.id = slugify(v);
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'ID',
-              defaultValue: vnode.state.id,
-              value: vnode.state.id,
-              disabled: disableField,
-              onChangeHandler: (v) => {
-                vnode.state.id = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Symbol',
-              disabled: disableField,
-              defaultValue: vnode.state.symbol,
-              placeholder: 'XYZ',
-              onChangeHandler: (v) => {
-                vnode.state.symbol = v;
-              },
-            }),
-            ...defaultChainRows(vnode.state, disableField),
-          ]
-        ),
-        m(Button, {
-          label: 'Test fields',
-          intent: 'primary',
-          disabled: vnode.state.saving || !validAddress || !vnode.state.chain_id,
-          onclick: async (e) => {
-            await updateTokenForum();
-          },
-        }),
-        m(Button, {
-          class: 'mt-3',
-          label: 'Save changes',
-          intent: 'primary',
-          disabled: vnode.state.saving || !validAddress || !vnode.state.loaded,
-          onclick: async (e) => {
-            const {
+    return m('.CommunityMetadataManagementTable', [
+      m(
+        Table,
+        {
+          bordered: false,
+          interactive: false,
+          striped: false,
+          class: 'metadata-management-table',
+        },
+        [
+          m(InputPropertyRow, {
+            title: 'Chain ID',
+            defaultValue: vnode.state.chain_id,
+            placeholder: '1',
+            onChangeHandler: async (v) => {
+              vnode.state.chain_id = v;
+              vnode.state.loaded = false;
+            }
+          }),
+          m(InputPropertyRow, {
+            title: 'Websocket URL',
+            defaultValue: vnode.state.url,
+            placeholder: 'wss://... (leave empty for default)',
+            onChangeHandler: async (v) => {
+              vnode.state.url = v;
+              vnode.state.loaded = false;
+            }
+          }),
+          m(InputPropertyRow, {
+            title: 'Address',
+            defaultValue: vnode.state.address,
+            placeholder: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+            onChangeHandler: (v) => {
+              vnode.state.address = v;
+              vnode.state.loaded = false;
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'Name',
+            defaultValue: vnode.state.name,
+            disabled: disableField,
+            onChangeHandler: (v) => {
+              vnode.state.name = v;
+              vnode.state.id = slugify(v);
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'ID',
+            defaultValue: vnode.state.id,
+            value: vnode.state.id,
+            disabled: disableField,
+            onChangeHandler: (v) => {
+              vnode.state.id = v;
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'Symbol',
+            disabled: disableField,
+            defaultValue: vnode.state.symbol,
+            placeholder: 'XYZ',
+            onChangeHandler: (v) => {
+              vnode.state.symbol = v;
+            },
+          }),
+          ...defaultChainRows(vnode.state, disableField),
+        ]
+      ),
+      m(Button, {
+        label: 'Test fields',
+        intent: 'primary',
+        disabled: vnode.state.saving || !validAddress || !vnode.state.chain_id,
+        onclick: async (e) => {
+          await updateTokenForum();
+        },
+      }),
+      m(Button, {
+        class: 'mt-3',
+        label: 'Save changes',
+        intent: 'primary',
+        disabled: vnode.state.saving || !validAddress || !vnode.state.loaded,
+        onclick: async (e) => {
+          const {
+            address,
+            id,
+            name,
+            description,
+            symbol,
+            icon_url,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            chain_id,
+            url,
+          } = vnode.state;
+          vnode.state.saving = true;
+          try {
+            const res = await $.post(`${app.serverUrl()}/createChain`, {
               address,
               id,
               name,
               description,
-              symbol,
               icon_url,
+              symbol,
               website,
               discord,
               element,
               telegram,
               github,
-              chain_id,
-              url,
-            } = vnode.state;
-            vnode.state.saving = true;
-            try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
-                address,
-                id,
-                name,
-                description,
-                icon_url,
-                symbol,
-                website,
-                discord,
-                element,
-                telegram,
-                github,
-                jwt: app.user.jwt,
-                type: ChainType.Token,
-                base: ChainBase.Ethereum,
-                network: ChainNetwork.ERC20,
-                node_url: url,
-                eth_chain_id: chain_id,
-              });
-              await initAppState(false);
-              m.route.set(`/${res.result.chain?.id}`);
-            } catch (err) {
-              notifyError(
-                err.responseJSON?.error ||
-                'Creating new ERC20 community failed'
-              );
-            } finally {
-              vnode.state.saving = false;
-            }
-          },
-        }),
-      ]),
+              jwt: app.user.jwt,
+              type: ChainType.Token,
+              base: ChainBase.Ethereum,
+              network: ChainNetwork.ERC20,
+              node_url: url,
+              eth_chain_id: chain_id,
+            });
+            await initAppState(false);
+            m.route.set(`/${res.result.chain?.id}`);
+          } catch (err) {
+            notifyError(
+              err.responseJSON?.error ||
+              'Creating new ERC20 community failed'
+            );
+          } finally {
+            vnode.state.saving = false;
+          }
+        },
+      }),
     ]);
   },
 };

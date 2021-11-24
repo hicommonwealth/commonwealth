@@ -605,10 +605,9 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: Boolean }, {}> = {
+const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
   view: (vnode) => {
     const { useQuickSwitcher } = vnode.attrs;
-    console.log(useQuickSwitcher);
 
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),

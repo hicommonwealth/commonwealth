@@ -54,110 +54,108 @@ const OffchainCommunityForm: m.Component<
       defaultChains.splice(0, 0, 'ethereum');
     }
 
-    return m('.offchain-community-creation-form', [
-      m('.CommunityMetadataManagementTable', [
-        m(
-          Table,
-          {
-            bordered: false,
-            interactive: false,
-            striped: false,
-            class: 'metadata-management-table',
-          },
-          [
-            m(InputPropertyRow, {
-              title: 'Name',
-              defaultValue: vnode.state.name,
-              onChangeHandler: (v) => {
-                vnode.state.name = v;
-              },
-            }),
-            ...defaultChainRows(vnode.state),
-            m(TogglePropertyRow, {
-              title: 'Privacy',
-              defaultValue: vnode.state.privacyEnabled,
-              onToggle: (checked) => {
-                vnode.state.privacyEnabled = checked;
-              },
-              caption: (checked) =>
-                checked
-                  ? 'Threads are private to members'
-                  : 'Threads are visible to the public',
-            }),
-            m(TogglePropertyRow, {
-              title: 'Invites',
-              defaultValue: vnode.state.invitesEnabled,
-              onToggle: (checked) => {
-                vnode.state.invitesEnabled = checked;
-              },
-              caption: (checked) =>
-                checked
-                  ? 'Anyone can invite new members'
-                  : 'Admins/mods can invite new members',
-            }),
-            m(SelectPropertyRow, {
-              title: 'Default Chain',
-              options: defaultChains,
-              value: vnode.state.defaultChain,
-              onchange: (value) => {
-                vnode.state.defaultChain = value;
-              },
-            }),
-          ]
-        ),
-        m(Button, {
-          class: 'mt-3',
-          label: 'Save changes',
-          intent: 'primary',
-          disabled: vnode.state.saving,
-          onclick: async (e) => {
-            const {
-              name,
-              description,
-              icon_url,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              invitesEnabled,
-              privacyEnabled,
-              isAuthenticatedForum,
-              defaultChain,
-            } = vnode.state;
+    return m('.CommunityMetadataManagementTable', [
+      m(
+        Table,
+        {
+          bordered: false,
+          interactive: false,
+          striped: false,
+          class: 'metadata-management-table',
+        },
+        [
+          m(InputPropertyRow, {
+            title: 'Name',
+            defaultValue: vnode.state.name,
+            onChangeHandler: (v) => {
+              vnode.state.name = v;
+            },
+          }),
+          ...defaultChainRows(vnode.state),
+          m(TogglePropertyRow, {
+            title: 'Privacy',
+            defaultValue: vnode.state.privacyEnabled,
+            onToggle: (checked) => {
+              vnode.state.privacyEnabled = checked;
+            },
+            caption: (checked) =>
+              checked
+                ? 'Threads are private to members'
+                : 'Threads are visible to the public',
+          }),
+          m(TogglePropertyRow, {
+            title: 'Invites',
+            defaultValue: vnode.state.invitesEnabled,
+            onToggle: (checked) => {
+              vnode.state.invitesEnabled = checked;
+            },
+            caption: (checked) =>
+              checked
+                ? 'Anyone can invite new members'
+                : 'Admins/mods can invite new members',
+          }),
+          m(SelectPropertyRow, {
+            title: 'Default Chain',
+            options: defaultChains,
+            value: vnode.state.defaultChain,
+            onchange: (value) => {
+              vnode.state.defaultChain = value;
+            },
+          }),
+        ]
+      ),
+      m(Button, {
+        class: 'mt-3',
+        label: 'Save changes',
+        intent: 'primary',
+        disabled: vnode.state.saving,
+        onclick: async (e) => {
+          const {
+            name,
+            description,
+            icon_url,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            invitesEnabled,
+            privacyEnabled,
+            isAuthenticatedForum,
+            defaultChain,
+          } = vnode.state;
 
-            vnode.state.saving = true;
+          vnode.state.saving = true;
 
-            $.post(`${app.serverUrl()}/createCommunity`, {
-              name,
-              description,
-              icon_url,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              invites_enabled: invitesEnabled,
-              privacy_enabled: privacyEnabled,
-              is_authenticated_forum: isAuthenticatedForum,
-              default_chain: defaultChain,
-              jwt: app.user.jwt,
+          $.post(`${app.serverUrl()}/createCommunity`, {
+            name,
+            description,
+            icon_url,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            invites_enabled: invitesEnabled,
+            privacy_enabled: privacyEnabled,
+            is_authenticated_forum: isAuthenticatedForum,
+            default_chain: defaultChain,
+            jwt: app.user.jwt,
+          })
+            .then(async (res) => {
+              await initAppState(false);
+              m.route.set(`/${res.result.id}`);
             })
-              .then(async (res) => {
-                await initAppState(false);
-                m.route.set(`/${res.result.id}`);
-              })
-              .catch((err: any) => {
-                notifyError(
-                  err.responseJSON?.error || 'Creating new community failed'
-                );
-              })
-              .always(() => {
-                vnode.state.saving = false;
-              });
-          },
-        }),
-      ]),
+            .catch((err: any) => {
+              notifyError(
+                err.responseJSON?.error || 'Creating new community failed'
+              );
+            })
+            .always(() => {
+              vnode.state.saving = false;
+            });
+        },
+      }),
     ]);
   },
 };

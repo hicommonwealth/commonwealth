@@ -1,19 +1,22 @@
 import 'pages/create_community.scss';
 
 import m from 'mithril';
-import app from 'state';
 import { Tabs, TabItem } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import OffchainCommunityForm from './offchain_community_form';
 import ERC20Form from './erc20_form';
 import SubstrateForm from './substrate_form';
 import SputnikForm from './sputnik_form';
+import CosmosForm from './cosmos_form';
+import EthDaoForm from './eth_dao_form';
 
 enum CommunityType {
-  OffchainCommunity = 'offchain',
-  Erc20Community = 'erc20',
-  SubstrateCommunity = 'substrate',
-  SputnikDao = 'sputnik',
+  OffchainCommunity = 'Offchain Community',
+  Erc20Community = 'ERC20',
+  SubstrateCommunity = 'Substrate',
+  SputnikDao = 'Sputnik (V2)',
+  Cosmos = 'Cosmos',
+  EthDao = 'Compound/Aave',
 }
 
 type CreateCommunityAttrs = Record<string, unknown>;
@@ -30,6 +33,24 @@ const CreateCommunity: m.Component<
     vnode.state.activeForm = CommunityType.OffchainCommunity;
   },
   view: (vnode: m.VnodeDOM<CreateCommunityAttrs, CreateCommunityState>) => {
+    const getActiveForm = (): m.Component => {
+      switch (vnode.state.activeForm) {
+        case CommunityType.OffchainCommunity:
+          return OffchainCommunityForm;
+        case CommunityType.Erc20Community:
+          return ERC20Form;
+        case CommunityType.SputnikDao:
+          return SputnikForm;
+        case CommunityType.SubstrateCommunity:
+          return SubstrateForm;
+        case CommunityType.Cosmos:
+          return CosmosForm;
+        case CommunityType.EthDao:
+          return EthDaoForm;
+        default:
+          throw new Error(`Invalid community type: ${vnode.state.activeForm}`)
+      }
+    };
     return m(Sublayout, {
       class: 'CreateCommunityPage',
       title: 'Create Community',
@@ -44,53 +65,18 @@ const CreateCommunity: m.Component<
             bordered: false,
             fluid: true,
           },
-          [
-            m(TabItem, {
-              label: 'Offchain Community',
-              active: vnode.state.activeForm === CommunityType.OffchainCommunity,
+          Object.values(CommunityType).map((t) => {
+            return m(TabItem, {
+              label: t.toString(),
+              active: vnode.state.activeForm === t,
               onclick: () => {
-                vnode.state.activeForm = 'offchain';
-                return null;
+                vnode.state.activeForm = t;
               },
               style: 'text-align: center'
-            }),
-            m(TabItem, {
-              label: 'ERC20',
-              active: vnode.state.activeForm === CommunityType.Erc20Community,
-              onclick: () => {
-                vnode.state.activeForm = 'erc20';
-                return null;
-              },
-              style: 'text-align: center'
-            }),
-            app.user.isSiteAdmin &&
-              m(TabItem, {
-                label: 'Substrate',
-                active:
-                  vnode.state.activeForm === CommunityType.SubstrateCommunity,
-                onclick: () => {
-                  vnode.state.activeForm = 'substrate';
-                  return null;
-                },
-                style: 'text-align: center'
-              }),
-            m(TabItem, {
-              label: 'Sputnik (V2)',
-              active: vnode.state.activeForm === 'sputnik',
-              onclick: () => {
-                vnode.state.activeForm = 'sputnik';
-                return null;
-              },
-              style: 'text-align: center'
-            }),
-          ]
+            })
+          }),
         ),
-        vnode.state.activeForm === CommunityType.OffchainCommunity &&
-          m(OffchainCommunityForm),
-        vnode.state.activeForm === CommunityType.Erc20Community && m(ERC20Form),
-        vnode.state.activeForm === CommunityType.SubstrateCommunity &&
-          m(SubstrateForm),
-        vnode.state.activeForm === CommunityType.SputnikDao && m(SputnikForm),
+        m('.community-creation-form', [ m(getActiveForm()) ]),
       ])
     ]);
   },
