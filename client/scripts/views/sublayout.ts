@@ -33,6 +33,7 @@ const Sublayout: m.Component<{
   hideSearch?: boolean,
   centerGrid?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
+  useQuickSwitcher?: boolean,         // show quick switcher only, without the rest of the sidebar
 }, {
   modalAutoTriggered: boolean
 }> = {
@@ -47,6 +48,7 @@ const Sublayout: m.Component<{
       hideSidebar,
       hideSearch,
       alwaysShowTitle,
+      useQuickSwitcher
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
@@ -155,8 +157,8 @@ const Sublayout: m.Component<{
             ]) : '',
           m('.sublayout-body', [
             m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
-              !hideSidebar && m('.sublayout-sidebar-col', [
-                m(Sidebar),
+              !hideSidebar && m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
+                m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
               ]),
               m('.sublayout-main-col', {
                 class: !rightContent && 'no-right-content'

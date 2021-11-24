@@ -605,11 +605,15 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
+const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: Boolean }, {}> = {
   view: (vnode) => {
+    const { useQuickSwitcher } = vnode.attrs;
+    console.log(useQuickSwitcher);
+
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
-      m('.Sidebar', [
+      !useQuickSwitcher
+      ? m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(ExternalLinksModule),
@@ -623,7 +627,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
             window.open('https://commonwealth.im/');
           },
         }),
-      ]),
+      ]): '',
     ];
   },
 };

@@ -33,7 +33,7 @@ const CreateCommunity: m.Component<
     return m(Sublayout, {
       class: 'CreateCommunityPage',
       title: 'Create Community',
-      hideSidebar: true,
+      useQuickSwitcher: true,
     }, [
       m('.create-community-wrapper', [
         m('h3', 'New Commonwealth Community'),
