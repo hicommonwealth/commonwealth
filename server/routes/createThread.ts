@@ -22,7 +22,7 @@ export const Errors = {
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to post',
-  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
+  BalanceCheckFailed: 'Could not verify user token balance',
 };
 
 const createThread = async (
@@ -149,16 +149,9 @@ const createThread = async (
       },
     });
     if (!req.user.isAdmin && isAdmin.length === 0) {
-      try {
-        const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
-        let tokenBalance = new BN(0);
-        if (threshold) {
-          tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-        }
-        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
-      } catch (e) {
-        log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      const canReact = await tokenBalanceCache.validateTopicThreshold(topic_id, req.body.address);
+      if (!canReact) {
+        return next(new Error(Errors.BalanceCheckFailed));
       }
     }
   }

@@ -55,15 +55,6 @@ const TopicSelector: m.Component<{
       if (button) (button as HTMLButtonElement).click();
     };
 
-    const addTopic = (topic?) => {
-      const newTopic = topic || (document.getElementsByClassName('autocomplete-topic-input')[0]
-        .firstChild as HTMLInputElement).value;
-      topics.push({ name: newTopic, id: null, description: '', telegram: '', tokenThreshold: new BN(0) });
-      setTimeout(() => { selectedTopic = newTopic; m.redraw(); }, 1);
-      updateFormData(newTopic);
-      if (!topic) manuallyClosePopover();
-    };
-
     const sortTopics = (topics_: OffchainTopic[]) => {
       return topics_.filter((topic) => featuredTopics.includes(topic)).sort((a, b) => a.name > b.name ? 1 : -1)
         .concat(topics_.filter((topic) => !featuredTopics.includes(topic)).sort((a, b) => a.name > b.name ? 1 : -1));

@@ -14,6 +14,8 @@ declare global {
     interface Request {
       user?: User;
       wss: WebSocket.Server;
+      session: any;
+      sessionID: any;
     }
 
     interface SessionData {

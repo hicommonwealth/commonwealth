@@ -88,6 +88,7 @@ const createCommunity = async (
   const privacy_enabled = req.body.privacy_enabled === 'true';
   const invites_enabled = req.body.invites_enabled === 'true';
   const default_chain = req.body.default_chain || 'ethereum';
+  const default_summary_view = null;
 
   // Handle the case where a community already exists
   const oldCommunity = await models.OffchainCommunity.findOne({

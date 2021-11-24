@@ -1,7 +1,5 @@
 import express from 'express';
-import webpack from 'webpack';
 import passport from 'passport';
-import { GITHUB_OAUTH_CALLBACK } from './config';
 
 import domain from './routes/domain';
 import status from './routes/status';
@@ -9,10 +7,6 @@ import createGist from './routes/createGist';
 
 import edgewareLockdropEvents from './routes/edgeware_lockdrop_events';
 import edgewareLockdropBalances from './routes/edgeware_lockdrop_balances';
-
-import createHedgehogAuthentication from './routes/createHedgehogAuthentication';
-import getHedgehogAuthentication from './routes/getHedgehogAuthentication';
-import createHedgehogUser from './routes/createHedgehogUser';
 
 import createAddress from './routes/createAddress';
 import linkExistingAddressToChain from './routes/linkExistingAddressToChain';
@@ -40,7 +34,6 @@ import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import communityStats from './routes/communityStats';
-import getCommunitiesAndChains from './routes/getCommunitiesAndChains';
 import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
@@ -88,11 +81,12 @@ import viewOffchainVotes from './routes/viewOffchainVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
 import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
+import updateLinkedThreads from './routes/updateLinkedThreads';
 import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
-import getThread from './routes/getThread';
+import getThreads from './routes/getThreads';
 import search from './routes/search';
 import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
@@ -128,6 +122,7 @@ import TokenBalanceCache from './util/tokenBalanceCache';
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
+import getSupportedEthChains from './routes/getSupportedEthChains';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
@@ -224,10 +219,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     starCommunity.bind(this, models)
   );
-  router.get(
-    '/getCommunitiesAndChains',
-    getCommunitiesAndChains.bind(this, models)
-  );
 
   // offchain community admin routes
   router.post(
@@ -252,6 +243,7 @@ function setupRouter(
   );
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
+  router.get('/getSupportedEthChains', getSupportedEthChains.bind(this, models));
   router.post(
     '/createChain',
     passport.authenticate('jwt', { session: false }),
@@ -304,7 +296,7 @@ function setupRouter(
   router.post(
     '/updateOffchainVote',
     passport.authenticate('jwt', { session: false }),
-    updateOffchainVote.bind(this, models)
+    updateOffchainVote.bind(this, models, tokenBalanceCache)
   );
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 
@@ -318,6 +310,11 @@ function setupRouter(
     '/updateChainEntityTitle',
     passport.authenticate('jwt', { session: false }),
     updateChainEntityTitle.bind(this, models)
+  );
+  router.post(
+    '/updateLinkedThreads',
+    passport.authenticate('jwt', { session: false }),
+    updateLinkedThreads.bind(this, models)
   );
   router.post(
     '/addEditors',
@@ -336,7 +333,7 @@ function setupRouter(
   );
   router.get('/bulkThreads', bulkThreads.bind(this, models));
   router.get('/activeThreads', activeThreads.bind(this, models));
-  router.get('/getThread', getThread.bind(this, models));
+  router.get('/getThreads', getThreads.bind(this, models));
   router.get('/search', search.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));

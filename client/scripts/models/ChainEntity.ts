@@ -8,7 +8,7 @@ class ChainEntity {
   public readonly chain: string;
   public readonly type: IChainEntityKind;
   public readonly typeId: string;
-  public readonly title: string;
+  public readonly title?: string;
   public readonly author: string;
 
   public readonly threadId?: number;
@@ -18,7 +18,7 @@ class ChainEntity {
   private _updatedAt?: moment.Moment;
   public get updatedAt() { return this._updatedAt; }
 
-  private _chainEvents: ChainEvent[];
+  private _chainEvents?: ChainEvent[];
   public get chainEvents() { return this._chainEvents; }
 
   public get stringId(): string {

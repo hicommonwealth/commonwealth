@@ -56,6 +56,11 @@ module.exports = {
           name: 'polkadot',
           chunks: 'all',
         },
+        solana: {
+          test: /[\\/]node_modules[\\/](@solana)[\\/]/,
+          name: 'solana',
+          chunks: 'all',
+        },
         snapshot: {
           test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
           name: 'snapshot',
@@ -113,8 +118,9 @@ module.exports = {
           path.resolve(__dirname, '../shared'),
           path.resolve(__dirname, '../eth/types'),
         ],
-        use: {
-          loader: 'ts-loader'
+        loader: 'esbuild-loader',
+        options: {
+          loader: 'ts',
         }
       },
       {
