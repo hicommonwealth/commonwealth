@@ -2,6 +2,7 @@ import m from 'mithril';
 import {
   InputPropertyRow
 } from 'views/components/metadata_rows';
+import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 
 
 export interface ChainFormState {
@@ -12,6 +13,7 @@ export interface ChainFormState {
   element: string;
   telegram: string;
   github: string;
+  uploadInProgress: boolean;
 }
 
 export function initChainForm<T extends ChainFormState>(state: T) {
@@ -22,6 +24,7 @@ export function initChainForm<T extends ChainFormState>(state: T) {
   state.telegram = '';
   state.github = '';
   state.description = '';
+  state.uploadInProgress = false;
 }
 
 export function defaultChainRows<T extends ChainFormState>(state: T, disabled = false) {
@@ -35,6 +38,27 @@ export function defaultChainRows<T extends ChainFormState>(state: T, disabled = 
       },
       textarea: true,
     }),
+    m('tr.AvatarUploadRow', [
+      m('td', 'Upload Icon'),
+      m('td', [
+        m(AvatarUpload, {
+          avatarScope: AvatarScope.Chain,
+          uploadStartedCallback: () => {
+            state.uploadInProgress = true;
+            m.redraw();
+          },
+          uploadCompleteCallback: (files) => {
+            files.forEach((f) => {
+              if (!f.uploadURL) return;
+              const url = f.uploadURL.replace(/\?.*/, '');
+              state.icon_url = url;
+            });
+            state.uploadInProgress = false;
+            m.redraw();
+          },
+        }),
+      ]),
+    ]),
     m(InputPropertyRow, {
       title: 'Icon URL',
       disabled,

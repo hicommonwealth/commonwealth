@@ -91,10 +91,18 @@
                 @include success-text();
             }
         }
+
+        .AvatarUpload {
+            width: 92px;
+            height: 92px;
+            color: red;
+            margin: auto 0;
+        }
+
         .InputPropertyRow {
             width: 100%;
             .title-column {
-                width: 110px;
+                width: 150px;
             }
         }
         .TogglePropertyRow {
@@ -128,6 +136,8 @@
 
     .community-creation-form {
         width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
     }
 }
 .CompactModalExitButton {
