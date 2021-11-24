@@ -80,10 +80,10 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
               vnode.state.substrate_spec = v;
             },
           }),
-          m('tr.InputPropertyRow', [
+          m('tr', [
             m('td', { class: 'title-column', }, ''),
             m(Button, {
-              label: 'Test',
+              label: 'Test Connection',
               onclick: async (e) => {
                 // deinit substrate API if one exists
                 if (app.chain?.apiInitialized) {

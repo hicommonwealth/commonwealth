@@ -57,6 +57,10 @@
             margin: auto 0;
         }
 
+        .error-column {
+            @include error-text
+        }
+
         .InputPropertyRow {
             width: 100%;
             .title-column {

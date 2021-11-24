@@ -101,6 +101,8 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           class: 'metadata-management-table',
         },
         [
+          // TODO: factor out these ETH args
+          // TODO: dropdown for existing chain IDs/URLs
           m(InputPropertyRow, {
             title: 'Chain ID',
             defaultValue: vnode.state.chain_id,
@@ -128,7 +130,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               vnode.state.loaded = false;
             },
           }),
-          m('tr.InputPropertyRow', [
+          m('tr', [
             m('td', { class: 'title-column', }, ''),
             m(Button, {
               label: 'Populate fields',

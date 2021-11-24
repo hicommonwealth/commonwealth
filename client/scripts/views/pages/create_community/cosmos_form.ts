@@ -6,8 +6,9 @@ import { Table, Button } from 'construct-ui';
 import $ from 'jquery';
 import { initAppState } from 'app';
 import { slugify } from 'utils';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
+import { ChainBase, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import {
   InputPropertyRow
 } from 'views/components/metadata_rows';
@@ -20,20 +21,27 @@ import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_r
 type CosmosFormAttrs = Record<string, unknown>;
 
 interface CosmosFormState extends ChainFormState {
+  url: string;
+  endpointError: string;
   id: string;
   name: string;
+  symbol: string;
+  bech32_prefix: string;
   saving: boolean;
-  loaded: boolean;
+  testing: boolean;
   error: string;
 }
 
 const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
   oninit: (vnode) => {
+    vnode.state.url = '';
     vnode.state.id = '';
     vnode.state.name = '';
+    vnode.state.symbol = '';
+    vnode.state.bech32_prefix = '';
     initChainForm(vnode.state);
     vnode.state.saving = false;
-    vnode.state.loaded = false;
+    vnode.state.testing = false;
     vnode.state.error = '';
   },
   view: (vnode) => {
@@ -48,7 +56,42 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
             class: 'metadata-management-table',
           },
           [
-            // TODO: fields
+            m(InputPropertyRow, {
+              title: 'Tendermint URL',
+              defaultValue: vnode.state.url,
+              placeholder: 'http://my-rpc.cosmos-chain.com:26657/',
+              onChangeHandler: async (v) => {
+                vnode.state.url = v;
+              }
+            }),
+            m('tr', [
+              m('td', { class: 'title-column', }, ''),
+              m(Button, {
+                label: 'Test Connection',
+                disabled: vnode.state.testing,
+                onclick: async (e) => {
+                  vnode.state.endpointError = null;
+                  vnode.state.testing = true;
+                  try {
+                    const tmClient = await Tendermint34Client.connect(vnode.state.url);
+                    const status = await tmClient.status();
+                    console.log(status);
+                    const [chainId] = status.nodeInfo.network.split('-');
+                    vnode.state.name = chainId;
+                    vnode.state.id = slugify(chainId);
+                    // TODO: populate more information
+                  } catch (err) {
+                    vnode.state.endpointError = err.message;
+                  }
+                  vnode.state.testing = false;
+                  m.redraw();
+                },
+              }),
+            ]),
+            vnode.state.endpointError && m('tr', [
+              m('td', { class: 'title-column', }, 'Error'),
+              m('td', { class: 'error-column' }, vnode.state.endpointError),
+            ]),
             m(InputPropertyRow, {
               title: 'Name',
               defaultValue: vnode.state.name,
@@ -66,28 +109,38 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                 vnode.state.id = v;
               },
             }),
+            m(InputPropertyRow, {
+              title: 'Symbol',
+              defaultValue: vnode.state.symbol,
+              placeholder: 'XYZ',
+              onChangeHandler: (v) => {
+                vnode.state.symbol = v;
+              },
+            }),
+            m(InputPropertyRow, {
+              title: 'Bech32 Prefix',
+              defaultValue: vnode.state.bech32_prefix,
+              placeholder: 'cosmos',
+              onChangeHandler: async (v) => {
+                vnode.state.bech32_prefix = v;
+              }
+            }),
             ...defaultChainRows(vnode.state),
           ]
         ),
         m(Button, {
-          label: 'Test fields',
-          intent: 'primary',
-          disabled: vnode.state.saving,
-          onclick: async (e) => {
-            // TODO
-          },
-        }),
-        m(Button, {
           class: 'mt-3',
           label: 'Save changes',
           intent: 'primary',
-          disabled: vnode.state.saving || !vnode.state.loaded,
+          disabled: vnode.state.saving,
           onclick: async (e) => {
             const {
-              // TODO: fields
+              url,
               id,
               name,
               description,
+              symbol,
+              bech32_prefix,
               icon_url,
               website,
               discord,
@@ -98,10 +151,12 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
             vnode.state.saving = true;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
-                // TODO: fields
+                url,
                 id,
                 name,
                 description,
+                symbol,
+                bech32_prefix,
                 icon_url,
                 website,
                 discord,
