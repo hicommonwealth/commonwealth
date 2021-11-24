@@ -71,6 +71,8 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
           m(InputPropertyRow, {
             title: 'Spec (JSON)',
             defaultValue: vnode.state.substrate_spec,
+            // TODO: how to make this resizable vertically?
+            //   looks like CUI specifies an !important height tag, which prevents this
             textarea: true,
             placeholder:
               '{"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}}',
@@ -78,37 +80,40 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
               vnode.state.substrate_spec = v;
             },
           }),
+          m('tr.InputPropertyRow', [
+            m('td', { class: 'title-column', }, ''),
+            m(Button, {
+              label: 'Test',
+              onclick: async (e) => {
+                // deinit substrate API if one exists
+                if (app.chain?.apiInitialized) {
+                  await app.chain.deinit();
+                }
+
+                // create new API
+                const provider = new WsProvider(
+                  constructSubstrateUrl(vnode.state.nodeUrl),
+                  false
+                );
+                try {
+                  await provider.connect();
+                  const api = await ApiPromise.create({
+                    throwOnConnect: true,
+                    provider,
+                    ...JSON.parse(vnode.state.substrate_spec),
+                  });
+                  await api.disconnect();
+                  notifySuccess('Test has passed');
+                } catch (err) {
+                  console.error(err.message);
+                  notifyError('Test API initialization failed');
+                }
+              },
+            }),
+          ]),
           ...defaultChainRows(vnode.state),
         ]
       ),
-      m(Button, {
-        label: 'Test',
-        onclick: async (e) => {
-          // deinit substrate API if one exists
-          if (app.chain?.apiInitialized) {
-            await app.chain.deinit();
-          }
-
-          // create new API
-          const provider = new WsProvider(
-            constructSubstrateUrl(vnode.state.nodeUrl),
-            false
-          );
-          try {
-            await provider.connect();
-            const api = await ApiPromise.create({
-              throwOnConnect: true,
-              provider,
-              ...JSON.parse(vnode.state.substrate_spec),
-            });
-            await api.disconnect();
-            notifySuccess('Test has passed');
-          } catch (err) {
-            console.error(err.message);
-            notifyError('Test API initialization failed');
-          }
-        },
-      }),
       m(Button, {
         class: 'mt-3',
         label: 'Save changes',

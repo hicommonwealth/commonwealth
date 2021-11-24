@@ -50,11 +50,6 @@
             }
         }
 
-        input[type="text"] {
-            @include formfield-text;
-            margin: 10px 0;
-        }
-
         .AvatarUpload {
             width: 92px;
             height: 92px;
@@ -66,6 +61,12 @@
             width: 100%;
             .title-column {
                 width: 150px;
+            }
+            textarea {
+                resize: vertical !important;
+                min-height: 25px !important;
+                width: 100% !important;
+                height: auto !important;
             }
         }
         .TogglePropertyRow {
