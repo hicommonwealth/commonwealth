@@ -11,24 +11,18 @@ import {
   TogglePropertyRow,
   SelectPropertyRow,
 } from 'views/components/metadata_rows';
+import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
 
 type OffchainCommunityFormAttrs = Record<string, unknown>;
 
-interface OffchainCommunityFormState {
+interface OffchainCommunityFormState extends ChainFormState {
   disabled: boolean;
   error: string;
   success: string | boolean;
   name: string;
-  description: string;
-  iconUrl: string;
   invitesEnabled: boolean;
   privacyEnabled: boolean;
   isAuthenticatedForum: boolean;
-  website: string;
-  discord: string;
-  element: string;
-  telegram: string;
-  github: string;
   defaultChain: string;
   saving: boolean;
 }
@@ -39,13 +33,7 @@ const OffchainCommunityForm: m.Component<
 > = {
   oninit: (vnode) => {
     vnode.state.name = '';
-    vnode.state.description = '';
-    vnode.state.iconUrl = '';
-    vnode.state.website = '';
-    vnode.state.discord = '';
-    vnode.state.element = '';
-    vnode.state.telegram = '';
-    vnode.state.github = '';
+    initChainForm(vnode.state);
     vnode.state.isAuthenticatedForum = false;
     vnode.state.privacyEnabled = false;
     vnode.state.invitesEnabled = false;
@@ -84,54 +72,7 @@ const OffchainCommunityForm: m.Component<
                 vnode.state.name = v;
               },
             }),
-            m(InputPropertyRow, {
-              title: 'Description',
-              defaultValue: vnode.state.description,
-              onChangeHandler: (v) => {
-                vnode.state.description = v;
-              },
-              textarea: true,
-            }),
-            m(InputPropertyRow, {
-              title: 'Website',
-              defaultValue: vnode.state.website,
-              placeholder: 'https://example.com',
-              onChangeHandler: (v) => {
-                vnode.state.website = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Discord',
-              defaultValue: vnode.state.discord,
-              placeholder: 'https://discord.com/invite',
-              onChangeHandler: (v) => {
-                vnode.state.discord = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Element',
-              defaultValue: vnode.state.element,
-              placeholder: 'https://matrix.to/#',
-              onChangeHandler: (v) => {
-                vnode.state.element = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Telegram',
-              defaultValue: vnode.state.telegram,
-              placeholder: 'https://t.me',
-              onChangeHandler: (v) => {
-                vnode.state.telegram = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Github',
-              defaultValue: vnode.state.github,
-              placeholder: 'https://github.com',
-              onChangeHandler: (v) => {
-                vnode.state.github = v;
-              },
-            }),
+            ...defaultChainRows(vnode.state),
             m(TogglePropertyRow, {
               title: 'Privacy',
               defaultValue: vnode.state.privacyEnabled,
@@ -173,7 +114,7 @@ const OffchainCommunityForm: m.Component<
             const {
               name,
               description,
-              iconUrl,
+              icon_url,
               website,
               discord,
               element,
@@ -190,7 +131,7 @@ const OffchainCommunityForm: m.Component<
             $.post(`${app.serverUrl()}/createCommunity`, {
               name,
               description,
-              icon_url: iconUrl,
+              icon_url,
               website,
               discord,
               element,

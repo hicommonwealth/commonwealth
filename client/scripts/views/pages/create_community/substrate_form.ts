@@ -13,19 +13,14 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   InputPropertyRow,
 } from 'views/components/metadata_rows';
+import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
 
 type SubstrateFormAttrs = Record<string, unknown>;
 
-interface SubstrateFormState {
+interface SubstrateFormState extends ChainFormState {
   name: string;
   nodeUrl: string;
   symbol: string;
-  website: string;
-  discord: string;
-  element: string;
-  telegram: string;
-  github: string;
-  description: string;
   substrate_spec: string;
   saving: boolean;
 }
@@ -35,12 +30,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
     vnode.state.name = '';
     vnode.state.nodeUrl = '';
     vnode.state.symbol = '';
-    vnode.state.website = '';
-    vnode.state.discord = '';
-    vnode.state.element = '';
-    vnode.state.telegram = '';
-    vnode.state.github = '';
-    vnode.state.description = '';
+    initChainForm(vnode.state);
     vnode.state.substrate_spec = '';
     vnode.state.saving = false;
   },
@@ -80,14 +70,6 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
               },
             }),
             m(InputPropertyRow, {
-              title: 'Description',
-              defaultValue: vnode.state.description,
-              onChangeHandler: (v) => {
-                vnode.state.description = v;
-              },
-              textarea: true,
-            }),
-            m(InputPropertyRow, {
               title: 'Spec (JSON)',
               defaultValue: vnode.state.substrate_spec,
               textarea: true,
@@ -97,46 +79,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
                 vnode.state.substrate_spec = v;
               },
             }),
-            m(InputPropertyRow, {
-              title: 'Website',
-              defaultValue: vnode.state.website,
-              placeholder: 'https://example.com',
-              onChangeHandler: (v) => {
-                vnode.state.website = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Discord',
-              defaultValue: vnode.state.discord,
-              placeholder: 'https://discord.com/invite',
-              onChangeHandler: (v) => {
-                vnode.state.discord = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Element',
-              defaultValue: vnode.state.element,
-              placeholder: 'https://matrix.to/#',
-              onChangeHandler: (v) => {
-                vnode.state.element = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Telegram',
-              defaultValue: vnode.state.telegram,
-              placeholder: 'https://t.me',
-              onChangeHandler: (v) => {
-                vnode.state.telegram = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Github',
-              defaultValue: vnode.state.github,
-              placeholder: 'https://github.com',
-              onChangeHandler: (v) => {
-                vnode.state.github = v;
-              },
-            }),
+            ...defaultChainRows(vnode.state),
           ]
         ),
         m(Button, {
@@ -178,6 +121,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
               description,
               nodeUrl,
               symbol,
+              icon_url,
               website,
               discord,
               element,
@@ -196,6 +140,7 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
               name,
               description,
               node_url: nodeUrl,
+              icon_url,
               symbol,
               website,
               discord,

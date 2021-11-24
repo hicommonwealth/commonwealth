@@ -12,23 +12,17 @@ import { notifyError } from 'controllers/app/notifications';
 import {
   InputPropertyRow
 } from 'views/components/metadata_rows';
+import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
 
 type ERC20FormAttrs = Record<string, unknown>;
 
-interface ERC20FormState {
+interface ERC20FormState extends ChainFormState {
   chain_id: string;
   url: string;
   address: string;
   id: string;
   name: string;
   symbol: string;
-  icon_url: string;
-  website: string;
-  discord: string;
-  element: string;
-  telegram: string;
-  github: string;
-  description: string;
   saving: boolean;
   loaded: boolean;
   error: string;
@@ -42,13 +36,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
     vnode.state.id = '';
     vnode.state.name = '';
     vnode.state.symbol = '';
-    vnode.state.icon_url = '';
-    vnode.state.website = '';
-    vnode.state.discord = '';
-    vnode.state.element = '';
-    vnode.state.telegram = '';
-    vnode.state.github = '';
-    vnode.state.description = '';
+    initChainForm(vnode.state);
     vnode.state.saving = false;
     vnode.state.loaded = false;
     vnode.state.error = '';
@@ -160,69 +148,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
                 vnode.state.symbol = v;
               },
             }),
-            m(InputPropertyRow, {
-              title: 'Icon URL',
-              disabled: disableField,
-              defaultValue: vnode.state.icon_url,
-              placeholder: 'https://',
-              onChangeHandler: (v) => {
-                vnode.state.icon_url = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Description',
-              disabled: disableField,
-              defaultValue: vnode.state.description,
-              onChangeHandler: (v) => {
-                vnode.state.description = v;
-              },
-              textarea: true,
-            }),
-            m(InputPropertyRow, {
-              title: 'Website',
-              disabled: disableField,
-              defaultValue: vnode.state.website,
-              placeholder: 'https://example.com',
-              onChangeHandler: (v) => {
-                vnode.state.website = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Discord',
-              disabled: disableField,
-              defaultValue: vnode.state.discord,
-              placeholder: 'https://discord.com/invite',
-              onChangeHandler: (v) => {
-                vnode.state.discord = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Element',
-              disabled: disableField,
-              defaultValue: vnode.state.element,
-              placeholder: 'https://matrix.to/#',
-              onChangeHandler: (v) => {
-                vnode.state.element = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Telegram',
-              disabled: disableField,
-              defaultValue: vnode.state.telegram,
-              placeholder: 'https://t.me',
-              onChangeHandler: (v) => {
-                vnode.state.telegram = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Github',
-              disabled: disableField,
-              defaultValue: vnode.state.github,
-              placeholder: 'https://github.com',
-              onChangeHandler: (v) => {
-                vnode.state.github = v;
-              },
-            }),
+            ...defaultChainRows(vnode.state, disableField),
           ]
         ),
         m(Button, {

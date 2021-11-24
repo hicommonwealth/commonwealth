@@ -5,7 +5,7 @@ import app from 'state';
 import { Table, Button } from 'construct-ui';
 import BN from 'bn.js';
 import $ from 'jquery';
-import { initAppState } from 'app';
+import { initAppState, initChain } from 'app';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { NearAccount } from 'controllers/chain/near/account';
 import Near from 'controllers/chain/near/main';
@@ -14,18 +14,13 @@ import {
   InputPropertyRow,
   TogglePropertyRow,
 } from 'views/components/metadata_rows';
+import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
 
 type SputnikFormAttrs = Record<string, unknown>;
 
-interface SputnikFormState {
+interface SputnikFormState extends ChainFormState {
   name: string;
-  description: string;
   initialValue: string;
-  website: string;
-  discord: string;
-  element: string;
-  telegram: string;
-  github: string;
   createNew: boolean;
   saving: boolean;
 }
@@ -34,12 +29,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
   oninit: (vnode) => {
     vnode.state.name = '';
     vnode.state.initialValue = '';
-    vnode.state.website = '';
-    vnode.state.discord = '';
-    vnode.state.element = '';
-    vnode.state.telegram = '';
-    vnode.state.github = '';
-    vnode.state.description = '';
+    initChainForm(vnode.state);
     vnode.state.createNew = false;
     vnode.state.saving = false;
   },
@@ -62,14 +52,6 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
                 vnode.state.name = v.toLowerCase();
               },
               placeholder: 'genesis',
-            }),
-            m(InputPropertyRow, {
-              title: 'Description',
-              defaultValue: vnode.state.description,
-              onChangeHandler: (v) => {
-                vnode.state.description = v;
-              },
-              textarea: true,
             }),
             m(TogglePropertyRow, {
               title: 'Deploy',
@@ -99,46 +81,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
               placeholder: '5',
             }),
             // TODO: add divider to distinguish on-chain data
-            m(InputPropertyRow, {
-              title: 'Website',
-              defaultValue: vnode.state.website,
-              placeholder: 'https://example.com',
-              onChangeHandler: (v) => {
-                vnode.state.website = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Discord',
-              defaultValue: vnode.state.discord,
-              placeholder: 'https://discord.com/invite',
-              onChangeHandler: (v) => {
-                vnode.state.discord = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Element',
-              defaultValue: vnode.state.element,
-              placeholder: 'https://matrix.to/#',
-              onChangeHandler: (v) => {
-                vnode.state.element = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Telegram',
-              defaultValue: vnode.state.telegram,
-              placeholder: 'https://t.me',
-              onChangeHandler: (v) => {
-                vnode.state.telegram = v;
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'Github',
-              defaultValue: vnode.state.github,
-              placeholder: 'https://github.com',
-              onChangeHandler: (v) => {
-                vnode.state.github = v;
-              },
-            }),
+            ...defaultChainRows(vnode.state),
           ]
         ),
         m(Button, {
@@ -155,6 +98,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
               name,
               description,
               initialValue,
+              icon_url,
               website,
               discord,
               element,
@@ -174,6 +118,7 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
                 ? 'https://rpc.mainnet.near.org'
                 : 'https://rpc.testnet.near.org',
               symbol: isMainnet ? 'NEAR' : 'tNEAR',
+              icon_url,
               website,
               discord,
               element,
