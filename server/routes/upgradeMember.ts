@@ -50,11 +50,10 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
       }
     }]
   });
-  const roles = memberAddress.Roles;
+  const roles = memberAddress?.Roles;
   if (!memberAddress || !roles) return next(new Error(Errors.NoMember));
 
-  // TODO: use first role for now -- unclear if it's possible to have multiple roles on
-  //   same chain / community
+  // There should only be one role per address per chain/community
   const member = await models.Role.findOne({ where: { id: roles[0].id } });
   if (!member) return next(new Error(Errors.NoMember));
 

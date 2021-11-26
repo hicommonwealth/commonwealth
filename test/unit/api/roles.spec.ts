@@ -156,7 +156,7 @@ describe('Roles Test', () => {
           new_role: role,
         });
       expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(upgradeErrors.InvalidAddress);
+      expect(res.body.error).to.be.equal(upgradeErrors.NoMember);
     });
 
     it('should fail when admin upgrades without role', async () => {
