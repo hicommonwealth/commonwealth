@@ -9,7 +9,8 @@ import { modelFromServer } from './threads';
 export const ALL_RESULTS_QUERY = new SearchQuery('COMMONWEALTH_ALL_RESULTS');
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
-
+const SEARCH_HISTORY_KEY = "COMMONWEALTH_SEARCH_HISTORY"
+const SEARCH_HISTORY_SIZE = 20
 export interface SearchParams {
     communityScope?: string;
     chainScope?: string;
@@ -128,8 +129,6 @@ class SearchContoller {
         })
 
         if(getAllResults || searchScope.includes(SearchScope.THREADS)){
-          console.log(searchCache.results[SearchType.Discussion])
-          console.log(comments)
           searchCache.results[SearchType.Discussion] = searchCache.results[SearchType.Discussion]
             .concat(comments)
             .sort(({rank : a}, {rank : b}) => b-a)
@@ -277,6 +276,34 @@ class SearchContoller {
     );
     return bCreatedAt.diff(aCreatedAt);
   };
+
+  public getHistory() {
+    const rawHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || []
+    const history = []
+    for(let i = 0; i < rawHistory.length; i++){
+      history.push(SearchQuery.fromEncodedString(rawHistory[i]))
+    }
+    return history
+  }
+
+  public addToHistory(query: SearchQuery) {
+    this.removeFromHistory(query) // to ignore duplicates
+    const rawHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || []
+    if(rawHistory.length >= SEARCH_HISTORY_SIZE){
+      rawHistory.pop()
+    }
+    rawHistory.unshift(query.toEncodedString())
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(rawHistory))
+  }
+
+  public removeFromHistory(query: SearchQuery) {
+    const rawHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || []
+    const index = rawHistory.indexOf(query.toEncodedString())
+    if(index > -1){
+      rawHistory.splice(index, 1)
+    }
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(rawHistory))
+  }
 }
 
 export default SearchContoller

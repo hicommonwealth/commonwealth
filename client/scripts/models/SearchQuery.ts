@@ -34,7 +34,7 @@ export default class SearchQuery implements SearchParams {
         let encodedString = this.searchTerm +
             (this.communityScope ? ` communityScope=${this.communityScope}` : '') +
             (this.chainScope ? ` chainScope=${this.chainScope}` : '') +
-            (this.isSearchPreview ? ` preview=${this.isSearchPreview}` : '')
+            (this.isSearchPreview ? ` isSearchPreview=${this.isSearchPreview}` : '')
 
         for(const scope in this.searchScope){
             if (Object.prototype.hasOwnProperty.call(this.searchScope, scope) &&
@@ -42,8 +42,22 @@ export default class SearchQuery implements SearchParams {
                 encodedString += ` scope[]=${this.searchScope[scope]}`
             }
         }
-
+        SearchQuery.fromEncodedString(encodedString)
         return encodedString
+    }
+
+    public static fromEncodedString(encodedString: string) {
+        const props = encodedString.split(" ")
+        const sq = new SearchQuery(props[0])
+        for(let i = 1; i < props.length; i++){
+            const [prop, value] = props[i].split("=")
+            if(prop === 'scope[]'){
+                value === 'ALL' ? '' : sq.toggleScope(SearchScope[value])
+            } else {
+                sq[prop] = value === 'true' || value === 'false' ? value === 'true' : value
+            }
+        }
+        return sq
     }
 
     public toggleScope(scope: SearchScope) {
@@ -61,6 +75,7 @@ export default class SearchQuery implements SearchParams {
         if(this.searchScope.length === 0){
             this.searchScope.push(SearchScope.ALL)
         }
+        console.log(this)
     }
 
     public toUrlParams(){

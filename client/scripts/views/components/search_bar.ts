@@ -11,13 +11,16 @@ import {
   List,
   ListItem,
   Spinner,
+  Button,
+  Size,
+  Tag,
 } from 'construct-ui';
 import { SearchIcon } from 'helpers/search';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery'
-import { ContentType, SearchType, SearchParams } from 'controllers/server/search';
+import { ContentType, SearchType } from 'controllers/server/search';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
@@ -231,9 +234,6 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
   if (communityScope || chainScope) {
     types = [SearchType.Discussion, SearchType.Member];
     results = getBalancedContentListing(app.search.getByQuery(searchQuery).results, types);
-  } else if (isHomepageSearch) {
-    types = [SearchType.Community];
-    results = getBalancedContentListing(app.search.getByQuery(searchQuery).results, types);
   } else {
     types = [SearchType.Discussion, SearchType.Member, SearchType.Community];
     results = getBalancedContentListing(app.search.getByQuery(searchQuery).results, types);
@@ -274,6 +274,51 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
   });
   return organizedResults;
 };
+
+const getSearchHistoryPreview = (searchQuery: SearchQuery, setFilterMenuActive, executeSearch) => {
+  const scopeTags = searchQuery.searchScope[0] === SearchScope.ALL ? []
+    : searchQuery.searchScope.map(scope => m(Tag, {label: SearchScope[scope].toLowerCase()}) )
+
+  if(searchQuery.chainScope) {
+    scopeTags.unshift(m(Tag, {
+      label: searchQuery.chainScope.toLowerCase(),
+      class: 'search-history-primary-tag'
+    }))
+  }
+
+  if(searchQuery.communityScope) {
+    scopeTags.unshift(m(Tag, {
+      label: searchQuery.communityScope.toLowerCase(),
+      class: 'search-history-primary-tag'
+    }))
+  }
+
+  if(scopeTags.length > 1){
+    scopeTags.splice(-1, 0, m('p.search-history-tag-seperator', 'and'))
+  }
+
+  if(scopeTags.length >= 1){
+    scopeTags.unshift(m(Icon, {name: Icons.ARROW_RIGHT }))
+  }
+
+  return m(ListItem, {
+    class: 'search-history-item',
+    onclick: () => {
+      app.search.removeFromHistory(searchQuery)
+      executeSearch(searchQuery)
+    },
+    onmouseover: () => {setFilterMenuActive(true)},
+    onmouseout: () => {setFilterMenuActive(false)},
+    contentLeft: [
+      m('p.search-history-query', searchQuery.searchTerm),
+      scopeTags
+    ],
+    contentRight: m(Icon, {
+        name: Icons.X,
+        onclick: () => {app.search.removeFromHistory(searchQuery)}
+      })
+  })
+}
 
 export const search = async (
   searchQuery: SearchQuery,
@@ -325,6 +370,7 @@ export const SearchBar: m.Component<
     hideResults: boolean;
     inputTimeout: any;
     isTyping: boolean;
+    filterMenuActive: boolean;
     searchQuery: SearchQuery;
   }
 > = {
@@ -335,55 +381,119 @@ export const SearchBar: m.Component<
       vnode.state.searchQuery.searchTerm = vnode.state.searchTerm
     }
     const { results, searchTerm, searchQuery } = vnode.state;
-    const showDropdownPreview = !m.route.get().includes('/search?q=');
     const isMobile = window.innerWidth < 767.98;
-    const LoadingPreview = m(
-      List,
-      {
-        class: 'search-results-loading',
-      },
-      [m(ListItem, { label: m(Spinner, { active: true }) })]
-    );
-    const searchResults =
-      !results || results?.length === 0
-        ? app.search.getByQuery(searchQuery)?.loaded
-          ? m(List, [m(emptySearchPreview, { searchTerm })])
-          : LoadingPreview
-        : vnode.state.isTyping
-        ? LoadingPreview
-        : m(List, { class: 'search-results-list' }, results);
 
-    const instructions =
-      m(List, { class: 'search-results-list' }, [
-        app.community ? m(ListItem, {
-          label: m('a.search-results-item', `Search inside chain: ${app.community.name}`),
-          onclick: () => { vnode.state.searchQuery.communityScope = app.community.name }
-        }) :
-        app.activeId() && m(ListItem, {
-          label: m('a.search-results-item', `Search inside chain: ${app.activeChainId()}`),
-          onclick: () => {vnode.state.searchQuery.chainScope = app.activeChainId()}
-        }),
+    const setFilterMenuActive = (using: boolean) => {
+      vnode.state.filterMenuActive = using
+    }
+
+    vnode.state.closeResults = () => {
+      vnode.state.hideResults = true;
+    };
+
+    const executeSearch = (query: SearchQuery) => {
+      if (
+        !query.searchTerm ||
+        !query.searchTerm.toString().trim() ||
+        !query.searchTerm.match(/[A-Za-z]+/)
+      ) {
+        notifyError('Enter a valid search term');
+        return;
+      }
+      if (query.searchTerm.length < 4) {
+        notifyError('Query must be at least 4 characters');
+      }
+      query.isSearchPreview = false;
+      app.search.addToHistory(query)
+      m.route.set(`/search?${query.toUrlParams()}`);
+    }
+
+    const historyList = app.search.getHistory()
+      .map(h => getSearchHistoryPreview(h, setFilterMenuActive, executeSearch))
+
+    const activeCommunity = app.community ? app.community.name : vnode.state.searchQuery.communityScope
+    const activeChain = app.activeChainId() || vnode.state.searchQuery.chainScope
+    const scopeTitle = m(ListItem, {class: 'disabled', label: 'Scope'})
+
+    const filterDropdown =
+      m(List, {
+        class: 'search-results-list',
+      }, [
+        activeCommunity ? [scopeTitle, m(ListItem, {
+          class: 'disabled',
+          label: m(Button, {
+            size: Size.LG,
+            onclick: () => { vnode.state.searchQuery.communityScope = activeCommunity },
+            active: vnode.state.searchQuery.communityScope === activeCommunity,
+            onmouseover: () => {vnode.state.filterMenuActive = true},
+            onmouseout: () => {vnode.state.filterMenuActive = false},
+            label: `Search inside community: ${activeCommunity}`
+          }),
+        })] :
+        app.activeChainId() && [scopeTitle, m(ListItem, {
+          class: 'disabled',
+          label: m(Button, {
+            size: Size.LG,
+            onclick: () => { vnode.state.searchQuery.chainScope = activeChain },
+            active: vnode.state.searchQuery.chainScope === activeChain ,
+            onmouseover: () => {vnode.state.filterMenuActive = true},
+            onmouseout: () => {vnode.state.filterMenuActive = false},
+            label: `Search inside chain: ${activeChain}`
+          }),
+        })],
         m(ListItem, {
           class: 'disabled',
           label: "I'm looking for: "
         }),
         m(ListItem, {
-          label: "Replies",
-          onclick: () => {vnode.state.searchQuery.toggleScope(SearchScope.COMMENTS)}
-        }),
-        m(ListItem, {
-          label: "Proposals",
-          onclick: () => {vnode.state.searchQuery.toggleScope(SearchScope.PROPOSALS)}
-        }),
-        m(ListItem, {
-          label: "Threads",
-          onclick: () => {vnode.state.searchQuery.toggleScope(SearchScope.THREADS)}
-        }),
+          class: 'disabled bottom-border search-filter-button-bar',
+          label: [
+            m(Button, {
+              size: Size.LG,
+              active: vnode.state.searchQuery.searchScope.includes(SearchScope.THREADS),
+              onclick: () => {vnode.state.searchQuery.toggleScope(SearchScope.THREADS)},
+              onmouseover: () => {vnode.state.filterMenuActive = true},
+              onmouseout: () => {vnode.state.filterMenuActive = false},
+              label: 'Threads'
+            }),
+            m(Button, {
+              size: Size.LG,
+              active: vnode.state.searchQuery.searchScope.includes(SearchScope.COMMENTS),
+              onclick: () => vnode.state.searchQuery.toggleScope(SearchScope.COMMENTS),
+              onmouseover: () => {vnode.state.filterMenuActive = true},
+              onmouseout: () => {vnode.state.filterMenuActive = false},
+              label: 'Replies'
+            }),
+            m(Button, {
+              size: Size.LG,
+              active: vnode.state.searchQuery.searchScope.includes(SearchScope.MEMBERS),
+              onclick: () => vnode.state.searchQuery.toggleScope(SearchScope.MEMBERS),
+              onmouseover: () => {vnode.state.filterMenuActive = true},
+              onmouseout: () => {vnode.state.filterMenuActive = false},
+              label: 'Members'
+            }),
+            m(Button, {
+              size: Size.LG,
+              active: vnode.state.searchQuery.searchScope.includes(SearchScope.COMMUNITIES),
+              onclick: () => vnode.state.searchQuery.toggleScope(SearchScope.COMMUNITIES),
+              onmouseover: () => {vnode.state.filterMenuActive = true},
+              onmouseout: () => {vnode.state.filterMenuActive = false},
+              label: 'Communities'
+            }),
+        ]}),
+        vnode.state.searchTerm.length < 1 ?
+          historyList.length === 0
+          ? m(ListItem, {class: 'search-history-no-results',
+                         label: 'Enter a term into the field and press Enter to start' })
+          : [m(ListItem, {class: 'disabled', label: 'Search History' }), historyList]
+          : !results || results?.length === 0
+            ? app.search.getByQuery(searchQuery)?.loaded
+              ? m(ListItem, [m(emptySearchPreview, { searchTerm })])
+              : m(ListItem, { label: m(Spinner, { active: true }) })
+            : vnode.state.isTyping
+            ? m(ListItem, { label: m(Spinner, { active: true }) })
+            : results
       ])
-
-    vnode.state.closeResults = () => {
-      vnode.state.hideResults = true;
-    };
 
     const chainOrCommIcon = app.activeId()
       ? app.activeChainId()
@@ -407,27 +517,11 @@ export const SearchBar: m.Component<
         })
       : null;
 
-    const executeSearch = () => {
-      if (
-        !vnode.state.searchQuery.searchTerm ||
-        !vnode.state.searchQuery.searchTerm.toString().trim() ||
-        !vnode.state.searchQuery.searchTerm.match(/[A-Za-z]+/)
-      ) {
-        notifyError('Enter a valid search term');
-        return;
-      }
-      if (vnode.state.searchQuery.searchTerm.length < 4) {
-        notifyError('Query must be at least 4 characters');
-      }
-      vnode.state.searchQuery.isSearchPreview = false;
-      m.route.set(`/search?${vnode.state.searchQuery.toUrlParams()}`);
-    }
-
     const searchIcon = vnode.state.searchTerm
       ? m(Icon, {
           name: Icons.CORNER_DOWN_LEFT,
           onclick: () => {
-            executeSearch()
+            executeSearch(vnode.state.searchQuery)
           },
         })
       : null;
@@ -456,6 +550,9 @@ export const SearchBar: m.Component<
             vnode.state.focused = true;
             vnode.state.hideResults = false;
           },
+          onfocusout: () => {
+            if(!vnode.state.filterMenuActive) vnode.state.focused = false;
+          },
           oninput: (e) => {
             e.stopPropagation();
             vnode.state.isTyping = true;
@@ -474,15 +571,11 @@ export const SearchBar: m.Component<
           onkeyup: (e) => {
             e.stopPropagation();
             if (e.key === 'Enter') {
-              executeSearch()
+              executeSearch(vnode.state.searchQuery)
             }
           },
         }),
-        searchTerm.length > 3 &&
-          showDropdownPreview &&
-          !vnode.state.hideResults &&
-          searchResults,
-        vnode.state.focused && !vnode.state.hideResults && searchTerm.length < 3 && instructions
+        vnode.state.focused && !vnode.state.hideResults && filterDropdown
       ]
     );
   },
