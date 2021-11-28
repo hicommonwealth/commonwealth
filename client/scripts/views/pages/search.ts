@@ -18,8 +18,7 @@ import PageLoading from 'views/pages/loading';
 import { ContentType } from 'controllers/server/search'
 import {
   ReplyIcon,
-  AccountIcon,
-  ArrowRightIcon
+  AccountIcon
 } from '../components/component_kit/icons';
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
