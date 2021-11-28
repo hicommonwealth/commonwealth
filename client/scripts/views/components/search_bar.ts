@@ -20,7 +20,7 @@ import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery'
-import { ContentType, SearchType } from 'controllers/server/search';
+import { ContentType } from 'controllers/server/search';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
@@ -33,7 +33,8 @@ export const getMemberPreview = (
   closeResultsFn,
   searchTerm,
   tabIndex,
-  showChainName?
+  setUsingFilterMenuFn,
+  showChainName?,
 ) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
@@ -62,10 +63,12 @@ export const getMemberPreview = (
         closeResultsFn();
       }
     },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false)
   });
 };
 
-export const getCommunityPreview = (community, closeResultsFn, tabIndex) => {
+export const getCommunityPreview = (community, closeResultsFn, tabIndex, setUsingFilterMenuFn) => {
   const params =
     community.contentType === ContentType.Token
       ? { token: community }
@@ -94,6 +97,8 @@ export const getCommunityPreview = (community, closeResultsFn, tabIndex) => {
         onSelect(e);
       }
     },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false)
   });
 };
 
@@ -101,7 +106,8 @@ export const getDiscussionPreview = (
   thread,
   closeResultsFn,
   searchTerm,
-  tabIndex
+  tabIndex,
+  setUsingFilterMenuFn
 ) => {
   const proposalId = thread.proposalid;
   const chainOrComm = thread.chain || thread.offchain_community;
@@ -110,13 +116,7 @@ export const getDiscussionPreview = (
       notifyError('Discussion not found.');
       return;
     }
-    m.route.set(
-      thread.type === 'thread'
-        ? `/${chainOrComm}/proposal/discussion/${proposalId}`
-        : `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${
-            proposalId.split('_')[1]
-          }`
-    );
+    m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
     closeResultsFn();
   };
   return m(ListItem, {
@@ -127,81 +127,123 @@ export const getDiscussionPreview = (
         onSelect(e);
       }
     },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false),
     label: m('a.search-results-item', [
-      thread.type === 'thread'
-        ? [
-            m('.search-results-thread-title', [
-              decodeURIComponent(thread.title),
-            ]),
-            m('.search-results-thread-body', [
-              (() => {
-                try {
-                  const doc = JSON.parse(decodeURIComponent(thread.body));
-                  if (!doc.ops) throw new Error();
-                  return m(QuillFormattedText, {
-                    doc,
-                    hideFormatting: true,
-                    collapse: true,
-                    searchTerm,
-                  });
-                } catch (e) {
-                  const doc = decodeURIComponent(thread.body);
-                  return m(MarkdownFormattedText, {
-                    doc,
-                    hideFormatting: true,
-                    collapse: true,
-                    searchTerm,
-                  });
-                }
-              })(),
-            ]),
-          ]
-        : [
-            m('.search-results-thread-title', [
-              'Comment on ',
-              decodeURIComponent(thread.title),
-            ]),
-            m('.search-results-thread-subtitle', [
-              m('span.created-at', moment(thread.created_at).fromNow()),
-              m(User, {
-                user: new AddressInfo(
-                  thread.address_id,
-                  thread.address,
-                  thread.address_chain,
-                  null
-                ),
-              }),
-            ]),
-            m('.search-results-comment', [
-              (() => {
-                try {
-                  const doc = JSON.parse(decodeURIComponent(thread.text));
-                  if (!doc.ops) throw new Error();
-                  return m(QuillFormattedText, {
-                    doc,
-                    hideFormatting: true,
-                    collapse: true,
-                    searchTerm,
-                  });
-                } catch (e) {
-                  const doc = decodeURIComponent(thread.text);
-                  return m(MarkdownFormattedText, {
-                    doc,
-                    hideFormatting: true,
-                    collapse: true,
-                    searchTerm,
-                  });
-                }
-              })(),
-            ]),
-          ],
+      m('.search-results-thread-title', [
+        decodeURIComponent(thread.title),
+      ]),
+      m('.search-results-thread-subtitle', [
+        m('span.created-at', moment(thread.created_at).fromNow()),
+        m(User, {
+          user: new AddressInfo(
+            thread.address_id,
+            thread.address,
+            thread.address_chain,
+            null
+          ),
+        }),
+      ]),
+      m('.search-results-thread-body', [
+        (() => {
+          try {
+            const doc = JSON.parse(decodeURIComponent(thread.body));
+            if (!doc.ops) throw new Error();
+            return m(QuillFormattedText, {
+              doc,
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            });
+          } catch (e) {
+            const doc = decodeURIComponent(thread.body);
+            return m(MarkdownFormattedText, {
+              doc,
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            });
+          }
+        })(),
+      ]),
+    ]),
+  });
+};
+
+export const getCommentPreview = (
+  comment,
+  closeResultsFn,
+  searchTerm,
+  tabIndex,
+  setUsingFilterMenuFn
+) => {
+  const proposalId = comment.proposalid;
+  const chainOrComm = comment.chain || comment.offchain_community;
+  const onSelect = (e) => {
+    if (!chainOrComm) {
+      notifyError('Discussion not found.');
+      return;
+    }
+    m.route.set(`/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+    closeResultsFn();
+  };
+  return m(ListItem, {
+    tabIndex,
+    onclick: onSelect,
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        onSelect(e);
+      }
+    },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false),
+    label: m('a.search-results-item', [
+      [
+        m('.search-results-thread-title', [
+          'Comment on ',
+          decodeURIComponent(comment.title),
+        ]),
+        m('.search-results-thread-subtitle', [
+          m('span.created-at', moment(comment.created_at).fromNow()),
+          m(User, {
+            user: new AddressInfo(
+              comment.address_id,
+              comment.address,
+              comment.address_chain,
+              null
+            ),
+          }),
+        ]),
+        m('.search-results-comment', [
+          (() => {
+            try {
+              const doc = JSON.parse(decodeURIComponent(comment.text));
+              if (!doc.ops) throw new Error();
+              return m(QuillFormattedText, {
+                doc,
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
+            } catch (e) {
+              const doc = decodeURIComponent(comment.text);
+              return m(MarkdownFormattedText, {
+                doc,
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
+            }
+          })(),
+        ]),
+      ],
     ]),
   });
 };
 
 const getBalancedContentListing = (
   unfilteredResults: Record<any, any>,
-  types: SearchType[]
+  types: SearchScope[]
 ) => {
   const results = {};
   let unfilteredResultsLength = 0;
@@ -228,24 +270,16 @@ const getBalancedContentListing = (
 };
 
 const getResultsPreview = (searchQuery: SearchQuery, state) => {
-  let results;
-  let types;
-  const { communityScope, chainScope, isHomepageSearch } = searchQuery;
-  if (communityScope || chainScope) {
-    types = [SearchType.Discussion, SearchType.Member];
-    results = getBalancedContentListing(app.search.getByQuery(searchQuery).results, types);
-  } else {
-    types = [SearchType.Discussion, SearchType.Member, SearchType.Community];
-    results = getBalancedContentListing(app.search.getByQuery(searchQuery).results, types);
-  }
+  const { communityScope } = searchQuery;
+  const types = searchQuery.getSearchScope()
+  const results = getBalancedContentListing(app.search.getByQuery(searchQuery).results, types)
   const organizedResults = [];
   let tabIndex = 1;
-  types.forEach((type: SearchType) => {
+  types.forEach((type: SearchScope) => {
     const res = results[type];
     if (res?.length === 0) return;
     const headerEle = m(ListItem, {
-      label:
-        type === SearchType.Community ? 'Communities' : `${capitalize(type)}s`,
+      label: type,
       class: 'disabled',
       onclick: (e) => {
         e.preventDefault();
@@ -256,18 +290,21 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
     (res as any[]).forEach((item) => {
       tabIndex += 1;
       const resultRow =
-        item.searchType === SearchType.Discussion
-          ? getDiscussionPreview(item, state.closeResults, searchQuery.searchTerm, tabIndex)
-          : item.searchType === SearchType.Member
+        item.searchType === SearchScope.Threads
+          ? getDiscussionPreview(item, state.closeResults, searchQuery.searchTerm, tabIndex, state.setUsingFilterMenu)
+          : item.searchType === SearchScope.Members
           ? getMemberPreview(
               item,
               state.closeResults,
               searchQuery.searchTerm,
               tabIndex,
+              state.setUsingFilterMenu,
               !!communityScope
             )
-          : item.searchType === SearchType.Community
-          ? getCommunityPreview(item, state.closeResults, tabIndex)
+          : item.searchType === SearchScope.Communities
+          ? getCommunityPreview(item, state.closeResults, tabIndex, state.setUsingFilterMenu)
+          : item.searchType === SearchScope.Replies
+          ? getCommentPreview(item, state.closeResults, searchQuery.searchTerm, tabIndex, state.setUsingFilterMenu)
           : null;
       organizedResults.push(resultRow);
     });
@@ -276,7 +313,7 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
 };
 
 const getSearchHistoryPreview = (searchQuery: SearchQuery, setFilterMenuActive, executeSearch) => {
-  const scopeTags = searchQuery.searchScope[0] === SearchScope.ALL ? []
+  const scopeTags = searchQuery.searchScope[0] === SearchScope.All ? []
     : searchQuery.searchScope.map(scope => m(Tag, {label: SearchScope[scope].toLowerCase()}) )
 
   if(searchQuery.chainScope) {
@@ -371,6 +408,7 @@ export const SearchBar: m.Component<
     inputTimeout: any;
     isTyping: boolean;
     filterMenuActive: boolean;
+    setUsingFilterMenu: Function;
     searchQuery: SearchQuery;
   }
 > = {
@@ -390,6 +428,10 @@ export const SearchBar: m.Component<
     vnode.state.closeResults = () => {
       vnode.state.hideResults = true;
     };
+
+    vnode.state.setUsingFilterMenu = using => {
+      vnode.state.filterMenuActive = using
+    }
 
     const executeSearch = (query: SearchQuery) => {
       if (
@@ -415,6 +457,18 @@ export const SearchBar: m.Component<
     const activeChain = app.activeChainId() || vnode.state.searchQuery.chainScope
     const scopeTitle = m(ListItem, {class: 'disabled', label: 'Scope'})
 
+    const scopeButtons = [SearchScope.Threads, SearchScope.Replies, SearchScope.Communities, SearchScope.Members]
+      .map(s => {
+        return m(Button, {
+          size: Size.LG,
+          active: vnode.state.searchQuery.searchScope.includes(s),
+          onclick: () => {vnode.state.searchQuery.toggleScope(s)},
+          onmouseover: () => {vnode.state.filterMenuActive = true},
+          onmouseout: () => {vnode.state.filterMenuActive = false},
+          label: s
+        })
+      })
+
     const filterDropdown =
       m(List, {
         class: 'search-results-list',
@@ -423,7 +477,9 @@ export const SearchBar: m.Component<
           class: 'disabled',
           label: m(Button, {
             size: Size.LG,
-            onclick: () => { vnode.state.searchQuery.communityScope = activeCommunity },
+            onclick: () => { vnode.state.searchQuery.communityScope =
+              vnode.state.searchQuery.communityScope === activeCommunity
+              ? undefined : activeCommunity },
             active: vnode.state.searchQuery.communityScope === activeCommunity,
             onmouseover: () => {vnode.state.filterMenuActive = true},
             onmouseout: () => {vnode.state.filterMenuActive = false},
@@ -434,7 +490,9 @@ export const SearchBar: m.Component<
           class: 'disabled',
           label: m(Button, {
             size: Size.LG,
-            onclick: () => { vnode.state.searchQuery.chainScope = activeChain },
+            onclick: () => { vnode.state.searchQuery.chainScope =
+              vnode.state.searchQuery.chainScope === activeChain
+              ? undefined : activeChain },
             active: vnode.state.searchQuery.chainScope === activeChain ,
             onmouseover: () => {vnode.state.filterMenuActive = true},
             onmouseout: () => {vnode.state.filterMenuActive = false},
@@ -447,40 +505,7 @@ export const SearchBar: m.Component<
         }),
         m(ListItem, {
           class: 'disabled bottom-border search-filter-button-bar',
-          label: [
-            m(Button, {
-              size: Size.LG,
-              active: vnode.state.searchQuery.searchScope.includes(SearchScope.THREADS),
-              onclick: () => {vnode.state.searchQuery.toggleScope(SearchScope.THREADS)},
-              onmouseover: () => {vnode.state.filterMenuActive = true},
-              onmouseout: () => {vnode.state.filterMenuActive = false},
-              label: 'Threads'
-            }),
-            m(Button, {
-              size: Size.LG,
-              active: vnode.state.searchQuery.searchScope.includes(SearchScope.COMMENTS),
-              onclick: () => vnode.state.searchQuery.toggleScope(SearchScope.COMMENTS),
-              onmouseover: () => {vnode.state.filterMenuActive = true},
-              onmouseout: () => {vnode.state.filterMenuActive = false},
-              label: 'Replies'
-            }),
-            m(Button, {
-              size: Size.LG,
-              active: vnode.state.searchQuery.searchScope.includes(SearchScope.MEMBERS),
-              onclick: () => vnode.state.searchQuery.toggleScope(SearchScope.MEMBERS),
-              onmouseover: () => {vnode.state.filterMenuActive = true},
-              onmouseout: () => {vnode.state.filterMenuActive = false},
-              label: 'Members'
-            }),
-            m(Button, {
-              size: Size.LG,
-              active: vnode.state.searchQuery.searchScope.includes(SearchScope.COMMUNITIES),
-              onclick: () => vnode.state.searchQuery.toggleScope(SearchScope.COMMUNITIES),
-              onmouseover: () => {vnode.state.filterMenuActive = true},
-              onmouseout: () => {vnode.state.filterMenuActive = false},
-              label: 'Communities'
-            }),
-        ]}),
+          label: scopeButtons}),
         vnode.state.searchTerm.length < 1 ?
           historyList.length === 0
           ? m(ListItem, {class: 'search-history-no-results',

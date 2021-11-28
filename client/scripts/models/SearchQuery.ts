@@ -1,48 +1,56 @@
 /* eslint-disable prefer-template */
 export enum SearchScope {
-    "MEMBERS" = "MEMBERS",
-    "COMMUNITIES" = "COMMUNITIES",
-    "PROPOSALS" = "PROPOSALS",
-    "THREADS" = "THREADS",
-    "COMMENTS" = "COMMENTS",
-    "ALL" = "ALL"
+    "Members" = "Members",
+    "Communities" = "Communities",
+    "Proposals" = "Proposals",
+    "Threads" = "Threads",
+    "Replies" = "Replies",
+    "All" = "All"
+}
+
+export enum SearchSort {
+    "Best" = "Best",
+    "Newest" = "Newest",
+    "Oldest" = "Oldest"
 }
 export interface SearchParams {
     communityScope?: string;
     chainScope?: string;
     isSearchPreview?: boolean;
     searchScope?: [SearchScope];
+    sort?: SearchSort;
     resultSize?: number;
 }
 export default class SearchQuery implements SearchParams {
     public searchTerm: Lowercase<string>;
     public communityScope?: string;
     public chainScope?: string;
-    public isHomepageSearch?: boolean;
     public isSearchPreview?: boolean;
-    public searchScope?: [SearchScope];
+    public searchScope: [SearchScope];
+    public sort: SearchSort;
 
     constructor(searchTerm: string, params?: SearchParams){
         this.searchTerm = searchTerm
-        this.searchScope = params ? params.searchScope || [SearchScope.ALL] : [SearchScope.ALL]
+        this.searchScope = params ? params.searchScope || [SearchScope.All] : [SearchScope.All]
         this.communityScope = params ? params.communityScope : undefined
         this.chainScope = params ? params.chainScope : undefined
         this.isSearchPreview = params ? params.isSearchPreview : false
+        this.sort = params ? params.sort ? params.sort : SearchSort.Best : SearchSort.Best
     }
 
     public toEncodedString() {
         let encodedString = this.searchTerm +
             (this.communityScope ? ` communityScope=${this.communityScope}` : '') +
             (this.chainScope ? ` chainScope=${this.chainScope}` : '') +
-            (this.isSearchPreview ? ` isSearchPreview=${this.isSearchPreview}` : '')
+            (this.isSearchPreview ? ` isSearchPreview=${this.isSearchPreview}` : '') +
+            (this.sort ? ` sort=${this.sort}` : '')
 
         for(const scope in this.searchScope){
             if (Object.prototype.hasOwnProperty.call(this.searchScope, scope) &&
-                this.searchScope[scope] !== SearchScope.ALL) {
+                this.searchScope[scope] !== SearchScope.All) {
                 encodedString += ` scope[]=${this.searchScope[scope]}`
             }
         }
-        SearchQuery.fromEncodedString(encodedString)
         return encodedString
     }
 
@@ -53,6 +61,8 @@ export default class SearchQuery implements SearchParams {
             const [prop, value] = props[i].split("=")
             if(prop === 'scope[]'){
                 value === 'ALL' ? '' : sq.toggleScope(SearchScope[value])
+            } else if(prop === 'sort') {
+                sq.sort = SearchSort[value]
             } else {
                 sq[prop] = value === 'true' || value === 'false' ? value === 'true' : value
             }
@@ -65,7 +75,7 @@ export default class SearchQuery implements SearchParams {
         if(index > -1){
             this.searchScope.splice(index, 1)
         } else {
-            if(this.searchScope.length === 1 && this.searchScope[0] === SearchScope.ALL){
+            if(this.searchScope.length === 1 && this.searchScope[0] === SearchScope.All){
                 this.searchScope = [scope]
             } else {
                 this.searchScope.push(scope)
@@ -73,9 +83,8 @@ export default class SearchQuery implements SearchParams {
         }
 
         if(this.searchScope.length === 0){
-            this.searchScope.push(SearchScope.ALL)
+            this.searchScope.push(SearchScope.All)
         }
-        console.log(this)
     }
 
     public toUrlParams(){
@@ -87,7 +96,14 @@ export default class SearchQuery implements SearchParams {
         sq.chainScope = url['chainScope'] || undefined
         sq.communityScope = url['communityScope'] || undefined
         sq.isSearchPreview = url['preview'] === 'true'
-        sq.searchScope = url['scope'] || [SearchScope.ALL]
+        sq.sort = url['sort'] || SearchSort.Best
+        sq.searchScope = url['scope'] || [SearchScope.All]
         return sq
+    }
+
+    public getSearchScope() {
+        return this.searchScope[0] === SearchScope.All
+          ? [SearchScope.Threads, SearchScope.Replies, SearchScope.Communities, SearchScope.Members]
+          : this.searchScope
     }
 }

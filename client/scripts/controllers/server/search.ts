@@ -2,7 +2,7 @@ import $ from 'jquery';
 import moment from 'moment';
 import SearchStore from "stores/SearchStore";
 import app from 'state';
-import { SearchScope } from '../../models/SearchQuery';
+import { SearchScope, SearchParams } from '../../models/SearchQuery';
 import { OffchainThread, CommunityInfo, SearchQuery } from "../../models";
 import { modelFromServer } from './threads';
 
@@ -11,13 +11,6 @@ const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 const SEARCH_HISTORY_KEY = "COMMONWEALTH_SEARCH_HISTORY"
 const SEARCH_HISTORY_SIZE = 20
-export interface SearchParams {
-    communityScope?: string;
-    chainScope?: string;
-    isSearchPreview?: boolean;
-    isHomepageSearch?: boolean;
-    resultSize?: number;
-}
 
 export enum ContentType {
     Thread = 'thread',
@@ -26,13 +19,6 @@ export enum ContentType {
     Chain = 'chain',
     Token = 'token',
     Member = 'member'
-}
-
-export enum SearchType {
-  Discussion = 'discussion',
-  Community = 'community',
-  Member = 'member',
-  Top = 'top',
 }
 class SearchContoller {
   private _store: SearchStore = new SearchStore();
@@ -58,9 +44,9 @@ class SearchContoller {
                 }
             })
             const tokens = await getTokens();
-            allCommunitiesSearch.results[SearchType.Community] = tokens
+            allCommunitiesSearch.results[SearchScope.Communities] = tokens
         } catch (err) {
-            allCommunitiesSearch.results[SearchType.Community] = []
+            allCommunitiesSearch.results[SearchScope.Communities] = []
         } finally {
             allCommunitiesSearch.loaded = true
             this._store.update(allCommunitiesSearch)
@@ -73,79 +59,70 @@ class SearchContoller {
       return this.getByQuery(searchQuery)
     }
     const searchCache = this._store.getOrAdd(searchQuery)
-    const { searchTerm, communityScope, chainScope, isSearchPreview, searchScope } = searchQuery;
+    const { searchTerm, communityScope, chainScope, isSearchPreview, sort } = searchQuery;
     const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
-    const getAllResults = searchScope.includes(SearchScope.ALL)
+    const scope = searchQuery.getSearchScope()
 
     if (!this.getByQuery(ALL_RESULTS_QUERY)?.loaded){
       await this.initialize()
     }
 
     try {
-      if(getAllResults ||
-        searchScope.includes(SearchScope.THREADS) || searchScope.includes(SearchScope.PROPOSALS)){
+      if(scope.includes(SearchScope.Threads) || scope.includes(SearchScope.Proposals)){
 
         const discussions = await this.searchDiscussions(searchTerm, {
           resultSize,
           communityScope,
           chainScope,
+          sort
         })
 
-        searchCache.results[SearchType.Discussion] = discussions
+        searchCache.results[SearchScope.Threads] = discussions
         .map((discussion) => {
             discussion.contentType = ContentType.Thread;
-            discussion.searchType = SearchType.Discussion;
+            discussion.searchType = SearchScope.Threads;
             return discussion;
         })
       }
 
-      if (getAllResults || searchScope.includes(SearchScope.MEMBERS)){
+      if (scope.includes(SearchScope.Members)){
         const addrs = await this.searchMentionableAddresses(
             searchTerm,
             { resultSize, communityScope, chainScope },
             ['created_at', 'DESC']
           )
 
-        searchCache.results[SearchType.Member] = addrs
+        searchCache.results[SearchScope.Members] = addrs
         .map((addr) => {
             addr.contentType = ContentType.Member;
-            addr.searchType = SearchType.Member;
+            addr.searchType = SearchScope.Members;
             return addr;
         })
         .sort(this.sortResults);
       }
 
-      if (getAllResults || searchScope.includes(SearchScope.COMMENTS)) {
+      if (scope.includes(SearchScope.Replies)) {
         const comments = await this.searchComments(searchTerm, {
           resultSize,
           communityScope,
           chainScope,
         })
 
-        comments.map(comment => {
+        searchCache.results[SearchScope.Replies] = comments.map(comment => {
           comment.contentType = ContentType.Comment
-          comment.searchType = SearchType.Discussion
+          comment.searchType = SearchScope.Replies
           return comment
         })
-
-        if(getAllResults || searchScope.includes(SearchScope.THREADS)){
-          searchCache.results[SearchType.Discussion] = searchCache.results[SearchType.Discussion]
-            .concat(comments)
-            .sort(({rank : a}, {rank : b}) => b-a)
-            .slice(0, resultSize)
-        } else {
-          searchCache.results[SearchType.Discussion] = comments
-        }
       }
 
-      if (getAllResults || searchScope.includes(SearchScope.COMMUNITIES)){
-        const unfilteredTokens = this.getByQuery(ALL_RESULTS_QUERY).results[SearchType.Community];
+      if (scope.includes(SearchScope.Communities)){
+        const unfilteredTokens = this.getByQuery(ALL_RESULTS_QUERY).results[SearchScope.Communities];
         const tokens = unfilteredTokens.filter((token) =>
             token.name?.toLowerCase().includes(searchTerm)
         );
-        searchCache.results[SearchType.Community] = tokens.map((token) => {
+        searchCache.results[SearchScope.Communities] = tokens.map((token) => {
             token.contentType = ContentType.Token;
-            token.searchType = SearchType.Community;
+            token.searchType = SearchScope.Communities;
             return token;
         });
 
@@ -156,11 +133,11 @@ class SearchContoller {
                 comm.symbol?.toLowerCase().includes(searchTerm)
             );
         });
-        searchCache.results[SearchType.Community] = searchCache.results[SearchType.Community]
+        searchCache.results[SearchScope.Communities] = searchCache.results[SearchScope.Communities]
             .concat(filteredComms.map((commOrChain) => {
               commOrChain.contentType = commOrChain instanceof CommunityInfo ?
                 ContentType.Community : ContentType.Chain;
-              commOrChain.searchType = SearchType.Community;
+              commOrChain.searchType = SearchScope.Communities;
               return commOrChain;
             })).sort(this.sortResults);
       }
@@ -174,7 +151,7 @@ class SearchContoller {
     searchTerm: string,
     params: SearchParams
   ) => {
-    const { resultSize, chainScope, communityScope } = params;
+    const { resultSize, chainScope, communityScope, sort } = params;
     try {
         const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
         chain: chainScope,
@@ -182,6 +159,7 @@ class SearchContoller {
         cutoff_date: null, // cutoffDate.toISOString(),
         search: searchTerm,
         results_size: resultSize,
+        sort
         });
         if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
@@ -197,7 +175,7 @@ class SearchContoller {
     searchTerm: string,
     params: SearchParams
   ) => {
-    const { resultSize, chainScope, communityScope } = params;
+    const { resultSize, chainScope, communityScope, sort } = params;
     try {
         const response = await $.get(`${app.serverUrl()}/searchComments`, {
         chain: chainScope,
@@ -205,6 +183,7 @@ class SearchContoller {
         cutoff_date: null, // cutoffDate.toISOString(),
         search: searchTerm,
         results_size: resultSize,
+        sort
         });
         if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);

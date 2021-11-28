@@ -89,6 +89,12 @@ const searchDiscussions = async (
       : { chain: chain.id };
   }
 
+  const sort = req.query.sort === 'Newest'
+    ? 'ORDER BY "OffchainThreads".created_at DESC'
+    : req.query.sort === 'Oldest'
+    ? 'ORDER BY "OffchainThreads".created_at ASC'
+    : 'ORDER BY rank DESC'
+
   replacements['searchTerm'] = req.query.search;
   replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
 
@@ -113,7 +119,7 @@ const searchDiscussions = async (
     JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id, 
     websearch_to_tsquery('english', :searchTerm) as query
     WHERE query @@ "OffchainThreads"._search ${communityOptions} 
-    ORDER BY rank DESC LIMIT :limit
+    ${sort} LIMIT :limit
 `,
       {
         replacements,
