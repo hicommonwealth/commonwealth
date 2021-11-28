@@ -1,4 +1,4 @@
-import 'modals/manage_community_modal.scss';
+import 'pages/manage_community.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -10,8 +10,9 @@ import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import CommunityMetadataManagementTable from './community_metadata_management_table';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
+import Sublayout from '../../sublayout';
 
-const ManageCommunityModal: m.Component<
+const ManageCommunityPage: m.Component<
   {},
   {
     roleData: RoleInfo[];
@@ -21,6 +22,9 @@ const ManageCommunityModal: m.Component<
   }
 > = {
   view: (vnode) => {
+    if (!app.activeChainId() && !app.activeCommunityId()) {
+      return;
+    }
     const chainOrCommObj = app.chain
       ? { chain: app.activeChainId() }
       : { community: app.activeCommunityId() };
@@ -114,13 +118,13 @@ const ManageCommunityModal: m.Component<
       m.redraw();
     };
 
-    return m('.ManageCommunityModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Manage Community'),
-        m(CompactModalExitButton),
-      ]),
-      m('.compact-modal-body-max', [
-        m('.panel-left', [
+    return m(Sublayout, {
+      class: 'ManageCommunityPage',
+      title: 'Manage Community',
+      showNewProposalButton: true,
+    }, [
+      m('.manage-community-wrapper', [
+        m('.panel-top', [
           isCommunity
             ? vnode.state.loadingFinished &&
               m(CommunityMetadataManagementTable, {
@@ -139,7 +143,7 @@ const ManageCommunityModal: m.Component<
                   onRoleUpdate(oldRole, newRole),
               }),
         ]),
-        m('.panel-right', [
+        m('.panel-bottom', [
           vnode.state.loadingFinished &&
             m(AdminPanelTabs, {
               defaultTab: 1,
@@ -154,4 +158,4 @@ const ManageCommunityModal: m.Component<
   },
 };
 
-export default ManageCommunityModal;
+export default ManageCommunityPage;

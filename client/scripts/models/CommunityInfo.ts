@@ -99,7 +99,7 @@ class CommunityInfo {
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultSummaryView = defaultSummaryView;
     this.featuredTopics = featuredTopics || [];
-    this.topics = topics || [];
+    this.topics = topics.map((t) => new OffchainTopic(t)) || [];
     this.adminsAndMods = adminsAndMods || [];
   }
 

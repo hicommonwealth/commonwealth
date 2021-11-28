@@ -10,6 +10,8 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
+  public readonly name = 'User Flags';
+
   constructor(
     private readonly _models,
     private readonly _chain?: string,

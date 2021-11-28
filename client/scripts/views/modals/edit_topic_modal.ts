@@ -6,6 +6,7 @@ import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-u
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
+import { OffchainTopic } from 'models';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -60,15 +61,15 @@ const EditTopicModal : m.Component<{
         id,
         description: form.description,
         name: form.name,
-        communityId: app.activeCommunityId(),
-        chainId: app.activeChainId(),
+        community_id: app.activeCommunityId(),
+        chain_id: app.activeChainId(),
         telegram: null,
-        featuredInSidebar: form.featuredInSidebar,
-        featuredInNewPost: form.featuredInNewPost,
-        defaultOffchainTemplate: bodyText
+        featured_in_sidebar: form.featuredInSidebar,
+        featured_in_new_post: form.featuredInNewPost,
+        default_offchain_template: bodyText
       };
       try {
-        await app.topics.edit(topicInfo);
+        await app.topics.edit(new OffchainTopic(topicInfo));
         return true;
       } catch (err) {
         vnode.state.error = err.message || err;

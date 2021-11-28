@@ -1,7 +1,5 @@
 import express from 'express';
-import webpack from 'webpack';
 import passport from 'passport';
-import { GITHUB_OAUTH_CALLBACK } from './config';
 
 import domain from './routes/domain';
 import status from './routes/status';
@@ -9,10 +7,6 @@ import createGist from './routes/createGist';
 
 import edgewareLockdropEvents from './routes/edgeware_lockdrop_events';
 import edgewareLockdropBalances from './routes/edgeware_lockdrop_balances';
-
-import createHedgehogAuthentication from './routes/createHedgehogAuthentication';
-import getHedgehogAuthentication from './routes/getHedgehogAuthentication';
-import createHedgehogUser from './routes/createHedgehogUser';
 
 import createAddress from './routes/createAddress';
 import linkExistingAddressToChain from './routes/linkExistingAddressToChain';
@@ -129,6 +123,7 @@ import TokenBalanceCache from './util/tokenBalanceCache';
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
+import getSupportedEthChains from './routes/getSupportedEthChains';
 import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
@@ -249,6 +244,7 @@ function setupRouter(
   );
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
+  router.get('/getSupportedEthChains', getSupportedEthChains.bind(this, models));
   router.post(
     '/createChain',
     passport.authenticate('jwt', { session: false }),
@@ -301,7 +297,7 @@ function setupRouter(
   router.post(
     '/updateOffchainVote',
     passport.authenticate('jwt', { session: false }),
-    updateOffchainVote.bind(this, models)
+    updateOffchainVote.bind(this, models, tokenBalanceCache)
   );
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 

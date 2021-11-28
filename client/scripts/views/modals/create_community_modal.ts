@@ -1,5 +1,5 @@
 // import 'modals/create_community_modal.scss';
-import 'modals/manage_community_modal.scss';
+import 'pages/manage_community.scss';
 
 import BN from 'bn.js';
 import m from 'mithril';
@@ -21,7 +21,7 @@ import {
   InputPropertyRow,
   TogglePropertyRow,
   SelectPropertyRow,
-} from './manage_community_modal/metadata_rows';
+} from '../pages/manage_community/metadata_rows';
 import { initAppState } from '../../app';
 
 enum CommunityType {
@@ -425,9 +425,9 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
               github,
               substrate_spec,
               jwt: app.user.jwt,
-              type: 'chain',
+              type: ChainType.Chain,
               id: slugify(name),
-              base: 'substrate',
+              base: ChainBase.Substrate,
               network: slugify(name),
             })
               .then(async (res) => {
@@ -537,6 +537,8 @@ const SubstrateForm: m.Component<SubstrateFormAttrs, SubstrateFormState> = {
 interface ERC20FormAttrs {}
 
 interface ERC20FormState {
+  chain_id: string;
+  url: string;
   address: string;
   id: string;
   name: string;
@@ -555,6 +557,8 @@ interface ERC20FormState {
 
 const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
   oninit: (vnode) => {
+    vnode.state.chain_id = '1';
+    vnode.state.url = '';
     vnode.state.address = '';
     vnode.state.id = '';
     vnode.state.name = '';
@@ -574,6 +578,44 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
     const validAddress = isAddress(vnode.state.address);
     const disableField = !validAddress || !vnode.state.loaded;
 
+    const updateTokenForum = async () => {
+      if (!vnode.state.address || !vnode.state.chain_id) return;
+      const args = {
+        address: vnode.state.address,
+        chain_id: vnode.state.chain_id,
+        allowUncached: true,
+      };
+      if (vnode.state.url) {
+        args['url'] = vnode.state.url;
+      }
+      try {
+        const res = await $.get(`${app.serverUrl()}/getTokenForum`, args);
+        if (res.status === 'Success') {
+          vnode.state.name = res?.result?.chain?.name || '';
+          vnode.state.id = slugify(vnode.state.name);
+          vnode.state.symbol = res?.result?.chain?.symbol || '';
+          vnode.state.icon_url =
+            res?.result?.chain?.icon_url || '';
+          vnode.state.description =
+            res?.result?.chain?.description || '';
+          vnode.state.website = res?.result?.chain?.website || '';
+          vnode.state.discord = res?.result?.chain?.discord || '';
+          vnode.state.element = res?.result?.chain?.element || '';
+          vnode.state.telegram =
+            res?.result?.chain?.telegram || '';
+          vnode.state.github = res?.result?.chain?.github || '';
+          vnode.state.loaded = true;
+        } else {
+          notifyError(res.message);
+        }
+      } catch (err) {
+        notifyError(
+          err.responseJSON?.error ||
+          'Failed to load Token Information'
+        );
+      }
+    }
+
     return m('.compact-modal-body-max', [
       m('.CommunityMetadataManagementTable', [
         m(
@@ -586,53 +628,30 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           },
           [
             m(InputPropertyRow, {
+              title: 'Chain ID',
+              defaultValue: vnode.state.chain_id,
+              placeholder: '1',
+              onChangeHandler: async (v) => {
+                vnode.state.chain_id = v;
+                vnode.state.loaded = false;
+              }
+            }),
+            m(InputPropertyRow, {
+              title: 'Websocket URL',
+              defaultValue: vnode.state.url,
+              placeholder: 'wss://... (leave empty for default)',
+              onChangeHandler: async (v) => {
+                vnode.state.url = v;
+                vnode.state.loaded = false;
+              }
+            }),
+            m(InputPropertyRow, {
               title: 'Address',
               defaultValue: vnode.state.address,
               placeholder: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
               onChangeHandler: (v) => {
                 vnode.state.address = v;
                 vnode.state.loaded = false;
-                if (isAddress(v)) {
-                  $.get(`${app.serverUrl()}/getTokenForum`, {
-                    address: v,
-                    allowUncached: true,
-                  })
-                    .then(async (res) => {
-                      if (res.status === 'Success') {
-                        vnode.state.name = res?.result?.chain?.name || '';
-                        vnode.state.id = slugify(vnode.state.name);
-                        vnode.state.symbol = res?.result?.chain?.symbol || '';
-                        vnode.state.icon_url =
-                          res?.result?.chain?.icon_url || '';
-                        vnode.state.description =
-                          res?.result?.chain?.description || '';
-                        vnode.state.website = res?.result?.chain?.website || '';
-                        vnode.state.discord = res?.result?.chain?.discord || '';
-                        vnode.state.element = res?.result?.chain?.element || '';
-                        vnode.state.telegram =
-                          res?.result?.chain?.telegram || '';
-                        vnode.state.github = res?.result?.chain?.github || '';
-                        vnode.state.loaded = true;
-                      } else {
-                        notifyError(res.message);
-                      }
-                    })
-                    .catch((err: any) => {
-                      notifyError(
-                        err.responseJSON?.error ||
-                          'Failed to load Token Information'
-                      );
-                    });
-                }
-              },
-            }),
-            m(InputPropertyRow, {
-              title: 'ID',
-              defaultValue: vnode.state.id,
-              value: vnode.state.id,
-              disabled: disableField,
-              onChangeHandler: (v) => {
-                vnode.state.id = v;
               },
             }),
             m(InputPropertyRow, {
@@ -642,6 +661,15 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               onChangeHandler: (v) => {
                 vnode.state.name = v;
                 vnode.state.id = slugify(v);
+              },
+            }),
+            m(InputPropertyRow, {
+              title: 'ID',
+              defaultValue: vnode.state.id,
+              value: vnode.state.id,
+              disabled: disableField,
+              onChangeHandler: (v) => {
+                vnode.state.id = v;
               },
             }),
             m(InputPropertyRow, {
@@ -719,6 +747,14 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           ]
         ),
         m(Button, {
+          label: 'Test fields',
+          intent: 'primary',
+          disabled: vnode.state.saving || !validAddress || !vnode.state.chain_id,
+          onclick: async (e) => {
+            await updateTokenForum();
+          },
+        }),
+        m(Button, {
           label: 'Save changes',
           intent: 'primary',
           disabled: vnode.state.saving || !validAddress || !vnode.state.loaded,
@@ -735,185 +771,44 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               element,
               telegram,
               github,
+              chain_id,
+              url,
             } = vnode.state;
             vnode.state.saving = true;
-            $.post(`${app.serverUrl()}/createChain`, {
-              address,
-              id,
-              name,
-              description,
-              icon_url,
-              symbol,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              jwt: app.user.jwt,
-              type: 'token',
-              base: 'ethereum',
-              network: slugify(name),
-              node_url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-            })
-              .then(async (res) => {
-                await initAppState(false);
-                $(e.target).trigger('modalexit');
-                m.route.set(`/${res.result.chain?.id}`);
-              })
-              .catch((err: any) => {
-                notifyError(
-                  err.responseJSON?.error ||
-                    'Creating new ERC20 community failed'
-                );
-              })
-              .always(() => {
-                vnode.state.saving = false;
+            try {
+              const res = await $.post(`${app.serverUrl()}/createChain`, {
+                address,
+                id,
+                name,
+                description,
+                icon_url,
+                symbol,
+                website,
+                discord,
+                element,
+                telegram,
+                github,
+                jwt: app.user.jwt,
+                type: ChainType.Token,
+                base: ChainBase.Ethereum,
+                network: ChainNetwork.ERC20,
+                node_url: url,
+                eth_chain_id: chain_id,
               });
-          },
-        }),
-        m(InputPropertyRow, {
-          title: 'ID',
-          defaultValue: vnode.state.id,
-          value: vnode.state.id,
-          disabled: disableField,
-          onChangeHandler: (v) => {
-            vnode.state.id = v;
-          },
-        }),
-        m(InputPropertyRow, {
-          title: 'Name',
-          defaultValue: vnode.state.name,
-          disabled: disableField,
-          onChangeHandler: (v) => {
-            vnode.state.name = v;
-            vnode.state.id = slugify(v);
-          },
-        }),
-        m(InputPropertyRow, {
-          title: 'Symbol',
-          disabled: disableField,
-          defaultValue: vnode.state.symbol,
-          placeholder: 'XYZ',
-          onChangeHandler: (v) => {
-            vnode.state.symbol = v;
-          },
-        }),
-        m(InputPropertyRow, {
-          title: 'Icon URL',
-          disabled: disableField,
-          defaultValue: vnode.state.icon_url,
-          placeholder: 'https://',
-          onChangeHandler: (v) => {
-            vnode.state.icon_url = v;
-          },
-        }),
-        m(InputPropertyRow, {
-          title: 'Description',
-          disabled: disableField,
-          defaultValue: vnode.state.description,
-          onChangeHandler: (v) => {
-            vnode.state.description = v;
-          },
-          textarea: true,
-        }),
-        m(InputPropertyRow, {
-          title: 'Website',
-          disabled: disableField,
-          defaultValue: vnode.state.website,
-          placeholder: 'https://example.com',
-          onChangeHandler: (v) => {
-            vnode.state.website = v;
-          },
-        }),
-        m(InputPropertyRow, {
-          title: 'Discord',
-          disabled: disableField,
-          defaultValue: vnode.state.discord,
-          placeholder: 'https://discord.com/invite',
-          onChangeHandler: (v) => {
-            vnode.state.discord = v;
-          },
-        }),
-        m(InputPropertyRow, {
-          title: 'Element',
-          disabled: disableField,
-          defaultValue: vnode.state.element,
-          placeholder: 'https://matrix.to/#',
-          onChangeHandler: (v) => {
-            vnode.state.element = v;
-          },
-        }),
-        m(InputPropertyRow, {
-          title: 'Telegram',
-          disabled: disableField,
-          defaultValue: vnode.state.telegram,
-          placeholder: 'https://t.me',
-          onChangeHandler: (v) => {
-            vnode.state.telegram = v;
-          },
-        }),
-        m(InputPropertyRow, {
-          title: 'Github',
-          disabled: disableField,
-          defaultValue: vnode.state.github,
-          placeholder: 'https://github.com',
-          onChangeHandler: (v) => {
-            vnode.state.github = v;
-          },
-        }),
-      ]),
-      m(Button, {
-        label: 'Save changes',
-        intent: 'primary',
-        disabled: vnode.state.saving || !validAddress || !vnode.state.loaded,
-        onclick: async (e) => {
-          const {
-            address,
-            id,
-            name,
-            description,
-            symbol,
-            icon_url,
-            website,
-            discord,
-            element,
-            telegram,
-            github,
-          } = vnode.state;
-          vnode.state.saving = true;
-          $.post(`${app.serverUrl()}/createChain`, {
-            address,
-            id,
-            name,
-            description,
-            icon_url,
-            symbol,
-            website,
-            discord,
-            element,
-            telegram,
-            github,
-            jwt: app.user.jwt,
-            type: ChainType.Token,
-            base: ChainBase.Ethereum,
-            network: ChainNetwork.ERC20,
-            node_url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-          })
-            .then(async (res) => {
               await initAppState(false);
               $(e.target).trigger('modalexit');
               m.route.set(`/${res.result.chain?.id}`);
-            })
-            .catch((err: any) => {
+            } catch (err) {
               notifyError(
-                err.responseJSON?.error || 'Creating new ERC20 community failed'
+                err.responseJSON?.error ||
+                'Creating new ERC20 community failed'
               );
-            })
-            .always(() => {
+            } finally {
               vnode.state.saving = false;
-            });
-        },
-      }),
+            }
+          },
+        }),
+      ]),
     ]);
   },
 };
@@ -1150,7 +1045,7 @@ const CreateCommunityModal: m.Component<
     vnode.state.activeForm = CommunityType.OffchainCommunity;
   },
   view: (vnode: m.VnodeDOM<CreateCommunityAttrs, CreateCommunityState>) => {
-    return m('.ManageCommunityModal', [
+    return m('.CreateCommunityModal', [
       m('.compact-modal-title', [
         m('h3', 'New Commonwealth Community'),
         m(CompactModalExitButton),

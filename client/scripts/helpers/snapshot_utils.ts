@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-import moment from 'moment';
 
 let apolloClient = null;
 async function getApolloClient() {
@@ -152,6 +151,10 @@ export interface SnapshotProposalVote {
   power: number;
 }
 
+export async function getVersion(): Promise<string> {
+  return '0.1.3';
+}
+
 export async function getSpace(space: string): Promise<SnapshotSpace> {
   const client = await getApolloClient();
   const spaceObj = await client.query({
@@ -200,8 +203,24 @@ export async function getScore(space: SnapshotSpace, address: string) {
     space.id,
     space.strategies,
     space.network,
-    Snapshot.utils.getProvider(space.network),
-    [address]
+    [address],
+    // Snapshot.utils.getProvider(space.network),
+  );
+}
+
+/* Single Choice Voting */
+
+// Returns the total amount of the results
+export function sumOfResultsBalance(votes: SnapshotProposalVote[]) {
+  return votes.reduce((a, b: any) => a + b.power, 0);
+}
+
+//  Returns an array with the results for each choice
+export function resultsByVoteBalance(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {
+  return proposal.choices.map((choice, i) =>
+    votes
+      .filter((vote: any) => vote.choice === i + 1)
+      .reduce((a, b: any) => a + b.power, 0)
   );
 }
 
@@ -211,19 +230,20 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
     let votes = await getVotes(proposal.id);
 
     // const voters = votes.map(vote => vote.voter);
-    const provider = Snapshot.utils.getProvider(space.network);
+    // const provider = Snapshot.utils.getProvider(space.network);
     const strategies = space.strategies;
-    
+
     if (proposal.state !== 'pending') {
       console.time('getProposal.scores');
       const scores = await Snapshot.utils.getScores(
         space.id,
         strategies,
         space.network,
-        provider,
         (votes).map((vote) => vote.voter),
-        parseInt(proposal.snapshot)
+        proposal.snapshot,
+        // provider,
       );
+      console.log(scores);
       console.timeEnd('getProposal.scores');
       console.log('Scores', scores);
 
@@ -260,31 +280,15 @@ export async function getPower(space: SnapshotSpace, address: string, snapshot: 
     space.id,
     space.strategies,
     space.network,
-    Snapshot.utils.getProvider(space.network),
     [address],
     blockTag,
+    // Snapshot.utils.getProvider(space.network),
   );
   const summedScores = scores.map((score) => Object.values(score).reduce((a, b) => a + b, 0));
   return {
     scores: summedScores,
     totalScore: summedScores.reduce((a, b) => a + b, 0)
   };
-}
-
-/* Single Choice Voting */
-
-// Returns the total amount of the results
-export function sumOfResultsBalance(votes: SnapshotProposalVote[]) {
-  return votes.reduce((a, b: any) => a + b.power, 0);
-}
-
-  //  Returns an array with the results for each choice
-export function resultsByVoteBalance(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {
-  return proposal.choices.map((choice, i) =>
-    votes
-      .filter((vote: any) => vote.choice === i + 1)
-      .reduce((a, b: any) => a + b.power, 0)
-  );
 }
 
 // export function resultsByStrategyScore(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {

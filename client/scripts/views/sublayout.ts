@@ -158,7 +158,9 @@ const Sublayout: m.Component<{
               !hideSidebar && m('.sublayout-sidebar-col', [
                 m(Sidebar),
               ]),
-              m('.sublayout-main-col', [
+              m('.sublayout-main-col', {
+                class: !rightContent && 'no-right-content'
+              }, [
                 vnode.children
               ]),
               rightContent && m('.sublayout-right-col', rightContent),

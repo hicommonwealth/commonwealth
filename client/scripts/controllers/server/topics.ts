@@ -6,44 +6,15 @@ import { OffchainTopic } from 'models';
 import app from 'state';
 import BN from 'bn.js';
 
-const modelFromServer = (topic) => {
-  if (topic.token_threshold !== null) {
-    return new OffchainTopic(
-      topic.name,
-      topic.id,
-      topic.description,
-      topic.telegram,
-      topic.community_id,
-      topic.chain_id,
-      topic.featured_in_sidebar,
-      topic.featured_in_new_post,
-      topic.default_offchain_template,
-      new BN(topic.token_threshold)
-    );
-  } else {
-    return new OffchainTopic(
-      topic.name,
-      topic.id,
-      topic.description,
-      topic.telegram,
-      topic.community_id,
-      topic.chain_id,
-      topic.featured_in_sidebar,
-      topic.featured_in_new_post,
-      topic.default_offchain_template
-    );
-  }
-};
-
 class TopicsController {
   private _store: TopicStore = new TopicStore();
-  private _initialized: boolean = false;
+  private _initialized = false;
   public get store() { return this._store; }
   public get initialized() { return this._initialized; }
   public getByIdentifier(id) { return this._store.getById(id); }
   public getByCommunity(communityId) { return this._store.getByCommunity(communityId); }
   public getByName(name, communityId) { return this._store.getByName(name, communityId); }
-  public addToStore(topic: OffchainTopic) { return this._store.add(modelFromServer(topic)); }
+  public addToStore(topic: OffchainTopic) { return this._store.add(topic); }
 
   public async edit(topic: OffchainTopic, featured_order?: boolean) {
     try {
@@ -62,7 +33,7 @@ class TopicsController {
         'address': app.user.activeAccount.address,
         'jwt': app.user.jwt,
       });
-      const result = modelFromServer(response.result);
+      const result = new OffchainTopic(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -83,6 +54,10 @@ class TopicsController {
         'token_threshold': token_threshold,
         'jwt': app.user.jwt
       });
+      if (response.status === 'Success') {
+        // update stored value immediately
+        topic.setTokenThreshold(new BN(token_threshold));
+      }
       return response.status;
     } catch (err) {
       console.log('Failed to edit topic');
@@ -101,7 +76,7 @@ class TopicsController {
         'topic_name': topicName,
         'address': app.user.activeAccount.address,
       });
-      const result = modelFromServer(response.result);
+      const result = new OffchainTopic(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -140,7 +115,7 @@ class TopicsController {
         'jwt': app.user.jwt,
         'token_threshold': tokenThreshold,
       });
-      const result = modelFromServer(response.result);
+      const result = new OffchainTopic(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -188,7 +163,7 @@ class TopicsController {
         this._store.clear();
       }
       const topics = (app.chain) ? response.result.filter((topic) => !topic.communityId) : response.result;
-      topics.forEach((t) => this._store.add(modelFromServer(t)));
+      topics.forEach((t) => this._store.add(new OffchainTopic(t)));
       this._initialized = true;
     } catch (err) {
       console.log('Failed to load offchain topics');
@@ -204,7 +179,7 @@ class TopicsController {
     }
     initialTopics.forEach((t) => {
       try {
-        this._store.add(modelFromServer(t));
+        this._store.add(new OffchainTopic(t));
       } catch (e) {
         console.error(e);
       }

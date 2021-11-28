@@ -16,7 +16,7 @@ import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { SnapshotSpace, getScore, getSpaceBlockNumber } from 'helpers/snapshot_utils';
+import { SnapshotSpace, getScore, getSpaceBlockNumber, getVersion } from 'helpers/snapshot_utils';
 
 interface IThreadForm {
   name: string;
@@ -90,10 +90,12 @@ const newThread = async (
   form.start /= 1000;
   form.end /= 1000;
 
+  const version = await getVersion();
+
   const msg: any = {
     address: author.address,
     msg: JSON.stringify({
-      version: '0.1.3',
+      version,
       timestamp: (Date.now() / 1e3).toFixed(),
       space: space.id,
       type: 'proposal',

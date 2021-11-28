@@ -1,66 +1,67 @@
 import $ from 'jquery';
 import m from 'mithril';
-import { Table, Button } from 'construct-ui';
+import app from 'state';
+import { Button, Table } from 'construct-ui';
 
-import { CommunityInfo, ChainInfo } from 'models';
-import { notifyError } from 'controllers/app/notifications';
+import { ChainBase, ChainNetwork } from 'types';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import {
-  InputPropertyRow,
   TogglePropertyRow,
+  InputPropertyRow,
   ManageRolesRow,
 } from './metadata_rows';
 import AvatarUpload, { AvatarScope } from '../../components/avatar_upload';
 
-interface ICommunityMetadataManagementState {
+interface IChainMetadataManagementState {
   name: string;
   description: string;
-  iconUrl: string;
-  invitesEnabled: boolean;
-  privacyEnabled: boolean;
   website: string;
   discord: string;
   element: string;
   telegram: string;
   github: string;
+  url: string;
+  loadingFinished: boolean;
+  loadingStarted: boolean;
+  iconUrl: string;
   stagesEnabled: boolean;
   customStages: string;
   customDomain: string;
   terms: string;
   defaultSummaryView: boolean;
+  network: ChainNetwork;
+  symbol: string;
+  snapshot: string;
   uploadInProgress: boolean;
 }
 
-export interface IChainOrCommMetadataManagementAttrs {
-  community?: CommunityInfo;
-  chain?: ChainInfo;
-  onRoleUpdate: Function;
-  admins;
-  mods;
-}
-
-const CommunityMetadataManagementTable: m.Component<
+const ChainMetadataManagementTable: m.Component<
   IChainOrCommMetadataManagementAttrs,
-  ICommunityMetadataManagementState
+  IChainMetadataManagementState
 > = {
   oninit: (vnode) => {
-    vnode.state.name = vnode.attrs.community.name;
-    vnode.state.description = vnode.attrs.community.description;
-    vnode.state.iconUrl = vnode.attrs.community.iconUrl;
-    vnode.state.website = vnode.attrs.community.website;
-    vnode.state.discord = vnode.attrs.community.discord;
-    vnode.state.element = vnode.attrs.community.element;
-    vnode.state.telegram = vnode.attrs.community.telegram;
-    vnode.state.github = vnode.attrs.community.github;
-    vnode.state.stagesEnabled = vnode.attrs.community.stagesEnabled;
-    vnode.state.customStages = vnode.attrs.community.customStages;
-    vnode.state.customDomain = vnode.attrs.community.customDomain;
-    vnode.state.terms = vnode.attrs.community.terms;
-    vnode.state.defaultSummaryView = vnode.attrs.community.defaultSummaryView;
+    vnode.state.name = vnode.attrs.chain.name;
+    vnode.state.description = vnode.attrs.chain.description;
+    vnode.state.website = vnode.attrs.chain.website;
+    vnode.state.discord = vnode.attrs.chain.discord;
+    vnode.state.element = vnode.attrs.chain.element;
+    vnode.state.telegram = vnode.attrs.chain.telegram;
+    vnode.state.github = vnode.attrs.chain.github;
+    vnode.state.stagesEnabled = vnode.attrs.chain.stagesEnabled;
+    vnode.state.customStages = vnode.attrs.chain.customStages;
+    vnode.state.customDomain = vnode.attrs.chain.customDomain;
+    vnode.state.terms = vnode.attrs.chain.terms;
+    vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
+    vnode.state.network = vnode.attrs.chain.network;
+    vnode.state.symbol = vnode.attrs.chain.symbol;
+    vnode.state.snapshot = vnode.attrs.chain.snapshot;
+    vnode.state.defaultSummaryView = vnode.attrs.chain.defaultSummaryView;
   },
-  view: (vnode) => {
-    return m('.CommunityMetadataManagementTable', [
+  view: (vnode: any) => {
+    return m('.ChainMetadataManagementTable', [
       m(AvatarUpload, {
-        avatarScope: AvatarScope.Community,
+        avatarScope: AvatarScope.Chain,
         uploadStartedCallback: () => {
           vnode.state.uploadInProgress = true;
           m.redraw();
@@ -70,9 +71,7 @@ const CommunityMetadataManagementTable: m.Component<
             if (!f.uploadURL) return;
             const url = f.uploadURL.replace(/\?.*/, '');
             vnode.state.iconUrl = url;
-            $((vnode as any).dom)
-              .find('input[name=avatarUrl]')
-              .val(url.trim());
+            $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
           });
           vnode.state.uploadInProgress = false;
           m.redraw();
@@ -144,7 +143,7 @@ const CommunityMetadataManagementTable: m.Component<
           }),
           m(TogglePropertyRow, {
             title: 'Stages',
-            defaultValue: vnode.attrs.community.stagesEnabled,
+            defaultValue: vnode.attrs.chain.stagesEnabled,
             onToggle: (checked) => {
               vnode.state.stagesEnabled = checked;
             },
@@ -152,6 +151,17 @@ const CommunityMetadataManagementTable: m.Component<
               checked
                 ? 'Show proposal progress on threads'
                 : "Don't show progress on threads",
+          }),
+          m(TogglePropertyRow, {
+            title: 'Summary view',
+            defaultValue: vnode.attrs.chain.defaultSummaryView,
+            onToggle: (checked) => {
+              vnode.state.defaultSummaryView = checked;
+            },
+            caption: (checked) =>
+              checked
+                ? 'Discussion listing defaults to summary view'
+                : 'Discussion listing defaults to latest activity view',
           }),
           m(InputPropertyRow, {
             title: 'Custom Stages',
@@ -170,6 +180,15 @@ const CommunityMetadataManagementTable: m.Component<
             },
             disabled: true, // Custom domains should be admin configurable only
           }),
+          app.chain?.meta.chain.base === ChainBase.Ethereum &&
+            m(InputPropertyRow, {
+              title: 'Snapshot',
+              defaultValue: vnode.state.snapshot,
+              placeholder: vnode.state.network,
+              onChangeHandler: (v) => {
+                vnode.state.snapshot = v;
+              },
+            }),
           m(InputPropertyRow, {
             title: 'Terms of Service',
             defaultValue: vnode.state.terms,
@@ -178,46 +197,13 @@ const CommunityMetadataManagementTable: m.Component<
               vnode.state.terms = v;
             },
           }),
-          m(TogglePropertyRow, {
-            title: 'Privacy',
-            defaultValue: vnode.attrs.community.privacyEnabled,
-            onToggle: (checked) => {
-              vnode.state.privacyEnabled = checked;
-            },
-            caption: (checked) =>
-              checked
-                ? 'Threads are private to members'
-                : 'Threads are visible to the public',
-          }),
-          m(TogglePropertyRow, {
-            title: 'Invites',
-            defaultValue: vnode.attrs.community.invitesEnabled,
-            onToggle: (checked) => {
-              vnode.state.invitesEnabled = checked;
-            },
-            caption: (checked) =>
-              checked
-                ? 'Anyone can invite new members'
-                : 'Admins/mods can invite new members',
-          }),
-          m(TogglePropertyRow, {
-            title: 'Summary view',
-            defaultValue: vnode.attrs.community.defaultSummaryView,
-            onToggle: (checked) => {
-              vnode.state.defaultSummaryView = checked;
-            },
-            caption: (checked) =>
-              checked
-                ? 'Discussion listing defaults to summary view'
-                : 'Discussion listing defaults to latest activity view',
-          }),
           m('tr', [
             m('td', 'Admins'),
             m('td', [
               m(ManageRolesRow, {
                 roledata: vnode.attrs.admins,
-                onRoleUpdate: (oldRole, newRole) => {
-                  vnode.attrs.onRoleUpdate(oldRole, newRole);
+                onRoleUpdate: (x, y) => {
+                  vnode.attrs.onRoleUpdate(x, y);
                 },
               }),
             ]),
@@ -228,42 +214,24 @@ const CommunityMetadataManagementTable: m.Component<
               m('td', [
                 m(ManageRolesRow, {
                   roledata: vnode.attrs.mods,
-                  onRoleUpdate: (oldRole, newRole) => {
-                    vnode.attrs.onRoleUpdate(oldRole, newRole);
+                  onRoleUpdate: (x, y) => {
+                    vnode.attrs.onRoleUpdate(x, y);
                   },
                 }),
               ]),
             ]),
         ]
       ),
-      m(Button, {
-        label: 'Save changes',
-        disabled: vnode.state.uploadInProgress,
-        intent: 'primary',
-        rounded: true,
-        onclick: async (e) => {
-          const {
-            name,
-            description,
-            iconUrl,
-            website,
-            discord,
-            element,
-            telegram,
-            github,
-            stagesEnabled,
-            customStages,
-            customDomain,
-            terms,
-            invitesEnabled,
-            privacyEnabled,
-            defaultSummaryView,
-          } = vnode.state;
-          try {
-            await vnode.attrs.community.updateCommunityData({
+      m('.button-wrap', [
+        m(Button, {
+          class: 'save-changes-button',
+          disabled: vnode.state.uploadInProgress,
+          label: 'Save changes',
+          intent: 'primary',
+          onclick: async (e) => {
+            const {
               name,
               description,
-              iconUrl,
               website,
               discord,
               element,
@@ -272,19 +240,50 @@ const CommunityMetadataManagementTable: m.Component<
               stagesEnabled,
               customStages,
               customDomain,
+              snapshot,
               terms,
-              privacyEnabled,
-              invitesEnabled,
+              iconUrl,
               defaultSummaryView,
-            });
-            $(e.target).trigger('modalexit');
-          } catch (err) {
-            notifyError(err.responseJSON?.error || 'Community update failed');
-          }
-        },
-      }),
+            } = vnode.state;
+  
+            // /^[a-z]+\.eth/
+            if (
+              snapshot &&
+              snapshot !== '' &&
+              !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
+                snapshot
+              )
+            ) {
+              notifyError('Snapshot name must be in the form of *.eth');
+              return;
+            }
+  
+            try {
+              await vnode.attrs.chain.updateChainData({
+                name,
+                description,
+                website,
+                discord,
+                element,
+                telegram,
+                github,
+                stagesEnabled,
+                customStages,
+                customDomain,
+                snapshot,
+                terms,
+                iconUrl,
+                defaultSummaryView,
+              });
+              notifySuccess('Chain updated');
+            } catch (err) {
+              notifyError(err.responseJSON?.error || 'Chain update failed');
+            }
+          },
+        }),
+      ])
     ]);
   },
 };
 
-export default CommunityMetadataManagementTable;
+export default ChainMetadataManagementTable;
