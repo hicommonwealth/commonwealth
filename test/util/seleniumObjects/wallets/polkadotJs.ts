@@ -25,7 +25,7 @@ export class PolkadotJs implements WalletInterface {
   private signMsgBtn = By.xpath("//div[text()='Sign the message']");
 
   async injectWallet(driver: WebDriver): Promise<void> {
-    await waitForWindow(driver, 'polkadot{.js}');
+    await waitForWindow(driver, ['polkadot{.js}']);
     await getWindow(driver, 'polkadot{.js}');
     await driver.findElement(this.allowCwBtn).click();
     return Promise.resolve(undefined);
@@ -48,7 +48,7 @@ export class PolkadotJs implements WalletInterface {
   }
 
   async signTxn(driver: WebDriver): Promise<void> {
-    await waitForWindow(driver, 'polkadot{.js}');
+    await waitForWindow(driver, ['polkadot{.js}']);
     await getWindow(driver, 'polkadot{.js}');
 
     await driver.findElement(this.pswdInput).sendKeys(process.env.POLKADOT_JS_PASSWORD);

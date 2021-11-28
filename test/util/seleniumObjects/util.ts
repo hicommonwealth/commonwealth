@@ -15,10 +15,12 @@ export async function getWindow(
   const currentWindow = await driver.getWindowHandle();
 
   // if the current window is not the windowTitle window then cycle through windows to find it
-  if ((await driver.getTitle()) !== windowTitle) {
+  const title = await driver.getTitle();
+  if (!title || !title.includes(windowTitle)) {
     for (const window of windows) {
       await driver.switchTo().window(window);
-      if ((await driver.getTitle()) === windowTitle) {
+      const temp = await driver.getTitle();
+      if (temp?.includes(windowTitle)) {
         return true;
       }
     }
@@ -89,19 +91,26 @@ export async function getWindowTitles(driver: WebDriver): Promise<string[]> {
  * Function can be used to implicitly wait for a specific window to open. If the window does not open within 10 seconds
  * the function throws an error
  * @param driver A WebDriver instance in any state
- * @param windowTitle The title of the window to wait for
+ * @param windowTitles A list of strings to search in the window titles i.e. ['Commonwealth', 'Ethereum'] will match
+ * with the window title "Commonwealth - Ethereum"
  * @param timeout The number of milliseconds to wait before returning false
  */
 export async function waitForWindow(
   driver: WebDriver,
-  windowTitle: string,
+  windowTitles: string[],
   timeout = 10000,
 ): Promise<boolean> {
   try {
     // explicit wait until the signing metamask window opens
     await driver.wait(async () => {
       const titles = await getWindowTitles(driver);
-      return titles.includes(windowTitle);
+      for (const title of titles) {
+        let flag = true;
+        for (const searchTitle of windowTitles) {
+          if (!title.includes(searchTitle)) flag = false;
+        }
+        return flag;
+      }
     }, timeout);
   } catch (error) {
     return false;

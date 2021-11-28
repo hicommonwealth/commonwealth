@@ -38,7 +38,11 @@ export class BasePage {
   }
 
   public async initNoExtension(): Promise<WebDriver> {
-    this.driver = new webdriver.Builder().forBrowser('chrome').build();
+    const chromeOptions = new chrome.Options()
+    chromeOptions.addArguments("--no-sandbox");
+    chromeOptions.addArguments("--disable-dev-shm-usage");
+    chromeOptions.addArguments("--headless");
+    this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
     await this.init();
     return this.driver;
   }
@@ -49,6 +53,9 @@ export class BasePage {
   public async initWithMetaMask(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/MetaMask.crx'), { encoding: 'base64' })])
+    // chromeOptions.addArguments("--no-sandbox");
+    // chromeOptions.addArguments("--disable-dev-shm-usage");
+    // chromeOptions.addArguments("--headless");
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
     await this.init();
@@ -61,6 +68,9 @@ export class BasePage {
   public async initWithTerraStation(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/TerraStation.crx'), { encoding: 'base64' })])
+    chromeOptions.addArguments("--no-sandbox");
+    chromeOptions.addArguments("--disable-dev-shm-usage");
+    chromeOptions.addArguments("--headless");
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
     await this.init();
@@ -73,7 +83,9 @@ export class BasePage {
   public async initWithPolkadotJs(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/PolkadotJS.crx'), { encoding: 'base64' })])
-    // chromeOptions.headless();
+    chromeOptions.addArguments("--no-sandbox");
+    chromeOptions.addArguments("--disable-dev-shm-usage");
+    chromeOptions.addArguments("--headless");
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
     await this.init();
@@ -86,6 +98,9 @@ export class BasePage {
   public async initWithKeplr(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/Keplr.crx'), { encoding: 'base64' })])
+    chromeOptions.addArguments("--no-sandbox");
+    chromeOptions.addArguments("--disable-dev-shm-usage");
+    chromeOptions.addArguments("--headless");
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
     await this.init();

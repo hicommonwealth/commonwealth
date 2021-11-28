@@ -58,7 +58,7 @@ export class LoginModal {
     await this.driver.findElement(By.xpath(`//div[text()='${walletName}']`)).click();
 
     await wallet.injectWallet(this.driver);
-    await waitForWindow(this.driver, 'Commonwealth');
+    await waitForWindow(this.driver, ['Commonwealth', 'Ethereum']);
     await getWindow(this.driver, 'Commonwealth');
     const accounts = await this.driver.findElements(this.accountItems);
     await accounts[0].click();
@@ -87,6 +87,4 @@ export class LoginModal {
 
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+

@@ -16,7 +16,7 @@ require('dotenv').config();
 
 describe('Commonwealth.im Chrome Selenium Tests', function() {
   let driver;
-  xdescribe('Wallet Login Tests', function() {
+  describe('Wallet Login Tests', function() {
     beforeEach('start server and reset db', async function () {
       this.timeout(300000)
       // TODO: start local server and use that for selenium testing
@@ -82,7 +82,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from TerraStation is incorrect');
     }).timeout(60000)
 
-    it('Should login with Polkadot', async () => {
+    xit('Should login with Polkadot', async () => {
       const home = new HomePage();
 
       await home.initWithPolkadotJs();
@@ -93,7 +93,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       const loginModal = new LoginModal(driver);
       await loginModal.connectWallet(WalletName.POLKADOT, home.polkadotJs);
 
-      await waitForWindow(driver, 'Commonwealth');
+      await waitForWindow(driver, ['Commonwealth']);
       assert((await driver.getCurrentUrl()).includes('commonwealth.im/edgeware/'),
         'PolkadotJs login flow failed to load Edgeware community page')
       const communityHome = new CommunityHome(driver);
@@ -101,7 +101,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Tim', 'Account loaded from PolkadotJs is incorrect');
     }).timeout(60000)
 
-    it('Should login with Keplr', async () => {
+    xit('Should login with Keplr', async () => {
       const home = new HomePage();
 
       await home.initWithKeplr();
@@ -113,7 +113,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       const loginModal = new LoginModal(driver);
       await loginModal.connectWallet(WalletName.COSMOS, home.keplr);
 
-      await waitForWindow(driver, 'Commonwealth');
+      await waitForWindow(driver, ['Commonwealth']);
 
       assert((await driver.getCurrentUrl()).includes('commonwealth.im/osmosis/'),
         'Keplr login flow failed to load Osmosis community page')
@@ -152,7 +152,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     }).timeout(60000)
   })
 
-  describe('Proposal Loading Tests', function() {
+  xdescribe('Proposal Loading Tests', function() {
     afterEach('close driver', async function () {
       await driver.quit()
     })

@@ -34,7 +34,7 @@ export class MetaMask implements WalletInterface {
    * @param driver A web driver instance with the MetaMask setup window open (not necessarily active/selected)
    */
   public async setup(driver: WebDriver) {
-    await waitForWindow(driver, 'MetaMask');
+    await waitForWindow(driver, ['MetaMask']);
     await getWindow(driver, 'MetaMask');
 
     // import wallet process
@@ -63,7 +63,7 @@ export class MetaMask implements WalletInterface {
    * @param driver A web driver instance with the metamask extension open and ready for connect flow
    */
   public async injectWallet(driver: WebDriver) {
-    await waitForWindow(driver, 'MetaMask Notification');
+    await waitForWindow(driver, ['MetaMask Notification']);
     await getWindow(driver, 'MetaMask Notification');
 
     await driver.findElement(this.nextBtn).click();
@@ -75,8 +75,15 @@ export class MetaMask implements WalletInterface {
    * @param driver A driver instance that has a Metamask signing popup open AND ACTIVE
    */
   public async signTxn(driver: WebDriver) {
-    await waitForWindow(driver, 'MetaMask Notification');
+    await waitForWindow(driver, ['MetaMask Notification']);
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>> WINDOW FOUND')
+    await waitForWindow(driver, ['MetaMask Notification']);
+    console.log(await getWindowTitles(driver));
     await getWindow(driver, 'MetaMask Notification');
     await driver.findElement(this.signBtn).click();
   }
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

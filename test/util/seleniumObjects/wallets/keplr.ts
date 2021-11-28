@@ -20,7 +20,7 @@ export class Keplr implements WalletInterface {
 
 
   async injectWallet(driver: WebDriver): Promise<void> {
-    await waitForWindow(driver, 'Keplr');
+    await waitForWindow(driver, ['Keplr']);
     await getWindow(driver, 'Keplr');
 
     await driver.findElement(this.approveBtn).click();
@@ -51,7 +51,7 @@ export class Keplr implements WalletInterface {
   }
 
   async signTxn(driver: WebDriver): Promise<void> {
-    await waitForWindow(driver, 'Keplr');
+    await waitForWindow(driver, ['Keplr']);
     await getWindow(driver, 'Keplr')
 
     await driver.findElement(this.approveBtn).click();

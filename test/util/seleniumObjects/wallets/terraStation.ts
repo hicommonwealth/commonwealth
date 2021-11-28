@@ -27,7 +27,7 @@ export class TerraStation implements WalletInterface {
   }
 
   async injectWallet(driver: WebDriver): Promise<void> {
-    await waitForWindow(driver, 'Terra Station');
+    await waitForWindow(driver, ['Terra Station']);
     await getWindow(driver, 'Terra Station');
 
     await driver.findElement(this.AllowBtn).click();
@@ -35,7 +35,7 @@ export class TerraStation implements WalletInterface {
   }
 
   async signTxn(driver: WebDriver): Promise<void> {
-    await waitForWindow(driver, 'Terra Station');
+    await waitForWindow(driver, ['Terra Station']);
     await getWindow(driver, 'Terra Station');
 
     return Promise.resolve(undefined);
