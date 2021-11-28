@@ -453,6 +453,14 @@ export const SearchBar: m.Component<
     const historyList = app.search.getHistory()
       .map(h => getSearchHistoryPreview(h, setFilterMenuActive, executeSearch))
 
+
+    if(historyList.length > 0) {
+      historyList.push(
+        m(ListItem, {class: 'search-history-no-results upper-border',
+          label: 'Tip: You can use operators like \'single quotes\', and the keyword "or" to limit your search!'})
+      )
+    }
+
     const activeCommunity = app.community ? app.community.name : vnode.state.searchQuery.communityScope
     const activeChain = app.activeChainId() || vnode.state.searchQuery.chainScope
     const scopeTitle = m(ListItem, {class: 'disabled', label: 'Scope'})

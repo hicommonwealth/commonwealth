@@ -360,11 +360,17 @@
                 font-size: 18px;
                 text-align: center;
                 justify-content: center;
+                color: $text-color-lighter;
 
                 &:hover {
                     background: white !important;
                     cursor: initial !important;
                 }
+            }
+            &.upper-border {
+                border-top: 1px solid $background-color-light !important;
+                padding-top: 15px !important;
+                margin-top: 5px;
             }
             .cui-button {
                 margin-right: 10px;
