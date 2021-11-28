@@ -6,11 +6,6 @@ import moment from 'moment';
 import { Button, ListItem, Select, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 
 import { pluralize } from 'helpers';
-import {
-  DiscussionIcon,
-  CommunityIcon,
-  MemberIcon
-} from 'helpers/search';
 import app from 'state';
 import { AddressInfo, Profile, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery'
@@ -21,6 +16,11 @@ import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { ContentType } from 'controllers/server/search'
+import {
+  ReplyIcon,
+  AccountIcon,
+  ArrowRightIcon
+} from '../components/component_kit/icons';
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
 import { search } from '../components/search_bar';
@@ -37,7 +37,7 @@ export const getMemberResult = (addr, searchTerm) => {
   const userLink = `/${scope || addr.chain}/account/${addr.address}?base=${addr.chain}`;
 
   return m(ListItem, {
-    contentLeft: m(MemberIcon),
+    contentLeft: m(AccountIcon),
     label: m('a.search-results-item', [
       m(UserBlock, {
         user: profile,
@@ -127,7 +127,7 @@ export const getDiscussionResult = (thread, searchTerm) => {
         ])
       ]
     ),
-    contentLeft: m(DiscussionIcon)
+    contentLeft: m(ReplyIcon),
   });
 };
 
@@ -173,14 +173,14 @@ export const getCommentResult = (comment, searchTerm) => {
               });
             }
           })(),
-        ]),
+        ])
       ]
     ),
-    contentLeft: m(DiscussionIcon)
+    contentLeft: m(ReplyIcon),
   });
 };
 
-const getListing = (results: any, searchTerm: string, pageCount: number, searchType?: SearchScope, sort: SearchSort) => {
+const getListing = (results: any, searchTerm: string, pageCount: number, sort: SearchSort, searchType?: SearchScope) => {
   if (Object.keys(results).length === 0 || !results[searchType]) return [];
   const tabScopedResults = (results[searchType])
     .sort((a, b) => {
@@ -275,7 +275,7 @@ const SearchPage : m.Component<{
     }
 
     const tabs = vnode.state.searchQuery.getSearchScope().map(getTab)
-    const tabScopedListing = getListing(results, searchTerm, pageCount, activeTab, searchQuery.sort);
+    const tabScopedListing = getListing(results, searchTerm, pageCount, searchQuery.sort, activeTab);
     const resultCount = tabScopedListing.length === SEARCH_PAGE_SIZE
         ? `${tabScopedListing.length}+ ${pluralize(2, activeTab.toLowerCase()).replace('2 ', '')}`
         : pluralize(tabScopedListing.length, activeTab.toLowerCase());

@@ -14,7 +14,7 @@ import InvitesMenu from '../components/header/invites_menu';
 const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
   view: (vnode) => {
     const { sidebarOpen } = vnode.state;
-    // Because onClick never happens when logging out we must set manually
+    // Because onclick never happens when logging out we must set manually
     return m('.MobileHeader', [
       m('img.mobile-logo', {
         src: 'https://commonwealth.im/static/img/logo.png',

@@ -113,6 +113,11 @@ export const modelFromServer = (thread) => {
     ? versionHistoryProcessed[0].timestamp
     : null;
 
+  let topicFromStore = null;
+  if (topic?.id) {
+    topicFromStore = app.topics.store.getById(topic.id);
+  }
+
   return new OffchainThread({
     id,
     author: thread.Address.address,
@@ -122,7 +127,7 @@ export const modelFromServer = (thread) => {
     createdAt: moment(created_at),
     attachments,
     snapshotProposal: snapshot_proposal,
-    topic,
+    topic: topicFromStore,
     kind,
     stage,
     community,
@@ -548,7 +553,7 @@ class ThreadsController {
       linking_thread_id,
       linked_thread_id,
       address: app.user.activeAccount.address,
-      author_chain: app.user.activeAccount.chain,
+      author_chain: app.user.activeAccount.chain.id,
       jwt: app.user.jwt,
     });
     if (response.status !== 'Success') {
@@ -567,7 +572,7 @@ class ThreadsController {
       linking_thread_id,
       linked_thread_id,
       address: app.user.activeAccount.address,
-      author_chain: app.user.activeAccount.chain,
+      author_chain: app.user.activeAccount.chain.id,
       remove_link: true,
       jwt: app.user.jwt,
     });
