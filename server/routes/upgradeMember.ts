@@ -42,8 +42,20 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
     where: {
       address,
     },
+    include: [{
+      model: models.Role,
+      required: true,
+      where: {
+        ...chainOrCommObj
+      }
+    }]
   });
-  if (!memberAddress) return next(new Error(Errors.InvalidAddress));
+  const roles = memberAddress?.Roles;
+  if (!memberAddress || !roles) return next(new Error(Errors.NoMember));
+
+  // There should only be one role per address per chain/community
+  const member = await models.Role.findOne({ where: { id: roles[0].id } });
+  if (!member) return next(new Error(Errors.NoMember));
 
   const allCommunityAdmin = await models.Role.findAll({
     where: {
@@ -58,14 +70,6 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
   if (isLastAdmin && adminSelfDemoting) {
     return next(new Error(Errors.MustHaveAdmin));
   }
-
-  const member = await models.Role.findOne({
-    where: {
-      ...chainOrCommObj,
-      address_id: memberAddress.id,
-    },
-  });
-  if (!member) return next(new Error(Errors.NoMember));
 
   if (ValidRoles.includes(new_role)) {
     member.permission = new_role;
