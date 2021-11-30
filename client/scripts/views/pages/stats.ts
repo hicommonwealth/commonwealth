@@ -8,6 +8,7 @@ import app from 'state';
 import PageLoading from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import Sublayout from 'views/sublayout';
+import { CommunityOptionsPopover } from './discussions';
 
 const StatsTable: m.Component<{ data }, {}> = {
   view: (vnode) => {
@@ -127,10 +128,23 @@ const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = 
       ],
     });
 
+    const isAdmin =
+        app.user.isSiteAdmin ||
+        app.user.isAdminOfEntity({
+          chain: app.activeChainId(),
+          community: app.activeCommunityId(),
+        });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+    });
+
     return m(Sublayout, {
       class: 'StatsPage',
       title: [
         'Analytics',
+        m(CommunityOptionsPopover, { isAdmin, isMod }),
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
     }, [

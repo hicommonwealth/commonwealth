@@ -30,6 +30,7 @@ import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
+import { CommunityOptionsPopover } from './discussions';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -265,11 +266,24 @@ const ProposalsPage: m.Component<{}> = {
     const visibleTechnicalCommitteeProposals = app.chain
       && (app.chain.network === ChainNetwork.Kusama || app.chain.network === ChainNetwork.Polkadot)
       && (app.chain as Substrate).technicalCommittee.store.getAll();
+    
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+    });
 
     return m(Sublayout, {
       class: 'ProposalsPage',
       title: [
         'Proposals',
+        m(CommunityOptionsPopover, { isAdmin, isMod }),
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,

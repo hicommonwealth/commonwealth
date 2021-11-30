@@ -11,6 +11,7 @@ import CommunityMetadataManagementTable from './community_metadata_management_ta
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
+import { CommunityOptionsPopover } from '../discussions';
 
 const ManageCommunityPage: m.Component<
   {},
@@ -118,9 +119,24 @@ const ManageCommunityPage: m.Component<
       m.redraw();
     };
 
+    const isAdmin =
+        app.user.isSiteAdmin ||
+        app.user.isAdminOfEntity({
+          chain: app.activeChainId(),
+          community: app.activeCommunityId(),
+        });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+    });
+
     return m(Sublayout, {
       class: 'ManageCommunityPage',
-      title: 'Manage Community',
+      title: [
+        'Manage Community',
+        m(CommunityOptionsPopover, { isAdmin, isMod }),
+      ],
       showNewProposalButton: true,
     }, [
       m('.manage-community-wrapper', [
