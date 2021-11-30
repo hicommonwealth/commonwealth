@@ -118,7 +118,14 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
     }
   }
 
-  let eventsSubscriber: SubscriberSessionAsPromised, identitySubscriber: SubscriberSessionAsPromised;
+  let consumer: RabbitMQController, eventsSubscriber: SubscriberSessionAsPromised, identitySubscriber: SubscriberSessionAsPromised;
+  try {
+    consumer = new RabbitMQController(<BrokerConfig>RabbitMQConfig);
+    await consumer.init();
+  } catch (e) {
+    log.error("Rascal consumer setup failed. Please check the Rascal configuration");
+    throw e
+  }
 
   try {
     eventsSubscriber = await consumer.startSubscription(
@@ -129,6 +136,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
     log.info('Failure in ChainEventsHandlersSubscription');
     throw e;
   }
+
 
   try {
     identitySubscriber = await consumer.startSubscription(

@@ -253,6 +253,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/cosmos/main'
     )).default;
     newChain = new Cosmos(n, app);
+  } else if (n.chain.base === ChainBase.Solana) {
+    const Solana = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "solana-main" */
+      './controllers/chain/solana/main'
+    )).default;
+    newChain = new Solana(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */

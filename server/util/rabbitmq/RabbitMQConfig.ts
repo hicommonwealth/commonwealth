@@ -19,15 +19,27 @@ const config = {
       'queues': {
         'ChainEventsHandlersQueue': {
           'assert': true,
-          'purge': purge
+          'purge': purge,
+          'options': {
+            'x-dead-letter-exchange': 'DeadLetterExchange',
+            'dead-letter-routing-key': 'dlQueue'
+          }
         },
         'SubstrateIdentityEventsQueue': {
           'assert': true,
-          'purge': purge
+          'purge': purge,
+          'options': {
+            'x-dead-letter-exchange': 'DeadLetterExchange',
+            'dead-letter-routing-key': 'dlQueue'
+          }
         },
         'ChainEventsNotificationsQueue': {
           'assert': true,
           'purge': purge,
+          'options': {
+            'x-dead-letter-exchange': 'DeadLetterExchange',
+            'dead-letter-routing-key': 'dlQueue'
+          }
         },
         'DeadLetterQueue': {
           'assert': true,

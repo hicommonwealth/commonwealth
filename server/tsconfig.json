@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "target": "es2020",
+    "target": "esnext",
     "moduleResolution": "node",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
