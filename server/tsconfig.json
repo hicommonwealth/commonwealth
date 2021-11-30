@@ -19,15 +19,13 @@
   "include": [
     "models/*",
     "models/",
-    "socket",
+    "socket/*",
     "scripts",
     "eventHandlers",
-    "*"
   ],
   "exclude": [
     "./node_modules",
     "passport.ts",
-    "server/scripts/setupChainEventListeners.ts",
     "server/router.ts",
     "server/webhookNotifier.ts",
     "server/migrations",
