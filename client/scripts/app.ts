@@ -402,7 +402,6 @@ export async function initNewTokenChain(address: string) {
     // TODO: better custom 404
     m.route.set('/404');
   }
-  console.log(response.result);
   const { chain, node } = response.result;
   const chainInfo = ChainInfo.fromJSON(chain);
   const nodeInfo = new NodeInfo(node);
@@ -410,7 +409,6 @@ export async function initNewTokenChain(address: string) {
     app.config.chains.add(chainInfo);
     app.config.nodes.add(nodeInfo);
   }
-  console.log(nodeInfo, chainInfo);
   await selectNode(nodeInfo);
 }
 

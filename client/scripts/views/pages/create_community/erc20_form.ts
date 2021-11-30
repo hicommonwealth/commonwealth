@@ -57,7 +57,6 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
       };
       try {
         const res = await $.get(`${app.serverUrl()}/getTokenForum`, args);
-        console.log(res);
         if (res.status === 'Success') {
           vnode.state.name = res?.token?.name || '';
           vnode.state.id = slugify(res?.token?.id);

@@ -611,8 +611,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
 
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
-      !useQuickSwitcher
-      ? m('.Sidebar', [
+      !useQuickSwitcher && m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(ExternalLinksModule),
@@ -626,7 +625,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
             window.open('https://commonwealth.im/');
           },
         }),
-      ]): '',
+      ]),
     ];
   },
 };

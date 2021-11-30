@@ -53,7 +53,6 @@ const CreateCommunity: m.Component<
 
       // query names from chainlist if possible
       const chains = await $.getJSON('https://chainid.network/chains.json');
-      console.log(chains);
       for (const id of Object.keys(vnode.state.ethChains)) {
         const chain = chains.find((c) => c.chainId === +id);
         if (chain) {
