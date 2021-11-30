@@ -12,6 +12,7 @@ import Listing from 'views/pages/listing';
 
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import ProposalRow from './proposal_row';
+import { CommunityOptionsPopover } from '../discussions';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -65,6 +66,9 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
       app.snapshot.init(snapshotId).then(() => {
         m.redraw();
       });
+
+      
+
       return m(Sublayout, {
         class: 'DiscussionsPage',
         title: 'Proposals',
@@ -98,9 +102,24 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
       vnode.state.selectedFilter = value;
     };
 
+    const isAdmin =
+        app.user.isSiteAdmin ||
+        app.user.isAdminOfEntity({
+          chain: app.activeChainId(),
+          community: app.activeCommunityId(),
+        });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+    });
+
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      title: 'Proposals',
+      title: [
+        'Proposals',
+        m(CommunityOptionsPopover, { isAdmin, isMod }),
+      ],
       description: '',
       showNewProposalButton: true,
     }, [

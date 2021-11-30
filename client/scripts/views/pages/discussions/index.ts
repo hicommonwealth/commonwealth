@@ -63,6 +63,7 @@ const getLastSeenDivider = (hasText = true) => {
   );
 };
 
+
 export const CommunityOptionsPopover: m.Component<
   { isAdmin: boolean; isMod: boolean },
   {}
@@ -70,16 +71,34 @@ export const CommunityOptionsPopover: m.Component<
   view: (vnode) => {
     const { isAdmin, isMod } = vnode.attrs;
     if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
+
+    // add extra width to compensate for an icon that isn't centered inside its boundaries
+    const DropdownIcon = m('div', {
+      style: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        cursor: 'pointer',
+      },
+    },
+    [
+      m(Icon, {
+        name: Icons.CHEVRON_DOWN,
+        style: 'margin-left: 3px;',
+      }),
+      m('div', {
+        style: "width: 8px;"
+      })
+    ]);
+
+
     return m(PopoverMenu, {
       class: 'community-options-popover',
       position: 'bottom',
       transitionDuration: 0,
       hoverCloseDelay: 0,
       closeOnContentClick: true,
-      trigger: m(Icon, {
-        name: Icons.CHEVRON_DOWN,
-        style: 'margin-left: 6px;',
-      }),
+      trigger: DropdownIcon,
       content: [
         isAdmin &&
           m(MenuItem, {
@@ -759,8 +778,7 @@ const DiscussionsPage: m.Component<
         class: 'DiscussionsPage',
         title: [
           'Discussions',
-          (isAdmin || isMod || app.community?.meta.invitesEnabled) &&
-            m(CommunityOptionsPopover, { isAdmin, isMod }),
+          m(CommunityOptionsPopover, { isAdmin, isMod }),
         ],
         description: topicDescription,
         showNewProposalButton: true,
