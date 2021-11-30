@@ -13,15 +13,16 @@
     "traceResolution": false
   },
   "files": [
-    "chainEventsConsumer.ts",
+    "scripts/chainEventsConsumer.ts",
     "scripts/dbNode.ts",
   ],
   "include": [
-    "server/models/*",
-    "server/models/",
+    "models/*",
+    "models/",
     "socket",
     "scripts",
-    "eventHandlers"
+    "eventHandlers",
+    "*"
   ],
   "exclude": [
     "./node_modules",
