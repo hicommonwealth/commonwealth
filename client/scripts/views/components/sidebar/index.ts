@@ -82,7 +82,7 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           label: m(Icon, { name: Icons.PLUS }),
           onclick: (e) => {
             e.preventDefault();
-            m.route.set('/create-community');
+            m.route.set('/createCommunity');
           },
         }),
       ]),

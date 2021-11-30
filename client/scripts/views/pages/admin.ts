@@ -108,7 +108,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
       m('button', {
         onclick: (e) => {
           e.preventDefault();
-          m.route.set('/create-community');
+          m.route.set('/createCommunity');
         }
       }, 'Add a new offchain community'),
       (app.config.chains.getAll() || []).map((chain) => m('.chain-row', [
