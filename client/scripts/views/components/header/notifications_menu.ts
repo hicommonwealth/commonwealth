@@ -71,13 +71,15 @@ const NotificationsMenu: m.Component<{ small?: boolean }, { selectedChainEvents:
       : unreadFilteredNotificationsCount;
 
     const newNotificationRedraw = () => {
-      console.log(">>>>>>>>>>>>>>>>>>> This gets logged thousands of times even though callback is only called by " +
-        "the notification callback a few times")
       m.redraw();
     }
 
-    // add callback to notifications controller
-    app.user.notifications.notificationCallbacks.push(newNotificationRedraw.bind(this));
+    const existingNotificationCallbacks = app.user.notifications.notificationCallbacks.map(x => x.name)
+    console.log("Endlessly redrawing for some reason")
+    if (!existingNotificationCallbacks.includes(newNotificationRedraw.bind(this).name)) {
+      console.log("Adding callback")
+      app.user.notifications.notificationCallbacks.push(newNotificationRedraw.bind(this));
+    }
 
     return m(PopoverMenu, {
       hasArrow: false,

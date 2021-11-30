@@ -155,8 +155,8 @@ class NotificationsController {
   public update(n: Notification) {
     if (!this._store.getById(n.id)) {
       this._store.add(n);
-      console.log("Updating notifications");
       for (const func of this.notificationCallbacks) {
+        console.log("Just once biaatch")
         func();
       }
     }
