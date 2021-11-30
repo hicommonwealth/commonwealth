@@ -1,33 +1,33 @@
-import Rascal from 'rascal';
+import { BrokerConfig } from 'rascal';
 import { assert } from 'chai';
-import { RabbitMqProducer as Producer } from '../../../server/eventHandlers/rabbitmqPlugin/producer';
-import { getRabbitMQConfig } from '../../../server/eventHandlers/rabbitmqPlugin';
+import { CWEvent } from '@commonwealth/chain-events';
+import { RabbitMqHandler } from '../../../server/eventHandlers/rabbitMQ';
+import  RabbitMQConfig  from '../../../server/util/rabbitmq/RabbitMQConfig';
 
-// Assumes: A live local CW server, a live local RabbitMQ server
 describe.skip('RabbitMQ producer integration tests', () => {
-  let producer, consumer;
+  let controller
+
+  beforeEach('Initialize RabbitMQ Controller', () => {
+    controller = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
+  })
 
   it('should initialize a RabbitMQ producer with the default config', async function () {
-    producer = await new Producer(getRabbitMQConfig());
-    await producer.init();
-    assert.isNotNull(producer.broker);
+    await controller.init();
+    assert.isNotNull(controller.broker);
   });
 
   it('should publish a CWEvent to a queue', async function () {
-    consumer = await Rascal.BrokerAsPromised.create(
-      Rascal.withDefaultConfig(getRabbitMQConfig())
-    );
+    await controller.init();
+    const sub = await controller.startSubscription(
+    async (event: CWEvent) => {
+      assert.equal(event.blockNumber, 10);
+      assert.deepEqual(event.data, {} as any);
+      assert.equal(event.chain, 'polkadot');
+      assert.equal(event.network, 'substrate');
+      assert.equal(event.received, 123);
+    }, 'ChainEventsHandlersSubscription');
 
-    const sub = await consumer.subscribe('eventsSub');
-    sub.on('message', (message, content, ackOrNack) => {
-      assert.equal(content.blockNumber, 10);
-      assert.equal(content.data, {});
-      assert.equal(content.chain, 'polkadot');
-      assert.equal(content.network, 'substrate');
-      assert.equal(content.received, 123);
-    });
-
-    producer.handle({
+    controller.handle({
       blockNumber: 10,
       data: {},
       chain: 'polkadot',
@@ -36,17 +36,18 @@ describe.skip('RabbitMQ producer integration tests', () => {
     });
   });
 
-  it('should prevent excluded events from being published', async function () {
-    const sub = await consumer.subscribe('eventsSub');
-    sub.on('message', (message, content, ackOrNack) => {
-      assert.equal(content.blockNumber, 10);
-      assert.equal(content.data, {});
-      assert.equal(content.chain, 'polkadot');
-      assert.equal(content.network, 'substrate');
-      assert.equal(content.received, 123);
-    });
+  xit('should prevent excluded events from being published', async function () {
+    await controller.init();
+    const sub = await controller.startSubscription(
+      async (event: CWEvent) => {
+      assert.equal(event.blockNumber, 10);
+      assert.equal(event.data, {} as any);
+      assert.equal(event.chain, 'polkadot');
+      assert.equal(event.network, 'substrate');
+      assert.equal(event.received, 123);
+    }, 'ChainEventsHandlersSubscription');
 
-    producer.handle({
+    controller.handle({
       blockNumber: 10,
       data: {
         kind: 'dont-skip',
@@ -56,7 +57,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       received: 123,
     });
 
-    producer.handle({
+    controller.handle({
       blockNumber: 99,
       data: {
         kind: 'skip',

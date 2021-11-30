@@ -218,18 +218,6 @@ const ChainMetadataManagementTable: m.Component<
                 }),
               ]),
             ]),
-          vnode.attrs.mods.length > 0 &&
-            m('tr', [
-              m('td', 'Moderators'),
-              m('td', [
-                m(ManageRolesRow, {
-                  roledata: vnode.attrs.mods,
-                  onRoleUpdate: (x, y) => {
-                    vnode.attrs.onRoleUpdate(x, y);
-                  },
-                }),
-              ]),
-            ]),
         ]
       ),
       m('.button-wrap', [
