@@ -94,7 +94,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
               m('td', { class: 'title-column', }, 'Error'),
               m('td', { class: 'error-column' }, vnode.state.endpointError),
             ]),
-            vnode.state.height && m('tr', [
+            !!vnode.state.height && m('tr', [
               m('td', { class: 'title-column', }, 'Current Height'),
               m('td', { class: 'height-column' }, `${vnode.state.height}`),
             ]),

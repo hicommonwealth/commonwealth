@@ -118,7 +118,7 @@ const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
             },
           }),
           vnode.state.network === ChainNetwork.Compound && m(InputPropertyRow, {
-            title: 'Token Name',
+            title: 'Token Name (Case Sensitive)',
             defaultValue: vnode.state.token_name,
             onChangeHandler: (v) => {
               vnode.state.token_name = v;
