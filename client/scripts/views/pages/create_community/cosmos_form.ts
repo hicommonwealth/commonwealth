@@ -73,6 +73,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                 onclick: async (e) => {
                   vnode.state.endpointError = null;
                   vnode.state.testing = true;
+                  vnode.state.height = 0;
                   try {
                     const tmClient = await Tendermint34Client.connect(vnode.state.url);
                     const { block } = await tmClient.block();

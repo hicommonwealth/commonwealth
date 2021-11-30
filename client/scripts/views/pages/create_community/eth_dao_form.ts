@@ -7,125 +7,278 @@ import $ from 'jquery';
 import { initAppState } from 'app';
 import { slugify } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
+import { isAddress } from 'web3-utils';
+import Web3 from 'web3';
+import { IAaveGovernanceV2__factory } from 'eth/types';
 import { notifyError } from 'controllers/app/notifications';
 import {
-  InputPropertyRow
+  InputPropertyRow, SelectPropertyRow
 } from 'views/components/metadata_rows';
+import CompoundAPI, { GovernorTokenType, GovernorType } from 'controllers/chain/ethereum/compound/api';
+import AaveApi from 'controllers/chain/ethereum/aave/api';
 import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
-
-//
-// TODO: populate additional fields
-//
 
 type EthDaoFormAttrs = Record<string, unknown>;
 
 interface EthDaoFormState extends ChainFormState {
+  chain_id: string;
+  url: string;
+  address: string;
+  token_name: string;
   id: string;
   name: string;
+  symbol: string;
+  network: ChainNetwork.Aave | ChainNetwork.Compound,
   saving: boolean;
   loaded: boolean;
+  loading: boolean;
+  status: string;
   error: string;
 }
 
 const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
   oninit: (vnode) => {
+    vnode.state.chain_id = '1';
+    vnode.state.url = '';
+    vnode.state.address = '';
+    vnode.state.token_name = 'token';
     vnode.state.id = '';
     vnode.state.name = '';
+    vnode.state.symbol = '';
+    vnode.state.network = ChainNetwork.Compound;
     initChainForm(vnode.state);
     vnode.state.saving = false;
     vnode.state.loaded = false;
+    vnode.state.loading = false;
+    vnode.state.status = '';
     vnode.state.error = '';
   },
   view: (vnode) => {
-    return m('.eth-dao-creation-form', [
-      m('.CommunityMetadataManagementTable', [
-        m(
-          Table,
-          {
-            bordered: false,
-            interactive: false,
-            striped: false,
-            class: 'metadata-management-table',
-          },
-          [
-            // TODO: fields
-            m(InputPropertyRow, {
-              title: 'Name',
-              defaultValue: vnode.state.name,
-              onChangeHandler: (v) => {
-                vnode.state.name = v;
-                vnode.state.id = slugify(v);
+    const validAddress = isAddress(vnode.state.address);
+    const disableField = !validAddress || !vnode.state.loaded;
+
+    const updateDAO = async () => {
+      if (!vnode.state.address || !vnode.state.chain_id) return;
+      vnode.state.loading = true;
+      vnode.state.status = '';
+      vnode.state.error = '';
+      // 1. get supported eth chains for URL if not provided
+      if (!vnode.state.url) {
+        try {
+          const res = await $.get(`${app.serverUrl()}/getSupportedEthChains`, { chain_id: vnode.state.chain_id });
+          vnode.state.url = res.result[+vnode.state.chain_id];
+          if (!vnode.state.url) {
+            throw new Error(`No URL found for chain id ${vnode.state.chain_id}`)
+          }
+        } catch (e) {
+          vnode.state.error = e.message;
+          vnode.state.loading = false;
+          m.redraw();
+          return;
+        }
+      }
+
+      // 2. hit DAO for status
+      try {
+        if (vnode.state.network === ChainNetwork.Compound) {
+          const provider = new Web3.providers.WebsocketProvider(vnode.state.url);
+          const compoundApi = new CompoundAPI(
+            null,
+            vnode.state.address,
+            provider,
+          );
+          await compoundApi.init(vnode.state.token_name);
+          if (!compoundApi.Token) {
+            throw new Error('Could not find governance token. Is "Token Name" field valid?');
+          }
+          const govType = GovernorType[compoundApi.govType];
+          const tokenType = GovernorTokenType[compoundApi.tokenType];
+          vnode.state.status = `Found ${govType} with token type ${tokenType}`;
+        } else if (vnode.state.network === ChainNetwork.Aave) {
+          const provider = new Web3.providers.WebsocketProvider(vnode.state.url);
+          const aaveApi = new AaveApi(
+            IAaveGovernanceV2__factory.connect,
+            vnode.state.address,
+            provider,
+          );
+          await aaveApi.init();
+          vnode.state.status = `Found Aave type DAO`;
+        } else {
+          throw new Error('invalid chain network');
+        }
+      } catch (e) {
+        vnode.state.error = e.message;
+        vnode.state.loading = false;
+        m.redraw();
+        return;
+      }
+      vnode.state.loaded = true;
+      vnode.state.loading = false;
+      m.redraw();
+    }
+
+    return m('.CommunityMetadataManagementTable', [
+      m(
+        Table,
+        {
+          bordered: false,
+          interactive: false,
+          striped: false,
+          class: 'metadata-management-table',
+        },
+        [
+          // TODO: factor out these ETH args
+          // TODO: dropdown for existing chain IDs/URLs
+          m(InputPropertyRow, {
+            title: 'Chain ID',
+            defaultValue: vnode.state.chain_id,
+            placeholder: '1',
+            onChangeHandler: async (v) => {
+              vnode.state.chain_id = v;
+              vnode.state.loaded = false;
+            }
+          }),
+          m(InputPropertyRow, {
+            title: 'Websocket URL',
+            defaultValue: vnode.state.url,
+            placeholder: 'wss://... (leave empty for default)',
+            onChangeHandler: async (v) => {
+              vnode.state.url = v;
+              vnode.state.loaded = false;
+            }
+          }),
+          m(InputPropertyRow, {
+            title: 'Address',
+            defaultValue: vnode.state.address,
+            placeholder: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+            onChangeHandler: (v) => {
+              vnode.state.address = v;
+              vnode.state.loaded = false;
+            },
+          }),
+          m(SelectPropertyRow, {
+            title: 'DAO Type',
+            options: [ChainNetwork.Aave, ChainNetwork.Compound],
+            value: vnode.state.network,
+            onchange: (value) => {
+              vnode.state.network = value;
+              vnode.state.loaded = false;
+            },
+          }),
+          vnode.state.network === ChainNetwork.Compound && m(InputPropertyRow, {
+            title: 'Token Name',
+            defaultValue: vnode.state.token_name,
+            onChangeHandler: (v) => {
+              vnode.state.token_name = v;
+              vnode.state.loaded = false;
+            },
+          }),
+          m('tr', [
+            m('td', { class: 'title-column', }, ''),
+            m(Button, {
+              label: 'Test contract',
+              intent: 'primary',
+              disabled: vnode.state.saving || !validAddress || !vnode.state.chain_id || vnode.state.loading,
+              onclick: async (e) => {
+                await updateDAO();
               },
             }),
-            m(InputPropertyRow, {
-              title: 'ID',
-              defaultValue: vnode.state.id,
-              disabled: true,
-              value: vnode.state.id,
-              onChangeHandler: (v) => {
-                vnode.state.id = v;
-              },
-            }),
-            ...defaultChainRows(vnode.state),
-          ]
-        ),
-        m(Button, {
-          label: 'Test fields',
-          intent: 'primary',
-          disabled: vnode.state.saving,
-          onclick: async (e) => {
-            // TODO
-          },
-        }),
-        m(Button, {
-          class: 'mt-3',
-          label: 'Save changes',
-          intent: 'primary',
-          disabled: vnode.state.saving || !vnode.state.loaded,
-          onclick: async (e) => {
-            const {
-              // TODO: fields
+          ]),
+          vnode.state.error && m('tr', [
+            m('td', { class: 'title-column', }, 'Error'),
+            m('td', { class: 'error-column' }, vnode.state.error),
+          ]),
+          vnode.state.status && m('tr', [
+            m('td', { class: 'title-column', }, 'Test Status'),
+            m('td', { class: 'status-column' }, `${vnode.state.status}`),
+          ]),
+          m(InputPropertyRow, {
+            title: 'Name',
+            defaultValue: vnode.state.name,
+            disabled: disableField,
+            onChangeHandler: (v) => {
+              vnode.state.name = v;
+              vnode.state.id = slugify(v);
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'ID',
+            defaultValue: vnode.state.id,
+            value: vnode.state.id,
+            disabled: disableField,
+            onChangeHandler: (v) => {
+              vnode.state.id = v;
+            },
+          }),
+          m(InputPropertyRow, {
+            title: 'Symbol',
+            disabled: disableField,
+            defaultValue: vnode.state.symbol,
+            placeholder: 'XYZ',
+            onChangeHandler: (v) => {
+              vnode.state.symbol = v;
+            },
+          }),
+          ...defaultChainRows(vnode.state, disableField),
+        ]
+      ),
+      m(Button, {
+        class: 'mt-3',
+        label: 'Save changes',
+        intent: 'primary',
+        disabled: vnode.state.saving || !validAddress || !vnode.state.loaded,
+        onclick: async (e) => {
+          const {
+            address,
+            id,
+            name,
+            description,
+            symbol,
+            icon_url,
+            website,
+            discord,
+            element,
+            telegram,
+            github,
+            chain_id,
+            token_name,
+            url,
+          } = vnode.state;
+          vnode.state.saving = true;
+          try {
+            const res = await $.post(`${app.serverUrl()}/createChain`, {
+              address,
               id,
               name,
               description,
               icon_url,
+              symbol,
               website,
               discord,
               element,
               telegram,
               github,
-            } = vnode.state;
-            vnode.state.saving = true;
-            try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
-                // TODO: fields
-                id,
-                name,
-                description,
-                icon_url,
-                website,
-                discord,
-                element,
-                telegram,
-                github,
-                jwt: app.user.jwt,
-                type: ChainType.DAO,
-                base: ChainBase.Ethereum,
-                network: ChainNetwork.Aave, // TODO: support Comp/Oz/etc
-              });
-              await initAppState(false);
-              m.route.set(`/${res.result.chain?.id}`);
-            } catch (err) {
-              notifyError(
-                err.responseJSON?.error ||
-                'Creating new Cosmos community failed'
-              );
-            } finally {
-              vnode.state.saving = false;
-            }
-          },
-        }),
-      ]),
+              jwt: app.user.jwt,
+              type: ChainType.DAO,
+              base: ChainBase.Ethereum,
+              network: vnode.state.network,
+              token_name,
+              node_url: url,
+              eth_chain_id: chain_id,
+            });
+            await initAppState(false);
+            // TODO: notify about needing to run event migration
+            m.route.set(`/${res.result.chain?.id}`);
+          } catch (err) {
+            notifyError(
+              err.responseJSON?.error ||
+              'Creating new ETH DAO community failed'
+            );
+          } finally {
+            vnode.state.saving = false;
+          }
+        },
+      }),
     ]);
   },
 };

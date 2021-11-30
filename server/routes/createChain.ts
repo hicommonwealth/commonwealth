@@ -5,7 +5,7 @@ import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 import { getUrlForEthChainId } from '../util/supportedEthChains';
 
-import { ChainBase } from '../../shared/types';
+import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -32,6 +32,7 @@ export const Errors = {
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
+  NotAdmin: 'Must be admin',
 };
 
 const createChain = async (
@@ -42,6 +43,12 @@ const createChain = async (
 ) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
+  }
+  // require Admin privilege for creating Chain/DAO
+  if (req.body.type !== ChainType.Token) {
+    if (!req.user.isAdmin) {
+      return next(new Error(Errors.NotAdmin));
+    }
   }
   if (!req.body.name || !req.body.name.trim()) {
     return next(new Error(Errors.NoName));
