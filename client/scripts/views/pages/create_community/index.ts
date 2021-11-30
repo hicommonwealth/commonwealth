@@ -2,7 +2,8 @@ import 'pages/create_community.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { Tabs, TabItem } from 'construct-ui';
+import $ from 'jquery';
+import { Tabs, TabItem, Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import OffchainCommunityForm from './offchain_community_form';
 import ERC20Form from './erc20_form';
@@ -10,6 +11,7 @@ import SubstrateForm from './substrate_form';
 import SputnikForm from './sputnik_form';
 import CosmosForm from './cosmos_form';
 import EthDaoForm from './eth_dao_form';
+import { EthChainAttrs } from './chain_input_rows';
 
 enum CommunityType {
   OffchainCommunity = 'Offchain Community',
@@ -28,8 +30,9 @@ const ADMIN_ONLY_TABS = [
 
 type CreateCommunityAttrs = Record<string, unknown>;
 
-interface CreateCommunityState {
+interface CreateCommunityState extends EthChainAttrs {
   activeForm: string;
+  loadingEthChains: boolean;
 }
 
 const CreateCommunity: m.Component<
@@ -38,22 +41,45 @@ const CreateCommunity: m.Component<
 > = {
   oninit: (vnode) => {
     vnode.state.activeForm = CommunityType.OffchainCommunity;
+    vnode.state.loadingEthChains = true;
+    vnode.state.ethChains = {};
+    vnode.state.ethChainNames = {};
+
+    // query eth chains
+    $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(async (res) => {
+      if (res.status === 'Success') {
+        vnode.state.ethChains = res.result;
+      }
+
+      // query names from chainlist if possible
+      const chains = await $.getJSON('https://chainid.network/chains.json');
+      console.log(chains);
+      for (const id of Object.keys(vnode.state.ethChains)) {
+        const chain = chains.find((c) => c.chainId === +id);
+        if (chain) {
+          vnode.state.ethChainNames[id] = chain.name;
+        }
+      }
+      vnode.state.loadingEthChains = false;
+      m.redraw();
+    })
   },
   view: (vnode: m.VnodeDOM<CreateCommunityAttrs, CreateCommunityState>) => {
-    const getActiveForm = (): m.Component => {
+    const getActiveForm = () => {
+      const { ethChains, ethChainNames } = vnode.state;
       switch (vnode.state.activeForm) {
         case CommunityType.OffchainCommunity:
-          return OffchainCommunityForm;
+          return m(OffchainCommunityForm);
         case CommunityType.Erc20Community:
-          return ERC20Form;
+          return m(ERC20Form, { ethChains, ethChainNames });
         case CommunityType.SputnikDao:
-          return SputnikForm;
+          return m(SputnikForm);
         case CommunityType.SubstrateCommunity:
-          return SubstrateForm;
+          return m(SubstrateForm);
         case CommunityType.Cosmos:
-          return CosmosForm;
+          return m(CosmosForm);
         case CommunityType.EthDao:
-          return EthDaoForm;
+          return m(EthDaoForm, { ethChains, ethChainNames });
         default:
           throw new Error(`Invalid community type: ${vnode.state.activeForm}`)
       }
@@ -65,7 +91,13 @@ const CreateCommunity: m.Component<
     }, [
       m('.create-community-wrapper', [
         m('h3', 'New Commonwealth Community'),
-        m(
+        vnode.state.loadingEthChains && m(Spinner, {
+          fill: true,
+          message: 'Loading...',
+          size: 'xl',
+          style: 'visibility: visible; opacity: 1;'
+        }),
+        !vnode.state.loadingEthChains && m(
           Tabs,
           {
             align: 'center',
@@ -87,7 +119,7 @@ const CreateCommunity: m.Component<
               })
             }),
         ),
-        m('.community-creation-form', [ m(getActiveForm()) ]),
+        !vnode.state.loadingEthChains && m('.community-creation-form', [getActiveForm()]),
       ])
     ]);
   },

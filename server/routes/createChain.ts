@@ -90,6 +90,12 @@ const createChain = async (
     const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
     if (ethChainUrl) {
       url = ethChainUrl;
+    } else {
+      // If using overridden URL, then user must be admin -- we do not allow users to submit
+      // custom URLs yet.
+      if (!req.user.admin) {
+        return next(new Error(Errors.NotAdmin));
+      }
     }
     if (!url) {
       return next(new Error(Errors.InvalidChainIdOrUrl));
@@ -158,6 +164,8 @@ const createChain = async (
     github: req.body.github,
     element: req.body.element,
     base: req.body.base,
+    bech32_prefix: req.body.bech32_prefix,
+    decimals: req.body.decimals,
   };
   const chain = await models.Chain.create(chainContent);
 
@@ -166,6 +174,7 @@ const createChain = async (
     url,
     address: req.body.address,
     eth_chain_id,
+    token_name: req.body.token_name,
   };
   const node = await models.ChainNode.create(chainNodeContent);
 

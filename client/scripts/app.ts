@@ -397,11 +397,12 @@ export function initCommunity(communityId: string): Promise<boolean> {
 }
 
 export async function initNewTokenChain(address: string) {
-  const response = await $.getJSON('/api/getTokenForum', { address });
+  const response = await $.getJSON('/api/getTokenForum', { address, autocreate: true });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');
   }
+  console.log(response.result);
   const { chain, node } = response.result;
   const chainInfo = ChainInfo.fromJSON(chain);
   const nodeInfo = new NodeInfo(node);

@@ -1,6 +1,7 @@
 import m from 'mithril';
+import app from 'state';
 import {
-  InputPropertyRow
+  InputPropertyRow, SelectPropertyRow
 } from 'views/components/metadata_rows';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 
@@ -114,4 +115,70 @@ export function defaultChainRows<T extends ChainFormState>(state: T, disabled = 
       },
     }),
   ];
+}
+
+export interface EthChainAttrs {
+  ethChains: { [id: number]: string };
+  ethChainNames: { [id: number]: string };
+}
+
+export interface EthFormState extends ChainFormState {
+  chain_string: string;
+  chain_id: string;
+  url: string;
+  address: string;
+  loaded: boolean;
+}
+
+export function ethChainRows<
+  Attrs extends EthChainAttrs, State extends EthFormState
+  >(attrs: Attrs, state: State) {
+  const addlChainStrings = app?.user.isSiteAdmin ? ['Custom'] : [];
+  return [
+    m(SelectPropertyRow, {
+      title: 'Chain',
+      options: [...Object.keys(attrs.ethChains).map((c) => attrs.ethChainNames[c] || `${c}`), ...addlChainStrings],
+      value: state.chain_string,
+      onchange: (value) => {
+        state.chain_string = value;
+        if (value !== 'Custom') {
+          const [id] = Object.entries(attrs.ethChainNames).find(([, name]) => name === value)
+            || Object.keys(attrs.ethChains).find((cId) => `${cId}` === value);
+          state.chain_id = id;
+          state.url = attrs.ethChains[id];
+        } else {
+          state.chain_id = '';
+          state.url = '';
+        }
+        state.loaded = false;
+      },
+    }),
+    state.chain_string === 'Custom' && m(InputPropertyRow, {
+      title: 'Chain ID',
+      defaultValue: state.chain_id,
+      placeholder: '1',
+      onChangeHandler: async (v) => {
+        state.chain_id = v;
+        state.loaded = false;
+      }
+    }),
+    state.chain_string === 'Custom' && m(InputPropertyRow, {
+      title: 'Websocket URL',
+      defaultValue: state.url,
+      placeholder: 'wss://... (leave empty for default)',
+      onChangeHandler: async (v) => {
+        state.url = v;
+        state.loaded = false;
+      }
+    }),
+    m(InputPropertyRow, {
+      title: 'Address',
+      defaultValue: state.address,
+      placeholder: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+      onChangeHandler: (v) => {
+        state.address = v;
+        state.loaded = false;
+      },
+    }),
+  ]
 }

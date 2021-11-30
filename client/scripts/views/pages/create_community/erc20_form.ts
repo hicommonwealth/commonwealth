@@ -12,17 +12,15 @@ import { notifyError } from 'controllers/app/notifications';
 import {
   InputPropertyRow
 } from 'views/components/metadata_rows';
-import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
+import { EthFormState, initChainForm, defaultChainRows, EthChainAttrs, ethChainRows } from './chain_input_rows';
 
-type ERC20FormAttrs = Record<string, unknown>;
+type ERC20FormAttrs = EthChainAttrs;
 
-interface ERC20FormState extends ChainFormState {
-  chain_id: string;
-  url: string;
-  address: string;
+interface ERC20FormState extends EthFormState {
   id: string;
   name: string;
   symbol: string;
+  decimals: number;
   saving: boolean;
   loaded: boolean;
   loading: boolean;
@@ -31,12 +29,14 @@ interface ERC20FormState extends ChainFormState {
 
 const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
   oninit: (vnode) => {
+    vnode.state.chain_string = 'Ethereum Mainnet';
     vnode.state.chain_id = '1';
-    vnode.state.url = '';
+    vnode.state.url = vnode.attrs.ethChains[1];
     vnode.state.address = '';
     vnode.state.id = '';
     vnode.state.name = '';
     vnode.state.symbol = '';
+    vnode.state.decimals = 18;
     initChainForm(vnode.state);
     vnode.state.saving = false;
     vnode.state.loaded = false;
@@ -55,28 +55,27 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
         chain_id: vnode.state.chain_id,
         allowUncached: true,
       };
-      if (vnode.state.url) {
-        args['url'] = vnode.state.url;
-      }
       try {
         const res = await $.get(`${app.serverUrl()}/getTokenForum`, args);
+        console.log(res);
         if (res.status === 'Success') {
-          vnode.state.name = res?.result?.chain?.name || '';
-          vnode.state.id = slugify(vnode.state.name);
-          vnode.state.symbol = res?.result?.chain?.symbol || '';
+          vnode.state.name = res?.token?.name || '';
+          vnode.state.id = slugify(res?.token?.id);
+          vnode.state.symbol = res?.token?.symbol || '';
+          vnode.state.decimals = +res?.token?.decimals || 18;
           vnode.state.icon_url =
-            res?.result?.chain?.icon_url || '';
+            res?.token?.icon_url || '';
           if (vnode.state.icon_url.startsWith('/')) {
             vnode.state.icon_url = `https://commonwealth.im${vnode.state.icon_url}`;
           }
           vnode.state.description =
-            res?.result?.chain?.description || '';
-          vnode.state.website = res?.result?.chain?.website || '';
-          vnode.state.discord = res?.result?.chain?.discord || '';
-          vnode.state.element = res?.result?.chain?.element || '';
+            res?.token?.description || '';
+          vnode.state.website = res?.token?.website || '';
+          vnode.state.discord = res?.token?.discord || '';
+          vnode.state.element = res?.token?.element || '';
           vnode.state.telegram =
-            res?.result?.chain?.telegram || '';
-          vnode.state.github = res?.result?.chain?.github || '';
+            res?.token?.telegram || '';
+          vnode.state.github = res?.token?.github || '';
           vnode.state.loaded = true;
         } else {
           notifyError(res.message);
@@ -101,35 +100,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           class: 'metadata-management-table',
         },
         [
-          // TODO: factor out these ETH args
-          // TODO: dropdown for existing chain IDs/URLs
-          m(InputPropertyRow, {
-            title: 'Chain ID',
-            defaultValue: vnode.state.chain_id,
-            placeholder: '1',
-            onChangeHandler: async (v) => {
-              vnode.state.chain_id = v;
-              vnode.state.loaded = false;
-            }
-          }),
-          m(InputPropertyRow, {
-            title: 'Websocket URL',
-            defaultValue: vnode.state.url,
-            placeholder: 'wss://... (leave empty for default)',
-            onChangeHandler: async (v) => {
-              vnode.state.url = v;
-              vnode.state.loaded = false;
-            }
-          }),
-          m(InputPropertyRow, {
-            title: 'Address',
-            defaultValue: vnode.state.address,
-            placeholder: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
-            onChangeHandler: (v) => {
-              vnode.state.address = v;
-              vnode.state.loaded = false;
-            },
-          }),
+          ...ethChainRows(vnode.attrs, vnode.state),
           m('tr', [
             m('td', { class: 'title-column', }, ''),
             m(Button, {
@@ -191,6 +162,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             github,
             chain_id,
             url,
+            decimals,
           } = vnode.state;
           vnode.state.saving = true;
           try {
@@ -206,6 +178,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               element,
               telegram,
               github,
+              decimals,
               jwt: app.user.jwt,
               type: ChainType.Token,
               base: ChainBase.Ethereum,

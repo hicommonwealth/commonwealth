@@ -16,21 +16,17 @@ import {
 } from 'views/components/metadata_rows';
 import CompoundAPI, { GovernorTokenType, GovernorType } from 'controllers/chain/ethereum/compound/api';
 import AaveApi from 'controllers/chain/ethereum/aave/api';
-import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
+import { initChainForm, defaultChainRows, EthChainAttrs, EthFormState, ethChainRows } from './chain_input_rows';
 
-type EthDaoFormAttrs = Record<string, unknown>;
+type EthDaoFormAttrs = EthChainAttrs;
 
-interface EthDaoFormState extends ChainFormState {
-  chain_id: string;
-  url: string;
-  address: string;
+interface EthDaoFormState extends EthFormState {
   token_name: string;
   id: string;
   name: string;
   symbol: string;
   network: ChainNetwork.Aave | ChainNetwork.Compound,
   saving: boolean;
-  loaded: boolean;
   loading: boolean;
   status: string;
   error: string;
@@ -38,8 +34,9 @@ interface EthDaoFormState extends ChainFormState {
 
 const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
   oninit: (vnode) => {
+    vnode.state.chain_string = 'Ethereum Mainnet';
     vnode.state.chain_id = '1';
-    vnode.state.url = '';
+    vnode.state.url = vnode.attrs.ethChains[1];
     vnode.state.address = '';
     vnode.state.token_name = 'token';
     vnode.state.id = '';
@@ -58,27 +55,10 @@ const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
     const disableField = !validAddress || !vnode.state.loaded;
 
     const updateDAO = async () => {
-      if (!vnode.state.address || !vnode.state.chain_id) return;
+      if (!vnode.state.address || !vnode.state.chain_id || !vnode.state.url) return;
       vnode.state.loading = true;
       vnode.state.status = '';
       vnode.state.error = '';
-      // 1. get supported eth chains for URL if not provided
-      if (!vnode.state.url) {
-        try {
-          const res = await $.get(`${app.serverUrl()}/getSupportedEthChains`, { chain_id: vnode.state.chain_id });
-          vnode.state.url = res.result[+vnode.state.chain_id];
-          if (!vnode.state.url) {
-            throw new Error(`No URL found for chain id ${vnode.state.chain_id}`)
-          }
-        } catch (e) {
-          vnode.state.error = e.message;
-          vnode.state.loading = false;
-          m.redraw();
-          return;
-        }
-      }
-
-      // 2. hit DAO for status
       try {
         if (vnode.state.network === ChainNetwork.Compound) {
           const provider = new Web3.providers.WebsocketProvider(vnode.state.url);
@@ -127,35 +107,7 @@ const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
           class: 'metadata-management-table',
         },
         [
-          // TODO: factor out these ETH args
-          // TODO: dropdown for existing chain IDs/URLs
-          m(InputPropertyRow, {
-            title: 'Chain ID',
-            defaultValue: vnode.state.chain_id,
-            placeholder: '1',
-            onChangeHandler: async (v) => {
-              vnode.state.chain_id = v;
-              vnode.state.loaded = false;
-            }
-          }),
-          m(InputPropertyRow, {
-            title: 'Websocket URL',
-            defaultValue: vnode.state.url,
-            placeholder: 'wss://... (leave empty for default)',
-            onChangeHandler: async (v) => {
-              vnode.state.url = v;
-              vnode.state.loaded = false;
-            }
-          }),
-          m(InputPropertyRow, {
-            title: 'Address',
-            defaultValue: vnode.state.address,
-            placeholder: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
-            onChangeHandler: (v) => {
-              vnode.state.address = v;
-              vnode.state.loaded = false;
-            },
-          }),
+          ...ethChainRows(vnode.attrs, vnode.state),
           m(SelectPropertyRow, {
             title: 'DAO Type',
             options: [ChainNetwork.Aave, ChainNetwork.Compound],
