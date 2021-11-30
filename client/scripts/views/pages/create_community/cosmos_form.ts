@@ -29,6 +29,7 @@ interface CosmosFormState extends ChainFormState {
   bech32_prefix: string;
   saving: boolean;
   testing: boolean;
+  height: number;
   error: string;
 }
 
@@ -74,12 +75,12 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                   vnode.state.testing = true;
                   try {
                     const tmClient = await Tendermint34Client.connect(vnode.state.url);
-                    const status = await tmClient.status();
-                    console.log(status);
-                    const [chainId] = status.nodeInfo.network.split('-');
+                    const { block } = await tmClient.block();
+                    const [chainId] = block.header.chainId.split('-');
+                    vnode.state.height = block.header.height;
                     vnode.state.name = chainId;
                     vnode.state.id = slugify(chainId);
-                    // TODO: populate more information
+                    // TODO: populate more information if possible
                   } catch (err) {
                     vnode.state.endpointError = err.message;
                   }
@@ -91,6 +92,10 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
             vnode.state.endpointError && m('tr', [
               m('td', { class: 'title-column', }, 'Error'),
               m('td', { class: 'error-column' }, vnode.state.endpointError),
+            ]),
+            vnode.state.height && m('tr', [
+              m('td', { class: 'title-column', }, 'Current Height'),
+              m('td', { class: 'height-column' }, `${vnode.state.height}`),
             ]),
             m(InputPropertyRow, {
               title: 'Name',
