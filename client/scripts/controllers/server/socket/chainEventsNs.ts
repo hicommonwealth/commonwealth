@@ -1,5 +1,3 @@
-// import io from 'socket.io-client';
-
 import { WebsocketMessageType, WebsocketNamespaces } from 'types';
 import app from 'state';
 import { Notification, NotificationSubscription } from 'models';

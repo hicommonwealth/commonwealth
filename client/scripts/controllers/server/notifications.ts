@@ -25,6 +25,8 @@ class NotificationsController {
   private _subscriptions: NotificationSubscription[] = [];
   public get subscriptions() { return this._subscriptions; }
 
+  public notificationCallbacks: { (): void; } [] = [];
+
   public subscribe(category: string, objectId: string) {
     const subscription = this.subscriptions.find((v) => v.category === category && v.objectId === objectId);
     if (subscription) {
@@ -153,6 +155,10 @@ class NotificationsController {
   public update(n: Notification) {
     if (!this._store.getById(n.id)) {
       this._store.add(n);
+      console.log("Updating notifications");
+      for (const func of this.notificationCallbacks) {
+        func();
+      }
     }
   }
 

@@ -70,6 +70,15 @@ const NotificationsMenu: m.Component<{ small?: boolean }, { selectedChainEvents:
       ? unreadNotificationsCount - unreadFilteredNotificationsCount
       : unreadFilteredNotificationsCount;
 
+    const newNotificationRedraw = () => {
+      console.log(">>>>>>>>>>>>>>>>>>> This gets logged thousands of times even though callback is only called by " +
+        "the notification callback a few times")
+      m.redraw();
+    }
+
+    // add callback to notifications controller
+    app.user.notifications.notificationCallbacks.push(newNotificationRedraw.bind(this));
+
     return m(PopoverMenu, {
       hasArrow: false,
       transitionDuration: 0,
