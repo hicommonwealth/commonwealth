@@ -93,7 +93,7 @@ const createChain = async (
     } else {
       // If using overridden URL, then user must be admin -- we do not allow users to submit
       // custom URLs yet.
-      if (!req.user.admin) {
+      if (!req.user.isAdmin) {
         return next(new Error(Errors.NotAdmin));
       }
     }

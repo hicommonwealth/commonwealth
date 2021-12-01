@@ -552,9 +552,6 @@ const DiscussionsPage: m.Component<
             .filter((t) => t.pinned),
           chainId: app.activeChainId(),
           pinned: true,
-        })
-        .then(() => {
-          console.log('fetched');
         });
     }
 
