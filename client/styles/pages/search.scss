@@ -308,14 +308,12 @@
                 padding-bottom: 10px;
             }
             &.search-history-item {
-                overflow: scroll;
                 padding-top: 10px !important;
                 .cui-list-item-content-left {
                     display: flex;
                     flex-direction: row;
                     align-items: center;
                     align-content: space-around;
-                    overflow: scroll;
 
                     p{
                         padding-top: 5px;
@@ -416,8 +414,8 @@
 @media only screen and (max-width: 800px) {
 
     .search-results-list {
-        left: -45px !important;
-        width: 90vw !important;
+        left: -55px !important;
+        width: 97vw !important;
     }
 
     .search-filter-button-bar {

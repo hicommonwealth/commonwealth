@@ -14,9 +14,9 @@ import {
 
 import app from 'state';
 import { OffchainThread } from 'models';
+import { SearchParams } from 'models/SearchQuery';
 import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { SearchParams } from 'controllers/server/search';
 import { formatAddressShort } from '../../../../shared/utils';
 
 const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {

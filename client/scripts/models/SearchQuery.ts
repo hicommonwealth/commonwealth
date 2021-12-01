@@ -17,7 +17,7 @@ export interface SearchParams {
     communityScope?: string;
     chainScope?: string;
     isSearchPreview?: boolean;
-    searchScope?: [SearchScope];
+    searchScope?: Array<SearchScope>;
     sort?: SearchSort;
     resultSize?: number;
 }
@@ -26,7 +26,7 @@ export default class SearchQuery implements SearchParams {
     public communityScope?: string;
     public chainScope?: string;
     public isSearchPreview?: boolean;
-    public searchScope: [SearchScope];
+    public searchScope: Array<SearchScope>;
     public sort: SearchSort;
 
     constructor(searchTerm: string, params?: SearchParams){

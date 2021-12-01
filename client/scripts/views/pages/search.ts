@@ -286,7 +286,7 @@ const SearchPage : m.Component<{
         options: ['Best', 'Newest', 'Oldest'],
         value: vnode.state.searchQuery.sort,
         onchange: (e) => {
-          searchQuery.sort = SearchSort[e.currentTarget.value]
+          searchQuery.sort = SearchSort[e.currentTarget["value"]]
           m.route.set(`/search?${searchQuery.toUrlParams()}`);
           setTimeout(() => {
             vnode.state.refreshResults = true;

@@ -14,9 +14,7 @@ import {
   Button,
   Size,
   Tag,
-  IconIntent
 } from 'construct-ui';
-import { SearchIcon } from 'helpers/search';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
