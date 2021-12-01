@@ -75,7 +75,6 @@ const NotificationsMenu: m.Component<{ small?: boolean }, { selectedChainEvents:
     }
 
     const existingNotificationCallbacks = app.user.notifications.notificationCallbacks.map(x => x.name)
-    console.log("Endlessly redrawing for some reason")
     if (!existingNotificationCallbacks.includes(newNotificationRedraw.bind(this).name)) {
       console.log("Adding callback")
       app.user.notifications.notificationCallbacks.push(newNotificationRedraw.bind(this));
