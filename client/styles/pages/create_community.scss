@@ -1,0 +1,115 @@
+@import 'client/styles/shared';
+
+.CreateCommunityPage {
+    width: 100%;
+    @include sm-max {
+        width: initial;
+    }
+
+    .community-creation-form {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .create-community-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        h3 {
+            margin-top: 11px;
+        }
+
+        .CommunityMetadataManagementTable {
+            td {
+                padding: 11px 20px;
+            }
+            .cui-button {
+                display: block;
+                width: 40%;
+                min-width: 150px;
+                margin: 26px auto;
+            }
+            .cui-tabs {
+                margin-top: 0 !important;
+            }
+        }
+
+        .cui-table.metadata-management-table {
+            td {
+                line-height: 1.1;
+                padding: 5px 0 5px 28px !important;
+                border-bottom: none !important;
+            }
+            tr:first-child td {
+                padding-top: 18px !important;
+            }
+        }
+        .cui-tabs {
+            margin-top: 2px !important;
+            border-bottom-color: $background-color-light;
+            > :first-child {
+                margin-left: 15px !important;
+            }
+        }
+
+        .AvatarUpload {
+            width: 92px;
+            height: 92px;
+            color: red;
+            margin: auto 0;
+        }
+
+        .error-column {
+            @include error-text
+        }
+
+        .InputPropertyRow {
+            width: 100%;
+            .title-column {
+                width: 150px;
+            }
+            textarea {
+                resize: vertical !important;
+                min-height: 25px !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+        }
+        .TogglePropertyRow {
+            td:first-child {
+                padding-top: 7px !important;
+            }
+            td {
+                padding-top: 14px !important;
+                padding-bottom: 4px !important;
+            }
+            .cui-switch {
+                display: inline-block;
+                margin-right: 5px;
+                position: relative;
+                top: -2px;
+            }
+            .switch-caption {
+                display: inline-block;
+                color: $text-color-light;
+                font-size: 94%;
+                position: relative;
+                top: 1px;
+            }
+        }
+        .SelectPropertyRow {
+            td:first-child {
+                padding-top: 7px !important;
+            }
+            td {
+                padding-top: 14px !important;
+                padding-bottom: 4px !important;
+            }
+        }
+    }
+}
+.CompactModalExitButton {
+    color: $text-color-medium;
+}
