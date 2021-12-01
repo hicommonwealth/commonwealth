@@ -1,11 +1,13 @@
 import { Server } from 'socket.io';
 import { addPrefix, factory } from '../../shared/logging';
 import { WebsocketEngineEvents, WebsocketMessageType, WebsocketNamespaces } from '../../shared/types';
+import { authenticate } from './index';
 
 const log = factory.getLogger(addPrefix(__filename));
 
 export function createCeNamespace(io: Server) {
 	const CeNs = io.of('/chain-events');
+	io.use(authenticate);
 
 	CeNs.on('connection', (socket) => {
 		log.info(`${socket.id} connected to Chain-Events`)

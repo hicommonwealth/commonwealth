@@ -1,9 +1,10 @@
 // Use https://admin.socket.io/#/ to monitor
 
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io';
 import { instrument } from '@socket.io/admin-ui';
 import { BrokerConfig } from 'rascal';
 import * as jwt from 'jsonwebtoken';
+import { ExtendedError } from 'socket.io/dist/namespace';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig'
@@ -16,8 +17,7 @@ const io = new Server({ serveClient: false, transports: ['websocket'], cors: {
 		methods: ["GET", "POST"]
 	}});
 
-// this authentication middleware applies to ALL namespaces
-io.use((socket, next) => {
+export const authenticate = (socket: Socket, next: (err?: ExtendedError) => void) => {
 	if (socket.handshake.query?.token) {
 		jwt.verify(<string>socket.handshake.query.token, JWT_SECRET, (err, decodedUser) => {
 			if (err) return next(new Error('Authentication Error: incorrect JWT token'));
@@ -27,7 +27,9 @@ io.use((socket, next) => {
 	} else {
 		next(new Error('Authentication Error: no JWT token given'))
 	}
-})
+}
+
+io.use(authenticate);
 
 io.on('connection', (socket) => {
 	console.log(`${socket.id} connected`)

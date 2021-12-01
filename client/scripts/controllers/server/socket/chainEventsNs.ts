@@ -16,15 +16,23 @@ export class ChainEventsNamespace {
 	}
 
 	public addChainEventSubscriptions(subs: NotificationSubscription[]) {
-		const eventTypes = subs.map(x => x.ChainEventType).filter(x => !!x);
-		console.log('Adding Websocket subscriptions for:', eventTypes)
-		this.ceNs.emit('newSubscriptions', eventTypes);
+		if (this._isConnected) {
+			const eventTypes = subs.map(x => x.ChainEventType).filter(x => !!x);
+			console.log('Adding Websocket subscriptions for:', eventTypes)
+			this.ceNs.emit('newSubscriptions', eventTypes);
+		} else {
+			console.log('ChainEventsNamespace is not connected');
+		}
 	}
 
 	public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
-		const eventTypes = subs.map(x => x.ChainEventType).filter(x => !!x);
-		console.log('Deleting Websocket subscriptions for:', eventTypes)
-		this.ceNs.emit('deleteSubscriptions', subs.map(x => x.ChainEventType));
+		if (this._isConnected) {
+			const eventTypes = subs.map(x => x.ChainEventType).filter(x => !!x);
+			console.log('Deleting Websocket subscriptions for:', eventTypes)
+			this.ceNs.emit('deleteSubscriptions', subs.map(x => x.ChainEventType));
+		} else {
+			console.log('ChainEventsNamespace is not connected');
+		}
 	}
 
 	private onChainEvent(notification: any) {
