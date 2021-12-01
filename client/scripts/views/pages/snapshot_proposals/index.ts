@@ -103,9 +103,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
 
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      title: [
-        'Proposals',
-      ],
+      title: 'Proposals',     
       description: '',
       showNewProposalButton: true,
     }, [
