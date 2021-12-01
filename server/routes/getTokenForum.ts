@@ -34,10 +34,7 @@ const getTokenForum = async (
     }
   }
 
-  if (!token) {
-    if (req.query.allowUncached) {
-      return res.json({ status: 'Success', result: { chain: null, node: null } });
-    }
+  if (!token && !req.query.allowUncached) {
     return res.json({ status: 'Failure', message: 'Token does not exist' });
   }
 
@@ -82,7 +79,7 @@ const getTokenForum = async (
       return res.json({ status: 'Success', result });
     } else {
       // only return token data if we do not autocreate
-      return res.json({ status: 'Success', token: token.toJSON() });
+      return res.json({ status: 'Success', token: token ? token.toJSON() : {} });
     }
   } catch (e) {
     log.error(e.message);
