@@ -7,8 +7,8 @@ export class WebSocketController {
 	private _isConnected = false;
 	public readonly chainEventsNs: ChainEventsNamespace;
 
-	public constructor(domain: string) {
-		this._socket = io(domain, {transports: ['websocket']});
+	public constructor(domain: string, jwt: string) {
+		this._socket = io(domain, {transports: ['websocket'], query: { token: jwt }});
 		this._socket.on('connect', this.onconnect.bind(this))
 		this._socket.on('connect_error', this.onconnect_error.bind(this))
 		this._socket.on('disconnect', this.ondisconnect.bind(this))
@@ -59,6 +59,10 @@ export class WebSocketController {
 				console.log('Unknown WebSocket disconnect reason');
 				break;
 		}
+	}
+
+	public disconnect(): void {
+		this._socket.disconnect();
 	}
 
 	public get isConnected() { return this._isConnected }

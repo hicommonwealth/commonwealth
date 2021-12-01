@@ -15,16 +15,11 @@ import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
-import {
-  ChainInfo,
-  CommunityInfo,
-  NodeInfo,
-  NotificationCategory,
-} from 'models';
+import { ChainInfo, CommunityInfo, NodeInfo, NotificationCategory, } from 'models';
 
 import { WebSocketController } from 'controllers/server/socket';
 
-import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
+import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from 'controllers/chain/community/main';
 
@@ -46,6 +41,7 @@ const APPLICATION_UPDATE_ACTION = 'Okay';
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true, customDomain = null): Promise<void> {
+
   return new Promise((resolve, reject) => {
     $.get(`${app.serverUrl()}/status`).then( async (data) => {
       app.config.chains.clear();
@@ -105,6 +101,15 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+
+      if (!app.socket && app.loginState === LoginState.LoggedIn) {
+        app.socket = new WebSocketController("ws://localhost:3002", app.user.jwt);
+        app.user.notifications.refresh().then(() => m.redraw());
+      } else if (app.socket && app.loginState === LoginState.LoggedOut) {
+        app.socket.disconnect();
+        app.socket = undefined;
+      }
+
       app.user.setStarredCommunities(data.user ? data.user.starredCommunities : []);
 
       // update the selectedNode, unless we explicitly want to avoid
@@ -854,50 +859,17 @@ Promise.all([
   initAppState(true, customDomain).then(async () => {
     // setup notifications and websocket if not already set up
     if (!app.socket) {
-      let jwt;
-      // refresh notifications once
       if (app.loginState === LoginState.LoggedIn) {
+        // refresh notifications once
         app.user.notifications.refresh().then(() => m.redraw());
-        jwt = app.user.jwt;
-      }
-      // grab discussion drafts
-      if (app.loginState === LoginState.LoggedIn) {
+        // grab all discussion drafts
         app.user.discussionDrafts.refreshAll().then(() => m.redraw());
+        app.socket = new WebSocketController("ws://localhost:3002", app.user.jwt);
       }
 
       handleInviteLinkRedirect();
-
       // If the user updates their email
       handleUpdateEmailConfirmation();
-
-      app.socket = new WebSocketController("ws://localhost:3002");
-
-      // subscribe to notifications
-      // const wsUrl = document.location.origin
-      //   .replace('http://', 'ws://')
-      //   .replace('https://', 'wss://');
-      // app.socket = new WebsocketController(wsUrl, jwt, null);
-      // if (app.loginState === LoginState.LoggedIn) {
-      //   app.socket.addListener(
-      //     WebsocketMessageType.Notification,
-      //     (payload: IWebsocketsPayload<any>) => {
-      //       if (payload.data && payload.data.subscription_id) {
-      //         const subscription = app.user.notifications.subscriptions.find(
-      //           (sub) => sub.id === payload.data.subscription_id
-      //         );
-      //         // note that payload.data should have the correct JSON form
-      //         if (subscription) {
-      //           console.log('adding new notification from websocket:', payload.data);
-      //           const notification = Notification.fromJSON(payload.data, subscription);
-      //           app.user.notifications.update(notification);
-      //           m.redraw();
-      //         }
-      //       } else {
-      //         console.error('got invalid notification payload:', payload);
-      //       }
-      //     },
-      //   );
-      // }
     }
     m.redraw();
   }).catch((err) => {

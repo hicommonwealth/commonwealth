@@ -3,9 +3,11 @@
 import { Server } from 'socket.io'
 import { instrument } from '@socket.io/admin-ui';
 import { BrokerConfig } from 'rascal';
+import * as jwt from 'jsonwebtoken';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig'
+import { JWT_SECRET } from '../config';
 
 // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
 // library to the user since we already import it + disable http long-polling to avoid sticky session issues
@@ -13,6 +15,19 @@ const io = new Server({ serveClient: false, transports: ['websocket'], cors: {
 		origin: "http://localhost:8080", // TODO: change to commonwealth.im in prod/staging
 		methods: ["GET", "POST"]
 	}});
+
+// this authentication middleware applies to ALL namespaces
+io.use((socket, next) => {
+	if (socket.handshake.query?.token) {
+		jwt.verify(<string>socket.handshake.query.token, JWT_SECRET, (err, decodedUser) => {
+			if (err) return next(new Error('Authentication Error: incorrect JWT token'));
+			(<any>socket).user = decodedUser;
+			next();
+		})
+	} else {
+		next(new Error('Authentication Error: no JWT token given'))
+	}
+})
 
 io.on('connection', (socket) => {
 	console.log(`${socket.id} connected`)
