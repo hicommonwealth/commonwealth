@@ -53,6 +53,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
       const args = {
         address: vnode.state.address,
         chain_id: vnode.state.chain_id,
+        url: vnode.state.url,
         allowUncached: true,
       };
       try {
