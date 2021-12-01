@@ -70,16 +70,6 @@ const NotificationsMenu: m.Component<{ small?: boolean }, { selectedChainEvents:
       ? unreadNotificationsCount - unreadFilteredNotificationsCount
       : unreadFilteredNotificationsCount;
 
-    const newNotificationRedraw = () => {
-      m.redraw();
-    }
-
-    const existingNotificationCallbacks = app.user.notifications.notificationCallbacks.map(x => x.name)
-    if (!existingNotificationCallbacks.includes(newNotificationRedraw.bind(this).name)) {
-      console.log("Adding callback")
-      app.user.notifications.notificationCallbacks.push(newNotificationRedraw.bind(this));
-    }
-
     return m(PopoverMenu, {
       hasArrow: false,
       transitionDuration: 0,

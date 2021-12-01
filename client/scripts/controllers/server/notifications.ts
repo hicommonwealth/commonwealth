@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import _ from 'lodash';
+import m from 'mithril';
 
 import { NotificationStore } from 'stores';
 import { NotificationSubscription, Notification } from 'models';
@@ -24,8 +25,6 @@ class NotificationsController {
 
   private _subscriptions: NotificationSubscription[] = [];
   public get subscriptions() { return this._subscriptions; }
-
-  public notificationCallbacks: { (): void; } [] = [];
 
   public subscribe(category: string, objectId: string) {
     const subscription = this.subscriptions.find((v) => v.category === category && v.objectId === objectId);
@@ -155,10 +154,7 @@ class NotificationsController {
   public update(n: Notification) {
     if (!this._store.getById(n.id)) {
       this._store.add(n);
-      for (const func of this.notificationCallbacks) {
-        console.log("Just once biaatch")
-        func();
-      }
+      m.redraw();
     }
   }
 
