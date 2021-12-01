@@ -4,12 +4,10 @@ import { Table, Button } from 'construct-ui';
 
 import { CommunityInfo, ChainInfo } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import {
-  InputPropertyRow,
-  TogglePropertyRow,
-  ManageRolesRow,
-} from './metadata_rows';
-import AvatarUpload, { AvatarScope } from '../../components/avatar_upload';
+import { InputPropertyRow, TogglePropertyRow } from 'views/components/metadata_rows';
+import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
+
+import ManageRolesRow from './manage_roles_row';
 
 interface ICommunityMetadataManagementState {
   name: string;
