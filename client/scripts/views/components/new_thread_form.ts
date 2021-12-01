@@ -17,7 +17,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
+import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo, ITokenAdapter } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -28,8 +28,6 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
-import Token from 'controllers/chain/ethereum/token/adapter';
-import BN from 'bn.js';
 
 interface IThreadForm {
   topicName?: string;
@@ -662,7 +660,7 @@ export const NewThreadForm: m.Component<{
                 topics: app.topics && app.topics.getByCommunity(app.activeId()).filter((t) => {
                   return isAdmin
                     || t.tokenThreshold.isZero()
-                    || (app.chain instanceof Token && (t.tokenThreshold).lte((app.chain as Token).tokenBalance));
+                    || (ITokenAdapter.instanceOf(app.chain) && (t.tokenThreshold).lte(app.chain.tokenBalance));
                 }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
