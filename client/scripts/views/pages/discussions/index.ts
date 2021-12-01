@@ -89,7 +89,7 @@ export const CommunityOptionsPopover: m.Component<
               app.modals.create({ modal: NewTopicModal });
             },
           }),
-        isAdmin && app.chain instanceof ITokenAdapter &&
+        isAdmin && ITokenAdapter.instanceOf(app.chain) &&
           m(MenuItem, {
             label: 'Edit topic thresholds',
             onclick: (e) => {

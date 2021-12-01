@@ -346,7 +346,7 @@ const LoginSelector: m.Component<{
                   }
 
                   // If token forum make sure has token and add to app.chain obj
-                  if (app.chain && app.chain instanceof ITokenAdapter) {
+                  if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
                     await app.chain.activeAddressHasToken(app.user.activeAccount.address);
                   }
                   m.redraw();

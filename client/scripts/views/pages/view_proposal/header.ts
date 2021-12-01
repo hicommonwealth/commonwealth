@@ -103,7 +103,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
         app.user.activeAccount.address
       );
 
-    const tokenThresholdFailed = app.chain instanceof ITokenAdapter
+    const tokenThresholdFailed = ITokenAdapter.instanceOf(app.chain)
       && proposal.topic.tokenThreshold?.gtn(0)
         ? app.chain.tokenBalance.lt(proposal.topic.tokenThreshold)
         : false;

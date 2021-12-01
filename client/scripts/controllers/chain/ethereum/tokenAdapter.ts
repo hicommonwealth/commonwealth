@@ -16,7 +16,7 @@ export default class Token extends Ethereum implements ITokenAdapter {
   public hasToken = false;
   public tokenBalance: BN = new BN(0);
   public async activeAddressHasToken(activeAddress?: string): Promise<boolean> {
-    if (!activeAddress || !this.chain) return false;
+    if (!activeAddress || !this.contractApi?.Contract) return false;
     this.hasToken = false;
     const account = this.accounts.get(activeAddress);
 

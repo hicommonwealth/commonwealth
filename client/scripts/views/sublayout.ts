@@ -137,7 +137,7 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : (app.isLoggedIn() && app.chain instanceof ITokenAdapter && !app.user.activeAccount)
+            : (app.isLoggedIn() && ITokenAdapter.instanceOf(app.chain) && !app.user.activeAccount)
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link an address that holds ${chain.symbol} to participate in governance.`),
               ]) : '',

@@ -660,7 +660,7 @@ export const NewThreadForm: m.Component<{
                 topics: app.topics && app.topics.getByCommunity(app.activeId()).filter((t) => {
                   return isAdmin
                     || t.tokenThreshold.isZero()
-                    || (app.chain instanceof ITokenAdapter && (t.tokenThreshold).lte(app.chain.tokenBalance));
+                    || (ITokenAdapter.instanceOf(app.chain) && (t.tokenThreshold).lte(app.chain.tokenBalance));
                 }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),

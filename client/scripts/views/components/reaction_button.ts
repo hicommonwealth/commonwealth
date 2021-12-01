@@ -83,7 +83,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     let disabled = vnode.state.loading;
 
     // token balance check if needed
-    if (!app.community && app.chain instanceof ITokenAdapter) {
+    if (!app.community && ITokenAdapter.instanceOf(app.chain)) {
       const tokenBalance = app.chain.tokenBalance;
       const isAdmin = app.user.isSiteAdmin
         || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });

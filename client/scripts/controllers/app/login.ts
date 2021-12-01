@@ -56,8 +56,8 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   const community = app.activeCommunityId();
   const role = app.user.getRoleInCommunity({ account, chain, community });
 
-  if (app.chain && app.chain instanceof ITokenAdapter) {
-    (app.chain as ITokenAdapter).activeAddressHasToken(account.address).then(() => m.redraw());
+  if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
+    app.chain.activeAddressHasToken(account.address).then(() => m.redraw());
   }
 
   if (!role || role.is_user_default) {

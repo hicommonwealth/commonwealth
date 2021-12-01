@@ -150,7 +150,7 @@ const CreateComment: m.Component<{
 
     // token balance check if needed
     let tokenPostingThreshold: BN | null = null;
-    if (!app.community && app.chain instanceof ITokenAdapter) {
+    if (!app.community && ITokenAdapter.instanceOf(app.chain)) {
       const tokenBalance = app.chain.tokenBalance;
       tokenPostingThreshold = app.topics.getByName(
         activeTopicName,
