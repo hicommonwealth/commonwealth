@@ -281,7 +281,6 @@ const NotificationRow: m.Component<{
                   app.user.notifications.clear([notification]).then(() => {
                     m.redraw();
                   })
-                  m.redraw();
                 },
               })
             ]),
