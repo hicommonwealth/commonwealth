@@ -1,4 +1,5 @@
 import 'pages/discussions/index.scss';
+import 'components/dropdown_icon.scss';
 
 import $ from 'jquery';
 import _ from 'lodash';
@@ -63,32 +64,28 @@ const getLastSeenDivider = (hasText = true) => {
   );
 };
 
-
-export const CommunityOptionsPopover: m.Component<
-  { isAdmin: boolean; isMod: boolean },
-  {}
-> = {
+export const CommunityOptionsPopover: m.Component<{}> = {
   view: (vnode) => {
-    const { isAdmin, isMod } = vnode.attrs;
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+    });
     if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
 
     // add extra width to compensate for an icon that isn't centered inside its boundaries
-    const DropdownIcon = m('div', {
-      style: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        cursor: 'pointer',
-      },
-    },
+    const DropdownIcon = m('.dropdown-wrapper',
     [
       m(Icon, {
         name: Icons.CHEVRON_DOWN,
-        style: 'margin-left: 3px;',
       }),
-      m('div', {
-        style: "width: 8px;"
-      })
+      m('.dropdown-spacer', {})
     ]);
 
 
@@ -760,17 +757,6 @@ const DiscussionsPage: m.Component<
     const postsDepleted =
       allThreads.length > 0 && vnode.state.postsDepleted[subpage];
 
-    const isAdmin =
-      app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
-        chain: app.activeChainId(),
-        community: app.activeCommunityId(),
-      });
-    const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-    });
 
     return m(
       Sublayout,
@@ -778,7 +764,6 @@ const DiscussionsPage: m.Component<
         class: 'DiscussionsPage',
         title: [
           'Discussions',
-          m(CommunityOptionsPopover, { isAdmin, isMod }),
         ],
         description: topicDescription,
         showNewProposalButton: true,
