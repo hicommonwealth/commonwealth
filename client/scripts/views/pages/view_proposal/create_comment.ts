@@ -6,14 +6,13 @@ import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
+import { OffchainThread, OffchainComment, AnyProposal, Account, ITokenAdapter } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
 import { notifyError } from 'controllers/app/notifications';
-import Token from 'controllers/chain/ethereum/token/adapter';
 import BN from 'bn.js';
 import { tokenBaseUnitsToTokens } from 'helpers';
 import { GlobalStatus } from './body';
@@ -151,8 +150,8 @@ const CreateComment: m.Component<{
 
     // token balance check if needed
     let tokenPostingThreshold: BN | null = null;
-    if (!app.community && (app.chain as Token)?.isToken) {
-      const tokenBalance = (app.chain as Token).tokenBalance;
+    if (!app.community && app.chain instanceof ITokenAdapter) {
+      const tokenBalance = app.chain.tokenBalance;
       tokenPostingThreshold = app.topics.getByName(
         activeTopicName,
         app.activeId()

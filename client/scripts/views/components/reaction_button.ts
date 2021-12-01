@@ -5,9 +5,8 @@ import mixpanel from 'mixpanel-browser';
 import { Icon, Icons, Popover, Size } from 'construct-ui';
 
 import app from 'state';
-import { Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
+import { Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo, ITokenAdapter } from 'models';
 import User from 'views/components/widgets/user';
-import Token from 'controllers/chain/ethereum/token/adapter';
 import BN from 'bn.js';
 
 import $ from 'jquery';
@@ -84,8 +83,8 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     let disabled = vnode.state.loading;
 
     // token balance check if needed
-    if (!app.community && (app.chain as Token)?.isToken) {
-      const tokenBalance = (app.chain as Token).tokenBalance;
+    if (!app.community && app.chain instanceof ITokenAdapter) {
+      const tokenBalance = app.chain.tokenBalance;
       const isAdmin = app.user.isSiteAdmin
         || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 

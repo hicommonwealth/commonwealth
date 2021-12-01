@@ -398,20 +398,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         },
         label: 'Rage quit',
       }),
-      showMolochMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('token_management_modal', {
-            account: app.user.activeAccount,
-            accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
-            contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-            tokenAddress: ((app.user.activeAccount as any).app.chain as Moloch).governance.api.token.address,
-          });
-        },
-        label: 'Approve tokens',
-      }),
       m('.sidebar-spacer'),
       app.chain?.meta.chain.snapshot && m(Button, {
         rounded: true,

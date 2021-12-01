@@ -1,4 +1,4 @@
-import { Account, ITXModalData } from 'models';
+import { Account } from 'models';
 import { IApp } from 'state';
 import _ from 'lodash';
 import * as solw3 from '@solana/web3.js';
@@ -58,10 +58,5 @@ export default class SolanaAccount extends Account<SolanaToken> {
 
   public async signMessage(message: string): Promise<string> {
     throw new Error('unsupported');
-  }
-
-  public sendBalanceTx(recipient: Account<SolanaToken>, amount: SolanaToken):
-    ITXModalData | Promise<ITXModalData> {
-    throw new Error('Method not implemented.');
   }
 }

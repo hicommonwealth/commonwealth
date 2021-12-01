@@ -17,9 +17,6 @@ export class OffchainAccount extends Account<Coin> {
   public get freeBalance(): any {
     throw new Error('Method not implemented.');
   }
-  public sendBalanceTx(recipient: Account<Coin>, amount: Coin): Promise<any> {
-    throw new Error('Method not implemented.');
-  }
   public async signMessage(message: string): Promise<string> {
     throw new Error('Method not implemented.');
   }

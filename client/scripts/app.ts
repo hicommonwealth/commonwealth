@@ -308,7 +308,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
-      './controllers/chain/ethereum/token/adapter'
+      './controllers/chain/ethereum/tokenAdapter'
     )).default;
     newChain = new Token(n, app);
   } else if (n.chain.network === ChainNetwork.Commonwealth) {
@@ -409,7 +409,6 @@ export async function initNewTokenChain(address: string) {
     app.config.chains.add(chainInfo);
     app.config.nodes.add(nodeInfo);
   }
-  console.log(nodeInfo, chainInfo);
   await selectNode(nodeInfo);
 }
 

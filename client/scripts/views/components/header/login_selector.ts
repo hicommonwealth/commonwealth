@@ -10,7 +10,7 @@ import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider, Popover 
 import app from 'state';
 import { navigateToSubpage, initAppState } from 'app';
 import { ChainBase } from 'types';
-import { AddressInfo, ChainInfo, CommunityInfo } from 'models';
+import { AddressInfo, ChainInfo, CommunityInfo, ITokenAdapter } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 
 import { notifySuccess } from 'controllers/app/notifications';
@@ -22,7 +22,6 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 import LoginModal from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
-import Token from 'controllers/chain/ethereum/token/adapter';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import { linkExistingAddressToChainOrCommunity, setActiveAccount } from 'controllers/app/login';
 import {
@@ -347,8 +346,8 @@ const LoginSelector: m.Component<{
                   }
 
                   // If token forum make sure has token and add to app.chain obj
-                  if (app.chain && (app.chain as Token)?.isToken) {
-                    await (app.chain as Token).activeAddressHasToken(app.user.activeAccount.address);
+                  if (app.chain && app.chain instanceof ITokenAdapter) {
+                    await app.chain.activeAddressHasToken(app.user.activeAccount.address);
                   }
                   m.redraw();
                 } catch (err) {

@@ -251,15 +251,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     return this._Chain.computeFees(this.address, dummyTxFunc);
   }
 
-  public async sendBalanceTx(recipient: SubstrateAccount, amount: SubstrateCoin) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.balances.transfer(recipient.address, amount),
-      'balanceTransfer',
-      `${formatCoin(amount)} to ${recipient.address}`
-    );
-  }
-
   public nominateTx(nominees: SubstrateAccount[]) {
     return this._Chain.createTXModalData(
       this,

@@ -28,6 +28,7 @@ import {
   CommunityInfo,
   OffchainThreadStage,
   OffchainThread,
+  ITokenAdapter,
 } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -40,7 +41,6 @@ import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicThresholdsModal from 'views/modals/edit_topic_thresholds_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
-import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
@@ -89,8 +89,7 @@ export const CommunityOptionsPopover: m.Component<
               app.modals.create({ modal: NewTopicModal });
             },
           }),
-        isAdmin &&
-          (app.chain as Token)?.isToken &&
+        isAdmin && app.chain instanceof ITokenAdapter &&
           m(MenuItem, {
             label: 'Edit topic thresholds',
             onclick: (e) => {
