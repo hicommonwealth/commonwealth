@@ -15,6 +15,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import Token from 'controllers/chain/ethereum/token/adapter';
 import { SearchBar } from './components/search_bar';
+import { CommunityOptionsPopover } from './pages/discussions';
 
 const Sublayout: m.Component<{
   // overrides
@@ -66,9 +67,10 @@ const Sublayout: m.Component<{
         ]),
         m('h4.sublayout-header-heading', [
           link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
-          title && m('span.breadcrumb', m.trust('/')),
-          title
-        ]),
+          title && m('span.breadcrumb', m.trust('/')), 
+          title,
+          m(CommunityOptionsPopover),
+        ]), 
       ] : community ? [
         m('.ChainIcon', [
           link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [

@@ -119,23 +119,10 @@ const ManageCommunityPage: m.Component<
       m.redraw();
     };
 
-    const isAdmin =
-        app.user.isSiteAdmin ||
-        app.user.isAdminOfEntity({
-          chain: app.activeChainId(),
-          community: app.activeCommunityId(),
-        });
-    const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-    });
-
     return m(Sublayout, {
       class: 'ManageCommunityPage',
       title: [
         'Manage Community',
-        m(CommunityOptionsPopover, { isAdmin, isMod }),
       ],
       showNewProposalButton: true,
     }, [
