@@ -24,6 +24,7 @@ interface ERC20FormState extends EthFormState {
   saving: boolean;
   loaded: boolean;
   loading: boolean;
+  status: string;
   error: string;
 }
 
@@ -41,6 +42,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
     vnode.state.saving = false;
     vnode.state.loaded = false;
     vnode.state.loading = false;
+    vnode.state.status = '';
     vnode.state.error = '';
   },
   view: (vnode) => {
@@ -49,17 +51,20 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
 
     const updateTokenForum = async () => {
       if (!vnode.state.address || !vnode.state.chain_id) return;
+      vnode.state.status = '';
+      vnode.state.error = '';
       vnode.state.loading = true;
       const args = {
         address: vnode.state.address,
         chain_id: vnode.state.chain_id,
+        url: vnode.state.url,
         allowUncached: true,
       };
       try {
         const res = await $.get(`${app.serverUrl()}/getTokenForum`, args);
         if (res.status === 'Success') {
           vnode.state.name = res?.token?.name || '';
-          vnode.state.id = slugify(res?.token?.id);
+          vnode.state.id = res?.token?.id && slugify(res?.token?.id);
           vnode.state.symbol = res?.token?.symbol || '';
           vnode.state.decimals = +res?.token?.decimals || 18;
           vnode.state.icon_url =
@@ -76,14 +81,12 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             res?.token?.telegram || '';
           vnode.state.github = res?.token?.github || '';
           vnode.state.loaded = true;
+          vnode.state.status = 'Success!';
         } else {
-          notifyError(res.message);
+          vnode.state.error = res.message || 'Failed to load Token Information';
         }
       } catch (err) {
-        notifyError(
-          err.responseJSON?.error ||
-          'Failed to load Token Information'
-        );
+        vnode.state.error = err.responseJSON?.error || 'Failed to load Token Information';
       }
       vnode.state.loading = false;
       m.redraw();
@@ -110,6 +113,14 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
                 await updateTokenForum();
               },
             }),
+          ]),
+          vnode.state.error && m('tr', [
+            m('td', { class: 'title-column', }, 'Error'),
+            m('td', { class: 'error-column' }, vnode.state.error),
+          ]),
+          vnode.state.status && m('tr', [
+            m('td', { class: 'title-column', }, 'Test Status'),
+            m('td', { class: 'status-column' }, `${vnode.state.status}`),
           ]),
           m(InputPropertyRow, {
             title: 'Name',
