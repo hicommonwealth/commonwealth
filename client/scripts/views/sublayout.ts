@@ -4,6 +4,7 @@ import m, { Vnode } from 'mithril';
 import app from 'state';
 import { EmptyState, Button, Icon, Icons, Grid, Col, Spinner } from 'construct-ui';
 import { link } from 'helpers';
+import { ITokenAdapter } from 'models';
 
 import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
@@ -13,8 +14,7 @@ import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
-import Token from 'controllers/chain/ethereum/token/adapter';
-import { SearchBar } from './components/search_bar';
+import { SearchBar } from 'views/components/search_bar';
 
 const Sublayout: m.Component<{
   // overrides
@@ -139,7 +139,7 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !app.user.activeAccount)
+            : (app.isLoggedIn() && ITokenAdapter.instanceOf(app.chain) && !app.user.activeAccount)
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link an address that holds ${chain.symbol} to participate in governance.`),
               ]) : '',

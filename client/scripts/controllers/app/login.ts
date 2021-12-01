@@ -9,14 +9,14 @@ import { isSameAccount } from 'helpers';
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
-import Token from 'controllers/chain/ethereum/token/adapter';
 import { ChainBase } from 'types';
 import {
   ChainInfo,
   SocialAccount,
   Account,
   CommunityInfo,
-  AddressInfo
+  AddressInfo,
+  ITokenAdapter
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
@@ -56,8 +56,8 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   const community = app.activeCommunityId();
   const role = app.user.getRoleInCommunity({ account, chain, community });
 
-  if (app.chain && (app.chain as Token).isToken) {
-    (app.chain as Token).activeAddressHasToken(account.address).then(() => m.redraw());
+  if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
+    app.chain.activeAddressHasToken(account.address).then(() => m.redraw());
   }
 
   if (!role || role.is_user_default) {
