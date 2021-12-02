@@ -1,5 +1,7 @@
 // Use https://admin.socket.io/#/ to monitor
 
+// TODO: turn on session affinity in all staging environments and in production
+
 import { Server, Socket } from 'socket.io';
 import { instrument } from '@socket.io/admin-ui';
 import { BrokerConfig } from 'rascal';
@@ -10,10 +12,12 @@ import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig'
 import { JWT_SECRET } from '../config';
 
+const origin = process.env.SERVER_URL || "http://localhost:8080"
+
 // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
 // library to the user since we already import it + disable http long-polling to avoid sticky session issues
 const io = new Server({ serveClient: false, transports: ['websocket'], cors: {
-		origin: "http://localhost:8080", // TODO: change to commonwealth.im in prod/staging
+		origin,
 		methods: ["GET", "POST"]
 	}});
 
