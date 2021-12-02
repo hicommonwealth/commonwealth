@@ -63,7 +63,7 @@ const SplTokenForm: m.Component<SplTokenFormAttrs, SplTokenFormState> = {
       vnode.state.loading = true;
       try {
         const url = solw3.clusterApiUrl(vnode.state.cluster);
-        const connection = new solw3.Connection(url, 'confirmed');
+        const connection = new solw3.Connection(url);
         const supply = await connection.getTokenSupply(mintPubKey);
         const { decimals, amount } = supply.value;
         vnode.state.decimals = decimals;

@@ -45,7 +45,6 @@ const EditTopicThresholdsRow: m.Component<{
         value: vnode.state.newTokenThreshold,
         type: 'number',
         oninput: (v) => {
-          console.log('onkeyup fired');
           const threshold: string = (v.target as any).value;
           vnode.state.newTokenThreshold = threshold;
         },
@@ -78,7 +77,6 @@ const EditTopicThresholdsRow: m.Component<{
           title: '',
           defaultValue: vnode.state.useBaseToken,
           onchange: () => {
-            console.log('onchange fired');
             vnode.state.useBaseToken = !vnode.state.useBaseToken;
             if (vnode.state.useBaseToken) {
               vnode.state.switchCaption = 'Using base token value';

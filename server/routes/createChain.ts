@@ -127,7 +127,7 @@ const createChain = async (
 
     try {
       const clusterUrl = solw3.clusterApiUrl(url);
-      const connection = new solw3.Connection(clusterUrl, 'confirmed');
+      const connection = new solw3.Connection(clusterUrl);
       const supply = await connection.getTokenSupply(pubKey);
       const { decimals, amount } = supply.value;
       req.body.decimals = decimals;
