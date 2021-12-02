@@ -17,7 +17,7 @@ import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
-import CreateCommunityModal from 'views/modals/create_community_modal';
+
 
 import { DiscordIcon, TelegramIcon, ElementIcon, GithubIcon, WebsiteIcon } from '../component_kit/icons';
 
@@ -81,7 +81,8 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           rounded: true,
           label: m(Icon, { name: Icons.PLUS }),
           onclick: (e) => {
-            app.modals.create({ modal: CreateCommunityModal });
+            e.preventDefault();
+            m.route.set('/createCommunity');
           },
         }),
       ]),
@@ -398,20 +399,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         },
         label: 'Rage quit',
       }),
-      showMolochMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('token_management_modal', {
-            account: app.user.activeAccount,
-            accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
-            contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-            tokenAddress: ((app.user.activeAccount as any).app.chain as Moloch).governance.api.token.address,
-          });
-        },
-        label: 'Approve tokens',
-      }),
       m('.sidebar-spacer'),
       app.chain?.meta.chain.snapshot && m(Button, {
         rounded: true,
@@ -604,11 +591,13 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
+const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
   view: (vnode) => {
+    const { useQuickSwitcher } = vnode.attrs;
+
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
-      m('.Sidebar', [
+      !useQuickSwitcher && m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(ExternalLinksModule),

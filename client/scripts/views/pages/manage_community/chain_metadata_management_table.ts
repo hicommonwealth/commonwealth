@@ -5,13 +5,11 @@ import { Button, Table } from 'construct-ui';
 
 import { ChainBase, ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { InputPropertyRow, TogglePropertyRow } from 'views/components/metadata_rows';
+import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
+
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
-import {
-  TogglePropertyRow,
-  InputPropertyRow,
-  ManageRolesRow,
-} from './metadata_rows';
-import AvatarUpload, { AvatarScope } from '../../components/avatar_upload';
+import ManageRolesRow from './manage_roles_row';
 
 interface IChainMetadataManagementState {
   name: string;
@@ -245,7 +243,7 @@ const ChainMetadataManagementTable: m.Component<
               iconUrl,
               defaultSummaryView,
             } = vnode.state;
-  
+
             // /^[a-z]+\.eth/
             if (
               snapshot &&
@@ -257,7 +255,7 @@ const ChainMetadataManagementTable: m.Component<
               notifyError('Snapshot name must be in the form of *.eth');
               return;
             }
-  
+
             try {
               await vnode.attrs.chain.updateChainData({
                 name,

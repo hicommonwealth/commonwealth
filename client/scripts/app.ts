@@ -308,7 +308,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
-      './controllers/chain/ethereum/token/adapter'
+      './controllers/chain/ethereum/tokenAdapter'
     )).default;
     newChain = new Token(n, app);
   } else if (n.chain.network === ChainNetwork.Commonwealth) {
@@ -397,7 +397,7 @@ export function initCommunity(communityId: string): Promise<boolean> {
 }
 
 export async function initNewTokenChain(address: string) {
-  const response = await $.getJSON('/api/getTokenForum', { address });
+  const response = await $.getJSON('/api/getTokenForum', { address, autocreate: true });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');
@@ -409,7 +409,6 @@ export async function initNewTokenChain(address: string) {
     app.config.chains.add(chainInfo);
     app.config.nodes.add(nodeInfo);
   }
-  console.log(nodeInfo, chainInfo);
   await selectNode(nodeInfo);
 }
 
@@ -588,6 +587,7 @@ Promise.all([
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+    '/createCommunity':         importRoute('views/pages/create_community', { scoped: false }),
     ...(isCustomDomain ? {
       //
       // Custom domain routes

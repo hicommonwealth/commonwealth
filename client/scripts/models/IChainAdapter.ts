@@ -6,7 +6,6 @@ import $ from 'jquery';
 import m from 'mithril';
 import { ChainBase } from 'types';
 
-import { CommentRefreshOption } from 'controllers/server/comments';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { Account, NodeInfo, ProposalModule } from '.';
@@ -15,13 +14,13 @@ import { Account, NodeInfo, ProposalModule } from '.';
 // initialization. Saved as `app.chain` in the global object store.
 // TODO: move this from `app.chain` or else rename `chain`?
 abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
-  protected _apiInitialized: boolean = false;
+  protected _apiInitialized = false;
   public get apiInitialized() { return this._apiInitialized; }
 
-  protected _loaded: boolean = false;
+  protected _loaded = false;
   public get loaded() { return this._loaded; }
 
-  protected _failed: boolean = false;
+  protected _failed = false;
   public get failed() { return this._failed; }
 
   public abstract chain: IChainModule<C, A>;
@@ -44,8 +43,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
         ? EntityRefreshOption.AllEntities
         : EntityRefreshOption.CompletedEntities;
 
-      let _unused1;
-      [_unused1, response] = await Promise.all([
+      [, response] = await Promise.all([
         this.chainEntities.refresh(this.meta.chain.id, refresh),
         $.get(`${this.app.serverUrl()}/bulkOffchain`, {
           chain: this.id,
