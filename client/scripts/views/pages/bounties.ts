@@ -5,13 +5,13 @@ import app from 'state';
 import { Button, Grid, Col, List, Tag } from 'construct-ui';
 
 import { formatCoin } from 'adapters/currency';
-import { ProposalType } from 'identifiers';
+import { ProposalType, ChainBase } from 'types';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
-import { AddressInfo, ChainBase } from 'models';
+import { AddressInfo } from 'models';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';

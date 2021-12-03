@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { NotificationCategories } from '../../shared/types';
+import { ChainType, NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
@@ -19,7 +19,7 @@ export const Errors = {
   NoCommentMatch: 'No matching comment found',
   NoProposalMatch: 'No matching proposal found',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to react',
-  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
+  BalanceCheckFailed: 'Could not verify user token balance',
 };
 
 const createReaction = async (
@@ -35,7 +35,7 @@ const createReaction = async (
   if (authorError) return next(new Error(authorError));
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
 
-  if (chain && chain.type === 'token') {
+  if (chain && chain.type === ChainType.Token) {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
       where: {
@@ -48,19 +48,26 @@ const createReaction = async (
       try {
         let thread;
         if (thread_id) {
-          thread = await models.OffchainThread.findOne({ where: { id: thread_id } });
+          thread = await models.OffchainThread.findOne({
+            where: { id: thread_id },
+          });
         } else if (comment_id) {
-          const root_id = (await models.OffchainComment.findOne({ where: { id: comment_id } })).root_id;
-          const stage = root_id.substring(0, root_id.indexOf('_'));
-          const topic_id = root_id.substring(root_id.indexOf('_') + 1);
-          thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
+          const root_id = (
+            await models.OffchainComment.findOne({ where: { id: comment_id } })
+          ).root_id;
+          const comment_thread_id = root_id.substring(root_id.indexOf('_') + 1);
+          thread = await models.OffchainThread.findOne({
+            where: { id: comment_thread_id },
+          });
         }
-        const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
-        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
+
+        const canReact = await tokenBalanceCache.validateTopicThreshold(thread.topic_id, req.body.address);
+        if (!canReact) {
+          return next(new Error(Errors.BalanceCheckFailed));
+        }
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.CouldNotFetchTokenBalance));
+        return next(new Error(Errors.BalanceCheckFailed));
       }
     }
   }
@@ -95,12 +102,14 @@ const createReaction = async (
 
   let finalReaction;
   let created;
+
   try {
     [ finalReaction, created ] = await models.OffchainReaction.findOrCreate({
       where: options,
       defaults: options,
       include: [ models.Address]
     });
+
     if (created) finalReaction = await models.OffchainReaction.findOne({
       where: options,
       include: [ models.Address]
@@ -176,7 +185,6 @@ const createReaction = async (
     req.wss,
     [ finalReaction.Address.address ],
   );
-
   // update author.last_active (no await)
   author.last_active = new Date();
   author.save();

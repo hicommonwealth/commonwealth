@@ -1,15 +1,16 @@
 import 'pages/profile.scss';
 
 import m from 'mithril';
-import moment from 'moment';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
+import bs58 from 'bs58';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { OffchainThread, OffchainComment, OffchainAttachment, Profile, ChainBase } from 'models';
+import { ChainBase } from 'types';
+import { OffchainThread, OffchainComment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
 import PageNotFound from 'views/pages/404';
@@ -17,7 +18,7 @@ import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
 import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
-import { Bech32 } from '@cosmjs/encoding';
+import { bech32 } from 'bech32';
 import { setActiveAccount } from 'controllers/app/login';
 import { modelFromServer  as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer  as modelCommentFromServer } from 'controllers/server/comments';
@@ -97,13 +98,22 @@ interface IProfilePageState {
 const checkCosmosAddress = (address: string): boolean => {
   try {
     // 50 character max string length to throw on pubkey
-    const { prefix, data } = Bech32.decode(address, 50);
+    const { prefix, words } = bech32.decode(address, 50);
     // TODO: should we verify prefix as well?
     return true;
   } catch (e) {
     return false;
   }
 };
+
+const checkSolanaAddress = (address: string): boolean => {
+  try {
+    const decoded = bs58.decode(address);
+    return decoded.length === 32;
+  } catch (e) {
+    return false;
+  }
+}
 
 const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) => {
   const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
@@ -119,6 +129,8 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
     valid = checkCosmosAddress(address);
   } else if (chainInfo?.base === ChainBase.NEAR) {
     valid = true;
+  } else if (chainInfo?.base === ChainBase.Solana) {
+    valid = checkSolanaAddress(address);
   }
   if (!valid) {
     return;
@@ -215,6 +227,17 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
       }
     } else if (chainInfo?.base === ChainBase.CosmosSDK) {
       if (checkCosmosAddress(address)) {
+        state.account = {
+          profile: null,
+          chain,
+          address,
+          id: null,
+          name: null,
+          user_id: null,
+        };
+      }
+    } else if (chainInfo?.base === ChainBase.Solana) {
+      if (checkSolanaAddress(address)) {
         state.account = {
           profile: null,
           chain,

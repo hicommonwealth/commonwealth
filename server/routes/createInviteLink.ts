@@ -21,7 +21,7 @@ const createInviteLink = async (models: DB, req, res, next) => {
   const chainOrCommunityObj = chain ? { chain_id: chain.id }
     : { community_id: community.id };
 
-  if (community && !community.invitesEnabled) {
+  if (community && !community.invites_enabled) {
     const requesterIsAdminOrMod = await models.Role.findAll({
       where: {
         address_id: req.user.address_id || null, // this is overriding the search, bc null

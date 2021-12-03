@@ -66,11 +66,8 @@ class SubstratePhragmenElections extends ProposalModule<
     this._desiredMembers = +ChainInfo.api.consts[moduleName].desiredMembers;
     this._desiredRunnersUp = +ChainInfo.api.consts[moduleName].desiredRunnersUp;
     this._termDuration = +ChainInfo.api.consts[moduleName].termDuration;
-
-    const [ members, runnersUp ] = await ChainInfo.api.queryMulti([
-      [ ChainInfo.api.query[moduleName].members ],
-      [ ChainInfo.api.query[moduleName].runnersUp ],
-    ]) as [ Vec<any>, Vec<any> ];
+    const members = (await ChainInfo.api.query[moduleName].members()) as Vec<any>;
+    const runnersUp = (await ChainInfo.api.query[moduleName].runnersUp()) as Vec<any>;
 
     this._runnersUp = runnersUp.map((r) => ({
       who: r.who !== undefined ? r.who.toString() : r[0].toString(),

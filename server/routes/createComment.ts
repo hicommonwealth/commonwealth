@@ -2,7 +2,7 @@ import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { NotificationCategories } from '../../shared/types';
+import { ChainType, NotificationCategories, ProposalType } from '../../shared/types';
 import { DB } from '../database';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
@@ -26,7 +26,7 @@ export const Errors = {
   // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to comment',
-  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
+  BalanceCheckFailed: 'Could not verify user token balance',
   NestingTooDeep: 'Comments can only be nested 2 levels deep'
 };
 
@@ -44,7 +44,7 @@ const createComment = async (
 
   const { parent_id, root_id, text } = req.body;
 
-  if (chain && chain.type === 'token') {
+  if (chain && chain.type === ChainType.Token) {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
       where: {
@@ -55,16 +55,17 @@ const createComment = async (
     });
     if (!req.user.isAdmin && isAdmin.length === 0) {
       try {
-        const stage = root_id.substring(0, root_id.indexOf('_'));
-        const topic_id = root_id.substring(root_id.indexOf('_') + 1);
-        const thread = await models.OffchainThread.findOne({ where:{ stage, id: topic_id } });
-        const threshold = (await models.OffchainTopic.findOne({ where: { id: thread.topic_id } })).token_threshold;
-        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-
-        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
+        const thread_id = root_id.substring(root_id.indexOf('_') + 1);
+        const thread = await models.OffchainThread.findOne({
+          where: { id: thread_id },
+        });
+        const canReact = await tokenBalanceCache.validateTopicThreshold(thread.topic_id, req.body.address);
+        if (!canReact) {
+          return next(new Error(Errors.BalanceCheckFailed));
+        }
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.CouldNotFetchTokenBalance));
+        return next(new Error(Errors.BalanceCheckFailed));
       }
     }
   }
@@ -186,8 +187,8 @@ const createComment = async (
   // get parent entity if the comment is on an offchain thread
   // no parent entity if the comment is on an onchain entity
   let proposal;
-  const [prefix, id] = finalComment.root_id.split('_');
-  if (prefix === 'discussion') {
+  const [prefix, id] = finalComment.root_id.split('_') as [ProposalType, string];
+  if (prefix === ProposalType.OffchainThread) {
     proposal = await models.OffchainThread.findOne({
       where: { id }
     });
@@ -350,7 +351,7 @@ const createComment = async (
         const originCommunity = await models.OffchainCommunity.findOne({
           where: { id: finalComment.community }
         });
-        if (originCommunity.privacyEnabled) {
+        if (originCommunity.privacy_enabled) {
           const destinationCommunity = mentionedAddress.Roles
             .find((role) => role.offchain_community_id === originCommunity.id);
           if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;

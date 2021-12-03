@@ -9,7 +9,8 @@ import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider, Popover 
 
 import app from 'state';
 import { navigateToSubpage, initAppState } from 'app';
-import { AddressInfo, ChainBase, ChainInfo, CommunityInfo } from 'models';
+import { ChainBase } from 'types';
+import { AddressInfo, ChainInfo, CommunityInfo } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 
 import { notifySuccess } from 'controllers/app/notifications';
@@ -33,6 +34,7 @@ export const CHAINBASE_SHORT = {
   [ChainBase.Ethereum]: 'ETH',
   [ChainBase.NEAR]: 'NEAR',
   [ChainBase.Substrate]: 'Substrate',
+  [ChainBase.Solana]: 'Solana',
 };
 
 const CommunityLabel: m.Component<{

@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
-import { NotificationCategories, ProposalType } from '../../shared/types';
+import { NotificationCategories, ProposalType, ChainType } from '../../shared/types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -10,7 +10,6 @@ import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { DB } from '../database';
-
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -23,7 +22,7 @@ export const Errors = {
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
   InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to post',
-  CouldNotFetchTokenBalance: 'Unable to fetch user\'s token balance',
+  BalanceCheckFailed: 'Could not verify user token balance',
 };
 
 const createThread = async (
@@ -140,7 +139,7 @@ const createThread = async (
     }
   }
 
-  if (chain && chain.type === 'token') {
+  if (chain && chain.type === ChainType.Token) {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
       where: {
@@ -150,14 +149,9 @@ const createThread = async (
       },
     });
     if (!req.user.isAdmin && isAdmin.length === 0) {
-      try {
-        const threshold = (await models.OffchainTopic.findOne({ where: { id: topic_id } })).token_threshold;
-        const tokenBalance = await tokenBalanceCache.getBalance(chain.id, req.body.address);
-
-        if (threshold && tokenBalance.lt(new BN(threshold))) return next(new Error(Errors.InsufficientTokenBalance));
-      } catch (e) {
-        log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.CouldNotFetchTokenBalance));
+      const canReact = await tokenBalanceCache.validateTopicThreshold(topic_id, req.body.address);
+      if (!canReact) {
+        return next(new Error(Errors.BalanceCheckFailed));
       }
     }
   }
@@ -197,7 +191,7 @@ const createThread = async (
       include: [
         { model: models.Address, as: 'Address' },
         models.OffchainAttachment,
-        { model: models.OffchainTopic, as: 'topic' }
+        { model: models.OffchainTopic, as: 'topic' },
       ],
     });
   } catch (err) {
@@ -318,7 +312,7 @@ const createThread = async (
       const originCommunity = await models.OffchainCommunity.findOne({
         where: { id: finalThread.community }
       });
-      if (originCommunity.privacyEnabled) {
+      if (originCommunity.privacy_enabled) {
         const destinationCommunity = mentionedAddress.Roles
           .find((role) => role.offchain_community_id === originCommunity.id);
         if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;

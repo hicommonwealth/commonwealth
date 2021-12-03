@@ -9,7 +9,8 @@ import { Button, Input, TextArea, Spinner, Checkbox } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
-import { AddressInfo, Account, ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'types';
+import { AddressInfo, Account, IWebWallet } from 'models';
 import app, { ApiStatus } from 'state';
 
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -19,7 +20,7 @@ import Near from 'controllers/chain/near/main';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import CodeBlock from 'views/components/widgets/code_block';
 import User from 'views/components/widgets/user';
-import AvatarUpload from 'views/components/avatar_upload';
+import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 
 enum LinkNewAddressSteps {
@@ -62,9 +63,11 @@ const LinkAccountItem: m.Component<{
       : account.address;
     const isPrepopulated = account.address === linkNewAddressModalVnode.attrs.prepopulateAddress
       || address === linkNewAddressModalVnode.attrs.prepopulateAddress;
+    const baseName = app.chain.meta.chain.base;
+    const capitalizedBaseName = `${baseName.charAt(0).toUpperCase()}${baseName.slice(1)}`;
     const name = account.meta?.name || (base === ChainBase.CosmosSDK
       ? `${app.chain.meta.chain.name} address ${account.address.slice(0, 6)}...`
-      : `Ethereum address ${account.address.slice(0, 6)}...`);
+      : `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`);
     return m('.LinkAccountItem.account-item', {
       class: `${isPrepopulated ? 'account-item-emphasized' : ''} ${vnode.state.linking ? 'account-item-disabled' : ''}`,
       onclick: async (e) => {
@@ -602,6 +605,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           ]),
           m('.avatar-wrap', [
             m(AvatarUpload, {
+              avatarScope: AvatarScope.Account,
               uploadStartedCallback: () => {
                 vnode.state.uploadsInProgress = true;
                 m.redraw();
@@ -630,7 +634,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 $(vvnode.dom).find('input[type="text"]').val(vnode.state.newAddress.profile.name);
                 vnode.state.hasName = true;
                 m.redraw();
-              } else if (vnode.state.newAddress.chain.network === 'near') {
+              } else if (vnode.state.newAddress.chain.base === ChainBase.NEAR) {
                 $(vvnode.dom).find('input[type="text"]').val(vnode.state.newAddress.address);
                 vnode.state.hasName = true;
                 m.redraw();

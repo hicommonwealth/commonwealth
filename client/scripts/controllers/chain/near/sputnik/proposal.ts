@@ -5,6 +5,7 @@ import { Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXM
 import { NearToken } from 'adapters/chain/near/types';
 import { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
+import { ProposalType } from 'types';
 import NearSputnikDao from './dao';
 import {
   INearSputnikProposal,
@@ -34,9 +35,6 @@ export default class NearSputnikProposal extends Proposal<
     return `#${this.identifier.toString()}`;
   }
   public get title() {
-    const yoktoNear = new BN('1000000000000000000000000');
-    // TODO: fetch decimals from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L48
-    const decimals = 18;
     // naming taken from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L188
     if (this.data.kind === 'ChangeConfig') return 'Change Config: ';
     if (isChangePolicy(this.data.kind)) return 'Change Policy';
@@ -51,23 +49,15 @@ export default class NearSputnikProposal extends Proposal<
       return `Add ${this.data.kind.AddMemberToRole.member_id} to the council`;
     if (isRemoveMemberFromRole(this.data.kind) && this.data.kind.RemoveMemberFromRole.role === 'council')
       return `Remove ${this.data.kind.RemoveMemberFromRole.member_id} from the council`;
-    if (isTransfer(this.data.kind) && this.data.kind.Transfer.token_id === '')
+    if (isTransfer(this.data.kind) && this.data.kind.Transfer.token_id === '') {
+      const amount = this._Chain.coins(this.data.kind.Transfer.amount);
       return `${'Request for payout Ⓝ'}${
-        (new BN(this.data.kind.Transfer.amount))
-          .div(yoktoNear)
-          .toNumber()
+        amount.inDollars
           .toFixed(2)
           .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-      } to ${this.data.kind.Transfer.receiver_id}`;
-    if (decimals && isTransfer(this.data.kind) && this.data.kind.Transfer.token_id !== '')
-      return `Request for payout ${
-        this.data.kind.Transfer.token_id.split('.')[0].toUpperCase()
-      }${
-        (new BN(this.data.kind.Transfer.amount).div(new BN(10).pow(new BN(`${decimals}`))).toNumber().toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ','))
-      } to ${
-        this.data.kind.Transfer.receiver_id
-      }`;
+        } to ${this.data.kind.Transfer.receiver_id}`;
+    }
+    // TODO: support custom decimals
     if (isFunctionCall(this.data.kind) && this.data.kind.FunctionCall.actions[0].method_name === 'create_token')
       return 'Create token';
     return `Sputnik Proposal ${this.identifier}`;
@@ -108,7 +98,7 @@ export default class NearSputnikProposal extends Proposal<
     Dao: NearSputnikDao,
     data: INearSputnikProposal
   ) {
-    super('sputnikproposal', data);
+    super(ProposalType.SputnikProposal, data);
     this._Chain = Chain;
     this._Accounts = Accounts;
     this._Dao = Dao;

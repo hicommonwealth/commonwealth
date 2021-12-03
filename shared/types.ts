@@ -1,11 +1,9 @@
 import { ChainAttributes } from 'server/models/chain';
 import { OffchainCommunityAttributes } from 'server/models/offchain_community';
 
-import { Model, BuildOptions } from 'sequelize';
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
-
 // eslint-disable-next-line import/prefer-default-export
 export const NotificationCategories = {
   NewComment: 'new-comment-creation',
@@ -24,14 +22,73 @@ export const NotificationCategories = {
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
+  SubstrateBountyProposal = 'bountyproposal',
+  SubstrateTreasuryTip = 'treasurytip',
   SubstrateCollectiveProposal = 'councilmotion',
+  SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
   PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
-  AaveProposal = 'aaveproposal',
   CompoundProposal = 'compoundproposal',
+  AaveProposal = 'onchainproposal',
+  SputnikProposal = 'sputnikproposal',
+  SubstratePreimage = 'democracypreimage',
+  SubstrateImminentPreimage = 'democracyimminent',
+}
+
+export enum ChainBase {
+  CosmosSDK = 'cosmos',
+  Substrate = 'substrate',
+  Ethereum = 'ethereum',
+  NEAR = 'near',
+  Solana = 'solana',
+}
+
+export enum ChainType {
+  Chain = 'chain',
+  DAO = 'dao',
+  Token = 'token',
+}
+
+// TODO: remove many of these chain networks, esp substrate (make them all "Substrate"),
+// and just use id to identify specific chains for conditionals
+export enum ChainNetwork {
+  Edgeware = 'edgeware',
+  EdgewareTestnet = 'edgeware-testnet',
+  Kusama = 'kusama',
+  Kulupu = 'kulupu',
+  Polkadot = 'polkadot',
+  Plasm = 'plasm',
+  Stafi = 'stafi',
+  Darwinia = 'darwinia',
+  Phala = 'phala',
+  Centrifuge = 'centrifuge',
+  Straightedge = 'straightedge',
+  Osmosis = 'osmosis',
+  Injective = 'injective',
+  InjectiveTestnet = 'injective-testnet',
+  Terra = 'terra',
+  Ethereum = 'ethereum',
+  NEAR = 'near',
+  NEARTestnet = 'near-testnet',
+  Moloch = 'moloch',
+  Compound = 'compound',
+  Aave = 'aave',
+  AaveLocal = 'aave-local',
+  dYdX = 'dydx',
+  Metacartel = 'metacartel',
+  ALEX = 'alex',
+  ERC20 = 'erc20',
+  Clover = 'clover',
+  HydraDX = 'hydradx',
+  Crust = 'crust',
+  Sputnik = 'sputnik',
+  Commonwealth = 'commonwealth',
+  SolanaDevnet = 'solana-devnet',
+  SolanaTestnet = 'solana-testnet',
+  Solana = 'solana',
 }
 
 export enum WebsocketEventType {

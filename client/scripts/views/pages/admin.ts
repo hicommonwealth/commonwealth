@@ -80,6 +80,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
           const url = prompt('Enter the node url:');
           // TODO: Change to POST /chainNode
           // TODO: add ss58_prefix for substrate chains
+          // TODO: add eth_chain_id for ethereum chains
           $.post(`${app.serverUrl()}/addChainNode`, {
             id: chain.id,
             name: chain.name,
@@ -91,7 +92,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
             auth: true,
             jwt: app.user.jwt,
           }).then((result) => {
-            app.config.nodes.add(new NodeInfo(result.result.id, result.result.chain, result.result.url));
+            app.config.nodes.add(new NodeInfo(result.result));
             vnode.state.success = 'Sucessfully added';
             m.redraw();
           }, (err) => {

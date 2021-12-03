@@ -8,19 +8,18 @@ import {
 
 import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
-import { ProposalType } from 'identifiers';
+import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import { link } from 'helpers';
-import { ChainBase, ChainNetwork, ChainInfo, CommunityInfo, NodeInfo } from 'models';
+import { ChainInfo, CommunityInfo, NodeInfo } from 'models';
 
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
-import CreateCommunityModal from 'views/modals/create_community_modal';
 
-import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
-import { discordIcon, telegramIcon, elementIcon, githubIcon, websiteIcon } from './icons';
+
+import { DiscordIcon, TelegramIcon, ElementIcon, GithubIcon, WebsiteIcon } from '../component_kit/icons';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -82,7 +81,8 @@ const SidebarQuickSwitcher: m.Component<{}> = {
           rounded: true,
           label: m(Icon, { name: Icons.PLUS }),
           onclick: (e) => {
-            app.modals.create({ modal: CreateCommunityModal });
+            e.preventDefault();
+            m.route.set('/createCommunity');
           },
         }),
       ]),
@@ -103,6 +103,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       || p === `/${app.activeId()}/discussions/${f}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);
+    const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeId()}/sputnik-daos`);
 
     const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
       return { id, name, featuredInSidebar };
@@ -158,6 +159,19 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           navigateToSubpage('/members');
         },
       }),
+      (app.activeId() == 'near'
+      ? m(Button, {
+        rounded: true,
+        fluid: true,
+        active: onSputnikDaosPage(m.route.get())
+          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+        label: 'Sputnik DAOs',
+        onclick: (e) => {
+          e.preventDefault();
+          navigateToSubpage('/sputnik-daos');
+        },
+      })
+      : '')
       // m(Button, {
       //   rounded: true,
       //   fluid: true,
@@ -188,13 +202,13 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
-        || app.chain?.network === ChainNetwork.Sputnik
+        || app.chain.network === ChainNetwork.Sputnik
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || MolochTypes.EventChains.find((c) => c === app.chain.network)
-        || CompoundTypes.EventChains.find((c) => c === app.chain.network)
-        || AaveTypes.EventChains.find((c) => c === app.chain.network)
+        || app.chain.network === ChainNetwork.Moloch
+        || app.chain.network === ChainNetwork.Compound
+        || app.chain.network === ChainNetwork.Aave
         || app.chain.network === ChainNetwork.Commonwealth
-        || app.chain?.meta.chain.snapshot);
+        || app.chain.meta.chain.snapshot);
     if (!hasProposals) return;
 
     const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
@@ -209,20 +223,20 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`));
+        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyProposal}`));
     const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/referendum`);
+      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyReferendum}`);
 
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`);
+      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryProposal}`);
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
     const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/treasurytip`);
+      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`);
 
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onMotionPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/motions`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`));
+        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateCollectiveProposal}`));
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
@@ -249,9 +263,9 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
                          || app.chain?.network === ChainNetwork.Sputnik
-                         || MolochTypes.EventChains.find((c) => c === app.chain.network)
-                         || CompoundTypes.EventChains.find((c) => c === app.chain.network)
-                         || AaveTypes.EventChains.find((c) => c === app.chain.network))
+                         || app.chain?.network === ChainNetwork.Moloch
+                         || app.chain?.network === ChainNetwork.Compound
+                         || app.chain?.network === ChainNetwork.Aave)
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -355,16 +369,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Delegate',
         active: m.route.get() === `/${app.activeChainId()}/delegate`,
       }),
-      // showAaveOptions && m(Button, {
-      //   fluid: true,
-      //   rounded: true,
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.AaveProposal });
-      //   },
-      //   label: 'Submit Proposal',
-      //   active: m.route.get() === `/${app.activeChainId()}/new/proposal/${ProposalType.AaveProposal}`,
-      // }),
       showMolochMemberOptions && m(Button, {
         fluid: true,
         rounded: true,
@@ -395,20 +399,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         },
         label: 'Rage quit',
       }),
-      showMolochMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('token_management_modal', {
-            account: app.user.activeAccount,
-            accounts: ((app.user.activeAccount as any).app.chain as any).ethAccounts,
-            contractAddress: ((app.user.activeAccount as any).app.chain as any).governance.api.contractAddress,
-            tokenAddress: ((app.user.activeAccount as any).app.chain as Moloch).governance.api.token.address,
-          });
-        },
-        label: 'Approve tokens',
-      }),
       m('.sidebar-spacer'),
       app.chain?.meta.chain.snapshot && m(Button, {
         rounded: true,
@@ -417,7 +407,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Snapshot Proposals',
         onclick: (e) => {
           e.preventDefault();
-          m.route.set(`/${app.activeChainId()}/snapshot/${app.chain.meta.chain.snapshot}`);
+          navigateToSubpage(`/snapshot/${app.chain.meta.chain.snapshot}`);
         },
       }),
       // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
@@ -553,7 +543,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(discord),
-          label: m.trust(discordIcon),
+          label: m(DiscordIcon),
           class: 'discord-button',
         }),
       }),
@@ -563,7 +553,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(element),
-          label: m.trust(elementIcon),
+          label: m(ElementIcon),
           class: 'element-button',
         }),
       }),
@@ -573,7 +563,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(telegram),
-          label: m.trust(telegramIcon),
+          label: m(TelegramIcon),
           class: 'telegram-button',
         }),
       }),
@@ -583,7 +573,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(github),
-          label: m.trust(githubIcon),
+          label: m(GithubIcon),
           class: 'github-button',
         }),
       }),
@@ -593,7 +583,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
         trigger: m(Button, {
           rounded: true,
           onclick: () => window.open(website),
-          label: m.trust(websiteIcon),
+          label: m(WebsiteIcon),
           class: 'website-button',
         }),
       }),
@@ -601,11 +591,13 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{ hideQuickSwitcher? }, {}> = {
+const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
   view: (vnode) => {
+    const { useQuickSwitcher } = vnode.attrs;
+
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
-      m('.Sidebar', [
+      !useQuickSwitcher && m('.Sidebar', [
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(ExternalLinksModule),

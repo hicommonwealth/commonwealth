@@ -36,17 +36,15 @@ export { default as Webhook } from './Webhook';
 export { DepositVote, BinaryVote } from './votes';
 
 export {
-  ChainBase,
-  ChainNetwork,
   OffchainThreadKind,
   OffchainThreadStage,
   TransactionStatus,
   ProposalStatus,
   VotingType,
   VotingUnit,
-  ProposalEndTime,
-  AnyProposal,
 } from './types';
+
+export type { AnyProposal, ProposalEndTime } from './types';
 
 export {
   IBlockInfo,

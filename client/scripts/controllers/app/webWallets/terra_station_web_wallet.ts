@@ -1,4 +1,5 @@
-import { Account, ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'types';
+import { Account, IWebWallet } from 'models';
 import { Extension, Msg, MsgStoreCode, StdFee } from '@terra-money/terra.js';
 
 class TerraStationWebWalletController implements IWebWallet<string> {

@@ -19,7 +19,6 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
   if (!req.body.chain && !req.body.community) {
     return next(new Error(Errors.NoChainOrComm));
   }
-  console.log(req.body.chain, req.body.community);
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain || null }
   });

@@ -5,7 +5,7 @@ import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models'
 
 import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-import { EntityRefreshOption } from 'controllers/server/chain_entities';
+import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import { MolochEvents } from '@commonwealth/chain-events';
 
@@ -92,9 +92,14 @@ export default class MolochGovernance extends ProposalModule<
       );
       const subscriber = new MolochEvents.Subscriber(api.Contract as any, this.app.chain.id);
       const processor = new MolochEvents.Processor(api.Contract as any, 1);
-      await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
+      await this.app.chain.chainEntities.fetchEntities(
+        this.app.chain.id,
+        chainToEventNetwork(this.app.chain.meta.chain),
+        () => fetcher.fetch()
+      );
       await this.app.chain.chainEntities.subscribeEntities(
         this.app.chain.id,
+        chainToEventNetwork(this.app.chain.meta.chain),
         subscriber,
         processor,
       );
@@ -119,7 +124,6 @@ export default class MolochGovernance extends ProposalModule<
     sharesRequested: BN,
     details: string,
   ) {
-    await attachSigner(this.app.wallets, submitter.address, this.api.Contract);
     if (!(await this._Members.isDelegate(submitter.address))) {
       throw new Error('sender must be valid delegate');
     }
@@ -135,16 +139,22 @@ export default class MolochGovernance extends ProposalModule<
     }
 
     // first, we must approve xfer of proposal deposit tokens from the submitter
-    const approvalTxReceipt = await submitter.approveTokenTx(
-      new ERC20Token(this._api.token.address, this.proposalDeposit),
-      this._api.contractAddress,
+    const tokenContract = await attachSigner(this.app.wallets, submitter.address, this.api.token);
+    const approvalTx = await tokenContract.approve(
+      submitter.address,
+      this.proposalDeposit.toString(10),
+      { gasLimit: 3000000 }
     );
+
+    const approvalTxReceipt = await approvalTx.wait();
     if (approvalTxReceipt.status !== 1) {
-      throw new Error('failed to approve proposal deposit');
+      throw new Error('failed to approve amount');
     }
+
 
     // once approved we assume the applicant has approved the tribute and proceed
     // TODO: this assumes the active user is the signer on the contract -- we should make this explicit
+    await attachSigner(this.app.wallets, submitter.address, this.api.Contract);
     const tx = await this._api.Contract.submitProposal(
       applicantAddress,
       tokenTribute.toString(),

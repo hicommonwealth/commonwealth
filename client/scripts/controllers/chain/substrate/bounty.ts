@@ -6,6 +6,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
   VotingType, VotingUnit, ChainEntity, ChainEvent,
 } from 'models';
+import { ProposalType } from 'types';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
@@ -163,7 +164,7 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     Treasury: SubstrateBountyTreasury,
     entity: ChainEntity,
   ) {
-    super('bountyproposal', backportEventToAdapter( // TODO: check if this is the right backport string
+    super(ProposalType.SubstrateBountyProposal, backportEventToAdapter( // TODO: check if this is the right backport string
       ChainInfo,
       entity.chainEvents
         .find(

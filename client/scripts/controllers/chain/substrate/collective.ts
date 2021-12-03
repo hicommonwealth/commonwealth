@@ -8,6 +8,7 @@ import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateCollectiveProposal } from './collective_proposal';
+import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateCollective extends ProposalModule<
   ApiPromise,
@@ -56,6 +57,7 @@ class SubstrateCollective extends ProposalModule<
     // fetch proposals from chain
     await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       () => this._Chain.fetcher.fetchCollectiveProposals(this.moduleName, this.app.chain.block.height)
     );
 
@@ -128,7 +130,7 @@ class SubstrateCollective extends ProposalModule<
     const txFunc = fromTechnicalCommittee
       ? ((api: ApiPromise) => api.tx.technicalCommittee.propose.meta.args.length === 3
         ? api.tx.technicalCommittee.propose(threshold, action, length)
-        : api.tx.technicalCommittee.propose(threshold, action))
+        : (api.tx.technicalCommittee.propose as any)(threshold, action))
       : ((api: ApiPromise) => api.tx.council.propose.meta.args.length === 3
         ? api.tx.council.propose(threshold, action, length)
         : (api.tx.council.propose as any)(threshold, action, null));

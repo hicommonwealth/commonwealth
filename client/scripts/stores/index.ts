@@ -9,10 +9,12 @@ export { default as ProfileStore } from './ProfileStore';
 export { default as ProposalStore } from './ProposalStore';
 export { default as ReactionStore } from './ReactionStore';
 export { default as ReactionCountsStore } from './ReactionCountsStore';
+export { default as ThreadUniqueAddressesCountStore } from './ThreadUniqueAddressesCountStore';
 export { default as Store } from './Store';
 export { default as TopicStore } from './TopicStore';
 export { default as FilterScopedThreadStore } from './FilterScopedThreadStore';
 export { default as ChainEntityStore } from './ChainEntityStore';
 export { default as PersistentStore } from './PersistentStore';
 
-export { UpdateType, IHasId, ISerializable, IHasAddress } from './interfaces';
+export { UpdateType } from './interfaces';
+export type { IHasId, ISerializable, IHasAddress } from './interfaces';

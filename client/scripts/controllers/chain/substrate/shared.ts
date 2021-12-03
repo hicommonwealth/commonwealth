@@ -20,13 +20,13 @@ import { ApiOptions, Signer, SubmittableExtrinsic, VoidFn } from '@polkadot/api/
 
 import { formatCoin } from 'adapters/currency';
 import { BlocktimeHelper } from 'helpers';
+import { ChainNetwork } from 'types';
 import {
   NodeInfo,
   ITXModalData,
   TransactionStatus,
   IChainModule,
   ITXData,
-  ChainNetwork,
 } from 'models';
 
 import { SubstrateEvents } from '@commonwealth/chain-events';
@@ -39,6 +39,7 @@ import { u128 } from '@polkadot/types';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateAccount } from './account';
+import { chainToEventNetwork } from '../../server/chain_entities';
 
 export interface ISubstrateTXData extends ITXData {
   nonce: string;
@@ -88,9 +89,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   private _suppressAPIDisconnectErrors: boolean = false;
   private _api: ApiPromise;
 
-  private _reservationFee: SubstrateCoin;
-  public get reservationFee() { return this._reservationFee; }
-
   private _app: IApp;
   public get app() { return this._app; }
 
@@ -104,7 +102,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     }
   }
 
-  public createType<K extends keyof InterfaceTypes>(type: K, ...params: any[]): InterfaceTypes[K] {
+  public createType<K extends keyof InterfaceTypes>(type: K, ...params: any[]) {
     return this.api.registry.createType(type, ...params);
   }
   public findCall(callIndex: Uint8Array | string): CallFunction {
@@ -232,6 +230,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const processor = new SubstrateEvents.Processor(this.api);
     return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain.id,
+      chainToEventNetwork(this.app.chain.meta.chain),
       subscriber,
       processor,
     );
@@ -291,7 +290,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const existentialdeposit = this.api.consts.balances.existentialDeposit;
     const sudokey = this.api.query.sudo ? (await this.api.query.sudo.key()) : null;
     const chainProps = await this.api.rpc.system.properties();
-    const reservationFee = this.api.consts.nicks ? (this.api.consts.nicks.reservationFee as Balance) : null;
     this.app.chain.name = chainname.toString();
     this.app.chain.version = chainversion.toString();
     this.app.chain.runtimeName = chainruntimename.toString();
@@ -303,6 +301,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     // chainProps needs to be set first so calls to coins() correctly populate the denom
     if (chainProps) {
       const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
+      // @ts-ignore
       this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
       this._ss58Format = +ss58Format.unwrapOr(42);
       this._tokenDecimals = +tokenDecimals.unwrapOr([ 12 ])[0];
@@ -312,7 +311,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     this._totalbalance = this.coins(totalbalance);
     this._existentialdeposit = this.coins(existentialdeposit);
     this._sudoKey = sudokey ? sudokey.toString() : undefined;
-    this._reservationFee = reservationFee ? this.coins(reservationFee) : null;
 
     // redraw
     m.redraw();
@@ -485,11 +483,12 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                   });
                   if (unsubscribe) unsubscribe.then((u) => u());
                 } else if (this.api.events.system.ExtrinsicFailed.is(e.event)) {
-                  const errorData = e.event.data[0] as DispatchError;
+                  const errorData = e.event.data[0] as unknown as DispatchError;
                   let errorInfo;
                   if (errorData.isModule) {
-                    const details = this.registry.findMetaError(errorData.asModule.toU8a());
-                    errorInfo = `${details.section}::${details.name}: ${details.documentation[0]}`;
+                    const decoded = this.registry.findMetaError(errorData.asModule);
+                    const { docs, method, section } = decoded;
+                    errorInfo = `${section}.${method}: ${docs.join(' ')}`;
                   } else if (errorData.isBadOrigin) {
                     errorInfo = 'TX Error: invalid sender origin';
                   } else if (errorData.isCannotLookup) {
@@ -546,9 +545,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         // TODO: provide chain to formatAddressShort
         case 'Address': return formatAddressShort(this.createType('AccountId', arg).toString(), null);
         // TODO: when do we actually see this Moment in practice? is this a correct decoding?
-        case 'Compact<Moment>':
-          return moment(new Date(this.createType('Compact<Moment>', arg).toNumber())).utc().toString();
-        case 'Compact<Balance>': return formatCoin(this.coins(this.createType('Compact<Balance>', arg)));
+        case 'Moment':
+          return moment(new Date(this.createType('Moment', arg).toNumber())).utc().toString();
+        case 'Balance': return formatCoin(this.coins(this.createType('Balance', arg).toBn()));
         default: return arg.toString().length > 16 ? `${arg.toString().substr(0, 15)}...` : arg.toString();
       }
     });

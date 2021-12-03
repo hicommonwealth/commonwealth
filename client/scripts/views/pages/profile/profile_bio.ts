@@ -14,7 +14,7 @@ import EditIdentityModal from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
 import EditProfileModal from '../../modals/edit_profile_modal';
 import TwitterAttestationModal from '../../modals/twitter_attestation_modal';
-import { ChainBase } from 'models';
+import { ChainBase } from 'types';
 import { formatAddressShort } from '../../../../../shared/utils';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {

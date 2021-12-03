@@ -2,7 +2,6 @@ import fs from 'fs';
 import Web3 from 'web3';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
-import { INFURA_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
@@ -13,7 +12,13 @@ const MAINNET_LOCKDROP = '0xFEC6F679e32D45E22736aD09dFdF6E3368704e31';
 const ROPSTEN_LOCKDROP = '0x111ee804560787E0bFC1898ed79DAe24F2457a04';
 
 export function setupWeb3Provider(network) {
-  return new Web3(new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`));
+  if (network === 'mainnet') {
+    return new Web3(new Web3.providers.HttpProvider('https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr'));
+  } else if (network === 'ropsten') {
+    return new Web3(new Web3.providers.HttpProvider('https://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7'));
+  } else {
+    throw new Error('invalid network');
+  }
 }
 
 export const getLocks = async (lockdropContract, address?) => {

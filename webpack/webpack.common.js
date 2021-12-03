@@ -56,6 +56,11 @@ module.exports = {
           name: 'polkadot',
           chunks: 'all',
         },
+        solana: {
+          test: /[\\/]node_modules[\\/](@solana)[\\/]/,
+          name: 'solana',
+          chunks: 'all',
+        },
         snapshot: {
           test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
           name: 'snapshot',
@@ -83,6 +88,18 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.md$/,
+        include: [
+          path.resolve(__dirname, '../client'),
+          path.resolve(__dirname, '../shared')
+        ],
+        use: [
+          {
+            loader: 'ignore-loader',
+          }
+        ]
+      },
+      {
         test: /\.svg$/,
         include: [
           path.resolve(__dirname, '../node_modules/quill-2.0-dev/assets/icons'),
@@ -101,8 +118,9 @@ module.exports = {
           path.resolve(__dirname, '../shared'),
           path.resolve(__dirname, '../eth/types'),
         ],
-        use: {
-          loader: 'ts-loader'
+        loader: 'esbuild-loader',
+        options: {
+          loader: 'ts',
         }
       },
       {

@@ -14,23 +14,19 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 import _ from 'underscore';
 
-import { AaveTypes, CompoundTypes, MolochTypes } from '@commonwealth/chain-events';
 import app, { ApiStatus, LoginState } from 'state';
+import { ChainBase, ChainNetwork, ChainType } from 'types';
 import {
   ChainInfo,
   CommunityInfo,
   NodeInfo,
-  ChainNetwork,
   NotificationCategory,
   Notification,
-  ChainBase,
 } from 'models';
-import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from 'controllers/chain/community/main';
-import WebsocketController from 'controllers/server/socket/index';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -51,7 +47,7 @@ const APPLICATION_UPDATE_ACTION = 'Okay';
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true, customDomain = null): Promise<void> {
   return new Promise((resolve, reject) => {
-    $.get(`${app.serverUrl()}/status`).then((data) => {
+    $.get(`${app.serverUrl()}/status`).then( async (data) => {
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
@@ -66,6 +62,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           chain: app.config.chains.getById(node.chain),
           address: node.address,
           token_name: node.token_name,
+          eth_chain_id: node.eth_chain_id,
         }));
       });
       data.communities.sort((a, b) => a.id - b.id).map((community) => {
@@ -73,28 +70,28 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           id: community.id,
           name: community.name,
           description: community.description,
-          iconUrl: community.iconUrl,
+          icon_url: community.icon_url,
           website: community.website,
           discord: community.discord,
           element: community.element,
           telegram: community.telegram,
           github: community.github,
-          defaultChain: app.config.chains.getById(community.default_chain),
+          default_chain: app.config.chains.getById(community.default_chain),
           visible: community.visible,
-          collapsedOnHomepage: community.collapsed_on_homepage,
-          invitesEnabled: community.invitesEnabled,
-          privacyEnabled: community.privacyEnabled,
-          featuredTopics: community.featured_topics,
+          collapsed_on_homepage: community.collapsed_on_homepage,
+          default_summary_view: community.default_summary_view,
+          invites_enabled: community.invites_enabled,
+          privacy_enabled: community.privacy_enabled,
+          featured_topics: community.featured_topics,
           topics: community.topics,
-          stagesEnabled: community.stagesEnabled,
-          customStages: community.customStages,
-          customDomain: community.customDomain,
+          stages_enabled: community.stages_enabled,
+          custom_stages: community.custom_stages,
+          custom_domain: community.custom_domain,
           terms: community.terms,
-          adminsAndMods: [],
+          admins_and_mods: [],
         }));
       });
       app.user.setRoles(data.roles);
-      // app.config.topics = data.topics.map((json) => OffchainTopic.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
@@ -145,9 +142,10 @@ export async function deinitChainOrCommunity() {
   app.user.setSelectedNode(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
+  document.title = 'Commonwealth';
 }
 
-export function handleInviteLinkRedirect() {
+export async function handleInviteLinkRedirect() {
   const inviteMessage = m.route.param('invitemessage');
   if (inviteMessage) {
     mixpanel.track('Invite Link Used', {
@@ -169,7 +167,7 @@ export function handleInviteLinkRedirect() {
   }
 }
 
-export function handleUpdateEmailConfirmation() {
+export async function handleUpdateEmailConfirmation() {
   if (m.route.param('confirmation')) {
     mixpanel.track('Update Email Verification Redirect', {
       'Step No': 1,
@@ -187,6 +185,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
 
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
+  document.title = `Commonwealth – ${c.name}`;
 
   // Begin initializing the community
   const newCommunity = new Community(c, app);
@@ -234,6 +233,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
   app.chainPreloading = true;
+  document.title = `Commonwealth – ${n.chain.name}`;
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
@@ -253,6 +253,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/cosmos/main'
     )).default;
     newChain = new Cosmos(n, app);
+  } else if (n.chain.base === ChainBase.Solana) {
+    const Solana = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "solana-main" */
+      './controllers/chain/solana/main'
+    )).default;
+    newChain = new Solana(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */
@@ -276,28 +283,28 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Sputnik(n, app);
     initApi = true;
-  } else if (MolochTypes.EventChains.find((c) => c === n.chain.network)) {
+  } else if (n.chain.network === ChainNetwork.Moloch) {
     const Moloch = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "moloch-main" */
       './controllers/chain/ethereum/moloch/adapter'
     )).default;
     newChain = new Moloch(n, app);
-  } else if (CompoundTypes.EventChains.find((c) => c === n.chain.network || c === n.chain.id)) {
+  } else if (n.chain.network === ChainNetwork.Compound) {
     const Compound = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "compound-main" */
       './controllers/chain/ethereum/compound/adapter'
     )).default;
     newChain = new Compound(n, app);
-  } else if (AaveTypes.EventChains.find((c) => c === n.chain.network)) {
+  } else if (n.chain.network === ChainNetwork.Aave) {
     const Aave = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "aave-main" */
       './controllers/chain/ethereum/aave/adapter'
     )).default;
     newChain = new Aave(n, app);
-  } else if (n.chain.type === 'token') {
+  } else if (n.chain.network === ChainNetwork.ERC20) {
     const Token = (await import(
     //   /* webpackMode: "lazy" */
     //   /* webpackChunkName: "token-main" */
@@ -397,7 +404,7 @@ export async function initNewTokenChain(address: string) {
   }
   const { chain, node } = response.result;
   const chainInfo = ChainInfo.fromJSON(chain);
-  const nodeInfo = new NodeInfo(node.id, chainInfo, node.url, node.address);
+  const nodeInfo = new NodeInfo(node);
   if (!app.config.chains.getById(chainInfo.id)) {
     app.config.chains.add(chainInfo);
     app.config.nodes.add(nodeInfo);
@@ -436,6 +443,19 @@ export const navigateToSubpage = (...args) => {
   m.route.set.apply(this, args);
 };
 
+/* Uncomment for redraw instrumentation
+const _redraw = m.redraw;
+function redrawInstrumented(...args) {
+  console.log('redraw!');
+  _redraw.apply(this, args);
+}
+redrawInstrumented.sync = (...args) => {
+  console.log('redraw sync!');
+  _redraw.sync.apply(this, args);
+};
+m.redraw = redrawInstrumented;
+*/
+
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;
@@ -473,7 +493,7 @@ moment.updateLocale('en', {
 Promise.all([
   $.ready,
   $.get('/api/domain'),
-]).then(([ ready, { customDomain } ]) => {
+]).then(async ([ ready, { customDomain } ]) => {
   // set window error handler
   // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
   const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
@@ -504,7 +524,7 @@ Promise.all([
 
   let hasCompletedSuccessfulPageLoad = false;
   const importRoute = (path: string, attrs: RouteAttrs) => ({
-    onmatch: () => {
+    onmatch:  async () => {
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -523,9 +543,8 @@ Promise.all([
         if (hasCompletedSuccessfulPageLoad) history.back();
       });
     },
-    render: (vnode) => {
+    render:  (vnode) => {
       const { scoped, hideSidebar } = attrs;
-
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -554,7 +573,7 @@ Promise.all([
       if (path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      if (app.chain?.meta.chain.type === 'token') {
+      if (app.chain?.meta.chain.type === ChainType.Token) {
         deferChain = false;
       }
       return m(Layout, { scope, deferChain, hideSidebar }, [ vnode ]);
@@ -589,6 +608,7 @@ Promise.all([
       '/discussions':            redirectRoute((attrs) => `/${attrs.scope}/`),
       '/discussions/:topic':     importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/members':                importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/sputnik-daos':           importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/chat':                   importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/new/thread':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
@@ -611,6 +631,7 @@ Promise.all([
       '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
       // Admin
       '/admin':                  importRoute('views/pages/admin', { scoped: true }),
+      '/manage':                 importRoute('views/pages/manage_community/index', { scoped: true }),
       '/spec_settings':          importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/settings':               importRoute('views/pages/settings', { scoped: true }),
       '/analytics':              importRoute('views/pages/stats', { scoped: true, deferChain: true }),
@@ -638,6 +659,7 @@ Promise.all([
       '/:scope/discussions/:topic': redirectRoute((attrs) => `/discussions/${attrs.topic}/`),
       '/:scope/search':             redirectRoute(() => '/search'),
       '/:scope/members':            redirectRoute(() => '/members'),
+      '/:scope/sputnik-daos':       redirectRoute(() => '/sputnik-daos'),
       '/:scope/chat':               redirectRoute(() => '/chat'),
       '/:scope/new/thread':         redirectRoute(() => '/new/thread'),
       '/:scope/account/:address':   redirectRoute((attrs) => `/account/${attrs.address}/`),
@@ -656,6 +678,7 @@ Promise.all([
       '/:scope/web3login':          redirectRoute(() => '/web3login'),
       '/:scope/settings':           redirectRoute(() => '/settings'),
       '/:scope/admin':              redirectRoute(() => '/admin'),
+      '/:scope/manage':             redirectRoute(() => '/manage'),
       '/:scope/spec_settings':      redirectRoute(() => '/spec_settings'),
       '/:scope/analytics':          redirectRoute(() => '/analytics'),
       '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
@@ -700,6 +723,7 @@ Promise.all([
       '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
       '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/:scope/sputnik-daos':      importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
@@ -728,6 +752,8 @@ Promise.all([
       '/settings':                 importRoute('views/pages/settings', { scoped: false }),
       '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
+      '/manage':                 importRoute('views/pages/manage_community/index', { scoped: false }),
+      '/:scope/manage':          importRoute('views/pages/manage_community/index', { scoped: true }),
       '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
 
@@ -825,7 +851,7 @@ Promise.all([
   }
 
   // initialize the app
-  initAppState(true, customDomain).then(() => {
+  initAppState(true, customDomain).then(async () => {
     // setup notifications and websocket if not already set up
     if (!app.socket) {
       let jwt;

@@ -1,4 +1,4 @@
-import { ChainBase } from './types';
+import { ChainBase } from 'types';
 import Account from './Account';
 
 interface IWebWallet<AccountT extends { address: string } | string> {

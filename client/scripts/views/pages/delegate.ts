@@ -2,15 +2,14 @@ import 'pages/delegate.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { ChainNetwork } from 'models';
-import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
+import { ChainNetwork } from 'types';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
+import { Grid, Col, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
 import PageNotFound from './404';
 
 const DelegateStats: m.Component<{ currentDelegate: string, }> = {
@@ -60,24 +59,25 @@ interface IDelegateFormState {
   currentDelegate: string,
 }
 
-const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
-  if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+const getDelegate = async (vnode: m.Vnode<Record<string, never>, IDelegateFormState>) => {
+  if (app.chain.network === ChainNetwork.Compound) {
     vnode.state.currentDelegate = await (app.chain as Compound).chain.getDelegate();
-  } else if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+  } else if (app.chain.network === ChainNetwork.Aave) {
     // TODO: switch on delegation type
     vnode.state.currentDelegate = await (app.chain as Aave).chain.getDelegate(app.user.activeAccount.address, 'voting');
   }
   m.redraw();
 };
 
-const setDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
+// TODO: remove popup modal for delegation as we auto-delegate all tokens now
+const setDelegate = async (vnode: m.Vnode<Record<string, never>, IDelegateFormState>) => {
   if (app.chain.apiInitialized) {
-    let delegationPromise: Promise<any>;
-    if (CompoundTypes.EventChains.find((c) => c === app.chain.network)) {
+    let delegationPromise: Promise<void>;
+    if (app.chain.network === ChainNetwork.Compound) {
       delegationPromise = (app.chain as Compound).chain.setDelegate(
-        vnode.state.form.address, vnode.state.form.amount
+        vnode.state.form.address
       );
-    } else if (AaveTypes.EventChains.find((c) => c === app.chain.network)) {
+    } else if (app.chain.network === ChainNetwork.Aave) {
       delegationPromise = (app.chain as Aave).chain.setDelegate(vnode.state.form.address);
     }
     if (delegationPromise) {
@@ -92,7 +92,7 @@ const setDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
   }
 };
 
-const DelegateForm: m.Component<{}, IDelegateFormState> = {
+const DelegateForm: m.Component<Record<string, never>, IDelegateFormState> = {
   oninit: (vnode) => {
     vnode.state.form = {
       address: '',
@@ -158,8 +158,8 @@ const DelegateForm: m.Component<{}, IDelegateFormState> = {
   }
 };
 
-const DelegatePage: m.Component<{}> = {
-  view: (vnode) => {
+const DelegatePage: m.Component = {
+  view: () => {
     if (!app.chain || !app.chain.loaded) {
       // chain load failed
       if (app.chain && app.chain.failed) {
@@ -172,8 +172,8 @@ const DelegatePage: m.Component<{}> = {
       if (
         app.chain
         && app.chain.loaded
-        && !CompoundTypes.EventChains.find((c) => c === app.chain.network)
-        && !AaveTypes.EventChains.find((c) => c === app.chain.network)
+        && app.chain.network !== ChainNetwork.Compound
+        && app.chain.network !== ChainNetwork.Aave
       ) {
         return m(PageNotFound, {
           title: 'Delegate Page',

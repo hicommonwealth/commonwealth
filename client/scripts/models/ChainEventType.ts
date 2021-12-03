@@ -1,18 +1,20 @@
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { IChainEventKind, SupportedNetwork } from '@commonwealth/chain-events';
 
 class ChainEventType {
   public readonly id: string;
   public readonly chain: string;
-  public readonly eventName: SubstrateTypes.EventKind;
+  public readonly eventNetwork: SupportedNetwork;
+  public readonly eventName: IChainEventKind;
 
-  constructor(id, chain, eventName) {
+  constructor(id, chain, eventNetwork, eventName) {
     this.id = id;
     this.chain = chain;
+    this.eventNetwork = eventNetwork;
     this.eventName = eventName;
   }
 
   public static fromJSON(json) {
-    return new ChainEventType(json.id, json.chain, json.event_name);
+    return new ChainEventType(json.id, json.chain, json.event_network, json.event_name);
   }
 }
 

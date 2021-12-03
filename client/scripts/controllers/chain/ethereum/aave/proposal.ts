@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import $ from 'jquery';
 import bs58 from 'bs58';
 import { AaveTypes } from '@commonwealth/chain-events';
-import { BigNumber } from 'ethers';
+import { ProposalType } from 'types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { formatNumberLong } from 'adapters/currency';
@@ -40,7 +40,7 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
   }
 
   public format(): string {
-    return `${formatNumberLong(+Web3.utils.fromWei(this.power))} POWER`;
+    return `${formatNumberLong(+Web3.utils.fromWei(this.power))} ${this.account.chain.symbol}`;
   }
 }
 
@@ -159,7 +159,7 @@ export default class AaveProposal extends Proposal<
     if (state === AaveTypes.ProposalState.ACTIVE) return { kind: 'fixed_block', blocknum: this.data.endBlock };
 
     // queued but not ready for execution
-    if (state === AaveTypes.ProposalState.QUEUED) return { kind: 'fixed', time: moment(this.data.executionTime) };
+    if (state === AaveTypes.ProposalState.QUEUED) return { kind: 'fixed', time: moment.unix(this.data.executionTime) };
 
     // unavailable if: waiting to passed/failed but not in queue, or completed
     return { kind: 'unavailable' };
@@ -278,7 +278,7 @@ export default class AaveProposal extends Proposal<
     entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
-    super('aaveproposal', backportEntityToAdapter(entity));
+    super(ProposalType.AaveProposal, backportEntityToAdapter(entity));
 
     this._Chain = Chain;
     this._Accounts = Accounts;

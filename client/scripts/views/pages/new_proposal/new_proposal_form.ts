@@ -4,18 +4,22 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { utils } from 'ethers';
-import { Input, TextArea, Form, FormLabel, FormGroup,
-  Button, Grid, Col, Spinner, Tabs, TabItem, PopoverMenu, Icons, MenuItem } from 'construct-ui';
+import {
+  Input, TextArea, Form, FormLabel, FormGroup,
+  Button, Grid, Col, Spinner, Tabs, TabItem, PopoverMenu, Icons, MenuItem
+} from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind, OffchainThreadStage, ChainNetwork } from 'models';
-import { ProposalType, proposalSlugToClass } from 'identifiers';
+import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { ITXModalData, ProposalModule, OffchainThreadKind, OffchainThreadStage } from 'models';
+import { proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+import CosmosAccount from 'controllers/chain/cosmos/account';
 
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
@@ -37,11 +41,12 @@ import ErrorPage from 'views/pages/error';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
-import NearSputnik from 'client/scripts/controllers/chain/near/sputnik/adapter';
+import NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import { navigateToSubpage } from 'app';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
-  form: { },
+  form: {},
   oncreate: (vnode) => {
     vnode.state.toggleValue = 'proposal';
   },
@@ -66,37 +71,37 @@ const NewProposalForm = {
     if (!callback) return m('div', 'Must have callback');
     if (app.chain?.network === ChainNetwork.Plasm) return m('div', 'Unsupported network');
 
-    let hasCouncilMotionChooser : boolean;
-    let hasAction : boolean;
-    let hasToggle : boolean;
-    let hasPreimageInput : boolean;
-    let hasTitleAndDescription : boolean;
-    let hasBountyTitle : boolean;
-    let hasTopics : boolean;
-    let hasBeneficiary : boolean;
+    let hasCouncilMotionChooser: boolean;
+    let hasAction: boolean;
+    let hasToggle: boolean;
+    let hasPreimageInput: boolean;
+    let hasTitleAndDescription: boolean;
+    let hasBountyTitle: boolean;
+    let hasTopics: boolean;
+    let hasBeneficiary: boolean;
     let hasAmount: boolean;
-    let hasPhragmenInfo : boolean;
-    let hasDepositChooser : boolean;
+    let hasPhragmenInfo: boolean;
+    let hasDepositChooser: boolean;
     // bounty proposal
-    let hasBountyValue : boolean;
+    let hasBountyValue: boolean;
     // tip
-    let hasTipsFields : boolean;
+    let hasTipsFields: boolean;
     // council motion
-    let hasVotingPeriodAndDelaySelector : boolean;
-    let hasReferendumSelector : boolean;
-    let hasExternalProposalSelector : boolean;
-    let hasTreasuryProposalSelector : boolean;
-    let hasThreshold : boolean;
+    let hasVotingPeriodAndDelaySelector: boolean;
+    let hasReferendumSelector: boolean;
+    let hasExternalProposalSelector: boolean;
+    let hasTreasuryProposalSelector: boolean;
+    let hasThreshold: boolean;
     // moloch proposal
-    let hasMolochFields : boolean;
+    let hasMolochFields: boolean;
     // compound proposal
-    let hasCompoundFields : boolean;
+    let hasCompoundFields: boolean;
     // aave proposal
     let hasAaveFields: boolean;
     // sputnik proposal
     let hasSputnikFields: boolean;
     // data loaded
-    let dataLoaded : boolean = true;
+    let dataLoaded: boolean = true;
 
     if (proposalTypeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;
@@ -166,6 +171,7 @@ const NewProposalForm = {
       const done = (result) => {
         vnode.state.error = '';
         callback(result);
+        return result;
       };
       let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (a) => {
         return (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any>).createTx(...a);
@@ -214,17 +220,17 @@ const NewProposalForm = {
 
         mixpanel.track('Create Thread', {
           'Step No': 2,
-          'Step' : 'Submit Proposal',
+          'Step': 'Submit Proposal',
           'Proposal Type': 'Democracy',
           'Thread Type': 'Proposal',
         });
       } else if (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
-                 && vnode.state.councilMotionType === 'vetoNextExternal') {
+        && vnode.state.councilMotionType === 'vetoNextExternal') {
         args = [author, vnode.state.nextExternalProposalHash];
         createFunc = ([a, h]) => (app.chain as Substrate).council.vetoNextExternal(a, h);
         mixpanel.track('Create Thread', {
           'Step No': 2,
-          'Step' : 'Submit Proposal',
+          'Step': 'Submit Proposal',
           'Proposal Type': 'Council Motion',
           'Thread Type': 'Proposal',
         });
@@ -261,7 +267,7 @@ const NewProposalForm = {
         }
         mixpanel.track('Create Thread', {
           'Step No': 2,
-          'Step' : 'Submit Proposal',
+          'Step': 'Submit Proposal',
           'Proposal Type': 'Council Motion',
           'Thread Type': 'Proposal',
         });
@@ -272,7 +278,7 @@ const NewProposalForm = {
         args = [author, vnode.state.form.amount, beneficiary];
         mixpanel.track('Create Thread', {
           'Step No': 2,
-          'Step' : 'Submit Proposal',
+          'Step': 'Submit Proposal',
           'Proposal Type': 'Treasury',
           'Thread Type': 'Proposal',
         });
@@ -292,7 +298,7 @@ const NewProposalForm = {
         createFunc = ([a]) => (app.chain as Substrate).phragmenElections.activeElection.submitCandidacyTx(a);
         mixpanel.track('Create Thread', {
           'Step No': 2,
-          'Step' : 'Submit Proposal',
+          'Step': 'Submit Proposal',
           'Proposal Type': 'Phragmen Council Candidacy',
           'Thread Type': 'Proposal',
         });
@@ -300,13 +306,17 @@ const NewProposalForm = {
         const deposit = vnode.state.deposit
           ? new CosmosToken((app.chain as Cosmos).governance.minDeposit.denom, vnode.state.deposit, false)
           : (app.chain as Cosmos).governance.minDeposit;
-        args = [author, vnode.state.form.title, vnode.state.form.description, deposit];
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          'Step' : 'Submit Proposal',
-          'Proposal Type': 'Cosmos',
-          'Thread Type': 'Proposal',
-        });
+        // TODO: add disabled / loading
+        (app.chain as Cosmos).governance.submitProposalTx(
+          author as CosmosAccount,
+          vnode.state.form.title,
+          vnode.state.form.description,
+          deposit
+        ).then((result) => {
+          done(result);
+          navigateToSubpage(`/proposal/${ProposalType.CosmosProposal}/${result}`);
+        }).catch((err) => notifyError(err.message));
+        return;
       } else if (proposalTypeEnum === ProposalType.MolochProposal) {
         // TODO: check that applicant is valid ETH address in hex
         if (!vnode.state.applicantAddress) throw new Error('Invalid applicant address');
@@ -321,38 +331,50 @@ const NewProposalForm = {
           new BN(vnode.state.sharesRequested),
           details,
         )
-        // TODO: handling errors?
+          // TODO: handling errors?
           .then((result) => done(result))
           .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .catch((err) => notifyError(err.data?.message || err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
         vnode.state.proposer = app.user?.activeAccount?.address;
         if (!vnode.state.proposer) throw new Error('Invalid address / not logged in');
         if (!vnode.state.description) throw new Error('Invalid description');
-        if (!vnode.state.targets) throw new Error('No targets');
-        if (!vnode.state.values) throw new Error('No values');
-        if (!vnode.state.signatures) throw new Error('No signatures');
-        if (!vnode.state.calldatas) throw new Error('No calldatas');
-        const targetsArray = vnode.state.targets.split(',');
-        const valuesArray = vnode.state.values.split(',');
-        const calldatasArray = vnode.state.calldatas.split(',');
-        const signaturesArray = vnode.state.signatures.split(',');
-        if (targetsArray.length !== valuesArray.length
-          && valuesArray.length !== calldatasArray.length
-          && calldatasArray.length !== signaturesArray.length)
-          throw new Error('Array lengths do not match');
+
+        const targets = [];
+        const values = [];
+        const calldatas = [];
+        const signatures = [];
+
+        for (let i = 0; i < vnode.state.aaveTabCount; i++) {
+          const aaveProposal = vnode.state.aaveProposalState[i];
+          if (aaveProposal.target) {
+            targets.push(aaveProposal.target);
+          } else {
+            throw new Error(`No target for Call ${i + 1}`);
+          }
+
+          values.push(aaveProposal.value || '0');
+          calldatas.push(aaveProposal.calldata || '');
+          signatures.push(aaveProposal.signature || '');
+        }
         const details: CompoundProposalArgs = {
-          targets: targetsArray.toString(),
-          values: valuesArray.toString(),
-          signatures: signaturesArray.toString(),
-          calldatas: calldatasArray.toString(),
           description: vnode.state.description,
+          targets,
+          values,
+          calldatas,
+          signatures,
         };
         (app.chain as Compound).governance.propose(details)
-          .then((result) => done(result))
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .then((result: string) => {
+            done(result);
+            return result;
+          })
+          .then((result: string) => {
+            notifySuccess(`Proposal ${result} created successfully!`);
+            m.redraw();
+          })
+          .catch((err) => notifyError(err.data?.message || err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.AaveProposal) {
         vnode.state.proposer = app.user?.activeAccount?.address;
@@ -393,7 +415,7 @@ const NewProposalForm = {
         (app.chain as Aave).governance.propose(details)
           .then((result) => done(result))
           .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .catch((err) => notifyError(err.data?.message || err.message));
         return;
         // @TODO: Create Proposal via WebTx
       } else if (proposalTypeEnum === ProposalType.SputnikProposal) {
@@ -404,7 +426,7 @@ const NewProposalForm = {
         (app.chain as NearSputnik).dao.proposeTx(description, propArgs)
           .then((result) => done(result))
           .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+          .catch((err) => notifyError(err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
         if (!vnode.state.form.beneficiary) throw new Error('Invalid beneficiary address');
@@ -412,14 +434,14 @@ const NewProposalForm = {
         args = [author, vnode.state.form.description, beneficiary];
         mixpanel.track('Create Thread', {
           'Step No': 2,
-          'Step' : 'Submit Proposal',
+          'Step': 'Submit Proposal',
           'Proposal Type': 'Tip',
           'Thread Type': 'Proposal',
         });
       } else {
         mixpanel.track('Create Thread', {
           'Step No': 2,
-          'Step' : 'Incorrect Proposal',
+          'Step': 'Incorrect Proposal',
           'Thread Type': 'Proposal',
         });
         throw new Error('Invalid proposal type');
@@ -478,21 +500,21 @@ const NewProposalForm = {
               },
             }),
             vnode.state.councilMotionDescription
-              && m('.council-motion-description', vnode.state.councilMotionDescription),
+            && m('.council-motion-description', vnode.state.councilMotionDescription),
           ],
           // actions
           hasAction && m(EdgewareFunctionPicker),
           hasTopics
-            && m(TopicSelector, {
-              topics: app.topics.getByCommunity(app.activeId()),
-              featuredTopics: app.topics.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
-              updateFormData: (topicName: string, topicId?: number) => {
-                vnode.state.form.topicName = topicName;
-                vnode.state.form.topicId = topicId;
-              },
-              tabindex: 3,
-            }),
+          && m(TopicSelector, {
+            topics: app.topics.getByCommunity(app.activeId()),
+            featuredTopics: app.topics.getByCommunity(app.activeId())
+              .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+            updateFormData: (topicName: string, topicId?: number) => {
+              vnode.state.form.topicName = topicName;
+              vnode.state.form.topicId = topicId;
+            },
+            tabindex: 3,
+          }),
           hasBountyTitle && [
             m(FormGroup, [
               m(FormLabel, 'Title'),
@@ -584,14 +606,14 @@ const NewProposalForm = {
             ]),
           ],
           hasPhragmenInfo
-            && m('.council-slot-info', [
-              m('p', [
-                'Becoming a candidate requires a deposit of ',
-                formatCoin((app.chain as Substrate).phragmenElections.candidacyBond),
-                '. It will be returned if you are elected, or carried over to the next election if you are in the top ',
-                `${(app.chain as Substrate).phragmenElections.desiredRunnersUp} runners-up.`
-              ]),
+          && m('.council-slot-info', [
+            m('p', [
+              'Becoming a candidate requires a deposit of ',
+              formatCoin((app.chain as Substrate).phragmenElections.candidacyBond),
+              '. It will be returned if you are elected, or carried over to the next election if you are in the top ',
+              `${(app.chain as Substrate).phragmenElections.desiredRunnersUp} runners-up.`
             ]),
+          ]),
           hasToggle && [
             m(RadioSelectorFormField, {
               callback: async (value) => {
@@ -670,29 +692,29 @@ const NewProposalForm = {
             ]),
           ],
           hasReferendumSelector
-            && m(DropdownFormField, {
-              title: 'Referendum',
-              choices: (app.chain as Substrate).democracy.store.getAll().map(
-                (r) => ({ name: 'referendum', value: r.identifier, label: `${r.shortIdentifier}: ${r.title}` })
-              ),
-              callback: (result) => {
-                vnode.state.referendumId = result;
-                m.redraw();
-              },
-            }),
+          && m(DropdownFormField, {
+            title: 'Referendum',
+            choices: (app.chain as Substrate).democracy.store.getAll().map(
+              (r) => ({ name: 'referendum', value: r.identifier, label: `${r.shortIdentifier}: ${r.title}` })
+            ),
+            callback: (result) => {
+              vnode.state.referendumId = result;
+              m.redraw();
+            },
+          }),
           hasExternalProposalSelector
-            && m(DropdownFormField, {
-              title: 'Proposal',
-              choices: (app.chain as Substrate).democracyProposals.nextExternal ? [{
-                name: 'external_proposal',
-                value: (app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString(),
-                label: `${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(0, 8)}...`,
-              }] : [],
-              callback: (result) => {
-                vnode.state.nextExternalProposalHash = result;
-                m.redraw();
-              },
-            }),
+          && m(DropdownFormField, {
+            title: 'Proposal',
+            choices: (app.chain as Substrate).democracyProposals.nextExternal ? [{
+              name: 'external_proposal',
+              value: (app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString(),
+              label: `${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(0, 8)}...`,
+            }] : [],
+            callback: (result) => {
+              vnode.state.nextExternalProposalHash = result;
+              m.redraw();
+            },
+          }),
           hasTreasuryProposalSelector && m(DropdownFormField, {
             title: 'Treasury Proposal',
             choices: (app.chain as Substrate).treasury.store.getAll().map(
@@ -779,63 +801,18 @@ const NewProposalForm = {
               }),
             ]),
           ],
-          hasCompoundFields && [
-            m('h2', 'New Compound Proposal:'),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Targets'),
-              m(Input, {
-                name: 'targets',
-                placeholder: 'Proposal Targets',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.targets = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Values'),
-              m(Input, {
-                name: 'values',
-                placeholder: 'Proposal Values',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.values = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Calldatas'),
-              m(Input, {
-                name: 'calldatas',
-                placeholder: 'Proposal Calldatas',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.calldatas = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Signatures'),
-              m(Input, {
-                name: 'signatures',
-                placeholder: 'Proposal Signatures',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  vnode.state.signatures = result;
-                  m.redraw();
-                },
-              }),
-            ]),
+
+          hasCompoundFields && m('.AaveGovernance', [
             m(FormGroup, [
               m(FormLabel, 'Proposer (you)'),
-              m(Input, {
-                name: 'proposer',
-                value: `${app.user.activeAccount.address}`,
-                disabled: true,
-              }),
+              m('', [
+                m(User, {
+                  user: author,
+                  linkify: true,
+                  popover: true,
+                  showAddressWithDisplayName: true,
+                }),
+              ]),
             ]),
             m(FormGroup, [
               m(FormLabel, 'Proposal Description'),
@@ -849,7 +826,106 @@ const NewProposalForm = {
                 },
               }),
             ]),
-          ],
+            m('.tab-selector', [
+              m(Tabs, {
+                align: 'left',
+                class: 'tabs',
+              }, [
+                aaveProposalState.map((_, index) => m(TabItem, {
+                  key: index,
+                  label: `Call ${index + 1}`,
+                  active: activeAaveTabIndex === index,
+                  onclick: () => { vnode.state.activeAaveTabIndex = index; },
+                })),
+              ]),
+              m(PopoverMenu, {
+                closeOnContentClick: true,
+                content: [
+                  m(MenuItem, {
+                    iconLeft: Icons.EDIT_2,
+                    label: 'Add',
+                    onclick: () => {
+                      vnode.state.aaveTabCount++;
+                      vnode.state.activeAaveTabIndex = vnode.state.aaveTabCount - 1;
+                      vnode.state.aaveProposalState.push({
+                        target: null,
+                        value: null,
+                        calldata: null,
+                        signature: null,
+                        withDelegateCall: false,
+                      });
+                    },
+                  }),
+                  m(MenuItem, {
+                    iconLeft: Icons.TRASH_2,
+                    label: 'Delete',
+                    disabled: vnode.state.activeAaveTabIndex === 0,
+                    onclick: () => {
+                      vnode.state.aaveTabCount--;
+                      vnode.state.activeAaveTabIndex = vnode.state.aaveTabCount - 1;
+                      vnode.state.aaveProposalState.pop();
+                    },
+                  }),
+                ],
+                trigger: m(Button, { iconLeft: Icons.MORE_HORIZONTAL, basic: true })
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Target Address'),
+              m(Input, {
+                name: 'targets',
+                placeholder: 'Add Target',
+                value: aaveProposalState[activeAaveTabIndex].target,
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].target = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Value'),
+              m(Input, {
+                name: 'values',
+                placeholder: 'Enter amount in wei',
+                value: aaveProposalState[activeAaveTabIndex].value,
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].value = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Calldata'),
+              m(Input, {
+                name: 'calldatas',
+                placeholder: 'Add Calldata',
+                value: aaveProposalState[activeAaveTabIndex].calldata,
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].calldata = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m('.flex-label', [
+                m(FormLabel, 'Function Signature'),
+                m('.helper-text', 'Optional'),
+              ]),
+              m(Input, {
+                name: 'signatures',
+                placeholder: 'Add a signature',
+                value: aaveProposalState[activeAaveTabIndex].signature,
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.aaveProposalState[activeAaveTabIndex].signature = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ]),
           hasAaveFields && m('.AaveGovernance', [
             m(FormGroup, [
               m(FormLabel, 'Proposer (you)'),
@@ -935,7 +1011,7 @@ const NewProposalForm = {
               }),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Target'),
+              m(FormLabel, 'Target Address'),
               m(Input, {
                 name: 'targets',
                 placeholder: 'Add Target',
@@ -951,7 +1027,7 @@ const NewProposalForm = {
               m(FormLabel, 'Value'),
               m(Input, {
                 name: 'values',
-                placeholder: 'Enter amount',
+                placeholder: 'Enter amount in wei',
                 value: aaveProposalState[activeAaveTabIndex].value,
                 oninput: (e) => {
                   const result = (e.target as any).value;
@@ -975,7 +1051,7 @@ const NewProposalForm = {
             ]),
             m(FormGroup, [
               m('.flex-label', [
-                m(FormLabel, 'Signature'),
+                m(FormLabel, 'Function Signature'),
                 m('.helper-text', 'Optional'),
               ]),
               m(Input, {
@@ -993,12 +1069,12 @@ const NewProposalForm = {
               m(FormLabel, 'Delegate Call'),
               m('', [
                 m(Button, {
-                  label:'TRUE',
+                  label: 'TRUE',
                   class: `button ${aaveProposalState[activeAaveTabIndex].withDelegateCall === true && 'active'}`,
                   onclick: () => { vnode.state.aaveProposalState[activeAaveTabIndex].withDelegateCall = true; }
                 }),
                 m(Button, {
-                  label:'FALSE',
+                  label: 'FALSE',
                   class: `ml-12 button ${aaveProposalState[activeAaveTabIndex].withDelegateCall === false && 'active'}`,
                   onclick: () => { vnode.state.aaveProposalState[activeAaveTabIndex].withDelegateCall = false; }
                 }),

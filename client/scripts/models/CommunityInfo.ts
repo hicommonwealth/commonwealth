@@ -3,23 +3,30 @@ import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import ChainInfo from './ChainInfo';
 import OffchainTopic from './OffchainTopic';
+import { OffchainCommunityInstance } from 'server/models/offchain_community';
 
 interface CommunityData {
-  name: string,
-  iconUrl: string,
-  description: string,
-  website: string,
-  discord: string,
-  element: string,
+  name: string;
+  iconUrl: string;
+  description: string;
+  website: string;
+  discord: string;
+  element: string;
   telegram: string;
   github: string;
   visible: boolean;
-  stagesEnabled: boolean,
-  customStages: string,
+  defaultChain: string;
+  stagesEnabled: boolean;
+  customStages: string;
   customDomain: string;
   terms: string;
-  invitesEnabled: boolean,
-  privacyEnabled: boolean,
+  invitesEnabled: boolean;
+  privacyEnabled: boolean;
+  collapsedOnHomepage: boolean;
+  defaultSummaryView: boolean;
+  featuredTopics: any[];
+  topics: any[];
+  adminsAndMods: any;
 }
 
 class CommunityInfo {
@@ -41,6 +48,7 @@ class CommunityInfo {
   public customDomain: string;
   public terms: string;
   public readonly collapsedOnHomepage: boolean;
+  public defaultSummaryView: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public adminsAndMods: RoleInfo[];
@@ -48,9 +56,28 @@ class CommunityInfo {
 
   // TODO: convert this to accept opject with params instead
   constructor({
-    id, name, description, iconUrl, website, discord, element, telegram, github, defaultChain, visible,
-    stagesEnabled, customStages,
-    customDomain, terms, invitesEnabled, privacyEnabled, collapsedOnHomepage, featuredTopics, topics, adminsAndMods
+    id,
+    name,
+    description,
+    iconUrl,
+    website,
+    discord,
+    element,
+    telegram,
+    github,
+    defaultChain,
+    visible,
+    stagesEnabled,
+    customStages,
+    customDomain,
+    terms,
+    invitesEnabled,
+    privacyEnabled,
+    collapsedOnHomepage,
+    defaultSummaryView,
+    featuredTopics,
+    topics,
+    adminsAndMods,
   }) {
     this.id = id;
     this.name = name;
@@ -70,8 +97,9 @@ class CommunityInfo {
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
     this.collapsedOnHomepage = collapsedOnHomepage;
+    this.defaultSummaryView = defaultSummaryView;
     this.featuredTopics = featuredTopics || [];
-    this.topics = topics || [];
+    this.topics = topics.map((t) => new OffchainTopic(t)) || [];
     this.adminsAndMods = adminsAndMods || [];
   }
 
@@ -79,30 +107,31 @@ class CommunityInfo {
     id,
     name,
     description,
-    iconUrl,
+    icon_url,
     website,
     discord,
     element,
     telegram,
     github,
-    defaultChain: default_chain,
+    default_chain,
     visible,
-    stagesEnabled,
-    customStages,
-    customDomain,
+    stages_enabled,
+    custom_stages,
+    custom_domain,
     terms,
-    invitesEnabled,
-    privacyEnabled,
-    collapsedOnHomepage: collapsed_on_homepage,
-    featuredTopics,
+    invites_enabled,
+    privacy_enabled,
+    collapsed_on_homepage,
+    default_summary_view,
+    featured_topics,
     topics,
-    adminsAndMods,
+    admins_and_mods,
   }) {
     return new CommunityInfo({
       id,
       name,
       description,
-      iconUrl,
+      iconUrl: icon_url,
       website,
       discord,
       element,
@@ -110,26 +139,32 @@ class CommunityInfo {
       github,
       defaultChain: default_chain,
       visible,
-      stagesEnabled,
-      customStages,
-      customDomain,
+      stagesEnabled: stages_enabled,
+      customStages: custom_stages,
+      customDomain: custom_domain,
       terms,
-      invitesEnabled,
-      privacyEnabled,
+      invitesEnabled: invites_enabled,
+      privacyEnabled: privacy_enabled,
       collapsedOnHomepage: collapsed_on_homepage,
-      featuredTopics,
+      defaultSummaryView: default_summary_view,
+      featuredTopics: featured_topics,
       topics,
-      adminsAndMods,
+      adminsAndMods: admins_and_mods,
     });
   }
 
   // TODO: get operation should not have side effects, and either way this shouldn't be here
   public async getMembers(id: string) {
     try {
-      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { community: id, });
+      const res = await $.get(`${app.serverUrl()}/bulkMembers`, {
+        community: id,
+      });
       this.setMembers(res.result);
       const roles = res.result.filter((r) => {
-        return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
+        return (
+          r.permission === RolePermission.admin ||
+          r.permission === RolePermission.moderator
+        );
       });
       this.setAdmins(roles);
       return this.adminsAndMods;
@@ -141,32 +176,36 @@ class CommunityInfo {
   public setMembers(roles) {
     this.members = [];
     roles.forEach((r) => {
-      this.members.push(new RoleInfo(
-        r.id,
-        r.address_id,
-        r.Address.address,
-        r.Address.chain,
-        r.chain_id,
-        r.offchain_community_id,
-        r.permission,
-        r.is_user_default
-      ));
+      this.members.push(
+        new RoleInfo(
+          r.id,
+          r.address_id,
+          r.Address.address,
+          r.Address.chain,
+          r.chain_id,
+          r.offchain_community_id,
+          r.permission,
+          r.is_user_default
+        )
+      );
     });
   }
 
   public setAdmins(roles) {
     this.adminsAndMods = [];
     roles.forEach((r) => {
-      this.adminsAndMods.push(new RoleInfo(
-        r.id,
-        r.address_id,
-        r.Address.address,
-        r.Address.chain,
-        r.chain_id,
-        r.offchain_community_id,
-        r.permission,
-        r.is_user_default
-      ));
+      this.adminsAndMods.push(
+        new RoleInfo(
+          r.id,
+          r.address_id,
+          r.Address.address,
+          r.Address.chain,
+          r.chain_id,
+          r.offchain_community_id,
+          r.permission,
+          r.is_user_default
+        )
+      );
     });
   }
 
@@ -176,6 +215,7 @@ class CommunityInfo {
     name,
     iconUrl,
     privacyEnabled,
+    defaultSummaryView,
     stagesEnabled,
     customStages,
     customDomain,
@@ -188,27 +228,28 @@ class CommunityInfo {
   }) {
     // TODO: Change to PUT /community
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
-      'id': app.activeCommunityId(),
-      'name': name,
-      'description': description,
-      'iconUrl': iconUrl,
-      'website': website,
-      'discord': discord,
-      'element': element,
-      'telegram': telegram,
-      'github': github,
-      'stagesEnabled': stagesEnabled,
-      'customStages': customStages,
-      'customDomain': customDomain,
-      'terms': terms,
-      'privacy': privacyEnabled,
-      'invites': invitesEnabled,
-      'jwt': app.user.jwt,
+      id: app.activeCommunityId(),
+      name,
+      description,
+      icon_url: iconUrl,
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+      stages_enabled: stagesEnabled,
+      custom_stages: customStages,
+      custom_domain: customDomain,
+      terms,
+      privacy: privacyEnabled,
+      invites: invitesEnabled,
+      default_summary_view: defaultSummaryView,
+      jwt: app.user.jwt,
     });
-    const updatedCommunity: CommunityInfo = r.result;
+    const updatedCommunity: OffchainCommunityInstance = r.result;
     this.name = updatedCommunity.name;
     this.description = updatedCommunity.description;
-    this.iconUrl = updatedCommunity.iconUrl;
+    this.iconUrl = updatedCommunity.icon_url;
     this.website = updatedCommunity.website;
     this.discord = updatedCommunity.discord;
     this.element = updatedCommunity.element;
@@ -216,10 +257,11 @@ class CommunityInfo {
     this.github = updatedCommunity.github;
     this.stagesEnabled = stagesEnabled;
     this.customStages = customStages;
-    this.customDomain = updatedCommunity.customDomain;
+    this.customDomain = updatedCommunity.custom_domain;
     this.terms = updatedCommunity.terms;
-    this.privacyEnabled = updatedCommunity.privacyEnabled;
-    this.invitesEnabled = updatedCommunity.invitesEnabled;
+    this.privacyEnabled = updatedCommunity.privacy_enabled;
+    this.invitesEnabled = updatedCommunity.invites_enabled;
+    this.defaultSummaryView = updatedCommunity.default_summary_view;
   }
 
   public addFeaturedTopic(topic: string) {
@@ -236,15 +278,17 @@ class CommunityInfo {
     try {
       // TODO: Change to PUT /community
       await $.post(`${app.serverUrl()}/updateCommunity`, {
-        'id': app.activeCommunityId(),
+        id: app.activeCommunityId(),
         'featured_topics[]': topics,
-        'jwt': app.user.jwt
+        jwt: app.user.jwt,
       });
     } catch (err) {
       console.log('Failed to update featured topics');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to update featured topics');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to update featured topics'
+      );
     }
   }
 }

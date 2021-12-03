@@ -1,14 +1,17 @@
 import cheerio from 'cheerio';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
+import { factory, formatFilename } from '../../shared/logging';
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
   if (NO_CLIENT_SERVER) {
     return;
   }
-
+  log.info('setupAppRoutes');
   // Development: serve everything through devMiddleware
   if (DEV) {
     app.get('*', (req, res, next) => {
@@ -53,10 +56,11 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     // Retrieve chain or community
     const scope = req.params.scope;
     const chain = await models.Chain.findOne({ where: { id: scope } });
-    const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacyEnabled: false } });
+    const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacy_enabled: false } });
     const title = chain ? chain.name : community ? community.name : 'Commonwealth';
     const description = chain ? chain.description : community ? community.description : '';
-    const image = chain ? (chain.icon_url.match(`^(http|https)://`) ? chain.icon_url : `https://commonwealth.im${chain.icon_url}`) : DEFAULT_COMMONWEALTH_LOGO;
+    const image = chain?.icon_url ? (chain.icon_url.match(`^(http|https)://`) ? 
+      chain.icon_url : `https://commonwealth.im${chain.icon_url}`) : DEFAULT_COMMONWEALTH_LOGO;
     const author = '';
     renderWithMetaTags(res, title, description, author, image);
   });
@@ -104,7 +108,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     }
 
     const chain = await models.Chain.findOne({ where: { id: scope } });
-    const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacyEnabled: false } });
+    const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacy_enabled: false } });
 
     if (proposalType === 'discussion' && proposalId !== null) {
       // Retrieve offchain discussion
@@ -122,7 +126,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
         where: { id: proposalId },
         include: [{
           model: models.OffchainCommunity,
-          where: { privacyEnabled: false },
+          where: { privacy_enabled: false },
         }, {
           model: models.Address,
           as: 'Address',
@@ -132,7 +136,7 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       const proposal = chainProposal || communityProposal;
       title = proposal ? decodeURIComponent(proposal.title) : '';
       description = proposal ? proposal.plaintext : '';
-      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.iconUrl}` : DEFAULT_COMMONWEALTH_LOGO;
+      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.icon_url}` : DEFAULT_COMMONWEALTH_LOGO;
       try {
         const profileData = proposal && proposal.Address && proposal.Address.OffchainProfile
           ? JSON.parse(proposal.Address.OffchainProfile.data) : '';
@@ -143,13 +147,14 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     } else {
       title = chain ? chain.name : community ? community.name : 'Commonwealth';
       description = '';
-      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.iconUrl}` : DEFAULT_COMMONWEALTH_LOGO;
+      image = chain ? `https://commonwealth.im${chain.icon_url}` : community ? `https://commonwealth.im${community.icon_url}` : DEFAULT_COMMONWEALTH_LOGO;
       author = '';
     }
     renderWithMetaTags(res, title, description, author, image);
   });
 
   app.get('*', (req, res, next) => {
+    log.info(`setupAppRoutes sendFiles ${req.path}`);
     sendFile(res);
   });
 };

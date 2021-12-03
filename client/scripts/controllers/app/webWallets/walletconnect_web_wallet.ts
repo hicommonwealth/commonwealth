@@ -1,9 +1,9 @@
-import { Account, ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'types';
+import { Account, IWebWallet } from 'models';
 import app from 'state';
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
-import { INFURA_ID } from 'controllers/chain/ethereum/chain';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -48,25 +48,27 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
     try {
-      //  Create WalletConnect Provider
-      this._provider = new WalletConnectProvider({
-        infuraId: INFURA_ID
-      });
+      // Create WalletConnect Provider
+      if (!app.chain?.meta.ethChainId) {
+        throw new Error(`No chain id found!`);
+      }
+      const rpc = { [app.chain.meta.ethChainId]: app.chain.meta.url };
+      this._provider = new WalletConnectProvider({ rpc, chainId: app.chain.meta.ethChainId });
 
       //  Enable session (triggers QR Code modal)
       await this._provider.enable();
       this._web3 = new Web3(this._provider as any);
       this._accounts = await this._web3.eth.getAccounts();
       if (this._accounts.length === 0) {
-        throw new Error('Could not fetch accounts from WalletConnect');
+        throw new Error('WalletConnect fetched no accounts.');
       }
 
       await this.initAccountsChanged();
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
-      console.error(`Failed to enable WalletConnect: ${error.message}`);
       this._enabling = false;
+      throw new Error(`Failed to enable WalletConnect: ${error.message}`);
     }
   }
 

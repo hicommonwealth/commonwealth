@@ -5,8 +5,8 @@
 /venv
 /build
 /eth/build
-/eth/artifacts
-/eth/cache
+shared/eth/artifacts
+shared/eth/cache
 node_modules/
 jsconfig.json
 .vscode

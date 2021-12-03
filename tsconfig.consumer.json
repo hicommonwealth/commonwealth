@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "target": "es6",
+    "target": "esnext",
     "moduleResolution": "node",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
@@ -10,11 +10,12 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "traceResolution": true
+    "traceResolution": false
   },
   "files": [
     "server/scripts/chainEventsConsumer.ts",
     "server/scripts/dbNode.ts",
+    "shared/logging.ts"
   ],
   "include": [
     "server/models/*",

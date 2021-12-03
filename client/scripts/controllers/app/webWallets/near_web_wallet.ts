@@ -1,4 +1,5 @@
-import { Account, ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'types';
+import { Account, IWebWallet } from 'models';
 
 // TODO
 class NearWebWalletController implements IWebWallet<any> {

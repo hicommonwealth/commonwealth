@@ -3,7 +3,8 @@ declare let window: any;
 import app from 'state';
 import Web3 from 'web3';
 import { provider } from 'web3-core';
-import { Account, ChainBase, IWebWallet } from 'models';
+import { ChainBase } from 'types';
+import { Account, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
@@ -51,25 +52,43 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   // ACTIONS
   public async enable() {
+    // TODO: use https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods to switch active
+    // chain according to currently active node, if one exists
     console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
-      // (this needs to be called first, before other requests)
-      this._web3 = new Web3((window as any).ethereum);
-      await this._web3.givenProvider.enable();
+      if (!app.chain?.meta.ethChainId) {
+        throw new Error('No chain id found!');
+      }
 
+      // ensure we're on the correct chain
+      this._web3 = new Web3((window as any).ethereum);
+      await this._web3.givenProvider.request({
+        method: 'eth_requestAccounts'
+      });
+      await this._web3.givenProvider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${app.chain.meta.ethChainId.toString(16)}` }],
+      });
+
+      // fetch active accounts
       this._accounts = await this._web3.eth.getAccounts();
       this._provider = this._web3.currentProvider;
       if (this._accounts.length === 0) {
-        throw new Error('Could not fetch accounts from Metamask');
+        throw new Error('Metamask fetched no accounts');
       }
 
       await this.initAccountsChanged();
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
-      console.error(`Failed to enable Metamask: ${error.message}`);
+      let errorMsg = `Failed to enable Metamask: ${error.message}`;
+      if (error.code === 4902) {
+        errorMsg = `Failed to enable Metamask: Please add chain ID ${app.chain.meta.ethChainId}`;
+      }
+      console.error(errorMsg);
       this._enabling = false;
+      throw new Error(errorMsg);
     }
   }
 

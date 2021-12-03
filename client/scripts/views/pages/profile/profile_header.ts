@@ -21,7 +21,7 @@ import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown
 import { formatAddressShort } from '../../../../../shared/utils';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { alertModalWithText } from '../../modals/alert_modal';
-import { ChainBase } from 'models';
+import { ChainBase } from 'types';
 
 const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) => {
   const chainObj = app.config.chains.getById(account.chain);

@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import Web3 from 'web3';
 import { Op } from 'sequelize';
-import { INFURA_API_KEY } from '../config';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
+import { getUrlForEthChainId } from '../util/supportedEthChains';
 
+import { ChainBase } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -17,7 +18,10 @@ export const Errors = {
   NoBase: 'Must provide chain base',
   NoNodeUrl: 'Must provide node url',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
+  MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
+  InvalidChainId: 'Ethereum chain ID not provided or unsupported',
+  InvalidChainIdOrUrl: 'Could not determine a valid endpoint for provided chain',
   ChainAddressExists: 'The address already exists',
   ChainIDExists: 'The id for this chain already exists, please choose another id',
   ChainNameExists: 'The name for this chain already exists, please choose another name',
@@ -64,34 +68,50 @@ const createChain = async (
   if (!existingBaseChain) {
     return next(new Error(Errors.InvalidBase));
   }
-  if (req.body.base === 'ethereum') {
+  let eth_chain_id: number = null;
+  let url = req.body.node_url;
+  if (req.body.base === ChainBase.Ethereum) {
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
     }
-    const web3 = new Web3(new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${INFURA_API_KEY}`));
+    if (!req.body.eth_chain_id || !+req.body.eth_chain_id) {
+      return next(new Error(Errors.InvalidChainId));
+    }
+    eth_chain_id = +req.body.eth_chain_id;
+
+    // override provided URL for eth chains (typically ERC20) with stored, unless none found
+    const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
+    if (ethChainUrl) {
+      url = ethChainUrl;
+    }
+    if (!url) {
+      return next(new Error(Errors.InvalidChainIdOrUrl));
+    }
+
+    const provider = new Web3.providers.WebsocketProvider(url);
+    const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
+    provider.disconnect(1000, 'finished');
     if (code === '0x') {
       return next(new Error(Errors.InvalidAddress));
     }
 
     const existingChainNode = await models.ChainNode.findOne({
-      where: { address: req.body.address }
+      where: { address: req.body.address, eth_chain_id }
     });
     if (existingChainNode) {
       return next(new Error(Errors.ChainAddressExists));
     }
+  } else {
+    if (!url || !url.trim()) {
+      return next(new Error(Errors.InvalidNodeUrl));
+    }
+    if (!urlHasValidHTTPPrefix(url) && !url.match(/wss?:\/\//)) {
+      return next(new Error(Errors.InvalidNodeUrl));
+    }
   }
 
-  const { website, discord, element, telegram, github, icon_url, node_url } = req.body;
-
-  if (!node_url || !node_url.trim()) {
-    return next(new Error(Errors.NoNodeUrl));
-  }
-
-  if (!urlHasValidHTTPPrefix(node_url) && !node_url.startsWith('ws://') && !node_url.startsWith('wss://')) {
-    return next(new Error(Errors.InvalidNodeUrl));
-  }
-
+  const { website, discord, element, telegram, github, icon_url } = req.body;
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
@@ -123,7 +143,7 @@ const createChain = async (
     icon_url: req.body.icon_url,
     description: req.body.description,
     active: true,
-    network: req.body.id,
+    network: req.body.network,
     type: req.body.type,
     website: req.body.website,
     discord: req.body.discord,
@@ -136,8 +156,9 @@ const createChain = async (
 
   const chainNodeContent = {
     chain: req.body.id,
-    url: req.body.node_url,
+    url,
     address: req.body.address,
+    eth_chain_id,
   };
   const node = await models.ChainNode.create(chainNodeContent);
 

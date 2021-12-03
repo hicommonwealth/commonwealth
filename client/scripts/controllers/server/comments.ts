@@ -6,7 +6,7 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo } from 'models';
+import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo, OffchainThread } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
@@ -123,19 +123,6 @@ class CommentsController {
 
   public nComments<T extends IUniqueId>(proposal: T) {
     return this._store.nComments(proposal);
-  }
-
-  public uniqueCommenters<T extends IUniqueId>(proposal: T, proposalAuthor?, proposalAuthorChain?) {
-    // Returns an array of [chain, address] arrays
-    // TODO: Use a better comparator to determine uniqueness
-    const comments = (proposalAuthor && proposalAuthorChain)
-      ? [`${proposalAuthorChain}#${proposalAuthor}`]
-        .concat(this._store.getByProposal(proposal).map((c) => `${c.authorChain}#${c.author}`))
-      : (this._store.getByProposal(proposal)).map((c) => `${c.authorChain}#${c.author}`);
-
-    return _.uniq((comments as string[]))
-      .map((slug) => slug.split(/#/))
-      .map(([chain, address]) => new AddressInfo(null, address, chain, null));
   }
 
   public lastCommented<T extends IUniqueId>(proposal: T) {
@@ -318,7 +305,7 @@ class CommentsController {
     }
   }
 
-  public initialize(initialComments, reset = true) {
+  public initialize(initialComments = [], reset = true) {
     if (reset) {
       this._store.clear();
     }

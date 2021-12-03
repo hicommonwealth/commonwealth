@@ -6,7 +6,7 @@ import { hexToUtf8 } from 'web3-utils';
 import { Button, Input } from 'construct-ui';
 
 import app from 'state';
-import { CosmosAccount } from 'controllers/chain/cosmos/account';
+import CosmosAccount from 'controllers/chain/cosmos/account';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from 'models';
 import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/chain/substrate/democracy_referendum';
@@ -28,13 +28,15 @@ import MolochProposal, {
 } from 'controllers/chain/ethereum/moloch/proposal';
 import CompoundProposal, {
   CompoundProposalVote,
-  CompoundVote
+  BravoVote
 } from 'controllers/chain/ethereum/compound/proposal';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
+import Cosmos from 'controllers/chain/cosmos/main';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
 import {
   NearSputnikProposalStatus,
   NearSputnikVote,
@@ -59,12 +61,15 @@ const CannotVote: m.Component<{ action }> = {
   }
 };
 
-const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteConviction?, setDemocracyVoteAmount? }> = {
+const ProposalExtensions: m.Component<{
+  proposal: AnyProposal,
+  setDemocracyVoteConviction?,
+  setDemocracyVoteAmount?,
+  setCosmosDepositAmount?,
+}> = {
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
-    const callback = vnode.attrs.callback;
-    const user: SubstrateAccount = app.user.activeAccount as SubstrateAccount;
-    if (vnode.attrs.proposal instanceof SubstrateDemocracyReferendum) {
+    if (proposal instanceof SubstrateDemocracyReferendum) {
       if (!vnode.attrs.setDemocracyVoteConviction) return 'Misconfigured';
       if (!vnode.attrs.setDemocracyVoteAmount) return 'Misconfigured';
       if (!app.user.activeAccount) return 'Misconfigured';
@@ -87,13 +92,13 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
           },
         }),
         app.user.activeAccount instanceof SubstrateAccount
-          && m(BalanceInfo, { account: app.user.activeAccount }),
+        && m(BalanceInfo, { account: app.user.activeAccount }),
       ]);
-    } else if (vnode.attrs.proposal instanceof SubstrateDemocracyProposal) {
+    } else if (proposal instanceof SubstrateDemocracyProposal) {
       return m('.ProposalExtensions', [
         m('.proposal-second', 'Cost to second: ', proposal.deposit.format())
       ]);
-    } else if (vnode.attrs.proposal instanceof SubstratePhragmenElection) {
+    } else if (proposal instanceof SubstratePhragmenElection) {
       const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
       return m('.ProposalExtensions', [
         'Voting on councillor candidacies requires a voting bond of ',
@@ -102,6 +107,24 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setDemocracyVoteCon
         // TODO XXX: check whether user has deposited a voting bond
         // m('.proposal-bond', 'You have not deposited a voting bond for the current election.'),
         // m('.proposal-bond', 'You have already deposited a voting bond for the current election.'),
+      ]);
+    } else if (proposal instanceof CosmosProposal && proposal.status === 'DepositPeriod') {
+      if (!vnode.attrs.setCosmosDepositAmount) return 'Misconfigured';
+      return m('.ProposalExtensions', [
+        // m('.proposal-second', 'Must deposit at least: ', (app.chain as Cosmos).governance.minDeposit.format()),
+        m(Input, {
+          fluid: true,
+          class: 'cosmos-proposal-deposit-amount',
+          // TODO: support multiple denom
+          placeholder: `Amount to deposit (${app.chain?.chain?.denom})`,
+          oncreate: (vvnode) => {
+            vnode.attrs.setCosmosDepositAmount(0);
+          },
+          oninput: (e) => {
+            vnode.attrs.setCosmosDepositAmount(parseInt(e.target.value, 10));
+          },
+        }),
+        // TODO: balance display
       ]);
     }
   }
@@ -141,7 +164,7 @@ export const cancelProposal = (e, state, proposal, onModalClose) => {
 };
 
 // aave: queue / execute
-export const QueueButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
+export const QueueButton: m.Component<{ proposal, votingModalOpen?}, {}> = {
   view: (vnode) => {
     const { proposal, votingModalOpen } = vnode.attrs;
     return (proposal instanceof AaveProposal || proposal instanceof CompoundProposal)
@@ -149,7 +172,7 @@ export const QueueButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
       && m('.QueueButton', [
         m(Button, {
           intent: 'none',
-          disabled: proposal.isQueueable || votingModalOpen,
+          disabled: !proposal.isQueueable || votingModalOpen,
           onclick: () => proposal.queueTx().then(() => m.redraw()),
           label: proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue',
           compact: true,
@@ -159,7 +182,7 @@ export const QueueButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
   }
 };
 
-export const ExecuteButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
+export const ExecuteButton: m.Component<{ proposal, votingModalOpen?}, {}> = {
   view: (vnode) => {
     const { proposal, votingModalOpen } = vnode.attrs;
     return (proposal instanceof AaveProposal || proposal instanceof CompoundProposal)
@@ -178,7 +201,7 @@ export const ExecuteButton: m.Component<{ proposal, votingModalOpen? }, {}> = {
 };
 
 // moloch: cancel
-export const CancelButton: m.Component<{ proposal, votingModalOpen?, user?, onModalClose? }, {}> = {
+export const CancelButton: m.Component<{ proposal, votingModalOpen?, user?, onModalClose?}, {}> = {
   view: (vnode) => {
     const { proposal, votingModalOpen, user, onModalClose } = vnode.attrs;
     return (proposal instanceof MolochProposal) ? m('.veto-button', [
@@ -193,7 +216,7 @@ export const CancelButton: m.Component<{ proposal, votingModalOpen?, user?, onMo
     ]) : (proposal instanceof CompoundProposal) ? m('.veto-button', [
       m(Button, {
         intent: 'negative',
-        disabled: proposal.isCancelled || votingModalOpen,
+        disabled: proposal.completed || votingModalOpen,
         onclick: (e) => cancelProposal(e, vnode.state, proposal, onModalClose),
         label: proposal.isCancelled ? 'Cancelled' : 'Cancel',
         compact: true,
@@ -233,9 +256,9 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
 
     let user;
     if (proposal instanceof SubstrateDemocracyProposal
-        || proposal instanceof SubstrateDemocracyReferendum
-        || proposal instanceof SubstratePhragmenElection
-        || proposal instanceof SubstrateCollectiveProposal) {
+      || proposal instanceof SubstrateDemocracyReferendum
+      || proposal instanceof SubstratePhragmenElection
+      || proposal instanceof SubstrateCollectiveProposal) {
       user = app.user.activeAccount as SubstrateAccount;
     } else if (proposal instanceof CosmosProposal) {
       user = app.user.activeAccount as CosmosAccount;
@@ -286,15 +309,22 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       } else if (proposal instanceof SubstrateCollectiveProposal) {
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, true), onModalClose));
       } else if (proposal instanceof CosmosProposal) {
-        proposal.voteTx(new CosmosVote(user, 'Yes'))
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.toString()));
+        if (proposal.status === 'DepositPeriod') {
+          // TODO: configure deposit amount
+          proposal.submitDepositTx(user, (app.chain as Cosmos).chain.coins(vnode.state.amount))
+            .then(() => m.redraw())
+            .catch((err) => notifyError(err.toString()));
+        } else {
+          proposal.voteTx(new CosmosVote(user, 'Yes'))
+            .then(() => m.redraw())
+            .catch((err) => notifyError(err.toString()));
+        }
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof CompoundProposal) {
-        proposal.submitVoteWebTx(new CompoundProposalVote(user, CompoundVote.YES))
+        proposal.submitVoteWebTx(new CompoundProposalVote(user, BravoVote.YES))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
@@ -340,11 +370,13 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       } else if (proposal instanceof SubstrateCollectiveProposal) {
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false), onModalClose));
       } else if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, 'No'), null, onModalClose));
+        proposal.voteTx(new CosmosVote(user, 'No'))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
       } else if (proposal instanceof CompoundProposal) {
-        proposal.submitVoteWebTx(new CompoundProposalVote(user, CompoundVote.NO))
+        proposal.submitVoteWebTx(new CompoundProposalVote(user, BravoVote.NO))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
@@ -416,7 +448,13 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Last Thread Created': new Date().toISOString()
       });
       if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, 'Abstain'), null, onModalClose));
+        proposal.voteTx(new CosmosVote(user, 'Abstain'))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
+      } else if (proposal instanceof CompoundProposal && (app.chain as Compound).governance.supportsAbstain) {
+        proposal.submitVoteWebTx(new CompoundProposalVote(user, BravoVote.ABSTAIN))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else {
         vnode.state.votingModalOpen = false;
         return notifyError('Invalid proposal type');
@@ -436,7 +474,9 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Last Thread Created': new Date().toISOString()
       });
       if (proposal instanceof CosmosProposal) {
-        createTXModal(proposal.submitVoteTx(new CosmosVote(user, 'NoWithVeto'), null, onModalClose));
+        proposal.voteTx(new CosmosVote(user, 'NoWithVeto'))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else {
         vnode.state.votingModalOpen = false;
         return notifyError('Invalid proposal type');
@@ -482,7 +522,6 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     let hasVotedVeto;
     let hasVotedForAnyChoice;
     let hasVotedRemove;
-    const hasVotedForChoice = {};
     if (proposal instanceof SubstrateDemocracyProposal) {
       hasVotedYes = proposal.getVotes().filter((vote) => {
         return vote.account.address === user.address;
@@ -504,9 +543,11 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         .filter((vote) => vote.choice === MolochVote.NO && vote.account.address === user.address).length > 0;
     } else if (proposal instanceof CompoundProposal) {
       hasVotedYes = user && proposal.getVotes()
-        .filter((vote) => vote.choice === CompoundVote.YES && vote.account.address === user.address).length > 0;
+        .filter((vote) => vote.choice === BravoVote.YES && vote.account.address === user.address).length > 0;
       hasVotedNo = user && proposal.getVotes()
-        .filter((vote) => vote.choice === CompoundVote.NO && vote.account.address === user.address).length > 0;
+        .filter((vote) => vote.choice === BravoVote.NO && vote.account.address === user.address).length > 0;
+      hasVotedAbstain = user && proposal.getVotes()
+        .filter((vote) => vote.choice === BravoVote.ABSTAIN && vote.account.address === user.address).length > 0;
     } else if (proposal instanceof AaveProposal) {
       hasVotedYes = user && proposal.getVotes()
         .find((vote) => vote.choice && vote.account.address === user.address);
@@ -531,15 +572,15 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     } else if (proposal instanceof MolochProposal && proposal.state !== MolochProposalState.Voting) {
       canVote = false;
     } else if (proposal instanceof CompoundProposal && proposal.state !== CompoundTypes.ProposalState.Active) {
-      canVote = false; // TODO: Fix proposal.state function above to not return promise
+      canVote = false;
     } else if (proposal instanceof NearSputnikProposal
       && (proposal.data.status !== NearSputnikProposalStatus.InProgress || hasVotedForAnyChoice)) {
       canVote = false;
     } else if (hasVotedForAnyChoice) {
       // enable re-voting for particular types
       if (proposal instanceof SubstratePhragmenElection
-          || proposal instanceof SubstrateDemocracyProposal
-          || proposal instanceof SubstrateCollectiveProposal) {
+        || proposal instanceof SubstrateDemocracyProposal
+        || proposal instanceof SubstrateCollectiveProposal) {
         canVote = true;
       } else {
         canVote = false;
@@ -657,7 +698,10 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
       votingActionObj = [
         m('.button-row', multiDepositApproveButton),
-        m(ProposalExtensions, { proposal }),
+        m(ProposalExtensions, {
+          proposal,
+          setCosmosDepositAmount: (c) => { vnode.state.amount = c; },
+        }),
       ];
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       votingActionObj = [
@@ -671,21 +715,33 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
       ];
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       votingActionObj = [
-        [ m('.button-row', [
+        [m('.button-row', [
           yesButton,
           noButton,
           /* sponsorButton, */
           processButton,
           m(CancelButton, { proposal, votingModalOpen, user, onModalClose })
         ]),
-        m(ProposalExtensions, { proposal }) ]
+        m(ProposalExtensions, { proposal })]
       ];
     } else if (proposal.votingType === VotingType.CompoundYesNo) {
       votingActionObj = [
         m('.button-row', [
           yesButton,
           noButton,
-          /** executeButton, queueButton, */
+          // m(QueueButton, { proposal, votingModalOpen }),
+          // m(ExecuteButton, { proposal, votingModalOpen }),
+          m(CancelButton, { proposal, votingModalOpen, user, onModalClose })
+        ])
+      ];
+    } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
+      votingActionObj = [
+        m('.button-row', [
+          yesButton,
+          noButton,
+          abstainButton,
+          // m(QueueButton, { proposal, votingModalOpen }),
+          // m(ExecuteButton, { proposal, votingModalOpen }),
           m(CancelButton, { proposal, votingModalOpen, user, onModalClose })
         ])
       ];

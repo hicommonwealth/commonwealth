@@ -32,7 +32,7 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           (proposal.chain || proposal.community) && [
             ' on a ',
             link(
-              'a.link-normal', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
+              'a.link-bold', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
               ((proposal instanceof OffchainThread) ? 'thread' : 'proposal'), {},
               `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
             ),
