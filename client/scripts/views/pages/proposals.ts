@@ -30,6 +30,7 @@ import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
+import { CommunityOptionsPopover } from './discussions';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
