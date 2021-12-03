@@ -11,6 +11,7 @@ import CommunityMetadataManagementTable from './community_metadata_management_ta
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
+import { CommunityOptionsPopover } from '../discussions';
 
 const ManageCommunityPage: m.Component<
   {},
@@ -120,7 +121,9 @@ const ManageCommunityPage: m.Component<
 
     return m(Sublayout, {
       class: 'ManageCommunityPage',
-      title: 'Manage Community',
+      title: [
+        'Manage Community',
+      ],
       showNewProposalButton: true,
     }, [
       m('.manage-community-wrapper', [
