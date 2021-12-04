@@ -5,6 +5,7 @@ import _ from 'lodash';
 import app from 'state';
 import { ProfileStore } from 'stores';
 import { Profile } from 'models';
+import { Boolean } from 'aws-sdk/clients/appstream';
 
 class ProfilesController {
   private _store: ProfileStore = new ProfileStore();
