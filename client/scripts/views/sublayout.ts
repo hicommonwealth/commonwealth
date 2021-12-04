@@ -72,7 +72,7 @@ const Sublayout: m.Component<{
           title && m('span.breadcrumb', m.trust('/')), 
           title,
           m(CommunityOptionsPopover),
-        ]), 
+        ])
       ] : community ? [
         m('.ChainIcon', [
           link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
@@ -85,7 +85,8 @@ const Sublayout: m.Component<{
           ]),
           community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           title && m('span.breadcrumb', m.trust('/')),
-          title
+          title,
+          m(CommunityOptionsPopover),
         ]),
       ] : alwaysShowTitle ? [
         m('h4.sublayout-header-heading.no-chain-or-community', title)
