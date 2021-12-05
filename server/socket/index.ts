@@ -11,7 +11,10 @@ import http from 'http';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig'
-import { JWT_SECRET } from '../config';
+import { JWT_SECRET, NODE_ENV } from '../config';
+import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 
 const origin = process.env.SERVER_URL || "http://localhost:8080"
 
@@ -59,14 +62,23 @@ export function setupWebSocketServer(httpServer: http.Server) {
 		auth: false,
 	})
 
-	const rabbitController = new RabbitMQController(<BrokerConfig>RabbitMQConfig)
-	rabbitController.init()
-		.then(() => {
-			return rabbitController.startSubscription(publishToCERoom.bind(ceNamespace),
-				'ChainEventsNotificationsSubscription')
-		})
-
-	return { io, rabbitController }
+	try {
+		const rabbitController = new RabbitMQController(<BrokerConfig>RabbitMQConfig)
+		rabbitController.init()
+			.then(() => {
+				return rabbitController.startSubscription(publishToCERoom.bind(ceNamespace),
+					'ChainEventsNotificationsSubscription')
+			})
+	} catch (e) {
+		if (NODE_ENV === 'dev') {
+			log.warn('Failure connecting to local RabbitMQ server. Please ensure it is installed and running correctly.');
+			log.warn('WebSocket notifications will not work without initializing a RabbitMQ server.');
+			log.error(e);
+		} else {
+			log.warn("Failure connecting to production RabbitMQ server. Please fix the RabbitMQ server configuration");
+			log.error(e);
+		}
+	}
 }
 
 

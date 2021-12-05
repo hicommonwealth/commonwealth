@@ -9,7 +9,7 @@ const setupServer = (app: Express) => {
   const port = process.env.PORT || DEFAULT_PORT;
   app.set('port', port);
   const server = http.createServer(app);
-  const { io, rabbitController } = setupWebSocketServer(server);
+  setupWebSocketServer(server);
 
   const onError = (error) => {
     if (error.syscall !== 'listen') {
