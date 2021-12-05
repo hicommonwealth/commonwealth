@@ -4,6 +4,7 @@ import m, { Vnode } from 'mithril';
 import app from 'state';
 import { EmptyState, Button, Icon, Icons, Grid, Col, Spinner } from 'construct-ui';
 import { link } from 'helpers';
+import { ITokenAdapter } from 'models';
 
 import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
@@ -13,8 +14,8 @@ import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
-import Token from 'controllers/chain/ethereum/token/adapter';
 import { SearchBar } from './components/search_bar';
+import { CommunityOptionsPopover } from './pages/discussions';
 
 const Sublayout: m.Component<{
   // overrides
@@ -33,6 +34,7 @@ const Sublayout: m.Component<{
   hideSearch?: boolean,
   centerGrid?: boolean,
   alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
+  useQuickSwitcher?: boolean,         // show quick switcher only, without the rest of the sidebar
 }, {
   modalAutoTriggered: boolean
 }> = {
@@ -47,6 +49,7 @@ const Sublayout: m.Component<{
       hideSidebar,
       hideSearch,
       alwaysShowTitle,
+      useQuickSwitcher
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
@@ -66,9 +69,10 @@ const Sublayout: m.Component<{
         ]),
         m('h4.sublayout-header-heading', [
           link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
-          title && m('span.breadcrumb', m.trust('/')),
-          title
-        ]),
+          title && m('span.breadcrumb', m.trust('/')), 
+          title,
+          m(CommunityOptionsPopover),
+        ])
       ] : community ? [
         m('.ChainIcon', [
           link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
@@ -81,7 +85,8 @@ const Sublayout: m.Component<{
           ]),
           community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           title && m('span.breadcrumb', m.trust('/')),
-          title
+          title,
+          m(CommunityOptionsPopover),
         ]),
       ] : alwaysShowTitle ? [
         m('h4.sublayout-header-heading.no-chain-or-community', title)
@@ -137,7 +142,7 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : (app.isLoggedIn() && (app.chain as Token)?.isToken && !app.user.activeAccount)
+            : (app.isLoggedIn() && ITokenAdapter.instanceOf(app.chain) && !app.user.activeAccount)
               ? m('.sublayout-hero.token-banner', [
                 m('.token-banner-content', `Link an address that holds ${chain.symbol} to participate in governance.`),
               ]) : '',
@@ -155,8 +160,8 @@ const Sublayout: m.Component<{
             ]) : '',
           m('.sublayout-body', [
             m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
-              !hideSidebar && m('.sublayout-sidebar-col', [
-                m(Sidebar),
+              !hideSidebar && m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
+                m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
               ]),
               m('.sublayout-main-col', {
                 class: !rightContent && 'no-right-content'

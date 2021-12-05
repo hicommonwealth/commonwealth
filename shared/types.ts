@@ -89,6 +89,7 @@ export enum ChainNetwork {
   SolanaDevnet = 'solana-devnet',
   SolanaTestnet = 'solana-testnet',
   Solana = 'solana',
+  SPL = 'spl', // solana token
 }
 
 export enum WebsocketEventType {

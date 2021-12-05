@@ -1,4 +1,5 @@
 import 'pages/discussions/index.scss';
+import 'components/dropdown_icon.scss';
 
 import $ from 'jquery';
 import _ from 'lodash';
@@ -28,6 +29,7 @@ import {
   CommunityInfo,
   OffchainThreadStage,
   OffchainThread,
+  ITokenAdapter,
 } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -40,7 +42,6 @@ import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicThresholdsModal from 'views/modals/edit_topic_thresholds_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
-import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
@@ -63,23 +64,38 @@ const getLastSeenDivider = (hasText = true) => {
   );
 };
 
-export const CommunityOptionsPopover: m.Component<
-  { isAdmin: boolean; isMod: boolean },
-  {}
-> = {
+export const CommunityOptionsPopover: m.Component<{}> = {
   view: (vnode) => {
-    const { isAdmin, isMod } = vnode.attrs;
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+    });
     if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
+
+    // add extra width to compensate for an icon that isn't centered inside its boundaries
+    const DropdownIcon = m('.dropdown-wrapper',
+    [
+      m(Icon, {
+        name: Icons.CHEVRON_DOWN,
+      }),
+      m('.dropdown-spacer', {})
+    ]);
+
+
     return m(PopoverMenu, {
       class: 'community-options-popover',
       position: 'bottom',
       transitionDuration: 0,
       hoverCloseDelay: 0,
       closeOnContentClick: true,
-      trigger: m(Icon, {
-        name: Icons.CHEVRON_DOWN,
-        style: 'margin-left: 6px;',
-      }),
+      trigger: DropdownIcon,
       content: [
         isAdmin &&
           m(MenuItem, {
@@ -89,8 +105,7 @@ export const CommunityOptionsPopover: m.Component<
               app.modals.create({ modal: NewTopicModal });
             },
           }),
-        isAdmin &&
-          (app.chain as Token)?.isToken &&
+        isAdmin && ITokenAdapter.instanceOf(app.chain) &&
           m(MenuItem, {
             label: 'Edit topic thresholds',
             onclick: (e) => {
@@ -553,9 +568,6 @@ const DiscussionsPage: m.Component<
             .filter((t) => t.pinned),
           chainId: app.activeChainId(),
           pinned: true,
-        })
-        .then(() => {
-          console.log('fetched');
         });
     }
 
@@ -742,17 +754,6 @@ const DiscussionsPage: m.Component<
     const postsDepleted =
       allThreads.length > 0 && vnode.state.postsDepleted[subpage];
 
-    const isAdmin =
-      app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
-        chain: app.activeChainId(),
-        community: app.activeCommunityId(),
-      });
-    const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-    });
 
     return m(
       Sublayout,
@@ -760,8 +761,6 @@ const DiscussionsPage: m.Component<
         class: 'DiscussionsPage',
         title: [
           'Discussions',
-          (isAdmin || isMod || app.community?.meta.invitesEnabled) &&
-            m(CommunityOptionsPopover, { isAdmin, isMod }),
         ],
         description: topicDescription,
         showNewProposalButton: true,

@@ -34,10 +34,7 @@ const getTokenForum = async (
     }
   }
 
-  if (!token) {
-    if (req.query.allowUncached) {
-      return res.json({ status: 'Success', result: { chain: null, node: null } });
-    }
+  if (!token && !req.query.allowUncached) {
     return res.json({ status: 'Failure', message: 'Token does not exist' });
   }
 
@@ -50,35 +47,40 @@ const getTokenForum = async (
       // Account returns 0x, Smart contract returns bytecode
       return res.json({ status: 'Failure', message: 'Must provide contract address' });
     }
-    const result = await sequelize.transaction(async (t) => {
-      const [ chain ] = await models.Chain.findOrCreate({
-        where: { id: token.id },
-        defaults: {
-          active: true,
-          network: ChainNetwork.ERC20,
-          type: ChainType.Token,
-          icon_url: token.icon_url,
-          symbol: token.symbol,
-          name: token.name,
-          decimals: token.decimals,
-          base: ChainBase.Ethereum,
-          has_chain_events_listener: false,
-        },
-        transaction: t,
+    if (req.query.autocreate) {
+      const result = await sequelize.transaction(async (t) => {
+        const [chain] = await models.Chain.findOrCreate({
+          where: { id: token.id },
+          defaults: {
+            active: true,
+            network: ChainNetwork.ERC20,
+            type: ChainType.Token,
+            icon_url: token.icon_url,
+            symbol: token.symbol,
+            name: token.name,
+            decimals: token.decimals,
+            base: ChainBase.Ethereum,
+            has_chain_events_listener: false,
+          },
+          transaction: t,
+        });
+        const [node] = await models.ChainNode.findOrCreate({
+          where: { chain: token.id },
+          defaults: {
+            chain: token.id,
+            url,
+            address: token.address,
+            eth_chain_id: chain_id,
+          },
+          transaction: t,
+        });
+        return { chain: chain.toJSON(), node: node.toJSON() };
       });
-      const [ node ] = await models.ChainNode.findOrCreate({
-        where: { chain: token.id },
-        defaults: {
-          chain: token.id,
-          url,
-          address: token.address,
-          eth_chain_id: chain_id,
-        },
-        transaction: t,
-      });
-      return { chain: chain.toJSON(), node: node.toJSON() };
-    });
-    return res.json({ status: 'Success', result });
+      return res.json({ status: 'Success', result });
+    } else {
+      // only return token data if we do not autocreate
+      return res.json({ status: 'Success', token: token ? token.toJSON() : {} });
+    }
   } catch (e) {
     log.error(e.message);
     return res.json({ status: 'Failure', message: 'Failed to find or create chain' });

@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { Account, IAccountsModule, ITXModalData } from 'models';
+import { Account, IAccountsModule } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import { IApp } from 'state';
 import { AccountsStore } from 'stores';
@@ -41,10 +41,6 @@ export class NearAccount extends Account<NearToken> {
         return this._Chain.coins(s.amount, false);
       }
     );
-  }
-
-  public sendBalanceTx(recipient: NearAccount, amount: NearToken): ITXModalData {
-    throw new Error('tx not supported on NEAR protocol');
   }
 
   public async signMessage(message: string): Promise<string> {

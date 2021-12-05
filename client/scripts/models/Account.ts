@@ -3,7 +3,6 @@ import app, { IApp } from 'state';
 import { Coin } from 'adapters/currency';
 import { ChainBase, ChainType } from 'types';
 
-import { ITXModalData } from './interfaces';
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
 
@@ -15,7 +14,6 @@ abstract class Account<C extends Coin> {
   public readonly ghost_address: ChainBase;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
-  public abstract sendBalanceTx(recipient: Account<C>, amount: C): Promise<ITXModalData> | ITXModalData;
   public abstract signMessage(message: string): Promise<string>;
   protected abstract addressFromMnemonic(mnemonic: string): Promise<string>;
   protected abstract addressFromSeed(seed: string): Promise<string>;
