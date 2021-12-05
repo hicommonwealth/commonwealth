@@ -68,8 +68,27 @@ export default class extends IEventHandler {
           return this._rabbitMqController.publish(x, 'ChainEventsNotificationsPublication')
         }
       )
+      
+      // polyfill
+      if (!Promise.allSettled) {
+        Promise.allSettled = promises =>
+          Promise.all(
+            promises.map((promise, i) =>
+              promise
+                .then(value => ({
+                  status: "fulfilled",
+                  value,
+                }))
+                .catch(reason => ({
+                  status: "rejected",
+                  reason,
+                }))
+            )
+          );
+      }
+      
       const results = Promise.allSettled(promises)
-      // TODO: how to react to publishing failure
+      
       log.trace(`Emitted ${dbNotifications.length} notifications.`);
 
       return dbEvent;
