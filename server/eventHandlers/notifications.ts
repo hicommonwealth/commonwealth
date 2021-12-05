@@ -70,8 +70,8 @@ export default class extends IEventHandler {
       )
       
       // polyfill
-      if (!Promise.allSettled) {
-        Promise.allSettled = promises =>
+      if (!(<any>Promise).allSettled) {
+        (<any>Promise).allSettled = promises =>
           Promise.all(
             promises.map((promise, i) =>
               promise
@@ -87,7 +87,7 @@ export default class extends IEventHandler {
           );
       }
       
-      const results = Promise.allSettled(promises)
+      const results = (<any>Promise).allSettled(promises)
       
       log.trace(`Emitted ${dbNotifications.length} notifications.`);
 
