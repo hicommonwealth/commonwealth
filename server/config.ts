@@ -15,7 +15,7 @@ export const SERVER_URL =
                              'https://commonwealth.im' :
                              'http://localhost:8080');
 
-export const NODE_ENV = process.env.NODE_ENV || 'dev';
+export const NODE_ENV = process.env.NODE_ENV || 'development';
 
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
