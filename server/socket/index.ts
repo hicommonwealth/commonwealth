@@ -43,17 +43,18 @@ export function setupWebSocketServer(httpServer: http.Server) {
 	io.use(authenticate);
 
 	io.on('connection', (socket) => {
-		console.log(`${socket.id} connected`)
+		log.trace(`${socket.id} connected`)
 		socket.on('disconnect', () => {
-			console.log(`${socket.id} disconnected`);
+			log.trace(`${socket.id} disconnected`);
 		});
 	});
 
 	io.engine.on('connection_error', (err) => {
-		console.log(err.req);      // the request object
-		console.log(err.code);     // the error code, for example 1
-		console.log(err.message);  // the error message, for example "Session ID unknown"
-		console.log(err.context);  // some additional error context
+		// log.error(err.req);      // the request object
+		// console.log(err.code);     // the error code, for example 1
+		// console.log(err.message);  // the error message, for example "Session ID unknown"
+		// console.log(err.context);  // some additional error context
+		log.error("A WebSocket connection error has occurred", err)
 	})
 
 // create the chain-events namespace
@@ -64,7 +65,12 @@ export function setupWebSocketServer(httpServer: http.Server) {
 		auth: false,
 	})
 
-	const pool = new Pool({ connectionString: DATABASE_URI })
+	const pool = new Pool({
+		connectionString: DATABASE_URI,
+		ssl: {
+			rejectUnauthorized: false,
+		},
+	})
 	pool.query(`
   CREATE TABLE IF NOT EXISTS socket_io_attachments (
       id          bigserial UNIQUE,
@@ -74,8 +80,7 @@ export function setupWebSocketServer(httpServer: http.Server) {
 `).then((res) => {
 		log.info('Socket.io query successful')
 	}).catch((e) => {
-		log.error(e)
-		log.error("Postgres Adapter will not work so cross server websocket rooms will not be available.")
+		log.error("Postgres Adapter will not work so cross server websocket rooms will not be available.", e)
 	})
 
 	// @ts-ignore
