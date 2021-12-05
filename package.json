@@ -25,7 +25,6 @@
     "start": "NODE_OPTIONS=--max_old_space_size=4096 nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'ts-node --project server/tsconfig.json' server.ts",
     "start-consumer": "ts-node --project server/tsconfig.json server/scripts/chainEventsConsumer.ts",
     "start-dbNode": "WORKER_NUMBER=0 NUM_WORKERS=1 ts-node --project server/tsconfig.json server/scripts/dbNode.ts",
-    "start-websocket": "ts-node --project server/tsconfig.json server/socket/index.ts",
     "start-prerender": "ts-node --project tsconfig.node.json server/scripts/runPrerenderService.ts",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.node.json server.ts",
     "migrate-events": "ENTITY_MIGRATION=all ts-node --project tsconfig.node.json server/scripts/migrateChainEntities.ts",
