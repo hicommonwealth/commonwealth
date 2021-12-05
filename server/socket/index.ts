@@ -71,7 +71,12 @@ export function setupWebSocketServer(httpServer: http.Server) {
       created_at  timestamptz DEFAULT NOW(),
       payload     bytea
   );
-`);
+`).then((res) => {
+		log.info('Socket.io query successful')
+	}).catch((e) => {
+		log.error(e)
+		log.error("Postgres Adapter will not work so cross server websocket rooms will not be available.")
+	})
 
 	// @ts-ignore
 	io.adapter(createAdapter(pool));
