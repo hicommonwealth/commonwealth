@@ -8,7 +8,6 @@ import passport from 'passport';
 import session from 'express-session';
 import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
-import WebSocket from 'ws';
 
 import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
@@ -42,7 +41,6 @@ const tokenBalanceCache = new TokenBalanceCache(
   0,
   mockTokenBalanceProvider
 );
-const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
 const sessionStore = new SequelizeStore({
@@ -73,12 +71,6 @@ app.use(cookieParser());
 app.use(sessionParser);
 app.use(passport.initialize());
 app.use(passport.session());
-
-// store wss into request obj
-app.use((req, res, next) => {
-  req['wss'] = wss;
-  next();
-});
 
 const resetServer = (debug = false): Promise<void> => {
   if (debug) console.log('Resetting database...');
