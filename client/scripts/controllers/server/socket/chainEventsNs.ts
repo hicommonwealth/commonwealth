@@ -8,8 +8,8 @@ export class ChainEventsNamespace {
 	private ceNs;
 	private _isConnected = false;
 
-	constructor(domain: string) {
-		this.ceNs = io(`${domain}/${WebsocketNamespaces.ChainEvents}`, {transports: ['websocket']});
+	constructor() {
+		this.ceNs = io(`/${WebsocketNamespaces.ChainEvents}`, {transports: ['websocket']});
 		this.ceNs.on('connect', this.onconnect.bind(this));
 		this.ceNs.on('disconnect', this.ondisconnect.bind(this))
 		this.ceNs.on(WebsocketMessageType.ChainEventNotification, this.onChainEvent.bind(this))

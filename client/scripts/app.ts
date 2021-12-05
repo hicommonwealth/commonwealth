@@ -103,7 +103,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
 
       if (!app.socket && app.loginState === LoginState.LoggedIn) {
-        app.socket = new WebSocketController("ws://localhost:3002", app.user.jwt);
+        app.socket = new WebSocketController(app.user.jwt);
         app.user.notifications.refresh().then(() => m.redraw());
       } else if (app.socket && app.loginState === LoginState.LoggedOut) {
         app.socket.disconnect();
@@ -871,7 +871,7 @@ Promise.all([
         app.user.notifications.refresh().then(() => m.redraw());
         // grab all discussion drafts
         app.user.discussionDrafts.refreshAll().then(() => m.redraw());
-        app.socket = new WebSocketController("ws://localhost:3002", app.user.jwt);
+        app.socket = new WebSocketController(app.user.jwt);
       }
 
       handleInviteLinkRedirect();

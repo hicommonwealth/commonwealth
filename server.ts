@@ -4,7 +4,6 @@ import express from 'express';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import SessionSequelizeStore from 'connect-session-sequelize';
-import WebSocket from 'ws';
 import fs from 'fs';
 
 import passport from 'passport';
@@ -187,7 +186,6 @@ async function main() {
           publicPath: '/build',
         })
       : null;
-  const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const closeMiddleware = (): Promise<void> => {
@@ -272,12 +270,6 @@ async function main() {
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
-
-    // store wss into request obj
-    app.use((req: express.Request, res, next) => {
-      req.wss = wss;
-      next();
-    });
   };
 
   const templateFile = (() => {
@@ -321,7 +313,7 @@ async function main() {
       process.exit(exitCode);
     }
   }
-  setupServer(app, wss, sessionParser);
+  setupServer(app);
 }
 
 main();
