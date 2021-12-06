@@ -8,6 +8,7 @@ import app from 'state';
 import PageLoading from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import Sublayout from 'views/sublayout';
+import { CommunityOptionsPopover } from './discussions';
 
 const StatsTable: m.Component<{ data }, {}> = {
   view: (vnode) => {

@@ -157,7 +157,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
             vnode.state.saving = true;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
-                url,
+                node_url: url,
                 id,
                 name,
                 description,

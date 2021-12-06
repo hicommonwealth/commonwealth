@@ -6,7 +6,7 @@ import { Account, IChainAdapter } from '.';
 // See controller/ethereum/tokenAdapter for example usage
 export default abstract class ITokenAdapter extends IChainAdapter<Coin, Account<Coin>> {
   public readonly contractAddress: string;
-  public contractApi: unknown; // type-specific by implementation
+  public contractApi?: unknown; // type-specific by implementation
   public hasToken = false;
   public tokenBalance: BN = new BN(0);
 

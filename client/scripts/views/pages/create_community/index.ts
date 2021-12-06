@@ -11,6 +11,7 @@ import SubstrateForm from './substrate_form';
 import SputnikForm from './sputnik_form';
 import CosmosForm from './cosmos_form';
 import EthDaoForm from './eth_dao_form';
+import SplTokenForm from './spl_token_form';
 import { EthChainAttrs } from './chain_input_rows';
 
 enum CommunityType {
@@ -20,6 +21,7 @@ enum CommunityType {
   SputnikDao = 'Sputnik (V2)',
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
+  SplToken = 'Solana Token',
 }
 
 const ADMIN_ONLY_TABS = [
@@ -79,6 +81,8 @@ const CreateCommunity: m.Component<
           return m(CosmosForm);
         case CommunityType.EthDao:
           return m(EthDaoForm, { ethChains, ethChainNames });
+        case CommunityType.SplToken:
+          return m(SplTokenForm);
         default:
           throw new Error(`Invalid community type: ${vnode.state.activeForm}`)
       }

@@ -79,17 +79,11 @@ const MembersPage : m.Component<
       });
     }
 
-    const isAdmin = app.user.isSiteAdmin
-    || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
-    const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
-    });
 
     if (!vnode.state.membersLoaded) return m(PageLoading, {
       message: 'Loading members',
       title: [
         'Members',
-        m(CommunityOptionsPopover, { isAdmin, isMod }),
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,
@@ -161,7 +155,6 @@ const MembersPage : m.Component<
       class: 'MembersPage',
       title: [
         'Members',
-        m(CommunityOptionsPopover, { isAdmin, isMod }),
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
       ],
       showNewProposalButton: true,

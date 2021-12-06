@@ -253,13 +253,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/cosmos/main'
     )).default;
     newChain = new Cosmos(n, app);
-  } else if (n.chain.base === ChainBase.Solana) {
-    const Solana = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "solana-main" */
-      './controllers/chain/solana/main'
-    )).default;
-    newChain = new Solana(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */
@@ -305,12 +298,26 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Aave(n, app);
   } else if (n.chain.network === ChainNetwork.ERC20) {
-    const Token = (await import(
+    const ERC20 = (await import(
     //   /* webpackMode: "lazy" */
-    //   /* webpackChunkName: "token-main" */
+    //   /* webpackChunkName: "erc20-main" */
       './controllers/chain/ethereum/tokenAdapter'
     )).default;
-    newChain = new Token(n, app);
+    newChain = new ERC20(n, app);
+  } else if (n.chain.network === ChainNetwork.SPL) {
+    const SPL = (await import(
+      //   /* webpackMode: "lazy" */
+      //   /* webpackChunkName: "spl-main" */
+      './controllers/chain/solana/tokenAdapter'
+    )).default;
+    newChain = new SPL(n, app);
+  } else if (n.chain.base === ChainBase.Solana) {
+    const Solana = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "solana-main" */
+      './controllers/chain/solana/main'
+    )).default;
+    newChain = new Solana(n, app);
   } else if (n.chain.network === ChainNetwork.Commonwealth) {
     const Commonwealth = (await import(
       /* webpackMode: "lazy" */
