@@ -33,9 +33,19 @@ interface ProfileInfo {
 }
 
 
-const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[], 
-  profilesLoaded: ProfileInfo[], profilesFinishedLoading: boolean, numProfilesLoaded: number, 
-  initialProfilesLoaded: boolean, onscroll: any }> = {
+const MembersPage : m.Component<
+  {}, 
+  { 
+    membersRequested: boolean, 
+    membersLoaded: MemberInfo[], 
+    profilesLoaded: ProfileInfo[], 
+    profilesFinishedLoading: boolean, 
+    numProfilesLoaded: number, 
+    initialProfilesLoaded: boolean, 
+    initialScrollFinished: boolean,
+    onscroll: any 
+  }
+> = {
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading, {
@@ -49,7 +59,6 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
 
      // get members once
     const activeInfo = app.community ? app.community.meta : app.chain.meta.chain;
-
     if (!vnode.state.membersRequested) {
       vnode.state.membersRequested = true;
       activeInfo.getMembers(activeInfo.id).then(() => {
@@ -67,14 +76,6 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
         });
         vnode.state.membersLoaded = membersActive.concat(membersInactive).sort((a, b) => b.count - a.count);
         m.redraw();
-
-        // restore scroll position
-        if (app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
-            && localStorage[`${app.activeId()}-members-scrollY`]) {
-          setTimeout(() => {
-            window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
-          }, 100);
-        }
       });
     }
 
@@ -94,24 +95,46 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
       showNewProposalButton: true,
     });
 
-    if (!vnode.state.initialProfilesLoaded) {
-      vnode.state.initialProfilesLoaded = true
-      vnode.state.numProfilesLoaded = Math.min(DEFAULT_MEMBER_SIZE, vnode.state.membersLoaded.length);
-      vnode.state.profilesFinishedLoading = false;
+    const navigatedFromAccount = app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
+    && localStorage[`${app.activeId()}-members-scrollY`]
 
-      let profileInfos: ProfileInfo[] = vnode.state.membersLoaded.splice(0, vnode.state.numProfilesLoaded).map((member) => {
+    // Load default number of profiles on mount
+    if (!vnode.state.initialProfilesLoaded) {
+      vnode.state.initialScrollFinished = false
+      vnode.state.initialProfilesLoaded = true
+
+      // Set initial number loaded (contingent on navigation)
+      if (navigatedFromAccount) {
+        vnode.state.numProfilesLoaded = Math.min(Number(localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`]))
+      } else {
+        vnode.state.numProfilesLoaded = Math.min(DEFAULT_MEMBER_SIZE, vnode.state.membersLoaded.length);
+      }
+      vnode.state.profilesFinishedLoading = vnode.state.numProfilesLoaded >= vnode.state.membersLoaded.length;
+
+      let profileInfos: ProfileInfo[] = vnode.state.membersLoaded.slice(0, vnode.state.numProfilesLoaded).map((member) => {
         return {profile: app.profiles.getProfile(member.chain, member.address), postCount: member.count}
       })
 
       vnode.state.profilesLoaded = profileInfos;
     }
 
+    // Check if all profiles have been loaded
     if (!vnode.state.profilesFinishedLoading) {
       if (vnode.state.profilesLoaded.length >= vnode.state.membersLoaded.length) {
         vnode.state.profilesFinishedLoading = true
       }
     }
-        
+
+    // Return to correct scroll position upon redirect from accounts page
+    if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
+      vnode.state.initialScrollFinished = true
+      setTimeout(() => {
+        window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
+      }, 100);
+    }
+
+    // Infinite Scroll 
+    $(window).off('scroll');    
     vnode.state.onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
@@ -124,14 +147,14 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
           for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
             const member = vnode.state.membersLoaded[i];
             const profileInfo: ProfileInfo = {profile: app.profiles.getProfile(member.chain, member.address), postCount: member.count}
-            vnode.state.profilesLoaded.push(profileInfo)
+            vnode.state.profilesLoaded.push(profileInfo);
           }
 
           vnode.state.numProfilesLoaded += newBatchSize
+          m.redraw();
         }
       } 
     }, 400)
-
     $(window).on('scroll', vnode.state.onscroll)
 
     return m(Sublayout, {
@@ -157,6 +180,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
                   onclick: (e) => {
                     e.preventDefault();
                     localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
+                    localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`] = vnode.state.numProfilesLoaded;
                     navigateToSubpage(`/account/${profileInfo.profile.address}?base=${profileInfo.profile.chain}`);
                   }
                 }, [
@@ -166,7 +190,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
               m('td.align-right', profileInfo.postCount),
             ]);
         })]),
-        m('.listing-wrap', [
+        m('div', [
           m('#infinite-scroll-wrapper', [
             vnode.state.profilesFinishedLoading ? 
             m('.infinite-scroll-reached-end', [
@@ -178,7 +202,6 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
                 size: 'lg',
               }),
             ])
-          
           ]),
         ])
        
