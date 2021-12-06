@@ -56,6 +56,11 @@ module.exports = {
           name: 'polkadot',
           chunks: 'all',
         },
+        solana: {
+          test: /[\\/]node_modules[\\/](@solana)[\\/]/,
+          name: 'solana',
+          chunks: 'all',
+        },
         snapshot: {
           test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
           name: 'snapshot',

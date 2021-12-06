@@ -1,8 +1,7 @@
 import { SubstrateTypes, CWEvent } from '@commonwealth/chain-events';
 import * as WebSocket from 'ws';
+import { BrokerConfig, SubscriberSessionAsPromised } from 'rascal';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-
-import { HANDLE_IDENTITY } from '../config';
 
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EventStorageHandler from '../eventHandlers/storage';
@@ -12,8 +11,9 @@ import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { ChainBase } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
-import { Consumer } from '../util/rabbitmq/consumer';
+import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import models from '../database';
+
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -108,21 +108,36 @@ const setupChainEventListeners = async (wss: WebSocket.Server): Promise<{}> => {
     }
   }
 
-  const consumer = new Consumer(RabbitMQConfig);
-  await consumer.init();
-
-  const eventsSubscriber = await consumer.consumeEvents(
-    processClassicEvents,
-    'eventsSub'
-  );
-
-  let identitySubscriber;
-  if (HANDLE_IDENTITY === 'publish') {
-    identitySubscriber = await consumer.consumeEvents(
-      processIdentityEvents,
-      'identitySub'
-    );
+  let consumer: RabbitMQController, eventsSubscriber: SubscriberSessionAsPromised, identitySubscriber: SubscriberSessionAsPromised;
+  try {
+    consumer = new RabbitMQController(<BrokerConfig>RabbitMQConfig);
+    await consumer.init();
+  } catch (e) {
+    log.error("Rascal consumer setup failed. Please check the Rascal configuration");
+    throw e
   }
+
+  try {
+    eventsSubscriber = await consumer.startSubscription(
+      processClassicEvents,
+      'ChainEventsHandlersSubscription'
+    );
+  } catch (e) {
+    log.info('Failure in ChainEventsHandlersSubscription');
+    throw e;
+  }
+
+
+  try {
+    identitySubscriber = await consumer.startSubscription(
+      processIdentityEvents,
+      'SubstrateIdentityEventsSubscription'
+    );
+  } catch (e) {
+    log.info('Failure in SubstrateIdentityEventsSubscription');
+    throw e;
+  }
+
 
   log.info('Consumer started');
   return { eventsSubscriber, identitySubscriber };
