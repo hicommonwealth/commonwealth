@@ -18,7 +18,9 @@ import PageLoading from 'views/pages/loading';
 import { ContentType } from 'controllers/server/search'
 import {
   ReplyIcon,
-  AccountIcon
+  AccountIcon,
+  IconIntent,
+  IconSize
 } from '../components/component_kit/icons';
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
@@ -36,7 +38,11 @@ export const getMemberResult = (addr, searchTerm) => {
   const userLink = `/${scope || addr.chain}/account/${addr.address}?base=${addr.chain}`;
 
   return m(ListItem, {
-    contentLeft: m(AccountIcon),
+    allowOnContentClick: true,
+    contentLeft: m(AccountIcon, {
+      size: IconSize.LG,
+      intent: IconIntent.Primary,
+    }),
     label: m('a.search-results-item', [
       m(UserBlock, {
         user: profile,
@@ -88,6 +94,11 @@ export const getDiscussionResult = (thread, searchTerm) => {
   if (app.isCustomDomain() && app.customDomainId() !== chainOrComm) return;
 
   return m(ListItem, {
+    allowOnContentClick: true,
+    contentLeft: m(ReplyIcon, {
+      size: IconSize.MD,
+      intent: IconIntent.Primary,
+    }),
     onclick: () => {
       m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
     },
@@ -126,7 +137,6 @@ export const getDiscussionResult = (thread, searchTerm) => {
         ])
       ]
     ),
-    contentLeft: m(ReplyIcon),
   });
 };
 
@@ -137,6 +147,11 @@ export const getCommentResult = (comment, searchTerm) => {
   if (app.isCustomDomain() && app.customDomainId() !== chainOrComm) return;
 
   return m(ListItem, {
+    allowOnContentClick: true,
+    contentLeft: m(ReplyIcon, {
+      size: IconSize.MD,
+      intent: IconIntent.Primary,
+    }),
     onclick: (e) => {
       m.route.set(`/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
     },
@@ -175,11 +190,16 @@ export const getCommentResult = (comment, searchTerm) => {
         ])
       ]
     ),
-    contentLeft: m(ReplyIcon),
   });
 };
 
-const getListing = (results: any, searchTerm: string, pageCount: number, sort: SearchSort, searchType?: SearchScope) => {
+const getListing = (
+  results: any,
+  searchTerm: string,
+  pageCount: number,
+  sort: SearchSort,
+  searchType?: SearchScope
+) => {
   if (Object.keys(results).length === 0 || !results[searchType]) return [];
   const tabScopedResults = (results[searchType])
     .sort((a, b) => {
