@@ -1,0 +1,20 @@
+@import 'client/styles/shared';
+
+.TokenDecimalInput {
+
+    .token-settings {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-left: 1px;
+
+    }
+
+    .switch-caption {
+        color: $text-color-light;
+        font-size: 0.94rem;
+    }
+
+}
+
