@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Web3 from 'web3';
+import * as solw3 from '@solana/web3.js';
+import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
@@ -114,6 +116,26 @@ const createChain = async (
     });
     if (existingChainNode) {
       return next(new Error(Errors.ChainAddressExists));
+    }
+  } else if (req.body.base === ChainBase.Solana) {
+    let pubKey: solw3.PublicKey;
+    try {
+      pubKey = new solw3.PublicKey(req.body.address);
+    } catch (e) {
+      return next(new Error(Errors.InvalidAddress));
+    }
+
+    try {
+      const clusterUrl = solw3.clusterApiUrl(url);
+      const connection = new solw3.Connection(clusterUrl);
+      const supply = await connection.getTokenSupply(pubKey);
+      const { decimals, amount } = supply.value;
+      req.body.decimals = decimals;
+      if (new BN(amount, 10).isZero()) {
+        throw new Error('Invalid supply amount');
+      }
+    } catch (e) {
+      return next(new Error(Errors.InvalidNodeUrl));
     }
   } else {
     if (!url || !url.trim()) {
