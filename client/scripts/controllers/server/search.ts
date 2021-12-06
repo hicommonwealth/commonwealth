@@ -78,11 +78,11 @@ class SearchContoller {
         })
 
         searchCache.results[SearchScope.Threads] = discussions
-        .map((discussion) => {
-            discussion.contentType = ContentType.Thread;
-            discussion.searchType = SearchScope.Threads;
-            return discussion;
-        })
+          .map((discussion) => {
+              discussion.contentType = ContentType.Thread;
+              discussion.searchType = SearchScope.Threads;
+              return discussion;
+          })
       }
 
       if (scope.includes(SearchScope.Members)){
@@ -93,12 +93,12 @@ class SearchContoller {
           )
 
         searchCache.results[SearchScope.Members] = addrs
-        .map((addr) => {
-            addr.contentType = ContentType.Member;
-            addr.searchType = SearchScope.Members;
-            return addr;
-        })
-        .sort(this.sortResults);
+          .map((addr) => {
+              addr.contentType = ContentType.Member;
+              addr.searchType = SearchScope.Members;
+              return addr;
+          })
+          .sort(this.sortResults);
       }
 
       if (scope.includes(SearchScope.Replies)) {

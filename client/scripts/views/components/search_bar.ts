@@ -481,51 +481,67 @@ export const SearchBar: m.Component<
       m(List, {
         class: 'search-results-list',
       }, [
-        activeCommunity ? [scopeTitle, m(ListItem, {
-          class: 'disabled',
-          label: m(Button, {
-            size: Size.LG,
-            onclick: () => { vnode.state.searchQuery.communityScope =
-              vnode.state.searchQuery.communityScope === activeCommunity
-              ? undefined : activeCommunity },
-            active: vnode.state.searchQuery.communityScope === activeCommunity,
-            onmouseover: () => {vnode.state.filterMenuActive = true},
-            onmouseout: () => {vnode.state.filterMenuActive = false},
-            label: `Search inside community: ${activeCommunity}`
-          }),
-        })] :
-        app.activeChainId() && [scopeTitle, m(ListItem, {
-          class: 'disabled',
-          label: m(Button, {
-            size: Size.LG,
-            onclick: () => { vnode.state.searchQuery.chainScope =
-              vnode.state.searchQuery.chainScope === activeChain
-              ? undefined : activeChain },
-            active: vnode.state.searchQuery.chainScope === activeChain ,
-            onmouseover: () => {vnode.state.filterMenuActive = true},
-            onmouseout: () => {vnode.state.filterMenuActive = false},
-            label: `Search inside chain: ${activeChain}`
-          }),
-        })],
+        activeCommunity
+          ? [
+              scopeTitle,
+              m(ListItem, {
+                class: 'disabled',
+                label: m(Button, {
+                  size: Size.LG,
+                  onclick: () => { vnode.state.searchQuery.communityScope =
+                    vnode.state.searchQuery.communityScope === activeCommunity
+                    ? undefined : activeCommunity },
+                  active: vnode.state.searchQuery.communityScope === activeCommunity,
+                  onmouseover: () => {vnode.state.filterMenuActive = true},
+                  onmouseout: () => {vnode.state.filterMenuActive = false},
+                  label: `Search inside community: ${activeCommunity}`
+                }),
+              })
+            ]
+          : app.activeChainId()
+            && [
+              scopeTitle,
+              m(ListItem, {
+                class: 'disabled',
+                label: m(Button, {
+                  size: Size.LG,
+                  onclick: () => { vnode.state.searchQuery.chainScope =
+                    vnode.state.searchQuery.chainScope === activeChain
+                    ? undefined : activeChain },
+                  active: vnode.state.searchQuery.chainScope === activeChain ,
+                  onmouseover: () => {vnode.state.filterMenuActive = true},
+                  onmouseout: () => {vnode.state.filterMenuActive = false},
+                  label: `Search inside chain: ${activeChain}`
+                }),
+              })
+            ],
         m(ListItem, {
           class: 'disabled',
           label: "I'm looking for: "
         }),
         m(ListItem, {
           class: 'disabled bottom-border search-filter-button-bar',
-          label: scopeButtons}),
-        vnode.state.searchTerm.length < 1 ?
-          historyList.length === 0
-          ? m(ListItem, {class: 'search-history-no-results',
-                         label: 'Enter a term into the field and press Enter to start' })
-          : [m(ListItem, {class: 'disabled', label: 'Search History' }), historyList]
+          label: scopeButtons
+        }),
+        vnode.state.searchTerm.length < 1
+          ? historyList.length === 0
+            ? m(ListItem, {
+              class: 'search-history-no-results',
+              label: 'Enter a term into the field and press Enter to start'
+            })
+            : [
+              m(ListItem, { class: 'disabled', label: 'Search History' }),
+              historyList
+            ]
           : !results || results?.length === 0
             ? app.search.getByQuery(searchQuery)?.loaded
-              ? m(ListItem, [m(emptySearchPreview, { searchTerm })])
+              ? m(ListItem, [
+                m(emptySearchPreview, { searchTerm })
+              ])
               : m(ListItem, { label: m(Spinner, { active: true }) })
             : vnode.state.isTyping
-            ? m(ListItem, { label: m(Spinner, { active: true }) })
-            : results
+              ? m(ListItem, { label: m(Spinner, { active: true }) })
+              : results
       ])
 
     const chainOrCommIcon = app.activeId()
