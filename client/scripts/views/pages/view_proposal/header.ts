@@ -20,6 +20,7 @@ import {
   OffchainThreadKind,
   OffchainThreadStage,
   AnyProposal,
+  ITokenAdapter,
 } from 'models';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -32,7 +33,6 @@ import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
 import LinkedThreadModal from '../../modals/linked_thread_modal';
-import Token from 'controllers/chain/ethereum/token/adapter';
 
 export const ProposalHeaderExternalLink: m.Component<{
   proposal: AnyProposal | OffchainThread;
@@ -103,9 +103,9 @@ export const ProposalHeaderOffchainPoll: m.Component<
         app.user.activeAccount.address
       );
 
-    const tokenThresholdFailed = (app.chain instanceof Token)
+    const tokenThresholdFailed = ITokenAdapter.instanceOf(app.chain)
       && proposal.topic.tokenThreshold?.gtn(0)
-        ? (app.chain as Token).tokenBalance.lt(proposal.topic.tokenThreshold)
+        ? app.chain.tokenBalance.lt(proposal.topic.tokenThreshold)
         : false;
 
     const vote = async (option, hasVoted, isSelected) => {

@@ -5,7 +5,7 @@ import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 import { getUrlForEthChainId } from '../util/supportedEthChains';
 
-import { ChainBase } from '../../shared/types';
+import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -32,6 +32,7 @@ export const Errors = {
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
+  NotAdmin: 'Must be admin',
 };
 
 const createChain = async (
@@ -42,6 +43,12 @@ const createChain = async (
 ) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
+  }
+  // require Admin privilege for creating Chain/DAO
+  if (req.body.type !== ChainType.Token) {
+    if (!req.user.isAdmin) {
+      return next(new Error(Errors.NotAdmin));
+    }
   }
   if (!req.body.name || !req.body.name.trim()) {
     return next(new Error(Errors.NoName));
@@ -83,6 +90,12 @@ const createChain = async (
     const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
     if (ethChainUrl) {
       url = ethChainUrl;
+    } else {
+      // If using overridden URL, then user must be admin -- we do not allow users to submit
+      // custom URLs yet.
+      if (!req.user.isAdmin) {
+        return next(new Error(Errors.NotAdmin));
+      }
     }
     if (!url) {
       return next(new Error(Errors.InvalidChainIdOrUrl));
@@ -151,6 +164,8 @@ const createChain = async (
     github: req.body.github,
     element: req.body.element,
     base: req.body.base,
+    bech32_prefix: req.body.bech32_prefix,
+    decimals: req.body.decimals,
   };
   const chain = await models.Chain.create(chainContent);
 
@@ -159,6 +174,7 @@ const createChain = async (
     url,
     address: req.body.address,
     eth_chain_id,
+    token_name: req.body.token_name,
   };
   const node = await models.ChainNode.create(chainNodeContent);
 

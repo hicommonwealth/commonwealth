@@ -241,7 +241,6 @@ const NotificationRow: m.Component<{
 
       if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
       const label = ChainEventLabel(chainId, chainEvent);
-      m.redraw();
 
       if (vnode.state.scrollOrStop) {
         setTimeout(() => {
@@ -279,8 +278,9 @@ const NotificationRow: m.Component<{
                   e.preventDefault();
                   e.stopPropagation();
                   vnode.state.scrollOrStop = true;
-                  app.user.notifications.clear([notification]);
-                  m.redraw();
+                  app.user.notifications.clear([notification]).then(() => {
+                    m.redraw();
+                  })
                 },
               })
             ]),
