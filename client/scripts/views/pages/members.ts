@@ -19,7 +19,7 @@ import { min } from 'underscore';
 import ConfirmSnapshotVoteModal from '../modals/confirm_snapshot_vote_modal';
 
 // The number of member profiles that are batch loaded
-const DEFAULT_MEMBER_SIZE = 20;
+const DEFAULT_MEMBER_REQ_SIZE = 20;
 
 interface MemberInfo {
   chain: string;
@@ -101,7 +101,7 @@ const MembersPage : m.Component<
       if (navigatedFromAccount) {
         vnode.state.numProfilesLoaded = Math.min(Number(localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`]))
       } else {
-        vnode.state.numProfilesLoaded = Math.min(DEFAULT_MEMBER_SIZE, vnode.state.membersLoaded.length);
+        vnode.state.numProfilesLoaded = Math.min(DEFAULT_MEMBER_REQ_SIZE, vnode.state.membersLoaded.length);
       }
       vnode.state.profilesFinishedLoading = vnode.state.numProfilesLoaded >= vnode.state.membersLoaded.length;
 
@@ -135,7 +135,7 @@ const MembersPage : m.Component<
       if (scrollPos > scrollHeight - 400) {
         if (!vnode.state.profilesFinishedLoading) {
           const lastLoadedProfileIndex = vnode.state.numProfilesLoaded
-          const newBatchSize = Math.min(DEFAULT_MEMBER_SIZE, vnode.state.membersLoaded.length - lastLoadedProfileIndex)
+          const newBatchSize = Math.min(DEFAULT_MEMBER_REQ_SIZE, vnode.state.membersLoaded.length - lastLoadedProfileIndex)
           const newBatchEnd = lastLoadedProfileIndex + newBatchSize;
           
           for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
@@ -183,22 +183,19 @@ const MembersPage : m.Component<
               m('td.align-right', profileInfo.postCount),
             ]);
         })]),
-        m('div', [
-          m('#infinite-scroll-wrapper', [
-            vnode.state.profilesFinishedLoading ? 
-            m('.infinite-scroll-reached-end', [
-              `Showing all ${vnode.state.membersLoaded.length} community members`,
-            ]) :
-            m('.infinite-scroll-spinner-wrap', [
-              m(Spinner, {
-                active: true,
-                size: 'lg',
-              }),
-            ])
-          ]),
-        ])
-       
-    ]);   
+        m('.infinite-scroll-wrapper', [
+          vnode.state.profilesFinishedLoading ? 
+          m('.infinite-scroll-reached-end', [
+            `Showing all ${vnode.state.membersLoaded.length} community members`,
+          ]) :
+          m('.infinite-scroll-spinner-wrap', [
+            m(Spinner, {
+              active: true,
+              size: 'lg',
+            }),
+          ])
+        ]),
+      ])
   }
 };
 
