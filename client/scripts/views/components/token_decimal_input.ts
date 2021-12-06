@@ -1,3 +1,5 @@
+import 'components/token_decimal_input.scss';
+
 import m from 'mithril';
 import { Switch, Input } from 'construct-ui';
 import { weiToTokens, tokensToWei } from 'helpers';
@@ -21,7 +23,7 @@ const TokenDecimalInput: m.Component<{
   },
   view: (vnode) => {
     const { onInputChange, decimals } = vnode.attrs;
-    return m('.div', [
+    return m('.TokenDecimalInput', [
       m(Input, {
         title: '',
         value: vnode.state.displayValue,
@@ -49,7 +51,7 @@ const TokenDecimalInput: m.Component<{
           }
         },
       }),
-      m('span.token-settings', [
+      m('.token-settings', [
         m(Switch, {
           title: '',
           defaultValue: vnode.state.isInputInWei,
