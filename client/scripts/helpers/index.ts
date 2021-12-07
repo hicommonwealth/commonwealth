@@ -366,19 +366,23 @@ export const removeOrAddClasslistToAllElements = (
   });
 };
 
-export const tokensToTokenBaseUnits = (input: string, decimals: number) : string => {
+export const tokensToWei = (input: string, decimals: number): string => {
   const value = new BigNumber(input);
   if (value.isNaN()) {
     throw new Error('Invalid input');
   }
-  const valueWei = new BN(value.multipliedBy((new BigNumber(10)).pow(decimals)).toString());
-  return valueWei.toString();
+  const exp = new BigNumber(10).pow(decimals);
+  const valueWei = value.multipliedBy(exp);
+  return valueWei.toFixed();
 };
 
-export const tokenBaseUnitsToTokens = (input: string, decimals: number) => {
+export const weiToTokens = (input: string, decimals: number) => {
   // input will always be positive whole number
-  const inputBn = new BN(input);
-  const dollarValue = (new BN(10)).pow(new BN(decimals));
-  const numericDecimal = +inputBn.div(dollarValue) + (+inputBn.mod(dollarValue) / +dollarValue);
-  return formatNumberLong(numericDecimal);
+  const value = new BigNumber(input);
+  if (value.isNaN()) {
+    throw new Error('Invalid input');
+  }
+  const exp = new BigNumber(10).pow(decimals);
+  const valueTokens = value.div(exp);
+  return valueTokens.toFixed();
 };
