@@ -72,7 +72,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     try {
       // enabling without version (i.e. cosmoshub instead of cosmoshub-4) should work
       this._chainId = app.chain.meta.chain.id;
-      console.log(app.chain.meta);
       try {
         await window.keplr.enable(this._chainId);
       } catch (err) {
