@@ -7,8 +7,6 @@ import $ from 'jquery';
 import { initAppState } from 'app';
 import { slugify } from 'utils';
 import { ChainBase, ChainType } from 'types';
-import { notifyError } from 'controllers/app/notifications';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import {
   InputPropertyRow
 } from 'views/components/metadata_rows';
