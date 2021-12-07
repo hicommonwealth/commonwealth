@@ -84,7 +84,6 @@ import {
   // ProposalHeaderLinkThreadsMenuItem,
 } from './header';
 import {
-  ProposalSidebarStageEditorModule,
   ProposalSidebarPollEditorModule,
   ProposalSidebarLinkedViewer,
   ProposalLinkedThreadsEditorModule,
