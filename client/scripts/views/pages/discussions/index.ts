@@ -207,7 +207,7 @@ const DiscussionFilterBar: m.Component<
             rounded: true,
             compact: true,
             class: 'topic-filter',
-            label: selectedTopic ? `Topic: ${topic}` : 'All Discussions',
+            label: selectedTopic ? `Topic: ${topic}` : 'All Topics',
             iconRight: Icons.CHEVRON_DOWN,
             size: 'sm',
             disabled,
@@ -224,7 +224,7 @@ const DiscussionFilterBar: m.Component<
                 m.route.get() === `/${app.activeId()}` || !topic
                   ? Icons.CHECK
                   : null,
-              label: 'All Discussions',
+              label: 'All Topics',
               onclick: () => {
                 localStorage.setItem('discussion-summary-toggle', 'false');
                 vnode.attrs.parentState.summaryView = false;
@@ -282,6 +282,7 @@ const DiscussionFilterBar: m.Component<
                           rounded: true,
                           onclick: (e) => {
                             e.preventDefault();
+                            e.stopPropagation();
                             app.modals.create({
                               modal: EditTopicModal,
                               data: {
