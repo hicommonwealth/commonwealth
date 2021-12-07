@@ -22,14 +22,11 @@ type CosmosFormAttrs = Record<string, unknown>;
 
 interface CosmosFormState extends ChainFormState {
   url: string;
-  endpointError: string;
   id: string;
   name: string;
   symbol: string;
   bech32_prefix: string;
   saving: boolean;
-  testing: boolean;
-  height: number;
   error: string;
 }
 
@@ -42,7 +39,6 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
     vnode.state.bech32_prefix = '';
     initChainForm(vnode.state);
     vnode.state.saving = false;
-    vnode.state.testing = false;
     vnode.state.error = '';
   },
   view: (vnode) => {
@@ -65,39 +61,6 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                 vnode.state.url = v;
               }
             }),
-            m('tr', [
-              m('td', { class: 'title-column', }, ''),
-              m(Button, {
-                label: 'Test Connection',
-                disabled: true, // vnode.state.testing,
-                onclick: async (e) => {
-                  vnode.state.endpointError = null;
-                  vnode.state.testing = true;
-                  vnode.state.height = 0;
-                  try {
-                    const tmClient = await Tendermint34Client.connect(vnode.state.url);
-                    const { block } = await tmClient.block();
-                    const [chainId] = block.header.chainId.split('-');
-                    vnode.state.height = block.header.height;
-                    vnode.state.name = chainId;
-                    vnode.state.id = slugify(chainId);
-                    // TODO: populate more information if possible
-                  } catch (err) {
-                    vnode.state.endpointError = err.message;
-                  }
-                  vnode.state.testing = false;
-                  m.redraw();
-                },
-              }),
-            ]),
-            vnode.state.endpointError && m('tr', [
-              m('td', { class: 'title-column', }, 'Error'),
-              m('td', { class: 'error-column' }, vnode.state.endpointError),
-            ]),
-            !!vnode.state.height && m('tr', [
-              m('td', { class: 'title-column', }, 'Current Height'),
-              m('td', { class: 'height-column' }, `${vnode.state.height}`),
-            ]),
             m(InputPropertyRow, {
               title: 'Name',
               defaultValue: vnode.state.name,
@@ -177,15 +140,17 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
-              notifyError(
-                err.responseJSON?.error ||
-                'Creating new Cosmos community failed'
-              );
+              vnode.state.error = err.responseJSON?.error || 'Creating new Cosmos community failed';
             } finally {
               vnode.state.saving = false;
+              m.redraw();
             }
           },
         }),
+        vnode.state.error && m('tr', [
+          m('td', { class: 'title-column', }, 'Error'),
+          m('td', { class: 'error-column' }, vnode.state.error),
+        ]),
       ]),
     ]);
   },
