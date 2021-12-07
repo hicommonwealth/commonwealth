@@ -72,42 +72,51 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     try {
       // enabling without version (i.e. cosmoshub instead of cosmoshub-4) should work
       this._chainId = app.chain.meta.chain.id;
-      if (this._chainId === 'osmosis-local') {
-        this._chainId = 'osmosis-local-1';
-        // TODO: for testing
+      console.log(app.chain.meta);
+      try {
+        await window.keplr.enable(this._chainId);
+      } catch (err) {
+        console.log(`Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`);
+
+        const bech32Prefix = app.chain.meta.chain.bech32Prefix;
         const info: ChainInfo = {
-          rpc: 'http://localhost:26657',
-          rest: 'http://localhost:1317',
-          chainId: 'osmosis-local-1',
-          chainName: 'Osmosis Local',
-          stakeCurrency: {
-            coinDenom: 'OSMO',
-            coinMinimalDenom: 'uosmo',
-            coinDecimals: 6,
+          chainId: this._chainId,
+          chainName: app.chain.meta.chain.name,
+          rpc: app.chain.meta.url,
+          // TODO: this is a HACK -- this is not a valid REST url, it is only a duplicate of the
+          //    RPC URL. But Keplr will not use this to send transactions, as we only use Keplr
+          //    for offline signing, so it should not break tx functionality.
+          rest: app.chain.meta.url,
+          bip44: {
+              coinType: 118,
           },
-          bip44: { coinType: 118 },
           bech32Config: {
-            bech32PrefixAccAddr: 'osmo',
-            bech32PrefixAccPub: 'osmopub',
-            bech32PrefixValAddr: 'osmovaloper',
-            bech32PrefixValPub: 'osmovaloperpub',
-            bech32PrefixConsAddr: 'osmovalcons',
-            bech32PrefixConsPub: 'osmovalconspub',
+            bech32PrefixAccAddr: `${bech32Prefix}`,
+            bech32PrefixAccPub: `${bech32Prefix}pub`,
+            bech32PrefixValAddr: `${bech32Prefix}valoper`,
+            bech32PrefixValPub: `${bech32Prefix}valoperpub`,
+            bech32PrefixConsAddr: `${bech32Prefix}valcons`,
+            bech32PrefixConsPub: `${bech32Prefix}valconspub`,
           },
           currencies: [
             {
-              coinDenom: 'OSMO',
-              coinMinimalDenom: 'uosmo',
-              coinDecimals: 6,
+              coinDenom: app.chain.meta.chain.symbol,
+              coinMinimalDenom: `u${app.chain.meta.chain.symbol.toLowerCase()}`,
+              coinDecimals: app.chain.meta.chain.decimals || 6,
             },
           ],
           feeCurrencies: [
             {
-              coinDenom: 'OSMO',
-              coinMinimalDenom: 'uosmo',
-              coinDecimals: 6,
+              coinDenom: app.chain.meta.chain.symbol,
+              coinMinimalDenom: `u${app.chain.meta.chain.symbol.toLowerCase()}`,
+              coinDecimals: app.chain.meta.chain.decimals || 6,
             },
           ],
+          stakeCurrency: {
+            coinDenom: app.chain.meta.chain.symbol,
+            coinMinimalDenom: `u${app.chain.meta.chain.symbol.toLowerCase()}`,
+            coinDecimals: app.chain.meta.chain.decimals || 6,
+          },
           gasPriceStep: {
             low: 0,
             average: 0,
@@ -116,8 +125,8 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           features: ['stargate'],
         };
         await window.keplr.experimentalSuggestChain(info);
+        await window.keplr.enable(this._chainId);
       }
-      await window.keplr.enable(this._chainId);
       console.log(`Enabled web wallet for ${this._chainId}`);
       this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
       this._accounts = await this._offlineSigner.getAccounts();
