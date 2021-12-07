@@ -1298,14 +1298,10 @@ const ViewProposalPage: m.Component<
               (proposal as OffchainThread).snapshotProposal?.length > 0) &&
             m(ProposalSidebarLinkedViewer, {
               proposal,
-            }),
-          proposal instanceof OffchainThread &&
-            (isAuthor || isAdmin) &&
-            m(ProposalSidebarStageEditorModule, {
-              proposal,
               openStageEditor: () => {
                 vnode.state.stageEditorIsOpen = true;
               },
+              showAddProposalButton: (isAuthor || isAdmin)
             }),
           proposal instanceof OffchainThread &&
           (proposal.linkedThreads?.length > 0 || isAuthor || isAdmin) &&
