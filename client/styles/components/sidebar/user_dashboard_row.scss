@@ -1,6 +1,6 @@
 @import 'client/styles/shared';
 
-.DashboardRow {
+.UserDashboardRow {
     display: flex;
     flex-direction: column;
     padding: 17px 22px;
@@ -12,7 +12,7 @@
     color: black !important;
     position: relative;
 
-    .DashboardRow-overwrite {
+    .UserDashboardRow-overwrite {
         position: absolute;
         top: 0;
         left: 0;
@@ -24,7 +24,7 @@
         // background: #f2f2f2;
         // border-radius: 20px;
 
-        .DashboardRow-overwrite {
+        .UserDashboardRow-overwrite {
             background: #f2f2f2;
             border-radius: 20px;
         }
@@ -65,7 +65,7 @@
         background: #F7F4FF;
         border-radius: 10px;
     }
-    .comment-body-title:hover ~ .DashboardRow-overwrite {
+    .comment-body-title:hover ~ .UserDashboardRow-overwrite {
         background: white;
     }
     .comment-body-title {
@@ -175,7 +175,7 @@
     }
 }
 
-.DashboardRowMarkAsRead {
+.UserDashboardRowMarkAsRead {
     .cui-popover-content {
         padding: 15px 20px 10px;
     }

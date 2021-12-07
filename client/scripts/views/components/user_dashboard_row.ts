@@ -1,4 +1,4 @@
-import 'components/sidebar/dashboard_row.scss';
+import 'components/sidebar/user_dashboard_row.scss';
 
 import { Icon, Icons, Button, ButtonGroup, MenuItem, PopoverMenu } from 'construct-ui';
 import _ from 'lodash';
@@ -357,7 +357,7 @@ const getBatchNotificationFields = (
   };
 };
 
-const DashboardRow: m.Component<
+const UserDashboardRow: m.Component<
   {
     notifications: Notification[];
     onListPage?: boolean;
@@ -431,7 +431,7 @@ const DashboardRow: m.Component<
 
       if (!label) {
         return m(
-          'li.DashboardRow',
+          'li.UserDashboardRow',
           {
             class: notification.isRead ? '' : 'unread',
             key: notification.id,
@@ -441,7 +441,7 @@ const DashboardRow: m.Component<
         );
       }
       return link(
-        'a.DashboardRow',
+        'a.UserDashboardRow',
         `/notificationsList?id=${notification.id}`,
         [
           m('.comment-body', [
@@ -518,7 +518,7 @@ const DashboardRow: m.Component<
       }
 
       return link(
-        'a.DashboardRow',
+        'a.UserDashboardRow',
         path.replace(/ /g, '%20'),
         [
           // authorInfo.length === 1
@@ -617,7 +617,7 @@ const DashboardRow: m.Component<
               ]),
             ]),
 
-            m('.DashboardRow-overwrite'),
+            m('.UserDashboardRow-overwrite'),
             // m('.comment-body-bottom-wrap', [
             //   m('.comment-body-created', moment(createdAt).fromNow()),
             //   !notification.isRead && m('.comment-body-mark-as-read', {
@@ -652,4 +652,4 @@ const DashboardRow: m.Component<
   },
 };
 
-export default DashboardRow;
+export default UserDashboardRow;

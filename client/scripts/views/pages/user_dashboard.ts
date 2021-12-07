@@ -3,17 +3,15 @@ import 'pages/user_dashboard.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import Infinite from 'mithril-infinite';
 import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo } from 'models';
 import { sortNotifications } from 'helpers/notifications';
-import DashboardRow from 'views/components/dashboard_row';
+import UserDashboardRow from 'views/components/user_dashboard_row';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import Sublayout from 'views/sublayout';
-import PageError from 'views/pages/error';
 import PageLoading from 'views/pages/loading';
 import StaticLandingPage from './landing/landing_page';
 
@@ -124,7 +122,7 @@ const notificationsRemaining = (contentLength, count) => {
   return (contentLength >= 10 && count < contentLength);
 };
 
-const DashboardPage: m.Component<{}, {
+const UserDashboard: m.Component<{}, {
   count: number,
   onscroll;
 }> = {
@@ -191,7 +189,7 @@ const DashboardPage: m.Component<{}, {
     $(window).on('scroll', vnode.state.onscroll);
 
     return m(Sublayout, {
-      class: 'UserDashboardPage',
+      class: 'UserDashboard',
       title: [
         'Dashboard ',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -224,21 +222,21 @@ const DashboardPage: m.Component<{}, {
               onclick: () => { },
             }),
           ]),
-          m('.DashboardList', [
+          m('.dashboard-row-wrap', [
             // sortedNotifications.length > 0
             //   ? m(Infinite, {
             //     maxPages: 1, // prevents rollover/repeat
             //     key: sortedNotifications.length,
             //     pageData: () => sortedNotifications,
             //     item: (data, opts, index) => {
-            //       return m(DashboardRow, { notifications: data, onListPage: true, });
+            //       return m(UserDashboardRow, { notifications: data, onListPage: true, });
             //     },
             //   })
             //   : m('.no-notifications', 'No Notifications'),
             sortedNotifications.length > 0
             ? [
               sortedNotifications.slice(0, vnode.state.count).map((data) => {
-                return m(DashboardRow, { notifications: data, onListPage: true, });
+                return m(UserDashboardRow, { notifications: data, onListPage: true, });
               }),
               notificationsRemaining(sortedNotifications.length, vnode.state.count)
               ? m('.infinite-scroll-spinner-wrap .text-center', [
@@ -273,4 +271,4 @@ const DashboardPage: m.Component<{}, {
   }
 };
 
-export default DashboardPage;
+export default UserDashboard;
