@@ -69,7 +69,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
               m('td', { class: 'title-column', }, ''),
               m(Button, {
                 label: 'Test Connection',
-                disabled: vnode.state.testing,
+                disabled: true, // vnode.state.testing,
                 onclick: async (e) => {
                   vnode.state.endpointError = null;
                   vnode.state.testing = true;
