@@ -151,6 +151,7 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
     } else if (allowLinking || proposal.linkedThreads.length) {
       return m('.ProposalLinkedThreadsEditorModule', [
         !!vnode.state.linkedThreads?.length &&
+        m('.linked-threads-title', 'Linked Threads:'),
         m(List, vnode.state.linkedThreads.map((thread) => {
             const discussionLink =
             `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
@@ -170,7 +171,7 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
           compact: true,
           fluid: true,
           label: proposal.linkedThreads?.length
-            ? 'Linked threads'
+            ? 'Link another Thread'
             : 'Link threads',
           onclick: (e) => {
             e.preventDefault();
@@ -192,13 +193,15 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
 
 export const ProposalSidebarLinkedViewer: m.Component<{
   proposal: OffchainThread;
+  openStageEditor: Function;
+  showAddProposalButton: boolean
 }> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
+    const { proposal, openStageEditor, showAddProposalButton } = vnode.attrs;
 
     return m('.ProposalSidebarLinkedViewer', [
       proposal.chainEntities.length > 0 || proposal.snapshotProposal?.length > 0
-        ? m('.placeholder-copy', 'Proposals for this thread:')
+        ? m('.placeholder-copy', 'Proposals for Thread:')
         : m(
             '.placeholder-copy',
             app.chain
@@ -216,37 +219,19 @@ export const ProposalSidebarLinkedViewer: m.Component<{
         ]),
       proposal.snapshotProposal?.length > 0 &&
         m(ProposalSidebarLinkedSnapshot, { proposal }),
-    ]);
-  },
-};
-
-export const ProposalSidebarStageEditorModule: m.Component<
-  {
-    proposal: OffchainThread;
-    openStageEditor: Function;
-  },
-  {
-    isOpen: boolean;
-  }
-> = {
-  view: (vnode) => {
-    const { openStageEditor } = vnode.attrs;
-
-    if (!app.chain?.meta?.chain && !app.community?.meta) return;
-    const { stagesEnabled } = app.chain?.meta?.chain || app.community?.meta;
-    if (!stagesEnabled) return;
-
-    return m('.ProposalSidebarStageEditorModule', [
-      m(Button, {
-        rounded: true,
-        compact: true,
-        fluid: true,
-        label: app.chain ? 'Connect a proposal' : 'Update status',
-        onclick: (e) => {
-          e.preventDefault();
-          openStageEditor();
-        },
-      }),
+      showAddProposalButton &&  
+      m('.ConnectProposalButtonWrapper', [
+        m(Button, {
+          rounded: true,
+          compact: true,
+          fluid: true,
+          label: app.chain ? 'Connect a proposal' : 'Update status',
+          onclick: (e) => {
+            e.preventDefault();
+            openStageEditor();
+          },
+        }),
+      ])
     ]);
   },
 };
