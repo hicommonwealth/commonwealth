@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 import 'components/component_kit/buttons.scss';
 import m from 'mithril';
-import { CreateIcon, ExternalLinkIcon, IconIntent, IconSize } from './icons';
+import { CreateIcon, ExternalLinkIcon, IconIntent, IconSize, NotificationIcon, ShareIcon } from './icons';
 
 export enum ButtonIntent {
   Primary = 'primary',
@@ -203,11 +203,11 @@ export const FaceliftRadioGroup: m.Component<
   },
 };
 
-export const EngagementButton: m.Component<
+export const DiscussButton: m.Component<
   {
     size: ButtonSize;
-    label: string;
     onclick: Function;
+    label?: string;
     disabled?: boolean;
     className?: string;
   },
@@ -216,7 +216,7 @@ export const EngagementButton: m.Component<
   view: (vnode) => {
     const { label, onclick, disabled } = vnode.attrs;
     return m(
-      appendTags('Button.EngagementButton', vnode.attrs),
+      appendTags('Button.EngagementButton.DiscussButton.rounded', vnode.attrs),
       {
         onclick,
       },
@@ -226,7 +226,64 @@ export const EngagementButton: m.Component<
           disabled,
           intent: IconIntent.Primary,
         }),
-        m('span.label', label),
+        m('span.label', label || 'Discuss'),
+      ]
+    );
+  },
+};
+
+export const SubscribeButton: m.Component<
+  {
+    size: ButtonSize;
+    onclick: Function;
+    label?: string;
+    disabled?: boolean;
+    className?: string;
+  },
+  {}
+> = {
+  view: (vnode) => {
+    const { label, onclick, disabled } = vnode.attrs;
+    return m(
+      appendTags('Button.EngagementButton.SubscribeButton.rounded', vnode.attrs),
+      {
+        onclick,
+      },
+      [
+        m(NotificationIcon, {
+          size: IconSize.MD,
+          disabled,
+          intent: IconIntent.Primary,
+        }),
+        m('span.label', label || 'Subscribe'),
+      ]
+    );
+  },
+};
+
+export const ShareButton: m.Component<
+  {
+    size: ButtonSize;
+    onclick: Function;
+    label?: string;
+    disabled?: boolean;
+    className?: string;
+  },
+  {}
+> = {
+  view: (vnode) => {
+    const { label, onclick, disabled } = vnode.attrs;
+    return m(
+      appendTags('Button.EngagementButton.ShareButton.rounded', vnode.attrs),
+      {
+        onclick,
+      },
+      [
+        m(ShareIcon, {
+          disabled,
+          intent: IconIntent.Primary,
+        }),
+        m('span.label', label || 'Share'),
       ]
     );
   },

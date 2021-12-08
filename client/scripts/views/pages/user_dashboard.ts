@@ -1,7 +1,7 @@
 import 'pages/user_dashboard.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
+import _, { capitalize } from 'lodash';
 import $ from 'jquery';
 import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons, Spinner } from 'construct-ui';
 
@@ -122,8 +122,15 @@ const notificationsRemaining = (contentLength, count) => {
   return (contentLength >= 10 && count < contentLength);
 };
 
+export enum DashboardViews {
+  Latest = 'latest',
+  Trending = 'trending',
+  Chain = 'chain',
+}
+
 const UserDashboard: m.Component<{}, {
-  count: number,
+  count: number;
+  activeTab: DashboardViews;
   onscroll;
 }> = {
   oncreate: (vnode) => {
@@ -133,6 +140,10 @@ const UserDashboard: m.Component<{}, {
     if (!app.isLoggedIn()) {
       return m(StaticLandingPage);
     }
+    if (!vnode.state.activeTab) {
+      vnode.state.activeTab = DashboardViews.Latest;
+    }
+    const { activeTab } = vnode.state;
     // const activeEntity = app.community ? app.community : app.chain;
     const activeEntity = 'edgeware';
     if (!activeEntity) return m(PageLoading, {
@@ -207,19 +218,25 @@ const UserDashboard: m.Component<{}, {
             fluid: true,
           }, [
             m(TabItem, {
-              label: 'Latest',
-              active: true,
-              onclick: () => { },
+              label: capitalize(DashboardViews.Latest),
+              active: activeTab === DashboardViews.Latest,
+              onclick: () => {
+                vnode.state.activeTab = DashboardViews.Latest;
+              },
             }),
             m(TabItem, {
-              label: 'Trending',
-              active: false,
-              onclick: () => { },
+              label: capitalize(DashboardViews.Trending),
+              active: activeTab === DashboardViews.Trending,
+              onclick: () => {
+                vnode.state.activeTab = DashboardViews.Trending;
+              },
             }),
             m(TabItem, {
-              label: 'Chain',
-              active: false,
-              onclick: () => { },
+              label: capitalize(DashboardViews.Chain),
+              active: activeTab === DashboardViews.Chain,
+              onclick: () => {
+                vnode.state.activeTab = DashboardViews.Chain;
+              },
             }),
           ]),
           m('.dashboard-row-wrap', [

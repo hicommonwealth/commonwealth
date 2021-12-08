@@ -26,6 +26,7 @@ import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
+import { ButtonSize, DiscussButton, ShareButton, SubscribeButton } from './component_kit/buttons';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -544,11 +545,9 @@ const UserDashboardRow: m.Component<
             m('.comment-body-excerpt', notificationBody),
             m('.comment-body-bottom', [
               m('.comment-body-bottom-left', [
-                m(Button, {
-                  iconLeft: Icons.PLUS,
-                  label: 'Discuss',
-                  rounded: true,
-                  onclick: (e: any) => {
+                m(DiscussButton, {
+                  size: ButtonSize.SM,
+                  onclick: (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                   },
@@ -574,18 +573,14 @@ const UserDashboardRow: m.Component<
                       }
                     }),
                   ],
-                  trigger: m(Button, {
-                    iconLeft: Icons.SHARE,
-                    id: 'share-button',
-                    label: 'Share',
-                    rounded: true,
+                  trigger: m(ShareButton, {
+                    size: ButtonSize.SM,
+                    onclick: (e) => e.stopPropagation(),
                   }),
                 }),
-                m(Button, {
-                  iconLeft: Icons.BELL,
-                  label: 'Subscribe',
-                  rounded: true,
-                  onclick: (e: any) => {
+                m(SubscribeButton, {
+                  size: ButtonSize.SM,
+                  onclick: (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                   },

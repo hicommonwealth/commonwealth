@@ -61,7 +61,7 @@ import {
   LinkStyle,
   FaceliftRadioGroup,
   ButtonSize,
-  EngagementButton,
+  DiscussButton,
 } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
 
@@ -323,23 +323,23 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 600px;',
         },
         [
-          m(EngagementButton, {
+          m(DiscussButton, {
             size: ButtonSize.SM,
             label: 'Small',
             onclick: () => notifySuccess('Button clicked!'),
           }),
-          m(EngagementButton, {
+          m(DiscussButton, {
             size: ButtonSize.LG,
             label: 'Big',
             onclick: () => notifySuccess('Button clicked!'),
           }),
-          m(EngagementButton, {
+          m(DiscussButton, {
             size: ButtonSize.SM,
             label: 'Small',
             disabled: true,
             onclick: () => notifySuccess('Button clicked!'),
           }),
-          m(EngagementButton, {
+          m(DiscussButton, {
             size: ButtonSize.LG,
             label: 'Big',
             disabled: true,

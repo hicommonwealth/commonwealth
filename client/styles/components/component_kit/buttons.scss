@@ -9,7 +9,7 @@
     }
 }
 
-.Button {
+Button.EngagementButton {
     min-width: 70px;
     height: 40px;
     border-radius: 8px;
@@ -41,6 +41,49 @@
             border: 1px solid $disable-gray;
             box-shadow: none;
             cursor: default;
+        }
+    }
+    &.rounded {
+        display: flex;
+        align-items: center;
+        color: $black;
+        background: $white;
+        border: 1px solid $disable-gray;
+        border-radius: 20px;
+        height: 40px;
+        font-weight: 500;
+        .Icon {
+            margin-right: 12px;
+        }
+        .label {
+            padding-top: 5.5px;
+        }
+        &:hover {
+            color: $dark-purp;
+            background: $xlite-purp;
+            border: 1px solid $dark-purp;
+            .Icon path {
+                stroke: $dark-purp;
+            }
+        }
+        &.sm {
+            padding: 12px 20px;
+        }
+        &.lg {
+            padding: 12px 44px;
+        }
+        &.disabled {
+            color: $disable-gray;
+            background: $white;
+            cursor: default;
+            &:hover {
+                color: $disable-gray;
+                border: 1px solid $disable-gray;
+                background: $white;
+                .Icon path {
+                    stroke: $disable-gray;
+                }
+            }
         }
     }
 }
@@ -151,48 +194,4 @@
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
-}
-
-.EngagementButton {
-    display: flex;
-    align-items: center;
-    color: $black;
-    background: $white;
-    border: 1px solid $disable-gray;
-    border-radius: 20px;
-    height: 40px;
-    font-weight: 500;
-    .Icon {
-        margin-right: 12px;
-    }
-    .label {
-        padding-top: 5.5px;
-    }
-    &:hover {
-        color: $dark-purp;
-        background: $xlite-purp;
-        border: 1px solid $dark-purp;
-        .Icon path {
-            stroke: $dark-purp;
-        }
-    }
-    &.sm {
-        padding: 12px 20px;
-    }
-    &.lg {
-        padding: 12px 44px;
-    }
-    &.disabled {
-        color: $disable-gray;
-        background: $white;
-        cursor: default;
-        &:hover {
-            color: $disable-gray;
-            border: 1px solid $disable-gray;
-            background: $white;
-            .Icon path {
-                stroke: $disable-gray;
-            }
-        }
-    }
 }

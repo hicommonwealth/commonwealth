@@ -33,7 +33,7 @@ const createThread = async (
   next: NextFunction
 ) => {
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-
+  console.log(req.user?.id);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -90,7 +90,9 @@ const createThread = async (
     body: decodeURIComponent(req.body.body)
   };
   const version_history : string[] = [ JSON.stringify(firstVersion) ];
-
+  console.log(community?.id);
+  console.log(chain?.id);
+  console.log(author?.id);
   const threadContent = community ? {
     community: community.id,
     address_id: author.id,
@@ -128,6 +130,7 @@ const createThread = async (
           chain_id: chain?.id || null,
         },
       });
+      console.log(offchainTopic?.id);
       threadContent['topic_id'] = offchainTopic.id;
       topic_id = offchainTopic.id;
     } catch (err) {
@@ -162,7 +165,7 @@ const createThread = async (
   } catch (err) {
     return next(new Error(err));
   }
-
+  console.log(thread?.id);
   // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
   try {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
@@ -197,7 +200,7 @@ const createThread = async (
   } catch (err) {
     return next(err);
   }
-
+  console.log(finalThread?.id);
   // auto-subscribe thread creator to comments & reactions
   try {
     await models.Subscription.create({
@@ -223,6 +226,7 @@ const createThread = async (
         email: 'notifications@commonwealth.im',
       },
     });
+    console.log(ghostUser?.id);
     await models.Subscription.create({
       subscriber_id: ghostUser.id,
       category_id: NotificationCategories.NewComment,
