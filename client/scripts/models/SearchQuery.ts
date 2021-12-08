@@ -31,15 +31,15 @@ export default class SearchQuery implements SearchParams {
 
     constructor(searchTerm: string, params?: SearchParams){
         this.searchTerm = searchTerm
-        this.searchScope = params ? params.searchScope || [SearchScope.All] : [SearchScope.All]
-        this.communityScope = params ? params.communityScope : undefined
-        this.chainScope = params ? params.chainScope : undefined
-        this.isSearchPreview = params ? params.isSearchPreview : false
-        this.sort = params ? params.sort ? params.sort : SearchSort.Best : SearchSort.Best
+        this.searchScope = params?.searchScope || [SearchScope.All]
+        this.communityScope = params?.communityScope
+        this.chainScope = params?.chainScope
+        this.isSearchPreview = !!params?.isSearchPreview
+        this.sort = params?.sort || SearchSort.Best
     }
 
     public toEncodedString() {
-        let encodedString = this.searchTerm +
+        let encodedString = this.searchTerm.trim().replace(/\s+/g, '%20') +
             (this.communityScope ? ` communityScope=${this.communityScope}` : '') +
             (this.chainScope ? ` chainScope=${this.chainScope}` : '') +
             (this.isSearchPreview ? ` isSearchPreview=${this.isSearchPreview}` : '') +
@@ -56,7 +56,7 @@ export default class SearchQuery implements SearchParams {
 
     public static fromEncodedString(encodedString: string) {
         const props = encodedString.split(" ")
-        const sq = new SearchQuery(props[0])
+        const sq = new SearchQuery(props[0].replace('%20', ' '))
         for(let i = 1; i < props.length; i++){
             const [prop, value] = props[i].split("=")
             if(prop === 'scope[]'){

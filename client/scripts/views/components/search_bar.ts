@@ -396,6 +396,23 @@ const emptySearchPreview: m.Component<{ searchTerm: string }, {}> = {
   },
 };
 
+export const executeSearch = (query: SearchQuery) => {
+  if (
+    !query.searchTerm ||
+    !query.searchTerm.toString().trim() ||
+    !query.searchTerm.match(/[A-Za-z]+/)
+  ) {
+    notifyError('Enter a valid search term');
+    return;
+  }
+  if (query.searchTerm.length < 4) {
+    notifyError('Query must be at least 4 characters');
+  }
+  query.isSearchPreview = false;
+  app.search.addToHistory(query)
+  m.route.set(`/search?${query.toUrlParams()}`);
+}
+
 export const SearchBar: m.Component<
   {},
   {
@@ -431,23 +448,6 @@ export const SearchBar: m.Component<
 
     vnode.state.setUsingFilterMenu = using => {
       vnode.state.filterMenuActive = using
-    }
-
-    const executeSearch = (query: SearchQuery) => {
-      if (
-        !query.searchTerm ||
-        !query.searchTerm.toString().trim() ||
-        !query.searchTerm.match(/[A-Za-z]+/)
-      ) {
-        notifyError('Enter a valid search term');
-        return;
-      }
-      if (query.searchTerm.length < 4) {
-        notifyError('Query must be at least 4 characters');
-      }
-      query.isSearchPreview = false;
-      app.search.addToHistory(query)
-      m.route.set(`/search?${query.toUrlParams()}`);
     }
 
     const historyList = app.search.getHistory()
@@ -591,7 +591,7 @@ export const SearchBar: m.Component<
             isMobile,
             intent: IconIntent.Primary,
           }),
-          contentRight: vnode.state.searchTerm ? m(ControlGroup, {}, [searchIcon, cancelInputIcon]) : chainOrCommIcon,
+          contentRight: vnode.state.searchTerm ? m(ControlGroup, {}, [cancelInputIcon, searchIcon]) : chainOrCommIcon,
           defaultValue: m.route.param('q') || vnode.state.searchTerm,
           value: vnode.state.searchTerm,
           autocomplete: 'off',

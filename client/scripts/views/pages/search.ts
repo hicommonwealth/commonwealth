@@ -202,16 +202,6 @@ const getListing = (
 ) => {
   if (Object.keys(results).length === 0 || !results[searchType]) return [];
   const tabScopedResults = (results[searchType])
-    .sort((a, b) => {
-      if (sort === SearchSort.Best && (searchType === SearchScope.Threads || searchType === SearchScope.Replies)) {
-        return b.rank - a.rank
-      } else {
-        // Some users are not verified; we give them a default date of 1900
-        const aCreatedAt = moment(a.created_at || a.createdAt || a.verified || '1900-01-01T:00:00:00Z');
-        const bCreatedAt = moment(b.created_at || b.createdAt || b.verified || '1900-01-01T:00:00:00Z');
-        return bCreatedAt.diff(aCreatedAt);
-      }
-    })
     .map((res) => {
       return res.searchType === SearchScope.Threads
         ? getDiscussionResult(res, searchTerm)
@@ -252,11 +242,11 @@ const SearchPage : m.Component<{
     const { communityScope, chainScope, searchTerm } = searchQuery
     const scope = app.isCustomDomain() ? app.customDomainId() : (communityScope || chainScope);
 
-    if (!searchTerm) {
-      vnode.state.errorText = 'Must enter query to begin searching';
+    if (!app.search.isValidQuery(searchQuery)) {
+      vnode.state.errorText = 'Must enter query longer than 3 characters to begin searching';
       return m(PageNotFound, {
         title: 'Search',
-        message: 'Please enter a query to begin searching'
+        message: 'Please enter a query longer than 3 characters to begin searching'
       });
     }
 
@@ -269,7 +259,7 @@ const SearchPage : m.Component<{
       return LoadingPage;
     }
 
-    if (!app.search.getByQuery(searchQuery).loaded) {
+    if (!app.search.getByQuery(searchQuery)?.loaded) {
       return LoadingPage;
     }
 

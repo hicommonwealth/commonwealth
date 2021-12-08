@@ -55,17 +55,18 @@ class SearchContoller {
   }
 
   public async search(searchQuery: SearchQuery) {
+    if (!this.getByQuery(ALL_RESULTS_QUERY)?.loaded){
+      await this.initialize()
+    }
+
     if (this.getByQuery(searchQuery)?.loaded) {
       return this.getByQuery(searchQuery)
     }
     const searchCache = this._store.getOrAdd(searchQuery)
     const { searchTerm, communityScope, chainScope, isSearchPreview, sort } = searchQuery;
+    console.log(searchTerm)
     const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
     const scope = searchQuery.getSearchScope()
-
-    if (!this.getByQuery(ALL_RESULTS_QUERY)?.loaded){
-      await this.initialize()
-    }
 
     try {
       if(scope.includes(SearchScope.Threads) || scope.includes(SearchScope.Proposals)){
@@ -145,6 +146,7 @@ class SearchContoller {
       searchCache.loaded = true
       this._store.update(searchCache)
     }
+    return searchCache
   }
 
   private searchDiscussions = async (
@@ -282,6 +284,13 @@ class SearchContoller {
       rawHistory.splice(index, 1)
     }
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(rawHistory))
+  }
+
+  public isValidQuery(searchQuery: SearchQuery){
+    return searchQuery.searchTerm
+      && searchQuery.searchTerm.toString().trim()
+      && searchQuery.searchTerm.match(/[A-Za-z]+/)
+      && searchQuery.searchTerm.length > 3
   }
 }
 

@@ -4,8 +4,8 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         'UPDATE "OffchainThreads" SET _search = ' +
-        '= (setweight(to_tsvector(\'english\', coalesce(title, \'\')), \'A\') || ' +
-        'setweight(to_tsvector(\'english\', coalesce(plaintext, \'\')), \'C\'));',
+        '(setweight(to_tsvector(\'english\', coalesce(title, \'\')), \'A\') || ' +
+        'setweight(to_tsvector(\'english\', coalesce(plaintext, \'\')), \'D\'));',
         { transaction: t }
       );
 
