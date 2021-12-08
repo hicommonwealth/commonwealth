@@ -24,6 +24,7 @@ interface CosmosFormState extends ChainFormState {
   name: string;
   symbol: string;
   bech32_prefix: string;
+  decimals: string;
   saving: boolean;
   error: string;
 }
@@ -52,7 +53,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
           },
           [
             m(InputPropertyRow, {
-              title: 'Tendermint URL',
+              title: 'RPC URL',
               defaultValue: vnode.state.url,
               placeholder: 'http://my-rpc.cosmos-chain.com:26657/',
               onChangeHandler: async (v) => {
@@ -70,7 +71,6 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
             m(InputPropertyRow, {
               title: 'ID',
               defaultValue: vnode.state.id,
-              disabled: true,
               value: vnode.state.id,
               onChangeHandler: (v) => {
                 vnode.state.id = v;
@@ -92,6 +92,15 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                 vnode.state.bech32_prefix = v;
               }
             }),
+            // TODO: validate this as number
+            m(InputPropertyRow, {
+              title: 'Decimals',
+              defaultValue: vnode.state.decimals,
+              placeholder: '6',
+              onChangeHandler: async (v) => {
+                vnode.state.decimals = v;
+              }
+            }),
             ...defaultChainRows(vnode.state),
           ]
         ),
@@ -108,6 +117,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
               description,
               symbol,
               bech32_prefix,
+              decimals,
               icon_url,
               website,
               discord,
@@ -124,6 +134,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                 description,
                 symbol,
                 bech32_prefix,
+                decimals,
                 icon_url,
                 website,
                 discord,
