@@ -118,12 +118,28 @@ export const modelFromServer = (thread) => {
     topicFromStore = app.topics.store.getById(topic.id);
   }
 
+  let decodedTitle;
+  try {
+    decodedTitle = decodeURIComponent(title);
+  } catch (err) {
+    console.error(`Could not decode title: "${title}"`);
+    decodedTitle = title;
+  }
+
+  let decodedBody;
+  try {
+    decodedBody = decodeURIComponent(body);
+  } catch (err) {
+    console.error(`Could not decode body: "${body}"`);
+    decodedBody = body;
+  }
+
   return new OffchainThread({
     id,
     author: thread.Address.address,
     authorChain: thread.Address.chain,
-    title: decodeURIComponent(title),
-    body: decodeURIComponent(body),
+    title: decodedTitle,
+    body: decodedBody,
     createdAt: moment(created_at),
     attachments,
     snapshotProposal: snapshot_proposal,
