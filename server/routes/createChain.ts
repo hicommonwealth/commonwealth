@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Web3 from 'web3';
 import * as solw3 from '@solana/web3.js';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
@@ -20,6 +21,7 @@ export const Errors = {
   NoBase: 'Must provide chain base',
   NoNodeUrl: 'Must provide node url',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
+  InvalidNode: 'Node url returned invalid response',
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
@@ -136,6 +138,17 @@ const createChain = async (
       }
     } catch (e) {
       return next(new Error(Errors.InvalidNodeUrl));
+    }
+  } else if (req.body.base === ChainBase.CosmosSDK) {
+    // test cosmos endpoint validity -- must be http(s)
+    if (!urlHasValidHTTPPrefix(url)) {
+      return next(new Error(Errors.InvalidNodeUrl));
+    }
+    try {
+      const tmClient = await Tendermint34Client.connect(url);
+      const { block } = await tmClient.block();
+    } catch (err) {
+      return next(new Error(Errors.InvalidNode));
     }
   } else {
     if (!url || !url.trim()) {
