@@ -42,8 +42,6 @@ export type CosmosApiType = QueryClient
   & BankExtension;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
-  private _url: string;
-  public get url() { return this._url; }
   private _api: CosmosApiType;
   public get api() { return this._api; }
 
@@ -75,16 +73,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();
   private _tmClient: Tendermint34Client;
   public async init(node: NodeInfo, reset = false) {
-    // A note on REST RPC: gaiacli exposes a command line option "rest-server" which
-    // creates the endpoint necessary. However, it doesn't send headers correctly
-    // on its own, so you need to configure a reverse-proxy server (I did it with nginx)
-    // that forwards the requests to it, and adds the header 'Access-Control-Allow-Origin: *'
-    /* eslint-disable prefer-template */
-    this._url = node.url;
-
-    console.log(`Starting Tendermint RPC API at ${this._url}...`);
+    const url = `${window.location.origin}/cosmosAPI/${node.chain.id}`;
+    console.log(`Starting Tendermint RPC API at ${url}...`);
     // TODO: configure broadcast mode
-    this._tmClient = await Tendermint34Client.connect(this._url);
+    this._tmClient = await Tendermint34Client.connect(url);
     this._api = QueryClient.withExtensions(
       this._tmClient,
       setupGovExtension,
