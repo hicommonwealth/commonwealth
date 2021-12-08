@@ -1,5 +1,6 @@
 import express from 'express';
 import passport from 'passport';
+import type { Express } from 'express';
 
 import domain from './routes/domain';
 import status from './routes/status';
@@ -131,7 +132,7 @@ import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 
 function setupRouter(
-  app,
+  app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
@@ -652,4 +653,5 @@ function setupRouter(
 
   app.use('/api', router);
 }
+
 export default setupRouter;
