@@ -264,7 +264,10 @@ const TwitterAttestationModal: m.Component<{
                 .then(async (res) => {
                   vnode.state.attested = true;
                   vnode.state.step += 1;
-                  m.redraw();
+                  if(res && res.status == 'Success')
+                    location.reload();
+                  else
+                    m.redraw();
                 })
                 .catch((e) => {
                   console.log(e);
