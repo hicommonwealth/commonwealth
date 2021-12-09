@@ -146,72 +146,51 @@ module.exports = {
       // Merge offchain ids into chain column
       await queryInterface.sequelize.query(
         `UPDATE "Roles" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "InviteCodes" SET chain_id = community_id WHERE chain_id IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "InviteLinks" SET chain_id = community_id WHERE chain_id IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "OffchainComments" SET chain = community WHERE chain IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "OffchainReactions" SET chain = community WHERE chain IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "OffchainTopics" SET chain_id = community_id WHERE chain_id IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "OffchainViewCounts" SET chain = community WHERE chain IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "OffchainVotes" SET chain = community WHERE chain IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "StarredCommunity" SET chain = community WHERE chain IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
       await queryInterface.sequelize.query(
         `UPDATE "Subscriptions" SET chain_id = community_id WHERE chain_id IS NULL;`,
-        { transaction },
+        { transaction: t },
+
       );
       await queryInterface.sequelize.query(
         `UPDATE "Webhooks" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
-        { transaction },
+        { transaction: t },
       );
-      /*
-      InviteCode
-       delete this table? no
-       merge community_id and chain_id, add fkey to Chains.id
-     InviteLink
-       merge community_id and chain_id, add fkey to Chains.id
-     OffchainComment
-       merge community and chain, add fkey to Chains.id
-     OffchainReactions
-       merge community and chain, add fkey to Chains.id
-     OffchainTopics
-       merge community_id and chain_id, add fkey to Chains.id
-     OffchainViewCounts
-       merge community and chain, add fkey to Chains.id
-     OffchainVotes
-       merge community and chain, add fkey to Chains.id
-     StarredCommunity
-       merge community and chain, add fkey to Chains.id
-     Subscriptions
-       merge community_id and chain_id, add fkey to Chains.id
-     Webhooks
-       empty table
-     */
 
+      // TODO: Add fkey constraints to DB
 
 
     });
