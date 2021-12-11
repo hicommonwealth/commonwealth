@@ -56,7 +56,7 @@ export default class SearchQuery implements SearchParams {
 
     public static fromEncodedString(encodedString: string) {
         const props = encodedString.split(" ")
-        const sq = new SearchQuery(props[0].replace('%20', ' '))
+        const sq = new SearchQuery(props[0].replace(/(%20)/g, ' '))
         for(let i = 1; i < props.length; i++){
             const [prop, value] = props[i].split("=")
             if(prop === 'scope[]'){

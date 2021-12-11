@@ -430,12 +430,20 @@ export const SearchBar: m.Component<
   }
 > = {
   view: (vnode) => {
+    const activeCommunity = app.community?.name
+    const activeChain = app.activeChainId()
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
-    if (!vnode.state.searchQuery) vnode.state.searchQuery = new SearchQuery('', { isSearchPreview: true });
+    if (!vnode.state.searchQuery) {
+      vnode.state.searchQuery = new SearchQuery('', {
+        isSearchPreview: true,
+        communityScope: activeCommunity,
+        chainScope: activeChain });
+      vnode.state.isTyping = false;
+    }
     if (vnode.state.searchQuery.searchTerm !== vnode.state.searchTerm && vnode.state.searchTerm.length > 3) {
       vnode.state.searchQuery.searchTerm = vnode.state.searchTerm
     }
-    const { results, searchTerm, searchQuery } = vnode.state;
+    const { results, searchQuery } = vnode.state;
     const isMobile = window.innerWidth < 767.98;
 
     const setFilterMenuActive = (using: boolean) => {
@@ -461,16 +469,17 @@ export const SearchBar: m.Component<
       )
     }
 
-    const activeCommunity = app.community ? app.community.name : vnode.state.searchQuery.communityScope
-    const activeChain = app.activeChainId() || vnode.state.searchQuery.chainScope
-    const scopeTitle = m(ListItem, {class: 'disabled', label: 'Scope'})
+    const scopeTitle = m(ListItem, {class: 'disabled', label: 'Limit search to:'})
 
     const scopeButtons = [SearchScope.Threads, SearchScope.Replies, SearchScope.Communities, SearchScope.Members]
       .map(s => {
         return m(Button, {
-          size: Size.LG,
+          size: Size.SM,
           active: vnode.state.searchQuery.searchScope.includes(s),
-          onclick: () => {vnode.state.searchQuery.toggleScope(s)},
+          onclick: () => {
+            vnode.state.searchQuery.toggleScope(s)
+            search(vnode.state.searchQuery, vnode.state)
+          },
           onmouseover: () => {vnode.state.filterMenuActive = true},
           onmouseout: () => {vnode.state.filterMenuActive = false},
           label: s
@@ -481,20 +490,30 @@ export const SearchBar: m.Component<
       m(List, {
         class: 'search-results-list',
       }, [
+        m(ListItem, {
+          class: 'disabled',
+          label: "I'm looking for: "
+        }),
+        m(ListItem, {
+          class: `disabled search-filter-button-bar ${!(activeCommunity || activeChain) ? 'bottom-border' : ''}`,
+          label: scopeButtons
+        }),
         activeCommunity
           ? [
               scopeTitle,
               m(ListItem, {
-                class: 'disabled',
+                class: 'disabled bottom-border',
                 label: m(Button, {
-                  size: Size.LG,
-                  onclick: () => { vnode.state.searchQuery.communityScope =
-                    vnode.state.searchQuery.communityScope === activeCommunity
-                    ? undefined : activeCommunity },
+                  size: Size.SM,
+                  onclick: () => {
+                    vnode.state.searchQuery.communityScope = vnode.state.searchQuery.communityScope === activeCommunity
+                      ? undefined : activeCommunity
+                    search(vnode.state.searchQuery, vnode.state)
+                  },
                   active: vnode.state.searchQuery.communityScope === activeCommunity,
                   onmouseover: () => {vnode.state.filterMenuActive = true},
                   onmouseout: () => {vnode.state.filterMenuActive = false},
-                  label: `Search inside community: ${activeCommunity}`
+                  label: `Inside community: ${activeCommunity}`
                 }),
               })
             ]
@@ -502,27 +521,21 @@ export const SearchBar: m.Component<
             && [
               scopeTitle,
               m(ListItem, {
-                class: 'disabled',
+                class: 'disabled bottom-border',
                 label: m(Button, {
-                  size: Size.LG,
-                  onclick: () => { vnode.state.searchQuery.chainScope =
-                    vnode.state.searchQuery.chainScope === activeChain
-                    ? undefined : activeChain },
+                  size: Size.SM,
+                  onclick: () => {
+                    vnode.state.searchQuery.chainScope = vnode.state.searchQuery.chainScope === activeChain
+                      ? undefined : activeChain;
+                    search(vnode.state.searchQuery, vnode.state)
+                  },
                   active: vnode.state.searchQuery.chainScope === activeChain ,
                   onmouseover: () => {vnode.state.filterMenuActive = true},
                   onmouseout: () => {vnode.state.filterMenuActive = false},
-                  label: `Search inside chain: ${activeChain}`
+                  label: `Inside chain: ${activeChain}`
                 }),
               })
-            ],
-        m(ListItem, {
-          class: 'disabled',
-          label: "I'm looking for: "
-        }),
-        m(ListItem, {
-          class: 'disabled bottom-border search-filter-button-bar',
-          label: scopeButtons
-        }),
+          ],
         vnode.state.searchTerm.length < 1
           ? historyList.length === 0
             ? m(ListItem, {
@@ -535,12 +548,15 @@ export const SearchBar: m.Component<
             ]
           : !results || results?.length === 0
             ? app.search.getByQuery(searchQuery)?.loaded
-              ? m(ListItem, [
-                m(emptySearchPreview, { searchTerm })
-              ])
-              : m(ListItem, { label: m(Spinner, { active: true }) })
+              ? m(ListItem, { class: 'disabled', label: m(Spinner, { active: true }) })
+              : vnode.state.isTyping
+                ? m(ListItem, { class: 'disabled', label: m(Spinner, { active: true }) })
+                : m(ListItem, {
+                  class: 'search-history-no-results',
+                  label: 'Make your query longer than 3 characters to search'
+                })
             : vnode.state.isTyping
-              ? m(ListItem, { label: m(Spinner, { active: true }) })
+              ? m(ListItem, { class: 'disabled', label: m(Spinner, { active: true }) })
               : results
       ])
 
@@ -600,25 +616,26 @@ export const SearchBar: m.Component<
           },
           onclick: async (e) => {
             vnode.state.focused = true;
-            vnode.state.hideResults = false;
           },
           onfocusout: () => {
-            if(!vnode.state.filterMenuActive) vnode.state.focused = false;
+            // if(!vnode.state.filterMenuActive) vnode.state.focused = false;
           },
           oninput: (e) => {
             e.stopPropagation();
             vnode.state.isTyping = true;
             vnode.state.searchTerm = e.target.value?.toLowerCase();
-            if (vnode.state.hideResults) {
-              vnode.state.hideResults = false;
-            }
-            if (e.target.value?.length > 3) {
-              clearTimeout(vnode.state.inputTimeout);
-              vnode.state.inputTimeout = setTimeout(() => {
-                vnode.state.isTyping = false;
-                return search(vnode.state.searchQuery, vnode.state);
-              }, 500);
-            }
+            clearTimeout(vnode.state.inputTimeout);
+            const timeout = e.target.value?.length > 3 ? 250 : 500000
+            vnode.state.inputTimeout = setTimeout(() => {
+              vnode.state.isTyping = false;
+              if (e.target.value?.length > 3) {
+                search(vnode.state.searchQuery, vnode.state);
+              } else {
+                vnode.state.searchQuery.searchTerm = e.target.value?.toLowerCase();
+                vnode.state.results = []
+                m.redraw()
+              }
+            }, timeout);
           },
           onkeyup: (e) => {
             e.stopPropagation();
