@@ -316,14 +316,14 @@ const getSearchHistoryPreview = (searchQuery: SearchQuery, setFilterMenuActive, 
   const scopeTags = searchQuery.searchScope[0] === SearchScope.All ? []
     : searchQuery.searchScope.map(scope => m(Tag, {label: SearchScope[scope].toLowerCase()}) )
 
-  if(searchQuery.chainScope) {
+  if(searchQuery.chainScope && !app.isCustomDomain()) {
     scopeTags.unshift(m(Tag, {
       label: searchQuery.chainScope.toLowerCase(),
       class: 'search-history-primary-tag'
     }))
   }
 
-  if(searchQuery.communityScope) {
+  if(searchQuery.communityScope && !app.isCustomDomain()) {
     scopeTags.unshift(m(Tag, {
       label: searchQuery.communityScope.toLowerCase(),
       class: 'search-history-primary-tag'
@@ -427,17 +427,22 @@ export const SearchBar: m.Component<
     filterMenuActive: boolean;
     setUsingFilterMenu: Function;
     searchQuery: SearchQuery;
+    activeCommunity: string;
+    activeChain: string;
   }
 > = {
   view: (vnode) => {
-    const activeCommunity = app.community?.name
-    const activeChain = app.activeChainId()
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
     if (!vnode.state.searchQuery) {
-      vnode.state.searchQuery = new SearchQuery('', {
-        isSearchPreview: true,
-        communityScope: activeCommunity,
-        chainScope: activeChain });
+      vnode.state.searchQuery = m.route.get().startsWith('/search')
+        ? SearchQuery.fromUrlParams(m.route.param())
+        : new SearchQuery('', {
+            isSearchPreview: true,
+            communityScope: app.community?.name,
+            chainScope: app.activeChainId()
+          });
+      vnode.state.activeCommunity = app.community ? app.community.name : vnode.state.searchQuery.communityScope
+      vnode.state.activeChain = app.activeChainId() ? app.activeChainId() : vnode.state.searchQuery.chainScope
       vnode.state.isTyping = false;
     }
     if (vnode.state.searchQuery.searchTerm !== vnode.state.searchTerm && vnode.state.searchTerm.length > 3) {
@@ -471,20 +476,25 @@ export const SearchBar: m.Component<
 
     const scopeTitle = m(ListItem, {class: 'disabled', label: 'Limit search to:'})
 
-    const scopeButtons = [SearchScope.Threads, SearchScope.Replies, SearchScope.Communities, SearchScope.Members]
-      .map(s => {
-        return m(Button, {
-          size: Size.SM,
-          active: vnode.state.searchQuery.searchScope.includes(s),
-          onclick: () => {
-            vnode.state.searchQuery.toggleScope(s)
-            search(vnode.state.searchQuery, vnode.state)
-          },
-          onmouseover: () => {vnode.state.filterMenuActive = true},
-          onmouseout: () => {vnode.state.filterMenuActive = false},
-          label: s
-        })
+    const scopeToButton = (scope, disabled) => {
+      return m(Button, {
+        size: Size.SM,
+        class: `${disabled ? 'disabled' : ''}`,
+        active: vnode.state.searchQuery.searchScope.includes(scope),
+        onclick: () => {
+          vnode.state.searchQuery.toggleScope(scope)
+          search(vnode.state.searchQuery, vnode.state)
+        },
+        onmouseover: () => {vnode.state.filterMenuActive = true},
+        onmouseout: () => {vnode.state.filterMenuActive = false},
+        label: scope
       })
+    }
+
+    const scopeButtons = [SearchScope.Threads, SearchScope.Replies].map(s => scopeToButton(s, false))
+      .concat((app.isCustomDomain() ? [] : [SearchScope.Communities, SearchScope.Members])
+        .map(s => scopeToButton(s, (vnode.state.searchQuery.chainScope || vnode.state.searchQuery.communityScope)))
+      )
 
     const filterDropdown =
       m(List, {
@@ -495,68 +505,69 @@ export const SearchBar: m.Component<
           label: "I'm looking for: "
         }),
         m(ListItem, {
-          class: `disabled search-filter-button-bar ${!(activeCommunity || activeChain) ? 'bottom-border' : ''}`,
+          class: 'disabled search-filter-button-bar',
           label: scopeButtons
         }),
-        activeCommunity
+        vnode.state.activeCommunity && !app.isCustomDomain()
           ? [
               scopeTitle,
               m(ListItem, {
-                class: 'disabled bottom-border',
+                class: 'disabled',
                 label: m(Button, {
                   size: Size.SM,
                   onclick: () => {
-                    vnode.state.searchQuery.communityScope = vnode.state.searchQuery.communityScope === activeCommunity
-                      ? undefined : activeCommunity
+                    vnode.state.searchQuery.communityScope =
+                      vnode.state.searchQuery.communityScope === vnode.state.activeCommunity
+                      ? undefined : vnode.state.activeCommunity
                     search(vnode.state.searchQuery, vnode.state)
                   },
-                  active: vnode.state.searchQuery.communityScope === activeCommunity,
+                  active: vnode.state.searchQuery.communityScope === vnode.state.activeCommunity,
                   onmouseover: () => {vnode.state.filterMenuActive = true},
                   onmouseout: () => {vnode.state.filterMenuActive = false},
-                  label: `Inside community: ${activeCommunity}`
+                  label: `Inside community: ${vnode.state.activeCommunity}`
                 }),
               })
             ]
-          : app.activeChainId()
+          : vnode.state.activeChain && !app.isCustomDomain()
             && [
               scopeTitle,
               m(ListItem, {
-                class: 'disabled bottom-border',
+                class: 'disabled',
                 label: m(Button, {
                   size: Size.SM,
                   onclick: () => {
-                    vnode.state.searchQuery.chainScope = vnode.state.searchQuery.chainScope === activeChain
-                      ? undefined : activeChain;
+                    vnode.state.searchQuery.chainScope = vnode.state.searchQuery.chainScope === vnode.state.activeChain
+                      ? undefined : vnode.state.activeChain;
                     search(vnode.state.searchQuery, vnode.state)
                   },
-                  active: vnode.state.searchQuery.chainScope === activeChain ,
+                  active: vnode.state.searchQuery.chainScope === vnode.state.activeChain,
                   onmouseover: () => {vnode.state.filterMenuActive = true},
                   onmouseout: () => {vnode.state.filterMenuActive = false},
-                  label: `Inside chain: ${activeChain}`
+                  label: `Inside chain: ${vnode.state.activeChain}`
                 }),
               })
           ],
         vnode.state.searchTerm.length < 1
           ? historyList.length === 0
             ? m(ListItem, {
-              class: 'search-history-no-results',
+              class: 'search-history-no-results upper-border',
               label: 'Enter a term into the field and press Enter to start'
             })
             : [
-              m(ListItem, { class: 'disabled', label: 'Search History' }),
+              m(ListItem, { class: 'disabled upper-border', label: 'Search History' }),
               historyList
             ]
           : !results || results?.length === 0
             ? app.search.getByQuery(searchQuery)?.loaded
-              ? m(ListItem, { class: 'disabled', label: m(Spinner, { active: true }) })
+              ? m(ListItem, { class: 'disabled upper-border', label: m(Spinner, { active: true }) })
               : vnode.state.isTyping
-                ? m(ListItem, { class: 'disabled', label: m(Spinner, { active: true }) })
+                ? m(ListItem, { class: 'disabled upper-border', label: m(Spinner, { active: true }) })
                 : m(ListItem, {
-                  class: 'search-history-no-results',
+                  class: 'search-history-no-results upper-border',
                   label: 'Make your query longer than 3 characters to search'
                 })
             : vnode.state.isTyping
-              ? m(ListItem, { class: 'disabled', label: m(Spinner, { active: true }) })
+              ? m(ListItem, { class: 'disabled upper-border', label: m(Spinner, { active: true }) })
               : results
       ])
 

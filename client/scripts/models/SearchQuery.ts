@@ -103,7 +103,9 @@ export default class SearchQuery implements SearchParams {
 
     public getSearchScope() {
         return this.searchScope[0] === SearchScope.All
-          ? [SearchScope.Threads, SearchScope.Replies, SearchScope.Communities, SearchScope.Members]
+          ? (this.communityScope || this.chainScope)
+            ? [SearchScope.Threads, SearchScope.Replies]
+            : [SearchScope.Threads, SearchScope.Replies, SearchScope.Communities, SearchScope.Members]
           : this.searchScope
     }
 }

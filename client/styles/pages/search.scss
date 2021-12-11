@@ -392,6 +392,12 @@
                     margin: 0;
                     padding: 0;
                 }
+
+                &.disabled {
+                    pointer-events: none;
+                    background: #bebebe;
+                    color: $text-color-light;
+                }
             }
             .cui-button:hover{
                 background: #e7e7e7;
