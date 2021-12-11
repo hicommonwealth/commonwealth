@@ -13,7 +13,7 @@ import { Pool } from 'pg';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig'
-import { DATABASE_URI, JWT_SECRET, NODE_ENV } from '../config';
+import { DATABASE_URI, JWT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -94,14 +94,8 @@ export function setupWebSocketServer(httpServer: http.Server) {
 					'ChainEventsNotificationsSubscription')
 			})
 	} catch (e) {
-		if (NODE_ENV === 'dev') {
-			log.warn('Failure connecting to local RabbitMQ server. Please ensure it is installed and running correctly.');
-			log.warn('WebSocket notifications will not work without initializing a RabbitMQ server.');
-			log.error(e);
-		} else {
-			log.warn("Failure connecting to production RabbitMQ server. Please fix the RabbitMQ server configuration");
-			log.error(e);
-		}
+		log.warn(`Failure connecting to ${`${process.env.NODE_ENV} ` || ''}RabbitMQ server. Please fix the RabbitMQ server configuration`);
+		log.error(e);
 	}
 }
 
