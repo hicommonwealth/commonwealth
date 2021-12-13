@@ -1,3 +1,4 @@
+/* eslint-disable no-continue */
 // Modified for better handling of code blocks & fenced code blocks.
 // <hr> element has also been removed.
 // <h1> through <h3> are the only headers.
@@ -79,35 +80,39 @@ export class MarkdownShortcuts {
       {
         // bolditalic now handles bold, italic, and bold italic
         name: 'bolditalic',
-        pattern: /\b((?:\*|_){1,3})(.+?)((?:\*|_){1,3})\b/g,
+        pattern: /(?<!\S)((?:\*|_){1,3})([^\s].+?[^\s])((?:\*|_){1,3})(?!\S)/g,
         action: (text, selection, pattern, lineStart) => {
-          let match = pattern.exec(text)
-          const annotatedText = match[0]
-          const openingDelimiter = match[1]
-          const matchedText = match[2]
-          const closingDelimiter = match[3]
-          const startIndex = lineStart + match.index
+          console.log({text});
+          console.log({ selection, pattern, lineStart })
+          const allMatches = text.matchAll(pattern);
+          // let match = pattern.exec(text);
+          for (const match of allMatches) {
+            const annotatedText = match[0]
+            const openingDelimiter = match[1]
+            const matchedText = match[2]
+            const closingDelimiter = match[3]
+            const startIndex = lineStart + match.index
 
-          // bolditalic must be prefixed with whitespace
-          if (startIndex > 0 && this.quill.getText()[startIndex - 1]
-              && this.quill.getText()[startIndex - 1].match(/[*_ \n]/) === null) return
+            // bolditalic must be prefixed with whitespace
+            if (startIndex > 0 && this.quill.getText()[startIndex - 1]
+              && this.quill.getText()[startIndex - 1].match(/[*_ \n]/) === null) continue;
+            if (text.match(/^([*_ \n]+)$/g)) continue;
+            if (matchedText[0] === ' ' || matchedText[matchedText.length - 1] === ' ') continue;
+            if (matchedText[0] === '*' || matchedText[0] === '_') continue;
+            if (openingDelimiter !== closingDelimiter) continue;
+            if (openingDelimiter !== closingDelimiter.split('').reverse().join('')) continue;
 
-          if (text.match(/^([*_ \n]+)$/g)) return
-          if (matchedText[0] === ' ' || matchedText[matchedText.length - 1] === ' ') return
-          if (matchedText[0] === '*' || matchedText[0] === '_') return
-          if (openingDelimiter !== closingDelimiter) return
-          if (openingDelimiter !== closingDelimiter.split('').reverse().join('')) return
-
-          setTimeout(() => {
-            const formatting =
-                  (openingDelimiter === '*' || openingDelimiter === '_') ? {italic: true} :
-                  (openingDelimiter === '**' || openingDelimiter === '__') ? {bold: true} :
-                  {bold: true, italic: true};
-            this.quill.deleteText(startIndex, annotatedText.length)
-            this.quill.insertText(startIndex, matchedText, formatting)
-            this.quill.format('bold', false)
-            this.quill.format('italic', false)
-          }, 0)
+            setTimeout(() => {
+              const formatting =
+                    (openingDelimiter === '*' || openingDelimiter === '_') ? {italic: true} :
+                    (openingDelimiter === '**' || openingDelimiter === '__') ? {bold: true} :
+                    {bold: true, italic: true};
+              this.quill.deleteText(startIndex, annotatedText.length)
+              this.quill.insertText(startIndex, matchedText, formatting)
+              this.quill.format('bold', false)
+              this.quill.format('italic', false)
+            }, 0)
+          }
         }
       },
       {
