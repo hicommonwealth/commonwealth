@@ -86,6 +86,12 @@
            console.log({ selection, pattern, lineStart })
            const allMatches = text.matchAll(pattern);
            // let match = pattern.exec(text);
+
+           // TODO: the indexes get messed up by formatting, so the parser has to go one at a time
+           // e.g. it keeps going until there are no longer any matches unaccounted for
+           // TODO: The interior ([^\s*_]{1,2}|[^\s*_].+?[^\s*_]) regex needs troubleshooting
+           // to cover various edgecases, e.g. to handle `__Example __ *test*` not being parsed
+           // as a single match stretching from `__` to `*`
            for (const match of allMatches) {
              console.log({match});
              const annotatedText = match[0]
