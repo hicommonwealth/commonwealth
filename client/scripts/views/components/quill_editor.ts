@@ -848,7 +848,6 @@ const instantiateEditor = (
     // Log that the quill doc has been altered, so that
     // newThread draft system prompts w/ save confirmation modal
     if (source === 'user' && !state.alteredText) {
-      console.log('redrawing for alteration');
       state.alteredText = true;
       m.redraw();
     }
