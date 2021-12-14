@@ -196,6 +196,7 @@ class ChainInfo {
       pageNum,
       itemsPerPage,
     });
+    console.log({ res });
     return res;
   }
 

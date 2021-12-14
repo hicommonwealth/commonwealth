@@ -13,16 +13,10 @@ import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
-import { pluralize } from 'helpers';
 import { BigNumber } from 'ethers';
 import { notifyError } from 'controllers/app/notifications';
 import { formatAddressShort } from 'utils';
 import { CommunityOptionsPopover } from './discussions';
-import { ConsoleLoggerImpl } from 'typescript-logging';
-import { Profile } from 'client/scripts/models';
-import address from 'server/models/address';
-import { min } from 'underscore';
-import ConfirmSnapshotVoteModal from '../modals/confirm_snapshot_vote_modal';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -76,6 +70,7 @@ const DelegateModal: m.Component<
             !app.user.isMember({ account: app.user.activeAccount, chain: app.activeChainId() }),
           onclick: async (e) => {
             chainController?.chain
+            // TODO: reconcile against original
               .setDelegate(vnode.attrs.address, vnode.state.delegateAmount)
               .catch((err) => {
                 if (err.message.indexOf('delegates underflow') > -1) {
@@ -122,24 +117,6 @@ const MembersPage: m.Component<
     );
   },
   view: (vnode) => {
-    $(window).on('scroll', () => {
-      const elementTarget =
-        document.getElementsByClassName('sublayout-main-col')[0];
-      if (
-        $(window).scrollTop() + $(window).height() >=
-        (elementTarget as HTMLElement).offsetTop +
-        (elementTarget as HTMLElement).offsetHeight
-      ) {
-        if (
-          !vnode.state.requestMembers &&
-          vnode.state.members.length !== vnode.state.totalMemberCount
-        ) {
-          vnode.state.requestMembers = true;
-          vnode.state.pageToLoad++;
-          m.redraw();
-        }
-      }
-    });
     vnode.state.delegates = app.chain instanceof Compound;
     const chainController =
       app.chain instanceof Compound ? (app.chain as Compound) : null;
@@ -162,14 +139,13 @@ const MembersPage: m.Component<
       if (
         !vnode.state.requestMembers &&
         !vnode.state.pageToLoad &&
-        !vnode.state.members
+        !vnode.state.members?.length
       ) {
         vnode.state.requestMembers = true;
         vnode.state.members = [];
         vnode.state.pageToLoad = 0;
       }
     }
-    // get members once
 
     const activeInfo = app.community
       ? app.community.meta
@@ -187,16 +163,6 @@ const MembersPage: m.Component<
             o.address = o.Address.address;
             o.chain = o.chain_id;
             return o;
-          });
-
-          app.recentActivity.getMostActiveUsers().map((user) => {
-            newMembers.map((u) => {
-              const { chain, address } = user.info;
-              if (u.address === user.info.address) {
-                u.count = user.count;
-              }
-              return { chain, address, count: user.count };
-            });
           });
 
           vnode.state.members = vnode.state.members.concat(newMembers);
@@ -226,51 +192,47 @@ const MembersPage: m.Component<
       requestMembers,
       members,
       delegates,
-      voteEvents,
     } = vnode.state;
 
     const noCommunityMembers =
       totalMemberCount === 0 && pageToLoad === 0 && !requestMembers;
 
-      const navigatedFromAccount = app.lastNavigatedBack()
-        && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
-        && localStorage[`${app.activeId()}-members-scrollY`]
+    // const navigatedFromAccount = app.lastNavigatedBack()
+    //   && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
+    //   && localStorage[`${app.activeId()}-members-scrollY`]
 
-      // Load default number of profiles on mount
-      if (!vnode.state.initialProfilesLoaded) {
-        vnode.state.initialScrollFinished = false
-        vnode.state.initialProfilesLoaded = true
+    // // Return to correct scroll position upon redirect from accounts page
+    // if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
+    //   vnode.state.initialScrollFinished = true
+    //   setTimeout(() => {
+    //     window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
+    //   }, 100);
+    // }
 
-        // Set initial number loaded (contingent on navigation)
-        if (navigatedFromAccount) {
-          vnode.state.numProfilesLoaded =
-            Math.min(Number(localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`]))
-        } else {
-          vnode.state.numProfilesLoaded = Math.min(DEFAULT_MEMBER_REQ_SIZE, vnode.state.members.length);
-        }
-        vnode.state.profilesFinishedLoading = vnode.state.numProfilesLoaded >= vnode.state.members.length;
-
-      }
-
-      // Return to correct scroll position upon redirect from accounts page
-      if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
-        vnode.state.initialScrollFinished = true
-        setTimeout(() => {
-          window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
-        }, 100);
-      }
-
-      // Infinite Scroll
-      $(window).off('scroll');
-      vnode.state.onscroll = _.debounce(() => {
-        const scrollHeight = $(document).height();
-        const scrollPos = $(window).height() + $(window).scrollTop();
-        if (scrollPos > scrollHeight - 400) {
+    // Infinite Scroll
+    $(window).off('scroll');
+    vnode.state.onscroll = _.debounce(() => {
+      const scrollHeight = $(document).height();
+      const scrollPos = $(window).height() + $(window).scrollTop();
+      if (scrollPos > scrollHeight - 400) {
+        if (
+          !vnode.state.requestMembers &&
+          vnode.state.members.length !== vnode.state.totalMemberCount
+        ) {
           vnode.state.requestMembers = true;
-        } 
-      }, 400)
-      $(window).on('scroll', vnode.state.onscroll)
+          vnode.state.pageToLoad++;
+          m.redraw();
+        }
+      }
+    }, 400)
+    $(window).on('scroll', vnode.state.onscroll);
 
+    const { numProfilesLoaded } = vnode.state;
+    console.log({
+      totalMemberCount,
+      members,
+      numProfilesLoaded
+    })
     return m(
       Sublayout,
       {
@@ -296,7 +258,7 @@ const MembersPage: m.Component<
                 delegates && m('th.align-right', 'Voting Power'),
                 delegates && m('th.align-right', 'Delegate'),
               ]),
-              vnode.state.members.slice(0, vnode.state.numProfilesLoaded).map((member) => {
+              vnode.state.members.map((member) => {
                 const profileInfo = app.profiles.getProfile(member.chain, member.address);
                 return m('tr', [
                   m('td.members-item-info', [
@@ -306,7 +268,7 @@ const MembersPage: m.Component<
                         e.preventDefault();
                         localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
                         localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`] =
-                          vnode.state.numProfilesLoaded;
+                          numProfilesLoaded;
                         navigateToSubpage(`/account/${profileInfo.address}?base=${profileInfo.chain}`);
                       }
                     }, [
