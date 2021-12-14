@@ -43,6 +43,13 @@ import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
+import { NearSputnikProposalKind } from 'client/scripts/controllers/chain/near/sputnik/types';
+
+enum SupportedSputnikProposalTypes {
+  AddMemberToRole = 'Add Member',
+  RemoveMemberFromRole = 'Remove Member',
+  Transfer = 'Payout',
+}
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -420,9 +427,27 @@ const NewProposalForm = {
         // @TODO: Create Proposal via WebTx
       } else if (proposalTypeEnum === ProposalType.SputnikProposal) {
         // TODO: make type of proposal switchable
-        const account = vnode.state.addMember;
+        const member = vnode.state.member;
         const description = vnode.state.description;
-        const propArgs = { AddMemberToRole: { role: 'council', member_id: account } };
+        let propArgs: NearSputnikProposalKind;
+        if (vnode.state.sputnikProposalType === SupportedSputnikProposalTypes.AddMemberToRole) {
+          propArgs = { AddMemberToRole: { role: 'council', member_id: member } };
+        } else if (vnode.state.sputnikProposalType === SupportedSputnikProposalTypes.RemoveMemberFromRole) {
+          propArgs = { RemoveMemberFromRole: { role: 'council', member_id: member }};
+        } else if (vnode.state.sputnikProposalType === SupportedSputnikProposalTypes.Transfer) {
+          // TODO: validate amount / token id
+          const token_id = vnode.state.tokenId || '';
+          let amount: string;
+          // treat NEAR as in dollars but tokens as whole #s
+          if (!token_id) {
+            amount = app.chain.chain.coins(+vnode.state.payoutAmount, true).asBN.toString();
+          } else {
+            amount = `${+vnode.state.payoutAmount}`;
+          }
+          propArgs = { Transfer: { receiver_id: member, token_id, amount } }
+        } else {
+          throw new Error('unsupported sputnik proposal type');
+        }
         (app.chain as NearSputnik).dao.proposeTx(description, propArgs)
           .then((result) => done(result))
           .then(() => m.redraw())
@@ -1082,19 +1107,32 @@ const NewProposalForm = {
             ]),
           ]),
           hasSputnikFields && [
-            // TODO: add switcher for kinds that modifies fields
             // TODO: add deposit copy
+            m(DropdownFormField, {
+              title: 'Proposal Type',
+              value: vnode.state.sputnikProposalType,
+              defaultValue: SupportedSputnikProposalTypes.AddMemberToRole,
+              choices: Object.values(SupportedSputnikProposalTypes).map((v) => ({
+                name: 'proposalType',
+                label: v,
+                value: v,
+              })),
+              callback: (result) => {
+                vnode.state.sputnikProposalType = result;
+                m.redraw();
+              },
+            }),
             m(FormGroup, [
               m(FormLabel, 'Member'),
               m(Input, {
-                name: 'addMember',
+                name: 'member',
                 defaultValue: 'tokenfactory.testnet',
                 oncreate: (vvnode) => {
-                  vnode.state.addMember = 'tokenfactory.testnet';
+                  vnode.state.member = 'tokenfactory.testnet';
                 },
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.addMember = result;
+                  vnode.state.member = result;
                   m.redraw();
                 },
               }),
@@ -1110,6 +1148,36 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            vnode.state.sputnikProposalType === SupportedSputnikProposalTypes.Transfer && m(FormGroup, [
+              m(FormLabel, 'Token ID (leave blank for Ⓝ)'),
+              m(Input, {
+                name: 'token_id',
+                defaultValue: '',
+                oncreate: (vvnode) => {
+                  vnode.state.tokenId = '';
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.tokenId = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            vnode.state.sputnikProposalType === SupportedSputnikProposalTypes.Transfer && m(FormGroup, [
+              m(FormLabel, 'Amount'),
+              m(Input, {
+                name: 'amount',
+                defaultValue: '',
+                oncreate: (vvnode) => {
+                  vnode.state.payoutAmount = '';
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.payoutAmount = result;
                   m.redraw();
                 },
               }),
