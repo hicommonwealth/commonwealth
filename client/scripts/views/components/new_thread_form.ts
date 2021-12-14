@@ -11,13 +11,12 @@ import {
   Callout, Tabs, TabItem, Form, FormGroup, Input, Button,
   Icon, Icons, List, ListItem, Tag,
 } from 'construct-ui';
-import { toBN } from 'web3-utils';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
+import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo, ITokenAdapter } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -28,8 +27,6 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
-import Token from 'controllers/chain/ethereum/token/adapter';
-import BN from 'bn.js';
 
 interface IThreadForm {
   topicName?: string;
@@ -476,6 +473,17 @@ export const NewThreadForm: m.Component<{
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { fromDraft, postType, saving } = vnode.state;
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const disableDiscussionSubmission = postType === PostType.Discussion
+      && (!author
+        || vnode.state.saving
+        || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+        || !vnode.state.form?.threadTitle
+        || (hasTopics && !vnode.state.form?.topicName)
+        || vnode.state.uploadsInProgress > 0);
+    const disableDiscussionDraftSave = postType === PostType.Discussion
+      && (!author
+        || saving
+        || vnode.state.uploadsInProgress > 0);
     return m('.NewThreadForm', {
       class: `${postType === PostType.Link ? 'link-post' : ''} `
         + `${postType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
@@ -662,7 +670,7 @@ export const NewThreadForm: m.Component<{
                 topics: app.topics && app.topics.getByCommunity(app.activeId()).filter((t) => {
                   return isAdmin
                     || t.tokenThreshold.isZero()
-                    || (app.chain instanceof Token && (t.tokenThreshold).lte((app.chain as Token).tokenBalance));
+                    || (ITokenAdapter.instanceOf(app.chain) && (t.tokenThreshold).lte(app.chain.tokenBalance));
                 }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
@@ -703,7 +711,7 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, { order: 5 }, [
             m(Button, {
-              disabled: !author || saving || vnode.state.uploadsInProgress > 0,
+              disabled: disableDiscussionSubmission,
               intent: 'primary',
               rounded: true,
               onclick: async (e) => {
@@ -740,7 +748,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
             m(Button, {
-              disabled: !author || saving || vnode.state.uploadsInProgress > 0,
+              disabled: disableDiscussionDraftSave,
               intent: 'none',
               rounded: true,
               onclick: async (e) => {

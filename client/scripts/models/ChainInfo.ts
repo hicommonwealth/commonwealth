@@ -34,6 +34,7 @@ class ChainInfo {
   public members: RoleInfo[];
   public type: string;
   public readonly ss58Prefix: string;
+  public readonly bech32Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
 
@@ -62,6 +63,7 @@ class ChainInfo {
     adminsAndMods,
     base,
     ss58_prefix,
+    bech32_prefix,
     type,
     decimals,
     substrateSpec,
@@ -88,10 +90,11 @@ class ChainInfo {
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultSummaryView = defaultSummaryView;
     this.featuredTopics = featuredTopics || [];
-    this.topics = topics.map((t) => new OffchainTopic(t)) || [];
+    this.topics = topics ? topics.map((t) => new OffchainTopic(t)) : [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
+    this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
   }
@@ -121,6 +124,7 @@ class ChainInfo {
     adminsAndMods,
     base,
     ss58_prefix,
+    bech32_prefix,
     type,
     decimals,
     substrate_spec,
@@ -157,6 +161,7 @@ class ChainInfo {
       adminsAndMods,
       base,
       ss58_prefix,
+      bech32_prefix,
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,

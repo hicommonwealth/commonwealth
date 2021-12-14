@@ -1,11 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import Web3 from 'web3';
+import * as solw3 from '@solana/web3.js';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 import { getUrlForEthChainId } from '../util/supportedEthChains';
 
-import { ChainBase } from '../../shared/types';
+import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,6 +21,7 @@ export const Errors = {
   NoBase: 'Must provide chain base',
   NoNodeUrl: 'Must provide node url',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
+  InvalidNode: 'Node url returned invalid response',
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
@@ -32,6 +36,7 @@ export const Errors = {
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
+  NotAdmin: 'Must be admin',
 };
 
 const createChain = async (
@@ -42,6 +47,12 @@ const createChain = async (
 ) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
+  }
+  // require Admin privilege for creating Chain/DAO
+  if (req.body.type !== ChainType.Token) {
+    if (!req.user.isAdmin) {
+      return next(new Error(Errors.NotAdmin));
+    }
   }
   if (!req.body.name || !req.body.name.trim()) {
     return next(new Error(Errors.NoName));
@@ -83,6 +94,12 @@ const createChain = async (
     const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
     if (ethChainUrl) {
       url = ethChainUrl;
+    } else {
+      // If using overridden URL, then user must be admin -- we do not allow users to submit
+      // custom URLs yet.
+      if (!req.user.isAdmin) {
+        return next(new Error(Errors.NotAdmin));
+      }
     }
     if (!url) {
       return next(new Error(Errors.InvalidChainIdOrUrl));
@@ -101,6 +118,37 @@ const createChain = async (
     });
     if (existingChainNode) {
       return next(new Error(Errors.ChainAddressExists));
+    }
+  } else if (req.body.base === ChainBase.Solana) {
+    let pubKey: solw3.PublicKey;
+    try {
+      pubKey = new solw3.PublicKey(req.body.address);
+    } catch (e) {
+      return next(new Error(Errors.InvalidAddress));
+    }
+
+    try {
+      const clusterUrl = solw3.clusterApiUrl(url);
+      const connection = new solw3.Connection(clusterUrl);
+      const supply = await connection.getTokenSupply(pubKey);
+      const { decimals, amount } = supply.value;
+      req.body.decimals = decimals;
+      if (new BN(amount, 10).isZero()) {
+        throw new Error('Invalid supply amount');
+      }
+    } catch (e) {
+      return next(new Error(Errors.InvalidNodeUrl));
+    }
+  } else if (req.body.base === ChainBase.CosmosSDK) {
+    // test cosmos endpoint validity -- must be http(s)
+    if (!urlHasValidHTTPPrefix(url)) {
+      return next(new Error(Errors.InvalidNodeUrl));
+    }
+    try {
+      const tmClient = await Tendermint34Client.connect(url);
+      const { block } = await tmClient.block();
+    } catch (err) {
+      return next(new Error(Errors.InvalidNode));
     }
   } else {
     if (!url || !url.trim()) {
@@ -151,6 +199,8 @@ const createChain = async (
     github: req.body.github,
     element: req.body.element,
     base: req.body.base,
+    bech32_prefix: req.body.bech32_prefix,
+    decimals: req.body.decimals,
   };
   const chain = await models.Chain.create(chainContent);
 
@@ -159,6 +209,7 @@ const createChain = async (
     url,
     address: req.body.address,
     eth_chain_id,
+    token_name: req.body.token_name,
   };
   const node = await models.ChainNode.create(chainNodeContent);
 

@@ -20,24 +20,24 @@ const bulkThreads = async (
   const { cutoff_date, topic_id, stage } = req.query;
 
   const communityOptions = community
-    ? `community = :community `
-    : `chain = :chain `;
+    ? `community = $community `
+    : `chain = $chain `;
 
-  const replacements = community
+  const bind = community
     ? { community: community.id }
     : { chain: chain.id };
 
   let topicOptions = '';
   if (topic_id) {
-    topicOptions += `AND t.topic_id = :topic_id `;
-    replacements['topic_id'] = topic_id;
+    topicOptions += `AND t.topic_id = $topic_id `;
+    bind['topic_id'] = topic_id;
   }
   if (stage) {
-    topicOptions += `AND t.stage = :stage `;
-    replacements['stage'] = stage;
+    topicOptions += `AND t.stage = $stage `;
+    bind['stage'] = stage;
   }
 
-  replacements['created_at'] = cutoff_date;
+  bind['created_at'] = cutoff_date;
 
   // Threads
   let threads;
@@ -84,7 +84,7 @@ const bulkThreads = async (
           FROM "OffchainComments"
           WHERE ${communityOptions}
             AND root_id LIKE 'discussion%'
-            AND created_at < :created_at
+            AND created_at < $created_at
             AND deleted_at IS NULL
           GROUP BY root_id
           ) c
@@ -100,7 +100,7 @@ const bulkThreads = async (
         WHERE t.deleted_at IS NULL
           AND t.${communityOptions}
           ${topicOptions}
-          AND t.created_at < :created_at
+          AND t.created_at < $created_at
           AND t.pinned = false
           GROUP BY (t.id, c.latest_comm_created_at, t.created_at)
           ORDER BY COALESCE(c.latest_comm_created_at, t.created_at) DESC LIMIT 20
@@ -111,7 +111,7 @@ const bulkThreads = async (
     let preprocessedThreads;
     try {
       preprocessedThreads = await models.sequelize.query(query, {
-        replacements,
+        bind,
         type: QueryTypes.SELECT,
       });
     } catch (e) {
@@ -220,7 +220,7 @@ const bulkThreads = async (
 
   const threadsInVoting: OffchainThreadInstance[] =
     await models.sequelize.query(countsQuery, {
-      replacements,
+      bind,
       type: QueryTypes.SELECT,
     });
   const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;

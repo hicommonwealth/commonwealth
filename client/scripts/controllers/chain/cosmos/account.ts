@@ -58,11 +58,6 @@ export default class CosmosAccount extends Account<CosmosToken> {
     }
   });
 
-  public sendBalanceTx(recipient: Account<CosmosToken>, amount: CosmosToken):
-    ITXModalData | Promise<ITXModalData> {
-    throw new Error('Method not implemented.');
-  }
-
   public async sendTx(recipient: CosmosAccount, amount: CosmosToken) {
     const msg: MsgSendEncodeObject = {
       typeUrl: '/cosmos.bank.v1beta1.MsgSend',
