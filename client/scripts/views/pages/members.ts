@@ -117,6 +117,7 @@ const MembersPage: m.Component<
     );
   },
   view: (vnode) => {
+    console.log(app.chain instanceof Compound);
     vnode.state.delegates = app.chain instanceof Compound;
     const chainController =
       app.chain instanceof Compound ? (app.chain as Compound) : null;
@@ -147,16 +148,25 @@ const MembersPage: m.Component<
       }
     }
 
+    const navigatedFromAccount = app.lastNavigatedBack()
+      && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
+      && localStorage[`${app.activeId()}-members-scrollY`]
+      && localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`];
+
+    // TODO: Members should be stored to prevent redundant fetches each time
+    // the members page is navigated to.
     const activeInfo = app.community
       ? app.community.meta
       : app.chain.meta.chain;
+    const outsizedFirstPageFetch = (vnode.state.pageToLoad === 0 && navigatedFromAccount)
+      ? localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`] : null;
     if (vnode.state.requestMembers) {
       vnode.state.requestMembers = false;
       activeInfo
         .getMembersByPage(
           app.activeId(),
           vnode.state.pageToLoad,
-          MEMBERS_PER_PAGE
+          outsizedFirstPageFetch || MEMBERS_PER_PAGE
         )
         .then(({ result, total }) => {
           const newMembers = result.map((o) => {
@@ -194,20 +204,15 @@ const MembersPage: m.Component<
       delegates,
     } = vnode.state;
 
-    const noCommunityMembers =
-      totalMemberCount === 0 && pageToLoad === 0 && !requestMembers;
+    const noCommunityMembers = (totalMemberCount === 0 && pageToLoad === 0 && !requestMembers);
 
-    // const navigatedFromAccount = app.lastNavigatedBack()
-    //   && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
-    //   && localStorage[`${app.activeId()}-members-scrollY`]
-
-    // // Return to correct scroll position upon redirect from accounts page
-    // if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
-    //   vnode.state.initialScrollFinished = true
-    //   setTimeout(() => {
-    //     window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
-    //   }, 100);
-    // }
+    // Return to correct scroll position upon redirect from accounts page
+    if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
+      vnode.state.initialScrollFinished = true
+      setTimeout(() => {
+        window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
+      }, 100);
+    }
 
     // Infinite Scroll
     $(window).off('scroll');
@@ -259,6 +264,7 @@ const MembersPage: m.Component<
                 delegates && m('th.align-right', 'Delegate'),
               ]),
               vnode.state.members.map((member) => {
+                console.log(member.votes);
                 const profileInfo = app.profiles.getProfile(member.chain, member.address);
                 return m('tr', [
                   m('td.members-item-info', [
@@ -279,7 +285,7 @@ const MembersPage: m.Component<
                   delegates
                   && m('td.align-right', [
                       member.votes !== undefined
-                        ? `${member.votes.toNumber().toFixed(2)} ${app.chain.meta.chain.symbol
+                        ? `${member.votes.toNumber()?.toFixed(2)} ${app.chain.meta.chain.symbol
                         }`
                         : m(Spinner, { active: true, size: 'xs' }),
                     ]),
