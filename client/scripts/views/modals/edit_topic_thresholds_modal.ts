@@ -3,15 +3,12 @@ import 'modals/new_topic_modal.scss';
 
 import m from 'mithril';
 import app from 'state';
-import $ from 'jquery';
-import { Button, Col, Input, Form, FormGroup, FormLabel, Grid, Spinner } from 'construct-ui';
-import BN from 'bn.js';
+import { Button, Form } from 'construct-ui';
 
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { OffchainTopic } from 'models';
 import { CompactModalExitButton } from 'views/modal';
-import { tokensToTokenBaseUnits, tokenBaseUnitsToTokens } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { OffchainTopic } from '../../models';
+import TokenDecimalInput from 'views/components/token_decimal_input';
 
 interface INewTopicModalForm {
   id: number,
@@ -20,44 +17,46 @@ interface INewTopicModalForm {
   tokenThreshold: number
 }
 
-const EditTopicThresholdsRow: m.Component<{ topic: OffchainTopic }, { newTokenThreshold: string }> = {
+const EditTopicThresholdsRow: m.Component<{
+  topic: OffchainTopic
+}, {
+  newTokenThresholdInWei: string,
+}> = {
   view: (vnode) => {
     const { topic } = vnode.attrs;
-    const decimals = app.chain.meta.chain.decimals ? app.chain.meta.chain.decimals : 18;
-    if (vnode.state.newTokenThreshold === null || vnode.state.newTokenThreshold === undefined) {
-      vnode.state.newTokenThreshold = topic.tokenThreshold
-        ? tokenBaseUnitsToTokens(topic.tokenThreshold.toString(), decimals) : '0';
+    if (typeof vnode.state.newTokenThresholdInWei !== 'string') {
+      vnode.state.newTokenThresholdInWei = topic.tokenThreshold?.toString() || '0';
     }
+    const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
 
     return m(Form, [
-      m('.topic-name', [ topic.name ]),
-      m('div',  [ m(Input, {
-        value: vnode.state.newTokenThreshold,
-        oninput: (e) => {
-          const threshold = (e.target as any).value;
-          if (threshold.match(/^\d*?\.?\d*?$/)) {
-            vnode.state.newTokenThreshold = threshold;
-          }
-        },
+      m('.topic-name', [topic.name]),
+      m(TokenDecimalInput, {
+        decimals,
+        defaultValueInWei: topic.tokenThreshold.toString(),
+        onInputChange: (newValue: string) => {
+          vnode.state.newTokenThresholdInWei = newValue;
+        }
       }),
       m(Button, {
         label: 'Update',
         intent: 'primary',
         rounded: true,
+        disabled: !vnode.state.newTokenThresholdInWei,
         onclick: async (e) => {
           e.preventDefault();
-          app.topics.setTopicThreshold(topic,
-            tokensToTokenBaseUnits(vnode.state.newTokenThreshold.toString(), decimals))
-            .then((status) => {
-              if (status === 'Success') {
-                notifySuccess('Successfully updated threshold value');
-              } else {
-                notifyError('Could not update threshold value');
-              }
-            });
+          try {
+            const status = await app.topics.setTopicThreshold(topic, vnode.state.newTokenThresholdInWei);
+            if (status === 'Success') {
+              notifySuccess('Successfully updated threshold value');
+            } else {
+              notifyError('Could not update threshold value');
+            }
+          } catch (err) {
+            notifyError(`Invalid threshold value: ${err.message}`);
+          }
         },
       }),
-      ]),
     ]);
   }
 };

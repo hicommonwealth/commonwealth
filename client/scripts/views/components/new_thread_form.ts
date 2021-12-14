@@ -17,7 +17,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo } from 'models';
+import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo, ITokenAdapter } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -658,8 +658,9 @@ export const NewThreadForm: m.Component<{
                   ? vnode.state.activeTopic
                   : localStorage.getItem(`${app.activeId()}-active-topic`),
                 topics: app.topics && app.topics.getByCommunity(app.activeId()).filter((t) => {
-                  // @To-do // Change this because right now the forum threshold is hardcoded to zero
-                  return isAdmin || (app.chain && toBN(0).gte(t.tokenThreshold));
+                  return isAdmin
+                    || t.tokenThreshold.isZero()
+                    || (ITokenAdapter.instanceOf(app.chain) && (t.tokenThreshold).lte(app.chain.tokenBalance));
                 }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),

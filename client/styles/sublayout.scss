@@ -74,9 +74,14 @@
         padding: 0;
         padding-right: 20px;
         max-width: calc(100% - #{$sidebar-width});
+        &.no-right-content {
+            width: 100%;
+            max-width: 100%;
+        }
         @include sm-max {
             max-width: 100%;
             padding: 0;
+            max-width: 100%;
         }
         @include xs-max {
             min-width: calc(100vw - 80px);
@@ -171,6 +176,7 @@
             .CommunitySelector,
             .sublayout-header-heading {
                 display: flex;
+                align-items: baseline;
             }
             h3 {
                 font-size: 1.15rem;
@@ -195,7 +201,9 @@
                 }
                 .cui-icon {
                     position: relative;
-                    top: -1px;
+                    &.cui-icon-chevron-down {
+                        top: 1px;
+                    }
                     &::before {
                         content: ' ';
                         width: 5px;

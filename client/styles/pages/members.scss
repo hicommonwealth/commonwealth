@@ -28,10 +28,22 @@
             font-size: 18px;
         }
     }
-    .spinner-wrap {
+
+    .infinite-scroll-reached-end {
+        color: $text-color-light;
+        font-size: 0.94rem;
+        margin: 20px 0;
+        text-align: center;
+    }
+    .topic-loading-spinner-wrap,
+    .infinite-scroll-spinner-wrap {
+        height: 70px;
         width: 100%;
         display: flex;
         justify-content: center;
-        margin-top: 20px;
+        align-items: center;
+    }
+    .topic-loading-spinner-wrap {
+        height: 120px;
     }
 }

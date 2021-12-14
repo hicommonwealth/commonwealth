@@ -18,6 +18,7 @@ export class TimelockInterface__factory {
 
 const _abi = [
   {
+    constant: true,
     inputs: [],
     name: "GRACE_PERIOD",
     outputs: [
@@ -27,17 +28,21 @@ const _abi = [
         type: "uint256",
       },
     ],
+    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
+    constant: false,
     inputs: [],
     name: "acceptAdmin",
     outputs: [],
+    payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
   {
+    constant: false,
     inputs: [
       {
         internalType: "address",
@@ -67,10 +72,12 @@ const _abi = [
     ],
     name: "cancelTransaction",
     outputs: [],
+    payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
   {
+    constant: true,
     inputs: [],
     name: "delay",
     outputs: [
@@ -80,10 +87,12 @@ const _abi = [
         type: "uint256",
       },
     ],
+    payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
+    constant: false,
     inputs: [
       {
         internalType: "address",
@@ -119,10 +128,12 @@ const _abi = [
         type: "bytes",
       },
     ],
+    payable: true,
     stateMutability: "payable",
     type: "function",
   },
   {
+    constant: false,
     inputs: [
       {
         internalType: "address",
@@ -158,10 +169,12 @@ const _abi = [
         type: "bytes32",
       },
     ],
+    payable: false,
     stateMutability: "nonpayable",
     type: "function",
   },
   {
+    constant: true,
     inputs: [
       {
         internalType: "bytes32",
@@ -177,6 +190,7 @@ const _abi = [
         type: "bool",
       },
     ],
+    payable: false,
     stateMutability: "view",
     type: "function",
   },

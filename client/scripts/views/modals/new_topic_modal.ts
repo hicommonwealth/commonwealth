@@ -8,8 +8,9 @@ import BN from 'bn.js';
 
 import QuillEditor from 'views/components/quill_editor';
 import { CompactModalExitButton } from 'views/modal';
-import { tokensToTokenBaseUnits } from 'helpers';
+import { tokensToWei } from 'helpers';
 import { stubFalse } from 'lodash';
+import TokenDecimalInput from '../components/token_decimal_input';
 interface INewTopicModalForm {
   id: number,
   name: string,
@@ -52,6 +53,7 @@ const NewTopicModal: m.Component<{
       disabled = true;
     }
 
+    const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
     return m('.NewTopicModal', [
       m('.compact-modal-title', [
         m('h3', 'New topic'),
@@ -89,19 +91,13 @@ const NewTopicModal: m.Component<{
               }
             }),
           ]),
-          m(FormGroup, [
-            m(FormLabel, { for: 'tokenThreshold' }, `Number of tokens needed to post (${app.chain.meta.chain.symbol})`),
-            m(Input, {
-              title: 'Token threshold',
-              class: 'topic-form-token-threshold',
-              tabindex: 2,
-              defaultValue: '0',
-              value: vnode.state.form.tokenThreshold,
-              oninput: (e) => {
-                // restrict it to numerical input
-                if (e.target.value === '' || /^\d+\.?\d*$/.test(e.target.value)) {
-                  vnode.state.form.tokenThreshold = (e.target as any).value;
-                }
+          app.activeChainId() && m(FormGroup, [
+            m(FormLabel, { for: 'tokenThreshold' }, `Number of tokens needed to post (${app.chain?.meta.chain.symbol})`),
+            m(TokenDecimalInput, {
+              decimals,
+              defaultValueInWei: '0',
+              onInputChange: (newValue: string) => {
+                vnode.state.form.tokenThreshold = newValue;
               }
             })
           ]),
@@ -159,8 +155,8 @@ const NewTopicModal: m.Component<{
                 null,
                 form.featuredInSidebar,
                 form.featuredInNewPost,
-                tokensToTokenBaseUnits(vnode.state.form.tokenThreshold || '0',
-                  app.chain.meta.chain.decimals || 18),
+                app.activeChainId() ? tokensToWei(vnode.state.form.tokenThreshold || '0',
+                  app.chain?.meta.chain.decimals || 18) : '0',
                 defaultOffchainTemplate
               ).then(() => {
                 vnode.state.saving = false;

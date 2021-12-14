@@ -197,6 +197,7 @@ $discussion-title-font-size: 1.45rem;
         }
         .proposal-content-right {
             flex: 1;
+            overflow-x: auto;
             margin-left: $discussion-comment-padding;
             @include xs-max {
                 margin-right: 10px;
@@ -270,6 +271,7 @@ $discussion-title-font-size: 1.45rem;
         display: flex;
         .comment-body {
             flex: 1;
+            overflow-x: auto;
             padding-left: $discussion-comment-padding;
         }
         .comment-body-top {
@@ -400,16 +402,52 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
+    .ProposalSidebarLinkedViewer {
+        border-radius: 10px;
+        border: 1px solid tint($border-color-lightest, 26%);
+        padding: 22px 18px 21px;
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .placeholder-copy {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }   
+    }
+    
+    .ConnectProposalButtonWrapper {
+        margin-top: 10px;
+    }
+
     .ProposalHeaderOffchainPoll,
-    .ProposalSidebarLinkedViewer,
-    .ProposalSidebarStageEditorModule,
-    .ProposalSidebarPollEditorModule {
+    .ProposalSidebarPollEditorModule,
+    .ProposalLinkedThreadsEditorModule {
         border-radius: 10px;
         border: 1px solid tint($border-color-lightest, 26%);
         padding: 22px 18px 21px;
         margin-bottom: 24px;
     }
-    .ProposalSidebarStageEditorModule,
+    .ProposalLinkedThreadsEditorModule {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        a.linked-thread {
+            color: #9a9da4;
+        }
+        .cui-list-item {
+            &:first-child {
+                padding-top: 0 !important;
+            }
+            &:hover {
+                background: none;
+            }
+        }
+        .linked-threads-title {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+    }
     .ProposalSidebarPollEditorModule {
         .placeholder-copy {
             line-height: 1.2;

@@ -37,7 +37,9 @@ export class SubstrateTreasuryTip extends Proposal<
   }
 
   private _title: string;
-  public get title() { return this._title || `Tip ${this.shortIdentifier}`; }
+  public get title() {
+    return this._title || `${this.support.inDollars} ${this.support.denom} to ${this.data.who.slice(0, 8)}…`;
+  }
 
   private readonly _description: string;
   public get description() { return this._description; }

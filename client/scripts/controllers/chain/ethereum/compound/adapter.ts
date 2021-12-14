@@ -50,7 +50,7 @@ export default class Compound extends IChainAdapter<EthereumCoin, EthereumAccoun
       await super.initApi();
     } catch (e) {
       this._failed = true;
-      notifyError('Failed to fetch via infura');
+      notifyError('Failed to initialize API.');
     }
   }
 

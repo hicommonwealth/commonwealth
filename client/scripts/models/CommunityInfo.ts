@@ -23,6 +23,7 @@ interface CommunityData {
   invitesEnabled: boolean;
   privacyEnabled: boolean;
   collapsedOnHomepage: boolean;
+  defaultSummaryView: boolean;
   featuredTopics: any[];
   topics: any[];
   adminsAndMods: any;
@@ -47,6 +48,7 @@ class CommunityInfo {
   public customDomain: string;
   public terms: string;
   public readonly collapsedOnHomepage: boolean;
+  public defaultSummaryView: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public adminsAndMods: RoleInfo[];
@@ -72,6 +74,7 @@ class CommunityInfo {
     invitesEnabled,
     privacyEnabled,
     collapsedOnHomepage,
+    defaultSummaryView,
     featuredTopics,
     topics,
     adminsAndMods,
@@ -94,8 +97,9 @@ class CommunityInfo {
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
     this.collapsedOnHomepage = collapsedOnHomepage;
+    this.defaultSummaryView = defaultSummaryView;
     this.featuredTopics = featuredTopics || [];
-    this.topics = topics || [];
+    this.topics = topics.map((t) => new OffchainTopic(t)) || [];
     this.adminsAndMods = adminsAndMods || [];
   }
 
@@ -103,30 +107,31 @@ class CommunityInfo {
     id,
     name,
     description,
-    iconUrl,
+    icon_url,
     website,
     discord,
     element,
     telegram,
     github,
-    defaultChain: default_chain,
+    default_chain,
     visible,
-    stagesEnabled,
-    customStages,
-    customDomain,
+    stages_enabled,
+    custom_stages,
+    custom_domain,
     terms,
-    invitesEnabled,
-    privacyEnabled,
-    collapsedOnHomepage: collapsed_on_homepage,
-    featuredTopics,
+    invites_enabled,
+    privacy_enabled,
+    collapsed_on_homepage,
+    default_summary_view,
+    featured_topics,
     topics,
-    adminsAndMods,
+    admins_and_mods,
   }) {
     return new CommunityInfo({
       id,
       name,
       description,
-      iconUrl,
+      iconUrl: icon_url,
       website,
       discord,
       element,
@@ -134,16 +139,17 @@ class CommunityInfo {
       github,
       defaultChain: default_chain,
       visible,
-      stagesEnabled,
-      customStages,
-      customDomain,
+      stagesEnabled: stages_enabled,
+      customStages: custom_stages,
+      customDomain: custom_domain,
       terms,
-      invitesEnabled,
-      privacyEnabled,
+      invitesEnabled: invites_enabled,
+      privacyEnabled: privacy_enabled,
       collapsedOnHomepage: collapsed_on_homepage,
-      featuredTopics,
+      defaultSummaryView: default_summary_view,
+      featuredTopics: featured_topics,
       topics,
-      adminsAndMods,
+      adminsAndMods: admins_and_mods,
     });
   }
 
@@ -214,6 +220,7 @@ class CommunityInfo {
     name,
     iconUrl,
     privacyEnabled,
+    defaultSummaryView,
     stagesEnabled,
     customStages,
     customDomain,
@@ -241,6 +248,7 @@ class CommunityInfo {
       terms,
       privacy: privacyEnabled,
       invites: invitesEnabled,
+      default_summary_view: defaultSummaryView,
       jwt: app.user.jwt,
     });
     const updatedCommunity: OffchainCommunityInstance = r.result;
@@ -258,6 +266,7 @@ class CommunityInfo {
     this.terms = updatedCommunity.terms;
     this.privacyEnabled = updatedCommunity.privacy_enabled;
     this.invitesEnabled = updatedCommunity.invites_enabled;
+    this.defaultSummaryView = updatedCommunity.default_summary_view;
   }
 
   public addFeaturedTopic(topic: string) {

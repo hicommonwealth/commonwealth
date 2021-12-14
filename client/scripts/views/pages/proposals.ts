@@ -31,6 +31,7 @@ import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
+import { CommunityOptionsPopover } from './discussions';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -88,11 +89,13 @@ const CompoundProposalStats: m.Component<{}, {}> = {
           ]),
         ]),
         m('', [
+          // TODO: We shouldn't be hardcoding these decimal amounts
           m('.stats-box-stat', [
             `Quorum: ${formatNumberShort(+app.chain.governance?.quorumVotes.div(decimals))} ${symbol}`
           ]),
-          m('.stats-box-stat', [
-            `Proposal Threshold: ${formatNumberShort(+app.chain.governance?.proposalThreshold.div(decimals))} ${symbol}`
+          app.chain.governance?.proposalThreshold && m('.stats-box-stat', [
+            `Proposal Threshold: ${app.chain.governance?.proposalThreshold
+              .div(new BN('1000000000000000000')).toString()} ${symbol}`
           ]),
           m('.stats-box-stat', [
             `Voting Period Length: ${app.chain.governance.votingPeriod.toString(10)} Blocks`,

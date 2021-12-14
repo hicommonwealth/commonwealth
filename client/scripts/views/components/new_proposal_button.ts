@@ -127,8 +127,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     }),
     showSnapshotOptions && m(MenuItem, {
       onclick: (e) => {
-        e.preventDefault();
-        navigateToSubpage(`/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+        navigateToSubpage(`/new/snapshot/${app.chain.meta.chain.snapshot}`);
       },
       label: 'New Snapshot Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,

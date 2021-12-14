@@ -26,6 +26,7 @@ class ChainInfo {
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
+  public defaultSummaryView: boolean;
   public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
@@ -33,6 +34,7 @@ class ChainInfo {
   public members: RoleInfo[];
   public type: string;
   public readonly ss58Prefix: string;
+  public readonly bech32Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
 
@@ -55,11 +57,13 @@ class ChainInfo {
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
+    defaultSummaryView,
     featuredTopics,
     topics,
     adminsAndMods,
     base,
     ss58_prefix,
+    bech32_prefix,
     type,
     decimals,
     substrateSpec,
@@ -84,11 +88,13 @@ class ChainInfo {
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
+    this.defaultSummaryView = defaultSummaryView;
     this.featuredTopics = featuredTopics || [];
-    this.topics = topics || [];
+    this.topics = topics ? topics.map((t) => new OffchainTopic(t)) : [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
+    this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
   }
@@ -112,11 +118,13 @@ class ChainInfo {
     terms,
     block_explorer_ids,
     collapsed_on_homepage,
+    default_summary_view,
     featured_topics,
     topics,
     adminsAndMods,
     base,
     ss58_prefix,
+    bech32_prefix,
     type,
     decimals,
     substrate_spec,
@@ -147,11 +155,13 @@ class ChainInfo {
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
+      defaultSummaryView: default_summary_view,
       featuredTopics: featured_topics,
       topics,
       adminsAndMods,
       base,
       ss58_prefix,
+      bech32_prefix,
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
@@ -240,6 +250,7 @@ class ChainInfo {
     terms,
     snapshot,
     iconUrl,
+    defaultSummaryView,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -257,6 +268,7 @@ class ChainInfo {
       snapshot,
       terms,
       icon_url: iconUrl,
+      default_summary_view: defaultSummaryView,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
@@ -273,6 +285,8 @@ class ChainInfo {
     this.snapshot = updatedChain.snapshot;
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
+    this.defaultSummaryView = updatedChain.default_summary_view;
+    console.log({ this: this.defaultSummaryView, route: updatedChain.default_summary_view });
   }
 
   public addFeaturedTopic(topic: string) {

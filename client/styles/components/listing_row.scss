@@ -53,17 +53,19 @@
                 font-weight: 600;
             }
             .row-subheader {
-                margin-top: 3px;
-                @media (min-width: 800px){
-                    display: flex;
-                    align-items: baseline;
-                }
+                margin-top: 5px;
+                display: flex;
                 > * {
                     display: inline;
                 }
             }
             .row-subheader + .row-subheader {
                 margin-top: 1px;
+            }
+            .row-subheader > .created-at {
+                max-height: 17px;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             .row-subheader > a,
             .row-subheader > .User > a,
@@ -72,9 +74,15 @@
             > span {
                 color: $text-color-light;
                 font-size: $text-size-item-meta;
+                max-height: 17px;
+                overflow: hidden;
+                text-overflow: ellipsis;
                 &:hover {
                     color: darken($text-color-light, 8%);
                 }
+            }
+            .external-discussion-link {
+                word-break: break-all;
             }
         }
     }

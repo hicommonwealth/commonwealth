@@ -4,6 +4,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
 import { Button, Input, Tag, Table, Tooltip, Spinner } from 'construct-ui';
+import $ from 'jquery';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -17,6 +18,14 @@ import { BigNumber } from 'ethers';
 import { notifyError } from 'controllers/app/notifications';
 import { formatAddressShort } from 'utils';
 import { CommunityOptionsPopover } from './discussions';
+import { ConsoleLoggerImpl } from 'typescript-logging';
+import { Profile } from 'client/scripts/models';
+import address from 'server/models/address';
+import { min } from 'underscore';
+import ConfirmSnapshotVoteModal from '../modals/confirm_snapshot_vote_modal';
+
+// The number of member profiles that are batch loaded
+const DEFAULT_MEMBER_REQ_SIZE = 20;
 
 interface MemberInfo {
   chain: string;
@@ -91,6 +100,11 @@ const MembersPage: m.Component<
     totalMemberCount: number;
     delegates: boolean;
     voteEvents;
+    profilesFinishedLoading: boolean;
+    numProfilesLoaded: number;
+    initialProfilesLoaded: boolean;
+    initialScrollFinished: boolean;
+    onscroll;
   }
 > = {
   oninit: (vnode) => {
@@ -206,17 +220,6 @@ const MembersPage: m.Component<
         .then(() => m.redraw());
     }
 
-    const isAdmin = app.user.isSiteAdmin;
-    app.user.isAdminOfEntity({
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-    });
-    const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-    });
-
     const {
       totalMemberCount,
       pageToLoad,
@@ -229,13 +232,52 @@ const MembersPage: m.Component<
     const noCommunityMembers =
       totalMemberCount === 0 && pageToLoad === 0 && !requestMembers;
 
+      const navigatedFromAccount = app.lastNavigatedBack()
+        && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
+        && localStorage[`${app.activeId()}-members-scrollY`]
+
+      // Load default number of profiles on mount
+      if (!vnode.state.initialProfilesLoaded) {
+        vnode.state.initialScrollFinished = false
+        vnode.state.initialProfilesLoaded = true
+
+        // Set initial number loaded (contingent on navigation)
+        if (navigatedFromAccount) {
+          vnode.state.numProfilesLoaded =
+            Math.min(Number(localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`]))
+        } else {
+          vnode.state.numProfilesLoaded = Math.min(DEFAULT_MEMBER_REQ_SIZE, vnode.state.members.length);
+        }
+        vnode.state.profilesFinishedLoading = vnode.state.numProfilesLoaded >= vnode.state.members.length;
+
+      }
+
+      // Return to correct scroll position upon redirect from accounts page
+      if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
+        vnode.state.initialScrollFinished = true
+        setTimeout(() => {
+          window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
+        }, 100);
+      }
+
+      // Infinite Scroll
+      $(window).off('scroll');
+      vnode.state.onscroll = _.debounce(() => {
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollPos > scrollHeight - 400) {
+          vnode.state.requestMembers = true;
+        } 
+      }, 400)
+      $(window).on('scroll', vnode.state.onscroll)
+
     return m(
       Sublayout,
       {
         class: 'MembersPage',
         title: [
           'Members',
-          m(CommunityOptionsPopover, { isAdmin, isMod }),
+          m(CommunityOptionsPopover),
           m(Tag, {
             size: 'xs',
             label: 'Beta',
@@ -246,103 +288,78 @@ const MembersPage: m.Component<
       },
       [
         m('.title', 'Members'),
-        (totalMemberCount > 0 && members?.length > 0) || noCommunityMembers
-          ? m(Table, [
-            m('tr', [
-              m('th', 'Member'),
-              m('th.align-right', 'Posts'),
-              delegates && m('th.align-right', 'Voting Power'),
-              delegates && m('th.align-right', 'Delegate'),
-            ]),
-            members.map((info) => {
-              const profile = app.profiles.getProfile(
-                info.chain,
-                info.address
-              );
-
-              return m('tr', [
-                m('td.members-item-info', [
-                  m(
-                    'a',
-                    {
-                      href: `/${app.activeId()}/account/${info.address
-                        }?base=${info.chain}`,
+        (totalMemberCount > 0 && members?.length > 0)
+          && m(Table, [
+              m('tr', [
+                m('th', 'Member'),
+                m('th.align-right', 'Posts / Month'),
+                delegates && m('th.align-right', 'Voting Power'),
+                delegates && m('th.align-right', 'Delegate'),
+              ]),
+              vnode.state.members.slice(0, vnode.state.numProfilesLoaded).map((member) => {
+                const profileInfo = app.profiles.getProfile(member.chain, member.address);
+                return m('tr', [
+                  m('td.members-item-info', [
+                    m('a', {
+                      href: `/${app.activeId()}/account/${profileInfo.address}?base=${profileInfo.chain}`,
                       onclick: (e) => {
                         e.preventDefault();
-                        localStorage[`${app.activeId()}-members-scrollY`] =
-                          window.scrollY;
-                        navigateToSubpage(
-                          `/account/${info.address}?base=${info.chain}`
-                        );
+                        localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
+                        localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`] =
+                          vnode.state.numProfilesLoaded;
+                        navigateToSubpage(`/account/${profileInfo.address}?base=${profileInfo.chain}`);
+                      }
+                    }, [
+                      m(User, { user: profileInfo, showRole: true }),
+                    ]),
+                  ]),
+                  m('td.align-right', member.count),
+                  delegates
+                  && m('td.align-right', [
+                      member.votes !== undefined
+                        ? `${member.votes.toNumber().toFixed(2)} ${app.chain.meta.chain.symbol
+                        }`
+                        : m(Spinner, { active: true, size: 'xs' }),
+                    ]),
+                  delegates
+                  && m(
+                    'td.align-right',
+                    m(Button, {
+                      label: 'Delegate',
+                      intent: 'primary',
+                      disabled:
+                        !app.user.activeAccount ||
+                        !app.user.isMember({ account: app.user.activeAccount, chain: app.activeChainId() }),
+                      onclick: async (e) => {
+                        app.modals.create({
+                          modal: DelegateModal,
+                          data: {
+                            address: profileInfo.address,
+                            name: profileInfo.name,
+                            symbol: app.chain.meta.chain.symbol,
+                            chainController: app.chain,
+                          },
+                        });
                       },
-                    },
-                    [
-                      m(User, { user: profile, showRole: true }),
-                      voteEvents[info.address] &&
-                      m(Tooltip, {
-                        trigger: m(Tag, {
-                          label: `${voteEvents[info.address].length} event${voteEvents[info.address].length !== 1 && 's'
-                            }`,
-                          size: 'xs',
-                        }),
-                        content: voteEvents[info.address].map((o) => {
-                          return m(
-                            'div',
-                            `Proposal #${o.event_data.id}, ${o.event_data.support ? 'YES' : 'NO'
-                            }, ${o.event_data.votes} votes`
-                          );
-                        }),
-                      }),
-                    ]
+                    })
                   ),
-                ]),
-                m('td.align-right', [
-                  info.count > 0 &&
-                  `${pluralize(info.count, 'post')} this month`,
-                ]),
-                delegates &&
-                m('td.align-right', [
-                  info.votes !== undefined
-                    ? `${info.votes.toNumber().toFixed(2)} ${app.chain.meta.chain.symbol
-                    }`
-                    : m(Spinner, { active: true, size: 'xs' }),
-                ]),
-                delegates &&
-                m(
-                  'td.align-right',
-                  m(Button, {
-                    label: 'Delegate',
-                    intent: 'primary',
-                    disabled:
-                      !app.user.activeAccount ||
-                      !app.user.isMember({ account: app.user.activeAccount, chain: app.activeChainId() }),
-                    onclick: async (e) => {
-                      app.modals.create({
-                        modal: DelegateModal,
-                        data: {
-                          address: info.address,
-                          name: profile.name,
-                          symbol: app.chain.meta.chain.symbol,
-                          chainController: app.chain,
-                        },
-                      });
-                    },
-                  })
-                ),
-              ]);
+                ]);
+              }),
+            ]),
+        m('.infinite-scroll-wrapper', [
+        (!noCommunityMembers && !vnode.state.profilesFinishedLoading)
+          ? m('.infinite-scroll-spinner-wrap', [
+            m(Spinner, {
+              active: true,
+              size: 'lg',
             }),
           ])
-          : m(Spinner, {
-            active: true,
-            fill: true,
-            size: 'lg',
-            message: 'Loading members...',
-          }),
-        members.length < totalMemberCount &&
-        m('tr.spinner-wrap', [m(Spinner, { active: true, size: 'lg' })]),
-      ]
-    );
-  },
+          : m('.infinite-scroll-reached-end', [
+            `Showing all ${vnode.state.members.length} community members`,
+          ])
+        ]),
+      ])
+    }
 };
 
 export default MembersPage;

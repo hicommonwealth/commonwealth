@@ -1,11 +1,19 @@
 import BN from 'bn.js';
-import { Coin } from 'adapters/currency';
+import { Coin, formatNumberShort, formatNumberLong } from 'adapters/currency';
 
 export class NearToken extends Coin {
-  constructor(n: number | string | BN, inDollars: boolean = false) {
+  constructor(
+    n: number | string | BN,
+    inDollars = false,
+    dollar: BN = null,
+  ) {
     if (typeof n === 'string') {
       n = new BN(n, 10);
     }
-    super('NEAR', n, inDollars, new BN(10).pow(new BN(24)));
+    super('NEAR', n, inDollars, dollar);
+  }
+
+  public format(short?: boolean) {
+    return `Ⓝ${short ? formatNumberShort(this.inDollars) : formatNumberLong(this.inDollars)}`;
   }
 }

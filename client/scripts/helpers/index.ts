@@ -1,12 +1,9 @@
 import m, { RouteOptions } from 'mithril';
 import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
-
+import BigNumber from 'bignumber.js';
 import app from 'state';
 import { OffchainThreadStage } from 'models';
-import { BigNumber } from '@ethersproject/bignumber';
-import { isInstanceOf } from '@polkadot/util';
-import { isValueNode } from 'graphql';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -368,32 +365,23 @@ export const removeOrAddClasslistToAllElements = (
   });
 };
 
-export const tokensToTokenBaseUnits = (input: string, decimals: number) : string => {
-  // necessary unfortunately because BN.js can't parse decimal strings
-  const parts = input.split('.');
-  const zeroesToAdd = parts[1] ? decimals - parts[1].length : decimals;
-
-  if (zeroesToAdd < 0) { throw new Error('More decimals supplied than are'); }
-  return parts[0] + (parts[1] ? parts[1] : '') + '0'.repeat(zeroesToAdd);
+export const tokensToWei = (input: string, decimals: number): string => {
+  const value = new BigNumber(input);
+  if (value.isNaN()) {
+    throw new Error('Invalid input');
+  }
+  const exp = new BigNumber(10).pow(decimals);
+  const valueWei = value.multipliedBy(exp);
+  return valueWei.toFixed();
 };
 
-export const tokenBaseUnitsToTokens = (input: string, decimals: number) => {
-  if (input === '0') return '0';
-  let partOne = ''; // part before decimal point
-  let partTwo = ''; // part after
-
-  if (input.length >= decimals + 1) {
-    partOne = input.substring(0, input.length - decimals);
-    partTwo = input.substring(partOne.length);
-  } else {
-    const zeroesAtBeginning = '0'.repeat(decimals - input.length);
-    partTwo = zeroesAtBeginning + input;
+export const weiToTokens = (input: string, decimals: number) => {
+  // input will always be positive whole number
+  const value = new BigNumber(input);
+  if (value.isNaN()) {
+    throw new Error('Invalid input');
   }
-
-  // cut off trailing zeroes
-  while (partTwo.charAt(partTwo.length - 1) === '0') {
-    partTwo = partTwo.slice(0, -1);
-  }
-
-  return `${partOne}${partTwo.length ? '.' : ''}${partTwo}`;
+  const exp = new BigNumber(10).pow(decimals);
+  const valueTokens = value.div(exp);
+  return valueTokens.toFixed();
 };

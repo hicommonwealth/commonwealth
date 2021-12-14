@@ -8,4 +8,25 @@
   input {
     margin-right: 10px;
   }
+
+  // disable arrows on number
+  input[type='number'] {
+    -moz-appearance:textfield;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+  }
+
+  .token-settings {
+    margin-left: 10px;
+  }
+
+  .switch-caption {
+    display: inline-flex;
+    color: $text-color-light;
+    font-size: 94%;
+    position: relative;
+    top: 1px;
+  }
 }

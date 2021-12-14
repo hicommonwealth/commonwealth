@@ -8,6 +8,7 @@ import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import NearWebWalletController from './webWallets/near_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import InjectiveWebWalletController from './webWallets/injective_web_wallet';
+import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
@@ -57,6 +58,7 @@ export default class WebWalletController {
       new NearWebWalletController(),
       new TerraStationWebWalletController(),
       new InjectiveWebWalletController(),
+      new PhantomWebWalletController(),
     ];
   }
 }

@@ -8,6 +8,7 @@ export { default as ContractItem } from './ContractItem';
 export { default as DiscussionDraft } from './DiscussionDraft';
 export { default as IChainAdapter } from './IChainAdapter';
 export { default as ICommunityAdapter } from './ICommunityAdapter';
+export { default as ITokenAdapter } from './ITokenAdapter';
 export { default as IWebWallet } from './IWebWallet';
 export { default as Identity } from './Identity';
 export { default as NodeInfo } from './NodeInfo';
@@ -42,9 +43,9 @@ export {
   ProposalStatus,
   VotingType,
   VotingUnit,
-  ProposalEndTime,
-  AnyProposal,
 } from './types';
+
+export type { AnyProposal, ProposalEndTime } from './types';
 
 export {
   IBlockInfo,

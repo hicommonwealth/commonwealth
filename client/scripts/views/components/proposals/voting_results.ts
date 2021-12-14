@@ -10,7 +10,7 @@ import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } f
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'controllers/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
-import CompoundProposal, { CompoundProposalVote, CompoundVote } from 'controllers/chain/ethereum/compound/proposal';
+import CompoundProposal, { CompoundProposalVote, BravoVote } from 'controllers/chain/ethereum/compound/proposal';
 import { SubstrateCollectiveVote } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_referendum';
 import AaveProposal, { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
@@ -58,9 +58,13 @@ const VoteListing: m.Component<{
             } else {
               // fetch balance and store in cache
               vnode.state.balancesCacheInitialized[vote.account.address] = true;
-              if (vote instanceof AaveProposalVote || vote instanceof CompoundProposalVote) {
-                balance = vote.format();
+              if (vote instanceof AaveProposalVote) {
+                balance = vote.power;
                 vnode.state.balancesCache[vote.account.address] = vote.format();
+                m.redraw();
+              } else if (vote instanceof CompoundProposalVote) {
+                balance = formatCoin(app.chain.chain.coins(vote.power), true);
+                vnode.state.balancesCache[vote.account.address] = balance;
                 m.redraw();
               } else {
                 vote.account.balance.then((b) => {
@@ -225,23 +229,53 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
     } else if (proposal.votingType === VotingType.CompoundYesNo) {
       return m('.VotingResults', [
         m('.results-column.yes-votes', [
-          m('.results-header', `Yes (${votes.filter((v) => v.choice === CompoundVote.YES).length})`),
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === BravoVote.YES).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CompoundVote.YES)
+              votes: votes.filter((v) => v.choice === BravoVote.YES)
             })
           ]),
         ]),
         m('.results-column.no-votes', [
-          m('.results-header', `No (${votes.filter((v) => v.choice === CompoundVote.NO).length})`),
+          m('.results-header', `No (${votes.filter((v) => v.choice === BravoVote.NO).length})`),
           m('.results-cell', [
             m(VoteListing, {
               proposal,
-              votes: votes.filter((v) => v.choice === CompoundVote.NO)
+              votes: votes.filter((v) => v.choice === BravoVote.NO)
             })
           ]),
         ])
+      ]);
+    } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
+      return m('.VotingResults', [
+        m('.results-column.yes-votes', [
+          m('.results-header', `Yes (${votes.filter((v) => v.choice === BravoVote.YES).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === BravoVote.YES)
+            })
+          ]),
+        ]),
+        m('.results-column.no-votes', [
+          m('.results-header', `No (${votes.filter((v) => v.choice === BravoVote.NO).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === BravoVote.NO)
+            })
+          ]),
+        ]),
+        m('.results-column.no-votes', [
+          m('.results-header', `Abstain (${votes.filter((v) => v.choice === BravoVote.ABSTAIN).length})`),
+          m('.results-cell', [
+            m(VoteListing, {
+              proposal,
+              votes: votes.filter((v) => v.choice === BravoVote.ABSTAIN)
+            })
+          ]),
+        ]),
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.VotingResults', [

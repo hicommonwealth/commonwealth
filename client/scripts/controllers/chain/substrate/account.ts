@@ -251,15 +251,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     return this._Chain.computeFees(this.address, dummyTxFunc);
   }
 
-  public async sendBalanceTx(recipient: SubstrateAccount, amount: SubstrateCoin) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.balances.transfer(recipient.address, amount),
-      'balanceTransfer',
-      `${formatCoin(amount)} to ${recipient.address}`
-    );
-  }
-
   public nominateTx(nominees: SubstrateAccount[]) {
     return this._Chain.createTXModalData(
       this,
@@ -324,28 +315,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       (api: ApiPromise) => api.tx.staking.setPayee(this._Chain.createType('RewardDestination', rewardDestination)),
       'setPayee',
       `${this.address} sets reward destination ${rewardDestination}`,
-    );
-  }
-
-  public setKeys(sessionKeys: string) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.session.setKeys(this._Chain.createType('Keys', sessionKeys), '0x'),
-      'setKeys',
-      `${this.address} sets session keys ${sessionKeys}`,
-    );
-  }
-
-  public validateTx(validatorPrefs: number) {
-    if (validatorPrefs < 0 || validatorPrefs > 100) return;
-    const commission = Math.round(1000000000 * ((validatorPrefs * 1.0) / 100));
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiPromise) => api.tx.staking.validate({
-        commission: new BN(commission),
-      }),
-      'setKeys',
-      `${this.address} sets validation commission ${this.validate}`,
     );
   }
 

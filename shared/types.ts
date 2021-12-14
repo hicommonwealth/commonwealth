@@ -43,6 +43,7 @@ export enum ChainBase {
   Substrate = 'substrate',
   Ethereum = 'ethereum',
   NEAR = 'near',
+  Solana = 'solana',
 }
 
 export enum ChainType {
@@ -85,6 +86,10 @@ export enum ChainNetwork {
   Crust = 'crust',
   Sputnik = 'sputnik',
   Commonwealth = 'commonwealth',
+  SolanaDevnet = 'solana-devnet',
+  SolanaTestnet = 'solana-testnet',
+  Solana = 'solana',
+  SPL = 'spl', // solana token
 }
 
 export enum WebsocketEventType {

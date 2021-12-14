@@ -62,6 +62,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           chain: app.config.chains.getById(node.chain),
           address: node.address,
           token_name: node.token_name,
+          eth_chain_id: node.eth_chain_id,
         }));
       });
       data.communities.sort((a, b) => a.id - b.id).map((community) => {
@@ -69,28 +70,28 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           id: community.id,
           name: community.name,
           description: community.description,
-          iconUrl: community.iconUrl,
+          icon_url: community.icon_url,
           website: community.website,
           discord: community.discord,
           element: community.element,
           telegram: community.telegram,
           github: community.github,
-          defaultChain: app.config.chains.getById(community.default_chain),
+          default_chain: app.config.chains.getById(community.default_chain),
           visible: community.visible,
-          collapsedOnHomepage: community.collapsed_on_homepage,
-          invitesEnabled: community.invitesEnabled,
-          privacyEnabled: community.privacyEnabled,
-          featuredTopics: community.featured_topics,
+          collapsed_on_homepage: community.collapsed_on_homepage,
+          default_summary_view: community.default_summary_view,
+          invites_enabled: community.invites_enabled,
+          privacy_enabled: community.privacy_enabled,
+          featured_topics: community.featured_topics,
           topics: community.topics,
-          stagesEnabled: community.stagesEnabled,
-          customStages: community.customStages,
-          customDomain: community.customDomain,
+          stages_enabled: community.stages_enabled,
+          custom_stages: community.custom_stages,
+          custom_domain: community.custom_domain,
           terms: community.terms,
-          adminsAndMods: [],
+          admins_and_mods: [],
         }));
       });
       app.user.setRoles(data.roles);
-      // app.config.topics = data.topics.map((json) => OffchainTopic.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
@@ -141,6 +142,7 @@ export async function deinitChainOrCommunity() {
   app.user.setSelectedNode(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
+  document.title = 'Commonwealth';
 }
 
 export async function handleInviteLinkRedirect() {
@@ -183,6 +185,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
 
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
+  document.title = `Commonwealth – ${c.name}`;
 
   // Begin initializing the community
   const newCommunity = new Community(c, app);
@@ -230,6 +233,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
   app.chainPreloading = true;
+  document.title = `Commonwealth – ${n.chain.name}`;
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
@@ -294,12 +298,26 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Aave(n, app);
   } else if (n.chain.network === ChainNetwork.ERC20) {
-    const Token = (await import(
+    const ERC20 = (await import(
     //   /* webpackMode: "lazy" */
-    //   /* webpackChunkName: "token-main" */
-      './controllers/chain/ethereum/token/adapter'
+    //   /* webpackChunkName: "erc20-main" */
+      './controllers/chain/ethereum/tokenAdapter'
     )).default;
-    newChain = new Token(n, app);
+    newChain = new ERC20(n, app);
+  } else if (n.chain.network === ChainNetwork.SPL) {
+    const SPL = (await import(
+      //   /* webpackMode: "lazy" */
+      //   /* webpackChunkName: "spl-main" */
+      './controllers/chain/solana/tokenAdapter'
+    )).default;
+    newChain = new SPL(n, app);
+  } else if (n.chain.base === ChainBase.Solana) {
+    const Solana = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "solana-main" */
+      './controllers/chain/solana/main'
+    )).default;
+    newChain = new Solana(n, app);
   } else if (n.chain.network === ChainNetwork.Commonwealth) {
     const Commonwealth = (await import(
       /* webpackMode: "lazy" */
@@ -386,19 +404,18 @@ export function initCommunity(communityId: string): Promise<boolean> {
 }
 
 export async function initNewTokenChain(address: string) {
-  const response = await $.getJSON('/api/getTokenForum', { address });
+  const response = await $.getJSON('/api/getTokenForum', { address, autocreate: true });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');
   }
   const { chain, node } = response.result;
   const chainInfo = ChainInfo.fromJSON(chain);
-  const nodeInfo = new NodeInfo(node.id, chainInfo, node.url, node.address);
+  const nodeInfo = new NodeInfo(node);
   if (!app.config.chains.getById(chainInfo.id)) {
     app.config.chains.add(chainInfo);
     app.config.nodes.add(nodeInfo);
   }
-  console.log(nodeInfo, chainInfo);
   await selectNode(nodeInfo);
 }
 
@@ -577,6 +594,7 @@ Promise.all([
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+    '/createCommunity':         importRoute('views/pages/create_community', { scoped: false }),
     ...(isCustomDomain ? {
       //
       // Custom domain routes
@@ -597,6 +615,7 @@ Promise.all([
       '/discussions':            redirectRoute((attrs) => `/${attrs.scope}/`),
       '/discussions/:topic':     importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/members':                importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/sputnik-daos':           importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/chat':                   importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/new/thread':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
@@ -619,6 +638,7 @@ Promise.all([
       '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
       // Admin
       '/admin':                  importRoute('views/pages/admin', { scoped: true }),
+      '/manage':                 importRoute('views/pages/manage_community/index', { scoped: true }),
       '/spec_settings':          importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/settings':               importRoute('views/pages/settings', { scoped: true }),
       '/analytics':              importRoute('views/pages/stats', { scoped: true, deferChain: true }),
@@ -646,6 +666,7 @@ Promise.all([
       '/:scope/discussions/:topic': redirectRoute((attrs) => `/discussions/${attrs.topic}/`),
       '/:scope/search':             redirectRoute(() => '/search'),
       '/:scope/members':            redirectRoute(() => '/members'),
+      '/:scope/sputnik-daos':       redirectRoute(() => '/sputnik-daos'),
       '/:scope/chat':               redirectRoute(() => '/chat'),
       '/:scope/new/thread':         redirectRoute(() => '/new/thread'),
       '/:scope/account/:address':   redirectRoute((attrs) => `/account/${attrs.address}/`),
@@ -664,6 +685,7 @@ Promise.all([
       '/:scope/web3login':          redirectRoute(() => '/web3login'),
       '/:scope/settings':           redirectRoute(() => '/settings'),
       '/:scope/admin':              redirectRoute(() => '/admin'),
+      '/:scope/manage':             redirectRoute(() => '/manage'),
       '/:scope/spec_settings':      redirectRoute(() => '/spec_settings'),
       '/:scope/analytics':          redirectRoute(() => '/analytics'),
       '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
@@ -708,6 +730,7 @@ Promise.all([
       '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/:scope/search':            importRoute('views/pages/search', { scoped: true, deferChain: true }),
       '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
+      '/:scope/sputnik-daos':      importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
       '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
@@ -736,6 +759,8 @@ Promise.all([
       '/settings':                 importRoute('views/pages/settings', { scoped: false }),
       '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
+      '/manage':                 importRoute('views/pages/manage_community/index', { scoped: false }),
+      '/:scope/manage':          importRoute('views/pages/manage_community/index', { scoped: true }),
       '/:scope/spec_settings':     importRoute('views/pages/spec_settings', { scoped: true, deferChain: true }),
       '/:scope/analytics':         importRoute('views/pages/stats', { scoped: true, deferChain: true }),
 

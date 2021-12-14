@@ -17,17 +17,24 @@ const fetchUniqueAddressesByRootIds = async (
   models: DB,
   { chain, root_ids }
 ) => {
+  const formattedIds = root_ids.map((root_id) => `${root_id}`);
   return sequelize.query<UniqueAddresses>(
     `
-    select distinct cts.address_id, address, root_id, cts.chain
-    from "OffchainComments" cts inner join "Addresses" adr
-    on adr.id = cts.address_id
-    where root_id in (${root_ids.map((root_id) => `'${root_id}'`)})
-    and cts.chain = '${chain}'
-    and deleted_at is null
-    order by root_id
+    SELECT distinct cts.address_id, address, root_id, cts.chain
+    FROM "OffchainComments" cts INNER JOIN "Addresses" adr
+    ON adr.id = cts.address_id
+    WHERE root_id IN ($root_ids)
+    AND cts.chain = $chain
+    AND deleted_at IS NULL
+    ORDER BY root_id
   `,
-    { type: QueryTypes.SELECT }
+    {
+      type: QueryTypes.SELECT,
+      bind: {
+        root_ids: formattedIds,
+        chain,
+      }
+    }
   );
 };
 
@@ -35,6 +42,9 @@ const fetchUniqueAddressesByRootIds = async (
 1) Get the number of distinct users for list of threads(root_id)
 2) Get first 2 avatars for each group of users
 3) Get latest comment
+
+TODO: The naming system here, and in the threadUniqueAddressesCount controller,
+is wildly unclear and wildly inconsistent. We should standardize + clarify.
  */
 const threadsUsersCountAndAvatar = async (
   models: DB,

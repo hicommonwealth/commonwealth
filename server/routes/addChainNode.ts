@@ -67,7 +67,9 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
       element: req.body.element ? req.body.element : '',
       description: req.body.description ? req.body.description : '',
       type: req.body.type ? req.body.type : ChainType.Chain,
-      has_chain_events_listener: false
+      // TODO: set this to true for Comp/Aave
+      has_chain_events_listener: false,
+      bech32_prefix: req.body.bech32_prefix || null,
     });
   }
 
@@ -78,8 +80,12 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
   const node = await models.ChainNode.create({
     chain: chain.id,
     url: req.body.node_url,
-    address: (req.body.address) ? req.body.address : '',
+    address: req.body.address || '',
+    token_name: req.body.token_name || null,
+    eth_chain_id: req.body.eth_chain_id || null, // TODO: will this work on nullable field?
   });
+
+  // TODO: trigger migration job if turning on chain events for Comp/Aave
 
   return res.json({ status: 'Success', result: node.toJSON() });
 };

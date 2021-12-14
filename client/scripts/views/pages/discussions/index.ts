@@ -1,4 +1,5 @@
 import 'pages/discussions/index.scss';
+import 'components/dropdown_icon.scss';
 
 import $ from 'jquery';
 import _ from 'lodash';
@@ -21,12 +22,14 @@ import {
   pluralize,
   offchainThreadStageToLabel,
   parseCustomStages,
+  link,
 } from 'helpers';
 import {
   NodeInfo,
   CommunityInfo,
   OffchainThreadStage,
   OffchainThread,
+  ITokenAdapter,
 } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -39,7 +42,6 @@ import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicThresholdsModal from 'views/modals/edit_topic_thresholds_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
-import Token from 'controllers/chain/ethereum/token/adapter';
 
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
@@ -62,23 +64,38 @@ const getLastSeenDivider = (hasText = true) => {
   );
 };
 
-export const CommunityOptionsPopover: m.Component<
-  { isAdmin: boolean; isMod: boolean },
-  {}
-> = {
+export const CommunityOptionsPopover: m.Component<{}> = {
   view: (vnode) => {
-    const { isAdmin, isMod } = vnode.attrs;
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+    });
     if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
+
+    // add extra width to compensate for an icon that isn't centered inside its boundaries
+    const DropdownIcon = m('.dropdown-wrapper',
+    [
+      m(Icon, {
+        name: Icons.CHEVRON_DOWN,
+      }),
+      m('.dropdown-spacer', {})
+    ]);
+
+
     return m(PopoverMenu, {
       class: 'community-options-popover',
       position: 'bottom',
       transitionDuration: 0,
       hoverCloseDelay: 0,
       closeOnContentClick: true,
-      trigger: m(Icon, {
-        name: Icons.CHEVRON_DOWN,
-        style: 'margin-left: 6px;',
-      }),
+      trigger: DropdownIcon,
       content: [
         isAdmin &&
           m(MenuItem, {
@@ -88,8 +105,7 @@ export const CommunityOptionsPopover: m.Component<
               app.modals.create({ modal: NewTopicModal });
             },
           }),
-        isAdmin &&
-          (app.chain as Token)?.isToken &&
+        isAdmin && ITokenAdapter.instanceOf(app.chain) &&
           m(MenuItem, {
             label: 'Edit topic thresholds',
             onclick: (e) => {
@@ -113,11 +129,7 @@ export const CommunityOptionsPopover: m.Component<
           }),
         isAdmin &&
           m(MenuItem, {
-            label: 'Manage community',
-            onclick: (e) => {
-              e.preventDefault();
-              app.modals.lazyCreate('manage_community_modal');
-            },
+            label: link('a', `${(app.isCustomDomain() ? '' : `/${app.activeId()}`)}/manage`, 'Manage community'),
           }),
         (isAdmin || isMod) &&
           app.activeId() &&
@@ -195,7 +207,7 @@ const DiscussionFilterBar: m.Component<
             rounded: true,
             compact: true,
             class: 'topic-filter',
-            label: selectedTopic ? `Topic: ${topic}` : 'All Discussions',
+            label: selectedTopic ? `Topic: ${topic}` : 'All Topics',
             iconRight: Icons.CHEVRON_DOWN,
             size: 'sm',
             disabled,
@@ -212,7 +224,7 @@ const DiscussionFilterBar: m.Component<
                 m.route.get() === `/${app.activeId()}` || !topic
                   ? Icons.CHECK
                   : null,
-              label: 'All Discussions',
+              label: 'All Topics',
               onclick: () => {
                 localStorage.setItem('discussion-summary-toggle', 'false');
                 vnode.attrs.parentState.summaryView = false;
@@ -270,6 +282,7 @@ const DiscussionFilterBar: m.Component<
                           rounded: true,
                           onclick: (e) => {
                             e.preventDefault();
+                            e.stopPropagation();
                             app.modals.create({
                               modal: EditTopicModal,
                               data: {
@@ -395,8 +408,10 @@ const DiscussionsPage: m.Component<
     lastVisitedUpdated?: boolean;
     onscroll: any;
     summaryView: boolean;
+    summaryViewInitialized: boolean;
     recentThreads: { threads: OffchainThread[]; activitySummary };
     loadingRecentThreads: boolean;
+    activityFetched: boolean;
   }
 > = {
   oncreate: (vnode) => {
@@ -425,7 +440,7 @@ const DiscussionsPage: m.Component<
       app.user.unseenPosts[app.activeId()]['threads'] = 0;
     }
   },
-  oninit: async (vnode) => {
+  oninit: (vnode) => {
     vnode.state.lookback = {};
     vnode.state.postsDepleted = {};
     vnode.state.topicInitialized = {};
@@ -446,20 +461,27 @@ const DiscussionsPage: m.Component<
         : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
         : moment();
-    if (app.lastNavigatedBack()) {
-      if (localStorage.getItem('discussion-summary-toggle') === 'true') {
-        vnode.state.summaryView = true;
-      }
-    } else {
-      if (!vnode.state.summaryView) {
-        localStorage.setItem('discussion-summary-toggle', 'false');
-      }
-    }
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
-    const { summaryView, recentThreads } = vnode.state;
-    if (summaryView && !recentThreads?.threads?.length) {
+    if (!app.community && !app.chain) return;
+    if (!vnode.state.summaryViewInitialized) {
+      if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
+        vnode.state.summaryView = true;
+      }
+      if (app.lastNavigatedBack()) {
+        if (localStorage.getItem('discussion-summary-toggle') === 'true') {
+          vnode.state.summaryView = true;
+        }
+      } else {
+        if (!vnode.state.summaryView) {
+          localStorage.setItem('discussion-summary-toggle', 'false');
+        }
+      }
+      vnode.state.summaryViewInitialized = true;
+    }
+    const { summaryView, recentThreads, lastSubpage } = vnode.state;
+    if (summaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
         .getRecentCommunityActivity({
@@ -467,6 +489,7 @@ const DiscussionsPage: m.Component<
           chainId: app.activeChainId(),
         })
         .then((res) => {
+          vnode.state.activityFetched = true;
           vnode.state.loadingRecentThreads = false;
           vnode.state.recentThreads = res;
           m.redraw();
@@ -546,9 +569,6 @@ const DiscussionsPage: m.Component<
             .filter((t) => t.pinned),
           chainId: app.activeChainId(),
           pinned: true,
-        })
-        .then(() => {
-          console.log('fetched');
         });
     }
 
@@ -624,7 +644,8 @@ const DiscussionsPage: m.Component<
       }
     }
 
-    const newSubpage = subpage !== vnode.state.lastSubpage;
+    // TODO: Refactor this logic in light of summary system
+    const newSubpage = subpage !== lastSubpage;
 
     if (newSubpage) {
       $(window).off('scroll');
@@ -734,17 +755,6 @@ const DiscussionsPage: m.Component<
     const postsDepleted =
       allThreads.length > 0 && vnode.state.postsDepleted[subpage];
 
-    const isAdmin =
-      app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
-        chain: app.activeChainId(),
-        community: app.activeCommunityId(),
-      });
-    const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-    });
 
     return m(
       Sublayout,
@@ -752,8 +762,6 @@ const DiscussionsPage: m.Component<
         class: 'DiscussionsPage',
         title: [
           'Discussions',
-          (isAdmin || isMod || app.community?.meta.invitesEnabled) &&
-            m(CommunityOptionsPopover, { isAdmin, isMod }),
         ],
         description: topicDescription,
         showNewProposalButton: true,

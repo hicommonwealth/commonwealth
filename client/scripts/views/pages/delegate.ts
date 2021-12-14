@@ -9,7 +9,7 @@ import PageLoading from 'views/pages/loading';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { Grid, Col, List, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
+import { Grid, Col, Form, FormGroup, FormLabel, Input, Button } from 'construct-ui';
 import PageNotFound from './404';
 
 const DelegateStats: m.Component<{ currentDelegate: string, }> = {
@@ -59,7 +59,7 @@ interface IDelegateFormState {
   currentDelegate: string,
 }
 
-const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
+const getDelegate = async (vnode: m.Vnode<Record<string, never>, IDelegateFormState>) => {
   if (app.chain.network === ChainNetwork.Compound) {
     vnode.state.currentDelegate = await (app.chain as Compound).chain.getDelegate(app.user.activeAccount.address);
   } else if (app.chain.network === ChainNetwork.Aave) {
@@ -69,12 +69,13 @@ const getDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
   m.redraw();
 };
 
-const setDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
+// TODO: remove popup modal for delegation as we auto-delegate all tokens now
+const setDelegate = async (vnode: m.Vnode<Record<string, never>, IDelegateFormState>) => {
   if (app.chain.apiInitialized) {
-    let delegationPromise: Promise<any>;
+    let delegationPromise: Promise<void>;
     if (app.chain.network === ChainNetwork.Compound) {
       delegationPromise = (app.chain as Compound).chain.setDelegate(
-        vnode.state.form.address, vnode.state.form.amount
+        vnode.state.form.address
       );
     } else if (app.chain.network === ChainNetwork.Aave) {
       delegationPromise = (app.chain as Aave).chain.setDelegate(vnode.state.form.address);
@@ -91,7 +92,7 @@ const setDelegate = async (vnode: m.Vnode<{}, IDelegateFormState>) => {
   }
 };
 
-const DelegateForm: m.Component<{}, IDelegateFormState> = {
+const DelegateForm: m.Component<Record<string, never>, IDelegateFormState> = {
   oninit: (vnode) => {
     vnode.state.form = {
       address: '',
@@ -157,8 +158,8 @@ const DelegateForm: m.Component<{}, IDelegateFormState> = {
   }
 };
 
-const DelegatePage: m.Component<{}> = {
-  view: (vnode) => {
+const DelegatePage: m.Component = {
+  view: () => {
     if (!app.chain || !app.chain.loaded) {
       // chain load failed
       if (app.chain && app.chain.failed) {

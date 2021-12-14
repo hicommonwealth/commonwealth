@@ -49,7 +49,7 @@ export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
       await super.initApi();
     } catch (e) {
       this._failed = true;
-      notifyError('Failed to fetch via infura');
+      notifyError('Failed to fetch from web3 provider');
       console.error(`Aave init error: ${e.message}`);
     }
   }

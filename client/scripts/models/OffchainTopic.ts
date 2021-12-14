@@ -1,34 +1,55 @@
 import BN from 'bn.js';
+
 class OffchainTopic {
   public readonly name: string;
   public readonly id: number;
   public readonly description: string;
-  public readonly telegram: string;
+  public readonly telegram?: string;
   public readonly communityId?: string;
   public readonly chainId?: string;
-  public readonly tokenThreshold?: BN;
   public readonly featuredInSidebar?: boolean;
   public readonly featuredInNewPost?: boolean;
   public readonly defaultOffchainTemplate?: string;
 
-  constructor(name, id, description, telegram, communityId, chainId,
-    featuredInSidebar, featuredInNewPost, defaultOffchainTemplate, tokenThreshold?) {
+  private _tokenThreshold?: BN;
+  public get tokenThreshold() { return this._tokenThreshold; }
+  public setTokenThreshold(t: BN) { this._tokenThreshold = t; }
+
+  constructor({
+    name,
+    id,
+    description,
+    telegram,
+    community_id,
+    chain_id,
+    featured_in_sidebar,
+    featured_in_new_post,
+    default_offchain_template,
+    token_threshold,
+  }: {
+      name: string,
+      id: number,
+      description: string,
+      telegram?: string,
+      community_id?: string,
+      chain_id?: string,
+      featured_in_sidebar?: boolean,
+      featured_in_new_post?: boolean,
+      default_offchain_template?: string,
+      token_threshold?: BN | string | number,
+  }) {
     this.name = name;
     this.id = id;
     this.description = description;
     this.telegram = telegram;
-    this.communityId = communityId;
-    this.chainId = chainId;
-    this.featuredInSidebar = featuredInSidebar;
-    this.featuredInNewPost = featuredInNewPost;
-    this.defaultOffchainTemplate = defaultOffchainTemplate;
-    this.tokenThreshold = tokenThreshold;
-  }
-  public static fromJSON({ name, id, description, telegram, communityId, chainId,
-    featuredInSidebar, featuredInNewPost, defaultOffchainTemplate, tokenThreshold
-  }) {
-    return new OffchainTopic(name, id, description, telegram, communityId, chainId,
-      featuredInSidebar, featuredInNewPost, defaultOffchainTemplate, tokenThreshold);
+    this.communityId = community_id;
+    this.chainId = chain_id;
+    this.featuredInSidebar = featured_in_sidebar;
+    this.featuredInNewPost = featured_in_new_post;
+    this.defaultOffchainTemplate = default_offchain_template;
+    if (token_threshold !== undefined) {
+      this._tokenThreshold = new BN(token_threshold);
+    }
   }
 }
 
