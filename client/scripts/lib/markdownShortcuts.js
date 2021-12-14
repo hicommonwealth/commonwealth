@@ -32,7 +32,6 @@
  // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  // THE SOFTWARE.
  //
- import Quill from 'quill';
 
  export class MarkdownShortcuts {
    constructor (quill, options) {
