@@ -15,7 +15,7 @@ import { IDaoInfo } from 'controllers/chain/near/chain';
 
 const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDaoInfo[] }> = {
   view: (vnode) => {
-    if (app.activeId() && app.activeId() !== 'near' && app.activeId() !== 'near-testnet')
+    if (app.activeId() && app.activeId() !== 'near')
       m.route.set(`/${app.activeId()}`);
 
     const activeEntity = app.community ? app.community : app.chain;
