@@ -80,46 +80,37 @@
        {
          // bolditalic now handles bold, italic, and bold italic
          name: 'bolditalic',
-         pattern: /(?<!\S)((?:\*|_){1,3})([^\s*_]{1,2}|[^\s*_].+?[^\s*_])((?:\*|_){1,3})(?!\S)/g,
+         pattern: /(?<!\S)((?:\*|_){1,3})([^\s*_]{1,2}|[^\s_*][^_*]+?[^\s_*])((?:\*|_){1,3})(?!\S)/g,
          action: (text, selection, pattern, lineStart) => {
-           console.log({text});
-           console.log({ selection, pattern, lineStart })
            const allMatches = text.matchAll(pattern);
-           // let match = pattern.exec(text);
 
-           // TODO: the indexes get messed up by formatting, so the parser has to go one at a time
-           // e.g. it keeps going until there are no longer any matches unaccounted for
-           // TODO: The interior ([^\s*_]{1,2}|[^\s*_].+?[^\s*_]) regex needs troubleshooting
-           // to cover various edgecases, e.g. to handle `__Example __ *test*` not being parsed
-           // as a single match stretching from `__` to `*`
+           let indexOffset = 0;
            for (const match of allMatches) {
-             console.log({match});
-             const annotatedText = match[0]
-             const openingDelimiter = match[1]
-             const matchedText = match[2]
-             const closingDelimiter = match[3]
-             const startIndex = lineStart + match.index
- 
-             // bolditalic must be prefixed with whitespace
-             if (startIndex > 0 && this.quill.getText()[startIndex - 1]
-               && this.quill.getText()[startIndex - 1].match(/[*_ \n]/) === null) continue;
-             if (text.match(/^([*_ \n]+)$/g)) continue;
-             if (matchedText[0] === ' ' || matchedText[matchedText.length - 1] === ' ') continue;
-             if (matchedText[0] === '*' || matchedText[0] === '_') continue;
-             if (openingDelimiter !== closingDelimiter) continue;
-             if (openingDelimiter !== closingDelimiter.split('').reverse().join('')) continue;
- 
-             setTimeout(() => {
-               console.log('timeout');
-               const formatting =
-                     (openingDelimiter === '*' || openingDelimiter === '_') ? {italic: true} :
-                     (openingDelimiter === '**' || openingDelimiter === '__') ? {bold: true} :
-                     {bold: true, italic: true};
-               this.quill.deleteText(startIndex, annotatedText.length)
-               this.quill.insertText(startIndex, matchedText, formatting)
-               this.quill.format('bold', false)
-               this.quill.format('italic', false)
-             }, 0)
+              const annotatedText = match[0]
+              const openingDelimiter = match[1]
+              const matchedText = match[2]
+              const closingDelimiter = match[3]
+              const startIndex = lineStart + match.index + indexOffset;
+
+              // bolditalic must be prefixed with whitespace
+              if (startIndex > 0 && this.quill.getText()[startIndex - 1]
+                && this.quill.getText()[startIndex - 1].match(/[*_ \n]/) === null) continue;
+              if (text.match(/^([*_ \n]+)$/g)) continue;
+              if (matchedText[0] === ' ' || matchedText[matchedText.length - 1] === ' ') continue;
+              if (matchedText[0] === '*' || matchedText[0] === '_') continue;
+              if (openingDelimiter !== closingDelimiter) continue;
+              if (openingDelimiter !== closingDelimiter.split('').reverse().join('')) continue;
+              indexOffset += openingDelimiter.length * 2;
+              setTimeout(() => {
+                const formatting =
+                      (openingDelimiter === '*' || openingDelimiter === '_') ? {italic: true} :
+                      (openingDelimiter === '**' || openingDelimiter === '__') ? {bold: true} :
+                      {bold: true, italic: true};
+                this.quill.deleteText(startIndex, annotatedText.length)
+                this.quill.insertText(startIndex, matchedText, formatting)
+                this.quill.format('bold', false)
+                this.quill.format('italic', false)
+              }, 0)
            }
          }
        },
