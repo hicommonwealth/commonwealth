@@ -97,13 +97,16 @@ const Sublayout: m.Component<{
     ]);
 
     const hiringButton = m(FaceliftButton, {
-      intent: ButtonIntent.Primary,
+      intent: ButtonIntent.Secondary,
       label: "We're hiring!",
       onclick: () => {
-        window.open('https://commonwealth.im/hiring');
+        window.open(
+          'https://angel.co/company/commonwealth-labs',
+          '_blank'
+        );
       },
       disabled: false,
-      className: ' HiringBtn'
+      className: '.hiringBtn'
     });
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [

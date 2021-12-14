@@ -8,7 +8,9 @@
         min-width: 100%;
         max-width: calc(100% - 72px); // horizontal padding * 2
     }
-    .sublayout-header-right,
+    .sublayout-header-right {
+        flex: 3;
+    }
     .sublayout-header-left {
         flex: 2;
     }
