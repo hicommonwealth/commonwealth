@@ -1128,11 +1128,11 @@ const NewProposalForm = {
                 name: 'member',
                 defaultValue: 'tokenfactory.testnet',
                 oncreate: (vvnode) => {
-                  vnode.state.target = 'tokenfactory.testnet';
+                  vnode.state.member = 'tokenfactory.testnet';
                 },
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.target = result;
+                  vnode.state.member = result;
                   m.redraw();
                 },
               }),
