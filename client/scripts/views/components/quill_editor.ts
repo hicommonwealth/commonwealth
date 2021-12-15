@@ -845,8 +845,19 @@ const instantiateEditor = (
   state.unsavedChanges = new Delta();
   quill.on('text-change', (delta, oldDelta, source) => {
     state.unsavedChanges = state.unsavedChanges.compose(delta);
+    // Log that the quill doc has been altered, so that
+    // newThread draft system prompts w/ save confirmation modal
     if (source === 'user' && !state.alteredText) {
       state.alteredText = true;
+      m.redraw();
+    }
+    // Log that the editor isBlank status has changed, to change
+    // enabled/disabled state of submission button
+    if (state.enableSubmission && quill.editor.isBlank()) {
+      state.enableSubmission = false;
+      m.redraw();
+    } else if (!state.enableSubmission && !quill.editor.isBlank()) {
+      state.enableSubmission = true;
       m.redraw();
     }
   });
@@ -882,7 +893,8 @@ interface IQuillEditorState {
   uploading?: boolean;
   // for localStorage drafts:
   beforeunloadHandler;
-  alteredText;
+  alteredText: boolean;
+  enableSubmission: boolean;
   unsavedChanges;
   clearUnsavedChanges;
 }
