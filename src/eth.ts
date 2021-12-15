@@ -21,7 +21,8 @@ export async function createProvider(
     const provider = new providers.Web3Provider(web3Provider);
     // 12s minute polling interval (default is 4s)
     provider.pollingInterval = 12000;
-    const data = await provider.getBlock('latest');
+    const blockNumber = await provider.getBlockNumber();
+    const data = await provider.getBlock(`${blockNumber}`);
     if (!data)
       throw new Error(
         `A connection to ${ethNetworkUrl} could not be established.`
