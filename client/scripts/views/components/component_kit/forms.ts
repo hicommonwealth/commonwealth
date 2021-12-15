@@ -10,7 +10,7 @@ export enum TextInputStatus {
 export const TextInput: m.Component<
   {
     name: string;
-    oninput?: (e) => null;
+    oninput?: (e) => any;
     inputValidationFn?: (value: string) => [TextInputStatus, string];
     label?: string;
     className?: string;

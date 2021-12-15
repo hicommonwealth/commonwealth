@@ -15,11 +15,7 @@ import Sublayout from 'views/sublayout';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import { BigNumber } from 'ethers';
 import { notifyError } from 'controllers/app/notifications';
-import { formatAddressShort } from 'utils';
 import { CommunityOptionsPopover } from './discussions';
-
-// The number of member profiles that are batch loaded
-const DEFAULT_MEMBER_REQ_SIZE = 20;
 
 interface MemberInfo {
   chain: string;
@@ -28,63 +24,8 @@ interface MemberInfo {
   votes: BigNumber;
 }
 
+// The number of member profiles that are batch loaded
 const MEMBERS_PER_PAGE = 20;
-
-const DelegateModal: m.Component<
-  {
-    address: string;
-    name: string;
-    symbol: string;
-    chainController: Compound;
-  },
-  { delegateAmount: number }
-> = {
-  view: (vnode) => {
-    const { address, name, symbol, chainController } = vnode.attrs;
-    return m('.DelegateModal', [
-      m('.compact-modal-title', [
-        m(
-          'h3',
-          `Delegate to ${name
-            ? `${name} at Address: ${formatAddressShort(address)}`
-            : `Anonymous at Address: ${formatAddressShort(address)}`
-          }`
-        ),
-      ]),
-      m('.compact-modal-body', [
-        m('div', `Amount ${symbol} to delegate`),
-        m(Input, {
-          title: 'Add amount',
-          oninput: (e) => {
-            const num = (e.target as any).value;
-            if (!Number.isNaN(parseInt(num, 10))) {
-              vnode.state.delegateAmount = num;
-            }
-          },
-        }),
-        m(Button, {
-          label: 'Delegate',
-          intent: 'primary',
-          disabled:
-            !app.user.activeAccount ||
-            !app.user.isMember({ account: app.user.activeAccount, chain: app.activeChainId() }),
-          onclick: async (e) => {
-            chainController?.chain
-            // TODO: reconcile against original
-              .setDelegate(vnode.attrs.address, vnode.state.delegateAmount)
-              .catch((err) => {
-                if (err.message.indexOf('delegates underflow') > -1) {
-                  err.message =
-                    'You do not have the requested number of votes to delegate';
-                }
-                notifyError(err.message);
-              });
-          },
-        }),
-      ]),
-    ]);
-  },
-};
 
 const MembersPage: m.Component<
   {},
@@ -117,7 +58,6 @@ const MembersPage: m.Component<
     );
   },
   view: (vnode) => {
-    console.log(app.chain instanceof Compound);
     vnode.state.hasDelegates = app.chain instanceof Compound;
     const chainController =
       app.chain instanceof Compound ? (app.chain as Compound) : null;
@@ -298,15 +238,24 @@ const MembersPage: m.Component<
                         !app.user.activeAccount ||
                         !app.user.isMember({ account: app.user.activeAccount, chain: app.activeChainId() }),
                       onclick: async (e) => {
-                        app.modals.create({
-                          modal: DelegateModal,
-                          data: {
-                            address: profileInfo.address,
-                            name: profileInfo.name,
-                            symbol: app.chain.meta.chain.symbol,
-                            chainController: app.chain,
-                          },
-                        });
+                        chainController?.chain
+                          .setDelegate(profileInfo.address)
+                          .catch((err) => {
+                            if (err.message.indexOf('delegates underflow') > -1) {
+                              err.message =
+                                'You do not have the requested number of votes to delegate';
+                            }
+                            notifyError(err.message);
+                          });
+                        // app.modals.create({
+                        //   modal: DelegateModal,
+                        //   data: {
+                        //     address: profileInfo.address,
+                        //     name: profileInfo.name,
+                        //     symbol: app.chain.meta.chain.symbol,
+                        //     chainController: app.chain,
+                        //   },
+                        // });
                       },
                     })
                   ),

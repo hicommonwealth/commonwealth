@@ -5,6 +5,8 @@
     flex-direction: column;
     label {
         @include form-label;
+        position: relative;
+        left: 3px;
         margin-bottom: 4px;
     }
     .cui-input {

@@ -21,6 +21,9 @@
         &:hover {
             background-color: $dark-purp;
         }
+        &:focus {
+            outline: 5px $dark-purp;
+        }
         &.disabled {
             background-color: $disable-gray;
             cursor: default;
@@ -34,6 +37,9 @@
             color: $midi-gray;
             background-color: $background-gray;
             box-shadow: 0px 2px 6px 0px #0000001A;
+        }
+        &:focus {
+            outline: 5px $midi-gray;
         }
         &.disabled {
             color: $disable-gray;
