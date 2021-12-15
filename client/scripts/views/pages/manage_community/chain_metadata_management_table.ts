@@ -30,7 +30,7 @@ interface IChainMetadataManagementState {
   defaultSummaryView: boolean;
   network: ChainNetwork;
   symbol: string;
-  snapshot: string;
+  snapshot: string[];
   uploadInProgress: boolean;
 }
 
@@ -180,11 +180,12 @@ const ChainMetadataManagementTable: m.Component<
           }),
           app.chain?.meta.chain.base === ChainBase.Ethereum &&
             m(InputPropertyRow, {
-              title: 'Snapshot',
+              title: 'Snapshot(s)',
               defaultValue: vnode.state.snapshot,
               placeholder: vnode.state.network,
               onChangeHandler: (v) => {
-                vnode.state.snapshot = v;
+                const snapshots = v.split(',').map((val) => val.trim()).filter((val) => val.length > 0);
+                vnode.state.snapshot = snapshots;
               },
             }),
           m(InputPropertyRow, {
@@ -244,18 +245,13 @@ const ChainMetadataManagementTable: m.Component<
               defaultSummaryView,
             } = vnode.state;
 
-            // /^[a-z]+\.eth/
-            if (
-              snapshot &&
-              snapshot !== '' &&
-              !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
-                snapshot
-              )
-            ) {
-              notifyError('Snapshot name must be in the form of *.eth');
-              return;
+            for (const space of snapshot) {
+              if (!/^[a-z]+\.eth$/gi.test(space)) {
+                notifyError('Snapshot name must be in the form of *.eth');
+                return;
+              }
             }
-
+            
             try {
               await vnode.attrs.chain.updateChainData({
                 name,

@@ -69,9 +69,13 @@ const updateChain = async (
     custom_domain,
     default_summary_view,
     terms,
-    snapshot,
   } = req.body;
 
+  let snapshot = req.body['snapshot[]'];
+  // Handle single string case
+  if (typeof snapshot === 'string') {
+    snapshot = [snapshot]
+  }
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
@@ -85,10 +89,7 @@ const updateChain = async (
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
   } else if (
-    snapshot &&
-    !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
-      snapshot
-    )
+    snapshot.some((snapshot_space) => !/^[a-z]+\.eth$/gi.test(snapshot_space))
   ) {
     return next(new Error(Errors.InvalidSnapshot));
   } else if (snapshot && chain.base !== ChainBase.Ethereum) {
@@ -96,6 +97,7 @@ const updateChain = async (
   } else if (terms && !urlHasValidHTTPPrefix(terms)) {
     return next(new Error(Errors.InvalidTerms));
   }
+
 
   if (name) chain.name = name;
   if (description) chain.description = description;

@@ -22,7 +22,7 @@ class ChainInfo {
   public stagesEnabled: boolean;
   public customStages: string;
   public customDomain: string;
-  public snapshot: string;
+  public snapshot: string[];
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;

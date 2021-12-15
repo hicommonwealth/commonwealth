@@ -407,7 +407,17 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Snapshot Proposals',
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/snapshot/${app.chain.meta.chain.snapshot}`);
+          console.log("Snapshot: ", app.chain.meta.chain.snapshot)
+          console.log("Navigating to: ", `/snapshot/${app.chain.meta.chain.snapshot}`)
+          // Check if we have multiple snapshots for conditional redirect
+          const snapshotSpaces = app.chain.meta.chain.snapshot;
+
+          if (snapshotSpaces.length > 1) {
+
+          } else {
+            navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+          }
+          
         },
       }),
       // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
