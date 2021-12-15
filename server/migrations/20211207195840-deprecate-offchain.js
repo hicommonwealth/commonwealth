@@ -109,6 +109,7 @@ module.exports = {
       const description = info['description'].substring(0, 200)
       const { website, discord, telegram } = info;
 
+      // console.log(chain, website, discord, telegram)
 
       // Create new rows
       const chainObject = {
@@ -119,7 +120,7 @@ module.exports = {
         // default values below
         active: true,
         symbol: 'ETH',
-        type: 'chain',
+        type: 'offchain',
         network: 'ethereum',
         base: 'ethereum',
         website,
@@ -140,7 +141,6 @@ module.exports = {
         console.log("successfully ported over community", community)
       } catch (error) {
         console.log("error porting over community", community, error.errors)
-        // console.log(error)
       }
     }
 
@@ -151,22 +151,26 @@ module.exports = {
       }
 
       // // Merge offchain ids into chain column
-      await queryInterface.sequelize.query(
-        `UPDATE "Roles" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
-        { transaction: t },
-      );
-      // await queryInterface.sequelize.query(
-      //   `UPDATE "InviteCodes" SET chain_id = community_id WHERE chain_id IS NULL;`,
-      //   { transaction: t },
-      // );
-      // await queryInterface.sequelize.query(
-      //   `UPDATE "InviteLinks" SET chain_id = community_id WHERE chain_id IS NULL;`,
-      //   { transaction: t },
-      // );
-      // await queryInterface.sequelize.query(
-      //   `UPDATE "OffchainComments" SET chain = community WHERE chain IS NULL;`,
-      //   { transaction: t },
-      // );
+      // try {
+      //   await queryInterface.sequelize.query(
+      //     `UPDATE "Roles" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
+      //     { transaction: t },
+      //   );
+      //   await queryInterface.sequelize.query(
+      //     `UPDATE "InviteCodes" SET chain_id = community_id WHERE chain_id IS NULL;`,
+      //     { transaction: t },
+      //   );
+      //   await queryInterface.sequelize.query(
+      //     `UPDATE "InviteLinks" SET chain_id = community_id WHERE chain_id IS NULL;`,
+      //     { transaction: t },
+      //   );
+      //   await queryInterface.sequelize.query(
+      //     `UPDATE "OffchainComments" SET chain = community WHERE chain IS NULL;`,
+      //     { transaction: t },
+      //   );
+      // } catch (error) {
+      //   console.log(error)
+      // }
       // await queryInterface.sequelize.query(
       //   `UPDATE "OffchainReactions" SET chain = community WHERE chain IS NULL;`,
       //   { transaction: t },
@@ -190,7 +194,6 @@ module.exports = {
       // await queryInterface.sequelize.query(
       //   `UPDATE "Subscriptions" SET chain_id = community_id WHERE chain_id IS NULL;`,
       //   { transaction: t },
-
       // );
       // await queryInterface.sequelize.query(
       //   `UPDATE "Webhooks" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
@@ -198,7 +201,6 @@ module.exports = {
       // );
 
       // TODO: Add fkey constraints to DB
-
 
     });
   },
