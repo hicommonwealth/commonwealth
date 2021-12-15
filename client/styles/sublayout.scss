@@ -152,6 +152,12 @@
                 max-width: 840px;
                 margin: 0 auto;
             }
+            .hiringBtn {
+                min-width: fit-content;
+                box-shadow: none;
+                height: 36px;
+                border-radius: 4px;
+            }
         }
 
         .sublayout-header-left {
@@ -221,7 +227,7 @@
         .sublayout-header-right {
             display: flex;
             align-items: center;
-            flex: 2;
+            flex: 3;
             text-align: right;
             flex-direction: row-reverse;
             > .cui-button,
