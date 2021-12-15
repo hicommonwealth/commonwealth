@@ -101,6 +101,7 @@ export default class CompoundChain extends EthereumChain {
   }
 
   public async getVotingPower(address: string): Promise<BigNumber> {
+    console.log(this.compoundApi);
     if (!this.compoundApi.Token) {
       console.warn('No token found, cannot fetch vote status');
       return null;
@@ -111,6 +112,7 @@ export default class CompoundChain extends EthereumChain {
     } else {
       voteAmount = await this.compoundApi.Token.getCurrentVotes(address);
     }
+    console.log(voteAmount);
     return voteAmount;
   }
 

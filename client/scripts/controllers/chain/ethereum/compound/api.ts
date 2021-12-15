@@ -36,7 +36,6 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
   public get tokenType() { return this._tokenType; }
   private _Token: MPond | ERC20VotesComp | undefined;
   public get Token() { return this._Token; }
-  public get decimals() { return this._decimals; }
 
   private _govType: GovernorType;
   public get govType() { return this._govType; }
@@ -114,6 +113,7 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
       const iface = new utils.Interface(JSON.stringify(ABI));
       const data = iface.encodeFunctionData(tokenName);
       const resultData = await this.Contract.provider.call({ to: this.Contract.address, data });
+      console.log({resultData});
       tokenAddress = utils.getAddress(Buffer.from(utils.stripZeros(resultData)).toString('hex'));
     } catch (err) {
       console.error(`Could not fetch token ${tokenName}: ${err.message}`);

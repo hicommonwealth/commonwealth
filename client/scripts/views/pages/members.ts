@@ -93,7 +93,7 @@ const MembersPage: m.Component<
     members: MemberInfo[];
     pageToLoad: number;
     totalMemberCount: number;
-    delegates: boolean;
+    hasDelegates: boolean;
     voteEvents;
     profilesFinishedLoading: boolean;
     numProfilesLoaded: number;
@@ -118,7 +118,7 @@ const MembersPage: m.Component<
   },
   view: (vnode) => {
     console.log(app.chain instanceof Compound);
-    vnode.state.delegates = app.chain instanceof Compound;
+    vnode.state.hasDelegates = app.chain instanceof Compound;
     const chainController =
       app.chain instanceof Compound ? (app.chain as Compound) : null;
 
@@ -179,7 +179,7 @@ const MembersPage: m.Component<
           vnode.state.totalMemberCount = total;
 
           const offset = vnode.state.members.length - newMembers.length;
-          if (vnode.state.delegates) {
+          if (vnode.state.hasDelegates) {
             return app.chain.initApi().then(() =>
               Promise.all(
                 newMembers.map((o, i) => {
@@ -201,7 +201,7 @@ const MembersPage: m.Component<
       pageToLoad,
       requestMembers,
       members,
-      delegates,
+      hasDelegates,
     } = vnode.state;
 
     const noCommunityMembers = (totalMemberCount === 0 && pageToLoad === 0 && !requestMembers);
@@ -260,11 +260,10 @@ const MembersPage: m.Component<
               m('tr', [
                 m('th', 'Member'),
                 m('th.align-right', 'Posts / Month'),
-                delegates && m('th.align-right', 'Voting Power'),
-                delegates && m('th.align-right', 'Delegate'),
+                hasDelegates && m('th.align-right', 'Voting Power'),
+                hasDelegates && m('th.align-right', 'Delegate'),
               ]),
               vnode.state.members.map((member) => {
-                console.log(member.votes);
                 const profileInfo = app.profiles.getProfile(member.chain, member.address);
                 return m('tr', [
                   m('td.members-item-info', [
@@ -282,14 +281,14 @@ const MembersPage: m.Component<
                     ]),
                   ]),
                   m('td.align-right', member.count),
-                  delegates
+                  hasDelegates
                   && m('td.align-right', [
-                      member.votes !== undefined
+                      member.votes
                         ? `${member.votes.toNumber()?.toFixed(2)} ${app.chain.meta.chain.symbol
                         }`
                         : m(Spinner, { active: true, size: 'xs' }),
                     ]),
-                  delegates
+                  hasDelegates
                   && m(
                     'td.align-right',
                     m(Button, {
