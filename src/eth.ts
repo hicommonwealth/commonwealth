@@ -22,8 +22,7 @@ export async function createProvider(
     // 12s minute polling interval (default is 4s)
     provider.pollingInterval = 12000;
     const blockNumber = await provider.getBlockNumber();
-    const data = await provider.getBlock(`${blockNumber}`);
-    if (!data)
+    if (!blockNumber)
       throw new Error(
         `A connection to ${ethNetworkUrl} could not be established.`
       );
