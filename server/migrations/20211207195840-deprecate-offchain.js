@@ -262,6 +262,15 @@ module.exports = {
         { transaction: t }
       );
 
+      await queryInterface.sequelize.query(
+        `UPDATE "OffchainThreads" SET chain = community WHERE chain IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        'ALTER TABLE "OffchainThreads" DROP COLUMN community;',
+        { transaction: t }
+      );
+
 
 
       // remove threads index
@@ -358,11 +367,8 @@ module.exports = {
         await removeOffchain(t, offchainToRemove[i]);
       }
 
-      // Merge offchain ids into chain column
+      // Merge offchain ids into chain column and delete old columns
       await mergeOffchainIdsIntoChain(t)
-
-      // Delete old columns
-
     });
   },
   down: (queryInterface, Sequelize) => {
