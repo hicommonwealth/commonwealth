@@ -1,6 +1,6 @@
 'use strict';
 
-const communities = [
+const offChainCommunities = [
   'clcg-commonwealth',
   'dtrade',
   'decent',
@@ -146,7 +146,7 @@ module.exports = {
      * Remove offchain community and its dependent tables
      */
     const removeOffchain = async (t, community) => {
-      console.log("removing offchain community", offchainToRemove[i])
+      console.log("removing offchain community", community)
       await queryInterface.bulkDelete('OffchainReactions', { community }, { transaction: t })
       await queryInterface.bulkDelete('OffchainThreads', { community }, { transaction: t });
       await queryInterface.bulkDelete('OffchainComments', { community }, { transaction: t });
@@ -158,140 +158,139 @@ module.exports = {
      */
     const mergeOffchainIdsIntoChain = async (t,) => {
       console.log("merging offchain ids into chain column")
-      try {
-        await queryInterface.sequelize.query(
-          `UPDATE "Roles" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
-          { transaction: t },
-        );
-        await queryInterface.sequelize.query(
-          `UPDATE "InviteCodes" SET chain_id = community_id WHERE chain_id IS NULL;`,
-          { transaction: t },
-        );
-        await queryInterface.sequelize.query(
-          `UPDATE "InviteLinks" SET chain_id = community_id WHERE chain_id IS NULL;`,
-          { transaction: t },
-        );
-        await queryInterface.sequelize.query(
-          `UPDATE "OffchainTopics" SET chain_id = community_id WHERE chain_id IS NULL;`,
-          { transaction: t },
-        );
-        await queryInterface.sequelize.query(
-          `UPDATE "Subscriptions" SET chain_id = community_id WHERE chain_id IS NULL;`,
-          { transaction: t },
-        );
-        await queryInterface.sequelize.query(
-          `UPDATE "Webhooks" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
-          { transaction: t },
-        );
-        await queryInterface.sequelize.query(
-          `UPDATE "OffchainViewCounts" SET chain = community WHERE chain IS NULL;`,
-          { transaction: t },
-        );
-        await queryInterface.sequelize.query(
-          `UPDATE "OffchainVotes" SET chain = community WHERE chain IS NULL;`,
-          { transaction: t },
-        );
-        await queryInterface.sequelize.query(
-          `UPDATE "StarredCommunities" SET chain = community WHERE chain IS NULL;`,
-          { transaction: t },
-        );
-        await queryInterface.sequelize.query(
-          `UPDATE "OffchainReactions" SET chain = community WHERE chain IS NULL;`,
-          { transaction: t },
-        );
+      await queryInterface.sequelize.query(
+        `UPDATE "Roles" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "InviteCodes" SET chain_id = community_id WHERE chain_id IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "InviteLinks" SET chain_id = community_id WHERE chain_id IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "OffchainTopics" SET chain_id = community_id WHERE chain_id IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "Subscriptions" SET chain_id = community_id WHERE chain_id IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "Webhooks" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "OffchainViewCounts" SET chain = community WHERE chain IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "OffchainVotes" SET chain = community WHERE chain IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "StarredCommunities" SET chain = community WHERE chain IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "OffchainReactions" SET chain = community WHERE chain IS NULL;`,
+        { transaction: t },
+      );
 
-        // remove threads index
-        console.log("removing threads index")
-        await queryInterface.sequelize.query(
-          'DROP TRIGGER "OffchainThreads_vector_update" ON "OffchainThreads";',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'DROP INDEX "OffchainThreads_search";',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'ALTER TABLE "OffchainThreads" DROP COLUMN _search;',
-          { transaction: t }
-        );
+      // remove threads index
+      console.log("removing threads index")
+      await queryInterface.sequelize.query(
+        'DROP TRIGGER "OffchainThreads_vector_update" ON "OffchainThreads";',
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        'DROP INDEX "OffchainThreads_search";',
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        'ALTER TABLE "OffchainThreads" DROP COLUMN _search;',
+        { transaction: t }
+      );
 
-        // remove comments index
-        console.log("removing comments index")
-        await queryInterface.sequelize.query(
-          'DROP TRIGGER "OffchainComments_vector_update" ON "OffchainComments";',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'DROP INDEX "OffchainComments_search";',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'ALTER TABLE "OffchainComments" DROP COLUMN _search;',
-          { transaction: t }
-        );
+      // remove comments index
+      console.log("removing comments index")
+      await queryInterface.sequelize.query(
+        'DROP TRIGGER "OffchainComments_vector_update" ON "OffchainComments";',
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        'DROP INDEX "OffchainComments_search";',
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        'ALTER TABLE "OffchainComments" DROP COLUMN _search;',
+        { transaction: t }
+      );
 
-        // // // // //
-        console.log("merging OffchainComments columns")
-        await queryInterface.sequelize.query(
-          `UPDATE "OffchainComments" SET chain = community WHERE chain IS NULL;`,
-          { transaction: t },
-        );
-        // // // // //
+      // // // // //
+      console.log("merging OffchainComments columns")
+      await queryInterface.sequelize.query(
+        `UPDATE "OffchainComments" SET chain = community WHERE chain IS NULL;`,
+        { transaction: t },
+      );
+      // // // // //
 
-        // add threads index
-        console.log("adding threads index")
-        await queryInterface.sequelize.query(
-          'ALTER TABLE "OffchainThreads" ADD COLUMN _search TSVECTOR',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'UPDATE "OffchainThreads" SET _search = to_tsvector(\'english\', title || \' \' || plaintext)',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'CREATE INDEX "OffchainThreads_search" ON "OffchainThreads" USING gin(_search)',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'CREATE TRIGGER "OffchainThreads_vector_update" BEFORE INSERT OR UPDATE ON "OffchainThreads" '
-          + 'FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(_search, \'pg_catalog.english\', title, plaintext)',
-          { transaction: t }
-        );
+      // add threads index
+      console.log("adding threads index")
+      await queryInterface.sequelize.query(
+        'ALTER TABLE "OffchainThreads" ADD COLUMN _search TSVECTOR',
+        { transaction: t }
+      );
+      console.log("set _search solumn")
+      await queryInterface.sequelize.query(
+        `UPDATE "OffchainThreads" SET _search = to_tsvector('english', title || ' ' || plaintext);`,
+        { transaction: t }
+      );
+      console.log("create index with gin")
+      await queryInterface.sequelize.query(
+        'CREATE INDEX "OffchainThreads_search" ON "OffchainThreads" USING gin(_search)',
+        { transaction: t }
+      );
+      console.log("create trigger")
+      await queryInterface.sequelize.query(
+        'CREATE TRIGGER "OffchainThreads_vector_update" BEFORE INSERT OR UPDATE ON "OffchainThreads" '
+        + 'FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(_search, \'pg_catalog.english\', title, plaintext)',
+        { transaction: t }
+      );
 
-        // add comments index
-        console.log("adding comments index")
-        await queryInterface.sequelize.query(
-          'ALTER TABLE "OffchainComments" ADD COLUMN _search TSVECTOR',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'UPDATE "OffchainComments" SET _search = to_tsvector(\'english\', plaintext)',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'CREATE INDEX "OffchainComments_search" ON "OffchainComments" USING gin(_search)',
-          { transaction: t }
-        );
-        await queryInterface.sequelize.query(
-          'CREATE TRIGGER "OffchainComments_vector_update" BEFORE INSERT OR UPDATE ON "OffchainComments" '
-          + 'FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(_search, \'pg_catalog.english\', plaintext)',
-          { transaction: t }
-        );
-      } catch (error) {
-        console.log(error)
-      }
+      // add comments index
+      console.log("adding comments index")
+      await queryInterface.sequelize.query(
+        'ALTER TABLE "OffchainComments" ADD COLUMN _search TSVECTOR',
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        'UPDATE "OffchainComments" SET _search = to_tsvector(\'english\', plaintext)',
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        'CREATE INDEX "OffchainComments_search" ON "OffchainComments" USING gin(_search)',
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        'CREATE TRIGGER "OffchainComments_vector_update" BEFORE INSERT OR UPDATE ON "OffchainComments" '
+        + 'FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(_search, \'pg_catalog.english\', plaintext)',
+        { transaction: t }
+      );
     }
 
     return queryInterface.sequelize.transaction(async (t) => {
       // Port over offchains to chain
-      for (let i = 0; i < communities.length; i++) {
-        await fromOffchainToChain(t, communities[i])
+      for (let i = 0; i < offChainCommunities.length; i++) {
+        await fromOffchainToChain(t, offChainCommunities[i])
       }
 
       // Remove offchain communities
       await queryInterface.dropTable('Collaborations', { transaction: t });
       for (let i = 0; i < offchainToRemove.length; i++) {
-        await removeOffchain(offchainToRemove[i]);
+        await removeOffchain(t, offchainToRemove[i]);
       }
 
       // Merge offchain ids into chain column
@@ -299,13 +298,19 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
+    // There isnt really a good down. To delete the ported over community means to delete all their comments
+    // and other related data.
     return queryInterface.sequelize.transaction(async (t) => {
-      for (let i = 0; i < communities.length; i++) {
+      for (let i = 0; i < offChainCommunities.length; i++) {
         try {
-          await queryInterface.bulkDelete('ChainNodes', { chain: communities[i] }, { transaction: t });
-          await queryInterface.bulkDelete('Chains', { id: communities[i] }, { transaction: t });
+          await queryInterface.bulkDelete('OffchainReactions', { community: offChainCommunities[i] }, { transaction: t })
+          await queryInterface.bulkDelete('OffchainThreads', { community: offChainCommunities[i] }, { transaction: t });
+          await queryInterface.bulkDelete('OffchainComments', { community: offChainCommunities[i] }, { transaction: t });
+          await queryInterface.bulkDelete('OffchainCommunities', { id: offChainCommunities[i] }, { transaction: t })
+          await queryInterface.bulkDelete('ChainNodes', { chain: offChainCommunities[i] }, { transaction: t });
+          await queryInterface.bulkDelete('Chains', { id: offChainCommunities[i] }, { transaction: t });
         } catch (error) {
-          console.log("error deleting community", communities[i], error)
+          console.log("error deleting community", offChainCommunities[i], error)
         }
       }
     });
