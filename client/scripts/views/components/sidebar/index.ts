@@ -159,7 +159,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           navigateToSubpage('/members');
         },
       }),
-      (app.activeId() == 'near'
+      (app.activeId() === 'near'
       ? m(Button, {
         rounded: true,
         fluid: true,
