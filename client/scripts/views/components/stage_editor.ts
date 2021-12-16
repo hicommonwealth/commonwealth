@@ -9,7 +9,7 @@ import { offchainThreadStageToLabel, parseCustomStages } from 'helpers';
 import { ChainEntity, OffchainThread, OffchainThreadStage } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
+import { loadMultipleSpacesData, SnapshotProposal } from 'helpers/snapshot_utils';
 
 const SnapshotProposalSelector: m.Component<{
   thread: OffchainThread;
@@ -18,32 +18,27 @@ const SnapshotProposalSelector: m.Component<{
 }, {
   initialized: boolean;
   snapshotProposalsLoaded: boolean;
+  all_proposals: SnapshotProposal[]
 }> = {
   view: (vnode) => {
     const { thread, onSelect } = vnode.attrs;
     if (!app.chain || !app.activeChainId()) return;
     if (!vnode.state.initialized) {
+      vnode.state.all_proposals = []
       vnode.state.initialized = true;
-      if (app.chain.meta.chain.snapshot) {
-        if (!app.snapshot.initialized) {
-          app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
-            // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
-            vnode.state.snapshotProposalsLoaded = true;
-            m.redraw();
-          })
-        } else {
-          app.snapshot.refreshProposals().then(() => {
-            vnode.state.snapshotProposalsLoaded = true;
-            m.redraw();
-          })
-        };
-      }
+      loadMultipleSpacesData(app.chain.meta.chain.snapshot).then((data) => {
+        for (const {proposals} of data) {
+          vnode.state.all_proposals = [...vnode.state.all_proposals, ...proposals]
+        }
+        vnode.state.snapshotProposalsLoaded = true;
+        m.redraw();
+      })
     }
 
     return m('.ChainEntitiesSelector', [
       vnode.state.snapshotProposalsLoaded ? m(QueryList, {
         checkmark: true,
-        items: app.snapshot.proposals.sort((a, b) => {
+        items: vnode.state.all_proposals.sort((a, b) => {
           return b.created - a.created;
         }),
         inputAttrs: {

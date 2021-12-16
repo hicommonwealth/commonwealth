@@ -300,3 +300,16 @@ export async function getPower(space: SnapshotSpace, address: string, snapshot: 
 //     )
 //   );
 // }
+
+export async function loadMultipleSpacesData(snapshot_spaces:string[]) {
+  let spaces_data: Array<{space: SnapshotSpace, proposals: SnapshotProposal[]}> = [];
+
+  for (const spaceId of snapshot_spaces) {
+      const proposals = await getProposals(spaceId);
+      const space = await getSpace(spaceId);
+
+      spaces_data.push({space: space, proposals: proposals});
+  }
+  
+  return spaces_data;
+}
