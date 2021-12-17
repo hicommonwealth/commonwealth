@@ -60,7 +60,7 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
 
   const role = await models.Role.create({
     address_id: addressObj.id,
-    offchain_community_id: community?.id,
+    // offchain_community_id: community?.id,
     chain_id: chain?.id,
     permission: 'member',
   });

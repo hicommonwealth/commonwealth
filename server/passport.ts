@@ -193,15 +193,20 @@ function setupPassport(models: DB) {
             }, { transaction: t });
           }
 
-          if (req.body.chain || req.body.community) await models.Role.create(req.body.community ? {
-            address_id: newAddress.id,
-            offchain_community_id: req.body.community,
-            permission: 'member',
-          } : {
+          if (req.body.chain || req.body.community) await models.Role.create({
             address_id: newAddress.id,
             chain_id: req.body.chain,
             permission: 'member',
           }, { transaction: t });
+          // if (req.body.chain || req.body.community) await models.Role.create(req.body.community ? {
+          //   address_id: newAddress.id,
+          //   offchain_community_id: req.body.community,
+          //   permission: 'member',
+          // } : {
+          //   address_id: newAddress.id,
+          //   chain_id: req.body.chain,
+          //   permission: 'member',
+          // }, { transaction: t });
 
           // Automatically create subscription to their own mentions
           await models.Subscription.create({

@@ -30,7 +30,7 @@ export default (
   const OffchainViewCount = <OffchainViewCountModelStatic>sequelize.define('OffchainViewCount', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.STRING },
-    community: { type: dataTypes.STRING },
+    // community: { type: dataTypes.STRING },
     object_id: { type: dataTypes.INTEGER, allowNull: false },
     view_count: { type: dataTypes.INTEGER, allowNull: false },
   }, {
@@ -40,15 +40,15 @@ export default (
     indexes: [
       { fields: ['id'] },
       { fields: ['chain', 'object_id'] },
-      { fields: ['community', 'object_id'] },
-      { fields: ['chain', 'community', 'object_id'] },
+      // { fields: ['community', 'object_id'] },
+      // { fields: ['chain', 'community', 'object_id'] },
       { fields: ['view_count'] },
     ],
   });
 
   OffchainViewCount.associate = (models) => {
     models.OffchainViewCount.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.OffchainViewCount.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
+    // models.OffchainViewCount.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
     models.OffchainViewCount.belongsTo(models.OffchainThread, { foreignKey: 'object_id', targetKey: 'id' });
   };
 

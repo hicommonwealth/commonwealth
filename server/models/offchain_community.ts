@@ -131,10 +131,12 @@ export default (
       // foreignKey: 'community_id',
     });
     models.OffchainCommunity.hasMany(models.OffchainThread, {
-      foreignKey: 'community',
+      foreignKey: 'chain',
+      // foreignKey: 'community',
     });
     models.OffchainCommunity.hasMany(models.StarredCommunity, {
-      foreignKey: 'community',
+      foreignKey: 'chain',
+      // foreignKey: 'community',
     });
   };
 

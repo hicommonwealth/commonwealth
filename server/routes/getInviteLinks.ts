@@ -25,7 +25,8 @@ const getInviteLinks = async (models: DB, req, res, next) => {
   const requesterIsAdminOrMod = await models.Role.findAll({
     where: {
       address_id: address.id,
-      offchain_community_id: community_id,
+      chain_id: community_id,
+      // offchain_community_id: community_id,
       permission: ['admin', 'moderator'],
     },
   });

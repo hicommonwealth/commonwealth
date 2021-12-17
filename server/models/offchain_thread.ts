@@ -80,7 +80,7 @@ export default (
         allowNull: false,
       },
       chain: { type: dataTypes.STRING, allowNull: true },
-      community: { type: dataTypes.STRING, allowNull: true },
+      // community: { type: dataTypes.STRING, allowNull: true },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -112,17 +112,17 @@ export default (
       indexes: [
         { fields: ['address_id'] },
         { fields: ['chain'] },
-        { fields: ['community'] },
+        // { fields: ['community'] },
         { fields: ['chain', 'created_at'] },
-        { fields: ['community', 'created_at'] },
+        // { fields: ['community', 'created_at'] },
         { fields: ['chain', 'updated_at'] },
-        { fields: ['community', 'updated_at'] },
+        // { fields: ['community', 'updated_at'] },
         { fields: ['chain', 'pinned'] },
-        { fields: ['community', 'pinned'] },
+        // { fields: ['community', 'pinned'] },
         { fields: ['chain', 'offchain_voting_ends_at'] },
-        { fields: ['community', 'offchain_voting_ends_at'] },
+        // { fields: ['community', 'offchain_voting_ends_at'] },
         { fields: ['chain', 'offchain_voting_votes'] },
-        { fields: ['community', 'offchain_voting_votes'] },
+        // { fields: ['community', 'offchain_voting_votes'] },
       ],
     }
   );
@@ -132,10 +132,10 @@ export default (
       foreignKey: 'chain',
       targetKey: 'id',
     });
-    models.OffchainThread.belongsTo(models.OffchainCommunity, {
-      foreignKey: 'community',
-      targetKey: 'id',
-    });
+    // models.OffchainThread.belongsTo(models.OffchainCommunity, {
+    //   foreignKey: 'community',
+    //   targetKey: 'id',
+    // });
     models.OffchainThread.belongsTo(models.Address, {
       as: 'Address',
       foreignKey: 'address_id',

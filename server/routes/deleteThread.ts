@@ -45,16 +45,23 @@ const deleteThread = async (models: DB, req: Request, res: Response, next: NextF
     }
 
     const userRole = await models.Role.findOne({
-      where: thread.Chain ? {
+      where: {
         address_id: userOwnedAddressIds,
         chain_id: thread.Chain.id,
         permission: ['admin', 'moderator'],
-      } : {
-        address_id: userOwnedAddressIds,
-        offchain_community_id: thread.OffchainCommunity.id,
-        permission: ['admin', 'moderator'],
       },
     });
+    // const userRole = await models.Role.findOne({
+    //   where: thread.Chain ? {
+    //     address_id: userOwnedAddressIds,
+    //     chain_id: thread.Chain.id,
+    //     permission: ['admin', 'moderator'],
+    //   } : {
+    //     address_id: userOwnedAddressIds,
+    //     offchain_community_id: thread.OffchainCommunity.id,
+    //     permission: ['admin', 'moderator'],
+    //   },
+    // });
 
     const isAdminOrMod = userRole?.permission === 'admin' || userRole?.permission === 'moderator';
 

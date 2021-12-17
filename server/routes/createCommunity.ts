@@ -129,7 +129,8 @@ const createCommunity = async (
   const community = await models.OffchainCommunity.create(communityContent);
   const roleContent: RoleAttributes = {
     address_id: address.id,
-    offchain_community_id: community.id,
+    chain_id: community.id,
+    // offchain_community_id: community.id,
     permission: 'admin',
   };
   const admin = await models.Role.create(roleContent);

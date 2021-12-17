@@ -35,13 +35,17 @@ const createRole = async (
   });
   if (!validAddress) return next(new Error(Errors.InvalidAddress));
 
-  const [ role ] = await models.Role.findOrCreate({ where: chain ? {
+  const [ role ] = await models.Role.findOrCreate({ where: {
     address_id: validAddress.id,
     chain_id: chain.id,
-  } : {
-    address_id: validAddress.id,
-    offchain_community_id: community.id,
-  } });
+  }});
+  // const [ role ] = await models.Role.findOrCreate({ where: chain ? {
+  //   address_id: validAddress.id,
+  //   chain_id: chain.id,
+  // } : {
+  //   address_id: validAddress.id,
+  //   offchain_community_id: community.id,
+  // } });
 
   const [ subscription ] = await models.Subscription.findOrCreate({
     where: chain ? {

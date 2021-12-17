@@ -41,7 +41,8 @@ const updateCommunity = async (
     const userRole = await models.Role.findOne({
       where: {
         address_id: userAddressIds,
-        offchain_community_id: community.id,
+        chain_id: community.id,
+        // offchain_community_id: community.id,
       },
     });
     if (!req.user.isAdmin && (!userRole || userRole.permission !== 'admin')) {

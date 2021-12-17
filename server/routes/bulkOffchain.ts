@@ -32,15 +32,16 @@ const bulkOffchain = async (
     req.user
   );
   if (error) return next(new Error(error));
-  console.log("yo1")
 
   // globally shared SQL replacements
-  const communityOptions = community
-    ? 'community = :community'
-    : 'chain = :chain';
-  const replacements = community
-    ? { community: community.id }
-    : { chain: chain.id };
+  const communityOptions = 'chain = :chain';
+  // const communityOptions = community
+  //   ? 'community = :community'
+  //   : 'chain = :chain';
+  const replacements = { chain: chain.id };
+  // const replacements = community
+  //   ? { community: community.id }
+  //   : { chain: chain.id };
 
   // parallelized queries
   const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting] =
@@ -66,7 +67,7 @@ const bulkOffchain = async (
       new Promise(async (resolve, reject) => {
         try {
           const threadParams = Object.assign(replacements, { pinned: true });
-
+          console.log('threadParams', threadParams)
           const rawPinnedThreads = await models.OffchainThread.findAll({
             where: threadParams,
             include: [
@@ -106,16 +107,21 @@ const bulkOffchain = async (
       }),
       // admins
       models.Role.findAll({
-        where: chain
-          ? {
-              chain_id: chain.id,
-              permission: { [Op.in]: ['admin', 'moderator'] },
-            }
-          : {
-              offchain_community_id: community.id,
-              permission: { [Op.in]: ['admin', 'moderator'] },
-            },
+        where: {
+          chain_id: chain.id,
+          permission: { [Op.in]: ['admin', 'moderator'] },
+        },
         include: [models.Address],
+        // where: chain
+        //   ? {
+        //       chain_id: chain.id,
+        //       permission: { [Op.in]: ['admin', 'moderator'] },
+        //     }
+        //   : {
+        //       offchain_community_id: community.id,
+        //       permission: { [Op.in]: ['admin', 'moderator'] },
+        //     },
+        // include: [models.Address],
         order: [['created_at', 'DESC']],
       }),
       // most active users
@@ -126,6 +132,7 @@ const bulkOffchain = async (
           );
           const activeUsers = {};
           const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
+          console.log("is community", community)
           if (community) where['community'] = community.id;
           else where['chain'] = chain.id;
 

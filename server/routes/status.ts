@@ -130,25 +130,26 @@ const status = async (
     include: [models.Address, models.OffchainAttachment],
   });
 
-  const visiblePrivateCommunityIds = Array.from(
-    roles.map((role) => role.offchain_community_id)
-  ); // both private and public
-  const privateCommunities = await models.OffchainCommunity.findAll({
-    where: {
-      id: {
-        [Op.in]: visiblePrivateCommunityIds,
-      },
-      privacy_enabled: true,
-    },
-    include: [
-      {
-        model: models.OffchainTopic,
-        as: 'topics',
-      },
-    ],
-  });
+  // const visiblePrivateCommunityIds = Array.from(
+  //   roles.map((role) => role.offchain_community_id)
+  // ); // both private and public
+  // const privateCommunities = await models.OffchainCommunity.findAll({
+  //   where: {
+  //     id: {
+  //       [Op.in]: visiblePrivateCommunityIds,
+  //     },
+  //     privacy_enabled: true,
+  //   },
+  //   include: [
+  //     {
+  //       model: models.OffchainTopic,
+  //       as: 'topics',
+  //     },
+  //   ],
+  // });
   const allCommunities: any = _.uniqBy(
-    publicCommunities.concat(privateCommunities),
+    publicCommunities,
+    // publicCommunities.concat(privateCommunities),
     'id'
   );
   console.log('blah2')
@@ -172,10 +173,10 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
       {
         replacements: {
           thirtyDaysAgo,
-          visiblePrivateCommunityIds:
-            privateCommunities.length > 0
-              ? privateCommunities.map((c) => c.id)
-              : ['NO_COMMUNITY'],
+          // visiblePrivateCommunityIds:
+          //   privateCommunities.length > 0
+          //     ? privateCommunities.map((c) => c.id)
+          //     : ['NO_COMMUNITY'],
         },
         type: QueryTypes.SELECT,
       }

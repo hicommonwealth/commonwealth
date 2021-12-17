@@ -158,15 +158,20 @@ const linkExistingAddressToChain = async (
     });
 
     if (!role) {
-      await models.Role.create(req.body.community ? {
-        address_id: addressId,
-        offchain_community_id: req.body.community,
-        permission: 'member',
-      } : {
+      await models.Role.create({
         address_id: addressId,
         chain_id: req.body.chain,
         permission: 'member',
       });
+      // await models.Role.create(req.body.community ? {
+      //   address_id: addressId,
+      //   offchain_community_id: req.body.community,
+      //   permission: 'member',
+      // } : {
+      //   address_id: addressId,
+      //   chain_id: req.body.chain,
+      //   permission: 'member',
+      // });
     }
 
     return res.json({
