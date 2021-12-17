@@ -72,10 +72,13 @@ const updateChain = async (
   } = req.body;
 
   let snapshot = req.body['snapshot[]'];
-  // Handle single string case
-  if (typeof snapshot === 'string') {
+  // Handle single string case and undefined case
+  if (snapshot !== undefined && typeof snapshot === 'string') {
     snapshot = [snapshot]
+  } else if (snapshot === undefined) {
+    snapshot = []
   }
+  
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
