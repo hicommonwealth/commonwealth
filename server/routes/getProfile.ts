@@ -15,10 +15,10 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
   if (!chain) return next(new Error(Errors.NoChain));
   if (!address) return next(new Error(Errors.NoAddress));
 
-  const publicCommunities = await models.OffchainCommunity.findAll({
-    where: { privacy_enabled: false },
-  });
-  const visibleCommunityIds = publicCommunities.map((c) => c.id);
+  // const publicCommunities = await models.OffchainCommunity.findAll({
+  //   where: { privacy_enabled: false },
+  // });
+  // const visibleCommunityIds = publicCommunities.map((c) => c.id);
 
   // if (req.user) {
     // const addresses = (await req.user.getAddresses()).filter((a) => !!a.verified);
@@ -56,8 +56,6 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
     where: {
       address_id: addressModel.id,
       [Op.or]: [{
-        community: { [Op.in]: visibleCommunityIds }
-      }, {
         chain: { [Op.in]: visibleChainIds }
       }]
     },
@@ -68,8 +66,6 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
     where: {
       address_id: addressModel.id,
       [Op.or]: [{
-        community: { [Op.in]: visibleCommunityIds }
-      }, {
         chain: { [Op.in]: visibleChainIds }
       }]
     },

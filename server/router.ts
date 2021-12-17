@@ -221,26 +221,26 @@ function setupRouter(
   );
 
   // offchain community admin routes
-  router.post(
-    '/createCommunity',
-    passport.authenticate('jwt', { session: false }),
-    createCommunity.bind(this, models)
-  );
-  router.post(
-    '/deleteCommunity',
-    passport.authenticate('jwt', { session: false }),
-    deleteCommunity.bind(this, models)
-  );
-  router.post(
-    '/updateCommunity',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunity.bind(this, models)
-  );
-  router.get(
-    '/communityStats',
-    passport.authenticate('jwt', { session: false }),
-    communityStats.bind(this, models)
-  );
+  // router.post(
+  //   '/createCommunity',
+  //   passport.authenticate('jwt', { session: false }),
+  //   createCommunity.bind(this, models)
+  // );
+  // router.post(
+  //   '/deleteCommunity',
+  //   passport.authenticate('jwt', { session: false }),
+  //   deleteCommunity.bind(this, models)
+  // );
+  // router.post(
+  //   '/updateCommunity',
+  //   passport.authenticate('jwt', { session: false }),
+  //   updateCommunity.bind(this, models)
+  // );
+  // router.get(
+  //   '/communityStats',
+  //   passport.authenticate('jwt', { session: false }),
+  //   communityStats.bind(this, models)
+  // );
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get('/getSupportedEthChains', getSupportedEthChains.bind(this, models));

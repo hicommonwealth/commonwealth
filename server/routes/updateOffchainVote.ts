@@ -67,7 +67,7 @@ const updateOffchainVote = async (
       address: req.body.address,
       author_chain: req.body.author_chain,
       chain: req.body.chain,
-      community: req.body.community,
+      // community: req.body.community,
       option: req.body.option,
     }, { transaction: t });
 

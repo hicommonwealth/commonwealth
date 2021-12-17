@@ -28,7 +28,7 @@ export default (
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     url: { type: dataTypes.STRING, allowNull: false },
     chain_id: { type: dataTypes.STRING, allowNull: true },
-    offchain_community_id: { type: dataTypes.STRING, allowNull: true },
+    // offchain_community_id: { type: dataTypes.STRING, allowNull: true },
     categories: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
   }, {
     tableName: 'Webhooks',
@@ -42,20 +42,20 @@ export default (
     ],
     validate: {
       // webhooks should only have 1 of these properties
-      eitherOffchainOrOnchain() {
-        if (!this.chain_id && !this.offchain_community_id) {
-          throw new Error('Either chain_id or offchain_community_id!');
-        }
-        if (this.chain_id && this.offchain_community_id) {
-          throw new Error('Either chain_id or offchain_community_id not both!');
-        }
-      }
+      // eitherOffchainOrOnchain() {
+      //   if (!this.chain_id && !this.offchain_community_id) {
+      //     throw new Error('Either chain_id or offchain_community_id!');
+      //   }
+      //   if (this.chain_id && this.offchain_community_id) {
+      //     throw new Error('Either chain_id or offchain_community_id not both!');
+      //   }
+      // }
     }
   });
 
   Webhook.associate = (models) => {
     models.Webhook.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
-    models.Webhook.belongsTo(models.OffchainCommunity, { foreignKey: 'offchain_community_id', targetKey: 'id' });
+    // models.Webhook.belongsTo(models.OffchainCommunity, { foreignKey: 'offchain_community_id', targetKey: 'id' });
   };
 
   return Webhook;

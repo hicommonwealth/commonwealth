@@ -144,13 +144,13 @@ const createCommunity = async (
       role_id: admin.id,
       author_address: creator_address,
       chain: default_chain,
-      community: name,
+      // community: name,
     },
     {
       user: creator_address,
       title: 'New Admin',
       chain: default_chain,
-      community: name,
+      // community: name,
     },
     req.wss,
     [creator_address]

@@ -32,10 +32,7 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
 
   // verify count exists before querying
   let count = await models.OffchainViewCount.findOne({
-    where: community ? {
-      community: req.body.community,
-      object_id: req.body.object_id,
-    } : {
+    where: {
       chain: req.body.chain,
       object_id: req.body.object_id,
     }

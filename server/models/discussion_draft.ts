@@ -44,7 +44,7 @@ export default (
 
   DiscussionDraft.associate = (models) => {
     models.DiscussionDraft.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.DiscussionDraft.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
+    // models.DiscussionDraft.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
     models.DiscussionDraft.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.DiscussionDraft.hasMany(models.OffchainAttachment, {
       foreignKey: 'attachment_id',
