@@ -148,6 +148,11 @@ module.exports = {
     const removeOffchain = async (t, community) => {
       console.log("removing offchain community", community)
       await queryInterface.bulkDelete('OffchainReactions', { community }, { transaction: t })
+      await queryInterface.sequelize.query(`
+        DELETE FROM "Collaborations" WHERE "offchain_thread_id" in (
+          SELECT "id" FROM "OffchainThreads"  WHERE "community" = '${community}'
+        );
+      `)
       await queryInterface.bulkDelete('OffchainThreads', { community }, { transaction: t });
       await queryInterface.bulkDelete('OffchainComments', { community }, { transaction: t });
       await queryInterface.bulkDelete('OffchainCommunities', { id: community }, { transaction: t })
@@ -356,20 +361,26 @@ module.exports = {
     }
 
     return queryInterface.sequelize.transaction(async (t) => {
-      // Port over offchains to chain
-      for (let i = 0; i < offChainCommunities.length; i++) {
-        await fromOffchainToChain(t, offChainCommunities[i])
-      }
+      try {
+        // Port over offchains to chain
+        for (let i = 0; i < offChainCommunities.length; i++) {
+          await fromOffchainToChain(t, offChainCommunities[i])
+        }
 
-      // Remove offchain communities
-      await queryInterface.dropTable('Collaborations', { transaction: t });
-      for (let i = 0; i < offchainToRemove.length; i++) {
-        await removeOffchain(t, offchainToRemove[i]);
-      }
+        // Remove offchain communities
+        // await queryInterface.dropTable('Collaborations', { transaction: t });
+        for (let i = 0; i < offchainToRemove.length; i++) {
+          await removeOffchain(t, offchainToRemove[i]);
+        }
 
-      // Merge offchain ids into chain column and delete old columns
-      await mergeOffchainIdsIntoChain(t)
+        // Merge offchain ids into chain column and delete old columns
+        await mergeOffchainIdsIntoChain(t)
+
+      } catch (error) {
+        console.log(error)
+      }
     });
+
   },
   down: (queryInterface, Sequelize) => {
     // There isnt really a good down. To delete the ported over community means to delete all their comments
