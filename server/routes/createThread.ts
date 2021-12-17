@@ -194,8 +194,8 @@ const createThread = async (
       category_id: NotificationCategories.NewComment,
       object_id: `discussion_${finalThread.id}`,
       offchain_thread_id: finalThread.id,
-      community_id: finalThread.community || null,
-      chain_id: finalThread.chain || null,
+      // community_id: finalThread.community || null,
+      chain_id: finalThread.chain,
       is_active: true,
     });
     await models.Subscription.create({
@@ -203,8 +203,8 @@ const createThread = async (
       category_id: NotificationCategories.NewReaction,
       object_id: `discussion_${finalThread.id}`,
       offchain_thread_id: finalThread.id,
-      community_id: finalThread.community || null,
-      chain_id: finalThread.chain || null,
+      // community_id: finalThread.community || null,
+      chain_id: finalThread.chain,
       is_active: true,
     });
   } catch (err) {
@@ -212,7 +212,7 @@ const createThread = async (
   }
   // auto-subscribe NewThread subscribers to NewComment as well
   // findOrCreate because redundant creation if author is also subscribed to NewThreads
-  const location = finalThread.community || finalThread.chain;
+  const location = finalThread.chain;
   const subscribers = await models.Subscription.findAll({
     where: {
       category_id: NotificationCategories.NewThread,
@@ -226,8 +226,8 @@ const createThread = async (
         category_id: NotificationCategories.NewComment,
         object_id: `discussion_${finalThread.id}`,
         offchain_thread_id: finalThread.id,
-        community_id: finalThread.community || null,
-        chain_id: finalThread.chain || null,
+        // community_id: finalThread.community || null,
+        chain_id: finalThread.chain,
         is_active: true,
       },
     });
@@ -274,7 +274,7 @@ const createThread = async (
       root_title: finalThread.title,
       comment_text: finalThread.body,
       chain_id: finalThread.chain,
-      community_id: finalThread.community,
+      // community_id: finalThread.community,
       author_address: finalThread.Address.address,
       author_chain: finalThread.Address.chain,
     },
@@ -285,7 +285,7 @@ const createThread = async (
       title: req.body.title,
       bodyUrl: req.body.url,
       chain: finalThread.chain,
-      community: finalThread.community,
+      // community: finalThread.community,
       body: finalThread.body,
     },
     req.wss,
@@ -318,7 +318,7 @@ const createThread = async (
         root_title: finalThread.title,
         comment_text: finalThread.body,
         chain_id: finalThread.chain,
-        community_id: finalThread.community,
+        // community_id: finalThread.community,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.chain,
       },
@@ -328,7 +328,7 @@ const createThread = async (
         title: req.body.title,
         bodyUrl: req.body.url,
         chain: finalThread.chain,
-        community: finalThread.community,
+        // community: finalThread.community,
         body: finalThread.body,
       },
       req.wss,

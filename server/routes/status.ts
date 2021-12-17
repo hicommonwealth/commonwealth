@@ -158,18 +158,14 @@ const status = async (
   const threadCountQueryData: ThreadCountQueryData[] =
     await models.sequelize.query(
       `
-SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
-  FROM "OffchainThreads"
-  LEFT JOIN "OffchainCommunities"
-    ON "OffchainThreads".community = "OffchainCommunities".id
-WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
-  AND "OffchainThreads".deleted_at IS NULL
-  AND NOT "OffchainThreads".pinned
-  AND ("OffchainThreads".chain IS NOT NULL
-    OR NOT "OffchainCommunities"."privacy_enabled"
-    OR "OffchainCommunities".id IN(:visiblePrivateCommunityIds))
-GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
-`,
+      SELECT "OffchainThreads".chain, COUNT("OffchainThreads".id) 
+      FROM "OffchainThreads"
+      WHERE 
+        "OffchainThreads".deleted_at IS NULL
+          AND NOT "OffchainThreads".pinned
+          AND "OffchainThreads".chain IS NOT NULL
+      GROUP BY "OffchainThreads".chain;
+      `,
       {
         replacements: {
           thirtyDaysAgo,
@@ -181,6 +177,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
         type: QueryTypes.SELECT,
       }
     );
+  // eslint-disable-next-line no-return-assign
   threadCountQueryData.forEach((ct) => (threadCount[ct.concat] = ct.count));
 
   // get starred communities for user
@@ -189,12 +186,12 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
   });
 
   // get invites for user
-  const invites = await models.InviteCode.findAll({
-    where: {
-      invited_email: user.email,
-      used: false,
-    },
-  });
+  // const invites = await models.InviteCode.findAll({
+  //   where: {
+  //     invited_email: user.email,
+  //     used: false,
+  //   },
+  // });
   console.log('blah3')
 
   // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
@@ -203,7 +200,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
   await Promise.all(
     commsAndChains.map(async (c) => {
       const [name, time] = c;
-      if (isNaN(new Date(time as string).getDate())) {
+      if (Number.isNaN(new Date(time as string).getDate())) {
         unseenPosts[name] = {};
         return;
       }
@@ -248,7 +245,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
     notificationCategories,
     recentThreads: threadCount,
     roles,
-    invites,
+    // invites,
     loggedIn: true,
     user: {
       email: user.email,

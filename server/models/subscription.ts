@@ -33,7 +33,7 @@ export interface SubscriptionAttributes {
   created_at?: Date;
   updated_at?: Date;
   chain_id?: string;
-  community_id?: string;
+  // community_id?: string;
   offchain_thread_id?: number;
   offchain_comment_id?: number;
   chain_event_type_id?: string;
@@ -70,7 +70,7 @@ export default (
       is_active: { type: dataTypes.BOOLEAN, defaultValue: true, allowNull: false },
       immediate_email: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
       chain_id: { type: dataTypes.STRING, allowNull: true },
-      community_id: { type: dataTypes.STRING, allowNull: true },
+      // community_id: { type: dataTypes.STRING, allowNull: true },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
       offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
       chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
@@ -196,8 +196,10 @@ export default (
     // send data to relevant webhooks
     // TODO: currently skipping all erc20 events from webhooks - change?
     if (webhook_data && (
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       !webhook_data?.chainEventType?.chain
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
         || !erc20Tokens.includes(webhook_data.chainEventType.chain)
     )) {
@@ -239,7 +241,7 @@ export default (
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
     models.Subscription.hasMany(models.Notification, { onDelete: 'cascade' });
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
+    // models.Subscription.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainComment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });

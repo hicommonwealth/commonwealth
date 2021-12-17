@@ -100,7 +100,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
     }
 
     const cwUrl = typeof proposal === 'string'
-      ? getProposalUrlWithoutObject(prefix, (comment.chain || comment.community), proposal, finalComment)
+      ? getProposalUrlWithoutObject(prefix, comment.chain, proposal, finalComment)
       : getProposalUrl(prefix, proposal, comment);
     const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
 
@@ -117,7 +117,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
         comment_id: +finalComment.id,
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
-        community_id: finalComment.community,
+        // community_id: finalComment.community,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.chain,
       },
@@ -127,7 +127,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
         url: cwUrl,
         title: proposal.title || '',
         chain: finalComment.chain,
-        community: finalComment.community,
+        // community: finalComment.community,
       },
       req.wss,
       [ finalComment.Address.address ],
@@ -176,17 +176,17 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
       await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-        let shouldNotifyMentionedUser = true;
-        if (finalComment.community) {
-          const originCommunity = await models.OffchainCommunity.findOne({
-            where: { id: finalComment.community }
-          });
-          if (originCommunity.privacy_enabled) {
-            const destinationCommunity = mentionedAddress.Roles
-              .find((role) => role.offchain_community_id === originCommunity.id);
-            if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
-          }
-        }
+        const shouldNotifyMentionedUser = true;
+        // if (finalComment.community) {
+        //   const originCommunity = await models.OffchainCommunity.findOne({
+        //     where: { id: finalComment.community }
+        //   });
+        //   if (originCommunity.privacy_enabled) {
+        //     const destinationCommunity = mentionedAddress.Roles
+        //       .find((role) => role.offchain_community_id === originCommunity.id);
+        //     if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
+        //   }
+        // }
         if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
           models,
           NotificationCategories.NewMention,
@@ -199,7 +199,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
             comment_id: +finalComment.id,
             comment_text: finalComment.text,
             chain_id: finalComment.chain,
-            community_id: finalComment.community,
+            // community_id: finalComment.community,
             author_address: finalComment.Address.address,
             author_chain: finalComment.Address.chain,
           },
@@ -209,7 +209,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
             url: cwUrl,
             title: proposal.title || '',
             chain: finalComment.chain,
-            community: finalComment.community,
+            // community: finalComment.community,
             body: finalComment.text,
           },
           req.wss,

@@ -15,7 +15,7 @@ export interface OffchainCommentAttributes {
   id?: number;
   chain?: string;
   parent_id?: string;
-  community?: string;
+  // community?: string;
   version_history?: string[];
   created_at?: Date;
   updated_at?: Date;
@@ -23,7 +23,7 @@ export interface OffchainCommentAttributes {
 
   // associations
   Chain?: ChainAttributes;
-  OffchainCommunity?: OffchainCommunityAttributes;
+  // OffchainCommunity?: OffchainCommunityAttributes;
   Address?: AddressAttributes;
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
 }
@@ -47,7 +47,7 @@ export default (
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     text: { type: dataTypes.TEXT, allowNull: false },
     plaintext: { type: dataTypes.TEXT, allowNull: true },
-    community: { type: dataTypes.STRING, allowNull: true },
+    // community: { type: dataTypes.STRING, allowNull: true },
     version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
@@ -65,9 +65,9 @@ export default (
       { fields: ['chain', 'root_id'] },
       { fields: ['address_id'] },
       { fields: ['chain', 'created_at'] },
-      { fields: ['community', 'created_at'] },
+      // { fields: ['community', 'created_at'] },
       { fields: ['chain', 'updated_at'] },
-      { fields: ['community', 'updated_at'] },
+      // { fields: ['community', 'updated_at'] },
       { fields: ['root_id'] },
     ],
   });
@@ -77,10 +77,10 @@ export default (
       foreignKey: 'chain',
       targetKey: 'id'
     });
-    models.OffchainComment.belongsTo(models.OffchainCommunity, {
-      foreignKey: 'community',
-      targetKey: 'id'
-    });
+    // models.OffchainComment.belongsTo(models.OffchainCommunity, {
+    //   foreignKey: 'community',
+    //   targetKey: 'id'
+    // });
     models.OffchainComment.belongsTo(models.Address, {
       foreignKey: 'address_id',
       targetKey: 'id'

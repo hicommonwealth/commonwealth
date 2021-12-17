@@ -155,7 +155,7 @@ const createReaction = async (
     root_title,
     root_type,
     chain_id: finalReaction.chain,
-    community_id: finalReaction.community,
+    // community_id: finalReaction.community,
     author_address: finalReaction.Address.address,
     author_chain: finalReaction.Address.chain,
   };
@@ -179,7 +179,7 @@ const createReaction = async (
       url: cwUrl,
       title: proposal.title || '',
       chain: finalReaction.chain,
-      community: finalReaction.community,
+      // community: finalReaction.community,
       body: (comment_id) ? comment.text : '',
     },
     req.wss,

@@ -57,12 +57,7 @@ export default async (
           where: { id: Number(p_id) },
         });
         if (!thread) return next(new Error(Errors.NoThread));
-        if (thread.community) {
-          obj = {
-            offchain_thread_id: Number(p_id),
-            community_id: thread.community,
-          };
-        } else if (thread.chain) {
+        if (thread.chain) {
           obj = { offchain_thread_id: Number(p_id), chain_id: thread.chain };
         }
       } else if (p_entity === 'comment') {
@@ -72,11 +67,6 @@ export default async (
         if (!comment) return next(new Error(Errors.NoComment));
         if (comment.chain) {
           obj = { offchain_comment_id: Number(p_id), chain_id: comment.chain };
-        } else if (comment.community) {
-          obj = {
-            offchain_comment_id: Number(p_id),
-            community_id: comment.community,
-          };
         }
       } else {
         if (!req.body.chain_id)

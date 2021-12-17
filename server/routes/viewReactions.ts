@@ -21,7 +21,6 @@ const viewReactions = async (models: DB, req: Request, res: Response, next: Next
   const options = {};
   if (chain) options['chain'] = chain.id;
   if (req.query.thread_id) options['thread_id'] = req.query.thread_id;
-  else if (req.query.community_id) options['comment_id'] = req.query.comment_id;
 
   let reactions;
   try {

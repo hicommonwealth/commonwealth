@@ -48,14 +48,14 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
     return next(new Error(Errors.WrongOwner));
   }
 
-  const community = await models.OffchainCommunity.findOne({
-    where: { id: code.community_id }
-  });
+  // const community = await models.OffchainCommunity.findOne({
+  //   where: { id: code.community_id }
+  // });
   const chain = await models.Chain.findOne({
     where: { id: code.chain_id }
   });
-  if (!community && !chain) {
-    return next(new Error(Errors.NoCommunityFound(code.community_id || code.chain_id)));
+  if (!chain) {
+    return next(new Error(Errors.NoCommunityFound(code.chain_id)));
   }
 
   const role = await models.Role.create({
@@ -74,8 +74,8 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
   const subscription = await models.Subscription.create({
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewThread,
-    object_id: (chain || community).id,
-    community_id: community?.id,
+    object_id: chain.id,
+    // community_id: community?.id,
     chain_id: chain?.id,
     is_active: true,
   });

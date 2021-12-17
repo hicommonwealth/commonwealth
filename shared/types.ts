@@ -118,7 +118,7 @@ export interface IWebsocketsPayload<T> {
 
 export interface InviteCodeAttributes {
   id?: string;
-  community_id?: string;
+  // community_id?: string;
   community_name?: string;
   chain_id?: string;
   creator_id: number;
@@ -140,7 +140,7 @@ export interface IPostNotificationData {
   parent_comment_id?: number;
   parent_comment_text?: string;
   chain_id: string;
-  community_id: string;
+  // community_id: string;
   author_address: string;
   author_chain: string;
 }
@@ -150,7 +150,7 @@ export interface ICommunityNotificationData {
   role_id: string | number;
   author_address: string;
   chain: string;
-  community: string;
+  // community: string;
 }
 
 export interface IChainEventNotificationData {

@@ -238,7 +238,7 @@ const createComment = async (
 
   // craft commonwealth url
   const cwUrl = typeof proposal === 'string'
-    ? getProposalUrlWithoutObject(prefix, (finalComment.chain || finalComment.community), proposal, finalComment)
+    ? getProposalUrlWithoutObject(prefix, finalComment.chain, proposal, finalComment)
     : getProposalUrl(prefix, proposal, finalComment);
   const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
 
@@ -248,7 +248,7 @@ const createComment = async (
     category_id: NotificationCategories.NewReaction,
     object_id: `comment-${finalComment.id}`,
     chain_id: finalComment.chain || null,
-    community_id: finalComment.community || null,
+    // community_id: finalComment.community || null,
     offchain_comment_id: finalComment.id,
     is_active: true,
   });
@@ -258,7 +258,7 @@ const createComment = async (
     category_id: NotificationCategories.NewComment,
     object_id: `comment-${finalComment.id}`,
     chain_id: finalComment.chain || null,
-    community_id: finalComment.community || null,
+    // community_id: finalComment.community || null,
     offchain_comment_id: finalComment.id,
     is_active: true,
   });
@@ -301,7 +301,7 @@ const createComment = async (
       comment_id: +finalComment.id,
       comment_text: finalComment.text,
       chain_id: finalComment.chain,
-      community_id: finalComment.community,
+      // community_id: finalComment.community,
       author_address: finalComment.Address.address,
       author_chain: finalComment.Address.chain,
     },
@@ -311,7 +311,7 @@ const createComment = async (
       url: cwUrl,
       title: root_title,
       chain: finalComment.chain,
-      community: finalComment.community,
+      // community: finalComment.community,
       body: finalComment.text,
     },
     req.wss,
@@ -334,7 +334,7 @@ const createComment = async (
         parent_comment_id: +parent_id,
         parent_comment_text: parentComment.text,
         chain_id: finalComment.chain,
-        community_id: finalComment.community,
+        // community_id: finalComment.community,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.chain,
       },
@@ -344,7 +344,7 @@ const createComment = async (
         url: cwUrl,
         title: proposal.title || '',
         chain: finalComment.chain,
-        community: finalComment.community,
+        // community: finalComment.community,
         body: finalComment.text,
       },
       req.wss,
@@ -357,17 +357,17 @@ const createComment = async (
     await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-      let shouldNotifyMentionedUser = true;
-      if (finalComment.community) {
-        const originCommunity = await models.OffchainCommunity.findOne({
-          where: { id: finalComment.community }
-        });
-        if (originCommunity.privacy_enabled) {
-          const destinationCommunity = mentionedAddress.Roles
-            .find((role) => role.offchain_community_id === originCommunity.id);
-          if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
-        }
-      }
+      const shouldNotifyMentionedUser = true;
+      // if (finalComment.community) {
+      //   const originCommunity = await models.OffchainCommunity.findOne({
+      //     where: { id: finalComment.community }
+      //   });
+      //   if (originCommunity.privacy_enabled) {
+      //     const destinationCommunity = mentionedAddress.Roles
+      //       .find((role) => role.offchain_community_id === originCommunity.id);
+      //     if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
+      //   }
+      // }
       if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
         models,
         NotificationCategories.NewMention,
@@ -380,7 +380,7 @@ const createComment = async (
           comment_id: +finalComment.id,
           comment_text: finalComment.text,
           chain_id: finalComment.chain,
-          community_id: finalComment.community,
+          // community_id: finalComment.community,
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },
@@ -390,7 +390,7 @@ const createComment = async (
           url: cwUrl,
           title: proposal.title || '',
           chain: finalComment.chain,
-          community: finalComment.community,
+          // community: finalComment.community,
           body: finalComment.text,
         }, // TODO: add webhook data for mentions
         req.wss,
