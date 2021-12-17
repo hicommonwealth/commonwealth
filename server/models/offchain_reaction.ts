@@ -13,7 +13,7 @@ export interface OffchainReactionAttributes {
   thread_id?: number;
   proposal_id?: number;
   comment_id?: number;
-  community?: string;
+  // community?: string;
   created_at?: Date;
   updated_at?: Date;
   Chain?: ChainAttributes;
@@ -38,7 +38,7 @@ export default (
     comment_id: { type: dataTypes.INTEGER, allowNull: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     reaction: { type: dataTypes.STRING, allowNull: false },
-    community: { type: dataTypes.STRING, allowNull: true },
+    // community: { type: dataTypes.STRING, allowNull: true },
   }, {
     tableName: 'OffchainReactions',
     underscored: true,
@@ -50,15 +50,15 @@ export default (
       { fields: ['address_id'] },
       { fields: ['chain', 'address_id', 'thread_id', 'proposal_id', 'comment_id', 'reaction'], unique: true },
       { fields: ['chain', 'thread_id'] },
-      { fields: ['community', 'thread_id'] },
+      // { fields: ['community', 'thread_id'] },
       { fields: ['chain', 'comment_id'] },
-      { fields: ['community', 'comment_id'] },
+      // { fields: ['community', 'comment_id'] },
     ],
   });
 
   OffchainReaction.associate = (models) => {
     models.OffchainReaction.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
+    // models.OffchainReaction.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
     models.OffchainReaction.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.OffchainReaction.belongsTo(models.OffchainComment, { foreignKey: 'comment_id', targetKey: 'id' });
     models.OffchainReaction.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });

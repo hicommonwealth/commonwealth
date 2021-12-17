@@ -207,13 +207,13 @@ const status = async (
       const threadNum = await models.OffchainThread.findAndCountAll({
         where: {
           kind: { [Op.or]: ['forum', 'link'] },
-          [Op.or]: [{ community: name }, { chain: name }],
+          [Op.or]: [{ chain: name }],
           created_at: { [Op.gt]: new Date(time as string) },
         },
       });
       const commentNum = await models.OffchainComment.findAndCountAll({
         where: {
-          [Op.or]: [{ community: name }, { chain: name }],
+          [Op.or]: [{ chain: name }],
           created_at: { [Op.gt]: new Date(time as string) },
         },
       });
