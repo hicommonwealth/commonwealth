@@ -129,7 +129,7 @@ export default (
       snapshot: { 
         type: dataTypes.ARRAY(dataTypes.STRING), 
         allowNull: true,
-        defaultValue: {}
+        defaultValue: []
       },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
