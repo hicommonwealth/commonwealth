@@ -54,9 +54,10 @@ const bulkOffchain = async (
     >Promise.all([
       // topics
       models.OffchainTopic.findAll({
-        where: community
-          ? { community_id: community.id }
-          : { chain_id: chain.id },
+        where: { chain_id: chain.id },
+        // where: community
+        //   ? { community_id: community.id }
+        //   : { chain_id: chain.id },
       }),
       // threads, comments, reactions
       new Promise(async (resolve, reject) => {

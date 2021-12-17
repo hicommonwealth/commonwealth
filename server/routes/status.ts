@@ -8,6 +8,7 @@ import {
 import { factory, formatFilename } from '../../shared/logging';
 import '../types';
 import { DB } from '../database';
+import { ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -17,6 +18,10 @@ const status = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log('blah0')
+
+  try {
+
   const [
     chains,
     nodes,
@@ -65,17 +70,15 @@ const status = async (
     const threadCountQueryData: ThreadCountQueryData[] =
       await models.sequelize.query(
         `
-      SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
+        SELECT "OffchainThreads".chain, COUNT("OffchainThreads".id) 
         FROM "OffchainThreads"
-        LEFT JOIN "OffchainCommunities"
-          ON "OffchainThreads".community = "OffchainCommunities".id
-      WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
+        LEFT JOIN "OffchainCommunities" ON "OffchainThreads".chain = "OffchainCommunities".id
         AND "OffchainThreads".deleted_at IS NULL
         AND NOT "OffchainThreads".pinned
         AND ("OffchainThreads".chain IS NOT NULL
-            OR NOT "OffchainCommunities"."privacy_enabled")
-      GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
-      `,
+        OR NOT "OffchainCommunities"."privacy_enabled")
+        GROUP BY "OffchainThreads".chain;
+        `,
         { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
       );
     // eslint-disable-next-line no-return-assign
@@ -91,7 +94,6 @@ const status = async (
       loggedIn: false,
     });
   }
-
   const unfilteredAddresses = await user.getAddresses();
   // TODO: fetch all this data with a single query
   const [
@@ -148,6 +150,7 @@ const status = async (
     publicCommunities.concat(privateCommunities),
     'id'
   );
+  console.log('blah2')
 
   const threadCount = {};
   const threadCountQueryData: ThreadCountQueryData[] =
@@ -190,6 +193,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
       used: false,
     },
   });
+  console.log('blah3')
 
   // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
   const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
@@ -231,6 +235,7 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
       };
     })
   );
+  console.log('blah4')
 
   const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
   return res.json({
@@ -259,6 +264,11 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
       unseenPosts,
     },
   });
+} catch (error) {
+    console.log(error)
+    throw new ServerError("something broke", error)
+}
+
 };
 
 export default status;

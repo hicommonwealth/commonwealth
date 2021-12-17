@@ -56,7 +56,7 @@ const updateTopics = async (models: DB, req, res: Response, next: NextFunction) 
     [newTopic] = await models.OffchainTopic.findOrCreate({
       where: {
         name: req.body.topic_name,
-        community_id: thread.community || null,
+        // community_id: thread.community || null,
         chain_id: thread.community ? null : thread.chain,
       },
     });

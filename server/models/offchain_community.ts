@@ -127,7 +127,8 @@ export default (
     });
     models.OffchainCommunity.hasMany(models.OffchainTopic, {
       as: 'topics',
-      foreignKey: 'community_id',
+      foreignKey: 'chain_id',
+      // foreignKey: 'community_id',
     });
     models.OffchainCommunity.hasMany(models.OffchainThread, {
       foreignKey: 'community',

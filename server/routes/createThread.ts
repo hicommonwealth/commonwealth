@@ -124,7 +124,7 @@ const createThread = async (
       [offchainTopic] = await models.OffchainTopic.findOrCreate({
         where: {
           name: topic_name,
-          community_id: community?.id || null,
+          // community_id: community?.id || null,
           chain_id: chain?.id || null,
         },
       });
