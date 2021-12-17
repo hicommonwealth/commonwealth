@@ -89,8 +89,8 @@ const addEditors = async (models: DB, req: Request, res: Response, next: NextFun
           category_id: NotificationCategories.NewComment,
           object_id: `discussion_${thread.id}`,
           offchain_thread_id: thread.id,
-          community_id: thread.community || null,
-          chain_id: thread.chain || null,
+          // community_id: thread.community || null,
+          chain_id: thread.chain,
           is_active: true,
         }
       });
@@ -100,8 +100,8 @@ const addEditors = async (models: DB, req: Request, res: Response, next: NextFun
           category_id: NotificationCategories.NewReaction,
           object_id: `discussion_${thread.id}`,
           offchain_thread_id: thread.id,
-          community_id: thread.community || null,
-          chain_id: thread.chain || null,
+          // community_id: thread.community || null,
+          chain_id: thread.chain,
           is_active: true,
         }
       });
@@ -128,7 +128,7 @@ const addEditors = async (models: DB, req: Request, res: Response, next: NextFun
         root_title: thread.title,
         comment_text: thread.body,
         chain_id: thread.chain,
-        community_id: thread.community,
+        // community_id: thread.community,
         author_address: author.address,
         author_chain: author.chain,
       },
@@ -138,7 +138,7 @@ const addEditors = async (models: DB, req: Request, res: Response, next: NextFun
         title: req.body.title,
         bodyUrl: req.body.url,
         chain: thread.chain,
-        community: thread.community,
+        // community: thread.community,
         body: thread.body,
       },
       req.wss,

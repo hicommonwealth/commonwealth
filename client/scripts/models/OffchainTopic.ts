@@ -20,7 +20,7 @@ class OffchainTopic {
     id,
     description,
     telegram,
-    community_id,
+    // community_id,
     chain_id,
     featured_in_sidebar,
     featured_in_new_post,
@@ -31,7 +31,7 @@ class OffchainTopic {
       id: number,
       description: string,
       telegram?: string,
-      community_id?: string,
+      // community_id?: string,
       chain_id?: string,
       featured_in_sidebar?: boolean,
       featured_in_new_post?: boolean,
@@ -42,7 +42,7 @@ class OffchainTopic {
     this.id = id;
     this.description = description;
     this.telegram = telegram;
-    this.communityId = community_id;
+    // this.communityId = community_id;
     this.chainId = chain_id;
     this.featuredInSidebar = featured_in_sidebar;
     this.featuredInNewPost = featured_in_new_post;

@@ -80,8 +80,9 @@ const updateLinkedThreads = async (
         where: { id: linking_thread_id }
       });
       const threadsShareChain = linkedThread?.chain && linkedThread?.chain === linkingThread?.chain;
-      const threadsShareCommunity = linkedThread?.community && linkedThread?.community === linkingThread?.community;
-      if (threadsShareChain || threadsShareCommunity) {
+      // const threadsShareCommunity = linkedThread?.community && linkedThread?.community === linkingThread?.community;
+      // if (threadsShareChain || threadsShareCommunity) {
+      if (threadsShareChain) {
         await models.LinkedThread.findOrCreate({ where: params });
       } else {
         return next(new Error(Errors.ThreadsMustShareCommunity));

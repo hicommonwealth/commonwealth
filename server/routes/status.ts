@@ -94,6 +94,7 @@ const status = async (
       loggedIn: false,
     });
   }
+
   const unfilteredAddresses = await user.getAddresses();
   // TODO: fetch all this data with a single query
   const [

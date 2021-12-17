@@ -142,7 +142,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
         chain_id: finalThread.chain,
-        community_id: finalThread.community,
+        // community_id: finalThread.community,
         author_address: finalThread.Address.address
       },
       // don't send webhook notifications for edits
@@ -193,17 +193,18 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
     if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-      let shouldNotifyMentionedUser = true;
-      if (finalThread.community) {
-        const originCommunity = await models.OffchainCommunity.findOne({
-          where: { id: finalThread.community }
-        });
-        if (originCommunity.privacy_enabled) {
-          const destinationCommunity = mentionedAddress.Roles
-            .find((role) => role.offchain_community_id === originCommunity.id);
-          if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
-        }
-      }
+      const shouldNotifyMentionedUser = true;
+      // let shouldNotifyMentionedUser = true;
+      // if (finalThread.community) {
+      //   const originCommunity = await models.OffchainCommunity.findOne({
+      //     where: { id: finalThread.community }
+      //   });
+      //   if (originCommunity.privacy_enabled) {
+      //     const destinationCommunity = mentionedAddress.Roles
+      //       .find((role) => role.offchain_community_id === originCommunity.id);
+      //     if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
+      //   }
+      // }
 
       if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
         models,
@@ -216,7 +217,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
           root_title: finalThread.title,
           comment_text: finalThread.body,
           chain_id: finalThread.chain,
-          community_id: finalThread.community,
+          // community_id: finalThread.community,
           author_address: finalThread.Address.address,
           author_chain: finalThread.Address.chain,
         },
@@ -226,7 +227,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
           title: req.body.title,
           bodyUrl: req.body.url,
           chain: finalThread.chain,
-          community: finalThread.community,
+          // community: finalThread.community,
           body: finalThread.body,
         },
         req.wss,

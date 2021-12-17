@@ -20,7 +20,7 @@ export interface OffchainThreadAttributes {
   topic_id?: number;
   pinned?: boolean;
   chain?: string;
-  community?: string;
+  // community?: string;
 
   read_only?: boolean;
   version_history?: string[];

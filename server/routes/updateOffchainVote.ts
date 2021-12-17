@@ -31,9 +31,10 @@ const updateOffchainVote = async (
   // TODO: check and validate req.signature, instead of checking for author
 
   const thread = await models.OffchainThread.findOne({
-    where: community
-      ? { id: req.body.thread_id, community: community.id }
-      : { id: req.body.thread_id, chain: chain.id }
+    where: { id: req.body.thread_id, chain: chain.id }
+    // where: community
+    //   ? { id: req.body.thread_id, community: community.id }
+    //   : { id: req.body.thread_id, chain: chain.id }
   });
   if (!thread) return next(new Error(Errors.InvalidThread));
 

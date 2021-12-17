@@ -24,12 +24,15 @@ const bulkOffchain = async (
   res: Response,
   next: NextFunction
 ) => {
+  try {
+
   const [chain, community, error] = await lookupCommunityIsVisibleToUser(
     models,
     req.query,
     req.user
   );
   if (error) return next(new Error(error));
+  console.log("yo1")
 
   // globally shared SQL replacements
   const communityOptions = community
@@ -164,6 +167,7 @@ const bulkOffchain = async (
         }
       ),
     ]));
+    console.log("yo2")
 
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting'
@@ -179,6 +183,10 @@ const bulkOffchain = async (
       activeUsers: mostActiveUsers,
     },
   });
+} catch (error) {
+    console.log(error)
+}
+
 };
 
 export default bulkOffchain;

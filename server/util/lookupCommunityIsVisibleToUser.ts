@@ -27,7 +27,8 @@ const lookupCommunityIsVisibleToUser = async (
         model: models.OffchainTopic,
         as: 'topics',
         required: false,
-        attributes: ['id', 'name', 'community_id', 'chain_id'],
+        attributes: ['id', 'name', 'chain_id'],
+        // attributes: ['id', 'name', 'community_id', 'chain_id'],
       },
     ],
   });
