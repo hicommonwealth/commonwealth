@@ -12,26 +12,25 @@ export const Errors = {
 };
 
 const createInviteLink = async (models: DB, req, res, next) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { time } = req.body;
   if (!time) return next(new Error(Errors.NoTimeLimit));
 
-  const chainOrCommunityObj = chain ? { chain_id: chain.id }
-    : { community_id: community.id };
+  const chainOrCommunityObj = { chain_id: chain.id }
 
-  if (community && !community.invites_enabled) {
-    const requesterIsAdminOrMod = await models.Role.findAll({
-      where: {
-        address_id: req.user.address_id || null, // this is overriding the search, bc null
-        chain_id: community.id,
-        // offchain_community_id: community.id,
-        permission: ['admin', 'moderator'],
-      },
-    });
-    if (!requesterIsAdminOrMod) return next(new Error(Errors.NotAdminMod));
-  }
+  // if (community && !community.invites_enabled) {
+  //   const requesterIsAdminOrMod = await models.Role.findAll({
+  //     where: {
+  //       address_id: req.user.address_id || null, // this is overriding the search, bc null
+  //       chain_id: community.id,
+  //       // offchain_community_id: community.id,
+  //       permission: ['admin', 'moderator'],
+  //     },
+  //   });
+  //   if (!requesterIsAdminOrMod) return next(new Error(Errors.NotAdminMod));
+  // }
 
   let { uses } = req.body;
   if (uses === 'none') {
@@ -39,7 +38,7 @@ const createInviteLink = async (models: DB, req, res, next) => {
   } else {
     uses = +uses;
   }
-  if (isNaN(uses)) {
+  if (Number.isNaN(uses)) {
     return next(new Error(Errors.InvalidUses));
   }
   // check to see if unlimited time + unlimited usage already exists

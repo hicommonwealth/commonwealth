@@ -21,7 +21,7 @@ const updateOffchainVote = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (!author) return next(new Error(Errors.InvalidUser));
@@ -52,12 +52,7 @@ const updateOffchainVote = async (
   await sequelize.transaction(async (t) => {
     // delete existing votes
     const destroyed = await models.OffchainVote.destroy({
-      where: community ? {
-        thread_id: req.body.thread_id,
-        address: req.body.address,
-        author_chain: req.body.author_chain,
-        community: req.body.community,
-      } : {
+      where: {
         thread_id: req.body.thread_id,
         address: req.body.address,
         author_chain: req.body.author_chain,

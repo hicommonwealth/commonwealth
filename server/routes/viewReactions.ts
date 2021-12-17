@@ -11,7 +11,7 @@ export const Errors = {
 };
 
 const viewReactions = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
   if (!req.query.thread_id && !req.query.comment_id) {
@@ -19,8 +19,7 @@ const viewReactions = async (models: DB, req: Request, res: Response, next: Next
   }
 
   const options = {};
-  if (community) options['community'] = community.id;
-  else if (chain) options['chain'] = chain.id;
+  if (chain) options['chain'] = chain.id;
   if (req.query.thread_id) options['thread_id'] = req.query.thread_id;
   else if (req.query.community_id) options['comment_id'] = req.query.comment_id;
 

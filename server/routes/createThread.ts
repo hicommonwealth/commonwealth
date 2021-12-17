@@ -32,7 +32,7 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
 
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -91,18 +91,7 @@ const createThread = async (
   };
   const version_history : string[] = [ JSON.stringify(firstVersion) ];
 
-  const threadContent = community ? {
-    community: community.id,
-    address_id: author.id,
-    title,
-    body,
-    plaintext,
-    version_history,
-    kind,
-    stage,
-    url,
-    read_only: readOnly,
-  } : {
+  const threadContent = {
     chain: chain.id,
     address_id: author.id,
     title,
@@ -134,7 +123,7 @@ const createThread = async (
       return next(err);
     }
   } else {
-    if ((community || chain).topics?.length) {
+    if (chain.topics?.length) {
       return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
     }
   }

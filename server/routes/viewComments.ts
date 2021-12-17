@@ -16,7 +16,7 @@ const viewComments = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+  const [chain, error] = await lookupCommunityIsVisibleToUser(
     models,
     req.query,
     req.user
@@ -28,9 +28,7 @@ const viewComments = async (
   }
 
   const comments = await models.OffchainComment.findAll({
-    where: community
-      ? { community: community.id, root_id: req.query.root_id }
-      : { chain: chain.id, root_id: req.query.root_id },
+    where: { chain: chain.id, root_id: req.query.root_id },
     include: [
       models.Address,
       models.OffchainAttachment,

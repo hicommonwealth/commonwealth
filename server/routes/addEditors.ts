@@ -24,7 +24,7 @@ const addEditors = async (models: DB, req: Request, res: Response, next: NextFun
   } catch (e) {
     return next(new Error(Errors.InvalidEditorFormat));
   }
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -64,21 +64,11 @@ const addEditors = async (models: DB, req: Request, res: Response, next: NextFun
       if (!collaborator.Roles || !collaborator.User) {
         return null;
       }
-      if (community) {
-        const isMember = collaborator.Roles
-          .find((role) => role.offchain_community_id === community.id);
-        if (!isMember) throw new Error(Errors.InvalidEditor);
-      } else if (chain) {
+      if (chain) {
         const isMember = collaborator.Roles
           .find((role) => role.chain_id === chain.id);
         if (!isMember) throw new Error(Errors.InvalidEditor);
       }
-      const collaboration = await models.Collaboration.findOrCreate({
-        where: {
-          offchain_thread_id: thread.id,
-          address_id: collaborator.id
-        }
-      });
 
       // auto-subscribe collaborator to comments & reactions
       // findOrCreate to avoid duplicate subscriptions being created e.g. for

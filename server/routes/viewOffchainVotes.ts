@@ -13,9 +13,9 @@ const viewOffchainVotes = async (
   res: Response,
   next: NextFunction
 ) => {
-  let chain, community, error;
+  let chain, error;
   try {
-    [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    [chain, error] = await lookupCommunityIsVisibleToUser(
       models,
       req.query,
       req.user
@@ -35,9 +35,7 @@ const viewOffchainVotes = async (
 
   try {
     const votes = await models.OffchainVote.findAll({
-      where: community
-        ? { thread_id: req.query.thread_id, community: community.id }
-        : { thread_id: req.query.thread_id, chain: chain.id },
+      where: { thread_id: req.query.thread_id, chain: chain.id },
     });
     return res.json({
       status: 'Success',

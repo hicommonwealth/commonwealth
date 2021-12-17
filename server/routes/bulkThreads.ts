@@ -15,17 +15,13 @@ const bulkThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
   const { cutoff_date, topic_id, stage } = req.query;
 
-  const communityOptions = community
-    ? `community = :community `
-    : `chain = :chain `;
+  const communityOptions = `chain = :chain `;
 
-  const replacements = community
-    ? { community: community.id }
-    : { chain: chain.id };
+  const replacements = { chain: chain.id };
 
   let topicOptions = '';
   if (topic_id) {
@@ -45,17 +41,17 @@ const bulkThreads = async (
     const query = `
       SELECT addr.id AS addr_id, addr.address AS addr_address, latest_comm_created_at,
         addr.chain AS addr_chain, thread_id, thread_title,
-        thread_community, thread_chain, thread_created, threads.kind,
+        thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.snapshot_proposal,
         threads.offchain_voting_options, threads.offchain_voting_votes, threads.offchain_voting_ends_at,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
-        topics.community_id AS topic_community, collaborators, chain_entities, linked_threads
+        collaborators, chain_entities, linked_threads
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, latest_comm_created_at,
-          t.created_at AS thread_created, t.community AS thread_community,
+          t.created_at AS thread_created,
           t.chain AS thread_chain, t.read_only, t.body,
           t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
           t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
@@ -145,7 +141,7 @@ const bulkThreads = async (
         stage: t.stage,
         read_only: t.read_only,
         pinned: t.pinned,
-        community: t.thread_community,
+        // community: t.thread_community,
         chain: t.thread_chain,
         created_at: t.thread_created,
         collaborators,
@@ -175,9 +171,7 @@ const bulkThreads = async (
       return data;
     });
   } else {
-    const whereOptions = community
-      ? { community: community.id }
-      : { chain: chain.id };
+    const whereOptions = { chain: chain.id };
 
     threads = (
       await models.OffchainThread.findAll({

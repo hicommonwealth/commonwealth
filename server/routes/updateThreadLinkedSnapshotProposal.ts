@@ -12,7 +12,7 @@ export const Errors = {
 };
 
 const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!chain?.snapshot) {
     return next(new Error(Errors.MustBeSnapshotChain));

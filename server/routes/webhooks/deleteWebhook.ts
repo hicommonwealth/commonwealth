@@ -6,10 +6,10 @@ import { factory, formatFilename } from '../../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const deleteWebhook = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   // if chain is present we know we are dealing with a chain first community
-  const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
+  const chainOrCommObj = { chain_id: chain.id };
 
   // only admins should be able to get webhooks
   if (!req.user) return next(new Error(Errors.NotLoggedIn));

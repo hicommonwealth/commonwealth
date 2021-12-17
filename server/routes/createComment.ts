@@ -37,7 +37,7 @@ const createComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -82,28 +82,40 @@ const createComment = async (
   if (parent_id) {
     // check that parent comment is in the same community
     parentComment = await models.OffchainComment.findOne({
-      where: community ? {
-        id: parent_id,
-        community: community.id,
-      } : {
+      where: {
         id: parent_id,
         chain: chain.id,
       }
     });
+    // parentComment = await models.OffchainComment.findOne({
+    //   where: community ? {
+    //     id: parent_id,
+    //     community: community.id,
+    //   } : {
+    //     id: parent_id,
+    //     chain: chain.id,
+    //   }
+    // });
     if (!parentComment) return next(new Error(Errors.InvalidParent));
 
     // Backend check to ensure comments are never nested more than three levels deep:
     // top-level, child, and grandchild
     if (parentComment.parent_id) {
       const grandparentComment = await models.OffchainComment.findOne({
-        where: community ? {
-          id: parentComment.parent_id,
-          community: community.id,
-        } : {
+        where: {
           id: parentComment.parent_id,
           chain: chain.id,
         }
       });
+      // const grandparentComment = await models.OffchainComment.findOne({
+      //   where: community ? {
+      //     id: parentComment.parent_id,
+      //     community: community.id,
+      //   } : {
+      //     id: parentComment.parent_id,
+      //     chain: chain.id,
+      //   }
+      // });
       if (grandparentComment?.parent_id) {
         return next(new Error(Errors.NestingTooDeep));
       }
@@ -145,8 +157,7 @@ const createComment = async (
     community: null,
     parent_id: null,
   };
-  if (community) Object.assign(commentContent, { community: community.id });
-  else if (chain) Object.assign(commentContent, { chain: chain.id });
+  if (chain) Object.assign(commentContent, { chain: chain.id });
   if (parent_id) Object.assign(commentContent, { parent_id });
 
   let comment;

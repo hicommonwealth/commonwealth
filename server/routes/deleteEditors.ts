@@ -24,7 +24,7 @@ const deleteEditors = async (models: DB, req: Request, res: Response, next: Next
   } catch (e) {
     return next(new Error(Errors.InvalidEditorFormat));
   }
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));

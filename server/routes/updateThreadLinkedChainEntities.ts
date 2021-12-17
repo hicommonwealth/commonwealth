@@ -10,7 +10,7 @@ export const Errors = {
 };
 
 const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const { thread_id } = req.body;
 

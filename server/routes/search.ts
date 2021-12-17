@@ -33,7 +33,7 @@ const search = async (
     if (!req.query.chain && !req.query.community) {
       return next(new Error(Errors.NoCommunity));
     }
-    const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    const [chain, error] = await lookupCommunityIsVisibleToUser(
       models,
       req.query,
       req.user
@@ -49,7 +49,6 @@ const search = async (
       },
     };
     if (chain) params['chain'] = chain.id;
-    else if (community) params['community'] = community.id;
     try {
       const threads = await models.OffchainThread.findAll({
         where: params,
@@ -77,7 +76,7 @@ const search = async (
   let communityOptions = '';
   let communityOptions2 = '';
   if (req.query.chain || req.query.community) {
-    const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    const [chain, error] = await lookupCommunityIsVisibleToUser(
       models,
       req.query,
       req.user
@@ -85,15 +84,9 @@ const search = async (
     if (error) return next(new Error(error));
 
     // set up query parameters
-    communityOptions = community
-      ? `"OffchainThreads".community = :community AND `
-      : `"OffchainThreads".chain = :chain AND `;
-    communityOptions2 = community
-      ? `"OffchainComments".community = :community AND `
-      : `"OffchainComments".chain = :chain AND `;
-    replacements = community
-      ? { community: community.id }
-      : { chain: chain.id };
+    communityOptions = `"OffchainThreads".chain = :chain AND `;
+    communityOptions2 = `"OffchainComments".chain = :chain AND `;
+    replacements = { chain: chain.id };
   }
 
   const { cutoff_date } = req.query;

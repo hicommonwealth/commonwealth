@@ -14,7 +14,7 @@ const activeThreads = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+  const [chain, error] = await lookupCommunityIsVisibleToUser(
     models,
     req.query,
     req.user
@@ -26,12 +26,10 @@ const activeThreads = async (
   if (cutoff_date) {
     whereOptions.created_at = { [Op.gt]: cutoff_date };
   }
-  if (community) {
-    whereOptions.community = community.id;
-  } else {
-    whereOptions.chain = chain.id;
-    whereOptions.root_id = { [Op.like]: 'discussion%' };
-  }
+
+  whereOptions.chain = chain.id;
+  whereOptions.root_id = { [Op.like]: 'discussion%' };
+
   const comments = await models.OffchainComment.findAll({
     where: whereOptions,
     include: [models.Address],
@@ -48,7 +46,7 @@ const activeThreads = async (
     ],
   };
   if (chain) threadWhereOptions['chain'] = chain.id;
-  if (community) threadWhereOptions['community'] = community.id;
+  // if (community) threadWhereOptions['community'] = community.id;
   const threads: OffchainThreadInstance[] = await models.OffchainThread.findAll(
     {
       where: threadWhereOptions,

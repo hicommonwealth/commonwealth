@@ -11,16 +11,14 @@ export const Errors = {
 };
 
 const bulkComments = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
   if (req.query.offchain_threads_only && req.query.proposals_only) {
     return next(new Error(Errors.MutuallyExclusive));
   }
   const whereOptions: any = {};
-  if (community) {
-    whereOptions.community = community.id;
-  } else {
+  if (chain) {
     whereOptions.chain = chain.id;
     if (req.query.offchain_threads_only) {
       whereOptions.root_id = { [Op.like]: 'discussion%' };

@@ -17,10 +17,11 @@ export const ChainCommunityErrors = {
 // sequelize 5.0 does not accept undefined key in where clause
 const lookupCommunityIsVisibleToUser = async (
   models, params, user
-): Promise<[ChainInstance, OffchainCommunityInstance, string]> => {
+): Promise<[ChainInstance, string]> => {
   const chain = await models.Chain.findOne({
     where: {
-      id: params.chain || null,
+      id: params.chain,
+      // id: params.chain || null,
     },
     include: [
       {
@@ -32,38 +33,29 @@ const lookupCommunityIsVisibleToUser = async (
       },
     ],
   });
-  const community = await models.OffchainCommunity.findOne({
-    where: {
-      id: params.community || null,
-    },
-    include: {
-      model: models.OffchainTopic,
-      as: 'topics',
-    },
-  });
   // searching for both chain and community
-  if (params.chain && params.community) return [null, null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
+  if (params.chain && params.community) return [null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
   // searching for chain that doesn't exist
-  if (params.chain && !chain) return [null, null, ChainCommunityErrors.ChainDNE];
+  if (params.chain && !chain) return [null, ChainCommunityErrors.ChainDNE];
   // searching for community that doesn't exist
-  if (params.community && !community) return [null, null, ChainCommunityErrors.CommunityDNE];
+  // if (params.community && !community) return [null, ChainCommunityErrors.CommunityDNE];
   // searching for both chain and community with results
-  if (chain && community) return [null, null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
+  // if (chain && community) return [null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
   // searching for chain and community that both don't exist
-  if (!chain && !community) return [null, null, ChainCommunityErrors.BothChainAndCommunityDNE];
+  // if (!chain && !community) return [null, ChainCommunityErrors.BothChainAndCommunityDNE];
 
-  if (community && community.privacy_enabled && !user?.isAdmin) {
-    if (!user) return [null, null, ChainCommunityErrors.NoUserProvided];
-    const userAddressIds = (await user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const userMembership = await models.Role.findOne({
-      where: {
-        address_id: userAddressIds,
-        offchain_community_id: community.id,
-      },
-    });
-    if (!userMembership) return [null, null, ChainCommunityErrors.NotMember];
-  }
-  return [chain, community, null];
+  // if (community && community.privacy_enabled && !user?.isAdmin) {
+  //   if (!user) return [null, ChainCommunityErrors.NoUserProvided];
+  //   const userAddressIds = (await user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+  //   const userMembership = await models.Role.findOne({
+  //     where: {
+  //       address_id: userAddressIds,
+  //       offchain_community_id: community.id,
+  //     },
+  //   });
+  //   if (!userMembership) return [null, ChainCommunityErrors.NotMember];
+  // }
+  return [chain, null];
 };
 
 export default lookupCommunityIsVisibleToUser;

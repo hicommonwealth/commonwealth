@@ -5,7 +5,7 @@ import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 const bulkMembers = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
   const members = await models.Role.findAll({

@@ -4,7 +4,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import { DB } from '../database';
 
 const communityStats = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
   if (!req.user) {
@@ -26,7 +26,7 @@ WHERE ${chain ? chainParam : communityParam} = :chainOrCommunity
 GROUP BY seq.date
 ORDER BY seq.date DESC;`, {
       type: QueryTypes.SELECT,
-      replacements: { chainOrCommunity: chain ? chain.id : community.id },
+      replacements: { chainOrCommunity: chain.id },
     });
   };
   const roles = await newObjectsQuery('"Roles"');
@@ -38,7 +38,7 @@ ORDER BY seq.date DESC;`, {
     return models.sequelize.query(
       `SELECT COUNT(id) AS new_items FROM ${table} WHERE ${chain ? chainParam : communityParam} = :chainOrCommunity;`, {
         type: QueryTypes.SELECT,
-        replacements: { chainOrCommunity: chain ? chain.id : community.id },
+        replacements: { chainOrCommunity: chain.id },
       }
     );
   };
@@ -65,7 +65,7 @@ GROUP BY seq.date
 ORDER BY seq.date DESC;
 `, {
     type: QueryTypes.SELECT,
-    replacements: { chainOrCommunity: chain ? chain.id : community.id },
+    replacements: { chainOrCommunity: chain.id },
   });
 
   return res.json({

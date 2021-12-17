@@ -8,7 +8,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = { };
 
 const bulkTopics = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
   if (error) return next(new Error(error));
 
   const topics = await models.OffchainTopic.findAll({

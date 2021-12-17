@@ -29,7 +29,7 @@ const createReaction = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -87,8 +87,8 @@ const createReaction = async (
     address_id: author.id,
   };
 
-  if (community) options['community'] = community.id;
-  else if (chain) options['chain'] = chain.id;
+  if (chain) options['chain'] = chain.id;
+  // if (community) options['community'] = community.id;
 
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {

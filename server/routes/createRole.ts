@@ -17,14 +17,14 @@ const createRole = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
 
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
 
   // cannot join private communities using this route
-  if (community && community.privacy_enabled) return next(new Error(Errors.InvalidChainComm));
+  // if (community && community.privacy_enabled) return next(new Error(Errors.InvalidChainComm));
 
   const validAddress = await models.Address.findOne({
     where: {
@@ -48,17 +48,11 @@ const createRole = async (
   // } });
 
   const [ subscription ] = await models.Subscription.findOrCreate({
-    where: chain ? {
+    where: {
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewThread,
       chain_id: chain.id,
       object_id: chain.id,
-      is_active: true,
-    } : {
-      subscriber_id: req.user.id,
-      category_id: NotificationCategories.NewThread,
-      community_id: community.id,
-      object_id: community.id,
       is_active: true,
     }
   });

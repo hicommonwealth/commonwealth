@@ -26,7 +26,7 @@ const bulkOffchain = async (
 ) => {
   try {
 
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+  const [chain, error] = await lookupCommunityIsVisibleToUser(
     models,
     req.query,
     req.user
@@ -132,9 +132,7 @@ const bulkOffchain = async (
           );
           const activeUsers = {};
           const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
-          console.log("is community", community)
-          if (community) where['community'] = community.id;
-          else where['chain'] = chain.id;
+          if (chain)where['chain'] = chain.id;
 
           const monthlyComments = await models.OffchainComment.findAll({
             where,

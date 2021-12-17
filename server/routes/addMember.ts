@@ -15,15 +15,17 @@ export const Errors = {
 };
 
 const addMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
-  if (!community && !chain) return next(new Error(Errors.InvalidCommunity));
+  if (!chain) return next(new Error(Errors.InvalidCommunity));
+  // if (!community && !chain) return next(new Error(Errors.InvalidCommunity));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));
-  const chainOrCommunity = chain ? { chain_id: chain.id } : { offchain_community_id: community.id };
+  const chainOrCommunity = { chain_id: chain.id };
+  // const chainOrCommunity = chain ? { chain_id: chain.id } : { offchain_community_id: community.id };
 
   // check that either invites_enabled === true, or the user is an admin or mod
-  if ((community && !community.invites_enabled) || chain) {
+  if (chain) {
     const adminAddress = await models.Address.findOne({
       where: {
         address: req.body.address,
