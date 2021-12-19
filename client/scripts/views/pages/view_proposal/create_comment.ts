@@ -14,7 +14,7 @@ import User from 'views/components/widgets/user';
 
 import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';
-import { tokenBaseUnitsToTokens } from 'helpers';
+import { weiToTokens } from 'helpers';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
@@ -219,7 +219,7 @@ const CreateComment: m.Component<{
               tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
                 ? [
                   `Commenting in ${activeTopicName} requires `,
-                  `${tokenBaseUnitsToTokens(tokenPostingThreshold.toString(), decimals)} `,
+                  `${weiToTokens(tokenPostingThreshold.toString(), decimals)} `,
                   `${app.chain.meta.chain.symbol}`
                 ]
                 : null

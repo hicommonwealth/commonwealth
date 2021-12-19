@@ -1,4 +1,5 @@
 import 'pages/discussions/index.scss';
+import 'components/dropdown_icon.scss';
 
 import $ from 'jquery';
 import _ from 'lodash';
@@ -63,23 +64,38 @@ const getLastSeenDivider = (hasText = true) => {
   );
 };
 
-export const CommunityOptionsPopover: m.Component<
-  { isAdmin: boolean; isMod: boolean },
-  {}
-> = {
+export const CommunityOptionsPopover: m.Component<{}> = {
   view: (vnode) => {
-    const { isAdmin, isMod } = vnode.attrs;
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+      });
+    const isMod = app.user.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+    });
     if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
+
+    // add extra width to compensate for an icon that isn't centered inside its boundaries
+    const DropdownIcon = m('.dropdown-wrapper',
+    [
+      m(Icon, {
+        name: Icons.CHEVRON_DOWN,
+      }),
+      m('.dropdown-spacer', {})
+    ]);
+
+
     return m(PopoverMenu, {
       class: 'community-options-popover',
       position: 'bottom',
       transitionDuration: 0,
       hoverCloseDelay: 0,
       closeOnContentClick: true,
-      trigger: m(Icon, {
-        name: Icons.CHEVRON_DOWN,
-        style: 'margin-left: 6px;',
-      }),
+      trigger: DropdownIcon,
       content: [
         isAdmin &&
           m(MenuItem, {
@@ -191,7 +207,7 @@ const DiscussionFilterBar: m.Component<
             rounded: true,
             compact: true,
             class: 'topic-filter',
-            label: selectedTopic ? `Topic: ${topic}` : 'All Discussions',
+            label: selectedTopic ? `Topic: ${topic}` : 'All Topics',
             iconRight: Icons.CHEVRON_DOWN,
             size: 'sm',
             disabled,
@@ -208,7 +224,7 @@ const DiscussionFilterBar: m.Component<
                 m.route.get() === `/${app.activeId()}` || !topic
                   ? Icons.CHECK
                   : null,
-              label: 'All Discussions',
+              label: 'All Topics',
               onclick: () => {
                 localStorage.setItem('discussion-summary-toggle', 'false');
                 vnode.attrs.parentState.summaryView = false;
@@ -266,6 +282,7 @@ const DiscussionFilterBar: m.Component<
                           rounded: true,
                           onclick: (e) => {
                             e.preventDefault();
+                            e.stopPropagation();
                             app.modals.create({
                               modal: EditTopicModal,
                               data: {
@@ -738,17 +755,6 @@ const DiscussionsPage: m.Component<
     const postsDepleted =
       allThreads.length > 0 && vnode.state.postsDepleted[subpage];
 
-    const isAdmin =
-      app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
-        chain: app.activeChainId(),
-        community: app.activeCommunityId(),
-      });
-    const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-    });
 
     return m(
       Sublayout,
@@ -756,8 +762,6 @@ const DiscussionsPage: m.Component<
         class: 'DiscussionsPage',
         title: [
           'Discussions',
-          (isAdmin || isMod || app.community?.meta.invitesEnabled) &&
-            m(CommunityOptionsPopover, { isAdmin, isMod }),
         ],
         description: topicDescription,
         showNewProposalButton: true,

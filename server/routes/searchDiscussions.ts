@@ -17,7 +17,7 @@ const searchDiscussions = async (
   res: Response,
   next: NextFunction
 ) => {
-  let replacements = {};
+  let bind = {};
 
   if (!req.query.search) {
     return next(new Error(Errors.QueryMissing));
@@ -82,9 +82,9 @@ const searchDiscussions = async (
 
     // set up query parameters
     communityOptions = community
-      ? `AND "OffchainThreads".community = :community `
-      : `AND "OffchainThreads".chain = :chain `;
-    replacements = community
+      ? `AND "OffchainThreads".community = $community`
+      : `AND "OffchainThreads".chain = $chain`;
+    bind = community
       ? { community: community.id }
       : { chain: chain.id };
   }
@@ -92,11 +92,11 @@ const searchDiscussions = async (
   const sort = req.query.sort === 'Newest'
     ? 'ORDER BY "OffchainThreads".created_at DESC'
     : req.query.sort === 'Oldest'
-    ? 'ORDER BY "OffchainThreads".created_at ASC'
-    : 'ORDER BY rank DESC'
+      ? 'ORDER BY "OffchainThreads".created_at ASC'
+      : 'ORDER BY rank DESC'
 
-  replacements['searchTerm'] = req.query.search;
-  replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
+  bind['searchTerm'] = req.query.search.toLowerCase();
+  bind['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
 
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   let threadsAndComments;
@@ -122,7 +122,7 @@ const searchDiscussions = async (
     ${sort} LIMIT :limit
 `,
       {
-        replacements,
+        bind,
         type: QueryTypes.SELECT,
       }
     );
