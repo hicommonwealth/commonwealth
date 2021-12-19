@@ -20,7 +20,7 @@ const search = async (
   res: Response,
   next: NextFunction
 ) => {
-  let replacements = {};
+  let bind = {};
 
   if (!req.query.search) {
     return next(new Error(Errors.QueryMissing));
@@ -86,20 +86,20 @@ const search = async (
 
     // set up query parameters
     communityOptions = community
-      ? `"OffchainThreads".community = :community AND `
-      : `"OffchainThreads".chain = :chain AND `;
+      ? `"OffchainThreads".community = $community AND `
+      : `"OffchainThreads".chain = $chain AND `;
     communityOptions2 = community
-      ? `"OffchainComments".community = :community AND `
-      : `"OffchainComments".chain = :chain AND `;
-    replacements = community
+      ? `"OffchainComments".community = $community AND `
+      : `"OffchainComments".chain = $chain AND `;
+    bind = community
       ? { community: community.id }
       : { chain: chain.id };
   }
 
   const { cutoff_date } = req.query;
 
-  replacements['searchTerm'] = req.query.search;
-  replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
+  bind['searchTerm'] = req.query.search.toLowerCase();
+  bind['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
 
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   let threadsAndComments;
@@ -120,8 +120,8 @@ SELECT * FROM (
       "OffchainThreads".community
     FROM "OffchainThreads"
     JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id
-    WHERE ${communityOptions} "OffchainThreads"._search @@ plainto_tsquery('english', :searchTerm)
-    ORDER BY "OffchainThreads".created_at DESC LIMIT :limit)
+    WHERE ${communityOptions} "OffchainThreads"._search @@ plainto_tsquery('english', $searchTerm)
+    ORDER BY "OffchainThreads".created_at DESC LIMIT $limit)
   UNION ALL
   (SELECT
       "OffchainThreads".title,
@@ -138,13 +138,13 @@ SELECT * FROM (
     JOIN "OffchainThreads" ON "OffchainThreads".id =
         CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
     JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id
-    WHERE ${communityOptions2} "OffchainComments"._search @@ plainto_tsquery('english', :searchTerm)
-    ORDER BY "OffchainComments".created_at DESC LIMIT :limit)
+    WHERE ${communityOptions2} "OffchainComments"._search @@ plainto_tsquery('english', $searchTerm)
+    ORDER BY "OffchainComments".created_at DESC LIMIT $limit)
 ) s
-ORDER BY created_at DESC LIMIT :limit;
+ORDER BY created_at DESC LIMIT $limit;
 `,
       {
-        replacements,
+        bind,
         type: QueryTypes.SELECT,
       }
     );
