@@ -153,36 +153,36 @@ const EmailWell: m.Component<IAttrs, IState> = {
               contentLeft: m(Icon, { name: Icons.DISC }), // TODO: add a discord icon
               disabled: true,
             }),
-          ]),
-          m(Button, {
-            label: discordAccount ? 'Unlink Discord' : 'Link Discord',
-            intent: discordAccount ? 'negative': 'primary',
-            rounded: true,
-            onclick: () => {
-              if (discordAccount) {
-                $.ajax({
-                  url: `${app.serverUrl()}/discordAccount`,
-                  data: { jwt: app.user.jwt },
-                  type: 'DELETE',
-                  success: (result) => {
-                    vnode.state.discordAccount = null;
-                    m.redraw();
-                  },
-                  error: (err) => {
-                    console.dir(err);
-                    m.redraw();
-                  }
-                })
-              } else {
-                localStorage.setItem('discordPostAuthRedirect', JSON.stringify({
-                  timestamp: (+new Date()).toString(),
-                  path: m.route.get()
-                }));
-                document.location = `${app.serverUrl()}/auth/discord` as any;
-                m.redraw;
+            m(Button, {
+              label: discordAccount ? 'Unlink Discord' : 'Link Discord',
+              intent: discordAccount ? 'negative': 'primary',
+              rounded: true,
+              onclick: () => {
+                if (discordAccount) {
+                  $.ajax({
+                    url: `${app.serverUrl()}/discordAccount`,
+                    data: { jwt: app.user.jwt },
+                    type: 'DELETE',
+                    success: (result) => {
+                      vnode.state.discordAccount = null;
+                      m.redraw();
+                    },
+                    error: (err) => {
+                      console.dir(err);
+                      m.redraw();
+                    }
+                  })
+                } else {
+                  localStorage.setItem('discordPostAuthRedirect', JSON.stringify({
+                    timestamp: (+new Date()).toString(),
+                    path: m.route.get()
+                  }));
+                  document.location = `${app.serverUrl()}/auth/discord` as any;
+                  m.redraw();
+                }
               }
-            }
-          })
+            })
+          ]),   
         ])
       ]),
     ];
