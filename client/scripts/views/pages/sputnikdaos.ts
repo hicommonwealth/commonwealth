@@ -35,13 +35,18 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
       showNewProposalButton: true,
     });
 
-    if(app.activeId() === 'near' && !vnode.state.daosRequested){
+    if ((app.activeId() === 'near' || app.activeId() === 'near-testnet') && !vnode.state.daosRequested) {
       vnode.state.daosRequested = true;
       (app.chain as Near).chain.viewDaoList().then((daos) => {
+        const isMainnet = app.activeId() === 'near';
         vnode.state.daosList = daos;
         vnode.state.daosList.sort((d1, d2) => {
-          const d1Exist = allCommunities.filter(c => c.id === `${d1.name}.sputnik-dao.near`).length;
-          const d2Exist = allCommunities.filter(c => c.id === `${d2.name}.sputnik-dao.near`).length;
+          const d1Exist = allCommunities.filter(c => isMainnet
+            ? c.id === `${d1.name}.sputnik-dao.near`
+            : c.id === `${d1.name}.sputnikv2.testnet`).length;
+          const d2Exist = allCommunities.filter(c => isMainnet
+            ? c.id === `${d2.name}.sputnik-dao.near`
+            : c.id === `${d1.name}.sputnikv2.testnet`).length;
           if(d1Exist !== d2Exist)
             return d2Exist - d1Exist;
           else
@@ -52,7 +57,7 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
     }
 
     if (!vnode.state.daosList) {
-      if (app.activeId() === 'near') {
+      if (app.activeId() === 'near' || app.activeId() === 'near-testnet') {
         return m(PageLoading, {
           message: 'Loading Sputnik DAOs',
           title: [
