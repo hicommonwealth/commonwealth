@@ -247,15 +247,6 @@ const MembersPage: m.Component<
                             }
                             notifyError(err.message);
                           });
-                        // app.modals.create({
-                        //   modal: DelegateModal,
-                        //   data: {
-                        //     address: profileInfo.address,
-                        //     name: profileInfo.name,
-                        //     symbol: app.chain.meta.chain.symbol,
-                        //     chainController: app.chain,
-                        //   },
-                        // });
                       },
                     })
                   ),
