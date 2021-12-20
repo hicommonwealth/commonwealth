@@ -16,7 +16,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { CommunityOptionsPopover } from './pages/discussions';
-import { ButtonIntent, FaceliftButton } from 'views/components/component_kit/buttons';
+import { ButtonIntent, FaceliftButton, FaceliftHoverButton } from 'views/components/component_kit/buttons';
 
 const Sublayout: m.Component<{
   // overrides
@@ -96,7 +96,7 @@ const Sublayout: m.Component<{
       ],
     ]);
 
-    const hiringButton = m(FaceliftButton, {
+    const hiringButton = m(FaceliftHoverButton, {
       intent: ButtonIntent.Secondary,
       label: "We're hiring!",
       onclick: () => {

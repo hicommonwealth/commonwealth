@@ -57,6 +57,25 @@ export const FaceliftButton: m.Component<
   },
 };
 
+export const FaceliftHoverButton: m.Component<
+  {
+    intent: ButtonIntent;
+    label;
+    onclick: Function;
+    disabled?: boolean;
+    className?: string;
+    hoverable?: boolean;
+  },
+  {}
+> = {
+  view: (vnode) => {
+    const { onclick, label } = vnode.attrs;
+    return m(appendTags('button.RainbowButton', vnode.attrs), { onclick }, [
+      m('span.label', label),
+    ]);
+  },
+};
+
 export const FaceliftButtonGroup: m.Component<
   {
     primaryLabel: string;

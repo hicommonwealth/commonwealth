@@ -45,6 +45,68 @@
     }
 }
 
+
+
+
+.RainbowButton {
+    min-width: fit-content;
+    height: 40px;
+    padding: 1px;
+    font-weight: 600;
+    border: 0.5px double transparent;
+    --angle: 45deg;
+    border-radius: 16px;
+    background-image: linear-gradient(white, white), linear-gradient(
+        var(--angle),
+        #91BFFF,
+        #91FFA0,
+        #FBFF91,
+        #FF9191, 
+    );
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    
+    &.primary {
+        &:hover {
+            box-shadow: 0px 1px 6px 0px #0000001A;
+            animation: 6s rotate linear infinite;
+        }
+        &.disabled {
+            color: $disable-gray;
+            background-color: $white;
+            border: 1px solid $disable-gray;
+            box-shadow: none;
+            cursor: default;
+        }
+    }
+    &.secondary {
+        &:hover {
+            box-shadow: 0px 1px 6px 0px #0000001A;
+            animation: 5s rotate linear infinite;
+        }
+        &.disabled {
+            color: $disable-gray;
+            background-color: $white;
+            border: 1px solid $disable-gray;
+            box-shadow: none;
+            cursor: default;
+        }
+    }
+}
+
+@keyframes rotate {
+    to {
+        --angle: 360deg;
+    }
+}
+
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 45deg;
+    inherits: false;
+}
+
+
 .ExternalLinkElement {
     display: flex;
     max-width: fit-content;
