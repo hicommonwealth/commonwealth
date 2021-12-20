@@ -220,8 +220,10 @@
         width: 100%;
         padding: 20px 0 10px 0;
         overflow-y: visible;
-        max-height: none !important;
-        min-width: 300px;
+        max-height: 90vh !important;
+        min-width: 400px;
+        overflow-y: scroll;
+
         &.search-results-loading {
             display: flex;
             justify-content: center;

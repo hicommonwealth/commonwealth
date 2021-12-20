@@ -280,7 +280,7 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
     if (res?.length === 0) return;
     const headerEle = m(ListItem, {
       label: type,
-      class: 'disabled',
+      class: `disabled ${organizedResults.length === 0 ? 'upper-border' : ''}`,
       onclick: (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -374,26 +374,6 @@ export const search = async (
     ? getResultsPreview(searchQuery, state)
     : app.search.getByQuery(searchQuery).results;
   m.redraw();
-};
-
-const emptySearchPreview: m.Component<{ searchTerm: string }, {}> = {
-  view: (vnode) => {
-    const { searchTerm } = vnode.attrs;
-    const message = app.activeId()
-      ? `No results in ${app.activeId()}. Search Commonwealth?`
-      : 'No communities found';
-    return m(ListItem, {
-      class: 'no-results',
-      label: [m('b', searchTerm), m('span', message)],
-      onclick: (e) => {
-        if (searchTerm.length < 4) {
-          notifyError('Query must be at least 4 characters');
-        }
-        const params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
-        m.route.set(`/search?${params}`);
-      },
-    });
-  },
 };
 
 export const executeSearch = (query: SearchQuery) => {
@@ -559,7 +539,7 @@ export const SearchBar: m.Component<
             ]
           : !results || results?.length === 0
             ? app.search.getByQuery(searchQuery)?.loaded
-              ? m(ListItem, { class: 'disabled upper-border', label: m(Spinner, { active: true }) })
+              ? m(ListItem, { class: 'search-history-no-results upper-border', label: "No Results Found" })
               : vnode.state.isTyping
                 ? m(ListItem, { class: 'disabled upper-border', label: m(Spinner, { active: true }) })
                 : m(ListItem, {
@@ -629,14 +609,14 @@ export const SearchBar: m.Component<
             vnode.state.focused = true;
           },
           onfocusout: () => {
-            // if(!vnode.state.filterMenuActive) vnode.state.focused = false;
+            if(!vnode.state.filterMenuActive) vnode.state.focused = false;
           },
           oninput: (e) => {
             e.stopPropagation();
             vnode.state.isTyping = true;
             vnode.state.searchTerm = e.target.value?.toLowerCase();
             clearTimeout(vnode.state.inputTimeout);
-            const timeout = e.target.value?.length > 3 ? 250 : 500000
+            const timeout = e.target.value?.length > 3 ? 250 : 1000
             vnode.state.inputTimeout = setTimeout(() => {
               vnode.state.isTyping = false;
               if (e.target.value?.length > 3) {

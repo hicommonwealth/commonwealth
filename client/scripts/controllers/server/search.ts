@@ -10,7 +10,7 @@ export const ALL_RESULTS_QUERY = new SearchQuery('COMMONWEALTH_ALL_RESULTS');
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 const SEARCH_HISTORY_KEY = "COMMONWEALTH_SEARCH_HISTORY"
-const SEARCH_HISTORY_SIZE = 20
+const SEARCH_HISTORY_SIZE = 10
 
 export enum ContentType {
     Thread = 'thread',
