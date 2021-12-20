@@ -31,6 +31,9 @@
     .cui-button-label .cui-icon-user {
         margin-right: 0;
     }
+    .hiringBtn {
+        display: none;
+    }
 }
 
 .Sublayout {
@@ -157,6 +160,10 @@
                 box-shadow: none;
                 height: 36px;
                 border-radius: 4px;
+                margin: 0 7px;
+                color: #4a4a4a;
+                border: solid 1px #c5cdd1;
+                font-weight: 500;
             }
         }
 
