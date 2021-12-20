@@ -12,11 +12,11 @@ import {
     SnapshotSpace,
   } from 'helpers/snapshot_utils';
 import 'pages/discussions/discussion_row.scss';
-import SnapshotSpaceCard from './space_card';
 import 'pages/snapshot/multiple_snapshots.scss';
 import { head } from 'underscore';
 import { StringWithLengthBetween0And32K } from 'aws-sdk/clients/apigatewayv2';
 import { OffchainThread } from 'client/scripts/models';
+import SnapshotSpaceCard from './space_card';
 
 export const enum SPACES_HEADER_MESSAGES {
     NEW_PROPOSAL = "Select a Snapshot Space to Create a Proposal:",
@@ -35,7 +35,7 @@ function redirectHandler(action: string, proposal: null | OffchainThread): {head
     let header = SPACES_HEADER_MESSAGES.ENTER_SPACES;
     let redirect = REDIRECT_ACTIONS.ENTER_SPACE
     let from_proposal = null;
-    
+
     if (action === 'create-proposal') {
         header = SPACES_HEADER_MESSAGES.NEW_PROPOSAL;
         redirect = REDIRECT_ACTIONS.NEW_PROPOSAL
@@ -50,10 +50,7 @@ function redirectHandler(action: string, proposal: null | OffchainThread): {head
         redirect_option: redirect,
         proposal: from_proposal
     }
-} 
-
-
-
+}
 
 const MultipleSnapshotsPage: m.Component<{
     action?: string,
@@ -78,7 +75,7 @@ const MultipleSnapshotsPage: m.Component<{
                 vnode.state.spaces_metadata = data;
                 m.redraw();
             })
-           
+
             return m(Sublayout, {
                 class: 'DiscussionsPage',
                 title: 'Proposals',
@@ -86,9 +83,8 @@ const MultipleSnapshotsPage: m.Component<{
                 showNewProposalButton: true,
             }, [
                 m(Spinner, { active: true, fill: true, size: 'lg' })
-            ]);       
-        } 
-
+            ]);
+        }
 
          return m(Sublayout, {
             class: 'DiscussionsPage',
@@ -102,11 +98,13 @@ const MultipleSnapshotsPage: m.Component<{
             (app.chain || app.community) && vnode.state.spaces_metadata && [
                 m(Listing, {
                     content: [
-                      m('.discussion-group-wrap',  vnode.state.spaces_metadata.map((data) => m(SnapshotSpaceCard, { space: data.space, proposals: data.proposals, redirect_action: redirect_options.redirect_option, proposal: redirect_options.proposal})))
+                        m('.discussion-group-wrap',  vnode.state.spaces_metadata.map((data) =>
+                            m(SnapshotSpaceCard, { space: data.space, proposals: data.proposals,
+                            redirect_action: redirect_options.redirect_option, proposal: redirect_options.proposal})))
                     ]
-                  })
+                })
             ]
-        ]);   
+        ]);
     }
 }
 

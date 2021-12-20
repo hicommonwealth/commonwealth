@@ -124,7 +124,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
         if (snapshotSpaces.length > 1) {
           navigateToSubpage('/multiple-snapshots', {action: 'create-proposal'});
         } else {
-          navigateToSubpage(`/new/snapshot/${app.chain.meta.chain.snapshot}`);
+          navigateToSubpage(`/new/snapshot/${snapshotSpaces}`);
         }
       },
       label: 'New Snapshot Proposal',

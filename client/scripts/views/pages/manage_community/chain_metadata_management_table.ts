@@ -244,14 +244,12 @@ const ChainMetadataManagementTable: m.Component<
               iconUrl,
               defaultSummaryView,
             } = vnode.state;
-
             for (const space of snapshot) {
               if (!/^[a-z]+\.eth$/gi.test(space)) {
                 notifyError('Snapshot name must be in the form of *.eth');
                 return;
               }
             }
-            
             try {
               await vnode.attrs.chain.updateChainData({
                 name,

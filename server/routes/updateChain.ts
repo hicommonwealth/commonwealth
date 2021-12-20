@@ -101,7 +101,6 @@ const updateChain = async (
     return next(new Error(Errors.InvalidTerms));
   }
 
-
   if (name) chain.name = name;
   if (description) chain.description = description;
   if (symbol) chain.symbol = symbol;

@@ -70,12 +70,10 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
         }
         vnode.state.snapshotProposalsLoaded = true;
         m.redraw();
-      })
-
+      });
     }
 
     let proposalLink = '';
-
     if (vnode.state.space && vnode.state.snapshot) {
       proposalLink = `${
         app.isCustomDomain() ? '' : `/${proposal.chain}`

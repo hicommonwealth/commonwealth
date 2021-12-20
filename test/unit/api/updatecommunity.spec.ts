@@ -59,7 +59,7 @@ describe('Update Community/Chain Tests', () => {
     it('should update chain name', async () => {
       const name = 'commonwealtheum';
       const res = await chai
-        .request(app) 
+        .request(app)
         .post('/api/updateChain')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, name });
