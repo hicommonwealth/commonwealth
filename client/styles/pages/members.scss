@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
 .MembersPage {
-    .title {
+    .table-title {
         font-size: 32px;
         margin-top: 32px;
         padding-left: 12px;
@@ -10,9 +10,17 @@
         color: #666666;
         font-weight: 400;
         border: 0;
+        text-align: center;
+    }
+    th:first-child {
+        text-align: left;
     }
     td {
         border: 0;
+        text-align: center;
+    }
+    td:first-child {
+        text-align: left;
     }
     .align-right {
         text-align: right;

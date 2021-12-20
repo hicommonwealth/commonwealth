@@ -98,8 +98,10 @@ const MembersPage: m.Component<
     const activeInfo = app.community
       ? app.community.meta
       : app.chain.meta.chain;
-    const outsizedFirstPageFetch = (vnode.state.pageToLoad === 0 && navigatedFromAccount)
-      ? localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`] : null;
+    let outsizedFirstPageFetch;
+    if (vnode.state.pageToLoad === 0 && navigatedFromAccount) {
+      localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`];
+    }
     if (vnode.state.requestMembers) {
       vnode.state.requestMembers = false;
       activeInfo
@@ -132,6 +134,14 @@ const MembersPage: m.Component<
               )
             );
           }
+
+          // Return to correct scroll position upon redirect from accounts page
+          if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
+            vnode.state.initialScrollFinished = true
+            setTimeout(() => {
+              window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
+            }, 100);
+          }
         })
         .then(() => m.redraw());
     }
@@ -145,14 +155,6 @@ const MembersPage: m.Component<
     } = vnode.state;
 
     const noCommunityMembers = (totalMemberCount === 0 && pageToLoad === 0 && !requestMembers);
-
-    // Return to correct scroll position upon redirect from accounts page
-    if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
-      vnode.state.initialScrollFinished = true
-      setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
-      }, 100);
-    }
 
     // Infinite Scroll
     $(window).off('scroll');
@@ -173,11 +175,6 @@ const MembersPage: m.Component<
     $(window).on('scroll', vnode.state.onscroll);
 
     const { numProfilesLoaded } = vnode.state;
-    console.log({
-      totalMemberCount,
-      members,
-      numProfilesLoaded
-    })
     return m(
       Sublayout,
       {
@@ -194,14 +191,14 @@ const MembersPage: m.Component<
         showNewProposalButton: true,
       },
       [
-        m('.title', 'Members'),
+        m('.table-title', 'Members'),
         (totalMemberCount > 0 && members?.length > 0)
           && m(Table, [
               m('tr', [
                 m('th', 'Member'),
-                m('th.align-right', 'Posts / Month'),
-                hasDelegates && m('th.align-right', 'Voting Power'),
-                hasDelegates && m('th.align-right', 'Delegate'),
+                m('th', 'Posts / Month'),
+                hasDelegates && m('th', 'Voting Power'),
+                hasDelegates && m('th', 'Delegate'),
               ]),
               vnode.state.members.map((member) => {
                 const profileInfo = app.profiles.getProfile(member.chain, member.address);
@@ -220,9 +217,9 @@ const MembersPage: m.Component<
                       m(User, { user: profileInfo, showRole: true }),
                     ]),
                   ]),
-                  m('td.align-right', member.count),
+                  m('td', member.count),
                   hasDelegates
-                  && m('td.align-right', [
+                  && m('td', [
                       member.votes
                         ? `${member.votes.toNumber()?.toFixed(2)} ${app.chain.meta.chain.symbol
                         }`
@@ -230,7 +227,7 @@ const MembersPage: m.Component<
                     ]),
                   hasDelegates
                   && m(
-                    'td.align-right',
+                    'td',
                     m(Button, {
                       label: 'Delegate',
                       intent: 'primary',
