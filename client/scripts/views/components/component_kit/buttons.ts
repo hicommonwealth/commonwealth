@@ -42,7 +42,7 @@ const appendTags = (base: string, attrs) => {
 export const FaceliftButton: m.Component<
   {
     intent: ButtonIntent;
-    label: string;
+    label;
     onclick: Function;
     disabled?: boolean;
     className?: string;
