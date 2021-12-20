@@ -45,49 +45,57 @@
     }
 }
 
+.gradient-button-label {
+    padding-top: 6px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
 
-
-
-.RainbowButton {
-    min-width: fit-content;
+.GradientButton {
+    min-width: 70px;
     height: 40px;
     padding: 1px;
     font-weight: 600;
-    border: 0.5px double transparent;
+    margin: 0 7px;
+    color: #4a4a4a;
+    font-weight: 500;
+    border: 1px double transparent;
     --angle: 45deg;
-    border-radius: 16px;
-    background-image: linear-gradient(white, white), linear-gradient(
-        var(--angle),
-        #91BFFF,
-        #91FFA0,
-        #FBFF91,
-        #FF9191, 
-    );
+    border-radius: 10px;
     background-origin: border-box;
     background-clip: content-box, border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.rainbow-gradient {
+        background-image: linear-gradient(white, white), linear-gradient(
+            var(--angle),
+            #91BFFF,
+            #91FFA0,
+            #FBFF91,
+            #FF9191, 
+        );
+    }
     
     &.primary {
         &:hover {
-            box-shadow: 0px 1px 6px 0px #0000001A;
-            animation: 6s rotate linear infinite;
+            box-shadow: 0px 1px 3px 0px #0000001A;
+            animation: 5s rotate linear infinite;
         }
         &.disabled {
-            color: $disable-gray;
             background-color: $white;
-            border: 1px solid $disable-gray;
             box-shadow: none;
             cursor: default;
         }
     }
     &.secondary {
         &:hover {
-            box-shadow: 0px 1px 6px 0px #0000001A;
+            box-shadow: 0px 1px 3px 0px #0000001A;
             animation: 5s rotate linear infinite;
         }
         &.disabled {
             color: $disable-gray;
-            background-color: $white;
-            border: 1px solid $disable-gray;
             box-shadow: none;
             cursor: default;
         }
@@ -105,7 +113,6 @@
     initial-value: 45deg;
     inherits: false;
 }
-
 
 .ExternalLinkElement {
     display: flex;
