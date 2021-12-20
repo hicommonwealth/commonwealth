@@ -64,7 +64,6 @@ class SearchContoller {
     }
     const searchCache = this._store.getOrAdd(searchQuery)
     const { searchTerm, communityScope, chainScope, isSearchPreview, sort } = searchQuery;
-    console.log(searchTerm)
     const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
     const scope = searchQuery.getSearchScope()
 
@@ -268,7 +267,8 @@ class SearchContoller {
   }
 
   public addToHistory(query: SearchQuery) {
-    this.removeFromHistory(query) // to ignore duplicates
+    this.removeFromHistory(query) // to refresh duplicates
+    if(!this.isValidQuery(query)) return
     const rawHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || []
     if(rawHistory.length >= SEARCH_HISTORY_SIZE){
       rawHistory.pop()
@@ -289,7 +289,6 @@ class SearchContoller {
   public isValidQuery(searchQuery: SearchQuery){
     return searchQuery.searchTerm
       && searchQuery.searchTerm.toString().trim()
-      && searchQuery.searchTerm.match(/[A-Za-z]+/)
       && searchQuery.searchTerm.length > 3
   }
 }

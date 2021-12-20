@@ -379,8 +379,7 @@ export const search = async (
 export const executeSearch = (query: SearchQuery) => {
   if (
     !query.searchTerm ||
-    !query.searchTerm.toString().trim() ||
-    !query.searchTerm.match(/[A-Za-z]+/)
+    !query.searchTerm.toString().trim()
   ) {
     notifyError('Enter a valid search term');
     return;
@@ -614,6 +613,7 @@ export const SearchBar: m.Component<
           oninput: (e) => {
             e.stopPropagation();
             vnode.state.isTyping = true;
+            vnode.state.focused = true;
             vnode.state.searchTerm = e.target.value?.toLowerCase();
             clearTimeout(vnode.state.inputTimeout);
             const timeout = e.target.value?.length > 3 ? 250 : 1000
