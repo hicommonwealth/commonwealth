@@ -54,4 +54,32 @@
     .topic-loading-spinner-wrap {
         height: 120px;
     }
+
+    @include xs-max {
+        .table-title {
+            padding-left: 0 !important;
+        }
+        th, td {
+            max-width: 20vw;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            button {
+                padding: 0 3px;
+            }
+            .User {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: block;
+            }
+        }
+        th:first-child, td:first-child {
+            padding-left: 0 !important;
+        }
+        th:last-child, td:last-child {
+            padding-right: 0 !important;
+            text-overflow: clip;
+        }
+    }
 }
