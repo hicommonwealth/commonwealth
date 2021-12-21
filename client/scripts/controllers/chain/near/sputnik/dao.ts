@@ -71,10 +71,6 @@ export default class NearSputnikDao extends ProposalModule<
   }
 
   public async proposeTx(description: string, kind: NearSputnikProposalKind) {
-    if (typeof kind === 'string') {
-      throw new Error(`invalid proposal kind: ${kind}`);
-    }
-
     // TODO: user pre-checks
 
     const contractId = this.app.activeChainId();
