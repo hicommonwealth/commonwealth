@@ -13,7 +13,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   private _web3: Web3;
 
   public readonly name = 'walletconnect';
-  public readonly label = 'Ethereum Wallet (WalletConnect)';
+  public readonly label = 'WalletConnect';
   public readonly chain = ChainBase.Ethereum;
   public readonly available = true;
 
