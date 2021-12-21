@@ -63,7 +63,6 @@ describe('Update Community/Chain Tests', () => {
         .post('/api/updateChain')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, name });
-        console.log("res: ", res.body)
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.name).to.be.equal(name);
     });
