@@ -10,6 +10,10 @@ import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
 
+function encodeEthAddress(address: string): string {
+  return bech32.encode('inj', bech32.toWords(Address.fromString(address).toBuffer()));
+}
+
 class InjectiveWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
@@ -19,8 +23,8 @@ class InjectiveWebWalletController implements IWebWallet<string> {
   private _provider: provider;
   private _web3: Web3;
 
-  public readonly name = 'InjMetamask';
-  public readonly label = 'Injective MetaMask Wallet';
+  public readonly name = 'inj-metamask';
+  public readonly label = 'Metamask (Injective)';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly specificChain = 'injective';
 
@@ -70,7 +74,7 @@ class InjectiveWebWalletController implements IWebWallet<string> {
         throw new Error('Could not fetch accounts from Metamask');
       } else {
         for (const acc of this._ethAccounts) {
-          this._accounts.push(bech32.encode('inj', bech32.toWords(Address.fromString(acc.toString()).toBuffer())));
+          this._accounts.push(encodeEthAddress(acc));
         }
       }
 
@@ -85,7 +89,8 @@ class InjectiveWebWalletController implements IWebWallet<string> {
 
   public async initAccountsChanged() {
     await this._web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
-      const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
+      const encodedAccounts = accounts.map((a) => encodeEthAddress(a));
+      const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === encodedAccounts[0]);
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
     });
