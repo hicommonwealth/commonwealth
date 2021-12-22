@@ -32,7 +32,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
     const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(chain);
 
     return m(Card, {
-      elevation: 1,
+      elevation: 2,
       interactive: true,
       class: 'home-card',
       onclick: (e) => {
@@ -40,12 +40,12 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
         localStorage['home-scrollY'] = window.scrollY;
         m.route.set(`/${chain}`);
       },
-    }, [
-      m('.card-left', [
-        m(ChainIcon, { chain: nodeList[0].chain }),
+    }, [    
+      m('.card-header', [
+        m(ChainIcon, { chain: nodeList[0].chain, size: 90 }),
       ]),
-      m('.card-right', [
-        m('.card-right-top', [
+      m('.card-body', [
+        m('.community-name', [
           m('h3', chainInfo.name),
         ]),
         m('p.card-description', chainInfo.description),
@@ -66,7 +66,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
             updatedThreads > 0 && getNewTag(updatedThreads),
           ],
         ])
-      ]),
+      ]), 
     ]);
   }
 };
