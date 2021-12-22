@@ -308,7 +308,6 @@ export async function loadMultipleSpacesData(snapshot_spaces:string[]) {
     try {
       const proposals = await getProposals(spaceId);
       const space = await getSpace(spaceId);
-
       spaces_data.push({space, proposals});
     } catch (e) {
       console.error(`Failed to initialize snapshot: ${spaceId}.`);
