@@ -260,8 +260,9 @@ class SearchContoller {
   public getHistory() {
     const rawHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || []
     const history = []
-    for(let i = 0; i < rawHistory.length; i++){
-      history.push(SearchQuery.fromEncodedString(rawHistory[i]))
+    // eslint-disable-next-line guard-for-in
+    for(const entry in rawHistory){
+      history.push(SearchQuery.fromEncodedString(entry))
     }
     return history
   }
