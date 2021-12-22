@@ -40,13 +40,6 @@ export default async (
       });
       if (chain) {
         obj = { chain_id: p_entity };
-      } else {
-        const community = await models.OffchainCommunity.findOne({
-          where: {
-            id: p_entity,
-          },
-        });
-        if (community) obj = { community_id: p_entity };
       }
       break;
     }

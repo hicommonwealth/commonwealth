@@ -16,17 +16,13 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
   if (!req.body.object_id) {
     return next(new Error(Errors.NoObjectId));
   }
-  if (!req.body.chain && !req.body.community) {
+  if (!req.body.chain) {
     return next(new Error(Errors.NoChainOrComm));
   }
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain || null }
   });
-  const community = await models.OffchainCommunity.findOne({
-    where: { id: req.body.community || null }
-  });
-
-  if (!chain && !community) {
+  if (!chain) {
     return next(new Error(Errors.InvalidChainOrComm));
   }
 

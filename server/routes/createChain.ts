@@ -45,7 +45,7 @@ const createChain = async (
     return next(new Error('Not logged in'));
   }
   // require Admin privilege for creating Chain/DAO
-  if (req.body.type !== ChainType.Token) {
+  if (req.body.type !== ChainType.Token && req.body.type !== ChainType.Offchain) {
     if (!req.user.isAdmin) {
       return next(new Error(Errors.NotAdmin));
     }
@@ -77,7 +77,7 @@ const createChain = async (
   }
   let eth_chain_id: number = null;
   let url = req.body.node_url;
-  if (req.body.base === ChainBase.Ethereum) {
+  if (req.body.base === ChainBase.Ethereum && req.body.type !== ChainType.Offchain) {
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
     }
@@ -115,6 +115,9 @@ const createChain = async (
     if (existingChainNode) {
       return next(new Error(Errors.ChainAddressExists));
     }
+  } else if (req.body.base === ChainBase.Ethereum && req.body.type === ChainType.Offchain) {
+    // should always be 1 ...
+    eth_chain_id = +req.body.eth_chain_id;
   } else {
     if (!url || !url.trim()) {
       return next(new Error(Errors.InvalidNodeUrl));

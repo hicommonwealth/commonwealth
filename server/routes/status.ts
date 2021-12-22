@@ -25,7 +25,6 @@ const status = async (
   const [
     chains,
     nodes,
-    publicCommunities,
     contractCategories,
     notificationCategories,
   ] = await Promise.all([
@@ -46,13 +45,6 @@ const status = async (
         },
       ],
     }),
-    models.OffchainCommunity.findAll({
-      where: { privacy_enabled: false },
-      include: {
-        model: models.OffchainTopic,
-        as: 'topics',
-      },
-    }),
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
@@ -72,11 +64,9 @@ const status = async (
         `
         SELECT "OffchainThreads".chain, COUNT("OffchainThreads".id) 
         FROM "OffchainThreads"
-        LEFT JOIN "OffchainCommunities" ON "OffchainThreads".chain = "OffchainCommunities".id
-        AND "OffchainThreads".deleted_at IS NULL
+        WHERE "OffchainThreads".deleted_at IS NULL
         AND NOT "OffchainThreads".pinned
-        AND ("OffchainThreads".chain IS NOT NULL
-        OR NOT "OffchainCommunities"."privacy_enabled")
+        AND "OffchainThreads".chain IS NOT NULL
         GROUP BY "OffchainThreads".chain;
         `,
         { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
@@ -88,7 +78,6 @@ const status = async (
       chains,
       nodes,
       contractCategories,
-      communities: publicCommunities,
       notificationCategories,
       recentThreads: threadCount,
       loggedIn: false,
@@ -130,30 +119,6 @@ const status = async (
     include: [models.Address, models.OffchainAttachment],
   });
 
-  // const visiblePrivateCommunityIds = Array.from(
-  //   roles.map((role) => role.offchain_community_id)
-  // ); // both private and public
-  // const privateCommunities = await models.OffchainCommunity.findAll({
-  //   where: {
-  //     id: {
-  //       [Op.in]: visiblePrivateCommunityIds,
-  //     },
-  //     privacy_enabled: true,
-  //   },
-  //   include: [
-  //     {
-  //       model: models.OffchainTopic,
-  //       as: 'topics',
-  //     },
-  //   ],
-  // });
-  const allCommunities: any = _.uniqBy(
-    publicCommunities,
-    // publicCommunities.concat(privateCommunities),
-    'id'
-  );
-  console.log('blah2')
-
   const threadCount = {};
   const threadCountQueryData: ThreadCountQueryData[] =
     await models.sequelize.query(
@@ -169,10 +134,6 @@ const status = async (
       {
         replacements: {
           thirtyDaysAgo,
-          // visiblePrivateCommunityIds:
-          //   privateCommunities.length > 0
-          //     ? privateCommunities.map((c) => c.id)
-          //     : ['NO_COMMUNITY'],
         },
         type: QueryTypes.SELECT,
       }
@@ -240,12 +201,10 @@ const status = async (
   return res.json({
     chains,
     nodes,
-    communities: allCommunities,
     contractCategories,
     notificationCategories,
     recentThreads: threadCount,
     roles,
-    // invites,
     loggedIn: true,
     user: {
       email: user.email,

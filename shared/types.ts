@@ -1,5 +1,4 @@
 import { ChainAttributes } from 'server/models/chain';
-import { OffchainCommunityAttributes } from 'server/models/offchain_community';
 
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
@@ -50,6 +49,7 @@ export enum ChainType {
   Chain = 'chain',
   DAO = 'dao',
   Token = 'token',
+  Offchain = 'offchain',
 }
 
 // TODO: remove many of these chain networks, esp substrate (make them all "Substrate"),
@@ -126,7 +126,6 @@ export interface InviteCodeAttributes {
   used?: boolean;
   created_at?: Date;
   updated_at?: Date;
-  OffchainCommunity?: OffchainCommunityAttributes;
   Chain?: ChainAttributes;
 }
 

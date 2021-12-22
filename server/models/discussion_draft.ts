@@ -9,7 +9,6 @@ export interface DiscussionDraftAttributes {
   topic?: string;
   body?: string;
   chain?: string;
-  community?: string;
   attachment?: string;
 }
 
@@ -29,7 +28,6 @@ export default (
     topic: { type: DataTypes.STRING, allowNull: true },
     body: { type: DataTypes.TEXT, allowNull: true },
     chain: { type: DataTypes.STRING, allowNull: true },
-    community: { type: DataTypes.STRING, allowNull: true },
     attachment: { type: DataTypes.INTEGER, allowNull: true },
   }, {
     tableName: 'DiscussionDrafts',
@@ -44,7 +42,6 @@ export default (
 
   DiscussionDraft.associate = (models) => {
     models.DiscussionDraft.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    // models.DiscussionDraft.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
     models.DiscussionDraft.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.DiscussionDraft.hasMany(models.OffchainAttachment, {
       foreignKey: 'attachment_id',

@@ -33,7 +33,7 @@ const deleteComment = async (models: DB, req: Request, res: Response, next: Next
         where: {
           id: req.body.comment_id,
         },
-        include: [ models.Chain, models.OffchainCommunity ],
+        include: [ models.Chain ],
       });
       const roleWhere = {
         permission: { [Op.in]: ['admin', 'moderator'] },

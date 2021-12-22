@@ -1342,35 +1342,6 @@ const resetServer = (): Promise<number> => {
         }),
       ]);
 
-      // Communities
-      const communities = await Promise.all([
-        models.OffchainCommunity.create({
-          id: 'staking',
-          name: 'Staking',
-          creator_id: 1,
-          description: 'All things staking',
-          default_chain: 'ethereum',
-        }),
-        models.OffchainCommunity.create({
-          id: 'governance',
-          name: 'Governance',
-          creator_id: 1,
-          description: 'All things governance',
-          default_chain: 'ethereum',
-        }),
-        models.OffchainCommunity.create({
-          id: 'meta',
-          name: 'Commonwealth Meta',
-          creator_id: 1,
-          description: 'All things Commonwealth',
-          default_chain: 'edgeware',
-        })
-      ]);
-
-      // Specific communities
-      // Make sure to maintain this list if you make any changes!
-      const [staking, governance, meta] = communities;
-
       // OffchainTopics
       await Promise.all(
         chains.map((chain) => models.OffchainTopic.create({

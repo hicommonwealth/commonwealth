@@ -31,7 +31,7 @@ const acceptInviteLink = async (models: DB, req, res, next) => {
   });
   if (!inviteLink || !inviteLink.active) return redirectWithError(res, 'Invite link expired or invalid');
 
-  const { time_limit, multi_use, used, community_id, creator_id } = inviteLink;
+  const { time_limit, multi_use, used, chain_id, creator_id } = inviteLink;
 
   if (multi_use !== null) { // meaning limited usage
     if (used === multi_use) {
@@ -76,7 +76,7 @@ const acceptInviteLink = async (models: DB, req, res, next) => {
   // check if outstanding invite to community already exists
   const prevInviteCode = await models.InviteCode.findOne({
     where: {
-      community_id,
+      chain_id,
       invited_email: req.user.email,
       used: false,
     }
@@ -85,20 +85,20 @@ const acceptInviteLink = async (models: DB, req, res, next) => {
     return redirectWithSuccess(res);
   }
 
-  const community = await models.OffchainCommunity.findOne({
+  const chain = await models.Chain.findOne({
     where: {
-      id: community_id,
+      id: chain_id,
     }
   });
-  if (!community) {
+  if (!chain) {
     return redirectWithError(res, 'Community associated with invite not found!');
   }
 
   const code = crypto.randomBytes(24).toString('hex');
   const invite = await models.InviteCode.create({
     id: code,
-    community_id,
-    community_name: community.name,
+    chain_id,
+    community_name: chain.name,
     creator_id,
     invited_email: req.user.email, // Should we require req.user.email? null is fine too, but can't be fetched via /status/ in the future.
     used: false,

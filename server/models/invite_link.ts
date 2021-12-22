@@ -2,8 +2,6 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ModelStatic } from './types';
 
-import { OffchainCommunityAttributes } from './offchain_community';
-
 export enum InviteLinkTimeLimit {
   '24h' = '24h',
   '48h' = '48h',
@@ -16,7 +14,6 @@ export enum InviteLinkTimeLimit {
 export interface InviteLinkAttributes {
   creator_id: number;
   id?: string;
-  community_id?: string;
   chain_id?: string;
   active?: boolean;
   multi_use?: number;
@@ -24,7 +21,6 @@ export interface InviteLinkAttributes {
   time_limit?: InviteLinkTimeLimit;
   created_at?: Date;
   updated_at?: Date;
-  OffchainCommunity?: OffchainCommunityAttributes;
 }
 
 export interface InviteLinkInstance
@@ -38,7 +34,6 @@ export default (
 ): InviteLinkModelStatic => {
   const InviteLink = <InviteLinkModelStatic>sequelize.define('InviteLink', {
     id: { type: dataTypes.STRING, primaryKey: true, allowNull: false },
-    community_id: { type: dataTypes.STRING, allowNull: true },
     chain_id: { type: dataTypes.STRING, allowNull: true },
     creator_id: { type: dataTypes.INTEGER, allowNull: false },
     active: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: true },
@@ -61,7 +56,7 @@ export default (
   });
 
   InviteLink.associate = (models) => {
-    models.InviteLink.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
+    models.InviteLink.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
   };
 
   return InviteLink;

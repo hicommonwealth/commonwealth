@@ -12,6 +12,8 @@ export const Errors = {
 };
 
 const getInviteLinks = async (models: DB, req, res, next) => {
+  return res.json({ status: 'Failure', message: 'not implemented' });
+  /*
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { community_id } = req.query;
   if (!community_id) return next(new Error(Errors.NoCommunity));
@@ -32,7 +34,7 @@ const getInviteLinks = async (models: DB, req, res, next) => {
   });
   if (!requesterIsAdminOrMod) return next(new Error(Errors.NotAdminOrMod));
 
-  const community = await models.OffchainCommunity.findOne({
+  const community = await models.Chain.findOne({
     where: {
       id: community_id,
     },
@@ -47,6 +49,7 @@ const getInviteLinks = async (models: DB, req, res, next) => {
   if (!inviteLinks) return next(new Error(Errors.ErrorFetchingLinks));
 
   return res.json({ status: 'Success', result: inviteLinks.map((inv) => inv.toJSON()) });
+  */
 };
 
 export default getInviteLinks;

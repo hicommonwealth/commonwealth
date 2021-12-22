@@ -13,15 +13,10 @@ const startOAuthLogin = async (
   let successRedirect = '/';
   const failureRedirect = '#!/login';
   if (req.query.from) {
-    // Validate that req.query.from matches an existing Chain or Community
+    // Validate that req.query.from matches an existing Chain
     try {
-      const [chain, community] = await Promise.all([
-        models.Chain.findOne({ where: { custom_domain: req.query.from } }),
-        models.OffchainCommunity.findOne({
-          where: { custom_domain: req.query.from },
-        }),
-      ]);
-      if (chain || community) {
+      const chain = await models.Chain.findOne({ where: { custom_domain: req.query.from } });
+      if (chain) {
         const tokenObj = await models.LoginToken.createForOAuth(req.query.from);
         successRedirect = `https://${req.query.from}/api/finishOAuthLogin?token=${tokenObj.token}`;
         (req as any).loginTokenForRedirect = tokenObj.id;

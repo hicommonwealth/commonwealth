@@ -117,7 +117,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
         comment_id: +finalComment.id,
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
-        // community_id: finalComment.community,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.chain,
       },
@@ -127,7 +126,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
         url: cwUrl,
         title: proposal.title || '',
         chain: finalComment.chain,
-        // community: finalComment.community,
       },
       req.wss,
       [ finalComment.Address.address ],
@@ -177,16 +175,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
         const shouldNotifyMentionedUser = true;
-        // if (finalComment.community) {
-        //   const originCommunity = await models.OffchainCommunity.findOne({
-        //     where: { id: finalComment.community }
-        //   });
-        //   if (originCommunity.privacy_enabled) {
-        //     const destinationCommunity = mentionedAddress.Roles
-        //       .find((role) => role.offchain_community_id === originCommunity.id);
-        //     if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
-        //   }
-        // }
         if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
           models,
           NotificationCategories.NewMention,
@@ -199,7 +187,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
             comment_id: +finalComment.id,
             comment_text: finalComment.text,
             chain_id: finalComment.chain,
-            // community_id: finalComment.community,
             author_address: finalComment.Address.address,
             author_chain: finalComment.Address.chain,
           },
@@ -209,7 +196,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
             url: cwUrl,
             title: proposal.title || '',
             chain: finalComment.chain,
-            // community: finalComment.community,
             body: finalComment.text,
           },
           req.wss,

@@ -43,44 +43,6 @@ const offChainCommunities = [
   'redacted-cartel'
 ];
 
-const offchainToRemove = [
-  'agoric-community',
-  'bauhaus-cw',
-  'blockchainyonsei',
-  'bv-test',
-  'cow-moon',
-  'cw-kong',
-  'd',
-  'df344sdfg',
-  'diamond-age-dao-sample',
-  'dydx-internal',
-  'gg',
-  'governance-is-near',
-  'hello-world',
-  'hello-world-wow-martians-are-here',
-  'hen',
-  'honest-farmer',
-  'impossible-finance',
-  'internal',
-  'meta',
-  'my-community',
-  'name',
-  'nns',
-  'o-test',
-  'panacea',
-  'paraswap',
-  'soldev',
-  'svgsvgsvgononloadconfirm1',
-  'test',
-  'test222',
-  'testify',
-  'trtr',
-  'w3f-cw',
-  'winky',
-  'yeeeew',
-  'yzs-stash',
-]
-
 module.exports = {
   up: (queryInterface, Sequelize) => {
     /**
@@ -168,10 +130,10 @@ module.exports = {
         `UPDATE "OffchainComments" SET chain = community WHERE chain IS NULL;`,
         { transaction: t },
       );
-      // await queryInterface.sequelize.query(
-      //   'ALTER TABLE "OffchainComments" DROP COLUMN community;',
-      //   { transaction: t }
-      // );
+      await queryInterface.sequelize.query(
+        'ALTER TABLE "OffchainComments" DROP COLUMN community;',
+        { transaction: t }
+      );
 
       await queryInterface.sequelize.query(
         `UPDATE "Roles" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
@@ -309,11 +271,15 @@ module.exports = {
       );
 
       // // // // //
-      console.log("merging OffchainComments columns")
-      await queryInterface.sequelize.query(
-        `UPDATE "OffchainComments" SET chain = community WHERE chain IS NULL;`,
-        { transaction: t },
-      );
+      // console.log("merging OffchainComments columns")
+      // await queryInterface.sequelize.query(
+      //   `UPDATE "OffchainComments" SET chain = community WHERE chain IS NULL;`,
+      //   { transaction: t },
+      // );
+      // await queryInterface.sequelize.query(
+      //   'ALTER TABLE "OffchainComments" DROP COLUMN community;',
+      //   { transaction: t }
+      // );
       // // // // //
 
       // add threads index
@@ -358,27 +324,32 @@ module.exports = {
         + 'FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(_search, \'pg_catalog.english\', plaintext)',
         { transaction: t }
       );
+
+      // remove fully remove offchain communities once ported
+      await queryInterface.sequelize.query(
+        'DROP TABLE "OffchainCommunities"',
+        { transaction: t }
+      );
     }
 
     return queryInterface.sequelize.transaction(async (t) => {
-      try {
-        // Port over offchains to chain
-        for (let i = 0; i < offChainCommunities.length; i++) {
-          await fromOffchainToChain(t, offChainCommunities[i])
-        }
-
-        // Remove offchain communities
-        // await queryInterface.dropTable('Collaborations', { transaction: t });
-        for (let i = 0; i < offchainToRemove.length; i++) {
-          await removeOffchain(t, offchainToRemove[i]);
-        }
-
-        // Merge offchain ids into chain column and delete old columns
-        await mergeOffchainIdsIntoChain(t)
-
-      } catch (error) {
-        console.log(error)
+      // Port over offchains to chain
+      for (let i = 0; i < offChainCommunities.length; i++) {
+        await fromOffchainToChain(t, offChainCommunities[i])
       }
+
+      // Remove offchain communities
+      // await queryInterface.dropTable('Collaborations', { transaction: t });
+      const [ offchainToRemove ] = await queryInterface.sequelize.query(
+        `SELECT id FROM "OffchainCommunities" WHERE id NOT IN (${[...(offChainCommunities.map((oc) => `'${oc}'`))]})`,
+        { transaction: t }
+      );
+      for (let i = 0; i < offchainToRemove.length; i++) {
+        await removeOffchain(t, offchainToRemove[i].id);
+      }
+
+      // Merge offchain ids into chain column and delete old columns
+      await mergeOffchainIdsIntoChain(t)
     });
 
   },

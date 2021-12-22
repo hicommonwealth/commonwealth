@@ -2,7 +2,6 @@
 // If a community is found, also check that the user is allowed to see it.
 
 import { ChainInstance } from '../models/chain';
-import { OffchainCommunityInstance } from '../models/offchain_community';
 
 export const ChainCommunityErrors = {
   CannotProvideBothCommunityAndChain: 'Cannot provide both community and chain',
@@ -34,7 +33,7 @@ const lookupCommunityIsVisibleToUser = async (
     ],
   });
   // searching for both chain and community
-  if (params.chain && params.community) return [null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
+  // if (params.chain && params.community) return [null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
   // searching for chain that doesn't exist
   if (params.chain && !chain) return [null, ChainCommunityErrors.ChainDNE];
   // searching for community that doesn't exist

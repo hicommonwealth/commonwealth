@@ -65,32 +65,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           eth_chain_id: node.eth_chain_id,
         }));
       });
-      data.communities.sort((a, b) => a.id - b.id).map((community) => {
-        return app.config.communities.add(CommunityInfo.fromJSON({
-          id: community.id,
-          name: community.name,
-          description: community.description,
-          icon_url: community.icon_url,
-          website: community.website,
-          discord: community.discord,
-          element: community.element,
-          telegram: community.telegram,
-          github: community.github,
-          default_chain: app.config.chains.getById(community.default_chain),
-          visible: community.visible,
-          collapsed_on_homepage: community.collapsed_on_homepage,
-          default_summary_view: community.default_summary_view,
-          invites_enabled: community.invites_enabled,
-          privacy_enabled: community.privacy_enabled,
-          featured_topics: community.featured_topics,
-          topics: community.topics,
-          stages_enabled: community.stages_enabled,
-          custom_stages: community.custom_stages,
-          custom_domain: community.custom_domain,
-          terms: community.terms,
-          admins_and_mods: [],
-        }));
-      });
       app.user.setRoles(data.roles);
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));

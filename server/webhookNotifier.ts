@@ -156,16 +156,6 @@ const send = async (models, content: WebhookContent) => {
         // because social platforms can't access to localhost:8080.
         previewAltText = chain.name;
       }
-    } else if (content.community) {
-      // if the community has a logo, show it as preview image
-      const offchainCommunity = await models.OffchainCommunity.findOne({ where: { id: content.community, privacy_enabled: false } });
-      if (offchainCommunity) {
-        if (offchainCommunity.icon_url) {
-          previewImageUrl = (offchainCommunity.icon_url.match(`^(http|https)://`)) ? offchainCommunity.icon_url :
-            `https://commonwealth.im${offchainCommunity.icon_url}`;
-        }
-        previewAltText = offchainCommunity.name;
-      }
     }
   }
 

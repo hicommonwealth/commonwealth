@@ -241,7 +241,6 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
     if (onNotificationsPage(m.route.get())) return;
-
     return m('.OnchainNavigationModule.SidebarModule', [
       m('.sidebar-spacer'),
       // referenda (substrate only)
@@ -400,7 +399,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Rage quit',
       }),
       m('.sidebar-spacer'),
-      app.chain?.meta.chain.snapshot && m(Button, {
+      app.chain?.meta.chain.snapshot && typeof app.chain?.meta.chain.snapshot === 'string' && m(Button, {
         rounded: true,
         fluid: true,
         active: onSnapshotProposal(m.route.get()),

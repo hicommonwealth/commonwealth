@@ -15,31 +15,6 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
   if (!chain) return next(new Error(Errors.NoChain));
   if (!address) return next(new Error(Errors.NoAddress));
 
-  // const publicCommunities = await models.OffchainCommunity.findAll({
-  //   where: { privacy_enabled: false },
-  // });
-  // const visibleCommunityIds = publicCommunities.map((c) => c.id);
-
-  // if (req.user) {
-    // const addresses = (await req.user.getAddresses()).filter((a) => !!a.verified);
-    // const addressIds = addresses.map((a) => a.id);
-    // const roles = await models.Role.findAll({
-    //   where: {
-    //     address_id: { [Op.in]: addressIds },
-    //   },
-    // });
-    // const visiblePrivateCommunityIds = roles.map((role) => role.offchain_community_id);
-    // const privateCommunities = await models.OffchainCommunity.findAll({
-    //   where: {
-    //     privacy_enabled: true,
-    //     id: {
-    //       [Op.in]: visiblePrivateCommunityIds,
-    //     },
-    //   },
-    // });
-    // privateCommunities.forEach((c) => visibleCommunityIds.push(c.id));
-  // }
-
   const publicChains = await models.Chain.findAll();
   const visibleChainIds = publicChains.map((c) => c.id);
 
