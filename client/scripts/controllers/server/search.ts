@@ -155,12 +155,12 @@ class SearchContoller {
     const { resultSize, chainScope, communityScope, sort } = params;
     try {
         const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
-        chain: chainScope,
-        community: communityScope,
-        cutoff_date: null, // cutoffDate.toISOString(),
-        search: searchTerm,
-        results_size: resultSize,
-        sort
+          chain: chainScope,
+          community: communityScope,
+          cutoff_date: null, // cutoffDate.toISOString(),
+          search: searchTerm,
+          results_size: resultSize,
+          sort
         });
         if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
@@ -179,12 +179,12 @@ class SearchContoller {
     const { resultSize, chainScope, communityScope, sort } = params;
     try {
         const response = await $.get(`${app.serverUrl()}/searchComments`, {
-        chain: chainScope,
-        community: communityScope,
-        cutoff_date: null, // cutoffDate.toISOString(),
-        search: searchTerm,
-        results_size: resultSize,
-        sort
+          chain: chainScope,
+          community: communityScope,
+          cutoff_date: null, // cutoffDate.toISOString(),
+          search: searchTerm,
+          results_size: resultSize,
+          sort
         });
         if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);
