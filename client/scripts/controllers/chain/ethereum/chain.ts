@@ -70,7 +70,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     }
 
     this.app.chain.networkStatus = ApiStatus.Connected;
-    this._api.eth.getBlock('latest').then((headers) => {
+    this._api.eth.getBlockNumber().then(async (blockNumber) => {
+      const headers = await this._api.eth.getBlock(`${blockNumber}`);
       if (this.app.chain) {
         this.app.chain.block.height = headers.number;
         this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
