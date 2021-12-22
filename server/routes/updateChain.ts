@@ -73,7 +73,6 @@ const updateChain = async (
 
   let snapshot = req.body['snapshot[]'];
 
-  console.log("original", snapshot === '')
   // Handle single string case and undefined case
   if (snapshot !== undefined && typeof snapshot === 'string') {
     snapshot = [snapshot]
