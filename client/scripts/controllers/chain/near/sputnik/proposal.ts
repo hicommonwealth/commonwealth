@@ -38,13 +38,13 @@ export default class NearSputnikProposal extends Proposal<
     // naming taken from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L188
     if (this.data.kind === 'ChangeConfig') return 'Change Config: ';
     if (isChangePolicy(this.data.kind)) return 'Change Policy';
-    if (this.data.kind === 'UpgradeSelf') return `UpgradeSelf: ${this.data.target}`;
-    if (this.data.kind === 'UpgradeRemote') return `UpgradeRemote: ${this.data.target}`;
-    if (this.data.kind === 'Transfer') return `Transfer: ${this.data.target}`;
-    if (this.data.kind === 'SetStakingContract') return `SetStakingContract: ${this.data.target}`;
-    if (this.data.kind === 'AddBounty') return `AddBounty: ${this.data.target}`;
-    if (this.data.kind === 'BountyDone') return `BountyDone: ${this.data.target}`;
-    if (this.data.kind === 'Vote') return `Vote: ${this.data.target}`;
+    if (this.data.kind === 'UpgradeSelf') return `UpgradeSelf: ${this.data.description}`;
+    if (this.data.kind === 'UpgradeRemote') return `UpgradeRemote: ${this.data.description}`;
+    if (this.data.kind === 'Transfer') return `Transfer: ${this.data.description}`;
+    if (this.data.kind === 'SetStakingContract') return `SetStakingContract: ${this.data.description}`;
+    if (this.data.kind === 'AddBounty') return `AddBounty: ${this.data.description}`;
+    if (this.data.kind === 'BountyDone') return `BountyDone: ${this.data.description}`;
+    if (this.data.kind === 'Vote') return `Vote: ${this.data.description}`;
     if (isAddMemberToRole(this.data.kind) && this.data.kind.AddMemberToRole.role === 'council')
       return `Add ${this.data.kind.AddMemberToRole.member_id} to the council`;
     if (isRemoveMemberFromRole(this.data.kind) && this.data.kind.RemoveMemberFromRole.role === 'council')

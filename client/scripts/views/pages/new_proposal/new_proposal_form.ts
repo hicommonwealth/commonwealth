@@ -49,6 +49,7 @@ enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
   RemoveMemberFromRole = 'Remove Member',
   Transfer = 'Payout',
+  Vote = 'Poll'
 }
 
 // this should be titled the Substrate/Edgeware new proposal form
@@ -445,6 +446,8 @@ const NewProposalForm = {
             amount = `${+vnode.state.payoutAmount}`;
           }
           propArgs = { Transfer: { receiver_id: member, token_id, amount } }
+        } else if (vnode.state.sputnikProposalType === SupportedSputnikProposalTypes.Vote) {
+          propArgs = 'Vote';
         } else {
           throw new Error('unsupported sputnik proposal type');
         }
@@ -1123,8 +1126,8 @@ const NewProposalForm = {
               },
             }),
             m(FormGroup, [
-              m(FormLabel, 'Member'),
-              m(Input, {
+              vnode.state.sputnikProposalType !== SupportedSputnikProposalTypes.Vote && m(FormLabel, 'Member'),
+              vnode.state.sputnikProposalType !== SupportedSputnikProposalTypes.Vote && m(Input, {
                 name: 'member',
                 defaultValue: 'tokenfactory.testnet',
                 oncreate: (vvnode) => {
