@@ -68,7 +68,7 @@ const MultipleSnapshotsPage: m.Component<{
             m.redraw();
         }
 
-        const {snapshot_spaces } = vnode.state;
+        const { snapshot_spaces } = vnode.state;
 
         if (!vnode.state.spaces_metadata && snapshot_spaces) {
             loadMultipleSpacesData(snapshot_spaces).then((data) => {
