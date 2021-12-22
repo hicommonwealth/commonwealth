@@ -273,7 +273,6 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultSummaryView = updatedChain.default_summary_view;
-    console.log({ this: this.defaultSummaryView, route: updatedChain.default_summary_view });
   }
 
   public addFeaturedTopic(topic: string) {
