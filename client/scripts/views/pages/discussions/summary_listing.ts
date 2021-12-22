@@ -4,7 +4,7 @@ import app from 'state';
 import m from 'mithril';
 import moment from 'moment';
 import { OffchainThread, OffchainTopic } from 'models';
-import { formatTimestamp, link } from 'helpers';
+import { link } from 'helpers';
 import { slugify } from 'utils';
 
 const SummaryRow: m.Component<
@@ -18,23 +18,30 @@ const SummaryRow: m.Component<
   view: (vnode) => {
     const { topic, monthlyThreads, activitySummary } = vnode.attrs;
     if (!topic?.name) return null;
-
-    // TODO: Filter & render inactive, then empty, topics at bottom
+    const sortedThreads = monthlyThreads.map((thread) => {
+      return Object.assign(thread, { lastUpdated: moment(activitySummary[thread.id]?.lastUpdated) });
+    }).sort((a, b) => {
+      return b.lastUpdated.valueOf() - a.lastUpdated.valueOf();
+    });
+    const mostRecentUpdate = sortedThreads[0]?.lastUpdated;
     return m('.SummaryRow', [
-      m('.topic', [m('h3', topic.name), m('p', topic.description)]),
-      m('.thread-count', `${monthlyThreads.length} / month`),
+      m('.topic', [
+        m('h3', topic.name),
+        m('p', topic.description)
+      ]),
+      m('.last-updated', [
+        m('.time', `${mostRecentUpdate?.format('hh:mm A') || ''}`),
+        m('.date', `${mostRecentUpdate?.format('MMM D YYYY') || ''}`),
+      ]),
       m(
         '.recent-threads',
-        monthlyThreads.slice(0, 3).map((thread) => {
+        sortedThreads.slice(0, 3).map((thread) => {
           const discussionLink =
             `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
             `${slugify(thread.title)}`;
-          const lastUpdated = moment(
-            activitySummary[thread.id]?.lastUpdated || thread.createdAt
-          );
           return m('.thread-summary', [
             link('a', discussionLink, thread.title),
-            m('span', formatTimestamp(lastUpdated)),
+            m('span', thread.lastUpdated.format('MMM D YYYY')),
           ]);
         })
       ),
@@ -62,8 +69,8 @@ export const SummaryListing: m.Component<
     return m('.SummaryListing', [
       m('.row-header', [
         m('h4.topic', 'Topic'),
-        m('h4.thread-count', 'Threads'),
-        m('h4.recent-threads', 'Recent'),
+        m('h4.last-updated', 'Latest reply'),
+        m('h4.recent-threads', 'Recent threads'),
       ]),
       m(
         '.row-wrap',
