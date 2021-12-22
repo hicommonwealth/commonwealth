@@ -155,17 +155,13 @@
                 margin: 0 auto;
             }
             .hiringBtn {
-                min-width: fit-content;
-                box-shadow: none;
+                min-width: 120px;
                 height: 36px;
-                border-radius: 4px;
                 margin: 0 7px;
                 color: #4a4a4a;
-                border: solid 1px #c5cdd1;
                 font-weight: 500;
             }
         }
-
         .sublayout-header-left {
             display: flex;
             align-items: center;

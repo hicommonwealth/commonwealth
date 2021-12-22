@@ -63,13 +63,39 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
+      // TODO: does this come after?
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts'
       });
-      await this._web3.givenProvider.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: `0x${app.chain.meta.ethChainId.toString(16)}` }],
-      });
+      const chainId = `0x${app.chain.meta.ethChainId.toString(16)}`;
+      try {
+        await this._web3.givenProvider.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId }],
+        });
+      } catch (switchError) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (switchError.code === 4902) {
+          const wsRpcUrl = new URL(app.chain.meta.url);
+          const rpcUrl = `https://${wsRpcUrl.host}`;
+          await this._web3.givenProvider.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId,
+              chainName: app.chain.meta.chain.name,
+              nativeCurrency: {
+                name: app.chain.meta.chain.symbol,
+                symbol: app.chain.meta.chain.symbol,
+                // MetaMask does not yet support chains with native currencies that do not have 18 decimals
+                decimals: 18,
+              },
+              rpcUrls: [rpcUrl]
+            }]
+          });
+        } else {
+          throw switchError;
+        }
+      }
 
       // fetch active accounts
       this._accounts = await this._web3.eth.getAccounts();
