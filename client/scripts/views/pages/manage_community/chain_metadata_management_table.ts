@@ -184,7 +184,7 @@ const ChainMetadataManagementTable: m.Component<
               defaultValue: vnode.state.snapshot,
               placeholder: vnode.state.network,
               onChangeHandler: (v) => {
-                const snapshots = v.split(',').map((val) => val.trim()).filter((val) => val.length > 0);
+                const snapshots = v.split(',').map((val) => val.trim()).filter((val) => val.length > 4);
                 vnode.state.snapshot = snapshots;
               },
             }),
@@ -246,7 +246,7 @@ const ChainMetadataManagementTable: m.Component<
             } = vnode.state;
             for (const space of snapshot) {
               if (space !== '') {
-                if (!/^[a-z]+\.eth$/gi.test(space)) {
+                if (space.slice(space.length-4) != '.eth') {
                   notifyError('Snapshot name must be in the form of *.eth');
                   return;
                 }

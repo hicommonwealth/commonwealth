@@ -13,7 +13,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
   const showSnapshotOptions = app.user.activeAccount
-    && app.chain?.meta.chain.snapshot;
+    && app.chain?.meta.chain.snapshot.length > 0 && app.chain?.meta.chain.snapshot[0] !== '';
 
   const topics = app.topics.getByCommunity(
     app.activeId()

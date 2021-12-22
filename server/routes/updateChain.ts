@@ -92,7 +92,7 @@ const updateChain = async (
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
   } else if (
-    snapshot.some((snapshot_space) => snapshot_space !== '' && !/^[a-z]+\.eth$/gi.test(snapshot_space))
+    snapshot.some((snapshot_space) => snapshot_space !== '' && snapshot_space.slice(snapshot_space.length-4) != '.eth')
   ) {
     return next(new Error(Errors.InvalidSnapshot));
   } else if (snapshot && chain.base !== ChainBase.Ethereum) {
