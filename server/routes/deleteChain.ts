@@ -27,12 +27,27 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.NotAcceptableAdmin));
   }
 
-  const chain = await models.Chain.findOne({ where: {
-    id: req.body.id,
-  } });
+  const chain = await models.Chain.findOne({
+    where: {
+      id: req.body.id,
+    },
+    include: [
+      { model: models.OffchainTopic, required: false, },
+      { model: models.OffchainThread, required: false, },
+      { model: models.StarredCommunity, required: false, },
+      { model: models.ChainNode, required: false, },
+      { model: models.Address, required: false, },
+    ]
+  });
   if (!chain) {
     return next(new Error(Errors.NoChain));
   }
+
+  // get addresses
+  // get topics
+  // get comments
+  // get reactions
+  // get roles
 
   // make sure no addresses are associated
   const hasAddresses = await chain.getAddresses();
