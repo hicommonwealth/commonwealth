@@ -331,10 +331,12 @@ const ProposalHeader: m.Component<
                             app.chain?.meta.chain.snapshot !== null &&
                             m(MenuItem, {
                               onclick: (e) => {
-                                navigateToSubpage(
-                                  `/new/snapshot/${app.chain.meta.chain.snapshot}` +
-                                    `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
-                                );
+                                const snapshotSpaces = app.chain.meta.chain.snapshot;
+                                if (snapshotSpaces.length > 1) {
+                                  navigateToSubpage('/multiple-snapshots', {action: 'create-from-thread', proposal: proposal});
+                                } else {
+                                  navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+                                }
                               },
                               label: 'Snapshot proposal from thread',
                             }),

@@ -23,7 +23,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _client: SigningStargateClient;
 
   public readonly name = 'keplr';
-  public readonly label = 'Cosmos Wallet (Keplr)';
+  public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
 
   public get available() {

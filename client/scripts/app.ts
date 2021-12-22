@@ -646,6 +646,9 @@ Promise.all([
       '/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
       ),
+      '/multiple-snapshots': importRoute(
+        'views/pages/view_multiple_snapshot_spaces', { scoped: true, deferChain: true }
+      ),
       '/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
       ),
@@ -721,6 +724,10 @@ Promise.all([
       '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
       '/:scope/finishNearLogin':   importRoute('views/pages/finish_near_login', { scoped: true }),
+      // Settings
+      '/settings':                 redirectRoute(() => '/edgeware/settings'),
+      '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
+
       // Discussions
       '/home':                     redirectRoute('/'), // legacy redirect, here for compatibility only
       '/discussions':              redirectRoute('/'), // legacy redirect, here for compatibility only
@@ -756,8 +763,6 @@ Promise.all([
       '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
       '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
       // Admin
-      '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-      '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
       '/manage':                 importRoute('views/pages/manage_community/index', { scoped: false }),
       '/:scope/manage':          importRoute('views/pages/manage_community/index', { scoped: true }),
@@ -766,6 +771,9 @@ Promise.all([
 
       '/:scope/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
+      ),
+      '/:scope/multiple-snapshots': importRoute(
+        'views/pages/view_multiple_snapshot_spaces', { scoped: true, deferChain: true }
       ),
       '/:scope/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }

@@ -2,10 +2,12 @@
 
 @mixin sidebar {
     .OffchainNavigationModule {
+        button {
+            height: 100%;
+        }
         button > span {
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
+            white-space: normal;
+            text-align: left;
         }
     }
     .cui-button.cui-active {

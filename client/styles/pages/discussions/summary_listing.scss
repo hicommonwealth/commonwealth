@@ -4,7 +4,7 @@
     .topic {
         flex: 3;
     }
-    .thread-count {
+    .last-updated {
         flex: 1;
     }
     .recent-threads {
@@ -29,12 +29,6 @@
     padding: 20px 0;
     border-bottom: 1px solid #DDDDDD;
     max-width: 100%;
-    > div {
-        padding-right: 15px;
-        &:last-child {
-            padding-right: 0;
-        }
-    }
     &:last-child {
         border-bottom: none;
     }
@@ -55,8 +49,13 @@
             }
         }
     }
-    .thread-count {
-        font-weight: 500;
+    .last-updated {
+        .time {
+            font-weight: 500;
+        }
+        .date {
+            font-weight: 400;
+        }
     }
     .topic {
         h3 {
