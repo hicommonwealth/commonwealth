@@ -10,6 +10,7 @@ export const Errors = {
   NeedChainId: 'Must provide chain id',
   NoChain: 'Chain not found',
   CannotDeleteChain: 'Cannot delete a chain with registered addresses',
+  NotAcceptableAdmin: 'Not an Acceptable Admin'
 };
 
 const deleteChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -21,6 +22,9 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
   }
   if (!req.body.id) {
     return next(new Error(Errors.NeedChainId));
+  }
+  if (!['george@commonwealth.im', 'zak@commonwealth.im', 'jake@commonwealth.im'].includes(req.user.email)) {
+    return next(new Error(Errors.NotAcceptableAdmin));
   }
 
   const chain = await models.Chain.findOne({ where: {
