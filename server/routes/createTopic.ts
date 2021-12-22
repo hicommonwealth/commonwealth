@@ -8,7 +8,8 @@ export const Errors = {
   TopicRequired: 'Topic name required',
   MustBeAdmin: 'Must be an admin',
   InvalidTokenThreshold: 'Invalid token threshold',
-  DefaultTemplateRequired: 'Default Template required'
+  DefaultTemplateRequired: 'Default Template required',
+  InvalidTopicName: 'Only alphanumeric chars allowed'
 };
 
 const createTopic = async (models: DB, req, res: Response, next: NextFunction) => {
@@ -16,6 +17,7 @@ const createTopic = async (models: DB, req, res: Response, next: NextFunction) =
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
+  if (req.body.name.match(/[^\w\s]/g)) return next(new Error(Errors.InvalidTopicName))
   if (req.body.featured_in_new_post === 'true'
     && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
     return next(new Error(Errors.DefaultTemplateRequired));
