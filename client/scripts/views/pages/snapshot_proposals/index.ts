@@ -62,7 +62,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
   view: (vnode) => {
     const { selectedFilter } = vnode.state;
     const { snapshotId } = vnode.attrs;
-    if (!app.snapshot.initialized) {
+    if (!app.snapshot.initialized || app.snapshot.space.id != snapshotId) {
       app.snapshot.init(snapshotId).then(() => {
         m.redraw();
       });

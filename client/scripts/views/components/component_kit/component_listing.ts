@@ -62,6 +62,8 @@ import {
   FaceliftRadioGroup,
   ButtonSize,
   EngagementButton,
+  FaceliftGradientButton,
+  GradientType,
 } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
 
@@ -262,6 +264,13 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
             label: 'Disabled',
             onclick: () => notifySuccess('Button clicked!'),
             disabled: true,
+          }),
+          m(FaceliftGradientButton, {
+            intent: ButtonIntent.Primary,
+            label: 'Primary',
+            onclick: () => notifySuccess('Button clicked!'),
+            disabled: false,
+            gradient: GradientType.RAINBOW
           }),
         ]
       ),
