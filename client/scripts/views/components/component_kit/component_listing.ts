@@ -64,6 +64,8 @@ import {
   EngagementButton,
 } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
+import { FaceliftCard } from './cards';
+import { stubTrue } from 'lodash';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -345,6 +347,29 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
             disabled: true,
             onclick: () => notifySuccess('Button clicked!'),
           }),
+        ]
+      ),
+      m('h1', 'Cards'),
+      m('.card-gallery', 
+        {
+          style: 'max-width: 600px;',
+        },
+        [
+          m(FaceliftCard, {
+            elevation: 2,
+            interactive: true,
+            onclick: () => console.log("hi"),
+            onmouseover: () => console.log("yoo")
+          }, [
+            m('div', ["hello000000"])
+          ]),
+          m(FaceliftCard, {
+            interactive: true},[
+            m('div', ["hello"])
+          ]),
+          m(FaceliftCard, [
+            m('div', ["hello"])
+          ]),
         ]
       ),
       m('h1', 'Form Fields'),
