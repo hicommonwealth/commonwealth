@@ -22,6 +22,8 @@ import {
   ChainEvent,
 } from 'models';
 
+import Web3 from 'web3';
+import { formatNumberShort } from '../../../../../../shared/adapters/currency';
 import CompoundAPI, { GovernorType } from './api';
 import CompoundGovernance from './governance';
 import { attachSigner } from '../contractApi';

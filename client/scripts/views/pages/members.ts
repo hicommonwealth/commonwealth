@@ -4,7 +4,6 @@ import $ from 'jquery';
 import m from 'mithril';
 import _ from 'lodash';
 import { Button, Input, Tag, Table, Tooltip, Spinner } from 'construct-ui';
-import $ from 'jquery';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';

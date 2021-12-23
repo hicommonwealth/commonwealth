@@ -79,7 +79,7 @@ export default class CompoundChain extends EthereumChain {
     }
   }
 
-  public async getDelegate(): Promise<string> {
+  public async getDelegate(address): Promise<string> {
     const token = this.compoundApi.Token;
     if (!token) {
       console.warn('No token found, cannot fetch delegate');
@@ -90,7 +90,7 @@ export default class CompoundChain extends EthereumChain {
       console.warn('Cannot fetch delegates on MPond-type token');
       return null;
     } else {
-      const delegate = await token.delegates(this.app.user.activeAccount.address);
+      const delegate = await token.delegates(address);
       return delegate;
     }
   }

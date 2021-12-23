@@ -75,9 +75,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.chain) return;
     if (!(app.chain instanceof Compound)) return;
-    const activeAccount = app.user.activeAccount;
     const symbol = app.chain.meta.chain.symbol;
-    const decimals = new BN(10).pow(new BN(app.chain.governance.api.decimals || 18));
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -91,7 +89,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
         m('', [
           // TODO: We shouldn't be hardcoding these decimal amounts
           m('.stats-box-stat', [
-            `Quorum: ${formatNumberShort(+app.chain.governance?.quorumVotes.div(decimals))} ${symbol}`
+            `Quorum: ${app.chain.governance?.quorumVotes.div(new BN('1000000000000000000')).toString()} ${symbol}`
           ]),
           app.chain.governance?.proposalThreshold && m('.stats-box-stat', [
             `Proposal Threshold: ${app.chain.governance?.proposalThreshold
