@@ -113,7 +113,6 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
       const iface = new utils.Interface(JSON.stringify(ABI));
       const data = iface.encodeFunctionData(tokenName);
       const resultData = await this.Contract.provider.call({ to: this.Contract.address, data });
-      console.log({resultData});
       tokenAddress = utils.getAddress(Buffer.from(utils.stripZeros(resultData)).toString('hex'));
     } catch (err) {
       console.error(`Could not fetch token ${tokenName}: ${err.message}`);
