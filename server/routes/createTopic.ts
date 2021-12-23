@@ -17,7 +17,7 @@ const createTopic = async (models: DB, req, res: Response, next: NextFunction) =
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
-  if (req.body.name.match(/[^\w\s]/g)) return next(new Error(Errors.InvalidTopicName))
+  if (req.body.name.match(/["<>%{}|\\/^`]/g)) return next(new Error(Errors.InvalidTopicName))
   if (req.body.featured_in_new_post === 'true'
     && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
     return next(new Error(Errors.DefaultTemplateRequired));

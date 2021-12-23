@@ -69,7 +69,7 @@ const NewTopicModal: m.Component<{
               vnode.state.form.name = (e.target as any).value;
             },
             inputValidationFn: (text) => {
-              if (text.match(/[^\w\s]/g)) {
+              if (text.match(/["<>%{}|\\/^`]/g)) {
                 return [TextInputStatus.Error, 'Only alphanumeric input allowed'];
               } else {
                 return [TextInputStatus.Validate, 'Valid topic name'];
