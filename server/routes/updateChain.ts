@@ -96,7 +96,7 @@ const updateChain = async (
     snapshot.some((snapshot_space) => snapshot_space !== '' && snapshot_space.slice(snapshot_space.length-4) != '.eth')
   ) {
     return next(new Error(Errors.InvalidSnapshot));
-  } else if (snapshot.length > 0 && snapshot[0] !== '' && chain.base !== ChainBase.Ethereum) {
+  } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {
     return next(new Error(Errors.SnapshotOnlyOnEthereum));
   } else if (terms && !urlHasValidHTTPPrefix(terms)) {
     return next(new Error(Errors.InvalidTerms));
