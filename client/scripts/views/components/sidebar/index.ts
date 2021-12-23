@@ -400,7 +400,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Rage quit',
       }),
       m('.sidebar-spacer'),
-      app.chain?.meta.chain.snapshot.length > 0 && app.chain?.meta.chain.snapshot[0] !== '' && m(Button, {
+      app.chain?.meta.chain.snapshot.length > 0 && m(Button, {
         rounded: true,
         fluid: true,
         active: onSnapshotProposal(m.route.get()),
