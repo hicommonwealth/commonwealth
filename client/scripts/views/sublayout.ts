@@ -16,6 +16,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { CommunityOptionsPopover } from './pages/discussions';
+import { ButtonIntent, FaceliftButton } from 'views/components/component_kit/buttons';
 
 const Sublayout: m.Component<{
   // overrides
@@ -95,12 +96,26 @@ const Sublayout: m.Component<{
       ],
     ]);
 
+    const hiringButton = m(FaceliftButton, {
+      intent: ButtonIntent.Secondary,
+      label: "We're hiring!",
+      onclick: () => {
+        window.open(
+          'https://angel.co/company/commonwealth-labs',
+          '_blank'
+        );
+      },
+      disabled: false,
+      className: '.hiringBtn'
+    });
+
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
       && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
+      hiringButton,
       // above threadOnly option assumes all chains have proposals beyond threads
     ]);
 

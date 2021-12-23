@@ -402,9 +402,25 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
+    .ProposalSidebarLinkedViewer {
+        border-radius: 10px;
+        border: 1px solid tint($border-color-lightest, 26%);
+        padding: 22px 18px 21px;
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .placeholder-copy {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }   
+    }
+    
+    .ConnectProposalButtonWrapper {
+        margin-top: 10px;
+    }
+
     .ProposalHeaderOffchainPoll,
-    .ProposalSidebarLinkedViewer,
-    .ProposalSidebarStageEditorModule,
     .ProposalSidebarPollEditorModule,
     .ProposalLinkedThreadsEditorModule {
         border-radius: 10px;
@@ -413,6 +429,9 @@ $discussion-title-font-size: 1.45rem;
         margin-bottom: 24px;
     }
     .ProposalLinkedThreadsEditorModule {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         a.linked-thread {
             color: #9a9da4;
         }
@@ -424,8 +443,11 @@ $discussion-title-font-size: 1.45rem;
                 background: none;
             }
         }
+        .linked-threads-title {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
     }
-    .ProposalSidebarStageEditorModule,
     .ProposalSidebarPollEditorModule {
         .placeholder-copy {
             line-height: 1.2;
