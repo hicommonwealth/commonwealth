@@ -328,7 +328,7 @@ const ProposalHeader: m.Component<
                               getSetGlobalEditingStatus,
                             }),
                           (isAuthor || isAdmin) &&
-                            app.chain?.meta.chain.snapshot !== null &&
+                            app.chain?.meta.chain.snapshot.length > 0 &&
                             m(MenuItem, {
                               onclick: (e) => {
                                 const snapshotSpaces = app.chain.meta.chain.snapshot;

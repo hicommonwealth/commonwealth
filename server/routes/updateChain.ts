@@ -72,6 +72,7 @@ const updateChain = async (
   } = req.body;
 
   let snapshot = req.body['snapshot[]'];
+
   // Handle single string case and undefined case
   if (snapshot !== undefined && typeof snapshot === 'string') {
     snapshot = [snapshot]
@@ -92,10 +93,10 @@ const updateChain = async (
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
   } else if (
-    snapshot.some((snapshot_space) => !/^[a-z]+\.eth$/gi.test(snapshot_space))
+    snapshot.some((snapshot_space) => snapshot_space !== '' && snapshot_space.slice(snapshot_space.length-4) != '.eth')
   ) {
     return next(new Error(Errors.InvalidSnapshot));
-  } else if (snapshot && chain.base !== ChainBase.Ethereum) {
+  } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {
     return next(new Error(Errors.SnapshotOnlyOnEthereum));
   } else if (terms && !urlHasValidHTTPPrefix(terms)) {
     return next(new Error(Errors.InvalidTerms));
