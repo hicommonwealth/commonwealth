@@ -8,6 +8,7 @@ import { link, pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import UserGallery from 'views/components/widgets/user_gallery';
+import { FaceliftCard } from '../../components/component_kit/cards';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -22,7 +23,7 @@ const getNewTag = (labelCount = null) => {
   ]);
 };
 
-const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
+const ChainCardOLD : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
   view: (vnode) => {
     const { chain, nodeList } = vnode.attrs;
     const { unseenPosts } = app.user;
@@ -67,6 +68,55 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
           ],
         ])
       ]), 
+    ]);
+  }
+};
+
+const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
+  view: (vnode) => {
+    const { chain, nodeList } = vnode.attrs;
+    const { unseenPosts } = app.user;
+    const chainInfo = app.config.chains.getById(chain);
+    const visitedChain = !!unseenPosts[chain];
+    const updatedThreads = unseenPosts[chain]?.activePosts || 0;
+    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(chain);
+
+    return m(FaceliftCard, {
+      elevation: 2,
+      interactive: true,
+      class_name: '.chain-card',
+      onclick: (e) => {
+        e.preventDefault();
+        localStorage['home-scrollY'] = window.scrollY;
+        m.route.set(`/${chain}`);
+      },
+    }, [    
+        m(ChainIcon, { chain: nodeList[0].chain, size: 90 }),
+        m('.card-body', [
+          m('.community-name', [
+            m('h3', chainInfo.name),
+          ]),
+          m('p.card-description', chainInfo.description),
+          // if no recently active threads, hide this module altogether
+          m('.recent-activity', !!monthlyThreadCount && [
+            m('span.recent-threads', monthlyThreadCount > 20 ? [
+              pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
+              ' / week',
+            ] : [
+              pluralize(monthlyThreadCount, 'thread'),
+              ' / month',
+            ]),
+            app.user.isMember({
+              account: app.user.activeAccount,
+              chain,
+            }) && [
+              app.isLoggedIn() && !visitedChain && getNewTag(),
+              updatedThreads > 0 && getNewTag(updatedThreads),
+            ],
+          ])
+        ]), 
+        
+        // if no recently active threads, hide this module altogether
     ]);
   }
 };

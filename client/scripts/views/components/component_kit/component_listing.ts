@@ -351,27 +351,69 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
       ),
       m('h1', 'Cards'),
       m('.card-gallery', 
-        {
-          style: 'max-width: 600px;',
-        },
         [
+          m(FaceliftCard, {
+            elevation: 1,
+            interactive: true,
+            fluid: false,
+            onclick: () => notifySuccess('Card clicked!'),
+          }, [m('h4', 'Card title'), m('div', 'Elevation: 1')]),
           m(FaceliftCard, {
             elevation: 2,
             interactive: true,
-            onclick: () => console.log("hi"),
-            onmouseover: () => console.log("yoo")
-          }, [
-            m('div', ["hello000000"])
-          ]),
+            fluid: false,
+            onclick: () => notifySuccess('Card clicked!'),
+          }, [m('h4', 'Card title'), m('div', 'Elevation: 2')]),
           m(FaceliftCard, {
-            interactive: true},[
-            m('div', ["hello"])
-          ]),
-          m(FaceliftCard, [
-            m('div', ["hello"])
-          ]),
+            elevation: 3,
+            interactive: true,
+            fluid: false,
+            onclick: () => notifySuccess('Card clicked!'),
+          }, [m('h4', 'Card title'), m('div', 'Elevation: 3')]),
         ]
       ),
+      m(FaceliftCard, {
+        elevation: 1,
+        interactive: true,
+        fluid: true,
+      }, [m('h4', 'Card title'), m('div', 'Fluid: true')]),
+      m(FaceliftCard, {
+        elevation: 1,
+        interactive: true,
+        class_name: '.form-card'
+      }, [
+        m(Form, { gutter: 15 }, [
+          m(FormGroup, [
+            m(FormLabel, { for: 'name' }, 'Name'),
+            m(Input, {
+              id: 'name',
+              name: 'name',
+              placeholder: 'Name...',
+            }),
+          ]),
+          m(FormGroup, [
+            m(FormLabel, { for: 'bio' }, 'Bio'),
+            m(TextArea, {
+              id: 'bio',
+              name: 'bio',
+              placeholder: 'Bio...',
+            }),
+          ]),
+          m(FormGroup, [
+            m(FormLabel, { for: 'privacy' }, 'Privacy'),
+            m(RadioGroup, {
+              options: ['Public', 'Private'],
+              name: 'privacy',
+              onchange: (e) => {
+                vnode.state.radioGroupSelected = (
+                  e.currentTarget as HTMLInputElement
+                ).value;
+              },
+              value: vnode.state.radioGroupSelected,
+            }),
+          ]),
+        ]),
+      ]),
       m('h1', 'Form Fields'),
       m(
         '.form-gallery',

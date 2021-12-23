@@ -59,8 +59,15 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 20px;
     }
     .TextInput {
         margin-bottom: 20px;
+    }
+}
+
+.Card {
+    &.form-card {
+        min-width: 400px;
     }
 }

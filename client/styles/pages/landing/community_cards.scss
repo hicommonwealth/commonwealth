@@ -1,5 +1,16 @@
 @import 'client/styles/shared';
 
+.Card {
+    &.chain-card {
+        align-items: center;
+        flex-direction: column;
+        max-width: calc(25% - 30px);
+
+        
+    }
+    
+}
+
 .HomepageCommunityCards {
     text-align: left;
     margin: 0 auto;
@@ -112,3 +123,4 @@
         }
     }
 }
+
