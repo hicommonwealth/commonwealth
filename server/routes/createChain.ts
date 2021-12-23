@@ -118,7 +118,8 @@ const createChain = async (
   } else if (req.body.base === ChainBase.Ethereum && req.body.type === ChainType.Offchain) {
     // should always be 1 ...
     eth_chain_id = +req.body.eth_chain_id;
-  } else {
+  } else if (req.body.type !== ChainType.Offchain) {
+    // no URL validation for offchain type
     if (!url || !url.trim()) {
       return next(new Error(Errors.InvalidNodeUrl));
     }

@@ -9,8 +9,9 @@ import { slugify } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import {
-  InputPropertyRow
+  InputPropertyRow, SelectPropertyRow
 } from 'views/components/metadata_rows';
+import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
 import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
 
 type OffchainFormAttrs = Record<string, unknown>;
@@ -18,10 +19,12 @@ type OffchainFormAttrs = Record<string, unknown>;
 interface OffchainFormState extends ChainFormState {
   id: string;
   name: string;
+  base: ChainBase;
   saving: boolean;
   loaded: boolean;
   loading: boolean;
   status: string;
+  symbol: string;
   error: string;
 }
 
@@ -29,6 +32,8 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
   oninit: (vnode) => {
     vnode.state.id = '';
     vnode.state.name = '';
+    vnode.state.symbol = 'XYZ';
+    vnode.state.base = ChainBase.Ethereum;
     initChainForm(vnode.state);
     vnode.state.saving = false;
     vnode.state.loaded = false;
@@ -63,6 +68,21 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
               vnode.state.id = v;
             },
           }),
+          m(InputPropertyRow, {
+            title: 'Symbol',
+            defaultValue: vnode.state.symbol,
+            onChangeHandler: (v) => {
+              vnode.state.symbol = v;
+            },
+          }),
+          m(SelectPropertyRow, {
+            title: 'Base Chain',
+            options: [...Object.values(ChainBase)],
+            value: vnode.state.base,
+            onchange: (value) => {
+              vnode.state.base = value;
+            },
+          }),
           ...defaultChainRows(vnode.state),
         ]
       ),
@@ -82,8 +102,36 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
             element,
             telegram,
             github,
+            symbol,
           } = vnode.state;
           vnode.state.saving = true;
+          const additionalArgs: { eth_chain_id?: number, node_url?: string } = {};
+
+          // defaults to be overridden when chain is no longer "offchain" type
+          switch (vnode.state.base) {
+            case ChainBase.CosmosSDK: {
+              additionalArgs.node_url = 'https://osmosis-rpc.cw-figment.workers.dev';
+              break;
+            }
+            case ChainBase.NEAR: {
+              additionalArgs.node_url = 'https://rpc.mainnet.near.org';
+              break;
+            }
+            case ChainBase.Solana: {
+              additionalArgs.node_url = 'mainnet-beta';
+              break;
+            }
+            case ChainBase.Substrate: {
+              additionalArgs.node_url = 'wss://mainnet.edgewa.re';
+              break;
+            }
+            case ChainBase.Ethereum:
+            default: {
+              additionalArgs.eth_chain_id = 1;
+              additionalArgs.node_url = 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
+              break;
+            }
+          }
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
               address: '',
@@ -91,7 +139,7 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
               name,
               description,
               icon_url,
-              symbol: 'ETH',
+              symbol,
               website,
               discord,
               element,
@@ -99,10 +147,9 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
               github,
               jwt: app.user.jwt,
               type: ChainType.Offchain,
-              base: ChainBase.Ethereum,
-              network: ChainNetwork.Ethereum,
-              node_url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-              eth_chain_id: 1,
+              base: vnode.state.base,
+              network: baseToNetwork(vnode.state.base),
+              ...additionalArgs,
             });
             await initAppState(false);
             m.route.set(`/${res.result.chain?.id}`);

@@ -51,7 +51,7 @@ module.exports = {
     const fromOffchainToChain = async (t, community) => {
       // Get rest of the info
       const chain = await queryInterface.sequelize.query(
-        `SELECT id, name, icon_url, description FROM "OffchainCommunities" WHERE id='${community}'`,
+        `SELECT id, name, icon_url, description, default_chain FROM "OffchainCommunities" WHERE id='${community}'`,
         { transaction: t }
       );
 
@@ -66,10 +66,24 @@ module.exports = {
       const id = info['id']
       const name = info['name']
       const icon_url = info['icon_url']
+      const default_chain = info['default_chain'].trim(); // remove trailing newline
       const description = info['description'].substring(0, 200)
       const { website, discord, telegram } = info;
 
-      // console.log(chain, website, discord, telegram)
+      const baseQuery = await queryInterface.sequelize.query(
+        `SELECT symbol, network, base FROM "Chains" WHERE id='${default_chain}'`,
+        { transaction: t }
+      );
+      const base = baseQuery[0][0]['base'];
+      const symbol = baseQuery[0][0]['symbol'];
+      const network = baseQuery[0][0]['network'];
+
+      const nodeQuery = await queryInterface.sequelize.query(
+        `SELECT url, eth_chain_id FROM "ChainNodes" WHERE chain='${default_chain}'`,
+        { transaction: t }
+      );
+      const url = nodeQuery[0][0]['url'];
+      const eth_chain_id = nodeQuery[0][0]['eth_chain_id'];
 
       // Create new rows
       const chainObject = {
@@ -79,18 +93,18 @@ module.exports = {
         icon_url,
         // default values below
         active: true,
-        symbol: 'ETH',
+        symbol,
         type: 'offchain',
-        network: 'ethereum',
-        base: 'ethereum',
+        network,
+        base,
         website,
         discord,
         telegram
       }
       const chainNodeObject = {
         chain: id,
-        url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr/',
-        eth_chain_id: 1,
+        url,
+        eth_chain_id,
         address: null,
       }
 

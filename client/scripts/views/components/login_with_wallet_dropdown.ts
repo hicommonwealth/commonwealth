@@ -12,7 +12,7 @@ import { ChainBase, ChainNetwork } from 'types';
 import _ from 'underscore';
 
 // Returns a default chain for a chainbase
-function baseToNetwork(n: ChainBase): ChainNetwork {
+export function baseToNetwork(n: ChainBase): ChainNetwork {
   switch (n) {
     case ChainBase.CosmosSDK:
       return ChainNetwork.Osmosis;
