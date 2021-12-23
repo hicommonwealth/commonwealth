@@ -464,6 +464,8 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
+    if (topic)
+      vnode.state.summaryView = false;
     if (!app.community && !app.chain) return;
     if (!vnode.state.summaryViewInitialized) {
       if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
