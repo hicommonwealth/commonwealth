@@ -7,7 +7,7 @@ import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-u
 
 import QuillEditor from 'views/components/quill_editor';
 import { CompactModalExitButton } from 'views/modal';
-import { tokensToWei } from 'helpers';
+import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import TokenDecimalInput from '../components/token_decimal_input';
 import { TextInput, TextInputStatus } from '../components/component_kit/forms';
 interface INewTopicModalForm {
@@ -69,8 +69,13 @@ const NewTopicModal: m.Component<{
               vnode.state.form.name = (e.target as any).value;
             },
             inputValidationFn: (text) => {
-              if (text.match(/["<>%{}|\\/^`]/g)) {
-                return [TextInputStatus.Error, 'Only alphanumeric input allowed'];
+              const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
+              if (disallowedCharMatches) {
+                return [
+                  TextInputStatus.Error,
+                  `The ${pluralizeWithoutNumberPrefix(disallowedCharMatches.length, 'char')} 
+                  ${disallowedCharMatches.join(', ')} are not permitted`
+                ];
               } else {
                 return [TextInputStatus.Validate, 'Valid topic name'];
               }
