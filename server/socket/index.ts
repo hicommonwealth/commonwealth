@@ -83,8 +83,7 @@ export function setupWebSocketServer(httpServer: http.Server) {
 		log.error("Postgres Adapter will not work so cross server websocket rooms will not be available.", e)
 	})
 
-	// @ts-ignore
-	io.adapter(createAdapter(pool));
+	io.adapter(<any>createAdapter(pool));
 
 	try {
 		const rabbitController = new RabbitMQController(<BrokerConfig>RabbitMQConfig)
