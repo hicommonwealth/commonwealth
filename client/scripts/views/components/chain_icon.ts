@@ -25,32 +25,16 @@ export const ChainIcon: m.Component<{ chain: ChainInfo, onclick?: Function, size
   }
 };
 
-export const ChainBaseIcon: m.Component<{ chainbase: ChainBase, onclick?: Function, size?: number }> = {
+export const WalletIcon: m.Component<{ walletName: string, onclick?: Function, size?: number }> = {
   view: (vnode) => {
-    const { onclick } = vnode.attrs;
+    const { onclick, walletName } = vnode.attrs;
     const size = vnode.attrs.size || 32;
-    const iconName = vnode.attrs.chainbase === ChainBase.Ethereum ? 'eth' : vnode.attrs.chainbase;
+    if (!walletName) return;
 
     return m('.ChainIcon', { class: onclick ? 'onclick' : '' }, [
       m('img.chain-icon', {
         style: `width: ${size}px; height: ${size}px;`,
-        src: `/static/img/protocols/${iconName}.png`,
-        onclick
-      }),
-    ]);
-  }
-};
-
-export const ChainNetworkIcon: m.Component<{ chain: string, onclick?: Function, size?: number }> = {
-  view: (vnode) => {
-    const { onclick } = vnode.attrs;
-    const size = vnode.attrs.size || 32;
-    const iconName = vnode.attrs.chain;
-
-    return m('.ChainIcon', { class: onclick ? 'onclick' : '' }, [
-      m('img.chain-icon', {
-        style: `width: ${size}px; height: ${size}px;`,
-        src: `/static/img/protocols/${iconName}.png`,
+        src: `/static/img/wallets/${walletName}.png`,
         onclick
       }),
     ]);

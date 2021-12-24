@@ -560,6 +560,7 @@ const DiscussionsPage: m.Component<
     const lastVisited = moment(allLastVisited[id]).utc();
 
     let sortedListing = [];
+    let pinnedListing = [];
     // fetch unique addresses count for pinned threads
     if (!app.threadUniqueAddressesCount.getInitializedPinned()) {
       app.threadUniqueAddressesCount
@@ -581,6 +582,8 @@ const DiscussionsPage: m.Component<
       const pinnedThreads = allThreads.filter((t) => t.pinned);
       if (pinnedThreads.length > 0) {
         sortedListing.push(m(PinnedListing, { proposals: pinnedThreads }));
+        pinnedListing.push(m(PinnedListing, { proposals: pinnedThreads }));
+        pinnedListing.push(m('.PinnedDivider', m('hr')));
       }
     }
 
@@ -781,7 +784,9 @@ const DiscussionsPage: m.Component<
                 ? isLoading
                   ? m(LoadingRow)
                   : m(Listing, {
-                      content: [m(SummaryListing, { recentThreads })],
+                      content: [
+                        // ...pinnedListing,
+                        m(SummaryListing, { recentThreads })],
                     })
                 : [
                     isLoading
