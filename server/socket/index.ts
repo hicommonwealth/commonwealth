@@ -85,13 +85,13 @@ export function setupWebSocketServer(httpServer: http.Server) {
   pool
     .query(
       `
-      CREATE TABLE IF NOT EXISTS socket_io_attachments
-      (
-          id         bigserial UNIQUE,
-          created_at timestamptz DEFAULT NOW(),
-          payload    bytea
-      );
-	`
+          CREATE TABLE IF NOT EXISTS socket_io_attachments
+          (
+              id         bigserial UNIQUE,
+              created_at timestamptz DEFAULT NOW(),
+              payload    bytea
+          );
+			`
     )
     .then((res) => {
       log.info('Socket.io query successful');
