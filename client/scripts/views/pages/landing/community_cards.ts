@@ -9,6 +9,7 @@ import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { FaceliftCard } from '../../components/component_kit/cards';
+import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -23,55 +24,6 @@ const getNewTag = (labelCount = null) => {
   ]);
 };
 
-const ChainCardOLD : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
-  view: (vnode) => {
-    const { chain, nodeList } = vnode.attrs;
-    const { unseenPosts } = app.user;
-    const chainInfo = app.config.chains.getById(chain);
-    const visitedChain = !!unseenPosts[chain];
-    const updatedThreads = unseenPosts[chain]?.activePosts || 0;
-    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(chain);
-
-    return m(Card, {
-      elevation: 2,
-      interactive: true,
-      class: 'home-card',
-      onclick: (e) => {
-        e.preventDefault();
-        localStorage['home-scrollY'] = window.scrollY;
-        m.route.set(`/${chain}`);
-      },
-    }, [    
-      m('.card-header', [
-        m(ChainIcon, { chain: nodeList[0].chain, size: 90 }),
-      ]),
-      m('.card-body', [
-        m('.community-name', [
-          m('h3', chainInfo.name),
-        ]),
-        m('p.card-description', chainInfo.description),
-        // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreadCount && [
-          m('span.recent-threads', monthlyThreadCount > 20 ? [
-            pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
-            ' / week',
-          ] : [
-            pluralize(monthlyThreadCount, 'thread'),
-            ' / month',
-          ]),
-          app.user.isMember({
-            account: app.user.activeAccount,
-            chain,
-          }) && [
-            app.isLoggedIn() && !visitedChain && getNewTag(),
-            updatedThreads > 0 && getNewTag(updatedThreads),
-          ],
-        ])
-      ]), 
-    ]);
-  }
-};
-
 const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
   view: (vnode) => {
     const { chain, nodeList } = vnode.attrs;
@@ -81,42 +33,41 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
     const updatedThreads = unseenPosts[chain]?.activePosts || 0;
     const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(chain);
 
+    const redirectFunction = (e) => {
+      e.preventDefault();
+        localStorage['home-scrollY'] = window.scrollY;
+        m.route.set(`/${chain}`);
+    }
+
+    // Potentially Temporary (could be built into create community flow)
+    let pretty_description = '';
+    if (chainInfo.description) {
+      pretty_description = chainInfo.description[chainInfo.description.length-1] === '.' ? chainInfo.description : chainInfo.description + '.';
+    }
+
     return m(FaceliftCard, {
       elevation: 2,
       interactive: true,
       class_name: '.chain-card',
-      onclick: (e) => {
-        e.preventDefault();
-        localStorage['home-scrollY'] = window.scrollY;
-        m.route.set(`/${chain}`);
-      },
+      onclick: redirectFunction
     }, [    
-        m(ChainIcon, { chain: nodeList[0].chain, size: 90 }),
-        m('.card-body', [
-          m('.community-name', [
-            m('h3', chainInfo.name),
-          ]),
-          m('p.card-description', chainInfo.description),
-          // if no recently active threads, hide this module altogether
-          m('.recent-activity', !!monthlyThreadCount && [
-            m('span.recent-threads', monthlyThreadCount > 20 ? [
-              pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
-              ' / week',
-            ] : [
-              pluralize(monthlyThreadCount, 'thread'),
-              ' / month',
-            ]),
-            app.user.isMember({
-              account: app.user.activeAccount,
-              chain,
-            }) && [
-              app.isLoggedIn() && !visitedChain && getNewTag(),
-              updatedThreads > 0 && getNewTag(updatedThreads),
-            ],
-          ])
-        ]), 
-        
-        // if no recently active threads, hide this module altogether
+      m('.card-header', [
+        m(ChainIcon, { chain: nodeList[0].chain, size: 100 }),
+      ]),
+      m('.card-body', [
+        m('.community-name', [
+          m('h3', chainInfo.name),
+        ]),
+        m('.card-description', pretty_description),
+        m('.join-button-wrapper', [
+          m(FaceliftButton, {
+            intent: ButtonIntent.Secondary,
+            label: 'Join',
+            disabled: false,
+            onclick: redirectFunction
+          }),
+        ])
+      ]), 
     ]);
   }
 };
@@ -129,55 +80,58 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
     const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
     const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(community.id);
 
-    return m(Card, {
-      elevation: 1,
-      interactive: true,
-      class: 'home-card',
-      onclick: (e) => {
-        e.preventDefault();
+    const redirectFunction = (e) => {
+      e.preventDefault();
         localStorage['home-scrollY'] = window.scrollY;
         m.route.set(`/${community.id}`);
-      },
-    }, [
-      m('.card-left', [
-        m(CommunityIcon, { community }),
+    }
+
+    // Potentially Temporary (could be built into create community flow)
+    let pretty_description = '';
+    if (community.description) {
+      pretty_description = community.description[community.description.length-1] === '.' ? community.description : community.description + '.';
+    }
+    
+
+    return m(FaceliftCard, {
+      elevation: 2,
+      interactive: true,
+      class_name: '.chain-card',
+      onclick: redirectFunction
+    }, [    
+      m('.card-header', [
+        m(CommunityIcon, { community, size: 100 }),
       ]),
-      m('.card-right', [
-        m('.card-right-top', [
+      m('.card-body', [
+        m('.community-name', [
           m('h3', [
             community.name,
             community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           ]),
         ]),
-        m('p.card-description', community.description),
-        // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreadCount && [
-          m('span.recent-threads', monthlyThreadCount > 20 ? [
-            pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
-            ' / week',
-          ] : [
-            pluralize(monthlyThreadCount, 'thread'),
-            ' / month',
-          ]),
-          app.user.isMember({ account: app.user.activeAccount, community: community.id })
-            && [
-              app.isLoggedIn() && !visitedCommunity && getNewTag(),
-              updatedThreads > 0 && getNewTag(updatedThreads),
-            ],
+        m('.card-description', pretty_description),
+        m('.join-button-wrapper', [
+          m(FaceliftButton, {
+            intent: ButtonIntent.Secondary,
+            label: 'Join',
+            disabled: false,
+            onclick: redirectFunction
+          }),
         ])
-      ]),
+      ]), 
     ]);
   }
 };
 
 const LockdropToolsCard: m.Component<{}> = {
   view: (vnode) => {
-    return m(Card, {
-      elevation: 1,
-      class: 'home-card LockdropToolsCard',
-    }, [
-      m('.card-right', [
-        m('h3', { style: 'margin-top: 4px;' }, 'Edgeware Lockdrop Tools'),
+    return m(FaceliftCard, {
+      elevation: 2,
+      interactive: true,
+      class_name: '.chain-card',
+    }, [    
+      m('h3', { style: 'margin-top: 4px; display: flex;' }, 'Edgeware Lockdrop Tools'),
+      m('.lockdrop-card-body', [
         m(Button, {
           interactive: true,
           compact: true,
@@ -204,7 +158,7 @@ const LockdropToolsCard: m.Component<{}> = {
           },
           label: [ 'Unlock ETH ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
         }),
-      ]),
+      ])
     ]);
   }
 };

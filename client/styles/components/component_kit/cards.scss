@@ -11,7 +11,6 @@ $default-card-height: 100px;
 
 .Card {
     min-height: $default-card-height;
-    min-width: fit-content;
     background: #FFFFFF;
     border: 1px solid #DDDDDD;
     border-radius: 10px;
@@ -20,6 +19,7 @@ $default-card-height: 100px;
     align-items: flex-start;
     padding: 15px;
     flex-direction: column;
+    cursor: pointer;
 
     &.not-fluid {
         width: $default-card-width;
@@ -29,7 +29,7 @@ $default-card-height: 100px;
         box-shadow: $elevation-1-shadow;
         &.interactive {
             &:hover {
-                box-shadow: $elevation-2-shadow;
+                box-shadow: $elevation-3-shadow;
             }
         }
     }
@@ -37,20 +37,12 @@ $default-card-height: 100px;
         box-shadow: $elevation-2-shadow;
         &.interactive {
             &:hover {
-                box-shadow: $elevation-3-shadow;
+                box-shadow: $elevation-4-shadow;
             }
         }
     }
     &.elevation-3 {
         box-shadow: $elevation-3-shadow;
-        &.interactive {
-            &:hover {
-                box-shadow: $elevation-4-shadow;
-            }
-        }
-    }
-    &.elevation-4 {
-        box-shadow: $elevation-4-shadow;
         &.interactive {
             &:hover {
                 box-shadow: $elevation-5-shadow;

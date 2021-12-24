@@ -3,7 +3,7 @@ import 'components/component_kit/cards.scss';
 import { FunctionList } from 'aws-sdk/clients/lambda';
 
 export interface CardAttrs {
-    /** Degree of card shadow (1-4) */
+    /** Degree of card shadow (1-3) */
     elevation?: number 
     /** Fills width of parent container */
     fluid?: boolean;
@@ -20,7 +20,7 @@ export interface CardAttrs {
 const appendTags = (base: string, attrs: CardAttrs) => {
     const {elevation, fluid, class_name, interactive} = attrs;
     let tag = base;
-    if (elevation > 0 && elevation < 6) tag += `.elevation-${elevation}`;
+    if (elevation > 0 && elevation < 4) tag += `.elevation-${elevation}`;
     if (interactive) tag += '.interactive';
     if (!fluid && fluid === false) tag += '.not-fluid';
     if (class_name) tag += class_name;
