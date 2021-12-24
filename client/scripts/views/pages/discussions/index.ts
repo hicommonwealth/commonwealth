@@ -785,7 +785,7 @@ const DiscussionsPage: m.Component<
                   ? m(LoadingRow)
                   : m(Listing, {
                       content: [
-                        ...pinnedListing,
+                        // ...pinnedListing,
                         m(SummaryListing, { recentThreads })],
                     })
                 : [

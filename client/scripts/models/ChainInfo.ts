@@ -22,7 +22,7 @@ class ChainInfo {
   public stagesEnabled: boolean;
   public customStages: string;
   public customDomain: string;
-  public snapshot: string;
+  public snapshot: string[];
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
@@ -273,7 +273,6 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultSummaryView = updatedChain.default_summary_view;
-    console.log({ this: this.defaultSummaryView, route: updatedChain.default_summary_view });
   }
 
   public addFeaturedTopic(topic: string) {
