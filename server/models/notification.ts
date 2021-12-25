@@ -4,14 +4,11 @@ import { ModelStatic } from './types';
 import { SubscriptionAttributes } from './subscription';
 
 export interface NotificationAttributes {
-  subscription_id: number;
   notification_data: string;
   id?: number;
-  is_read?: boolean;
   chain_event_id?: number;
   created_at?: Date;
   updated_at?: Date;
-  Subscription?: SubscriptionAttributes;
 }
 
 export interface NotificationInstance
@@ -25,9 +22,7 @@ export default (
 ): NotificationModelStatic => {
   const Notification = <NotificationModelStatic>sequelize.define('Notification', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    subscription_id: { type: dataTypes.INTEGER, allowNull: false },
     notification_data: { type: dataTypes.TEXT, allowNull: false },
-    is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
   }, {
     tableName: 'Notifications',
@@ -40,7 +35,7 @@ export default (
   });
 
   Notification.associate = (models) => {
-    models.Notification.belongsTo(models.Subscription, { foreignKey: 'subscription_id', targetKey: 'id' });
+    models.Notification.hasMany(models.NotificationsRead)
     models.Notification.belongsTo(models.ChainEvent, { foreignKey: 'chain_event_id', targetKey: 'id' });
   };
 

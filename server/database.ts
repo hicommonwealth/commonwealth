@@ -105,6 +105,7 @@ import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
+import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -130,6 +131,7 @@ export type Models = {
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
+  NotificationsRead: NotificationsReadModelStatic;
   OffchainAttachment: OffchainAttachmentModelStatic;
   OffchainComment: OffchainCommentModelStatic;
   OffchainCommunity: OffchainCommunityModelStatic;
@@ -211,6 +213,7 @@ const models: Models = {
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
+  NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
   OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
   OffchainCommunity: OffchainCommunityFactory(sequelize, DataTypes),

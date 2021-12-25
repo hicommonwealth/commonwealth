@@ -108,11 +108,17 @@ module.exports = {
         }
       );
 
-      await queryInterface.dropTable('Old_Notifications');
+      // Cannot regenerate the original notification id's once the Old_Notifications table is dropped
+      // best to leave the old notification's table until smooth transition is confirmed (delete manually later)
+      // await queryInterface.dropTable('Old_Notifications');
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    // TODO
+    await queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.dropTable('Notifications_Read', { transaction: t });
+      await queryInterface.dropTable('Notifications', { transaction: t });
+      await queryInterface.renameTable('Old_Notifications', 'Notifications', { transaction: t });
+    });
   },
 };
