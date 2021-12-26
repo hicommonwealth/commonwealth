@@ -45,7 +45,7 @@ export default class extends IEventHandler {
         return;
       }
 
-      // locate subscriptions generate notifications as needed
+      // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
       const dbNotifications = await this._models.Subscription.emitNotifications(
         this._models,
         NotificationCategories.ChainEvent,
