@@ -37,7 +37,7 @@ module.exports = {
       // creates a new table called Notifications
       await queryInterface.sequelize.query(
         `
-            CREATE TABLE IF NOT EXISTS Notifications
+            CREATE TABLE IF NOT EXISTS "Notifications"
             (
                 id                SERIAL PRIMARY KEY,
                 notification_data text,
@@ -56,7 +56,7 @@ module.exports = {
       // copies all UNIQUE (notifications that have the same notification_data AND chain_event_id notifications from Old_Notifications to Notifications
       await queryInterface.sequelize.query(
         `
-            INSERT INTO Notifications
+            INSERT INTO "Notifications"
             SELECT A.id,
                    A.notification_data,
                    CURRENT_TIMESTAMP as created_at,
@@ -80,9 +80,9 @@ module.exports = {
       // Notifications_Read table.
       await queryInterface.sequelize.query(
         `
-            INSERT INTO Notifications_Read
+            INSERT INTO "Notifications_Read"
             SELECT N.id as notification_id, O.subscription_id as subscription_id, O.is_read as is_read
-            FROM Notifications N
+            FROM "Notifications" N
                      JOIN "Old_Notifications" O on N.chain_event_id = O.chain_event_id;
 				`,
         {
@@ -95,9 +95,9 @@ module.exports = {
       // same thing here but for regular/community related notifications
       await queryInterface.sequelize.query(
         `
-          INSERT INTO Notifications_Read
+          INSERT INTO "Notifications_Read"
           SELECT N.id as notification_id, O.subscription_id as subscription_id, O.is_read as is_read
-          FROM Notifications N
+          FROM "Notifications" N
                    JOIN "Old_Notifications" O on N.notification_data = O.notification_data
           WHERE O.notification_data != '';
 			`,

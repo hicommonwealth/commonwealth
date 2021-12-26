@@ -26,8 +26,8 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     idOptions = { [Op.in]: req.body['notification_ids[]'].map((n) => +n) };
   }
 
-  const notifications = await models.Notification.findAll({
-    where: { id: idOptions },
+  const notifications = await models.NotificationsRead.findAll({
+    where: { notification_id: idOptions },
     include: [ models.Subscription ]
   });
 

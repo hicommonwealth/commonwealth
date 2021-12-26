@@ -12,7 +12,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
   const subscriptions = await models.Subscription.findAll({
     where: { subscriber_id: req.user.id },
     include: [{
-      model: models.Notification,
+      model: models.NotificationsRead,
       where: { is_read: true },
       as: 'Notifications',
     }]

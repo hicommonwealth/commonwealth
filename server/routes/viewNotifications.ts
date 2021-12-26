@@ -30,33 +30,33 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     });
   }
 
-  // only locate unread notifications if specified
-  const notificationParams: any = {
-    model: models.Notification,
-    as: 'Notifications',
-    include: [{
-      model: models.ChainEvent,
-      required: false,
-      as: 'ChainEvent',
-      include: [{
-        model: models.ChainEventType,
-        required: false,
-        as: 'ChainEventType',
-      }, ],
-    }, ]
-  };
-  if (req.body.unread_only) {
-    notificationParams.where = { is_read: false };
-  }
-
-  // perform the query
   const subscriptions = await models.Subscription.findAll({
     where: {
       [Op.and]: searchParams
     },
-    include: [ notificationParams ],
-  });
+    include: {
+      model: models.NotificationsRead,
+      as: 'NotificationsRead',
+      where: {
+        is_read: !req.body.unread_only
+      },
+      include: [{
+        model: models.Notification,
+        required: true,
+        as: 'Notifications',
+        include: [{
+          model: models.ChainEvent,
+          required: false,
+          as: 'ChainEvent',
+          include: [{
+            model: models.ChainEventType,
+            required: false,
+            as: 'ChainEventType',
+          }]
+        }]
+      }]
+    }
+  })
 
-  // TODO: flatten? sort by date?
   return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
 };
