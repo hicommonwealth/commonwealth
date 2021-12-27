@@ -28,13 +28,12 @@ export default (
 	}, {
 		tableName: 'Notifications_Read',
 		underscored: true,
-		createdAt: 'created_at',
-		updatedAt: 'updated_at',
+		timestamps: false
 	});
 
 	Notification.associate = (models) => {
-		models.Notification.belongsTo(models.Subscription, { foreignKey: 'subscription_id', targetKey: 'id' });
-		models.Notification.belongsTo(models.Notification, { foreignKey: 'notification_id', targetKey: 'id' });
+		models.NotificationsRead.belongsTo(models.Subscription, { foreignKey: 'subscription_id', targetKey: 'id' });
+		models.NotificationsRead.belongsTo(models.Notification, { foreignKey: 'notification_id', targetKey: 'id' });
 	};
 
 	return Notification;

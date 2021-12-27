@@ -8,8 +8,8 @@ module.exports = {
         `
             CREATE TABLE IF NOT EXISTS "Notifications_Read"
             (
-                notification_id integer,
-                subscription_id integer,
+                notification_id integer REFERENCES "Notifications" (id),
+                subscription_id integer REFERENCES "Subscriptions" (id),
                 is_read         boolean,
                 PRIMARY KEY (notification_id, subscription_id)
             );
@@ -43,7 +43,7 @@ module.exports = {
                 notification_data text,
                 created_at        timestamp with time zone,
                 updated_at        timestamp with time zone,
-                chain_event_id    integer
+                chain_event_id    integer REFERENCES "ChainEvents" (id)
             );
 				`,
         {
@@ -95,12 +95,12 @@ module.exports = {
       // same thing here but for regular/community related notifications
       await queryInterface.sequelize.query(
         `
-          INSERT INTO "Notifications_Read"
-          SELECT N.id as notification_id, O.subscription_id as subscription_id, O.is_read as is_read
-          FROM "Notifications" N
-                   JOIN "Old_Notifications" O on N.notification_data = O.notification_data
-          WHERE O.notification_data != '';
-			`,
+            INSERT INTO "Notifications_Read"
+            SELECT N.id as notification_id, O.subscription_id as subscription_id, O.is_read as is_read
+            FROM "Notifications" N
+                     JOIN "Old_Notifications" O on N.notification_data = O.notification_data
+            WHERE O.notification_data != '';
+				`,
         {
           raw: true,
           type: 'RAW',
@@ -118,7 +118,9 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.dropTable('Notifications_Read', { transaction: t });
       await queryInterface.dropTable('Notifications', { transaction: t });
-      await queryInterface.renameTable('Old_Notifications', 'Notifications', { transaction: t });
+      await queryInterface.renameTable('Old_Notifications', 'Notifications', {
+        transaction: t,
+      });
     });
   },
 };
