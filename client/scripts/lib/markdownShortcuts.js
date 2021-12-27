@@ -91,14 +91,6 @@
               const matchedText = match[2]
               const closingDelimiter = match[3]
               const startIndex = lineStart + match.index - indexOffset;
-              console.log({
-                '0': match[0],
-                '1': match[1],
-                '2': match[2],
-                '3': match[3],
-              })
-              console.log({ indexOffset });
-              console.log(startIndex);
 
               // bolditalic must be prefixed with whitespace
               if (startIndex > 0 && this.quill.getText()[startIndex]
