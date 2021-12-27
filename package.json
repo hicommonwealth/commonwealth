@@ -11,6 +11,7 @@
     "stylelint": "stylelint client/styles/*",
     "lint": "./scripts/lint-new-work.sh",
     "lint-all": "eslint client/\\**/*.ts server/\\**/*.ts",
+    "lint-branch": "./scripts/lint-branch.sh",
     "listen": "RUN_AS_LISTENER=true ts-node --project tsconfig.node.json server.ts",
     "load-tokens": "ts-node --project tsconfig.node.json server/scripts/loadDatabaseFromTokenLists.ts",
     "emit-events": "ts-node --project tsconfig.node.json server/scripts/emitChainEvents.ts",
