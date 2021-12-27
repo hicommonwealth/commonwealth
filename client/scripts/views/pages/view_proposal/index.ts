@@ -1274,8 +1274,7 @@ const ViewProposalPage: m.Component<
         ]
       );
     }
-
-    const showLinkedOptions = proposal instanceof OffchainThread && (proposal.linkedThreads?.length > 0 || isAuthor || isAdmin);
+    const showLinkedOptions = (proposal as OffchainThread).linkedThreads?.length > 0 || isAuthor || isAdmin;
 
     return m(
       Sublayout,
@@ -1296,7 +1295,7 @@ const ViewProposalPage: m.Component<
                 vnode.state.pollEditorIsOpen = true;
               },
             }),
-          showLinkedOptions && (proposal as OffchainThread) &&
+          showLinkedOptions && proposal instanceof OffchainThread &&
             m(ProposalSidebarLinkedViewer, {
               proposal,
               openStageEditor: () => {
@@ -1304,7 +1303,7 @@ const ViewProposalPage: m.Component<
               },
               showAddProposalButton: (isAuthor || isAdmin)
             }),
-          showLinkedOptions && (proposal as OffchainThread) &&
+          showLinkedOptions && proposal instanceof OffchainThread &&
             m(ProposalLinkedThreadsEditorModule, {
               proposal,
               allowLinking: isAuthor || isAdmin,
