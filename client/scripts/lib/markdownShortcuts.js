@@ -101,7 +101,6 @@
               if (openingDelimiter !== closingDelimiter) continue;
               if (openingDelimiter !== closingDelimiter.split('').reverse().join('')) continue;
               indexOffset += openingDelimiter.length * 2;
-              console.log('timeout');
               setTimeout(() => {
                 const formatting =
                       (openingDelimiter === '*' || openingDelimiter === '_') ? {italic: true} :
