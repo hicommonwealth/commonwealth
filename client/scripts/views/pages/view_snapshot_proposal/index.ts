@@ -262,7 +262,7 @@ const ViewProposalPage: m.Component<
     totalScore: number;
     scores: number[];
     activeTab: string;
-    thread: string;
+    threads: Array<{id: string, title: string}> | null;
   }
 > = {
   oninit: (vnode) => {
@@ -271,7 +271,7 @@ const ViewProposalPage: m.Component<
     vnode.state.totalScore = 0;
     vnode.state.scores = [];
     vnode.state.proposal = null;
-    vnode.state.thread = 'false';
+    vnode.state.threads = null;
 
     const loadVotes = async () => {
       vnode.state.proposal = app.snapshot.proposals.find(
@@ -289,9 +289,9 @@ const ViewProposalPage: m.Component<
       m.redraw();
 
       app.threads
-        .fetchThreadIdForSnapshot({ snapshot: vnode.state.proposal.id })
+        .fetchThreadIdsForSnapshot({ snapshot: vnode.state.proposal.id })
         .then((res) => {
-          vnode.state.thread = res;
+          vnode.state.threads = res.map((thread_data) => { return {id: thread_data.id, title: thread_data.title} })
           m.redraw();
         });
     };
@@ -314,7 +314,7 @@ const ViewProposalPage: m.Component<
   },
   view: (vnode) => {
     const author = app.user.activeAccount;
-    const { proposal, votes, activeTab, thread } = vnode.state;
+    const { proposal, votes, activeTab, threads } = vnode.state;
     const route = m.route.get();
     const scope = route.slice(0, route.lastIndexOf('/'));
 
@@ -437,12 +437,14 @@ const ViewProposalPage: m.Component<
                       ),
                     ]),
                   ]),
-                  thread !== 'false' &&
+                  threads !== null &&
                     m('.linked-discussion', [
-                      m('.heading-2', 'Linked Discussion'),
-                      m(ProposalHeaderSnapshotThreadLink, {
-                        threadId: vnode.state.thread,
-                      }),
+                      m('.heading-2', 'Linked Discussions'),
+                      threads.map((thread) => 
+                        m(ProposalHeaderSnapshotThreadLink, {
+                          thread
+                        }),
+                      )
                     ]),
                 ]),
                 isActive &&
