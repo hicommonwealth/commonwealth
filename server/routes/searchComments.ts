@@ -17,7 +17,7 @@ const searchComments = async (
   res: Response,
   next: NextFunction
 ) => {
-  let replacements = {};
+  let bind = {};
 
   if (!req.query.search) {
     return next(new Error(Errors.QueryMissing));
@@ -40,7 +40,7 @@ const searchComments = async (
     communityOptions = community
       ? `AND "OffchainComments".community = :community`
       : `AND "OffchainComments".chain = :chain `;
-    replacements = community
+    bind = community
       ? { community: community.id }
       : { chain: chain.id };
   }
@@ -51,8 +51,8 @@ const searchComments = async (
     ? 'ORDER BY "OffchainComments".created_at ASC'
     : 'ORDER BY rank DESC'
 
-  replacements['searchTerm'] = req.query.search;
-  replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
+  bind['searchTerm'] = req.query.search;
+  bind['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
 
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   let comments;
@@ -75,12 +75,12 @@ const searchComments = async (
     JOIN "OffchainThreads" ON "OffchainThreads".id =
         CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
     JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id, 
-    websearch_to_tsquery('english', :searchTerm) as query
+    websearch_to_tsquery('english', $searchTerm) as query
     WHERE query @@ "OffchainComments"._search ${communityOptions} 
-    ${sort} LIMIT :limit
+    ${sort} LIMIT $limit
 `,
       {
-        replacements,
+        bind,
         type: QueryTypes.SELECT,
       }
     );
