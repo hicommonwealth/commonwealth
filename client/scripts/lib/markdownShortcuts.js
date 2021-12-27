@@ -90,7 +90,15 @@
               const openingDelimiter = match[1]
               const matchedText = match[2]
               const closingDelimiter = match[3]
-              const startIndex = lineStart + match.index + indexOffset;
+              const startIndex = lineStart + match.index - indexOffset;
+              console.log({
+                '0': match[0],
+                '1': match[1],
+                '2': match[2],
+                '3': match[3],
+              })
+              console.log({ indexOffset });
+              console.log(startIndex);
 
               // bolditalic must be prefixed with whitespace
               if (startIndex > 0 && this.quill.getText()[startIndex]
@@ -101,17 +109,16 @@
               if (openingDelimiter !== closingDelimiter) continue;
               if (openingDelimiter !== closingDelimiter.split('').reverse().join('')) continue;
               indexOffset += openingDelimiter.length * 2;
-              setTimeout(() => {
-                const formatting =
-                      (openingDelimiter === '*' || openingDelimiter === '_') ? {italic: true} :
-                      (openingDelimiter === '**' || openingDelimiter === '__') ? {bold: true} :
-                      {bold: true, italic: true};
-                this.quill.deleteText(startIndex + whitespaceStartOffset,
-                  annotatedText.length - whitespaceStartOffset - whitespaceEndOffset)
-                this.quill.insertText(startIndex + whitespaceStartOffset, matchedText, formatting)
-                this.quill.format('bold', false)
-                this.quill.format('italic', false)
-              }, 0)
+
+              const formatting =
+                    (openingDelimiter === '*' || openingDelimiter === '_') ? {italic: true} :
+                    (openingDelimiter === '**' || openingDelimiter === '__') ? {bold: true} :
+                    {bold: true, italic: true};
+              this.quill.deleteText(startIndex + whitespaceStartOffset,
+                annotatedText.length - whitespaceStartOffset - whitespaceEndOffset)
+              this.quill.insertText(startIndex + whitespaceStartOffset, matchedText, formatting)
+              this.quill.format('bold', false)
+              this.quill.format('italic', false)
            }
          }
        },
