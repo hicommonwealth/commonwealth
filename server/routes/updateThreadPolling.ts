@@ -60,6 +60,7 @@ const updateThreadPolling = async (models: DB, req: Request, res: Response, next
         : getNextOffchainPollEndingTime(moment());
     console.log(offchain_voting_ends_at);
     await thread.update({
+      offchain_voting_enabled: true,
       offchain_voting_ends_at,
       offchain_voting_options: req.body.content,
     });

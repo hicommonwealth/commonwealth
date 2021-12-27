@@ -61,7 +61,6 @@ export const ProposalHeaderOffchainPoll: m.Component<
 > = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
-    if (!proposal.offchainVotingEndsAt) return;
 
     if (
       vnode.state.offchainVotes === undefined ||
@@ -91,9 +90,8 @@ export const ProposalHeaderOffchainPoll: m.Component<
         });
     }
 
-    const pollingEnded = proposal.offchainVotingEndsAt?.isBefore(
-      moment().utc()
-    );
+    const pollingEnded = proposal.offchainVotingEndsAt
+      && proposal.offchainVotingEndsAt?.isBefore(moment().utc());
     const canVote =
       app.isLoggedIn() &&
       app.user.activeAccount &&
@@ -211,8 +209,11 @@ export const ProposalHeaderOffchainPoll: m.Component<
       m('.offchain-poll-caption', [
         !pollingEnded && [
           // weird hack because we overwrote the moment formatter to display "just now" for future dates
-          moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
-          ' left',
+          proposal.offchainVotingEndsAt
+            ? [
+              moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
+              ' left',
+            ] : 'Poll does not expire.'
         ],
         m('br'),
         pollingEnded ? 'Ended ' : 'Ends ',

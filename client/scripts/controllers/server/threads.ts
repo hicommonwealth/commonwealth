@@ -396,9 +396,9 @@ class ThreadsController {
         }
         thread.offchainVotingOptions = { name, choices };
         thread.offchainVotingNumVotes = 0;
-        thread.offchainVotingEndsAt = moment(
-          response.result.offchain_voting_ends_at
-        );
+        thread.offchainVotingEndsAt = response.result.offchain_voting_ends_at
+          ? moment(response.result.offchain_voting_ends_at)
+          : null;
       },
       error: (err) => {
         console.log('Failed to start polling');
