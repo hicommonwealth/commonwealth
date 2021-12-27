@@ -99,8 +99,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       || p.startsWith(`/${app.activeId()}/discussions/`)
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
       || p.startsWith(`/${app.activeId()}?`);
-    const onFeaturedDiscussionPage = (p, f) => p === `/${app.activeId()}/discussions/${f}`
-      || p === `/${app.activeId()}/discussions/${f}/`;
+    const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);
     const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeId()}/sputnik-daos`);
@@ -400,7 +399,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Rage quit',
       }),
       m('.sidebar-spacer'),
-      app.chain?.meta.chain.snapshot && m(Button, {
+      app.chain?.meta.chain.snapshot.length > 0 && m(Button, {
         rounded: true,
         fluid: true,
         active: onSnapshotProposal(m.route.get()),
