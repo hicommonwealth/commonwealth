@@ -136,8 +136,9 @@ module.exports = {
 
     /**
      * Merge offchain_community_id, community_id, etc into chain column
+     * Add the not null constraint.
      */
-    const mergeOffchainIdsIntoChain = async (t,) => {
+    const mergeOffchainIdsIntoChain = async (t) => {
       console.log("merging offchain ids into chain column")
 
       await queryInterface.sequelize.query(
@@ -148,6 +149,10 @@ module.exports = {
         'ALTER TABLE "OffchainComments" DROP COLUMN community;',
         { transaction: t }
       );
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "OffchainComments" ALTER COLUMN "chain" SET NOT NULL;`,
+        { transaction: t }
+      )
 
       await queryInterface.sequelize.query(
         `UPDATE "Roles" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
@@ -157,6 +162,10 @@ module.exports = {
         'ALTER TABLE "Roles" DROP COLUMN offchain_community_id;',
         { transaction: t }
       );
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "Roles" ALTER COLUMN "chain_id" SET NOT NULL;`,
+        { transaction: t }
+      )
 
       await queryInterface.sequelize.query(
         `UPDATE "InviteCodes" SET chain_id = community_id WHERE chain_id IS NULL;`,
@@ -166,6 +175,10 @@ module.exports = {
         'ALTER TABLE "InviteCodes" DROP COLUMN community_id;',
         { transaction: t }
       );
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "InviteCodes" ALTER COLUMN "chain_id" SET NOT NULL;`,
+        { transaction: t }
+      )
 
       await queryInterface.sequelize.query(
         `UPDATE "InviteLinks" SET chain_id = community_id WHERE chain_id IS NULL;`,
@@ -175,6 +188,10 @@ module.exports = {
         'ALTER TABLE "InviteLinks" DROP COLUMN community_id;',
         { transaction: t }
       );
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "InviteLinks" ALTER COLUMN "chain_id" SET NOT NULL;`,
+        { transaction: t }
+      )
 
       await queryInterface.sequelize.query(
         `UPDATE "OffchainTopics" SET chain_id = community_id WHERE chain_id IS NULL;`,
@@ -184,6 +201,10 @@ module.exports = {
         'ALTER TABLE "OffchainTopics" DROP COLUMN community_id;',
         { transaction: t }
       );
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "OffchainTopics" ALTER COLUMN "chain_id" SET NOT NULL;`,
+        { transaction: t }
+      )
 
       await queryInterface.sequelize.query(
         `UPDATE "Subscriptions" SET chain_id = community_id WHERE chain_id IS NULL;`,
@@ -193,6 +214,11 @@ module.exports = {
         'ALTER TABLE "Subscriptions" DROP COLUMN community_id;',
         { transaction: t }
       );
+      // TODO: Subscriptions are currently being refactored. Add constraint another time.
+      // await queryInterface.sequelize.query(
+      //   `ALTER TABLE "Subscriptions" ALTER COLUMN "chain_id" SET NOT NULL;`,
+      //   { transaction: t }
+      // )
 
       await queryInterface.sequelize.query(
         `UPDATE "Webhooks" SET chain_id = offchain_community_id WHERE chain_id IS NULL;`,
@@ -202,6 +228,10 @@ module.exports = {
         'ALTER TABLE "Webhooks" DROP COLUMN offchain_community_id;',
         { transaction: t }
       );
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "Webhooks" ALTER COLUMN "chain_id" SET NOT NULL;`,
+        { transaction: t }
+      )
 
 
       await queryInterface.sequelize.query(
@@ -212,7 +242,10 @@ module.exports = {
         'ALTER TABLE "OffchainViewCounts" DROP COLUMN community;',
         { transaction: t }
       );
-
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "OffchainViewCounts" ALTER COLUMN "chain" SET NOT NULL;`,
+        { transaction: t }
+      )
 
       await queryInterface.sequelize.query(
         `UPDATE "OffchainVotes" SET chain = community WHERE chain IS NULL;`,
@@ -222,7 +255,10 @@ module.exports = {
         'ALTER TABLE "OffchainVotes" DROP COLUMN community;',
         { transaction: t }
       );
-
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "OffchainVotes" ALTER COLUMN "chain" SET NOT NULL;`,
+        { transaction: t }
+      )
 
       await queryInterface.sequelize.query(
         `UPDATE "StarredCommunities" SET chain = community WHERE chain IS NULL;`,
@@ -232,7 +268,10 @@ module.exports = {
         'ALTER TABLE "StarredCommunities" DROP COLUMN community;',
         { transaction: t }
       );
-
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "StarredCommunities" ALTER COLUMN "chain" SET NOT NULL;`,
+        { transaction: t }
+      )
 
       await queryInterface.sequelize.query(
         `UPDATE "OffchainReactions" SET chain = community WHERE chain IS NULL;`,
@@ -242,6 +281,10 @@ module.exports = {
         'ALTER TABLE "OffchainReactions" DROP COLUMN community;',
         { transaction: t }
       );
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "OffchainReactions" ALTER COLUMN "chain" SET NOT NULL;`,
+        { transaction: t }
+      )
 
       await queryInterface.sequelize.query(
         `UPDATE "OffchainThreads" SET chain = community WHERE chain IS NULL;`,
@@ -251,7 +294,10 @@ module.exports = {
         'ALTER TABLE "OffchainThreads" DROP COLUMN community;',
         { transaction: t }
       );
-
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "OffchainThreads" ALTER COLUMN "chain" SET NOT NULL;`,
+        { transaction: t }
+      );
 
 
       // remove threads index
@@ -354,7 +400,7 @@ module.exports = {
 
       // Remove offchain communities
       // await queryInterface.dropTable('Collaborations', { transaction: t });
-      const [ offchainToRemove ] = await queryInterface.sequelize.query(
+      const [offchainToRemove] = await queryInterface.sequelize.query(
         `SELECT id FROM "OffchainCommunities" WHERE id NOT IN (${[...(offChainCommunities.map((oc) => `'${oc}'`))]})`,
         { transaction: t }
       );
@@ -363,6 +409,7 @@ module.exports = {
       }
 
       // Merge offchain ids into chain column and delete old columns
+      // Add non null constraint to chain column.
       await mergeOffchainIdsIntoChain(t)
     });
 
