@@ -1296,7 +1296,7 @@ const ViewProposalPage: m.Component<
                 vnode.state.pollEditorIsOpen = true;
               },
             }),
-          showLinkedOptions &&
+          showLinkedOptions && (proposal as OffchainThread) &&
             m(ProposalSidebarLinkedViewer, {
               proposal,
               openStageEditor: () => {
@@ -1304,7 +1304,7 @@ const ViewProposalPage: m.Component<
               },
               showAddProposalButton: (isAuthor || isAdmin)
             }),
-          showLinkedOptions &&
+          showLinkedOptions && (proposal as OffchainThread) &&
             m(ProposalLinkedThreadsEditorModule, {
               proposal,
               allowLinking: isAuthor || isAdmin,
