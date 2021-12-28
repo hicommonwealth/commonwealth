@@ -1274,7 +1274,7 @@ const ViewProposalPage: m.Component<
         ]
       );
     }
-    console.log(proposal);
+
     return m(
       Sublayout,
       {
