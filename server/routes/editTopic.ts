@@ -41,10 +41,9 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
   const roleWhere = {
     address_id: adminAddress.id,
     permission: 'admin',
+    chain_id: chain.id,
   };
-  if (chain) {
-    roleWhere['chain_id'] = chain.id;
-  }
+
   const requesterIsAdminOrMod = await models.Role.findOne({
     where: roleWhere,
   });

@@ -23,9 +23,6 @@ const createRole = async (
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
 
-  // cannot join private communities using this route
-  // if (community && community.privacy_enabled) return next(new Error(Errors.InvalidChainComm));
-
   const validAddress = await models.Address.findOne({
     where: {
       id: req.body.address_id,
@@ -39,13 +36,6 @@ const createRole = async (
     address_id: validAddress.id,
     chain_id: chain.id,
   }});
-  // const [ role ] = await models.Role.findOrCreate({ where: chain ? {
-  //   address_id: validAddress.id,
-  //   chain_id: chain.id,
-  // } : {
-  //   address_id: validAddress.id,
-  //   offchain_community_id: community.id,
-  // } });
 
   const [ subscription ] = await models.Subscription.findOrCreate({
     where: {

@@ -25,7 +25,7 @@ const bulkAddresses = async (models: DB, req, res, next) => {
   if (req.query.chain) {
     [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
     if (error) return next(new Error(error));
-    if (chain) options['where'] = { chain: req.query.chain };
+    options['where'] = { chain: req.query.chain };
   }
 
   if (req.query.searchTerm?.length) {

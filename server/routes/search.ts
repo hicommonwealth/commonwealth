@@ -41,6 +41,7 @@ const search = async (
     if (error) return next(new Error(error));
     const encodedSearchTerm = encodeURIComponent(req.query.search);
     const params = {
+      chain: chain.id,
       title: {
         [Op.or]: [
           { [Op.iLike]: `%${encodedSearchTerm}%` },
@@ -48,7 +49,7 @@ const search = async (
         ]
       },
     };
-    if (chain) params['chain'] = chain.id;
+
     try {
       const threads = await models.OffchainThread.findAll({
         where: params,

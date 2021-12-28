@@ -18,8 +18,8 @@ const viewReactions = async (models: DB, req: Request, res: Response, next: Next
     return next(new Error(Errors.NoCommentOrThreadId));
   }
 
-  const options = {};
-  if (chain) options['chain'] = chain.id;
+  const options = { chain: chain.id };
+
   if (req.query.thread_id) options['thread_id'] = req.query.thread_id;
 
   let reactions;

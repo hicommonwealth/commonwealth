@@ -30,7 +30,6 @@ const viewOffchainVotes = async (
 
   if (!req.query.thread_id) {
     throw new AppError(Errors.InvalidThread);
-    // return next(new Error(Errors.InvalidThread));
   }
 
   try {

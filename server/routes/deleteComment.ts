@@ -38,10 +38,8 @@ const deleteComment = async (models: DB, req: Request, res: Response, next: Next
       const roleWhere = {
         permission: { [Op.in]: ['admin', 'moderator'] },
         address_id: { [Op.in]: userOwnedAddressIds },
+        chain_id: comment.Chain.id,
       };
-      if (comment.chain) {
-        roleWhere['chain_id'] = comment.Chain.id;
-      }
       const requesterIsAdminOrMod = await models.Role.findOne({
         where: roleWhere
       });

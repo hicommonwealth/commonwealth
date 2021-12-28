@@ -45,8 +45,7 @@ const activeThreads = async (
       { created_at: { [Op.gt]: cutoff_date } },
     ],
   };
-  if (chain) threadWhereOptions['chain'] = chain.id;
-  // if (community) threadWhereOptions['community'] = community.id;
+  threadWhereOptions['chain'] = chain.id;
   const threads: OffchainThreadInstance[] = await models.OffchainThread.findAll(
     {
       where: threadWhereOptions,

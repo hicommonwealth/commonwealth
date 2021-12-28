@@ -62,13 +62,11 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
     if (req.body.community) {
       const role = await models.Role.findOne({
         where: { address_id: updatedObj.id, chain_id: req.body.community }
-        // where: { address_id: updatedObj.id, offchain_community_id: req.body.community }
       });
       if (!role) {
         await models.Role.create({
           address_id: updatedObj.id,
           chain_id: req.body.community,
-          // offchain_community_id: req.body.community,
           permission: 'member',
         });
       }
@@ -92,15 +90,6 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
           chain_id: req.body.chain,
           permission: 'member',
         });
-        // await models.Role.create(req.body.community ? {
-        //   address_id: newObj.id,
-        //   offchain_community_id: req.body.community,
-        //   permission: 'member',
-        // } : {
-        //   address_id: newObj.id,
-        //   chain_id: req.body.chain,
-        //   permission: 'member',
-        // });
       }
 
       return res.json({ status: 'Success', result: newObj.toJSON() });

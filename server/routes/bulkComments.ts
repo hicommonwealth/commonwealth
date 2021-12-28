@@ -18,13 +18,11 @@ const bulkComments = async (models: DB, req: Request, res: Response, next: NextF
     return next(new Error(Errors.MutuallyExclusive));
   }
   const whereOptions: any = {};
-  if (chain) {
-    whereOptions.chain = chain.id;
-    if (req.query.offchain_threads_only) {
-      whereOptions.root_id = { [Op.like]: 'discussion%' };
-    } else if (req.query.proposals_only) {
-      whereOptions.root_id = { [Op.notLike]: 'discussion%' };
-    }
+  whereOptions.chain = chain.id;
+  if (req.query.offchain_threads_only) {
+    whereOptions.root_id = { [Op.like]: 'discussion%' };
+  } else if (req.query.proposals_only) {
+    whereOptions.root_id = { [Op.notLike]: 'discussion%' };
   }
   const comments = await models.OffchainComment.findAll({
     where: whereOptions,

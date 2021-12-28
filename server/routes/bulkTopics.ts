@@ -13,9 +13,6 @@ const bulkTopics = async (models: DB, req: Request, res: Response, next: NextFun
 
   const topics = await models.OffchainTopic.findAll({
     where: { chain_id: chain.id },
-    // where: community
-    //   ? { community_id: community.id }
-    //   : { chain_id: chain.id },
   });
 
   return res.json({ status: 'Success', result: topics.map((c) => c.toJSON()) });

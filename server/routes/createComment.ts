@@ -135,10 +135,9 @@ const createComment = async (
     plaintext,
     version_history,
     address_id: author.id,
-    chain: null,
+    chain: chain.id,
     parent_id: null,
   };
-  if (chain) Object.assign(commentContent, { chain: chain.id });
   if (parent_id) Object.assign(commentContent, { parent_id });
 
   let comment;

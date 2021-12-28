@@ -61,12 +61,6 @@ function setupPassport(models: DB) {
         if (error) return cb(error);
       }
       const registrationChain = chain;
-      // if (chain?.id) {
-      //   registrationChain = chain;
-      // } else {
-      //   const chainId = community?.default_chain || MAGIC_DEFAULT_CHAIN;
-      //   registrationChain = await models.Chain.findOne({ where: { id: chainId } });
-      // }
 
       // fetch user data from magic backend
       let userMetadata: MagicUserMetadata;
@@ -193,20 +187,11 @@ function setupPassport(models: DB) {
             }, { transaction: t });
           }
 
-          if (req.body.chain || req.body.community) await models.Role.create({
+          if (req.body.chain) await models.Role.create({
             address_id: newAddress.id,
             chain_id: req.body.chain,
             permission: 'member',
           }, { transaction: t });
-          // if (req.body.chain || req.body.community) await models.Role.create(req.body.community ? {
-          //   address_id: newAddress.id,
-          //   offchain_community_id: req.body.community,
-          //   permission: 'member',
-          // } : {
-          //   address_id: newAddress.id,
-          //   chain_id: req.body.chain,
-          //   permission: 'member',
-          // }, { transaction: t });
 
           // Automatically create subscription to their own mentions
           await models.Subscription.create({
