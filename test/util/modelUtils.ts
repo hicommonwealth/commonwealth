@@ -252,7 +252,7 @@ export const createWebhook = async ({ chain, webhookUrl, jwt }) => {
 export interface AssignRoleArgs {
   address_id: number;
   chainOrCommObj: {
-    chain_id?: string;
+    chain_id: string;
     offchain_community_id?: string;
   };
   role: Permission;
