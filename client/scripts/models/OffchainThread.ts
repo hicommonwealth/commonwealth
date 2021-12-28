@@ -62,10 +62,8 @@ class OffchainThread implements IUniqueId {
     return `${this.slug}_${this.identifier}`;
   }
 
-  private _hasOffchainPoll: boolean;
   public get hasOffchainPoll() {
-    return true;
-    // return _hasOffchainPoll;
+    return this.offchainVotingEnabled;
   }
 
   public offchainVotingEnabled: boolean;

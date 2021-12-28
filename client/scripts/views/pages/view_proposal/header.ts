@@ -208,17 +208,16 @@ export const ProposalHeaderOffchainPoll: m.Component<
         })
       ),
       m('.offchain-poll-caption', [
-        !pollingEnded && [
-          // weird hack because we overwrote the moment formatter to display "just now" for future dates
-          proposal.offchainVotingEndsAt
-            ? [
-              moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
-              ' left',
-            ] : 'Poll does not expire.'
-        ],
-        m('br'),
-        pollingEnded ? 'Ended ' : 'Ends ',
-        proposal.offchainVotingEndsAt?.format('lll'),
+        proposal.offchainVotingEndsAt
+          ? [
+              !pollingEnded && moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
+              !pollingEnded && ' left',
+              m('br'),
+              !pollingEnded && 'Ends ',
+              pollingEnded && 'Ended ',
+              proposal.offchainVotingEndsAt?.format('lll'),
+            ]
+          : 'Poll does not expire.'
       ]),
       m('.offchain-poll-header', 'Voters'),
       m('.offchain-poll-voters', [

@@ -1274,7 +1274,7 @@ const ViewProposalPage: m.Component<
         ]
       );
     }
-
+    console.log(proposal);
     return m(
       Sublayout,
       {
@@ -1282,12 +1282,12 @@ const ViewProposalPage: m.Component<
         showNewProposalButton: true,
         title: headerTitle,
         rightContent: [
-          proposal instanceof OffchainThread &&
-            proposal.hasOffchainPoll &&
-            m(ProposalHeaderOffchainPoll, { proposal }),
-          proposal instanceof OffchainThread &&
-            (isAuthor) &&
-            !proposal.offchainVotingEnabled &&
+          proposal instanceof OffchainThread
+            && proposal.hasOffchainPoll
+            && m(ProposalHeaderOffchainPoll, { proposal }),
+          proposal instanceof OffchainThread
+            && isAuthor
+            && !proposal.offchainVotingEnabled &&
             m(ProposalSidebarPollEditorModule, {
               proposal,
               openPollEditor: () => {
