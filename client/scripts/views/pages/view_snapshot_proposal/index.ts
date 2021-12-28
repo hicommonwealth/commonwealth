@@ -288,12 +288,16 @@ const ViewProposalPage: m.Component<
       });
       m.redraw();
 
-      app.threads
+      try {
+        app.threads
         .fetchThreadIdsForSnapshot({ snapshot: vnode.state.proposal.id })
         .then((res) => {
-          vnode.state.threads = res.map((thread_data) => { return {id: thread_data.id, title: thread_data.title} })
+          vnode.state.threads = res;
           m.redraw();
         });
+      } catch (e) {
+        console.log(`Failed to fetch threads: ${e}`);
+      }
     };
 
     const snapshotId = vnode.attrs.snapshotId;
