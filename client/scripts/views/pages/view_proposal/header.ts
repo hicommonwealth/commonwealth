@@ -61,6 +61,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
 > = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
+    if (!proposal.offchainVotingEnabled) return;
 
     if (
       vnode.state.offchainVotes === undefined ||

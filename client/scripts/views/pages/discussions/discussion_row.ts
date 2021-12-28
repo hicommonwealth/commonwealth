@@ -65,7 +65,7 @@ const DiscussionRow: m.Component<
         ]),
       ],
       proposal instanceof OffchainThread &&
-        (proposal.offchainVotingNumVotes) && [
+        (proposal.offchainVotingEnabled) && [
           m(Button, {
             class: 'discussion-row-linked-poll',
             label: 'Poll',

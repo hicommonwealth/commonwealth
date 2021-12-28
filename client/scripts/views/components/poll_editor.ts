@@ -2,7 +2,6 @@ import 'components/poll_editor.scss';
 
 import m from 'mithril';
 import moment from 'moment';
-import $ from 'jquery';
 import { Switch, Button, Input, Classes, Dialog, SelectList, Icons } from 'construct-ui';
 
 import { getNextOffchainPollEndingTime } from 'utils';
@@ -10,6 +9,7 @@ import app from 'state';
 import { OffchainThread } from 'models';
 import _ from 'underscore';
 import { pluralize } from 'helpers';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 const PollEditor: m.Component<{
   thread: OffchainThread;
@@ -96,13 +96,13 @@ const PollEditor: m.Component<{
             ? customDuration === 'Infinite'
               ? 'This poll will never expire.'
               : [
-                'If started now, this poll will be open until ',
+                'If started now, this poll will stay open until ',
                 moment().add(customDuration.split(' ')[0], 'days').local().format('lll'),
                 '.'
               ]
             : [
               'By default, offchain polls run for at least 5 days, ending on the 1st and 15th of each month. ',
-              'If started now, this poll would be open until ',
+              'If started now, this poll would stay open until ',
               getNextOffchainPollEndingTime(moment()).local().format('lll'),
               '. Override?'
             ]
@@ -158,11 +158,17 @@ const PollEditor: m.Component<{
             rounded: true,
             onclick: async () => {
               if (vnode.state.pollingEnabled) {
-                await app.threads.setPolling({
-                  threadId: thread.id,
-                  name: vnode.state.name,
-                  choices: vnode.state.choices,
-                });
+                try {
+                  await app.threads.setPolling({
+                    threadId: thread.id,
+                    name: vnode.state.name,
+                    choices: vnode.state.choices,
+                    customDuration: vnode.state.customDuration,
+                  });
+                  notifySuccess('Poll creation succeeded');
+                } catch (e) {
+                  notifyError('Poll creation failed');
+                }
                 vnode.attrs.onChangeHandler();
               } else {
                 vnode.attrs.onChangeHandler();

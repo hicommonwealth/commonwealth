@@ -375,6 +375,7 @@ class ThreadsController {
     customDuration?: string;
   }) {
     const { threadId, name, choices, customDuration } = args;
+    console.log({ customDuration });
     // start polling
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadPolling`,
@@ -385,7 +386,7 @@ class ThreadsController {
         jwt: app.user.jwt,
         thread_id: threadId,
         content: JSON.stringify({ name, choices }),
-        custom_duration: customDuration.split(' ')[0],
+        custom_duration: customDuration?.split(' ')[0],
       },
       success: (response) => {
         const thread = this._store.getByIdentifier(threadId);
