@@ -307,7 +307,7 @@ export const ProposalHeaderSnapshotThreadLink: m.Component<{
 
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [
-        title,
+        decodeURIComponent(title),
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
     ]);
