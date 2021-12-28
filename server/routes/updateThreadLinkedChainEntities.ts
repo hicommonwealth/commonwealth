@@ -31,7 +31,6 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
     });
     const role = roles.find((r) => {
       return r.chain_id === thread.chain;
-      // return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
     });
     if (!role) return next(new Error(Errors.NotAdminOrOwner));
   }

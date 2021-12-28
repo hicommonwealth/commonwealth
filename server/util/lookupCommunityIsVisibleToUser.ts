@@ -4,13 +4,7 @@
 import { ChainInstance } from '../models/chain';
 
 export const ChainCommunityErrors = {
-  CannotProvideBothCommunityAndChain: 'Cannot provide both community and chain',
   ChainDNE: 'Chain does not exist',
-  CommunityDNE: 'Community does not exist',
-  MustProvideCommunityOrChain: 'Must provide community or chain',
-  BothChainAndCommunityDNE: 'Neither chain nor community exist',
-  NoUserProvided: 'No user provided for privacy-enabled community',
-  NotMember: 'User is not member of private community',
 };
 
 // sequelize 5.0 does not accept undefined key in where clause

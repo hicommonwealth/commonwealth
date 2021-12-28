@@ -173,9 +173,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
     if (mentionedAddresses?.length > 0) {
       await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
-
-        const shouldNotifyMentionedUser = true;
-        if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
+        await models.Subscription.emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,

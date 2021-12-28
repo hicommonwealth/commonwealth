@@ -33,18 +33,8 @@ const updateTopics = async (models: DB, req, res: Response, next: NextFunction) 
       address_id: userAddress.id,
       chain_id: thread.chain,
     },
-    // where: thread.community ? {
-    //   permission: ['admin', 'moderator'],
-    //   address_id: userAddress.id,
-    //   offchain_community_id: thread.community,
-    // } : {
-    //   permission: ['admin', 'moderator'],
-    //   address_id: userAddress.id,
-    //   chain_id: thread.chain,
-    // },
   });
   const isAdminOrMod = roles.length > 0;
-  // const isAuthor = (thread.address_id === userAddress.id);
   if (!isAdminOrMod) {
     return next(new Error(UpdateTopicsErrors.NoPermission));
   }
@@ -61,9 +51,7 @@ const updateTopics = async (models: DB, req, res: Response, next: NextFunction) 
     [newTopic] = await models.OffchainTopic.findOrCreate({
       where: {
         name: req.body.topic_name,
-        // community_id: thread.community || null,
         chain_id: thread.chain,
-        // chain_id: thread.community ? null : thread.chain,
       },
     });
     thread.topic_id = newTopic.id;

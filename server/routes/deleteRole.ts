@@ -29,13 +29,6 @@ const deleteRole = async (models: DB, req, res: Response, next: NextFunction) =>
     address_id: req.body.address_id,
     chain_id: chain.id,
   } });
-  // const existingRole = await models.Role.findOne({ where: chain ? {
-  //   address_id: req.body.address_id,
-  //   chain_id: chain.id,
-  // } : {
-  //   address_id: req.body.address_id,
-  //   offchain_community_id: community.id,
-  // } });
   if (!existingRole) return next(new Error(Errors.RoleDNE));
 
   if (existingRole.permission === 'admin') {
@@ -45,17 +38,6 @@ const deleteRole = async (models: DB, req, res: Response, next: NextFunction) =>
       id: { [Sequelize.Op.ne]: existingRole.id },
       permission: ['admin'],
     }});
-    // const otherExistingAdmin = await models.Role.findOne({ where: chain ? {
-    //   address_id: req.body.address_id,
-    //   chain_id: chain.id,
-    //   id: { [Sequelize.Op.ne]: existingRole.id },
-    //   permission: ['admin'],
-    // } : {
-    //   address_id: req.body.address_id,
-    //   offchain_community_id: community.id,
-    //   id: { [Sequelize.Op.ne]: existingRole.id },
-    //   permission: ['admin'],
-    // } });
     if (!otherExistingAdmin) return next(new Error(Errors.OtherAdminDNE));
   }
 

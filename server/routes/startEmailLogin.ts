@@ -51,12 +51,6 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
 
   const magicChain = chain;
-  // if (chain?.id) {
-  //   magicChain = chain;
-  // } else {
-  //   const chainId = community?.default_chain || MAGIC_DEFAULT_CHAIN;
-  //   magicChain = await models.Chain.findOne({ where: { id: chainId } });
-  // }
 
   const isNewRegistration = !previousUser;
   const isExistingMagicUser = previousUser && !!previousUser.lastMagicLoginAt;

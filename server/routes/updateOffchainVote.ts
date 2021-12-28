@@ -32,9 +32,6 @@ const updateOffchainVote = async (
 
   const thread = await models.OffchainThread.findOne({
     where: { id: req.body.thread_id, chain: chain.id }
-    // where: community
-    //   ? { id: req.body.thread_id, community: community.id }
-    //   : { id: req.body.thread_id, chain: chain.id }
   });
   if (!thread) return next(new Error(Errors.InvalidThread));
 
@@ -67,7 +64,6 @@ const updateOffchainVote = async (
       address: req.body.address,
       author_chain: req.body.author_chain,
       chain: req.body.chain,
-      // community: req.body.community,
       option: req.body.option,
     }, { transaction: t });
 

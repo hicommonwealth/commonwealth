@@ -15,8 +15,8 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
   if (!chain) return next(new Error(Errors.NoChain));
   if (!address) return next(new Error(Errors.NoAddress));
 
-  const publicChains = await models.Chain.findAll();
-  const visibleChainIds = publicChains.map((c) => c.id);
+  const chains = await models.Chain.findAll();
+  const chainIds = chains.map((c) => c.id);
 
   const addressModel = await models.Address.findOne({
     where: {
@@ -31,7 +31,7 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
     where: {
       address_id: addressModel.id,
       [Op.or]: [{
-        chain: { [Op.in]: visibleChainIds }
+        chain: { [Op.in]: chainIds }
       }]
     },
     include: [ { model: models.Address, as: 'Address' } ],
@@ -41,7 +41,7 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
     where: {
       address_id: addressModel.id,
       [Op.or]: [{
-        chain: { [Op.in]: visibleChainIds }
+        chain: { [Op.in]: chainIds }
       }]
     },
   });
