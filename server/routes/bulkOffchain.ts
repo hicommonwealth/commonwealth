@@ -148,7 +148,6 @@ const bulkOffchain = async (
         }
       ),
     ]));
-    console.log("yo2")
 
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting'
@@ -164,7 +163,6 @@ const bulkOffchain = async (
       activeUsers: mostActiveUsers,
     },
   });
-
 };
 
 export default bulkOffchain;

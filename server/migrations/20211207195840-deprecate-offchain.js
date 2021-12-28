@@ -51,7 +51,7 @@ module.exports = {
     const fromOffchainToChain = async (t, community) => {
       // Get rest of the info
       const chain = await queryInterface.sequelize.query(
-        `SELECT id, name, icon_url, description, default_chain FROM "OffchainCommunities" WHERE id='${community}'`,
+        `SELECT * FROM "OffchainCommunities" WHERE id='${community}'`,
         { transaction: t }
       );
 
@@ -63,12 +63,27 @@ module.exports = {
 
       // Parse out information
       const info = chain[0][0];
-      const id = info['id']
-      const name = info['name']
-      const icon_url = info['icon_url']
+
+      // Bring over as much offchain data as possible to chain
+      const {
+        id,
+        name,
+        icon_url,
+        website,
+        discord,
+        telegram,
+        github,
+        collapsed_on_homepage,
+        element,
+        custom_domain,
+        custom_stages,
+        stages_enabled,
+        terms,
+        default_summary_view
+      } = info;
+
       const default_chain = info['default_chain'].trim(); // remove trailing newline
       const description = info['description'].substring(0, 200)
-      const { website, discord, telegram } = info;
 
       const baseQuery = await queryInterface.sequelize.query(
         `SELECT symbol, network, base FROM "Chains" WHERE id='${default_chain}'`,
@@ -91,7 +106,6 @@ module.exports = {
         name,
         description,
         icon_url,
-        // default values below
         active: true,
         symbol,
         type: 'offchain',
@@ -99,7 +113,15 @@ module.exports = {
         base,
         website,
         discord,
-        telegram
+        telegram,
+        github,
+        collapsed_on_homepage,
+        element,
+        custom_domain,
+        custom_stages,
+        stages_enabled,
+        terms,
+        default_summary_view
       }
       const chainNodeObject = {
         chain: id,
@@ -192,19 +214,6 @@ module.exports = {
         `ALTER TABLE "InviteCodes" ALTER COLUMN "chain_id" SET NOT NULL;`,
         { transaction: t }
       )
-
-      // await queryInterface.sequelize.query(
-      //   `UPDATE "InviteLinks" SET chain_id = community_id WHERE chain_id IS NULL;`,
-      //   { transaction: t },
-      // );
-      // await queryInterface.sequelize.query(
-      //   'ALTER TABLE "InviteLinks" DROP COLUMN community_id;',
-      //   { transaction: t }
-      // );
-      // await queryInterface.sequelize.query(
-      //   `ALTER TABLE "InviteLinks" ALTER COLUMN "chain_id" SET NOT NULL;`,
-      //   { transaction: t }
-      // )
 
       await queryInterface.sequelize.query(
         `UPDATE "OffchainTopics" SET chain_id = community_id WHERE chain_id IS NULL;`,

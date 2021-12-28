@@ -19,8 +19,6 @@ const bulkThreads = async (
   if (error) return next(new Error(error));
   const { cutoff_date, topic_id, stage } = req.query;
 
-  const communityOptions = `chain = :chain `;
-
   const replacements = { chain: chain.id };
 
   let topicOptions = '';
@@ -78,7 +76,7 @@ const bulkThreads = async (
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS latest_comm_created_at
           FROM "OffchainComments"
-          WHERE ${communityOptions}
+          WHERE chain = :chain 
             AND root_id LIKE 'discussion%'
             AND created_at < :created_at
             AND deleted_at IS NULL
@@ -94,7 +92,7 @@ const bulkThreads = async (
         LEFT JOIN "ChainEntities" AS chain_entities
         ON t.id = chain_entities.thread_id
         WHERE t.deleted_at IS NULL
-          AND t.${communityOptions}
+          AND t.chain = :chain 
           ${topicOptions}
           AND t.created_at < :created_at
           AND t.pinned = false
@@ -141,7 +139,6 @@ const bulkThreads = async (
         stage: t.stage,
         read_only: t.read_only,
         pinned: t.pinned,
-        // community: t.thread_community,
         chain: t.thread_chain,
         created_at: t.thread_created,
         collaborators,
@@ -171,11 +168,9 @@ const bulkThreads = async (
       return data;
     });
   } else {
-    const whereOptions = { chain: chain.id };
-
     threads = (
       await models.OffchainThread.findAll({
-        where: whereOptions,
+        where: { chain: chain.id },
         include: [
           {
             model: models.Address,
@@ -210,7 +205,7 @@ const bulkThreads = async (
 
   const countsQuery = `
      SELECT id, title, stage FROM "OffchainThreads"
-     WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`;
+     WHERE chain = :chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
   const threadsInVoting: OffchainThreadInstance[] =
     await models.sequelize.query(countsQuery, {
