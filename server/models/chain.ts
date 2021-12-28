@@ -143,6 +143,7 @@ export default (
   Chain.associate = (models) => {
     models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
+    models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' })
     models.Chain.hasMany(models.OffchainTopic, {
       as: 'topics',
       foreignKey: 'chain_id',

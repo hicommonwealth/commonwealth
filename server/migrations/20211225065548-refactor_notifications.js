@@ -19,14 +19,17 @@ module.exports = {
       // creates a new table called Notifications
       await queryInterface.sequelize.query(
         `
-            CREATE TABLE IF NOT EXISTS "Notifications"
-            (
-                id                SERIAL PRIMARY KEY,
-                notification_data text,
-                created_at        timestamp with time zone,
-                updated_at        timestamp with time zone,
-                chain_event_id    integer REFERENCES "ChainEvents" (id)
-            );
+          CREATE TABLE IF NOT EXISTS "Notifications"
+          (
+            id                SERIAL PRIMARY KEY,
+            notification_data text,
+            created_at        timestamp with time zone,
+            updated_at        timestamp with time zone,
+            chain_event_id    integer REFERENCES "ChainEvents" (id),
+            chain_id          varchar(255) REFERENCES "Chains" (id),
+            --     community_id integer REFERENCES "Chains"(community_id),
+            category_id       varchar(255) REFERENCES "NotificationCategories" (name)
+          );
 				`,
         {
           raw: true,
@@ -38,17 +41,13 @@ module.exports = {
       // create a new table called Notifications_Read
       await queryInterface.sequelize.query(
         `
-            CREATE TABLE IF NOT EXISTS "Notifications"
-            (
-                id                SERIAL PRIMARY KEY,
-                notification_data text,
-                created_at        timestamp with time zone,
-                updated_at        timestamp with time zone,
-                chain_event_id    integer REFERENCES "ChainEvents" (id),
-                chain_id          varchar(255) REFERENCES "Chains" (id),
---     community_id integer REFERENCES "Chains"(community_id),
-                category_id       varchar(255) REFERENCES "NotificationCategories" (name)
-            );
+          CREATE TABLE IF NOT EXISTS "Notifications_Read"
+          (
+            notification_id integer REFERENCES "Notifications" (id),
+            subscription_id integer REFERENCES "Subscriptions" (id),
+            is_read         boolean,
+            PRIMARY KEY (notification_id, subscription_id)
+          );
 				`,
         {
           raw: true,
