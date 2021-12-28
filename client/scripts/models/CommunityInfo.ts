@@ -3,7 +3,7 @@ import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import ChainInfo from './ChainInfo';
 import OffchainTopic from './OffchainTopic';
-import { OffchainCommunityInstance } from 'server/models/offchain_community';
+// import { OffchainCommunityInstance } from 'server/models/offchain_community';
 
 interface CommunityData {
   name: string;
@@ -246,22 +246,22 @@ class CommunityInfo {
       default_summary_view: defaultSummaryView,
       jwt: app.user.jwt,
     });
-    const updatedCommunity: OffchainCommunityInstance = r.result;
-    this.name = updatedCommunity.name;
-    this.description = updatedCommunity.description;
-    this.iconUrl = updatedCommunity.icon_url;
-    this.website = updatedCommunity.website;
-    this.discord = updatedCommunity.discord;
-    this.element = updatedCommunity.element;
-    this.telegram = updatedCommunity.telegram;
-    this.github = updatedCommunity.github;
-    this.stagesEnabled = stagesEnabled;
-    this.customStages = customStages;
-    this.customDomain = updatedCommunity.custom_domain;
-    this.terms = updatedCommunity.terms;
-    this.privacyEnabled = updatedCommunity.privacy_enabled;
-    this.invitesEnabled = updatedCommunity.invites_enabled;
-    this.defaultSummaryView = updatedCommunity.default_summary_view;
+    // const updatedCommunity: OffchainCommunityInstance = r.result;
+    // this.name = updatedCommunity.name;
+    // this.description = updatedCommunity.description;
+    // this.iconUrl = updatedCommunity.icon_url;
+    // this.website = updatedCommunity.website;
+    // this.discord = updatedCommunity.discord;
+    // this.element = updatedCommunity.element;
+    // this.telegram = updatedCommunity.telegram;
+    // this.github = updatedCommunity.github;
+    // this.stagesEnabled = stagesEnabled;
+    // this.customStages = customStages;
+    // this.customDomain = updatedCommunity.custom_domain;
+    // this.terms = updatedCommunity.terms;
+    // this.privacyEnabled = updatedCommunity.privacy_enabled;
+    // this.invitesEnabled = updatedCommunity.invites_enabled;
+    // this.defaultSummaryView = updatedCommunity.default_summary_view;
   }
 
   public addFeaturedTopic(topic: string) {

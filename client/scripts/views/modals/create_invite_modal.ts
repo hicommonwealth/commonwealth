@@ -285,6 +285,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
                 result.address,
                 result.address_chain,
                 result.chain_id,
+                result.offchain_community_id,
                 result.permission,
                 result.is_user_default
               ));

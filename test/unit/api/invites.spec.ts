@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken';
 import sleep from 'sleep-promise';
 import { Errors as CreateInviteErrors } from 'server/routes/createInvite';
 import { Errors as AcceptInviteErrors } from 'server/routes/acceptInvite';
-import { Errors as CreateInviteLinkErrors } from 'server/routes/createInviteLink';
 import { ChainCommunityErrors } from 'server/util/lookupCommunityIsVisibleToUser';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -460,119 +459,6 @@ describe('Invite Tests', () => {
       expect(res.body.result.used).to.be.true;
       expect(res.body.result.community_id).to.be.equal(community);
       expect(res.body.result.invited_email).to.be.equal(userEmail);
-    });
-  });
-
-  describe('/createInviteLink', () => {
-    it('should create an invite link as an admin', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'none',
-          jwt: adminJWT,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.community_id).to.be.equal(community);
-      expect(res.body.result.time_limit).to.be.equal('none');
-      expect(res.body.result.multi_use).to.be.null;
-      expect(res.body.result.active).to.be.true;
-    });
-
-    it('should create an invite link as a user', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.community_id).to.be.equal(community);
-      expect(res.body.result.time_limit).to.be.equal('none');
-      expect(res.body.result.multi_use).to.be.null;
-      expect(res.body.result.active).to.be.true;
-    });
-
-    it('should fail to create an invite link without a community', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          time: 'none',
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(ChainCommunityErrors.BothChainAndCommunityDNE);
-    });
-
-    it('should fail to create an invite link without a time', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.NoTimeLimit);
-    });
-
-    it('should fail to create an invite link without uses', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.InvalidUses);
-    });
-
-    it('should fail to create an invite link with invalid uses', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'hello',
-          jwt: userJWT,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.InvalidUses);
-    });
-
-    it('should fail to create a new forever invite link if one already exists', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      const res2 = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.id).to.be.equal(res2.body.result.id);
     });
   });
 });
