@@ -8,7 +8,7 @@ export interface InviteCodeAttributes {
   creator_id: number;
   id?: string;
   community_name?: string;
-  chain_id?: string;
+  chain_id: string;
   invited_email?: string;
   used?: boolean;
   created_at?: Date;
@@ -27,7 +27,7 @@ export default (
 ): InviteCodeModelStatic => {
   const InviteCode = <InviteCodeModelStatic>sequelize.define('InviteCode', {
     id: { type: dataTypes.STRING, primaryKey: true },
-    chain_id: { type: dataTypes.STRING, allowNull: true },
+    chain_id: { type: dataTypes.STRING, allowNull: false },
     community_name: { type: dataTypes.STRING, allowNull: true },
     creator_id: { type: dataTypes.INTEGER, allowNull: false },
     invited_email: { type: dataTypes.STRING, allowNull: true, defaultValue: null },

@@ -8,7 +8,7 @@ export interface OffchainReactionAttributes {
   address_id: number;
   reaction: string;
   id?: number;
-  chain?: string;
+  chain: string;
   thread_id?: number;
   proposal_id?: number;
   comment_id?: number;
@@ -29,7 +29,7 @@ export default (
 ): OffchainReactionModelStatic => {
   const OffchainReaction = <OffchainReactionModelStatic>sequelize.define('OffchainReaction', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: dataTypes.STRING, allowNull: true },
+    chain: { type: dataTypes.STRING, allowNull: false },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
     proposal_id: { type: dataTypes.STRING, allowNull: true },
     comment_id: { type: dataTypes.INTEGER, allowNull: true },

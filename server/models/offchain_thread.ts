@@ -18,7 +18,7 @@ export interface OffchainThreadAttributes {
   url?: string;
   topic_id?: number;
   pinned?: boolean;
-  chain?: string;
+  chain: string;
 
   read_only?: boolean;
   version_history?: string[];
@@ -76,7 +76,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      chain: { type: dataTypes.STRING, allowNull: true },
+      chain: { type: dataTypes.STRING, allowNull: false },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,

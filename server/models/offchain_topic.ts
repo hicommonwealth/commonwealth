@@ -9,8 +9,7 @@ export interface OffchainTopicAttributes {
   featured_in_sidebar: boolean;
   featured_in_new_post: boolean;
   id?: number;
-  chain_id?: string;
-  // community_id?: string;
+  chain_id: string;
   description?: string;
   telegram?: string;
   created_at?: Date;
@@ -40,7 +39,7 @@ export default (
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
     telegram: { type: dataTypes.STRING, allowNull: true },
-    chain_id: { type: dataTypes.STRING, allowNull: true },
+    chain_id: { type: dataTypes.STRING, allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },

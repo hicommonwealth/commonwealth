@@ -12,7 +12,7 @@ export interface OffchainCommentAttributes {
   text: string;
   plaintext: string;
   id?: number;
-  chain?: string;
+  chain: string;
   parent_id?: string;
   version_history?: string[];
   created_at?: Date;
@@ -38,7 +38,7 @@ export default (
 ): OffchainCommentModelStatic => {
   const OffchainComment = <OffchainCommentModelStatic>sequelize.define('OffchainComment', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: dataTypes.STRING, allowNull: true },
+    chain: { type: dataTypes.STRING, allowNull: false },
     root_id: { type: dataTypes.STRING, allowNull: false },
     parent_id: { type: dataTypes.STRING, allowNull: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },

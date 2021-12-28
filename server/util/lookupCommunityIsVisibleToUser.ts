@@ -20,7 +20,6 @@ const lookupCommunityIsVisibleToUser = async (
   const chain = await models.Chain.findOne({
     where: {
       id: params.chain,
-      // id: params.chain || null,
     },
     include: [
       {
@@ -28,32 +27,11 @@ const lookupCommunityIsVisibleToUser = async (
         as: 'topics',
         required: false,
         attributes: ['id', 'name', 'chain_id'],
-        // attributes: ['id', 'name', 'community_id', 'chain_id'],
       },
     ],
   });
-  // searching for both chain and community
-  // if (params.chain && params.community) return [null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
   // searching for chain that doesn't exist
   if (params.chain && !chain) return [null, ChainCommunityErrors.ChainDNE];
-  // searching for community that doesn't exist
-  // if (params.community && !community) return [null, ChainCommunityErrors.CommunityDNE];
-  // searching for both chain and community with results
-  // if (chain && community) return [null, ChainCommunityErrors.CannotProvideBothCommunityAndChain];
-  // searching for chain and community that both don't exist
-  // if (!chain && !community) return [null, ChainCommunityErrors.BothChainAndCommunityDNE];
-
-  // if (community && community.privacy_enabled && !user?.isAdmin) {
-  //   if (!user) return [null, ChainCommunityErrors.NoUserProvided];
-  //   const userAddressIds = (await user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
-  //   const userMembership = await models.Role.findOne({
-  //     where: {
-  //       address_id: userAddressIds,
-  //       offchain_community_id: community.id,
-  //     },
-  //   });
-  //   if (!userMembership) return [null, ChainCommunityErrors.NotMember];
-  // }
   return [chain, null];
 };
 

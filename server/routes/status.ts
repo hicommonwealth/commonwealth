@@ -18,10 +18,7 @@ const status = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('blah0')
-
   try {
-
   const [
     chains,
     nodes,
@@ -147,13 +144,12 @@ const status = async (
   });
 
   // get invites for user
-  // const invites = await models.InviteCode.findAll({
-  //   where: {
-  //     invited_email: user.email,
-  //     used: false,
-  //   },
-  // });
-  console.log('blah3')
+  const invites = await models.InviteCode.findAll({
+    where: {
+      invited_email: user.email,
+      used: false,
+    },
+  });
 
   // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
   const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
@@ -195,7 +191,6 @@ const status = async (
       };
     })
   );
-  console.log('blah4')
 
   const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
   return res.json({

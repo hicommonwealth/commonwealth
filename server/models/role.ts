@@ -10,7 +10,7 @@ export interface RoleAttributes {
   address_id: number;
   permission: Permission;
   id?: number;
-  chain_id?: string;
+  chain_id: string;
   is_user_default?: boolean;
   created_at?: Date;
   updated_at?: Date;

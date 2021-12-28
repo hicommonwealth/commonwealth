@@ -85,10 +85,8 @@ const createReaction = async (
   const options = {
     reaction,
     address_id: author.id,
+    chain: chain.id
   };
-
-  if (chain) options['chain'] = chain.id;
-  // if (community) options['community'] = community.id;
 
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {

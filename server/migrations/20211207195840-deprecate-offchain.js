@@ -142,6 +142,19 @@ module.exports = {
       console.log("merging offchain ids into chain column")
 
       await queryInterface.sequelize.query(
+        `UPDATE "DiscussionDrafts" SET chain = community WHERE chain IS NULL;`,
+        { transaction: t },
+      );
+      await queryInterface.sequelize.query(
+        'ALTER TABLE "DiscussionDrafts" DROP COLUMN community;',
+        { transaction: t }
+      );
+      await queryInterface.sequelize.query(
+        `ALTER TABLE "DiscussionDrafts" ALTER COLUMN "chain" SET NOT NULL;`,
+        { transaction: t }
+      )
+
+      await queryInterface.sequelize.query(
         `UPDATE "OffchainComments" SET chain = community WHERE chain IS NULL;`,
         { transaction: t },
       );

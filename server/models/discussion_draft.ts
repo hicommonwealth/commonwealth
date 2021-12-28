@@ -8,7 +8,7 @@ export interface DiscussionDraftAttributes {
   title?: string;
   topic?: string;
   body?: string;
-  chain?: string;
+  chain: string;
   attachment?: string;
 }
 
@@ -27,7 +27,7 @@ export default (
     title: { type: DataTypes.TEXT, allowNull: true },
     topic: { type: DataTypes.STRING, allowNull: true },
     body: { type: DataTypes.TEXT, allowNull: true },
-    chain: { type: DataTypes.STRING, allowNull: true },
+    chain: { type: DataTypes.STRING, allowNull: false },
     attachment: { type: DataTypes.INTEGER, allowNull: true },
   }, {
     tableName: 'DiscussionDrafts',

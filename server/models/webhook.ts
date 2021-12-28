@@ -7,7 +7,7 @@ export interface WebhookAttributes {
   url: string;
   categories: string[];
   id?: number;
-  chain_id?: string;
+  chain_id: string;
   created_at?: Date;
   updated_at?: Date;
   Chain?: ChainAttributes;

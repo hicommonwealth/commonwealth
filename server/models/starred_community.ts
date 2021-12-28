@@ -7,7 +7,7 @@ import { ChainAttributes } from './chain';
 export interface StarredCommunityAttributes {
   user_id: number;
   id?: number;
-  chain?: string;
+  chain: string;
   created_at?: Date;
   updated_at?: Date;
 

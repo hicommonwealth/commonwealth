@@ -8,7 +8,7 @@ export interface OffchainViewCountAttributes {
   object_id: number;
   view_count: number;
   id?: number;
-  chain?: string;
+  chain: string;
   Chain?: ChainAttributes;
   OffchainThread?: OffchainThreadAttributes;
 }
@@ -26,7 +26,7 @@ export default (
 ): OffchainViewCountModelStatic => {
   const OffchainViewCount = <OffchainViewCountModelStatic>sequelize.define('OffchainViewCount', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: dataTypes.STRING },
+    chain: { type: dataTypes.STRING, allowNull: false },
     object_id: { type: dataTypes.INTEGER, allowNull: false },
     view_count: { type: dataTypes.INTEGER, allowNull: false },
   }, {
