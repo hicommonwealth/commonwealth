@@ -23,6 +23,7 @@ import moment from 'moment';
 import app from 'state';
 import { ChainBase } from 'types';
 import { CommunityInfo, ChainInfo, RoleInfo, Profile } from 'models';
+import { SearchScope } from 'models/SearchQuery'
 import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError } from 'controllers/app/notifications';
@@ -44,10 +45,6 @@ interface IInviteButtonAttrs {
   disabled?: boolean
 }
 
-enum SearchType {
-  Member = 'member',
-}
-
 interface ICommunityOption {
   label: string,
   value: string
@@ -61,7 +58,7 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
-const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]) => {
+const getBalancedContentListing = (unfilteredResults: any[], types: SearchScope[]) => {
   const results = {};
   let unfilteredResultsLength = 0;
   for (const key of types) {
@@ -116,12 +113,12 @@ export const getMemberPreview = (addr, enterAddressFn, closeResultsFn, searchTer
 const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
   const { communityScope, chainScope } = params;
 
-  const results = getBalancedContentListing(app.searchAddressCache[searchTerm], [SearchType.Member]);
+  const results = getBalancedContentListing(app.searchAddressCache[searchTerm], [SearchScope.Members]);
 
   const organizedResults = [];
   let tabIndex = 1;
 
-  const res = results[SearchType.Member];
+  const res = results[SearchScope.Members];
   if (res?.length === 0) return;
 
   (res as any[]).forEach((item) => {
@@ -203,11 +200,7 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
       ['created_at', 'DESC']
     );
 
-    app.searchAddressCache[searchTerm].member = addrs.map((addr) => {
-      addr.contentType = 'member';
-      addr.searchType = SearchType.Member;
-      return addr;
-    }).sort(sortResults);
+    app.searchAddressCache[searchTerm].member = addrs.sort(sortResults);
 
     if (communityScope || chainScope) {
       concludeSearch(searchTerm, params, state);
