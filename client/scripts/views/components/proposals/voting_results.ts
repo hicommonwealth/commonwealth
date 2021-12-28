@@ -314,18 +314,26 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           const coin = new Coin(denom, n, false, decimals);
           return coin.format();
         }
+        const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
+        const getPct = (n: BN) => {
+          return (n.muln(10_000).div(voteTotal).toNumber() / 10_000).toFixed(3);
+        }
         return m('.VotingResults', [
           m('.results-column', [
-            m('.results-header', `Voted yes (${formatCurrency(yes)})`),
+            m('.results-header', `${getPct(yes)}% voted Yes`),
+            m('.results-cell', `(${formatCurrency(yes)})`),
           ]),
           m('.results-column', [
-            m('.results-header', `Voted no (${formatCurrency(no)})`),
+            m('.results-header', `${getPct(no)}% voted No`),
+            m('.results-cell', `(${formatCurrency(no)})`),
           ]),
           m('.results-column', [
-            m('.results-header', `Voted abstain (${formatCurrency(abstain)})`),
+            m('.results-header', `${getPct(abstain)}% voted Abstain`),
+            m('.results-cell', `(${formatCurrency(abstain)})`),
           ]),
           m('.results-column', [
-            m('.results-header', `Voted veto (${formatCurrency(noWithVeto)})`),
+            m('.results-header', `${getPct(noWithVeto)}% voted Veto`),
+            m('.results-cell', `(${formatCurrency(noWithVeto)})`),
           ])
         ]);
       }
