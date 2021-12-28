@@ -10,6 +10,7 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { FaceliftCard } from '../../components/component_kit/cards';
 import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
+var numeral = require('numeral');
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -23,6 +24,14 @@ const getNewTag = (labelCount = null) => {
     })
   ]);
 };
+
+const buildCommunityString = (numCommunities: number) => {
+  let numberString = numCommunities;
+  if (numCommunities >= 1000) {
+    numberString = numeral(numCommunities).format('0.0a');
+  } 
+  return numberString + ' Communities'; 
+}
 
 const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
   view: (vnode) => {
@@ -130,8 +139,8 @@ const LockdropToolsCard: m.Component<{}> = {
       interactive: true,
       class_name: '.chain-card',
     }, [    
-      m('h3', { style: 'margin-top: 4px; display: flex;' }, 'Edgeware Lockdrop Tools'),
       m('.lockdrop-card-body', [
+        m('h3', 'Edgeware Lockdrop Tools'),
         m(Button, {
           interactive: true,
           compact: true,
@@ -145,6 +154,7 @@ const LockdropToolsCard: m.Component<{}> = {
           },
           label: [ 'Lockdrop stats ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
         }),
+        m('.spacer', []),
         m(Button, {
           interactive: true,
           compact: true,
@@ -165,16 +175,16 @@ const LockdropToolsCard: m.Component<{}> = {
 
 const NewCommunityCard: m.Component<{}> = {
   view: (vnode) => {
-    return m(Card, {
-      elevation: 1,
+    return m(FaceliftCard, {
+      elevation: 2,
       interactive: true,
-      class: 'home-card NewCommunityCard',
+      class_name: '.chain-card',
       onclick: (e) => {
         e.preventDefault();
         document.location = 'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
       }
     }, [
-      m('.card-right', [
+      m('.lockdrop-card-body', [
         m('h3', 'Create a new community'),
         m('p.action', 'Launch and grow your decentralized community on Commonwealth'),
         m('a.learn-more', { href: '#' }, m.trust('Learn more &raquo;')),
@@ -220,20 +230,21 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
         .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
     );
 
+    const totalCommunitiesString = buildCommunityString(sortedChainsAndCommunities.length + betaChainsAndCommunities.length);
+    
     return m('.HomepageCommunityCards', {
       style: 'margin-top: 40px',
     }, [
       m('.communities-list', [
+        m('.communities-number', totalCommunitiesString),
         sortedChainsAndCommunities,
         m('.clear'),
         betaChainsAndCommunities.length > 0 && m('h4', 'Testnets & Alpha Networks'),
         betaChainsAndCommunities,
-        m('.clear'),
       ]),
       m('.other-list', [
         m(NewCommunityCard),
         m(LockdropToolsCard),
-        m('.clear'),
       ]),
     ]);
   }
