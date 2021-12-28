@@ -4,10 +4,8 @@ import m from 'mithril';
 import { Button, Icon, Icons, Card, Tag } from 'construct-ui';
 
 import app from 'state';
-import { link, pluralize } from 'helpers';
 import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
-import UserGallery from 'views/components/widgets/user_gallery';
 import { FaceliftCard } from '../../components/component_kit/cards';
 import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
 var numeral = require('numeral');
@@ -71,7 +69,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
         m('.join-button-wrapper', [
           m(FaceliftButton, {
             intent: ButtonIntent.Secondary,
-            label: 'Join',
+            label: 'See More',
             disabled: false,
             onclick: redirectFunction
           }),
@@ -101,7 +99,6 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
       pretty_description = community.description[community.description.length-1] === '.' ? community.description : community.description + '.';
     }
     
-
     return m(FaceliftCard, {
       elevation: 2,
       interactive: true,

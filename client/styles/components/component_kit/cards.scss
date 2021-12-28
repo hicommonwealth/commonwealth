@@ -24,7 +24,7 @@ $default-card-height: 100px;
     &.not-fluid {
         width: $default-card-width;
     }
-    
+
     &.elevation-1 {
         box-shadow: $elevation-1-shadow;
         &.interactive {

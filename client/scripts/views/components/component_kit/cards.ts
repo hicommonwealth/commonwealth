@@ -1,9 +1,8 @@
 import m from 'mithril';
 import 'components/component_kit/cards.scss';
-import { FunctionList } from 'aws-sdk/clients/lambda';
 
 export interface CardAttrs {
-    /** Degree of card shadow (1-3) */
+    /** Degree of card shadow (Range 1-3) */
     elevation?: number 
     /** Fills width of parent container */
     fluid?: boolean;
