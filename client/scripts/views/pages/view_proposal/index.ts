@@ -387,7 +387,7 @@ const ProposalHeader: m.Component<
                         onChangeHandler: (
                           stage: OffchainThreadStage,
                           chainEntities: ChainEntity[],
-                          snapshotProposal: SnapshotProposal
+                          snapshotProposal: SnapshotProposal[]
                         ) => {
                           proposal.stage = stage;
                           proposal.chainEntities = chainEntities;

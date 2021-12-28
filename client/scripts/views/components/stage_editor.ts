@@ -45,7 +45,7 @@ const SnapshotProposalSelector: m.Component<{
           placeholder: 'Search for an existing snapshot proposal...',
         },
         itemRender: (sn: SnapshotProposal, idx: number) => {
-          const selected = vnode.attrs.snapshotProposalsToSet.map((sn_) => sn_.created).indexOf(sn.created) !== -1;
+          const selected = sn.id === vnode.attrs.thread.snapshotProposal;
           // TODO: show additional info on the ListItem, like any set proposal title, the creator, or other metadata
           return m(ListItem, {
             label: m('.chain-entity-info', [
@@ -60,16 +60,7 @@ const SnapshotProposalSelector: m.Component<{
           // TODO
           return sn.title?.toString().toLowerCase().includes(query.toLowerCase())
         },
-        onSelect: (sn: SnapshotProposal) => {
-          // TODO
-          if (vnode.attrs.snapshotProposalsToSet.map((sn_) => sn_.created).indexOf(sn.created) !== -1) {
-            const index = vnode.attrs.snapshotProposalsToSet.findIndex((sn_) => sn_.id === sn.id);
-            vnode.attrs.snapshotProposalsToSet.splice(index, 1);
-          } else {
-            vnode.attrs.snapshotProposalsToSet.push(sn);
-          }
-          onSelect(sn);
-        },
+        onSelect: (sn: SnapshotProposal) => { onSelect(sn) },
       }) : m('.chain-entities-selector-placeholder', [
         m('.chain-entities-selector-placeholder-text', [
           vnode.state.snapshotProposalsLoaded
@@ -213,10 +204,17 @@ const StageEditor: m.Component<{
           ]),
           app.chain?.meta?.chain.snapshot && m(SnapshotProposalSelector, {
             thread: vnode.attrs.thread,
-            onSelect: (result) => {
+            onSelect: (sn) => {
               if (vnode.state.stage === OffchainThreadStage.Discussion
                   || vnode.state.stage === OffchainThreadStage.ProposalInReview) {
                 vnode.state.stage = OffchainThreadStage.Voting;
+              }
+              if (sn.id === vnode.attrs.thread.snapshotProposal) {
+                vnode.state.snapshotProposalsToSet = [];
+                vnode.attrs.thread.snapshotProposal = '';
+              } else {
+                vnode.state.snapshotProposalsToSet = [sn];
+                vnode.attrs.thread.snapshotProposal = sn.id;
               }
             },
             snapshotProposalsToSet: vnode.state.snapshotProposalsToSet,
@@ -263,7 +261,6 @@ const StageEditor: m.Component<{
             onclick: async () => {
               const { stage } = vnode.state;
               const { thread } = vnode.attrs;
-
               // set stage
               try {
                 await app.threads.setStage({ threadId: thread.id, stage: vnode.state.stage });
@@ -293,7 +290,7 @@ const StageEditor: m.Component<{
                 vnode.attrs.openStateHandler(false);
               } else {
                 vnode.state.isOpen = false;
-              }
+              }    
             },
           }),
         ])
