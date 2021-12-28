@@ -88,7 +88,8 @@ import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
 import getThreads from './routes/getThreads';
-import search from './routes/search';
+import searchDiscussions from './routes/searchDiscussions'
+import searchComments from './routes/searchComments'
 import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
@@ -335,7 +336,8 @@ function setupRouter(
   router.get('/bulkThreads', bulkThreads.bind(this, models));
   router.get('/activeThreads', activeThreads.bind(this, models));
   router.get('/getThreads', getThreads.bind(this, models));
-  router.get('/search', search.bind(this, models));
+  router.get('/searchDiscussions', searchDiscussions.bind(this, models));
+  router.get('/searchComments', searchComments.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
 

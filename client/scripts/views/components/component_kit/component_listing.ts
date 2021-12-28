@@ -219,6 +219,10 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
             size: IconSize.LG,
             intent: IconIntent.Primary,
           }),
+          // ReplyIcon: m(ReplyIcon, {
+          //   size: IconSize.LG,
+          //   intent: IconIntent.Primary,
+          // }),
           NotificationIcon: m(NotificationIcon, {
             size: IconSize.LG,
             intent: IconIntent.Primary,
