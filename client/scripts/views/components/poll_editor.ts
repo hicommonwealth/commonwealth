@@ -24,7 +24,6 @@ const PollEditor: m.Component<{
   view: (vnode) => {
     const { thread } = vnode.attrs;
     const { pollingEnabled, customDurationEnabled, customDuration } = vnode.state;
-    console.log({ pollingEnabled, customDurationEnabled, customDuration });
 
     // reset choices when initializing
     if (!vnode.state.choices || vnode.state.choices.length === 0) {
@@ -167,7 +166,7 @@ const PollEditor: m.Component<{
                   });
                   notifySuccess('Poll creation succeeded');
                 } catch (e) {
-                  notifyError('Poll creation failed');
+                  console.error(e);
                 }
                 vnode.attrs.onChangeHandler();
               } else {
