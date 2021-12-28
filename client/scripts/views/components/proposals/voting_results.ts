@@ -4,7 +4,7 @@ import app from 'state';
 import BN from 'bn.js';
 import Web3 from 'web3';
 
-import { formatCoin, formatNumberLong } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
+import { formatCoin, formatNumberLong, Coin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
@@ -303,6 +303,32 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
         ])
       ]);
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
+      // return different voting results on completed cosmos proposal, as voters are not available
+      if (proposal.completed && (proposal as CosmosProposal).data?.state?.tally) {
+        const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal).data.state.tally;
+
+        // TODO: move this marshalling into controller
+        const formatCurrency = (n: BN) => {
+          const decimals = new BN(10).pow(new BN(app.chain.meta.chain.decimals || 6));
+          const denom = app.chain.meta.chain.symbol;
+          const coin = new Coin(denom, n, false, decimals);
+          return coin.format();
+        }
+        return m('.VotingResults', [
+          m('.results-column', [
+            m('.results-header', `Voted yes (${formatCurrency(yes)})`),
+          ]),
+          m('.results-column', [
+            m('.results-header', `Voted no (${formatCurrency(no)})`),
+          ]),
+          m('.results-column', [
+            m('.results-header', `Voted abstain (${formatCurrency(abstain)})`),
+          ]),
+          m('.results-column', [
+            m('.results-header', `Voted veto (${formatCurrency(noWithVeto)})`),
+          ])
+        ]);
+      }
       return m('.VotingResults', [
         m('.results-column', [
           m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`),
