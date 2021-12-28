@@ -19,7 +19,7 @@ const updateThreadPolling = async (models: DB, req: Request, res: Response, next
   const { thread_id } = req.body;
   let { custom_duration } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
-  console.log(custom_duration);
+
   if (custom_duration !== 'Infinite') {
     custom_duration = Number(custom_duration);
     if (!Number.isInteger(custom_duration) || custom_duration < 0 || custom_duration > 31) {
@@ -61,7 +61,6 @@ const updateThreadPolling = async (models: DB, req: Request, res: Response, next
       : custom_duration
         ? moment().add(custom_duration, 'days')
         : getNextOffchainPollEndingTime(moment());
-    console.log(offchain_voting_ends_at);
     await thread.update({
       offchain_voting_enabled: true,
       offchain_voting_ends_at,
