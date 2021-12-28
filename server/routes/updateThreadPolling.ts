@@ -1,10 +1,8 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { getNextOffchainPollEndingTime } from '../../shared/utils';
 import { DB } from '../database';
-import { isNumber } from 'underscore';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,10 +16,15 @@ export const Errors = {
 };
 
 const updateThreadPolling = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const { thread_id, custom_duration } = req.body;
+  const { thread_id } = req.body;
+  let { custom_duration } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
-  if (custom_duration !== 'Infinite' && !(isNumber(custom_duration) && custom_duration > 0 && custom_duration < 31)) {
-    return next(new Error(Errors.InvalidDuration));
+  console.log(custom_duration);
+  if (custom_duration !== 'Infinite') {
+    custom_duration = Number(custom_duration);
+    if (!Number.isInteger(custom_duration) || custom_duration < 0 || custom_duration > 31) {
+      return next(new Error(Errors.InvalidDuration));
+    }
   }
 
   try {
