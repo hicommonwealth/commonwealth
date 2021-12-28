@@ -193,18 +193,18 @@ module.exports = {
         { transaction: t }
       )
 
-      await queryInterface.sequelize.query(
-        `UPDATE "InviteLinks" SET chain_id = community_id WHERE chain_id IS NULL;`,
-        { transaction: t },
-      );
-      await queryInterface.sequelize.query(
-        'ALTER TABLE "InviteLinks" DROP COLUMN community_id;',
-        { transaction: t }
-      );
-      await queryInterface.sequelize.query(
-        `ALTER TABLE "InviteLinks" ALTER COLUMN "chain_id" SET NOT NULL;`,
-        { transaction: t }
-      )
+      // await queryInterface.sequelize.query(
+      //   `UPDATE "InviteLinks" SET chain_id = community_id WHERE chain_id IS NULL;`,
+      //   { transaction: t },
+      // );
+      // await queryInterface.sequelize.query(
+      //   'ALTER TABLE "InviteLinks" DROP COLUMN community_id;',
+      //   { transaction: t }
+      // );
+      // await queryInterface.sequelize.query(
+      //   `ALTER TABLE "InviteLinks" ALTER COLUMN "chain_id" SET NOT NULL;`,
+      //   { transaction: t }
+      // )
 
       await queryInterface.sequelize.query(
         `UPDATE "OffchainTopics" SET chain_id = community_id WHERE chain_id IS NULL;`,
@@ -401,6 +401,12 @@ module.exports = {
       // remove fully remove offchain communities once ported
       await queryInterface.sequelize.query(
         'DROP TABLE "OffchainCommunities"',
+        { transaction: t }
+      );
+
+      // also remove InviteLinks:)
+      await queryInterface.sequelize.query(
+        'DROP TABLE "InviteLinks"',
         { transaction: t }
       );
     }

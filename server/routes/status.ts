@@ -200,6 +200,7 @@ const status = async (
     notificationCategories,
     recentThreads: threadCount,
     roles,
+    invites,
     loggedIn: true,
     user: {
       email: user.email,

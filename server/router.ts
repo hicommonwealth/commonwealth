@@ -52,9 +52,6 @@ import getInvites from './routes/getInvites';
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
-import createInviteLink from './routes/createInviteLink';
-import acceptInviteLink from './routes/acceptInviteLink';
-import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
 import getProfile from './routes/getProfile';
 
@@ -398,19 +395,6 @@ function setupRouter(
   router.post(
     '/threadsUsersCountAndAvatars',
     threadsUsersCountAndAvatars.bind(this, models)
-  );
-
-  // generic invite link
-  router.post(
-    '/createInviteLink',
-    passport.authenticate('jwt', { session: false }),
-    createInviteLink.bind(this, models)
-  );
-  router.get('/acceptInviteLink', acceptInviteLink.bind(this, models));
-  router.get(
-    '/getInviteLinks',
-    passport.authenticate('jwt', { session: false }),
-    getInviteLinks.bind(this, models)
   );
 
   // roles + permissions

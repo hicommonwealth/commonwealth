@@ -50,7 +50,7 @@ import IdentityCacheFactory, {
   IdentityCacheStatic,
 } from './models/identity_cache';
 import InviteCodeFactory, { InviteCodeModelStatic } from './models/invite_code';
-import InviteLinkFactory, { InviteLinkModelStatic } from './models/invite_link';
+// import InviteLinkFactory, { InviteLinkModelStatic } from './models/invite_link';
 import LinkedThread, { LinkedThreadModelStatic } from './models/linked_thread';
 import LoginTokenFactory, { LoginTokenModelStatic } from './models/login_token';
 import NotificationFactory, {
@@ -122,7 +122,7 @@ export type Models = {
   HedgehogUser: HedgehogUserModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
-  InviteLink: InviteLinkModelStatic;
+  // InviteLink: InviteLinkModelStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
@@ -202,7 +202,7 @@ const models: Models = {
   HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
-  InviteLink: InviteLinkFactory(sequelize, DataTypes),
+  // InviteLink: InviteLinkFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
