@@ -18,7 +18,8 @@ export default class CompoundChain extends EthereumChain {
     this.compoundApi = new CompoundAPI(
       null,
       selectedNode.address,
-      this.api.currentProvider as any
+      this.api.currentProvider as any,
+      selectedNode.ethChainId,
     );
     await this.compoundApi.init(selectedNode.tokenName);
   }

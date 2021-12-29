@@ -49,10 +49,11 @@ export default class CompoundAPI implements ContractApi<GovernorAlpha | Governor
   constructor(
     _factory: any,
     contractAddress: string,
-    web3Provider: ExternalProvider
+    web3Provider: ExternalProvider,
+    chainId?: number
   ) {
     this.contractAddress = contractAddress;
-    this.Provider = new Web3Provider(web3Provider);
+    this.Provider = new Web3Provider(web3Provider, chainId);
     // 12s minute polling interval (default is 4s)
     this.Provider.pollingInterval = 12000;
   }

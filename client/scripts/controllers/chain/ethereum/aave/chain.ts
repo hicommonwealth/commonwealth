@@ -15,7 +15,8 @@ export default class AaveChain extends EthereumChain {
     this.aaveApi = new AaveApi(
       IAaveGovernanceV2__factory.connect,
       selectedNode.address,
-      this.api.currentProvider as any
+      this.api.currentProvider as any,
+      selectedNode.ethChainId,
     );
     await this.aaveApi.init();
   }

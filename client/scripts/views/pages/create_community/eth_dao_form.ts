@@ -66,6 +66,7 @@ const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
             null,
             vnode.state.address,
             provider,
+            +vnode.state.chain_id,
           );
           await compoundApi.init(vnode.state.token_name);
           if (!compoundApi.Token) {
@@ -80,6 +81,7 @@ const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
             IAaveGovernanceV2__factory.connect,
             vnode.state.address,
             provider,
+            +vnode.state.chain_id,
           );
           await aaveApi.init();
           vnode.state.status = `Found Aave type DAO`;
