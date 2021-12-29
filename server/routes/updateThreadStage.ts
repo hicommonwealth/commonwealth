@@ -10,7 +10,7 @@ export const Errors = {
   NoStage: 'Must pass in stage',
   NoThread: 'Cannot find thread',
   NotAdminOrOwner: 'Not an admin or owner of this thread',
-  InvalidStage: 'Invalid stage',
+  InvalidStage: 'Please Select a Stage',
 };
 
 const updateThreadStage = async (models: DB, req: Request, res: Response, next: NextFunction) => {
