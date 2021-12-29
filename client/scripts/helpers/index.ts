@@ -296,53 +296,6 @@ export function blockperiodToDuration(blocknum: number) {
   return moment.duration(blocknum * app.chain.block.duration, 'seconds');
 }
 
-export class BlocktimeHelper {
-  private _durations = [];
-  private _durationwindow;
-  private _previousblocktime: moment.Moment;
-  private _lastblocktime;
-  private _blocktime;
-
-  constructor(durationwindow: number = 5) {
-    this._durationwindow = durationwindow;
-  }
-
-  get lastblocktime() {
-    return this._lastblocktime;
-  }
-
-  get blocktime() {
-    return this._blocktime;
-  }
-
-  public stamp(timestamp: moment.Moment, heightDiff = 1) {
-    this._previousblocktime = this._lastblocktime;
-    this._lastblocktime = timestamp;
-    if (!this._previousblocktime) {
-      return;
-    }
-
-    // apply moving average to figure out blocktimes
-    const lastblocksduration = moment.duration(timestamp.diff(this._previousblocktime)).asSeconds();
-    const lastblockduration = lastblocksduration / heightDiff;
-    this._durations.push(lastblockduration);
-    if (this._durations.length > this._durationwindow) {
-      this._durations.shift();
-    }
-    const durations = this._durations.slice();
-    durations.sort();
-
-    // take the median duration
-    // TODO: support decimal block times
-    const newblocktime = Math.round(durations[Math.floor(durations.length / 2)]);
-    if (newblocktime > 0 && newblocktime !== this._blocktime) {
-      this._blocktime = newblocktime;
-      console.log(`blocktime: ${this._blocktime}`);
-      m.redraw();
-    }
-  }
-}
-
 // loads remote scripts from a URI, e.g. Twitter widgets
 export const loadScript = (scriptURI) => {
   return new Promise((resolve, reject) => {
