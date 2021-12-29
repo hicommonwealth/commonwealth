@@ -81,7 +81,10 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       );
       return [];
     }
-    if (range.endBlock && range.startBlock >= range.endBlock) {
+    if (!range.endBlock) {
+      range.endBlock = this._currentBlock;
+    }
+    if (range.startBlock >= range.endBlock) {
       this.log.error(
         `Invalid fetch range: ${range.startBlock}-${range.endBlock}.`
       );
@@ -107,7 +110,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         null
       ),
       range.startBlock,
-      range.endBlock || 'latest'
+      range.endBlock
     );
     const createdCwEvents = await Promise.all(
       proposalCreatedEvents.map((evt) => {
@@ -130,7 +133,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const voteEmittedEvents = await this._api.governance.queryFilter(
       this._api.governance.filters.VoteEmitted(null, null, null, null),
       range.startBlock,
-      range.endBlock || 'latest'
+      range.endBlock
     );
     const voteCwEvents = await Promise.all(
       voteEmittedEvents.map((evt) => {
@@ -153,7 +156,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const proposalQueuedEvents = await this._api.governance.queryFilter(
       this._api.governance.filters.ProposalQueued(null, null, null),
       range.startBlock,
-      range.endBlock || 'latest'
+      range.endBlock
     );
     const queuedCwEvents = await Promise.all(
       proposalQueuedEvents.map((evt) => {
@@ -176,7 +179,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const proposalCanceledEvents = await this._api.governance.queryFilter(
       this._api.governance.filters.ProposalCanceled(null),
       range.startBlock,
-      range.endBlock || 'latest'
+      range.endBlock
     );
     const cancelledCwEvents = await Promise.all(
       proposalCanceledEvents.map((evt) => {
@@ -199,7 +202,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const proposalExecutedEvents = await this._api.governance.queryFilter(
       this._api.governance.filters.ProposalExecuted(null, null),
       range.startBlock,
-      range.endBlock || 'latest'
+      range.endBlock
     );
     const executedCwEvents = await Promise.all(
       proposalExecutedEvents.map((evt) => {

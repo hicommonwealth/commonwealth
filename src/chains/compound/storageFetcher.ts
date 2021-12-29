@@ -74,7 +74,10 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       );
       return [];
     }
-    if (range.endBlock && range.startBlock >= range.endBlock) {
+    if (!range.endBlock) {
+      range.endBlock = this._currentBlock;
+    }
+    if (range.startBlock >= range.endBlock) {
       this.log.error(
         `Invalid fetch range: ${range.startBlock}-${range.endBlock}.`
       );
@@ -97,7 +100,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         null
       ),
       range.startBlock,
-      range.endBlock || 'latest'
+      range.endBlock
     );
     const createdCwEvents = await Promise.all(
       proposalCreatedEvents.map(
@@ -115,7 +118,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         ? this._api.filters.VoteCast(null, null, null, null)
         : this._api.filters.VoteCast(null, null, null, null, null),
       range.startBlock,
-      range.endBlock || 'latest'
+      range.endBlock
     );
     const voteCwEvents = await Promise.all(
       voteCastEvents.map(
@@ -134,7 +137,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       const proposalQueuedEvents = await this._api.queryFilter(
         this._api.filters.ProposalQueued(null, null),
         range.startBlock,
-        range.endBlock || 'latest'
+        range.endBlock
       );
       queuedCwEvents = await Promise.all(
         proposalQueuedEvents.map(
@@ -153,7 +156,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const proposalCanceledEvents = await this._api.queryFilter(
       this._api.filters.ProposalCanceled(null),
       range.startBlock,
-      range.endBlock || 'latest'
+      range.endBlock
     );
     const cancelledCwEvents = await Promise.all(
       proposalCanceledEvents.map(
@@ -169,7 +172,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     const proposalExecutedEvents = await this._api.queryFilter(
       this._api.filters.ProposalExecuted(null),
       range.startBlock,
-      range.endBlock || 'latest'
+      range.endBlock
     );
     const executedCwEvents = await Promise.all(
       proposalExecutedEvents.map(
