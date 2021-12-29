@@ -25,13 +25,12 @@ export default (
 ): ChatMessageModelStatic => {
   const ChatMessage = <ChatMessageModelStatic>sequelize.define('ChatMessage', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    chain: { type: dataTypes.STRING, allowNull: false },
-    address: { type: dataTypes.STRING, allowNull: false },
-    text: { type: dataTypes.TEXT, allowNull: false },
-    room: { type: dataTypes.STRING, allowNull: false },
+    address: { type: dataTypes.STRING, allowNull: false, references: { model: 'Address', key: 'address' } },
+    message: { type: dataTypes.TEXT, allowNull: false },
+    chat_channel_id: { type: dataTypes.INTEGER, allowNull: false, references: { model: 'ChatChannel', key: 'id' } },
   }, {
     tableName: 'ChatMessages',
-    underscored: true,
+    underscored: false,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     timestamps: true,
@@ -39,6 +38,10 @@ export default (
       { fields: ['created_at'] },
     ],
   });
+
+  ChatMessage.associate = (models) => {
+    models.ChatMessage.belongsTo(models.ChatChannel)
+  }
 
   return ChatMessage;
 };
