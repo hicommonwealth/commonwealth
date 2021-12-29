@@ -38,8 +38,8 @@ const searchComments = async (
 
     // set up query parameters
     communityOptions = community
-      ? `AND "OffchainComments".community = :community`
-      : `AND "OffchainComments".chain = :chain `;
+      ? `AND "OffchainComments".community = $community`
+      : `AND "OffchainComments".chain = $chain `;
     bind = community
       ? { community: community.id }
       : { chain: chain.id };
