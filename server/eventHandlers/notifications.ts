@@ -50,8 +50,8 @@ export default class extends IEventHandler {
         this._models,
         NotificationCategories.ChainEvent,
         dbEventType.id,
-        { chainEvent: dbEvent, chainEventType: dbEventType },
-        { chainEvent: dbEvent, chainEventType: dbEventType }, // TODO: add webhook data once specced out
+        { chainEvent: dbEvent, chainEventType: dbEventType, chain_id: event.chain },
+        { chainEvent: dbEvent, chainEventType: dbEventType, chain: event.chain }, // TODO: add webhook data once specced out
         this._wss,
         event.excludeAddresses,
         event.includeAddresses

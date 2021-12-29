@@ -107,7 +107,7 @@ export default (
     };
 
     // typeguard function to differentiate between chain event notifications as needed
-    const isChainEventData = (notification_data as IChainEventNotificationData).chainEvent !== undefined
+    const isChainEventData = (<IChainEventNotificationData>notification_data).chainEvent !== undefined
 
     // retrieve distinct user ids given a set of addresses
     const fetchUsersFromAddresses = async (addresses: string[]): Promise<number[]> => {
@@ -162,9 +162,13 @@ export default (
     if (!notification) {
       notification = await models.Notification.create(isChainEventData ? {
         notification_data: '',
-        chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id
+        chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
+        category_id: 'chain-event',
+        chain_id: (<IChainEventNotificationData>notification_data).chain_id
       } : {
         notification_data: JSON.stringify(notification_data),
+        category_id,
+        chain_id: (<IPostNotificationData>notification_data).chain_id || (<ICommunityNotificationData>notification_data).chain
       })
     }
 

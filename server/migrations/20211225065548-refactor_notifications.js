@@ -127,7 +127,7 @@ module.exports = {
               UPDATE "Notifications" AS N
         SET chain_id = A.chain_id
         FROM (
-            SELECT id, notification_data->>'chain_id' as chain_id
+            SELECT id, COALESCE(notification_data->>'chain_id', notification_data->>'chain') as chain_id
             FROM (SELECT id, cast(notification_data as json) FROM "Notifications" WHERE chain_event_id IS NULL) as N_Data
             UNION
             SELECT NO.id as id, CET.chain as chain_id
@@ -143,7 +143,6 @@ module.exports = {
           type: 'RAW',
           transaction: t,
         });
-
       // Cannot regenerate the original notification id's once the Old_Notifications table is dropped
       // best to leave the old notification's table until smooth transition is confirmed (delete manually later)
       // await queryInterface.dropTable('Old_Notifications');
