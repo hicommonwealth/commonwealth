@@ -19,17 +19,17 @@ module.exports = {
       // creates a new table called Notifications
       await queryInterface.sequelize.query(
         `
-          CREATE TABLE IF NOT EXISTS "Notifications"
-          (
-            id                SERIAL PRIMARY KEY,
-            notification_data text,
-            created_at        timestamp with time zone,
-            updated_at        timestamp with time zone,
-            chain_event_id    integer REFERENCES "ChainEvents" (id),
-            chain_id          varchar(255) REFERENCES "Chains" (id),
-            --     community_id integer REFERENCES "Chains"(community_id),
-            category_id       varchar(255) REFERENCES "NotificationCategories" (name)
-          );
+            CREATE TABLE IF NOT EXISTS "Notifications"
+            (
+                id                SERIAL PRIMARY KEY,
+                notification_data text,
+                created_at        timestamp with time zone,
+                updated_at        timestamp with time zone,
+                chain_event_id    integer REFERENCES "ChainEvents" (id),
+                chain_id          varchar(255) REFERENCES "Chains" (id),
+                --     community_id integer REFERENCES "Chains"(community_id),
+                category_id       varchar(255) REFERENCES "NotificationCategories" (name)
+            );
 				`,
         {
           raw: true,
@@ -41,13 +41,13 @@ module.exports = {
       // create a new table called Notifications_Read
       await queryInterface.sequelize.query(
         `
-          CREATE TABLE IF NOT EXISTS "Notifications_Read"
-          (
-            notification_id integer REFERENCES "Notifications" (id),
-            subscription_id integer REFERENCES "Subscriptions" (id),
-            is_read         boolean,
-            PRIMARY KEY (notification_id, subscription_id)
-          );
+            CREATE TABLE IF NOT EXISTS "Notifications_Read"
+            (
+                notification_id integer REFERENCES "Notifications" (id),
+                subscription_id integer REFERENCES "Subscriptions" (id),
+                is_read         boolean,
+                PRIMARY KEY (notification_id, subscription_id)
+            );
 				`,
         {
           raw: true,
@@ -80,20 +80,23 @@ module.exports = {
         }
       );
 
-      // Adds is_read and subscriber_id from the old chain-event notifications to the Notifications_Read table.
-      // This ensures that there are unique notifications in the Notifications table and references to those from the
-      // Notifications_Read table.
+      // populates Notifications_Read table by getting notification_id, subscription_id and is_read using joins of
+      // Notifications table (new notification_id with no duplicates) and Old_Notifications table (subscription_id and is_read)
       await queryInterface.sequelize.query(
         `
-          INSERT INTO "Notifications_Read"
-          SELECT N.id as notification_id, O.subscription_id as subscription_id, O.is_read as is_read
-          FROM "Notifications" N
-                 JOIN "Old_Notifications" O on N.chain_event_id = O.chain_event_id
-          UNION
-          SELECT N.id as notification_id, O.subscription_id as subscription_id, O.is_read as is_read
-          FROM "Notifications" N
-                 JOIN "Old_Notifications" O on N.notification_data = O.notification_data
-          WHERE O.notification_data != '';
+            INSERT INTO "Notifications_Read"
+            SELECT notification_id, subscription_id, cast(MAX(cast(is_read AS text)) as boolean)
+            FROM (
+                     SELECT N1.id as notification_id, O1.subscription_id as subscription_id, O1.is_read as is_read
+                     FROM "Notifications" N1
+                              JOIN "Old_Notifications" O1 on N1.chain_event_id = O1.chain_event_id
+                     UNION
+                     SELECT N2.id as notification_id, O2.subscription_id as subscription_id, O2.is_read as is_read
+                     FROM "Notifications" N2
+                              JOIN "Old_Notifications" O2 on N2.notification_data = O2.notification_data
+                     WHERE O2.notification_data != ''
+                 ) as temp
+            GROUP BY (notification_id, subscription_id);
 				`,
         {
           raw: true,
@@ -123,26 +126,30 @@ module.exports = {
       );
 
       // populate chain_id's for the new notifications
-      await queryInterface.sequelize.query(`
-              UPDATE "Notifications" AS N
-        SET chain_id = A.chain_id
-        FROM (
-            SELECT id, COALESCE(notification_data->>'chain_id', notification_data->>'chain') as chain_id
-            FROM (SELECT id, cast(notification_data as json) FROM "Notifications" WHERE chain_event_id IS NULL) as N_Data
-            UNION
-            SELECT NO.id as id, CET.chain as chain_id
-            FROM "Notifications" NO
-            LEFT OUTER JOIN "ChainEvents" CE on NO.chain_event_id = CE.id
-            LEFT OUTER JOIN "ChainEventTypes" CET on CE.chain_event_type_id = CET.id
-            WHERE NO.chain_event_id IS NOT NULL
-        ) AS A(id, chain_id)
-        WHERE N.id = A.id;
-      `,
+      await queryInterface.sequelize.query(
+        `
+                  UPDATE "Notifications" AS N
+                  SET chain_id = A.chain_id
+                  FROM (
+                           SELECT id, COALESCE(notification_data ->> 'chain_id', notification_data ->> 'chain') as chain_id
+                           FROM (SELECT id, cast(notification_data as json)
+                                 FROM "Notifications"
+                                 WHERE chain_event_id IS NULL) as N_Data
+                           UNION
+                           SELECT NO.id as id, CET.chain as chain_id
+                           FROM "Notifications" NO
+                                    LEFT OUTER JOIN "ChainEvents" CE on NO.chain_event_id = CE.id
+                                    LEFT OUTER JOIN "ChainEventTypes" CET on CE.chain_event_type_id = CET.id
+                           WHERE NO.chain_event_id IS NOT NULL
+                       ) AS A(id, chain_id)
+                  WHERE N.id = A.id;
+				`,
         {
           raw: true,
           type: 'RAW',
           transaction: t,
-        });
+        }
+      );
       // Cannot regenerate the original notification id's once the Old_Notifications table is dropped
       // best to leave the old notification's table until smooth transition is confirmed (delete manually later)
       // await queryInterface.dropTable('Old_Notifications');
