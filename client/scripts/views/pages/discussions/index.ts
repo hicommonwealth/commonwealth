@@ -64,7 +64,7 @@ const getLastSeenDivider = (hasText = true) => {
   );
 };
 
-const onSummaryPage = (p, activeId) => decodeURI(p).endsWith(`/${activeId}/`);
+const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
 
 export const CommunityOptionsPopover: m.Component<{}> = {
   view: (vnode) => {
@@ -200,7 +200,7 @@ const DiscussionFilterBar: m.Component<
 
     const selectedStage = stages.find((s) => s === (stage as any));
 
-    const summaryViewEnabled = vnode.attrs.parentState.summaryView && onSummaryPage(m.route.get(), app.activeId());
+    const summaryViewEnabled = vnode.attrs.parentState.summaryView && !onFeaturedDiscussionPage(m.route.get(), topic);
 
     return m('.DiscussionFilterBar', [
       topics.length > 0 &&
@@ -487,7 +487,9 @@ const DiscussionsPage: m.Component<
       }
       vnode.state.summaryViewInitialized = true;
     }
-    const { summaryView, recentThreads, lastSubpage } = vnode.state;
+    let { summaryView, recentThreads, lastSubpage } = vnode.state;
+    summaryView = summaryView && !onFeaturedDiscussionPage(m.route.get(), topic);
+
     if (summaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
@@ -511,7 +513,7 @@ const DiscussionsPage: m.Component<
         showNewProposalButton: true,
       });
 
-    if (summaryView && onSummaryPage(m.route.get(), app.activeId())) {
+    if (summaryView) {
       // overwrite any topic- or stage-scoping in URL
       topic = null;
       stage = null;
@@ -787,7 +789,7 @@ const DiscussionsPage: m.Component<
                 disabled: isLoading || stillFetching,
               }),
             m('.listing-wrap', [
-              summaryView && onSummaryPage(m.route.get(), app.activeId())
+              summaryView
                 ? isLoading
                   ? m(LoadingRow)
                   : m(Listing, {
