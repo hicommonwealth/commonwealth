@@ -1,6 +1,5 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { getNextOffchainPollEndingTime } from '../../shared/utils';
 import { DB } from '../database';
@@ -13,11 +12,20 @@ export const Errors = {
   NoThread: 'Cannot find thread',
   InvalidContent: 'Invalid poll content',
   NotAuthor: 'Only the thread author can start polling',
+  InvalidDuration: 'Invalid poll duration',
 };
 
 const updateThreadPolling = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
+  let { custom_duration } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
+
+  if (custom_duration && custom_duration !== 'Infinite') {
+    custom_duration = Number(custom_duration);
+    if (!Number.isInteger(custom_duration) || custom_duration < 0 || custom_duration > 31) {
+      return next(new Error(Errors.InvalidDuration));
+    }
+  }
 
   try {
     const thread = await models.OffchainThread.findOne({
@@ -48,8 +56,14 @@ const updateThreadPolling = async (models: DB, req: Request, res: Response, next
 
     // We assume that the server-side time is in sync with client-side time here
     if (thread.offchain_voting_ends_at) return next(new Error(Errors.AlreadyPolling));
+    const offchain_voting_ends_at = custom_duration === 'Infinite'
+      ? null
+      : custom_duration
+        ? moment().add(custom_duration, 'days')
+        : getNextOffchainPollEndingTime(moment());
     await thread.update({
-      offchain_voting_ends_at: getNextOffchainPollEndingTime(moment()),
+      offchain_voting_enabled: true,
+      offchain_voting_ends_at,
       offchain_voting_options: req.body.content,
     });
 
