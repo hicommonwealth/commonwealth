@@ -157,12 +157,12 @@ const PollEditor: m.Component<{
             rounded: true,
             onclick: async () => {
               if (vnode.state.pollingEnabled) {
-                if (!vnode.state.choices[0]?.length || !vnode.state.choices[1]?.length) {
-                  notifyError('Must set poll choices');
-                  return;
-                }
                 if (!vnode.state.name) {
                   notifyError('Must set poll name');
+                  return;
+                }
+                if (!vnode.state.choices[0]?.length || !vnode.state.choices[1]?.length) {
+                  notifyError('Must set poll choices');
                   return;
                 }
                 try {

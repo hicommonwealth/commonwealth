@@ -396,6 +396,9 @@ class ThreadsController {
           location.reload();
           return;
         }
+        // TODO: This should be handled properly
+        // via controller/store & update method
+        thread.offchainVotingEnabled = true;
         thread.offchainVotingOptions = { name, choices };
         thread.offchainVotingNumVotes = 0;
         thread.offchainVotingEndsAt = response.result.offchain_voting_ends_at
