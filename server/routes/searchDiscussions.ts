@@ -82,8 +82,8 @@ const searchDiscussions = async (
 
     // set up query parameters
     communityOptions = community
-      ? `AND "OffchainThreads".community = :community `
-      : `AND "OffchainThreads".chain = :chain `;
+      ? `AND "OffchainThreads".community = $community `
+      : `AND "OffchainThreads".chain = $chain `;
     bind = community
       ? { community: community.id }
       : { chain: chain.id };

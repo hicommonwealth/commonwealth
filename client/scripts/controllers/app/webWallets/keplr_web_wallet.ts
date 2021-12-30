@@ -1,6 +1,6 @@
 import app from 'state';
 
-import { SigningStargateClient } from '@cosmjs/stargate';
+import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase } from 'types';
@@ -70,8 +70,12 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     // enable
     this._enabling = true;
     try {
-      // enabling without version (i.e. cosmoshub instead of cosmoshub-4) should work
-      this._chainId = app.chain.meta.chain.id;
+      // fetch chain id from URL using stargate client
+      const client = await StargateClient.connect(app.chain.meta.url);
+      const chainId = await client.getChainId();
+      this._chainId = chainId;
+      client.disconnect();
+
       try {
         await window.keplr.enable(this._chainId);
       } catch (err) {
