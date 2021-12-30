@@ -602,7 +602,7 @@ class ThreadsController {
     this._store.add(modelFromServer(response.result));
   }
 
-  public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
+  public async fetchThreadIdsForSnapshot(args: { snapshot: string }) {
     const response = await $.ajax({
       url: `${app.serverUrl()}/fetchThreadForSnapshot`,
       type: 'GET',

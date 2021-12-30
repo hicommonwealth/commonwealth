@@ -387,7 +387,7 @@ const ProposalHeader: m.Component<
                         onChangeHandler: (
                           stage: OffchainThreadStage,
                           chainEntities: ChainEntity[],
-                          snapshotProposal: SnapshotProposal
+                          snapshotProposal: SnapshotProposal[]
                         ) => {
                           proposal.stage = stage;
                           proposal.chainEntities = chainEntities;
@@ -1274,6 +1274,7 @@ const ViewProposalPage: m.Component<
         ]
       );
     }
+    const showLinkedOptions = (proposal as OffchainThread).linkedThreads?.length > 0 || isAuthor || isAdmin;
 
     return m(
       Sublayout,
@@ -1294,9 +1295,7 @@ const ViewProposalPage: m.Component<
                 vnode.state.pollEditorIsOpen = true;
               },
             }),
-          proposal instanceof OffchainThread &&
-            ((proposal as OffchainThread).chainEntities.length > 0 ||
-              (proposal as OffchainThread).snapshotProposal?.length > 0) &&
+          showLinkedOptions && proposal instanceof OffchainThread &&
             m(ProposalSidebarLinkedViewer, {
               proposal,
               openStageEditor: () => {
@@ -1304,8 +1303,7 @@ const ViewProposalPage: m.Component<
               },
               showAddProposalButton: (isAuthor || isAdmin)
             }),
-          proposal instanceof OffchainThread &&
-          (proposal.linkedThreads?.length > 0 || isAuthor || isAdmin) &&
+          showLinkedOptions && proposal instanceof OffchainThread &&
             m(ProposalLinkedThreadsEditorModule, {
               proposal,
               allowLinking: isAuthor || isAdmin,

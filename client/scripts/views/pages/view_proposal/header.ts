@@ -297,18 +297,18 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
   };
 
 export const ProposalHeaderSnapshotThreadLink: m.Component<{
-  threadId: string;
+  thread: {id: string, title: string}
 }> = {
   view: (vnode) => {
-    const { threadId } = vnode.attrs;
-    if (!threadId) return;
+    const { id, title } = vnode.attrs.thread;
+    if (!id) return;
     const proposalLink = `${
       app.isCustomDomain() ? '' : `/${app.activeId()}`
-    }/proposal/discussion/${threadId}`;
+    }/proposal/discussion/${id}`;
 
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [
-        'Go to discussion',
+        decodeURIComponent(title),
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
     ]);
