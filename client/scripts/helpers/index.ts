@@ -168,6 +168,7 @@ export function isSameAccount(a, b) {
 /*
  * formatters
  */
+
 export function pluralize(num: number, str: string) {
   if (str.endsWith('y')) {
     return `${num} ${str.slice(0, str.length - 1)}${(num === 1) ? 'y' : 'ies'}`;
@@ -175,6 +176,16 @@ export function pluralize(num: number, str: string) {
     return `${num} ${str}${num === 1 ? '' : 'es'}`;
   } else {
     return `${num} ${str}${(num === 1 || str.endsWith('s')) ? '' : 's'}`;
+  }
+}
+
+export function pluralizeWithoutNumberPrefix(num: number, str: string) {
+  if (str.endsWith('y')) {
+    return `${str.slice(0, str.length - 1)}${(num === 1) ? 'y' : 'ies'}`;
+  } else if (str.endsWith('ss')) {
+    return `${str}${num === 1 ? '' : 'es'}`;
+  } else {
+    return `${str}${(num === 1 || str.endsWith('s')) ? '' : 's'}`;
   }
 }
 

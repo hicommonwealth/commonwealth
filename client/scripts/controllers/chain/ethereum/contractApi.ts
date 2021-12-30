@@ -42,10 +42,11 @@ abstract class ContractApi<ContractT extends Contract> {
   constructor(
     factory: ContractFactoryT<ContractT>,
     contractAddress: string,
-    web3Provider: ExternalProvider
+    web3Provider: ExternalProvider,
+    ethChainId?: number,
   ) {
     this.contractAddress = contractAddress;
-    this.Provider = new ethers.providers.Web3Provider(web3Provider);
+    this.Provider = new ethers.providers.Web3Provider(web3Provider, ethChainId);
     // 12s minute polling interval (default is 4s)
     this.Provider.pollingInterval = 12000;
     this.Contract = factory(this.contractAddress, this.Provider);

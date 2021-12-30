@@ -208,6 +208,9 @@ const MembersPage: m.Component<
               ]),
               vnode.state.members.map((member) => {
                 const profileInfo = app.profiles.getProfile(member.chain, member.address);
+                const votes = member?.votes && member.votes.div(
+                  BigNumber.from(10).pow(app.chain.meta.chain.decimals || 18)
+                ).toNumber();
                 return m('tr', [
                   m('td.members-item-info', [
                     m('a', {
@@ -227,7 +230,7 @@ const MembersPage: m.Component<
                   chainSupportsDelegates
                   && m('td', [
                       member.votes
-                        ? `${member.votes.toNumber()?.toFixed(2)} ${app.chain.meta.chain.symbol
+                        ? `${votes.toFixed(2)} ${app.chain.meta.chain.symbol
                         }`
                         : m(Spinner, { active: true, size: 'xs' }),
                     ]),
