@@ -20,7 +20,7 @@ const updateThreadPolling = async (models: DB, req: Request, res: Response, next
   let { custom_duration } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
 
-  if (custom_duration !== 'Infinite') {
+  if (custom_duration && custom_duration !== 'Infinite') {
     custom_duration = Number(custom_duration);
     if (!Number.isInteger(custom_duration) || custom_duration < 0 || custom_duration > 31) {
       return next(new Error(Errors.InvalidDuration));
