@@ -200,7 +200,8 @@ const DiscussionFilterBar: m.Component<
 
     const selectedStage = stages.find((s) => s === (stage as any));
 
-    const summaryViewEnabled = vnode.attrs.parentState.summaryView && !onFeaturedDiscussionPage(m.route.get(), topic);
+    const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
+    const summaryViewEnabled = vnode.attrs.parentState.summaryView && !topicSelected;
 
     return m('.DiscussionFilterBar', [
       topics.length > 0 &&
@@ -488,9 +489,10 @@ const DiscussionsPage: m.Component<
       vnode.state.summaryViewInitialized = true;
     }
     let { summaryView, recentThreads, lastSubpage } = vnode.state;
-    summaryView = summaryView && !onFeaturedDiscussionPage(m.route.get(), topic);
+    const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
+    const onSummaryView = summaryView && !topicSelected;
 
-    if (summaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
+    if (onSummaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
         .getRecentCommunityActivity({
@@ -513,7 +515,7 @@ const DiscussionsPage: m.Component<
         showNewProposalButton: true,
       });
 
-    if (summaryView) {
+    if (onSummaryView) {
       // overwrite any topic- or stage-scoping in URL
       topic = null;
       stage = null;
@@ -789,7 +791,7 @@ const DiscussionsPage: m.Component<
                 disabled: isLoading || stillFetching,
               }),
             m('.listing-wrap', [
-              summaryView
+              onSummaryView
                 ? isLoading
                   ? m(LoadingRow)
                   : m(Listing, {
