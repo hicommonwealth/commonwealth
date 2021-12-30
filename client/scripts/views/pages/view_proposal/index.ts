@@ -1283,12 +1283,12 @@ const ViewProposalPage: m.Component<
         showNewProposalButton: true,
         title: headerTitle,
         rightContent: [
-          proposal instanceof OffchainThread &&
-            proposal.hasOffchainPoll &&
-            m(ProposalHeaderOffchainPoll, { proposal }),
-          proposal instanceof OffchainThread &&
-            (isAuthor) &&
-            !proposal.offchainVotingEndsAt &&
+          proposal instanceof OffchainThread
+            && proposal.hasOffchainPoll
+            && m(ProposalHeaderOffchainPoll, { proposal }),
+          proposal instanceof OffchainThread
+            && isAuthor
+            && !proposal.offchainVotingEnabled &&
             m(ProposalSidebarPollEditorModule, {
               proposal,
               openPollEditor: () => {
