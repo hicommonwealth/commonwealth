@@ -614,7 +614,7 @@ class ThreadsController {
         chain: app.activeId(),
       },
     });
-    if (response.status === 'Failed') {
+    if (response.status === 'Failure') {
       return null;
     }
     return response.result;

@@ -444,7 +444,7 @@ const ViewProposalPage: m.Component<
                   threads !== null &&
                     m('.linked-discussion', [
                       m('.heading-2', 'Linked Discussions'),
-                      threads.length > 0 && threads.map((thread) => 
+                      threads.map((thread) => 
                         m(ProposalHeaderSnapshotThreadLink, {
                           thread
                         }),
