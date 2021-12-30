@@ -42,8 +42,8 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
 
     const redirectFunction = (e) => {
       e.preventDefault();
-        localStorage['home-scrollY'] = window.scrollY;
-        m.route.set(`/${chain}`);
+      localStorage['home-scrollY'] = window.scrollY;
+      m.route.set(`/${chain}`);
     }
 
     // Potentially Temporary (could be built into create community flow)
@@ -89,11 +89,10 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
 
     const redirectFunction = (e) => {
       e.preventDefault();
-        localStorage['home-scrollY'] = window.scrollY;
-        m.route.set(`/${community.id}`);
+      localStorage['home-scrollY'] = window.scrollY;
+      m.route.set(`/${community.id}`);
     }
 
-    // Potentially Temporary (could be built into create community flow)
     let pretty_description = '';
     if (community.description) {
       pretty_description = community.description[community.description.length-1] === '.' ? community.description : community.description + '.';
@@ -181,7 +180,7 @@ const NewCommunityCard: m.Component<{}> = {
         document.location = 'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
       }
     }, [
-      m('.lockdrop-card-body', [
+      m('.new-community-card-body', [
         m('h3', 'Create a new community'),
         m('p.action', 'Launch and grow your decentralized community on Commonwealth'),
         m('a.learn-more', { href: '#' }, m.trust('Learn more &raquo;')),
