@@ -26,6 +26,7 @@ import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_p
 import { RoleAttributes, RoleInstance } from './role';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
+import { StargateClient } from '@cosmjs/stargate';
 const log = factory.getLogger(formatFilename(__filename));
 
 export interface AddressAttributes {
@@ -291,8 +292,14 @@ export default (
         const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
 
         if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
+          // query chain ID from URL
+          const [ node ] = await chain.getChainNodes();
+          const client = await StargateClient.connect(node.url);
+          const chainId = await client.getChainId();
+          client.disconnect();
+
           const generatedSignDoc = validationTokenToSignDoc(
-            chain.id === 'terra' ? 'columbus-4' : chain.id === 'osmosis-local' ? 'osmosis-local-1' : chain.id,
+            chainId,
             addressModel.verification_token.trim(),
             signed.fee,
             signed.memo,
