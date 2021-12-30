@@ -467,11 +467,7 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
-    
-    if (localStorage.getItem('discussion-topic-toggle') === 'true'){
-      localStorage.setItem('discussion-topic-toggle', 'false');
-      vnode.state.summaryView = false;
-    }
+
     if (!app.community && !app.chain) return;
     if (!vnode.state.summaryViewInitialized) {
       if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {

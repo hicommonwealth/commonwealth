@@ -132,7 +132,6 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            localStorage.setItem('discussion-topic-toggle', 'true');
             navigateToSubpage(`/discussions/${t.name}`);
           },
         })
