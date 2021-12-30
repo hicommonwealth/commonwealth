@@ -170,7 +170,9 @@ export function isSameAccount(a, b) {
  */
 
 export function pluralize(num: number, str: string) {
-  if (str.endsWith('y')) {
+  if (str === 'day') {
+    return `${num} ${str.slice(0, str.length - 1)}${(num === 1) ? 'y' : 'ys'}`;
+  } else if (str.endsWith('y')) {
     return `${num} ${str.slice(0, str.length - 1)}${(num === 1) ? 'y' : 'ies'}`;
   } else if (str.endsWith('ss')) {
     return `${num} ${str}${num === 1 ? '' : 'es'}`;

@@ -50,6 +50,9 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
     snapshot: SnapshotProposal;
   }
 > = {
+  onupdate: (vnode) => {
+    vnode.state.initialized = false;
+  },
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal.snapshotProposal) return;
