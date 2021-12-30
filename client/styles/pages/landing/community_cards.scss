@@ -5,12 +5,12 @@
         box-sizing: border-box;
         float: left;
         width: 240px;
-        max-width: 300px;
+        max-width: 240px;
         margin-right: 30px;
         margin-bottom: 30px;
         @include sm-max {
             width: 100%;
-            margin-right: 0;
+            margin-right: 30;
         }
         align-items: center;
         height: 370px;
