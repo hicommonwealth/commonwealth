@@ -33,7 +33,8 @@ const MembersPage: m.Component<
     members: MemberInfo[];
     pageToLoad: number;
     totalMemberCount: number;
-    hasDelegates: boolean;
+    chainSupportsDelegates: boolean;
+    activeUserIsDelegate: boolean;
     voteEvents;
     profilesFinishedLoading: boolean;
     numProfilesLoaded: number;
@@ -57,9 +58,15 @@ const MembersPage: m.Component<
     );
   },
   view: (vnode) => {
-    vnode.state.hasDelegates = app.chain instanceof Compound;
+    vnode.state.chainSupportsDelegates = app.chain instanceof Compound;
     const chainController =
       app.chain instanceof Compound ? (app.chain as Compound) : null;
+    if (vnode.state.activeUserIsDelegate === undefined && chainController?.chain?.compoundApi?.Token) {
+      (app.chain as Compound).chain.isDelegate(app.user.activeAccount.address).then((res) => {
+        console.log({ res });
+        vnode.state.activeUserIsDelegate = res;
+      });
+    }
 
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) {
@@ -120,7 +127,7 @@ const MembersPage: m.Component<
           vnode.state.totalMemberCount = total;
 
           const offset = vnode.state.members.length - newMembers.length;
-          if (vnode.state.hasDelegates) {
+          if (vnode.state.chainSupportsDelegates) {
             return app.chain.initApi().then(() =>
               Promise.all(
                 newMembers.map((o, i) => {
@@ -150,7 +157,7 @@ const MembersPage: m.Component<
       pageToLoad,
       requestMembers,
       members,
-      hasDelegates,
+      chainSupportsDelegates,
     } = vnode.state;
 
     const noCommunityMembers = (totalMemberCount === 0 && pageToLoad === 0 && !requestMembers);
@@ -196,8 +203,8 @@ const MembersPage: m.Component<
               m('tr', [
                 m('th', 'Member'),
                 m('th', 'Posts / Month'),
-                hasDelegates && m('th', 'Voting Power'),
-                hasDelegates && m('th', 'Delegate'),
+                chainSupportsDelegates && m('th', 'Voting Power'),
+                chainSupportsDelegates && m('th', 'Delegate'),
               ]),
               vnode.state.members.map((member) => {
                 const profileInfo = app.profiles.getProfile(member.chain, member.address);
@@ -217,14 +224,14 @@ const MembersPage: m.Component<
                     ]),
                   ]),
                   m('td', member.count),
-                  hasDelegates
+                  chainSupportsDelegates
                   && m('td', [
                       member.votes
                         ? `${member.votes.toNumber()?.toFixed(2)} ${app.chain.meta.chain.symbol
                         }`
                         : m(Spinner, { active: true, size: 'xs' }),
                     ]),
-                  hasDelegates
+                  chainSupportsDelegates
                   && m(
                     'td',
                     m(Button, {
@@ -232,7 +239,8 @@ const MembersPage: m.Component<
                       intent: 'primary',
                       disabled:
                         !app.user.activeAccount ||
-                        !app.user.isMember({ account: app.user.activeAccount, chain: app.activeChainId() }),
+                        !app.user.isMember({ account: app.user.activeAccount, chain: app.activeChainId() }) ||
+                        !vnode.state.activeUserIsDelegate,
                       onclick: async (e) => {
                         chainController?.chain
                           .setDelegate(profileInfo.address)
