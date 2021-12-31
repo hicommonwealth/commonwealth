@@ -34,7 +34,7 @@ export default async (
     `
       DELETE
       FROM "Notifications_Read"
-      WHERE notification_id IN ?
+      WHERE notification_id IN (?)
         AND subscription_id IN (SELECT id FROM "Subscriptions" where subscriber_id = ?)
 	`,
     { replacements: [notification_ids, req.user.id] }
