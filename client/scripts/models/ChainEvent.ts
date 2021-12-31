@@ -19,11 +19,11 @@ class ChainEvent {
     this.type = type;
   }
 
-  public static fromJSON(json) {
+  public static fromJSON(json, chainEventType?: ChainEventType) {
     return new ChainEvent(
       json.block_number,
       json.event_data,
-      ChainEventType.fromJSON(json.ChainEventType),
+      chainEventType || ChainEventType.fromJSON(json.ChainEventType),
       json.id,
     );
   }

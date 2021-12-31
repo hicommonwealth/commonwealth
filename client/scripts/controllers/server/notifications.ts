@@ -3,7 +3,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { NotificationStore } from 'stores';
-import { NotificationSubscription, Notification } from 'models';
+import { NotificationSubscription, Notification, ChainEventType } from 'models';
 import app from 'state';
 
 const post = (route, args, callback) => {
@@ -161,8 +161,12 @@ class NotificationsController {
       for (const subscriptionJSON of result) {
         const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
         this._subscriptions.push(subscription);
+        let chainEventType = null;
+        if (subscriptionJSON.ChainEventType) {
+          chainEventType = ChainEventType.fromJSON(subscriptionJSON.ChainEventType);
+        }
         for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
-          const notification = Notification.fromJSON(notificationsReadJSON, subscription);
+          const notification = Notification.fromJSON(notificationsReadJSON, subscription, chainEventType);
           this._store.add(notification);
         }
       }
