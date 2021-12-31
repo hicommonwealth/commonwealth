@@ -18,6 +18,7 @@ import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
+import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -41,7 +42,7 @@ export interface SubscriptionAttributes {
 
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
-  Notifications?: NotificationAttributes[];
+  NotificationsRead?: NotificationsReadAttributes[];
   Chain?: ChainAttributes;
   OffchainCommunity?: OffchainCommunityAttributes;
   OffchainThread?: OffchainThreadAttributes;
@@ -52,7 +53,7 @@ export interface SubscriptionAttributes {
 
 export interface SubscriptionInstance
 extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {
-  getNotifications: Sequelize.HasManyGetAssociationsMixin<NotificationInstance>;
+  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 }
 
 export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; }
@@ -230,7 +231,7 @@ export default (
   Subscription.associate = (models) => {
     models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
-    models.Subscription.hasMany(models.NotificationsRead, { onDelete: 'cascade' });
+    models.Subscription.hasMany(models.NotificationsRead, { foreignKey: 'subscription_id', onDelete: 'cascade' });
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });

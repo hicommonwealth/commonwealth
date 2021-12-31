@@ -21,12 +21,18 @@ export default async (
   }
 
   // locate active subscriptions, filter by category if specified
-  let searchParams: string;
+  const searchParams: any[] = [
+    { subscriber_id: req.user.id },
+  ];
   if (req.body.active_only) {
-    searchParams = ` AND is_active = true `;
+    searchParams.push({ is_active: true });
   }
   if (req.body.categories && req.body.categories.length) {
-    searchParams += `AND category_id IN (?)`;
+    searchParams.push({
+      category_id: {
+        [Op.contained]: req.body.categories,
+      }
+    });
   }
 
   // const query = `
@@ -52,10 +58,11 @@ export default async (
 
   const notificationParams: any = {
     model: models.NotificationsRead,
+    attributes: ['is_read'],
     include: [
       {
         model: models.Notification,
-        as: 'Notifications',
+        attributes: ['id', 'notification_data', 'created_at'],
         include: [
           {
             model: models.ChainEvent,
@@ -81,14 +88,12 @@ export default async (
   // perform the query
   const subscriptions = await models.Subscription.findAll({
     where: {
-      [Op.and]: searchParams,
+      [Op.and]: searchParams
     },
-    include: [notificationParams],
+    include: [ notificationParams ],
   });
 
+  // return res.json({ status: 'Success', result: subscriptions.map((s) => s.NotificationsRead[0].notification_id) });
+
   return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
-  // return res.json({
-  //   status: 'Success',
-  //   result: subscriptions,
-  // });
 };

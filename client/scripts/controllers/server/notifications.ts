@@ -161,8 +161,8 @@ class NotificationsController {
       for (const subscriptionJSON of result) {
         const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
         this._subscriptions.push(subscription);
-        for (const notificationJSON of subscriptionJSON.Notifications) {
-          const notification = Notification.fromJSON(notificationJSON, subscription);
+        for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
+          const notification = Notification.fromJSON(notificationsReadJSON, subscription);
           this._store.add(notification);
         }
       }
