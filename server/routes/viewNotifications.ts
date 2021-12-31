@@ -58,11 +58,9 @@ export default async (
 
   const notificationParams: any = {
     model: models.NotificationsRead,
-    attributes: ['is_read'],
     include: [
       {
         model: models.Notification,
-        attributes: ['id', 'notification_data', 'created_at'],
         include: [
           {
             model: models.ChainEvent,
@@ -70,9 +68,8 @@ export default async (
             as: 'ChainEvent',
             include: [
               {
-                model: models.ChainEventType,
+                model: models.ChainEventType, // TODO: for some reason event_name and event_network are not included even when using attributes
                 required: false,
-                as: 'ChainEventType',
               },
             ],
           },
@@ -95,5 +92,11 @@ export default async (
 
   // return res.json({ status: 'Success', result: subscriptions.map((s) => s.NotificationsRead[0].notification_id) });
 
+  // const test = await models.ChainEventType.findOne({
+  //   where: {
+  //     id: 'usd-coin-approval'
+  //   }
+  // })
+  // return res.json({status: 'Success', result: test.toJSON()})
   return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
 };
