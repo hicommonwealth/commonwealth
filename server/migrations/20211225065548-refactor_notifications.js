@@ -7,7 +7,7 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
             ALTER TABLE "Notifications"
-                RENAME TO "Old_Notifications";
+                RENAME TO "OldNotifications";
 				`,
         {
           raw: true,
@@ -38,10 +38,10 @@ module.exports = {
         }
       );
 
-      // create a new table called Notifications_Read
+      // create a new table called NotificationsRead
       await queryInterface.sequelize.query(
         `
-            CREATE TABLE IF NOT EXISTS "Notifications_Read"
+            CREATE TABLE IF NOT EXISTS "NotificationsRead"
             (
                 notification_id integer REFERENCES "Notifications" (id),
                 subscription_id integer REFERENCES "Subscriptions" (id),
@@ -56,7 +56,7 @@ module.exports = {
         }
       );
 
-      // copies all UNIQUE (notifications that have the same notification_data AND chain_event_id notifications from Old_Notifications to Notifications
+      // copies all UNIQUE (notifications that have the same notification_data AND chain_event_id notifications from OldNotifications to Notifications
       await queryInterface.sequelize.query(
         `
             INSERT INTO "Notifications"
@@ -69,7 +69,7 @@ module.exports = {
                      SELECT ROW_NUMBER() OVER (ORDER BY chain_event_id) as id,
                             notification_data,
                             chain_event_id
-                     FROM "Old_Notifications"
+                     FROM "OldNotifications"
                      GROUP BY (notification_data, chain_event_id)
                  ) as A;
 				`,
@@ -80,20 +80,20 @@ module.exports = {
         }
       );
 
-      // populates Notifications_Read table by getting notification_id, subscription_id and is_read using joins of
-      // Notifications table (new notification_id with no duplicates) and Old_Notifications table (subscription_id and is_read)
+      // populates NotificationsRead table by getting notification_id, subscription_id and is_read using joins of
+      // Notifications table (new notification_id with no duplicates) and OldNotifications table (subscription_id and is_read)
       await queryInterface.sequelize.query(
         `
-            INSERT INTO "Notifications_Read"
+            INSERT INTO "NotificationsRead"
             SELECT notification_id, subscription_id, cast(MAX(cast(is_read AS text)) as boolean)
             FROM (
                      SELECT N1.id as notification_id, O1.subscription_id as subscription_id, O1.is_read as is_read
                      FROM "Notifications" N1
-                              JOIN "Old_Notifications" O1 on N1.chain_event_id = O1.chain_event_id
+                              JOIN "OldNotifications" O1 on N1.chain_event_id = O1.chain_event_id
                      UNION
                      SELECT N2.id as notification_id, O2.subscription_id as subscription_id, O2.is_read as is_read
                      FROM "Notifications" N2
-                              JOIN "Old_Notifications" O2 on N2.notification_data = O2.notification_data
+                              JOIN "OldNotifications" O2 on N2.notification_data = O2.notification_data
                      WHERE O2.notification_data != ''
                  ) as temp
             GROUP BY (notification_id, subscription_id);
@@ -112,7 +112,7 @@ module.exports = {
             SET category_id = A.category_id
             FROM (SELECT DISTINCT(N.id) as id, S.category_id as category_id
                   FROM "Notifications" N,
-                       "Notifications_Read" NR,
+                       "NotificationsRead" NR,
                        "Subscriptions" S
                   where N.id = NR.notification_id
                     AND NR.subscription_id = S.id) AS A
@@ -150,17 +150,17 @@ module.exports = {
           transaction: t,
         }
       );
-      // Cannot regenerate the original notification id's once the Old_Notifications table is dropped
+      // Cannot regenerate the original notification id's once the OldNotifications table is dropped
       // best to leave the old notification's table until smooth transition is confirmed (delete manually later)
-      // await queryInterface.dropTable('Old_Notifications');
+      // await queryInterface.dropTable('OldNotifications');
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.dropTable('Notifications_Read', { transaction: t });
+      await queryInterface.dropTable('NotificationsRead', { transaction: t });
       await queryInterface.dropTable('Notifications', { transaction: t });
-      await queryInterface.renameTable('Old_Notifications', 'Notifications', {
+      await queryInterface.renameTable('OldNotifications', 'Notifications', {
         transaction: t,
       });
     });

@@ -26,7 +26,7 @@ export default (
 		notification_id: { type: dataTypes.INTEGER, primaryKey: true },
 		is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
 	}, {
-		tableName: 'Notifications_Read',
+		tableName: 'NotificationsRead',
 		underscored: true,
 		timestamps: false
 	});
