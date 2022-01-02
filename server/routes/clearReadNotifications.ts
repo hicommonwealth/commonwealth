@@ -17,7 +17,7 @@ export default async (
   await sequelize.query(
     `
       DELETE
-      FROM "Notifications_Read"
+      FROM "NotificationsRead"
       WHERE subscription_id IN (SELECT id FROM "Subscriptions" WHERE subscriber_id = ?)
         AND is_read = true
 	`,

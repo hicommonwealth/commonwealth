@@ -494,10 +494,10 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
-          thread_id: thread_id,
+          thread_id,
           kind: thread_kind,
           stage: thread_stage,
           body: thread.body,
@@ -520,7 +520,7 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
           thread_id: null,
@@ -548,10 +548,10 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
-          thread_id: thread_id,
+          thread_id,
           kind: thread_kind,
           stage: thread_stage,
           body: null,
@@ -564,7 +564,7 @@ describe('Thread Tests', () => {
       expect(res.body.error).to.be.equal(EditThreadErrors.NoBodyOrAttachment);
     });
 
-    it('should succeed in updating a thread body', async () => {
+    it.only('should succeed in updating a thread body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
@@ -575,10 +575,10 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
-          thread_id: thread_id,
+          thread_id,
           kind: thread_kind,
           stage: thread_stage,
           body: newBody,
@@ -586,6 +586,7 @@ describe('Thread Tests', () => {
           read_only: readOnly,
           jwt: adminJWT,
         });
+      console.log(res);
       expect(res.status).to.be.equal(200);
       expect(res.body.result.body).to.be.equal(newBody);
     });
@@ -601,10 +602,10 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
-          thread_id: thread_id,
+          thread_id,
           kind: thread_kind,
           stage: thread_stage,
           body: thread.body,

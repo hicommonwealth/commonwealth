@@ -33,7 +33,7 @@ export default async (
   await sequelize.query(
     `
       DELETE
-      FROM "Notifications_Read"
+      FROM "NotificationsRead"
       WHERE notification_id IN (?)
         AND subscription_id IN (SELECT id FROM "Subscriptions" where subscriber_id = ?)
 	`,
