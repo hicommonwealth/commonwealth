@@ -65,7 +65,7 @@ const DiscussionRow: m.Component<
         ]),
       ],
       proposal instanceof OffchainThread &&
-        (proposal.offchainVotingEndsAt || proposal.offchainVotingNumVotes) && [
+        (proposal.offchainVotingEnabled) && [
           m(Button, {
             class: 'discussion-row-linked-poll',
             label: 'Poll',
@@ -94,17 +94,17 @@ const DiscussionRow: m.Component<
             });
           }),
       ],
-      proposal.snapshotProposal &&
-        m(Button, {
+      proposal.snapshotProposal
+        && m(Button, {
           class: 'discussion-row-linked-chain-entity',
           label: ['Snap ', `${proposal.snapshotProposal.slice(0, 4)}…`],
           intent: 'primary',
           size: 'xs',
           compact: true,
         }),
-      proposal instanceof OffchainThread &&
-        proposal.stage !== OffchainThreadStage.Discussion &&
-        m(Button, {
+      proposal instanceof OffchainThread
+        && proposal.stage !== OffchainThreadStage.Discussion
+        && m(Button, {
           class: 'discussion-row-stage-btn',
           intent:
             proposal.stage === OffchainThreadStage.ProposalInReview
@@ -120,15 +120,16 @@ const DiscussionRow: m.Component<
           compact: true,
           label: offchainThreadStageToLabel(proposal.stage),
         }),
-      proposal instanceof OffchainThread &&
-        (proposal.stage !== OffchainThreadStage.Discussion ||
+      proposal instanceof OffchainThread
+        && (proposal.stage !== OffchainThreadStage.Discussion ||
           proposal.chainEntities?.length > 0 ||
           proposal.offchainVotingEndsAt ||
           proposal.offchainVotingNumVotes ||
           proposal.readOnly) &&
         ' ', // en space
-      propType === OffchainThreadKind.Link &&
-        proposal.url && [
+      propType === OffchainThreadKind.Link
+        && proposal.url
+        && [
           externalLink(
             'a.external-discussion-link',
             proposal.url,
@@ -136,14 +137,15 @@ const DiscussionRow: m.Component<
           ),
           ' ', // em space
         ],
-      proposal.topic && [
-        link(
-          'a.proposal-topic',
-          `/${app.activeId()}/discussions/${proposal.topic.name}`,
-          [m('span.proposal-topic-name', `${proposal.topic.name}`)]
-        ),
-        ' ', // em space
-      ],
+      proposal.topic
+        && [
+          link(
+            'a.proposal-topic',
+            `/${app.activeId()}/discussions/${proposal.topic.name}`,
+            [m('span.proposal-topic-name', `${proposal.topic.name}`)]
+          ),
+          ' ', // em space
+        ],
       m(User, {
         user: new AddressInfo(
           null,
@@ -157,9 +159,10 @@ const DiscussionRow: m.Component<
         showAddressWithDisplayName: true,
         hideIdentityIcon: true,
       }),
-      proposal instanceof OffchainThread &&
-        proposal.collaborators &&
-        proposal.collaborators.length > 0 && [
+      proposal instanceof OffchainThread
+        && proposal.collaborators
+        && proposal.collaborators.length > 0
+        && [
           ' ', // regular space
           m(
             'span.proposal-collaborators',
