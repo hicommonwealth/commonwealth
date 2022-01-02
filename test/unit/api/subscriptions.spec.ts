@@ -35,7 +35,7 @@ describe('Subscriptions Tests', () => {
     );
   });
 
-  describe('/createSubscription test', () => {
+  describe.only('/createSubscription test', () => {
     it('should create new-thread subscription on community', async () => {
       const object_id = community;
       const is_active = true;
