@@ -21,7 +21,7 @@ export default (
 	sequelize: Sequelize.Sequelize,
 	dataTypes: typeof DataTypes,
 ): NotificationsReadModelStatic => {
-	const Notification = <NotificationsReadModelStatic>sequelize.define('NotificationsRead', {
+	const NotificationsRead = <NotificationsReadModelStatic>sequelize.define('NotificationsRead', {
 		subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
 		notification_id: { type: dataTypes.INTEGER, primaryKey: true },
 		is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
@@ -31,10 +31,10 @@ export default (
 		timestamps: false
 	});
 
-	Notification.associate = (models) => {
+	NotificationsRead.associate = (models) => {
 		models.NotificationsRead.belongsTo(models.Subscription, { foreignKey: 'subscription_id', targetKey: 'id' });
 		models.NotificationsRead.belongsTo(models.Notification, { foreignKey: 'notification_id', targetKey: 'id' });
 	};
 
-	return Notification;
+	return NotificationsRead;
 };

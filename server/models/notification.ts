@@ -39,9 +39,6 @@ export default (
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    indexes: [
-      { fields: ['subscription_id'] },
-    ],
   });
 
   Notification.associate = (models) => {
