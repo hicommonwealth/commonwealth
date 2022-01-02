@@ -218,7 +218,7 @@ export default (
 
     // send data to relevant webhooks
     if (webhook_data && (
-      webhook_data.chainEventType.chain || !erc20Tokens.includes(webhook_data.chainEventType.chain)
+      webhook_data.chainEventType?.chain || !erc20Tokens.includes(webhook_data.chainEventType?.chain)
     )) {
       await send(models, {
         notificationCategory: category_id,

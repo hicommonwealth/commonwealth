@@ -313,7 +313,7 @@ const setupServer = () => {
         process.exit(1);
         break;
       case 'EADDRINUSE':
-        console.error('Port is already in use');
+        console.error(`Port ${port} already in use`);
         process.exit(1);
         break;
       default:
