@@ -425,7 +425,7 @@ const DiscussionsPage: m.Component<
 
     const returningFromThread =
       app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/proposal/discussion/');
+      app.lastNavigatedFrom().includes('/discussion/');
     if (
       returningFromThread &&
       localStorage[`${app.activeId()}-discussions-scrollY`]

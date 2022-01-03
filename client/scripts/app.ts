@@ -32,6 +32,7 @@ import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
+import { pathIsDiscussion } from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -576,7 +577,8 @@ Promise.all([
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
       let deferChain = attrs.deferChain;
-      if (path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
+      const isDiscussion = vnode.attrs.type === 'discussion' || pathIsDiscussion(scope, window.location.pathname);
+      if (path === 'views/pages/view_proposal/index' && isDiscussion) {
         deferChain = true;
       }
       if (app.chain?.meta.chain.type === ChainType.Token) {
@@ -627,6 +629,8 @@ Promise.all([
       '/council':                importRoute('views/pages/council', { scoped: true }),
       '/delegate':               importRoute('views/pages/delegate', { scoped: true, }),
       '/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/proposal/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/discussion/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/new/proposal/:type':     importRoute('views/pages/new_proposal/index', { scoped: true }),
       // Treasury
       '/treasury':               importRoute('views/pages/treasury', { scoped: true }),
@@ -679,6 +683,8 @@ Promise.all([
       '/:scope/council':            redirectRoute(() => '/council'),
       '/:scope/delegate':           redirectRoute(() => '/delegate'),
       '/:scope/proposal/:type/:identifier': redirectRoute((attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`),
+      '/:scope/proposal/:identifier': redirectRoute((attrs) => `/proposal/${attrs.identifier}/`),
+      '/:scope/discussion/:identifier': redirectRoute((attrs) => `/discussion/${attrs.identifier}/`),
       '/:scope/new/proposal/:type':  redirectRoute((attrs) => `/new/proposal/${attrs.type}/`),
       '/:scope/treasury':           redirectRoute(() => '/treasury'),
       '/:scope/bounties':           redirectRoute(() => '/bounties'),
@@ -751,6 +757,8 @@ Promise.all([
       '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
       '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
       '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/:scope/proposal/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/:scope/discussion/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
 
       // Treasury

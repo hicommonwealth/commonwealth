@@ -1,9 +1,22 @@
-import { StorageModule, ProposalModule } from 'models';
+import { StorageModule, ProposalModule, ChainInfo } from 'models';
 import { SubstrateTypes, IChainEntityKind } from '@commonwealth/chain-events';
 import { ProposalStore } from 'stores';
 import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
+
+export const pathIsDiscussion = (scope: string | null, path: string): boolean => {
+  return path.startsWith(`/${scope}/discussion`) || path.startsWith('/discussion');
+}
+
+export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
+  if (c.base === ChainBase.CosmosSDK) return ProposalType.CosmosProposal;
+  if (c.network === ChainNetwork.Sputnik) return ProposalType.SputnikProposal;
+  if (c.network === ChainNetwork.Moloch) return ProposalType.MolochProposal;
+  if (c.network === ChainNetwork.Compound) return ProposalType.CompoundProposal;
+  if (c.network === ChainNetwork.Aave) return ProposalType.AaveProposal;
+  throw new Error(`Cannot determine proposal slug from chain ${c.id}.`);
+}
 
 export const proposalSlugToClass = () => {
   if (app.community) {

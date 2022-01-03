@@ -19,7 +19,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { ProposalType, ChainBase } from 'types';
-import { idToProposal, proposalSlugToClass } from 'identifiers';
+import { chainToProposalSlug, idToProposal, pathIsDiscussion, proposalSlugToClass } from 'identifiers';
 import { slugify } from 'utils';
 
 import Substrate from 'controllers/chain/substrate/main';
@@ -830,11 +830,12 @@ const ProposalComments: m.Component<
 const ViewProposalPage: m.Component<
   {
     identifier: string;
-    type: string;
+    type?: string;
   },
   IProposalPageState
 > = {
   oncreate: (vnode) => {
+    // writes type field if accessed as /proposal/XXX (shortcut for non-substrate chains)
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
       'Step No': 1,
@@ -847,7 +848,18 @@ const ViewProposalPage: m.Component<
     }
   },
   view: (vnode) => {
-    const { identifier, type } = vnode.attrs;
+    const { identifier } = vnode.attrs;
+    if (!app.chain?.meta) {
+      return m(PageLoading, {
+        narrow: true,
+        showNewProposalButton: true,
+        title: 'Loading...',
+      });
+    }
+    const isDiscussion = pathIsDiscussion(app.activeId(), window.location.pathname);
+    const type = vnode.attrs.type || (isDiscussion
+      ? ProposalType.OffchainThread
+      : chainToProposalSlug(app.chain.meta.chain));
     const headerTitle =
       m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string')
@@ -1011,7 +1023,7 @@ const ViewProposalPage: m.Component<
 
     if (vnode.state.comments?.length) {
       const mismatchedComments = vnode.state.comments.filter((c) => {
-        return c.rootProposal !== `${vnode.attrs.type}_${proposalId}`;
+        return c.rootProposal !== `${type}_${proposalId}`;
       });
       if (mismatchedComments.length) {
         vnode.state.prefetch[proposalIdAndType]['commentsStarted'] = false;
