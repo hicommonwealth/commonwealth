@@ -43,7 +43,7 @@ const SummaryRow: m.Component<
           return m('.thread-summary', [
             link('a', discussionLink, thread.title),
             m('span', thread.lastUpdated.format('MMM D YYYY')),
-              isHot(thread) && m('span', '🔥'),
+            isHot(thread) && m('span', '🔥'),
           ]);
         })
       ),
