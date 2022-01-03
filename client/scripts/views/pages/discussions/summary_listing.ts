@@ -6,6 +6,7 @@ import moment from 'moment';
 import { OffchainThread, OffchainTopic } from 'models';
 import { link } from 'helpers';
 import { slugify } from 'utils';
+import { getLastUpdated } from './discussion_row';
 
 const SummaryRow: m.Component<
   {
@@ -42,8 +43,8 @@ const SummaryRow: m.Component<
           return m('.thread-summary', [
             link('a', discussionLink, thread.title),
             m('span', thread.lastUpdated.format('MMM D YYYY')),
-            moment.duration(moment().diff(thread.lastUpdated)).asSeconds() < 24 * 60 * 60
-              && m('span', '🔥'),
+              moment.duration(moment().diff(getLastUpdated(thread))).asSeconds() < 24 * 60 * 60
+                && m('span', '🔥'),
           ]);
         })
       ),
