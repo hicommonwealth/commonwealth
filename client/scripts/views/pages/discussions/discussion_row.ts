@@ -178,10 +178,12 @@ const DiscussionRow: m.Component<
           `Last active ${formatLastUpdated(getLastUpdated(proposal))}`
         )
       ),
-      (moment.duration(moment().diff(getLastUpdated(proposal))).asSeconds() < 24 * 60 * 60
-      ? m('img.fire-icon', { src: '/static/img/fire.png', alt: '' })
-      : ''
-      ),
+      // activity icons
+      m('.activity-icons', [
+        ' ', // em space
+        moment.duration(moment().diff(getLastUpdated(proposal))).asSeconds() < 24 * 60 * 60
+          && m('span', '🔥'),
+      ]),
       m('.mobile-comment-count', [
         ' ', // em space
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
