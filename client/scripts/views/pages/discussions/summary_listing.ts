@@ -42,6 +42,8 @@ const SummaryRow: m.Component<
           return m('.thread-summary', [
             link('a', discussionLink, thread.title),
             m('span', thread.lastUpdated.format('MMM D YYYY')),
+            moment.duration(moment().diff(thread.lastUpdated)).asSeconds() < 24 * 60 * 60
+              && m('span', '🔥'),
           ]);
         })
       ),
