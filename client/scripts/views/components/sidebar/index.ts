@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'components/sidebar/index.scss';
 
 import m from 'mithril';
@@ -10,7 +11,7 @@ import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import { link } from 'helpers';
-import { ChainInfo, CommunityInfo, NodeInfo } from 'models';
+import { ChainInfo, NodeInfo } from 'models';
 
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import SubscriptionButton from 'views/components/subscription_button';
@@ -30,26 +31,21 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
     }, [
       m('.quick-switcher-option', {
         class: (item instanceof ChainInfo && item.id === app?.chain?.meta?.chain?.id)
-          || (item instanceof CommunityInfo && item.id === app?.community?.id)
           ? ' active' : '',
       }, item instanceof ChainInfo
         ? m(ChainIcon, {
           size,
           chain: item,
           onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-        }) : item instanceof CommunityInfo
-          ? m(CommunityIcon, {
-            size,
-            community: item,
-            onclick: link ? (() => m.route.set(`/${item.id}`)) : null
-          }) : null),
+        }) : null),
     ]);
   }
 };
 
 const SidebarQuickSwitcher: m.Component<{}> = {
   view: (vnode) => {
-    const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
+    // const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
+    const allCommunities = (app.config.chains.getAll() as ChainInfo[])
       .concat(app.config.chains.getAll())
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((item) => (item instanceof ChainInfo)
@@ -59,7 +55,6 @@ const SidebarQuickSwitcher: m.Component<{}> = {
     const starredCommunities = allCommunities.filter((item) => {
       // filter out non-starred communities
       if (item instanceof ChainInfo && !app.communities.isStarred(item.id, null)) return false;
-      if (item instanceof CommunityInfo && !app.communities.isStarred(null, item.id)) return false;
       return true;
     });
 
@@ -117,7 +112,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         rounded: true,
         fluid: true,
         active: onDiscussionsPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          && (app.chain ? app.chain.serverLoaded : true),
         label: discussionsLabel,
         onclick: (e) => {
           e.preventDefault();
@@ -152,7 +147,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         rounded: true,
         fluid: true,
         active: onMembersPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          && (app.chain ? app.chain.serverLoaded : true),
         label: 'Members',
         onclick: (e) => {
           e.preventDefault();
@@ -164,7 +159,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
         rounded: true,
         fluid: true,
         active: onSputnikDaosPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+          && (app.chain ? app.chain.serverLoaded : true),
         label: 'Sputnik DAOs',
         onclick: (e) => {
           e.preventDefault();
@@ -200,7 +195,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     // const molochProposals = (app.chain?.loaded && app.chain?.network === ChainNetwork.Moloch)
     //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
-    const hasProposals = app.chain && !app.community && (
+    const hasProposals = app.chain && (
       app.chain.base === ChainBase.CosmosSDK
         || app.chain.network === ChainNetwork.Sputnik
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
@@ -244,7 +239,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     return m('.OnchainNavigationModule.SidebarModule', [
       m('.sidebar-spacer'),
       // referenda (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
+      app.chain?.base === ChainBase.Substrate
         && app.chain.network !== ChainNetwork.Darwinia
         && app.chain.network !== ChainNetwork.HydraDX
         && m(Button, {
@@ -259,7 +254,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           contentRight: [], // TODO
         }),
       // proposals (substrate, cosmos, moloch & compound only)
-      !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
+      app.chain && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                          || app.chain?.base === ChainBase.CosmosSDK
                          || app.chain?.network === ChainNetwork.Sputnik
                          || app.chain?.network === ChainNetwork.Moloch
@@ -290,7 +285,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
       //     },
       //   }),
       // council (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
+      app.chain?.base === ChainBase.Substrate
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -304,7 +299,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       m('.sidebar-spacer'),
       // treasury (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+      app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -316,7 +311,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
           },
         }),
       // bounties (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
+      app.chain?.base === ChainBase.Substrate
         && app.chain.network !== ChainNetwork.Centrifuge
         && app.chain.network !== ChainNetwork.HydraDX
         && m(Button, {
@@ -332,7 +327,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       // tips (substrate only)
       // TODO: which chains?
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
+      app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -346,7 +341,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       m('.sidebar-spacer'),
       // validators (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
+      app.chain?.base === ChainBase.Substrate
         && app.chain?.network !== ChainNetwork.Kulupu && app.chain?.network !== ChainNetwork.Darwinia
         && m(Button, {
           fluid: true,
@@ -530,8 +525,8 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
 
 export const ExternalLinksModule: m.Component<{}, {}> = {
   view: (vnode) => {
-    if (!app.chain && !app.community) return;
-    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    if (!app.chain) return;
+    const meta = app.chain.meta.chain;
     const { name, description, website, discord, element, telegram, github } = meta;
     if (!website && !discord && !telegram && !github) return;
 
@@ -597,11 +592,11 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
       !useQuickSwitcher && m('.Sidebar', [
-        (app.chain || app.community) && m(OffchainNavigationModule),
-        (app.chain || app.community) && m(OnchainNavigationModule),
-        (app.chain || app.community) && m(ExternalLinksModule),
+        (app.chain) && m(OffchainNavigationModule),
+        (app.chain) && m(OnchainNavigationModule),
+        (app.chain) && m(ExternalLinksModule),
         m('br'),
-        app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
+        app.isLoggedIn() && (app.chain) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
         app.isCustomDomain()
         && m('a', {

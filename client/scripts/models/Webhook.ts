@@ -1,4 +1,4 @@
-import { ChainInfo, CommunityInfo } from '.';
+import { ChainInfo } from '.';
 
 class Webhook {
   public readonly id: number;
@@ -7,16 +7,16 @@ class Webhook {
   public readonly chain_id?: string;
   public readonly offchain_community_id?: string;
   public readonly Chain?: ChainInfo;
-  public readonly OffchainCommunity?: CommunityInfo;
+  // public readonly OffchainCommunity?: CommunityInfo;
 
-  constructor(id, url, categories, chain_id, offchain_community_id, chain, offchainCommunity) {
+  constructor(id, url, categories, chain_id, offchain_community_id, chain) {
     this.id = id;
     this.url = url;
     this.categories = categories;
     this.chain_id = chain_id;
     this.offchain_community_id = offchain_community_id;
     this.Chain = chain;
-    this.OffchainCommunity = offchainCommunity;
+    // this.OffchainCommunity = offchainCommunity;
   }
 
   public static fromJSON(json) {
@@ -27,7 +27,7 @@ class Webhook {
       json.chain_id,
       json.offchain_community_id,
       json.Chain,
-      json.OffchainCommunity,
+      // json.OffchainCommunity,
     );
   }
 }

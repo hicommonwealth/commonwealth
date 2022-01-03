@@ -44,7 +44,7 @@ class DraftsController {
         'address': app.user.activeAccount.address,
         'author_chain': app.user.activeAccount.chain.id,
         'chain': app.activeChainId(),
-        'community': app.activeCommunityId(),
+        // 'community': app.activeCommunityId(),
         'title': title,
         'body': body,
         'topic': topicName,
@@ -75,7 +75,7 @@ class DraftsController {
         data: {
           'address': app.user.activeAccount.address,
           'author_chain': app.user.activeAccount.chain.id,
-          'community': app.activeCommunityId(),
+          // 'community': app.activeCommunityId(),
           'chain': app.activeChainId(),
           'id': id,
           'title': title,
@@ -105,7 +105,7 @@ class DraftsController {
         data: {
           'address': app.user.activeAccount.address,
           'author_chain': app.user.activeAccount.chain.id,
-          'community': app.activeCommunityId(),
+          // 'community': app.activeCommunityId(),
           'chain': app.activeChainId(),
           'id': id,
           'jwt': app.user.jwt,

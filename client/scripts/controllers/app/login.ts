@@ -14,7 +14,7 @@ import {
   ChainInfo,
   SocialAccount,
   Account,
-  CommunityInfo,
+  // CommunityInfo,
   AddressInfo,
   ITokenAdapter
 } from 'models';
@@ -40,21 +40,19 @@ export function linkExistingAddressToChainOrCommunity(
   address: string,
   chain: string,
   originChain: string,
-  community: string,
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     'address': address,
     'chain': chain,
     'originChain': originChain,
-    'community': community,
     jwt: app.user.jwt,
   });
 }
 
 export async function setActiveAccount(account: Account<any>): Promise<void> {
   const chain = app.activeChainId();
-  const community = app.activeCommunityId();
-  const role = app.user.getRoleInCommunity({ account, chain, community });
+  // const community = app.activeCommunityId();
+  const role = app.user.getRoleInCommunity({ account, chain });
 
   if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
     app.chain.activeAddressHasToken(account.address).then(() => m.redraw());
@@ -69,16 +67,10 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   }
 
   try {
-    const response = await $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
+    const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
       author_chain: account.chain.id,
       chain,
-      jwt: app.user.jwt,
-      auth: true,
-    } : {
-      address: account.address,
-      author_chain: account.chain.id,
-      community,
       jwt: app.user.jwt,
       auth: true,
     });
@@ -91,7 +83,7 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   }
 
   // update is_user_default
-  app.user.getAllRolesInCommunity({ chain, community })
+  app.user.getAllRolesInCommunity({ chain })
     .forEach((r) => { r.is_user_default = false; });
   role.is_user_default = true;
   app.user.ephemerallySetActiveAccount(account);
@@ -100,7 +92,7 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   }
 }
 
-export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo, updateFrontend?: boolean) {
+export async function updateLastVisited(activeEntity: ChainInfo, updateFrontend?: boolean) {
   if (!app.isLoggedIn()) return;
   try {
     const timestamp = moment();
@@ -123,22 +115,15 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
-    chain
-      ? app.user.addresses
-        .filter((a) => a.chain === chain.id)
-        .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
-        .filter((addr) => addr)
-      : app.user.addresses
-        .filter((addr) => app.config.chains.getById(addr.chain))
-        .map((addr) => app.community?.accounts.get(addr.address, addr.chain))
-        .filter((addr) => addr)
+    app.user.addresses
+      .filter((a) => a.chain === chain.id)
+      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+      .filter((addr) => addr)
   );
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return chain
-      ? app.user.isMember({ chain: chain.id, account })
-      : app.user.isMember({ community: app.community.meta.id, account });
+    return app.user.isMember({ chain: chain.id, account })
   });
 
   if (memberAddresses.length === 1) {
@@ -147,9 +132,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
-    const existingAddress = chain
-      ? app.user.getDefaultAddressInCommunity({ chain: chain.id })
-      : app.user.getDefaultAddressInCommunity({ community: app.community.meta.id });
+    const existingAddress = app.user.getDefaultAddressInCommunity({ chain: chain.id })
 
     if (existingAddress) {
       const account = app.user.activeAccounts.find((a) => {
@@ -251,15 +234,13 @@ export async function loginWithMagicLink(email: string) {
     data: {
       // send chain/community to request
       'chain': app.activeChainId(),
-      'community': app.activeCommunityId(),
+      // 'community': app.activeCommunityId(),
     },
   });
   if (response.status === 'Success') {
     // log in as the new user (assume all verification done server-side)
     await initAppState(false);
-    if (app.community) {
-      await updateActiveAddresses();
-    } else if (app.chain) {
+    if (app.chain) {
       const c = app.user.selectedNode
         ? app.user.selectedNode.chain
         : app.config.nodes.getByChain(app.activeChainId())[0].chain;

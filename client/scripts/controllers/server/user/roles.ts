@@ -94,7 +94,7 @@ export default class extends Base {
    * @param account An arbitrary Commonwealth account
    * @param options A chain or a community ID
    */
-  public getRoleInCommunity(options: { account?: Account<any>, chain?: string, community?: string }): RoleInfo {
+  public getRoleInCommunity(options: { account?: Account<any>, chain?: string }): RoleInfo {
     const account = options.account || this.activeAccount;
     if (!account) return;
 
@@ -104,9 +104,10 @@ export default class extends Base {
 
     return this.roles.find((r) => {
       const addressMatches = r.address_id === address_id;
-      const communityMatches = options.chain
-        ? r.chain_id === options.chain
-        : r.offchain_community_id === options.community;
+      const communityMatches = r.chain_id === options.chain
+      // const communityMatches = options.chain
+      //   ? r.chain_id === options.chain
+      //   : r.offchain_community_id === options.community;
       return addressMatches && communityMatches;
     });
   }
@@ -143,11 +144,9 @@ export default class extends Base {
    * Filters all active roles by a specific chain/commnity
    * @param options A chain or a community ID
    */
-  public getAllRolesInCommunity(options: { chain?: string, community?: string }) {
+  public getAllRolesInCommunity(options: { chain?: string }) {
     return this.roles.filter((r) => {
-      return options.chain
-        ? r.chain_id === options.chain
-        : r.offchain_community_id === options.community;
+      return r.chain_id === options.chain
     });
   }
 
@@ -193,7 +192,7 @@ export default class extends Base {
       const role = this.getRoleInCommunity({
         account,
         chain: app.activeChainId(),
-        community: app.activeCommunityId()
+        // community: app.activeCommunityId()
       });
       return [account, role];
     });
@@ -219,15 +218,14 @@ export default class extends Base {
    * active account is an admin of the specified community.
    * @param options A chain or a community ID
    */
-  public isAdminOfEntity(options: { chain?: string, community?: string }): boolean {
+  public isAdminOfEntity(options: { chain?: string }): boolean {
     if (!this.activeAccount) return false;
     if (app.user.isSiteAdmin) return true;
 
     const adminRole = this.roles.find((role) => {
       return role.address === this.activeAccount.address
         && role.permission === RolePermission.admin
-        && ((options.community && role.offchain_community_id === options.community)
-            || (options.chain && role.chain_id === options.chain));
+        && ((options.chain && role.chain_id === options.chain));
     });
 
     return !!adminRole;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/members.scss';
 
 import m from 'mithril';
@@ -20,7 +21,7 @@ interface MemberInfo {
 
 const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: MemberInfo[] }> = {
   view: (vnode) => {
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntity = app.chain;
     if (!activeEntity) return m(PageLoading, {
       message: 'Loading members',
       title: [
@@ -31,7 +32,7 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
     });
 
     // get members once
-    const activeInfo = app.community ? app.community.meta : app.chain.meta.chain;
+    const activeInfo = app.chain.meta.chain;
     if (!vnode.state.membersRequested) {
       vnode.state.membersRequested = true;
       activeInfo.getMembers(activeInfo.id).then(() => {
@@ -61,9 +62,9 @@ const MembersPage : m.Component<{}, { membersRequested: boolean, membersLoaded: 
     }
 
     const isAdmin = app.user.isSiteAdmin
-    || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    || app.user.isAdminOfEntity({ chain: app.activeChainId() });
     const isMod = app.user.isRoleOfCommunity({
-      role: 'moderator', chain: app.activeChainId(), community: app.activeCommunityId()
+      role: 'moderator', chain: app.activeChainId()
     });
 
     if (!vnode.state.membersLoaded) return m(PageLoading, {

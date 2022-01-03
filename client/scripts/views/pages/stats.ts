@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
@@ -48,7 +49,6 @@ const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = 
 
       $.get(`${app.serverUrl()}/communityStats`, {
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
         jwt: app.user?.jwt,
       }).then(({ status, result }) => {
         // vnode.state.data = result;

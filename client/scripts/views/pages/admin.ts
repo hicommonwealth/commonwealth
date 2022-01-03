@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable no-restricted-globals */
 import 'pages/admin.scss';
 
 import $ from 'jquery';
@@ -455,59 +457,59 @@ const InviteLinkRow: m.Component<{data}, {link}> = {
   }
 };
 
-const InviteLinkTable: m.Component<{links}, {links}> = {
-  oninit: (vnode) => {
-    vnode.state.links = [];
-  },
-  oncreate: (vnode) => {
-    // TODO: Change to GET /inviteLinks
-    $.get(`${app.serverUrl()}/getInviteLinks`, {
-      address: app.user.activeAccount.address,
-      community_id: app.activeCommunityId(),
-      jwt: app.user.jwt,
-    }).then((res) => {
-      res.result.map((link) => vnode.state.links.push(link));
-      m.redraw();
-    });
-  },
-  view: (vnode) => {
-    if (vnode.attrs.links.length > 0) {
-      const newLink = vnode.attrs.links[vnode.attrs.links.length - 1];
-      if (!vnode.state.links.some((link) => newLink.id === link.id)) {
-        vnode.state.links.push(newLink);
-      }
-    }
-    return m('.InviteLinkTable', [
-      m('h3', `All Historic Invite Links for "${app.activeCommunityId()}"`),
-      m('table', [
-        (vnode.state.links.length > 0)
-        && m('tr', [
-          m('th', 'Link'), m('th', 'Active?'), m('th', 'Uses'),
-          m('th', 'Times Used'), m('th', 'Time Limit'), m('th', 'Date Created'),
-        ]),
-        (vnode.state.links.length > 0)
-          ? vnode.state.links.sort((a, b) => (a.created_at < b.created_at) ? 1 : -1).map((link) => {
-            return m(InviteLinkRow, {
-              data: link,
-            });
-          }) : m('h4', 'No Invite Links created yet– Make One!')
-      ])
-    ]);
-  }
-};
+// const InviteLinkTable: m.Component<{links}, {links}> = {
+//   oninit: (vnode) => {
+//     vnode.state.links = [];
+//   },
+//   oncreate: (vnode) => {
+//     // TODO: Change to GET /inviteLinks
+//     $.get(`${app.serverUrl()}/getInviteLinks`, {
+//       address: app.user.activeAccount.address,
+//       community_id: app.activeCommunityId(),
+//       jwt: app.user.jwt,
+//     }).then((res) => {
+//       res.result.map((link) => vnode.state.links.push(link));
+//       m.redraw();
+//     });
+//   },
+//   view: (vnode) => {
+//     if (vnode.attrs.links.length > 0) {
+//       const newLink = vnode.attrs.links[vnode.attrs.links.length - 1];
+//       if (!vnode.state.links.some((link) => newLink.id === link.id)) {
+//         vnode.state.links.push(newLink);
+//       }
+//     }
+//     return m('.InviteLinkTable', [
+//       m('h3', `All Historic Invite Links for "${app.activeCommunityId()}"`),
+//       m('table', [
+//         (vnode.state.links.length > 0)
+//         && m('tr', [
+//           m('th', 'Link'), m('th', 'Active?'), m('th', 'Uses'),
+//           m('th', 'Times Used'), m('th', 'Time Limit'), m('th', 'Date Created'),
+//         ]),
+//         (vnode.state.links.length > 0)
+//           ? vnode.state.links.sort((a, b) => (a.created_at < b.created_at) ? 1 : -1).map((link) => {
+//             return m(InviteLinkRow, {
+//               data: link,
+//             });
+//           }) : m('h4', 'No Invite Links created yet– Make One!')
+//       ])
+//     ]);
+//   }
+// };
 
-const GenericInviteLinks: m.Component<{}, {newlinks}> = {
-  oninit: (vnode) => {
-    vnode.state.newlinks = [];
-  },
-  view: (vnode) => {
-    return m('.GenericInviteLinks', [
-      m(InviteLinkTable, {
-        links: vnode.state.newlinks,
-      }),
-    ]);
-  }
-};
+// const GenericInviteLinks: m.Component<{}, {newlinks}> = {
+//   oninit: (vnode) => {
+//     vnode.state.newlinks = [];
+//   },
+//   view: (vnode) => {
+//     return m('.GenericInviteLinks', [
+//       m(InviteLinkTable, {
+//         links: vnode.state.newlinks,
+//       }),
+//     ]);
+//   }
+// };
 
 const AdminPage: m.Component<{}> = {
   oncreate: (vnode) => {
@@ -528,14 +530,10 @@ const AdminPage: m.Component<{}> = {
       m('.forum-container', [
         m(Tabs, [{
           name: 'Admin',
-          content: app.community ? [ m(AdminActions), ]
-            : app.chain ? [ m(AdminActions), m(SudoForm), m(ChainStats) ] : []
+          content: app.chain ? [ m(AdminActions), m(SudoForm), m(ChainStats) ] : []
         }, {
           name: 'Manage Chains and Nodes',
           content: m(ChainManager),
-        }, {
-          name: 'Generic Invite Links',
-          content: m(GenericInviteLinks),
         }]),
       ]),
     ]);

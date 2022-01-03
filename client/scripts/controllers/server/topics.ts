@@ -100,12 +100,9 @@ class TopicsController {
     defaultOffchainTemplate: string,
   ) {
     try {
-      const chainOrCommObj = (app.activeChainId())
-        ? { 'chain': app.activeChainId() }
-        : { 'community': app.activeCommunityId() };
       // TODO: Change to POST /topic
       const response = await $.post(`${app.serverUrl()}/createTopic`, {
-        ...chainOrCommObj,
+        'chain': app.activeChainId(),
         'name': name,
         'description': description,
         'telegram': telegram,
@@ -154,7 +151,7 @@ class TopicsController {
       // TODO: Change to GET /topics
       const response = await $.get(`${app.serverUrl()}/bulkTopics`, {
         chain: chainId || app.activeChainId(),
-        community: communityId || app.activeCommunityId(),
+        // community: communityId || app.activeCommunityId(),
       });
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);

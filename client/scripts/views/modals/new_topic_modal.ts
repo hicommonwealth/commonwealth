@@ -34,7 +34,7 @@ const NewTopicModal: m.Component<{
 }> = {
   view: (vnode) => {
     if (!app.user.isSiteAdmin
-    && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) {
+    && !app.user.isAdminOfEntity({ chain: app.activeChainId() })) {
       return null;
     }
     const { id, name, description, tokenThreshold = '0', featuredInSidebar, featuredInNewPost } = vnode.attrs;

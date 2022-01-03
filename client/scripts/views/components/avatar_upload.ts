@@ -96,10 +96,7 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     const logoURL =
-      vnode.state.dropzone?.option?.url ||
-      (app.activeCommunityId()
-        ? app.community?.meta.iconUrl
-        : app.chain?.meta.chain.iconUrl);
+      vnode.state.dropzone?.option?.url || app.chain?.meta.chain.iconUrl;
     return m('form.AvatarUpload', [
       m(
         '.dropzone-attach',

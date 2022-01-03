@@ -1,13 +1,14 @@
-import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'stores';
+import { ChainStore, NodeStore } from 'stores';
 import {
   ContractCategory,
   IChainAdapter,
-  ICommunityAdapter,
+  // ICommunityAdapter,
   NotificationCategory,
 } from 'models';
 import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
+import { InviteCodeAttributes } from 'types';
 import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
@@ -21,7 +22,6 @@ import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
-import { InviteCodeAttributes } from 'types';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -38,7 +38,7 @@ export const enum LoginState {
 export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
-  community: ICommunityAdapter<any, any>;
+  // community: ICommunityAdapter<any, any>;
 
   chainPreloading: boolean;
   chainAdapterReady: EventEmitter;
@@ -65,7 +65,7 @@ export interface IApp {
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
-  activeCommunityId(): string;
+  // activeCommunityId(): string;
   activeId(): string;
 
   toasts: ToastStore;
@@ -73,7 +73,7 @@ export interface IApp {
   loginState: LoginState;
   // stored on server-side
   config: {
-    communities: OffchainCommunitiesStore;
+    // communities: OffchainCommunitiesStore;
     chains: ChainStore;
     nodes: NodeStore;
     contractCategories?: ContractCategory[];
@@ -103,7 +103,7 @@ export interface IApp {
 const app: IApp = {
   socket: null,
   chain: null,
-  community: null,
+  // community: null,
 
   chainPreloading: false,
   chainAdapterReady: new EventEmitter(),
@@ -135,18 +135,19 @@ const app: IApp = {
   searchAddressCache: {},
 
   activeChainId: () => app.chain?.id,
-  activeCommunityId: () => app.community?.meta.id,
-  activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
+  // activeCommunityId: () => app.community?.meta.id,
+  activeId: () => app.activeChainId(),
+  // activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
 
   toasts: getToastStore(),
   modals: getModalStore(),
   loginState: LoginState.NotLoaded,
   config: {
-    communities: new OffchainCommunitiesStore(),
+    // communities: new OffchainCommunitiesStore(),
     chains: new ChainStore(),
     nodes: new NodeStore(),
     defaultChain: 'edgeware',
-    invites: [],
+    // invites: [],
   },
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,

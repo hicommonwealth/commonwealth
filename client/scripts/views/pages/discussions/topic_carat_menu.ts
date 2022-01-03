@@ -7,7 +7,7 @@ import EditTopicModal from 'views/modals/edit_topic_modal';
 const TopicCaratMenu: m.Component<{ topic: string }, { topicEditorIsOpen: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
-    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return;
+    if (!app.user.isAdminOfEntity({ chain: app.activeChainId()})) return;
 
     const { topic } = vnode.attrs;
     if (!topic) return;

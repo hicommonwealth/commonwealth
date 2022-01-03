@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/view_proposal/index.scss';
 import 'pages/view_proposal/tips.scss';
 
@@ -970,10 +972,7 @@ const ViewProposalPage: m.Component<
 
     // load comments
     if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
-      (app.activeCommunityId()
-        ? app.comments.refresh(proposal, null, app.activeCommunityId())
-        : app.comments.refresh(proposal, app.activeChainId(), null)
-      )
+      (app.comments.refresh(proposal, app.activeChainId(), null))
         .then(async (result) => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
@@ -1031,7 +1030,6 @@ const ViewProposalPage: m.Component<
     ) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
         object_id: proposal.id, // (proposal instanceof OffchainThread) ? proposal.id : proposal.slug,
       })
         .then((response) => {
@@ -1151,12 +1149,10 @@ const ViewProposalPage: m.Component<
       app.user.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       }) ||
       app.user.isRoleOfCommunity({
         role: 'moderator',
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       });
 
     if (proposal instanceof SubstrateTreasuryTip) {

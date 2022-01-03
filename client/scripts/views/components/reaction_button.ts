@@ -83,10 +83,10 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     let disabled = vnode.state.loading;
 
     // token balance check if needed
-    if (!app.community && ITokenAdapter.instanceOf(app.chain)) {
+    if (ITokenAdapter.instanceOf(app.chain)) {
       const tokenBalance = app.chain.tokenBalance;
       const isAdmin = app.user.isSiteAdmin
-        || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+        || app.user.isAdminOfEntity({ chain: app.activeChainId()});
 
       let tokenPostingThreshold: BN;
       if (post instanceof OffchainThread && post.topic && app.topics) {
@@ -131,8 +131,8 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
         } else {
           const { address: userAddress, chain } = app.user.activeAccount;
           // if it's a community use the app.user.activeAccount.chain.id instead of author chain
-          const chainId = app.activeCommunityId() ? null : app.activeChainId();
-          const communityId = app.activeCommunityId();
+          const chainId = app.activeChainId();
+          // const communityId = app.activeCommunityId();
           if (hasReacted) {
             const reaction = (await fetchReactionsByPost(post)).find((r) => {
               return (r.reaction === hasReactedType && r.Address.address === activeAddress);
@@ -146,7 +146,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
               vnode.state.reactors = reactors.filter(({ Address }) => Address.address !== userAddress);
               if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
                 || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
-                app.reactions.create(userAddress, post, type, chainId, communityId).then(() => {
+                app.reactions.create(userAddress, post, type, chainId).then(() => {
                   vnode.state.loading = false;
                   m.redraw();
                 });
@@ -157,7 +157,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
             });
           } else {
             vnode.state.loading = true;
-            app.reactionCounts.create(userAddress, post, type, chainId, communityId)
+            app.reactionCounts.create(userAddress, post, type, chainId)
               .then(() => {
                 vnode.state.loading = false;
                 vnode.state.reactors = [ ...reactors, {

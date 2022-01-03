@@ -12,7 +12,7 @@ import InvitesMenu, { handleEmailInvites } from 'views/components/header/invites
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from 'views/components/search_bar';
 
@@ -52,7 +52,6 @@ const Sublayout: m.Component<{
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
-    const community = app.community ? app.community.meta : null;
     const narrowBrowserWidth = (window.innerWidth > 767.98) && (window.innerWidth < 850);
     const terms = app.chain ? chain.terms : null;
 
@@ -68,20 +67,6 @@ const Sublayout: m.Component<{
         ]),
         m('h4.sublayout-header-heading', [
           link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
-          title && m('span.breadcrumb', m.trust('/')),
-          title
-        ]),
-      ] : community ? [
-        m('.ChainIcon', [
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
-            m(CommunityIcon, { size: ICON_SIZE, community })
-          ])
-        ]),
-        m('h4.sublayout-header-heading', [
-          m('div.sublayout-header-heading-wrapper', [
-            link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), community.name),
-          ]),
-          community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           title && m('span.breadcrumb', m.trust('/')),
           title
         ]),
@@ -158,7 +143,7 @@ const Sublayout: m.Component<{
           m('.sublayout-body', [
             m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
               !hideSidebar && m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
-                m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
+                m(Sidebar, { useQuickSwitcher }),
               ]),
               m('.sublayout-main-col', {
                 class: !rightContent && 'no-right-content'

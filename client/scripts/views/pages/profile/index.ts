@@ -48,7 +48,7 @@ const getProfileStatus = (account) => {
   let isUnjoinedJoinableAddress;
   let currentAddressInfo;
   if (!onOwnProfile && !onLinkedProfile) {
-    const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
+    const communityOptions = { chain: app.activeChainId() };
     const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
     const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
     const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)

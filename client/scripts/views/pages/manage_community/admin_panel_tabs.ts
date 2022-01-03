@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import $ from 'jquery';
 
@@ -23,7 +24,7 @@ interface IWebhooksFormState {
 const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
   view: (vnode) => {
     const { webhooks } = vnode.attrs;
-    const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+    const chainOrCommObj = { chain: app.activeChainId() };
 
     const createWebhook = (e) => {
       e.preventDefault();
@@ -194,9 +195,7 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
       const roletext = (role.permission === 'moderator') ? '(moderator)' : '';
       return `${displayName}: ${role.Address.address.slice(0, 6)}...${roletext}`;
     });
-    const chainOrCommObj = app.community
-      ? { community: app.activeCommunityId() }
-      : { chain: app.activeChainId() };
+    const chainOrCommObj = { chain: app.activeChainId() };
     return m('.UpgradeRolesForm', [
       m(RadioGroup, {
         name: 'members/mods',

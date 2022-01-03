@@ -83,11 +83,10 @@ const CreateComment: m.Component<{
       vnode.state.error = null;
       vnode.state.sendingComment = true;
       quillEditorState.editor.enable(false);
-      const chainId = app.activeCommunityId() ? null : app.activeChainId();
-      const communityId = app.activeCommunityId();
+      const chainId = app.activeChainId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, proposalPageState.parentCommentId, attachments);
+          chainId, commentText, proposalPageState.parentCommentId, attachments);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -130,15 +129,13 @@ const CreateComment: m.Component<{
     const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
 
     const isAdmin = app.user.isSiteAdmin
-      || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+      || app.user.isAdminOfEntity({ chain: app.activeChainId() });
 
-    let parentScopedClass: string = 'new-thread-child';
+    let parentScopedClass = 'new-thread-child';
     let parentAuthor: Account<any>;
     if (parentType === CommentParent.Comment) {
       parentScopedClass = 'new-comment-child';
-      parentAuthor = app.community
-        ? app.community.accounts.get(parentComment.author, parentComment.authorChain)
-        : app.chain.accounts.get(parentComment.author);
+      parentAuthor = app.chain.accounts.get(parentComment.author);
     }
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
@@ -150,7 +147,7 @@ const CreateComment: m.Component<{
 
     // token balance check if needed
     let tokenPostingThreshold: BN | null = null;
-    if (!app.community && ITokenAdapter.instanceOf(app.chain)) {
+    if (ITokenAdapter.instanceOf(app.chain)) {
       const tokenBalance = app.chain.tokenBalance;
       tokenPostingThreshold = app.topics.getByName(
         activeTopicName,

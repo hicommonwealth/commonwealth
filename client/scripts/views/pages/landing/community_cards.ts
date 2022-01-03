@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/landing/community_cards.scss';
 
 import m from 'mithril';
@@ -5,8 +6,8 @@ import { Button, Icon, Icons, Card, Tag } from 'construct-ui';
 
 import app from 'state';
 import { link, pluralize } from 'helpers';
-import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { NodeInfo, AddressInfo, ChainInfo } from 'models';
+import { ChainIcon } from 'views/components/chain_icon';
 import UserGallery from 'views/components/widgets/user_gallery';
 
 const getNewTag = (labelCount = null) => {
@@ -71,7 +72,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
   }
 };
 
-const CommunityCard : m.Component<{ community: CommunityInfo }> = {
+const CommunityCard : m.Component<{ community: ChainInfo }> = {
   view: (vnode) => {
     const { community } = vnode.attrs;
     const { unseenPosts } = app.user;
@@ -90,13 +91,13 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
       },
     }, [
       m('.card-left', [
-        m(CommunityIcon, { community }),
+        m(ChainIcon, { chain: community }),
       ]),
       m('.card-right', [
         m('.card-right-top', [
           m('h3', [
             community.name,
-            community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
+            // community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           ]),
         ]),
         m('p.card-description', community.description),
@@ -191,7 +192,7 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
     });
 
     const myChains: any = Object.entries(chains);
-    const myCommunities: any = app.config.communities.getAll();
+    // const myCommunities: any = app.config.communities.getAll();
 
     const sortChainsAndCommunities = (list) => list.sort((a, b) => {
       const threadCountA = app.recentActivity.getCommunityThreadCount(Array.isArray(a) ? a[0] : a.id);
@@ -209,11 +210,11 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
 
     const sortedChainsAndCommunities = sortChainsAndCommunities(
       myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
-        .concat(myCommunities.filter((c) => !c.collapsedOnHomepage))
+        // .concat(myCommunities.filter((c) => !c.collapsedOnHomepage))
     );
     const betaChainsAndCommunities = sortChainsAndCommunities(
       myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
-        .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
+        // .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
     );
 
     return m('.HomepageCommunityCards', {

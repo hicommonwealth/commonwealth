@@ -26,12 +26,12 @@ enum MenuTabs {
 const MobileAccountMenu: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.isLoggedIn) return;
-    const isPrivateCommunity = app.community?.meta.privacyEnabled;
+    // const isPrivateCommunity = app.community?.meta.privacyEnabled;
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
         account,
         chain: app.activeChainId(),
-        community: app.activeCommunityId()
+        // community: app.activeCommunityId()
       });
     });
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
@@ -42,7 +42,7 @@ const MobileAccountMenu: m.Component<{}, {}> = {
           app.activeId() && m(LoginSelectorMenuLeft, {
             activeAddressesWithRole,
             nAccountsWithoutRole,
-            isPrivateCommunity,
+            // isPrivateCommunity,
             mobile: true
           }),
           app.activeId() && m(MenuDivider),
@@ -91,10 +91,10 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
           }
         }),
       m(MenuDivider),
-      (app.chain || app.community) && m(OffchainNavigationModule),
-      (app.chain || app.community) && m(OnchainNavigationModule),
-      (app.chain || app.community) && m(ExternalLinksModule),
-      app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
+      (app.chain) && m(OffchainNavigationModule),
+      (app.chain) && m(OnchainNavigationModule),
+      (app.chain) && m(ExternalLinksModule),
+      app.isLoggedIn() && (app.chain) && m(SubscriptionButton),
       app.chain && m(ChainStatusModule),
     ]);
     const AllCommunitiesMenu = m(Menu, { class: 'AllCommunitiesMenu' }, [

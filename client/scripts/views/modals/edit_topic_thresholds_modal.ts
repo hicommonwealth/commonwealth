@@ -117,7 +117,7 @@ const EditTopicThresholdsModal: m.Component<{
 }> = {
   view: (vnode) => {
     if (!app.user.isSiteAdmin
-      && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
+      && !app.user.isAdminOfEntity({ chain: app.activeChainId()})) return null;
     const { id, name, description, tokenThreshold } = vnode.attrs;
 
     if (!vnode.state.form) {

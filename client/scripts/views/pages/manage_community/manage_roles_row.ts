@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import $ from 'jquery';
 import { Input, TextArea, Icon, Icons, Switch, Select } from 'construct-ui';
@@ -10,12 +11,8 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
-    const chainOrCommObj = app.community
-      ? { community: app.activeCommunityId() }
-      : { chain: app.activeChainId() };
-    const communityMeta = app.community
-      ? app.community.meta
-      : app.chain.meta.chain;
+    const chainOrCommObj = { chain: app.activeChainId() };
+    const communityMeta = app.chain.meta.chain;
 
     return m('.ManageRoleRow', [
       vnode.attrs.roledata?.map((role) => {

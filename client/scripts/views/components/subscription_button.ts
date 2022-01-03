@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import _ from 'lodash';
 import m from 'mithril';
 
@@ -11,7 +12,7 @@ const SubscriptionButton: m.Component<{}> = {
     const subscriptions = app.user.notifications;
     const communitySubscription = subscriptions.subscriptions
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeId());
-    const communityOrChain = app.activeChainId() ? app.activeChainId() : app.activeCommunityId();
+    const communityOrChain = app.activeChainId();
 
     return m(Button, {
       class: 'SubscriptionButton',

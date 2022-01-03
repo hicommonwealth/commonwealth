@@ -25,7 +25,6 @@ import {
 } from 'helpers';
 import {
   NodeInfo,
-  CommunityInfo,
   OffchainThreadStage,
   OffchainThread,
   ITokenAdapter,
@@ -69,7 +68,7 @@ export const CommunityOptionsPopover: m.Component<
 > = {
   view: (vnode) => {
     const { isAdmin, isMod } = vnode.attrs;
-    if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
+    if (!isAdmin && !isMod) return;
     return m(PopoverMenu, {
       class: 'community-options-popover',
       position: 'bottom',
@@ -97,14 +96,12 @@ export const CommunityOptionsPopover: m.Component<
               app.modals.create({ modal: EditTopicThresholdsModal });
             },
           }),
-        (app.community?.meta.invitesEnabled || isAdmin) &&
+        (isAdmin) &&
           m(MenuItem, {
             label: 'Invite members',
             onclick: (e) => {
               e.preventDefault();
-              const data = app.activeCommunityId()
-                ? { communityInfo: app.community.meta }
-                : { chainInfo: app.chain.meta.chain };
+              const data = { chainInfo: app.chain.meta.chain };
               app.modals.create({
                 modal: CreateInviteModal,
                 data,
@@ -133,7 +130,7 @@ const DiscussionFilterBar: m.Component<
   view: (vnode) => {
     const { topic, stage, disabled } = vnode.attrs;
 
-    const communityInfo = app.chain?.meta?.chain || app.community?.meta;
+    const communityInfo = app.chain?.meta?.chain;
     if (!communityInfo) return;
     const { stagesEnabled, customStages } = communityInfo;
 
@@ -256,7 +253,6 @@ const DiscussionFilterBar: m.Component<
                       m('.topic-menu-item-name', name),
                       app.user?.isAdminOfEntity({
                         chain: app.activeChainId(),
-                        community: app.activeCommunityId(),
                       }) &&
                         m(Button, {
                           size: 'xs',
@@ -447,9 +443,9 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
-    if (!app.community && !app.chain) return;
+    if (!app.chain) return;
     if (!vnode.state.summaryViewInitialized) {
-      if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
+      if (app.chain?.meta?.chain?.defaultSummaryView) {
         vnode.state.summaryView = true;
       }
       if (app.lastNavigatedBack()) {
@@ -468,7 +464,6 @@ const DiscussionsPage: m.Component<
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
         .getRecentCommunityActivity({
-          communityId: app.activeCommunityId(),
           chainId: app.activeChainId(),
         })
         .then((res) => {
@@ -480,7 +475,7 @@ const DiscussionsPage: m.Component<
     }
 
     let stage = m.route.param('stage');
-    const activeEntity = app.community || app.chain;
+    const activeEntity = app.chain;
     if (!activeEntity)
       return m(PageLoading, {
         title: 'Discussions',
@@ -496,11 +491,11 @@ const DiscussionsPage: m.Component<
       topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
     // add chain compatibility (node info?)
-    if (app.community && !activeEntity?.serverLoaded)
-      return m(PageLoading, {
-        title: 'Discussions',
-        showNewProposalButton: true,
-      });
+    // if (app.community && !activeEntity?.serverLoaded)
+    //   return m(PageLoading, {
+    //     title: 'Discussions',
+    //     showNewProposalButton: true,
+    //   });
 
     const activeNode = app.chain?.meta;
     const selectedNodes = app.config.nodes
@@ -514,12 +509,12 @@ const DiscussionsPage: m.Component<
           n.chain.id === activeNode.chain.id
       );
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    const selectedCommunity = app.community;
+    // const selectedCommunity = app.community;
 
     const communityName = selectedNode
       ? selectedNode.chain.name
-      : selectedCommunity
-      ? selectedCommunity.meta.name
+      // : selectedCommunity
+      // ? selectedCommunity.meta.name
       : '';
 
     const allLastVisited =
@@ -528,18 +523,14 @@ const DiscussionsPage: m.Component<
         : app.user.lastVisited;
     if (!vnode.state.lastVisitedUpdated) {
       vnode.state.lastVisitedUpdated = true;
-      updateLastVisited(
-        app.community
-          ? (activeEntity.meta as CommunityInfo)
-          : (activeEntity.meta as NodeInfo).chain
+      updateLastVisited((activeEntity.meta as NodeInfo).chain
       );
     }
 
     // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
     // for easy comparison with weekly indexes' msecAgo
-    const id = (activeEntity.meta as NodeInfo).chain
-      ? (activeEntity.meta as NodeInfo).chain.id
-      : (activeEntity.meta as CommunityInfo).id;
+    const id = (activeEntity.meta as NodeInfo).chain.id
+      // : (activeEntity.meta as CommunityInfo).id;
     const lastVisited = moment(allLastVisited[id]).utc();
 
     let sortedListing = [];
@@ -663,7 +654,6 @@ const DiscussionsPage: m.Component<
       // function as the query cutoff, fetching only threads older than it.
       const options = {
         chainId: app.activeChainId(),
-        communityId: app.activeCommunityId(),
         cutoffDate: vnode.state.lookback[subpage],
         topicId,
         stage,
@@ -742,12 +732,10 @@ const DiscussionsPage: m.Component<
       app.user.isSiteAdmin ||
       app.user.isAdminOfEntity({
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       });
     const isMod = app.user.isRoleOfCommunity({
       role: 'moderator',
       chain: app.activeChainId(),
-      community: app.activeCommunityId(),
     });
 
     return m(
@@ -756,14 +744,14 @@ const DiscussionsPage: m.Component<
         class: 'DiscussionsPage',
         title: [
           'Discussions',
-          (isAdmin || isMod || app.community?.meta.invitesEnabled) &&
+          (isAdmin || isMod) &&
             m(CommunityOptionsPopover, { isAdmin, isMod }),
         ],
         description: topicDescription,
         showNewProposalButton: true,
       },
       [
-        (app.chain || app.community) && [
+        (app.chain) && [
           m('.discussions-main', [
             !isEmpty &&
               m(DiscussionFilterBar, {

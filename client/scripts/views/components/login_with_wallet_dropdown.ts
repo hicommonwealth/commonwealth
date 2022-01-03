@@ -35,7 +35,7 @@ const LoginWithWalletDropdown: m.Component<{
   label,
   loggingInWithAddress,
   joiningChain,
-  joiningCommunity,
+  // joiningCommunity,
   onSuccess?,
   prepopulateAddress?,
 }> = {
@@ -44,7 +44,7 @@ const LoginWithWalletDropdown: m.Component<{
       label,
       loggingInWithAddress,
       joiningChain,
-      joiningCommunity,
+      // joiningCommunity,
       onSuccess,
       prepopulateAddress,
     } = vnode.attrs;
@@ -56,17 +56,24 @@ const LoginWithWalletDropdown: m.Component<{
                   && m.route.param('prev') !== '/')
       ? m.route.param('prev')
       : joiningChain ? `/${joiningChain}`
-        : joiningCommunity ? `/${joiningCommunity}`
+        // : joiningCommunity ? `/${joiningCommunity}`
           : m.route.get().indexOf('web3login') === -1 && m.route.get().replace(/\?.*/, '') !== '/' ? m.route.get()
             : app.chain ? `/${app.chain.meta.chain.id}`
-              : app.community ? `/${app.community.meta.id}`
+              // : app.community ? `/${app.community.meta.id}`
                 : '/?';
     // only redirect to home as an absolute last resort
 
-    const targetCommunity = app.community?.id;
+    // const targetCommunity = app.community?.id;
 
-    const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress, targetCommunity } : joiningChain
-      ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
+    // const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
+    //   ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
+
+    // TODO: double check this
+    const web3loginParams = loggingInWithAddress
+    ? { prev, loggingInWithAddress }
+    : joiningChain
+    ? { prev, joiningChain }
+    : { prev };
 
     const allChains = app.config.chains.getAll();
     const sortedChainBases = [
@@ -79,8 +86,8 @@ const LoginWithWalletDropdown: m.Component<{
       const baseString = base.charAt(0).toUpperCase() + base.slice(1);
       const createItem = (webWallet?: IWebWallet<any>, useCli?: boolean) => m(MenuItem, {
         label: m('.chain-login-label', [
-          webWallet?.name === 'InjMetamask' || webWallet?.name === 'terrastation' ?  
-            m(ChainNetworkIcon, { chain: webWallet.specificChain, size: 20 }) : 
+          webWallet?.name === 'InjMetamask' || webWallet?.name === 'terrastation' ?
+            m(ChainNetworkIcon, { chain: webWallet.specificChain, size: 20 }) :
             m(ChainBaseIcon, { chainbase: base, size: 20 }),
           m('.chain-login-label-name', [
             useCli ? `${baseString} (command line)` : webWallet.label
@@ -97,8 +104,8 @@ const LoginWithWalletDropdown: m.Component<{
           app.modals.lazyCreate('link_new_address_modal', {
             loggingInWithAddress,
             joiningChain,
-            joiningCommunity,
-            targetCommunity,
+            // joiningCommunity,
+            // targetCommunity,
             useCommandLineWallet: !!useCli,
             webWallet,
             prepopulateAddress,

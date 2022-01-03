@@ -10,7 +10,7 @@ import {
 } from 'helpers/search';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { Profile, AddressInfo, CommunityInfo } from 'models';
+import { Profile, AddressInfo } from 'models';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import { IconIntent, SearchIcon } from "./component_kit/icons";
@@ -21,7 +21,7 @@ import { ALL_RESULTS_KEY } from '../pages/search';
 import { ChainIcon, CommunityIcon } from './chain_icon';
 
 export interface SearchParams {
-  communityScope?: string;
+  // communityScope?: string;
   chainScope?: string;
   isSearchPreview?: boolean;
   isHomepageSearch?: boolean;
@@ -38,7 +38,7 @@ export enum SearchType {
 export enum ContentType {
   Thread = 'thread',
   Comment = 'comment',
-  Community = 'community',
+  // Community = 'community',
   Chain = 'chain',
   Token = 'token',
   Member = 'member'
@@ -78,13 +78,17 @@ export const getMemberPreview = (addr, closeResultsFn, searchTerm, tabIndex, sho
 };
 
 export const getCommunityPreview = (community, closeResultsFn, tabIndex) => {
-  const params = community.contentType === ContentType.Token
-    ? { token: community }
-    : community.contentType === ContentType.Chain
-      ? { chain: community }
-      : community.contentType === ContentType.Community
-        ? { community }
-        : null;
+  let params;
+  if (community.contentType === ContentType.Token) {
+    params = {token: community}
+  } else if (community.contentType === ContentType.Chain) {
+    params = { chain: community }
+  }
+  // const params = community.contentType === ContentType.Token
+  //   ? { token: community }
+  //   : community.contentType === ContentType.Chain
+  //     ? { chain: community }
+  //     :
   params['size'] = 36;
   const onSelect = (e) => {
     if (params.token) {
@@ -228,8 +232,8 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
 const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
   let results;
   let types;
-  const { communityScope, chainScope, isHomepageSearch } = params;
-  if (communityScope || chainScope) {
+  const {chainScope, isHomepageSearch } = params;
+  if (chainScope) {
     types = [SearchType.Discussion, SearchType.Member];
     results = getBalancedContentListing(app.searchCache[searchTerm], types);
   } else if (isHomepageSearch) {
@@ -258,7 +262,7 @@ const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
       const resultRow = item.searchType === SearchType.Discussion
         ? getDiscussionPreview(item, state.closeResults, searchTerm, tabIndex)
         : item.searchType === SearchType.Member
-          ? getMemberPreview(item, state.closeResults, searchTerm, tabIndex, !!communityScope)
+          ? getMemberPreview(item, state.closeResults, searchTerm, tabIndex)
           : item.searchType === SearchType.Community
             ? getCommunityPreview(item, state.closeResults, tabIndex)
             : null;
@@ -289,7 +293,7 @@ const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) =
 // preview rows
 export const search = async (searchTerm: string, params: SearchParams, state) => {
   searchTerm = searchTerm.toLowerCase();
-  const { isSearchPreview, isHomepageSearch, communityScope, chainScope } = params;
+  const { isSearchPreview, isHomepageSearch, chainScope } = params;
   const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
   if (app.searchCache[searchTerm]?.loaded) {
     // If results exist in cache, conclude search
@@ -298,8 +302,8 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
   try {
     if (!isHomepageSearch) {
       const [discussions, addrs] = await Promise.all([
-        searchDiscussions(searchTerm, { resultSize, communityScope, chainScope }),
-        searchMentionableAddresses(searchTerm, { resultSize, communityScope, chainScope }, ['created_at', 'DESC'])
+        searchDiscussions(searchTerm, { resultSize, chainScope }),
+        searchMentionableAddresses(searchTerm, { resultSize, chainScope }, ['created_at', 'DESC'])
       ]);
 
       app.searchCache[searchTerm][SearchType.Discussion] = discussions.map((discussion) => {
@@ -336,7 +340,7 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
     });
     app.searchCache[searchTerm][SearchType.Community] = app.searchCache[searchTerm][SearchType.Community]
       .concat(filteredComms.map((commOrChain) => {
-        commOrChain.contentType = commOrChain instanceof CommunityInfo ? ContentType.Community : ContentType.Chain;
+        commOrChain.contentType = ContentType.Chain;
         commOrChain.searchType = SearchType.Community;
         return commOrChain;
       })).sort(sortResults);
@@ -422,14 +426,9 @@ export const SearchBar : m.Component<{}, {
     vnode.state.closeResults = () => { vnode.state.hideResults = true; };
 
     const chainOrCommIcon = app.activeId()
-      ? app.activeChainId()
-        ? m(ChainIcon, {
+      ? m(ChainIcon, {
           size: 18,
           chain: app.chain.meta.chain,
-        })
-        : m(CommunityIcon, {
-          size: 18,
-          community: app.community.meta,
         })
       : null;
     const cancelInputIcon = vnode.state.searchTerm
@@ -477,7 +476,7 @@ export const SearchBar : m.Component<{}, {
           if (e.target.value?.length > 3) {
             const params: SearchParams = {
               isSearchPreview: true,
-              communityScope: app.activeCommunityId(),
+              // communityScope: app.activeCommunityId(),
               chainScope: app.activeChainId(),
               isHomepageSearch: m.route.get() === '/'
             };
@@ -502,8 +501,8 @@ export const SearchBar : m.Component<{}, {
               app.searchCache[searchTerm].loaded = false;
             }
             let params = `q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`;
-            if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
-            else if (app.activeChainId()) params += `&chain=${app.activeChainId()}`;
+            if (app.activeChainId()) params += `&chain=${app.activeChainId()}`;
+            // if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
             m.route.set(`/search?${params}`);
           }
         },

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/notifications.scss';
 
 import m from 'mithril';
@@ -8,7 +9,7 @@ import { Checkbox, Button, Icons, ListItem, Table, Tag, Grid, Col, SelectList, R
 
 import app from 'state';
 import { ChainNetwork } from 'types';
-import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
+import { NotificationSubscription, ChainInfo } from 'models';
 import { NotificationCategories } from 'types';
 
 import { link, pluralize } from 'helpers';
@@ -258,7 +259,7 @@ const BatchedSubscriptionRow: m.Component<{
   }
 };
 
-const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: CommunityInfo | ChainInfo }> = {
+const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: ChainInfo }> = {
   view: (vnode) => {
     const { subscriptions, community } = vnode.attrs;
     const subscription = subscriptions.find(
@@ -535,7 +536,7 @@ const DydxChainEventNotifications: m.Component = {
 };
 
 const IndividualCommunityNotifications: m.Component<{
-  community: CommunityInfo | ChainInfo;
+  community: ChainInfo;
   subscriptions: NotificationSubscription[];
 }, {
   expanded: boolean;
@@ -636,9 +637,10 @@ const AllCommunitiesNotifications: m.Component<{
 };
 
 const NotificationsPage: m.Component<{}, {
-  communities: CommunityInfo[];
+  communities: ChainInfo[];
+  // communities: CommunityInfo[];
   subscriptions: NotificationSubscription[];
-  selectedCommunity: CommunityInfo | ChainInfo;
+  selectedCommunity: ChainInfo;
   selectedCommunityId: string;
   selectableCommunityIds: string[];
   allCommunityIds: string[];
@@ -670,7 +672,7 @@ const NotificationsPage: m.Component<{}, {
       .filter((role) => role.offchain_community_id)
       .map((r) => r.offchain_community_id);
     vnode.state.communities = _.uniq(
-      app.config.communities.getAll()
+      app.config.chains.getAll()
         .filter((c) => selectableCommunityIds.includes(c.id))
     );
 

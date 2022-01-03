@@ -81,7 +81,7 @@ const Login: m.Component<{}, {
               try {
                 const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
                   'chain': app.activeChainId(),
-                  'community': app.activeCommunityId(),
+                  // 'community': app.activeCommunityId(),
                   email,
                   path,
                 });
@@ -149,7 +149,7 @@ const Login: m.Component<{}, {
               const path = m.route.get();
               const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
                 'chain': app.activeChainId(),
-                'community': app.activeCommunityId(),
+                // 'community': app.activeCommunityId(),
                 email: vnode.state.showMagicLoginPromptEmail,
                 path,
                 forceEmailLogin: true,
@@ -219,7 +219,7 @@ const Login: m.Component<{}, {
             m(LoginWithWalletDropdown, {
               label: 'Continue with wallet',
               joiningChain: null,
-              joiningCommunity: null,
+              // joiningCommunity: null,
               loggingInWithAddress: true,
             }),
           ]),

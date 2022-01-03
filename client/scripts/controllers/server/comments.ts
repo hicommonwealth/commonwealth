@@ -6,7 +6,7 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo, OffchainThread } from 'models';
+import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, NodeInfo, OffchainThread } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
@@ -140,7 +140,6 @@ class CommentsController {
     address: string,
     proposalIdentifier: string,
     chain: string,
-    community: string,
     unescapedText: string,
     parentCommentId: any = null,
     attachments?: string[],
@@ -150,7 +149,6 @@ class CommentsController {
       const res = await $.post(`${app.serverUrl()}/createComment`, {
         'author_chain': app.user.activeAccount.chain.id,
         'chain': chain,
-        'community': community,
         'address': address,
         'parent_id': parentCommentId,
         'root_id': proposalIdentifier,
@@ -161,10 +159,9 @@ class CommentsController {
       const { result } = res;
       const newComment = modelFromServer(result);
       this._store.add(newComment);
-      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
-      updateLastVisited(app.activeCommunityId()
-        ? (activeEntity.meta as CommunityInfo)
-        : (activeEntity.meta as NodeInfo).chain, true);
+      const activeEntity = app.chain;
+      // const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+      updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
       return newComment;
     } catch (err) {
       console.log('Failed to create comment');

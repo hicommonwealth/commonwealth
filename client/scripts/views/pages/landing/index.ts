@@ -62,7 +62,7 @@ const LandingPage: m.Component<{}, IState> = {
     });
 
     const myChains: any = Object.entries(chains);
-    const myCommunities: any = app.config.communities.getAll();
+    // const myCommunities: any = app.config.communities.getAll();
     const sortChains = (list: any[]) => list
       .sort((a, b) => {
         const threadCountA = app.recentActivity.getCommunityThreadCount(
@@ -110,6 +110,7 @@ const LandingPage: m.Component<{}, IState> = {
       ...sortedChainsAndCommunities,
       ...betaChainsAndCommunities,
     ];
+    console.log(vnode.state.chains)
   },
   view: (vnode) => {
     if (m.route.param('triggerInvite') === 't') {

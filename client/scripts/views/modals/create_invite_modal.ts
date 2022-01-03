@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'modals/create_invite_modal.scss';
 
 import m from 'mithril';
@@ -22,7 +23,7 @@ import moment from 'moment';
 
 import app from 'state';
 import { ChainBase } from 'types';
-import { CommunityInfo, ChainInfo, RoleInfo, Profile } from 'models';
+import { ChainInfo, RoleInfo, Profile } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError } from 'controllers/app/notifications';
@@ -39,7 +40,6 @@ interface IInviteButtonAttrs {
   invitedAddress?: string,
   invitedEmail?: string,
   invitedAddressChain?: string,
-  community?: CommunityInfo,
   chain?: ChainInfo,
   disabled?: boolean
 }
@@ -226,7 +226,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
   },
   view: (vnode) => {
     const { selection, successCallback, failureCallback,
-      invitedAddress, invitedEmail, invitedAddressChain, community, chain, disabled } = vnode.attrs;
+      invitedAddress, invitedEmail, invitedAddressChain, chain, disabled } = vnode.attrs;
     return m(Button, {
       class: 'create-invite-button',
       intent: 'primary',
@@ -261,9 +261,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
           return;
         }
 
-        const chainOrCommunityObj = chain ? { chain: chain.id }
-          : community ? { community:  community.id }
-            : null;
+        const chainOrCommunityObj = chain ? { chain: chain.id } : null;
         if (!chainOrCommunityObj) return;
         $.post(app.serverUrl() + postType, {
           address: app.user.activeAccount.address,
@@ -310,7 +308,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
 
 const CreateInviteLink: m.Component<{
   chain?: ChainInfo,
-  community?: CommunityInfo,
+  // community?: CommunityInfo,
   onChangeHandler?: Function,
 }, {
   link: string,
@@ -323,10 +321,8 @@ const CreateInviteLink: m.Component<{
     vnode.state.inviteTime = 'none';
   },
   view: (vnode) => {
-    const { chain, community, onChangeHandler } = vnode.attrs;
-    const chainOrCommunityObj = chain
-      ? { chain: chain.id }
-      : { community: community.id };
+    const { chain, onChangeHandler } = vnode.attrs;
+    const chainOrCommunityObj = { chain: chain.id }
     return m(Form, { class: 'CreateInviteLink' }, [
       m(FormGroup, { span: 12 }, [
         m('h2.invite-link-title', 'Generate Invite Link'),
@@ -429,7 +425,7 @@ const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
 };
 
 const CreateInviteModal: m.Component<{
-  communityInfo?: CommunityInfo;
+  // communityInfo?: CommunityInfo;
   chainInfo?: ChainInfo;
 }, {
   success: boolean;
@@ -457,10 +453,8 @@ const CreateInviteModal: m.Component<{
     });
   },
   view: (vnode) => {
-    const { communityInfo, chainInfo } = vnode.attrs;
-    const chainOrCommunityObj = chainInfo ? { chain: chainInfo }
-      : communityInfo ? { community: communityInfo }
-        : null;
+    const {chainInfo } = vnode.attrs;
+    const chainOrCommunityObj = chainInfo ? { chain: chainInfo } : null;
     if (!chainOrCommunityObj) return;
 
     const selectedChainId = vnode.state.invitedAddressChain

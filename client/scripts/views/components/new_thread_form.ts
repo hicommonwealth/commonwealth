@@ -17,7 +17,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo, ITokenAdapter } from 'models';
+import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, NodeInfo, ITokenAdapter } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -113,9 +113,7 @@ const newThread = async (
   stage = OffchainThreadStage.Discussion,
   readOnly?: boolean
 ) => {
-  const topics = app.chain
-    ? app.chain.meta.chain.topics
-    : app.community.meta.topics;
+  const topics = app.chain.meta.chain.topics
 
   if (kind === OffchainThreadKind.Forum) {
     if (!form.threadTitle) {
@@ -149,8 +147,8 @@ const newThread = async (
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
-  const chainId = app.activeCommunityId() ? null : app.activeChainId();
-  const communityId = app.activeCommunityId();
+  const chainId = app.activeChainId();
+  // const communityId = app.activeCommunityId();
 
   let result;
   try {
@@ -160,7 +158,7 @@ const newThread = async (
       kind,
       stage,
       chainId,
-      communityId,
+      // communityId,
       title,
       topicName || 'General', // if no topic name set to default
       topicId,
@@ -175,10 +173,8 @@ const newThread = async (
     throw new Error(e);
   }
 
-  const activeEntity = app.activeCommunityId() ? app.community : app.chain;
-  updateLastVisited(app.activeCommunityId()
-    ? (activeEntity.meta as CommunityInfo)
-    : (activeEntity.meta as NodeInfo).chain, true);
+  const activeEntity = app.chain;
+  updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
 
   await app.user.notifications.refresh();
 
@@ -418,9 +414,9 @@ export const NewThreadForm: m.Component<{
     }
   },
   view: (vnode) => {
-    if (!app.community && !app.chain) return;
+    if (!app.chain) return;
     const author = app.user.activeAccount;
-    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+    const activeEntityInfo = app.chain.meta.chain;
     const { isModal, hasTopics } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;
@@ -473,7 +469,7 @@ export const NewThreadForm: m.Component<{
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { fromDraft, postType, saving } = vnode.state;
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId()});
     return m('.NewThreadForm', {
       class: `${postType === PostType.Link ? 'link-post' : ''} `
         + `${postType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `

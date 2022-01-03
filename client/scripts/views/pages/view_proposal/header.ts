@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment';
@@ -75,8 +76,6 @@ export const ProposalHeaderOffchainPoll: m.Component<
         `/api/viewOffchainVotes?thread_id=${proposal.id}${
           app.activeChainId()
             ? `&chain=${app.activeChainId()}`
-            : app.activeCommunityId()
-            ? `&community=${app.activeCommunityId()}`
             : ''
         }`
       )
