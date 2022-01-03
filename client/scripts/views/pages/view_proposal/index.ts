@@ -1274,7 +1274,7 @@ const ViewProposalPage: m.Component<
         ]
       );
     }
-    const showLinkedOptions = (proposal as OffchainThread).linkedThreads?.length > 0 || isAuthor || isAdmin;
+    const showLinkedOptions = (proposal as OffchainThread).snapshotProposal?.length > 0 || isAuthor || isAdmin;
 
     return m(
       Sublayout,
