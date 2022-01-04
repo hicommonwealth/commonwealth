@@ -225,6 +225,10 @@ const createComment = async (
     return next(new Error(Errors.CantCommentOnReadOnly));
   }
 
+  proposal.updated_at = new Date();
+  console.log(proposal);
+  proposal.save();
+
   // craft commonwealth url
   const cwUrl = typeof proposal === 'string'
     ? getProposalUrlWithoutObject(prefix, (finalComment.chain || finalComment.community), proposal, finalComment)

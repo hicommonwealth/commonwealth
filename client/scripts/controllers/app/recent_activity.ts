@@ -78,26 +78,25 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentCommunityActivity(options: {
+  public async getRecentTopicActivity(options: {
     chainId: string;
     communityId: string;
-    cutoffDate?: moment.Moment;
+    threadsPerTopic?: number;
   }): Promise<{ threads: OffchainThread[]; activitySummary }> {
     const { chainId, communityId } = options;
-    const cutoffDate =
-      options.cutoffDate || moment(Date.now() - 30 * 24 * 3600 * 1000);
-
+    const threadsPerTopic = options.threadsPerTopic || 3;
     const params = {
       chain: chainId,
       community: communityId,
-      cutoff_date: cutoffDate.toISOString(),
+      threads_per_topics: threadsPerTopic
     };
+
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);
     }
-    const { threads, activitySummary } = response.result;
 
+    const { threads, activitySummary } = response.result;
     return {
       threads: threads.map((thread) => {
         const modeledThread = modelThreadFromServer(thread);
@@ -113,6 +112,7 @@ class RecentActivityController {
       }),
       activitySummary,
     };
+    return;
   }
 
   // public addThreads(threads: IAbridgedThreadFromServer[], clear?: boolean) {

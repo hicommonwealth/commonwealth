@@ -491,7 +491,7 @@ const DiscussionsPage: m.Component<
     if (onSummaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
-        .getRecentCommunityActivity({
+        .getRecentTopicActivity({
           communityId: app.activeCommunityId(),
           chainId: app.activeChainId(),
         })
