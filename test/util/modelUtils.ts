@@ -336,7 +336,7 @@ export const createInvite = async (args: InviteArgs) => {
 export class MockTokenBalanceProvider extends TokenBalanceProvider {
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 
-  public async getBalance(
+  public async getEthTokenBalance(
     tokenAddress: string,
     userAddress: string
   ): Promise<BN> {

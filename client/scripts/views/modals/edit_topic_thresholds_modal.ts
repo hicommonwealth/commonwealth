@@ -3,12 +3,12 @@ import 'modals/new_topic_modal.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { Button, Switch, Input, Form } from 'construct-ui';
+import { Button, Form } from 'construct-ui';
 
 import { OffchainTopic } from 'models';
 import { CompactModalExitButton } from 'views/modal';
-import { tokensToTokenBaseUnits, tokenBaseUnitsToTokens } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import TokenDecimalInput from 'views/components/token_decimal_input';
 
 interface INewTopicModalForm {
   id: number,
@@ -20,49 +20,33 @@ interface INewTopicModalForm {
 const EditTopicThresholdsRow: m.Component<{
   topic: OffchainTopic
 }, {
-  newTokenThreshold: string,
-  useBaseToken: boolean,
-  switchCaption: string,
+  newTokenThresholdInWei: string,
 }> = {
-  oninit: (vnode) => {
-    const { topic } = vnode.attrs;
-    const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
-    if (vnode.state.newTokenThreshold === null || vnode.state.newTokenThreshold === undefined) {
-      vnode.state.newTokenThreshold = topic.tokenThreshold
-        ? tokenBaseUnitsToTokens(topic.tokenThreshold.toString(), decimals) : '0';
-    }
-    vnode.state.useBaseToken = false;
-    vnode.state.switchCaption = `Using ${decimals} decimal precision`;
-  },
   view: (vnode) => {
     const { topic } = vnode.attrs;
+    if (typeof vnode.state.newTokenThresholdInWei !== 'string') {
+      vnode.state.newTokenThresholdInWei = topic.tokenThreshold?.toString() || '0';
+    }
     const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
 
     return m(Form, [
       m('.topic-name', [topic.name]),
-      m(Input, {
-        title: '',
-        value: vnode.state.newTokenThreshold,
-        type: 'number',
-        oninput: (v) => {
-          console.log('onkeyup fired');
-          const threshold: string = (v.target as any).value;
-          vnode.state.newTokenThreshold = threshold;
-        },
+      m(TokenDecimalInput, {
+        decimals,
+        defaultValueInWei: topic.tokenThreshold.toString(),
+        onInputChange: (newValue: string) => {
+          vnode.state.newTokenThresholdInWei = newValue;
+        }
       }),
       m(Button, {
         label: 'Update',
         intent: 'primary',
         rounded: true,
-        disabled: !vnode.state.newTokenThreshold,
+        disabled: !vnode.state.newTokenThresholdInWei,
         onclick: async (e) => {
           e.preventDefault();
           try {
-            // always convert to base token
-            const amount = vnode.state.useBaseToken
-              ? vnode.state.newTokenThreshold.toString()
-              : tokensToTokenBaseUnits(vnode.state.newTokenThreshold.toString(), decimals);
-            const status = await app.topics.setTopicThreshold(topic, amount);
+            const status = await app.topics.setTopicThreshold(topic, vnode.state.newTokenThresholdInWei);
             if (status === 'Success') {
               notifySuccess('Successfully updated threshold value');
             } else {
@@ -73,34 +57,6 @@ const EditTopicThresholdsRow: m.Component<{
           }
         },
       }),
-      m('span.token-settings', [
-        m(Switch, {
-          title: '',
-          defaultValue: vnode.state.useBaseToken,
-          onchange: () => {
-            console.log('onchange fired');
-            vnode.state.useBaseToken = !vnode.state.useBaseToken;
-            if (vnode.state.useBaseToken) {
-              vnode.state.switchCaption = 'Using base token value';
-              if (vnode.state.newTokenThreshold) {
-                vnode.state.newTokenThreshold = tokensToTokenBaseUnits(
-                  vnode.state.newTokenThreshold,
-                  decimals
-                );
-              }
-            } else {
-              vnode.state.switchCaption = `Using ${decimals} decimal precision`;
-              if (vnode.state.newTokenThreshold) {
-                vnode.state.newTokenThreshold = tokenBaseUnitsToTokens(
-                  vnode.state.newTokenThreshold,
-                  decimals
-                );
-              }
-            }
-          },
-        }),
-        m('.switch-caption', vnode.state.switchCaption),
-      ])
     ]);
   }
 };

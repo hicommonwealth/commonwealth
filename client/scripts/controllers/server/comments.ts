@@ -204,7 +204,6 @@ class CommentsController {
   }
 
   public async delete(comment) {
-    const _this = this;
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /comment
       $.post(`${app.serverUrl()}/deleteComment`, {

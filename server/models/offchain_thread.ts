@@ -24,6 +24,7 @@ export interface OffchainThreadAttributes {
   version_history?: string[];
   snapshot_proposal?: string;
 
+  offchain_voting_enabled?: boolean;
   offchain_voting_options?: string;
   offchain_voting_ends_at?: Date;
   offchain_voting_votes?: number;
@@ -89,7 +90,8 @@ export default (
       },
       snapshot_proposal: { type: dataTypes.STRING(48), allowNull: true },
 
-      offchain_voting_options: { type: dataTypes.STRING },
+      offchain_voting_enabled: { type: dataTypes.BOOLEAN, allowNull: true },
+      offchain_voting_options: { type: dataTypes.STRING, allowNull: true },
       offchain_voting_ends_at: { type: dataTypes.DATE, allowNull: true },
       offchain_voting_votes: { type: dataTypes.INTEGER, allowNull: true },
 
@@ -111,6 +113,7 @@ export default (
         { fields: ['chain', 'created_at'] },
         { fields: ['chain', 'updated_at'] },
         { fields: ['chain', 'pinned'] },
+        { fields: ['chain', 'offchain_voting_enabled'] },
         { fields: ['chain', 'offchain_voting_ends_at'] },
         { fields: ['chain', 'offchain_voting_votes'] },
       ],

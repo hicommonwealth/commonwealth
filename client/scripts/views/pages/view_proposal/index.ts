@@ -86,7 +86,6 @@ import {
   // ProposalHeaderLinkThreadsMenuItem,
 } from './header';
 import {
-  ProposalSidebarStageEditorModule,
   ProposalSidebarPollEditorModule,
   ProposalSidebarLinkedViewer,
   ProposalLinkedThreadsEditorModule,
@@ -331,13 +330,15 @@ const ProposalHeader: m.Component<
                               getSetGlobalEditingStatus,
                             }),
                           (isAuthor || isAdmin) &&
-                            app.chain?.meta.chain.snapshot !== null &&
+                            app.chain?.meta.chain.snapshot.length > 0 &&
                             m(MenuItem, {
                               onclick: (e) => {
-                                navigateToSubpage(
-                                  `/new/snapshot/${app.chain.meta.chain.snapshot}` +
-                                    `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
-                                );
+                                const snapshotSpaces = app.chain.meta.chain.snapshot;
+                                if (snapshotSpaces.length > 1) {
+                                  navigateToSubpage('/multiple-snapshots', {action: 'create-from-thread', proposal: proposal});
+                                } else {
+                                  navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+                                }
                               },
                               label: 'Snapshot proposal from thread',
                             }),
@@ -388,7 +389,7 @@ const ProposalHeader: m.Component<
                         onChangeHandler: (
                           stage: OffchainThreadStage,
                           chainEntities: ChainEntity[],
-                          snapshotProposal: SnapshotProposal
+                          snapshotProposal: SnapshotProposal[]
                         ) => {
                           proposal.stage = stage;
                           proposal.chainEntities = chainEntities;
@@ -1269,6 +1270,8 @@ const ViewProposalPage: m.Component<
         ]
       );
     }
+    const showLinkedSnapshotOptions = (proposal as OffchainThread).snapshotProposal?.length > 0 || isAuthor || isAdmin;
+    const showLinkedThreadOptions = (proposal as OffchainThread).linkedThreads?.length > 0 || isAuthor || isAdmin;
 
     return m(
       Sublayout,
@@ -1277,34 +1280,27 @@ const ViewProposalPage: m.Component<
         showNewProposalButton: true,
         title: headerTitle,
         rightContent: [
-          proposal instanceof OffchainThread &&
-            proposal.hasOffchainPoll &&
-            m(ProposalHeaderOffchainPoll, { proposal }),
-          proposal instanceof OffchainThread &&
-            (isAuthor) &&
-            !proposal.offchainVotingEndsAt &&
+          proposal instanceof OffchainThread
+            && proposal.hasOffchainPoll
+            && m(ProposalHeaderOffchainPoll, { proposal }),
+          proposal instanceof OffchainThread
+            && isAuthor
+            && !proposal.offchainVotingEnabled &&
             m(ProposalSidebarPollEditorModule, {
               proposal,
               openPollEditor: () => {
                 vnode.state.pollEditorIsOpen = true;
               },
             }),
-          proposal instanceof OffchainThread &&
-            ((proposal as OffchainThread).chainEntities.length > 0 ||
-              (proposal as OffchainThread).snapshotProposal?.length > 0) &&
+            showLinkedSnapshotOptions && proposal instanceof OffchainThread &&
             m(ProposalSidebarLinkedViewer, {
-              proposal,
-            }),
-          proposal instanceof OffchainThread &&
-            (isAuthor || isAdmin) &&
-            m(ProposalSidebarStageEditorModule, {
               proposal,
               openStageEditor: () => {
                 vnode.state.stageEditorIsOpen = true;
               },
+              showAddProposalButton: (isAuthor || isAdmin)
             }),
-          proposal instanceof OffchainThread &&
-          (proposal.linkedThreads?.length > 0 || isAuthor || isAdmin) &&
+            showLinkedThreadOptions && proposal instanceof OffchainThread &&
             m(ProposalLinkedThreadsEditorModule, {
               proposal,
               allowLinking: isAuthor || isAdmin,

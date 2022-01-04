@@ -19,19 +19,19 @@ const bulkThreads = async (
   if (error) return next(new Error(error));
   const { cutoff_date, topic_id, stage } = req.query;
 
-  const replacements = { chain: chain.id };
+  const bind = { chain: chain.id };
 
   let topicOptions = '';
   if (topic_id) {
-    topicOptions += `AND t.topic_id = :topic_id `;
-    replacements['topic_id'] = topic_id;
+    topicOptions += `AND t.topic_id = $topic_id `;
+    bind['topic_id'] = topic_id;
   }
   if (stage) {
-    topicOptions += `AND t.stage = :stage `;
-    replacements['stage'] = stage;
+    topicOptions += `AND t.stage = $stage `;
+    bind['stage'] = stage;
   }
 
-  replacements['created_at'] = cutoff_date;
+  bind['created_at'] = cutoff_date;
 
   // Threads
   let threads;
@@ -41,7 +41,8 @@ const bulkThreads = async (
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.snapshot_proposal,
-        threads.offchain_voting_options, threads.offchain_voting_votes, threads.offchain_voting_ends_at,
+        threads.offchain_voting_enabled, threads.offchain_voting_options, 
+        threads.offchain_voting_votes, threads.offchain_voting_ends_at,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
@@ -51,7 +52,7 @@ const bulkThreads = async (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, latest_comm_created_at,
           t.created_at AS thread_created,
           t.chain AS thread_chain, t.read_only, t.body,
-          t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
+          t.offchain_voting_enabled, t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
           t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
@@ -78,7 +79,7 @@ const bulkThreads = async (
           FROM "OffchainComments"
           WHERE chain = :chain 
             AND root_id LIKE 'discussion%'
-            AND created_at < :created_at
+            AND created_at < $created_at
             AND deleted_at IS NULL
           GROUP BY root_id
           ) c
@@ -94,7 +95,7 @@ const bulkThreads = async (
         WHERE t.deleted_at IS NULL
           AND t.chain = :chain 
           ${topicOptions}
-          AND t.created_at < :created_at
+          AND t.created_at < $created_at
           AND t.pinned = false
           GROUP BY (t.id, c.latest_comm_created_at, t.created_at)
           ORDER BY COALESCE(c.latest_comm_created_at, t.created_at) DESC LIMIT 20
@@ -105,7 +106,7 @@ const bulkThreads = async (
     let preprocessedThreads;
     try {
       preprocessedThreads = await models.sequelize.query(query, {
-        replacements,
+        bind,
         type: QueryTypes.SELECT,
       });
     } catch (e) {
@@ -145,6 +146,7 @@ const bulkThreads = async (
         linked_threads,
         chain_entities,
         snapshot_proposal: t.snapshot_proposal,
+        offchain_voting_enabled: t.offchain_voting_enabled,
         offchain_voting_options: t.offchain_voting_options,
         offchain_voting_votes: t.offchain_voting_votes,
         offchain_voting_ends_at: t.offchain_voting_ends_at,
@@ -209,7 +211,7 @@ const bulkThreads = async (
 
   const threadsInVoting: OffchainThreadInstance[] =
     await models.sequelize.query(countsQuery, {
-      replacements,
+      bind,
       type: QueryTypes.SELECT,
     });
   const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;

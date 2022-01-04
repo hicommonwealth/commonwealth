@@ -2,10 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
@@ -14,13 +11,13 @@ const Errors = {
   NoCommunity: 'Title search must be community scoped'
 };
 
-const search = async (
+const searchDiscussions = async (
   models: DB,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  let replacements = {};
+  let bind = {};
 
   if (!req.query.search) {
     return next(new Error(Errors.QueryMissing));
@@ -74,6 +71,7 @@ const search = async (
   }
 
   // Community-scoped search
+  let communityOptions = '';
   if (req.query.chain) {
     const [chain, error] = await lookupCommunityIsVisibleToUser(
       models,
@@ -81,21 +79,27 @@ const search = async (
       req.user
     );
     if (error) return next(new Error(error));
-    replacements = { chain: chain.id };
+
+    // set up query parameters
+    communityOptions = `AND "OffchainThreads".chain = $chain `;
+    bind = { chain: chain.id };
   }
 
-  const { cutoff_date } = req.query;
+  const sort = req.query.sort === 'Newest'
+    ? 'ORDER BY "OffchainThreads".created_at DESC'
+    : req.query.sort === 'Oldest'
+    ? 'ORDER BY "OffchainThreads".created_at ASC'
+    : 'ORDER BY rank DESC'
 
-  replacements['searchTerm'] = req.query.search;
-  replacements['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
+  bind['searchTerm'] = req.query.search;
+  bind['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
 
   // query for both threads and comments, and then execute a union and keep only the most recent :limit
   let threadsAndComments;
   try {
     threadsAndComments = await models.sequelize.query(
       `
-SELECT * FROM (
-  (SELECT
+  SELECT
       "OffchainThreads".title,
       "OffchainThreads".body,
       CAST("OffchainThreads".id as VARCHAR) as proposalId,
@@ -105,34 +109,16 @@ SELECT * FROM (
       "Addresses".chain as address_chain,
       "OffchainThreads".created_at,
       "OffchainThreads".chain,
-      "OffchainThreads".community
+      "OffchainThreads".community,
+      ts_rank_cd("OffchainThreads"._search, query) as rank
     FROM "OffchainThreads"
-    JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id
-    WHERE "OffchainThreads".chain = :chain AND "OffchainThreads"._search @@ plainto_tsquery('english', :searchTerm)
-    ORDER BY "OffchainThreads".created_at DESC LIMIT :limit)
-  UNION ALL
-  (SELECT
-      "OffchainThreads".title,
-      "OffchainComments".text,
-      "OffchainComments".root_id as proposalId,
-      'comment' as type,
-      "Addresses".id as address_id,
-      "Addresses".address,
-      "Addresses".chain as address_chain,
-      "OffchainComments".created_at,
-      "OffchainThreads".chain,
-      "OffchainThreads".community
-    FROM "OffchainComments"
-    JOIN "OffchainThreads" ON "OffchainThreads".id =
-        CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
-    JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id
-    WHERE "OffchainThreads".chain = :chain AND "OffchainComments"._search @@ plainto_tsquery('english', :searchTerm)
-    ORDER BY "OffchainComments".created_at DESC LIMIT :limit)
-) s
-ORDER BY created_at DESC LIMIT :limit;
+    JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id, 
+    websearch_to_tsquery('english', $searchTerm) as query
+    WHERE query @@ "OffchainThreads"._search ${communityOptions} 
+    ${sort} LIMIT $limit
 `,
       {
-        replacements,
+        bind,
         type: QueryTypes.SELECT,
       }
     );
@@ -147,4 +133,4 @@ ORDER BY created_at DESC LIMIT :limit;
   });
 };
 
-export default search;
+export default searchDiscussions;

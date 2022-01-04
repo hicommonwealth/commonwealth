@@ -1,13 +1,13 @@
 import m from 'mithril';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
+import { ALL_RESULTS_QUERY } from 'controllers/server/search';
+import { SearchScope } from 'models/SearchQuery'
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
 import 'pages/landing/tokens_community_hero.scss';
-import { initializeSearch } from '../../components/search_bar';
 import { Chain, Token } from './index';
-import { ALL_RESULTS_KEY } from '../search';
 
 interface IState {
   chainsAndTokens: (Chain | Token)[];
@@ -28,23 +28,20 @@ const initiateFullSearch = (searchTerm) => {
   if (searchTerm.length < 3) {
     notifyError('Query must be at least 3 characters');
   }
-  if (app.searchCache[searchTerm]?.loaded) {
-    app.searchCache[searchTerm].loaded = false;
-  }
   const params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
   m.route.set(`/search?${params}`);
 };
 
 const TokensCommunityComponent: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
-    initializeSearch();
+    app.search.initialize()
     vnode.state.hiddenInputTokenList = true;
     vnode.state.inputTokenValue = '';
     vnode.state.refilterResults = true;
     vnode.state.chainsAndTokens = [];
   },
   view: (vnode) => {
-    const stillLoadingTokens = !app.searchCache[ALL_RESULTS_KEY].loaded;
+    const stillLoadingTokens = !app.search.getByQuery(ALL_RESULTS_QUERY).loaded;
     if (!stillLoadingTokens) {
       vnode.state.chainsAndTokens = [
         {
@@ -55,7 +52,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
           placeholder: true,
         },
         ...vnode.attrs.chains,
-        ...app.searchCache[ALL_RESULTS_KEY]['tokens']
+        ...app.search.getByQuery(ALL_RESULTS_QUERY).results[SearchScope.Communities]
       ];
     }
     const mappedCommunities = [

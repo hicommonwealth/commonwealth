@@ -93,8 +93,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
       || p.startsWith(`/${app.activeId()}/discussions/`)
       || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
       || p.startsWith(`/${app.activeId()}?`);
-    const onFeaturedDiscussionPage = (p, f) => p === `/${app.activeId()}/discussions/${f}`
-      || p === `/${app.activeId()}/discussions/${f}/`;
+    const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
       || p.startsWith(`/${app.activeId()}/account/`);
     const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeId()}/sputnik-daos`);
@@ -153,7 +152,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           navigateToSubpage('/members');
         },
       }),
-      (app.activeId() == 'near'
+      (app.activeId() === 'near'
       ? m(Button, {
         rounded: true,
         fluid: true,
@@ -393,14 +392,20 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         label: 'Rage quit',
       }),
       m('.sidebar-spacer'),
-      app.chain?.meta.chain.snapshot && typeof app.chain?.meta.chain.snapshot === 'string' && m(Button, {
+      app.chain?.meta.chain.snapshot.length > 0 && m(Button, {
         rounded: true,
         fluid: true,
         active: onSnapshotProposal(m.route.get()),
-        label: 'Snapshot Proposals',
+        label: 'Snapshots',
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage(`/snapshot/${app.chain.meta.chain.snapshot}`);
+          // Check if we have multiple snapshots for conditional redirect
+          const snapshotSpaces = app.chain.meta.chain.snapshot;
+          if (snapshotSpaces.length > 1) {
+            navigateToSubpage('/multiple-snapshots', {action: 'select-space'});
+          } else {
+            navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+          }
         },
       }),
       // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {

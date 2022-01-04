@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
-import { Button, List, ListItem } from 'construct-ui';
+import { Button, List, ListItem, Spinner } from 'construct-ui';
 
 import app from 'state';
 
@@ -11,9 +11,10 @@ import {
 } from 'identifiers';
 import { OffchainThread } from 'models';
 import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
-import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import { loadMultipleSpacesData, SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import LinkedThreadModal from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
+import Sublayout from '../../sublayout';
 
 export const ProposalSidebarLinkedChainEntity: m.Component<{
   proposal: OffchainThread;
@@ -46,9 +47,13 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
   {
     initialized: boolean;
     snapshotProposalsLoaded: boolean;
+    space: SnapshotSpace;
     snapshot: SnapshotProposal;
   }
 > = {
+  onupdate: (vnode) => {
+    vnode.state.initialized = false;
+  },
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal.snapshotProposal) return;
@@ -56,19 +61,28 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
 
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
-      app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
-        // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
-        vnode.state.snapshot = app.snapshot.proposals.find(
-          (sn) => sn.id === proposal.snapshotProposal
-        );
+      loadMultipleSpacesData(app.chain.meta.chain.snapshot).then((data) => {
+        for (const {space, proposals} of data) {
+          const matching_snapshot = proposals.find(
+            (sn) => sn.id === proposal.snapshotProposal
+          );
+          if (matching_snapshot) {
+            vnode.state.snapshot = matching_snapshot;
+            vnode.state.space = space;
+            break;
+          }
+        }
         vnode.state.snapshotProposalsLoaded = true;
         m.redraw();
       });
     }
 
-    const proposalLink = `${
-      app.isCustomDomain() ? '' : `/${proposal.chain}`
-    }/snapshot/${app.chain?.meta.chain.snapshot}/${proposal.snapshotProposal}`;
+    let proposalLink = '';
+    if (vnode.state.space && vnode.state.snapshot) {
+      proposalLink = `${
+        app.isCustomDomain() ? '' : `/${proposal.chain}`
+      }/snapshot/${vnode.state.space.id}/${vnode.state.snapshot.id}`;
+    }
 
     return m(
       '.ProposalSidebarLinkedSnapshot',
@@ -152,6 +166,7 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
     } else if (allowLinking || proposal.linkedThreads.length) {
       return m('.ProposalLinkedThreadsEditorModule', [
         !!vnode.state.linkedThreads?.length &&
+        m('.linked-threads-title', 'Linked Threads:'),
         m(List, vnode.state.linkedThreads.map((thread) => {
             const discussionLink =
             `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
@@ -171,7 +186,7 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
           compact: true,
           fluid: true,
           label: proposal.linkedThreads?.length
-            ? 'Linked threads'
+            ? 'Link another Thread'
             : 'Link threads',
           onclick: (e) => {
             e.preventDefault();
@@ -193,13 +208,15 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
 
 export const ProposalSidebarLinkedViewer: m.Component<{
   proposal: OffchainThread;
+  openStageEditor: Function;
+  showAddProposalButton: boolean
 }> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
+    const { proposal, openStageEditor, showAddProposalButton } = vnode.attrs;
 
     return m('.ProposalSidebarLinkedViewer', [
       proposal.chainEntities.length > 0 || proposal.snapshotProposal?.length > 0
-        ? m('.placeholder-copy', 'Proposals for this thread:')
+        ? m('.placeholder-copy', 'Proposals for Thread:')
         : m(
             '.placeholder-copy',
             app.chain
@@ -217,37 +234,19 @@ export const ProposalSidebarLinkedViewer: m.Component<{
         ]),
       proposal.snapshotProposal?.length > 0 &&
         m(ProposalSidebarLinkedSnapshot, { proposal }),
-    ]);
-  },
-};
-
-export const ProposalSidebarStageEditorModule: m.Component<
-  {
-    proposal: OffchainThread;
-    openStageEditor: Function;
-  },
-  {
-    isOpen: boolean;
-  }
-> = {
-  view: (vnode) => {
-    const { openStageEditor } = vnode.attrs;
-
-    if (!app.chain?.meta?.chain) return;
-    const { stagesEnabled } = app.chain?.meta?.chain;
-    if (!stagesEnabled) return;
-
-    return m('.ProposalSidebarStageEditorModule', [
-      m(Button, {
-        rounded: true,
-        compact: true,
-        fluid: true,
-        label: app.chain ? 'Connect a proposal' : 'Update status',
-        onclick: (e) => {
-          e.preventDefault();
-          openStageEditor();
-        },
-      }),
+      showAddProposalButton &&
+      m('.ConnectProposalButtonWrapper', [
+        m(Button, {
+          rounded: true,
+          compact: true,
+          fluid: true,
+          label: app.chain ? 'Connect a proposal' : 'Update status',
+          onclick: (e) => {
+            e.preventDefault();
+            openStageEditor();
+          },
+        }),
+      ])
     ]);
   },
 };

@@ -62,7 +62,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
 > = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
-    if (!proposal.offchainVotingEndsAt) return;
+    if (!proposal.offchainVotingEnabled) return;
 
     if (
       vnode.state.offchainVotes === undefined ||
@@ -90,9 +90,8 @@ export const ProposalHeaderOffchainPoll: m.Component<
         });
     }
 
-    const pollingEnded = proposal.offchainVotingEndsAt?.isBefore(
-      moment().utc()
-    );
+    const pollingEnded = proposal.offchainVotingEndsAt
+      && proposal.offchainVotingEndsAt?.isBefore(moment().utc());
     const canVote =
       app.isLoggedIn() &&
       app.user.activeAccount &&
@@ -208,14 +207,16 @@ export const ProposalHeaderOffchainPoll: m.Component<
         })
       ),
       m('.offchain-poll-caption', [
-        !pollingEnded && [
-          // weird hack because we overwrote the moment formatter to display "just now" for future dates
-          moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
-          ' left',
-        ],
-        m('br'),
-        pollingEnded ? 'Ended ' : 'Ends ',
-        proposal.offchainVotingEndsAt?.format('lll'),
+        proposal.offchainVotingEndsAt
+          ? [
+              !pollingEnded && moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
+              !pollingEnded && ' left',
+              m('br'),
+              !pollingEnded && 'Ends ',
+              pollingEnded && 'Ended ',
+              proposal.offchainVotingEndsAt?.format('lll'),
+            ]
+          : 'Poll does not expire.'
       ]),
       m('.offchain-poll-header', 'Voters'),
       m('.offchain-poll-voters', [
@@ -295,18 +296,18 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
   };
 
 export const ProposalHeaderSnapshotThreadLink: m.Component<{
-  threadId: string;
+  thread: {id: string, title: string}
 }> = {
   view: (vnode) => {
-    const { threadId } = vnode.attrs;
-    if (!threadId) return;
+    const { id, title } = vnode.attrs.thread;
+    if (!id) return;
     const proposalLink = `${
       app.isCustomDomain() ? '' : `/${app.activeId()}`
-    }/proposal/discussion/${threadId}`;
+    }/proposal/discussion/${id}`;
 
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [
-        'Go to discussion',
+        decodeURIComponent(title),
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
     ]);

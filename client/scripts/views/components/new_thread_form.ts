@@ -11,7 +11,6 @@ import {
   Callout, Tabs, TabItem, Form, FormGroup, Input, Button,
   Icon, Icons, List, ListItem, Tag,
 } from 'construct-ui';
-import { toBN } from 'web3-utils';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -469,7 +468,18 @@ export const NewThreadForm: m.Component<{
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { fromDraft, postType, saving } = vnode.state;
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId()});
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId() });
+    const disableDiscussionSubmission = postType === PostType.Discussion
+      && (!author
+        || vnode.state.saving
+        || vnode.state.quillEditorState?.editor?.editor?.isBlank()
+        || !vnode.state.form?.threadTitle
+        || (hasTopics && !vnode.state.form?.topicName)
+        || vnode.state.uploadsInProgress > 0);
+    const disableDiscussionDraftSave = postType === PostType.Discussion
+      && (!author
+        || saving
+        || vnode.state.uploadsInProgress > 0);
     return m('.NewThreadForm', {
       class: `${postType === PostType.Link ? 'link-post' : ''} `
         + `${postType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
@@ -697,7 +707,7 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, { order: 5 }, [
             m(Button, {
-              disabled: !author || saving || vnode.state.uploadsInProgress > 0,
+              disabled: disableDiscussionSubmission,
               intent: 'primary',
               rounded: true,
               onclick: async (e) => {
@@ -734,7 +744,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
             m(Button, {
-              disabled: !author || saving || vnode.state.uploadsInProgress > 0,
+              disabled: disableDiscussionDraftSave,
               intent: 'none',
               rounded: true,
               onclick: async (e) => {

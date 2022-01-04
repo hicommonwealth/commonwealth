@@ -11,7 +11,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   private _accounts: string[];
 
   public readonly name = 'phantom';
-  public readonly label = 'Solana Wallet (Phantom)';
+  public readonly label = 'Phantom';
   public readonly chain = ChainBase.Solana;
 
   public get available() {

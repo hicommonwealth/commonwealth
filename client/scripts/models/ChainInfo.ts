@@ -22,7 +22,7 @@ class ChainInfo {
   public stagesEnabled: boolean;
   public customStages: string;
   public customDomain: string;
-  public snapshot: string;
+  public snapshot: string[];
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
@@ -34,6 +34,7 @@ class ChainInfo {
   public members: RoleInfo[];
   public type: string;
   public readonly ss58Prefix: string;
+  public readonly bech32Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
 
@@ -62,6 +63,7 @@ class ChainInfo {
     adminsAndMods,
     base,
     ss58_prefix,
+    bech32_prefix,
     type,
     decimals,
     substrateSpec,
@@ -92,6 +94,7 @@ class ChainInfo {
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
+    this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
   }
@@ -121,6 +124,7 @@ class ChainInfo {
     adminsAndMods,
     base,
     ss58_prefix,
+    bech32_prefix,
     type,
     decimals,
     substrate_spec,
@@ -157,6 +161,7 @@ class ChainInfo {
       adminsAndMods,
       base,
       ss58_prefix,
+      bech32_prefix,
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
@@ -268,7 +273,6 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultSummaryView = updatedChain.default_summary_view;
-    console.log({ this: this.defaultSummaryView, route: updatedChain.default_summary_view });
   }
 
   public addFeaturedTopic(topic: string) {

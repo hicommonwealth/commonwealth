@@ -14,7 +14,9 @@ import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
-import { SearchBar } from 'views/components/search_bar';
+import { ButtonIntent, FaceliftButton, FaceliftGradientButton, GradientType } from 'views/components/component_kit/buttons';
+import { SearchBar } from './components/search_bar';
+import { CommunityOptionsPopover } from './pages/discussions';
 
 const Sublayout: m.Component<{
   // overrides
@@ -68,8 +70,9 @@ const Sublayout: m.Component<{
         m('h4.sublayout-header-heading', [
           link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
           title && m('span.breadcrumb', m.trust('/')),
-          title
-        ]),
+          title,
+          m(CommunityOptionsPopover),
+        ])
       ] : alwaysShowTitle ? [
         m('h4.sublayout-header-heading.no-chain-or-community', title)
       ] : [
@@ -77,12 +80,27 @@ const Sublayout: m.Component<{
       ],
     ]);
 
+    const hiringButton = m(FaceliftGradientButton, {
+      intent: ButtonIntent.Secondary,
+      label: "We're hiring!",
+      onclick: () => {
+        window.open(
+          'https://angel.co/company/commonwealth-labs',
+          '_blank'
+        );
+      },
+      disabled: false,
+      className: '.hiringBtn',
+      gradient: GradientType.RAINBOW
+    });
+
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
       && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
+      hiringButton,
       // above threadOnly option assumes all chains have proposals beyond threads
     ]);
 

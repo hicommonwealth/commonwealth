@@ -159,9 +159,9 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
         name: '',
         body: '',
         choices: ['Yes', 'No'],
-        range: '3d',
+        range: '5d',
         start: new Date().getTime(),
-        end: moment().add(3, 'days').toDate().getTime(),
+        end: moment().add(5, 'days').toDate().getTime(),
         snapshot: 0,
         metadata: {},
         type: 'single-choice'
@@ -325,27 +325,15 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
               m(RadioGroup, {
                 name: 'period',
                 options: [
-                  { value: '3d', label: '3-day' },
-                  { value: '7d', label: '7-day' },
-                  { value: '2w', label: '2 weeks' },
-                  { value: '4w', label: '4 weeks' },
+                  { value: '5d', label: '5-day' },
                 ],
                 value: vnode.state.form.range,
                 onchange: (e: Event) => {
                   vnode.state.form.range = (e.target as any).value;
                   vnode.state.form.start = new Date().getTime();
                   switch (vnode.state.form.range) {
-                    case '3d':
-                      vnode.state.form.end = moment().add(3, 'days').toDate().getTime();
-                      break;
-                    case '7d':
-                      vnode.state.form.end = moment().add(7, 'days').toDate().getTime();
-                      break;
-                    case '2w':
-                      vnode.state.form.end = moment().add(2, 'weeks').toDate().getTime();
-                      break;
-                    case '4w':
-                      vnode.state.form.end = moment().add(4, 'weeks').toDate().getTime();
+                    case '5d':
+                      vnode.state.form.end = moment().add(5, 'days').toDate().getTime();
                       break;
                     default:
                       break;

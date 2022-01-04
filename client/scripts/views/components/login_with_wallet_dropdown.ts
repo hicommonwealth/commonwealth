@@ -7,7 +7,7 @@ import { Button, PopoverMenu, MenuItem, MenuDivider, Icon, Icons } from 'constru
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { IWebWallet } from 'models';
-import { ChainBaseIcon, ChainNetworkIcon } from 'views/components/chain_icon';
+import { WalletIcon } from 'views/components/chain_icon';
 import { ChainBase, ChainNetwork } from 'types';
 import _ from 'underscore';
 
@@ -86,9 +86,7 @@ const LoginWithWalletDropdown: m.Component<{
       const baseString = base.charAt(0).toUpperCase() + base.slice(1);
       const createItem = (webWallet?: IWebWallet<any>, useCli?: boolean) => m(MenuItem, {
         label: m('.chain-login-label', [
-          webWallet?.name === 'InjMetamask' || webWallet?.name === 'terrastation' ?
-            m(ChainNetworkIcon, { chain: webWallet.specificChain, size: 20 }) :
-            m(ChainBaseIcon, { chainbase: base, size: 20 }),
+          webWallet && m(WalletIcon, { walletName: webWallet.name, size: 20 }),
           m('.chain-login-label-name', [
             useCli ? `${baseString} (command line)` : webWallet.label
           ]),

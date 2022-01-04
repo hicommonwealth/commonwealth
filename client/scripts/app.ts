@@ -228,13 +228,6 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/cosmos/main'
     )).default;
     newChain = new Cosmos(n, app);
-  } else if (n.chain.base === ChainBase.Solana) {
-    const Solana = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "solana-main" */
-      './controllers/chain/solana/main'
-    )).default;
-    newChain = new Solana(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import(
       /* webpackMode: "lazy" */
@@ -242,7 +235,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/main'
     )).default;
     newChain = new Ethereum(n, app);
-  } else if (n.chain.network === ChainNetwork.NEAR || n.chain.network == ChainNetwork.NEARTestnet) {
+  } else if (n.chain.network === ChainNetwork.NEAR || n.chain.network === ChainNetwork.NEARTestnet) {
     const Near = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "near-main" */
@@ -280,12 +273,26 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
     )).default;
     newChain = new Aave(n, app);
   } else if (n.chain.network === ChainNetwork.ERC20) {
-    const Token = (await import(
+    const ERC20 = (await import(
     //   /* webpackMode: "lazy" */
-    //   /* webpackChunkName: "token-main" */
+    //   /* webpackChunkName: "erc20-main" */
       './controllers/chain/ethereum/tokenAdapter'
     )).default;
-    newChain = new Token(n, app);
+    newChain = new ERC20(n, app);
+  } else if (n.chain.network === ChainNetwork.SPL) {
+    const SPL = (await import(
+      //   /* webpackMode: "lazy" */
+      //   /* webpackChunkName: "spl-main" */
+      './controllers/chain/solana/tokenAdapter'
+    )).default;
+    newChain = new SPL(n, app);
+  } else if (n.chain.base === ChainBase.Solana) {
+    const Solana = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "solana-main" */
+      './controllers/chain/solana/main'
+    )).default;
+    newChain = new Solana(n, app);
   } else if (n.chain.network === ChainNetwork.Commonwealth) {
     const Commonwealth = (await import(
       /* webpackMode: "lazy" */
@@ -614,6 +621,9 @@ Promise.all([
       '/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
       ),
+      '/multiple-snapshots': importRoute(
+        'views/pages/view_multiple_snapshot_spaces', { scoped: true, deferChain: true }
+      ),
       '/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
       ),
@@ -689,6 +699,10 @@ Promise.all([
       '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
       '/:scope/finishNearLogin':   importRoute('views/pages/finish_near_login', { scoped: true }),
+      // Settings
+      '/settings':                 redirectRoute(() => '/edgeware/settings'),
+      '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
+
       // Discussions
       '/home':                     redirectRoute('/'), // legacy redirect, here for compatibility only
       '/discussions':              redirectRoute('/'), // legacy redirect, here for compatibility only
@@ -724,8 +738,6 @@ Promise.all([
       '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
       '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
       // Admin
-      '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-      '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
       '/manage':                 importRoute('views/pages/manage_community/index', { scoped: false }),
       '/:scope/manage':          importRoute('views/pages/manage_community/index', { scoped: true }),
@@ -734,6 +746,9 @@ Promise.all([
 
       '/:scope/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
+      ),
+      '/:scope/multiple-snapshots': importRoute(
+        'views/pages/view_multiple_snapshot_spaces', { scoped: true, deferChain: true }
       ),
       '/:scope/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
