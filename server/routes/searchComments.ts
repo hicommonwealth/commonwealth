@@ -29,7 +29,7 @@ const searchComments = async (
   // Community-scoped search
   let communityOptions = '';
   if (req.query.chain || req.query.community) {
-    const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    const [chain, error] = await lookupCommunityIsVisibleToUser(
       models,
       req.query,
       req.user
@@ -37,12 +37,8 @@ const searchComments = async (
     if (error) return next(new Error(error));
 
     // set up query parameters
-    communityOptions = community
-      ? `AND "OffchainComments".community = $community`
-      : `AND "OffchainComments".chain = $chain `;
-    bind = community
-      ? { community: community.id }
-      : { chain: chain.id };
+    communityOptions = `AND "OffchainComments".chain = $chain `;
+    bind = { chain: chain.id };
   }
 
   const sort = req.query.sort === 'Newest'

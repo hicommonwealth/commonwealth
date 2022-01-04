@@ -20,6 +20,7 @@ const bulkThreads = async (
   const { cutoff_date, topic_id, stage } = req.query;
 
   const bind = { chain: chain.id };
+  console.log(bind)
 
   let topicOptions = '';
   if (topic_id) {
@@ -77,7 +78,7 @@ const bulkThreads = async (
         LEFT JOIN (
           SELECT root_id, MAX(created_at) AS latest_comm_created_at
           FROM "OffchainComments"
-          WHERE chain = :chain 
+          WHERE chain = $chain 
             AND root_id LIKE 'discussion%'
             AND created_at < $created_at
             AND deleted_at IS NULL
@@ -93,7 +94,7 @@ const bulkThreads = async (
         LEFT JOIN "ChainEntities" AS chain_entities
         ON t.id = chain_entities.thread_id
         WHERE t.deleted_at IS NULL
-          AND t.chain = :chain 
+          AND t.chain = $chain 
           ${topicOptions}
           AND t.created_at < $created_at
           AND t.pinned = false
@@ -207,7 +208,7 @@ const bulkThreads = async (
 
   const countsQuery = `
      SELECT id, title, stage FROM "OffchainThreads"
-     WHERE chain = :chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
+     WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
   const threadsInVoting: OffchainThreadInstance[] =
     await models.sequelize.query(countsQuery, {
