@@ -21,7 +21,7 @@ describe('Subscriptions Tests', () => {
   let loggedInAddr;
   let loggedInAddrId;
   const chain = 'ethereum';
-  const community = 'staking';
+  // const community = chain;
 
   before('reset database', async () => {
     await resetDatabase();
@@ -37,7 +37,7 @@ describe('Subscriptions Tests', () => {
 
   describe('/createSubscription test', () => {
     it('should create new-thread subscription on community', async () => {
-      const object_id = community;
+      const object_id = chain;
       const is_active = true;
       const category = NotificationCategories.NewThread;
       const res = await chai
@@ -71,7 +71,6 @@ describe('Subscriptions Tests', () => {
     it('should make new-comment subscription on thread in community', async () => {
       let res = await modelUtils.createThread({
         chainId: chain,
-        communityId: community,
         address: loggedInAddr,
         jwt: jwtToken,
         title: 't',
@@ -99,7 +98,6 @@ describe('Subscriptions Tests', () => {
     it('should make new-comment subscription on thread in chain', async () => {
       let res = await modelUtils.createThread({
         chainId: chain,
-        communityId: null,
         address: loggedInAddr,
         jwt: jwtToken,
         title: 't2',
@@ -127,7 +125,6 @@ describe('Subscriptions Tests', () => {
     it('should make new-comment subscription on comment on thread in chain', async () => {
       const res1 = await modelUtils.createThread({
         chainId: chain,
-        communityId: null,
         address: loggedInAddr,
         jwt: jwtToken,
         title: 't2',
@@ -139,7 +136,6 @@ describe('Subscriptions Tests', () => {
       });
       let res = await modelUtils.createComment({
         chain,
-        community: null,
         address: loggedInAddr,
         jwt: jwtToken,
         text: 'cw4eva',
@@ -163,7 +159,6 @@ describe('Subscriptions Tests', () => {
     it('should make new-comment subscription on comment on thread in community', async () => {
       let res = await modelUtils.createThread({
         chainId: chain,
-        communityId: community,
         address: loggedInAddr,
         jwt: jwtToken,
         title: 't3',
@@ -175,7 +170,6 @@ describe('Subscriptions Tests', () => {
       });
       res = await modelUtils.createComment({
         chain,
-        community,
         address: loggedInAddr,
         jwt: jwtToken,
         text: 'hi',
@@ -382,7 +376,7 @@ describe('Subscriptions Tests', () => {
 
     it.skip('should check /viewSubscriptions for all', async () => {
       const subscription = await modelUtils.createSubscription({
-        object_id: community,
+        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -401,7 +395,7 @@ describe('Subscriptions Tests', () => {
     let subscription: NotificationSubscription;
     beforeEach('creating a subscription', async () => {
       subscription = await modelUtils.createSubscription({
-        object_id: community,
+        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -456,7 +450,7 @@ describe('Subscriptions Tests', () => {
       for (let i = 0; i < 3; i++) {
         subscriptions.push(
           modelUtils.createSubscription({
-            object_id: community,
+            object_id: chain,
             jwt: jwtToken,
             is_active: true,
             category: NotificationCategories.NewThread,
@@ -531,7 +525,7 @@ describe('Subscriptions Tests', () => {
     let subscription: NotificationSubscription;
     beforeEach('creating a subscription', async () => {
       subscription = await modelUtils.createSubscription({
-        object_id: community,
+        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -628,7 +622,7 @@ describe('Subscriptions Tests', () => {
 
     beforeEach('make subscription', async () => {
       subscription = await modelUtils.createSubscription({
-        object_id: community,
+        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -675,7 +669,7 @@ describe('Subscriptions Tests', () => {
     it('emitting a notification', async () => {
       // Subscription for Default User in 'Staking'
       subscription = await modelUtils.createSubscription({
-        object_id: community,
+        object_id: chain,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -689,7 +683,6 @@ describe('Subscriptions Tests', () => {
       );
       thread = await modelUtils.createThread({
         chainId: chain,
-        communityId: community,
         jwt: newJWT,
         address: newAddress,
         title: 'hi',

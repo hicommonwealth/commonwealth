@@ -35,7 +35,7 @@ describe('Invite Tests', () => {
     adminUserId = res.user_id;
     const isAdmin = await modelUtils.assignRole({
       address_id: res.address_id,
-      chainOrCommObj: { chain },
+      chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
 
