@@ -105,7 +105,7 @@ const CommunitySelector: m.Component<{
 }> = {
   view: (vnode) => {
     const { showTextLabel, showListOnly, showHomeButtonAtTop } = vnode.attrs;
-    const activeEntityName = app.chain.meta.chain.name;
+    const activeEntityName = app.chain?.meta.chain.name;
     const allCommunities = (app.config.chains.getAll())
       .sort((a, b) => a.name.localeCompare(b.name))
       .sort((a, b) => {

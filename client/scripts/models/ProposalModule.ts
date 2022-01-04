@@ -16,13 +16,13 @@ export abstract class ProposalModule<
 > extends StorageModule {
   public readonly store = new ProposalStore<ProposalT>();
 
-  protected _disabled: boolean = false;
+  protected _disabled = false;
   public get disabled() { return this._disabled; }
   public disable() { this._disabled = true; }
 
-  protected _initializing: boolean = false;
+  protected _initializing = false;
   public get initializing() { return this._initializing; }
-  protected _initialized: boolean = false;
+  protected _initialized = false;
   public get initialized() { return this._initialized; }
   public get ready() { return this._initialized || this._disabled; }
 

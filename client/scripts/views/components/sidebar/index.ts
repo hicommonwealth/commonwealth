@@ -16,7 +16,7 @@ import { ChainInfo, NodeInfo } from 'models';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 
 
@@ -45,8 +45,7 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
 const SidebarQuickSwitcher: m.Component<{}> = {
   view: (vnode) => {
     // const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
-    const allCommunities = (app.config.chains.getAll() as ChainInfo[])
-      .concat(app.config.chains.getAll())
+    const allCommunities = app.config.chains.getAll()
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((item) => (item instanceof ChainInfo)
         ? app.config.nodes.getByChain(item.id)?.length > 0

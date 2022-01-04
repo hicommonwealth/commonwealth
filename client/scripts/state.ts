@@ -147,7 +147,7 @@ const app: IApp = {
     chains: new ChainStore(),
     nodes: new NodeStore(),
     defaultChain: 'edgeware',
-    // invites: [],
+    invites: [],
   },
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,

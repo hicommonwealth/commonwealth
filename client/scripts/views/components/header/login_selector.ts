@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'components/header/login_selector.scss';
 
 import $ from 'jquery';
@@ -15,7 +16,7 @@ import { isSameAccount, pluralize } from 'helpers';
 
 import { notifySuccess } from 'controllers/app/notifications';
 
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
@@ -285,7 +286,7 @@ const LoginSelector: m.Component<{
       }
     }
 
-    const activeCommunityMeta = app.chain.meta?.chain;
+    const activeCommunityMeta = app.chain?.meta?.chain;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     return m(ButtonGroup, { class: 'LoginSelector' }, [
