@@ -393,8 +393,10 @@ const createComment = async (
   author.save();
 
   // update proposal updated_at timestamp
-  proposal.changed('updated_at', true);
-  proposal.save();
+  if (prefix === ProposalType.OffchainThread) {
+    proposal.last_commented_on = Date.now();
+    proposal.save();
+  }
 
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };

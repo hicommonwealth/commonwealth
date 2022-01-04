@@ -88,7 +88,7 @@ class RecentActivityController {
     const params = {
       chain: chainId,
       community: communityId,
-      threads_per_topics: threadsPerTopic
+      threads_per_topic: threadsPerTopic
     };
 
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
@@ -97,22 +97,18 @@ class RecentActivityController {
     }
 
     const { threads, activitySummary } = response.result;
-    return {
-      threads: threads.map((thread) => {
-        const modeledThread = modelThreadFromServer(thread);
-        if (!thread.Address) {
-          console.error('OffchainThread missing address');
-        }
-        try {
-          app.threads.store.add(modeledThread);
-        } catch (e) {
-          console.error(e.message);
-        }
-        return modeledThread;
-      }),
-      activitySummary,
-    };
-    return;
+    return threads.map((thread) => {
+      const modeledThread = modelThreadFromServer(thread);
+      if (!thread.Address) {
+        console.error('OffchainThread missing address');
+      }
+      try {
+        app.threads.store.add(modeledThread);
+      } catch (e) {
+        console.error(e.message);
+      }
+      return modeledThread;
+    });
   }
 
   // public addThreads(threads: IAbridgedThreadFromServer[], clear?: boolean) {

@@ -39,11 +39,11 @@ const activeThreads = async (
           topic_id: topic.id,
         },
         limit: threads_per_topic,
-        order: ['updated_at', 'DESC']
+        order: [['last_commented_on', 'DESC']]
       });
-      allThreads.push(recentTopicThreads);
+      allThreads.concat(recentTopicThreads);
     }));
-    console.log(allThreads.length);
+    console.log({ length: allThreads.length });
 
     return res.json({
       status: 'Success',

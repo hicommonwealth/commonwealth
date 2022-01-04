@@ -52,14 +52,14 @@ const SummaryRow: m.Component<
 };
 
 export const SummaryListing: m.Component<
-  { recentThreads: { threads: OffchainThread[]; activitySummary } },
+  { recentThreads: OffchainThread[] },
   {}
 > = {
   view: (vnode) => {
     const topicScopedThreads = {};
     const topics = app.topics.getByCommunity(app.activeId());
     topics.forEach((topic) => {
-      topicScopedThreads[topic.id] = vnode.attrs.recentThreads.threads.filter(
+      topicScopedThreads[topic.id] = vnode.attrs.recentThreads.filter(
         (thread) => thread.topic?.id === topic?.id
       );
     });
@@ -80,7 +80,6 @@ export const SummaryListing: m.Component<
           return m(SummaryRow, {
             topic,
             monthlyThreads: topicScopedThreads[topic.id],
-            activitySummary: vnode.attrs.recentThreads.activitySummary,
           });
         })
       ),
