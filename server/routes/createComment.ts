@@ -225,10 +225,6 @@ const createComment = async (
     return next(new Error(Errors.CantCommentOnReadOnly));
   }
 
-  proposal.updated_at = new Date();
-  console.log(proposal);
-  proposal.save();
-
   // craft commonwealth url
   const cwUrl = typeof proposal === 'string'
     ? getProposalUrlWithoutObject(prefix, (finalComment.chain || finalComment.community), proposal, finalComment)
@@ -395,6 +391,10 @@ const createComment = async (
   // update author.last_active (no await)
   author.last_active = new Date();
   author.save();
+
+  // update proposal updated_at timestamp
+  proposal.changed('updated_at', true);
+  proposal.save();
 
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };

@@ -21,7 +21,7 @@ const activeThreads = async (
   );
   if (error) return next(new Error(error));
   let { threads_per_topic } = req.query;
-  if (!threads_per_topic || !Number.isNaN(threads_per_topic || threads_per_topic < 0 || threads_per_topic > 10)) {
+  if (!threads_per_topic || Number.isNaN(threads_per_topic) || threads_per_topic < 0 || threads_per_topic > 10) {
     threads_per_topic = 3;
   }
 
@@ -31,7 +31,9 @@ const activeThreads = async (
     else communityWhere['community_id'] = community.id;
     const communityTopics = await models.OffchainTopic.findAll({ where: communityWhere });
     const allThreads = [];
+    console.log(communityTopics?.length);
     await Promise.all(communityTopics.map(async (topic) => {
+      console.log(topic.id);
       const recentTopicThreads = await models.OffchainThread.findAll({
         where: {
           topic_id: topic.id,
@@ -50,7 +52,7 @@ const activeThreads = async (
       },
     });
   } catch (err) {
-    return next(new Error());
+    return next(new Error(err));
   }
 
 };
