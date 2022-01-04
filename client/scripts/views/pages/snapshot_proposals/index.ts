@@ -104,7 +104,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
       description: '',
       showNewProposalButton: true,
     }, [
-      (app.chain || app.community) && [
+      (app.chain) && [
         m('.discussions-main', [
           m(SnapshotProposalStagesBar, { selected: selectedFilter, onChangeFilter }),
           m(Listing, {

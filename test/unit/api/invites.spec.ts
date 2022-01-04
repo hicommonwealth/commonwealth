@@ -35,7 +35,7 @@ describe('Invite Tests', () => {
     adminUserId = res.user_id;
     const isAdmin = await modelUtils.assignRole({
       address_id: res.address_id,
-      chainOrCommObj: { offchain_community_id: community },
+      chainOrCommObj: { chain },
       role: 'admin',
     });
 
@@ -142,31 +142,6 @@ describe('Invite Tests', () => {
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
       expect(invite.body.error).to.be.equal(CreateInviteErrors.AddressNotFound);
-    });
-
-    it('should fail to invite an address that is already a member', async () => {
-      if (!process.env.SENDGRID_API_KEY) return;
-
-      const res = await modelUtils.createAndVerifyAddress({ chain });
-      await modelUtils.assignRole({
-        address_id: res.address_id,
-        chainOrCommObj: { offchain_community_id: community },
-        role: 'member',
-      });
-
-      const invite = await chai.request(app)
-        .post('/api/createInvite')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: adminJWT,
-          invitedAddress: res.address,
-          community,
-          address: adminAddress,
-        });
-
-      expect(invite.status).to.be.equal(500);
-      expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(CreateInviteErrors.IsAlreadyMember);
     });
 
     it('should fail to create an invite from an invites disabled community as a user', async () => {

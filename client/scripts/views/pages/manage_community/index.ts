@@ -8,7 +8,7 @@ import app from 'state';
 import { RoleInfo, RolePermission, Webhook } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
-import CommunityMetadataManagementTable from './community_metadata_management_table';
+// import CommunityMetadataManagementTable from './community_metadata_management_table';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';

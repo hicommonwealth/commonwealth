@@ -59,9 +59,7 @@ const User: m.Component<{
     const friendlyChainName = app.config.chains
       .getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name;
 
-    const adminsAndMods = app.chain
-      ? app.chain.meta.chain.adminsAndMods
-      : app.community ? app.community.meta.adminsAndMods : [];
+    const adminsAndMods = app.chain.meta.chain.adminsAndMods
 
     if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !app.cachedIdentityWidget) {
       vnode.state.identityWidgetLoading = true;

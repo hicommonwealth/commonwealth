@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
@@ -23,7 +24,6 @@ let userAddress;
 let topic;
 
 describe('Topic Tests', () => {
-  const community = 'staking';
   const chain = 'ethereum';
   const title = 'test title';
   const body = 'test body';
@@ -39,7 +39,7 @@ describe('Topic Tests', () => {
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     const isAdmin = await modelUtils.assignRole({
       address_id: res.address_id,
-      chainOrCommObj: { offchain_community_id: community },
+      chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
     expect(adminAddress).to.not.be.null;
@@ -60,7 +60,7 @@ describe('Topic Tests', () => {
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
       const isAdmin = await modelUtils.assignRole({
         address_id: res.address_id,
-        chainOrCommObj: { offchain_community_id: community },
+        chainOrCommObj: { chain_id: chain },
         role: 'admin',
       });
       expect(adminAddress).to.not.be.null;
@@ -68,7 +68,6 @@ describe('Topic Tests', () => {
       expect(isAdmin).to.not.be.null;
       const res2 = await modelUtils.createThread({
         chainId: chain,
-        communityId: undefined,
         address: adminAddress,
         jwt: adminJWT,
         title,
@@ -109,7 +108,7 @@ describe('Topic Tests', () => {
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
       const isAdmin = await modelUtils.assignRole({
         address_id: res.address_id,
-        chainOrCommObj: { offchain_community_id: community },
+        chainOrCommObj: { chain_id: chain },
         role: 'admin',
       });
       expect(adminAddress).to.not.be.null;
@@ -124,7 +123,6 @@ describe('Topic Tests', () => {
 
       const res3 = await modelUtils.createThread({
         chainId: chain,
-        communityId: community,
         address: adminAddress,
         jwt: adminJWT,
         title,

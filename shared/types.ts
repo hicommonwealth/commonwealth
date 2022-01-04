@@ -119,7 +119,6 @@ export interface IWebsocketsPayload<T> {
 export interface InviteCodeAttributes {
   id?: string;
   community_name?: string;
-  community_id?: string;
   chain_id?: string;
   creator_id: number;
   invited_email?: string;

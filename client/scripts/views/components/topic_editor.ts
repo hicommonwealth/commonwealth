@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import $ from 'jquery';
 import { Button, Classes, Dialog, Icon, Icons, MenuItem } from 'construct-ui';
@@ -18,7 +19,7 @@ const TopicWindow: m.Component<{
     }
   },
   view: (vnode) => {
-    const activeMeta = app.chain ? app.chain.meta.chain : app.community.meta;
+    const activeMeta =  app.chain.meta.chain;
     const featuredTopics = activeMeta.featuredTopics.map((t) => {
       return app.topics.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
     });

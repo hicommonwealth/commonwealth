@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'components/stage_editor.scss';
 
 import m from 'mithril';
@@ -36,7 +37,7 @@ const SnapshotProposalSelector: m.Component<{
             vnode.state.snapshotProposalsLoaded = true;
             m.redraw();
           })
-        };
+        }
       }
     }
 
@@ -181,9 +182,9 @@ const StageEditor: m.Component<{
     vnode.attrs.thread.chainEntities.forEach((ce) => vnode.state.chainEntitiesToSet.push(ce));
   },
   view: (vnode) => {
-    if (!app.chain?.meta?.chain && !app.community?.meta) return;
+    if (!app.chain?.meta?.chain) return;
 
-    const { customStages } = app.chain?.meta?.chain || app.community?.meta;
+    const { customStages } = app.chain?.meta?.chain ;
     const stages = !customStages ? [
       OffchainThreadStage.Discussion,
       OffchainThreadStage.ProposalInReview,

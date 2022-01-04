@@ -22,7 +22,6 @@ describe('Roles Test', () => {
   let loggedInAddrId;
   let adminUserId;
   const chain = 'ethereum';
-  const community = 'staking';
 
   before('reset database', async () => {
     await resetDatabase();
@@ -33,7 +32,7 @@ describe('Roles Test', () => {
     adminUserId = res.user_id;
     const isAdmin = await modelUtils.assignRole({
       address_id: res.address_id,
-      chainOrCommObj: { offchain_community_id: community },
+      chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
   });
@@ -47,14 +46,14 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwt.sign({ id: user.user_id, email: user.email }, JWT_SECRET),
-          community,
+          chain,
           address_id: user.address_id,
         });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.role.address_id).to.be.equal(user.address_id);
-      expect(res.body.result.role.offchain_community_id).to.be.equal(community);
+      expect(res.body.result.role.offchain_community_id).to.be.equal(chain);
       expect(res.body.result.subscription).to.not.be.null;
-      expect(res.body.result.subscription.object_id).to.be.equal(community);
+      expect(res.body.result.subscription.object_id).to.be.equal(chain);
       expect(res.body.result.subscription.category_id).to.be.equal(
         NotificationCategories.NewThread
       );
@@ -67,12 +66,12 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           address_id: loggedInAddrId,
         });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.role.address_id).to.be.equal(loggedInAddrId);
-      expect(res.body.result.role.offchain_community_id).to.be.equal(community);
+      expect(res.body.result.role.offchain_community_id).to.be.equal(chain);
       expect(res.body.result.role.permission).to.be.equal('admin');
     });
 
@@ -83,7 +82,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(createErrors.InvalidAddress);
@@ -106,7 +105,7 @@ describe('Roles Test', () => {
         newUserId = res.user_id;
         const isMember = await modelUtils.assignRole({
           address_id: newUserAddressId,
-          chainOrCommObj: { offchain_community_id: community },
+          chainOrCommObj: { chain_id: chain },
           role: 'member',
         });
       }
@@ -120,7 +119,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           address: newUserAddress,
           new_role: role,
         });
@@ -136,7 +135,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           new_role: role,
         });
       expect(res.body.error).to.not.be.null;
@@ -151,7 +150,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           address: 'invalid address',
           new_role: role,
         });
@@ -166,7 +165,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           address: newUserAddress,
         });
       expect(res.body.error).to.not.be.null;
@@ -180,7 +179,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           address: newUserAddress,
           new_role: 'commander in chief',
         });
@@ -195,7 +194,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: newJwt,
-          community,
+          chain,
           address: newUserAddress,
           new_role: 'moderator',
         });
@@ -215,7 +214,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           address: temp.address,
           new_role: 'admin',
         });
@@ -231,7 +230,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           address: loggedInAddr,
           new_role: role,
         });
@@ -248,7 +247,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           address: newUserAddress,
           new_role: role,
         });
@@ -262,7 +261,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          community,
+          chain,
           address: loggedInAddr,
           new_role: newAdminRole,
         });
@@ -285,7 +284,7 @@ describe('Roles Test', () => {
       memberUserId = res.user_id;
       const isMember = await modelUtils.assignRole({
         address_id: memberAddressId,
-        chainOrCommObj: { offchain_community_id: community },
+        chainOrCommObj: { chain_id: chain },
         role: 'member',
       });
     });
@@ -297,7 +296,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: memberJwt,
-          community,
+          chain,
           address_id: memberAddressId,
         });
       expect(res.body.status).to.be.equal('Success');
@@ -310,7 +309,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: memberJwt,
-          community,
+          chain,
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(deleteErrors.InvalidAddress);
@@ -323,7 +322,7 @@ describe('Roles Test', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: memberJwt,
-          community,
+          chain,
           address_id: 123456,
         });
       expect(res.body.error).to.not.be.null;
@@ -362,7 +361,7 @@ describe('Roles Test', () => {
         .get('/api/bulkMembers')
         .set('Accept', 'application/json')
         .query({
-          community,
+          chain,
           jwt: jwtToken,
         });
       expect(res.body.status).to.be.equal('Success');
@@ -389,7 +388,7 @@ describe('Roles Test', () => {
         .get('/api/bulkMembers')
         .set('Accept', 'application/json')
         .query({
-          community,
+          chain,
           jwt: jwtToken,
         });
       expect(res.body.status).to.be.equal('Success');

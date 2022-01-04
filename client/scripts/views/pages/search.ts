@@ -6,10 +6,6 @@ import moment from 'moment';
 import { Input, ListItem, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 
 import { link, pluralize } from 'helpers';
-import {
-  ReplyIcon,
-  AccountIcon
-} from '../components/component_kit/icons';
 import app from 'state';
 import { AddressInfo, Profile } from 'models';
 
@@ -18,6 +14,10 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
+import {
+  ReplyIcon,
+  AccountIcon
+} from '../components/component_kit/icons';
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
 import { ContentType, initializeSearch, search, SearchType } from '../components/search_bar';
@@ -56,8 +56,6 @@ export const getCommunityResult = (community) => {
     ? { token: community }
     : community.contentType === ContentType.Chain
       ? { chain: community }
-      : community.contentType === ContentType.Community
-        ? { community }
         : null;
   params['size'] = 36;
   const onSelect = (e) => {
@@ -243,7 +241,7 @@ const SearchPage : m.Component<{
       if (!app.searchCache[vnode.state.searchTerm]) {
         app.searchCache[vnode.state.searchTerm] = { loaded: false };
       }
-      search(searchTerm, { communityScope, chainScope }, vnode.state);
+      search(searchTerm, { chainScope }, vnode.state);
       return LoadingPage;
     }
 
