@@ -116,9 +116,7 @@ async function mainProcess(
   });
   if (activeChains.length > 0)
     log.info(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      `Starting scheduled process. Active chains: ${JSON.stringify(activeChains.flat())}`
+      `Starting scheduled process. Active chains: ${JSON.stringify(activeChains.reduce((acc, val) => acc.concat(val), []))}`
     );
 
   let query =
