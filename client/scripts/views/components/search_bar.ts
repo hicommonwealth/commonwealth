@@ -75,8 +75,6 @@ export const getCommunityPreview = (community, closeResultsFn, tabIndex, setUsin
       ? { token: community }
       : community.contentType === ContentType.Chain
       ? { chain: community }
-      : community.contentType === ContentType.Community
-      ? { community }
       : null;
   params['size'] = 36;
   const onSelect = (e) => {
@@ -271,7 +269,8 @@ const getBalancedContentListing = (
 };
 
 const getResultsPreview = (searchQuery: SearchQuery, state) => {
-  const { communityScope } = searchQuery;
+  // TODO: using chainScope instead of communityScope OK?
+  const { chainScope } = searchQuery;
   const types = searchQuery.getSearchScope()
   const results = getBalancedContentListing(app.search.getByQuery(searchQuery).results, types)
   const organizedResults = [];
@@ -300,7 +299,7 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
               searchQuery.searchTerm,
               tabIndex,
               state.setUsingFilterMenu,
-              !!communityScope
+              !!chainScope
             )
           : item.searchType === SearchScope.Communities
           ? getCommunityPreview(item, state.closeResults, tabIndex, state.setUsingFilterMenu)
@@ -320,13 +319,6 @@ const getSearchHistoryPreview = (searchQuery: SearchQuery, setFilterMenuActive, 
   if(searchQuery.chainScope && !app.isCustomDomain()) {
     scopeTags.unshift(m(Tag, {
       label: searchQuery.chainScope.toLowerCase(),
-      class: 'search-history-primary-tag'
-    }))
-  }
-
-  if(searchQuery.communityScope && !app.isCustomDomain()) {
-    scopeTags.unshift(m(Tag, {
-      label: searchQuery.communityScope.toLowerCase(),
       class: 'search-history-primary-tag'
     }))
   }
@@ -472,7 +464,7 @@ export const SearchBar: m.Component<
 
     const scopeButtons = [SearchScope.Threads, SearchScope.Replies].map(s => scopeToButton(s, false))
       .concat((app.isCustomDomain() ? [] : [SearchScope.Communities, SearchScope.Members])
-        .map(s => scopeToButton(s, (vnode.state.searchQuery.chainScope || vnode.state.searchQuery.communityScope)))
+        .map(s => scopeToButton(s, (vnode.state.searchQuery.chainScope)))
       )
 
     const filterDropdown =
@@ -487,27 +479,7 @@ export const SearchBar: m.Component<
           class: 'disabled search-filter-button-bar',
           label: scopeButtons
         }),
-        vnode.state.activeCommunity && !app.isCustomDomain()
-          ? [
-              scopeTitle,
-              m(ListItem, {
-                class: 'disabled',
-                label: m(Button, {
-                  size: Size.SM,
-                  onclick: () => {
-                    vnode.state.searchQuery.communityScope =
-                      vnode.state.searchQuery.communityScope === vnode.state.activeCommunity
-                      ? undefined : vnode.state.activeCommunity
-                    search(vnode.state.searchQuery, vnode.state)
-                  },
-                  active: vnode.state.searchQuery.communityScope === vnode.state.activeCommunity,
-                  onmouseover: () => {vnode.state.filterMenuActive = true},
-                  onmouseout: () => {vnode.state.filterMenuActive = false},
-                  label: `Inside community: ${vnode.state.activeCommunity}`
-                }),
-              })
-            ]
-          : vnode.state.activeChain && !app.isCustomDomain()
+        vnode.state.activeChain && !app.isCustomDomain()
             && [
               scopeTitle,
               m(ListItem, {

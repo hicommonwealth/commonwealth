@@ -34,7 +34,7 @@ class SearchStore extends Store<SearchResult> {
     this._storeSearch = {};
   }
 
-  public getByQueryString(queryString: string) {
+  public getByQueryString(queryString: string): SearchResult {
     return this._storeSearch[queryString] || null
   }
 }

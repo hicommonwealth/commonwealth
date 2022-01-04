@@ -23,7 +23,6 @@ export interface SearchParams {
 }
 export default class SearchQuery implements SearchParams {
     public searchTerm: Lowercase<string>;
-    public communityScope?: string;
     public chainScope?: string;
     public isSearchPreview?: boolean;
     public searchScope: Array<SearchScope>;
@@ -32,7 +31,6 @@ export default class SearchQuery implements SearchParams {
     constructor(searchTerm: string, params?: SearchParams){
         this.searchTerm = searchTerm
         this.searchScope = params?.searchScope || [SearchScope.All]
-        this.communityScope = params?.communityScope
         this.chainScope = params?.chainScope
         this.isSearchPreview = !!params?.isSearchPreview
         this.sort = params?.sort || SearchSort.Best
@@ -40,7 +38,6 @@ export default class SearchQuery implements SearchParams {
 
     public toEncodedString() {
         let encodedString = this.searchTerm.trim().replace(/\s+/g, '%20') +
-            (this.communityScope ? ` communityScope=${this.communityScope}` : '') +
             (this.chainScope ? ` chainScope=${this.chainScope}` : '') +
             (this.isSearchPreview ? ` isSearchPreview=${this.isSearchPreview}` : '') +
             (this.sort ? ` sort=${this.sort}` : '')
@@ -94,7 +91,6 @@ export default class SearchQuery implements SearchParams {
     public static fromUrlParams(url: Record<string, any>){
         const sq = new SearchQuery(url['q'])
         sq.chainScope = url['chainScope'] || undefined
-        sq.communityScope = url['communityScope'] || undefined
         sq.isSearchPreview = url['preview'] === 'true'
         sq.sort = url['sort'] || SearchSort.Best
         sq.searchScope = url['scope'] || [SearchScope.All]
@@ -103,7 +99,7 @@ export default class SearchQuery implements SearchParams {
 
     public getSearchScope() {
         return this.searchScope[0] === SearchScope.All
-          ? (this.communityScope || this.chainScope)
+          ? (this.chainScope)
             ? [SearchScope.Threads, SearchScope.Replies]
             : [SearchScope.Threads, SearchScope.Replies, SearchScope.Communities, SearchScope.Members]
           : this.searchScope

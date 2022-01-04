@@ -109,7 +109,6 @@ const searchDiscussions = async (
       "Addresses".chain as address_chain,
       "OffchainThreads".created_at,
       "OffchainThreads".chain,
-      "OffchainThreads".community,
       ts_rank_cd("OffchainThreads"._search, query) as rank
     FROM "OffchainThreads"
     JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id, 
