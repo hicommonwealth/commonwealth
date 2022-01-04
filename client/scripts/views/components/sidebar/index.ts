@@ -9,7 +9,7 @@ import {
 
 import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
-import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'types';
 import { link } from 'helpers';
 import { ChainInfo, NodeInfo } from 'models';
 
@@ -253,11 +253,11 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         }),
       // proposals (substrate, cosmos, moloch & compound only)
       app.chain && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
-                         || app.chain?.base === ChainBase.CosmosSDK
-                         || app.chain?.network === ChainNetwork.Sputnik
-                         || app.chain?.network === ChainNetwork.Moloch
-                         || app.chain?.network === ChainNetwork.Compound
-                         || app.chain?.network === ChainNetwork.Aave)
+                  || app.chain?.base === ChainBase.CosmosSDK
+                  || app.chain?.network === ChainNetwork.Sputnik
+                  || app.chain?.network === ChainNetwork.Moloch
+                  || app.chain?.network === ChainNetwork.Compound
+                  || app.chain?.network === ChainNetwork.Aave)
         && m(Button, {
           fluid: true,
           rounded: true,
@@ -597,7 +597,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
       !useQuickSwitcher && m('.Sidebar', [
         (app.chain) && m(OffchainNavigationModule),
-        (app.chain) && m(OnchainNavigationModule),
+        (app.chain?.meta.chain.type !== ChainType.Offchain) && m(OnchainNavigationModule),
         (app.chain) && m(ExternalLinksModule),
         m('br'),
         app.isLoggedIn() && (app.chain) && m(SubscriptionButton),
