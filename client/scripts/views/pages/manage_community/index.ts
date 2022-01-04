@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { RoleInfo, RolePermission, Webhook } from 'models';
+import { ChainInfo, RoleInfo, RolePermission, Webhook } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import CommunityMetadataManagementTable from './community_metadata_management_table';
@@ -12,6 +12,27 @@ import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { CommunityOptionsPopover } from '../discussions';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+
+const deleteChainButton = (chain: ChainInfo) => {
+  return m('a', {
+    href: '#',
+    onclick: (e) => {
+      $.post(`${app.serverUrl()}/deleteChain`, {
+        id: chain.id,
+        auth: true,
+        jwt: app.user.jwt,
+      }).then((result) => {
+        if (result.status !== 'Success') return;
+        app.config.chains.remove(chain);
+        notifySuccess('Deleted chain!');
+        // redirect to /
+      }, (err) => {
+        notifyError('Failed to delete chain!');
+      });
+    }
+  }, 'DELETE CHAIN');
+}
 
 const ManageCommunityPage: m.Component<
   {},
@@ -138,13 +159,16 @@ const ManageCommunityPage: m.Component<
                   onRoleUpdate(oldRole, newRole),
               })
             : vnode.state.loadingFinished &&
-              m(ChainMetadataManagementTable, {
+              [
+                m(ChainMetadataManagementTable, {
                 admins,
                 chain: app.config.chains.getById(app.activeChainId()),
                 mods,
                 onRoleUpdate: (oldRole, newRole) =>
                   onRoleUpdate(oldRole, newRole),
               }),
+                app.user.isSiteAdmin && deleteChainButton(app.config.chains.getById(app.activeChainId()))
+            ],
         ]),
         m('.panel-bottom', [
           vnode.state.loadingFinished &&
