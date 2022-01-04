@@ -101,24 +101,30 @@ export default class CompoundChain extends EthereumChain {
     return !m.isZero();
   }
 
-  public async getVotingPower(address: string): Promise<BigNumber> {
+  public async getVotingPower(address: string, blockNumber?: number | string): Promise<BigNumber> {
     console.log(this.compoundApi);
+    if (!blockNumber) {
+      blockNumber = (await this.compoundApi.Provider.getBlockNumber()) - 1;
+    }
     if (!this.compoundApi.Token) {
       console.warn('No token found, cannot fetch vote status');
       return null;
     }
     let voteAmount: BigNumber;
     if (this.compoundApi.tokenType === GovernorTokenType.OzVotes) {
-      voteAmount = await (this.compoundApi.Token as ERC20Votes).getVotes(address);
+      voteAmount = await (this.compoundApi.Token as ERC20Votes).getPastVotes(address, blockNumber);
     } else {
       voteAmount = await this.compoundApi.Token.getCurrentVotes(address);
     }
-    console.log(voteAmount);
+    console.log(voteAmount.toString());
     return voteAmount;
   }
 
-  public async isDelegate(address: string): Promise<boolean> {
-    const voteAmount = await this.getVotingPower(address);
+  public async isDelegate(address: string, blockNumber?: number | string): Promise<boolean> {
+    if (!blockNumber) {
+      blockNumber = (await this.compoundApi.Provider.getBlockNumber()) - 1;
+    }
+    const voteAmount = await this.getVotingPower(address, blockNumber);
     return !voteAmount.isZero();
   }
 }

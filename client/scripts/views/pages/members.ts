@@ -211,6 +211,7 @@ const MembersPage: m.Component<
                 const votes = member?.votes && member.votes.div(
                   BigNumber.from(10).pow(app.chain.meta.chain.decimals || 18)
                 ).toNumber();
+                // const votes = member.votes?.toNumber();
                 return m('tr', [
                   m('td.members-item-info', [
                     m('a', {
