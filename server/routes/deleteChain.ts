@@ -30,38 +30,90 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
   const chain = await models.Chain.findOne({
     where: {
       id: req.body.id,
-    },
-    include: [
-      { model: models.OffchainTopic, required: false, },
-      { model: models.OffchainThread, required: false, },
-      { model: models.StarredCommunity, required: false, },
-      { model: models.ChainNode, required: false, },
-      { model: models.Address, required: false, },
-    ]
+    }
   });
   if (!chain) {
     return next(new Error(Errors.NoChain));
   }
 
-  // get addresses
-  // get topics
-  // get comments
-  // get reactions
-  // get roles
-
-  // make sure no addresses are associated
-  const hasAddresses = await chain.getAddresses();
-  if (hasAddresses && hasAddresses.length) {
-    return next(new Error(Errors.CannotDeleteChain));
-  }
-
-  const chainTopics = await chain.getTopics();
-  chain.removeTopics(chainTopics);
-
   // delete all nodes first
-  const nodes = await chain.getChainNodes();
-  await Promise.all(nodes.map((n) => n.destroy()));
+  const chainNodes = await chain.getChainNodes();
+
+  const chainEntities = await models.ChainEntity.findAll({
+    where: {
+      chain: chain.id,
+    },
+    include: [ models.ChainEvents ],
+  });
+
+  const addresses = await chain.getAddresses();
+
+  const threads = await chain.getOffchainThreads();
+
+  const comments = await chain.getOffchainComments();
+
+  const reactions = await chain.getOffchainReactions();
+
+  const topics = await chain.getTopics();
+  await Promise.all(topics.map((n) => n.destroy()));
+
+  const roles = await models.Roles.findAll({
+    where: {
+      chain_id: chain.id,
+    }
+  });
+
+  const inviteCodes = await models.InviteCode.findAll({
+    where: {
+      chain_id: chain.id,
+    }
+  });
+
+  const inviteLinks = await models.InviteLink.findAll({
+    where: {
+      chain_id: chain.id,
+    }
+  });
+
+  const subscriptions = await models.Subscription.findAll({
+    where: {
+      chain_id: chain.id,
+    }
+  });
+
+  const webhooks = await models.Webhook.findAll({
+    where: {
+      chain_id: chain.id,
+    }
+  });
+
+  const starredCommunities = await models.StarredCommunity.findAll({
+    where: {
+      chain: chain.id,
+    }
+  });
+
+
+  await Promise.all(starredCommunities.map((n) => n.destroy()));
+
+  await Promise.all(reactions.map((n) => n.destroy()));
+  await Promise.all(comments.map((n) => n.destroy()));
+  await Promise.all(threads.map((n) => n.destroy()));
+
+  await Promise.all(inviteCodes.map((n) => n.destroy()));
+  await Promise.all(inviteLinks.map((n) => n.destroy()));
+
+  await Promise.all(chainEntities.map((n) => n.destroy()));
+
+  await Promise.all(subscriptions.map((n) => n.destroy()));
+  await Promise.all(webhooks.map((n) => n.destroy()));
+
+  await Promise.all(roles.map((n) => n.destroy()));
+  await Promise.all(addresses.map((n) => n.destroy()));
+
+  await Promise.all(chainNodes.map((n) => n.destroy()));
   await chain.destroy();
+
   return res.json({ status: 'Success', result: 'Deleted chain' });
 };
 
