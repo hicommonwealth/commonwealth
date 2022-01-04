@@ -100,7 +100,7 @@ const NewProposalForm = {
     // sputnik proposal
     let hasSputnikFields: boolean;
     // data loaded
-    let dataLoaded: boolean = true;
+    let dataLoaded = true;
 
     if (proposalTypeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;

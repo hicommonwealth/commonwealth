@@ -129,10 +129,12 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
   ];
 };
 
-export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
+export const MobileNewProposalButton: m.Component<{
+
+}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
-    if (!app.chain && !app.community) return;
+    if (!app.chain) return;
     if (!app.activeId()) return;
     return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {
@@ -165,11 +167,11 @@ const NewProposalButton: m.Component<{
     const { fluid, threadOnly, councilCandidates } = vnode.attrs;
 
     if (!app.isLoggedIn()) return;
-    if (!app.chain && !app.community) return;
+    if (!app.chain) return;
     if (!app.activeId()) return;
 
     // just a button for communities, or chains without governance
-    if (app.community || threadOnly) {
+    if (threadOnly) {
       return m(Button, {
         class: 'NewProposalButton',
         label: 'New thread',

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import { Button, List, ListItem } from 'construct-ui';
 
@@ -232,8 +233,8 @@ export const ProposalSidebarStageEditorModule: m.Component<
   view: (vnode) => {
     const { openStageEditor } = vnode.attrs;
 
-    if (!app.chain?.meta?.chain && !app.community?.meta) return;
-    const { stagesEnabled } = app.chain?.meta?.chain || app.community?.meta;
+    if (!app.chain?.meta?.chain) return;
+    const { stagesEnabled } = app.chain?.meta?.chain;
     if (!stagesEnabled) return;
 
     return m('.ProposalSidebarStageEditorModule', [

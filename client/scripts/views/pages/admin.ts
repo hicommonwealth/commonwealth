@@ -128,14 +128,6 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
           addNodeRow(chain),
         ])
       ])),
-      (app.config.communities.getAll() || []).map((community) => m('.chain-row', [
-        m('h3', [
-          m('strong', community.name),
-        ]),
-        m('.chain-subtitle', {
-          style: 'margin: -14px 0 10px; color: #999;'
-        }, `${community.id}`),
-      ])),
       vnode.state.success && m('.success-message', {
         style: 'color: #5eaf77; font-weight: 500; margin: 10px 0;'
       }, vnode.state.error),

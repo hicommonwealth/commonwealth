@@ -24,9 +24,7 @@ const MembershipButton: m.Component<{
           vnode.state.loading = false;
           m.redraw();
           // notify
-          const name = chain
-            ? app.config.chains.getById(chain)?.name
-            : app.config.communities.getById(community)?.name;
+          const name = app.config.chains.getById(chain)?.name
           notifySuccess(`Joined ${name}`);
         }).catch((err: any) => {
           vnode.state.loading = false;
@@ -49,9 +47,7 @@ const MembershipButton: m.Component<{
           vnode.state.loading = false;
           m.redraw();
           // notify
-          const name = chain
-            ? app.config.chains.getById(chain)?.name
-            : app.config.communities.getById(community)?.name;
+          const name = app.config.chains.getById(chain)?.name
           notifySuccess(`Left ${name}`);
         }).catch((err: any) => {
           vnode.state.loading = false;
@@ -73,8 +69,7 @@ const MembershipButton: m.Component<{
           // select an existing address
           existingJoinableAddresses.map((a) => {
             const hasExistingRole = existingRolesAddressIDs.indexOf(a.id) !== -1;
-            const cannotJoinPrivateCommunity = community && app.config.communities.getById(community)?.privacyEnabled
-              && !hasExistingRole;
+            const cannotJoinPrivateCommunity = !hasExistingRole;
             return m(MenuItem, {
               disabled: cannotJoinPrivateCommunity,
               hasAnyExistingRole: hasExistingRole,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
@@ -8,8 +9,15 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputPropertyRow, TogglePropertyRow } from 'views/components/metadata_rows';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 
-import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
+import { ChainInfo } from 'client/scripts/models';
 import ManageRolesRow from './manage_roles_row';
+
+interface IChainOrCommMetadataManagementAttrs {
+  chain?: ChainInfo;
+  onRoleUpdate: Function;
+  admins;
+  mods;
+}
 
 interface IChainMetadataManagementState {
   name: string;

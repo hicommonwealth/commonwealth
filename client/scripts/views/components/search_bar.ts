@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/search.scss';
 
 import m from 'mithril';
@@ -18,7 +19,7 @@ import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
 import { ALL_RESULTS_KEY } from '../pages/search';
-import { ChainIcon, CommunityIcon } from './chain_icon';
+import { ChainIcon } from './chain_icon';
 
 export interface SearchParams {
   // communityScope?: string;
@@ -318,7 +319,7 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
         return addr;
       }).sort(sortResults);
 
-      if (communityScope || chainScope) {
+      if (chainScope) {
         concludeSearch(searchTerm, params, state);
         return;
       }
@@ -333,7 +334,6 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
     });
 
     const allComms = (app.config.chains.getAll() as any)
-      .concat(app.config.communities.getAll() as any);
     const filteredComms = allComms.filter((comm) => {
       return comm.name?.toLowerCase().includes(searchTerm)
         || comm.symbol?.toLowerCase().includes(searchTerm);

@@ -9,11 +9,10 @@ export const searchThreadTitles = async (
   searchTerm: string,
   params: SearchParams
 ): Promise<OffchainThread[]> => {
-  const { resultSize, chainScope, communityScope } = params;
+  const { resultSize, chainScope } = params;
   try {
     const response = await $.get(`${app.serverUrl()}/search`, {
       chain: chainScope,
-      community: communityScope,
       search: searchTerm,
       results_size: resultSize,
       thread_title_only: true,
@@ -34,11 +33,10 @@ export const searchDiscussions = async (
   searchTerm: string,
   params: SearchParams
 ) => {
-  const { resultSize, chainScope, communityScope } = params;
+  const { resultSize, chainScope } = params;
   try {
     const response = await $.get(`${app.serverUrl()}/search`, {
       chain: chainScope,
-      community: communityScope,
       cutoff_date: null, // cutoffDate.toISOString(),
       search: searchTerm,
       results_size: resultSize,
@@ -58,11 +56,10 @@ export const searchMentionableAddresses = async (
   params: SearchParams,
   order?: string[]
 ) => {
-  const { resultSize, communityScope, chainScope } = params;
+  const { resultSize, chainScope } = params;
   try {
     const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
       chain: chainScope,
-      community: communityScope,
       limit: resultSize,
       searchTerm,
       order,

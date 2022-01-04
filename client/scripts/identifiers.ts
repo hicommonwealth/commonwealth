@@ -6,12 +6,6 @@ import app from './state';
 import ThreadsController from './controllers/server/threads';
 
 export const proposalSlugToClass = () => {
-  if (app.community) {
-    return new Map<string, StorageModule>([
-      [ProposalType.OffchainThread, app.threads],
-    ]);
-  }
-
   const mmap = new Map<
     string,
     ProposalModule<any, any, any> | ThreadsController

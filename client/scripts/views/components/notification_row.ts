@@ -43,9 +43,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
     parent_comment_text, chain_id, community_id, author_address, author_chain } = data;
 
-  const community_name = community_id
-    ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-    : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+  const community_name = (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
 
   let notificationHeader;
   let notificationBody;
@@ -110,9 +108,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
   const authorInfo = _.uniq(data.map((d) => `${d.author_chain}#${d.author_address}`))
     .map((u) => u.split('#'));
   const length = authorInfo.length - 1;
-  const community_name = community_id
-    ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-    : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+  const community_name = (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
 
   let notificationHeader;
   let notificationBody;

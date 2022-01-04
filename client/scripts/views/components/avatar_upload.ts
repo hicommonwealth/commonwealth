@@ -7,7 +7,6 @@ import Dropzone from 'dropzone';
 import { Icon, Icons } from 'construct-ui';
 import User from 'views/components/widgets/user';
 import app from 'state';
-import { ChainIcon, CommunityIcon } from './chain_icon';
 
 export enum AvatarScope {
   Account = 'account',

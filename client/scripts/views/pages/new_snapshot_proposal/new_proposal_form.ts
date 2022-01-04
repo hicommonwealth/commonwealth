@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
@@ -46,10 +47,6 @@ const newThread = async (
   space: SnapshotSpace,
   snapshotId: string,
 ) => {
-  const topics = app.chain
-    ? app.chain.meta.chain.topics
-    : app.community.meta.topics;
-
   if (!form.name) {
     throw new Error(NewThreadErrors.NoTitle);
   }
@@ -146,7 +143,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
 }> = {
   view: (vnode) => {
     const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
-    if (!app.community && !app.chain) return getLoadingPage();
+    if (!app.chain) return getLoadingPage();
 
     const pathVars = m.parsePathname(window.location.href);
 

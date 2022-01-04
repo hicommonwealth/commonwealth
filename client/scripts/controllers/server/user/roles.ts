@@ -155,7 +155,7 @@ export default class extends Base {
    * of active roles for a given chain/community.
    * @param options A chain or a community ID
    */
-  getAddressIdsFromRoles(options: { chain: string; community: string; }): Number[] {
+  getAddressIdsFromRoles(options: { chain: string; community: string; }): number[] {
     return (options.chain)
       ? this.roles
         .filter((role) => role.chain_id === options.chain)

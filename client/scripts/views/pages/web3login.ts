@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/web3login.scss';
 
 import m from 'mithril';
@@ -27,7 +28,6 @@ const Web3LoginPage: m.Component<{}> = {
         m(LoginWithWalletDropdown, {
           label: 'Try again',
           joiningChain,
-          joiningCommunity,
           loggingInWithAddress,
         }),
         m.route.param('prev')
