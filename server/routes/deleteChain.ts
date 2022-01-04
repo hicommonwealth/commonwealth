@@ -37,65 +37,63 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
   }
 
   // delete all nodes first
-  const chainNodes = await chain.getChainNodes();
-
-  const chainEntities = await models.ChainEntity.findAll({
-    where: {
-      chain: chain.id,
-    },
-    include: [ models.ChainEvents ],
+  const chainNodes = await models.ChainNode.findAll({
+    where: { chain: chain.id, },
   });
 
-  const addresses = await chain.getAddresses();
+  const chainEntities = await models.ChainEntity.findAll({
+    where: { chain: chain.id, },
+    include: [ models.ChainEvent ],
+  });
 
-  const threads = await chain.getOffchainThreads();
+  const addresses = await models.Address.findAll({
+    where: { chain: chain.id, }
+  });
 
-  const comments = await chain.getOffchainComments();
+  const threads = await models.OffchainThread.findAll({
+    where: { chain: chain.id, }
+  });
 
-  const reactions = await chain.getOffchainReactions();
+  const comments = await models.OffchainComment.findAll({
+   where: { chain: chain.id, }
+  });
 
-  const topics = await chain.getTopics();
-  await Promise.all(topics.map((n) => n.destroy()));
+  const reactions = await models.OffchainReaction.findAll({
+    where: { chain: chain.id, }
+  });
 
-  const roles = await models.Roles.findAll({
-    where: {
-      chain_id: chain.id,
-    }
+  const topics = await models.OffchainTopic.findAll({
+    where: { chain_id: chain.id, }
+  });
+
+  const roles = await models.Role.findAll({
+    where: { chain_id: chain.id, }
   });
 
   const inviteCodes = await models.InviteCode.findAll({
-    where: {
-      chain_id: chain.id,
-    }
+    where: { chain_id: chain.id, }
   });
 
   const inviteLinks = await models.InviteLink.findAll({
-    where: {
-      chain_id: chain.id,
-    }
+    where: { chain_id: chain.id, }
   });
 
   const subscriptions = await models.Subscription.findAll({
-    where: {
-      chain_id: chain.id,
-    }
+    where: { chain_id: chain.id, }
   });
 
   const webhooks = await models.Webhook.findAll({
-    where: {
-      chain_id: chain.id,
-    }
+    where: { chain_id: chain.id, }
   });
 
   const starredCommunities = await models.StarredCommunity.findAll({
-    where: {
-      chain: chain.id,
-    }
+    where: { chain: chain.id, }
   });
 
 
   await Promise.all(starredCommunities.map((n) => n.destroy()));
 
+  await Promise.all(topics.map((n) => n.destroy()));
   await Promise.all(reactions.map((n) => n.destroy()));
   await Promise.all(comments.map((n) => n.destroy()));
   await Promise.all(threads.map((n) => n.destroy()));
