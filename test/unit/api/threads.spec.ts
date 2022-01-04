@@ -564,7 +564,7 @@ describe('Thread Tests', () => {
       expect(res.body.error).to.be.equal(EditThreadErrors.NoBodyOrAttachment);
     });
 
-    it.only('should succeed in updating a thread body', async () => {
+    it('should succeed in updating a thread body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
       const thread_stage = thread.stage;
@@ -586,10 +586,9 @@ describe('Thread Tests', () => {
           read_only: readOnly,
           jwt: adminJWT,
         });
-      console.log(res);
       expect(res.status).to.be.equal(200);
       expect(res.body.result.body).to.be.equal(newBody);
-    });
+    }).timeout(400000);
 
     it('should succeed in updating a thread title', async () => {
       const thread_id = thread.id;

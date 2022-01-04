@@ -230,6 +230,22 @@ const resetServer = (debug = false): Promise<void> => {
         name: NotificationCategories.NewReaction,
         description: 'someone reacts to a post',
       });
+      await models.NotificationCategory.create({
+        name: NotificationCategories.ThreadEdit,
+        description: 'someone edited a thread'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.CommentEdit,
+        description: 'someoned edited a comment'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.NewRoleCreation,
+        description: 'someone created a role'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.EntityEvent,
+        description: 'an entity-event as occurred'
+      })
 
       // Admins need to be subscribed to mentions and collaborations
       await models.Subscription.create({
