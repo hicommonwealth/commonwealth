@@ -1,7 +1,6 @@
 import 'components/chain_status_indicator.scss';
 
 import m from 'mithril';
-import { formatNumberLong } from 'helpers';
 import app, { ApiStatus } from 'state';
 
 const ChainStatusIndicator: m.Component<{
@@ -24,8 +23,8 @@ const ChainStatusIndicator: m.Component<{
     const title = !app.chain ? '' : app.chain.networkStatus !== ApiStatus.Connected
       ? apiStatusToLabel.get(app.chain.networkStatus)
       : app.chain?.block?.height
-        ? `Block ${formatNumberLong(app.chain?.block?.height)}`
-        : 'Loading blocks...';
+        ? 'Connected'
+        : 'Loading...';
 
     return m('.ChainStatusIndicator', [
       m('.status', {

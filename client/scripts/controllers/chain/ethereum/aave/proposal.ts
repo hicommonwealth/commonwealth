@@ -20,6 +20,7 @@ import {
   ChainEntity,
   ChainEvent,
 } from 'models';
+import { blocknumToTime } from 'helpers';
 
 import AaveAPI, { AaveExecutor } from './api';
 import AaveGovernance from './governance';
@@ -134,15 +135,14 @@ export default class AaveProposal extends Proposal<
   }
 
   public get state(): AaveTypes.ProposalState {
-    const blockNumber = this._Gov.app.chain.block.height;
-    const blockTimestamp = this._Gov.app.chain.block.lastTime.unix();
+    const currentTime = Date.now() / 1000;
     if (this.data.cancelled) return AaveTypes.ProposalState.CANCELED;
-    if (blockNumber <= this.data.startBlock) return AaveTypes.ProposalState.PENDING;
-    if (blockNumber <= this.data.endBlock) return AaveTypes.ProposalState.ACTIVE;
+    if (currentTime <= blocknumToTime(this.data.startBlock).unix()) return AaveTypes.ProposalState.PENDING;
+    if (currentTime <= blocknumToTime(this.data.endBlock).unix()) return AaveTypes.ProposalState.ACTIVE;
     if (this._isPassed() === false) return AaveTypes.ProposalState.FAILED;
     if (!this.data.executionTime && !this.data.queued) return AaveTypes.ProposalState.SUCCEEDED;
     if (this.data.executed) return AaveTypes.ProposalState.EXECUTED;
-    if (blockTimestamp > (this.data.executionTime + this._Executor.gracePeriod)) return AaveTypes.ProposalState.EXPIRED;
+    if (currentTime > (this.data.executionTime + this._Executor.gracePeriod)) return AaveTypes.ProposalState.EXPIRED;
     if (this.data.queued) return AaveTypes.ProposalState.QUEUED;
     return null;
   }
@@ -366,10 +366,11 @@ export default class AaveProposal extends Proposal<
     if (!executor) {
       throw new Error('executor not found');
     }
+    const blockNumber = await this._Gov.api.Provider.getBlockNumber();
     const isCancellable = await executor.contract.validateProposalCancellation(
       this._Gov.api.Governance.address,
       this.data.proposer,
-      this._Gov.app.chain.block.height - 1,
+      blockNumber - 1,
     );
     if (!isCancellable) {
       const guardian = await this._Gov.api.Governance.getGuardian();
