@@ -366,8 +366,15 @@ const NewProposalForm = {
           calldatas.push(aaveProposal.calldata || '');
           signatures.push(aaveProposal.signature || '');
         }
+
+        // if they passed a title, use the JSON format for description.
+        // otherwise, keep description raw
+        let description = vnode.state.description;
+        if (vnode.state.title) {
+          description = JSON.stringify({ description: vnode.state.description, title: vnode.state.title });
+        }
         const details: CompoundProposalArgs = {
-          description: vnode.state.description,
+          description,
           targets,
           values,
           calldatas,
@@ -841,6 +848,18 @@ const NewProposalForm = {
                   showAddressWithDisplayName: true,
                 }),
               ]),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Title (leave blank for no title)'),
+              m(Input, {
+                name: 'title',
+                placeholder: 'Proposal Title',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.title = result;
+                  m.redraw();
+                },
+              }),
             ]),
             m(FormGroup, [
               m(FormLabel, 'Proposal Description'),
