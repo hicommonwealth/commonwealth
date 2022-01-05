@@ -62,7 +62,6 @@ export const modelFromServer = (thread) => {
     last_commented_on,
     linked_threads,
   } = thread;
-  console.log({ last_commented_on });
 
   const attachments = OffchainAttachments
     ? OffchainAttachments.map(

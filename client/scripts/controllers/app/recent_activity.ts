@@ -93,7 +93,6 @@ class RecentActivityController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);
     }
-    console.log(response.result);
 
     const threads = response.result;
     return threads.map((thread) => {
@@ -106,7 +105,6 @@ class RecentActivityController {
       } catch (e) {
         console.error(e.message);
       }
-      console.log({ modeledThread });
       return modeledThread;
     });
   }

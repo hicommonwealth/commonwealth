@@ -16,7 +16,6 @@ const SummaryRow: m.Component<
 > = {
   view: (vnode) => {
     const { topic, monthlyThreads } = vnode.attrs;
-    console.log({ topic, monthlyThreads });
     if (!topic?.name) return null;
     const sortedThreads = monthlyThreads.sort((a, b) => {
       const aLastUpdated = a.lastCommentedOn || a.createdAt;
