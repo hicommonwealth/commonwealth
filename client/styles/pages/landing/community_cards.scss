@@ -84,21 +84,28 @@
             @include mobile-max {
                 width: 100px;
             }
-            h3 {
-                flex: 1;
+            .community-name {
                 font-size: 30px;
                 font-weight: 600;
-                margin: 8px 0;
-                line-height: 1.1;
+                margin-top:22px;
+                margin-bottom: 8px;
                 text-align: center;
-                white-space: initial;
-                word-wrap: break-word;
-                display: -webkit-box; 
-                -webkit-line-clamp: 3; 
-                -webkit-box-orient: vertical;
-                display: inline-block;
-                justify-content: center;
                 width: 190px;
+                line-height: 1.25em;
+                max-height: 2.5em;
+                -webkit-hyphens: auto;
+                -ms-hyphens: auto;
+                hyphens: auto;
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                @include mobile-max {
+                    font-size: 20px;
+                    font-weight: 600;
+                    width: 110px;
+                    margin-top:10px;
+                    margin-bottom: 1px;
+                }
                 .cui-icon {
                     position: relative;
                     top: -2px;
@@ -106,11 +113,6 @@
                         content: ' ';
                         width: 4px;
                     }
-                }
-                @include mobile-max {
-                    font-size: 20px;
-                    font-weight: 600;
-                    width: 110px;
                 }
             }
             .chain-new {
@@ -122,12 +124,15 @@
                 line-height: 1.25em;
                 max-height: 3.75em;
                 overflow: hidden;
-                text-overflow: hidden;
+                text-overflow: ellipsis;
                 word-wrap: normal;
                 width: 150px;
                 color: #999999;
                 font-weight: normal;
                 font-size: 16px;
+                -webkit-hyphens: auto;
+                -ms-hyphens: auto;
+                hyphens: auto;
                 @include mobile-max {
                     font-size: 14px;
                     width: 110px;
@@ -211,7 +216,7 @@
 
     .join-button-wrapper {
         position: absolute;
-        margin-top: 170px;
+        margin-top: 180px;
 
         @include mobile-max {
             margin-top: 120px;

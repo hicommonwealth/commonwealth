@@ -65,10 +65,8 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
         }) : m('.chain-icon.no-image')
       ]),
       m('.card-body', [
-        m('.community-name', [
-          m('h3', chainInfo.name),
-        ]),
-        m('.card-description', pretty_description),
+        m('.community-name', {lang: 'en'}, chainInfo.name),
+        m('.card-description', {lang: 'en'}, pretty_description),
         m('.join-button-wrapper', [
           m(FaceliftButton, {
             intent: ButtonIntent.Secondary,
@@ -113,13 +111,8 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
         }) :  m('.chain-icon.no-image')
       ]),
       m('.card-body', [
-        m('.community-name', [
-          m('h3', [
-            community.name,
-            community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
-          ]),
-        ]),
-        m('.card-description', pretty_description),
+        m('.community-name',  {lang: 'en'}, community.name, community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' })),
+        m('.card-description', {lang: 'en'}, pretty_description),
         m('.join-button-wrapper', [
           m(FaceliftButton, {
             intent: ButtonIntent.Secondary,
