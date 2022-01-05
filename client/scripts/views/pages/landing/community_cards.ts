@@ -1,5 +1,4 @@
 import 'pages/landing/community_cards.scss';
-
 import m from 'mithril';
 import { Button, Icon, Icons, Card, Tag } from 'construct-ui';
 
@@ -52,6 +51,8 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
       pretty_description = chainInfo.description[chainInfo.description.length-1] === '.' ? chainInfo.description : chainInfo.description + '.';
     }
 
+    const iconUrl = nodeList[0].chain.iconUrl || (nodeList[0].chain as any).icon_url;
+
     return m(FaceliftCard, {
       elevation: 2,
       interactive: true,
@@ -59,7 +60,9 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
       onclick: redirectFunction
     }, [    
       m('.card-header', [
-        m(ChainIcon, { chain: nodeList[0].chain, size: 100 }),
+        iconUrl ? m('img.chain-icon', {
+          src: iconUrl,
+        }) : m('.chain-icon.no-image')
       ]),
       m('.card-body', [
         m('.community-name', [
@@ -105,7 +108,9 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
       onclick: redirectFunction
     }, [    
       m('.card-header', [
-        m(CommunityIcon, { community, size: 100 }),
+        community.iconUrl ? m('img.chain-icon', {
+          src: community.iconUrl,
+        }) :  m('.chain-icon.no-image')
       ]),
       m('.card-body', [
         m('.community-name', [
@@ -118,7 +123,7 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
         m('.join-button-wrapper', [
           m(FaceliftButton, {
             intent: ButtonIntent.Secondary,
-            label: 'Join',
+            label: 'See More',
             disabled: false,
             onclick: redirectFunction
           }),
@@ -137,32 +142,24 @@ const LockdropToolsCard: m.Component<{}> = {
     }, [    
       m('.lockdrop-card-body', [
         m('h3', 'Edgeware Lockdrop Tools'),
-        m(Button, {
-          interactive: true,
-          compact: true,
-          fluid: true,
-          rounded: true,
-          intent: 'primary',
+        m(FaceliftButton, {
+          intent: ButtonIntent.Primary,
           onclick: (e) => {
             e.preventDefault();
             localStorage['home-scrollY'] = window.scrollY;
             m.route.set('/edgeware/stats');
           },
-          label: [ 'Lockdrop stats ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
+          label: [ 'Lockdrop stats ' ],
         }),
         m('.spacer', []),
-        m(Button, {
-          interactive: true,
-          compact: true,
-          fluid: true,
-          rounded: true,
-          intent: 'primary',
+        m(FaceliftButton, {
+          intent: ButtonIntent.Primary,
           onclick: (e) => {
             e.preventDefault();
             localStorage['home-scrollY'] = window.scrollY;
             m.route.set('/edgeware/unlock');
           },
-          label: [ 'Unlock ETH ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
+          label: [ 'Unlock ETH ' ],
         }),
       ])
     ]);
