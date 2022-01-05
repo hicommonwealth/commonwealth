@@ -30,7 +30,7 @@ describe('User Model Routes', () => {
       userAddress = res.address;
       userEmail = res.email;
       jwtToken = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignRole({
+      const isAdmin = await modelUtils.updateRole({
         address_id: res.address_id,
         chainOrCommObj: { chain_id: chain },
         role: 'admin',

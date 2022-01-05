@@ -37,7 +37,7 @@ describe('Topic Tests', () => {
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    const isAdmin = await modelUtils.assignRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
@@ -58,7 +58,7 @@ describe('Topic Tests', () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       adminAddress = res.address;
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignRole({
+      const isAdmin = await modelUtils.updateRole({
         address_id: res.address_id,
         chainOrCommObj: { chain_id: chain },
         role: 'admin',
@@ -106,7 +106,7 @@ describe('Topic Tests', () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       adminAddress = res.address;
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignRole({
+      const isAdmin = await modelUtils.updateRole({
         address_id: res.address_id,
         chainOrCommObj: { chain_id: chain },
         role: 'admin',
@@ -121,6 +121,7 @@ describe('Topic Tests', () => {
       expect(userAddress).to.not.be.null;
       expect(userJWT).to.not.be.null;
 
+      console.log('creating thread')
       const res3 = await modelUtils.createThread({
         chainId: chain,
         address: adminAddress,

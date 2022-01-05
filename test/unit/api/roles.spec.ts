@@ -12,6 +12,7 @@ import * as modelUtils from '../../util/modelUtils';
 import { Errors as createErrors } from '../../../server/routes/createRole';
 import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
 import { Errors as deleteErrors } from '../../../server/routes/deleteRole';
+import { generateEthAddress } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -30,7 +31,7 @@ describe('Roles Test', () => {
     loggedInAddrId = res.address_id;
     jwtToken = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     adminUserId = res.user_id;
-    const isAdmin = await modelUtils.assignRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
@@ -51,7 +52,7 @@ describe('Roles Test', () => {
         });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.role.address_id).to.be.equal(user.address_id);
-      expect(res.body.result.role.offchain_community_id).to.be.equal(chain);
+      expect(res.body.result.role.chain_id).to.be.equal(chain);
       expect(res.body.result.subscription).to.not.be.null;
       expect(res.body.result.subscription.object_id).to.be.equal(chain);
       expect(res.body.result.subscription.category_id).to.be.equal(
@@ -71,7 +72,7 @@ describe('Roles Test', () => {
         });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.role.address_id).to.be.equal(loggedInAddrId);
-      expect(res.body.result.role.offchain_community_id).to.be.equal(chain);
+      expect(res.body.result.role.chain_id).to.be.equal(chain);
       expect(res.body.result.role.permission).to.be.equal('admin');
     });
 
@@ -103,7 +104,7 @@ describe('Roles Test', () => {
         newUserAddressId = res.address_id;
         newJwt = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
         newUserId = res.user_id;
-        const isMember = await modelUtils.assignRole({
+        const isMember = await modelUtils.updateRole({
           address_id: newUserAddressId,
           chainOrCommObj: { chain_id: chain },
           role: 'member',
@@ -215,7 +216,7 @@ describe('Roles Test', () => {
         .send({
           jwt: jwtToken,
           chain,
-          address: temp.address,
+          address: generateEthAddress().address,
           new_role: 'admin',
         });
       expect(res.body.error).to.not.be.null;
@@ -282,7 +283,7 @@ describe('Roles Test', () => {
       memberAddressId = res.address_id;
       memberJwt = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
       memberUserId = res.user_id;
-      const isMember = await modelUtils.assignRole({
+      const isMember = await modelUtils.updateRole({
         address_id: memberAddressId,
         chainOrCommObj: { chain_id: chain },
         role: 'member',

@@ -141,7 +141,7 @@ export const createThread = async (args: ThreadArgs) => {
 };
 
 export interface CommentArgs {
-  chain?: string;
+  chain: string;
   address: string;
   jwt: any;
   text: any;

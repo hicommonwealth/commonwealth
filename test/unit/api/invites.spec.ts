@@ -17,8 +17,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Invite Tests', () => {
-  const community = 'staking';
-  const chain = 'ethereum';
+  const community = 'ethereum';
   let adminJWT;
   let adminAddress;
   let adminUserId;
@@ -29,17 +28,17 @@ describe('Invite Tests', () => {
 
   before(async () => {
     await resetDatabase();
-    let res = await modelUtils.createAndVerifyAddress({ chain });
+    let res = await modelUtils.createAndVerifyAddress({ chain: community });
     adminAddress = res.address;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     adminUserId = res.user_id;
-    const isAdmin = await modelUtils.assignRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
-      chainOrCommObj: { chain_id: chain },
+      chainOrCommObj: { chain_id: community },
       role: 'admin',
     });
 
-    res = await modelUtils.createAndVerifyAddress({ chain });
+    res = await modelUtils.createAndVerifyAddress({ chain: community });
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
     userUserId = res.user_id;
@@ -73,7 +72,7 @@ describe('Invite Tests', () => {
     it('should create an invite for an address from a invites disabled community as admin', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
-      const addrRes = await modelUtils.createAndVerifyAddress({ chain });
+      const addrRes = await modelUtils.createAndVerifyAddress({ chain: community });
 
       const res = await chai.request(app)
         .post('/api/createInvite')
@@ -100,9 +99,9 @@ describe('Invite Tests', () => {
         id: 'invites',
         name: 'invites community',
         creator_address: userAddress,
-        creator_chain: chain,
+        creator_chain: community,
         description: 'Invites enabled community',
-        default_chain: chain,
+        default_chain: community,
       };
 
       const invCommunity = await modelUtils.createCommunity(communityArgs);
@@ -184,7 +183,7 @@ describe('Invite Tests', () => {
     it('should fail to create an invite with an invalid email', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
-      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await modelUtils.createAndVerifyAddress({ chain: community });
       const newUserAddress = res.address;
       const newUserEmail = 'test-commonwealth.im';
       const invite = await chai.request(app)
@@ -205,7 +204,7 @@ describe('Invite Tests', () => {
     it('should fail to create an invite with an address and an email', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
-      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await modelUtils.createAndVerifyAddress({ chain: community });
       const newUserAddress = res.address;
       const newUserEmail = 'test@commonwealth.im';
       const invite = await chai.request(app)
@@ -227,7 +226,7 @@ describe('Invite Tests', () => {
     it('should fail to create an invite without an address or an email', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
-      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await modelUtils.createAndVerifyAddress({ chain: community });
       const newUserAddress = res.address;
       const newUserEmail = 'test@commonwealth.im';
       const invite = await chai.request(app)
@@ -351,7 +350,7 @@ describe('Invite Tests', () => {
           address: adminAddress,
         });
 
-      const newUserRes = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserRes = await modelUtils.createAndVerifyAddress({ chain: community });
       const newUserAddress = newUserRes.address;
       const res = await chai.request(app)
         .post('/api/acceptInvite')

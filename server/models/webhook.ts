@@ -34,7 +34,6 @@ export default (
     indexes: [
       { fields: ['url'] },
       { fields: ['chain_id'] },
-      { fields: ['offchain_community_id'] },
     ],
   });
 

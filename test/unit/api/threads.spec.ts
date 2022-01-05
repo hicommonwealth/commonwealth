@@ -51,7 +51,7 @@ describe('Thread Tests', () => {
     adminAddress = res.address;
     adminAddressId = res.address_id;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    const isAdmin = await modelUtils.assignRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
@@ -761,7 +761,6 @@ describe('Thread Tests', () => {
       expect(eRes.result).not.to.be.null;
       expect(eRes.result.chain).to.be.equal(chain);
       expect(eRes.result.root_id).to.be.equal(`discussion_${tRes.result.id}`);
-      expect(eRes.result.community).to.be.null;
     });
   });
 

@@ -46,11 +46,6 @@ describe('Webhook Tests', () => {
     let result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
-    await modelUtils.assignRole({
-      address_id: result.address_id,
-      chainOrCommObj: { chain_id: chain },
-      role: 'admin',
-    });
     await modelUtils.updateRole({
       address_id: result.address_id,
       chainOrCommObj: { chain_id: chain },
@@ -76,21 +71,6 @@ describe('Webhook Tests', () => {
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
       expect(res.body.result.chain_id).to.be.equal(chain);
-      expect(res.body.result.offchain_community_id).to.be.null;
-      expect(res.body.result.url).to.be.equal(webhookUrl);
-    });
-
-    it('should create a webhook for a community', async () => {
-      const webhookUrl = faker.internet.url();
-      const res = await chai.request.agent(app)
-        .post('/api/createWebhook')
-        .set('Accept', 'application/json')
-        .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.equal('Success');
-      expect(res.body.result).to.be.not.null;
-      expect(res.body.result.offchain_community_id).to.be.equal(chain);
-      expect(res.body.result.chain_id).to.be.null;
       expect(res.body.result.url).to.be.equal(webhookUrl);
     });
 
