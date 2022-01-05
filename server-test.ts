@@ -245,15 +245,6 @@ const resetServer = (debug = false): Promise<void> => {
         is_active: true,
       });
 
-      // Communities
-      await models['OffchainCommunity'].create({
-        id: 'staking',
-        name: 'Staking',
-        creator_id: 1,
-        description: 'All things staking',
-        default_chain: 'ethereum',
-      });
-
       const nodes = [
         ['mainnet1.edgewa.re', 'edgeware', null, '0'],
         [
