@@ -131,7 +131,6 @@ class OffchainThread implements IUniqueId {
     attachments,
     id,
     createdAt,
-    updatedAt,
     topic,
     kind,
     stage,

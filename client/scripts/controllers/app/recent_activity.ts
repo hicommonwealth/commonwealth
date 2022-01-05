@@ -80,7 +80,7 @@ class RecentActivityController {
     chainId: string;
     communityId: string;
     threadsPerTopic?: number;
-  }): Promise<{ threads: OffchainThread[]; activitySummary }> {
+  }): Promise<OffchainThread[]> {
     const { chainId, communityId } = options;
     const threadsPerTopic = options.threadsPerTopic || 3;
     const params = {
