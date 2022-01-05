@@ -119,14 +119,13 @@ const createChain = async (
     if (existingChainNode) {
       return next(new Error(Errors.ChainAddressExists));
     }
-  } else if (req.body.base === ChainBase.Solana) {
+  } else if (req.body.base === ChainBase.Solana && req.body.type !== ChainType.Offchain) {
     let pubKey: solw3.PublicKey;
     try {
       pubKey = new solw3.PublicKey(req.body.address);
     } catch (e) {
       return next(new Error(Errors.InvalidAddress));
     }
-
     try {
       const clusterUrl = solw3.clusterApiUrl(url);
       const connection = new solw3.Connection(clusterUrl);
@@ -139,7 +138,7 @@ const createChain = async (
     } catch (e) {
       return next(new Error(Errors.InvalidNodeUrl));
     }
-  } else if (req.body.base === ChainBase.CosmosSDK) {
+  } else if (req.body.base === ChainBase.CosmosSDK && req.body.type !== ChainType.Offchain) {
     // test cosmos endpoint validity -- must be http(s)
     if (!urlHasValidHTTPPrefix(url)) {
       return next(new Error(Errors.InvalidNodeUrl));
