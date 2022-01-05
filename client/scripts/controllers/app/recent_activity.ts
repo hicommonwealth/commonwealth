@@ -95,8 +95,9 @@ class RecentActivityController {
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);
     }
+    console.log(response.result);
 
-    const { threads, activitySummary } = response.result;
+    const threads = response.result;
     return threads.map((thread) => {
       const modeledThread = modelThreadFromServer(thread);
       if (!thread.Address) {

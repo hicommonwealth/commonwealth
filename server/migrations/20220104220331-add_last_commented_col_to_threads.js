@@ -15,10 +15,10 @@ module.exports = {
         }
       );
       const threadLastCommentedOn = {};
-      const allComments = await queryInterface.sequelize.query(`SELECT root_id, created_at FROM "OffchainComments"`, {
+      const allComments = await queryInterface.sequelize.query(
+        `SELECT root_id, created_at FROM "OffchainComments"`, {
         transaction: t
       });
-      console.log(allComments[0][0]);
       allComments[0].forEach((comment) => {
         const discussionId = comment.root_id.split('_')[1];
         if (discussionId.includes('0x') || Number.isNaN(Number(discussionId))) return;
@@ -27,13 +27,10 @@ module.exports = {
             threadLastCommentedOn[discussionId] = comment.created_at;
           }
       });
-      console.log(threadLastCommentedOn[2413]);
-      console.log(typeof threadLastCommentedOn[2413]);
-      const ex = threadLastCommentedOn[2413];
-      // throw Error();
       await Promise.all(Object.keys(threadLastCommentedOn).map(async (threadId) => {
+        const unixTimestamp = (new Date(threadLastCommentedOn[threadId]).getTime() / 1000).toFixed(0);
         await queryInterface.sequelize.query(
-          `UPDATE "OffchainThreads" SET last_commented_on=TO_TIMESTAMP(${(new Date(threadLastCommentedOn[threadId]).getTime() / 1000).toFixed(0)}) WHERE id=${threadId}`,
+          `UPDATE "OffchainThreads" SET last_commented_on=TO_TIMESTAMP(${unixTimestamp}) WHERE id=${threadId}`,
           { transaction: t }
         );
       }))

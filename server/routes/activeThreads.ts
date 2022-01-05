@@ -1,12 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { Op, WhereOptions } from 'sequelize';
-import { OffchainCommentAttributes } from 'server/models/offchain_comment';
-import {
-  OffchainThreadAttributes,
-  OffchainThreadInstance,
-} from 'server/models/offchain_thread';
+import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
+
+const MIN_THREADS_PER_TOPIC = 0;
+const MAX_THREADS_PER_TOPIC = 10;
 
 const activeThreads = async (
   models: DB,
@@ -20,41 +18,75 @@ const activeThreads = async (
     req.user
   );
   if (error) return next(new Error(error));
+
   let { threads_per_topic } = req.query;
-  if (!threads_per_topic || Number.isNaN(threads_per_topic) || threads_per_topic < 0 || threads_per_topic > 10) {
+  if (!threads_per_topic
+    || Number.isNaN(threads_per_topic)
+    || threads_per_topic < MIN_THREADS_PER_TOPIC
+    || threads_per_topic > MAX_THREADS_PER_TOPIC) {
     threads_per_topic = 3;
   }
 
+  const allThreads = [];
   try {
-    const communityWhere = {};
-    if (chain) communityWhere['chain_id'] = chain.id;
-    else communityWhere['community_id'] = community.id;
-    const communityTopics = await models.OffchainTopic.findAll({ where: communityWhere });
-    const allThreads = [];
-    console.log(communityTopics?.length);
+    const communityWhere = chain
+      ? { chain_id: chain.id }
+      : { community_id: community.id };
+    const communityTopics = await models.OffchainTopic.findAll({
+      where: communityWhere
+    });
+
+    const threadInclude = [
+      { model: models.Address, as: 'Address', },
+      { model: models.Address, as: 'collaborators',},
+      { model: models.OffchainTopic, as: 'topic', },
+      { model: models.LinkedThread, as: 'linked_threads' },
+      { model: models.ChainEntity }
+    ];
+
     await Promise.all(communityTopics.map(async (topic) => {
-      console.log(topic.id);
       const recentTopicThreads = await models.OffchainThread.findAll({
         where: {
           topic_id: topic.id,
+          last_commented_on: {
+            [Op.not]: null,
+          }
         },
+        include: threadInclude,
         limit: threads_per_topic,
         order: [['last_commented_on', 'DESC']]
       });
-      allThreads.concat(recentTopicThreads);
-    }));
-    console.log({ length: allThreads.length });
+
+      // In absence of X threads with recent activity (comments),
+      // commentless threads are fetched and included as active
+      if (!recentTopicThreads || recentTopicThreads.length < threads_per_topic) {
+        const commentlessTopicThreads = await models.OffchainThread.findAll({
+          where: {
+            topic_id: topic.id,
+            last_commented_on: {
+              [Op.is]: null,
+            }
+          },
+          include: threadInclude,
+          limit: threads_per_topic - (recentTopicThreads || []).length,
+          order: [['created_at', 'DESC']]
+        });
+
+        recentTopicThreads.push(...(commentlessTopicThreads || []));
+      }
+
+      allThreads.push(...(recentTopicThreads || []));
+    })).catch((err) => {
+      return next(new Error(err));
+    });
 
     return res.json({
       status: 'Success',
-      result: {
-        threads: allThreads.map((c) => c.toJSON()),
-      },
+      result: allThreads.map((c) => c.toJSON()),
     });
   } catch (err) {
     return next(new Error(err));
   }
-
 };
 
 export default activeThreads;
