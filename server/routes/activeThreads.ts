@@ -56,6 +56,14 @@ const activeThreads = async (
         limit: threads_per_topic,
         order: [['last_commented_on', 'DESC']]
       });
+      if (topic.id === 112) {
+        console.log(recentTopicThreads.map((t) => ({
+            title: t.title,
+            created_at: t.created_at,
+            last_comment: t.last_commented_on
+          })
+        ));
+      }
 
       // In absence of X threads with recent activity (comments),
       // commentless threads are fetched and included as active

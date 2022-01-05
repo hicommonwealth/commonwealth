@@ -17,10 +17,11 @@
     .row-header {
         color: $midi-gray;
         font-size: 18px;
+        margin-bottom: 10px;
+        display: flex;
         h4 {
             font-weight: 500;
         }
-        display: flex;
     }
     .row-wrap {
         display: flex;
@@ -30,7 +31,7 @@
 
 .SummaryRow {
     display: flex;
-    padding: 20px 0;
+    padding: 15px 0;
     border-top: 1px solid $disable-gray;
     max-width: 100%;
     .recent-threads {
@@ -39,16 +40,25 @@
         .thread-summary {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            a {
+            margin-bottom: 15px;
+            &:last-child {
+                margin-bottom: 0;
+            }
+            a.discussion-title {
+                flex: 4;
                 color: $purp-blue;
                 &:hover {
                     text-decoration: none;
                 }
             }
-            span {
-                color: $lite-gray;
-                margin-left: 10px;
+            .last-updated {
+                flex: 1;
+                min-width: max-content;
+                margin-left: 48px;
+                span {
+                    color: $lite-gray;
+                    margin-left: 10px;
+                }
             }
         }
     }

@@ -35,8 +35,8 @@ const SummaryRow: m.Component<
             `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
             `${slugify(thread.title)}`;
           return m('.thread-summary', [
-            link('a', discussionLink, thread.title),
-            m('', [
+            link('a.discussion-title', discussionLink, thread.title),
+            m('.last-updated', [
               m('span', formatLastUpdated(getLastUpdated(thread))),
               isHot(thread) && m('span', '🔥'),
             ])
@@ -60,8 +60,8 @@ export const SummaryListing: m.Component<
       );
     });
     const sortedTopics = topics.sort((a, b) => {
-      if (a.name < b.name) { return -1; }
-      if (a.name > b.name) { return 1; }
+      if (a.name.toLowerCase() < b.name.toLowerCase()) { return -1; }
+      if (a.name.toLowerCase() > b.name.toLowerCase()) { return 1; }
       return 0;
     });
     return m('.SummaryListing', [
