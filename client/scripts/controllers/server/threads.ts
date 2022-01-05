@@ -59,9 +59,10 @@ export const modelFromServer = (thread) => {
     offchain_voting_ends_at,
     offchain_voting_votes,
     reactions,
-    latest_comm_created_at,
+    last_commented_on,
     linked_threads,
   } = thread;
+  console.log({ last_commented_on });
 
   const attachments = OffchainAttachments
     ? OffchainAttachments.map(
@@ -161,8 +162,8 @@ export const modelFromServer = (thread) => {
     offchainVotingOptions: offchain_voting_options,
     offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
-    latestCommCreatedAt: latest_comm_created_at
-      ? moment(latest_comm_created_at)
+    lastCommentedOn: last_commented_on
+      ? moment(last_commented_on)
       : null,
     linkedThreads: linked_threads,
   });

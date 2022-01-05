@@ -47,7 +47,7 @@ class OffchainThread implements IUniqueId {
   public readonly identifier: string;
   public readonly id: number;
   public readonly createdAt: moment.Moment;
-  public readonly latestCommCreatedAt: moment.Moment;
+  public readonly lastCommentedOn: moment.Moment;
   public topic: OffchainTopic;
   public readonly slug = ProposalType.OffchainThread;
   public readonly url: string;
@@ -131,6 +131,7 @@ class OffchainThread implements IUniqueId {
     attachments,
     id,
     createdAt,
+    updatedAt,
     topic,
     kind,
     stage,
@@ -153,7 +154,7 @@ class OffchainThread implements IUniqueId {
     offchainVotingEndsAt,
     offchainVotingNumVotes,
     offchainVotes,
-    latestCommCreatedAt,
+    lastCommentedOn,
     linkedThreads,
   }: {
     author: string;
@@ -161,7 +162,7 @@ class OffchainThread implements IUniqueId {
     attachments: OffchainAttachment[];
     id: number;
     createdAt: moment.Moment;
-    latestCommCreatedAt: moment.Moment;
+    lastCommentedOn: moment.Moment;
     topic: OffchainTopic;
     kind: OffchainThreadKind;
     stage: OffchainThreadStage;
@@ -204,7 +205,7 @@ class OffchainThread implements IUniqueId {
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];
-    this.latestCommCreatedAt = latestCommCreatedAt;
+    this.lastCommentedOn = lastCommentedOn;
     this.chainEntities = chainEntities
       ? chainEntities.map((ce) => {
           return {

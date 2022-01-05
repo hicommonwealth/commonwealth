@@ -106,6 +106,7 @@ class RecentActivityController {
       } catch (e) {
         console.error(e.message);
       }
+      console.log({ modeledThread });
       return modeledThread;
     });
   }

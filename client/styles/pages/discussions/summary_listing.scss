@@ -1,3 +1,7 @@
+@import 'client/styles/shared';
+@import 'client/styles/facelift';
+
+
 .SummaryListing {
     display: flex;
     flex-direction: column;
@@ -11,7 +15,7 @@
         flex: 4;
     }
     .row-header {
-        color: #666666;
+        color: $midi-gray;
         font-size: 18px;
         h4 {
             font-weight: 500;
@@ -27,34 +31,25 @@
 .SummaryRow {
     display: flex;
     padding: 20px 0;
-    border-bottom: 1px solid #DDDDDD;
+    border-top: 1px solid $disable-gray;
     max-width: 100%;
-    &:last-child {
-        border-bottom: none;
-    }
     .recent-threads {
         display: flex;
         flex-direction: column;
         .thread-summary {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 10px;
             a {
-                color: #4723AD;
+                color: $purp-blue;
                 &:hover {
                     text-decoration: none;
                 }
             }
             span {
-                color: #9b9b9b;
+                color: $lite-gray;
                 margin-left: 10px;
             }
-        }
-    }
-    .last-updated {
-        .time {
-            font-weight: 500;
-        }
-        .date {
-            font-weight: 400;
         }
     }
     .topic {

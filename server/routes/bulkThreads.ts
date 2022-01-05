@@ -40,6 +40,7 @@ const bulkThreads = async (
   bind['created_at'] = cutoff_date;
 
   // Threads
+  // TODO: Transition latest_comm_created_at to use the thread last_commented_on column
   let threads;
   if (cutoff_date) {
     const query = `
@@ -156,7 +157,7 @@ const bulkThreads = async (
         offchain_voting_options: t.offchain_voting_options,
         offchain_voting_votes: t.offchain_voting_votes,
         offchain_voting_ends_at: t.offchain_voting_ends_at,
-        latest_comm_created_at: t.latest_comm_created_at,
+        last_commented_on: t.latest_comm_created_at,
         Address: {
           id: t.addr_id,
           address: t.addr_address,

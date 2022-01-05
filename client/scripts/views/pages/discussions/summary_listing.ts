@@ -3,9 +3,9 @@ import 'pages/discussions/summary_listing.scss';
 import app from 'state';
 import m from 'mithril';
 import { OffchainThread, OffchainTopic } from 'models';
-import { link } from 'helpers';
+import { formatLastUpdated, link } from 'helpers';
 import { slugify } from 'utils';
-import { isHot } from './discussion_row';
+import { getLastUpdated, isHot } from './discussion_row';
 
 const SummaryRow: m.Component<
   {
@@ -19,31 +19,27 @@ const SummaryRow: m.Component<
     console.log({ topic, monthlyThreads });
     if (!topic?.name) return null;
     const sortedThreads = monthlyThreads.sort((a, b) => {
-      const aLastUpdated = a.latestCommCreatedAt || a.createdAt;
-      const bLastUpdated = b.latestCommCreatedAt || b.createdAt;
+      const aLastUpdated = a.lastCommentedOn || a.createdAt;
+      const bLastUpdated = b.lastCommentedOn || b.createdAt;
       return bLastUpdated.valueOf() - aLastUpdated.valueOf();
     });
-    const mostRecentUpdate = sortedThreads[0]?.latestCommCreatedAt;
     return m('.SummaryRow', [
       m('.topic', [
         m('h3', topic.name),
         m('p', topic.description)
       ]),
-      m('.last-updated', [
-        m('.time', `${mostRecentUpdate?.format('hh:mm A') || ''}`),
-        m('.date', `${mostRecentUpdate?.format('MMM D YYYY') || ''}`),
-      ]),
       m(
         '.recent-threads',
         sortedThreads.slice(0, 3).map((thread) => {
-          const threadLastUpdated = thread.latestCommCreatedAt || thread.createdAt;
           const discussionLink =
             `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
             `${slugify(thread.title)}`;
           return m('.thread-summary', [
             link('a', discussionLink, thread.title),
-            m('span', (threadLastUpdated).format('MMM D YYYY')),
-            isHot(thread) && m('span', '🔥'),
+            m('', [
+              m('span', formatLastUpdated(getLastUpdated(thread))),
+              isHot(thread) && m('span', '🔥'),
+            ])
           ]);
         })
       ),
@@ -64,14 +60,13 @@ export const SummaryListing: m.Component<
       );
     });
     const sortedTopics = topics.sort((a, b) => {
-      return (
-        topicScopedThreads[b.name] - topicScopedThreads[a.name]
-      );
+      if (a.name < b.name) { return -1; }
+      if (a.name > b.name) { return 1; }
+      return 0;
     });
     return m('.SummaryListing', [
       m('.row-header', [
         m('h4.topic', 'Topic'),
-        m('h4.last-updated', 'Latest reply'),
         m('h4.recent-threads', 'Recent threads'),
       ]),
       m(
