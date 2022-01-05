@@ -3,13 +3,11 @@ import {
   OffchainTopic,
   AbridgedThread,
   Profile,
-  OffchainComment,
   OffchainThread,
 } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 export interface IAbridgedThreadFromServer {
   id: number;

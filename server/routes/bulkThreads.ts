@@ -122,7 +122,6 @@ const bulkThreads = async (
 
     const root_ids = [];
     threads = preprocessedThreads.map((t) => {
-      const { latest_comm_created_at } = t;
       const root_id = `discussion_${t.thread_id}`;
       root_ids.push(root_id);
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
@@ -157,7 +156,7 @@ const bulkThreads = async (
         offchain_voting_options: t.offchain_voting_options,
         offchain_voting_votes: t.offchain_voting_votes,
         offchain_voting_ends_at: t.offchain_voting_ends_at,
-        latestCommCreatedAt: latest_comm_created_at,
+        latest_comm_created_at: t.latest_comm_created_at,
         Address: {
           id: t.addr_id,
           address: t.addr_address,

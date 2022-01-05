@@ -2,29 +2,28 @@
 import 'pages/discussions/summary_listing.scss';
 import app from 'state';
 import m from 'mithril';
-import moment from 'moment';
 import { OffchainThread, OffchainTopic } from 'models';
 import { link } from 'helpers';
 import { slugify } from 'utils';
-import { getLastUpdated, isHot } from './discussion_row';
+import { isHot } from './discussion_row';
 
 const SummaryRow: m.Component<
   {
     topic: OffchainTopic;
     monthlyThreads: OffchainThread[];
-    activitySummary;
   },
   {}
 > = {
   view: (vnode) => {
-    const { topic, monthlyThreads, activitySummary } = vnode.attrs;
+    const { topic, monthlyThreads } = vnode.attrs;
+    console.log({ topic, monthlyThreads });
     if (!topic?.name) return null;
-    const sortedThreads = monthlyThreads.map((thread) => {
-      return Object.assign(thread, { lastUpdated: moment(activitySummary[thread.id]?.lastUpdated) });
-    }).sort((a, b) => {
-      return b.lastUpdated.valueOf() - a.lastUpdated.valueOf();
+    const sortedThreads = monthlyThreads.sort((a, b) => {
+      const aLastUpdated = a.latestCommCreatedAt || a.createdAt;
+      const bLastUpdated = b.latestCommCreatedAt || b.createdAt;
+      return bLastUpdated.valueOf() - aLastUpdated.valueOf();
     });
-    const mostRecentUpdate = sortedThreads[0]?.lastUpdated;
+    const mostRecentUpdate = sortedThreads[0]?.latestCommCreatedAt;
     return m('.SummaryRow', [
       m('.topic', [
         m('h3', topic.name),
@@ -37,12 +36,13 @@ const SummaryRow: m.Component<
       m(
         '.recent-threads',
         sortedThreads.slice(0, 3).map((thread) => {
+          const threadLastUpdated = thread.latestCommCreatedAt || thread.createdAt;
           const discussionLink =
             `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
             `${slugify(thread.title)}`;
           return m('.thread-summary', [
             link('a', discussionLink, thread.title),
-            m('span', thread.lastUpdated.format('MMM D YYYY')),
+            m('span', (threadLastUpdated).format('MMM D YYYY')),
             isHot(thread) && m('span', '🔥'),
           ]);
         })
@@ -65,7 +65,7 @@ export const SummaryListing: m.Component<
     });
     const sortedTopics = topics.sort((a, b) => {
       return (
-        topicScopedThreads[b.id]?.length - topicScopedThreads[a.id]?.length
+        topicScopedThreads[b.name] - topicScopedThreads[a.name]
       );
     });
     return m('.SummaryListing', [
