@@ -863,7 +863,7 @@ const NewProposalForm = {
             ]),
             m(FormGroup, [
               m(FormLabel, 'Proposal Description'),
-              m(Input, {
+              m(TextArea, {
                 name: 'description',
                 placeholder: 'Proposal Description',
                 oninput: (e) => {
