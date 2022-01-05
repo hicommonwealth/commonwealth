@@ -6,6 +6,7 @@ import moment from 'moment';
 import { OffchainThread, OffchainTopic } from 'models';
 import { link } from 'helpers';
 import { slugify } from 'utils';
+import { getLastUpdated, isHot } from './discussion_row';
 
 const SummaryRow: m.Component<
   {
@@ -42,6 +43,7 @@ const SummaryRow: m.Component<
           return m('.thread-summary', [
             link('a', discussionLink, thread.title),
             m('span', thread.lastUpdated.format('MMM D YYYY')),
+            isHot(thread) && m('span', '🔥'),
           ]);
         })
       ),

@@ -41,6 +41,10 @@ export const getLastUpdated = (proposal) => {
   return moment(lastUpdate);
 };
 
+export const isHot = (proposal) => {
+  return moment.duration(moment().diff(getLastUpdated(proposal))).asSeconds() < 24 * 60 * 60
+}
+
 const DiscussionRow: m.Component<
   { proposal: OffchainThread; onSelect?: any },
   { expanded: boolean }
@@ -178,6 +182,11 @@ const DiscussionRow: m.Component<
           `Last active ${formatLastUpdated(getLastUpdated(proposal))}`
         )
       ),
+      // activity icons
+      m('.activity-icons', [
+        ' ', // en space
+        isHot(proposal) && m('span', '🔥'),
+      ]),
       m('.mobile-comment-count', [
         ' ', // em space
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
