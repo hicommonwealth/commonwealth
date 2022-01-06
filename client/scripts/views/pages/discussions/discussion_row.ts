@@ -32,9 +32,9 @@ import ListingRow from 'views/components/listing_row';
 import DiscussionRowMenu from './discussion_row_menu';
 
 export const getLastUpdated = (proposal) => {
-  const { latestCommCreatedAt } = proposal;
-  const lastComment = latestCommCreatedAt
-    ? Number(latestCommCreatedAt.utc())
+  const { lastCommentedOn } = proposal;
+  const lastComment = lastCommentedOn
+    ? Number(lastCommentedOn.utc())
     : 0;
   const createdAt = Number(proposal.createdAt.utc());
   const lastUpdate = Math.max(createdAt, lastComment);

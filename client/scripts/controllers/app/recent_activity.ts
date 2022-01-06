@@ -3,13 +3,11 @@ import {
   OffchainTopic,
   AbridgedThread,
   Profile,
-  OffchainComment,
   OffchainThread,
 } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 export interface IAbridgedThreadFromServer {
   id: number;
@@ -78,41 +76,37 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentCommunityActivity(options: {
+  public async getRecentTopicActivity(options: {
     chainId: string;
     communityId: string;
-    cutoffDate?: moment.Moment;
-  }): Promise<{ threads: OffchainThread[]; activitySummary }> {
+    threadsPerTopic?: number;
+  }): Promise<OffchainThread[]> {
     const { chainId, communityId } = options;
-    const cutoffDate =
-      options.cutoffDate || moment(Date.now() - 30 * 24 * 3600 * 1000);
-
+    const threadsPerTopic = options.threadsPerTopic || 3;
     const params = {
       chain: chainId,
       community: communityId,
-      cutoff_date: cutoffDate.toISOString(),
+      threads_per_topic: threadsPerTopic
     };
+
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);
     }
-    const { threads, activitySummary } = response.result;
 
-    return {
-      threads: threads.map((thread) => {
-        const modeledThread = modelThreadFromServer(thread);
-        if (!thread.Address) {
-          console.error('OffchainThread missing address');
-        }
-        try {
-          app.threads.store.add(modeledThread);
-        } catch (e) {
-          console.error(e.message);
-        }
-        return modeledThread;
-      }),
-      activitySummary,
-    };
+    const threads = response.result;
+    return threads.map((thread) => {
+      const modeledThread = modelThreadFromServer(thread);
+      if (!thread.Address) {
+        console.error('OffchainThread missing address');
+      }
+      try {
+        app.threads.store.add(modeledThread);
+      } catch (e) {
+        console.error(e.message);
+      }
+      return modeledThread;
+    });
   }
 
   // public addThreads(threads: IAbridgedThreadFromServer[], clear?: boolean) {
