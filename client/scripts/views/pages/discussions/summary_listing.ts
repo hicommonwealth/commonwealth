@@ -24,7 +24,12 @@ const SummaryRow: m.Component<
     });
     return m('.SummaryRow', [
       m('.topic', [
-        m('h3', topic.name),
+        m('h3', {
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${app.activeId()}/discussions/${encodeURI(topic.name)}`);
+          },
+        }, topic.name),
         m('p', topic.description)
       ]),
       m(
