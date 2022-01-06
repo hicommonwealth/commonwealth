@@ -1,3 +1,5 @@
+import { ProposalType } from "./types";
+
 export const getNextOffchainPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,
   // and should always be open for at least 5 days.
@@ -26,6 +28,17 @@ export const slugify = (str: string): string => {
   return str.toLowerCase().trim().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 };
 
+export const requiresTypeSlug = (type: ProposalType): boolean => {
+  return type === ProposalType.SubstrateDemocracyReferendum
+    || type === ProposalType.SubstrateDemocracyProposal
+    || type === ProposalType.SubstrateBountyProposal
+    || type === ProposalType.SubstrateTreasuryTip
+    || type === ProposalType.SubstrateCollectiveProposal
+    || type === ProposalType.SubstrateTechnicalCommitteeMotion
+    || type === ProposalType.PhragmenCandidacy
+    || type === ProposalType.SubstrateTreasuryProposal;
+}
+
 /* eslint-disable import/prefer-default-export */
 export const getProposalUrl = (type, proposal, comment?) => {
   const aId = (proposal.community) ? proposal.community : proposal.chain;
@@ -33,9 +46,19 @@ export const getProposalUrl = (type, proposal, comment?) => {
   const tTitle = proposal.title ? `-${slugify(proposal.title)}` : '';
   const cId = comment ? `?comment=${comment.id}` : '';
 
-  return (process.env.NODE_ENV === 'production')
-    ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`
-    : `http://localhost:8080/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`;
+  if (requiresTypeSlug(type)) {
+    return (process.env.NODE_ENV === 'production')
+      ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`
+      : `http://localhost:8080/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`;
+  } else if (type === ProposalType.OffchainThread) {
+    return (process.env.NODE_ENV === 'production')
+      ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
+      : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+  } else {
+    return (process.env.NODE_ENV === 'production')
+      ? `https://commonwealth.im/${aId}/proposal/${tId}${tTitle.toLowerCase()}${cId}`
+      : `http://localhost:8080/${aId}/proposal/${tId}${tTitle.toLowerCase()}${cId}`;
+  }
 };
 
 export const getProposalUrlWithoutObject = (type, proposalCommunity, proposalId, comment?) => {
@@ -43,9 +66,19 @@ export const getProposalUrlWithoutObject = (type, proposalCommunity, proposalId,
   const tId = proposalId;
   const cId = comment ? `?comment=${comment.id}` : '';
 
-  return (process.env.NODE_ENV === 'production')
-    ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${cId}`
-    : `http://localhost:8080/${aId}/proposal/${type}/${tId}${cId}`;
+  if (requiresTypeSlug(type)) {
+    return (process.env.NODE_ENV === 'production')
+      ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${cId}`
+      : `http://localhost:8080/${aId}/proposal/${type}/${tId}${cId}`;
+  } else if (type === ProposalType.OffchainThread) {
+    return (process.env.NODE_ENV === 'production')
+      ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
+      : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
+  } else {
+    return (process.env.NODE_ENV === 'production')
+      ? `https://commonwealth.im/${aId}/proposal/${tId}${cId}`
+      : `http://localhost:8080/${aId}/proposal/${tId}${cId}`;
+  }
 };
 
 export const getCommunityUrl = (community) => {
