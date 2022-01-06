@@ -338,7 +338,6 @@ function setupPassport(models: DB) {
     }
 
     if (req.user) {
-      // @ts-ignore
       await newGithubAccount.setUser(req.user);
       return cb(null, req.user);
     } else {
@@ -442,7 +441,6 @@ function setupPassport(models: DB) {
     }
 
     if (req.user) {
-      // @ts-ignore
       await newDiscordAccount.setUser(req.user);
       return cb(null, req.user);
     } else {
