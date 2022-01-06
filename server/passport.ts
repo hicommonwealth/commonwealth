@@ -263,6 +263,11 @@ function setupPassport(models: DB) {
     callbackURL: GITHUB_OAUTH_CALLBACK,
     passReqToCallback: true,
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
+    const str = '&state='
+    const splitState = req.url.substring(req.url.indexOf(str) + str.length)
+    const state = splitState.substring(splitState.indexOf('='));
+    if (state !== String(req.sessionID)) return cb(null, false)
+
     const githubAccount = await models.SocialAccount.findOne({
       where: { provider: 'github', provider_userid: profile.id }
     });
