@@ -40,7 +40,6 @@ const MobileAccountMenu: m.Component<{}, {}> = {
           app.activeChainId() && m(LoginSelectorMenuLeft, {
             activeAddressesWithRole,
             nAccountsWithoutRole,
-            // isPrivateCommunity,
             mobile: true
           }),
           app.activeChainId() && m(MenuDivider),

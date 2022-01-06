@@ -87,7 +87,6 @@ export const CurrentCommunityLabel: m.Component<{}> = {
 export const LoginSelectorMenuLeft: m.Component<{
   activeAddressesWithRole: any,
   nAccountsWithoutRole: number,
-  // isPrivateCommunity: boolean,
   mobile?: boolean,
 }> = {
   view: (vnode) => {

@@ -37,7 +37,6 @@ export const Layout: m.Component<{
     const { scope, deferChain, hideSidebar } = vnode.attrs;
     const scopeIsEthereumAddress = scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
-    // const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
     if (app.loadingError) {
       return m('.Layout.mithril-app', {

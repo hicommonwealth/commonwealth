@@ -217,7 +217,6 @@ const Login: m.Component<{}, {
             m(LoginWithWalletDropdown, {
               label: 'Continue with wallet',
               joiningChain: null,
-              // joiningCommunity: null,
               loggingInWithAddress: true,
             }),
           ]),
