@@ -84,12 +84,7 @@ function getModules() {
 const TreasuryPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'TreasuryPage' });
-    let returningFromThread = false;
-    Object.values(ProposalType).forEach((type) => {
-      if (app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/${type}/`)) {
-        returningFromThread = true;
-      }
-    });
+    const returningFromThread = app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
     if (returningFromThread && localStorage[`${app.activeChainId()}-proposals-scrollY`]) {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeChainId()}-proposals-scrollY`]));

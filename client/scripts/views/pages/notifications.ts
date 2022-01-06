@@ -8,9 +8,9 @@ import moment from 'moment';
 import { Checkbox, Button, Icons, ListItem, Table, Tag, Grid, Col, SelectList, RadioGroup } from 'construct-ui';
 
 import app from 'state';
-import { ChainNetwork } from 'types';
+import { ChainNetwork, ProposalType, NotificationCategories } from 'types';
 import { NotificationSubscription, ChainInfo } from 'models';
-import { NotificationCategories } from 'types';
+import { getProposalUrlPath } from 'identifiers';
 
 import { link, pluralize } from 'helpers';
 import { sortSubscriptions } from 'helpers/notifications';
@@ -139,7 +139,9 @@ const BatchedSubscriptionRow: m.Component<{
               : subscription.objectId;
 
           return subscription.OffchainThread ? [
-            link('a', `/${chain}/proposal/discussion/${subscription.OffchainThread.id}`,
+            link('a', `/${chain}${
+              getProposalUrlPath(ProposalType.OffchainThread, subscription.OffchainThread.id, true)
+            }`,
               threadOrComment.toString(), { target: '_blank' }),
             m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
             m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
@@ -155,7 +157,9 @@ const BatchedSubscriptionRow: m.Component<{
               ? decodeURIComponent(subscription.OffchainComment.id)
               : subscription.objectId;
           return subscription.OffchainThread ? [
-            link('a', `/${chain}/proposal/discussion/${subscription.OffchainThread.id}`,
+            link('a', `/${chain}${
+              getProposalUrlPath(ProposalType.OffchainThread, subscription.OffchainThread.id, true)
+            }`,
               threadOrComment.toString(), { target: '_blank' }),
             m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
             m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
@@ -182,7 +186,9 @@ const BatchedSubscriptionRow: m.Component<{
           : subscription.objectId;
 
       return subscription.OffchainThread ? [
-        link('a', `/${chain}/proposal/discussion/${subscription.OffchainThread.id}`,
+        link('a', `/${chain}${
+              getProposalUrlPath(ProposalType.OffchainThread, subscription.OffchainThread.id, true)
+            }`,
           threadOrComment.toString(), { target: '_blank' }),
         m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
       ] : [ threadOrComment.toString() ];
