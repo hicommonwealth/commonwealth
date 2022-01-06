@@ -4,11 +4,11 @@ import _ from 'lodash';
 import app from 'state';
 import { link } from 'helpers';
 import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
+import { getProposalUrlPath } from 'identifiers';
 
 import User from 'views/components/widgets/user';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import { getProposalUrlPath } from 'client/scripts/identifiers';
 
 interface IProfileCommentGroupAttrs {
   proposal: OffchainThread | any;

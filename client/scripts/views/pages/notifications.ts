@@ -7,9 +7,9 @@ import moment from 'moment';
 import { Checkbox, Button, Icons, ListItem, Table, Tag, Grid, Col, SelectList, RadioGroup } from 'construct-ui';
 
 import app from 'state';
-import { ChainNetwork, ProposalType } from 'types';
+import { ChainNetwork, ProposalType, NotificationCategories } from 'types';
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
-import { NotificationCategories } from 'types';
+import { getProposalUrlPath } from 'identifiers';
 
 import { link, pluralize } from 'helpers';
 import { sortSubscriptions } from 'helpers/notifications';
@@ -23,7 +23,6 @@ import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import PageError from 'views/pages/error';
-import { getProposalUrlPath } from 'client/scripts/identifiers';
 
 const NOTIFICATION_TABLE_PRE_COPY = 'Off-chain discussion events';
 const CHAIN_NOTIFICATION_TABLE_PRE_COPY = 'On-chain events';

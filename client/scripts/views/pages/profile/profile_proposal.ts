@@ -5,8 +5,8 @@ import { slugify } from 'utils';
 import app from 'state';
 import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
 import { link } from 'helpers';
+import { getProposalUrlPath } from 'identifiers';
 import User from 'views/components/widgets/user';
-import { getProposalUrlPath } from 'client/scripts/identifiers';
 
 const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThread: boolean } > = {
   view: (vnode) => {

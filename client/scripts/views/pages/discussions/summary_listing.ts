@@ -4,10 +4,10 @@ import app from 'state';
 import m from 'mithril';
 import moment from 'moment';
 import { OffchainThread, OffchainTopic } from 'models';
+import { getProposalUrlPath } from 'identifiers';
 import { link } from 'helpers';
 import { slugify } from 'utils';
 import { getLastUpdated, isHot } from './discussion_row';
-import { getProposalUrlPath } from 'client/scripts/identifiers';
 
 const SummaryRow: m.Component<
   {
