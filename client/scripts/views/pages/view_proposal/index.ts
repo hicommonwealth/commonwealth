@@ -844,19 +844,18 @@ const ViewProposalPage: m.Component<
   },
   view: (vnode) => {
     const { identifier } = vnode.attrs;
-    if (!app.chain?.meta) {
+    const isDiscussion = pathIsDiscussion(app.activeId(), window.location.pathname);
+    if (!app.chain?.meta && !isDiscussion) {
       return m(PageLoading, {
         narrow: true,
         showNewProposalButton: true,
         title: 'Loading...',
       });
     }
-    const isDiscussion = pathIsDiscussion(app.activeId(), window.location.pathname);
     const type = vnode.attrs.type || (isDiscussion
       ? ProposalType.OffchainThread
       : chainToProposalSlug(app.chain.meta.chain));
-    const headerTitle =
-      m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
+    const headerTitle = isDiscussion ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string')
       return m(PageNotFound, { title: headerTitle });
     const proposalId = identifier.split('-')[0];
