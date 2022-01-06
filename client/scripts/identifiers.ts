@@ -23,7 +23,7 @@ export const getProposalUrlPath = (type: ProposalType, id: string, omitActiveId 
     basePath = `/proposal/${id}`;
   }
   if (!app.isCustomDomain() && !omitActiveId) {
-    return `/${app.activeId()}${basePath}`;
+    return `/${app.activeChainId()}${basePath}`;
   } else {
     return basePath;
   }
