@@ -392,27 +392,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         return notifyError('Invalid proposal type');
       }
     };
-    // V2 only
-    // const sponsorProposal = (e) => {
-    //   e.preventDefault();
-    //   vnode.state.votingModalOpen = true;
-    //   mixpanel.track('Proposal Funnel', {
-    //     'Step No': 3,
-    //     'Step': 'Cancel Proposal',
-    //     'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-    //     'Scope': app.activeId() ,
-    //   });
-    //   mixpanel.people.increment('Votes');
-    //   mixpanel.people.set({
-    //     'Last Thread Created': new Date().toISOString()
-    //   });
-    //   if (proposal instanceof MolochProposal) {
-    //     proposal.sponsorTx(proposal, user);
-    //   } else {
-    //     vnode.state.votingModalOpen = false;
-    //     return notifyError('Invalid proposal type');
-    //   }
-    // };
+
     const processProposal = (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = true;

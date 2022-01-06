@@ -59,7 +59,6 @@ const LoginWithWalletDropdown: m.Component<{
                 : '/?';
     // only redirect to home as an absolute last resort
 
-    // TODO: double check this
     const web3loginParams = loggingInWithAddress
     ? { prev, loggingInWithAddress }
     : joiningChain

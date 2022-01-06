@@ -26,7 +26,6 @@ import {
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
-// import Community from 'controllers/chain/community/main';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -51,7 +50,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
     $.get(`${app.serverUrl()}/status`).then( async (data) => {
       app.config.chains.clear();
       app.config.nodes.clear();
-      // app.config.communities.clear();
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active)
