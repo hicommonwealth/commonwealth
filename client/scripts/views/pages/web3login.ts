@@ -32,7 +32,7 @@ const Web3LoginPage: m.Component<{}> = {
         }),
         m.route.param('prev')
           ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
-          : link('a.web3login-go-home', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), 'Go home'),
+          : link('a.web3login-go-home', (app.isCustomDomain() ? '/' : `/${app.activeChainId()}`), 'Go home'),
       ]),
     ]);
   }

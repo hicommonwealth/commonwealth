@@ -366,7 +366,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                 type: UserContent.All,
                 content: allContent,
                 // eslint-disable-next-line max-len
-                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
+                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
               })
             }, {
               name: threadsTabTitle,
@@ -375,7 +375,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                 type: UserContent.Threads,
                 content: proposals,
                 // eslint-disable-next-line max-len
-                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
+                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
               }),
             }, {
               name: commentsTabTitle,
@@ -384,7 +384,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                 type: UserContent.Comments,
                 content: comments,
                 // eslint-disable-next-line max-len
-                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
+                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
               }),
             }]),
           ]),

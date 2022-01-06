@@ -137,7 +137,7 @@ const CouncilPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'CouncilPage',
-      'Scope': app.activeId(),
+      'Scope': app.activeChainId(),
     });
   },
   view: (vnode) => {

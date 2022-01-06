@@ -243,7 +243,6 @@ class ThreadsController {
     kind: string,
     stage: string,
     chainId: string,
-    // communityId: string,
     title: string,
     topicName: string,
     topicId: number,
@@ -258,7 +257,6 @@ class ThreadsController {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         chain: chainId,
-        // community: communityId,
         address,
         title: encodeURIComponent(title),
         body: encodeURIComponent(body),
@@ -310,7 +308,6 @@ class ThreadsController {
         author: JSON.stringify(app.user.activeAccount.profile),
         address: app.user.activeAccount.address,
         chain: app.activeChainId(),
-        // community: app.activeCommunityId(),
         thread_id: proposal.id,
         kind: proposal.kind,
         stage: proposal.stage,
@@ -379,7 +376,6 @@ class ThreadsController {
       type: 'POST',
       data: {
         chain: app.activeChainId(),
-        // community: app.activeCommunityId(),
         jwt: app.user.jwt,
         thread_id: threadId,
         content: JSON.stringify({ name, choices }),
@@ -421,7 +417,6 @@ class ThreadsController {
       type: 'POST',
       data: {
         chain: app.activeChainId(),
-        // community: app.activeCommunityId(),
         thread_id: args.threadId,
         stage: args.stage,
         jwt: app.user.jwt,
@@ -532,7 +527,6 @@ class ThreadsController {
       type: 'POST',
       data: {
         chain: app.activeChainId(),
-        // community: app.activeCommunityId(),
         thread_id: args.threadId,
         chain_entity_id: args.entities.map((ce) => ce.id),
         jwt: app.user.jwt,
@@ -568,7 +562,6 @@ class ThreadsController {
   ) {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
-      // community: app.activeCommunityId(),
       linking_thread_id,
       linked_thread_id,
       address: app.user.activeAccount.address,
@@ -587,7 +580,6 @@ class ThreadsController {
   ) {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
-      // community: app.activeCommunityId(),
       linking_thread_id,
       linked_thread_id,
       address: app.user.activeAccount.address,
@@ -607,7 +599,7 @@ class ThreadsController {
       type: 'GET',
       data: {
         snapshot: args.snapshot,
-        chain: app.activeId(),
+        chain: app.activeChainId(),
       },
     });
     if (response.status === 'Failure') {
@@ -619,7 +611,6 @@ class ThreadsController {
   public async fetchThreadsFromId(ids: Array<number | string>): Promise<OffchainThread[]> {
     const params = {
       chain: app.activeChainId(),
-      // community: app.activeCommunityId(),
       ids,
     };
     const response = await $.get(`${app.serverUrl()}/getThreads`, params);
@@ -723,11 +714,10 @@ class ThreadsController {
     return !(threads.length < DEFAULT_PAGE_SIZE);
   }
 
-  public refreshAll(chainId: string, communityId: string, reset = false) {
+  public refreshAll(chainId: string, reset = false) {
     // TODO: Change to GET /threads
     return $.get(`${app.serverUrl()}/bulkThreads`, {
       chain: chainId,
-      community: communityId,
     }).then(
       (response) => {
         if (response.status !== 'Success') {

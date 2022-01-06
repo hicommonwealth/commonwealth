@@ -29,7 +29,6 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
       app.user.createRole({
         address: addressInfo,
         chain: app.activeChainId(),
-        // community: app.activeCommunityId(),
       }).then(() => {
         vnode.state.loading = false;
         m.redraw();

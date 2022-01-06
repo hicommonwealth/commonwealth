@@ -39,9 +39,9 @@ export enum GlobalStatus {
 
 const clearEditingLocalStorage = (item, isThread: boolean) => {
   if (isThread) {
-    localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
+    localStorage.removeItem(`${app.activeChainId()}-edit-thread-${item.id}-storedText`);
   } else {
-    localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+    localStorage.removeItem(`${app.activeChainId()}-edit-comment-${item.id}-storedText`);
   }
 };
 
@@ -644,8 +644,8 @@ export const ProposalBodyEditor: m.Component<{
     const { item } = vnode.attrs;
     const isThread = item instanceof OffchainThread;
     vnode.state.savedEdits = isThread
-      ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
-      : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+      ? localStorage.getItem(`${app.activeChainId()}-edit-thread-${item.id}-storedText`)
+      : localStorage.getItem(`${app.activeChainId()}-edit-comment-${item.id}-storedText`);
     if (vnode.state.savedEdits) {
       const modalMsg = 'Previous changes found. Restore edits?';
       vnode.state.restoreEdits = await confirmationModalWithText(modalMsg, 'Yes', 'No')();

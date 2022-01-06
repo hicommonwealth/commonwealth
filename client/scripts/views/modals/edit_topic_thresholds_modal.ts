@@ -80,7 +80,7 @@ const EditTopicThresholdsModal: m.Component<{
       vnode.state.form = { id, name, description, tokenThreshold };
     }
 
-    const topics =  app.topics.getByCommunity(app.activeId());
+    const topics =  app.topics.getByCommunity(app.activeChainId());
 
     return m('.EditTopicThresholdsModal', [
       m('.compact-modal-title', [

@@ -154,7 +154,7 @@ const User: m.Component<{
             linkify
               ? link('a.user-display-name.username',
                 (profile
-                  ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+                  ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:'
                 ), [
                   !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
@@ -200,7 +200,7 @@ const User: m.Component<{
             showAddressWithDisplayName: false
           }) : link('a.user-display-name',
             profile
-              ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+              ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
             !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
               profile.displayName,
@@ -313,7 +313,7 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+      ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
       : 'javascript:';
 
     return linkify

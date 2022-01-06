@@ -204,7 +204,7 @@ const ConfirmInviteModal: m.Component<{}, {
                   const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
 
                   // redirect to /web3login to connect to the chain
-                  if (app.activeId()) {
+                  if (app.activeChainId()) {
                     navigateToSubpage('/web3login', web3loginParams);
                   } else {
                     m.route.set(`${defaultChainId}/web3login`, web3loginParams);

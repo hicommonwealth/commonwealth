@@ -106,7 +106,6 @@ const ManageCommunityPage: m.Component<
             newRole.Address.address,
             newRole.Address.chain,
             newRole.chain_id,
-            newRole.offchain_community_id,
             newRole.permission,
             newRole.is_user_default
           )

@@ -276,7 +276,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
                 result.address,
                 result.address_chain,
                 result.chain_id,
-                result.offchain_community_id,
                 result.permission,
                 result.is_user_default
               ));
@@ -357,7 +356,6 @@ const CreateInviteLink: m.Component<{
             e.preventDefault();
             // TODO: Change to POST /inviteLink
             $.post(`${app.serverUrl()}/createInviteLink`, {
-              // community_id: app.activeCommunityId(),
               ...chainOrCommunityObj,
               time: vnode.state.inviteTime,
               uses: vnode.state.inviteUses,

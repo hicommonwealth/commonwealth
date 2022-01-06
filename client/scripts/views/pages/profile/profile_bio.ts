@@ -25,7 +25,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
     // wait for info to load before making it clickable
     disabled: vnode.state.chainLoading,
     onclick: async () => {
-      if (app.activeId() !== chainObj.id) {
+      if (app.activeChainId() !== chainObj.id) {
         let confirmed = false;
         const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
         confirmed = await confirmationModalWithText(msg)();

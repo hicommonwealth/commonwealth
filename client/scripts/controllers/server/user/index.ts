@@ -6,9 +6,7 @@ export default class extends Roles {
   */
   public getDefaultAddressInCommunity(options: { chain?: string, community?: string }) {
     const role = this.roles.find((r) => {
-      const communityMatches = options.chain
-        ? r.chain_id === options.chain
-        : r.offchain_community_id === options.community;
+      const communityMatches = r.chain_id === options.chain
       return communityMatches && r.is_user_default;
     });
 

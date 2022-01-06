@@ -285,7 +285,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           'Step No': 2,
           'Step': 'Add Address',
           'Option': 'Wallet',
-          'Scope': app.activeId(),
+          'Scope': app.activeChainId(),
         });
         mixpanel.people.increment('Addresses');
         mixpanel.people.set({

@@ -369,15 +369,6 @@ export async function initChain(): Promise<void> {
   m.redraw();
 }
 
-// export function initCommunity(communityId: string): Promise<boolean> {
-//   const community = app.config.communities.getByCommunity(communityId);
-//   if (community && community.length > 0) {
-//     return selectCommunity(community[0]);
-//   } else {
-//     throw new Error(`No community found for '${communityId}'`);
-//   }
-// }
-
 export async function initNewTokenChain(address: string) {
   const response = await $.getJSON('/api/getTokenForum', { address, autocreate: true });
   if (response.status !== 'Success') {
@@ -419,7 +410,7 @@ m.route.set = (...args) => {
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
   if (!app.isCustomDomain()) {
-    args[0] = `/${app.activeId()}${args[0]}`;
+    args[0] = `/${app.activeChainId()}${args[0]}`;
   }
   m.route.set.apply(this, args);
 };

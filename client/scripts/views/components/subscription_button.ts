@@ -11,7 +11,7 @@ const SubscriptionButton: m.Component<{}> = {
   view: (vnode) => {
     const subscriptions = app.user.notifications;
     const communitySubscription = subscriptions.subscriptions
-      .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeId());
+      .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeChainId());
     const communityOrChain = app.activeChainId();
 
     return m(Button, {

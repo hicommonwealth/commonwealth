@@ -1356,20 +1356,6 @@ const resetServer = (): Promise<number> => {
               chain_id: chain.id,
             }))
           )
-          .concat(
-            communities.map((community) => models.OffchainTopic.create({
-              name: 'General',
-              description: 'General discussion',
-              community_id: community.id,
-            }))
-          )
-          .concat(
-            communities.map((community) => models.OffchainTopic.create({
-              name: 'Random',
-              description: 'Non-work banter and water cooler conversation',
-              community_id: community.id,
-            }))
-          )
       );
 
       await Promise.all([

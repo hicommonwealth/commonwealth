@@ -38,7 +38,7 @@ const SummaryRow: m.Component<
         '.recent-threads',
         sortedThreads.slice(0, 3).map((thread) => {
           const discussionLink =
-            `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
+            `/${app.activeChainId()}/proposal/${thread.slug}/${thread.identifier}-` +
             `${slugify(thread.title)}`;
           return m('.thread-summary', [
             link('a', discussionLink, thread.title),
@@ -57,7 +57,7 @@ export const SummaryListing: m.Component<
 > = {
   view: (vnode) => {
     const topicScopedThreads = {};
-    const topics = app.topics.getByCommunity(app.activeId());
+    const topics = app.topics.getByCommunity(app.activeChainId());
     topics.forEach((topic) => {
       topicScopedThreads[topic.id] = vnode.attrs.recentThreads.threads.filter(
         (thread) => thread.topic?.id === topic?.id

@@ -196,7 +196,6 @@ class ChainInfo {
           r.Address.address,
           r.Address.chain,
           r.chain_id,
-          r.offchain_community_id,
           r.permission,
           r.is_user_default
         )
@@ -214,7 +213,6 @@ class ChainInfo {
           r.Address.address,
           r.Address.chain,
           r.chain_id,
-          r.offchain_community_id,
           r.permission,
           r.is_user_default
         )

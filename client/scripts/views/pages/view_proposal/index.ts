@@ -243,7 +243,7 @@ const ProposalHeader: m.Component<
         ? (proposal as OffchainThread).attachments
         : false;
     const proposalLink =
-      `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/${
+      `${app.isCustomDomain() ? '' : `/${app.activeChainId()}`}/proposal/${
         proposal.slug
       }/${proposal.identifier}-` + `${slugify(proposal.title)}`;
     const proposalTitleIsEditable =
@@ -558,7 +558,7 @@ const ProposalComment: m.Component<
       : CommentParent.Proposal;
 
     const commentLink =
-      `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/${
+      `${app.isCustomDomain() ? '' : `/${app.activeChainId()}`}/proposal/${
         proposal.slug
       }/` +
       `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
@@ -842,7 +842,7 @@ const ViewProposalPage: m.Component<
       'Step No': 1,
       Step: 'Viewing Proposal',
       'Proposal Name': `${vnode.attrs.type}: ${vnode.attrs.identifier}`,
-      Scope: app.activeId(),
+      Scope: app.activeChainId(),
     });
     if (!vnode.state.editing) {
       vnode.state.editing = false;
@@ -1131,7 +1131,7 @@ const ViewProposalPage: m.Component<
     const authorChain =
       proposal instanceof OffchainThread
         ? proposal.authorChain
-        : app.activeId();
+        : app.activeChainId();
     const authorAddress =
       proposal instanceof OffchainThread
         ? proposal.author

@@ -532,8 +532,8 @@ const NewProposalForm = {
           hasAction && m(EdgewareFunctionPicker),
           hasTopics
           && m(TopicSelector, {
-            topics: app.topics.getByCommunity(app.activeId()),
-            featuredTopics: app.topics.getByCommunity(app.activeId())
+            topics: app.topics.getByCommunity(app.activeChainId()),
+            featuredTopics: app.topics.getByCommunity(app.activeChainId())
               .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
             updateFormData: (topicName: string, topicId?: number) => {
               vnode.state.form.topicName = topicName;

@@ -59,16 +59,16 @@ const Sublayout: m.Component<{
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
-      (!app.activeId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
+      (!app.activeChainId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
       ] : chain ? [
         m('.ChainIcon', [
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
+          link('a', (!app.isCustomDomain() ? `/${app.activeChainId()}` : '/'), [
             m(ChainIcon, { size: ICON_SIZE, chain })
           ])
         ]),
         m('h4.sublayout-header-heading', [
-          link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
+          link('a', (app.isCustomDomain() ? '/' : `/${app.activeChainId()}`), chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title,
           m(CommunityOptionsPopover),
@@ -127,7 +127,7 @@ const Sublayout: m.Component<{
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }
 
-    const tosStatus = localStorage.getItem(`${app.activeId()}-tos`);
+    const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
     return [
       m('.layout-container', [
@@ -155,7 +155,7 @@ const Sublayout: m.Component<{
               m('span', ' before interacting with this community.'),
               m('span', { class: 'close-button',
                 onclick: () => {
-                  localStorage.setItem(`${app.activeId()}-tos`, 'off');
+                  localStorage.setItem(`${app.activeChainId()}-tos`, 'off');
                 } }, 'X')
             ]) : '',
           m('.sublayout-body', [

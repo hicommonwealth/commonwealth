@@ -84,7 +84,6 @@ describe('Invite Tests', () => {
           address: adminAddress,
         });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.offchain_community_id).to.be.equal(community);
       expect(res.body.result.address_id).to.be.equal(addrRes.address_id);
     });
 
@@ -331,7 +330,6 @@ describe('Invite Tests', () => {
       expect(res.body.result.updatedCode.invited_email).to.be.equal(userEmail);
       expect(res.body.result.updatedCode.used).to.be.true;
       expect(res.body.result.role).to.not.be.null;
-      expect(res.body.result.role.offchain_community_id).to.be.equal(community);
       expect(res.body.result.subscription).to.not.be.null;
       expect(res.body.result.subscription.object_id).to.be.equal(community);
       expect(res.body.result.subscription.category_id).to.be.equal(NotificationCategories.NewThread);

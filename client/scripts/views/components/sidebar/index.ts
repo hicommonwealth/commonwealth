@@ -89,20 +89,20 @@ const SidebarQuickSwitcher: m.Component<{}> = {
 
 export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
   view: (vnode) => {
-    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
-      || p.startsWith(`/${app.activeId()}/discussions/`)
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
-      || p.startsWith(`/${app.activeId()}?`);
+    const onDiscussionsPage = (p) => p === `/${app.activeChainId()}` || p === `/${app.activeChainId()}/`
+      || p.startsWith(`/${app.activeChainId()}/discussions/`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/discussion/`)
+      || p.startsWith(`/${app.activeChainId()}?`);
     const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
-    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
-      || p.startsWith(`/${app.activeId()}/account/`);
-    const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeId()}/sputnik-daos`);
+    const onMembersPage = (p) => p.startsWith(`/${app.activeChainId()}/members`)
+      || p.startsWith(`/${app.activeChainId()}/account/`);
+    const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
 
-    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
+    const topics = app.topics.getByCommunity(app.activeChainId()).map(({ id, name, featuredInSidebar }) => {
       return { id, name, featuredInSidebar };
     }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
 
-    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeId())) ? 'Forums' : 'Discussions';
+    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeChainId())) ? 'Forums' : 'Discussions';
 
     return m('.OffchainNavigationModule.SidebarModule', [
       // m('.section-header', 'Discuss'),
@@ -152,7 +152,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           navigateToSubpage('/members');
         },
       }),
-      (app.activeId() === 'near'
+      (app.activeChainId() === 'near'
       ? m(Button, {
         rounded: true,
         fluid: true,
@@ -211,8 +211,8 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
     const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
     const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
 
-    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot`);
-    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot/`);
+    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeChainId()}/snapshot`);
+    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeChainId()}/new/snapshot/`);
 
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)

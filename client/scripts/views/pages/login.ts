@@ -14,7 +14,7 @@ const LoginPage: m.Component<{}> = {
   view: (vnode) => {
     // this page requires a logged-out user
     if (app.isLoggedIn()) {
-      if (app.activeId()) navigateToSubpage('/settings');
+      if (app.activeChainId()) navigateToSubpage('/settings');
       else m.route.set('/settings');
       return;
     }

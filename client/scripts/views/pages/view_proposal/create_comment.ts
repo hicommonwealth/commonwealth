@@ -115,7 +115,7 @@ const CreateComment: m.Component<{
         'Step No': 2,
         'Step': 'Create Comment',
         'Proposal Name': `${(rootProposal).slug}: ${(rootProposal).identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
       mixpanel.people.increment('Comment');
       mixpanel.people.set({
@@ -151,7 +151,7 @@ const CreateComment: m.Component<{
       const tokenBalance = app.chain.tokenBalance;
       tokenPostingThreshold = app.topics.getByName(
         activeTopicName,
-        app.activeId()
+        app.activeChainId()
       )?.tokenThreshold;
       disabled = disabled
         || !app.isAdapterReady
@@ -184,7 +184,7 @@ const CreateComment: m.Component<{
               content: [
                 'You haven\'t set a display name yet. ',
                 m('a', {
-                  href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
+                  href: `/${app.activeChainId()}/account/${app.user.activeAccount.address}`
                     + `?base=${app.user.activeAccount.chain}`,
                   onclick: (e) => {
                     e.preventDefault();

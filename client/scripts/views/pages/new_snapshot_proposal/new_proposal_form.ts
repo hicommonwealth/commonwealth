@@ -205,15 +205,15 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
     }
 
     const saveToLocalStorage = () => {
-      localStorage.setItem(`${app.activeId()}-new-snapshot-proposal-name`, vnode.state.form.name);
+      localStorage.setItem(`${app.activeChainId()}-new-snapshot-proposal-name`, vnode.state.form.name);
     };
 
     const populateFromLocalStorage = () => {
-      vnode.state.form.name = localStorage.getItem(`${app.activeId()}-new-snapshot-proposal-name`);
+      vnode.state.form.name = localStorage.getItem(`${app.activeChainId()}-new-snapshot-proposal-name`);
     };
 
     const clearLocalStorage = () => {
-      localStorage.removeItem(`${app.activeId()}-new-snapshot-proposal-name`);
+      localStorage.removeItem(`${app.activeChainId()}-new-snapshot-proposal-name`);
     };
 
     const isMember = author
@@ -272,7 +272,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
                   e.redraw = false; // do not redraw on input
                   const { value } = e.target as any;
                   vnode.state.form.name = value;
-                  localStorage.setItem(`${app.activeId()}-new-snapshot-proposal-name`, vnode.state.form.name);
+                  localStorage.setItem(`${app.activeChainId()}-new-snapshot-proposal-name`, vnode.state.form.name);
                 },
                 defaultValue: vnode.state.form.name,
               }),

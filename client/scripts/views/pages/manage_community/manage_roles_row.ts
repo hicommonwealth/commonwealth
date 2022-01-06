@@ -35,7 +35,7 @@ const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
-              const adminsAndMods = await communityMeta.getMembers(app.activeId());
+              const adminsAndMods = await communityMeta.getMembers(app.activeChainId());
               const userAdminsAndMods = adminsAndMods.filter((role_) => {
                 const belongsToUser = !!app.user.addresses
                   .filter((addr_) => addr_.id === role_.address_id)
@@ -80,7 +80,7 @@ const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
                 vnode.attrs.onRoleUpdate(role, newRole);
 
                 if (isLosingAdminPermissions) {
-                  m.route.set(`/${app.activeId()}`);
+                  m.route.set(`/${app.activeChainId()}`);
                 }
               } catch (err) {
                 const errMsg = err.responseJSON?.error || 'Failed to alter role.';

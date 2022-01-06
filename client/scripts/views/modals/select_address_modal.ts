@@ -29,7 +29,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       app.user.createRole({
         address: addressInfo,
         chain: app.activeChainId(),
-        // community: app.activeCommunityId(),
       }).then(() => {
         vnode.state.loading = false;
         m.redraw();
@@ -64,7 +63,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       app.user.deleteRole({
         address: addressInfo,
         chain: app.activeChainId(),
-        // community: app.activeCommunityId(),
       }).then(() => {
         vnode.state.loading = false;
         m.redraw();
@@ -143,7 +141,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         }),
         m(LoginWithWalletDropdown, {
           loggingInWithAddress: false,
-          // joiningCommunity: app.activeCommunityId(),
           joiningChain: app.activeChainId(),
           label: activeAccountsByRole.length !== 0 ? 'Connect a new address' : 'Connect address',
           onSuccess: () => {

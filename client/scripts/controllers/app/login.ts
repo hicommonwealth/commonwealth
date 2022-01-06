@@ -51,7 +51,6 @@ export function linkExistingAddressToChainOrCommunity(
 
 export async function setActiveAccount(account: Account<any>): Promise<void> {
   const chain = app.activeChainId();
-  // const community = app.activeCommunityId();
   const role = app.user.getRoleInCommunity({ account, chain });
 
   if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
@@ -234,7 +233,6 @@ export async function loginWithMagicLink(email: string) {
     data: {
       // send chain/community to request
       'chain': app.activeChainId(),
-      // 'community': app.activeCommunityId(),
     },
   });
   if (response.status === 'Success') {

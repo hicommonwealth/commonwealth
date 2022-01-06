@@ -137,7 +137,7 @@ export const cancelProposal = (e, state, proposal, onModalClose) => {
     'Step No': 3,
     'Step': 'Cancel Proposal',
     'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-    'Scope': app.activeId(),
+    'Scope': app.activeChainId(),
   });
   mixpanel.people.set({
     'Last Thread Created': new Date().toISOString()
@@ -285,7 +285,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Step No': 3,
         'Step': 'Vote Yes',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -350,7 +350,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Step No': 3,
         'Step': 'Vote No',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -420,7 +420,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Step No': 3,
         'Step': 'Process Proposal',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
       mixpanel.people.set({
         'Last Thread Created': new Date().toISOString()
@@ -441,7 +441,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Step No': 3,
         'Step': 'Vote Abstain',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -467,7 +467,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Step No': 3,
         'Step': 'Vote Veto',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -489,7 +489,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Step No': 3,
         'Step': 'Vote Reject',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -512,7 +512,7 @@ const VotingActions: m.Component<{ proposal: AnyProposal }, {
         'Step No': 3,
         'Step': `Vote for choice ${choice.toString()}`,
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
     };
 

@@ -160,7 +160,6 @@ class CommentsController {
       const newComment = modelFromServer(result);
       this._store.add(newComment);
       const activeEntity = app.chain;
-      // const activeEntity = app.activeCommunityId() ? app.community : app.chain;
       updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
       return newComment;
     } catch (err) {
@@ -232,13 +231,12 @@ class CommentsController {
     });
   }
 
-  public async refresh(proposal, chainId: string, communityId: string) {
+  public async refresh(proposal, chainId: string) {
     return new Promise<void>(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments
         const response = await $.get(`${app.serverUrl()}/viewComments`, {
           chain: chainId,
-          community: communityId,
           root_id: encodeURIComponent(proposal.uniqueIdentifier),
         });
         if (response.status !== 'Success') {
@@ -259,11 +257,10 @@ class CommentsController {
     });
   }
 
-  public async refreshAll(chainId: string, communityId: string, reset: CommentRefreshOption) {
+  public async refreshAll(chainId: string, reset: CommentRefreshOption) {
     try {
       const args: any = {
         chain: chainId,
-        community: communityId,
       };
       if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
         args.offchain_threads_only = 1;

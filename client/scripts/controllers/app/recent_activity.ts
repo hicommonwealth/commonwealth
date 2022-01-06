@@ -80,7 +80,6 @@ class RecentActivityController {
 
   public async getRecentCommunityActivity(options: {
     chainId: string;
-    // communityId: string;
     cutoffDate?: moment.Moment;
   }): Promise<{ threads: OffchainThread[]; activitySummary }> {
     const { chainId } = options;
@@ -89,7 +88,6 @@ class RecentActivityController {
 
     const params = {
       chain: chainId,
-      // community: communityId,
       cutoff_date: cutoffDate.toISOString(),
     };
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);

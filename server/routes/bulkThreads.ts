@@ -163,7 +163,6 @@ const bulkThreads = async (
           id: t.topic_id,
           name: t.topic_name,
           description: t.topic_description,
-          communityId: t.topic_community,
           chainId: t.topic_chain,
           telegram: t.telegram,
         };

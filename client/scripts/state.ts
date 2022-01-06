@@ -66,15 +66,13 @@ export interface IApp {
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
-  // activeCommunityId(): string;
-  activeId(): string;
+  activeChainId(): string;
 
   toasts: ToastStore;
   modals: ModalStore;
   loginState: LoginState;
   // stored on server-side
   config: {
-    // communities: OffchainCommunitiesStore;
     chains: ChainStore;
     nodes: NodeStore;
     contractCategories?: ContractCategory[];
@@ -104,7 +102,6 @@ export interface IApp {
 const app: IApp = {
   socket: null,
   chain: null,
-  // community: null,
 
   chainPreloading: false,
   chainAdapterReady: new EventEmitter(),
@@ -135,9 +132,6 @@ const app: IApp = {
   searchAddressCache: {},
 
   activeChainId: () => app.chain?.id,
-  // activeCommunityId: () => app.community?.meta.id,
-  activeId: () => app.activeChainId(),
-  // activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
 
   toasts: getToastStore(),
   modals: getModalStore(),

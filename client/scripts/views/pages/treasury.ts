@@ -90,9 +90,9 @@ const TreasuryPage: m.Component<{}> = {
         returningFromThread = true;
       }
     });
-    if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
+    if (returningFromThread && localStorage[`${app.activeChainId()}-proposals-scrollY`]) {
       setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
+        window.scrollTo(0, Number(localStorage[`${app.activeChainId()}-proposals-scrollY`]));
       }, 100);
     }
   },

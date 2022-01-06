@@ -21,7 +21,6 @@ class TopicsController {
       // TODO: Change to PUT /topic
       const response = await $.post(`${app.serverUrl()}/editTopic`, {
         'id': topic.id,
-        'community': topic.communityId,
         'chain': topic.chainId,
         'name': topic.name,
         'description': topic.description,
@@ -131,12 +130,11 @@ class TopicsController {
       // TODO: Change to DELETE /topic
       const response = await $.post(`${app.serverUrl()}/deleteTopic`, {
         'id': topic.id,
-        'community': topic.communityId,
         'chain': topic.chainId,
         'jwt': app.user.jwt
       });
       this._store.remove(this._store.getById(topic.id));
-      const activeEntity = topic.communityId || topic.chainId;
+      const activeEntity = topic.chainId;
       app.threads.listingStore.removeTopic(activeEntity, topic.name);
     } catch (err) {
       console.log('Failed to delete topic');
@@ -146,12 +144,11 @@ class TopicsController {
     }
   }
 
-  public async refreshAll(chainId, communityId, reset = false) {
+  public async refreshAll(chainId, reset = false) {
     try {
       // TODO: Change to GET /topics
       const response = await $.get(`${app.serverUrl()}/bulkTopics`, {
         chain: chainId || app.activeChainId(),
-        // community: communityId || app.activeCommunityId(),
       });
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);

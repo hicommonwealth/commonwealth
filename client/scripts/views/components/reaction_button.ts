@@ -92,12 +92,12 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
       if (post instanceof OffchainThread && post.topic && app.topics) {
         tokenPostingThreshold = app.topics.getByName(
           (post as OffchainThread).topic.name,
-          app.activeId()
+          app.activeChainId()
         )?.tokenThreshold;
       } else if (post instanceof OffchainComment) {
         // post.rootProposal has typescript typedef number but in practice seems to be a string
         const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
-        tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeId())?.tokenThreshold;
+        tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeChainId())?.tokenThreshold;
       } else {
         tokenPostingThreshold = new BN(0);
       }
@@ -132,7 +132,6 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
           const { address: userAddress, chain } = app.user.activeAccount;
           // if it's a community use the app.user.activeAccount.chain.id instead of author chain
           const chainId = app.activeChainId();
-          // const communityId = app.activeCommunityId();
           if (hasReacted) {
             const reaction = (await fetchReactionsByPost(post)).find((r) => {
               return (r.reaction === hasReactedType && r.Address.address === activeAddress);
@@ -170,7 +169,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
             'Step No': 1,
             'Step': 'Create Reaction',
             'Post Name': `${post.slug}: ${post.identifier}`,
-            'Scope': app.activeId(),
+            'Scope': app.activeChainId(),
           });
           mixpanel.people.increment('Reaction');
           mixpanel.people.set({

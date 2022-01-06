@@ -67,7 +67,7 @@ export const Layout: m.Component<{
         m(AppModals),
         m(AppToasts),
       ]);
-    } else if (scope && scope !== app.activeId() && scope !== vnode.state.loadingScope) {
+    } else if (scope && scope !== app.activeChainId() && scope !== vnode.state.loadingScope) {
       // If we are supposed to load a new chain or community, we do so now
       // This happens only once, and then loadingScope should be set
       vnode.state.loadingScope = scope;

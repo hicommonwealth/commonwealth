@@ -130,7 +130,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'LoginPage',
-      'Scope': app.activeId(),
+      'Scope': app.activeChainId(),
     });
   },
   view: (vnode) => {

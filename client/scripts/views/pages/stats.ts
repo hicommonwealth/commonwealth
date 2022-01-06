@@ -45,7 +45,7 @@ const StatsTable: m.Component<{ data }, {}> = {
 
 const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = {
   view: (vnode) => {
-    if (!vnode.state.requested && app.user && app.activeId()) {
+    if (!vnode.state.requested && app.user && app.activeChainId()) {
       vnode.state.requested = true;
 
       $.get(`${app.serverUrl()}/communityStats`, {

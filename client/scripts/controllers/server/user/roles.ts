@@ -22,11 +22,7 @@ const getPermissionLevel = (permission: RolePermission | undefined) => {
 
 export default class extends Base {
   public getChainRoles(): RoleInfo[] {
-    return this.roles.filter((role) => !role.offchain_community_id);
-  }
-
-  public getCommunityRoles(): RoleInfo[] {
-    return this.roles.filter((role) => role.offchain_community_id);
+    return this.roles.filter((role) => role.chain_id);
   }
 
   public createRole(options: {
@@ -59,10 +55,6 @@ export default class extends Base {
       if (options.chain) {
         this.removeRole((r) => {
           return r.chain_id === options.chain && r.address_id === options.address.id;
-        });
-      } else {
-        this.removeRole((r) => {
-          return r.offchain_community_id === options.community && r.address_id === options.address.id;
         });
       }
     });
@@ -105,9 +97,6 @@ export default class extends Base {
     return this.roles.find((r) => {
       const addressMatches = r.address_id === address_id;
       const communityMatches = r.chain_id === options.chain
-      // const communityMatches = options.chain
-      //   ? r.chain_id === options.chain
-      //   : r.offchain_community_id === options.community;
       return addressMatches && communityMatches;
     });
   }
@@ -124,9 +113,7 @@ export default class extends Base {
       const referencedAddress = this.addresses.find((address) => address.id === r.address_id);
       if (!referencedAddress) return;
       const isSame = this.activeAccount.address === referencedAddress.address;
-      const ofCommunity = (options.chain)
-        ? (r.chain_id === options.chain)
-        : (r.offchain_community_id === options.community);
+      const ofCommunity = r.chain_id === options.chain
       return permission && referencedAddress && isSame && ofCommunity;
     });
   }
@@ -156,13 +143,9 @@ export default class extends Base {
    * @param options A chain or a community ID
    */
   getAddressIdsFromRoles(options: { chain: string; community: string; }): number[] {
-    return (options.chain)
-      ? this.roles
-        .filter((role) => role.chain_id === options.chain)
-        .map((role) => role.address_id)
-      : this.roles
-        .filter((role) => role.offchain_community_id === options.community)
-        .map((role) => role.address_id);
+    return this.roles
+      .filter((role) => role.chain_id === options.chain)
+      .map((role) => role.address_id)
   }
 
   /**
@@ -175,15 +158,9 @@ export default class extends Base {
       : this.addresses;
   }
 
-  public getCommunitiesOfRoles(): string[] {
-    return this.roles
-      .filter((role) => role.offchain_community_id)
-      .map((r) => r.offchain_community_id);
-  }
-
   public getChainsOfRoles(): string[] {
     return this.roles
-      .filter((role) => !role.offchain_community_id)
+      .filter((role) => role.chain_id)
       .map((r) => r.chain_id);
   }
 
@@ -192,7 +169,6 @@ export default class extends Base {
       const role = this.getRoleInCommunity({
         account,
         chain: app.activeChainId(),
-        // community: app.activeCommunityId()
       });
       return [account, role];
     });
@@ -253,8 +229,6 @@ export default class extends Base {
       : true);
     if (options.chain) {
       return roles.map((r) => r.chain_id).indexOf(options.chain) !== -1;
-    } else if (options.community) {
-      return roles.map((r) => r.offchain_community_id).indexOf(options.community) !== -1;
     } else {
       return false;
     }

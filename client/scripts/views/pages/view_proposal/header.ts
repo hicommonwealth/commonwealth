@@ -286,7 +286,7 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
       return m('.ProposalHeaderThreadLink', [
         link(
           'a.thread-link',
-          `/${proposal['chain'] || app.activeId()}/proposal/discussion/${
+          `/${proposal['chain'] || app.activeChainId()}/proposal/discussion/${
             proposal.threadId
           }`,
           ['Go to discussion', m(Icon, { name: Icons.EXTERNAL_LINK })]
@@ -302,7 +302,7 @@ export const ProposalHeaderSnapshotThreadLink: m.Component<{
     const { id, title } = vnode.attrs.thread;
     if (!id) return;
     const proposalLink = `${
-      app.isCustomDomain() ? '' : `/${app.activeId()}`
+      app.isCustomDomain() ? '' : `/${app.activeChainId()}`
     }/proposal/discussion/${id}`;
 
     return m('.ProposalHeaderThreadLink', [
@@ -334,7 +334,7 @@ export const ProposalHeaderTopics: m.Component<{
     return m('.ProposalHeaderTopics', [
       link(
         'a.proposal-topic',
-        `/${app.activeId()}/discussions/${proposal.topic.name}`,
+        `/${app.activeChainId()}/discussions/${proposal.topic.name}`,
         [m('span.proposal-topic-name', `${proposal.topic?.name}`)]
       ),
     ]);
@@ -490,7 +490,7 @@ export const ProposalTitleSaveEdit: m.Component<{
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
     if (!proposal) return;
     const proposalLink =
-      `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/${
+      `${app.isCustomDomain() ? '' : `/${app.activeChainId()}`}/proposal/${
         proposal.slug
       }/${proposal.identifier}` + `-${slugify(proposal.title)}`;
 

@@ -93,9 +93,7 @@ const send = async (models, content: WebhookContent) => {
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
-  const chainOrCommObj = (content.community) ? { offchain_community_id: content.community }
-    : (content.chain) ? { chain_id: content.chain }
-      : null;
+  const chainOrCommObj = (content.chain) ? { chain_id: content.chain } : null;
   const notificationCategory = (content.chainEvent)
     ? content.chainEvent.chain_event_type_id : content.notificationCategory;
   // grab all webhooks for specific community

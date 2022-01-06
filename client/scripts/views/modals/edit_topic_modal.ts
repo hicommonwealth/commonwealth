@@ -61,7 +61,6 @@ const EditTopicModal : m.Component<{
         id,
         description: form.description,
         name: form.name,
-        // community_id: app.activeCommunityId(),
         chain_id: app.activeChainId(),
         telegram: null,
         featured_in_sidebar: form.featuredInSidebar,
@@ -82,7 +81,6 @@ const EditTopicModal : m.Component<{
       const topicInfo = {
         id,
         name: form.name,
-        // communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
       };
       await app.topics.remove(topicInfo);

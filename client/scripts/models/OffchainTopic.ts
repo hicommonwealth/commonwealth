@@ -5,8 +5,7 @@ class OffchainTopic {
   public readonly id: number;
   public readonly description: string;
   public readonly telegram?: string;
-  public readonly communityId?: string;
-  public readonly chainId?: string;
+  public readonly chainId: string;
   public readonly featuredInSidebar?: boolean;
   public readonly featuredInNewPost?: boolean;
   public readonly defaultOffchainTemplate?: string;
@@ -20,7 +19,6 @@ class OffchainTopic {
     id,
     description,
     telegram,
-    community_id,
     chain_id,
     featured_in_sidebar,
     featured_in_new_post,
@@ -31,7 +29,6 @@ class OffchainTopic {
       id: number,
       description: string,
       telegram?: string,
-      community_id?: string,
       chain_id?: string,
       featured_in_sidebar?: boolean,
       featured_in_new_post?: boolean,
@@ -42,7 +39,6 @@ class OffchainTopic {
     this.id = id;
     this.description = description;
     this.telegram = telegram;
-    this.communityId = community_id;
     this.chainId = chain_id;
     this.featuredInSidebar = featured_in_sidebar;
     this.featuredInNewPost = featured_in_new_post;

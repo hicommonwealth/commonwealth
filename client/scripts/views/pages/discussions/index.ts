@@ -127,10 +127,10 @@ export const CommunityOptionsPopover: m.Component<{}> = {
           }),
         isAdmin &&
           m(MenuItem, {
-            label: link('a', `${(app.isCustomDomain() ? '' : `/${app.activeId()}`)}/manage`, 'Manage community'),
+            label: link('a', `${(app.isCustomDomain() ? '' : `/${app.activeChainId()}`)}/manage`, 'Manage community'),
           }),
         (isAdmin || isMod) &&
-          app.activeId() &&
+          app.activeChainId() &&
           m(MenuItem, {
             label: 'Analytics',
             onclick: (e) => navigateToSubpage('/analytics'),
@@ -153,7 +153,7 @@ const DiscussionFilterBar: m.Component<
 
     const featuredTopicIds = communityInfo.featuredTopics;
     const topics = app.topics
-      .getByCommunity(app.activeId())
+      .getByCommunity(app.activeChainId())
       .map(
         ({
           id,
@@ -218,9 +218,9 @@ const DiscussionFilterBar: m.Component<
           class: 'TopicsFilterPopover',
           content: m('.discussions-topic-items', [
             m(MenuItem, {
-              active: m.route.get() === `/${app.activeId()}` || !topic,
+              active: m.route.get() === `/${app.activeChainId()}` || !topic,
               iconLeft:
-                m.route.get() === `/${app.activeId()}` || !topic
+                m.route.get() === `/${app.activeChainId()}` || !topic
                   ? Icons.CHECK
                   : null,
               label: 'All Topics',
@@ -249,7 +249,7 @@ const DiscussionFilterBar: m.Component<
                 ) => {
                   const active =
                     m.route.get() ===
-                      `/${app.activeId()}/discussions/${encodeURI(
+                      `/${app.activeChainId()}/discussions/${encodeURI(
                         name.toString().trim()
                       )}` ||
                     (topic && topic === name);
@@ -415,7 +415,7 @@ const DiscussionsPage: m.Component<
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
-      Scope: app.activeId(),
+      Scope: app.activeChainId(),
     });
 
     const returningFromThread =
@@ -423,19 +423,19 @@ const DiscussionsPage: m.Component<
       app.lastNavigatedFrom().includes('/proposal/discussion/');
     if (
       returningFromThread &&
-      localStorage[`${app.activeId()}-discussions-scrollY`]
+      localStorage[`${app.activeChainId()}-discussions-scrollY`]
     ) {
       setTimeout(() => {
         window.scrollTo(
           0,
-          Number(localStorage[`${app.activeId()}-discussions-scrollY`])
+          Number(localStorage[`${app.activeChainId()}-discussions-scrollY`])
         );
       }, 100);
     }
 
-    if (app.user.unseenPosts[app.activeId()]) {
-      app.user.unseenPosts[app.activeId()]['activePosts'] = 0;
-      app.user.unseenPosts[app.activeId()]['threads'] = 0;
+    if (app.user.unseenPosts[app.activeChainId()]) {
+      app.user.unseenPosts[app.activeChainId()]['activePosts'] = 0;
+      app.user.unseenPosts[app.activeChainId()]['threads'] = 0;
     }
   },
   oninit: (vnode) => {
@@ -452,9 +452,9 @@ const DiscussionsPage: m.Component<
       app.lastNavigatedFrom().includes('/proposal/discussion/');
     vnode.state.lookback[subpage] =
       returningFromThread &&
-      localStorage[`${app.activeId()}-lookback-${subpage}`]
+      localStorage[`${app.activeChainId()}-lookback-${subpage}`]
         ? moment.unix(
-            parseInt(localStorage[`${app.activeId()}-lookback-${subpage}`], 10)
+            parseInt(localStorage[`${app.activeChainId()}-lookback-${subpage}`], 10)
           )
         : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
@@ -571,7 +571,7 @@ const DiscussionsPage: m.Component<
     }
 
     const allThreads = app.threads.listingStore
-      .getByCommunityTopicAndStage(app.activeId(), topic, stage)
+      .getByCommunityTopicAndStage(app.activeChainId(), topic, stage)
       .sort(orderDiscussionsbyLastComment);
 
     if (allThreads.length > 0) {
@@ -652,7 +652,7 @@ const DiscussionsPage: m.Component<
 
       let topicId;
       if (topic) {
-        topicId = app.topics.getByName(topic, app.activeId())?.id;
+        topicId = app.topics.getByName(topic, app.activeChainId())?.id;
         if (!topicId) {
           return m(
             Sublayout,
@@ -663,7 +663,7 @@ const DiscussionsPage: m.Component<
             },
             [
               m(EmptyListingPlaceholder, {
-                communityName: app.activeId(),
+                communityName: app.activeChainId(),
                 topicName: topic,
               }),
             ]
@@ -729,15 +729,15 @@ const DiscussionsPage: m.Component<
 
     let topicName;
     let topicDescription;
-    if (topic && app.activeId()) {
-      const topics = app.topics.getByCommunity(app.activeId());
+    if (topic && app.activeChainId()) {
+      const topics = app.topics.getByCommunity(app.activeChainId());
       const topicObject = topics.find((t) => t.name === topic);
       topicName = topicObject?.name;
       topicDescription = topicObject?.description;
     }
 
     localStorage.setItem(
-      `${app.activeId()}-lookback-${subpage}`,
+      `${app.activeChainId()}-lookback-${subpage}`,
       `${vnode.state.lookback[subpage].unix()}`
     );
     const stillFetching =

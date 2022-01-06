@@ -40,7 +40,7 @@ export const getMemberPreview = (
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
   const userLink = `${
-    app.isCustomDomain() ? '' : `/${app.activeId() || addr.chain}`
+    app.isCustomDomain() ? '' : `/${app.activeChainId() || addr.chain}`
   }/account/${addr.address}?base=${addr.chain}`;
   return m(ListItem, {
     tabIndex,
@@ -522,7 +522,7 @@ export const SearchBar: m.Component<
               : results
       ])
 
-    const chainOrCommIcon = app.activeId()
+    const chainOrCommIcon = app.activeChainId()
         ? m(ChainIcon, {
             size: 18,
             chain: app.chain.meta.chain,

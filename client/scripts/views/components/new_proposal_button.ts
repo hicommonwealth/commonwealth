@@ -16,7 +16,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     && app.chain?.meta.chain.snapshot.length > 0;
 
   const topics = app.topics.getByCommunity(
-    app.activeId()
+    app.activeChainId()
   ).reduce(
     (acc, current) => current.featuredInNewPost
       ? [...acc, current]
@@ -32,11 +32,11 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     topics.map((t) => (
       m(MenuItem, {
         onclick: (e) => {
-          localStorage.setItem(`${app.activeId()}-active-topic`, t.name);
+          localStorage.setItem(`${app.activeChainId()}-active-topic`, t.name);
           if (t.defaultOffchainTemplate) {
-            localStorage.setItem(`${app.activeId()}-active-topic-default-template`, t.defaultOffchainTemplate);
+            localStorage.setItem(`${app.activeChainId()}-active-topic-default-template`, t.defaultOffchainTemplate);
           } else {
-            localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
+            localStorage.removeItem(`${app.activeChainId()}-active-topic-default-template`);
           }
           navigateToSubpage('/new/thread');
         },
@@ -139,7 +139,7 @@ export const MobileNewProposalButton: m.Component<{
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     if (!app.chain) return;
-    if (!app.activeId()) return;
+    if (!app.activeChainId()) return;
     return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {
         class: 'new-proposal-button-popover',
@@ -172,7 +172,7 @@ const NewProposalButton: m.Component<{
 
     if (!app.isLoggedIn()) return;
     if (!app.chain) return;
-    if (!app.activeId()) return;
+    if (!app.activeChainId()) return;
 
     // just a button for communities, or chains without governance
     if (threadOnly) {

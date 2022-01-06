@@ -383,7 +383,6 @@ describe('Roles Test', () => {
         default_chain: chain,
       };
       const testCommunity = await modelUtils.createCommunity(communityArgs);
-      const communityId = testCommunity.id;
       const res = await chai.request
         .agent(app)
         .get('/api/bulkMembers')

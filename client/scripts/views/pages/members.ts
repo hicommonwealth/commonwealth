@@ -84,8 +84,8 @@ const MembersPage : m.Component<
       showNewProposalButton: true,
     });
 
-    const navigatedFromAccount = app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
-    && localStorage[`${app.activeId()}-members-scrollY`]
+    const navigatedFromAccount = app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/${app.activeChainId()}/account/`)
+    && localStorage[`${app.activeChainId()}-members-scrollY`]
 
     // Load default number of profiles on mount
     if (!vnode.state.initialProfilesLoaded) {
@@ -94,7 +94,7 @@ const MembersPage : m.Component<
 
       // Set initial number loaded (contingent on navigation)
       if (navigatedFromAccount) {
-        vnode.state.numProfilesLoaded = Math.min(Number(localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`]))
+        vnode.state.numProfilesLoaded = Math.min(Number(localStorage[`${app.activeChainId()}-members-numProfilesAlreadyLoaded`]))
       } else {
         vnode.state.numProfilesLoaded = Math.min(DEFAULT_MEMBER_REQ_SIZE, vnode.state.membersLoaded.length);
       }
@@ -118,7 +118,7 @@ const MembersPage : m.Component<
     if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
       vnode.state.initialScrollFinished = true
       setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
+        window.scrollTo(0, Number(localStorage[`${app.activeChainId()}-members-scrollY`]));
       }, 100);
     }
 
@@ -164,11 +164,11 @@ const MembersPage : m.Component<
             return m('tr', [
               m('td.members-item-info', [
                 m('a', {
-                  href: `/${app.activeId()}/account/${profileInfo.profile.address}?base=${profileInfo.profile.chain}`,
+                  href: `/${app.activeChainId()}/account/${profileInfo.profile.address}?base=${profileInfo.profile.chain}`,
                   onclick: (e) => {
                     e.preventDefault();
-                    localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
-                    localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`] = vnode.state.numProfilesLoaded;
+                    localStorage[`${app.activeChainId()}-members-scrollY`] = window.scrollY;
+                    localStorage[`${app.activeChainId()}-members-numProfilesAlreadyLoaded`] = vnode.state.numProfilesLoaded;
                     navigateToSubpage(`/account/${profileInfo.profile.address}?base=${profileInfo.profile.chain}`);
                   }
                 }, [

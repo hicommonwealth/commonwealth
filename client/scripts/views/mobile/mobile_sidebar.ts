@@ -31,7 +31,6 @@ const MobileAccountMenu: m.Component<{}, {}> = {
       return app.user.getRoleInCommunity({
         account,
         chain: app.activeChainId(),
-        // community: app.activeCommunityId()
       });
     });
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
@@ -39,13 +38,13 @@ const MobileAccountMenu: m.Component<{}, {}> = {
     return m(Menu, { class: 'MobileAccountMenu' },
       app.isLoggedIn()
         ? [
-          app.activeId() && m(LoginSelectorMenuLeft, {
+          app.activeChainId() && m(LoginSelectorMenuLeft, {
             activeAddressesWithRole,
             nAccountsWithoutRole,
             // isPrivateCommunity,
             mobile: true
           }),
-          app.activeId() && m(MenuDivider),
+          app.activeChainId() && m(MenuDivider),
           m(LoginSelectorMenuRight, { mobile: true })
         ]
         : m(MenuItem, {
@@ -63,10 +62,10 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
     if (!app) return;
     let { activeTab } = vnode.state;
     const { showNewThreadOptions } = vnode.state;
-    if (!app.activeId() && !app.activeId()) {
+    if (!app.activeChainId() && !app.activeChainId()) {
       vnode.state.activeTab = MenuTabs.account;
     }
-    if (!activeTab) activeTab = app.activeId()
+    if (!activeTab) activeTab = app.activeChainId()
       ? MenuTabs.currentCommunity
       : MenuTabs.account;
     const CurrentCommunityMenu = m(Menu, { class: 'CurrentCommunityMenu' }, [
@@ -102,16 +101,16 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
     ]);
     return m('.MobileSidebar', [
       m(Tabs, [
-        app.activeId()
+        app.activeChainId()
         && m(TabItem, {
-          label: capitalize(app.activeId()),
+          label: capitalize(app.activeChainId()),
           active: activeTab === MenuTabs.currentCommunity,
           onclick: (e) => {
             e.stopPropagation();
             vnode.state.activeTab = MenuTabs.currentCommunity;
           }
         }),
-        app.activeId()
+        app.activeChainId()
         && m(TabItem, {
           label: 'Communities',
           active: activeTab === MenuTabs.allCommunities,

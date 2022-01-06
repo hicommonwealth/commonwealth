@@ -137,7 +137,7 @@ export const LoginSelectorMenuLeft: m.Component<{
           ],
         })),
         activeAddressesWithRole.length > 0 && m(MenuDivider),
-        activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+        activeAddressesWithRole.length > 0 && app.activeChainId() && m(MenuItem, {
           onclick: () => {
             const pf = app.user.activeAccount.profile;
             if (app.chain) {
@@ -146,7 +146,7 @@ export const LoginSelectorMenuLeft: m.Component<{
           },
           label: m('.label-wrap', [ mobile && m(CustomEyeIcon), m('span', 'View profile') ]),
         }),
-        activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+        activeAddressesWithRole.length > 0 && app.activeChainId() && m(MenuItem, {
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({
@@ -257,7 +257,6 @@ const LoginSelector: m.Component<{
 
     const joiningChainInfo = app.chain?.meta.chain;
     const joiningChain = joiningChainInfo?.id;
-    // const joiningCommunity = app.activeCommunityId();
 
     let samebaseAddresses: AddressInfo[];
 

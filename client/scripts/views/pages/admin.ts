@@ -507,7 +507,7 @@ const AdminPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'AdminPage',
-      'Scope': app.activeId(),
+      'Scope': app.activeChainId(),
     });
   },
   view: (vnode) => {

@@ -179,7 +179,7 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
-          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
+          localStorage[`${app.activeChainId()}-proposals-scrollY`] = window.scrollY;
           navigateToSubpage(`/proposal/${proposal.slug}/${proposal.identifier}`
                                    + `-${slugify(proposal.title)}`); // avoid resetting scroll point
         },
@@ -253,11 +253,11 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         // thread link
         proposal.threadId && m('.proposal-thread-link', [
           m('a', {
-            href: `/${app.activeId()}/proposal/discussion/${proposal.threadId}`,
+            href: `/${app.activeChainId()}/proposal/discussion/${proposal.threadId}`,
             onclick: (e) => {
               e.stopPropagation();
               e.preventDefault();
-              localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
+              localStorage[`${app.activeChainId()}-proposals-scrollY`] = window.scrollY;
               navigateToSubpage(`/proposal/discussion/${proposal.threadId}`);
               // avoid resetting scroll point
             },

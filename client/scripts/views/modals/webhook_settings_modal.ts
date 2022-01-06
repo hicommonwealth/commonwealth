@@ -105,9 +105,7 @@ const WebhookSettingsModal: m.Component<IAttrs, IState> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          const chainOrCommObj = webhook.chain_id
-            ? { chain: webhook.chain_id }
-            : { community: webhook.offchain_community_id };
+          const chainOrCommObj = { chain: webhook.chain_id }
           $.ajax({
             url: `${app.serverUrl()}/updateWebhook`,
             data: {
