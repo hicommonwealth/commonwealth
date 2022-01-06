@@ -1,4 +1,4 @@
-import 'components/sidebar/index.scss';
+import 'components/sidebar/new_index.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
