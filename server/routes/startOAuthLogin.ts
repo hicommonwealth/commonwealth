@@ -43,7 +43,8 @@ const startOAuthLogin = async (
   else
     passport.authenticate('discord', {
       successRedirect,
-      failureRedirect
+      failureRedirect,
+      state: String(req.sessionID)
     } as any)(req, res, next)
 };
 

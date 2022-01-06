@@ -367,6 +367,12 @@ function setupPassport(models: DB) {
     passReqToCallback: true,
     authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none'
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
+    // prevents Cross-site request forgery and Clickjacking
+    const str = '&state='
+    const splitState = req.url.substring(req.url.indexOf(str) + str.length)
+    const state = splitState.substring(splitState.indexOf('='));
+    if (state !== String(req.sessionID)) return cb(null, false)
+
     const discordAccount = await models.SocialAccount.findOne({
       where: { provider: 'discord', provider_userid: profile.id }
     });
