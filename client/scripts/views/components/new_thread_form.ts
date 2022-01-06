@@ -514,7 +514,7 @@ export const NewThreadForm: m.Component<{
               active: postType === PostType.Link,
             }),
             m('.tab-spacer', { style: 'flex: 1' }),
-            isModal && m.route.get() !== `${app.activeChainId()}/new/thread` && m(TabItem, {
+            isModal && m.route.get() !== `${app.activeChainId()}/new/discussion` && m(TabItem, {
               class: 'tab-right',
               label: [
                 'Full editor',
@@ -523,7 +523,7 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 vnode.state.overwriteConfirmationModal = true;
                 localStorage.setItem(`${app.activeChainId()}-from-draft`, `${fromDraft}`);
-                navigateToSubpage('/new/thread');
+                navigateToSubpage('/new/discussion');
                 $(e.target).trigger('modalexit');
               },
             }),

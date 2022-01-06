@@ -20,7 +20,7 @@ const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
 
     // auto-redirect to the new thread page if sent here accidentally
     if (vnode.state.typeEnum === ProposalType.OffchainThread) {
-      navigateToSubpage('/new/thread');
+      navigateToSubpage('/new/discussion');
     }
 
     // wait for chain
