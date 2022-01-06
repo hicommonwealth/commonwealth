@@ -101,7 +101,7 @@ class NotificationsController {
     // TODO: Change to PUT /notificationsRead
     const MAX_NOTIFICATIONS_READ = 100; // mark up to 100 notifications read at a time
     const unreadNotifications = notifications.filter((notif) => !notif.isRead);
-    if (unreadNotifications.length === 0) return;
+    if (unreadNotifications.length === 0) return $.Deferred().resolve().promise();
     return post('/markNotificationsRead', {
       'notification_ids[]': unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ).map((n) => n.id)
     }, (result) => {
@@ -111,7 +111,6 @@ class NotificationsController {
       if (unreadNotifications.slice(MAX_NOTIFICATIONS_READ).length > 0) {
         this.markAsRead(unreadNotifications.slice(MAX_NOTIFICATIONS_READ));
       }
-      // TODO: post(/markNotificationsRead) should wait on all notifications being marked as read before redrawing
     });
   }
 

@@ -294,9 +294,7 @@ const NotificationRow: m.Component<{
         null,
         () => {
           if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
-          const notificationArray: Notification[] = [];
-          notificationArray.push(notification);
-          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          app.user.notifications.markAsRead([notification]).then(() => m.redraw());
         },
         () => m.redraw.sync(),
       );
