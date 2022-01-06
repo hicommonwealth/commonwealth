@@ -14,7 +14,6 @@ import {
   ChainInfo,
   SocialAccount,
   Account,
-  // CommunityInfo,
   AddressInfo,
   ITokenAdapter
 } from 'models';

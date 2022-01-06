@@ -412,7 +412,6 @@ export const SearchBar: m.Component<
             isSearchPreview: true,
             chainScope: app.activeChainId()
           });
-      // vnode.state.activeCommunity = app.community ? app.community.name : vnode.state.searchQuery.communityScope
       vnode.state.activeChain = app.activeChainId() ? app.activeChainId() : vnode.state.searchQuery.chainScope
       vnode.state.isTyping = false;
     }

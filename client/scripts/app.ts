@@ -19,7 +19,6 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import {
   ChainInfo,
-  // CommunityInfo,
   NodeInfo,
   NotificationCategory,
   Notification,
@@ -109,11 +108,6 @@ export async function deinitChainOrCommunity() {
     console.log('Finished deinitializing chain');
     app.chain = null;
   }
-  // if (app.community) {
-  //   await app.community.deinit();
-  //   console.log('Finished deinitializing community');
-  //   app.community = null;
-  // }
   app.user.setSelectedNode(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
@@ -153,36 +147,6 @@ export async function handleUpdateEmailConfirmation() {
     }
   }
 }
-
-// export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
-//   // Check for valid community selection, and that we need to switch
-//   if (app.community && c === app.community.meta) return;
-
-//   // Shut down old chain if applicable
-//   await deinitChainOrCommunity();
-//   document.title = `Commonwealth – ${c.name}`;
-
-//   // Begin initializing the community
-//   const newCommunity = new Community(c, app);
-//   const finalizeInitialization = await newCommunity.init();
-
-//   // If the user is still in the initializing community, finalize the
-//   // initialization; otherwise, abort and return false
-//   if (!finalizeInitialization) {
-//     return false;
-//   } else {
-//     app.community = newCommunity;
-//   }
-//   console.log(`${c.name.toUpperCase()} started.`);
-
-//   // Initialize available addresses
-//   await updateActiveAddresses();
-
-//   // Redraw with community fully loaded and return true to indicate
-//   // initialization has finalized.
-//   m.redraw();
-//   return true;
-// }
 
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the

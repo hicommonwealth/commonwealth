@@ -42,30 +42,6 @@ export const WalletIcon: m.Component<{ walletName: string, onclick?: Function, s
   }
 };
 
-// export const CommunityIcon: m.Component<{ community: CommunityInfo, onclick?: Function, size?: number }> = {
-//   view: (vnode) => {
-//     const { community, onclick } = vnode.attrs;
-//     const size = vnode.attrs.size || 32;
-
-//     return m('.CommunityIcon', { class: onclick ? 'onclick' : '' }, [
-//       community.iconUrl
-//         ? m('img.community-icon', {
-//           style: `width: ${size}px; height: ${size}px;`,
-//           src: community.iconUrl,
-//           onclick
-//         })
-//         : m('.community-icon.no-image', {
-//           style: `width: ${size}px; height: ${size}px;`,
-//           onclick
-//         }, [
-//           m('span', {
-//             style: `font-size: ${size - 6}px;`
-//           }, community.name.slice(0, 1))
-//         ]),
-//     ]);
-//   }
-// };
-
 export const TokenIcon: m.Component<{ token: any, onclick?: Function, size?: number }> = {
   view: (vnode) => {
     const { token, onclick } = vnode.attrs;

@@ -2,7 +2,6 @@ import { ChainStore, NodeStore } from 'stores';
 import {
   ContractCategory,
   IChainAdapter,
-  // ICommunityAdapter,
   NotificationCategory,
 } from 'models';
 import { EventEmitter } from 'events';
@@ -39,7 +38,6 @@ export const enum LoginState {
 export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
-  // community: ICommunityAdapter<any, any>;
 
   chainPreloading: boolean;
   chainAdapterReady: EventEmitter;
@@ -137,7 +135,6 @@ const app: IApp = {
   modals: getModalStore(),
   loginState: LoginState.NotLoaded,
   config: {
-    // communities: new OffchainCommunitiesStore(),
     chains: new ChainStore(),
     nodes: new NodeStore(),
     defaultChain: 'edgeware',

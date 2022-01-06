@@ -39,7 +39,6 @@ export const CHAINBASE_SHORT = {
 
 const CommunityLabel: m.Component<{
   chain?: ChainInfo,
-  // community?: CommunityInfo,
   showStatus?: boolean,
   link?: boolean,
 }> = {
@@ -63,25 +62,6 @@ const CommunityLabel: m.Component<{
       ]),
     ]);
 
-    // if (community) return m('.CommunityLabel', [
-    //   m('.community-label-left', [
-    //     m(CommunityIcon, {
-    //       community,
-    //       size,
-    //       onclick: link ? (() => m.route.set(`/${community.id}`)) : null
-    //     }),
-    //   ]),
-    //   m('.community-label-right', [
-    //     m('.community-name-row', [
-    //       m('span.community-name', community.name),
-    //       showStatus === true && [
-    //         community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
-    //         !community.privacyEnabled && m(Icon, { name: Icons.GLOBE, size: 'xs' }),
-    //       ],
-    //     ]),
-    //   ]),
-    // ]);
-
     return m('.CommunityLabel', [
       m('.site-brand', 'Commonwealth'),
     ]);
@@ -95,7 +75,6 @@ export const CurrentCommunityLabel: m.Component<{}> = {
     const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
                                        && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    // const selectedCommunity = app.community;
 
     if (selectedNode) {
       return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true, link: true });
@@ -242,7 +221,6 @@ const LoginSelector: m.Component<{
         chain: app.activeChainId(),
       });
     });
-    // const isPrivateCommunity = app.community?.meta.privacyEnabled;
     const isAdmin = app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),

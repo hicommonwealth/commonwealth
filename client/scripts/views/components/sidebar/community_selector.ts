@@ -37,25 +37,6 @@ export const CommunityLabel: m.Component<{
       ]),
     ]);
 
-    // if (community) return m('.CommunityLabel', [
-    //   m('.community-label-left', [
-    //     m(CommunityIcon, {
-    //       size: vnode.attrs.size || 18,
-    //       community,
-    //       onclick: link ? (() => m.route.set(`/${community.id}`)) : null
-    //     }),
-    //   ]),
-    //   m('.community-label-right', [
-    //     m('.community-name-row', [
-    //       m('span.community-name', community.name),
-    //       showStatus === true && [
-    //         community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
-    //         !community.privacyEnabled && m(Icon, { name: Icons.GLOBE, size: 'xs' }),
-    //       ],
-    //     ]),
-    //   ]),
-    // ]);
-
     if (token) return m('.TokenLabel', [
       m('.token-label-left', [
         m(TokenIcon, {
@@ -88,7 +69,6 @@ export const CurrentCommunityLabel: m.Component<{}> = {
     const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
                                        && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    // const selectedCommunity = app.community;
 
     if (selectedNode) {
       return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true, link: true });
@@ -111,7 +91,6 @@ const CommunitySelector: m.Component<{
       .sort((a, b) => {
         // sort starred communities at top
         if (a instanceof ChainInfo && app.communities.isStarred(a.id, null)) return -1;
-        // if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
         return 0;
       })
       .filter((item) => {
@@ -120,12 +99,6 @@ const CommunitySelector: m.Component<{
           ? app.config.nodes.getByChain(item.id)?.length
           : true;
       });
-
-    // const currentCommunity = allCommunities.find((item) => {
-    //   if (item instanceof ChainInfo) return app.activeChainId() === item.id;
-    //   if (item instanceof CommunityInfo) return app.activeCommunityId() === item.id;
-    //   return false;
-    // });
 
     const isInCommunity = (item) => {
       if (item instanceof ChainInfo) {

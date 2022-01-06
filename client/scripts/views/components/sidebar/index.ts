@@ -44,7 +44,6 @@ const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
 
 const SidebarQuickSwitcher: m.Component<{}> = {
   view: (vnode) => {
-    // const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
     const allCommunities = app.config.chains.getAll()
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((item) => (item instanceof ChainInfo)

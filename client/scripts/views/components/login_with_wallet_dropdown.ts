@@ -35,7 +35,6 @@ const LoginWithWalletDropdown: m.Component<{
   label,
   loggingInWithAddress,
   joiningChain,
-  // joiningCommunity,
   onSuccess?,
   prepopulateAddress?,
 }> = {
@@ -44,7 +43,6 @@ const LoginWithWalletDropdown: m.Component<{
       label,
       loggingInWithAddress,
       joiningChain,
-      // joiningCommunity,
       onSuccess,
       prepopulateAddress,
     } = vnode.attrs;
@@ -56,17 +54,10 @@ const LoginWithWalletDropdown: m.Component<{
                   && m.route.param('prev') !== '/')
       ? m.route.param('prev')
       : joiningChain ? `/${joiningChain}`
-        // : joiningCommunity ? `/${joiningCommunity}`
           : m.route.get().indexOf('web3login') === -1 && m.route.get().replace(/\?.*/, '') !== '/' ? m.route.get()
             : app.chain ? `/${app.chain.meta.chain.id}`
-              // : app.community ? `/${app.community.meta.id}`
                 : '/?';
     // only redirect to home as an absolute last resort
-
-    // const targetCommunity = app.community?.id;
-
-    // const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
-    //   ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
 
     // TODO: double check this
     const web3loginParams = loggingInWithAddress
@@ -102,8 +93,6 @@ const LoginWithWalletDropdown: m.Component<{
           app.modals.lazyCreate('link_new_address_modal', {
             loggingInWithAddress,
             joiningChain,
-            // joiningCommunity,
-            // targetCommunity,
             useCommandLineWallet: !!useCli,
             webWallet,
             prepopulateAddress,

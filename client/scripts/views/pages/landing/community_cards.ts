@@ -97,7 +97,6 @@ const CommunityCard : m.Component<{ community: ChainInfo }> = {
         m('.card-right-top', [
           m('h3', [
             community.name,
-            // community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
           ]),
         ]),
         m('p.card-description', community.description),
@@ -192,7 +191,6 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
     });
 
     const myChains: any = Object.entries(chains);
-    // const myCommunities: any = app.config.communities.getAll();
 
     const sortChainsAndCommunities = (list) => list.sort((a, b) => {
       const threadCountA = app.recentActivity.getCommunityThreadCount(Array.isArray(a) ? a[0] : a.id);
@@ -210,11 +208,9 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
 
     const sortedChainsAndCommunities = sortChainsAndCommunities(
       myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
-        // .concat(myCommunities.filter((c) => !c.collapsedOnHomepage))
     );
     const betaChainsAndCommunities = sortChainsAndCommunities(
       myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
-        // .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
     );
 
     return m('.HomepageCommunityCards', {

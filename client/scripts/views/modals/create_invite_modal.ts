@@ -300,7 +300,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
 
 const CreateInviteLink: m.Component<{
   chain?: ChainInfo,
-  // community?: CommunityInfo,
   onChangeHandler?: Function,
 }, {
   link: string,
@@ -416,7 +415,6 @@ const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
 };
 
 const CreateInviteModal: m.Component<{
-  // communityInfo?: CommunityInfo;
   chainInfo?: ChainInfo;
 }, {
   success: boolean;

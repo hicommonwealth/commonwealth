@@ -26,7 +26,6 @@ enum MenuTabs {
 const MobileAccountMenu: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.isLoggedIn) return;
-    // const isPrivateCommunity = app.community?.meta.privacyEnabled;
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
         account,

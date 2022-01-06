@@ -513,13 +513,6 @@ const DiscussionsPage: m.Component<
     const subpage =
       topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
-    // add chain compatibility (node info?)
-    // if (app.community && !activeEntity?.serverLoaded)
-    //   return m(PageLoading, {
-    //     title: 'Discussions',
-    //     showNewProposalButton: true,
-    //   });
-
     const activeNode = app.chain?.meta;
     const selectedNodes = app.config.nodes
       .getAll()
@@ -532,12 +525,9 @@ const DiscussionsPage: m.Component<
           n.chain.id === activeNode.chain.id
       );
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    // const selectedCommunity = app.community;
 
     const communityName = selectedNode
       ? selectedNode.chain.name
-      // : selectedCommunity
-      // ? selectedCommunity.meta.name
       : '';
 
     const allLastVisited =
@@ -553,7 +543,6 @@ const DiscussionsPage: m.Component<
     // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
     // for easy comparison with weekly indexes' msecAgo
     const id = (activeEntity.meta as NodeInfo).chain.id
-      // : (activeEntity.meta as CommunityInfo).id;
     const lastVisited = moment(allLastVisited[id]).utc();
 
     let sortedListing = [];
