@@ -527,7 +527,7 @@ function setupRouter(
   router.delete(
     '/githubAccount',
     passport.authenticate('jwt', { session: false }),
-    deleteSocialAccount.bind(this, models, 'discord')
+    deleteSocialAccount.bind(this, models, 'github')
   );
 
   router.delete(
