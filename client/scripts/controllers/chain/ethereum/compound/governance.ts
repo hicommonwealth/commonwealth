@@ -133,7 +133,7 @@ export default class CompoundGovernance extends ProposalModule<
       const params = new URLSearchParams(countingMode);
       this._supportsAbstain = params.get('support') === 'bravo';
       this._useAbstainInQuorum = params.get('quorum') !== 'bravo';
-      const blockNumber = this.app.chain.block.height;
+      const blockNumber = await this._api.Provider.getBlockNumber();
       this._quorumVotes = new BN(
         (await (this.api.Contract as GovernorCompatibilityBravo).quorum(blockNumber - 1)
       ).toString());
