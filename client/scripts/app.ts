@@ -619,7 +619,7 @@ Promise.all([
       '/members':                importRoute('views/pages/members', { scoped: true, deferChain: true }),
       '/sputnik-daos':           importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/chat':                   importRoute('views/pages/chat', { scoped: true, deferChain: true }),
-      '/new/thread':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+      '/new/discussion':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
       '/account/:address':       importRoute('views/pages/profile', { scoped: true, deferChain: true }),
       '/account':                redirectRoute((a) => activeAcct ? `/account/${activeAcct.address}` : '/'),
@@ -676,7 +676,7 @@ Promise.all([
       '/:scope/members':            redirectRoute(() => '/members'),
       '/:scope/sputnik-daos':       redirectRoute(() => '/sputnik-daos'),
       '/:scope/chat':               redirectRoute(() => '/chat'),
-      '/:scope/new/thread':         redirectRoute(() => '/new/thread'),
+      '/:scope/new/discussion':         redirectRoute(() => '/new/discussion'),
       '/:scope/account/:address':   redirectRoute((attrs) => `/account/${attrs.address}/`),
       '/:scope/account':            redirectRoute(() => activeAcct ? `/account/${activeAcct.address}` : '/'),
       '/:scope/referenda':          redirectRoute(() => '/referenda'),
@@ -747,7 +747,7 @@ Promise.all([
       '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
       '/:scope/sputnik-daos':      importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
-      '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+      '/:scope/new/discussion':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
       '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
       '/:scope/account':           redirectRoute(

@@ -25,7 +25,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
 
   return [
     m(MenuItem, {
-      onclick: () => { navigateToSubpage('/new/thread'); },
+      onclick: () => { navigateToSubpage('/new/discussion'); },
       label: 'New thread',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
@@ -38,7 +38,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
           } else {
             localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
           }
-          navigateToSubpage('/new/thread');
+          navigateToSubpage('/new/discussion');
         },
         label: `New ${t.name} Thread`,
         iconLeft: mobile ? Icons.PLUS : undefined,
