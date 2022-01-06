@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Button, List, ListItem } from 'construct-ui';
+import { Button, List, ListItem, Spinner } from 'construct-ui';
 
 import app from 'state';
 
@@ -10,9 +10,10 @@ import {
 } from 'identifiers';
 import { OffchainThread } from 'models';
 import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
-import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import { loadMultipleSpacesData, SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import LinkedThreadModal from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
+import Sublayout from '../../sublayout';
 
 export const ProposalSidebarLinkedChainEntity: m.Component<{
   proposal: OffchainThread;
@@ -45,9 +46,13 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
   {
     initialized: boolean;
     snapshotProposalsLoaded: boolean;
+    space: SnapshotSpace;
     snapshot: SnapshotProposal;
   }
 > = {
+  onupdate: (vnode) => {
+    vnode.state.initialized = false;
+  },
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal.snapshotProposal) return;
@@ -55,19 +60,28 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
 
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
-      app.snapshot.init(app.chain.meta.chain.snapshot).then(() => {
-        // refreshing loads the latest snapshot proposals into app.snapshot.proposals array
-        vnode.state.snapshot = app.snapshot.proposals.find(
-          (sn) => sn.id === proposal.snapshotProposal
-        );
+      loadMultipleSpacesData(app.chain.meta.chain.snapshot).then((data) => {
+        for (const {space, proposals} of data) {
+          const matching_snapshot = proposals.find(
+            (sn) => sn.id === proposal.snapshotProposal
+          );
+          if (matching_snapshot) {
+            vnode.state.snapshot = matching_snapshot;
+            vnode.state.space = space;
+            break;
+          }
+        }
         vnode.state.snapshotProposalsLoaded = true;
         m.redraw();
       });
     }
 
-    const proposalLink = `${
-      app.isCustomDomain() ? '' : `/${proposal.chain}`
-    }/snapshot/${app.chain?.meta.chain.snapshot}/${proposal.snapshotProposal}`;
+    let proposalLink = '';
+    if (vnode.state.space && vnode.state.snapshot) {
+      proposalLink = `${
+        app.isCustomDomain() ? '' : `/${proposal.chain}`
+      }/snapshot/${vnode.state.space.id}/${vnode.state.snapshot.id}`;
+    }
 
     return m(
       '.ProposalSidebarLinkedSnapshot',

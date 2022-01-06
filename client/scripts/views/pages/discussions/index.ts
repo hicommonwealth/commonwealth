@@ -64,6 +64,8 @@ const getLastSeenDivider = (hasText = true) => {
   );
 };
 
+const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
+
 export const CommunityOptionsPopover: m.Component<{}> = {
   view: (vnode) => {
     const isAdmin =
@@ -198,7 +200,8 @@ const DiscussionFilterBar: m.Component<
 
     const selectedStage = stages.find((s) => s === (stage as any));
 
-    const summaryViewEnabled = vnode.attrs.parentState.summaryView;
+    const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
+    const summaryViewEnabled = vnode.attrs.parentState.summaryView && !topicSelected;
 
     return m('.DiscussionFilterBar', [
       topics.length > 0 &&
@@ -464,6 +467,7 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
+
     if (!app.community && !app.chain) return;
     if (!vnode.state.summaryViewInitialized) {
       if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
@@ -480,8 +484,11 @@ const DiscussionsPage: m.Component<
       }
       vnode.state.summaryViewInitialized = true;
     }
-    const { summaryView, recentThreads, lastSubpage } = vnode.state;
-    if (summaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
+    let { summaryView, recentThreads, lastSubpage } = vnode.state;
+    const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
+    const onSummaryView = summaryView && !topicSelected;
+
+    if (onSummaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
         .getRecentCommunityActivity({
@@ -504,7 +511,7 @@ const DiscussionsPage: m.Component<
         showNewProposalButton: true,
       });
 
-    if (summaryView) {
+    if (onSummaryView) {
       // overwrite any topic- or stage-scoping in URL
       topic = null;
       stage = null;
@@ -560,6 +567,7 @@ const DiscussionsPage: m.Component<
     const lastVisited = moment(allLastVisited[id]).utc();
 
     let sortedListing = [];
+    let pinnedListing = [];
     // fetch unique addresses count for pinned threads
     if (!app.threadUniqueAddressesCount.getInitializedPinned()) {
       app.threadUniqueAddressesCount
@@ -581,6 +589,8 @@ const DiscussionsPage: m.Component<
       const pinnedThreads = allThreads.filter((t) => t.pinned);
       if (pinnedThreads.length > 0) {
         sortedListing.push(m(PinnedListing, { proposals: pinnedThreads }));
+        pinnedListing.push(m(PinnedListing, { proposals: pinnedThreads }));
+        pinnedListing.push(m('.PinnedDivider', m('hr')));
       }
     }
 
@@ -777,11 +787,13 @@ const DiscussionsPage: m.Component<
                 disabled: isLoading || stillFetching,
               }),
             m('.listing-wrap', [
-              summaryView
+              onSummaryView
                 ? isLoading
                   ? m(LoadingRow)
                   : m(Listing, {
-                      content: [m(SummaryListing, { recentThreads })],
+                      content: [
+                        // ...pinnedListing,
+                        m(SummaryListing, { recentThreads })],
                     })
                 : [
                     isLoading

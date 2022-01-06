@@ -14,7 +14,6 @@ import QuillMention from 'quill-mention';
 
 import app from 'state';
 import { loadScript } from 'helpers';
-import { searchMentionableAddresses } from 'helpers/search';
 import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
@@ -46,8 +45,8 @@ const sliceFromLastWhitespace = (str) => {
 const instantiateEditor = (
   $editor: any,
   theme: string,
-  hasFormats: boolean = true,
-  imageUploader: boolean = true,
+  hasFormats = true,
+  imageUploader = true,
   placeholder: string,
   editorNamespace: string,
   state: any,
@@ -172,9 +171,9 @@ const instantiateEditor = (
 
   const BlockEmbed = Quill.import('blots/block/embed');
   class TwitterBlot extends BlockEmbed {
-    public static blotName: string = 'twitter';
-    public static className: string = 'ql-twitter';
-    public static tagName: string = 'div';
+    public static blotName = 'twitter';
+    public static className = 'ql-twitter';
+    public static tagName = 'div';
 
     public static create(id) {
       const node = super.create(id);
@@ -206,9 +205,9 @@ const instantiateEditor = (
   }
 
   class VideoBlot extends BlockEmbed {
-    public static blotName: string = 'video';
-    public static className: string = 'ql-video';
-    public static tagName: string = 'iframe';
+    public static blotName = 'video';
+    public static className = 'ql-video';
+    public static tagName = 'iframe';
     domNode: any;
 
     public static create(url) {
@@ -276,7 +275,7 @@ const instantiateEditor = (
       }];
       renderList(formattedMatches, searchTerm);
     } else if (searchTerm.length > 0) {
-      members = await searchMentionableAddresses(searchTerm, { resultSize: 6 });
+      members = await app.search.searchMentionableAddresses(searchTerm, { resultSize: 6 });
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
         const node = document.createElement('div');

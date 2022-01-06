@@ -49,8 +49,11 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
   }
 
   // link snapshot proposal
-  // TODO: should we verify proposal exists here?
-  thread.snapshot_proposal = req.body.snapshot_proposal;
+  if (req.body.snapshot_proposal) {
+    thread.snapshot_proposal = req.body.snapshot_proposal;
+  } else {
+    thread.snapshot_proposal = '';
+  }
   await thread.save();
 
   const finalThread = await models.OffchainThread.findOne({

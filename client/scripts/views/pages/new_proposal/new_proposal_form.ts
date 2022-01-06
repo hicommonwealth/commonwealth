@@ -49,6 +49,7 @@ enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
   RemoveMemberFromRole = 'Remove Member',
   Transfer = 'Payout',
+  Vote = 'Poll'
 }
 
 // this should be titled the Substrate/Edgeware new proposal form
@@ -365,8 +366,15 @@ const NewProposalForm = {
           calldatas.push(aaveProposal.calldata || '');
           signatures.push(aaveProposal.signature || '');
         }
+
+        // if they passed a title, use the JSON format for description.
+        // otherwise, keep description raw
+        let description = vnode.state.description;
+        if (vnode.state.title) {
+          description = JSON.stringify({ description: vnode.state.description, title: vnode.state.title });
+        }
         const details: CompoundProposalArgs = {
-          description: vnode.state.description,
+          description,
           targets,
           values,
           calldatas,
@@ -445,6 +453,8 @@ const NewProposalForm = {
             amount = `${+vnode.state.payoutAmount}`;
           }
           propArgs = { Transfer: { receiver_id: member, token_id, amount } }
+        } else if (vnode.state.sputnikProposalType === SupportedSputnikProposalTypes.Vote) {
+          propArgs = 'Vote';
         } else {
           throw new Error('unsupported sputnik proposal type');
         }
@@ -840,8 +850,20 @@ const NewProposalForm = {
               ]),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Proposal Description'),
+              m(FormLabel, 'Proposal Title (leave blank for no title)'),
               m(Input, {
+                name: 'title',
+                placeholder: 'Proposal Title',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.title = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Description'),
+              m(TextArea, {
                 name: 'description',
                 placeholder: 'Proposal Description',
                 oninput: (e) => {
@@ -1123,8 +1145,8 @@ const NewProposalForm = {
               },
             }),
             m(FormGroup, [
-              m(FormLabel, 'Member'),
-              m(Input, {
+              vnode.state.sputnikProposalType !== SupportedSputnikProposalTypes.Vote && m(FormLabel, 'Member'),
+              vnode.state.sputnikProposalType !== SupportedSputnikProposalTypes.Vote && m(Input, {
                 name: 'member',
                 defaultValue: 'tokenfactory.testnet',
                 oncreate: (vvnode) => {

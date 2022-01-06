@@ -12,15 +12,15 @@ const fetchThreadForSnapshot = async (models: DB, req: Request, res: Response, n
   if (!snapshot) return next(new Error(Errors.InvalidSnapshot));
   if (!chain) return next(new Error(Errors.InvalidChain));
 
-  const thread = await models.OffchainThread.findOne({
+  const threads = await models.OffchainThread.findAll({
     where: { 
       chain: chain,
       snapshot_proposal: snapshot,
     }
   });
-  if (!thread) return res.json({ status: 'Failure', message: '' });
-
-  return res.json({ status: 'Success', result: thread.id });
+  if (threads.length < 1) return res.json({ status: 'Failure' });
+  
+  return res.json({ status: 'Success', result: threads.map((thread) => { return { id: thread.id, title: thread.title } }) });
 };
 
 export default fetchThreadForSnapshot;

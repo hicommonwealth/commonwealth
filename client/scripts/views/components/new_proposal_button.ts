@@ -13,7 +13,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
   const showSnapshotOptions = app.user.activeAccount
-    && app.chain?.meta.chain.snapshot;
+    && app.chain?.meta.chain.snapshot.length > 0;
 
   const topics = app.topics.getByCommunity(
     app.activeId()
@@ -120,7 +120,12 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
     }),
     showSnapshotOptions && m(MenuItem, {
       onclick: (e) => {
-        navigateToSubpage(`/new/snapshot/${app.chain.meta.chain.snapshot}`);
+        const snapshotSpaces = app.chain.meta.chain.snapshot;
+        if (snapshotSpaces.length > 1) {
+          navigateToSubpage('/multiple-snapshots', {action: 'create-proposal'});
+        } else {
+          navigateToSubpage(`/new/snapshot/${snapshotSpaces}`);
+        }
       },
       label: 'New Snapshot Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
