@@ -54,12 +54,20 @@
             }
         }
     }
+    .card-gallery,
     .button-gallery {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 20px;
     }
     .TextInput {
         margin-bottom: 20px;
+    }
+}
+
+.Card {
+    &.form-card {
+        max-width: 300px;
     }
 }
