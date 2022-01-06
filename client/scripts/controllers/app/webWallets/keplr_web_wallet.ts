@@ -71,7 +71,8 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const client = await StargateClient.connect(app.chain.meta.url);
+      const url = `${window.location.origin}/cosmosAPI/${app.chain.id}`;
+      const client = await StargateClient.connect(url);
       const chainId = await client.getChainId();
       this._chainId = chainId;
       client.disconnect();
@@ -85,11 +86,11 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
         const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain.meta.chain.name,
-          rpc: app.chain.meta.url,
+          rpc: url,
           // TODO: this is a HACK -- this is not a valid REST url, it is only a duplicate of the
           //    RPC URL. But Keplr will not use this to send transactions, as we only use Keplr
           //    for offline signing, so it should not break tx functionality.
-          rest: app.chain.meta.url,
+          rest: url,
           bip44: {
               coinType: 118,
           },
