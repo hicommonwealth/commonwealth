@@ -132,7 +132,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/discussions/${t.name}`);
+            navigateToSubpage(`/discussions/${encodeURI(t.name)}`);
           },
         })
       )),
