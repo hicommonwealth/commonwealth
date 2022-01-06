@@ -4,6 +4,7 @@ import app from 'state';
 import m from 'mithril';
 import { OffchainThread, OffchainTopic } from 'models';
 import { formatLastUpdated, link } from 'helpers';
+import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { getLastUpdated, isHot } from './discussion_row';
 
@@ -35,9 +36,7 @@ const SummaryRow: m.Component<
       m(
         '.recent-threads',
         sortedThreads.slice(0, 3).map((thread) => {
-          const discussionLink =
-            `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
-            `${slugify(thread.title)}`;
+          const discussionLink = getProposalUrlPath(thread.slug, `${thread.identifier}-${slugify(thread.title)}`);
           return m('.thread-summary', [
             link('a.discussion-title', discussionLink, thread.title),
             m('.last-updated', [
