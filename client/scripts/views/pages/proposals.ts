@@ -100,9 +100,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
         ]),
         m(Button, {
           intent: 'primary',
-          onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-            type: ProposalType.CompoundProposal
-          }),
+          onclick: (e) => navigateToSubpage('/new/proposal'),
           label: 'New proposal',
         }),
       ]),
@@ -134,12 +132,7 @@ function getModules(): ProposalModule<any, any, any>[] {
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
-    let returningFromThread = false;
-    Object.values(ProposalType).forEach((type) => {
-      if (app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/${type}/`)) {
-        returningFromThread = true;
-      }
-    });
+    const returningFromThread = app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');
     if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
       setTimeout(() => {
         window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));

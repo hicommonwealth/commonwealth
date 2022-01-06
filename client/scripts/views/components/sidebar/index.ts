@@ -132,7 +132,7 @@ export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: tru
           class: 'sub-button',
           onclick: (e) => {
             e.preventDefault();
-            navigateToSubpage(`/discussions/${t.name}`);
+            navigateToSubpage(`/discussions/${encodeURI(t.name)}`);
           },
         })
       )),
@@ -373,7 +373,7 @@ export const OnchainNavigationModule: m.Component<{}, {}> = {
         rounded: true,
         onclick: (e) => {
           e.preventDefault();
-          navigateToSubpage('/new/proposal/:type', { type: ProposalType.MolochProposal });
+          navigateToSubpage('/new/proposal');
         },
         label: 'New proposal',
       }),
