@@ -973,7 +973,7 @@ const ViewProposalPage: m.Component<
 
     // load comments
     if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
-      (app.comments.refresh(proposal, app.activeChainId(), null))
+      (app.comments.refresh(proposal, app.activeChainId()))
         .then(async (result) => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
