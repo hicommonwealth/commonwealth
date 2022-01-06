@@ -7,7 +7,7 @@ import moment from 'moment';
 import { Checkbox, Button, Icons, ListItem, Table, Tag, Grid, Col, SelectList, RadioGroup } from 'construct-ui';
 
 import app from 'state';
-import { ChainNetwork } from 'types';
+import { ChainNetwork, ProposalType } from 'types';
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import { NotificationCategories } from 'types';
 
@@ -23,6 +23,7 @@ import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import PageError from 'views/pages/error';
+import { getProposalUrlPath } from 'client/scripts/identifiers';
 
 const NOTIFICATION_TABLE_PRE_COPY = 'Off-chain discussion events';
 const CHAIN_NOTIFICATION_TABLE_PRE_COPY = 'On-chain events';
@@ -140,7 +141,9 @@ const BatchedSubscriptionRow: m.Component<{
               : subscription.objectId;
 
           return subscription.OffchainThread ? [
-            link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+            link('a', `/${chainOrCommunityId}${
+              getProposalUrlPath(ProposalType.OffchainThread, subscription.OffchainThread.id, true)
+            }`,
               threadOrComment.toString(), { target: '_blank' }),
             m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
             m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
@@ -156,7 +159,9 @@ const BatchedSubscriptionRow: m.Component<{
               ? decodeURIComponent(subscription.OffchainComment.id)
               : subscription.objectId;
           return subscription.OffchainThread ? [
-            link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+            link('a', `/${chainOrCommunityId}${
+              getProposalUrlPath(ProposalType.OffchainThread, subscription.OffchainThread.id, true)
+            }`,
               threadOrComment.toString(), { target: '_blank' }),
             m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
             m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
@@ -185,7 +190,9 @@ const BatchedSubscriptionRow: m.Component<{
           : subscription.objectId;
 
       return subscription.OffchainThread ? [
-        link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+        link('a', `/${chainOrCommunityId}${
+              getProposalUrlPath(ProposalType.OffchainThread, subscription.OffchainThread.id, true)
+            }`,
           threadOrComment.toString(), { target: '_blank' }),
         m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
       ] : [ threadOrComment.toString() ];

@@ -8,6 +8,7 @@ import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
 import User from 'views/components/widgets/user';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { getProposalUrlPath } from 'client/scripts/identifiers';
 
 interface IProfileCommentGroupAttrs {
   proposal: OffchainThread | any;
@@ -32,7 +33,11 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           (proposal.chain || proposal.community) && [
             ' on a ',
             link(
-              'a.link-bold', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
+              'a.link-bold', `/${
+                proposal.chain || proposal.community
+              }${
+                getProposalUrlPath(slug, identifier, true)
+              }`,
               ((proposal instanceof OffchainThread) ? 'thread' : 'proposal'), {},
               `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
             ),

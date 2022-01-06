@@ -1,13 +1,17 @@
 import cheerio from 'cheerio';
+import { DB } from '../database';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+import { ChainBase, ChainNetwork, ProposalType } from '../../shared/types';
+import { ChainInstance } from '../models/chain';
+import { OffchainCommunityInstance } from '../models/offchain_community';
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
+const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) => {
   if (NO_CLIENT_SERVER) {
     return;
   }
@@ -94,21 +98,18 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
     renderWithMetaTags(res, title, description, author, image);
   });
 
-  app.get('/:scope/proposal/:type/:identifier', async (req, res, next) => {
-    const scope = req.params.scope;
-    const proposalType = req.params.type;
-    const proposalId = parseInt(req.params.identifier.split('-')[0], 10);
-
+  const renderProposal = async (
+    scope: string,
+    proposalType: string,
+    proposalId: string,
+    res,
+    chain?: ChainInstance,
+    community?: OffchainCommunityInstance
+  ) => {
     // Retrieve title, description, and author from the database
     let title, description, author, image;
-    // eslint-disable-next-line no-restricted-globals
-    if (isNaN(proposalId)) {
-      renderWithMetaTags(res, '', '', '', null);
-      return;
-    }
-
-    const chain = await models.Chain.findOne({ where: { id: scope } });
-    const community = await models.OffchainCommunity.findOne({ where: { id: scope, privacy_enabled: false } });
+    chain = chain || (await models.Chain.findOne({ where: { id: scope } }));
+    community = community || (await models.OffchainCommunity.findOne({ where: { id: scope, privacy_enabled: false } }));
 
     if (proposalType === 'discussion' && proposalId !== null) {
       // Retrieve offchain discussion
@@ -151,6 +152,55 @@ const setupAppRoutes = (app, models, devMiddleware, templateFile, sendFile) => {
       author = '';
     }
     renderWithMetaTags(res, title, description, author, image);
+  }
+
+  app.get('/:scope/proposal/:type/:identifier', async (req, res, next) => {
+    const scope = req.params.scope;
+    const proposalType = req.params.type;
+    const proposalId = req.params.identifier.split('-')[0];
+    await renderProposal(scope, proposalType, proposalId, res);
+  });
+
+  app.get('/:scope/discussion/:identifier', async (req, res, next) => {
+    const scope = req.params.scope;
+    const proposalType = ProposalType.OffchainThread;
+    const proposalId = req.params.identifier.split('-')[0];
+    await renderProposal(scope, proposalType, proposalId, res);
+  });
+
+  app.get('/:scope/proposal/:identifier', async (req, res, next) => {
+    const scope = req.params.scope;
+    const proposalId = req.params.identifier.split('-')[0];
+    const chain = await models.Chain.findOne({ where: { id: scope } });
+    let community: OffchainCommunityInstance;
+    let c = chain;
+    if (!c) {
+      community = await models.OffchainCommunity.findOne({ where: { id: scope, privacy_enabled: false } });
+      c = await models.Chain.findOne({ where: { id: community.default_chain } });
+      if (!c) {
+        renderWithMetaTags(res, '', '', '', null);
+        return;
+      }
+    }
+
+    // derive proposal type from scope if possible
+    let proposalType;
+    if (c.base === ChainBase.CosmosSDK) {
+      proposalType = ProposalType.CosmosProposal;
+    } else if (c.network === ChainNetwork.Sputnik) {
+      proposalType = ProposalType.SputnikProposal;
+    } else if (c.network === ChainNetwork.Moloch) {
+      proposalType = ProposalType.MolochProposal;
+    } else if (c.network === ChainNetwork.Compound) {
+      proposalType = ProposalType.CompoundProposal;
+    } else if (c.network === ChainNetwork.Aave) {
+      proposalType = ProposalType.AaveProposal;
+    } else {
+      renderWithMetaTags(res, '', '', '', null);
+      return;
+    }
+
+    await renderProposal(scope, proposalType, proposalId, res, chain, community);
   });
 
   app.get('*', (req, res, next) => {

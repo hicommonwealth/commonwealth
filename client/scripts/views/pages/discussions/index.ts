@@ -454,7 +454,7 @@ const DiscussionsPage: m.Component<
       topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread =
       app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/proposal/discussion/');
+      app.lastNavigatedFrom().includes('/discussion/');
     vnode.state.lookback[subpage] =
       returningFromThread &&
       localStorage[`${app.activeId()}-lookback-${subpage}`]

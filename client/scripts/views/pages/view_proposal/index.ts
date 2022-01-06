@@ -19,7 +19,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { ProposalType, ChainBase } from 'types';
-import { chainToProposalSlug, idToProposal, pathIsDiscussion, proposalSlugToClass } from 'identifiers';
+import { chainToProposalSlug, getProposalUrlPath, idToProposal, pathIsDiscussion, proposalSlugToClass } from 'identifiers';
 import { slugify } from 'utils';
 
 import Substrate from 'controllers/chain/substrate/main';
@@ -240,10 +240,7 @@ const ProposalHeader: m.Component<
       proposal instanceof OffchainThread
         ? (proposal as OffchainThread).attachments
         : false;
-    const proposalLink =
-      `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/${
-        proposal.slug
-      }/${proposal.identifier}-` + `${slugify(proposal.title)}`;
+    const proposalLink = getProposalUrlPath(proposal.slug, `${proposal.identifier}-${slugify(proposal.title)}`);
     const proposalTitleIsEditable =
       proposal instanceof SubstrateDemocracyProposal ||
       proposal instanceof SubstrateCollectiveProposal ||
@@ -555,12 +552,10 @@ const ProposalComment: m.Component<
       ? CommentParent.Comment
       : CommentParent.Proposal;
 
-    const commentLink =
-      `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/${
-        proposal.slug
-      }/` +
-      `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
-
+    const commentLink = getProposalUrlPath(
+      proposal.slug,
+      `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`
+    );
     const commentReplyCount = app.comments
       .getByProposal(proposal)
       .filter((c) => c.parentComment === comment.id && !c.deleted).length;
@@ -975,7 +970,7 @@ const ViewProposalPage: m.Component<
     if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
       navigateToSubpage(
-        `/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`,
+        getProposalUrlPath(proposal.slug, `${proposalId}-${slugify(proposal.title)}`, true),
         {},
         { replace: true }
       );

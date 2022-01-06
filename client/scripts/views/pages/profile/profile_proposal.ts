@@ -6,6 +6,7 @@ import app from 'state';
 import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
 import { link } from 'helpers';
 import User from 'views/components/widgets/user';
+import { getProposalUrlPath } from 'client/scripts/identifiers';
 
 const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThread: boolean } > = {
   view: (vnode) => {
@@ -25,7 +26,9 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
                 'Created a new ',
                 link(
                   'a.link-bold',
-                  `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, 'thread', {},
+                  `/${chain || community}${
+                    getProposalUrlPath(slug, `${identifier}-${slugify(title)}`, true)
+                  }`, 'thread', {},
                   `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
                 ),
                 ' in ',
@@ -37,7 +40,9 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
       m('.activity.proposal', [
         proposal.kind === OffchainThreadKind.Forum || proposal.kind === OffchainThreadKind.Link
           ? link(
-            'a.proposal-title', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, title, {},
+            'a.proposal-title', `/${chain || community}${
+              getProposalUrlPath(slug, `${identifier}-${slugify(title)}`, true)
+            }`, title, {},
             `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
           )
           : m('a.proposal-title', title),
