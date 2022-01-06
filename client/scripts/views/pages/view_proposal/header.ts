@@ -14,7 +14,7 @@ import {
   extractDomain,
   offchainThreadStageToLabel,
 } from 'helpers';
-import { proposalSlugToFriendlyName } from 'identifiers';
+import { getProposalUrlPath, proposalSlugToFriendlyName } from 'identifiers';
 import {
   OffchainThread,
   OffchainThreadKind,
@@ -287,7 +287,7 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
       return m('.ProposalHeaderThreadLink', [
         link(
           'a.thread-link',
-          `/${proposal['chain'] || app.activeId()}/proposal/discussion/${
+          `/${proposal['chain'] || app.activeId()}/discussion/${
             proposal.threadId
           }`,
           ['Go to discussion', m(Icon, { name: Icons.EXTERNAL_LINK })]
@@ -304,7 +304,7 @@ export const ProposalHeaderSnapshotThreadLink: m.Component<{
     if (!id) return;
     const proposalLink = `${
       app.isCustomDomain() ? '' : `/${app.activeId()}`
-    }/proposal/discussion/${id}`;
+    }/discussion/${id}`;
 
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [
@@ -490,10 +490,7 @@ export const ProposalTitleSaveEdit: m.Component<{
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
     if (!proposal) return;
-    const proposalLink =
-      `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/${
-        proposal.slug
-      }/${proposal.identifier}` + `-${slugify(proposal.title)}`;
+    const proposalLink = getProposalUrlPath(proposal.slug, `${proposal.identifier}-${slugify(proposal.title)}`);
 
     return m('.ProposalTitleSaveEdit', [
       m(

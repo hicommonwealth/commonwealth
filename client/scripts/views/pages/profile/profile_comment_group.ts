@@ -4,6 +4,7 @@ import _ from 'lodash';
 import app from 'state';
 import { link } from 'helpers';
 import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
+import { getProposalUrlPath } from 'identifiers';
 
 import User from 'views/components/widgets/user';
 import QuillFormattedText from 'views/components/quill_formatted_text';
@@ -32,7 +33,11 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           (proposal.chain || proposal.community) && [
             ' on a ',
             link(
-              'a.link-bold', `/${proposal.chain || proposal.community}/proposal/${slug}/${identifier}`,
+              'a.link-bold', `/${
+                proposal.chain || proposal.community
+              }${
+                getProposalUrlPath(slug, identifier, true)
+              }`,
               ((proposal instanceof OffchainThread) ? 'thread' : 'proposal'), {},
               `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
             ),

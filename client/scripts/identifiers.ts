@@ -1,9 +1,42 @@
-import { StorageModule, ProposalModule } from 'models';
+import { StorageModule, ProposalModule, ChainInfo } from 'models';
 import { SubstrateTypes, IChainEntityKind } from '@commonwealth/chain-events';
 import { ProposalStore } from 'stores';
 import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { requiresTypeSlug } from 'utils';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
+
+export const pathIsDiscussion = (scope: string | null, path: string): boolean => {
+  return path.startsWith(`/${scope}/discussion`) || path.startsWith('/discussion');
+}
+
+// returns a URL path to a proposal based on its type and id, taking into account
+// custom domain prefixes as well.
+export const getProposalUrlPath = (type: ProposalType, id: string, omitActiveId = false): string => {
+  let basePath: string;
+  const useTypeSlug = requiresTypeSlug(type);
+  if (type === ProposalType.OffchainThread) {
+    basePath = `/discussion/${id}`;
+  } else if (useTypeSlug) {
+    basePath = `/proposal/${type}/${id}`;
+  } else {
+    basePath = `/proposal/${id}`;
+  }
+  if (!app.isCustomDomain() && !omitActiveId) {
+    return `/${app.activeId()}${basePath}`;
+  } else {
+    return basePath;
+  }
+}
+
+export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
+  if (c.base === ChainBase.CosmosSDK) return ProposalType.CosmosProposal;
+  if (c.network === ChainNetwork.Sputnik) return ProposalType.SputnikProposal;
+  if (c.network === ChainNetwork.Moloch) return ProposalType.MolochProposal;
+  if (c.network === ChainNetwork.Compound) return ProposalType.CompoundProposal;
+  if (c.network === ChainNetwork.Aave) return ProposalType.AaveProposal;
+  throw new Error(`Cannot determine proposal slug from chain ${c.id}.`);
+}
 
 export const proposalSlugToClass = () => {
   if (app.community) {
