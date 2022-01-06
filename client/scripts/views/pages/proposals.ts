@@ -100,9 +100,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
         ]),
         m(Button, {
           intent: 'primary',
-          onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-            type: ProposalType.CompoundProposal
-          }),
+          onclick: (e) => navigateToSubpage('/new/proposal'),
           label: 'New proposal',
         }),
       ]),

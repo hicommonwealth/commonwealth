@@ -632,6 +632,7 @@ Promise.all([
       '/proposal/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/discussion/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/new/proposal/:type':     importRoute('views/pages/new_proposal/index', { scoped: true }),
+      '/new/proposal':           importRoute('views/pages/new_proposal/index', { scoped: true }),
       // Treasury
       '/treasury':               importRoute('views/pages/treasury', { scoped: true }),
       '/bounties':               importRoute('views/pages/bounties', { scoped: true }),
@@ -686,6 +687,7 @@ Promise.all([
       '/:scope/proposal/:identifier': redirectRoute((attrs) => `/proposal/${attrs.identifier}/`),
       '/:scope/discussion/:identifier': redirectRoute((attrs) => `/discussion/${attrs.identifier}/`),
       '/:scope/new/proposal/:type':  redirectRoute((attrs) => `/new/proposal/${attrs.type}/`),
+      '/:scope/new/proposal':        redirectRoute(() => '/new/proposal'),
       '/:scope/treasury':           redirectRoute(() => '/treasury'),
       '/:scope/bounties':           redirectRoute(() => '/bounties'),
       '/:scope/tips':               redirectRoute(() => '/tips'),
@@ -757,9 +759,10 @@ Promise.all([
       '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
       '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
       '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-      '/:scope/proposal/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/:scope/proposal/:identifier':   importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/:scope/discussion/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-      '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
+      '/:scope/new/proposal/:type':     importRoute('views/pages/new_proposal/index', { scoped: true }),
+      '/:scope/new/proposal':           importRoute('views/pages/new_proposal/index', { scoped: true }),
 
       // Treasury
       '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
