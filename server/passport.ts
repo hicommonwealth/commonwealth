@@ -365,6 +365,7 @@ function setupPassport(models: DB) {
     callbackURL: DISCORD_OAUTH_CALLBACK,
     scope: DISCORD_OAUTH_SCOPES,
     passReqToCallback: true,
+    authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none'
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     const discordAccount = await models.SocialAccount.findOne({
       where: { provider: 'discord', provider_userid: profile.id }
