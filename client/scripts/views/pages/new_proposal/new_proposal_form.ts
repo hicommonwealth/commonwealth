@@ -10,6 +10,7 @@ import {
 } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
+import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'types';
@@ -52,6 +53,11 @@ enum SupportedSputnikProposalTypes {
   Vote = 'Poll'
 }
 
+enum SupportedCosmosProposalTypes {
+  Text = 'Text Proposal',
+  CommunitySpend = 'Community Spend',
+}
+
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
   form: {},
@@ -68,6 +74,8 @@ const NewProposalForm = {
       signature: null,
       withDelegateCall: false,
     }];
+    vnode.state.cosmosProposalType = SupportedCosmosProposalTypes.Text;
+    vnode.state.sputnikProposalType = SupportedSputnikProposalTypes.AddMemberToRole;
   },
   view: (vnode) => {
     const callback = vnode.attrs.callback;
@@ -108,6 +116,7 @@ const NewProposalForm = {
     let hasAaveFields: boolean;
     // sputnik proposal
     let hasSputnikFields: boolean;
+    let hasCosmosFields: boolean;
     // data loaded
     let dataLoaded: boolean = true;
 
@@ -156,8 +165,7 @@ const NewProposalForm = {
       const elections = (app.chain as Substrate).phragmenElections;
       dataLoaded = !!elections.initialized;
     } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
-      hasTitleAndDescription = true;
-      hasDepositChooser = true;
+      hasCosmosFields = true;
       dataLoaded = !!(app.chain as Cosmos).governance.initialized;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
@@ -311,15 +319,27 @@ const NewProposalForm = {
           'Thread Type': 'Proposal',
         });
       } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
+        let prop: ProtobufAny;
+        const { title, description } = vnode.state.form;
         const deposit = vnode.state.deposit
           ? new CosmosToken((app.chain as Cosmos).governance.minDeposit.denom, vnode.state.deposit, false)
           : (app.chain as Cosmos).governance.minDeposit;
+        if (vnode.state.cosmosProposalType === SupportedCosmosProposalTypes.Text) {
+          prop = (app.chain as Cosmos).governance.encodeTextProposal(title, description);
+        } else if (vnode.state.cosmosProposalType === SupportedCosmosProposalTypes.CommunitySpend) {
+          prop = (app.chain as Cosmos).governance.encodeCommunitySpend(
+            title, description,
+            vnode.state.recipient,
+            vnode.state.payoutAmount
+          );
+        } else {
+          throw new Error('Unknown Cosmos proposal type.');
+        }
         // TODO: add disabled / loading
         (app.chain as Cosmos).governance.submitProposalTx(
           author as CosmosAccount,
-          vnode.state.form.title,
-          vnode.state.form.description,
-          deposit
+          deposit,
+          prop,
         ).then((result) => {
           done(result);
           navigateToSubpage(`/proposal/${result}`);
@@ -681,17 +701,13 @@ const NewProposalForm = {
           ],
           hasDepositChooser && [
             m(FormGroup, [
-              m(FormLabel, `Deposit (${app.chain.base === ChainBase.Substrate
-                ? app.chain.currency
-                : (app.chain as Cosmos).governance.minDeposit.denom})`),
+              m(FormLabel, `Deposit (${app.chain.currency})`),
               m(Input, {
                 name: 'deposit',
-                placeholder: `Min: ${app.chain.base === ChainBase.Substrate
-                  ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
-                  : +(app.chain as Cosmos).governance.minDeposit}`,
-                oncreate: (vvnode) => $(vvnode.dom).val(app.chain.base === ChainBase.Substrate
-                  ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
-                  : +(app.chain as Cosmos).governance.minDeposit),
+                placeholder: `Min: ${(app.chain as Substrate).democracyProposals.minimumDeposit.inDollars}`,
+                oncreate: (vvnode) => $(vvnode.dom).val(
+                  (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
+                ),
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.deposit = parseFloat(result);
@@ -1193,6 +1209,94 @@ const NewProposalForm = {
               m(FormLabel, 'Amount'),
               m(Input, {
                 name: 'amount',
+                defaultValue: '',
+                oncreate: (vvnode) => {
+                  vnode.state.payoutAmount = '';
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.payoutAmount = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+          ],
+          hasCosmosFields && [
+            m(DropdownFormField, {
+              title: 'Proposal Type',
+              value: vnode.state.cosmosProposalType,
+              defaultValue: SupportedCosmosProposalTypes.Text,
+              choices: Object.values(SupportedCosmosProposalTypes).map((v) => ({
+                name: 'proposalType',
+                label: v,
+                value: v,
+              })),
+              callback: (result) => {
+                vnode.state.cosmosProposalType = result;
+                m.redraw();
+              },
+            }),
+            m(FormGroup, [
+              m(FormLabel, 'Title'),
+              m(Input, {
+                placeholder: 'Enter a title',
+                name: 'title',
+                autofocus: true,
+                autocomplete: 'off',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.form.title = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Description'),
+              m(TextArea, {
+                name: 'description',
+                placeholder: 'Enter a description',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  if (vnode.state.form.description === result) return;
+                  vnode.state.form.description = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, `Deposit (${(app.chain as Cosmos).governance.minDeposit.denom})`),
+              m(Input, {
+                name: 'deposit',
+                placeholder: `Min: ${+(app.chain as Cosmos).governance.minDeposit}`,
+                oncreate: (vvnode) => $(vvnode.dom).val(+(app.chain as Cosmos).governance.minDeposit),
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.deposit = +result;
+                  m.redraw();
+                },
+              })
+            ]),
+            vnode.state.cosmosProposalType !== SupportedCosmosProposalTypes.Text && m(FormGroup, [
+              m(FormLabel, 'Recipient'),
+              m(Input, {
+                name: 'recipient',
+                placeholder: app.user.activeAccount.address,
+                defaultValue: '',
+                oncreate: (vvnode) => {
+                  vnode.state.recipient = '';
+                },
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.recipient = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            vnode.state.cosmosProposalType !== SupportedCosmosProposalTypes.Text && m(FormGroup, [
+              m(FormLabel, `Amount (${(app.chain as Cosmos).governance.minDeposit.denom})`),
+              m(Input, {
+                name: 'amount',
+                placeholder: '12345',
                 defaultValue: '',
                 oncreate: (vvnode) => {
                   vnode.state.payoutAmount = '';

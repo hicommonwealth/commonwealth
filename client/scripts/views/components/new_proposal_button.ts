@@ -53,7 +53,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
       onclick: (e) => navigateToSubpage('/new/proposal'),
-      label: 'New text proposal',
+      label: 'New On-Chain Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Aave
