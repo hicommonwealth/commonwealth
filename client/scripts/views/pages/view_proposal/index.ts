@@ -846,6 +846,7 @@ const ViewProposalPage: m.Component<
   },
   view: (vnode) => {
     const { identifier } = vnode.attrs;
+    const pathname = window.location.pathname;
     if (!app.chain?.meta) {
       return m(PageLoading, {
         narrow: true,
@@ -853,7 +854,7 @@ const ViewProposalPage: m.Component<
         title: 'Loading...',
       });
     }
-    const isDiscussion = pathIsDiscussion(app.activeChainId(), window.location.pathname);
+    const isDiscussion = pathIsDiscussion(app.activeChainId(), pathname);
     const type = vnode.attrs.type || (isDiscussion
       ? ProposalType.OffchainThread
       : chainToProposalSlug(app.chain.meta.chain));

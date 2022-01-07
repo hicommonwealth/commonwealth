@@ -64,7 +64,6 @@ export interface IApp {
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
-  activeChainId(): string;
 
   toasts: ToastStore;
   modals: ModalStore;
