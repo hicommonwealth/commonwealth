@@ -40,7 +40,7 @@ const offChainCommunities = [
   'knoxedge',
   'likecoin',
   'pfeilstorch',
-  'redacted-cartel'
+  'new-order-dao'
 ];
 
 module.exports = {
@@ -86,12 +86,13 @@ module.exports = {
       const description = info['description'].substring(0, 200)
 
       const baseQuery = await queryInterface.sequelize.query(
-        `SELECT symbol, network, base FROM "Chains" WHERE id='${default_chain}'`,
+        `SELECT symbol, network, base, ss58_prefix FROM "Chains" WHERE id='${default_chain}'`,
         { transaction: t }
       );
       const base = baseQuery[0][0]['base'];
       const symbol = baseQuery[0][0]['symbol'];
       const network = baseQuery[0][0]['network'];
+      const ss58_prefix = baseQuery[0][0]['ss58_prefix'];
 
       const nodeQuery = await queryInterface.sequelize.query(
         `SELECT url, eth_chain_id FROM "ChainNodes" WHERE chain='${default_chain}'`,
@@ -121,7 +122,8 @@ module.exports = {
         custom_stages,
         stages_enabled,
         terms,
-        default_summary_view
+        default_summary_view,
+        ss58_prefix,
       }
       const chainNodeObject = {
         chain: id,
