@@ -181,7 +181,7 @@ const newThread = async (
 
   await app.user.notifications.refresh();
 
-  navigateToSubpage(`/proposal/discussion/${result.id}`);
+  navigateToSubpage(`/discussion/${result.id}`);
 
   if (result.topic) {
     try {
