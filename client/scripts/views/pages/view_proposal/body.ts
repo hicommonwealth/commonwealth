@@ -105,8 +105,6 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
     if ((item instanceof OffchainComment || item instanceof OffchainComment)
       && app.chain.meta.chain.type === ChainType.Offchain) {
       if (item.authorChain !== app.chain.base) {
-        console.log('found mismatch: ', item.authorChain, app.chain.base)
-        console.log(item)
         return m('.ProposalBodyAuthor', [
           m('.User.avatar-only', {
             key: '-',
