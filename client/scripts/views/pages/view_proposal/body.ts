@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-globals */
 import 'pages/view_proposal/editor_permissions.scss';
@@ -29,6 +31,7 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
+import { ChainType } from '../../../../../shared/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 
@@ -58,6 +61,19 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
     if (!item) return;
     if (!item.author) return;
 
+    // Check for accounts on offchain forums that originally signed up on a different base chain,
+    // Render them as anonymous as the forum is unable to support them.
+    if (item.authorChain !== app.chain.base) {
+      return m('.ProposalBodyAvatar', [
+        m(AnonymousUser, {
+            avatarOnly: true,
+            avatarSize: 40,
+            showAsDeleted: true,
+            distinguishingKey: item.author.slice(item.author.length - 3),
+          })
+      ]);
+    }
+
     const author : Account<any> = app.chain.accounts.get(item.author);
 
     return m('.ProposalBodyAvatar', [
@@ -83,6 +99,26 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
     const { item } = vnode.attrs;
     if (!item) return;
     if (!item.author) return;
+
+    // Check for accounts on offchain forums that originally signed up on a different base chain,
+    // Render them as anonymous as the forum is unable to support them.
+    if ((item instanceof OffchainComment || item instanceof OffchainComment)
+      && app.chain.meta.chain.type === ChainType.Offchain) {
+      if (item.authorChain !== app.chain.base) {
+        console.log('found mismatch: ', item.authorChain, app.chain.base)
+        console.log(item)
+        return m('.ProposalBodyAuthor', [
+          m('.User.avatar-only', {
+            key: '-',
+          }, [
+            m('a.user-display-name.username', [
+              // TODO: pick a good name here?
+              "*Anonymous*"]
+            )
+          ]),
+        ]);
+      }
+    }
 
     const author : Account<any> = (item instanceof OffchainThread || item instanceof OffchainComment)
       ? (app.chain.accounts.get(item.author))
