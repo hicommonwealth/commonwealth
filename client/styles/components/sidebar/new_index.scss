@@ -346,3 +346,38 @@
 .cui-popover.community-options-popover .cui-menu {
     padding: 4px 0;
 }
+
+
+.SidebarSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom-width: 2px;
+    cursor: pointer;
+    user-select: none;    
+
+
+    .SidebarTitle {
+        margin-top: 8px;
+        font-size: 22px;
+        font-weight: 500;
+    }
+}
+
+.SectionGroup {
+    font-weight: 400;
+    font-size: 18px;
+    .SectionGroupTitle {
+        display: flex; 
+        .section-title-text {
+            margin-left: 3px;
+        }
+        .no-carat {
+            width: 6px;
+        }
+    }
+}
+
+.SubSection {
+    margin-left: 20px;
+}

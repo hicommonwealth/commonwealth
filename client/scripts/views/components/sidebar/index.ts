@@ -20,6 +20,7 @@ import CommunitySelector from 'views/components/sidebar/community_selector';
 
 
 import { DiscordIcon, TelegramIcon, ElementIcon, GithubIcon, WebsiteIcon } from '../component_kit/icons';
+import SidebarSection, { SectionGroupProps, SidebarSectionProps, SubSectionProps } from './sidebar_section';
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -596,7 +597,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
+const oldSidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
   view: (vnode) => {
     const { useQuickSwitcher } = vnode.attrs;
 
@@ -606,6 +607,75 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
         (app.chain || app.community) && m(OffchainNavigationModule),
         (app.chain || app.community) && m(OnchainNavigationModule),
         (app.chain || app.community) && m(ExternalLinksModule),
+        m('br'),
+        app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
+        app.chain && m(ChainStatusModule),
+        app.isCustomDomain()
+        && m('a', {
+          class: 'PoweredBy',
+          onclick: (e) => {
+            window.open('https://commonwealth.im/');
+          },
+        }),
+      ]),
+    ];
+  },
+};
+
+const GovernanceSection: m.Component<{}, {}> = {
+  view: (vnode) => {
+
+    const onProposalPage = (p) => (
+      p.startsWith(`/${app.activeChainId()}/proposals`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyProposal}`));
+
+    const referenda_section_data: SubSectionProps[] = [
+      {
+        title: 'Proposals',
+        onclick: () => navigateToSubpage('/proposals'),
+        is_visible: true,
+        is_active: onProposalPage(m.route.get()),
+      },
+      {
+        title: 'Councilors',
+        onclick: () => console.log("yoo"),
+        is_visible: true,
+        is_active: false
+      }
+    ]
+    
+    const governance_group_data: SectionGroupProps[] = [{
+      title: 'Referenda',
+      contains_children: true,
+      default_active: true,
+      is_visible: true,
+      is_active: true,
+      onclick: () => console.log("click 2"),
+      display_data: referenda_section_data
+    }]
+
+    const sidebar_section_data: SidebarSectionProps = {
+      title: 'GOVERNANCE',
+      default_active: true,
+      onclick: () => console.log('clicked!'),
+      display_data: governance_group_data,
+      is_active: true
+
+    }
+
+    return m(SidebarSection, {...sidebar_section_data});
+  }
+}
+
+const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
+  view: (vnode) => {
+    const { useQuickSwitcher } = vnode.attrs;
+
+    return [
+      !app.isCustomDomain() && m(SidebarQuickSwitcher),
+      !useQuickSwitcher && m('.Sidebar', [
+        m(GovernanceSection),
+        m(GovernanceSection),
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
         app.chain && m(ChainStatusModule),
