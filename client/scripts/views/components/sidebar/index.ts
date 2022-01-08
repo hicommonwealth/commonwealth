@@ -1,4 +1,4 @@
-import 'components/sidebar/new_index.scss';
+import 'components/sidebar/index.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
@@ -635,19 +635,21 @@ const GovernanceSection: m.Component<{}, {}> = {
         onclick: () => navigateToSubpage('/proposals'),
         is_visible: true,
         is_active: onProposalPage(m.route.get()),
+        row_icon: true
       },
       {
         title: 'Councilors',
         onclick: () => console.log("yoo"),
         is_visible: true,
-        is_active: false
+        is_active: false,
+        row_icon: false
       }
     ]
     
     const governance_group_data: SectionGroupProps[] = [{
       title: 'Referenda',
       contains_children: true,
-      default_active: true,
+      default_active: false,
       is_visible: true,
       is_active: true,
       onclick: () => console.log("click 2"),
@@ -673,7 +675,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
 
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
-      !useQuickSwitcher && m('.Sidebar', [
+      !useQuickSwitcher && (app.chain || app.community) && m('.Sidebar', [
         m(GovernanceSection),
         m(GovernanceSection),
         m('br'),

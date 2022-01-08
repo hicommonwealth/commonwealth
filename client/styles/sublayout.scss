@@ -148,13 +148,13 @@
         position: sticky;
         top: 0;
         z-index: 10;
-        background: white;
+        background: $layout-color;
         @include sm-max {
             display: none;
         }
         margin: 0 auto;
-        border-bottom: 1px solid $border-color-off-white;
-        padding: 24px 0 22px;
+        border-bottom: 1px solid $disable-grey;
+        padding: 18px 0 16px;
         padding-right: 20px;
         @include md-max {
             @include narrowBrowserHeader();
@@ -270,6 +270,13 @@
         min-height: calc(100vh - 140px);
         padding: 1px 0; // prevent margins from flowing outside the container
         padding-bottom: 80px;
+    }
+    .sublayout-body-sidebar {
+        position: relative;
+        min-height: calc(100vh - 140px);
+        padding: 1px 0; // prevent margins from flowing outside the container
+        padding-bottom: 80px;
+        margin-left: $sidebar-width;
     }
     .token-banner {
         padding: 8px 0 2px;

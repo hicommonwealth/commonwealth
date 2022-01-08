@@ -144,6 +144,9 @@ const Sublayout: m.Component<{
     }
 
     const tosStatus = localStorage.getItem(`${app.activeId()}-tos`);
+    const sidebarOpen = (app.chain !== null || app.community !== null);
+
+    console.log("SidebarOpen: ", sidebarOpen)
 
     return [
       m('.layout-container', [
@@ -174,11 +177,11 @@ const Sublayout: m.Component<{
                   localStorage.setItem(`${app.activeId()}-tos`, 'off');
                 } }, 'X')
             ]) : '',
-          m('.sublayout-body', [
+          m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
+            m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
+          ]),
+          m(!sidebarOpen ? '.sublayout-body' : '.sublayout-body-sidebar' , [
             m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
-              !hideSidebar && m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
-                m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
-              ]),
               m('.sublayout-main-col', {
                 class: !rightContent && 'no-right-content'
               }, [

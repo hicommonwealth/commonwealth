@@ -9,7 +9,7 @@ export interface SubSectionProps {
     onclick: Function;
     is_active: boolean;
     onhover?: Function;
-    row_icon?: string;
+    row_icon?: boolean;
 }
 
 export interface SectionGroupProps {
@@ -32,11 +32,10 @@ export interface SidebarSectionProps {
     display_data: SectionGroupProps[];
 }
 
-const SubSection: m.Component<SubSectionProps, {is_active: boolean}> = {
+const SubSection: m.Component<SubSectionProps, {text_color: string}> = {
     view: (vnode) => {
-
-        const {title, is_visible, is_active, onclick} = vnode.attrs;
-
+        const {title, is_visible, is_active, onclick, row_icon} = vnode.attrs;
+        const { text_color } = vnode.state;
         if (!is_visible) {
             return;
         }
@@ -46,9 +45,12 @@ const SubSection: m.Component<SubSectionProps, {is_active: boolean}> = {
             //
         }
 
-        return m('.SubSection',{onclick: (e) => click_handler(e)}, [
-            m('.row-icon', []),
-            m('.row-title', title),
+
+        return m('.SubSection',{
+            onclick: (e) => click_handler(e),
+        }, [
+            row_icon && m(is_active ? '.row-icon-active' : '.row-icon-inactive', [m(Icon, {name: Icons.HASH})]),
+            m(is_active ? '.row-title-active' : '.row-title-inactive', title),
         ])
     }
 }
@@ -83,7 +85,7 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean}> = {
                 contains_children ? m('.carat', carat) : m('.no-carat'),
                 m('.section-title-text', title),
             ]),
-            toggled && m('.subsections', [
+            contains_children && toggled && m('.subsections', [
                 display_data.map((subsection) => (
                     m(SubSection, {...subsection})
                 ))
@@ -112,23 +114,30 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
 
         const mouse_enter_handler = (e) => {
             if (!toggled) {
-                vnode.state.hover_color = 'violet';
-            } 
+                vnode.state.hover_color = '#EDE7FF';
+            }   
         }
 
         const mouse_leave_handler = (e) => {
             vnode.state.hover_color = 'none';
         }
+
+        const carat = toggled ? m(Icon, {
+            name: Icons.CHEVRON_DOWN,
+        }) : m(Icon, {
+            name: Icons.CHEVRON_RIGHT,
+        });
         
-        return m('.SidebarSection', {}, [
+        return m('.SidebarSection', { 
+            onmouseenter: (e) => mouse_enter_handler(e),
+            onmouseleave: (e) => mouse_leave_handler(e),
+            style: `background-color: ${hover_color}`
+        }, [
             m('.SidebarTitle', {
                 onclick: (e) => click_handler(e), 
-                onmouseenter: (e) => mouse_enter_handler(e),
-                onmouseleave: (e) => mouse_leave_handler(e),
-                style: `background-color: ${hover_color}`
             }, [
                 m('.title-text', title),
-                m('.visibility-icon', [])
+                m('.visibility-icon', carat)
             ]),
             toggled && m('.section-groups', [
                 display_data.map((section_group) => (
