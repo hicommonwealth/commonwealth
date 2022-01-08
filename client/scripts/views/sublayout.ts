@@ -116,7 +116,7 @@ const Sublayout: m.Component<{
       app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
       && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
-      hiringButton,
+      !app.isCustomDomain() && hiringButton,
       // above threadOnly option assumes all chains have proposals beyond threads
     ]);
 
