@@ -54,11 +54,12 @@ export const modelFromServer = (thread) => {
     collaborators,
     chain_entities,
     ChainEntities,
+    offchain_voting_enabled,
     offchain_voting_options,
     offchain_voting_ends_at,
     offchain_voting_votes,
     reactions,
-    latestCommCreatedAt,
+    last_commented_on,
     linked_threads,
   } = thread;
 
@@ -156,11 +157,12 @@ export const modelFromServer = (thread) => {
     chainEntities: chainEntitiesProcessed || ChainEntities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
+    offchainVotingEnabled: offchain_voting_enabled,
     offchainVotingOptions: offchain_voting_options,
     offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
-    latestCommCreatedAt: latestCommCreatedAt
-      ? moment(latestCommCreatedAt)
+    lastCommentedOn: last_commented_on
+      ? moment(last_commented_on)
       : null,
     linkedThreads: linked_threads,
   });
@@ -372,8 +374,9 @@ class ThreadsController {
     threadId: number;
     name: string;
     choices: string[];
+    customDuration?: string;
   }) {
-    const { threadId, name, choices } = args;
+    const { threadId, name, choices, customDuration } = args;
     // start polling
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadPolling`,
@@ -384,6 +387,7 @@ class ThreadsController {
         jwt: app.user.jwt,
         thread_id: threadId,
         content: JSON.stringify({ name, choices }),
+        custom_duration: customDuration?.split(' ')[0],
       },
       success: (response) => {
         const thread = this._store.getByIdentifier(threadId);
@@ -392,11 +396,14 @@ class ThreadsController {
           location.reload();
           return;
         }
+        // TODO: This should be handled properly
+        // via controller/store & update method
+        thread.offchainVotingEnabled = true;
         thread.offchainVotingOptions = { name, choices };
         thread.offchainVotingNumVotes = 0;
-        thread.offchainVotingEndsAt = moment(
-          response.result.offchain_voting_ends_at
-        );
+        thread.offchainVotingEndsAt = response.result.offchain_voting_ends_at
+          ? moment(response.result.offchain_voting_ends_at)
+          : null;
       },
       error: (err) => {
         console.log('Failed to start polling');
@@ -607,8 +614,8 @@ class ThreadsController {
         chain: app.activeId(),
       },
     });
-    if (response.status !== 'Success') {
-      return 'false';
+    if (response.status === 'Failure') {
+      return null;
     }
     return response.result;
   }

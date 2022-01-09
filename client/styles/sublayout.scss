@@ -39,6 +39,33 @@
 .Sublayout {
     display: block;
 
+    &.Homepage {
+        .sublayout-main-col {
+            position: relative;
+            min-height: calc(100vh - 140px);
+            padding-bottom: 80px;
+            &.no-right-content {
+                width: 100%;
+                max-width: 100%;
+                padding: 0
+            }
+            display: flex;
+        }
+        .sublayout-grid {
+            position: relative;
+            min-height: calc(100vh - 150px);
+            max-width: 100%;
+            padding: 0 0;
+            @include xs-max {
+                padding: 0 0;
+            }
+            &.flex-center {
+                display: flex;
+                align-items: flex-start;
+            }
+        }
+    }
+
     .sublayout-grid {
         position: relative;
         display: flex;

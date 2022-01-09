@@ -18,9 +18,9 @@ const fetchThreadForSnapshot = async (models: DB, req: Request, res: Response, n
       snapshot_proposal: snapshot,
     }
   });
-  if (threads.length < 1) return res.json({ status: 'Failure', message: '' });
+  if (threads.length < 1) return res.json({ status: 'Failure' });
   
-  return res.json({ status: 'Success', result: threads.map((thread) => { return {id: thread.id, title: thread.title} }) });
+  return res.json({ status: 'Success', result: threads.map((thread) => { return { id: thread.id, title: thread.title } }) });
 };
 
 export default fetchThreadForSnapshot;

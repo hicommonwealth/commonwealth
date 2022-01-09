@@ -40,6 +40,7 @@ const bulkThreads = async (
   bind['created_at'] = cutoff_date;
 
   // Threads
+  // TODO: Transition latest_comm_created_at to use the thread last_commented_on column
   let threads;
   if (cutoff_date) {
     const query = `
@@ -47,7 +48,8 @@ const bulkThreads = async (
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_community, thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.snapshot_proposal,
-        threads.offchain_voting_options, threads.offchain_voting_votes, threads.offchain_voting_ends_at,
+        threads.offchain_voting_enabled, threads.offchain_voting_options, 
+        threads.offchain_voting_votes, threads.offchain_voting_ends_at,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
@@ -57,7 +59,7 @@ const bulkThreads = async (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, latest_comm_created_at,
           t.created_at AS thread_created, t.community AS thread_community,
           t.chain AS thread_chain, t.read_only, t.body,
-          t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
+          t.offchain_voting_enabled, t.offchain_voting_options, t.offchain_voting_votes, t.offchain_voting_ends_at,
           t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
@@ -121,7 +123,6 @@ const bulkThreads = async (
 
     const root_ids = [];
     threads = preprocessedThreads.map((t) => {
-      const { latest_comm_created_at } = t;
       const root_id = `discussion_${t.thread_id}`;
       root_ids.push(root_id);
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
@@ -152,10 +153,11 @@ const bulkThreads = async (
         linked_threads,
         chain_entities,
         snapshot_proposal: t.snapshot_proposal,
+        offchain_voting_enabled: t.offchain_voting_enabled,
         offchain_voting_options: t.offchain_voting_options,
         offchain_voting_votes: t.offchain_voting_votes,
         offchain_voting_ends_at: t.offchain_voting_ends_at,
-        latestCommCreatedAt: latest_comm_created_at,
+        last_commented_on: t.latest_comm_created_at,
         Address: {
           id: t.addr_id,
           address: t.addr_address,

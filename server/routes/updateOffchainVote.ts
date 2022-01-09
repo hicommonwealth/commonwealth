@@ -37,7 +37,7 @@ const updateOffchainVote = async (
   });
   if (!thread) return next(new Error(Errors.InvalidThread));
 
-  if (!thread.offchain_voting_ends_at || moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())) {
+  if (!thread.offchain_voting_ends_at && moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())) {
     return next(new Error(Errors.PollingClosed));
   }
 

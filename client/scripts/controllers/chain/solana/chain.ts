@@ -1,6 +1,7 @@
 import { ITXModalData, NodeInfo, IChainModule } from 'models';
 import { ApiStatus, IApp } from 'state';
 import m from 'mithril';
+import moment from 'moment';
 import BN from 'bn.js';
 import * as solw3 from '@solana/web3.js';
 
@@ -20,7 +21,6 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
 
   private _connection: solw3.Connection;
   public get connection() { return this._connection; }
-  private _blockSubscription: NodeJS.Timeout;
 
   constructor(app: IApp) {
     this._app = app;
@@ -41,38 +41,15 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
     // TODO: validate config here -- maybe we want ws?
     this._connection = new solw3.Connection(url, 'confirmed');
 
-    const SLOT_UPDATE_INTERVAL = 6000;
-    const updateSlot = async () => {
-      // slots are approx equal to block heights
-      const slot = await this._connection.getSlot();
-      const prevSlot = this.app.chain.block.height;
-      this.app.chain.block.height = slot;
-      if (prevSlot) {
-        // compute approx duration based on # of slots elapsed in update interval
-        const nSlotsElapsed = slot - prevSlot;
-        const msPerSlot = SLOT_UPDATE_INTERVAL / nSlotsElapsed;
-        this.app.chain.block.duration = msPerSlot / 1000;
-      }
-      m.redraw();
-    }
-
-    if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
-      this.app.chain.networkStatus = ApiStatus.Connecting;
-    }
-
-    // load current slot
-    await updateSlot();
+    // slots are approx equal to block heights
+    this.app.chain.block.height = await this._connection.getSlot();
+    this.app.chain.block.duration = await this._connection.getBlockTime(this.app.chain.block.height);
+    this.app.chain.block.lastTime = moment(); // approx hack to get current slot timestamp
     this.app.chain.networkStatus = ApiStatus.Connected;
-
-    // subscribe to new slots
-    this._blockSubscription = setInterval(updateSlot, SLOT_UPDATE_INTERVAL);
+    m.redraw();
   }
 
   public async deinit() {
-    if (this._connection && this._blockSubscription) {
-      clearInterval(this._blockSubscription);
-    }
-
     this.app.chain.networkStatus = ApiStatus.Disconnected;
     // no need to unsubscribe as it's HTTP RPC
     this._connection = null;

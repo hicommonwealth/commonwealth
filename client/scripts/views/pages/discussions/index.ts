@@ -64,6 +64,8 @@ const getLastSeenDivider = (hasText = true) => {
   );
 };
 
+const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
+
 export const CommunityOptionsPopover: m.Component<{}> = {
   view: (vnode) => {
     const isAdmin =
@@ -198,7 +200,8 @@ const DiscussionFilterBar: m.Component<
 
     const selectedStage = stages.find((s) => s === (stage as any));
 
-    const summaryViewEnabled = vnode.attrs.parentState.summaryView;
+    const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
+    const summaryViewEnabled = vnode.attrs.parentState.summaryView && !topicSelected;
 
     return m('.DiscussionFilterBar', [
       topics.length > 0 &&
@@ -391,8 +394,8 @@ const DiscussionFilterBar: m.Component<
 // comparator
 const orderDiscussionsbyLastComment = (a, b) => {
   // tslint:disable-next-line
-  const tsB = Math.max(+b.createdAt, +(b.latestCommCreatedAt || 0));
-  const tsA = Math.max(+a.createdAt, +(a.latestCommCreatedAt || 0));
+  const tsB = Math.max(+b.createdAt, +(b.lastCommentedOn || 0));
+  const tsA = Math.max(+a.createdAt, +(a.lastCommentedOn || 0));
   return tsB - tsA;
 };
 
@@ -409,7 +412,7 @@ const DiscussionsPage: m.Component<
     onscroll: any;
     summaryView: boolean;
     summaryViewInitialized: boolean;
-    recentThreads: { threads: OffchainThread[]; activitySummary };
+    recentThreads: OffchainThread[];
     loadingRecentThreads: boolean;
     activityFetched: boolean;
   }
@@ -422,7 +425,7 @@ const DiscussionsPage: m.Component<
 
     const returningFromThread =
       app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/proposal/discussion/');
+      app.lastNavigatedFrom().includes('/discussion/');
     if (
       returningFromThread &&
       localStorage[`${app.activeId()}-discussions-scrollY`]
@@ -451,7 +454,7 @@ const DiscussionsPage: m.Component<
       topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread =
       app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/proposal/discussion/');
+      app.lastNavigatedFrom().includes('/discussion/');
     vnode.state.lookback[subpage] =
       returningFromThread &&
       localStorage[`${app.activeId()}-lookback-${subpage}`]
@@ -464,6 +467,7 @@ const DiscussionsPage: m.Component<
   },
   view: (vnode) => {
     let { topic } = vnode.attrs;
+
     if (!app.community && !app.chain) return;
     if (!vnode.state.summaryViewInitialized) {
       if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
@@ -480,11 +484,14 @@ const DiscussionsPage: m.Component<
       }
       vnode.state.summaryViewInitialized = true;
     }
-    const { summaryView, recentThreads, lastSubpage } = vnode.state;
-    if (summaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
+    let { summaryView, recentThreads, lastSubpage } = vnode.state;
+    const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
+    const onSummaryView = summaryView && !topicSelected;
+
+    if (onSummaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
-        .getRecentCommunityActivity({
+        .getRecentTopicActivity({
           communityId: app.activeCommunityId(),
           chainId: app.activeChainId(),
         })
@@ -504,7 +511,7 @@ const DiscussionsPage: m.Component<
         showNewProposalButton: true,
       });
 
-    if (summaryView) {
+    if (onSummaryView) {
       // overwrite any topic- or stage-scoping in URL
       topic = null;
       stage = null;
@@ -780,7 +787,7 @@ const DiscussionsPage: m.Component<
                 disabled: isLoading || stillFetching,
               }),
             m('.listing-wrap', [
-              summaryView
+              onSummaryView
                 ? isLoading
                   ? m(LoadingRow)
                   : m(Listing, {

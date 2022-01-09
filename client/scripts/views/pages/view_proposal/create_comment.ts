@@ -218,9 +218,16 @@ const CreateComment: m.Component<{
             m('.token-requirement', [
               tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
                 ? [
-                  `Commenting in ${activeTopicName} requires `,
+                  `Commenting in "${activeTopicName}" requires `,
                   `${weiToTokens(tokenPostingThreshold.toString(), decimals)} `,
-                  `${app.chain.meta.chain.symbol}`
+                  `${app.chain.meta.chain.symbol}. `,
+                  !app.community
+                    && ITokenAdapter.instanceOf(app.chain)
+                    && app.chain.tokenBalance
+                    && app.user.activeAccount
+                    && `You have ${
+                      weiToTokens(app.chain.tokenBalance.toString(), decimals)
+                    } ${app.chain.meta.chain.symbol}.`
                 ]
                 : null
             ]),

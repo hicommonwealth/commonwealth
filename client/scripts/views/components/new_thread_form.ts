@@ -181,7 +181,7 @@ const newThread = async (
 
   await app.user.notifications.refresh();
 
-  navigateToSubpage(`/proposal/discussion/${result.id}`);
+  navigateToSubpage(`/discussion/${result.id}`);
 
   if (result.topic) {
     try {
@@ -520,7 +520,7 @@ export const NewThreadForm: m.Component<{
               active: postType === PostType.Link,
             }),
             m('.tab-spacer', { style: 'flex: 1' }),
-            isModal && m.route.get() !== `${app.activeId()}/new/thread` && m(TabItem, {
+            isModal && m.route.get() !== `${app.activeId()}/new/discussion` && m(TabItem, {
               class: 'tab-right',
               label: [
                 'Full editor',
@@ -529,7 +529,7 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 vnode.state.overwriteConfirmationModal = true;
                 localStorage.setItem(`${app.activeId()}-from-draft`, `${fromDraft}`);
-                navigateToSubpage('/new/thread');
+                navigateToSubpage('/new/discussion');
                 $(e.target).trigger('modalexit');
               },
             }),

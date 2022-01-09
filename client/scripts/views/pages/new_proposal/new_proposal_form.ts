@@ -322,7 +322,7 @@ const NewProposalForm = {
           deposit
         ).then((result) => {
           done(result);
-          navigateToSubpage(`/proposal/${ProposalType.CosmosProposal}/${result}`);
+          navigateToSubpage(`/proposal/${result}`);
         }).catch((err) => notifyError(err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.MolochProposal) {
@@ -366,8 +366,15 @@ const NewProposalForm = {
           calldatas.push(aaveProposal.calldata || '');
           signatures.push(aaveProposal.signature || '');
         }
+
+        // if they passed a title, use the JSON format for description.
+        // otherwise, keep description raw
+        let description = vnode.state.description;
+        if (vnode.state.title) {
+          description = JSON.stringify({ description: vnode.state.description, title: vnode.state.title });
+        }
         const details: CompoundProposalArgs = {
-          description: vnode.state.description,
+          description,
           targets,
           values,
           calldatas,
@@ -843,8 +850,20 @@ const NewProposalForm = {
               ]),
             ]),
             m(FormGroup, [
-              m(FormLabel, 'Proposal Description'),
+              m(FormLabel, 'Proposal Title (leave blank for no title)'),
               m(Input, {
+                name: 'title',
+                placeholder: 'Proposal Title',
+                oninput: (e) => {
+                  const result = (e.target as any).value;
+                  vnode.state.title = result;
+                  m.redraw();
+                },
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, 'Proposal Description'),
+              m(TextArea, {
                 name: 'description',
                 placeholder: 'Proposal Description',
                 oninput: (e) => {
