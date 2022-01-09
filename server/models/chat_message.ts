@@ -30,7 +30,7 @@ export default (
     chat_channel_id: { type: dataTypes.INTEGER, allowNull: false, references: { model: 'ChatChannel', key: 'id' } },
   }, {
     tableName: 'ChatMessages',
-    underscored: false,
+    underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     timestamps: true,
