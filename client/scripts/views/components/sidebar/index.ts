@@ -21,6 +21,12 @@ import CommunitySelector from 'views/components/sidebar/community_selector';
 
 import { DiscordIcon, TelegramIcon, ElementIcon, GithubIcon, WebsiteIcon } from '../component_kit/icons';
 import SidebarSection, { SectionGroupProps, SidebarSectionProps, SubSectionProps } from './sidebar_section';
+import { ConsoleLoggerImpl } from 'typescript-logging';
+
+// Check that our current cached tree is structurally correct
+const verifyExistingToggleTree = (tree: string) => {
+  return true
+}
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -625,17 +631,185 @@ const oldSidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }
 const GovernanceSection: m.Component<{}, {}> = {
   view: (vnode) => {
 
+    // Conditional Render Details
+    const hasProposals = app.chain && !app.community && (
+      app.chain.base === ChainBase.CosmosSDK
+        || app.chain.network === ChainNetwork.Sputnik
+        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
+        || app.chain.network === ChainNetwork.Moloch
+        || app.chain.network === ChainNetwork.Compound
+        || app.chain.network === ChainNetwork.Aave
+        || app.chain.network === ChainNetwork.Commonwealth
+        || app.chain.meta.chain.snapshot);
+    if (!hasProposals) return;
+
+    const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
+    const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
+    const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
+    const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
+    const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
+    const showSnapshotOptions = app.chain?.meta.chain.snapshot.length > 0;
+    const showReferenda = !app.community && app.chain?.base === ChainBase.Substrate
+                            && app.chain.network !== ChainNetwork.Darwinia
+                            && app.chain.network !== ChainNetwork.HydraDX;
+    const showProposals = !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
+                            || app.chain?.base === ChainBase.CosmosSDK
+                            || app.chain?.network === ChainNetwork.Sputnik
+                            || app.chain?.network === ChainNetwork.Moloch
+                            || app.chain?.network === ChainNetwork.Compound
+                            || app.chain?.network === ChainNetwork.Aave)      
+    const showCouncillors = !app.community && app.chain?.base === ChainBase.Substrate;
+    const showTreasury = !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge;
+    const showBounties = !app.community && app.chain?.base === ChainBase.Substrate
+                            && app.chain.network !== ChainNetwork.Centrifuge
+                            && app.chain.network !== ChainNetwork.HydraDX;
+    const showTips =  !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge;
+    const showValidators =  !app.community && app.chain?.base === ChainBase.Substrate
+                              && app.chain?.network !== ChainNetwork.Kulupu && app.chain?.network !== ChainNetwork.Darwinia;
+    
+    
+
+    // ---------- Build Toggle Tree ---------- //
+    let governance_default_toggle_tree = {
+      'Members': {
+        toggled_state: true,
+        children: {}
+      },
+      ...(showSnapshotOptions) && {
+        'Snapshots': {
+          toggled_state: true,
+          children: {}
+        }
+      },
+      ...(showReferenda || showProposals || showCouncillors) && {
+        'Referenda': {
+          toggled_state: true,
+          children: {
+            ...(showReferenda) && {
+              'Referenda': {
+                toggled_state: true
+              }
+            },
+            ...(showProposals) && {
+              'Proposals': {
+                toggled_state: true
+              }
+            },
+            ...(showCouncillors) && {
+              'Councillors': {
+                toggled_state: true
+              }
+            }
+          }
+        }
+      },
+      ...(showValidators) && {
+        'Validators': {
+          toggled_state: true,
+          children: {}
+        }
+      },
+      ...(showCompoundOptions) && {
+        'Delegate': {
+          toggled_state: true,
+          children: {}
+        }
+      },
+      ...(showTreasury || showBounties || showTips) && {
+        'Treasury': {
+          toggled_state: true,
+          children: {
+            ...(showTreasury) && {
+              'Treasury': {
+                toggled_state: true
+              }
+            },
+            ...(showBounties) && {
+              'Bounties': {
+                toggled_state: true
+              }
+            },
+            ...(showTips) && {
+              'Tips': {
+                toggled_state: true
+              }
+            }
+          }
+        }
+      },
+      ...(showMolochMemberOptions) && {
+        'Moloch': {
+          toggled_state: true,
+          children: {
+            'New-Proposal': {
+              toggled_state: true
+            },
+            'Update-Delegate-Key': {
+              toggled_state: true
+            },
+            'Rage-Quit': {
+              toggled_state: true
+            }
+          }
+        }
+      },
+      ...(showCommonwealthMenuOptions) && {
+        'Commonwealth': {
+          toggled_state: true,
+          children: {
+            'Projects': {
+              toggled_state: true
+            },
+            'Collectives': {
+              toggled_state: true
+            },
+          }
+        }
+      },
+    }
+
+    // Check if an existing toggle tree is stored
+    if (!localStorage[`${app.activeId()}-governance-toggle-tree`]) {
+      console.log("setting toggle tree")
+      localStorage[`${app.activeId()}-governance-toggle-tree`] = JSON.stringify(governance_default_toggle_tree);
+    }
+
+    const toggle_state = JSON.parse(localStorage[`${app.activeId()}-governance-toggle-tree`])
+
+    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot`);
+    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot/`);
+
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyProposal}`));
+    const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyReferendum}`);
+
+    const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryProposal}`);
+    const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
+    const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`);
+
+    const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
+    const onMotionPage = (p) => (
+      p.startsWith(`/${app.activeChainId()}/motions`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateCollectiveProposal}`));
+
+    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    const onNotificationsPage = (p) => p.startsWith('/notifications');
+    if (onNotificationsPage(m.route.get())) return;
+
+
+    // ---------- Build Section Props ---------- //
 
     const referenda_section_data: SubSectionProps[] = [
       {
         title: 'Proposals',
-        onclick: () => navigateToSubpage('/proposals'),
+        onclick: (e) => {e.preventDefault(); navigateToSubpage('/proposals')},
         is_visible: true,
-        is_active: onProposalPage(m.route.get()),
-        row_icon: true
+        is_active: true,
+        row_icon: false
       },
       {
         title: 'Councilors',
@@ -649,20 +823,36 @@ const GovernanceSection: m.Component<{}, {}> = {
     const governance_group_data: SectionGroupProps[] = [{
       title: 'Referenda',
       contains_children: true,
-      default_active: false,
+      default_active: true,
       is_visible: true,
       is_active: true,
       onclick: () => console.log("click 2"),
       display_data: referenda_section_data
-    }]
+    },
+    {
+      title: 'Members',
+      contains_children: false,
+      default_active: true,
+      is_visible: true,
+      is_active: true,
+      onclick: () => navigateToSubpage('/members'),
+      display_data: referenda_section_data
+    }
+    ]
 
+    let sidebar_section_toggled = true;
     const sidebar_section_data: SidebarSectionProps = {
       title: 'GOVERNANCE',
-      default_active: true,
-      onclick: () => console.log('clicked!'),
+      default_active: false,
+      onclick: (open_state: boolean) => sidebar_section_toggled = open_state,
       display_data: governance_group_data,
-      is_active: true
+      is_active: sidebar_section_toggled
 
+    }
+
+    if (!localStorage[`${app.activeId()}-toggle-tree`] || !verifyExistingToggleTree(localStorage[`${app.activeId()}-toggle-tree`])) {
+      console.log("togglie!")
+      // Build toggle tree for first time
     }
 
     return m(SidebarSection, {...sidebar_section_data});
@@ -673,10 +863,11 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
   view: (vnode) => {
     const { useQuickSwitcher } = vnode.attrs;
 
+    
+
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
       !useQuickSwitcher && (app.chain || app.community) && m('.Sidebar', [
-        m(GovernanceSection),
         m(GovernanceSection),
         m('br'),
         app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),

@@ -17,6 +17,7 @@ import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { CommunityOptionsPopover } from './pages/discussions';
 import { ButtonIntent, FaceliftButton, FaceliftGradientButton, GradientType } from 'views/components/component_kit/buttons';
+import { ConsoleLoggerImpl } from 'typescript-logging';
 
 const Sublayout: m.Component<{
   // overrides
@@ -145,8 +146,6 @@ const Sublayout: m.Component<{
 
     const tosStatus = localStorage.getItem(`${app.activeId()}-tos`);
     const sidebarOpen = (app.chain !== null || app.community !== null);
-
-    console.log("SidebarOpen: ", sidebarOpen)
 
     return [
       m('.layout-container', [

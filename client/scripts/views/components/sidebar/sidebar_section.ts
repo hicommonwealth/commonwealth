@@ -1,6 +1,7 @@
 import { Icon, Icons } from 'construct-ui';
 import { isValueNode } from 'graphql';
 import m from 'mithril';
+import { ConsoleLoggerImpl } from 'typescript-logging';
 
 
 export interface SubSectionProps {
@@ -41,7 +42,8 @@ const SubSection: m.Component<SubSectionProps, {text_color: string}> = {
         }
 
         const click_handler = (e) => {
-            onclick();
+            onclick(e);
+            console.log(e);
             //
         }
 
@@ -69,7 +71,7 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean}> = {
         }
 
         const click_handler = (e) => {
-            onclick();
+            onclick(e);
             vnode.state.toggled = !toggled;
         }
 
@@ -101,15 +103,18 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
         vnode.state.toggled = vnode.attrs.default_active;
         vnode.state.hover_color = 'none';
     },
+    onupdate: (vnode) => {
+        vnode.state.toggled = vnode.attrs.is_active;
+    },
     view: (vnode) => {
 
         const {title, onclick, onhover, display_data} = vnode.attrs;
         const {toggled, hover_color} = vnode.state;
 
         const click_handler = (e) => {
-            onclick();
-            //
+            
             vnode.state.toggled = !toggled;
+            onclick(vnode.state.toggled);
         }
 
         const mouse_enter_handler = (e) => {

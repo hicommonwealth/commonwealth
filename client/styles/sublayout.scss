@@ -148,13 +148,13 @@
         position: sticky;
         top: 0;
         z-index: 10;
-        background: $layout-color;
         @include sm-max {
             display: none;
         }
         margin: 0 auto;
         border-bottom: 1px solid $disable-grey;
-        padding: 18px 0 16px;
+        background-color: white;
+        padding: 24px 0 22px;
         padding-right: 20px;
         @include md-max {
             @include narrowBrowserHeader();
