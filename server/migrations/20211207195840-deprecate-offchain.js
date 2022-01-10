@@ -120,6 +120,21 @@ module.exports = {
       }
     }
 
+    const removeGhostRoles = async (t) => {
+      await queryInterface.sequelize.query(`
+        delete from "Roles" where id in 
+        (
+        SELECT roles.id
+        FROM "Roles" roles
+        LEFT JOIN "OffchainCommunities" ofc ON roles.offchain_community_id = ofc.id
+        LEFT JOIN "Addresses" addr ON roles.address_id = addr.id
+        WHERE addr.chain != ofc.default_chain
+        )
+      `,
+        { transaction: t }
+      )
+    }
+
     /**
      * Remove offchain community and its dependent tables
      */
@@ -401,6 +416,9 @@ module.exports = {
     }
 
     return queryInterface.sequelize.transaction(async (t) => {
+      // Remove ghost roles
+      await removeGhostRoles(t)
+
       // Port over offchains to chain
       for (let i = 0; i < offChainCommunities.length; i++) {
         await fromOffchainToChain(t, offChainCommunities[i])
