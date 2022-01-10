@@ -122,7 +122,7 @@ module.exports = {
 
     const removeGhostRoles = async (t) => {
       await queryInterface.sequelize.query(`
-        delete from "Roles" where id in 
+        DELETE FROM "Roles" WHERE id IN 
         (
         SELECT roles.id
         FROM "Roles" roles
