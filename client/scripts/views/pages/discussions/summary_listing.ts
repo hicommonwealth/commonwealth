@@ -8,6 +8,19 @@ import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { getLastUpdated, isHot } from './discussion_row';
 
+const getThreadCells = (sortedThreads: OffchainThread[]) => {
+  return sortedThreads.slice(0, 3).map((thread) => {
+    const discussionLink = getProposalUrlPath(thread.slug, `${thread.identifier}-${slugify(thread.title)}`);
+    return m('.thread-summary', [
+      link('a.thread-title', discussionLink, thread.title),
+      m('.last-updated', [
+        m('span', formatLastUpdated(getLastUpdated(thread))),
+        isHot(thread) && m('span', '🔥'),
+      ])
+    ]);
+  })
+}
+
 const SummaryRow: m.Component<
   {
     topic: OffchainTopic;
@@ -38,19 +51,7 @@ const SummaryRow: m.Component<
           m('p', topic.description)
         ]),
         m('h4.recent-thread-header', 'Recent threads'),
-        m(
-          '.recent-thread-cell',
-          sortedThreads.slice(0, 3).map((thread) => {
-            const discussionLink = getProposalUrlPath(thread.slug, `${thread.identifier}-${slugify(thread.title)}`);
-            return m('.thread-summary', [
-              link('a.thread-title', discussionLink, thread.title),
-              m('.last-updated', [
-                m('span', formatLastUpdated(getLastUpdated(thread))),
-                isHot(thread) && m('span', '🔥'),
-              ])
-            ]);
-          })
-        ),
+        m('.recent-thread-cell', getThreadCells(sortedThreads)),
       ]
       : [
         m('.topic-cell', [
@@ -62,19 +63,7 @@ const SummaryRow: m.Component<
           }, topic.name),
           m('p', topic.description)
         ]),
-        m(
-          '.recent-thread-cell',
-          sortedThreads.slice(0, 3).map((thread) => {
-            const discussionLink = getProposalUrlPath(thread.slug, `${thread.identifier}-${slugify(thread.title)}`);
-            return m('.thread-summary', [
-              link('a.thread-title', discussionLink, thread.title),
-              m('.last-updated', [
-                m('span', formatLastUpdated(getLastUpdated(thread))),
-                isHot(thread) && m('span', '🔥'),
-              ])
-            ]);
-          })
-        ),
+        m('.recent-thread-cell', getThreadCells(sortedThreads)),
       ]
     );
   },
