@@ -332,23 +332,48 @@ export default (
       // ethereum address handling
       //
 
-      const msgBuffer = Buffer.from(addressModel.verification_token.trim());
-      const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-      const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
-      const publicKey = ethUtil.ecrecover(
-        msgHash,
-        ethSignatureParams.v,
-        ethSignatureParams.r,
-        ethSignatureParams.s,
-      );
-      const addressBuffer = ethUtil.publicToAddress(publicKey);
-      const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
-      try {
+      const verifyWithEcrecover = (): boolean => {
+        const msgBuffer = Buffer.from(addressModel.verification_token.trim());
+        const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
+        const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
+        const publicKey = ethUtil.ecrecover(
+          msgHash,
+          ethSignatureParams.v,
+          ethSignatureParams.r,
+          ethSignatureParams.s,
+        );
+        const addressBuffer = ethUtil.publicToAddress(publicKey);
+        const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
         const address = Web3.utils.toChecksumAddress(lowercaseAddress);
-        isValid = (addressModel.address === address);
+        return (addressModel.address === address);
+      }
+
+      const verifyWithIsValidSignature = (): boolean => {
+        const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
+        return ethUtil.isValidSignature(
+          ethSignatureParams.v,
+          ethSignatureParams.r,
+          ethSignatureParams.s,
+        );
+      }
+
+      try {
+        log.trace('Attempting ECRecover validation.');
+        isValid = verifyWithEcrecover();
       } catch (e) {
+        log.trace(e.message);
         isValid = false;
       }
+      log.trace('ECRecover validation failed. Attempting IsValidSignature.');
+      if (!isValid) {
+        try {
+          isValid = verifyWithIsValidSignature();
+        } catch (e) {
+          log.trace(e.message);
+          isValid = false;
+        }
+      }
+      log.trace(`Final validation result: ${isValid}`);
     } else if (chain.base === ChainBase.NEAR) {
       //
       // near address handling
