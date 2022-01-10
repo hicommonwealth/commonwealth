@@ -61,43 +61,33 @@
         flex-direction: column;
     }
 
-    @include lg-min {
-        .topic-header, .topic-cell {
-            flex: 385;
-            margin-right: 50px;
+    .topic-header, .topic-cell {
+        flex: 385;
+    }
+    .recent-thread-header, .recent-thread-cell {
+        flex: 430;
+        .thread-title {
+            flex: 335;
         }
-        .recent-thread-header, .recent-thread-cell {
-            flex: 430;
-            .thread-title {
-                flex: 335;
-                margin-right: 50px;
-            }
-            .last-updated {
-                flex: 95;
-                width: auto;
-                // implement with "last commenter" icon
-                // margin-right: 25px;
-            }
+        .last-updated {
+            flex: 95;
+            width: auto;
+            // implement with "last commenter" icon
+            // margin-right: 25px;
         }
     }
 
     @include lg-min {
-        .topic-header, .topic-cell {
-            flex: 385;
-            margin-right: 40px;
+        .topic-header, .topic-cell,
+        .recent-thread-header, .thread-title {
+            margin-right: 50px;
         }
-        .recent-thread-header, .recent-thread-cell {
-            flex: 430;
-            .thread-title {
-                flex: 335;
-                margin-right: 40px;
-            }
-            .last-updated {
-                flex: 95;
-                width: auto;
-                // implement with "last commenter" icon
-                // margin-right: 25px;
-            }
+    }
+
+    @include lg-min {
+        .topic-header, .topic-cell,
+        .recent-thread-header, .thread-title {
+            margin-right: 40px;
         }
     }
     
