@@ -16,7 +16,7 @@ export interface SubSectionProps {
 export interface SectionGroupProps {
     title: string;
     contains_children: boolean;
-    default_active: boolean;
+    default_toggle: boolean;
     is_visible: boolean;
     is_active: boolean;
     onclick: Function;
@@ -26,7 +26,7 @@ export interface SectionGroupProps {
 
 export interface SidebarSectionProps {
     title: string;
-    default_active: boolean;
+    default_toggle: boolean;
     is_active: boolean;
     onclick: Function;
     onhover?: Function;
@@ -59,7 +59,7 @@ const SubSection: m.Component<SubSectionProps, {text_color: string}> = {
 
 const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean}> = {
     oninit: (vnode) => {
-        vnode.state.toggled = vnode.attrs.default_active;
+        vnode.state.toggled = vnode.attrs.default_toggle;
     },
     view: (vnode) => {
 
@@ -71,8 +71,8 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean}> = {
         }
 
         const click_handler = (e) => {
-            onclick(e);
             vnode.state.toggled = !toggled;
+            onclick(e, vnode.state.toggled);
         }
 
         
@@ -100,11 +100,8 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean}> = {
 
 const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_color: string}> = {
     oninit: (vnode) => {
-        vnode.state.toggled = vnode.attrs.default_active;
+        vnode.state.toggled = vnode.attrs.default_toggle;
         vnode.state.hover_color = 'none';
-    },
-    onupdate: (vnode) => {
-        vnode.state.toggled = vnode.attrs.is_active;
     },
     view: (vnode) => {
 
@@ -112,9 +109,8 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
         const {toggled, hover_color} = vnode.state;
 
         const click_handler = (e) => {
-            
             vnode.state.toggled = !toggled;
-            onclick(vnode.state.toggled);
+            onclick(e, vnode.state.toggled);
         }
 
         const mouse_enter_handler = (e) => {

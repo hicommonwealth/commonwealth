@@ -5,7 +5,7 @@ import _ from 'lodash';
 import {
   Button, PopoverMenu, MenuItem, Icon, Icons, Tooltip
 } from 'construct-ui';
-
+import produce from 'immer';
 import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'types';
@@ -671,101 +671,104 @@ const GovernanceSection: m.Component<{}, {}> = {
 
     // ---------- Build Toggle Tree ---------- //
     let governance_default_toggle_tree = {
-      'Members': {
-        toggled_state: true,
-        children: {}
-      },
-      ...(showSnapshotOptions) && {
-        'Snapshots': {
+      toggled_state: true,
+      children: {
+        'Members': {
           toggled_state: true,
           children: {}
-        }
-      },
-      ...(showReferenda || showProposals || showCouncillors) && {
-        'Referenda': {
-          toggled_state: true,
-          children: {
-            ...(showReferenda) && {
-              'Referenda': {
-                toggled_state: true
+        },
+        ...(showSnapshotOptions) && {
+          'Snapshots': {
+            toggled_state: true,
+            children: {}
+          }
+        },
+        ...(showReferenda || showProposals || showCouncillors) && {
+          'Referenda': {
+            toggled_state: true,
+            children: {
+              ...(showReferenda) && {
+                'Referenda': {
+                  toggled_state: true
+                }
+              },
+              ...(showProposals) && {
+                'Proposals': {
+                  toggled_state: true
+                }
+              },
+              ...(showCouncillors) && {
+                'Councillors': {
+                  toggled_state: true
+                }
               }
-            },
-            ...(showProposals) && {
-              'Proposals': {
-                toggled_state: true
+            }
+          }
+        },
+        ...(showValidators) && {
+          'Validators': {
+            toggled_state: true,
+            children: {}
+          }
+        },
+        ...(showCompoundOptions) && {
+          'Delegate': {
+            toggled_state: true,
+            children: {}
+          }
+        },
+        ...(showTreasury || showBounties || showTips) && {
+          'Treasury': {
+            toggled_state: true,
+            children: {
+              ...(showTreasury) && {
+                'Treasury': {
+                  toggled_state: true
+                }
+              },
+              ...(showBounties) && {
+                'Bounties': {
+                  toggled_state: true
+                }
+              },
+              ...(showTips) && {
+                'Tips': {
+                  toggled_state: true
+                }
               }
-            },
-            ...(showCouncillors) && {
-              'Councillors': {
+            }
+          }
+        },
+        ...(showMolochMemberOptions) && {
+          'Moloch': {
+            toggled_state: true,
+            children: {
+              'New-Proposal': {
+                toggled_state: true
+              },
+              'Update-Delegate-Key': {
+                toggled_state: true
+              },
+              'Rage-Quit': {
                 toggled_state: true
               }
             }
           }
-        }
-      },
-      ...(showValidators) && {
-        'Validators': {
-          toggled_state: true,
-          children: {}
-        }
-      },
-      ...(showCompoundOptions) && {
-        'Delegate': {
-          toggled_state: true,
-          children: {}
-        }
-      },
-      ...(showTreasury || showBounties || showTips) && {
-        'Treasury': {
-          toggled_state: true,
-          children: {
-            ...(showTreasury) && {
-              'Treasury': {
+        },
+        ...(showCommonwealthMenuOptions) && {
+          'Commonwealth': {
+            toggled_state: true,
+            children: {
+              'Projects': {
                 toggled_state: true
-              }
-            },
-            ...(showBounties) && {
-              'Bounties': {
+              },
+              'Collectives': {
                 toggled_state: true
-              }
-            },
-            ...(showTips) && {
-              'Tips': {
-                toggled_state: true
-              }
+              },
             }
           }
-        }
-      },
-      ...(showMolochMemberOptions) && {
-        'Moloch': {
-          toggled_state: true,
-          children: {
-            'New-Proposal': {
-              toggled_state: true
-            },
-            'Update-Delegate-Key': {
-              toggled_state: true
-            },
-            'Rage-Quit': {
-              toggled_state: true
-            }
-          }
-        }
-      },
-      ...(showCommonwealthMenuOptions) && {
-        'Commonwealth': {
-          toggled_state: true,
-          children: {
-            'Projects': {
-              toggled_state: true
-            },
-            'Collectives': {
-              toggled_state: true
-            },
-          }
-        }
-      },
+        },
+      }
     }
 
     // Check if an existing toggle tree is stored
@@ -774,7 +777,9 @@ const GovernanceSection: m.Component<{}, {}> = {
       localStorage[`${app.activeId()}-governance-toggle-tree`] = JSON.stringify(governance_default_toggle_tree);
     }
 
-    const toggle_state = JSON.parse(localStorage[`${app.activeId()}-governance-toggle-tree`])
+    const toggle_tree_state = JSON.parse(localStorage[`${app.activeId()}-governance-toggle-tree`])
+    console.log(toggle_tree_state)
+    
 
     const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot`);
     const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot/`);
@@ -790,73 +795,303 @@ const GovernanceSection: m.Component<{}, {}> = {
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
     const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
       || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`);
-
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onMotionPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/motions`)
         || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateCollectiveProposal}`));
-
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
+    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
+    || p.startsWith(`/${app.activeId()}/account/`);
+
     if (onNotificationsPage(m.route.get())) return;
 
 
     // ---------- Build Section Props ---------- //
 
+    // Members
+    const members_data: SectionGroupProps = {
+      title: 'Members',
+      contains_children: false,
+      default_toggle: toggle_tree_state['children']['Members']['toggled_state'],
+      is_visible: true,
+      is_active: onMembersPage(m.route.get())
+      && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setGovernanceToggleTree('children.Members.toggled_state', toggle)
+        navigateToSubpage('/members')
+      },
+      display_data: null
+    }
+
+    // Snapshots
+    const snapshot_data: SectionGroupProps = {
+      title: 'Snapshots',
+      contains_children: false,
+      default_toggle: showSnapshotOptions ? toggle_tree_state['children']['Snapshots']['toggled_state'] : false,
+      is_visible: showSnapshotOptions,
+      is_active: onSnapshotProposal(m.route.get()),
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setGovernanceToggleTree('children.Snapshots.toggled_state', toggle)
+        // Check if we have multiple snapshots for conditional redirect
+        const snapshotSpaces = app.chain.meta.chain.snapshot;
+        if (snapshotSpaces.length > 1) {
+          navigateToSubpage('/multiple-snapshots', {action: 'select-space'});
+        } else {
+          navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+        }
+      },
+      display_data: null
+    }
+
+    // Referenda
     const referenda_section_data: SubSectionProps[] = [
       {
-        title: 'Proposals',
-        onclick: (e) => {e.preventDefault(); navigateToSubpage('/proposals')},
-        is_visible: true,
-        is_active: true,
+        title: 'Referenda',
+        onclick: (e) => {
+          e.preventDefault(); 
+          navigateToSubpage('/referenda');
+        },
+        is_visible: showReferenda,
+        is_active: onReferendaPage(m.route.get()),
         row_icon: false
       },
       {
-        title: 'Councilors',
-        onclick: () => console.log("yoo"),
-        is_visible: true,
+        title: 'Proposals',
+        onclick: (e) => {
+          e.preventDefault(); 
+          navigateToSubpage('/referenda');
+        },
+        is_visible: showProposals,
+        is_active: onProposalPage(m.route.get()),
+        row_icon: false
+      },
+      {
+        title: 'Councillors',
+        onclick: (e) => {
+          e.preventDefault(); 
+          navigateToSubpage('/council');
+        },
+        is_visible: showCouncillors,
+        is_active: onCouncilPage(m.route.get()),
+        row_icon: false
+      }
+    ]
+
+    const referenda_data: SectionGroupProps = {
+      title: 'Referenda',
+      contains_children: true,
+      default_toggle: (showReferenda || showProposals || showCouncillors) ? toggle_tree_state['children']['Referenda']['toggled_state'] : false,
+      is_visible: showReferenda || showProposals || showCouncillors,
+      is_active: showReferenda || showProposals || showCouncillors,
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setGovernanceToggleTree('children.Referenda.toggled_state', toggle)
+      },
+      display_data: referenda_section_data
+    }
+
+    // Delegate
+    const delegate_data: SectionGroupProps = {
+      title: 'Delegate',
+      contains_children: false,
+      default_toggle: showCompoundOptions ? toggle_tree_state['children']['Delegate']['toggled_state'] : false,
+      is_visible: showCompoundOptions,
+      is_active: m.route.get() === `/${app.activeChainId()}/delegate`,
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setGovernanceToggleTree('children.Delegate.toggled_state', toggle)
+        navigateToSubpage('/delegate')
+      },
+      display_data: null
+    }
+
+    // Treasury
+    const treasury_section_data: SubSectionProps[] = [
+      {
+        title: 'Treasury',
+        onclick: (e) => {
+          e.preventDefault(); 
+          navigateToSubpage('/treasury');
+        },
+        is_visible: showTreasury,
+        is_active: onTreasuryPage(m.route.get()),
+        row_icon: false
+      },
+      {
+        title: 'Bounties',
+        onclick: (e) => {
+          e.preventDefault(); 
+          navigateToSubpage('/bounties');
+        },
+        is_visible: showBounties,
+        is_active: onBountiesPage(m.route.get()),
+        row_icon: false
+      },
+      {
+        title: 'Tips',
+        onclick: (e) => {
+          e.preventDefault(); 
+          navigateToSubpage('/tips');
+        },
+        is_visible: showTips,
+        is_active: onTipsPage(m.route.get()),
+        row_icon: false
+      }
+    ]
+
+    const treasury_data: SectionGroupProps = {
+      title: 'Treasury',
+      contains_children: true,
+      default_toggle: (showTreasury || showBounties || showTips) ? toggle_tree_state['children']['Treasury']['toggled_state'] : false, 
+      is_visible: showTreasury || showBounties || showTips,
+      is_active: showTreasury || showBounties || showTips,
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setGovernanceToggleTree('children.Treasury.toggled_state', toggle)
+      },
+      display_data: treasury_section_data
+    }
+
+    // Validators
+    const validators_data: SectionGroupProps = {
+      title: 'Validators',
+      contains_children: false,
+      default_toggle: showValidators ? toggle_tree_state['children']['Validators']['toggled_state'] : false,
+      is_visible: showValidators,
+      is_active: onValidatorsPage(m.route.get()),
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setGovernanceToggleTree('children.Validators.toggled_state', toggle)
+        navigateToSubpage('/validators')
+      },
+      display_data: null
+    }
+
+    // Moloch
+    const moloch_section_data: SubSectionProps[] = [
+      {
+        title: 'New Proposal',
+        onclick: (e) => {
+          e.preventDefault(); 
+          navigateToSubpage('/new/proposal/:type', { type: ProposalType.MolochProposal });
+        },
+        is_visible: showMolochMemberOptions,
+        is_active: m.route.get() === `/${app.activeChainId()}/new/proposal`, // TODO: Verify this works (and the other two)
+        row_icon: false
+      },
+      {
+        title: 'Update Delegate Key',
+        onclick: (e) => {
+          e.preventDefault(); 
+          app.modals.lazyCreate('update_delegate_modal', {
+            account: app.user.activeAccount,
+            delegateKey: (app.user.activeAccount as any).delegateKey,
+          });
+        },
+        is_visible: showMolochMemberOptions,
+        is_active: false,
+        row_icon: false
+      },
+      {
+        title: 'Rage Quit',
+        onclick: (e) => {
+          e.preventDefault(); 
+          app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
+        },
+        is_visible: showMolochMemberOptions,
         is_active: false,
         row_icon: false
       }
     ]
-    
-    const governance_group_data: SectionGroupProps[] = [{
-      title: 'Referenda',
+
+    const moloch_data: SectionGroupProps = {
+      title: 'Moloch',
       contains_children: true,
-      default_active: true,
-      is_visible: true,
-      is_active: true,
-      onclick: () => console.log("click 2"),
-      display_data: referenda_section_data
-    },
-    {
-      title: 'Members',
-      contains_children: false,
-      default_active: true,
-      is_visible: true,
-      is_active: true,
-      onclick: () => navigateToSubpage('/members'),
-      display_data: referenda_section_data
+      default_toggle: showMolochMemberOptions ? toggle_tree_state['children']['Moloch']['toggled_state'] : false,
+      is_visible: showMolochMemberOptions,
+      is_active: showMolochMemberOptions,
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setGovernanceToggleTree('children.Moloch.toggled_state', toggle)
+      },
+      display_data: moloch_section_data
     }
+
+    // Commonwealth
+    const commonwealth_section_data: SubSectionProps[] = [
+      {
+        title: 'Projects',
+        onclick: (e) => {
+          e.preventDefault(); 
+          navigateToSubpage('/projects');
+        },
+        is_visible: showCommonwealthMenuOptions,
+        is_active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
+        row_icon: false
+      },
+      {
+        title: 'Collectives',
+        onclick: (e) => {
+          e.preventDefault(); 
+          navigateToSubpage('/collectives');
+        },
+        is_visible: showCommonwealthMenuOptions,
+        is_active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
+        row_icon: false
+      },
     ]
 
-    let sidebar_section_toggled = true;
+    const commonwealth_data: SectionGroupProps = {
+      title: 'Commonwealth',
+      contains_children: true,
+      default_toggle: showCommonwealthMenuOptions ? toggle_tree_state['children']['Commonwealth']['toggled_state'] : false,
+      is_visible: showCommonwealthMenuOptions,
+      is_active: showCommonwealthMenuOptions,
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setGovernanceToggleTree('children.Commonwealth.toggled_state', toggle)
+      },
+      display_data: commonwealth_section_data
+    }
+  
+    const governance_group_data: SectionGroupProps[] = [members_data, snapshot_data, referenda_data, delegate_data, treasury_data,
+                                                          validators_data, moloch_data, commonwealth_data]
+
     const sidebar_section_data: SidebarSectionProps = {
       title: 'GOVERNANCE',
-      default_active: false,
-      onclick: (open_state: boolean) => sidebar_section_toggled = open_state,
+      default_toggle: toggle_tree_state['toggled_state'],
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setGovernanceToggleTree('toggled_state', toggle)
+      },
       display_data: governance_group_data,
-      is_active: sidebar_section_toggled
-
-    }
-
-    if (!localStorage[`${app.activeId()}-toggle-tree`] || !verifyExistingToggleTree(localStorage[`${app.activeId()}-toggle-tree`])) {
-      console.log("togglie!")
-      // Build toggle tree for first time
+      is_active: true
     }
 
     return m(SidebarSection, {...sidebar_section_data});
   }
+}
+
+
+function setGovernanceToggleTree(path: string, toggle: boolean) {
+  let current_tree = JSON.parse(localStorage[`${app.activeId()}-governance-toggle-tree`]);
+  const new_tree = produce(current_tree, (draft) => {
+    let cur_obj = draft;
+    const split = path.split('.');
+    for (const field of split.slice(0, split.length-1)) {
+      if (cur_obj.hasOwnProperty(field)) {
+        cur_obj = cur_obj[field];
+      } else {
+        return;
+      }
+    }
+    cur_obj[split[split.length-1]] = toggle;
+  })
+
+  localStorage[`${app.activeId()}-governance-toggle-tree`] = JSON.stringify(new_tree);
 }
 
 const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
