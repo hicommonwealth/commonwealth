@@ -16,7 +16,7 @@ const offChainCommunities = [
   'debt-dao', // ethereum
   'digm-dao', // ethereum
   'usemate', // ethereum
-  'qnt-dao', // TODO: Change default_chain to Ethereum or... currently "Quant" WHICH IS BAD
+  'qnt-dao', // ethereum
   'knoxedge', // ethereum
   'pfeilstorch', // edgeware
   'new-order-dao' // ethereum
