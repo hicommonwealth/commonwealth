@@ -1,13 +1,12 @@
 import 'pages/landing/community_cards.scss';
 import m from 'mithril';
-import { Button, Icon, Icons, Card, Tag } from 'construct-ui';
+import { Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
-import { NodeInfo, CommunityInfo, AddressInfo } from 'models';
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { NodeInfo, CommunityInfo } from 'models';
+import numeral from 'numeral';
 import { FaceliftCard } from '../../components/component_kit/cards';
 import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
-var numeral = require('numeral');
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -26,8 +25,8 @@ const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
   if (numCommunities >= 1000) {
     numberString = numeral(numCommunities).format('0.0a');
-  } 
-  return numberString + ' Communities'; 
+  }
+  return `${numberString  } Communities`;
 }
 
 const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
@@ -48,7 +47,9 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
     // Potentially Temporary (could be built into create community flow)
     let pretty_description = '';
     if (chainInfo.description) {
-      pretty_description = chainInfo.description[chainInfo.description.length-1] === '.' ? chainInfo.description : chainInfo.description + '.';
+      pretty_description = chainInfo.description[chainInfo.description.length-1] === '.'
+        ? chainInfo.description
+        : `${chainInfo.description  }.`;
     }
 
     const iconUrl = nodeList[0].chain.iconUrl || (nodeList[0].chain as any).icon_url;
@@ -58,7 +59,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
       interactive: true,
       class_name: '.chain-card',
       onclick: redirectFunction
-    }, [    
+    }, [
       m('.card-header', [
         iconUrl ? m('img.chain-icon', {
           src: iconUrl,
@@ -75,7 +76,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
             onclick: redirectFunction
           }),
         ])
-      ]), 
+      ]),
     ]);
   }
 };
@@ -96,23 +97,30 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
 
     let pretty_description = '';
     if (community.description) {
-      pretty_description = community.description[community.description.length-1] === '.' ? community.description : community.description + '.';
+      pretty_description = community.description[community.description.length-1] === '.'
+        ? community.description
+        : `${community.description  }.`;
     }
-    
+
     return m(FaceliftCard, {
       elevation: 2,
       interactive: true,
       class_name: '.chain-card',
       onclick: redirectFunction
-    }, [    
+    }, [
       m('.card-header', [
         community.iconUrl ? m('img.chain-icon', {
           src: community.iconUrl,
         }) :  m('.chain-icon.no-image')
       ]),
       m('.card-body', [
-        m('.community-name',  {lang: 'en'}, community.name, community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' })),
-        m('.card-description', {lang: 'en'}, pretty_description),
+        m('.community-name',  {
+          lang: 'en'
+        }, [
+          community.name,
+          community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' })
+        ]),
+        m('.card-description', { lang: 'en' }, pretty_description),
         m('.join-button-wrapper', [
           m(FaceliftButton, {
             intent: ButtonIntent.Secondary,
@@ -121,18 +129,18 @@ const CommunityCard : m.Component<{ community: CommunityInfo }> = {
             onclick: redirectFunction
           }),
         ])
-      ]), 
+      ]),
     ]);
   }
 };
 
-const LockdropToolsCard: m.Component<{}> = {
+const LockdropToolsCard: m.Component = {
   view: (vnode) => {
     return m(FaceliftCard, {
       elevation: 2,
       interactive: true,
       class_name: '.chain-card',
-    }, [    
+    }, [
       m('.lockdrop-card-body', [
         m('h3', 'Edgeware Lockdrop Tools'),
         m(FaceliftButton, {
@@ -159,7 +167,7 @@ const LockdropToolsCard: m.Component<{}> = {
   }
 };
 
-const NewCommunityCard: m.Component<{}> = {
+const NewCommunityCard: m.Component = {
   view: (vnode) => {
     return m(FaceliftCard, {
       elevation: 2,
@@ -179,7 +187,7 @@ const NewCommunityCard: m.Component<{}> = {
   }
 };
 
-const HomepageCommunityCards: m.Component<{}, {}> = {
+const HomepageCommunityCards: m.Component = {
   view: (vnode) => {
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
@@ -216,8 +224,9 @@ const HomepageCommunityCards: m.Component<{}, {}> = {
         .concat(myCommunities.filter((c) => c.collapsedOnHomepage))
     );
 
-    const totalCommunitiesString = buildCommunityString(sortedChainsAndCommunities.length + betaChainsAndCommunities.length);
-    
+    const totalCommunitiesString = buildCommunityString(
+      sortedChainsAndCommunities.length + betaChainsAndCommunities.length);
+
     return m('.HomepageCommunityCards', {
       style: 'margin-top: 40px',
     }, [
