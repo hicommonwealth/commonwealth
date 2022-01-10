@@ -9,7 +9,6 @@ const offChainCommunities = [
   'magicklu', // edgeware
   'element-finance', // ethereum
   'phantom-dao', // ethereum
-  'hashflow', // TODO: Change to osmosis/cosmos default_chain, currently Ethereum
   'orakuru', // ethereum
   'polaris-dao', // edgeware
   'infinity', // ethereum
