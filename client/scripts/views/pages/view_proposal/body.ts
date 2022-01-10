@@ -106,14 +106,10 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
       && app.chain.meta.chain.type === ChainType.Offchain) {
       if (item.authorChain !== app.chain.base) {
         return m('.ProposalBodyAuthor', [
-          m('.User.avatar-only', {
-            key: '-',
-          }, [
-            m('a.user-display-name.username', [
-              // TODO: pick a good name here?
-              "*Anonymous*"]
-            )
-          ]),
+          m(AnonymousUser, {
+            hideAvatar: true,
+            distinguishingKey: item.author,
+          })
         ]);
       }
     }
