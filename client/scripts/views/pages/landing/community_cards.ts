@@ -26,7 +26,7 @@ const buildCommunityString = (numCommunities: number) => {
   if (numCommunities >= 1000) {
     numberString = numeral(numCommunities).format('0.0a');
   }
-  return `${numberString  } Communities`;
+  return `${numberString} Communities`;
 }
 
 const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
