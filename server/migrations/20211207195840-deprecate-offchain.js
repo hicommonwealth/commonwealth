@@ -1,46 +1,25 @@
 'use strict';
 
 const offChainCommunities = [
-  'clcg-commonwealth',
-  'dtrade',
-  'decent',
-  'webb',
-  'agency',
-  'kabocha',
-  'cmn-protocol',
-  'polkaswapcommunity',
-  'stargaze',
-  'cabindao',
-  'ion',
-  'nippon-powder',
-  'endaoment',
-  'poof-cash',
-  'pontem-network',
-  'ubeswap',
-  'euler-finance',
-  'be-your-own-bank',
-  'antimatter-dao',
-  'longhorndao',
-  'magicklu',
-  'burnt-finance',
-  'element-finance',
-  'druside',
-  'sentinel',
-  'gopixel',
-  'anmol',
-  'harvest',
-  'impactmarket',
-  'immunefi',
-  'infinity',
-  'arvex28',
-  '222',
-  'digm-dao',
-  'usemate',
-  'qnt-dao',
-  'knoxedge',
-  'likecoin',
-  'pfeilstorch',
-  'new-order-dao'
+  'webb', // edgeware
+  'decent', // edgeware
+  'agency', // edgeware
+  'cmn-protocol', // TODO: Change to ETHEREUM (currently edgeware)
+  'ion', // ethereum
+  'magicklu', // edgeware
+  'element-finance', // ethereum
+  'phantom-dao', // ethereum
+  'hashflow', // TODO: Change to osmosis/cosmos default_chain, currently Ethereum
+  'orakuru', // ethereum
+  'polaris-dao', // edgeware
+  'infinity', // ethereum
+  'debt-dao', // ethereum
+  'digm-dao', // ethereum
+  'usemate', // ethereum
+  'qnt-dao', // TODO: Change default_chain to Ethereum or... currently "Quant" WHICH IS BAD
+  'knoxedge', // ethereum
+  'pfeilstorch', // edgeware
+  'new-order-dao' // ethereum
 ];
 
 module.exports = {
