@@ -95,6 +95,7 @@ class CosmosGovernance extends ProposalModule<
       console.error('Gov minDeposit in wrong denom:', depositParams.minDeposit);
       this._minDeposit = new CosmosToken(this._Chain.denom, 0);
     }
+    console.log(this._minDeposit);
 
     // query existing proposals
     await this._initProposals();
@@ -183,7 +184,7 @@ class CosmosGovernance extends ProposalModule<
     const spend = CommunityPoolSpendProposal.fromPartial({ title, description, recipient, amount: coinAmount });
     const prop = CommunityPoolSpendProposal.encode(spend).finish();
     return Any.fromPartial({
-      typeUrl: '/cosmos.gov.v1beta1.CommunityPoolSpend',
+      typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
       value: prop,
     });
   }
