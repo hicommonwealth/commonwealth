@@ -25,7 +25,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
 
   return [
     m(MenuItem, {
-      onclick: () => { navigateToSubpage('/new/thread'); },
+      onclick: () => { navigateToSubpage('/new/discussion'); },
       label: 'New thread',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
@@ -38,7 +38,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
           } else {
             localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
           }
-          navigateToSubpage('/new/thread');
+          navigateToSubpage('/new/discussion');
         },
         label: `New ${t.name} Thread`,
         iconLeft: mobile ? Icons.PLUS : undefined,
@@ -52,24 +52,18 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
-      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.CosmosProposal
-      }),
+      onclick: (e) => navigateToSubpage('/new/proposal'),
       label: 'New text proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Aave
      && m(MenuItem, {
-       onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-         type: ProposalType.AaveProposal
-       }),
-       label: 'New On-Chain Proposal',
-       iconLeft: mobile ? Icons.PLUS : undefined,
+      onclick: (e) => navigateToSubpage('/new/proposal'),
+      label: 'New On-Chain Proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
      }),
     app.chain?.network === ChainNetwork.Compound && m(MenuItem, {
-      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.CompoundProposal
-      }),
+      onclick: (e) => navigateToSubpage('/new/proposal'),
       label: 'New On-Chain Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
@@ -112,9 +106,7 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       }),
     ],
     app.chain.network === ChainNetwork.Sputnik && m(MenuItem, {
-      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.SputnikProposal
-      }),
+      onclick: (e) => navigateToSubpage('/new/proposal'),
       label: 'New Sputnik proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),

@@ -536,7 +536,7 @@ export const ProposalBodySaveEdit: m.Component<{
             : JSON.stringify(quillEditorState.editor.getContents());
           if (item instanceof OffchainThread) {
             app.threads.edit(item, itemText, parentState.updatedTitle, parentState.updatedUrl).then(() => {
-              navigateToSubpage(`/proposal/${item.slug}/${item.id}`);
+              navigateToSubpage(`/discussion/${item.id}`);
               parentState.editing = false;
               parentState.saving = false;
               clearEditingLocalStorage(item, true);

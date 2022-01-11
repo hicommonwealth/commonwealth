@@ -322,7 +322,7 @@ const NewProposalForm = {
           deposit
         ).then((result) => {
           done(result);
-          navigateToSubpage(`/proposal/${ProposalType.CosmosProposal}/${result}`);
+          navigateToSubpage(`/proposal/${result}`);
         }).catch((err) => notifyError(err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.MolochProposal) {
