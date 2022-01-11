@@ -257,7 +257,7 @@ const NotificationRow: m.Component<{
       }
       return link(
         'a.NotificationRow',
-        `/notificationsList?id=${notification.id}`,
+        `/notifications?id=${notification.id}`,
         [
           m('.comment-body', [
             m('.comment-body-top.chain-event-notification-top', [

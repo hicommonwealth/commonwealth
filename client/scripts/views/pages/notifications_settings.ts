@@ -637,7 +637,7 @@ const AllCommunitiesNotifications: m.Component<{
   },
 };
 
-const NotificationsPage: m.Component<{}, {
+const NotificationSettingsPage: m.Component<{}, {
   communities: ChainInfo[];
   subscriptions: NotificationSubscription[];
   selectedCommunity: ChainInfo;
@@ -719,7 +719,7 @@ const NotificationsPage: m.Component<{}, {
       ],
     });
     return m(Sublayout, {
-      class: 'NotificationsPage',
+      class: 'NotificationSettingsPage',
       title: [
         'Notification Settings ',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
@@ -799,4 +799,4 @@ const NotificationsPage: m.Component<{}, {
   },
 };
 
-export default NotificationsPage;
+export default NotificationSettingsPage;

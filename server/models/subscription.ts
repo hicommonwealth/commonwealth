@@ -175,7 +175,7 @@ export default (
           SERVER_URL
         }/${
           notification_data.chainEventType.chain
-        }/notificationsList?id=${
+        }/notifications?id=${
           notification.id
         }`;
       }
