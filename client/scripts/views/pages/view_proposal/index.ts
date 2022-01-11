@@ -846,7 +846,7 @@ const ViewProposalPage: m.Component<
   },
   view: (vnode) => {
     const { identifier } = vnode.attrs;
-    const isDiscussion = pathIsDiscussion(app.activeChainId(), window.location.pathname);
+    const isDiscussion = pathIsDiscussion(app.activeChainId(), m.route.get());
     if (!app.chain?.meta && !isDiscussion) {
       return m(PageLoading, {
         narrow: true,
