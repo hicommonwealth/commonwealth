@@ -33,7 +33,7 @@
                 .last-updated {
                     flex: 1;
                     text-align: left;
-                    min-width: max-content;
+                    min-width: max-content;                    
                     span {
                         color: $lite-gray;
                     }
@@ -113,6 +113,10 @@
             }
             .topic-cell {
                 margin-bottom: 15px;
+            }
+            .last-updated {
+                display: flex;
+                justify-content: space-between;
             }
         }
     }
