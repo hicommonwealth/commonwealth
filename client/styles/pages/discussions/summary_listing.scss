@@ -1,3 +1,7 @@
+@import 'client/styles/shared';
+@import 'client/styles/facelift';
+
+
 .SummaryListing {
     display: flex;
     flex-direction: column;
@@ -11,12 +15,13 @@
         flex: 4;
     }
     .row-header {
-        color: #666666;
+        color: $midi-gray;
         font-size: 18px;
+        margin-bottom: 10px;
+        display: flex;
         h4 {
             font-weight: 500;
         }
-        display: flex;
     }
     .row-wrap {
         display: flex;
@@ -26,35 +31,36 @@
 
 .SummaryRow {
     display: flex;
-    padding: 20px 0;
-    border-bottom: 1px solid #DDDDDD;
+    padding: 15px 0;
+    border-top: 1px solid $disable-gray;
     max-width: 100%;
-    &:last-child {
-        border-bottom: none;
-    }
     .recent-threads {
         display: flex;
         flex-direction: column;
         .thread-summary {
-            margin-bottom: 10px;
-            a {
-                color: #4723AD;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            &:last-child {
+                margin-bottom: 0;
+            }
+            a.discussion-title {
+                flex: 4;
+                color: $purp-blue;
                 &:hover {
                     text-decoration: none;
                 }
             }
-            span {
-                color: #9b9b9b;
-                margin-left: 10px;
+            .last-updated {
+                flex: 1;
+                text-align: left;
+                min-width: max-content;
+                margin-left: 48px;
+                span {
+                    color: $lite-gray;
+                    margin-left: 10px;
+                }
             }
-        }
-    }
-    .last-updated {
-        .time {
-            font-weight: 500;
-        }
-        .date {
-            font-weight: 400;
         }
     }
     .topic {
@@ -62,6 +68,7 @@
         h3 {
             font-size: 24px;
             font-weight: 500;
+            cursor: pointer;
         }
     }
 }

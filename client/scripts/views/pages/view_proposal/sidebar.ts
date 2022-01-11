@@ -7,6 +7,7 @@ import { link } from 'helpers';
 import {
   chainEntityTypeToProposalSlug,
   chainEntityTypeToProposalName,
+  getProposalUrlPath,
 } from 'identifiers';
 import { OffchainThread } from 'models';
 import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
@@ -26,7 +27,7 @@ export const ProposalSidebarLinkedChainEntity: m.Component<{
 
     const proposalLink = `${
       app.isCustomDomain() ? '' : `/${proposal.chain}`
-    }/proposal/${slug}/${chainEntity.typeId}`;
+    }${getProposalUrlPath(slug, chainEntity.typeId)}`;
 
     return m('.ProposalSidebarLinkedChainEntity', [
       link('a', proposalLink, [
@@ -50,9 +51,6 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
     snapshot: SnapshotProposal;
   }
 > = {
-  onupdate: (vnode) => {
-    vnode.state.initialized = false;
-  },
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal.snapshotProposal) return;

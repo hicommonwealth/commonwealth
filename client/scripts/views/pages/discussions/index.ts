@@ -394,8 +394,8 @@ const DiscussionFilterBar: m.Component<
 // comparator
 const orderDiscussionsbyLastComment = (a, b) => {
   // tslint:disable-next-line
-  const tsB = Math.max(+b.createdAt, +(b.latestCommCreatedAt || 0));
-  const tsA = Math.max(+a.createdAt, +(a.latestCommCreatedAt || 0));
+  const tsB = Math.max(+b.createdAt, +(b.lastCommentedOn || 0));
+  const tsA = Math.max(+a.createdAt, +(a.lastCommentedOn || 0));
   return tsB - tsA;
 };
 
@@ -412,7 +412,7 @@ const DiscussionsPage: m.Component<
     onscroll: any;
     summaryView: boolean;
     summaryViewInitialized: boolean;
-    recentThreads: { threads: OffchainThread[]; activitySummary };
+    recentThreads: OffchainThread[];
     loadingRecentThreads: boolean;
     activityFetched: boolean;
   }
@@ -425,7 +425,7 @@ const DiscussionsPage: m.Component<
 
     const returningFromThread =
       app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/proposal/discussion/');
+      app.lastNavigatedFrom().includes('/discussion/');
     if (
       returningFromThread &&
       localStorage[`${app.activeId()}-discussions-scrollY`]
@@ -454,7 +454,7 @@ const DiscussionsPage: m.Component<
       topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread =
       app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/proposal/discussion/');
+      app.lastNavigatedFrom().includes('/discussion/');
     vnode.state.lookback[subpage] =
       returningFromThread &&
       localStorage[`${app.activeId()}-lookback-${subpage}`]
@@ -491,7 +491,7 @@ const DiscussionsPage: m.Component<
     if (onSummaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
-        .getRecentCommunityActivity({
+        .getRecentTopicActivity({
           communityId: app.activeCommunityId(),
           chainId: app.activeChainId(),
         })
