@@ -1,3 +1,5 @@
+/* @jsx m */
+
 import m from 'mithril';
 import { ButtonIntent, GradientType } from './buttons';
 
@@ -12,5 +14,7 @@ export const CWButton: m.Component<
   },
   Record<string, unknown>
 > = {
-  view: () => <button />,
+  view: () => {
+    return <div>poop</div>;
+  },
 };
