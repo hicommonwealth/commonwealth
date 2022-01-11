@@ -62,7 +62,6 @@ const LandingPage: m.Component<{}, IState> = {
     });
 
     const myChains: any = Object.entries(chains);
-    const myCommunities: any = app.config.communities.getAll();
     const sortChains = (list: any[]) => list
       .sort((a, b) => {
         const threadCountA = app.recentActivity.getCommunityThreadCount(

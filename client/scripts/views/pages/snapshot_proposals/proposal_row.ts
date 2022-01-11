@@ -27,7 +27,7 @@ const ProposalRow: m.Component<
           onclick: (e) => {
             e.stopPropagation();
             e.preventDefault();
-            localStorage[`${app.activeId()}-proposals-scrollY`] =
+            localStorage[`${app.activeChainId()}-proposals-scrollY`] =
               window.scrollY;
             navigateToSubpage(proposalLink);
           },

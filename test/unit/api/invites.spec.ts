@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken';
 import sleep from 'sleep-promise';
 import { Errors as CreateInviteErrors } from 'server/routes/createInvite';
 import { Errors as AcceptInviteErrors } from 'server/routes/acceptInvite';
-import { Errors as CreateInviteLinkErrors } from 'server/routes/createInviteLink';
 import { ChainCommunityErrors } from 'server/util/lookupCommunityIsVisibleToUser';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -18,8 +17,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Invite Tests', () => {
-  const community = 'staking';
-  const chain = 'ethereum';
+  const community = 'ethereum';
   let adminJWT;
   let adminAddress;
   let adminUserId;
@@ -30,17 +28,17 @@ describe('Invite Tests', () => {
 
   before(async () => {
     await resetDatabase();
-    let res = await modelUtils.createAndVerifyAddress({ chain });
+    let res = await modelUtils.createAndVerifyAddress({ chain: community });
     adminAddress = res.address;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     adminUserId = res.user_id;
-    const isAdmin = await modelUtils.assignRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
-      chainOrCommObj: { offchain_community_id: community },
+      chainOrCommObj: { chain_id: community },
       role: 'admin',
     });
 
-    res = await modelUtils.createAndVerifyAddress({ chain });
+    res = await modelUtils.createAndVerifyAddress({ chain: community });
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
     userUserId = res.user_id;
@@ -74,7 +72,7 @@ describe('Invite Tests', () => {
     it('should create an invite for an address from a invites disabled community as admin', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
-      const addrRes = await modelUtils.createAndVerifyAddress({ chain });
+      const addrRes = await modelUtils.createAndVerifyAddress({ chain: community });
 
       const res = await chai.request(app)
         .post('/api/createInvite')
@@ -86,7 +84,6 @@ describe('Invite Tests', () => {
           address: adminAddress,
         });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.offchain_community_id).to.be.equal(community);
       expect(res.body.result.address_id).to.be.equal(addrRes.address_id);
     });
 
@@ -101,9 +98,9 @@ describe('Invite Tests', () => {
         id: 'invites',
         name: 'invites community',
         creator_address: userAddress,
-        creator_chain: chain,
+        creator_chain: community,
         description: 'Invites enabled community',
-        default_chain: chain,
+        default_chain: community,
       };
 
       const invCommunity = await modelUtils.createCommunity(communityArgs);
@@ -143,31 +140,6 @@ describe('Invite Tests', () => {
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
       expect(invite.body.error).to.be.equal(CreateInviteErrors.AddressNotFound);
-    });
-
-    it('should fail to invite an address that is already a member', async () => {
-      if (!process.env.SENDGRID_API_KEY) return;
-
-      const res = await modelUtils.createAndVerifyAddress({ chain });
-      await modelUtils.assignRole({
-        address_id: res.address_id,
-        chainOrCommObj: { offchain_community_id: community },
-        role: 'member',
-      });
-
-      const invite = await chai.request(app)
-        .post('/api/createInvite')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: adminJWT,
-          invitedAddress: res.address,
-          community,
-          address: adminAddress,
-        });
-
-      expect(invite.status).to.be.equal(500);
-      expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(CreateInviteErrors.IsAlreadyMember);
     });
 
     it('should fail to create an invite from an invites disabled community as a user', async () => {
@@ -210,7 +182,7 @@ describe('Invite Tests', () => {
     it('should fail to create an invite with an invalid email', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
-      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await modelUtils.createAndVerifyAddress({ chain: community });
       const newUserAddress = res.address;
       const newUserEmail = 'test-commonwealth.im';
       const invite = await chai.request(app)
@@ -231,7 +203,7 @@ describe('Invite Tests', () => {
     it('should fail to create an invite with an address and an email', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
-      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await modelUtils.createAndVerifyAddress({ chain: community });
       const newUserAddress = res.address;
       const newUserEmail = 'test@commonwealth.im';
       const invite = await chai.request(app)
@@ -253,7 +225,7 @@ describe('Invite Tests', () => {
     it('should fail to create an invite without an address or an email', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
-      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await modelUtils.createAndVerifyAddress({ chain: community });
       const newUserAddress = res.address;
       const newUserEmail = 'test@commonwealth.im';
       const invite = await chai.request(app)
@@ -358,7 +330,6 @@ describe('Invite Tests', () => {
       expect(res.body.result.updatedCode.invited_email).to.be.equal(userEmail);
       expect(res.body.result.updatedCode.used).to.be.true;
       expect(res.body.result.role).to.not.be.null;
-      expect(res.body.result.role.offchain_community_id).to.be.equal(community);
       expect(res.body.result.subscription).to.not.be.null;
       expect(res.body.result.subscription.object_id).to.be.equal(community);
       expect(res.body.result.subscription.category_id).to.be.equal(NotificationCategories.NewThread);
@@ -377,7 +348,7 @@ describe('Invite Tests', () => {
           address: adminAddress,
         });
 
-      const newUserRes = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserRes = await modelUtils.createAndVerifyAddress({ chain: community });
       const newUserAddress = newUserRes.address;
       const res = await chai.request(app)
         .post('/api/acceptInvite')
@@ -460,119 +431,6 @@ describe('Invite Tests', () => {
       expect(res.body.result.used).to.be.true;
       expect(res.body.result.community_id).to.be.equal(community);
       expect(res.body.result.invited_email).to.be.equal(userEmail);
-    });
-  });
-
-  describe('/createInviteLink', () => {
-    it('should create an invite link as an admin', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'none',
-          jwt: adminJWT,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.community_id).to.be.equal(community);
-      expect(res.body.result.time_limit).to.be.equal('none');
-      expect(res.body.result.multi_use).to.be.null;
-      expect(res.body.result.active).to.be.true;
-    });
-
-    it('should create an invite link as a user', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.community_id).to.be.equal(community);
-      expect(res.body.result.time_limit).to.be.equal('none');
-      expect(res.body.result.multi_use).to.be.null;
-      expect(res.body.result.active).to.be.true;
-    });
-
-    it('should fail to create an invite link without a community', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          time: 'none',
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(ChainCommunityErrors.BothChainAndCommunityDNE);
-    });
-
-    it('should fail to create an invite link without a time', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.NoTimeLimit);
-    });
-
-    it('should fail to create an invite link without uses', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.InvalidUses);
-    });
-
-    it('should fail to create an invite link with invalid uses', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'hello',
-          jwt: userJWT,
-        });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.InvalidUses);
-    });
-
-    it('should fail to create a new forever invite link if one already exists', async () => {
-      const res = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      const res2 = await chai.request(app)
-        .post('/api/createInviteLink')
-        .set('Accept', 'application/json')
-        .send({
-          community,
-          time: 'none',
-          uses: 'none',
-          jwt: userJWT,
-        });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.id).to.be.equal(res2.body.result.id);
     });
   });
 });

@@ -256,10 +256,6 @@ const instantiateEditor = (
 
   const queryMentions = async (searchTerm, renderList, mentionChar) => {
     if (mentionChar !== '@') return;
-    // Optional code for tagging roles:
-    // if (app.activeCommunityId()) roleData = await searchRoles();
-    // const truncRoles = roleData.filter(
-    //   (role) => role.name.includes(searchTerm) || role.address.includes(searchTerm));
 
     let members = [];
     let formattedMatches;
@@ -602,23 +598,6 @@ const instantiateEditor = (
     });
   };
 
-  // const searchRoles = async () => {
-  //   if (!app.activeCommunityId) return [];
-  //   const response = await $.get(`${app.serverUrl()}/bulkMembers`, {
-  //     community: app.activeCommunityId()
-  //   });
-  //   if (response.status !== 'Success') {
-  //     throw new Error(`got unsuccessful status: ${response.status}`);
-  //   }
-  // const admins = response.result.filter((role) => role.permission !== RolePermission.member);
-  //   const res = admins.map((role) => ({
-  //     address: role.Address.address,
-  //     chain: role.Address.chain,
-  //     name: role.permission,
-  //   }));
-  //   return res;
-  // };
-
   quill = new Quill($editor[0], {
     debug: 'error',
     modules: {
@@ -866,7 +845,7 @@ const instantiateEditor = (
       if (quill.isEnabled()) {
         // Save the entire updated text to localStorage
         const data = JSON.stringify(quill.getContents());
-        localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
+        localStorage.setItem(`${app.activeChainId()}-${editorNamespace}-storedText`, data);
         state.unsavedChanges = new Delta();
       }
     }
@@ -924,13 +903,13 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     let contentsDoc = vnode.attrs.contentsDoc;
     if (!contentsDoc
       && !vnode.state.markdownMode
-      && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
+      && localStorage.getItem(`${app.activeChainId()}-${editorNamespace}-storedText`) !== null) {
       try {
-        contentsDoc = JSON.parse(localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`));
+        contentsDoc = JSON.parse(localStorage.getItem(`${app.activeChainId()}-${editorNamespace}-storedText`));
         if (!contentsDoc.ops) throw new Error();
         vnode.state.markdownMode = false;
       } catch (e) {
-        contentsDoc = localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`);
+        contentsDoc = localStorage.getItem(`${app.activeChainId()}-${editorNamespace}-storedText`);
         vnode.state.markdownMode = true;
       }
     } else if (vnode.state.markdownMode === undefined) {
@@ -948,12 +927,12 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     if (vnode.state.clearUnsavedChanges === undefined) {
       vnode.state.clearUnsavedChanges = () => {
         localStorage.removeItem(`${editorNamespace}-markdownMode`);
-        localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
-        localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
-        if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
-          localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
+        localStorage.removeItem(`${app.activeChainId()}-${editorNamespace}-storedText`);
+        localStorage.removeItem(`${app.activeChainId()}-${editorNamespace}-storedTitle`);
+        if (localStorage.getItem(`${app.activeChainId()}-post-type`) === 'Link') {
+          localStorage.removeItem(`${app.activeChainId()}-new-link-storedLink`);
         }
-        localStorage.removeItem(`${app.activeId()}-post-type`);
+        localStorage.removeItem(`${app.activeChainId()}-post-type`);
       };
     }
     return m('.QuillEditor', {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/notificationsList.scss';
 
 import m from 'mithril';
@@ -21,7 +22,7 @@ const NotificationsPage: m.Component<{}> = {
       message: 'This page requires you to be logged in.'
     });
 
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntity = app.chain;
     if (!activeEntity) return m(PageLoading, {
       title: [
         'Notifications ',

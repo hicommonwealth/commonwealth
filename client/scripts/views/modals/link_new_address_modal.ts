@@ -259,9 +259,6 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 address: addressInfo,
                 chain: vnode.attrs.joiningChain,
               });
-            } else if (vnode.attrs.joiningCommunity
-                       && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
-              await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
             }
           } catch (e) {
             // this may fail if the role already exists, e.g. if the address is being migrated from another user
@@ -288,7 +285,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
           'Step No': 2,
           'Step': 'Add Address',
           'Option': 'Wallet',
-          'Scope': app.activeId(),
+          'Scope': app.activeChainId(),
         });
         mixpanel.people.increment('Addresses');
         mixpanel.people.set({
@@ -301,9 +298,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
         // log in as the new user
         await initAppState(false);
         // load addresses for the current chain/community
-        if (app.community) {
-          await updateActiveAddresses();
-        } else if (app.chain) {
+        if (app.chain) {
           // TODO: this breaks when the user action creates a new token forum
           const chain = app.user.selectedNode
             ? app.user.selectedNode.chain

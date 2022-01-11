@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/web3login.scss';
 
 import m from 'mithril';
@@ -27,12 +28,11 @@ const Web3LoginPage: m.Component<{}> = {
         m(LoginWithWalletDropdown, {
           label: 'Try again',
           joiningChain,
-          joiningCommunity,
           loggingInWithAddress,
         }),
         m.route.param('prev')
           ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
-          : link('a.web3login-go-home', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), 'Go home'),
+          : link('a.web3login-go-home', (app.isCustomDomain() ? '/' : `/${app.activeChainId()}`), 'Go home'),
       ]),
     ]);
   }
