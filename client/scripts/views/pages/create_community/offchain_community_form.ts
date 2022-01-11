@@ -82,7 +82,7 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
           }),
           m(SelectPropertyRow, {
             title: 'Base Chain',
-            options: [...Object.values(ChainBase)],
+            options: ['cosmos','ethereum','near'],
             value: vnode.state.base,
             onchange: (value) => {
               vnode.state.base = value;
