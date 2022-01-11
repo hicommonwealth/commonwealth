@@ -124,6 +124,17 @@ module.exports = {
         },
       },
       {
+        // ignore ".spec.ts" test files in build
+        test: /^(?!.*\.spec\.tsx$).*(?:\.tsx)$/,
+        include: [
+          path.resolve(__dirname, '../client'),
+        ],
+        loader: 'esbuild-loader',
+        options: {
+          loader: 'tsx',
+        },
+      },
+      {
         test: /\.(js)$/,
         include: [
           path.resolve(__dirname, '../client'),
