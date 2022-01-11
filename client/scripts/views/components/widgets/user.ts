@@ -48,7 +48,7 @@ const User: m.Component<{
     if (!user) return;
 
     let account : Account<any>;
-    let profile; // profile is used to retrieve the chain and address later
+    let profile: Profile; // profile is used to retrieve the chain and address later
     let role;
     const addrShort = formatAddressShort(
       user.address,
@@ -119,9 +119,9 @@ const User: m.Component<{
         size: 'xs',
       }),
     ];
-    const ghostAddress = app.user.addresses.some(({ address, ghostAddress }) => {
-      if (this !== undefined) account.address === address && ghostAddress
-    })
+    const ghostAddress = app.user.addresses.some(({ address, ghostAddress_ }) => {
+      if (this !== undefined) account.address === address && ghostAddress_
+    });
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
         key: profile?.address || '-',
