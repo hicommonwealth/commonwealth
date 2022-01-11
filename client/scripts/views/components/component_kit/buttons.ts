@@ -26,7 +26,7 @@ export enum ButtonSize {
 }
 
 export enum GradientType {
-  RAINBOW = 'rainbow'
+  RAINBOW = 'rainbow',
 }
 
 const appendTags = (base: string, attrs) => {
@@ -199,14 +199,7 @@ export const FaceliftRadioGroup: m.Component<
     }
   },
   view: (vnode) => {
-    const {
-      values,
-      labels,
-      onchange,
-      name,
-      klass,
-      disabled,
-    } = vnode.attrs;
+    const { values, labels, onchange, name, klass, disabled } = vnode.attrs;
     const { toggledValue } = vnode.state;
     return m(
       `.RadioGroup.${klass || ''}`,
