@@ -81,14 +81,16 @@ const createChain = async (
   }
   let eth_chain_id: number = null;
   let url = req.body.node_url;
-  if (req.body.base === ChainBase.Ethereum && req.body.type !== ChainType.Offchain) {
-    if (!Web3.utils.isAddress(req.body.address)) {
-      return next(new Error(Errors.InvalidAddress));
-    }
+  if (req.body.base === ChainBase.Ethereum && req.body.type === ChainType.Offchain) {
     if (!req.body.eth_chain_id || !+req.body.eth_chain_id) {
       return next(new Error(Errors.InvalidChainId));
     }
     eth_chain_id = +req.body.eth_chain_id;
+  }
+  if (req.body.base === ChainBase.Ethereum && req.body.type !== ChainType.Offchain) {
+    if (!Web3.utils.isAddress(req.body.address)) {
+      return next(new Error(Errors.InvalidAddress));
+    }
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
     const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
@@ -201,6 +203,7 @@ const createChain = async (
     bech32_prefix: req.body.bech32_prefix,
     decimals: req.body.decimals,
   };
+
   const chain = await models.Chain.create(chainContent);
 
   const chainNodeContent = {
@@ -210,6 +213,7 @@ const createChain = async (
     eth_chain_id,
     token_name: req.body.token_name,
   };
+
   const node = await models.ChainNode.create(chainNodeContent);
 
   return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: node.toJSON() } });
