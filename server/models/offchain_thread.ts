@@ -3,7 +3,6 @@ import { DataTypes, Model } from 'sequelize';
 import { ModelStatic } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
-import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
@@ -19,8 +18,7 @@ export interface OffchainThreadAttributes {
   url?: string;
   topic_id?: number;
   pinned?: boolean;
-  chain?: string;
-  community?: string;
+  chain: string;
 
   read_only?: boolean;
   version_history?: string[];
@@ -38,7 +36,6 @@ export interface OffchainThreadAttributes {
 
   // associations
   Chain?: ChainAttributes;
-  OffchainCommunity?: OffchainCommunityAttributes;
   Address?: AddressAttributes;
   OffchainAttachments?:
     | OffchainAttachmentAttributes[]
@@ -81,8 +78,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      chain: { type: dataTypes.STRING, allowNull: true },
-      community: { type: dataTypes.STRING, allowNull: true },
+      chain: { type: dataTypes.STRING, allowNull: false },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -116,19 +112,12 @@ export default (
       indexes: [
         { fields: ['address_id'] },
         { fields: ['chain'] },
-        { fields: ['community'] },
         { fields: ['chain', 'created_at'] },
-        { fields: ['community', 'created_at'] },
         { fields: ['chain', 'updated_at'] },
-        { fields: ['community', 'updated_at'] },
         { fields: ['chain', 'pinned'] },
-        { fields: ['community', 'pinned'] },
         { fields: ['chain', 'offchain_voting_enabled'] },
-        { fields: ['community', 'offchain_voting_enabled'] },
         { fields: ['chain', 'offchain_voting_ends_at'] },
-        { fields: ['community', 'offchain_voting_ends_at'] },
         { fields: ['chain', 'offchain_voting_votes'] },
-        { fields: ['community', 'offchain_voting_votes'] },
       ],
     }
   );
@@ -136,10 +125,6 @@ export default (
   OffchainThread.associate = (models) => {
     models.OffchainThread.belongsTo(models.Chain, {
       foreignKey: 'chain',
-      targetKey: 'id',
-    });
-    models.OffchainThread.belongsTo(models.OffchainCommunity, {
-      foreignKey: 'community',
       targetKey: 'id',
     });
     models.OffchainThread.belongsTo(models.Address, {

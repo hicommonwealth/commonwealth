@@ -59,9 +59,11 @@ const User: m.Component<{
     const friendlyChainName = app.config.chains
       .getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name;
 
-    const adminsAndMods = app.chain
-      ? app.chain.meta.chain.adminsAndMods
-      : app.community ? app.community.meta.adminsAndMods : [];
+    if (!app.chain) {
+      return;
+    }
+
+    const adminsAndMods = app.chain?.meta.chain.adminsAndMods
 
     if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !app.cachedIdentityWidget) {
       vnode.state.identityWidgetLoading = true;
@@ -152,7 +154,7 @@ const User: m.Component<{
             linkify
               ? link('a.user-display-name.username',
                 (profile
-                  ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+                  ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:'
                 ), [
                   !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
@@ -198,7 +200,7 @@ const User: m.Component<{
             showAddressWithDisplayName: false
           }) : link('a.user-display-name',
             profile
-              ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+              ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
             !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
               profile.displayName,
@@ -311,7 +313,7 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+      ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
       : 'javascript:';
 
     return linkify
@@ -334,7 +336,7 @@ export const AnonymousUser: m.Component<{
     const showAvatar = !hideAvatar;
     let profileAvatar;
     if (showAvatar) {
-      const pseudoAddress = distinguishingKey + moment('dddd, MMMM Do YYYY');
+      const pseudoAddress = distinguishingKey;
       profileAvatar = m('svg.Jdenticon', {
         width: avatarSize - 4,
         height: avatarSize - 4,

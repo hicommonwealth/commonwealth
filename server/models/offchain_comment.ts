@@ -4,7 +4,6 @@ import { ModelStatic } from './types';
 
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
-import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 
 export interface OffchainCommentAttributes {
@@ -13,9 +12,8 @@ export interface OffchainCommentAttributes {
   text: string;
   plaintext: string;
   id?: number;
-  chain?: string;
+  chain: string;
   parent_id?: string;
-  community?: string;
   version_history?: string[];
   created_at?: Date;
   updated_at?: Date;
@@ -23,7 +21,6 @@ export interface OffchainCommentAttributes {
 
   // associations
   Chain?: ChainAttributes;
-  OffchainCommunity?: OffchainCommunityAttributes;
   Address?: AddressAttributes;
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
 }
@@ -41,13 +38,12 @@ export default (
 ): OffchainCommentModelStatic => {
   const OffchainComment = <OffchainCommentModelStatic>sequelize.define('OffchainComment', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: dataTypes.STRING, allowNull: true },
+    chain: { type: dataTypes.STRING, allowNull: false },
     root_id: { type: dataTypes.STRING, allowNull: false },
     parent_id: { type: dataTypes.STRING, allowNull: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     text: { type: dataTypes.TEXT, allowNull: false },
     plaintext: { type: dataTypes.TEXT, allowNull: true },
-    community: { type: dataTypes.STRING, allowNull: true },
     version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
@@ -65,9 +61,7 @@ export default (
       { fields: ['chain', 'root_id'] },
       { fields: ['address_id'] },
       { fields: ['chain', 'created_at'] },
-      { fields: ['community', 'created_at'] },
       { fields: ['chain', 'updated_at'] },
-      { fields: ['community', 'updated_at'] },
       { fields: ['root_id'] },
     ],
   });
@@ -75,10 +69,6 @@ export default (
   OffchainComment.associate = (models) => {
     models.OffchainComment.belongsTo(models.Chain, {
       foreignKey: 'chain',
-      targetKey: 'id'
-    });
-    models.OffchainComment.belongsTo(models.OffchainCommunity, {
-      foreignKey: 'community',
       targetKey: 'id'
     });
     models.OffchainComment.belongsTo(models.Address, {
