@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -7,7 +8,6 @@ import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
-import { ConfigurationServicePlaceholders } from 'aws-sdk/lib/config_service_placeholders';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
@@ -20,7 +20,6 @@ describe('User Model Routes', () => {
   });
 
   describe('/updateEmail', () => {
-    const community = 'staking';
     const chain = 'ethereum';
     let jwtToken;
     let userAddress;
@@ -31,9 +30,9 @@ describe('User Model Routes', () => {
       userAddress = res.address;
       userEmail = res.email;
       jwtToken = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignRole({
+      const isAdmin = await modelUtils.updateRole({
         address_id: res.address_id,
-        chainOrCommObj: { offchain_community_id: community },
+        chainOrCommObj: { chain_id: chain },
         role: 'admin',
       });
       expect(userAddress).to.not.be.null;

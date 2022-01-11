@@ -10,7 +10,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   // unpack notification_data
   const {
     created_at, root_id, root_title, root_type, comment_id, comment_text,
-    chain_id, community_id, author_address, author_chain
+    chain_id, author_address, author_chain
   } = notification_data;
 
   // title
@@ -48,9 +48,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
         : [NotificationCategories.ThreadEdit, NotificationCategories.NewThread].includes(category_id) ? 'created a new thread'
           : null);
   const objectCopy = decodeURIComponent(root_title).trim();
-  const communityObject = chain_id
-    ? await models.Chain.findOne({ where: { id: chain_id || null } })
-    : await models.OffchainCommunity.findOne({ where: { id: community_id || null } });
+  const communityObject = await models.Chain.findOne({ where: { id: chain_id } })
   const communityCopy = communityObject ? `in ${communityObject.name}` : '';
   const excerpt = (() => {
     const text = decodeURIComponent(comment_text);
@@ -71,7 +69,6 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
     id: root_id,
     title: root_title,
     chain: chain_id,
-    community: community_id,
   };
   const proposalUrlArgs = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
   const proposalPath = (getProposalUrl as any)(...proposalUrlArgs);

@@ -7,7 +7,6 @@ import Dropzone from 'dropzone';
 import { Icon, Icons } from 'construct-ui';
 import User from 'views/components/widgets/user';
 import app from 'state';
-import { ChainIcon, CommunityIcon } from './chain_icon';
 
 export enum AvatarScope {
   Account = 'account',
@@ -96,10 +95,7 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     const logoURL =
-      vnode.state.dropzone?.option?.url ||
-      (app.activeCommunityId()
-        ? app.community?.meta.iconUrl
-        : app.chain?.meta.chain.iconUrl);
+      vnode.state.dropzone?.option?.url || app.chain?.meta.chain.iconUrl;
     return m('form.AvatarUpload', [
       m(
         '.dropzone-attach',

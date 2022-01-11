@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/discussions/discussion_row_menu.scss';
 
 import m from 'mithril';
@@ -87,8 +88,8 @@ export const StageEditorMenuItem: m.Component<{ openStageEditor: Function }, { i
   view: (vnode) => {
     const { openStageEditor } = vnode.attrs;
 
-    if (!app.chain?.meta?.chain && !app.community?.meta) return;
-    const { stagesEnabled } = app.chain?.meta?.chain || app.community?.meta;
+    if (!app.chain?.meta?.chain) return;
+    const { stagesEnabled } = app.chain?.meta?.chain;
     if (!stagesEnabled) return;
 
     return m('.StageEditorMenuItem', [
@@ -116,12 +117,10 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, {
     && (app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
-      community: app.activeCommunityId()
     })
     || app.user.isRoleOfCommunity({
       role: 'moderator',
       chain: app.activeChainId(),
-      community: app.activeCommunityId()
     }));
 
     const isAuthor = app.user.activeAccount

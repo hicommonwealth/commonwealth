@@ -28,7 +28,7 @@ const SummaryRow: m.Component<
         m('h3', {
           onclick: (e) => {
             e.preventDefault();
-            m.route.set(`/${app.activeId()}/discussions/${encodeURI(topic.name)}`);
+            m.route.set(`/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`);
           },
         }, topic.name),
         m('p', topic.description)
@@ -56,7 +56,7 @@ export const SummaryListing: m.Component<
 > = {
   view: (vnode) => {
     const topicScopedThreads = {};
-    const topics = app.topics.getByCommunity(app.activeId());
+    const topics = app.topics.getByCommunity(app.activeChainId());
     topics.forEach((topic) => {
       topicScopedThreads[topic.id] = vnode.attrs.recentThreads.filter(
         (thread) => thread.topic?.id === topic?.id

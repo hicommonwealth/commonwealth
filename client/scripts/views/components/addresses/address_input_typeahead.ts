@@ -29,7 +29,6 @@ const AddressInputTypeahead: m.Component<{ options: any, oninput }, { selectedIt
       vnode.state.loading = true;
       $.get(`${app.serverUrl()}/bulkMembers`, {
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       }).then((response) => {
         vnode.state.typeaheadAddresses = response.result.map((role) => {
           const res = {

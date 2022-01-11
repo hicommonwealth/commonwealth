@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
@@ -46,10 +47,6 @@ const newThread = async (
   space: SnapshotSpace,
   snapshotId: string,
 ) => {
-  const topics = app.chain
-    ? app.chain.meta.chain.topics
-    : app.community.meta.topics;
-
   if (!form.name) {
     throw new Error(NewThreadErrors.NoTitle);
   }
@@ -146,7 +143,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
 }> = {
   view: (vnode) => {
     const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
-    if (!app.community && !app.chain) return getLoadingPage();
+    if (!app.chain) return getLoadingPage();
 
     const pathVars = m.parsePathname(window.location.href);
 
@@ -208,15 +205,15 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
     }
 
     const saveToLocalStorage = () => {
-      localStorage.setItem(`${app.activeId()}-new-snapshot-proposal-name`, vnode.state.form.name);
+      localStorage.setItem(`${app.activeChainId()}-new-snapshot-proposal-name`, vnode.state.form.name);
     };
 
     const populateFromLocalStorage = () => {
-      vnode.state.form.name = localStorage.getItem(`${app.activeId()}-new-snapshot-proposal-name`);
+      vnode.state.form.name = localStorage.getItem(`${app.activeChainId()}-new-snapshot-proposal-name`);
     };
 
     const clearLocalStorage = () => {
-      localStorage.removeItem(`${app.activeId()}-new-snapshot-proposal-name`);
+      localStorage.removeItem(`${app.activeChainId()}-new-snapshot-proposal-name`);
     };
 
     const isMember = author
@@ -275,7 +272,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
                   e.redraw = false; // do not redraw on input
                   const { value } = e.target as any;
                   vnode.state.form.name = value;
-                  localStorage.setItem(`${app.activeId()}-new-snapshot-proposal-name`, vnode.state.form.name);
+                  localStorage.setItem(`${app.activeChainId()}-new-snapshot-proposal-name`, vnode.state.form.name);
                 },
                 defaultValue: vnode.state.form.name,
               }),
