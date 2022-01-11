@@ -9,10 +9,15 @@ import { slugify } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import {
-  InputPropertyRow, SelectPropertyRow
+  InputPropertyRow,
+  SelectPropertyRow,
 } from 'views/components/metadata_rows';
 import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
-import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
+import {
+  ChainFormState,
+  initChainForm,
+  defaultChainRows,
+} from './chain_input_rows';
 
 type OffchainFormAttrs = Record<string, unknown>;
 
@@ -105,12 +110,14 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
             symbol,
           } = vnode.state;
           vnode.state.saving = true;
-          const additionalArgs: { eth_chain_id?: number, node_url?: string } = {};
+          const additionalArgs: { eth_chain_id?: number; node_url?: string } =
+            {};
 
           // defaults to be overridden when chain is no longer "offchain" type
           switch (vnode.state.base) {
             case ChainBase.CosmosSDK: {
-              additionalArgs.node_url = 'https://osmosis-rpc.cw-figment.workers.dev';
+              additionalArgs.node_url =
+                'https://osmosis-rpc.cw-figment.workers.dev';
               break;
             }
             case ChainBase.NEAR: {
@@ -118,7 +125,7 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
               break;
             }
             case ChainBase.Solana: {
-              additionalArgs.node_url = 'mainnet-beta';
+              additionalArgs.node_url = 'https://api.mainnet-beta.solana.com';
               break;
             }
             case ChainBase.Substrate: {
@@ -128,7 +135,8 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
             case ChainBase.Ethereum:
             default: {
               additionalArgs.eth_chain_id = 1;
-              additionalArgs.node_url = 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
+              additionalArgs.node_url =
+                'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
               break;
             }
           }
@@ -156,7 +164,7 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
           } catch (err) {
             notifyError(
               err.responseJSON?.error ||
-              'Creating new offchain community failed'
+                'Creating new offchain community failed'
             );
           } finally {
             vnode.state.saving = false;
