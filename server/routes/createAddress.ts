@@ -61,12 +61,12 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
     // if req.body.community is valid, then we should create a role between this community vs address
     if (req.body.community) {
       const role = await models.Role.findOne({
-        where: { address_id: updatedObj.id, offchain_community_id: req.body.community }
+        where: { address_id: updatedObj.id, chain_id: req.body.community }
       });
       if (!role) {
         await models.Role.create({
           address_id: updatedObj.id,
-          offchain_community_id: req.body.community,
+          chain_id: req.body.community,
           permission: 'member',
         });
       }
@@ -85,11 +85,7 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
       // if req.user.id is undefined, the address is being used to create a new user,
       // and we should automatically give it a Role in its native chain (or community)
       if (!req.user) {
-        await models.Role.create(req.body.community ? {
-          address_id: newObj.id,
-          offchain_community_id: req.body.community,
-          permission: 'member',
-        } : {
+        await models.Role.create({
           address_id: newObj.id,
           chain_id: req.body.chain,
           permission: 'member',

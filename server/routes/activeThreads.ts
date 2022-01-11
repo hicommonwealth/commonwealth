@@ -12,7 +12,7 @@ const activeThreads = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+  const [chain, error] = await lookupCommunityIsVisibleToUser(
     models,
     req.query,
     req.user
@@ -29,9 +29,7 @@ const activeThreads = async (
 
   const allThreads = [];
   try {
-    const communityWhere = chain
-      ? { chain_id: chain.id }
-      : { community_id: community.id };
+    const communityWhere = { chain_id: chain.id }
     const communityTopics = await models.OffchainTopic.findAll({
       where: communityWhere
     });

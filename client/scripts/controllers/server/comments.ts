@@ -6,7 +6,7 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, CommunityInfo, NodeInfo, OffchainThread } from 'models';
+import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, NodeInfo, OffchainThread } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
@@ -140,7 +140,6 @@ class CommentsController {
     address: string,
     proposalIdentifier: string,
     chain: string,
-    community: string,
     unescapedText: string,
     parentCommentId: any = null,
     attachments?: string[],
@@ -150,7 +149,6 @@ class CommentsController {
       const res = await $.post(`${app.serverUrl()}/createComment`, {
         'author_chain': app.user.activeAccount.chain.id,
         'chain': chain,
-        'community': community,
         'address': address,
         'parent_id': parentCommentId,
         'root_id': proposalIdentifier,
@@ -161,10 +159,8 @@ class CommentsController {
       const { result } = res;
       const newComment = modelFromServer(result);
       this._store.add(newComment);
-      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
-      updateLastVisited(app.activeCommunityId()
-        ? (activeEntity.meta as CommunityInfo)
-        : (activeEntity.meta as NodeInfo).chain, true);
+      const activeEntity = app.chain;
+      updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
       return newComment;
     } catch (err) {
       console.log('Failed to create comment');
@@ -235,13 +231,12 @@ class CommentsController {
     });
   }
 
-  public async refresh(proposal, chainId: string, communityId: string) {
+  public async refresh(proposal, chainId: string) {
     return new Promise<void>(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments
         const response = await $.get(`${app.serverUrl()}/viewComments`, {
           chain: chainId,
-          community: communityId,
           root_id: encodeURIComponent(proposal.uniqueIdentifier),
         });
         if (response.status !== 'Success') {
@@ -262,11 +257,10 @@ class CommentsController {
     });
   }
 
-  public async refreshAll(chainId: string, communityId: string, reset: CommentRefreshOption) {
+  public async refreshAll(chainId: string, reset: CommentRefreshOption) {
     try {
       const args: any = {
         chain: chainId,
-        community: communityId,
       };
       if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
         args.offchain_threads_only = 1;

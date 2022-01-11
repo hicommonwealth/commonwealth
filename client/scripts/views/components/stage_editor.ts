@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'components/stage_editor.scss';
 
 import m from 'mithril';
@@ -167,9 +168,9 @@ const StageEditor: m.Component<{
     vnode.attrs.thread.chainEntities.forEach((ce) => vnode.state.chainEntitiesToSet.push(ce));
   },
   view: (vnode) => {
-    if (!app.chain?.meta?.chain && !app.community?.meta) return;
+    if (!app.chain?.meta?.chain) return;
 
-    const { customStages } = app.chain?.meta?.chain || app.community?.meta;
+    const { customStages } = app.chain?.meta?.chain ;
     const stages = !customStages ? [
       OffchainThreadStage.Discussion,
       OffchainThreadStage.ProposalInReview,
@@ -274,7 +275,7 @@ const StageEditor: m.Component<{
               // set linked chain entities
               try {
                 await app.threads.setLinkedChainEntities({ threadId: thread.id, entities: vnode.state.chainEntitiesToSet });
-                await app.threads.setLinkedSnapshotProposal({ threadId: thread.id, 
+                await app.threads.setLinkedSnapshotProposal({ threadId: thread.id,
                   snapshotProposal: vnode.state.snapshotProposalsToSet[0]?.id })
               } catch (err) {
                 console.log('Failed to update linked proposals');
@@ -290,7 +291,7 @@ const StageEditor: m.Component<{
                 vnode.attrs.openStateHandler(false);
               } else {
                 vnode.state.isOpen = false;
-              }    
+              }
             },
           }),
         ])

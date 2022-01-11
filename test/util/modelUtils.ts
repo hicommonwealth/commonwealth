@@ -96,7 +96,6 @@ export interface ThreadArgs {
   kind: string;
   stage: string;
   chainId: string;
-  communityId: string;
   title: string;
   topicName?: string;
   topicId?: number;
@@ -108,7 +107,6 @@ export interface ThreadArgs {
 export const createThread = async (args: ThreadArgs) => {
   const {
     chainId,
-    communityId,
     address,
     jwt,
     title,
@@ -127,8 +125,7 @@ export const createThread = async (args: ThreadArgs) => {
     .set('Accept', 'application/json')
     .send({
       author_chain: chainId,
-      chain: communityId ? undefined : chainId,
-      community: communityId,
+      chain: chainId,
       address,
       title: encodeURIComponent(title),
       body: encodeURIComponent(body),
@@ -144,8 +141,7 @@ export const createThread = async (args: ThreadArgs) => {
 };
 
 export interface CommentArgs {
-  chain?: string;
-  community?: string;
+  chain: string;
   address: string;
   jwt: any;
   text: any;
@@ -153,7 +149,7 @@ export interface CommentArgs {
   root_id?: any;
 }
 export const createComment = async (args: CommentArgs) => {
-  const { chain, community, address, jwt, text, parentCommentId, root_id } =
+  const { chain, address, jwt, text, parentCommentId, root_id } =
     args;
   const res = await chai.request
     .agent(app)
@@ -161,8 +157,7 @@ export const createComment = async (args: CommentArgs) => {
     .set('Accept', 'application/json')
     .send({
       author_chain: chain,
-      chain: community ? undefined : chain,
-      community,
+      chain,
       address,
       parent_id: parentCommentId,
       root_id,
@@ -252,8 +247,7 @@ export const createWebhook = async ({ chain, webhookUrl, jwt }) => {
 export interface AssignRoleArgs {
   address_id: number;
   chainOrCommObj: {
-    chain_id?: string;
-    offchain_community_id?: string;
+    chain_id: string;
   };
   role: Permission;
 }

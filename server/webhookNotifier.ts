@@ -93,9 +93,7 @@ const send = async (models, content: WebhookContent) => {
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
-  const chainOrCommObj = (content.community) ? { offchain_community_id: content.community }
-    : (content.chain) ? { chain_id: content.chain }
-      : null;
+  const chainOrCommObj = (content.chain) ? { chain_id: content.chain } : null;
   const notificationCategory = (content.chainEvent)
     ? content.chainEvent.chain_event_type_id : content.notificationCategory;
   // grab all webhooks for specific community
@@ -155,16 +153,6 @@ const send = async (models, content: WebhookContent) => {
         // can't handle the prefix of `previeImageUrl` with SERVER_URL
         // because social platforms can't access to localhost:8080.
         previewAltText = chain.name;
-      }
-    } else if (content.community) {
-      // if the community has a logo, show it as preview image
-      const offchainCommunity = await models.OffchainCommunity.findOne({ where: { id: content.community, privacy_enabled: false } });
-      if (offchainCommunity) {
-        if (offchainCommunity.icon_url) {
-          previewImageUrl = (offchainCommunity.icon_url.match(`^(http|https)://`)) ? offchainCommunity.icon_url :
-            `https://commonwealth.im${offchainCommunity.icon_url}`;
-        }
-        previewAltText = offchainCommunity.name;
       }
     }
   }

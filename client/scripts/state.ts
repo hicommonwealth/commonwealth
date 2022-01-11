@@ -1,8 +1,7 @@
-import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'stores';
+import { ChainStore, NodeStore } from 'stores';
 import {
   ContractCategory,
   IChainAdapter,
-  ICommunityAdapter,
   NotificationCategory,
 } from 'models';
 import { EventEmitter } from 'events';
@@ -39,7 +38,6 @@ export const enum LoginState {
 export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
-  community: ICommunityAdapter<any, any>;
 
   chainPreloading: boolean;
   chainAdapterReady: EventEmitter;
@@ -66,15 +64,12 @@ export interface IApp {
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
-  activeCommunityId(): string;
-  activeId(): string;
 
   toasts: ToastStore;
   modals: ModalStore;
   loginState: LoginState;
   // stored on server-side
   config: {
-    communities: OffchainCommunitiesStore;
     chains: ChainStore;
     nodes: NodeStore;
     contractCategories?: ContractCategory[];
@@ -104,7 +99,6 @@ export interface IApp {
 const app: IApp = {
   socket: null,
   chain: null,
-  community: null,
 
   chainPreloading: false,
   chainAdapterReady: new EventEmitter(),
@@ -135,14 +129,11 @@ const app: IApp = {
   searchAddressCache: {},
 
   activeChainId: () => app.chain?.id,
-  activeCommunityId: () => app.community?.meta.id,
-  activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
 
   toasts: getToastStore(),
   modals: getModalStore(),
   loginState: LoginState.NotLoaded,
   config: {
-    communities: new OffchainCommunitiesStore(),
     chains: new ChainStore(),
     nodes: new NodeStore(),
     defaultChain: 'edgeware',
