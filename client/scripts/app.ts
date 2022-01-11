@@ -650,10 +650,10 @@ Promise.all([
       '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
       '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
       // Notifications
-      '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
       '/:scope/notifications':     importRoute('views/pages/notifications_page', { scoped: true, deferChain: true }),
       '/notifications':            redirectRoute(() => '/edgeware/notifications'),
-      '/:scope/notification-settings': importRoute('views/pages/notifications_settings', { scoped: true, deferChain: true }),
+      '/:scope/notification-settings': importRoute('views/pages/notification_settings', { scoped: true, deferChain: true }),
+      '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
       // CMN
       '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
       '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),

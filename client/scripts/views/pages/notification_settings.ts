@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import 'pages/notifications.scss';
+import 'pages/notification_settings.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
