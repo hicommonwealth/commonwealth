@@ -336,7 +336,7 @@ export const AnonymousUser: m.Component<{
     const showAvatar = !hideAvatar;
     let profileAvatar;
     if (showAvatar) {
-      const pseudoAddress = distinguishingKey + moment('dddd, MMMM Do YYYY');
+      const pseudoAddress = distinguishingKey;
       profileAvatar = m('svg.Jdenticon', {
         width: avatarSize - 4,
         height: avatarSize - 4,
