@@ -5,6 +5,7 @@ import app from 'state';
 import { link } from 'helpers';
 import { NotificationCategories } from 'types';
 import { Button, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
+import { ButtonIntent, FaceliftButton } from './component_kit/buttons';
 
 const SubscriptionButton: m.Component<{}> = {
   view: (vnode) => {
@@ -13,10 +14,7 @@ const SubscriptionButton: m.Component<{}> = {
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeId());
     const communityOrChain = app.activeChainId() ? app.activeChainId() : app.activeCommunityId();
 
-    return m(Button, {
-      class: 'SubscriptionButton',
-      rounded: true,
-      fluid: true,
+    return m(FaceliftButton, {
       onclick: (e) => {
         e.preventDefault();
         if (communitySubscription) {
@@ -30,7 +28,7 @@ const SubscriptionButton: m.Component<{}> = {
         }
       },
       label: communitySubscription ? 'Notifications on' : 'Notifications off',
-      intent: communitySubscription ? 'primary' : 'none',
+      intent: communitySubscription ? ButtonIntent.Primary : ButtonIntent.Secondary,
     });
     //   m('.subscription-button-sub', [
     //     !communitySubscription

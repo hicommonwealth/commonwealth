@@ -7,8 +7,9 @@ import { ConsoleLoggerImpl } from 'typescript-logging';
 export interface SubSectionProps {
     title: string;
     is_visible: boolean;
+    is_active: boolean; // Is this the current page
+    is_updated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
     onclick: Function;
-    is_active: boolean;
     onhover?: Function;
     row_icon?: boolean;
 }
@@ -17,8 +18,9 @@ export interface SectionGroupProps {
     title: string;
     contains_children: boolean;
     default_toggle: boolean;
-    is_visible: boolean;
-    is_active: boolean;
+    is_visible: boolean; // Is this section shown as an option
+    is_active: boolean; // Is this the current page
+    is_updated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
     onclick: Function;
     onhover?: Function;
     display_data: SubSectionProps[] | null;
@@ -33,59 +35,108 @@ export interface SidebarSectionProps {
     display_data: SectionGroupProps[];
 }
 
-const SubSection: m.Component<SubSectionProps, {text_color: string}> = {
+const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
+    oninit: (vnode) => {
+        vnode.state.background_color = vnode.attrs.is_active ? '#EDE7FF' : 'none';
+    },
+    onupdate: (vnode) => {
+        vnode.state.background_color = vnode.attrs.is_active ? '#EDE7FF' : 'none';
+    },
     view: (vnode) => {
-        const {title, is_visible, is_active, onclick, row_icon} = vnode.attrs;
-        const { text_color } = vnode.state;
+        const {title, is_visible, is_active, onclick, row_icon, is_updated} = vnode.attrs;
+        const { background_color } = vnode.state;
         if (!is_visible) {
             return;
         }
 
         const click_handler = (e) => {
             onclick(e);
-            console.log(e);
-            //
         }
 
+        let title_text_class = '.title-standard';
+        if (is_active) {
+            title_text_class = '.title-active'
+        } else if (!is_updated) {
+            title_text_class = '.title-stale'
+        }
+
+        const mouse_enter_handler = (e) => {
+            vnode.state.background_color = '#EDE7FF';
+        }
+
+        const mouse_leave_handler = (e) => {
+            vnode.state.background_color = (is_active) ? '#EDE7FF' : 'none';
+        }
 
         return m('.SubSection',{
             onclick: (e) => click_handler(e),
+            style: `background-color: ${background_color}`,
+            onmouseenter: (e) => mouse_enter_handler(e),
+            onmouseleave: (e) => mouse_leave_handler(e),
         }, [
-            row_icon && m(is_active ? '.row-icon-active' : '.row-icon-inactive', [m(Icon, {name: Icons.HASH})]),
-            m(is_active ? '.row-title-active' : '.row-title-inactive', title),
+            row_icon && m(title_text_class, [m(Icon, {name: Icons.HASH})]),
+            m(title_text_class, title),
         ])
     }
 }
 
-const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean}> = {
+const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, background_color: string}> = {
     oninit: (vnode) => {
         vnode.state.toggled = vnode.attrs.default_toggle;
+        vnode.state.background_color = (vnode.attrs.is_active && !vnode.attrs.contains_children) ? '#EDE7FF' : 'none';
+    },
+    onupdate: (vnode) => {
+        vnode.state.background_color = (vnode.attrs.is_active && !vnode.attrs.contains_children) ? '#EDE7FF' : 'none';
     },
     view: (vnode) => {
 
-        const {title, contains_children, display_data, is_visible, onclick, onhover} = vnode.attrs;
-        const {toggled} = vnode.state;
+        const {title, contains_children, display_data, is_visible, is_updated, is_active, onclick, onhover} = vnode.attrs;
+        const {toggled, background_color} = vnode.state;
 
         if (!is_visible) {
             return;
         }
 
         const click_handler = (e) => {
-            vnode.state.toggled = !toggled;
+            if (contains_children) {
+                vnode.state.toggled = !toggled;
+            }
             onclick(e, vnode.state.toggled);
         }
 
-        
         const carat = toggled ? m(Icon, {
                 name: Icons.CHEVRON_DOWN,
             }) : m(Icon, {
                 name: Icons.CHEVRON_RIGHT,
             });
 
-        return m('.SectionGroup', [
-            m('.SectionGroupTitle', {onclick: (e) => click_handler(e)}, [
+        let title_text_class = '.section-title-text-standard';
+        if (is_active && !contains_children) {
+            title_text_class = '.section-title-text-active'
+        } else if (!is_updated) {
+            title_text_class = '.section-title-text-stale'
+        }
+
+        const mouse_enter_handler = (e) => {
+            if (!toggled) {
+                vnode.state.background_color = '#EDE7FF';
+            }   
+        }
+
+        const mouse_leave_handler = (e) => {
+            vnode.state.background_color = (is_active && !contains_children) ? '#EDE7FF' : 'none';
+        }
+        
+        return m('.SectionGroup', {
+            onmouseenter: (e) => mouse_enter_handler(e),
+            onmouseleave: (e) => mouse_leave_handler(e),
+        },[
+            m('.SectionGroupTitle', {
+                onclick: (e) => click_handler(e),
+                style: `background-color: ${background_color}`,
+            }, [
                 contains_children ? m('.carat', carat) : m('.no-carat'),
-                m('.section-title-text', title),
+                m(title_text_class, title), 
             ]),
             contains_children && toggled && m('.subsections', [
                 display_data.map((subsection) => (
@@ -138,7 +189,7 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
                 onclick: (e) => click_handler(e), 
             }, [
                 m('.title-text', title),
-                m('.visibility-icon', carat)
+                m('.toggle-icon', carat)
             ]),
             toggled && m('.section-groups', [
                 display_data.map((section_group) => (

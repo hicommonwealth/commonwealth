@@ -11,21 +11,39 @@ import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import { link } from 'helpers';
 import { ChainInfo, CommunityInfo, NodeInfo } from 'models';
-
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
-
-
 import { DiscordIcon, TelegramIcon, ElementIcon, GithubIcon, WebsiteIcon } from '../component_kit/icons';
 import SidebarSection, { SectionGroupProps, SidebarSectionProps, SubSectionProps } from './sidebar_section';
-import { ConsoleLoggerImpl } from 'typescript-logging';
+import { ButtonIntent, FaceliftButton } from '../component_kit/buttons';
 
+// Toggle Tree Definition (3 layers of depth, could add more if desired)
+interface ToggleTree {
+  toggled_state: boolean;
+  children: {
+    [child: string]: {
+      toggled_state: boolean;
+      children: {
+        [child: string]: {
+          toggled_state: boolean;
+        }
+      }
+    },
+  }
+}
+
+function comparisonCustomizer(value1, value2) {
+  if (typeof value1 === "boolean" && typeof value2 === "boolean") {
+    return true;
+  }
+}
 // Check that our current cached tree is structurally correct
-const verifyExistingToggleTree = (tree: string) => {
-  return true
+function verifyCachedToggleTree(tree_name: string, toggle_tree: ToggleTree) {
+  const cached_tree = JSON.parse(localStorage[`${app.activeId()}-${tree_name}-toggle-tree`]);
+  return _.isEqualWith(cached_tree, toggle_tree, comparisonCustomizer);
 }
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
@@ -100,372 +118,6 @@ const SidebarQuickSwitcher: m.Component<{}> = {
   }
 };
 
-export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
-  view: (vnode) => {
-    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
-      || p.startsWith(`/${app.activeId()}/discussions/`)
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
-      || p.startsWith(`/${app.activeId()}?`);
-    const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
-    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
-      || p.startsWith(`/${app.activeId()}/account/`);
-    const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeId()}/sputnik-daos`);
-
-    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
-      return { id, name, featuredInSidebar };
-    }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
-
-    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeId())) ? 'Forums' : 'Discussions';
-
-    return m('.OffchainNavigationModule.SidebarModule', [
-      // m('.section-header', 'Discuss'),
-      m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onDiscussionsPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-        label: discussionsLabel,
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/');
-        },
-      }),
-      topics.map((t) => (
-        m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onFeaturedDiscussionPage(m.route.get(), t.name),
-          label: t.name,
-          class: 'sub-button',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage(`/discussions/${t.name}`);
-          },
-        })
-      )),
-      // m(Button, {
-      //   rounded: true,
-      //   fluid: true,
-      //   active: onSearchPage(m.route.get())
-      //     && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-      //   label: 'Search',
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     navigateToSubpage('/search');
-      //   },
-      // }),
-      m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onMembersPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-        label: 'Members',
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/members');
-        },
-      }),
-      (app.activeId() === 'near'
-      ? m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onSputnikDaosPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-        label: 'Sputnik DAOs',
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/sputnik-daos');
-        },
-      })
-      : '')
-      // m(Button, {
-      //   rounded: true,
-      //   fluid: true,
-      //   active: onChatPage(m.route.get()),
-      //   label: 'Chat',
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     navigateToSubpage('/chat');
-      //   },
-      // }),
-    ]);
-  }
-};
-
-export const OnchainNavigationModule: m.Component<{}, {}> = {
-  view: (vnode) => {
-    // // proposal counts
-    // const substrateGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.Substrate)
-    //   ? ((app.chain as any).democracy.store.getAll().filter((p) => !p.completed && !p.passed).length
-    //     + (app.chain as any).democracyProposals.store.getAll().filter((p) => !p.completed).length
-    //     + (app.chain as any).council.store.getAll().filter((p) => !p.completed).length
-    //     + (app.chain as any).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
-    // const allSubstrateGovernanceProposals = substrateGovernanceProposals;
-    // const cosmosGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.CosmosSDK)
-    //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
-    // const molochProposals = (app.chain?.loaded && app.chain?.network === ChainNetwork.Moloch)
-    //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
-
-    const hasProposals = app.chain && !app.community && (
-      app.chain.base === ChainBase.CosmosSDK
-        || app.chain.network === ChainNetwork.Sputnik
-        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.network === ChainNetwork.Moloch
-        || app.chain.network === ChainNetwork.Compound
-        || app.chain.network === ChainNetwork.Aave
-        || app.chain.network === ChainNetwork.Commonwealth
-        || app.chain.meta.chain.snapshot);
-    if (!hasProposals) return;
-
-    const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
-    const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
-    const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
-
-    const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
-    const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
-
-    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot`);
-    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot/`);
-
-    const onProposalPage = (p) => (
-      p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyProposal}`));
-    const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyReferendum}`);
-
-    const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryProposal}`);
-    const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
-    const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`);
-
-    const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
-    const onMotionPage = (p) => (
-      p.startsWith(`/${app.activeChainId()}/motions`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateCollectiveProposal}`));
-
-    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
-    const onNotificationsPage = (p) => p.startsWith('/notifications');
-    if (onNotificationsPage(m.route.get())) return;
-
-    return m('.OnchainNavigationModule.SidebarModule', [
-      m('.sidebar-spacer'),
-      // referenda (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
-        && app.chain.network !== ChainNetwork.Darwinia
-        && app.chain.network !== ChainNetwork.HydraDX
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onReferendaPage(m.route.get()),
-          label: 'Referenda',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/referenda');
-          },
-          contentRight: [], // TODO
-        }),
-      // proposals (substrate, cosmos, moloch & compound only)
-      !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
-                         || app.chain?.base === ChainBase.CosmosSDK
-                         || app.chain?.network === ChainNetwork.Sputnik
-                         || app.chain?.network === ChainNetwork.Moloch
-                         || app.chain?.network === ChainNetwork.Compound
-                         || app.chain?.network === ChainNetwork.Aave)
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onProposalPage(m.route.get()),
-          label: 'Proposals',
-          class: app.chain?.base === ChainBase.Substrate ? 'sub-button' : '',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/proposals');
-          },
-        }),
-      // // motions (substrate only)
-      // !app.community && (app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
-      //   && m(Button, {
-      //     fluid: true,
-      //     rounded: true,
-      //     active: onMotionPage(m.route.get()),
-      //     label: 'Motions',
-      //     class: 'sub-button',
-      //     onclick: (e) => {
-      //       e.preventDefault();
-      //       navigateToSubpage(`/motions`);
-      //     },
-      //   }),
-      // council (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onCouncilPage(m.route.get()),
-          label: 'Councillors',
-          class: 'sub-button',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/council');
-          },
-        }),
-      m('.sidebar-spacer'),
-      // treasury (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onTreasuryPage(m.route.get()),
-          label: 'Treasury',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/treasury');
-          },
-        }),
-      // bounties (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
-        && app.chain.network !== ChainNetwork.Centrifuge
-        && app.chain.network !== ChainNetwork.HydraDX
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onBountiesPage(m.route.get()),
-          label: 'Bounties',
-          class: 'sub-button',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/bounties');
-          },
-        }),
-      // tips (substrate only)
-      // TODO: which chains?
-      !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onTipsPage(m.route.get()),
-          label: 'Tips',
-          class: 'sub-button',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/tips');
-          },
-        }),
-      m('.sidebar-spacer'),
-      // validators (substrate only)
-      !app.community && app.chain?.base === ChainBase.Substrate
-        && app.chain?.network !== ChainNetwork.Kulupu && app.chain?.network !== ChainNetwork.Darwinia
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onValidatorsPage(m.route.get()),
-          label: 'Validators',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/validators');
-          },
-        }),
-      showCompoundOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/delegate');
-        },
-        label: 'Delegate',
-        active: m.route.get() === `/${app.activeChainId()}/delegate`,
-      }),
-      showMolochMemberOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/new/proposal/:type', { type: ProposalType.MolochProposal });
-        },
-        label: 'New proposal',
-      }),
-      showMolochMemberOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('update_delegate_modal', {
-            account: app.user.activeAccount,
-            delegateKey: (app.user.activeAccount as any).delegateKey,
-          });
-        },
-        label: 'Update delegate key',
-      }),
-      showMolochMemberOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
-        },
-        label: 'Rage quit',
-      }),
-      m('.sidebar-spacer'),
-      app.chain?.meta.chain.snapshot.length > 0 && m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onSnapshotProposal(m.route.get()),
-        label: 'Snapshots',
-        onclick: (e) => {
-          e.preventDefault();
-          // Check if we have multiple snapshots for conditional redirect
-          const snapshotSpaces = app.chain.meta.chain.snapshot;
-          if (snapshotSpaces.length > 1) {
-            navigateToSubpage('/multiple-snapshots', {action: 'select-space'});
-          } else {
-            navigateToSubpage(`/snapshot/${snapshotSpaces}`);
-          }
-        },
-      }),
-      // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
-      //   rounded: true,
-      //   fluid: true,
-      //   active: onSnapshotProposalCreation(m.route.get()),
-      //   label: 'New Snapshot Pr...',
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     m.route.set(`/${app.activeChainId()}/new/snapshot/${app.chain.meta.chain.snapshot}`);
-      //   },
-      // }),
-      showCommonwealthMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        label: 'Projects',
-        active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/projects');
-        },
-      }),
-      // showCommonwealthMenuOptions && m(Button, {
-      //   fluid: true,
-      //   rounded: true,
-      //   label: 'Backers',
-      //   active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     navigateToSubpage(`/backers`);
-      //   },
-      // }),
-      showCommonwealthMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        label: 'Collectives',
-        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/collectives');
-        },
-      }),
-    ]);
-  }
-};
-
 export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   view: (vnode) => {
     const url = app.chain?.meta?.url;
@@ -494,10 +146,9 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
     })));
 
     return m('.ChainStatusModule', [
-      app.chain.deferred ? m(Button, {
+      app.chain.deferred ? m(FaceliftButton, {
+        intent: ButtonIntent.Primary,
         label: vnode.state.initializing ? 'Connecting...' : 'Connect to chain',
-        rounded: true,
-        fluid: true,
         disabled: vnode.state.initializing,
         onclick: async (e) => {
           e.preventDefault();
@@ -528,10 +179,8 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
             }
           });
         }),
-        trigger: m(Button, {
-          rounded: true,
-          class: 'chain-status-main',
-          fluid: true,
+        trigger: m(FaceliftButton, {
+          intent: ButtonIntent.Secondary,
           disabled: vnode.state.initializing,
           label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
             ? 'Connect to chain' : m(ChainStatusIndicator),
@@ -603,34 +252,131 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
   }
 };
 
-const oldSidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
+const DiscussionSection: m.Component<{}, {}> = {
   view: (vnode) => {
-    const { useQuickSwitcher } = vnode.attrs;
+    // Conditional Render Details + 
+    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
+      || p.startsWith(`/${app.activeId()}/discussions/`)
+      || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
+      || p.startsWith(`/${app.activeId()}?`);
+    const onAllDiscussionPage = (p) => p === `/${app.activeId()}/` || p === `/${app.activeId()}`;
+    const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
+    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
+      || p.startsWith(`/${app.activeId()}/account/`);
+    const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeId()}/sputnik-daos`);
 
-    return [
-      !app.isCustomDomain() && m(SidebarQuickSwitcher),
-      !useQuickSwitcher && m('.Sidebar', [
-        (app.chain || app.community) && m(OffchainNavigationModule),
-        (app.chain || app.community) && m(OnchainNavigationModule),
-        (app.chain || app.community) && m(ExternalLinksModule),
-        m('br'),
-        app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
-        app.chain && m(ChainStatusModule),
-        app.isCustomDomain()
-        && m('a', {
-          class: 'PoweredBy',
-          onclick: (e) => {
-            window.open('https://commonwealth.im/');
+    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
+      return { id, name, featuredInSidebar };
+    }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
+
+    const load_discussion_sections = onDiscussionsPage(m.route.get())
+                            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true);
+
+    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeId())) ? 'FORUMS' : 'DISCUSSIONS';
+
+    // Build Toggle Tree 
+    let discussions_default_toggle_tree = {
+      toggled_state: true,
+      children: {}
+    }
+
+    for (const topic of topics) {
+      if (topic.featuredInSidebar) {
+        discussions_default_toggle_tree.children[topic.name] = {
+          toggled_state: true,
+          children: {
+            'All': {
+              toggled_state: false,
+              children: {}
+            }, 
+            ...(app.activeId() === 'near') && {
+              'SputnikDaos': {
+                toggled_state: false,
+                children: {}
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Check if an existing toggle tree is stored
+    if (!localStorage[`${app.activeId()}-discussions-toggle-tree`]) {
+      console.log("setting discussions toggle tree since it doesn't exist")
+      localStorage[`${app.activeId()}-discussions-toggle-tree`] = JSON.stringify(discussions_default_toggle_tree);
+    } else if (!verifyCachedToggleTree('discussions', discussions_default_toggle_tree)) {
+      console.log("setting discussions toggle tree since the cached version differs from the updated version")
+      localStorage[`${app.activeId()}-discussions-toggle-tree`] = JSON.stringify(discussions_default_toggle_tree);
+    }
+    const toggle_tree_state = JSON.parse(localStorage[`${app.activeId()}-discussions-toggle-tree`])   
+
+    const discussions_group_data: SectionGroupProps[] = [{
+      title: 'All',
+      contains_children: false,
+      default_toggle: false,
+      is_visible: true,
+      is_updated: true,
+      is_active: onAllDiscussionPage(m.route.get()),
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setDiscussionsToggleTree(`children.All.toggled_state`, toggle);
+        navigateToSubpage("/");
+      },
+      display_data: null
+    },
+    (app.activeId() === 'near') && {
+      title: 'Sputnik Daos',
+      contains_children: false,
+      default_toggle: false,
+      is_visible: true,
+      is_updated: true,
+      is_active: onSputnikDaosPage(m.route.get())
+      && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setDiscussionsToggleTree(`children.SputnikDAOs.toggled_state`, toggle);
+        navigateToSubpage('/sputnik-daos');
+      },
+      display_data: null
+    }];
+
+    for (const topic of topics) {
+      if (topic.featuredInSidebar) {
+        const discussion_section_group: SectionGroupProps = {
+          title: topic.name,
+          contains_children: false,
+          default_toggle: false,
+          is_visible: true,
+          is_updated: true,
+          is_active: onFeaturedDiscussionPage(m.route.get(), topic.name),
+          onclick: (e, toggle: boolean) => {
+            e.preventDefault();
+            setDiscussionsToggleTree(`children.${topic.name}.toggled_state`, toggle);
+            navigateToSubpage(`/discussions/${topic.name}`);
           },
-        }),
-      ]),
-    ];
-  },
-};
+          display_data: null
+        }
+        discussions_group_data.push(discussion_section_group)
+      }
+    }
+
+    const sidebar_section_data: SidebarSectionProps = {
+      title: discussionsLabel,
+      default_toggle: toggle_tree_state['toggled_state'],
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        setDiscussionsToggleTree('toggled_state', toggle);
+      },
+      display_data: discussions_group_data,
+      is_active: true
+    }
+
+    return m(SidebarSection, {...sidebar_section_data});
+  }
+}
 
 const GovernanceSection: m.Component<{}, {}> = {
   view: (vnode) => {
-
     // Conditional Render Details
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
@@ -667,19 +413,18 @@ const GovernanceSection: m.Component<{}, {}> = {
     const showValidators =  !app.community && app.chain?.base === ChainBase.Substrate
                               && app.chain?.network !== ChainNetwork.Kulupu && app.chain?.network !== ChainNetwork.Darwinia;
     
-    
 
     // ---------- Build Toggle Tree ---------- //
-    let governance_default_toggle_tree = {
+    let governance_default_toggle_tree: ToggleTree = {
       toggled_state: true,
       children: {
         'Members': {
-          toggled_state: true,
+          toggled_state: false,
           children: {}
         },
         ...(showSnapshotOptions) && {
           'Snapshots': {
-            toggled_state: true,
+            toggled_state: false,
             children: {}
           }
         },
@@ -707,13 +452,13 @@ const GovernanceSection: m.Component<{}, {}> = {
         },
         ...(showValidators) && {
           'Validators': {
-            toggled_state: true,
+            toggled_state: false,
             children: {}
           }
         },
         ...(showCompoundOptions) && {
           'Delegate': {
-            toggled_state: true,
+            toggled_state: false,
             children: {}
           }
         },
@@ -773,23 +518,21 @@ const GovernanceSection: m.Component<{}, {}> = {
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeId()}-governance-toggle-tree`]) {
-      console.log("setting toggle tree")
+      console.log("setting toggle tree from scratch")
+      localStorage[`${app.activeId()}-governance-toggle-tree`] = JSON.stringify(governance_default_toggle_tree);
+    } else if (!verifyCachedToggleTree('governance', governance_default_toggle_tree)) {
+      console.log("setting discussions toggle tree since the cached version differs from the updated version")
       localStorage[`${app.activeId()}-governance-toggle-tree`] = JSON.stringify(governance_default_toggle_tree);
     }
-
-    const toggle_tree_state = JSON.parse(localStorage[`${app.activeId()}-governance-toggle-tree`])
-    console.log(toggle_tree_state)
-    
+    const toggle_tree_state = JSON.parse(localStorage[`${app.activeId()}-governance-toggle-tree`])    
 
     const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot`);
     const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot/`);
-
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyProposal}`));
     const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
       || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyReferendum}`);
-
     const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
       || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryProposal}`);
     const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
@@ -806,7 +549,6 @@ const GovernanceSection: m.Component<{}, {}> = {
 
     if (onNotificationsPage(m.route.get())) return;
 
-
     // ---------- Build Section Props ---------- //
 
     // Members
@@ -815,6 +557,7 @@ const GovernanceSection: m.Component<{}, {}> = {
       contains_children: false,
       default_toggle: toggle_tree_state['children']['Members']['toggled_state'],
       is_visible: true,
+      is_updated: true,
       is_active: onMembersPage(m.route.get())
       && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
       onclick: (e, toggle: boolean) => {
@@ -832,6 +575,7 @@ const GovernanceSection: m.Component<{}, {}> = {
       default_toggle: showSnapshotOptions ? toggle_tree_state['children']['Snapshots']['toggled_state'] : false,
       is_visible: showSnapshotOptions,
       is_active: onSnapshotProposal(m.route.get()),
+      is_updated: true,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
         setGovernanceToggleTree('children.Snapshots.toggled_state', toggle)
@@ -850,31 +594,37 @@ const GovernanceSection: m.Component<{}, {}> = {
     const referenda_section_data: SubSectionProps[] = [
       {
         title: 'Referenda',
-        onclick: (e) => {
+        onclick: (e, toggle: boolean) => {
           e.preventDefault(); 
           navigateToSubpage('/referenda');
+          setGovernanceToggleTree('children.Referenda.children.Referenda.toggled_state', toggle)
         },
         is_visible: showReferenda,
+        is_updated: true,
         is_active: onReferendaPage(m.route.get()),
         row_icon: false
       },
       {
         title: 'Proposals',
-        onclick: (e) => {
+        onclick: (e, toggle: boolean) => {
           e.preventDefault(); 
-          navigateToSubpage('/referenda');
+          navigateToSubpage('/proposals');
+          setGovernanceToggleTree('children.Referenda.children.Proposals.toggled_state', toggle)
         },
         is_visible: showProposals,
+        is_updated: true,
         is_active: onProposalPage(m.route.get()),
         row_icon: false
       },
       {
         title: 'Councillors',
-        onclick: (e) => {
+        onclick: (e, toggle: boolean) => {
           e.preventDefault(); 
           navigateToSubpage('/council');
+          setGovernanceToggleTree('children.Referenda.children.Referenda.toggled_state', toggle)
         },
         is_visible: showCouncillors,
+        is_updated: true,
         is_active: onCouncilPage(m.route.get()),
         row_icon: false
       }
@@ -886,6 +636,7 @@ const GovernanceSection: m.Component<{}, {}> = {
       default_toggle: (showReferenda || showProposals || showCouncillors) ? toggle_tree_state['children']['Referenda']['toggled_state'] : false,
       is_visible: showReferenda || showProposals || showCouncillors,
       is_active: showReferenda || showProposals || showCouncillors,
+      is_updated: true,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
         setGovernanceToggleTree('children.Referenda.toggled_state', toggle)
@@ -899,6 +650,7 @@ const GovernanceSection: m.Component<{}, {}> = {
       contains_children: false,
       default_toggle: showCompoundOptions ? toggle_tree_state['children']['Delegate']['toggled_state'] : false,
       is_visible: showCompoundOptions,
+      is_updated: true,
       is_active: m.route.get() === `/${app.activeChainId()}/delegate`,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
@@ -917,6 +669,7 @@ const GovernanceSection: m.Component<{}, {}> = {
           navigateToSubpage('/treasury');
         },
         is_visible: showTreasury,
+        is_updated: true,
         is_active: onTreasuryPage(m.route.get()),
         row_icon: false
       },
@@ -927,6 +680,7 @@ const GovernanceSection: m.Component<{}, {}> = {
           navigateToSubpage('/bounties');
         },
         is_visible: showBounties,
+        is_updated: true,
         is_active: onBountiesPage(m.route.get()),
         row_icon: false
       },
@@ -937,6 +691,7 @@ const GovernanceSection: m.Component<{}, {}> = {
           navigateToSubpage('/tips');
         },
         is_visible: showTips,
+        is_updated: true,
         is_active: onTipsPage(m.route.get()),
         row_icon: false
       }
@@ -948,6 +703,7 @@ const GovernanceSection: m.Component<{}, {}> = {
       default_toggle: (showTreasury || showBounties || showTips) ? toggle_tree_state['children']['Treasury']['toggled_state'] : false, 
       is_visible: showTreasury || showBounties || showTips,
       is_active: showTreasury || showBounties || showTips,
+      is_updated: true,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
         setGovernanceToggleTree('children.Treasury.toggled_state', toggle)
@@ -961,6 +717,7 @@ const GovernanceSection: m.Component<{}, {}> = {
       contains_children: false,
       default_toggle: showValidators ? toggle_tree_state['children']['Validators']['toggled_state'] : false,
       is_visible: showValidators,
+      is_updated: true,
       is_active: onValidatorsPage(m.route.get()),
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
@@ -979,6 +736,7 @@ const GovernanceSection: m.Component<{}, {}> = {
           navigateToSubpage('/new/proposal/:type', { type: ProposalType.MolochProposal });
         },
         is_visible: showMolochMemberOptions,
+        is_updated: true,
         is_active: m.route.get() === `/${app.activeChainId()}/new/proposal`, // TODO: Verify this works (and the other two)
         row_icon: false
       },
@@ -992,6 +750,7 @@ const GovernanceSection: m.Component<{}, {}> = {
           });
         },
         is_visible: showMolochMemberOptions,
+        is_updated: true,
         is_active: false,
         row_icon: false
       },
@@ -1002,6 +761,7 @@ const GovernanceSection: m.Component<{}, {}> = {
           app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
         },
         is_visible: showMolochMemberOptions,
+        is_updated: true,
         is_active: false,
         row_icon: false
       }
@@ -1013,6 +773,7 @@ const GovernanceSection: m.Component<{}, {}> = {
       default_toggle: showMolochMemberOptions ? toggle_tree_state['children']['Moloch']['toggled_state'] : false,
       is_visible: showMolochMemberOptions,
       is_active: showMolochMemberOptions,
+      is_updated: true,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
         setGovernanceToggleTree('children.Moloch.toggled_state', toggle)
@@ -1028,6 +789,7 @@ const GovernanceSection: m.Component<{}, {}> = {
           e.preventDefault(); 
           navigateToSubpage('/projects');
         },
+        is_updated: true,
         is_visible: showCommonwealthMenuOptions,
         is_active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
         row_icon: false
@@ -1038,6 +800,7 @@ const GovernanceSection: m.Component<{}, {}> = {
           e.preventDefault(); 
           navigateToSubpage('/collectives');
         },
+        is_updated: true,
         is_visible: showCommonwealthMenuOptions,
         is_active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
         row_icon: false
@@ -1049,6 +812,7 @@ const GovernanceSection: m.Component<{}, {}> = {
       contains_children: true,
       default_toggle: showCommonwealthMenuOptions ? toggle_tree_state['children']['Commonwealth']['toggled_state'] : false,
       is_visible: showCommonwealthMenuOptions,
+      is_updated: true,
       is_active: showCommonwealthMenuOptions,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
@@ -1065,16 +829,33 @@ const GovernanceSection: m.Component<{}, {}> = {
       default_toggle: toggle_tree_state['toggled_state'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        setGovernanceToggleTree('toggled_state', toggle)
+        setGovernanceToggleTree('toggled_state', toggle);
       },
       display_data: governance_group_data,
-      is_active: true
+      is_active: false
     }
 
     return m(SidebarSection, {...sidebar_section_data});
   }
 }
 
+function setDiscussionsToggleTree(path: string, toggle: boolean) {
+  let current_tree = JSON.parse(localStorage[`${app.activeId()}-discussions-toggle-tree`]);
+  const new_tree = produce(current_tree, (draft) => {
+    let cur_obj = draft;
+    const split = path.split('.');
+    for (const field of split.slice(0, split.length-1)) {
+      if (cur_obj.hasOwnProperty(field)) {
+        cur_obj = cur_obj[field];
+      } else {
+        return;
+      }
+    }
+    cur_obj[split[split.length-1]] = toggle;
+  })
+
+  localStorage[`${app.activeId()}-discussions-toggle-tree`] = JSON.stringify(new_tree);
+}
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let current_tree = JSON.parse(localStorage[`${app.activeId()}-governance-toggle-tree`]);
@@ -1098,14 +879,14 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
   view: (vnode) => {
     const { useQuickSwitcher } = vnode.attrs;
 
-    
-
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
       !useQuickSwitcher && (app.chain || app.community) && m('.Sidebar', [
+        m(DiscussionSection),
         m(GovernanceSection),
+        m(ExternalLinksModule),
         m('br'),
-        app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
+        app.isLoggedIn() && (app.chain || app.community) && m('.subscription-button', m(SubscriptionButton)),
         app.chain && m(ChainStatusModule),
         app.isCustomDomain()
         && m('a', {
@@ -1114,6 +895,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
             window.open('https://commonwealth.im/');
           },
         }),
+        m('.spacer', '')
       ]),
     ];
   },
