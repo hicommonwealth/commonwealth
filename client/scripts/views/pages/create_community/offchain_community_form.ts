@@ -110,14 +110,13 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
             symbol,
           } = vnode.state;
           vnode.state.saving = true;
-          const additionalArgs: { eth_chain_id?: number; node_url?: string } =
-            {};
+          const additionalArgs: { eth_chain_id?: number, node_url?: string, bech32_prefix?: string } = {};
 
           // defaults to be overridden when chain is no longer "offchain" type
           switch (vnode.state.base) {
             case ChainBase.CosmosSDK: {
-              additionalArgs.node_url =
-                'https://osmosis-rpc.cw-figment.workers.dev';
+              additionalArgs.node_url = 'https://rpc-osmosis.keplr.app';
+              additionalArgs.bech32_prefix = 'osmo';
               break;
             }
             case ChainBase.NEAR: {
