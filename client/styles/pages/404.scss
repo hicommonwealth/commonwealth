@@ -13,4 +13,12 @@
             stroke-width: 1.6px;
         }
     }
+    .sublayout-sidebar-col {
+        max-width: 0;
+        padding: 0;
+        margin: 0;
+    }
+    .sublayout-main-col {
+        padding-right: 0;
+    }
 }
