@@ -95,7 +95,7 @@ const MultipleSnapshotsPage: m.Component<{
             m('.SnapshotSpaceTextHeader', [
                 redirect_options.header_message
             ]),
-            (app.chain || app.community) && vnode.state.spaces_metadata && [
+            (app.chain) && vnode.state.spaces_metadata && [
                 m(Listing, {
                     content: [
                         m('.discussion-group-wrap',  vnode.state.spaces_metadata.map((data) =>

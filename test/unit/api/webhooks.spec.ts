@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
@@ -33,7 +34,6 @@ describe('Webhook Tests', () => {
   let loggedInNotAdminAddr;
   let notAdminJWT;
   const chain = 'ethereum';
-  const community = 'staking';
   const topicName = 'test';
   const topicId = 0;
 
@@ -46,11 +46,6 @@ describe('Webhook Tests', () => {
     let result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
-    await modelUtils.assignRole({
-      address_id: result.address_id,
-      chainOrCommObj: { offchain_community_id: community },
-      role: 'admin',
-    });
     await modelUtils.updateRole({
       address_id: result.address_id,
       chainOrCommObj: { chain_id: chain },
@@ -76,21 +71,6 @@ describe('Webhook Tests', () => {
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
       expect(res.body.result.chain_id).to.be.equal(chain);
-      expect(res.body.result.offchain_community_id).to.be.null;
-      expect(res.body.result.url).to.be.equal(webhookUrl);
-    });
-
-    it('should create a webhook for a community', async () => {
-      const webhookUrl = faker.internet.url();
-      const res = await chai.request.agent(app)
-        .post('/api/createWebhook')
-        .set('Accept', 'application/json')
-        .send({ community, webhookUrl, auth: true, jwt: jwtToken });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.equal('Success');
-      expect(res.body.result).to.be.not.null;
-      expect(res.body.result.offchain_community_id).to.be.equal(community);
-      expect(res.body.result.chain_id).to.be.null;
       expect(res.body.result.url).to.be.equal(webhookUrl);
     });
 
@@ -99,13 +79,13 @@ describe('Webhook Tests', () => {
       await chai.request.agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
-        .send({ community, webhookUrl, auth: true, jwt: jwtToken });
+        .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
       let webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
       expect(webhookUrls).to.have.length(1);
       const errorRes = await chai.request.agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
-        .send({ community, webhookUrl, auth: true, jwt: jwtToken });
+        .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
       expectErrorOnResponse(500, Errors.NoDuplicates, errorRes);
       webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
       expect(webhookUrls).to.have.length(1);
@@ -118,7 +98,7 @@ describe('Webhook Tests', () => {
       const errorRes = await chai.request.agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
-        .send({ address: notLoggedInAddr, community, webhookUrl, jwt: jwt.sign({ id: -1, email: null }, JWT_SECRET) });
+        .send({ address: notLoggedInAddr, chain, webhookUrl, jwt: jwt.sign({ id: -1, email: null }, JWT_SECRET) });
       expectErrorOnResponse(401, undefined, errorRes);
       const webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
       expect(webhookUrls).to.have.length(0);
@@ -131,7 +111,7 @@ describe('Webhook Tests', () => {
       const errorRes = await chai.request.agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
-        .send({ address: loggedInNotAdminAddr, community, webhookUrl, auth: true, jwt: notAdminJWT });
+        .send({ address: loggedInNotAdminAddr, chain, webhookUrl, auth: true, jwt: notAdminJWT });
       expectErrorOnResponse(500, Errors.NotAdmin, errorRes);
       const webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
       expect(webhookUrls).to.have.length(0);
@@ -227,7 +207,6 @@ describe('Webhook Tests', () => {
       });
       res = await modelUtils.createThread({
         chainId: chain,
-        communityId: null,
         topicName,
         topicId,
         address: loggedInAddr,
@@ -246,7 +225,6 @@ describe('Webhook Tests', () => {
       });
       res = await modelUtils.createThread({
         chainId: chain,
-        communityId: null,
         topicName,
         topicId,
         address: loggedInAddr,

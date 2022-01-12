@@ -63,8 +63,6 @@ export const getCommunityResult = (community) => {
     ? { token: community }
     : community.contentType === ContentType.Chain
       ? { chain: community }
-      : community.contentType === ContentType.Community
-        ? { community }
         : null;
   params['size'] = 36;
   const onSelect = (e) => {
@@ -239,8 +237,8 @@ const SearchPage : m.Component<{
 
     const searchQuery = SearchQuery.fromUrlParams(m.route.param())
 
-    const { communityScope, chainScope, searchTerm } = searchQuery
-    const scope = app.isCustomDomain() ? app.customDomainId() : (communityScope || chainScope);
+    const { chainScope, searchTerm } = searchQuery
+    const scope = app.isCustomDomain() ? app.customDomainId() : (chainScope);
 
     if (!app.search.isValidQuery(searchQuery)) {
       vnode.state.errorText = 'Must enter query longer than 3 characters to begin searching';
@@ -341,7 +339,6 @@ const SearchPage : m.Component<{
                 href: '#',
                 onclick: () => {
                   searchQuery.chainScope = undefined
-                  searchQuery.communityScope = undefined
                   m.route.set(`/search?${searchQuery.toUrlParams()}`);
                   setTimeout(() => {
                     vnode.state.refreshResults = true;

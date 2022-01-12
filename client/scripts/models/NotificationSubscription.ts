@@ -8,7 +8,6 @@ class NotificationSubscription {
   public readonly Chain: any;
   public readonly ChainEventType: any;
   public readonly OffchainComment: any;
-  public readonly OffchainCommunity: any;
   public readonly OffchainThread: any;
 
   private _immediateEmail: boolean;
@@ -43,7 +42,6 @@ class NotificationSubscription {
     this.Chain = Chain;
     this.ChainEventType = ChainEventType;
     this.OffchainComment = OffchainComment;
-    this.OffchainCommunity = OffchainCommunity;
     this.OffchainThread = OffchainThread;
   }
 

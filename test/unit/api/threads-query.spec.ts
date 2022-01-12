@@ -25,6 +25,7 @@ describe('Thread queries', () => {
     expect(address.id).to.be.greaterThan(0);
     const thread = (await models.OffchainThread.findOrCreate({
       where: {
+        chain: chain.id,
         address_id: address.id,
         title: 'title',
         kind: 'kind',

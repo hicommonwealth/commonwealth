@@ -2,7 +2,7 @@ import 'layout.scss';
 
 import m from 'mithril';
 
-import { initChain, initCommunity, initNewTokenChain, deinitChainOrCommunity, selectNode } from 'app';
+import { initChain, initNewTokenChain, deinitChainOrCommunity, selectNode } from 'app';
 import app from 'state';
 
 import Sublayout from 'views/sublayout';
@@ -37,7 +37,6 @@ export const Layout: m.Component<{
     const { scope, deferChain, hideSidebar } = vnode.attrs;
     const scopeIsEthereumAddress = scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
-    const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
     if (app.loadingError) {
       return m('.Layout.mithril-app', {
@@ -57,7 +56,7 @@ export const Layout: m.Component<{
       vnode.state.loadingScope = scope;
       initNewTokenChain(scope);
       return m(LoadingLayout, { hideSidebar });
-    } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity && !scopeIsEthereumAddress) {
+    } else if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return m('.Layout.mithril-app', {
@@ -67,7 +66,7 @@ export const Layout: m.Component<{
         m(AppModals),
         m(AppToasts),
       ]);
-    } else if (scope && scope !== app.activeId() && scope !== vnode.state.loadingScope) {
+    } else if (scope && scope !== app.activeChainId() && scope !== vnode.state.loadingScope) {
       // If we are supposed to load a new chain or community, we do so now
       // This happens only once, and then loadingScope should be set
       vnode.state.loadingScope = scope;
@@ -79,15 +78,12 @@ export const Layout: m.Component<{
           }
         });
         return m(LoadingLayout, { hideSidebar });
-      } else if (scopeMatchesCommunity) {
-        initCommunity(scope);
-        return m(LoadingLayout, { hideSidebar });
       }
     } else if (scope && vnode.state.deferred && !deferChain) {
       vnode.state.deferred = false;
       initChain();
       return m(LoadingLayout, { hideSidebar });
-    } else if (!scope && ((app.chain && app.chain.network) || app.community)) {
+    } else if (!scope && ((app.chain && app.chain.network))) {
       // Handle the case where we unload the network or community, if we're
       // going to a page that doesn't have one
       // Include this in if for isCustomDomain, scope gets unset on redirect

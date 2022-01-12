@@ -78,14 +78,12 @@ class RecentActivityController {
 
   public async getRecentTopicActivity(options: {
     chainId: string;
-    communityId: string;
     threadsPerTopic?: number;
   }): Promise<OffchainThread[]> {
-    const { chainId, communityId } = options;
+    const { chainId } = options;
     const threadsPerTopic = options.threadsPerTopic || 3;
     const params = {
       chain: chainId,
-      community: communityId,
       threads_per_topic: threadsPerTopic
     };
 

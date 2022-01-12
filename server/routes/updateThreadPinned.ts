@@ -30,7 +30,7 @@ const updateThreadPinned = async (models: DB, req: Request, res: Response, next:
       }
     });
     const role = roles.find((r) => {
-      return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
+      return r.chain_id === thread.chain;
     });
     if (!role) return next(new Error(Errors.NotAdmin));
 
