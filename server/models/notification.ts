@@ -6,7 +6,7 @@ import { ChainEventAttributes, ChainEventInstance } from './chain_event';
 
 export interface NotificationAttributes {
   notification_data: string;
-  chain_id: string;
+  chain_id?: string;
   category_id: string;
   id?: number;
   chain_event_id?: number;
