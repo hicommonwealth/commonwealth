@@ -63,6 +63,7 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
 
     // Check for accounts on offchain forums that originally signed up on a different base chain,
     // Render them as anonymous as the forum is unable to support them.
+
     if (item.authorChain !== app.chain.id) {
       return m('.ProposalBodyAvatar', [
         m(AnonymousUser, {

@@ -84,7 +84,12 @@ const User: m.Component<{
       if (!chainId || !address) return;
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === chainId) {
-        account = app.chain.accounts.get(address);
+        try {
+          account = app.chain.accounts.get(address);
+        } catch (e) {
+          console.error(e);
+          account = null;
+        }
       }
       profile = app.profiles.getProfile(chainId, address);
       role = adminsAndMods.find((r) => r.address === address && r.address_chain === chainId);
@@ -92,7 +97,12 @@ const User: m.Component<{
       profile = vnode.attrs.user;
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
-        account = app.chain.accounts.get(profile.address);
+        try {
+          account = app.chain.accounts.get(profile.address);
+        } catch (e) {
+          console.error(e);
+          account = null;
+        }
       }
       role = adminsAndMods.find((r) => r.address === profile.address && r.address_chain === profile.chain);
     } else {
@@ -119,6 +129,7 @@ const User: m.Component<{
         size: 'xs',
       }),
     ];
+
     const ghostAddress = app.user.addresses.some(({ address, ghostAddress_ }) => {
       if (this !== undefined) account.address === address && ghostAddress_
     });
@@ -349,6 +360,7 @@ export const AnonymousUser: m.Component<{
         }
       })
     }
+
     return avatarOnly
       ? m('.User.avatar-only', {
         key: '-'
