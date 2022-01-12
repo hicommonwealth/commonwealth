@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { ServerError } from '../util/errors';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
 
@@ -59,7 +60,7 @@ const getThreads = async (
     });
   } catch (e) {
     console.log(e);
-    return next(new Error(e));
+    throw new ServerError(error)
   }
 
   return threads.length
