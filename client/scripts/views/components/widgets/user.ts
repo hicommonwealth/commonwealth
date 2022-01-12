@@ -87,7 +87,7 @@ const User: m.Component<{
         try {
           account = app.chain.accounts.get(address);
         } catch (e) {
-          console.error(e);
+          console.log('legacy account error, carry on');
           account = null;
         }
       }
