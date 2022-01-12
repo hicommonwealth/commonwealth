@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable no-restricted-globals */
 import 'pages/view_proposal/editor_permissions.scss';
 
 import m from 'mithril';
@@ -27,6 +31,7 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import { MenuItem, Button, Dialog, QueryList, Classes, ListItem, Icon, Icons, Popover } from 'construct-ui';
 import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
+import { ChainType } from '../../../../../shared/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 
@@ -37,9 +42,9 @@ export enum GlobalStatus {
 
 const clearEditingLocalStorage = (item, isThread: boolean) => {
   if (isThread) {
-    localStorage.removeItem(`${app.activeId()}-edit-thread-${item.id}-storedText`);
+    localStorage.removeItem(`${app.activeChainId()}-edit-thread-${item.id}-storedText`);
   } else {
-    localStorage.removeItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+    localStorage.removeItem(`${app.activeChainId()}-edit-comment-${item.id}-storedText`);
   }
 };
 
@@ -56,9 +61,21 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
     if (!item) return;
     if (!item.author) return;
 
-    const author : Account<any> = app.community
-      ? app.community.accounts.get(item.author, item.authorChain)
-      : app.chain.accounts.get(item.author);
+    // Check for accounts on offchain forums that originally signed up on a different base chain,
+    // Render them as anonymous as the forum is unable to support them.
+
+    if (item.authorChain !== app.chain.id && item.authorChain !== app.chain.base) {
+      return m('.ProposalBodyAvatar', [
+        m(AnonymousUser, {
+            avatarOnly: true,
+            avatarSize: 40,
+            showAsDeleted: true,
+            distinguishingKey: item.author.slice(item.author.length - 3),
+          })
+      ]);
+    }
+
+    const author : Account<any> = app.chain.accounts.get(item.author);
 
     return m('.ProposalBodyAvatar', [
       (item as OffchainComment<any>).deleted
@@ -84,10 +101,22 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
     if (!item) return;
     if (!item.author) return;
 
+    // Check for accounts on offchain forums that originally signed up on a different base chain,
+    // Render them as anonymous as the forum is unable to support them.
+    if ((item instanceof OffchainComment || item instanceof OffchainComment)
+      && app.chain.meta.chain.type === ChainType.Offchain) {
+      if (item.authorChain !== app.chain.id && item.authorChain !== app.chain.base) {
+        return m('.ProposalBodyAuthor', [
+          m(AnonymousUser, {
+            hideAvatar: true,
+            distinguishingKey: item.author,
+          })
+        ]);
+      }
+    }
+
     const author : Account<any> = (item instanceof OffchainThread || item instanceof OffchainComment)
-      ? (app.community
-        ? app.community.accounts.get(item.author, item.authorChain)
-        : app.chain.accounts.get(item.author))
+      ? (app.chain.accounts.get(item.author))
       : item.author;
 
     return m('.ProposalBodyAuthor', [
@@ -277,7 +306,7 @@ export const ProposalEditorPermissions: m.Component<{
     const { thread } = vnode.attrs;
     if (!vnode.state.membersFetched) {
       vnode.state.membersFetched = true;
-      const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+      const chainOrCommObj = { chain: app.activeChainId() };
       $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
         .then((res) => {
           if (res.status !== 'Success') throw new Error('Could not fetch members');
@@ -340,7 +369,7 @@ export const ProposalEditorPermissions: m.Component<{
           },
           itemRender: (role: any, idx: number) => {
             const user: Profile = app.profiles.getProfile(role.Address.chain, role.Address.address);
-            const recentlyAdded: boolean = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
+            const recentlyAdded = !$.isEmptyObject(vnode.state.addedEditors[role.Address.address]);
             return m(ListItem, {
               label: [
                 m(User, { user })
@@ -417,7 +446,6 @@ export const ProposalEditorPermissions: m.Component<{
                   address: app.user.activeAccount.address,
                   author_chain: app.user.activeAccount.chain.id,
                   chain: app.activeChainId(),
-                  community: app.activeCommunityId(),
                   thread_id: thread.id,
                   editors: JSON.stringify(vnode.state.addedEditors),
                   jwt: app.user.jwt,
@@ -440,7 +468,6 @@ export const ProposalEditorPermissions: m.Component<{
                   address: app.user.activeAccount.address,
                   author_chain: app.user.activeAccount.chain.id,
                   chain: app.activeChainId(),
-                  community: app.activeCommunityId(),
                   thread_id: thread.id,
                   editors: JSON.stringify(vnode.state.removedEditors),
                   jwt: app.user.jwt,
@@ -580,9 +607,7 @@ export const ProposalBodyText: m.Component<{ item: AnyProposal | OffchainThread 
 
     const getPlaceholder = () => {
       if (!(item instanceof OffchainThread)) return;
-      const author : Account<any> = app.community
-        ? app.community.accounts.get(item.author, item.authorChain)
-        : app.chain ? app.chain.accounts.get(item.author) : null;
+      const author : Account<any> = app.chain ? app.chain.accounts.get(item.author) : null;
 
       return m('.ProposalBodyText.proposal-body-placeholder', [
         author ? [
@@ -650,8 +675,8 @@ export const ProposalBodyEditor: m.Component<{
     const { item } = vnode.attrs;
     const isThread = item instanceof OffchainThread;
     vnode.state.savedEdits = isThread
-      ? localStorage.getItem(`${app.activeId()}-edit-thread-${item.id}-storedText`)
-      : localStorage.getItem(`${app.activeId()}-edit-comment-${item.id}-storedText`);
+      ? localStorage.getItem(`${app.activeChainId()}-edit-thread-${item.id}-storedText`)
+      : localStorage.getItem(`${app.activeChainId()}-edit-comment-${item.id}-storedText`);
     if (vnode.state.savedEdits) {
       const modalMsg = 'Previous changes found. Restore edits?';
       vnode.state.restoreEdits = await confirmationModalWithText(modalMsg, 'Yes', 'No')();

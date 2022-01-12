@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
@@ -21,7 +22,6 @@ const { expect } = chai;
 const markdownComment = require('../../util/fixtures/markdownComment');
 
 describe('Thread Tests', () => {
-  const community = 'staking';
   const chain = 'ethereum';
   // The createThread util uses the chainId parameter to determine
   // author_chain, which is required for authorship lookup.
@@ -51,9 +51,9 @@ describe('Thread Tests', () => {
     adminAddress = res.address;
     adminAddressId = res.address_id;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    const isAdmin = await modelUtils.assignRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: res.address_id,
-      chainOrCommObj: { offchain_community_id: community },
+      chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
     expect(adminAddress).to.not.be.null;
@@ -78,7 +78,6 @@ describe('Thread Tests', () => {
         kind: null,
         stage,
         chainId: chain,
-        communityId: community,
         title,
         topicName,
         topicId,
@@ -96,7 +95,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: community,
         title: '',
         topicName,
         topicId,
@@ -114,7 +112,6 @@ describe('Thread Tests', () => {
         kind: 'question',
         stage,
         chainId: chain,
-        communityId: community,
         title: '',
         topicName,
         topicId,
@@ -132,7 +129,6 @@ describe('Thread Tests', () => {
         kind: 'request',
         stage,
         chainId: chain,
-        communityId: community,
         title: '',
         topicName,
         topicId,
@@ -150,7 +146,6 @@ describe('Thread Tests', () => {
         kind: 'link',
         stage,
         chainId: chain,
-        communityId: community,
         title: '',
         topicName,
         topicId,
@@ -169,7 +164,6 @@ describe('Thread Tests', () => {
         kind: 'link',
         stage,
         chainId: chain,
-        communityId: community,
         title,
         topicName,
         topicId,
@@ -188,7 +182,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: community,
         title,
         topicName,
         topicId,
@@ -229,7 +222,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: c.id,
         title,
         body,
         jwt: adminJWT,
@@ -244,7 +236,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: community,
         title,
         topicName,
         topicId,
@@ -265,7 +256,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: community,
         title,
         body,
         jwt: userJWT,
@@ -280,7 +270,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: community,
         title,
         topicName,
         topicId,
@@ -316,7 +305,7 @@ describe('Thread Tests', () => {
         .get('/api/bulkThreads')
         .set('Accept', 'application/json')
         .query({
-          community,
+          chain,
           jwt: adminJWT,
         });
       expect(res.body.result).to.not.be.null;
@@ -348,7 +337,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: community,
         title,
         topicName,
         topicId,
@@ -470,7 +458,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: undefined,
         title,
         topicName,
         topicId,
@@ -494,10 +481,9 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
-          thread_id: thread_id,
           kind: thread_kind,
           stage: thread_stage,
           body: thread.body,
@@ -520,7 +506,7 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
           thread_id: null,
@@ -548,10 +534,10 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
-          thread_id: thread_id,
+          thread_id,
           kind: thread_kind,
           stage: thread_stage,
           body: null,
@@ -575,10 +561,10 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
-          thread_id: thread_id,
+          thread_id,
           kind: thread_kind,
           stage: thread_stage,
           body: newBody,
@@ -601,10 +587,10 @@ describe('Thread Tests', () => {
         .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          chain: chain,
+          chain,
           address: adminAddress,
           author_chain: chain,
-          thread_id: thread_id,
+          thread_id,
           kind: thread_kind,
           stage: thread_stage,
           body: thread.body,
@@ -627,7 +613,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: community,
         title,
         topicName,
         topicId,
@@ -748,7 +733,6 @@ describe('Thread Tests', () => {
       const text = 'tes text';
       const tRes = await modelUtils.createThread({
         chainId: chain,
-        communityId: community,
         address: userAddress,
         jwt: userJWT,
         title,
@@ -777,7 +761,6 @@ describe('Thread Tests', () => {
       expect(eRes.result).not.to.be.null;
       expect(eRes.result.chain).to.be.equal(chain);
       expect(eRes.result.root_id).to.be.equal(`discussion_${tRes.result.id}`);
-      expect(eRes.result.community).to.be.null;
     });
   });
 
@@ -788,7 +771,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: undefined,
         title,
         topicName,
         topicId,
@@ -841,7 +823,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: community,
         title,
         topicName,
         topicId,
@@ -855,7 +836,7 @@ describe('Thread Tests', () => {
         .request(app)
         .post('/api/viewCount')
         .set('Accept', 'application/json')
-        .send({ community, object_id });
+        .send({ chain, object_id });
       expect(res.status).to.equal(200);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
@@ -916,7 +897,6 @@ describe('Thread Tests', () => {
         kind,
         stage,
         chainId: chain,
-        communityId: community,
         title,
         topicName,
         topicId,

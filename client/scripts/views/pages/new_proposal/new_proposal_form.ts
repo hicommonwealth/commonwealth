@@ -73,7 +73,6 @@ const NewProposalForm = {
     const callback = vnode.attrs.callback;
     const author = app.user.activeAccount;
     const proposalTypeEnum = vnode.attrs.typeEnum;
-    const activeEntity = app.community || app.chain;
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
@@ -109,7 +108,7 @@ const NewProposalForm = {
     // sputnik proposal
     let hasSputnikFields: boolean;
     // data loaded
-    let dataLoaded: boolean = true;
+    let dataLoaded = true;
 
     if (proposalTypeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;
@@ -191,7 +190,6 @@ const NewProposalForm = {
           OffchainThreadKind.Forum,
           OffchainThreadStage.Discussion,
           app.activeChainId(),
-          app.activeCommunityId(),
           vnode.state.form.title,
           vnode.state.form.topicName,
           vnode.state.form.topicId,
@@ -514,7 +512,7 @@ const NewProposalForm = {
       });
     }
 
-    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+    const activeEntityInfo = app.chain.meta.chain;
 
     const { activeAaveTabIndex, aaveProposalState } = vnode.state;
 
@@ -541,8 +539,8 @@ const NewProposalForm = {
           hasAction && m(EdgewareFunctionPicker),
           hasTopics
           && m(TopicSelector, {
-            topics: app.topics.getByCommunity(app.activeId()),
-            featuredTopics: app.topics.getByCommunity(app.activeId())
+            topics: app.topics.getByCommunity(app.activeChainId()),
+            featuredTopics: app.topics.getByCommunity(app.activeChainId())
               .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
             updateFormData: (topicName: string, topicId?: number) => {
               vnode.state.form.topicName = topicName;

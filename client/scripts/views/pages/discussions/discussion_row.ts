@@ -142,7 +142,7 @@ const DiscussionRow: m.Component<
         && [
           link(
             'a.proposal-topic',
-            `/${app.activeId()}/discussions/${proposal.topic.name}`,
+            `/${app.activeChainId()}/discussions/${proposal.topic.name}`,
             [m('span.proposal-topic-name', `${proposal.topic.name}`)]
           ),
           ' ', // em space
@@ -194,7 +194,7 @@ const DiscussionRow: m.Component<
     const rowMetadata = [
       m('.discussion-row-right-meta', [
         m(UserGallery, {
-          avatarSize: 20,
+          avatarSize: 36,
           popover: true,
           maxUsers: 2,
           addressesCount:
@@ -234,7 +234,7 @@ const DiscussionRow: m.Component<
         if ($(e.target).hasClass('cui-tag')) return;
         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         e.preventDefault();
-        localStorage[`${app.activeId()}-discussions-scrollY`] = window.scrollY;
+        localStorage[`${app.activeChainId()}-discussions-scrollY`] = window.scrollY;
         m.route.set(discussionLink);
       },
     });
