@@ -151,7 +151,7 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
   },
 };
 
-const LockdropToolsCard: m.Component<{}> = {
+const LockdropToolsCard: m.Component = {
   view: (vnode) => {
     return m(
       FaceliftCard,
@@ -188,7 +188,7 @@ const LockdropToolsCard: m.Component<{}> = {
   },
 };
 
-const NewCommunityCard: m.Component<{}> = {
+const NewCommunityCard: m.Component = {
   view: (vnode) => {
     return m(
       FaceliftCard,
@@ -216,7 +216,7 @@ const NewCommunityCard: m.Component<{}> = {
   },
 };
 
-const HomepageCommunityCards: m.Component<{}, {}> = {
+const HomepageCommunityCards: m.Component = {
   view: (vnode) => {
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
