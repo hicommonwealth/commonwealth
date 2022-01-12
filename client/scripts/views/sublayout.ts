@@ -14,7 +14,6 @@ import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
-import { ButtonIntent, FaceliftButton, FaceliftGradientButton, GradientType } from 'views/components/component_kit/buttons';
 import { SearchBar } from './components/search_bar';
 import { CommunityOptionsPopover } from './pages/discussions';
 import { ButtonIntent, FaceliftButton, FaceliftGradientButton, GradientType } from 'views/components/component_kit/buttons';
@@ -130,8 +129,9 @@ const Sublayout: m.Component<{
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }
 
-    const sidebarOpen = (app.chain !== null || app.community !== null);
+    const sidebarOpen = app.chain !== null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
+    console.log("sidebarOpen:", sidebarOpen)
 
     return [
       m('.layout-container', [

@@ -225,16 +225,15 @@
     top: $layout-padding + 48;
     left: $quick-switcher-width;
     z-index: 2;
-    //padding-top: 36px;
     padding-bottom: 36px;
     min-width: $sidebar-width;
     min-height: 100vh;
-    overflow-y: scroll;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
     background-color: $layout-color;
     border-right-color: $disable-grey;
     border-right-width: 1px;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
     &::-webkit-scrollbar { /* Chrome */
         display: none;
     }

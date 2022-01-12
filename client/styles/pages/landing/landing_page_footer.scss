@@ -12,5 +12,10 @@
 }
 
 .FooterLandingPage {
-  margin-left: $sidebar-width;
+  &.sidebar {
+    margin-left: $sidebar-width;
+    @include sm-max {
+      margin-left: 0px;
+    }
+  }
 }

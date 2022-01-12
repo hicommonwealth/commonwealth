@@ -11,7 +11,7 @@ import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'types';
 import { link } from 'helpers';
-import { ChainInfo, CommunityInfo, NodeInfo } from 'models';
+import { ChainInfo, NodeInfo } from 'models';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
@@ -43,7 +43,7 @@ function comparisonCustomizer(value1, value2) {
 }
 // Check that our current cached tree is structurally correct
 function verifyCachedToggleTree(tree_name: string, toggle_tree: ToggleTree) {
-  const cached_tree = JSON.parse(localStorage[`${app.activeId()}-${tree_name}-toggle-tree`]);
+  const cached_tree = JSON.parse(localStorage[`${app.activeChainId()}-${tree_name}-toggle-tree`]);
   return _.isEqualWith(cached_tree, toggle_tree, comparisonCustomizer);
 }
 
@@ -185,8 +185,8 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
 
 export const ExternalLinksModule: m.Component<{}, {}> = {
   view: (vnode) => {
-    if (!app.chain && !app.community) return;
-    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    if (!app.chain) return;
+    const meta = app.chain.meta.chain;
     const { name, description, website, discord, element, telegram, github } = meta;
     if (!website && !discord && !telegram && !github) return;
 
@@ -248,24 +248,21 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
 const DiscussionSection: m.Component<{}, {}> = {
   view: (vnode) => {
     // Conditional Render Details + 
-    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
-      || p.startsWith(`/${app.activeId()}/discussions/`)
-      || p.startsWith(`/${app.activeId()}/proposal/discussion/`)
-      || p.startsWith(`/${app.activeId()}?`);
-    const onAllDiscussionPage = (p) => p === `/${app.activeId()}/` || p === `/${app.activeId()}`;
+    const onAllDiscussionPage = (p) => p === `/${app.activeChainId()}/` || p === `/${app.activeChainId()}`;
+    const onDiscussionsPage = (p) => p === `/${app.activeChainId()}` || p === `/${app.activeChainId()}/`
+      || p.startsWith(`/${app.activeChainId()}/discussions/`)
+      || p.startsWith(`/${app.activeChainId()}/proposal/discussion/`)
+      || p.startsWith(`/${app.activeChainId()}?`);
     const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
-    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
-      || p.startsWith(`/${app.activeId()}/account/`);
-    const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeId()}/sputnik-daos`);
+    const onMembersPage = (p) => p.startsWith(`/${app.activeChainId()}/members`)
+      || p.startsWith(`/${app.activeChainId()}/account/`);
+    const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
 
-    const topics = app.topics.getByCommunity(app.activeId()).map(({ id, name, featuredInSidebar }) => {
+    const topics = app.topics.getByCommunity(app.activeChainId()).map(({ id, name, featuredInSidebar }) => {
       return { id, name, featuredInSidebar };
     }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
 
-    const load_discussion_sections = onDiscussionsPage(m.route.get())
-                            && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true);
-
-    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeId())) ? 'FORUMS' : 'DISCUSSIONS';
+    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeChainId())) ? 'FORUMS' : 'DISCUSSIONS';
 
     // Build Toggle Tree 
     let discussions_default_toggle_tree = {
@@ -282,7 +279,7 @@ const DiscussionSection: m.Component<{}, {}> = {
               toggled_state: false,
               children: {}
             }, 
-            ...(app.activeId() === 'near') && {
+            ...(app.activeChainId() === 'near') && {
               'SputnikDaos': {
                 toggled_state: false,
                 children: {}
@@ -294,14 +291,14 @@ const DiscussionSection: m.Component<{}, {}> = {
     }
 
     // Check if an existing toggle tree is stored
-    if (!localStorage[`${app.activeId()}-discussions-toggle-tree`]) {
+    if (!localStorage[`${app.activeChainId()}-discussions-toggle-tree`]) {
       console.log("setting discussions toggle tree since it doesn't exist")
-      localStorage[`${app.activeId()}-discussions-toggle-tree`] = JSON.stringify(discussions_default_toggle_tree);
+      localStorage[`${app.activeChainId()}-discussions-toggle-tree`] = JSON.stringify(discussions_default_toggle_tree);
     } else if (!verifyCachedToggleTree('discussions', discussions_default_toggle_tree)) {
       console.log("setting discussions toggle tree since the cached version differs from the updated version")
-      localStorage[`${app.activeId()}-discussions-toggle-tree`] = JSON.stringify(discussions_default_toggle_tree);
+      localStorage[`${app.activeChainId()}-discussions-toggle-tree`] = JSON.stringify(discussions_default_toggle_tree);
     }
-    const toggle_tree_state = JSON.parse(localStorage[`${app.activeId()}-discussions-toggle-tree`])   
+    const toggle_tree_state = JSON.parse(localStorage[`${app.activeChainId()}-discussions-toggle-tree`])   
 
     const discussions_group_data: SectionGroupProps[] = [{
       title: 'All',
@@ -317,14 +314,14 @@ const DiscussionSection: m.Component<{}, {}> = {
       },
       display_data: null
     },
-    (app.activeId() === 'near') && {
+    (app.activeChainId() === 'near') && {
       title: 'Sputnik Daos',
       contains_children: false,
       default_toggle: false,
       is_visible: true,
       is_updated: true,
       is_active: onSputnikDaosPage(m.route.get())
-      && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+                    && (app.chain ? app.chain.serverLoaded : true),
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
         setDiscussionsToggleTree(`children.SputnikDAOs.toggled_state`, toggle);
@@ -371,7 +368,7 @@ const DiscussionSection: m.Component<{}, {}> = {
 const GovernanceSection: m.Component<{}, {}> = {
   view: (vnode) => {
     // Conditional Render Details
-    const hasProposals = app.chain && !app.community && (
+    const hasProposals = app.chain && (
       app.chain.base === ChainBase.CosmosSDK
         || app.chain.network === ChainNetwork.Sputnik
         || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
@@ -382,28 +379,30 @@ const GovernanceSection: m.Component<{}, {}> = {
         || app.chain.meta.chain.snapshot);
     if (!hasProposals) return;
 
-    const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
-    const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
-    const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
-    const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
-    const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
-    const showSnapshotOptions = app.chain?.meta.chain.snapshot.length > 0;
-    const showReferenda = !app.community && app.chain?.base === ChainBase.Substrate
+    const isNotOffchain = app.chain?.meta.chain.type !== ChainType.Offchain;
+
+    const showMolochMenuOptions = isNotOffchain && app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
+    const showMolochMemberOptions = isNotOffchain && showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
+    const showCommonwealthMenuOptions = isNotOffchain && app.chain?.network === ChainNetwork.Commonwealth;
+    const showCompoundOptions = isNotOffchain && app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
+    const showAaveOptions = isNotOffchain && app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
+    const showSnapshotOptions = isNotOffchain && app.chain?.meta.chain.snapshot.length > 0;
+    const showReferenda = isNotOffchain && app.chain?.base === ChainBase.Substrate
                             && app.chain.network !== ChainNetwork.Darwinia
                             && app.chain.network !== ChainNetwork.HydraDX;
-    const showProposals = !app.community && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
+    const showProposals = isNotOffchain && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
                             || app.chain?.base === ChainBase.CosmosSDK
                             || app.chain?.network === ChainNetwork.Sputnik
                             || app.chain?.network === ChainNetwork.Moloch
                             || app.chain?.network === ChainNetwork.Compound
                             || app.chain?.network === ChainNetwork.Aave)      
-    const showCouncillors = !app.community && app.chain?.base === ChainBase.Substrate;
-    const showTreasury = !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge;
-    const showBounties = !app.community && app.chain?.base === ChainBase.Substrate
+    const showCouncillors = isNotOffchain && app.chain?.base === ChainBase.Substrate;
+    const showTreasury = isNotOffchain && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge;
+    const showBounties = isNotOffchain && app.chain?.base === ChainBase.Substrate
                             && app.chain.network !== ChainNetwork.Centrifuge
                             && app.chain.network !== ChainNetwork.HydraDX;
-    const showTips =  !app.community && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge;
-    const showValidators =  !app.community && app.chain?.base === ChainBase.Substrate
+    const showTips = isNotOffchain && app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge;
+    const showValidators = isNotOffchain && app.chain?.base === ChainBase.Substrate
                               && app.chain?.network !== ChainNetwork.Kulupu && app.chain?.network !== ChainNetwork.Darwinia;
     
 
@@ -510,17 +509,17 @@ const GovernanceSection: m.Component<{}, {}> = {
     }
 
     // Check if an existing toggle tree is stored
-    if (!localStorage[`${app.activeId()}-governance-toggle-tree`]) {
+    if (!localStorage[`${app.activeChainId()}-governance-toggle-tree`]) {
       console.log("setting toggle tree from scratch")
-      localStorage[`${app.activeId()}-governance-toggle-tree`] = JSON.stringify(governance_default_toggle_tree);
+      localStorage[`${app.activeChainId()}-governance-toggle-tree`] = JSON.stringify(governance_default_toggle_tree);
     } else if (!verifyCachedToggleTree('governance', governance_default_toggle_tree)) {
       console.log("setting discussions toggle tree since the cached version differs from the updated version")
-      localStorage[`${app.activeId()}-governance-toggle-tree`] = JSON.stringify(governance_default_toggle_tree);
+      localStorage[`${app.activeChainId()}-governance-toggle-tree`] = JSON.stringify(governance_default_toggle_tree);
     }
-    const toggle_tree_state = JSON.parse(localStorage[`${app.activeId()}-governance-toggle-tree`])    
+    const toggle_tree_state = JSON.parse(localStorage[`${app.activeChainId()}-governance-toggle-tree`])    
 
-    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeId()}/snapshot`);
-    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeId()}/new/snapshot/`);
+    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeChainId()}/snapshot`);
+    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeChainId()}/new/snapshot/`);
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyProposal}`));
@@ -537,8 +536,8 @@ const GovernanceSection: m.Component<{}, {}> = {
         || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateCollectiveProposal}`));
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
-    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`)
-    || p.startsWith(`/${app.activeId()}/account/`);
+    const onMembersPage = (p) => p.startsWith(`/${app.activeChainId()}/members`)
+    || p.startsWith(`/${app.activeChainId()}/account/`);
 
     if (onNotificationsPage(m.route.get())) return;
 
@@ -552,7 +551,7 @@ const GovernanceSection: m.Component<{}, {}> = {
       is_visible: true,
       is_updated: true,
       is_active: onMembersPage(m.route.get())
-      && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
+                    && (app.chain ? app.chain.serverLoaded : true),
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
         setGovernanceToggleTree('children.Members.toggled_state', toggle)
@@ -833,7 +832,7 @@ const GovernanceSection: m.Component<{}, {}> = {
 }
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
-  let current_tree = JSON.parse(localStorage[`${app.activeId()}-discussions-toggle-tree`]);
+  let current_tree = JSON.parse(localStorage[`${app.activeChainId()}-discussions-toggle-tree`]);
   const new_tree = produce(current_tree, (draft) => {
     let cur_obj = draft;
     const split = path.split('.');
@@ -847,11 +846,11 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     cur_obj[split[split.length-1]] = toggle;
   })
 
-  localStorage[`${app.activeId()}-discussions-toggle-tree`] = JSON.stringify(new_tree);
+  localStorage[`${app.activeChainId()}-discussions-toggle-tree`] = JSON.stringify(new_tree);
 }
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
-  let current_tree = JSON.parse(localStorage[`${app.activeId()}-governance-toggle-tree`]);
+  let current_tree = JSON.parse(localStorage[`${app.activeChainId()}-governance-toggle-tree`]);
   const new_tree = produce(current_tree, (draft) => {
     let cur_obj = draft;
     const split = path.split('.');
@@ -865,7 +864,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
     cur_obj[split[split.length-1]] = toggle;
   })
 
-  localStorage[`${app.activeId()}-governance-toggle-tree`] = JSON.stringify(new_tree);
+  localStorage[`${app.activeChainId()}-governance-toggle-tree`] = JSON.stringify(new_tree);
 }
 
 const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
@@ -874,12 +873,12 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
 
     return [
       !app.isCustomDomain() && m(SidebarQuickSwitcher),
-      !useQuickSwitcher && (app.chain || app.community) && m('.Sidebar', [
+      !useQuickSwitcher && app.chain && m('.Sidebar', [
         m(DiscussionSection),
         m(GovernanceSection),
         m(ExternalLinksModule),
         m('br'),
-        app.isLoggedIn() && (app.chain || app.community) && m('.subscription-button', m(SubscriptionButton)),
+        app.isLoggedIn() && app.chain && m('.subscription-button', m(SubscriptionButton)),
         app.chain && m(ChainStatusModule),
         app.isCustomDomain()
         && m('a', {
@@ -1423,5 +1422,3 @@ const SidebarOld: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }
     ];
   },
 };
-
-export default Sidebar;

@@ -85,9 +85,6 @@
         flex: 1;
         padding-right: 48px;
         max-width: $sidebar-width;
-        .Sidebar {
-            max-width: 190px; // sidebar button width
-        }
     }
     @include sm-max {
         .sublayout-sidebar-col {
@@ -277,6 +274,9 @@
         padding: 1px 0; // prevent margins from flowing outside the container
         padding-bottom: 80px;
         margin-left: $sidebar-width;
+        @include sm-max {
+            margin-left: 0px;
+        }
     }
     .token-banner {
         padding: 8px 0 2px;
