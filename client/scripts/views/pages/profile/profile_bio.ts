@@ -57,7 +57,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
   });
 };
 export interface IProfileHeaderAttrs {
-  account;
+  account: Account<any>;
   setIdentity: boolean;
   refreshCallback: Function;
   onLinkedProfile: boolean;
@@ -91,7 +91,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         }
       },
       { passive:true });
-    console.log('account', account.ghost_address)
+
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
