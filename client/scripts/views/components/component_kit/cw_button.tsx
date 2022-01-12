@@ -9,7 +9,7 @@ export const CWButton: m.Component<
   {
     styleProps: StyleProps;
     label: string;
-    onclick: () => void;
+    onclick: (e?: MouseEvent) => void;
   },
   Record<string, unknown>
 > = {
