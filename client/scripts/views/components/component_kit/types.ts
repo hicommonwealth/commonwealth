@@ -1,7 +1,18 @@
+export enum ComponentType {
+  Button = 'Button',
+  GradientButton = 'GradientButton',
+}
+
 export enum ButtonType {
   Primary = 'primary',
   Secondary = 'secondary',
 }
+
+export type StyleProps = {
+  buttonType: ButtonType;
+  disabled?: boolean;
+  className?: string;
+};
 
 export enum Justify {
   Right = 'right',
@@ -17,15 +28,4 @@ export enum LinkStyle {
 export enum EngagementButtonSize {
   Small = 'sm',
   Large = 'lg',
-}
-
-export type StyleProps = {
-  buttonType: ButtonType;
-  disabled?: boolean;
-  className?: string;
-};
-
-export enum ComponentType {
-  Button = 'Button',
-  GradientButton = 'GradientButton',
 }

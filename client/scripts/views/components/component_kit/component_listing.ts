@@ -270,10 +270,10 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           }),
           m(CWGradientButton, {
             styleProps: {
-              buttonType: ButtonType.Secondary,
+              buttonType: ButtonType.Primary,
               disabled: false,
             },
-            label: 'Secondary',
+            label: 'Primary',
             onclick: () => notifySuccess('Button clicked!'),
           }),
         ]

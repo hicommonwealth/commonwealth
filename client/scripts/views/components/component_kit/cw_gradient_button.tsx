@@ -1,8 +1,9 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { getClasses } from './helpers';
+
 import { ComponentType, StyleProps } from './types';
+import { getClasses } from './helpers';
 
 export const CWGradientButton: m.Component<
   {

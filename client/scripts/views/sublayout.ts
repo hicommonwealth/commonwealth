@@ -99,20 +99,11 @@ const Sublayout: m.Component<
           ],
     ]);
 
-    // m(CWGradientButton, {
-    //   styleProps: {
-    //     buttonType: ButtonType.Secondary,
-    //     disabled: false,
-    //   },
-    //   label: 'Secondary',
-    //   onclick: () => notifySuccess('Button clicked!'),
-    // }),
-
     const hiringButton = m(CWGradientButton, {
       styleProps: {
         buttonType: ButtonType.Secondary,
         disabled: false,
-        className: '.hiringBtn',
+        className: 'hiringBtn',
       },
       label: "We're hiring!",
       onclick: () => {
