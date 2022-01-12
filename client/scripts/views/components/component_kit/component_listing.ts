@@ -2,8 +2,6 @@ import m from 'mithril';
 import 'components/component_kit/component_listing.scss';
 import { notifySuccess } from 'controllers/app/notifications';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Icon,
   Icons,
   Input,
@@ -53,22 +51,16 @@ import {
   WebsiteIcon,
 } from './icons';
 import {
-  ButtonIntent,
   ExternalLinkElement,
-  FaceliftButton,
-  FaceliftButtonGroup,
-  Justify,
-  LinkStyle,
+  CWButtonGroup,
   FaceliftRadioGroup,
-  ButtonSize,
   EngagementButton,
-  FaceliftGradientButton,
-  GradientType,
 } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
-import { stubTrue } from 'lodash';
 import { CWButton } from './cw_button';
+import { ButtonType, EngagementButtonSize, Justify, LinkStyle } from './types';
+import { CWGradientButton } from './cw_gradient_button';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -245,60 +237,63 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         },
         [
           m(CWButton, {
-            intent: ButtonIntent.Primary,
+            styleProps: {
+              buttonType: ButtonType.Primary,
+              disabled: false,
+            },
             label: 'Primary',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: false,
           }),
-          m(FaceliftButton, {
-            intent: ButtonIntent.Primary,
-            label: 'Primary',
-            onclick: () => notifySuccess('Button clicked!'),
-            disabled: false,
-          }),
-          m(FaceliftButton, {
-            intent: ButtonIntent.Primary,
+          m(CWButton, {
+            styleProps: {
+              buttonType: ButtonType.Primary,
+              disabled: true,
+            },
             label: 'Disabled',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: true,
           }),
-          m(FaceliftButton, {
-            intent: ButtonIntent.Secondary,
+          m(CWButton, {
+            styleProps: {
+              buttonType: ButtonType.Secondary,
+              disabled: false,
+            },
             label: 'Secondary',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: false,
           }),
-          m(FaceliftButton, {
-            intent: ButtonIntent.Secondary,
+          m(CWButton, {
+            styleProps: {
+              buttonType: ButtonType.Secondary,
+              disabled: true,
+            },
             label: 'Disabled',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: true,
           }),
-          m(FaceliftGradientButton, {
-            intent: ButtonIntent.Primary,
-            label: 'Primary',
+          m(CWGradientButton, {
+            styleProps: {
+              buttonType: ButtonType.Secondary,
+              disabled: false,
+            },
+            label: 'Secondary',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: false,
-            gradient: GradientType.RAINBOW,
           }),
         ]
       ),
       m('.button-gallery', [
-        m(FaceliftButtonGroup, {
+        m(CWButtonGroup, {
           secondaryLabel: 'Button',
           primaryLabel: 'Group',
           primaryOnClick: () => notifySuccess('Primary clicked!'),
           secondaryOnClick: () => notifySuccess('Secondary clicked!'),
           justify: Justify.Left,
         }),
-        m(FaceliftButtonGroup, {
+        m(CWButtonGroup, {
           secondaryLabel: 'Center',
           primaryLabel: 'Justified',
           primaryOnClick: () => notifySuccess('Primary clicked!'),
           secondaryOnClick: () => notifySuccess('Secondary clicked!'),
           justify: Justify.Center,
         }),
-        m(FaceliftButtonGroup, {
+        m(CWButtonGroup, {
           secondaryLabel: 'Right',
           primaryLabel: 'Justified',
           primaryOnClick: () => notifySuccess('Primary clicked!'),
@@ -346,23 +341,23 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         },
         [
           m(EngagementButton, {
-            size: ButtonSize.SM,
+            size: EngagementButtonSize.Small,
             label: 'Small',
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(EngagementButton, {
-            size: ButtonSize.LG,
+            size: EngagementButtonSize.Large,
             label: 'Big',
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(EngagementButton, {
-            size: ButtonSize.SM,
+            size: EngagementButtonSize.Small,
             label: 'Small',
             disabled: true,
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(EngagementButton, {
-            size: ButtonSize.LG,
+            size: EngagementButtonSize.Large,
             label: 'Big',
             disabled: true,
             onclick: () => notifySuccess('Button clicked!'),

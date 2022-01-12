@@ -2,91 +2,30 @@
 /* eslint-disable max-len */
 import 'components/component_kit/buttons.scss';
 import m from 'mithril';
+import { CWButton } from './cw_button';
 import { CreateIcon, ExternalLinkIcon, IconIntent, IconSize } from './icons';
-
-export enum ButtonIntent {
-  Primary = 'primary',
-  Secondary = 'secondary',
-}
-
-export enum Justify {
-  Right = 'right',
-  Center = 'center',
-  Left = 'left',
-}
-
-export enum LinkStyle {
-  Button = 'button',
-  Inline = 'inline',
-}
-
-export enum ButtonSize {
-  SM = 'sm',
-  LG = 'lg',
-}
-
-export enum GradientType {
-  RAINBOW = 'rainbow',
-}
+import { ButtonType, LinkStyle, EngagementButtonSize, Justify } from './types';
 
 const appendTags = (base: string, attrs) => {
-  const { intent, disabled, className, style, size, gradient } = attrs;
+  const { intent, disabled, className, style, size } = attrs;
   let tag = base;
   if (disabled) tag += '.disabled';
-  if (intent === ButtonIntent.Primary) tag += '.primary';
-  else if (intent === ButtonIntent.Secondary) tag += '.secondary';
+  if (intent === ButtonType.Primary) tag += '.primary';
+  else if (intent === ButtonType.Secondary) tag += '.secondary';
   if (style === LinkStyle.Button) tag += '.button';
   if (style === LinkStyle.Inline) tag += '.inline';
-  if (size === ButtonSize.SM) tag += '.sm';
-  if (size === ButtonSize.LG) tag += '.lg';
+  if (size === EngagementButtonSize.Small) tag += '.sm';
+  if (size === EngagementButtonSize.Large) tag += '.lg';
   if (className) tag += className;
-  if (gradient === GradientType.RAINBOW) tag += '.rainbow-gradient';
   return tag;
 };
 
-export const FaceliftButton: m.Component<
-  {
-    intent: ButtonIntent;
-    label;
-    onclick: Function;
-    disabled?: boolean;
-    className?: string;
-  },
-  {}
-> = {
-  view: (vnode) => {
-    const { onclick, label } = vnode.attrs;
-    return m(appendTags('button.Button', vnode.attrs), { onclick }, [
-      m('span.label', label),
-    ]);
-  },
-};
-
-export const FaceliftGradientButton: m.Component<
-  {
-    intent: ButtonIntent;
-    label;
-    onclick: Function;
-    disabled?: boolean;
-    className?: string;
-    gradient: GradientType;
-  },
-  {}
-> = {
-  view: (vnode) => {
-    const { onclick, label } = vnode.attrs;
-    return m(appendTags('button.GradientButton', vnode.attrs), { onclick }, [
-      m('.gradient-button-label', label),
-    ]);
-  },
-};
-
-export const FaceliftButtonGroup: m.Component<
+export const CWButtonGroup: m.Component<
   {
     primaryLabel: string;
     secondaryLabel: string;
-    primaryOnClick: Function;
-    secondaryOnClick: Function;
+    primaryOnClick: () => void;
+    secondaryOnClick: () => void;
     primaryDisabled?: boolean;
     secondaryDisabled?: boolean;
     justify?: Justify;
@@ -110,16 +49,20 @@ export const FaceliftButtonGroup: m.Component<
         style: `justify-content: ${justify}`,
       },
       [
-        m(FaceliftButton, {
-          intent: ButtonIntent.Secondary,
+        m(CWButton, {
+          styleProps: {
+            buttonType: ButtonType.Secondary,
+            disabled: secondaryDisabled,
+          },
           label: secondaryLabel,
-          disabled: secondaryDisabled,
           onclick: secondaryOnClick,
         }),
-        m(FaceliftButton, {
-          intent: ButtonIntent.Primary,
+        m(CWButton, {
+          styleProps: {
+            buttonType: ButtonType.Primary,
+            disabled: primaryDisabled,
+          },
           label: primaryLabel,
-          disabled: primaryDisabled,
           onclick: primaryOnClick,
         }),
       ]
@@ -222,7 +165,7 @@ export const FaceliftRadioGroup: m.Component<
 
 export const EngagementButton: m.Component<
   {
-    size: ButtonSize;
+    size: EngagementButtonSize;
     label: string;
     onclick: Function;
     disabled?: boolean;

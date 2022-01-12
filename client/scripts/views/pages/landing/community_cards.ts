@@ -7,7 +7,7 @@ import app from 'state';
 import { ChainInfo, NodeInfo } from 'models';
 import { FaceliftCard } from '../../components/component_kit/cards';
 import {
-  ButtonIntent,
+  ButtonType,
   FaceliftButton,
 } from '../../components/component_kit/buttons';
 var numeral = require('numeral');
@@ -82,7 +82,7 @@ const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
           m('.card-description', { lang: 'en' }, pretty_description),
           m('.join-button-wrapper', [
             m(FaceliftButton, {
-              intent: ButtonIntent.Secondary,
+              intent: ButtonType.Secondary,
               label: 'See More',
               disabled: false,
               onclick: redirectFunction,
@@ -139,7 +139,7 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
           m('.card-description', { lang: 'en' }, pretty_description),
           m('.join-button-wrapper', [
             m(FaceliftButton, {
-              intent: ButtonIntent.Secondary,
+              intent: ButtonType.Secondary,
               label: 'See More',
               disabled: false,
               onclick: redirectFunction,
@@ -164,7 +164,7 @@ const LockdropToolsCard: m.Component<{}> = {
         m('.lockdrop-card-body', [
           m('h3', 'Edgeware Lockdrop Tools'),
           m(FaceliftButton, {
-            intent: ButtonIntent.Primary,
+            intent: ButtonType.Primary,
             onclick: (e) => {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;
@@ -174,7 +174,7 @@ const LockdropToolsCard: m.Component<{}> = {
           }),
           m('.spacer', []),
           m(FaceliftButton, {
-            intent: ButtonIntent.Primary,
+            intent: ButtonType.Primary,
             onclick: (e) => {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;

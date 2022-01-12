@@ -1,12 +1,10 @@
 /* @jsx m */
 
 import m from 'mithril';
-
-import 'components/component_kit/buttons.scss';
-import { ComponentType, StyleProps } from './types';
 import { getClasses } from './helpers';
+import { ComponentType, StyleProps } from './types';
 
-export const CWButton: m.Component<
+export const CWGradientButton: m.Component<
   {
     styleProps: StyleProps;
     label: string;
@@ -18,7 +16,7 @@ export const CWButton: m.Component<
     const { onclick, label, styleProps } = vnode.attrs;
     return (
       <button
-        class={getClasses(ComponentType.Button, styleProps)}
+        class={getClasses(ComponentType.GradientButton, styleProps)}
         onclick={onclick}
         disabled={styleProps.disabled}
       >
