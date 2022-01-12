@@ -86,7 +86,7 @@ import OffchainViewCountFactory, {
 import OffchainVoteFactory, {
   OffchainVoteModelStatic,
 } from './models/offchain_vote';
-import Profile, { ProfileModelStatic } from './models/profile';
+import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
