@@ -102,7 +102,8 @@ module.exports = {
                     FROM (
                              SELECT id,
                                     COALESCE(notification_data ->> 'chain_id',
-                                             notification_data ->> 'chain') as chain_id
+                                             notification_data ->> 'chain', 
+                                             notification_data ->> 'community_id') as chain_id
                              FROM (SELECT id, cast(notification_data as json)
                                    FROM "Notifications"
                                    WHERE chain_event_id IS NULL) as N_Data
