@@ -2,43 +2,27 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.sequelize.transaction(async (t) => {
       // create a new table called Profiles
       // NB: Profiles.email is public-facing, not duplicative of Users.email 
-      await queryInterface.sequelize.query(
-        `
-            CREATE TABLE IF NOT EXISTS "Profiles"
-            (
-                id 			SERIAL not null,
-                user_id 		integer not null,
-                created_at        	timestamp with time zone,
-                updated_at        	timestamp with time zone,
-                profile_name		varchar(255),
-                email			varchar(255),
-                website		varchar(255),
-                bio			text,	
-                PRIMARY KEY (id)
-            );
-				`,
-        {
-          raw: true,
-          type: 'RAW',
-          transaction: t,
-        }
-      );
-
+     return queryInterface.createTable('Profiles', {
+      id: { type: Sequelize.INTEGER, autoIncrement:true, allowNull: false, primaryKey: true },
+      user_id: { type: Sequelize.INTEGER, allowNull: false },
+      created_at: { type: Sequelize.DATE, allowNull: true },
+      updated_at: { type: Sequelize.DATE, allowNull: true },
+      profile_name: { type: Sequelize.STRING, allowNull: true },
+      email: { type: Sequelize.STRING, allowNull: true },
+      website: { type: Sequelize.STRING, allowNull: true },
+      bio: { type: Sequelize.STRING, allowNull: true },
+    });
+    
       // adds new column to map Addresses to the new Profiles object
-      await queryInterface.sequelize.query(
-        `
-            ALTER TABLE "Addresses"
-                ADD COLUMN profile_id integer;
-				`,
-        {
-          raw: true,
-          type: 'RAW',
-          transaction: t,
-        }
-      );
+      return queryInterface.addColumn(
+      		'Addresses',
+      		'profile_id',
+      		  {
+      			type: Sequelize.INTEGER
+      		  }
+      	    );
 
 
 
@@ -78,6 +62,7 @@ module.exports = {
   
 
   down: async (queryInterface, Sequelize) => {
-    // test to see if explicit rollback is required
+    return queryInterface.dropTable('Profiles');
+    return queryInterface.removeColumn('Addresses','profile_id');
   },
 };
