@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { ServerError } from '../util/errors';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
 
@@ -21,6 +22,7 @@ const getThreads = async (
     threads = await models.OffchainThread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
+        chain: chain.id
       },
       include: [
         {
@@ -58,9 +60,10 @@ const getThreads = async (
     });
   } catch (e) {
     console.log(e);
+    throw new ServerError(error)
   }
 
-  return threads
+  return threads.length
     ? res.json({ status: 'Success', result: threads.map((th) => th.toJSON()) })
     : res.json({ status: 'Failure' });
 };
