@@ -64,7 +64,7 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
     // Check for accounts on offchain forums that originally signed up on a different base chain,
     // Render them as anonymous as the forum is unable to support them.
 
-    if (item.authorChain !== app.chain.id) {
+    if (item.authorChain !== app.chain.id && item.authorChain !== app.chain.base) {
       return m('.ProposalBodyAvatar', [
         m(AnonymousUser, {
             avatarOnly: true,
@@ -105,7 +105,7 @@ export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThrea
     // Render them as anonymous as the forum is unable to support them.
     if ((item instanceof OffchainComment || item instanceof OffchainComment)
       && app.chain.meta.chain.type === ChainType.Offchain) {
-      if (item.authorChain !== app.chain.id) {
+      if (item.authorChain !== app.chain.id && item.authorChain !== app.chain.base) {
         return m('.ProposalBodyAuthor', [
           m(AnonymousUser, {
             hideAvatar: true,
