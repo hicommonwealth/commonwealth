@@ -3,8 +3,8 @@ import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'types';
-import OffchainTopic from './OffchainTopic';
 import { ChainInstance } from 'server/models/chain';
+import OffchainTopic from './OffchainTopic';
 
 class ChainInfo {
   public readonly id: string;
@@ -196,7 +196,6 @@ class ChainInfo {
           r.Address.address,
           r.Address.chain,
           r.chain_id,
-          r.offchain_community_id,
           r.permission,
           r.is_user_default
         )
@@ -214,7 +213,6 @@ class ChainInfo {
           r.Address.address,
           r.Address.chain,
           r.chain_id,
-          r.offchain_community_id,
           r.permission,
           r.is_user_default
         )

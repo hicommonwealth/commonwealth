@@ -61,7 +61,7 @@ const ProposalContent: m.Component<
                 user: new AddressInfo(
                   null,
                   proposal.author,
-                  app.activeId(),
+                  app.activeChainId(),
                   null
                 ),
                 linkify: true,
@@ -100,7 +100,7 @@ const ProposalContent: m.Component<
             m('.vote-row', [
               m('.user-column', [
                 m(User, {
-                  user: new AddressInfo(null, vote.voter, app.activeId(), null),
+                  user: new AddressInfo(null, vote.voter, app.activeChainId(), null),
                   linkify: true,
                   popover: true,
                 }),
@@ -397,7 +397,7 @@ const ViewProposalPage: m.Component<
                         user: new AddressInfo(
                           null,
                           proposal.author,
-                          app.activeId(),
+                          app.activeChainId(),
                           null
                         ),
                         linkify: true,

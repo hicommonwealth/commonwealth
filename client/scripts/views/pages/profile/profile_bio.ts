@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import _ from 'lodash';
 import { Account } from 'models';
@@ -24,7 +25,7 @@ const editIdentityAction = (account, currentIdentity: SubstrateIdentity, vnode) 
     // wait for info to load before making it clickable
     disabled: vnode.state.chainLoading,
     onclick: async () => {
-      if (app.activeId() !== chainObj.id) {
+      if (app.activeChainId() !== chainObj.id) {
         let confirmed = false;
         const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
         confirmed = await confirmationModalWithText(msg)();
@@ -100,7 +101,6 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         await app.user.createRole({
           address: addressInfo,
           chain: app.activeChainId(),
-          community: app.activeCommunityId(),
         });
         vnode.state.loading = false;
         await setActiveAccount(account);
@@ -146,7 +146,6 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       isClaimable && m(LoginWithWalletDropdown, {
         prepopulateAddress: account.address,
         loggingInWithAddress: !app.isLoggedIn(),
-        joiningCommunity: app.activeCommunityId(),
         joiningChain: app.activeChainId(),
         label: 'Claim address',
       }),

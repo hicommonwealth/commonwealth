@@ -83,11 +83,10 @@ const CreateComment: m.Component<{
       vnode.state.error = null;
       vnode.state.sendingComment = true;
       quillEditorState.editor.enable(false);
-      const chainId = app.activeCommunityId() ? null : app.activeChainId();
-      const communityId = app.activeCommunityId();
+      const chainId = app.activeChainId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, proposalPageState.parentCommentId, attachments);
+          chainId, commentText, proposalPageState.parentCommentId, attachments);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -116,7 +115,7 @@ const CreateComment: m.Component<{
         'Step No': 2,
         'Step': 'Create Comment',
         'Proposal Name': `${(rootProposal).slug}: ${(rootProposal).identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
       mixpanel.people.increment('Comment');
       mixpanel.people.set({
@@ -130,15 +129,13 @@ const CreateComment: m.Component<{
     const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
 
     const isAdmin = app.user.isSiteAdmin
-      || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+      || app.user.isAdminOfEntity({ chain: app.activeChainId() });
 
-    let parentScopedClass: string = 'new-thread-child';
+    let parentScopedClass = 'new-thread-child';
     let parentAuthor: Account<any>;
     if (parentType === CommentParent.Comment) {
       parentScopedClass = 'new-comment-child';
-      parentAuthor = app.community
-        ? app.community.accounts.get(parentComment.author, parentComment.authorChain)
-        : app.chain.accounts.get(parentComment.author);
+      parentAuthor = app.chain.accounts.get(parentComment.author);
     }
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
@@ -150,11 +147,11 @@ const CreateComment: m.Component<{
 
     // token balance check if needed
     let tokenPostingThreshold: BN | null = null;
-    if (!app.community && ITokenAdapter.instanceOf(app.chain)) {
+    if (ITokenAdapter.instanceOf(app.chain)) {
       const tokenBalance = app.chain.tokenBalance;
       tokenPostingThreshold = app.topics.getByName(
         activeTopicName,
-        app.activeId()
+        app.activeChainId()
       )?.tokenThreshold;
       disabled = disabled
         || !app.isAdapterReady
@@ -187,7 +184,7 @@ const CreateComment: m.Component<{
               content: [
                 'You haven\'t set a display name yet. ',
                 m('a', {
-                  href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
+                  href: `/${app.activeChainId()}/account/${app.user.activeAccount.address}`
                     + `?base=${app.user.activeAccount.chain}`,
                   onclick: (e) => {
                     e.preventDefault();
@@ -221,8 +218,7 @@ const CreateComment: m.Component<{
                   `Commenting in "${activeTopicName}" requires `,
                   `${weiToTokens(tokenPostingThreshold.toString(), decimals)} `,
                   `${app.chain.meta.chain.symbol}. `,
-                  !app.community
-                    && ITokenAdapter.instanceOf(app.chain)
+                    ITokenAdapter.instanceOf(app.chain)
                     && app.chain.tokenBalance
                     && app.user.activeAccount
                     && `You have ${

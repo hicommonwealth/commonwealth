@@ -8,6 +8,7 @@ import {
 import { factory, formatFilename } from '../../shared/logging';
 import '../types';
 import { DB } from '../database';
+import { ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -17,10 +18,10 @@ const status = async (
   res: Response,
   next: NextFunction
 ) => {
+  try {
   const [
     chains,
     nodes,
-    publicCommunities,
     contractCategories,
     notificationCategories,
   ] = await Promise.all([
@@ -41,13 +42,6 @@ const status = async (
         },
       ],
     }),
-    models.OffchainCommunity.findAll({
-      where: { privacy_enabled: false },
-      include: {
-        model: models.OffchainTopic,
-        as: 'topics',
-      },
-    }),
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
@@ -65,17 +59,13 @@ const status = async (
     const threadCountQueryData: ThreadCountQueryData[] =
       await models.sequelize.query(
         `
-      SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
+        SELECT "OffchainThreads".chain, COUNT("OffchainThreads".id) 
         FROM "OffchainThreads"
-        LEFT JOIN "OffchainCommunities"
-          ON "OffchainThreads".community = "OffchainCommunities".id
-      WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
-        AND "OffchainThreads".deleted_at IS NULL
+        WHERE "OffchainThreads".deleted_at IS NULL
         AND NOT "OffchainThreads".pinned
-        AND ("OffchainThreads".chain IS NOT NULL
-            OR NOT "OffchainCommunities"."privacy_enabled")
-      GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
-      `,
+        AND "OffchainThreads".chain IS NOT NULL
+        GROUP BY "OffchainThreads".chain;
+        `,
         { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
       );
     // eslint-disable-next-line no-return-assign
@@ -85,7 +75,6 @@ const status = async (
       chains,
       nodes,
       contractCategories,
-      communities: publicCommunities,
       notificationCategories,
       recentThreads: threadCount,
       loggedIn: false,
@@ -127,55 +116,26 @@ const status = async (
     include: [models.Address, models.OffchainAttachment],
   });
 
-  const visiblePrivateCommunityIds = Array.from(
-    roles.map((role) => role.offchain_community_id)
-  ); // both private and public
-  const privateCommunities = await models.OffchainCommunity.findAll({
-    where: {
-      id: {
-        [Op.in]: visiblePrivateCommunityIds,
-      },
-      privacy_enabled: true,
-    },
-    include: [
-      {
-        model: models.OffchainTopic,
-        as: 'topics',
-      },
-    ],
-  });
-  const allCommunities: any = _.uniqBy(
-    publicCommunities.concat(privateCommunities),
-    'id'
-  );
-
   const threadCount = {};
   const threadCountQueryData: ThreadCountQueryData[] =
     await models.sequelize.query(
       `
-SELECT CONCAT("OffchainThreads".chain, "OffchainThreads".community), COUNT("OffchainThreads".id)
-  FROM "OffchainThreads"
-  LEFT JOIN "OffchainCommunities"
-    ON "OffchainThreads".community = "OffchainCommunities".id
-WHERE "OffchainThreads".updated_at > :thirtyDaysAgo
-  AND "OffchainThreads".deleted_at IS NULL
-  AND NOT "OffchainThreads".pinned
-  AND ("OffchainThreads".chain IS NOT NULL
-    OR NOT "OffchainCommunities"."privacy_enabled"
-    OR "OffchainCommunities".id IN(:visiblePrivateCommunityIds))
-GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
-`,
+      SELECT "OffchainThreads".chain, COUNT("OffchainThreads".id) 
+      FROM "OffchainThreads"
+      WHERE 
+        "OffchainThreads".deleted_at IS NULL
+          AND NOT "OffchainThreads".pinned
+          AND "OffchainThreads".chain IS NOT NULL
+      GROUP BY "OffchainThreads".chain;
+      `,
       {
         replacements: {
           thirtyDaysAgo,
-          visiblePrivateCommunityIds:
-            privateCommunities.length > 0
-              ? privateCommunities.map((c) => c.id)
-              : ['NO_COMMUNITY'],
         },
         type: QueryTypes.SELECT,
       }
     );
+  // eslint-disable-next-line no-return-assign
   threadCountQueryData.forEach((ct) => (threadCount[ct.concat] = ct.count));
 
   // get starred communities for user
@@ -197,20 +157,20 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
   await Promise.all(
     commsAndChains.map(async (c) => {
       const [name, time] = c;
-      if (isNaN(new Date(time as string).getDate())) {
+      if (Number.isNaN(new Date(time as string).getDate())) {
         unseenPosts[name] = {};
         return;
       }
       const threadNum = await models.OffchainThread.findAndCountAll({
         where: {
           kind: { [Op.or]: ['forum', 'link'] },
-          [Op.or]: [{ community: name }, { chain: name }],
+          [Op.or]: [{ chain: name }],
           created_at: { [Op.gt]: new Date(time as string) },
         },
       });
       const commentNum = await models.OffchainComment.findAndCountAll({
         where: {
-          [Op.or]: [{ community: name }, { chain: name }],
+          [Op.or]: [{ chain: name }],
           created_at: { [Op.gt]: new Date(time as string) },
         },
       });
@@ -236,7 +196,6 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
   return res.json({
     chains,
     nodes,
-    communities: allCommunities,
     contractCategories,
     notificationCategories,
     recentThreads: threadCount,
@@ -259,6 +218,11 @@ GROUP BY CONCAT("OffchainThreads".chain, "OffchainThreads".community);
       unseenPosts,
     },
   });
+} catch (error) {
+    console.log(error)
+    throw new ServerError("something broke", error)
+}
+
 };
 
 export default status;

@@ -34,9 +34,6 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       model: models.Chain,
       as: 'Chain',
     }, {
-      model: models.OffchainCommunity,
-      as: 'OffchainCommunity',
-    }, {
       model: models.OffchainThread,
       as: 'OffchainThread',
     }, {

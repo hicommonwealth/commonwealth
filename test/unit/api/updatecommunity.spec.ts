@@ -11,7 +11,6 @@ import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
 import { Errors as ChainError } from '../../../server/routes/updateChain';
-import { Errors as CommunityError } from '../../../server/routes/updateCommunity';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -281,26 +280,6 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.discord).to.be.equal(discord);
     });
 
-    it.skip('should fail to update telegram without a proper prefix', async () => {
-      const telegram = 't.me';
-      const res = await chai
-        .request(app)
-        .post('/api/updateCommunity')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, telegram });
-      expect(res.body.error).to.be.equal(CommunityError.InvalidTelegram);
-    });
-
-    it.skip('should fail to update github without a proper prefix', async () => {
-      const github = 'github.com';
-      const res = await chai
-        .request(app)
-        .post('/api/updateCommunity')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, github });
-      expect(res.body.error).to.be.equal(CommunityError.InvalidGithub);
-    });
-
     it.skip('should update telegram', async () => {
       const telegram = 'https://t.me/';
       const res = await chai
@@ -321,52 +300,6 @@ describe('Update Community/Chain Tests', () => {
         .send({ jwt: jwtToken, id: offchainCommunity.id, github });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.github).to.be.equal(github);
-    });
-
-    it('should fail without a community id', async () => {
-      const res = await chai
-        .request(app)
-        .post('/api/updateCommunity')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CommunityError.NoCommunityId);
-    });
-
-    it('should fail with a wrong/invalid community id', async () => {
-      const res = await chai
-        .request(app)
-        .post('/api/updateCommunity')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: 'CWLabs' });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CommunityError.CommunityNotFound);
-    });
-
-    it.skip('should fail to change network', async () => {
-      const network = 'ethereum-testnet';
-      const res = await chai
-        .request(app)
-        .post('/api/updateCommunity')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, network });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CommunityError.CantChangeNetwork);
-    });
-
-    it.skip('should fail if not admin', async () => {
-      const result = await modelUtils.createAndVerifyAddress({ chain });
-      const newJwt = jwt.sign(
-        { id: result.user_id, email: result.email },
-        JWT_SECRET
-      );
-      const res = await chai
-        .request(app)
-        .post('/api/updateCommunity')
-        .set('Accept', 'application/json')
-        .send({ jwt: newJwt, id: offchainCommunity.id });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(CommunityError.NotAdmin);
     });
   });
 });
