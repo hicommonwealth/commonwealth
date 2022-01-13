@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import 'components/component_kit/buttons.scss';
 
 import { ComponentType, StyleProps } from './types';
 import { getClasses } from './helpers';
