@@ -1,10 +1,10 @@
 /* @jsx m */
 
 import m from 'mithril';
-import 'components/component_kit/buttons.scss';
+import './cw_button.scss';
 
-import { ComponentType, StyleProps } from './types';
-import { getClasses } from './helpers';
+import { ComponentType, StyleProps } from '../component_kit/types';
+import { getClasses } from '../component_kit/helpers';
 
 export const CWButton: m.Component<
   {

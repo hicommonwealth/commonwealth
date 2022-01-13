@@ -58,7 +58,7 @@ import {
 } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
-import { CWButton } from './cw_button';
+import { CWButton } from '../cw_button/cw_button';
 import { ButtonType, EngagementButtonSize, Justify, LinkStyle } from './types';
 import { CWGradientButton } from './cw_gradient_button';
 
