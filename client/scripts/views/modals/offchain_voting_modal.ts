@@ -19,14 +19,16 @@ const OffchainVotingModal : m.Component<{ votes: OffchainVote[] }, {}> = {
       ]),
       m('.compact-modal-body',
       [
-        m('a.download-link', {
-          onclick: (e) => {
-            e.preventDefault();
-            const csvContent = `data:text/csv;charset=utf-8,${csvRows.map((e) => e.join(",")).join("\n")}`;
-            const encodedUri = encodeURI(csvContent);
-            window.open(encodedUri);
-          }
-        }, 'Download all votes as CSV'),
+        m('.download-link', [
+          m('a', {
+            onclick: (e) => {
+              e.preventDefault();
+              const csvContent = `data:text/csv;charset=utf-8,${csvRows.map((e) => e.join(",")).join("\n")}`;
+              const encodedUri = encodeURI(csvContent);
+              window.open(encodedUri);
+            }
+          }, 'Download all votes as CSV'),
+        ]),
         votes.map((vote) => m('.offchain-poll-voter', [
           m('.offchain-poll-voter-user', [
             m(User, {
