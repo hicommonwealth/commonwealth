@@ -23,8 +23,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 	// check address
 	const addressAccount = await models.Address.findOne({
 		where: {
-			address: req.body.address,
-			// @ts-ignore
+			address: req.params.address,
 			user_id: req.user.id
 		}
 	});
@@ -33,14 +32,14 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 	}
 
 	// check community id
-	if (!req.body.community_id) {
+	if (!req.params.community_id) {
 		return next(new Error(Errors.NoCommunityId))
 	}
 
 	// get all messages
 	const messages = await models.ChatChannel.findAll({
 		where: {
-			community_id: req.body.community_id
+			community_id: req.params.community_id
 		},
 		include: {
 			model: models.ChatMessage,

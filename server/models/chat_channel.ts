@@ -4,7 +4,7 @@ import { ModelStatic } from './types';
 import { ChatMessageAttributes, ChatMessageInstance } from './chat_message';
 
 export interface ChatChannelAttributes {
-  id: number;
+  id?: number;
   name: string;
   community_id: string;
   chat_messages?: ChatMessageAttributes[] | ChatMessageAttributes['id'][];
