@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 
 import { UserAttributes } from './user';
+import { AddressAttributes } from './address';
 import { ModelStatic } from './types';
 
 export interface ProfileAttributes {
@@ -13,6 +14,7 @@ export interface ProfileAttributes {
   email?: string;
   website?: string;
   bio?: string;
+  is_default?: boolean;
 
   // associations
   User?: UserAttributes;
@@ -37,6 +39,7 @@ export default (
       email: { type: dataTypes.TEXT, allowNull: true },
       website: { type: dataTypes.TEXT, allowNull: true },
       bio: { type: dataTypes.TEXT, allowNull: true },
+      is_default: { type: dataTypes.BOOLEAN, allowNull: false },
     }, {
       tableName: 'Profiles',
       underscored: true,
@@ -51,6 +54,7 @@ export default (
 
   Profile.associate = (models) => {
     models.Profile.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
+    models.Profile.hasMany(models.Address, { foreignKey: 'profile_id' });
   };
 
   return Profile;

@@ -24,6 +24,7 @@ export interface UserAttributes {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedNode?: ChainNodeAttributes | ChainNodeAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
+  Profiles?: ProfileAttributes[] | ProfileAttributes['id'][];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
   Chains?: ChainAttributes[] | ChainAttributes['id'][];
 }
@@ -85,6 +86,7 @@ export default (
   User.associate = (models) => {
     models.User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
     models.User.hasMany(models.Address);
+    models.User.hasMany(models.Profile);
     models.User.hasMany(models.SocialAccount);
     models.User.hasMany(models.StarredCommunity);
     models.User.belongsToMany(models.Chain, { through: models.WaitlistRegistration });

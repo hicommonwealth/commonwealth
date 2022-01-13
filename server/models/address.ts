@@ -22,11 +22,11 @@ import { ModelStatic } from './types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes, UserInstance } from './user';
+import { ProfileAttributes, ProfileInstance } from './profile';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
-import { StargateClient } from '@cosmjs/stargate';
 const log = factory.getLogger(formatFilename(__filename));
 
 export interface AddressAttributes {
@@ -46,6 +46,7 @@ export interface AddressAttributes {
   is_validator?: boolean;
   is_magic?: boolean;
   ghost_address?: boolean;
+  profile_id?: number;
 
   // associations
   Chain?: ChainAttributes;
@@ -72,6 +73,7 @@ export interface AddressCreationAttributes extends AddressAttributes {
 
   createWithToken?: (
     user_id: number,
+    profile_id: number,
     chain: string,
     address: string,
     keytype?: string
@@ -123,6 +125,7 @@ export default (
     is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    profile_id:		 { type: dataTypes.INTEGER, allowNull: false, defaultValue: 0},
   }, {
     timestamps: true,
     createdAt: 'created_at',
@@ -155,6 +158,7 @@ export default (
 
   Address.createWithToken = (
     user_id: number,
+    profile_id: number,
     chain: string,
     address: string,
     keytype?: string,
@@ -163,7 +167,7 @@ export default (
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
     const last_active = new Date();
     return Address.create({
-      user_id, chain, address, verification_token, verification_token_expires, keytype, last_active,
+      user_id, profile_id, chain, address, verification_token, verification_token_expires, keytype, last_active,
     });
   };
 
@@ -292,14 +296,8 @@ export default (
         const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
 
         if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
-          // query chain ID from URL
-          const [ node ] = await chain.getChainNodes();
-          const client = await StargateClient.connect(node.url);
-          const chainId = await client.getChainId();
-          client.disconnect();
-
           const generatedSignDoc = validationTokenToSignDoc(
-            chainId,
+            chain.id === 'terra' ? 'columbus-4' : chain.id === 'osmosis-local' ? 'osmosis-local-1' : chain.id,
             addressModel.verification_token.trim(),
             signed.fee,
             signed.memo,
@@ -422,6 +420,7 @@ export default (
   Address.associate = (models) => {
     models.Address.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
+    models.Address.belongsTo(models.Profile, { foreignKey: 'profile_id', targetKey: 'id' });
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
     models.Address.belongsToMany(models.OffchainThread, {
