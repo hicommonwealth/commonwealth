@@ -1,8 +1,8 @@
-import { StyleProps } from './types';
+import { ButtonStyleProps } from './types';
 
 export const getClasses = (
   componentType: string,
-  styleProps: StyleProps
+  styleProps: ButtonStyleProps
 ): string =>
   `${componentType} ${Object.entries(styleProps)
     .map(([key, value]) =>

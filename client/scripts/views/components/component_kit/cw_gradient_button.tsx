@@ -2,16 +2,16 @@
 
 import m from 'mithril';
 
-import { ComponentType, StyleProps } from './types';
+import { ComponentType, ButtonStyleProps, State } from './types';
 import { getClasses } from './helpers';
 
 export const CWGradientButton: m.Component<
   {
-    styleProps: StyleProps;
+    styleProps: ButtonStyleProps;
     label: string;
     onclick: (e?: MouseEvent) => void;
   },
-  Record<string, unknown>
+  State
 > = {
   view: (vnode) => {
     const { onclick, label, styleProps } = vnode.attrs;

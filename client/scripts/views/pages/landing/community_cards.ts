@@ -6,7 +6,7 @@ import { Tag } from 'construct-ui';
 import app from 'state';
 import { ChainInfo, NodeInfo } from 'models';
 import { FaceliftCard } from '../../components/component_kit/cards';
-import { CWButton } from '../../components/cw_button/cw_button';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { ButtonType } from '../../components/component_kit/types';
 
 var numeral = require('numeral');

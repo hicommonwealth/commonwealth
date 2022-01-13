@@ -1,19 +1,12 @@
 /* @jsx m */
 
 import m from 'mithril';
-import './cw_button.scss';
+import 'components/component_kit/cw_button.scss';
 
-import { ComponentType, StyleProps } from '../component_kit/types';
-import { getClasses } from '../component_kit/helpers';
+import { ComponentType, State, ButtonProps } from './types';
+import { getClasses } from './helpers';
 
-export const CWButton: m.Component<
-  {
-    styleProps: StyleProps;
-    label: string;
-    onclick: (e?: MouseEvent) => void;
-  },
-  Record<string, unknown>
-> = {
+export const CWButton: m.Component<ButtonProps, State> = {
   view: (vnode) => {
     const { onclick, label, styleProps } = vnode.attrs;
     return (

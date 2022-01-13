@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 import 'components/component_kit/buttons.scss';
 import m from 'mithril';
-import { CWButton } from '../cw_button/cw_button';
+import { CWButton } from './cw_button';
 import { CreateIcon, ExternalLinkIcon, IconIntent, IconSize } from './icons';
 import { ButtonType, LinkStyle, EngagementButtonSize, Justify } from './types';
 
