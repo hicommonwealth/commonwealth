@@ -21,14 +21,19 @@ module.exports = {
                 }
             }, {transaction: t});
 
-            // create a new table called NotificationsRead
-            await queryInterface.createTable("NotificationsRead", {
-                notification_id: {
-                    type: Sequelize.INTEGER, primaryKey: true, references: {model: "Notifications", key: "id"}
-                }, subscription_id: {
-                    type: Sequelize.INTEGER, primaryKey: true, references: {model: "Subscriptions", key: "id"}
-                }, is_read: {type: Sequelize.BOOLEAN, allowNull: false}
-            }, {transaction: t});
+            // create a new table called NotificationsRead --- creating this table with queryInterface.createTable() does
+            // not properly enforce/create the ON DELETE CASCADE constraint
+            await queryInterface.sequelize.query(`
+                CREATE TABLE "NotificationsRead"
+                (
+                    notification_id INTEGER REFERENCES "Notifications" ON DELETE CASCADE,
+                    subscription_id INTEGER REFERENCES "Subscriptions",
+                    is_read         BOOLEAN NOT NULL,
+                    PRIMARY KEY (notification_id, subscription_id)
+                );
+            `, {
+                raw: true, type: 'RAW', transaction: t,
+            });
 
             // copies all UNIQUE (notifications that have the same notification_data AND chain_event_id notifications from OldNotifications to Notifications
             await queryInterface.sequelize.query(`
@@ -98,12 +103,11 @@ module.exports = {
                          SELECT *
                          FROM (
                                   SELECT id,
-                                         COALESCE(notification_data ->> 'chain_id',
-                                                  notification_data ->> 'chain',
-                                                  notification_data ->> 'community_id') as chain_id
-                                  FROM (SELECT id, cast(notification_data as json)
-                                        FROM "Notifications"
-                                        WHERE chain_event_id IS NULL) as N_Data
+                                         COALESCE(notification_data::json ->> 'chain_id',
+                                                  notification_data::json ->> 'chain',
+                                                  notification_data::json ->> 'community_id') as chain_id
+                                  FROM "Notifications"
+                                  WHERE chain_event_id IS NULL
                               ) as T
                          WHERE EXISTS(SELECT * FROM "Chains" WHERE id = T.chain_id)
                          UNION
@@ -118,11 +122,19 @@ module.exports = {
                 raw: true, type: 'RAW', transaction: t,
             });
 
+            // deletes notifications that did not define chain_id or chain and whose chain_id was derived from an off-chain
+            // community_id that was NOT transferred to the Chains table upon offchain community deprecation
+            await queryInterface.bulkDelete("Notifications", {
+                chain_id: {[Sequelize.Op.eq]: null}
+            }, {transaction: t});
+
             // add the not null constraint for chain_id and category_id on Notifications table
             // this is done here because it is necessary to first
             await queryInterface.sequelize.query(`
                 ALTER TABLE "Notifications"
                     ALTER COLUMN "category_id"
+                        SET NOT NULL,
+                    ALTER COLUMN "chain_id"
                         SET NOT NULL
             `, {
                 raw: true, type: 'RAW', transaction: t,

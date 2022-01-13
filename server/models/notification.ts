@@ -42,7 +42,7 @@ export default (
   });
 
   Notification.associate = (models) => {
-    models.Notification.hasMany(models.NotificationsRead, { foreignKey: 'notification_id' })
+    models.Notification.hasMany(models.NotificationsRead, { foreignKey: 'notification_id', onDelete: 'cascade', hooks: true })
     models.Notification.belongsTo(models.ChainEvent, { foreignKey: 'chain_event_id', targetKey: 'id' });
     models.Notification.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name'});
     models.Notification.belongsTo(models.Chain, {foreignKey: 'chain_id', targetKey: 'id'});
