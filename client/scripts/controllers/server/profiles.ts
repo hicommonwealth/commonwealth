@@ -31,7 +31,6 @@ class ProfilesController {
   public getProfile(chain: string, address: string) {
     const existingProfile = this._store.getByAddress(address);
     if (existingProfile !== undefined) return existingProfile;
-
     const profile = new Profile(chain, address);
     this._store.add(profile);
     this._unfetched.push(profile);
