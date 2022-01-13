@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ModelStatic } from './types';
 import { AddressInstance, AddressAttributes } from './address';
+import { ProfileInstance, ProfileAttributes } from './profile';
 import { ChainAttributes } from './chain';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { SocialAccountInstance, SocialAccountAttributes } from './social_account';
