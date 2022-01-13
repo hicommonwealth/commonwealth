@@ -55,18 +55,12 @@ function setupPassport(models: DB) {
     const magic = new Magic(MAGIC_API_KEY);
     passport.use(new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
       // determine login location
-      let chain, community, error;
+      let chain, error;
       if (req.body.chain || req.body.community) {
-        [ chain, community, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+        [ chain, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
         if (error) return cb(error);
       }
-      let registrationChain;
-      if (chain?.id) {
-        registrationChain = chain;
-      } else {
-        const chainId = community?.default_chain || MAGIC_DEFAULT_CHAIN;
-        registrationChain = await models.Chain.findOne({ where: { id: chainId } });
-      }
+      const registrationChain = chain;
 
       // fetch user data from magic backend
       let userMetadata: MagicUserMetadata;
@@ -193,11 +187,7 @@ function setupPassport(models: DB) {
             }, { transaction: t });
           }
 
-          if (req.body.chain || req.body.community) await models.Role.create(req.body.community ? {
-            address_id: newAddress.id,
-            offchain_community_id: req.body.community,
-            permission: 'member',
-          } : {
+          if (req.body.chain) await models.Role.create({
             address_id: newAddress.id,
             chain_id: req.body.chain,
             permission: 'member',
@@ -336,6 +326,7 @@ function setupPassport(models: DB) {
     }
 
     if (req.user) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       await newGithubAccount.setUser(req.user);
       return cb(null, req.user);

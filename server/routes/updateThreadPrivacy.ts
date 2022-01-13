@@ -42,7 +42,6 @@ const updateThreadPrivacy = async (
       });
       const role = roles.find((r) => {
         return (
-          r.offchain_community_id === thread.community ||
           r.chain_id === thread.chain
         );
       });

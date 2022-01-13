@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import _ from 'lodash';
 import m from 'mithril';
 
@@ -10,8 +11,8 @@ const SubscriptionButton: m.Component<{}> = {
   view: (vnode) => {
     const subscriptions = app.user.notifications;
     const communitySubscription = subscriptions.subscriptions
-      .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeId());
-    const communityOrChain = app.activeChainId() ? app.activeChainId() : app.activeCommunityId();
+      .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeChainId());
+    const communityOrChain = app.activeChainId();
 
     return m(Button, {
       class: 'SubscriptionButton',
@@ -32,29 +33,6 @@ const SubscriptionButton: m.Component<{}> = {
       label: communitySubscription ? 'Notifications on' : 'Notifications off',
       intent: communitySubscription ? 'primary' : 'none',
     });
-    //   m('.subscription-button-sub', [
-    //     !communitySubscription
-    //       ? 'You will not be notified of new threads'
-    //       : (app.user.emailInterval === 'daily' && (!app.user.email || !app.user.emailVerified))
-    //         ? [
-    //           'You will be notified in the app. ',
-    //           link('a', `/${app.activeId()}/settings`, app.user.email ? 'Verify your email' : 'Add an email'),
-    //         ]
-    //         : (app.user.emailInterval === 'daily' && communitySubscription.immediateEmail)
-    //           ? [
-    //             'You will be notified in the app & immediately by email. ',
-    //             link('a', `/${app.activeId()}/notifications`, 'Manage'),
-    //           ]
-    //           : app.user.emailInterval === 'daily'
-    //             ? [
-    //               'You will be notified in the app & daily emails. ',
-    //               link('a', `/${app.activeId()}/notifications`, 'Manage'),
-    //             ]
-    //             : app.user.emailInterval === 'never' ? [
-    //               'You will be notified in the app. ',
-    //               link('a', `/${app.activeId()}/notifications`, 'Manage'),
-    //             ] : '',
-    //   ]),
   },
 };
 

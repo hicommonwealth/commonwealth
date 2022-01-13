@@ -76,7 +76,7 @@ const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
                 'Step' : 'Transaction Signed',
                 'Thread Type': 'Proposal',
                 'ProposalID': typeof proposal === 'object' ? proposal.slug : proposal,
-                'Scope': app.activeId(),
+                'Scope': app.activeChainId(),
                 'user' : app.user.activeAccount.address,
               });
               mixpanel.people.increment('Thread');

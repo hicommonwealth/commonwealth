@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'components/header/login_selector.scss';
 
 import $ from 'jquery';
@@ -10,12 +11,12 @@ import { Button, ButtonGroup, Icon, Icons, Menu, MenuItem, MenuDivider, Popover 
 import app from 'state';
 import { navigateToSubpage, initAppState } from 'app';
 import { ChainBase } from 'types';
-import { AddressInfo, ChainInfo, CommunityInfo, ITokenAdapter } from 'models';
+import { AddressInfo, ChainInfo, ITokenAdapter } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 
 import { notifySuccess } from 'controllers/app/notifications';
 
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
@@ -38,12 +39,11 @@ export const CHAINBASE_SHORT = {
 
 const CommunityLabel: m.Component<{
   chain?: ChainInfo,
-  community?: CommunityInfo,
   showStatus?: boolean,
   link?: boolean,
 }> = {
   view: (vnode) => {
-    const { chain, community, showStatus, link } = vnode.attrs;
+    const { chain, showStatus, link } = vnode.attrs;
     const size = 22;
 
     if (chain) return m('.CommunityLabel', [
@@ -62,25 +62,6 @@ const CommunityLabel: m.Component<{
       ]),
     ]);
 
-    if (community) return m('.CommunityLabel', [
-      m('.community-label-left', [
-        m(CommunityIcon, {
-          community,
-          size,
-          onclick: link ? (() => m.route.set(`/${community.id}`)) : null
-        }),
-      ]),
-      m('.community-label-right', [
-        m('.community-name-row', [
-          m('span.community-name', community.name),
-          showStatus === true && [
-            community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
-            !community.privacyEnabled && m(Icon, { name: Icons.GLOBE, size: 'xs' }),
-          ],
-        ]),
-      ]),
-    ]);
-
     return m('.CommunityLabel', [
       m('.site-brand', 'Commonwealth'),
     ]);
@@ -94,12 +75,9 @@ export const CurrentCommunityLabel: m.Component<{}> = {
     const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
                                        && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    const selectedCommunity = app.community;
 
     if (selectedNode) {
       return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true, link: true });
-    } else if (selectedCommunity) {
-      return m(CommunityLabel, { community: selectedCommunity.meta, showStatus: true, link: true });
     } else {
       return m(CommunityLabel, { showStatus: true, link: true });
     }
@@ -109,14 +87,13 @@ export const CurrentCommunityLabel: m.Component<{}> = {
 export const LoginSelectorMenuLeft: m.Component<{
   activeAddressesWithRole: any,
   nAccountsWithoutRole: number,
-  isPrivateCommunity: boolean,
   mobile?: boolean,
 }> = {
   view: (vnode) => {
-    const { activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity, mobile } = vnode.attrs;
+    const { activeAddressesWithRole, nAccountsWithoutRole, mobile } = vnode.attrs;
     return m(Menu, { class: 'LoginSelectorMenu' }, [
       // address list
-      (app.chain || app.community) && [
+      (app.chain) && [
         activeAddressesWithRole.map((account) => m(MenuItem, {
           class: 'switch-user',
           align: 'left',
@@ -138,19 +115,16 @@ export const LoginSelectorMenuLeft: m.Component<{
           ],
         })),
         activeAddressesWithRole.length > 0 && m(MenuDivider),
-        activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+        activeAddressesWithRole.length > 0 && app.activeChainId() && m(MenuItem, {
           onclick: () => {
             const pf = app.user.activeAccount.profile;
             if (app.chain) {
               navigateToSubpage(`/account/${pf.address}`);
-            } else if (app.community) {
-              const a = app.user.activeAccount;
-              navigateToSubpage(`/account/${pf.address}?base=${pf.chain || a.chain.id}`);
             }
           },
           label: m('.label-wrap', [ mobile && m(CustomEyeIcon), m('span', 'View profile') ]),
         }),
-        activeAddressesWithRole.length > 0 && app.activeId() && m(MenuItem, {
+        activeAddressesWithRole.length > 0 && app.activeChainId() && m(MenuItem, {
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({
@@ -163,7 +137,7 @@ export const LoginSelectorMenuLeft: m.Component<{
           },
           label: m('.label-wrap', [ mobile && m(CustomPencilIcon), m('span', 'Edit profile') ]),
         }),
-        !isPrivateCommunity && m(MenuItem, {
+        m(MenuItem, {
           onclick: () => app.modals.create({
             modal: SelectAddressModal,
           }),
@@ -186,7 +160,7 @@ export const LoginSelectorMenuRight: m.Component<{ mobile?: boolean }, {}> = {
     const { mobile } = vnode.attrs;
     return m(Menu, { class: 'LoginSelectorMenu' }, [
       m(MenuItem, {
-        onclick: () => (app.activeChainId() || app.activeCommunityId())
+        onclick: () => (app.activeChainId())
           ? navigateToSubpage('/notifications')
           : m.route.set('/notifications'),
         label: m('.label-wrap', [ mobile && m(CustomBellIcon), m('span', 'Notification settings') ]),
@@ -244,14 +218,11 @@ const LoginSelector: m.Component<{
       return app.user.getRoleInCommunity({
         account,
         chain: app.activeChainId(),
-        community: app.activeCommunityId()
       });
     });
-    const isPrivateCommunity = app.community?.meta.privacyEnabled;
     const isAdmin = app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
-      community: app.activeCommunityId()
     });
 
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
@@ -263,7 +234,6 @@ const LoginSelector: m.Component<{
 
     const joiningChainInfo = app.chain?.meta.chain;
     const joiningChain = joiningChainInfo?.id;
-    const joiningCommunity = app.activeCommunityId();
 
     let samebaseAddresses: AddressInfo[];
 
@@ -292,11 +262,11 @@ const LoginSelector: m.Component<{
       }
     }
 
-    const activeCommunityMeta = app.chain ? app.chain.meta?.chain : app.community?.meta;
+    const activeCommunityMeta = app.chain?.meta?.chain;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     return m(ButtonGroup, { class: 'LoginSelector' }, [
-      (app.chain || app.community)
+      (app.chain)
         && !app.chainPreloading
         && vnode.state.profileLoadComplete
         && !app.user.activeAccount
@@ -313,7 +283,7 @@ const LoginSelector: m.Component<{
                   const address = originAddressInfo.address;
 
                   const res = await linkExistingAddressToChainOrCommunity(
-                    address, targetChain, originAddressInfo.chain, joiningCommunity
+                    address, targetChain, originAddressInfo.chain
                   );
 
                   if (res && res.result) {
@@ -324,17 +294,12 @@ const LoginSelector: m.Component<{
                     const addressInfo = app.user.addresses
                       .find((a) => a.address === encodedAddress && a.chain === targetChain);
 
-                    const account = app.chain
-                      ? app.chain.accounts.get(encodedAddress, addressInfo.keytype)
-                      : app.community.accounts.get(encodedAddress, addressInfo.chain);
+                    const account = app.chain.accounts.get(encodedAddress, addressInfo.keytype)
                     if (app.chain) {
                       account.setValidationToken(verification_token);
                     }
                     if (joiningChain && !app.user.getRoleInCommunity({ account, chain: joiningChain })) {
                       await app.user.createRole({ address: addressInfo, chain: joiningChain });
-                    } else if (joiningCommunity
-                              && !app.user.getRoleInCommunity({ account, community: joiningCommunity })) {
-                      await app.user.createRole({ address: addressInfo, community: joiningCommunity });
                     }
 
                     await setActiveAccount(account);
@@ -368,7 +333,7 @@ const LoginSelector: m.Component<{
             ]),
           ],
         }),
-      (app.chain || app.community)
+      (app.chain)
         && !app.chainPreloading
         && vnode.state.profileLoadComplete
         && app.user.activeAccount
@@ -390,7 +355,7 @@ const LoginSelector: m.Component<{
             ],
           }),
           content: m(LoginSelectorMenuLeft, {
-            activeAddressesWithRole, nAccountsWithoutRole, isPrivateCommunity
+            activeAddressesWithRole, nAccountsWithoutRole
           }),
         }),
       m(Popover, {

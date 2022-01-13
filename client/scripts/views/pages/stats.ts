@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
@@ -44,12 +45,11 @@ const StatsTable: m.Component<{ data }, {}> = {
 
 const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = {
   view: (vnode) => {
-    if (!vnode.state.requested && app.user && app.activeId()) {
+    if (!vnode.state.requested && app.user && app.activeChainId()) {
       vnode.state.requested = true;
 
       $.get(`${app.serverUrl()}/communityStats`, {
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
         jwt: app.user?.jwt,
       }).then(({ status, result }) => {
         // vnode.state.data = result;

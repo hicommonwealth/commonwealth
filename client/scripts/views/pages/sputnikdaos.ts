@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/sputnikdaos.scss';
 
 import m from 'mithril';
@@ -5,7 +6,7 @@ import _ from 'lodash';
 import { Tag, Table } from 'construct-ui';
 
 import app from 'state';
-import { ChainInfo, CommunityInfo } from 'models';
+import { ChainInfo } from 'models';
 
 import PageLoading from 'views/pages/loading';
 import SputnikDaoRow from 'views/components/sputnik_dao_row';
@@ -15,12 +16,11 @@ import { IDaoInfo } from 'controllers/chain/near/chain';
 
 const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDaoInfo[] }> = {
   view: (vnode) => {
-    if (app.activeId() && app.activeId() !== 'near')
-      m.route.set(`/${app.activeId()}`);
+    if (app.activeChainId() && app.activeChainId() !== 'near')
+      m.route.set(`/${app.activeChainId()}`);
 
-    const activeEntity = app.community ? app.community : app.chain;
-    const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
-      .concat(app.config.chains.getAll());
+    const activeEntity = app.chain;
+    const allCommunities = app.config.chains.getAll();
 
     if (!activeEntity) return m(PageLoading, {
       message: 'Loading Sputnik DAOs',
@@ -35,10 +35,10 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
       showNewProposalButton: true,
     });
 
-    if ((app.activeId() === 'near' || app.activeId() === 'near-testnet') && !vnode.state.daosRequested) {
+    if ((app.activeChainId() === 'near' || app.activeChainId() === 'near-testnet') && !vnode.state.daosRequested) {
       vnode.state.daosRequested = true;
       (app.chain as Near).chain.viewDaoList().then((daos) => {
-        const isMainnet = app.activeId() === 'near';
+        const isMainnet = app.activeChainId() === 'near';
         vnode.state.daosList = daos;
         vnode.state.daosList.sort((d1, d2) => {
           const d1Exist = allCommunities.filter(c => isMainnet
@@ -57,7 +57,7 @@ const SputnikDAOsPage : m.Component<{}, { daosRequested: boolean, daosList: IDao
     }
 
     if (!vnode.state.daosList) {
-      if (app.activeId() === 'near' || app.activeId() === 'near-testnet') {
+      if (app.activeChainId() === 'near' || app.activeChainId() === 'near-testnet') {
         return m(PageLoading, {
           message: 'Loading Sputnik DAOs',
           title: [

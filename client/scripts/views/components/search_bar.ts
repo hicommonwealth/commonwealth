@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/search.scss';
 
 import m from 'mithril';
@@ -26,7 +27,7 @@ import { IconIntent, SearchIcon } from "./component_kit/icons";
 import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
-import { ChainIcon, CommunityIcon } from './chain_icon';
+import { ChainIcon } from './chain_icon';
 
 export const getMemberPreview = (
   addr,
@@ -39,7 +40,7 @@ export const getMemberPreview = (
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
   const userLink = `${
-    app.isCustomDomain() ? '' : `/${app.activeId() || addr.chain}`
+    app.isCustomDomain() ? '' : `/${app.activeChainId() || addr.chain}`
   }/account/${addr.address}?base=${addr.chain}`;
   return m(ListItem, {
     tabIndex,
@@ -74,8 +75,6 @@ export const getCommunityPreview = (community, closeResultsFn, tabIndex, setUsin
       ? { token: community }
       : community.contentType === ContentType.Chain
       ? { chain: community }
-      : community.contentType === ContentType.Community
-      ? { community }
       : null;
   params['size'] = 36;
   const onSelect = (e) => {
@@ -270,7 +269,8 @@ const getBalancedContentListing = (
 };
 
 const getResultsPreview = (searchQuery: SearchQuery, state) => {
-  const { communityScope } = searchQuery;
+  // TODO: using chainScope instead of communityScope OK?
+  const { chainScope } = searchQuery;
   const types = searchQuery.getSearchScope()
   const results = getBalancedContentListing(app.search.getByQuery(searchQuery).results, types)
   const organizedResults = [];
@@ -299,7 +299,7 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
               searchQuery.searchTerm,
               tabIndex,
               state.setUsingFilterMenu,
-              !!communityScope
+              !!chainScope
             )
           : item.searchType === SearchScope.Communities
           ? getCommunityPreview(item, state.closeResults, tabIndex, state.setUsingFilterMenu)
@@ -319,13 +319,6 @@ const getSearchHistoryPreview = (searchQuery: SearchQuery, setFilterMenuActive, 
   if(searchQuery.chainScope && !app.isCustomDomain()) {
     scopeTags.unshift(m(Tag, {
       label: searchQuery.chainScope.toLowerCase(),
-      class: 'search-history-primary-tag'
-    }))
-  }
-
-  if(searchQuery.communityScope && !app.isCustomDomain()) {
-    scopeTags.unshift(m(Tag, {
-      label: searchQuery.communityScope.toLowerCase(),
       class: 'search-history-primary-tag'
     }))
   }
@@ -417,10 +410,8 @@ export const SearchBar: m.Component<
         ? SearchQuery.fromUrlParams(m.route.param())
         : new SearchQuery('', {
             isSearchPreview: true,
-            communityScope: app.community?.name,
             chainScope: app.activeChainId()
           });
-      vnode.state.activeCommunity = app.community ? app.community.name : vnode.state.searchQuery.communityScope
       vnode.state.activeChain = app.activeChainId() ? app.activeChainId() : vnode.state.searchQuery.chainScope
       vnode.state.isTyping = false;
     }
@@ -472,7 +463,7 @@ export const SearchBar: m.Component<
 
     const scopeButtons = [SearchScope.Threads, SearchScope.Replies].map(s => scopeToButton(s, false))
       .concat((app.isCustomDomain() ? [] : [SearchScope.Communities, SearchScope.Members])
-        .map(s => scopeToButton(s, (vnode.state.searchQuery.chainScope || vnode.state.searchQuery.communityScope)))
+        .map(s => scopeToButton(s, (vnode.state.searchQuery.chainScope)))
       )
 
     const filterDropdown =
@@ -487,27 +478,7 @@ export const SearchBar: m.Component<
           class: 'disabled search-filter-button-bar',
           label: scopeButtons
         }),
-        vnode.state.activeCommunity && !app.isCustomDomain()
-          ? [
-              scopeTitle,
-              m(ListItem, {
-                class: 'disabled',
-                label: m(Button, {
-                  size: Size.SM,
-                  onclick: () => {
-                    vnode.state.searchQuery.communityScope =
-                      vnode.state.searchQuery.communityScope === vnode.state.activeCommunity
-                      ? undefined : vnode.state.activeCommunity
-                    search(vnode.state.searchQuery, vnode.state)
-                  },
-                  active: vnode.state.searchQuery.communityScope === vnode.state.activeCommunity,
-                  onmouseover: () => {vnode.state.filterMenuActive = true},
-                  onmouseout: () => {vnode.state.filterMenuActive = false},
-                  label: `Inside community: ${vnode.state.activeCommunity}`
-                }),
-              })
-            ]
-          : vnode.state.activeChain && !app.isCustomDomain()
+        vnode.state.activeChain && !app.isCustomDomain()
             && [
               scopeTitle,
               m(ListItem, {
@@ -550,17 +521,12 @@ export const SearchBar: m.Component<
               : results
       ])
 
-    const chainOrCommIcon = app.activeId()
-      ? app.activeChainId()
+    const chainOrCommIcon = app.activeChainId()
         ? m(ChainIcon, {
             size: 18,
             chain: app.chain.meta.chain,
           })
-        : m(CommunityIcon, {
-            size: 18,
-            community: app.community.meta,
-          })
-      : null;
+        : null;
     const cancelInputIcon = vnode.state.searchTerm
       ? m(Icon, {
           name: Icons.X,

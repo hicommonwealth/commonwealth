@@ -38,11 +38,10 @@ class ReactionsController {
     return this._store.getByPost(post);
   }
 
-  public async create(address: string, post: any, reaction: string, chainId: string, communityId: string) {
+  public async create(address: string, post: any, reaction: string, chainId: string) {
     const options = {
       author_chain: app.user.activeAccount.chain.id,
       chain: chainId,
-      community: communityId,
       address,
       reaction,
       jwt: app.user.jwt,
@@ -64,8 +63,8 @@ class ReactionsController {
     }
   }
 
-  public async refresh(post: any, chainId: string, communityId: string) {
-    const options = { chain: chainId, community: communityId };
+  public async refresh(post: any, chainId: string) {
+    const options = { chain: chainId };
     // TODO: ensure identifier vs id use is correct; see also create method
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
     else if (post instanceof Proposal) {
@@ -115,12 +114,11 @@ class ReactionsController {
     });
   }
 
-  public async refreshAll(chainId: string, communityId: string, reset = false) {
+  public async refreshAll(chainId: string, reset = false) {
     try {
       // TODO: Change to GET /reactions
       const response = await $.get(`${app.serverUrl()}/bulkReactions`, {
         chain: chainId,
-        community: communityId,
       });
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);

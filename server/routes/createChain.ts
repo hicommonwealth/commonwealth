@@ -49,7 +49,7 @@ const createChain = async (
     return next(new Error('Not logged in'));
   }
   // require Admin privilege for creating Chain/DAO
-  if (req.body.type !== ChainType.Token) {
+  if (req.body.type !== ChainType.Token && req.body.type !== ChainType.Offchain) {
     if (!req.user.isAdmin) {
       return next(new Error(Errors.NotAdmin));
     }
@@ -81,14 +81,16 @@ const createChain = async (
   }
   let eth_chain_id: number = null;
   let url = req.body.node_url;
-  if (req.body.base === ChainBase.Ethereum) {
-    if (!Web3.utils.isAddress(req.body.address)) {
-      return next(new Error(Errors.InvalidAddress));
-    }
+  if (req.body.base === ChainBase.Ethereum && req.body.type === ChainType.Offchain) {
     if (!req.body.eth_chain_id || !+req.body.eth_chain_id) {
       return next(new Error(Errors.InvalidChainId));
     }
     eth_chain_id = +req.body.eth_chain_id;
+  }
+  if (req.body.base === ChainBase.Ethereum && req.body.type !== ChainType.Offchain) {
+    if (!Web3.utils.isAddress(req.body.address)) {
+      return next(new Error(Errors.InvalidAddress));
+    }
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
     const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
@@ -119,14 +121,13 @@ const createChain = async (
     if (existingChainNode) {
       return next(new Error(Errors.ChainAddressExists));
     }
-  } else if (req.body.base === ChainBase.Solana) {
+  } else if (req.body.base === ChainBase.Solana && req.body.type !== ChainType.Offchain) {
     let pubKey: solw3.PublicKey;
     try {
       pubKey = new solw3.PublicKey(req.body.address);
     } catch (e) {
       return next(new Error(Errors.InvalidAddress));
     }
-
     try {
       const clusterUrl = solw3.clusterApiUrl(url);
       const connection = new solw3.Connection(clusterUrl);
@@ -139,7 +140,7 @@ const createChain = async (
     } catch (e) {
       return next(new Error(Errors.InvalidNodeUrl));
     }
-  } else if (req.body.base === ChainBase.CosmosSDK) {
+  } else if (req.body.base === ChainBase.CosmosSDK && req.body.type !== ChainType.Offchain) {
     // test cosmos endpoint validity -- must be http(s)
     if (!urlHasValidHTTPPrefix(url)) {
       return next(new Error(Errors.InvalidNodeUrl));
@@ -202,6 +203,7 @@ const createChain = async (
     bech32_prefix: req.body.bech32_prefix,
     decimals: req.body.decimals,
   };
+
   const chain = await models.Chain.create(chainContent);
 
   const chainNodeContent = {
@@ -211,6 +213,7 @@ const createChain = async (
     eth_chain_id,
     token_name: req.body.token_name,
   };
+
   const node = await models.ChainNode.create(chainNodeContent);
 
   return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: node.toJSON() } });
