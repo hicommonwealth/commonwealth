@@ -7,6 +7,9 @@
         @include xs-max {
             width: initial;
         }
+        .download-link {
+            cursor: pointer;
+        }
         .offchain-poll-voter {
             display: flex;
             .User {
