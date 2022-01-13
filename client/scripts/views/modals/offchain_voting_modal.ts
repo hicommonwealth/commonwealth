@@ -5,9 +5,6 @@ import { OffchainVote, AddressInfo } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import User from 'views/components/widgets/user';
 
-import app from 'state';
-import { formatAddressShort } from '../../../../shared/utils';
-
 const OffchainVotingModal : m.Component<{ votes: OffchainVote[] }, {}> = {
   view: (vnode) => {
     const { votes } = vnode.attrs;
