@@ -13,6 +13,7 @@ module.exports = {
       email: { type: Sequelize.STRING, allowNull: true },
       website: { type: Sequelize.STRING, allowNull: true },
       bio: { type: Sequelize.STRING, allowNull: true },
+      is_default: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
     });
     
       // adds new column to map Addresses to the new Profiles object
@@ -29,10 +30,11 @@ module.exports = {
       // creates a new Profile object for each User
       await queryInterface.sequelize.query(
         `
-            INSERT INTO "Profiles" (user_id, created_at, updated_at)
+            INSERT INTO "Profiles" (user_id, created_at, updated_at, is_default)
             SELECT u.id,
                    CURRENT_TIMESTAMP as created_at,
-                   CURRENT_TIMESTAMP as updated_at
+                   CURRENT_TIMESTAMP as updated_at,
+                   TRUE as is_default
             FROM "Users" u;
 				`,
         {
