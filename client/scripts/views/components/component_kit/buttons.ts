@@ -2,6 +2,7 @@
 /* eslint-disable max-len */
 import 'components/component_kit/buttons.scss';
 import m from 'mithril';
+import { RadioButton } from './cw_radio_button';
 
 import { CreateIcon, IconIntent, IconSize } from './icons';
 import { ButtonType, LinkType, EngagementButtonSize } from './types';
@@ -18,34 +19,6 @@ export const appendTags = (base: string, attrs) => {
   if (size === EngagementButtonSize.Large) tag += '.lg';
   if (className) tag += className;
   return tag;
-};
-
-export const RadioButton: m.Component<
-  {
-    value: string;
-    label?: string;
-    toggled: boolean;
-    groupName: string;
-    onchange: Function;
-    className?: string;
-    disabled?: boolean;
-  },
-  {}
-> = {
-  view: (vnode) => {
-    const { toggled, value, label, groupName, onchange } = vnode.attrs;
-    const params = {
-      type: 'radio',
-      name: groupName,
-      value,
-      onchange,
-    };
-    if (toggled) params['checked'] = 'checked';
-    return m(appendTags('label.RadioButton', vnode.attrs), [
-      m('span.radio-input', [m('input', params), m('span.radio-control')]),
-      m('span.radio-label', label || value),
-    ]);
-  },
 };
 
 export const FaceliftRadioGroup: m.Component<
