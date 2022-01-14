@@ -32,7 +32,7 @@ export const CWRadioGroup: m.Component<RadioGroupProps, RadioGroupState> = {
     const { toggledValue } = vnode.state;
 
     return (
-      <div class={`${ComponentType.RadioGroup}`}>
+      <div class={ComponentType.RadioGroup}>
         {values.map((val, idx) => {
           return m(CWRadioButton, {
             value: val,
