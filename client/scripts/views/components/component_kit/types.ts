@@ -1,8 +1,11 @@
+import { Vnode } from 'mithril';
+
 export type State = Record<string, unknown>;
 
 export enum ComponentType {
   Button = 'Button',
   GradientButton = 'GradientButton',
+  ButtonGroup = 'ButtonGroup',
 }
 
 export type StyleProps = {
@@ -25,11 +28,9 @@ export type ButtonProps = {
   onclick: (e?: MouseEvent) => void;
 };
 
-export enum Justify {
-  Right = 'right',
-  Center = 'center',
-  Left = 'left',
-}
+export type ButtonGroupProps = {
+  children: Array<Vnode<ButtonProps, State>>;
+};
 
 export enum LinkStyle {
   Button = 'button',

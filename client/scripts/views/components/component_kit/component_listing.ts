@@ -52,15 +52,15 @@ import {
 } from './icons';
 import {
   ExternalLinkElement,
-  CWButtonGroup,
   FaceliftRadioGroup,
   EngagementButton,
 } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
 import { CWButton } from './cw_button';
-import { ButtonType, EngagementButtonSize, Justify, LinkStyle } from './types';
+import { ButtonType, EngagementButtonSize, LinkStyle } from './types';
 import { CWGradientButton } from './cw_gradient_button';
+import { CWButtonGroup } from './cw_button_group';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -275,29 +275,69 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           }),
         ]
       ),
-      m('.button-gallery', [
-        m(CWButtonGroup, {
-          secondaryLabel: 'Button',
-          primaryLabel: 'Group',
-          primaryOnClick: () => notifySuccess('Primary clicked!'),
-          secondaryOnClick: () => notifySuccess('Secondary clicked!'),
-          justify: Justify.Left,
-        }),
-        m(CWButtonGroup, {
-          secondaryLabel: 'Center',
-          primaryLabel: 'Justified',
-          primaryOnClick: () => notifySuccess('Primary clicked!'),
-          secondaryOnClick: () => notifySuccess('Secondary clicked!'),
-          justify: Justify.Center,
-        }),
-        m(CWButtonGroup, {
-          secondaryLabel: 'Right',
-          primaryLabel: 'Justified',
-          primaryOnClick: () => notifySuccess('Primary clicked!'),
-          secondaryOnClick: () => notifySuccess('Secondary clicked!'),
-          justify: Justify.Right,
-        }),
-      ]),
+      m(
+        '.button-gallery',
+        [
+          m(CWButtonGroup, {
+            children: [
+              m(CWButton, {
+                styleProps: {
+                  buttonType: ButtonType.Secondary,
+                },
+                label: 'Button',
+                onclick: () => notifySuccess('Secondary clicked!'),
+              }),
+              m(CWButton, {
+                styleProps: {
+                  buttonType: ButtonType.Primary,
+                },
+                label: 'Group',
+                onclick: () => notifySuccess('Primary clicked!'),
+              }),
+            ],
+          }),
+        ],
+        [
+          m(CWButtonGroup, {
+            children: [
+              m(CWButton, {
+                styleProps: {
+                  buttonType: ButtonType.Secondary,
+                },
+                label: 'Button',
+                onclick: () => notifySuccess('Secondary clicked!'),
+              }),
+              m(CWButton, {
+                styleProps: {
+                  buttonType: ButtonType.Primary,
+                },
+                label: 'Group',
+                onclick: () => notifySuccess('Primary clicked!'),
+              }),
+            ],
+          }),
+        ],
+        [
+          m(CWButtonGroup, {
+            children: [
+              m(CWButton, {
+                styleProps: {
+                  buttonType: ButtonType.Secondary,
+                },
+                label: 'Button',
+                onclick: () => notifySuccess('Secondary clicked!'),
+              }),
+              m(CWButton, {
+                styleProps: {
+                  buttonType: ButtonType.Primary,
+                },
+                label: 'Group',
+                onclick: () => notifySuccess('Primary clicked!'),
+              }),
+            ],
+          }),
+        ]
+      ),
       m(
         '.button-gallery',
         {

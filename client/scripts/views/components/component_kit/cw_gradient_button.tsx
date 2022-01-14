@@ -1,18 +1,12 @@
 /* @jsx m */
 
 import m from 'mithril';
+import 'components/component_kit/gradient_button.scss';
 
-import { ComponentType, ButtonStyleProps, State } from './types';
+import { ComponentType, State, ButtonProps } from './types';
 import { getClasses } from './helpers';
 
-export const CWGradientButton: m.Component<
-  {
-    styleProps: ButtonStyleProps;
-    label: string;
-    onclick: (e?: MouseEvent) => void;
-  },
-  State
-> = {
+export const CWGradientButton: m.Component<ButtonProps, State> = {
   view: (vnode) => {
     const { onclick, label, styleProps } = vnode.attrs;
     return (

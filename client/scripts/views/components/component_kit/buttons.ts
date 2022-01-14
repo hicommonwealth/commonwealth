@@ -6,7 +6,7 @@ import { CWButton } from './cw_button';
 import { CreateIcon, ExternalLinkIcon, IconIntent, IconSize } from './icons';
 import { ButtonType, LinkStyle, EngagementButtonSize, Justify } from './types';
 
-const appendTags = (base: string, attrs) => {
+export const appendTags = (base: string, attrs) => {
   const { intent, disabled, className, style, size } = attrs;
   let tag = base;
   if (disabled) tag += '.disabled';
@@ -18,56 +18,6 @@ const appendTags = (base: string, attrs) => {
   if (size === EngagementButtonSize.Large) tag += '.lg';
   if (className) tag += className;
   return tag;
-};
-
-export const CWButtonGroup: m.Component<
-  {
-    primaryLabel: string;
-    secondaryLabel: string;
-    primaryOnClick: () => void;
-    secondaryOnClick: () => void;
-    primaryDisabled?: boolean;
-    secondaryDisabled?: boolean;
-    justify?: Justify;
-    className?: string;
-  },
-  {}
-> = {
-  view: (vnode) => {
-    const {
-      primaryLabel,
-      secondaryLabel,
-      primaryOnClick,
-      secondaryOnClick,
-      primaryDisabled,
-      secondaryDisabled,
-      justify,
-    } = vnode.attrs;
-    return m(
-      appendTags('.ButtonGroup', vnode.attrs),
-      {
-        style: `justify-content: ${justify}`,
-      },
-      [
-        m(CWButton, {
-          styleProps: {
-            buttonType: ButtonType.Secondary,
-            disabled: secondaryDisabled,
-          },
-          label: secondaryLabel,
-          onclick: secondaryOnClick,
-        }),
-        m(CWButton, {
-          styleProps: {
-            buttonType: ButtonType.Primary,
-            disabled: primaryDisabled,
-          },
-          label: primaryLabel,
-          onclick: primaryOnClick,
-        }),
-      ]
-    );
-  },
 };
 
 // TODO: Synchronize/reconcile against
