@@ -22,6 +22,7 @@
     color: $dark-purp;
     background: $xlite-purp;
     border: 1px solid $dark-purp;
+    box-shadow: 0px 2px 6px 0px #0000001a;
 
     .Icon path {
       stroke: $dark-purp;
@@ -45,6 +46,7 @@
       color: $disable-gray;
       border: 1px solid $disable-gray;
       background: $white;
+      box-shadow: none;
 
       .Icon path {
         stroke: $disable-gray;
