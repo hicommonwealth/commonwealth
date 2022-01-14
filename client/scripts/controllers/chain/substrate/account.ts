@@ -186,10 +186,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     this._Accounts.store.add(this);
   }
 
-  public getKeyringPair(): KeyringPair {
-    return this._Chain.keyring(this.isEd25519);
-  }
-
   // TRANSACTIONS
   public get balanceTransferFee(): Promise<SubstrateCoin> {
     const txFee = this._Chain.api.consts.balances.transferFee as Balance;
