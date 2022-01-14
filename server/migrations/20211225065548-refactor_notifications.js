@@ -8,7 +8,7 @@ module.exports = {
 
             // creates a new table called Notifications
             await queryInterface.createTable("Notifications", {
-                id: {type: Sequelize.INTEGER, primaryKey: true},
+                id: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
                 notification_data: {type: Sequelize.TEXT, allowNull: true},
                 created_at: {type: Sequelize.DATE, allowNull: false},
                 updated_at: {type: Sequelize.DATE, allowNull: false},
@@ -38,14 +38,13 @@ module.exports = {
             // copies all UNIQUE (notifications that have the same notification_data AND chain_event_id notifications from OldNotifications to Notifications
             await queryInterface.sequelize.query(`
                 INSERT INTO "Notifications"
-                SELECT A.id,
+                SELECT ROW_NUMBER() OVER (ORDER BY chain_event_id) as id,
                        A.notification_data,
                        CURRENT_TIMESTAMP as created_at,
                        CURRENT_TIMESTAMP as updated_at,
                        A.chain_event_id
                 FROM (
-                         SELECT ROW_NUMBER() OVER (ORDER BY chain_event_id) as id,
-                                notification_data,
+                         SELECT notification_data,
                                 chain_event_id
                          FROM "OldNotifications"
                          GROUP BY (notification_data, chain_event_id)
