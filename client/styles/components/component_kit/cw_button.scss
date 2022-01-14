@@ -18,6 +18,7 @@
 
     &.disabled {
       background-color: $disable-gray;
+      box-shadow: none;
       cursor: default;
     }
   }
