@@ -1,8 +1,9 @@
-import { ButtonStyleProps } from './types';
+import { ButtonStyleProps } from './cw_button';
+import { EngagementButtonStyleProps } from './cw_engagement_button';
 
 export const getClasses = (
   componentType: string,
-  styleProps: ButtonStyleProps
+  styleProps: ButtonStyleProps | EngagementButtonStyleProps
 ): string =>
   `${componentType} ${Object.entries(styleProps)
     .map(([key, value]) =>

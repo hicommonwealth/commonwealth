@@ -7,6 +7,7 @@ export enum ComponentType {
   ExternalLink = 'ExternalLink',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  EngagementButton = 'EngagementButton',
 }
 
 export type StyleProps = {
@@ -17,9 +18,4 @@ export type StyleProps = {
 export enum ButtonType {
   Primary = 'primary',
   Secondary = 'secondary',
-}
-
-export enum EngagementButtonSize {
-  Small = 'sm',
-  Large = 'lg',
 }
