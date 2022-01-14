@@ -62,7 +62,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       if (!app.chain?.meta.ethChainId) {
         throw new Error(`No chain id found!`);
       }
-      const rpc = { [app.chain.meta.ethChainId]: app.chain.meta.url };
+
+      // use alt wallet url if available
+      const rpc = { [app.chain.meta.ethChainId]: app.chain.meta.altWalletUrl || app.chain.meta.url };
+      console.log(rpc);
       this._provider = new WalletConnectProvider({ rpc, chainId: app.chain.meta.ethChainId });
 
       //  Enable session (triggers QR Code modal)

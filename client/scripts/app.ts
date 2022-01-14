@@ -62,6 +62,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           address: node.address,
           token_name: node.token_name,
           eth_chain_id: node.eth_chain_id,
+          alt_wallet_url: node.alt_wallet_url,
         }));
       });
       app.user.setRoles(data.roles);
