@@ -1,9 +1,8 @@
 .ButtonGroup {
   display: flex;
   flex-direction: row;
-  margin: 20px 0;
 
-  .Button.primary {
-    margin-left: 20px;
+  .Button:not(:last-child) {
+    margin: 0 8px 0 0;
   }
 }

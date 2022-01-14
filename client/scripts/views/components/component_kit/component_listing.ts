@@ -50,17 +50,14 @@ import {
   IconIntent,
   WebsiteIcon,
 } from './icons';
-import {
-  ExternalLinkElement,
-  FaceliftRadioGroup,
-  EngagementButton,
-} from './buttons';
+import { FaceliftRadioGroup, EngagementButton } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
 import { CWButton } from './cw_button';
-import { ButtonType, EngagementButtonSize, LinkStyle } from './types';
+import { ButtonType, EngagementButtonSize, LinkType } from './types';
 import { CWGradientButton } from './cw_gradient_button';
 import { CWButtonGroup } from './cw_button_group';
+import { ExternalLink } from './cw_external_link';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -344,15 +341,15 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 420px;',
         },
         [
-          m(ExternalLinkElement, {
+          m(ExternalLink, {
             label: 'Button external link',
             target: 'https://edgewa.re/',
-            style: LinkStyle.Button,
+            linkType: LinkType.Button,
           }),
-          m(ExternalLinkElement, {
+          m(ExternalLink, {
             label: 'Inline external link',
             target: 'https://edgewa.re/',
-            style: LinkStyle.Inline,
+            linkType: LinkType.Inline,
           }),
         ]
       ),

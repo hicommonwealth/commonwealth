@@ -6,6 +6,7 @@ export enum ComponentType {
   Button = 'Button',
   GradientButton = 'GradientButton',
   ButtonGroup = 'ButtonGroup',
+  ExternalLink = 'ExternalLink',
 }
 
 export type StyleProps = {
@@ -32,10 +33,16 @@ export type ButtonGroupProps = {
   children: Array<Vnode<ButtonProps, State>>;
 };
 
-export enum LinkStyle {
+export enum LinkType {
   Button = 'button',
   Inline = 'inline',
 }
+
+export type ExternalLinkProps = {
+  label: string;
+  target: string;
+  linkType: LinkType;
+};
 
 export enum EngagementButtonSize {
   Small = 'sm',

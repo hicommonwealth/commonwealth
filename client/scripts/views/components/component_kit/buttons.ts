@@ -2,9 +2,9 @@
 /* eslint-disable max-len */
 import 'components/component_kit/buttons.scss';
 import m from 'mithril';
-import { CWButton } from './cw_button';
-import { CreateIcon, ExternalLinkIcon, IconIntent, IconSize } from './icons';
-import { ButtonType, LinkStyle, EngagementButtonSize, Justify } from './types';
+
+import { CreateIcon, IconIntent, IconSize } from './icons';
+import { ButtonType, LinkType, EngagementButtonSize } from './types';
 
 export const appendTags = (base: string, attrs) => {
   const { intent, disabled, className, style, size } = attrs;
@@ -12,36 +12,12 @@ export const appendTags = (base: string, attrs) => {
   if (disabled) tag += '.disabled';
   if (intent === ButtonType.Primary) tag += '.primary';
   else if (intent === ButtonType.Secondary) tag += '.secondary';
-  if (style === LinkStyle.Button) tag += '.button';
-  if (style === LinkStyle.Inline) tag += '.inline';
+  if (style === LinkType.Button) tag += '.button';
+  if (style === LinkType.Inline) tag += '.inline';
   if (size === EngagementButtonSize.Small) tag += '.sm';
   if (size === EngagementButtonSize.Large) tag += '.lg';
   if (className) tag += className;
   return tag;
-};
-
-// TODO: Synchronize/reconcile against
-// Mithril internal/external link helpers
-export const ExternalLinkElement: m.Component<
-  {
-    label: string;
-    target: string;
-    style: LinkStyle;
-  },
-  {}
-> = {
-  view: (vnode) => {
-    const { label, target } = vnode.attrs;
-    return m(
-      appendTags('.ExternalLinkElement', vnode.attrs),
-      {
-        href: target,
-        target: '_blank',
-        rel: 'noopener noreferrer',
-      },
-      [m('.link-text', label), m(ExternalLinkIcon)]
-    );
-  },
 };
 
 export const RadioButton: m.Component<
