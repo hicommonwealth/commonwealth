@@ -223,7 +223,7 @@ export default (
       });
     }
 
-    return nReads;
+    return notification;
   };
 
   Subscription.associate = (models) => {

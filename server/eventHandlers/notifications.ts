@@ -48,7 +48,7 @@ export default class extends IEventHandler {
       }
 
       // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
-      const dbNotifications = await this._models.Subscription.emitNotifications(
+      const dbNotification = await this._models.Subscription.emitNotifications(
         this._models,
         NotificationCategories.ChainEvent,
         dbEventType.id,
@@ -59,41 +59,16 @@ export default class extends IEventHandler {
         event.includeAddresses
       );
 
-      const promises = dbNotifications.map(
-        (x) => {
-          // add chainEventType to published message since chainEventType is used to determine room to emit to
-          x = JSON.parse(JSON.stringify(x));
-          x.ChainEvent = event;
-          x.ChainEvent.ChainEventType = dbEventType;
-          return this._rabbitMqController.publish(x, 'ChainEventsNotificationsPublication')
-        }
-      )
-      
-      // polyfill
-      if (!(<any>Promise).allSettled) {
-        (<any>Promise).allSettled = promises =>
-          Promise.all(
-            promises.map((promise, i) =>
-              promise
-                .then(value => ({
-                  status: "fulfilled",
-                  value,
-                }))
-                .catch(reason => ({
-                  status: "rejected",
-                  reason,
-                }))
-            )
-          );
-      }
-      
-      const results = (<any>Promise).allSettled(promises)
-      
-      log.trace(`Emitted ${dbNotifications.length} notifications.`);
+      const formattedEvent = dbNotification.toJSON()
+      formattedEvent.ChainEvent = dbEvent.toJSON()
+      // TODO check if ChainEventType is included at this point
+      console.log(formattedEvent)
+      log.info(formattedEvent)
+      await this._rabbitMqController.publish(formattedEvent, 'ChainEventsNotificationsPublication')
 
       return dbEvent;
     } catch (e) {
-      log.error(`Failed to generate notification: ${e.message}!`);
+      log.error(`Failed to generate notification: ${e.message}!\nevent: ${event}\ndbEvent: ${dbEvent.toJSON}`);
       return dbEvent;
     }
   }
