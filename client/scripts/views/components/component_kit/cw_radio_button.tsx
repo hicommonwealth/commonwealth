@@ -3,38 +3,43 @@
 import m from 'mithril';
 import 'components/component_kit/cw_radio_button.scss';
 
-import { State } from './types';
-import { appendTags } from './buttons';
+import { ComponentType, State } from './types';
 
-export const RadioButton: m.Component<
+export const CWRadioButton: m.Component<
   {
     value: string;
     label?: string;
-    toggled: boolean;
+    checked: boolean;
     groupName: string;
     // TODO: Gabe 1/14/22 type onchange for real
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onchange: (e?: any) => void;
     className?: string;
+    // TODO: Gabe 1/14/22 disabled isn't used for anything
     disabled?: boolean;
   },
   State
 > = {
   view: (vnode) => {
-    const { toggled, value, label, groupName, onchange } = vnode.attrs;
+    const { checked, value, label, groupName, onchange, className } =
+      vnode.attrs;
 
     const params = {
       type: 'radio',
       name: groupName,
       value,
       onchange,
+      checked: checked ? 'checked' : '',
     };
 
-    if (toggled) params['checked'] = 'checked';
-
-    return m(appendTags('label.RadioButton', vnode.attrs), [
-      m('span.radio-input', [m('input', params), m('span.radio-control')]),
-      m('span.radio-label', label || value),
-    ]);
+    return (
+      <label class={`${ComponentType.RadioButton} ${checked} ${className}`}>
+        <span class="radio-input">
+          <input {...params} />
+          <span class="radio-control" />
+        </span>
+        <span class="radio-label">{label || value}</span>
+      </label>
+    );
   },
 };

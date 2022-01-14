@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 import 'components/component_kit/buttons.scss';
 import m from 'mithril';
-import { RadioButton } from './cw_radio_button';
+import { CWRadioButton } from './cw_radio_button';
 
 import { CreateIcon, IconIntent, IconSize } from './icons';
 import { ButtonType, LinkType, EngagementButtonSize } from './types';
@@ -46,10 +46,10 @@ export const FaceliftRadioGroup: m.Component<
     return m(
       `.RadioGroup.${klass || ''}`,
       values.map((val, idx) => {
-        return m(RadioButton, {
+        return m(CWRadioButton, {
           value: val,
           label: labels[idx] || val,
-          toggled: val === toggledValue,
+          checked: val === toggledValue,
           groupName: name,
           onchange: (e) => {
             vnode.state.toggledValue = e?.target?.value;

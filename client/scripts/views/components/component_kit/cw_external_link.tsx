@@ -7,7 +7,7 @@ import { ExternalLinkIcon } from './icons';
 import { ComponentType, ExternalLinkProps, State } from './types';
 
 // TODO: Graham 11/17/21 - Synchronize/reconcile against Mithril internal/external link helpers
-export const ExternalLink: m.Component<ExternalLinkProps, State> = {
+export const CWExternalLink: m.Component<ExternalLinkProps, State> = {
   view: (vnode) => {
     const { label, target, linkType } = vnode.attrs;
     return (

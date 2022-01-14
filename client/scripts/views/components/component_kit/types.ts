@@ -7,6 +7,7 @@ export enum ComponentType {
   GradientButton = 'GradientButton',
   ButtonGroup = 'ButtonGroup',
   ExternalLink = 'ExternalLink',
+  RadioButton = 'RadioButton',
 }
 
 export type StyleProps = {

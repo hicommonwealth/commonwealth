@@ -57,7 +57,7 @@ import { CWButton } from './cw_button';
 import { ButtonType, EngagementButtonSize, LinkType } from './types';
 import { CWGradientButton } from './cw_gradient_button';
 import { CWButtonGroup } from './cw_button_group';
-import { ExternalLink } from './cw_external_link';
+import { CWExternalLink } from './cw_external_link';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -272,81 +272,52 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           }),
         ]
       ),
-      m(
-        '.button-gallery',
-        [
-          m(CWButtonGroup, {
-            children: [
-              m(CWButton, {
-                styleProps: {
-                  buttonType: ButtonType.Secondary,
-                },
-                label: 'Button',
-                onclick: () => notifySuccess('Secondary clicked!'),
-              }),
-              m(CWButton, {
-                styleProps: {
-                  buttonType: ButtonType.Primary,
-                },
-                label: 'Group',
-                onclick: () => notifySuccess('Primary clicked!'),
-              }),
-            ],
-          }),
-        ],
-        [
-          m(CWButtonGroup, {
-            children: [
-              m(CWButton, {
-                styleProps: {
-                  buttonType: ButtonType.Secondary,
-                },
-                label: 'Button',
-                onclick: () => notifySuccess('Secondary clicked!'),
-              }),
-              m(CWButton, {
-                styleProps: {
-                  buttonType: ButtonType.Primary,
-                },
-                label: 'Group',
-                onclick: () => notifySuccess('Primary clicked!'),
-              }),
-            ],
-          }),
-        ],
-        [
-          m(CWButtonGroup, {
-            children: [
-              m(CWButton, {
-                styleProps: {
-                  buttonType: ButtonType.Secondary,
-                },
-                label: 'Button',
-                onclick: () => notifySuccess('Secondary clicked!'),
-              }),
-              m(CWButton, {
-                styleProps: {
-                  buttonType: ButtonType.Primary,
-                },
-                label: 'Group',
-                onclick: () => notifySuccess('Primary clicked!'),
-              }),
-            ],
-          }),
-        ]
-      ),
+      m('.button-gallery', [
+        m(CWButtonGroup, {
+          children: [
+            m(CWButton, {
+              styleProps: {
+                buttonType: ButtonType.Primary,
+              },
+              label: 'One',
+              onclick: () => notifySuccess('One clicked!'),
+            }),
+            m(CWButton, {
+              styleProps: {
+                buttonType: ButtonType.Primary,
+              },
+              label: 'Two',
+              onclick: () => notifySuccess('Two clicked!'),
+            }),
+            m(CWButton, {
+              styleProps: {
+                buttonType: ButtonType.Primary,
+              },
+              label: 'Three',
+              onclick: () => notifySuccess('Three clicked!'),
+            }),
+            m(CWButton, {
+              styleProps: {
+                buttonType: ButtonType.Primary,
+              },
+              label: 'Four',
+              onclick: () => notifySuccess('Four clicked!'),
+            }),
+          ],
+        }),
+      ]),
       m(
         '.button-gallery',
         {
           style: 'max-width: 420px;',
         },
         [
-          m(ExternalLink, {
+          m(CWExternalLink, {
             label: 'Button external link',
             target: 'https://edgewa.re/',
             linkType: LinkType.Button,
           }),
-          m(ExternalLink, {
+          m(CWExternalLink, {
             label: 'Inline external link',
             target: 'https://edgewa.re/',
             linkType: LinkType.Inline,
