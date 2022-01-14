@@ -41,10 +41,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async signLoginToken(message: string): Promise<string> {
     const msgParams = constructTypedMessage(app.chain.meta.ethChainId, message);
-    const signature = await this._web3.givenProvider.request({
-      method: 'eth_signTypedData_v4',
-      params: [this._accounts[0], JSON.stringify(msgParams)],
-    })
+    const signature = await this._provider.wc.signTypedData([
+      this.accounts[0],
+      JSON.stringify(msgParams),
+    ]);
     return signature;
   }
 
