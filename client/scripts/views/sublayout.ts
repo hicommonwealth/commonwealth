@@ -100,11 +100,9 @@ const Sublayout: m.Component<
     ]);
 
     const hiringButton = m(CWGradientButton, {
-      styleProps: {
-        buttonType: ButtonType.Secondary,
-        disabled: false,
-        className: 'hiringBtn',
-      },
+      buttonType: ButtonType.Secondary,
+      disabled: false,
+      className: 'hiringBtn',
       label: "We're hiring!",
       onclick: () => {
         window.open('https://angel.co/company/commonwealth-labs', '_blank');

@@ -81,9 +81,7 @@ const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
           m('.card-description', { lang: 'en' }, pretty_description),
           m('.join-button-wrapper', [
             m(CWButton, {
-              styleProps: {
-                buttonType: ButtonType.Secondary,
-              },
+              buttonType: ButtonType.Secondary,
               label: 'See More',
               onclick: redirectFunction,
             }),
@@ -139,10 +137,8 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
           m('.card-description', { lang: 'en' }, pretty_description),
           m('.join-button-wrapper', [
             m(CWButton, {
-              styleProps: {
-                buttonType: ButtonType.Secondary,
-                disabled: false,
-              },
+              buttonType: ButtonType.Secondary,
+              disabled: false,
               label: 'See More',
               onclick: redirectFunction,
             }),
@@ -166,9 +162,7 @@ const LockdropToolsCard: m.Component<{}> = {
         m('.lockdrop-card-body', [
           m('h3', 'Edgeware Lockdrop Tools'),
           m(CWButton, {
-            styleProps: {
-              buttonType: ButtonType.Primary,
-            },
+            buttonType: ButtonType.Primary,
             onclick: (e) => {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;
@@ -178,9 +172,7 @@ const LockdropToolsCard: m.Component<{}> = {
           }),
           m('.spacer', []),
           m(CWButton, {
-            styleProps: {
-              buttonType: ButtonType.Primary,
-            },
+            buttonType: ButtonType.Primary,
             onclick: (e) => {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;
