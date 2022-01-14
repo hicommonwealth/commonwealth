@@ -4,7 +4,7 @@ import m from 'mithril';
 import 'components/component_kit/cw_button.scss';
 
 import { ButtonType, ComponentType, StyleProps } from './types';
-import { getClasses } from './helpers';
+import { getButtonClasses } from './helpers';
 
 export type ButtonStyleProps = {
   buttonType: ButtonType;
@@ -20,7 +20,7 @@ export const CWButton: m.Component<ButtonProps> = {
     const { onclick, label, disabled, className, buttonType } = vnode.attrs;
     return (
       <button
-        class={getClasses(ComponentType.Button, {
+        class={getButtonClasses(ComponentType.Button, {
           disabled,
           className,
           buttonType,

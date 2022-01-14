@@ -1,7 +1,7 @@
 import { ButtonStyleProps } from './cw_button';
 import { EngagementButtonStyleProps } from './cw_engagement_button';
 
-export const getClasses = (
+export const getButtonClasses = (
   componentType: string,
   styleProps: ButtonStyleProps | EngagementButtonStyleProps
 ): string =>
