@@ -1,9 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
+import m, { Vnode } from 'mithril';
 import 'components/component_kit/cw_button_group.scss';
 
-import { State, ComponentType, ButtonGroupProps } from './types';
+import { State, ComponentType } from './types';
+import { ButtonProps } from './cw_button';
+
+type ButtonGroupProps = {
+  children: Array<Vnode<ButtonProps, State>>;
+};
 
 export const CWButtonGroup: m.Component<ButtonGroupProps, State> = {
   view: (vnode) => {

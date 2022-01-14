@@ -2,10 +2,10 @@
 /* eslint-disable max-len */
 import 'components/component_kit/buttons.scss';
 import m from 'mithril';
-import { CWRadioButton } from './cw_radio_button';
 
+import { LinkType } from './cw_external_link';
 import { CreateIcon, IconIntent, IconSize } from './icons';
-import { ButtonType, LinkType, EngagementButtonSize } from './types';
+import { ButtonType, EngagementButtonSize } from './types';
 
 export const appendTags = (base: string, attrs) => {
   const { intent, disabled, className, style, size } = attrs;
@@ -19,47 +19,6 @@ export const appendTags = (base: string, attrs) => {
   if (size === EngagementButtonSize.Large) tag += '.lg';
   if (className) tag += className;
   return tag;
-};
-
-export const FaceliftRadioGroup: m.Component<
-  {
-    values: string[];
-    labels?: string[];
-    defaultValue: string;
-    name: string;
-    onchange: Function;
-    klass?: string;
-    disabled?: boolean;
-  },
-  {
-    toggledValue: string;
-  }
-> = {
-  oninit: (vnode) => {
-    if (!vnode.state.toggledValue) {
-      vnode.state.toggledValue = vnode.attrs.defaultValue;
-    }
-  },
-  view: (vnode) => {
-    const { values, labels, onchange, name, klass, disabled } = vnode.attrs;
-    const { toggledValue } = vnode.state;
-    return m(
-      `.RadioGroup.${klass || ''}`,
-      values.map((val, idx) => {
-        return m(CWRadioButton, {
-          value: val,
-          label: labels[idx] || val,
-          checked: val === toggledValue,
-          groupName: name,
-          onchange: (e) => {
-            vnode.state.toggledValue = e?.target?.value;
-            onchange(e);
-          },
-          disabled,
-        });
-      })
-    );
-  },
 };
 
 export const EngagementButton: m.Component<

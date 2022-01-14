@@ -50,14 +50,15 @@ import {
   IconIntent,
   WebsiteIcon,
 } from './icons';
-import { FaceliftRadioGroup, EngagementButton } from './buttons';
+import { EngagementButton } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
 import { CWButton } from './cw_button';
-import { ButtonType, EngagementButtonSize, LinkType } from './types';
+import { ButtonType, EngagementButtonSize } from './types';
 import { CWGradientButton } from './cw_gradient_button';
 import { CWButtonGroup } from './cw_button_group';
-import { CWExternalLink } from './cw_external_link';
+import { CWExternalLink, LinkType } from './cw_external_link';
+import { CWRadioGroup } from './cw_radio_group';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -330,7 +331,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 420px;',
         },
         [
-          m(FaceliftRadioGroup, {
+          m(CWRadioGroup, {
             values: ['This', 'Is', 'A', 'Radio', 'Group'],
             labels: ['This', 'Is', 'A', 'Radio', 'Group'],
             defaultValue: 'This',

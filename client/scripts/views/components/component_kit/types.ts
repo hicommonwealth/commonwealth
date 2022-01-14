@@ -1,5 +1,3 @@
-import { Vnode } from 'mithril';
-
 export type State = Record<string, unknown>;
 
 export enum ComponentType {
@@ -8,6 +6,7 @@ export enum ComponentType {
   ButtonGroup = 'ButtonGroup',
   ExternalLink = 'ExternalLink',
   RadioButton = 'RadioButton',
+  RadioGroup = 'RadioGroup',
 }
 
 export type StyleProps = {
@@ -19,31 +18,6 @@ export enum ButtonType {
   Primary = 'primary',
   Secondary = 'secondary',
 }
-
-export type ButtonStyleProps = {
-  buttonType: ButtonType;
-} & StyleProps;
-
-export type ButtonProps = {
-  styleProps: ButtonStyleProps;
-  label: string;
-  onclick: (e?: MouseEvent) => void;
-};
-
-export type ButtonGroupProps = {
-  children: Array<Vnode<ButtonProps, State>>;
-};
-
-export enum LinkType {
-  Button = 'button',
-  Inline = 'inline',
-}
-
-export type ExternalLinkProps = {
-  label: string;
-  target: string;
-  linkType: LinkType;
-};
 
 export enum EngagementButtonSize {
   Small = 'sm',
