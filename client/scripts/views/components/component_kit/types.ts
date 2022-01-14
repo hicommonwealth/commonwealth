@@ -1,5 +1,3 @@
-export type State = Record<string, unknown>;
-
 export enum ComponentType {
   Button = 'Button',
   GradientButton = 'GradientButton',

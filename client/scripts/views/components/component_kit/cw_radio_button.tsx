@@ -3,7 +3,7 @@
 import m from 'mithril';
 import 'components/component_kit/cw_radio_button.scss';
 
-import { ComponentType, State } from './types';
+import { ComponentType } from './types';
 
 export type RadioButtonProps = {
   value: string;
@@ -18,7 +18,7 @@ export type RadioButtonProps = {
   disabled?: boolean;
 };
 
-export const CWRadioButton: m.Component<RadioButtonProps, State> = {
+export const CWRadioButton: m.Component<RadioButtonProps> = {
   view: (vnode) => {
     const { checked, value, label, groupName, onchange, className } =
       vnode.attrs;

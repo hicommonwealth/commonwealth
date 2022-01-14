@@ -4,7 +4,7 @@ import m from 'mithril';
 import 'components/component_kit/cw_external_link.scss';
 
 import { ExternalLinkIcon } from './icons';
-import { ComponentType, State } from './types';
+import { ComponentType } from './types';
 
 export enum LinkType {
   Button = 'button',
@@ -18,7 +18,7 @@ type ExternalLinkProps = {
 };
 
 // TODO: Graham 11/17/21 - Synchronize/reconcile against Mithril internal/external link helpers
-export const CWExternalLink: m.Component<ExternalLinkProps, State> = {
+export const CWExternalLink: m.Component<ExternalLinkProps> = {
   view: (vnode) => {
     const { label, target, linkType } = vnode.attrs;
     return (

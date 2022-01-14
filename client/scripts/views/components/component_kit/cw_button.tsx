@@ -3,7 +3,7 @@
 import m from 'mithril';
 import 'components/component_kit/cw_button.scss';
 
-import { ButtonType, ComponentType, State, StyleProps } from './types';
+import { ButtonType, ComponentType, StyleProps } from './types';
 import { getClasses } from './helpers';
 
 export type ButtonStyleProps = {
@@ -15,7 +15,7 @@ export type ButtonProps = {
   onclick: (e?: MouseEvent) => void;
 } & ButtonStyleProps;
 
-export const CWButton: m.Component<ButtonProps, State> = {
+export const CWButton: m.Component<ButtonProps> = {
   view: (vnode) => {
     const { onclick, label, disabled, className, buttonType } = vnode.attrs;
     return (
