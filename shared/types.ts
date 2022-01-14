@@ -1,5 +1,4 @@
 import { ChainAttributes } from 'server/models/chain';
-import { OffchainCommunityAttributes } from 'server/models/offchain_community';
 
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
@@ -50,6 +49,7 @@ export enum ChainType {
   Chain = 'chain',
   DAO = 'dao',
   Token = 'token',
+  Offchain = 'offchain',
 }
 
 // TODO: remove many of these chain networks, esp substrate (make them all "Substrate"),
@@ -129,7 +129,6 @@ export interface IWebsocketsPayload<T> {
 
 export interface InviteCodeAttributes {
   id?: string;
-  community_id?: string;
   community_name?: string;
   chain_id?: string;
   creator_id: number;
@@ -137,7 +136,6 @@ export interface InviteCodeAttributes {
   used?: boolean;
   created_at?: Date;
   updated_at?: Date;
-  OffchainCommunity?: OffchainCommunityAttributes;
   Chain?: ChainAttributes;
 }
 
@@ -151,7 +149,6 @@ export interface IPostNotificationData {
   parent_comment_id?: number;
   parent_comment_text?: string;
   chain_id: string;
-  community_id: string;
   author_address: string;
   author_chain: string;
 }
@@ -161,7 +158,6 @@ export interface ICommunityNotificationData {
   role_id: string | number;
   author_address: string;
   chain: string;
-  community: string;
 }
 
 export interface IChainEventNotificationData {

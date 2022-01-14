@@ -21,6 +21,7 @@ import {
   ChainEntity,
   ChainEvent,
 } from 'models';
+import { blocknumToTime } from 'helpers';
 
 import CompoundAPI, { GovernorType } from './api';
 import CompoundGovernance from './governance';
@@ -162,14 +163,14 @@ export default class CompoundProposal extends Proposal<
   public get votingPeriodEnd() { return this.startingPeriod + +this._Gov.votingPeriod; }
 
   public get state(): CompoundTypes.ProposalState {
-    const blockNumber = this._Gov.app.chain.block.height;
+    const time = Date.now() / 1000;
     if (this.data.cancelled) return CompoundTypes.ProposalState.Canceled;
     if (this.data.executed) return CompoundTypes.ProposalState.Executed;
     if (this.data.expired) return CompoundTypes.ProposalState.Expired;
     if (this.data.queued) return CompoundTypes.ProposalState.Queued;
-    if (blockNumber <= this.data.startBlock)
+    if (time <= blocknumToTime(this.data.startBlock).unix())
       return CompoundTypes.ProposalState.Pending;
-    if (blockNumber <= this.data.endBlock)
+    if (time <= blocknumToTime(this.data.endBlock).unix())
       return CompoundTypes.ProposalState.Active;
 
     const votes = this.getVotes();

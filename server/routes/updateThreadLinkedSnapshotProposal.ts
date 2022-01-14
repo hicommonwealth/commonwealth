@@ -12,7 +12,7 @@ export const Errors = {
 };
 
 const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!chain?.snapshot) {
     return next(new Error(Errors.MustBeSnapshotChain));
@@ -20,7 +20,7 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
   // ensure snapshot proposal is a bs58-encoded sha256 hash
   // const decodedHash = bs58.decodeUnsafe(req.body.snapshot_proposal);
   //  || decodedHash.toString().length !== 256
-  // if (!req.body.snapshot_proposal) { 
+  // if (!req.body.snapshot_proposal) {
   //   return next(new Error(Errors.InvalidSnapshotProposal));
   // }
 
@@ -31,7 +31,7 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
       id: thread_id,
     },
   });
-  
+
   if (!thread) return next(new Error(Errors.NoThread));
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified).map((addr) => addr.id);
@@ -43,14 +43,17 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
       }
     });
     const role = roles.find((r) => {
-      return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
+      return r.chain_id === thread.chain;
     });
     if (!role) return next(new Error(Errors.NotAdminOrOwner));
   }
 
   // link snapshot proposal
-  // TODO: should we verify proposal exists here?
-  thread.snapshot_proposal = req.body.snapshot_proposal;
+  if (req.body.snapshot_proposal) {
+    thread.snapshot_proposal = req.body.snapshot_proposal;
+  } else {
+    thread.snapshot_proposal = '';
+  }
   await thread.save();
 
   const finalThread = await models.OffchainThread.findOne({

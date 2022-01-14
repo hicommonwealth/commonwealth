@@ -66,6 +66,8 @@ import {
   GradientType,
 } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
+import { FaceliftCard } from './cards';
+import { stubTrue } from 'lodash';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -217,6 +219,10 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
             size: IconSize.LG,
             intent: IconIntent.Primary,
           }),
+          // ReplyIcon: m(ReplyIcon, {
+          //   size: IconSize.LG,
+          //   intent: IconIntent.Primary,
+          // }),
           NotificationIcon: m(NotificationIcon, {
             size: IconSize.LG,
             intent: IconIntent.Primary,
@@ -356,6 +362,71 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           }),
         ]
       ),
+      m('h1', 'Cards'),
+      m('.card-gallery', 
+        [
+          m(FaceliftCard, {
+            elevation: 1,
+            interactive: true,
+            fluid: false,
+            onclick: () => notifySuccess('Card clicked!'),
+          }, [m('h4', 'Card title'), m('div', 'Elevation: 1')]),
+          m(FaceliftCard, {
+            elevation: 2,
+            interactive: true,
+            fluid: false,
+            onclick: () => notifySuccess('Card clicked!'),
+          }, [m('h4', 'Card title'), m('div', 'Elevation: 2')]),
+          m(FaceliftCard, {
+            elevation: 3,
+            interactive: true,
+            fluid: false,
+            onclick: () => notifySuccess('Card clicked!'),
+          }, [m('h4', 'Card title'), m('div', 'Elevation: 3')]),
+        ]
+      ),
+      m(FaceliftCard, {
+        elevation: 1,
+        interactive: true,
+        fluid: true,
+      }, [m('h4', 'Card title'), m('div', 'Fluid: true')]),
+      m(FaceliftCard, {
+        elevation: 1,
+        interactive: true,
+        class_name: '.form-card'
+      }, [
+        m(Form, { gutter: 15 }, [
+          m(FormGroup, [
+            m(FormLabel, { for: 'name' }, 'Name'),
+            m(Input, {
+              id: 'name',
+              name: 'name',
+              placeholder: 'Name...',
+            }),
+          ]),
+          m(FormGroup, [
+            m(FormLabel, { for: 'bio' }, 'Bio'),
+            m(TextArea, {
+              id: 'bio',
+              name: 'bio',
+              placeholder: 'Bio...',
+            }),
+          ]),
+          m(FormGroup, [
+            m(FormLabel, { for: 'privacy' }, 'Privacy'),
+            m(RadioGroup, {
+              options: ['Public', 'Private'],
+              name: 'privacy',
+              onchange: (e) => {
+                vnode.state.radioGroupSelected = (
+                  e.currentTarget as HTMLInputElement
+                ).value;
+              },
+              value: vnode.state.radioGroupSelected,
+            }),
+          ]),
+        ]),
+      ]),
       m('h1', 'Form Fields'),
       m(
         '.form-gallery',

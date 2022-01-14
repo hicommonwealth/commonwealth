@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'modals/select_address_modal.scss';
 
 import m from 'mithril';
@@ -18,7 +19,7 @@ import { formatAddressShort } from '../../../../shared/utils';
 const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
   view: (vnode) => {
     const activeAccountsByRole: Array<[Account<any>, RoleInfo]> = app.user.getActiveAccountsByRole();
-    const activeEntityInfo = app.community ? app.community.meta : app.chain?.meta?.chain;
+    const activeEntityInfo = app.chain?.meta?.chain;
     const createRole = (e) => {
       vnode.state.loading = true;
 
@@ -28,7 +29,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       app.user.createRole({
         address: addressInfo,
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       }).then(() => {
         vnode.state.loading = false;
         m.redraw();
@@ -63,7 +63,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       app.user.deleteRole({
         address: addressInfo,
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       }).then(() => {
         vnode.state.loading = false;
         m.redraw();
@@ -81,7 +80,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
 
     const chainbase = (app.chain) ? app.chain?.meta?.chain?.base : ChainBase.Ethereum;
 
-    const activeCommunityMeta = app.chain ? app.chain.meta?.chain : app.community?.meta;
+    const activeCommunityMeta = app.chain.meta?.chain;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     return m('.SelectAddressModal', [
@@ -142,7 +141,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         }),
         m(LoginWithWalletDropdown, {
           loggingInWithAddress: false,
-          joiningCommunity: app.activeCommunityId(),
           joiningChain: app.activeChainId(),
           label: activeAccountsByRole.length !== 0 ? 'Connect a new address' : 'Connect address',
           onSuccess: () => {

@@ -82,7 +82,7 @@ export const ArrowRightIcon: m.Component<
 
 export const ReplyIcon: m.Component<
   {
-    size?: IconSize;
+    size: IconSize;
     intent: IconIntent;
     disabled?: boolean;
   },
@@ -125,6 +125,10 @@ export const ReplyIcon: m.Component<
             }),
           ]
         ),
+      // size === IconSize.LG &&
+      //   m(
+      //     appendTags('ReplyIcon', vnode.attrs),
+      //   )
     ];
   },
 };

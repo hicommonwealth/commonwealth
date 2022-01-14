@@ -61,7 +61,7 @@ const ProposalContent: m.Component<
                 user: new AddressInfo(
                   null,
                   proposal.author,
-                  app.activeId(),
+                  app.activeChainId(),
                   null
                 ),
                 linkify: true,
@@ -100,7 +100,7 @@ const ProposalContent: m.Component<
             m('.vote-row', [
               m('.user-column', [
                 m(User, {
-                  user: new AddressInfo(null, vote.voter, app.activeId(), null),
+                  user: new AddressInfo(null, vote.voter, app.activeChainId(), null),
                   linkify: true,
                   popover: true,
                 }),
@@ -262,7 +262,7 @@ const ViewProposalPage: m.Component<
     totalScore: number;
     scores: number[];
     activeTab: string;
-    thread: string;
+    threads: Array<{id: string, title: string}> | null;
   }
 > = {
   oninit: (vnode) => {
@@ -271,7 +271,7 @@ const ViewProposalPage: m.Component<
     vnode.state.totalScore = 0;
     vnode.state.scores = [];
     vnode.state.proposal = null;
-    vnode.state.thread = 'false';
+    vnode.state.threads = null;
 
     const loadVotes = async () => {
       vnode.state.proposal = app.snapshot.proposals.find(
@@ -288,12 +288,16 @@ const ViewProposalPage: m.Component<
       });
       m.redraw();
 
-      app.threads
-        .fetchThreadIdForSnapshot({ snapshot: vnode.state.proposal.id })
+      try {
+        app.threads
+        .fetchThreadIdsForSnapshot({ snapshot: vnode.state.proposal.id })
         .then((res) => {
-          vnode.state.thread = res;
+          vnode.state.threads = res;
           m.redraw();
         });
+      } catch (e) {
+        console.log(`Failed to fetch threads: ${e}`);
+      }
     };
 
     const snapshotId = vnode.attrs.snapshotId;
@@ -314,7 +318,7 @@ const ViewProposalPage: m.Component<
   },
   view: (vnode) => {
     const author = app.user.activeAccount;
-    const { proposal, votes, activeTab, thread } = vnode.state;
+    const { proposal, votes, activeTab, threads } = vnode.state;
     const route = m.route.get();
     const scope = route.slice(0, route.lastIndexOf('/'));
 
@@ -393,7 +397,7 @@ const ViewProposalPage: m.Component<
                         user: new AddressInfo(
                           null,
                           proposal.author,
-                          app.activeId(),
+                          app.activeChainId(),
                           null
                         ),
                         linkify: true,
@@ -437,12 +441,14 @@ const ViewProposalPage: m.Component<
                       ),
                     ]),
                   ]),
-                  thread !== 'false' &&
+                  threads !== null &&
                     m('.linked-discussion', [
-                      m('.heading-2', 'Linked Discussion'),
-                      m(ProposalHeaderSnapshotThreadLink, {
-                        threadId: vnode.state.thread,
-                      }),
+                      m('.heading-2', 'Linked Discussions'),
+                      threads.map((thread) => 
+                        m(ProposalHeaderSnapshotThreadLink, {
+                          thread
+                        }),
+                      )
                     ]),
                 ]),
                 isActive &&

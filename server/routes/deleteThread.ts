@@ -30,14 +30,14 @@ const deleteThread = async (models: DB, req: Request, res: Response, next: NextF
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [ models.Chain, models.OffchainCommunity ]
+      include: [ models.Chain ]
     });
 
     const thread = myThread || await models.OffchainThread.findOne({
       where: {
         id: req.body.thread_id,
       },
-      include: [ models.Chain, models.OffchainCommunity ]
+      include: [ models.Chain ]
     });
 
     if (!thread) {
@@ -45,13 +45,9 @@ const deleteThread = async (models: DB, req: Request, res: Response, next: NextF
     }
 
     const userRole = await models.Role.findOne({
-      where: thread.Chain ? {
+      where: {
         address_id: userOwnedAddressIds,
         chain_id: thread.Chain.id,
-        permission: ['admin', 'moderator'],
-      } : {
-        address_id: userOwnedAddressIds,
-        offchain_community_id: thread.OffchainCommunity.id,
         permission: ['admin', 'moderator'],
       },
     });
@@ -66,7 +62,7 @@ const deleteThread = async (models: DB, req: Request, res: Response, next: NextF
       where: { id: thread.topic_id },
       include: [ { model: models.OffchainThread, as: 'threads' } ]
     });
-    const featuredTopics = (thread.Chain || thread.OffchainCommunity).featured_topics;
+    const featuredTopics = thread.Chain.featured_topics;
     if (topic && !featuredTopics.includes(`${topic.id}`) && topic.threads.length <= 1) {
       topic.destroy();
     }

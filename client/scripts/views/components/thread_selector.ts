@@ -14,11 +14,10 @@ import {
 
 import app from 'state';
 import { OffchainThread } from 'models';
+import { SearchParams } from 'models/SearchQuery';
 import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { searchThreadTitles } from 'helpers/search';
 import { formatAddressShort } from '../../../../shared/utils';
-import { SearchParams } from './search_bar';
 
 const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
   const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
@@ -126,10 +125,9 @@ export const ThreadSelector: m.Component<
                     vnode.state.fetchingResults = true;
                     const params: SearchParams = {
                       chainScope: app.activeChainId(),
-                      communityScope: app.activeCommunityId(),
                       resultSize: 20,
                     };
-                    searchThreadTitles(vnode.state.searchTerm, params)
+                    app.search.searchThreadTitles(vnode.state.searchTerm, params)
                       .then((results) => {
                         vnode.state.fetchingResults = false;
                         vnode.state.searchResults = results;

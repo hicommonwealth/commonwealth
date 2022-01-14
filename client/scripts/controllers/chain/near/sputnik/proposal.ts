@@ -22,6 +22,7 @@ import {
   getUserRoles,
   getTotalSupply,
   isChangePolicy,
+  isChangeConfig,
 } from './types';
 
 export default class NearSputnikProposal extends Proposal<
@@ -36,11 +37,10 @@ export default class NearSputnikProposal extends Proposal<
   }
   public get title() {
     // naming taken from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L188
-    if (this.data.kind === 'ChangeConfig') return 'Change Config: ';
-    if (isChangePolicy(this.data.kind)) return 'Change Policy';
+    if (isChangeConfig(this.data.kind)) return `Change Config: ${this.data.description}`;
+    if (isChangePolicy(this.data.kind)) return `Change Policy: ${this.data.description}`;
     if (this.data.kind === 'UpgradeSelf') return `UpgradeSelf: ${this.data.description}`;
     if (this.data.kind === 'UpgradeRemote') return `UpgradeRemote: ${this.data.description}`;
-    if (this.data.kind === 'Transfer') return `Transfer: ${this.data.description}`;
     if (this.data.kind === 'SetStakingContract') return `SetStakingContract: ${this.data.description}`;
     if (this.data.kind === 'AddBounty') return `AddBounty: ${this.data.description}`;
     if (this.data.kind === 'BountyDone') return `BountyDone: ${this.data.description}`;
@@ -56,10 +56,20 @@ export default class NearSputnikProposal extends Proposal<
           .toFixed(2)
           .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
         } to ${this.data.kind.Transfer.receiver_id}`;
+    } else if (isTransfer(this.data.kind)) {
+      const amount = this._Chain.coins(this.data.kind.Transfer.amount);
+      return `${'Request for payout '}${
+        amount.inDollars
+          .toFixed(2)
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+        } ${this.data.kind.Transfer.token_id} to ${this.data.kind.Transfer.receiver_id}`;
     }
     // TODO: support custom decimals
     if (isFunctionCall(this.data.kind) && this.data.kind.FunctionCall.actions[0].method_name === 'create_token')
       return 'Create token';
+    if (isFunctionCall(this.data.kind)) {
+      return `Call ${this.data.kind.FunctionCall.actions[0].method_name} on ${this.data.kind.FunctionCall.receiver_id}`;
+    }
     return `Sputnik Proposal ${this.identifier}`;
   }
   public get description() { return this.data.description; }

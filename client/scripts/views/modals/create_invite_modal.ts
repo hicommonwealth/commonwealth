@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'modals/create_invite_modal.scss';
 
 import m from 'mithril';
@@ -22,7 +23,8 @@ import moment from 'moment';
 
 import app from 'state';
 import { ChainBase } from 'types';
-import { CommunityInfo, ChainInfo, RoleInfo, Profile } from 'models';
+import { ChainInfo, RoleInfo, Profile } from 'models';
+import { SearchScope } from 'models/SearchQuery'
 import { UserBlock } from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { notifyError } from 'controllers/app/notifications';
@@ -39,13 +41,8 @@ interface IInviteButtonAttrs {
   invitedAddress?: string,
   invitedEmail?: string,
   invitedAddressChain?: string,
-  community?: CommunityInfo,
   chain?: ChainInfo,
   disabled?: boolean
-}
-
-enum SearchType {
-  Member = 'member',
 }
 
 interface ICommunityOption {
@@ -61,7 +58,7 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
-const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]) => {
+const getBalancedContentListing = (unfilteredResults: any[], types: SearchScope[]) => {
   const results = {};
   let unfilteredResultsLength = 0;
   for (const key of types) {
@@ -116,12 +113,12 @@ export const getMemberPreview = (addr, enterAddressFn, closeResultsFn, searchTer
 const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
   const { communityScope, chainScope } = params;
 
-  const results = getBalancedContentListing(app.searchAddressCache[searchTerm], [SearchType.Member]);
+  const results = getBalancedContentListing(app.searchAddressCache[searchTerm], [SearchScope.Members]);
 
   const organizedResults = [];
   let tabIndex = 1;
 
-  const res = results[SearchType.Member];
+  const res = results[SearchScope.Members];
   if (res?.length === 0) return;
 
   (res as any[]).forEach((item) => {
@@ -203,11 +200,7 @@ export const search = async (searchTerm: string, params: SearchParams, state) =>
       ['created_at', 'DESC']
     );
 
-    app.searchAddressCache[searchTerm].member = addrs.map((addr) => {
-      addr.contentType = 'member';
-      addr.searchType = SearchType.Member;
-      return addr;
-    }).sort(sortResults);
+    app.searchAddressCache[searchTerm].member = addrs.sort(sortResults);
 
     if (communityScope || chainScope) {
       concludeSearch(searchTerm, params, state);
@@ -226,7 +219,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
   },
   view: (vnode) => {
     const { selection, successCallback, failureCallback,
-      invitedAddress, invitedEmail, invitedAddressChain, community, chain, disabled } = vnode.attrs;
+      invitedAddress, invitedEmail, invitedAddressChain, chain, disabled } = vnode.attrs;
     return m(Button, {
       class: 'create-invite-button',
       intent: 'primary',
@@ -261,9 +254,7 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
           return;
         }
 
-        const chainOrCommunityObj = chain ? { chain: chain.id }
-          : community ? { community:  community.id }
-            : null;
+        const chainOrCommunityObj = chain ? { chain: chain.id } : null;
         if (!chainOrCommunityObj) return;
         $.post(app.serverUrl() + postType, {
           address: app.user.activeAccount.address,
@@ -285,7 +276,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
                 result.address,
                 result.address_chain,
                 result.chain_id,
-                result.offchain_community_id,
                 result.permission,
                 result.is_user_default
               ));
@@ -310,7 +300,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean, }> = {
 
 const CreateInviteLink: m.Component<{
   chain?: ChainInfo,
-  community?: CommunityInfo,
   onChangeHandler?: Function,
 }, {
   link: string,
@@ -323,10 +312,8 @@ const CreateInviteLink: m.Component<{
     vnode.state.inviteTime = 'none';
   },
   view: (vnode) => {
-    const { chain, community, onChangeHandler } = vnode.attrs;
-    const chainOrCommunityObj = chain
-      ? { chain: chain.id }
-      : { community: community.id };
+    const { chain, onChangeHandler } = vnode.attrs;
+    const chainOrCommunityObj = { chain: chain.id }
     return m(Form, { class: 'CreateInviteLink' }, [
       m(FormGroup, { span: 12 }, [
         m('h2.invite-link-title', 'Generate Invite Link'),
@@ -368,7 +355,6 @@ const CreateInviteLink: m.Component<{
             e.preventDefault();
             // TODO: Change to POST /inviteLink
             $.post(`${app.serverUrl()}/createInviteLink`, {
-              // community_id: app.activeCommunityId(),
               ...chainOrCommunityObj,
               time: vnode.state.inviteTime,
               uses: vnode.state.inviteUses,
@@ -429,7 +415,6 @@ const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
 };
 
 const CreateInviteModal: m.Component<{
-  communityInfo?: CommunityInfo;
   chainInfo?: ChainInfo;
 }, {
   success: boolean;
@@ -457,10 +442,8 @@ const CreateInviteModal: m.Component<{
     });
   },
   view: (vnode) => {
-    const { communityInfo, chainInfo } = vnode.attrs;
-    const chainOrCommunityObj = chainInfo ? { chain: chainInfo }
-      : communityInfo ? { community: communityInfo }
-        : null;
+    const {chainInfo } = vnode.attrs;
+    const chainOrCommunityObj = chainInfo ? { chain: chainInfo } : null;
     if (!chainOrCommunityObj) return;
 
     const selectedChainId = vnode.state.invitedAddressChain

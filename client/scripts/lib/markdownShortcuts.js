@@ -79,37 +79,38 @@
        {
          // bolditalic now handles bold, italic, and bold italic
          name: 'bolditalic',
-         pattern: /(?<!\S)((?:\*|_){1,3})([^\s*_]{1,2}|[^\s_*][^_*]+?[^\s_*])((?:\*|_){1,3})(?!\S)/g,
+         pattern: /[^\S]?((?:\*|_){1,3})([^\s*_]{1,2}|[^\s_*][^_*]+?[^\s_*])((?:\*|_){1,3})[^\S]?/g,
          action: (text, selection, pattern, lineStart) => {
            const allMatches = text.matchAll(pattern);
-
            let indexOffset = 0;
            for (const match of allMatches) {
-              const annotatedText = match[0]
+              const annotatedText = match[0];
+              const whitespaceStartOffset = annotatedText[0] === ' ' ? 1 : 0;
+              const whitespaceEndOffset = annotatedText[annotatedText.length - 1] === ' ' ? 1 : 0;
               const openingDelimiter = match[1]
               const matchedText = match[2]
               const closingDelimiter = match[3]
-              const startIndex = lineStart + match.index + indexOffset;
+              const startIndex = lineStart + match.index - indexOffset;
 
               // bolditalic must be prefixed with whitespace
-              if (startIndex > 0 && this.quill.getText()[startIndex - 1]
-                && this.quill.getText()[startIndex - 1].match(/[*_ \n]/) === null) continue;
+              if (startIndex > 0 && this.quill.getText()[startIndex]
+                && this.quill.getText()[startIndex].match(/[*_ \n]/) === null) continue;
               if (text.match(/^([*_ \n]+)$/g)) continue;
               if (matchedText[0] === ' ' || matchedText[matchedText.length - 1] === ' ') continue;
               if (matchedText[0] === '*' || matchedText[0] === '_') continue;
               if (openingDelimiter !== closingDelimiter) continue;
               if (openingDelimiter !== closingDelimiter.split('').reverse().join('')) continue;
               indexOffset += openingDelimiter.length * 2;
-              setTimeout(() => {
-                const formatting =
-                      (openingDelimiter === '*' || openingDelimiter === '_') ? {italic: true} :
-                      (openingDelimiter === '**' || openingDelimiter === '__') ? {bold: true} :
-                      {bold: true, italic: true};
-                this.quill.deleteText(startIndex, annotatedText.length)
-                this.quill.insertText(startIndex, matchedText, formatting)
-                this.quill.format('bold', false)
-                this.quill.format('italic', false)
-              }, 0)
+
+              const formatting =
+                    (openingDelimiter === '*' || openingDelimiter === '_') ? {italic: true} :
+                    (openingDelimiter === '**' || openingDelimiter === '__') ? {bold: true} :
+                    {bold: true, italic: true};
+              this.quill.deleteText(startIndex + whitespaceStartOffset,
+                annotatedText.length - whitespaceStartOffset - whitespaceEndOffset)
+              this.quill.insertText(startIndex + whitespaceStartOffset, matchedText, formatting)
+              this.quill.format('bold', false)
+              this.quill.format('italic', false)
            }
          }
        },

@@ -15,7 +15,7 @@ const createDraft = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+  const [chain, error] = await lookupCommunityIsVisibleToUser(
     models,
     req.body,
     req.user
@@ -29,15 +29,7 @@ const createDraft = async (
     return next(new Error(Errors.InsufficientData));
   }
 
-  const draftContent = community
-    ? {
-        community: community.id,
-        address_id: author.id,
-        title,
-        body,
-        topic,
-      }
-    : {
+  const draftContent = {
         chain: chain.id,
         address_id: author.id,
         title,

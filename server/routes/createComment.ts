@@ -37,7 +37,7 @@ const createComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -82,10 +82,7 @@ const createComment = async (
   if (parent_id) {
     // check that parent comment is in the same community
     parentComment = await models.OffchainComment.findOne({
-      where: community ? {
-        id: parent_id,
-        community: community.id,
-      } : {
+      where: {
         id: parent_id,
         chain: chain.id,
       }
@@ -96,10 +93,7 @@ const createComment = async (
     // top-level, child, and grandchild
     if (parentComment.parent_id) {
       const grandparentComment = await models.OffchainComment.findOne({
-        where: community ? {
-          id: parentComment.parent_id,
-          community: community.id,
-        } : {
+        where: {
           id: parentComment.parent_id,
           chain: chain.id,
         }
@@ -141,12 +135,9 @@ const createComment = async (
     plaintext,
     version_history,
     address_id: author.id,
-    chain: null,
-    community: null,
+    chain: chain.id,
     parent_id: null,
   };
-  if (community) Object.assign(commentContent, { community: community.id });
-  else if (chain) Object.assign(commentContent, { chain: chain.id });
   if (parent_id) Object.assign(commentContent, { parent_id });
 
   let comment;
@@ -227,7 +218,7 @@ const createComment = async (
 
   // craft commonwealth url
   const cwUrl = typeof proposal === 'string'
-    ? getProposalUrlWithoutObject(prefix, (finalComment.chain || finalComment.community), proposal, finalComment)
+    ? getProposalUrlWithoutObject(prefix, finalComment.chain, proposal, finalComment)
     : getProposalUrl(prefix, proposal, finalComment);
   const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
 
@@ -237,7 +228,6 @@ const createComment = async (
     category_id: NotificationCategories.NewReaction,
     object_id: `comment-${finalComment.id}`,
     chain_id: finalComment.chain || null,
-    community_id: finalComment.community || null,
     offchain_comment_id: finalComment.id,
     is_active: true,
   });
@@ -247,7 +237,6 @@ const createComment = async (
     category_id: NotificationCategories.NewComment,
     object_id: `comment-${finalComment.id}`,
     chain_id: finalComment.chain || null,
-    community_id: finalComment.community || null,
     offchain_comment_id: finalComment.id,
     is_active: true,
   });
@@ -290,7 +279,6 @@ const createComment = async (
       comment_id: +finalComment.id,
       comment_text: finalComment.text,
       chain_id: finalComment.chain,
-      community_id: finalComment.community,
       author_address: finalComment.Address.address,
       author_chain: finalComment.Address.chain,
     },
@@ -300,7 +288,6 @@ const createComment = async (
       url: cwUrl,
       title: root_title,
       chain: finalComment.chain,
-      community: finalComment.community,
       body: finalComment.text,
     },
     req.wss,
@@ -323,7 +310,6 @@ const createComment = async (
         parent_comment_id: +parent_id,
         parent_comment_text: parentComment.text,
         chain_id: finalComment.chain,
-        community_id: finalComment.community,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.chain,
       },
@@ -333,7 +319,6 @@ const createComment = async (
         url: cwUrl,
         title: proposal.title || '',
         chain: finalComment.chain,
-        community: finalComment.community,
         body: finalComment.text,
       },
       req.wss,
@@ -346,17 +331,7 @@ const createComment = async (
     await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-      let shouldNotifyMentionedUser = true;
-      if (finalComment.community) {
-        const originCommunity = await models.OffchainCommunity.findOne({
-          where: { id: finalComment.community }
-        });
-        if (originCommunity.privacy_enabled) {
-          const destinationCommunity = mentionedAddress.Roles
-            .find((role) => role.offchain_community_id === originCommunity.id);
-          if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
-        }
-      }
+      const shouldNotifyMentionedUser = true;
       if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
         models,
         NotificationCategories.NewMention,
@@ -369,7 +344,6 @@ const createComment = async (
           comment_id: +finalComment.id,
           comment_text: finalComment.text,
           chain_id: finalComment.chain,
-          community_id: finalComment.community,
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },
@@ -379,7 +353,6 @@ const createComment = async (
           url: cwUrl,
           title: proposal.title || '',
           chain: finalComment.chain,
-          community: finalComment.community,
           body: finalComment.text,
         }, // TODO: add webhook data for mentions
         req.wss,
@@ -391,6 +364,12 @@ const createComment = async (
   // update author.last_active (no await)
   author.last_active = new Date();
   author.save();
+
+  // update proposal updated_at timestamp
+  if (prefix === ProposalType.OffchainThread) {
+    proposal.last_commented_on = Date.now();
+    proposal.save();
+  }
 
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };

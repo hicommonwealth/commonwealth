@@ -8,6 +8,7 @@ import passport from 'passport';
 import session from 'express-session';
 import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
+import BN from 'bn.js';
 
 import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
@@ -21,8 +22,7 @@ import {
 } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
-import TokenBalanceCache from './server/util/tokenBalanceCache';
-import { MockTokenBalanceProvider } from './test/util/modelUtils';
+import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 
 require('express-async-errors');
@@ -34,6 +34,21 @@ const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(10 * 60);
 
 // always prune both token and non-token holders asap
+class MockTokenBalanceProvider extends TokenBalanceProvider {
+  public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
+
+  public async getEthTokenBalance(
+    tokenAddress: string,
+    userAddress: string
+  ): Promise<BN> {
+    if (this.balanceFn) {
+      return this.balanceFn(tokenAddress, userAddress);
+    } else {
+      throw new Error('unable to fetch token balance');
+    }
+  }
+}
+
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
 const tokenBalanceCache = new TokenBalanceCache(
   models,
@@ -74,9 +89,10 @@ app.use(passport.session());
 
 const resetServer = (debug = false): Promise<void> => {
   if (debug) console.log('Resetting database...');
-
-  return new Promise((resolve) => {
-    models.sequelize.sync({ force: true }).then(async () => {
+  return new Promise(async (resolve) => {
+    try {
+      await models.sequelize.sync({ force: true });
+      console.log('done syncing.');
       if (debug) console.log('Initializing default models...');
       const drew = await models['User'].create({
         email: 'drewstone329@gmail.com',
@@ -236,15 +252,6 @@ const resetServer = (debug = false): Promise<void> => {
         is_active: true,
       });
 
-      // Communities
-      await models['OffchainCommunity'].create({
-        id: 'staking',
-        name: 'Staking',
-        creator_id: 1,
-        description: 'All things staking',
-        default_chain: 'ethereum',
-      });
-
       const nodes = [
         ['mainnet1.edgewa.re', 'edgeware', null, '0'],
         [
@@ -285,8 +292,10 @@ const resetServer = (debug = false): Promise<void> => {
       );
 
       if (debug) console.log('Database reset!');
-      resolve();
-    });
+    } catch (error) {
+      console.log('error', error);
+    }
+    resolve();
   });
 };
 

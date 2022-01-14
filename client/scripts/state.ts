@@ -1,8 +1,7 @@
-import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'stores';
+import { ChainStore, NodeStore } from 'stores';
 import {
   ContractCategory,
   IChainAdapter,
-  ICommunityAdapter,
   NotificationCategory,
 } from 'models';
 import { EventEmitter } from 'events';
@@ -15,6 +14,7 @@ import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
 import SnapshotController from './controllers/chain/snapshot';
+import SearchController from './controllers/server/search'
 import ReactionsController from './controllers/server/reactions';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
@@ -38,7 +38,6 @@ export const enum LoginState {
 export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
-  community: ICommunityAdapter<any, any>;
 
   chainPreloading: boolean;
   chainAdapterReady: EventEmitter;
@@ -51,6 +50,7 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
+  search: SearchController;
   snapshot: SnapshotController;
   reactions: ReactionsController;
   reactionCounts: ReactionCountsController;
@@ -60,20 +60,16 @@ export interface IApp {
   wallets: WebWalletController;
 
   recentActivity: RecentActivityController;
-  searchCache: any;
   searchAddressCache: any;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
-  activeCommunityId(): string;
-  activeId(): string;
 
   toasts: ToastStore;
   modals: ModalStore;
   loginState: LoginState;
   // stored on server-side
   config: {
-    communities: OffchainCommunitiesStore;
     chains: ChainStore;
     nodes: NodeStore;
     contractCategories?: ContractCategory[];
@@ -103,7 +99,6 @@ export interface IApp {
 const app: IApp = {
   socket: null,
   chain: null,
-  community: null,
 
   chainPreloading: false,
   chainAdapterReady: new EventEmitter(),
@@ -120,6 +115,7 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
+  search: new SearchController(),
   snapshot: new SnapshotController(),
   reactions: new ReactionsController(),
   reactionCounts: new ReactionCountsController(),
@@ -130,19 +126,14 @@ const app: IApp = {
 
   recentActivity: new RecentActivityController(),
 
-  searchCache: {},
-
   searchAddressCache: {},
 
   activeChainId: () => app.chain?.id,
-  activeCommunityId: () => app.community?.meta.id,
-  activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
 
   toasts: getToastStore(),
   modals: getModalStore(),
   loginState: LoginState.NotLoaded,
   config: {
-    communities: new OffchainCommunitiesStore(),
     chains: new ChainStore(),
     nodes: new NodeStore(),
     defaultChain: 'edgeware',

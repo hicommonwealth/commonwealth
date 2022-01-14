@@ -73,10 +73,11 @@ export default class AaveGovernance extends ProposalModule<
     }
 
     // validate user
+    const blockNumber = await this._api.Provider.getBlockNumber();
     const isPropositionPowerEnough = await executorContract.isPropositionPowerEnough(
       this._api.Governance.address,
       address,
-      this.app.chain.block.height - 1,
+      blockNumber - 1,
     );
     if (!isPropositionPowerEnough) {
       throw new Error('user does not have enough proposition power');

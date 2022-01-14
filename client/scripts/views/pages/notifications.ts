@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/notifications.scss';
 
 import m from 'mithril';
@@ -7,9 +8,9 @@ import moment from 'moment';
 import { Checkbox, Button, Icons, ListItem, Table, Tag, Grid, Col, SelectList, RadioGroup } from 'construct-ui';
 
 import app from 'state';
-import { ChainNetwork } from 'types';
-import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
-import { NotificationCategories } from 'types';
+import { ChainNetwork, ProposalType, NotificationCategories } from 'types';
+import { NotificationSubscription, ChainInfo } from 'models';
+import { getProposalUrlPath } from 'identifiers';
 
 import { link, pluralize } from 'helpers';
 import { sortSubscriptions } from 'helpers/notifications';
@@ -87,12 +88,12 @@ const EmailIntervalConfiguration: m.Component<{}, { interval: string, saving: bo
         }),
         !app.user.email
           ? m('p', [
-            link('a', `/${app.activeId()}/settings`, 'Set an email'),
+            link('a', `/${app.activeChainId()}/settings`, 'Set an email'),
             ' to start receiving notification digests.'
           ])
           : !app.user.emailVerified ? m('p', [
             'Your email has not been verified. ',
-            link('a', `/${app.activeId()}/settings`, 'Finish verification'),
+            link('a', `/${app.activeChainId()}/settings`, 'Finish verification'),
             ' to continue receiving notification emails.'
           ]) : '',
         vnode.state.saving === false && m('p', 'Setting saved!'), // vnode.state.saving is undefined upon init
@@ -126,11 +127,9 @@ const BatchedSubscriptionRow: m.Component<{
     if (!subscriptions) return;
 
     const singleLabel = (subscription: NotificationSubscription) => {
-      const chainOrCommunityId = subscription.Chain
+      const chain = subscription.Chain
         ? subscription.Chain.id
-        : subscription.OffchainCommunity
-          ? subscription.OffchainCommunity.id
-          : null;
+        : null;
       switch (subscription.category) {
         case (NotificationCategories.NewComment): {
           const threadOrComment = subscription.OffchainThread
@@ -140,7 +139,9 @@ const BatchedSubscriptionRow: m.Component<{
               : subscription.objectId;
 
           return subscription.OffchainThread ? [
-            link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+            link('a', `/${chain}${
+              getProposalUrlPath(ProposalType.OffchainThread, subscription.OffchainThread.id, true)
+            }`,
               threadOrComment.toString(), { target: '_blank' }),
             m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
             m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
@@ -156,7 +157,9 @@ const BatchedSubscriptionRow: m.Component<{
               ? decodeURIComponent(subscription.OffchainComment.id)
               : subscription.objectId;
           return subscription.OffchainThread ? [
-            link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+            link('a', `/${chain}${
+              getProposalUrlPath(ProposalType.OffchainThread, subscription.OffchainThread.id, true)
+            }`,
               threadOrComment.toString(), { target: '_blank' }),
             m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
             m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
@@ -172,11 +175,9 @@ const BatchedSubscriptionRow: m.Component<{
 
     const batchLabel = (batchLabelSubscriptions: NotificationSubscription[]) => {
       const subscription = batchLabelSubscriptions[0];
-      const chainOrCommunityId = subscription.Chain
+      const chain = subscription.Chain
         ? subscription.Chain.id
-        : subscription.OffchainCommunity
-          ? subscription.OffchainCommunity.id
-          : null;
+        : null;
 
       const threadOrComment = subscription.OffchainThread
         ? decodeURIComponent(subscription.OffchainThread.title)
@@ -185,7 +186,9 @@ const BatchedSubscriptionRow: m.Component<{
           : subscription.objectId;
 
       return subscription.OffchainThread ? [
-        link('a', `/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`,
+        link('a', `/${chain}${
+              getProposalUrlPath(ProposalType.OffchainThread, subscription.OffchainThread.id, true)
+            }`,
           threadOrComment.toString(), { target: '_blank' }),
         m('span.item-metadata', moment(subscription.OffchainThread.created_at).fromNow()),
       ] : [ threadOrComment.toString() ];
@@ -258,7 +261,7 @@ const BatchedSubscriptionRow: m.Component<{
   }
 };
 
-const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: CommunityInfo | ChainInfo }> = {
+const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: ChainInfo }> = {
   view: (vnode) => {
     const { subscriptions, community } = vnode.attrs;
     const subscription = subscriptions.find(
@@ -535,7 +538,7 @@ const DydxChainEventNotifications: m.Component = {
 };
 
 const IndividualCommunityNotifications: m.Component<{
-  community: CommunityInfo | ChainInfo;
+  community: ChainInfo;
   subscriptions: NotificationSubscription[];
 }, {
   expanded: boolean;
@@ -543,7 +546,7 @@ const IndividualCommunityNotifications: m.Component<{
   view: (vnode) => {
     const { community, subscriptions } = vnode.attrs;
     const filteredSubscriptions = subscriptions.filter(
-      (s) => (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id)
+      (s) => (s.Chain?.id === community.id)
         && s.category !== NotificationCategories.NewThread
         && s.category !== NotificationCategories.NewMention
         && s.category !== NotificationCategories.NewCollaboration
@@ -592,7 +595,6 @@ const AllCommunitiesNotifications: m.Component<{
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     const collaborationsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewCollaboration);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
-    // const communityIds = communities.map((c) => c.id);
     const communityIds = communities;
     const batchedSubscriptions = sortSubscriptions(subscriptions.filter((s) => {
       return !chainIds.includes(s.objectId)
@@ -636,9 +638,9 @@ const AllCommunitiesNotifications: m.Component<{
 };
 
 const NotificationsPage: m.Component<{}, {
-  communities: CommunityInfo[];
+  communities: ChainInfo[];
   subscriptions: NotificationSubscription[];
-  selectedCommunity: CommunityInfo | ChainInfo;
+  selectedCommunity: ChainInfo;
   selectedCommunityId: string;
   selectableCommunityIds: string[];
   allCommunityIds: string[];
@@ -667,10 +669,10 @@ const NotificationsPage: m.Component<{}, {
 
     // initialize vnode.state.communities
     const selectableCommunityIds = app.user.roles
-      .filter((role) => role.offchain_community_id)
-      .map((r) => r.offchain_community_id);
+      .filter((role) => role.chain_id)
+      .map((r) => r.chain_id);
     vnode.state.communities = _.uniq(
-      app.config.communities.getAll()
+      app.config.chains.getAll()
         .filter((c) => selectableCommunityIds.includes(c.id))
     );
 

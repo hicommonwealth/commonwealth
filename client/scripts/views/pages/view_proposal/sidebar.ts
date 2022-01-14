@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import { Button, List, ListItem, Spinner } from 'construct-ui';
 
@@ -7,6 +8,7 @@ import { link } from 'helpers';
 import {
   chainEntityTypeToProposalSlug,
   chainEntityTypeToProposalName,
+  getProposalUrlPath,
 } from 'identifiers';
 import { OffchainThread } from 'models';
 import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
@@ -26,7 +28,7 @@ export const ProposalSidebarLinkedChainEntity: m.Component<{
 
     const proposalLink = `${
       app.isCustomDomain() ? '' : `/${proposal.chain}`
-    }/proposal/${slug}/${chainEntity.typeId}`;
+    }${getProposalUrlPath(slug, chainEntity.typeId)}`;
 
     return m('.ProposalSidebarLinkedChainEntity', [
       link('a', proposalLink, [
@@ -165,7 +167,7 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
         m('.linked-threads-title', 'Linked Threads:'),
         m(List, vnode.state.linkedThreads.map((thread) => {
             const discussionLink =
-            `/${app.activeId()}/proposal/${thread.slug}/${thread.identifier}-` +
+            `/${app.activeChainId()}/proposal/${thread.slug}/${thread.identifier}-` +
             `${slugify(thread.title)}`;
             return m(ListItem, {
               label: link(
@@ -230,7 +232,7 @@ export const ProposalSidebarLinkedViewer: m.Component<{
         ]),
       proposal.snapshotProposal?.length > 0 &&
         m(ProposalSidebarLinkedSnapshot, { proposal }),
-      showAddProposalButton &&  
+      showAddProposalButton &&
       m('.ConnectProposalButtonWrapper', [
         m(Button, {
           rounded: true,

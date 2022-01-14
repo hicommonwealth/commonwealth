@@ -1,56 +1,46 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/search.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
 import _, { capitalize } from 'lodash';
-import { ControlGroup, Icon, Icons, Input, List, ListItem, Spinner } from 'construct-ui';
 import {
-  searchMentionableAddresses,
-  searchDiscussions
-} from 'helpers/search';
+  ControlGroup,
+  Icon,
+  Icons,
+  Input,
+  List,
+  ListItem,
+  Spinner,
+  Button,
+  Size,
+  Tag,
+} from 'construct-ui';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { Profile, AddressInfo, CommunityInfo } from 'models';
+import { Profile, AddressInfo, SearchQuery } from 'models';
+import { SearchScope } from 'models/SearchQuery'
+import { ContentType } from 'controllers/server/search';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import { IconIntent, SearchIcon } from "./component_kit/icons";
 import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
-import { ALL_RESULTS_KEY } from '../pages/search';
-import { ChainIcon, CommunityIcon } from './chain_icon';
+import { ChainIcon } from './chain_icon';
 
-export interface SearchParams {
-  communityScope?: string;
-  chainScope?: string;
-  isSearchPreview?: boolean;
-  isHomepageSearch?: boolean;
-  resultSize?: number;
-}
-
-export enum SearchType {
-  Discussion = 'discussion',
-  Community = 'community',
-  Member = 'member',
-  Top = 'top',
-}
-
-export enum ContentType {
-  Thread = 'thread',
-  Comment = 'comment',
-  Community = 'community',
-  Chain = 'chain',
-  Token = 'token',
-  Member = 'member'
-}
-
-const SEARCH_PREVIEW_SIZE = 6;
-const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
-
-export const getMemberPreview = (addr, closeResultsFn, searchTerm, tabIndex, showChainName?) => {
+export const getMemberPreview = (
+  addr,
+  closeResultsFn,
+  searchTerm,
+  tabIndex,
+  setUsingFilterMenuFn,
+  showChainName?,
+) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
-  const userLink = `${app.isCustomDomain() ? '' : `/${app.activeId() || addr.chain}`
+  const userLink = `${
+    app.isCustomDomain() ? '' : `/${app.activeChainId() || addr.chain}`
   }/account/${addr.address}?base=${addr.chain}`;
   return m(ListItem, {
     tabIndex,
@@ -73,18 +63,19 @@ export const getMemberPreview = (addr, closeResultsFn, searchTerm, tabIndex, sho
         m.route.set(userLink);
         closeResultsFn();
       }
-    }
+    },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false)
   });
 };
 
-export const getCommunityPreview = (community, closeResultsFn, tabIndex) => {
-  const params = community.contentType === ContentType.Token
-    ? { token: community }
-    : community.contentType === ContentType.Chain
+export const getCommunityPreview = (community, closeResultsFn, tabIndex, setUsingFilterMenuFn) => {
+  const params =
+    community.contentType === ContentType.Token
+      ? { token: community }
+      : community.contentType === ContentType.Chain
       ? { chain: community }
-      : community.contentType === ContentType.Community
-        ? { community }
-        : null;
+      : null;
   params['size'] = 36;
   const onSelect = (e) => {
     if (params.token) {
@@ -104,11 +95,19 @@ export const getCommunityPreview = (community, closeResultsFn, tabIndex) => {
       if (e.key === 'Enter') {
         onSelect(e);
       }
-    }
+    },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false)
   });
 };
 
-export const getDiscussionPreview = (thread, closeResultsFn, searchTerm, tabIndex) => {
+export const getDiscussionPreview = (
+  thread,
+  closeResultsFn,
+  searchTerm,
+  tabIndex,
+  setUsingFilterMenuFn
+) => {
   const proposalId = thread.proposalid;
   const chainOrComm = thread.chain || thread.offchain_community;
   const onSelect = (e) => {
@@ -116,9 +115,7 @@ export const getDiscussionPreview = (thread, closeResultsFn, searchTerm, tabInde
       notifyError('Discussion not found.');
       return;
     }
-    m.route.set((thread.type === 'thread')
-      ? `/${chainOrComm}/proposal/discussion/${proposalId}`
-      : `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+    m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
     closeResultsFn();
   };
   return m(ListItem, {
@@ -129,87 +126,133 @@ export const getDiscussionPreview = (thread, closeResultsFn, searchTerm, tabInde
         onSelect(e);
       }
     },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false),
     label: m('a.search-results-item', [
-      thread.type === 'thread' ? [
-        m('.search-results-thread-title', [
-          decodeURIComponent(thread.title),
-        ]),
-        m('.search-results-thread-body', [
-          (() => {
-            try {
-              const doc = JSON.parse(decodeURIComponent(thread.body));
-              if (!doc.ops) throw new Error();
-              return m(QuillFormattedText, {
-                doc,
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            } catch (e) {
-              const doc = decodeURIComponent(thread.body);
-              return m(MarkdownFormattedText, {
-                doc,
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            }
-          })(),
-        ])
-      ] : [
-        m('.search-results-thread-title', [
-          'Comment on ',
-          decodeURIComponent(thread.title),
-        ]),
-        m('.search-results-thread-subtitle', [
-          m('span.created-at', moment(thread.created_at).fromNow()),
-          m(User, { user: new AddressInfo(thread.address_id, thread.address, thread.address_chain, null) }),
-        ]),
-        m('.search-results-comment', [
-          (() => {
-            try {
-              const doc = JSON.parse(decodeURIComponent(thread.body));
-              if (!doc.ops) throw new Error();
-              return m(QuillFormattedText, {
-                doc,
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            } catch (e) {
-              const doc = decodeURIComponent(thread.body);
-              return m(MarkdownFormattedText, {
-                doc,
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            }
-          })(),
-        ]),
-      ]
+      m('.search-results-thread-title', [
+        decodeURIComponent(thread.title),
+      ]),
+      m('.search-results-thread-subtitle', [
+        m('span.created-at', moment(thread.created_at).fromNow()),
+        m(User, {
+          user: new AddressInfo(
+            thread.address_id,
+            thread.address,
+            thread.address_chain,
+            null
+          ),
+        }),
+      ]),
+      m('.search-results-thread-body', [
+        (() => {
+          try {
+            const doc = JSON.parse(decodeURIComponent(thread.body));
+            if (!doc.ops) throw new Error();
+            return m(QuillFormattedText, {
+              doc,
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            });
+          } catch (e) {
+            const doc = decodeURIComponent(thread.body);
+            return m(MarkdownFormattedText, {
+              doc,
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            });
+          }
+        })(),
+      ]),
     ]),
   });
 };
 
-const sortResults = (a, b) => {
-  // TODO: Token-sorting approach
-  // Some users are not verified; we give them a default date of 1900
-  const aCreatedAt = moment(a.created_at || a.createdAt || a.verified || '1900-01-01T:00:00:00Z');
-  const bCreatedAt = moment(b.created_at || b.createdAt || b.verified || '1900-01-01T:00:00:00Z');
-  return bCreatedAt.diff(aCreatedAt);
+export const getCommentPreview = (
+  comment,
+  closeResultsFn,
+  searchTerm,
+  tabIndex,
+  setUsingFilterMenuFn
+) => {
+  const proposalId = comment.proposalid;
+  const chainOrComm = comment.chain || comment.offchain_community;
+  const onSelect = (e) => {
+    if (!chainOrComm) {
+      notifyError('Discussion not found.');
+      return;
+    }
+    m.route.set(`/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+    closeResultsFn();
+  };
+  return m(ListItem, {
+    tabIndex,
+    onclick: onSelect,
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        onSelect(e);
+      }
+    },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false),
+    label: m('a.search-results-item', [
+      [
+        m('.search-results-thread-title', [
+          'Comment on ',
+          decodeURIComponent(comment.title),
+        ]),
+        m('.search-results-thread-subtitle', [
+          m('span.created-at', moment(comment.created_at).fromNow()),
+          m(User, {
+            user: new AddressInfo(
+              comment.address_id,
+              comment.address,
+              comment.address_chain,
+              null
+            ),
+          }),
+        ]),
+        m('.search-results-comment', [
+          (() => {
+            try {
+              const doc = JSON.parse(decodeURIComponent(comment.text));
+              if (!doc.ops) throw new Error();
+              return m(QuillFormattedText, {
+                doc,
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
+            } catch (e) {
+              const doc = decodeURIComponent(comment.text);
+              return m(MarkdownFormattedText, {
+                doc,
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
+            }
+          })(),
+        ]),
+      ],
+    ]),
+  });
 };
 
-const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]) => {
+const getBalancedContentListing = (
+  unfilteredResults: Record<any, any>,
+  types: SearchScope[]
+) => {
   const results = {};
   let unfilteredResultsLength = 0;
   for (const key of types) {
     results[key] = [];
-    unfilteredResultsLength += (unfilteredResults[key]?.length || 0);
+    unfilteredResultsLength += unfilteredResults[key]?.length || 0;
   }
   let priorityPosition = 0;
   let resultsLength = 0;
-  while (resultsLength < 6 && (resultsLength < unfilteredResultsLength)) {
+  while (resultsLength < 6 && resultsLength < unfilteredResultsLength) {
     for (let i = 0; i < types.length; i++) {
       const type = types[i];
       if (resultsLength < 6) {
@@ -225,295 +268,343 @@ const getBalancedContentListing = (unfilteredResults: any[], types: SearchType[]
   return results;
 };
 
-const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
-  let results;
-  let types;
-  const { communityScope, chainScope, isHomepageSearch } = params;
-  if (communityScope || chainScope) {
-    types = [SearchType.Discussion, SearchType.Member];
-    results = getBalancedContentListing(app.searchCache[searchTerm], types);
-  } else if (isHomepageSearch) {
-    types = [SearchType.Community];
-    results = getBalancedContentListing(app.searchCache[searchTerm], types);
-  } else {
-    types = [SearchType.Discussion, SearchType.Member, SearchType.Community];
-    results = getBalancedContentListing(app.searchCache[searchTerm], types);
-  }
+const getResultsPreview = (searchQuery: SearchQuery, state) => {
+  // TODO: using chainScope instead of communityScope OK?
+  const { chainScope } = searchQuery;
+  const types = searchQuery.getSearchScope()
+  const results = getBalancedContentListing(app.search.getByQuery(searchQuery).results, types)
   const organizedResults = [];
   let tabIndex = 1;
-  types.forEach((type: SearchType) => {
+  types.forEach((type: SearchScope) => {
     const res = results[type];
     if (res?.length === 0) return;
     const headerEle = m(ListItem, {
-      label: type === SearchType.Community ? 'Communities' : `${capitalize(type)}s`,
-      class: 'disabled',
+      label: type,
+      class: `disabled ${organizedResults.length === 0 ? 'upper-border' : ''}`,
       onclick: (e) => {
         e.preventDefault();
         e.stopPropagation();
-      }
+      },
     });
     organizedResults.push(headerEle);
     (res as any[]).forEach((item) => {
       tabIndex += 1;
-      const resultRow = item.searchType === SearchType.Discussion
-        ? getDiscussionPreview(item, state.closeResults, searchTerm, tabIndex)
-        : item.searchType === SearchType.Member
-          ? getMemberPreview(item, state.closeResults, searchTerm, tabIndex, !!communityScope)
-          : item.searchType === SearchType.Community
-            ? getCommunityPreview(item, state.closeResults, tabIndex)
-            : null;
+      const resultRow =
+        item.searchType === SearchScope.Threads
+          ? getDiscussionPreview(item, state.closeResults, searchQuery.searchTerm, tabIndex, state.setUsingFilterMenu)
+          : item.searchType === SearchScope.Members
+          ? getMemberPreview(
+              item,
+              state.closeResults,
+              searchQuery.searchTerm,
+              tabIndex,
+              state.setUsingFilterMenu,
+              !!chainScope
+            )
+          : item.searchType === SearchScope.Communities
+          ? getCommunityPreview(item, state.closeResults, tabIndex, state.setUsingFilterMenu)
+          : item.searchType === SearchScope.Replies
+          ? getCommentPreview(item, state.closeResults, searchQuery.searchTerm, tabIndex, state.setUsingFilterMenu)
+          : null;
       organizedResults.push(resultRow);
     });
   });
   return organizedResults;
 };
 
-const concludeSearch = (searchTerm: string, params: SearchParams, state, err?) => {
-  if (!app.searchCache[searchTerm].loaded) {
-    app.searchCache[searchTerm].loaded = true;
+const getSearchHistoryPreview = (searchQuery: SearchQuery, setFilterMenuActive, executeSearch) => {
+  const scopeTags = searchQuery.searchScope[0] === SearchScope.All ? []
+    : searchQuery.searchScope.map(scope => m(Tag, {label: SearchScope[scope].toLowerCase()}) )
+
+  if(searchQuery.chainScope && !app.isCustomDomain()) {
+    scopeTags.unshift(m(Tag, {
+      label: searchQuery.chainScope.toLowerCase(),
+      class: 'search-history-primary-tag'
+    }))
   }
-  if (err) {
+
+  if(scopeTags.length > 1){
+    scopeTags.splice(-1, 0, m('p.search-history-tag-seperator', 'and'))
+  }
+
+  if(scopeTags.length >= 1){
+    scopeTags.unshift(m(Icon, {name: Icons.ARROW_RIGHT }))
+  }
+
+  return m(ListItem, {
+    class: 'search-history-item',
+    onclick: () => {
+      app.search.removeFromHistory(searchQuery)
+      executeSearch(searchQuery)
+    },
+    onmouseover: () => {setFilterMenuActive(true)},
+    onmouseout: () => {setFilterMenuActive(false)},
+    contentLeft: [
+      m('p.search-history-query', searchQuery.searchTerm),
+      scopeTags
+    ],
+    contentRight: m(Icon, {
+        name: Icons.X,
+        onclick: () => {app.search.removeFromHistory(searchQuery)}
+      })
+  })
+}
+
+export const search = async (
+  searchQuery: SearchQuery,
+  state,
+) => {
+  try {
+    await app.search.search(searchQuery)
+  }
+  catch (err) {
+    console.error(err)
     state.results = {};
-    state.errorText = (err.responseJSON?.error || err.responseText || err.toString());
-  } else {
-    state.results = params.isSearchPreview
-      ? getResultsPreview(searchTerm, state, params)
-      : app.searchCache[searchTerm];
+    state.errorText =
+      err.responseJSON?.error || err.responseText || err.toString();
   }
+  state.results = searchQuery.isSearchPreview
+    ? getResultsPreview(searchQuery, state)
+    : app.search.getByQuery(searchQuery).results;
   m.redraw();
 };
 
-// Search makes the relevant queries, depending on whether the search is global or
-// community-scoped. It then "concludesSearch," and either assigns the results to
-// app.searchCache or sends them to getResultsPreview, which creates the relevant
-// preview rows
-export const search = async (searchTerm: string, params: SearchParams, state) => {
-  searchTerm = searchTerm.toLowerCase();
-  const { isSearchPreview, isHomepageSearch, communityScope, chainScope } = params;
-  const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
-  if (app.searchCache[searchTerm]?.loaded) {
-    // If results exist in cache, conclude search
-    concludeSearch(searchTerm, params, state);
+export const executeSearch = (query: SearchQuery) => {
+  if (
+    !query.searchTerm ||
+    !query.searchTerm.toString().trim()
+  ) {
+    notifyError('Enter a valid search term');
+    return;
   }
-  try {
-    if (!isHomepageSearch) {
-      const [discussions, addrs] = await Promise.all([
-        searchDiscussions(searchTerm, { resultSize, communityScope, chainScope }),
-        searchMentionableAddresses(searchTerm, { resultSize, communityScope, chainScope }, ['created_at', 'DESC'])
-      ]);
-
-      app.searchCache[searchTerm][SearchType.Discussion] = discussions.map((discussion) => {
-        discussion.contentType = discussion.root_id ? ContentType.Comment : ContentType.Thread;
-        discussion.searchType = SearchType.Discussion;
-        return discussion;
-      }).sort(sortResults);
-
-      app.searchCache[searchTerm][SearchType.Member] = addrs.map((addr) => {
-        addr.contentType = ContentType.Member;
-        addr.searchType = SearchType.Member;
-        return addr;
-      }).sort(sortResults);
-
-      if (communityScope || chainScope) {
-        concludeSearch(searchTerm, params, state);
-        return;
-      }
-    }
-
-    const unfilteredTokens = app.searchCache[ALL_RESULTS_KEY]['tokens'];
-    const tokens = unfilteredTokens.filter((token) => token.name?.toLowerCase().includes(searchTerm));
-    app.searchCache[searchTerm][SearchType.Community] = tokens.map((token) => {
-      token.contentType = ContentType.Token;
-      token.searchType = SearchType.Community;
-      return token;
-    });
-
-    const allComms = (app.config.chains.getAll() as any)
-      .concat(app.config.communities.getAll() as any);
-    const filteredComms = allComms.filter((comm) => {
-      return comm.name?.toLowerCase().includes(searchTerm)
-        || comm.symbol?.toLowerCase().includes(searchTerm);
-    });
-    app.searchCache[searchTerm][SearchType.Community] = app.searchCache[searchTerm][SearchType.Community]
-      .concat(filteredComms.map((commOrChain) => {
-        commOrChain.contentType = commOrChain instanceof CommunityInfo ? ContentType.Community : ContentType.Chain;
-        commOrChain.searchType = SearchType.Community;
-        return commOrChain;
-      })).sort(sortResults);
-
-    concludeSearch(searchTerm, params, state);
-  } catch (err) {
-    concludeSearch(searchTerm, params, state, err);
+  if (query.searchTerm.length < 4) {
+    notifyError('Query must be at least 4 characters');
   }
-};
+  query.isSearchPreview = false;
+  app.search.addToHistory(query)
+  m.route.set(`/search?${query.toUrlParams()}`);
+}
 
-export const initializeSearch = async () => {
-  // Pre-queries tokens.
-  if (!app.searchCache[ALL_RESULTS_KEY]?.loaded) {
-    app.searchCache[ALL_RESULTS_KEY] = {};
-    try {
-      const getTokens = () => $.getJSON('/api/getTokensFromLists')
-        .then((response) => {
-          if (response.status === 'Failure') {
-            throw response.message;
-          } else {
-            return response.result;
-          }
-        });
-      const tokens = await getTokens();
-      app.searchCache[ALL_RESULTS_KEY]['tokens'] = tokens;
-    } catch (err) {
-      app.searchCache[ALL_RESULTS_KEY]['tokens'] = [];
-    }
-    app.searchCache[ALL_RESULTS_KEY].loaded = true;
-    m.redraw();
+export const SearchBar: m.Component<
+  {},
+  {
+    results: any[];
+    searchTerm: string;
+    errorText: string;
+    focused: boolean;
+    closeResults: Function;
+    hideResults: boolean;
+    inputTimeout: any;
+    isTyping: boolean;
+    filterMenuActive: boolean;
+    setUsingFilterMenu: Function;
+    searchQuery: SearchQuery;
+    activeCommunity: string;
+    activeChain: string;
   }
-};
-
-const emptySearchPreview : m.Component<{ searchTerm: string }, {}> = {
-  view: (vnode) => {
-    const { searchTerm } = vnode.attrs;
-    const message = app.activeId()
-      ? `No results in ${app.activeId()}. Search Commonwealth?`
-      : 'No communities found';
-    return m(ListItem, {
-      class: 'no-results',
-      label: [
-        m('b', searchTerm),
-        m('span', message)
-      ],
-      onclick: (e) => {
-        if (searchTerm.length < 4) {
-          notifyError('Query must be at least 4 characters');
-        }
-        const params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
-        m.route.set(`/search?${params}`);
-      }
-    });
-  }
-};
-
-export const SearchBar : m.Component<{}, {
-  results: any[],
-  searchTerm: string,
-  errorText: string,
-  focused: boolean,
-  closeResults: Function,
-  hideResults: boolean,
-  inputTimeout: any,
-  isTyping: boolean,
-}> = {
+> = {
   view: (vnode) => {
     if (!vnode.state.searchTerm) vnode.state.searchTerm = '';
+    if (!vnode.state.searchQuery) {
+      vnode.state.searchQuery = m.route.get().startsWith('/search')
+        ? SearchQuery.fromUrlParams(m.route.param())
+        : new SearchQuery('', {
+            isSearchPreview: true,
+            chainScope: app.activeChainId()
+          });
+      vnode.state.activeChain = app.activeChainId() ? app.activeChainId() : vnode.state.searchQuery.chainScope
+      vnode.state.isTyping = false;
+    }
+    if (vnode.state.searchQuery.searchTerm !== vnode.state.searchTerm && vnode.state.searchTerm.length > 3) {
+      vnode.state.searchQuery.searchTerm = vnode.state.searchTerm
+    }
+    const { results, searchQuery } = vnode.state;
+    const isMobile = window.innerWidth < 767.98;
 
-    const { results, searchTerm } = vnode.state;
-    const showDropdownPreview = !m.route.get().includes('/search?q=');
-    const isMobile = (window.innerWidth < 767.98);
-    const LoadingPreview = m(List, {
-      class: 'search-results-loading'
-    }, [ m(ListItem, { label: m(Spinner, { active: true }) }) ]);
-    const searchResults = (!results || results?.length === 0)
-      ? (app.searchCache[searchTerm]?.loaded)
-        ? m(List, [ m(emptySearchPreview, { searchTerm }) ])
-        : LoadingPreview
-      : vnode.state.isTyping
-        ? LoadingPreview
-        : m(List, { class: 'search-results-list' }, results);
-    vnode.state.closeResults = () => { vnode.state.hideResults = true; };
+    const setFilterMenuActive = (using: boolean) => {
+      vnode.state.filterMenuActive = using
+    }
 
-    const chainOrCommIcon = app.activeId()
-      ? app.activeChainId()
+    vnode.state.closeResults = () => {
+      vnode.state.hideResults = true;
+    };
+
+    vnode.state.setUsingFilterMenu = using => {
+      vnode.state.filterMenuActive = using
+    }
+
+    const historyList = app.search.getHistory()
+      .map(h => getSearchHistoryPreview(h, setFilterMenuActive, executeSearch))
+
+
+    if(historyList.length > 0) {
+      historyList.push(
+        m(ListItem, {class: 'search-history-no-results upper-border',
+          label: 'Tip: You can use operators like \'single quotes\', and the keyword "or" to limit your search!'})
+      )
+    }
+
+    const scopeTitle = m(ListItem, {class: 'disabled', label: 'Limit search to:'})
+
+    const scopeToButton = (scope, disabled) => {
+      return m(Button, {
+        size: Size.SM,
+        class: `${disabled ? 'disabled' : ''}`,
+        active: vnode.state.searchQuery.searchScope.includes(scope),
+        onclick: () => {
+          vnode.state.searchQuery.toggleScope(scope)
+          search(vnode.state.searchQuery, vnode.state)
+        },
+        onmouseover: () => {vnode.state.filterMenuActive = true},
+        onmouseout: () => {vnode.state.filterMenuActive = false},
+        label: scope
+      })
+    }
+
+    const scopeButtons = [SearchScope.Threads, SearchScope.Replies].map(s => scopeToButton(s, false))
+      .concat((app.isCustomDomain() ? [] : [SearchScope.Communities, SearchScope.Members])
+        .map(s => scopeToButton(s, (vnode.state.searchQuery.chainScope)))
+      )
+
+    const filterDropdown =
+      m(List, {
+        class: 'search-results-list',
+      }, [
+        m(ListItem, {
+          class: 'disabled',
+          label: "I'm looking for: "
+        }),
+        m(ListItem, {
+          class: 'disabled search-filter-button-bar',
+          label: scopeButtons
+        }),
+        vnode.state.activeChain && !app.isCustomDomain()
+            && [
+              scopeTitle,
+              m(ListItem, {
+                class: 'disabled',
+                label: m(Button, {
+                  size: Size.SM,
+                  onclick: () => {
+                    vnode.state.searchQuery.chainScope = vnode.state.searchQuery.chainScope === vnode.state.activeChain
+                      ? undefined : vnode.state.activeChain;
+                    search(vnode.state.searchQuery, vnode.state)
+                  },
+                  active: vnode.state.searchQuery.chainScope === vnode.state.activeChain,
+                  onmouseover: () => {vnode.state.filterMenuActive = true},
+                  onmouseout: () => {vnode.state.filterMenuActive = false},
+                  label: `Inside chain: ${vnode.state.activeChain}`
+                }),
+              })
+          ],
+        vnode.state.searchTerm.length < 1
+          ? historyList.length === 0
+            ? m(ListItem, {
+              class: 'search-history-no-results upper-border',
+              label: 'Enter a term into the field and press Enter to start'
+            })
+            : [
+              m(ListItem, { class: 'disabled upper-border', label: 'Search History' }),
+              historyList
+            ]
+          : !results || results?.length === 0
+            ? app.search.getByQuery(searchQuery)?.loaded
+              ? m(ListItem, { class: 'search-history-no-results upper-border', label: "No Results Found" })
+              : vnode.state.isTyping
+                ? m(ListItem, { class: 'disabled upper-border', label: m(Spinner, { active: true }) })
+                : m(ListItem, {
+                  class: 'search-history-no-results upper-border',
+                  label: 'Make your query longer than 3 characters to search'
+                })
+            : vnode.state.isTyping
+              ? m(ListItem, { class: 'disabled upper-border', label: m(Spinner, { active: true }) })
+              : results
+      ])
+
+    const chainOrCommIcon = app.activeChainId()
         ? m(ChainIcon, {
-          size: 18,
-          chain: app.chain.meta.chain,
-        })
-        : m(CommunityIcon, {
-          size: 18,
-          community: app.community.meta,
-        })
-      : null;
+            size: 18,
+            chain: app.chain.meta.chain,
+          })
+        : null;
     const cancelInputIcon = vnode.state.searchTerm
       ? m(Icon, {
-        name: Icons.X,
-        onclick: () => {
-          const input = $('.SearchBar').find('input[name=search');
-          input.val('');
-          vnode.state.searchTerm = '';
-        } })
+          name: Icons.X,
+          onclick: () => {
+            const input = $('.SearchBar').find('input[name=search');
+            input.val('');
+            vnode.state.searchTerm = '';
+          },
+        })
       : null;
-    return m(ControlGroup, {
-      class: 'SearchBar'
-    }, [
-      m(Input, {
-        name: 'search',
-        placeholder: 'Type to search...',
-        autofocus: false, // !isMobile,
-        fluid: true,
-        tabIndex: -10,
-        contentLeft: m(SearchIcon, {
-          isMobile,
-          intent: IconIntent.Primary,
-        }),
-        contentRight: cancelInputIcon || chainOrCommIcon,
-        defaultValue: m.route.param('q') || vnode.state.searchTerm,
-        value: vnode.state.searchTerm,
-        autocomplete: 'off',
-        oncreate: (e) => {
-          initializeSearch();
-        },
-        onclick: async (e) => {
-          vnode.state.focused = true;
-        },
-        oninput: (e) => {
-          e.stopPropagation();
-          vnode.state.isTyping = true;
-          vnode.state.searchTerm = e.target.value?.toLowerCase();
-          if (vnode.state.hideResults) {
-            vnode.state.hideResults = false;
-          }
-          if (!app.searchCache[vnode.state.searchTerm]) {
-            app.searchCache[vnode.state.searchTerm] = { loaded: false };
-          }
-          if (e.target.value?.length > 3) {
-            const params: SearchParams = {
-              isSearchPreview: true,
-              communityScope: app.activeCommunityId(),
-              chainScope: app.activeChainId(),
-              isHomepageSearch: m.route.get() === '/'
-            };
+
+    const searchIcon = vnode.state.searchTerm
+      ? m(Icon, {
+          name: Icons.CORNER_DOWN_LEFT,
+          onclick: () => {
+            executeSearch(vnode.state.searchQuery)
+          },
+        })
+      : null;
+
+    return m(
+      ControlGroup,
+      {
+        class: 'SearchBar',
+      },
+      [
+        m(Input, {
+          name: 'search',
+          placeholder: 'Type to search...',
+          autofocus: false, // !isMobile,
+          fluid: true,
+          tabIndex: -10,
+          contentLeft: m(SearchIcon, {
+            isMobile,
+            intent: IconIntent.Primary,
+          }),
+          contentRight: vnode.state.searchTerm ? m(ControlGroup, {}, [cancelInputIcon, searchIcon]) : chainOrCommIcon,
+          defaultValue: m.route.param('q') || vnode.state.searchTerm,
+          value: vnode.state.searchTerm,
+          autocomplete: 'off',
+          oncreate: (e) => {
+            app.search.initialize();
+          },
+          onclick: async (e) => {
+            vnode.state.focused = true;
+          },
+          onfocusout: () => {
+            if(!vnode.state.filterMenuActive) vnode.state.focused = false;
+          },
+          oninput: (e) => {
+            e.stopPropagation();
+            vnode.state.isTyping = true;
+            vnode.state.focused = true;
+            vnode.state.searchTerm = e.target.value?.toLowerCase();
             clearTimeout(vnode.state.inputTimeout);
+            const timeout = e.target.value?.length > 3 ? 250 : 1000
             vnode.state.inputTimeout = setTimeout(() => {
               vnode.state.isTyping = false;
-              return search(vnode.state.searchTerm, params, vnode.state);
-            }, 500);
-          }
-        },
-        onkeyup: (e) => {
-          e.stopPropagation();
-          if (e.key === 'Enter') {
-            if (!searchTerm || !searchTerm.toString().trim() || !searchTerm.match(/[A-Za-z]+/)) {
-              notifyError('Enter a valid search term');
-              return;
+              if (e.target.value?.length > 3) {
+                search(vnode.state.searchQuery, vnode.state);
+              } else {
+                vnode.state.searchQuery.searchTerm = e.target.value?.toLowerCase();
+                vnode.state.results = []
+                m.redraw()
+              }
+            }, timeout);
+          },
+          onkeyup: (e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter') {
+              executeSearch(vnode.state.searchQuery)
             }
-            if (searchTerm.length < 4) {
-              notifyError('Query must be at least 4 characters');
-            }
-            if (app.searchCache[searchTerm]?.loaded) {
-              app.searchCache[searchTerm].loaded = false;
-            }
-            let params = `q=${encodeURIComponent(vnode.state.searchTerm.toString().trim())}`;
-            if (app.activeCommunityId()) params += `&comm=${app.activeCommunityId()}`;
-            else if (app.activeChainId()) params += `&chain=${app.activeChainId()}`;
-            m.route.set(`/search?${params}`);
-          }
-        },
-      }),
-      searchTerm.length > 3
-      && showDropdownPreview
-      && !vnode.state.hideResults
-      && searchResults
-    ]);
-  }
+          },
+        }),
+        vnode.state.focused && !vnode.state.hideResults && filterDropdown
+      ]
+    );
+  },
 };
 
 export default SearchBar;

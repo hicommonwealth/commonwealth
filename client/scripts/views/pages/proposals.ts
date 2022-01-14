@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/proposals.scss';
 
 import m from 'mithril';
@@ -30,7 +31,6 @@ import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
-import { CommunityOptionsPopover } from './discussions';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -100,9 +100,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
         ]),
         m(Button, {
           intent: 'primary',
-          onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-            type: ProposalType.CompoundProposal
-          }),
+          onclick: (e) => navigateToSubpage('/new/proposal'),
           label: 'New proposal',
         }),
       ]),
@@ -134,15 +132,10 @@ function getModules(): ProposalModule<any, any, any>[] {
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
-    let returningFromThread = false;
-    Object.values(ProposalType).forEach((type) => {
-      if (app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/${type}/`)) {
-        returningFromThread = true;
-      }
-    });
-    if (returningFromThread && localStorage[`${app.activeId()}-proposals-scrollY`]) {
+    const returningFromThread = app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');
+    if (returningFromThread && localStorage[`${app.activeChainId()}-proposals-scrollY`]) {
       setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeId()}-proposals-scrollY`]));
+        window.scrollTo(0, Number(localStorage[`${app.activeChainId()}-proposals-scrollY`]));
       }, 100);
     }
   },
