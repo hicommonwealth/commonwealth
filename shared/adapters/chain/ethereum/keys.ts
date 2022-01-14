@@ -2,7 +2,7 @@ import type { TypedMessage, MessageTypes } from '@metamask/eth-sig-util';
 
 interface ServerTokenMessage extends MessageTypes {
   ServerToken: [
-    { name: 'contents', type: 'string' }
+    { name: 'serverToken', type: 'string' }
   ]
 }
 
@@ -15,7 +15,7 @@ export const constructTypedMessage = (chainId: number, token: string): TypedMess
         { name: 'chainId', type: 'uint256' },
       ],
       ServerToken: [
-        { name: 'contents', type: 'string' }
+        { name: 'serverToken', type: 'string' }
       ]
     },
     primaryType: 'ServerToken',
@@ -24,7 +24,7 @@ export const constructTypedMessage = (chainId: number, token: string): TypedMess
       version: '1',
       chainId,
     },
-    message: { ServerToken: { contents: token } },
+    message: { serverToken: token },
   };
   return typedMessage;
 }

@@ -341,7 +341,7 @@ export default (
           signature: signatureString.trim(),
           version: SignTypedDataVersion.V4
         });
-        isValid = (addressModel.address === address);
+        isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
         if (!isValid) {
           log.info(`Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`);
         }

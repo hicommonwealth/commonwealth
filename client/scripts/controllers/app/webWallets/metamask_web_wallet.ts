@@ -51,6 +51,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       method: 'eth_signTypedData_v4',
       params: [this._accounts[0], JSON.stringify(msgParams)],
     })
+    console.log(signature);
     return signature;
   }
 
