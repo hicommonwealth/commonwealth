@@ -194,7 +194,7 @@ const DiscussionRow: m.Component<
     const rowMetadata = [
       m('.discussion-row-right-meta', [
         m(UserGallery, {
-          avatarSize: 20,
+          avatarSize: 36,
           popover: true,
           maxUsers: 2,
           addressesCount:

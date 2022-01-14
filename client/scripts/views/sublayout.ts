@@ -227,7 +227,7 @@ const Sublayout: m.Component<
                 },
                 { text: 'Terms', redirectTo: '/terms' },
                 { text: 'Privacy', redirectTo: '/privacy' },
-                { text: 'Docs', redirectTo: 'https://docs.commonwealth.im' },
+                { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
                 {
                   text: 'Discord',
                   externalLink: 'https://discord.gg/ZFQCKUMP',
