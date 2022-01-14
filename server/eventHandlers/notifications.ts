@@ -68,7 +68,8 @@ export default class extends IEventHandler {
 
       return dbEvent;
     } catch (e) {
-      log.error(`Failed to generate notification: ${e.message}!\nevent: ${event}\ndbEvent: ${dbEvent.toJSON}`);
+      const errors = e.errors.map(x => x.message)
+      log.error(`Failed to generate notification (${e.message}): ${errors}!\nevent: ${JSON.stringify(event)}\ndbEvent: ${JSON.stringify(dbEvent)}\n`);
       return dbEvent;
     }
   }
