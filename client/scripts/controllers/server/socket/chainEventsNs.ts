@@ -21,7 +21,7 @@ export class ChainEventsNamespace {
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs.map((x) => x.ChainEventType).filter((x) => !!x);
+      const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
       console.log('Adding Websocket subscriptions for:', eventTypes);
       this.ceNs.emit('newSubscriptions', eventTypes);
     } else {
@@ -31,11 +31,11 @@ export class ChainEventsNamespace {
 
   public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs.map((x) => x.ChainEventType).filter((x) => !!x);
+      const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
       console.log('Deleting Websocket subscriptions for:', eventTypes);
       this.ceNs.emit(
         'deleteSubscriptions',
-        subs.map((x) => x.ChainEventType)
+        subs.map((x) => x.ChainEventType?.id)
       );
     } else {
       console.log('ChainEventsNamespace is not connected');
@@ -44,7 +44,7 @@ export class ChainEventsNamespace {
 
   private onChainEvent(notification: any) {
     const subscription = app.user.notifications.subscriptions.find(
-      (sub) => sub.ChainEventType === notification.ChainEvent.ChainEventType.id
+      (sub) => sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
     );
     const notificationObj = Notification.fromJSON(notification, subscription);
     app.user.notifications.update(notificationObj);
