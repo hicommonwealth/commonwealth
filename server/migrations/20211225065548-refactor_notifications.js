@@ -7,19 +7,20 @@ module.exports = {
             await queryInterface.renameTable("Notifications", "OldNotifications", {transaction: t});
 
             // creates a new table called Notifications
-            await queryInterface.createTable("Notifications", {
-                id: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
-                notification_data: {type: Sequelize.TEXT, allowNull: true},
-                created_at: {type: Sequelize.DATE, allowNull: false},
-                updated_at: {type: Sequelize.DATE, allowNull: false},
-                chain_event_id: {
-                    type: Sequelize.INTEGER, allowNull: true, references: {model: "ChainEvents", key: "id"}
-                },
-                chain_id: {type: Sequelize.STRING, allowNull: true, references: {model: "Chains", key: "id"}},
-                category_id: {
-                    type: Sequelize.STRING, allowNull: true, references: {model: "NotificationCategories", key: "name"}
-                }
-            }, {transaction: t});
+            await queryInterface.sequelize.query(`
+                CREATE TABLE IF NOT EXISTS "Notifications"
+                (
+                    id                SERIAL PRIMARY KEY,
+                    notification_data text,
+                    created_at        timestamp with time zone,
+                    updated_at        timestamp with time zone,
+                    chain_event_id    integer REFERENCES "ChainEvents" (id),
+                    chain_id          varchar(255) REFERENCES "Chains" (id),
+                    category_id       varchar(255) REFERENCES "NotificationCategories" (name)
+                );
+            `, {
+                raw: true, type: 'RAW', transaction: t,
+            });
 
             // create a new table called NotificationsRead --- creating this table with queryInterface.createTable() does
             // not properly enforce/create the ON DELETE CASCADE constraint
@@ -126,6 +127,12 @@ module.exports = {
             await queryInterface.bulkDelete("Notifications", {
                 chain_id: {[Sequelize.Op.eq]: null}
             }, {transaction: t});
+
+            await queryInterface.sequelize.query(`
+                SELECT setval(pg_get_serial_sequence('"Notifications"', 'id'), coalesce(max(id), 0)+1 , false) FROM "Notifications";
+            `, {
+                raw: true, type: 'RAW', transaction: t,
+            });
 
             // add the not null constraint for chain_id and category_id on Notifications table
             // this is done here because it is necessary to first

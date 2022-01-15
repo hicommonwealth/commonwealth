@@ -59,17 +59,20 @@ export default class extends IEventHandler {
         event.includeAddresses
       );
 
+      // construct notification with all the necessary data from the DB (without having to re-query using joins)
       const formattedEvent = dbNotification.toJSON()
       formattedEvent.ChainEvent = dbEvent.toJSON()
-      // TODO check if ChainEventType is included at this point
-      console.log(formattedEvent)
-      log.info(formattedEvent)
+      formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON()
       await this._rabbitMqController.publish(formattedEvent, 'ChainEventsNotificationsPublication')
 
       return dbEvent;
     } catch (e) {
-      const errors = e.errors.map(x => x.message)
-      log.error(`Failed to generate notification (${e.message}): ${errors}!\nevent: ${JSON.stringify(event)}\ndbEvent: ${JSON.stringify(dbEvent)}\n`);
+      if (e.errors && e.errors.length > 0) {
+        const errors = e.errors.map(x => x.message)
+        log.error(`Failed to generate notification (${e.message}): ${errors}!\nevent: ${JSON.stringify(event)}\ndbEvent: ${JSON.stringify(dbEvent)}\n`);
+      } else {
+        log.error(`Failed to generate notification: ${e.message}\nevent: ${JSON.stringify(event)}\ndbEvent: ${JSON.stringify(dbEvent)}\n`);
+      }
       return dbEvent;
     }
   }
