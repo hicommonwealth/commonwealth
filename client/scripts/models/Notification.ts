@@ -34,10 +34,10 @@ class Notification {
 
   public static fromJSON(json, subscription: NotificationSubscription, chainEventType?: ChainEventType) {
     return new Notification(
-      json.Notification.id,
-      json.Notification.notification_data,
+      json.id,
+      json.notification_data,
       json.is_read,
-      json.Notification.created_at,
+      json.created_at,
       subscription,
       json.Notification.ChainEvent ? ChainEvent.fromJSON(json.Notification.ChainEvent, chainEventType) : undefined
     );
