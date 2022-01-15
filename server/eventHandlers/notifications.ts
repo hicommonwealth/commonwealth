@@ -63,6 +63,8 @@ export default class extends IEventHandler {
       const formattedEvent = dbNotification.toJSON()
       formattedEvent.ChainEvent = dbEvent.toJSON()
       formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON()
+
+      // publish notification to the appropriate RabbitMQ queue (sends to socket.io servers to send to clients)
       await this._rabbitMqController.publish(formattedEvent, 'ChainEventsNotificationsPublication')
 
       return dbEvent;
