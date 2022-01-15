@@ -127,6 +127,14 @@ module.exports = {
                 chain_id: {[Sequelize.Op.eq]: null}
             }, {transaction: t});
 
+            // since we inserted rows with custom id (overrides sequence but does not increment it) we set the sequence
+            // to the current max id
+            await queryInterface.sequelize.query(`
+                SELECT setval(pg_get_serial_sequence('"Notifications"', 'id'), coalesce(max(id), 0)+1 , false) FROM "Notifications";
+            `, {
+                raw: true, type: 'RAW', transaction: t,
+            });
+
             // add the not null constraint for chain_id and category_id on Notifications table
             // this is done here because it is necessary to first
             await queryInterface.sequelize.query(`
