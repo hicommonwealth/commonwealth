@@ -35,7 +35,7 @@ export default async (
 
   const notificationParams: any = {
     model: models.NotificationsRead,
-    required: true,
+    required: false,
     include: [
       {
         model: models.Notification,
