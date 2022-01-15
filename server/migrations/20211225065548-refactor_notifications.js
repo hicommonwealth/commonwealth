@@ -13,7 +13,7 @@ module.exports = {
                 created_at: {type: Sequelize.DATE, allowNull: false},
                 updated_at: {type: Sequelize.DATE, allowNull: false},
                 chain_event_id: {
-                    type: Sequelize.INTEGER, allowNull: true, references: {model: "ChainEvents", key: "id"}
+                    type: Sequelize.INTEGER, allowNull: true, references: {model: "ChainEvent", key: "id"}
                 },
                 chain_id: {type: Sequelize.STRING, allowNull: true, references: {model: "Chains", key: "id"}},
                 category_id: {
