@@ -35,7 +35,7 @@ export function createChatNamespace(io: Server) {
         })
 
         socket.on(WebsocketMessageType.ChatMessage, (chatChannel: string, chatMessage: string) => {
-            ChatNs.to(chatChannel).emit(WebsocketMessageType.ChatMessage, chatMessage);
+            ChatNs.to(chatChannel).emit(WebsocketMessageType.ChatMessage, chatChannel, chatMessage);
         })
     })
 
@@ -52,4 +52,6 @@ export function createChatNamespace(io: Server) {
             log.info(`Chat channel: ${room}, was deleted`);
         }
     )
+
+    return ChatNs
 }

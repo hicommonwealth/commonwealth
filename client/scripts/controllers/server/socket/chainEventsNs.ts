@@ -11,8 +11,8 @@ export class ChainEventsNamespace {
     this.ceNs = io(`/${WebsocketNamespaces.ChainEvents}`, {
       transports: ['websocket'],
     });
-    this.ceNs.on('connect', this.onconnect.bind(this));
-    this.ceNs.on('disconnect', this.ondisconnect.bind(this));
+    this.ceNs.on('connect', this.onConnect.bind(this));
+    this.ceNs.on('disconnect', this.onDisconnect.bind(this));
     this.ceNs.on(
       WebsocketMessageType.ChainEventNotification,
       this.onChainEvent.bind(this)
@@ -50,13 +50,13 @@ export class ChainEventsNamespace {
     app.user.notifications.update(notificationObj);
   }
 
-  private onconnect() {
+  private onConnect() {
     this._isConnected = true;
     this.addChainEventSubscriptions(app.user.notifications.subscriptions);
     console.log('Chain events namespace connected!');
   }
 
-  private ondisconnect(reason) {
+  private onDisconnect(reason) {
     this._isConnected = false;
     console.log(reason);
     // TODO: notify user that live chain-events notifications are disabled?

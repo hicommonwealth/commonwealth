@@ -15,6 +15,7 @@ import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 import { DATABASE_URI, JWT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+import {createChatNamespace} from "./chatNs";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -70,6 +71,7 @@ export function setupWebSocketServer(httpServer: http.Server) {
 
   // create the chain-events namespace
   const ceNamespace = createCeNamespace(io);
+  const chatNamespace = createChatNamespace(io);
 
   // enables the admin analytics dashboard (creates /admin namespace)
   instrument(io, {
