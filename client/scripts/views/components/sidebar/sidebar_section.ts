@@ -33,13 +33,11 @@ export interface SidebarSectionProps {
     onclick: Function;
     onhover?: Function;
     display_data: SectionGroupProps[];
+    toggle_disabled?: boolean;
 }
 
 const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
     oninit: (vnode) => {
-        vnode.state.background_color = vnode.attrs.is_active ? '#EDE7FF' : 'none';
-    },
-    onupdate: (vnode) => {
         vnode.state.background_color = vnode.attrs.is_active ? '#EDE7FF' : 'none';
     },
     view: (vnode) => {
@@ -80,18 +78,13 @@ const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
     }
 }
 
-const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, background_color: string}> = {
+const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, hover_on: boolean}> = {
     oninit: (vnode) => {
         vnode.state.toggled = vnode.attrs.default_toggle;
-        vnode.state.background_color = (vnode.attrs.is_active && !vnode.attrs.contains_children) ? '#EDE7FF' : 'none';
-    },
-    onupdate: (vnode) => {
-        vnode.state.background_color = (vnode.attrs.is_active && !vnode.attrs.contains_children) ? '#EDE7FF' : 'none';
     },
     view: (vnode) => {
-
         const {title, contains_children, display_data, is_visible, is_updated, is_active, onclick, onhover} = vnode.attrs;
-        const {toggled, background_color} = vnode.state;
+        const {toggled} = vnode.state;
 
         if (!is_visible) {
             return;
@@ -117,14 +110,21 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, background
             title_text_class = '.section-title-text-stale'
         }
 
+        let background_color = 'none';
+        if (is_active && !contains_children) {
+            background_color = '#EDE7FF'
+        }
+
         const mouse_enter_handler = (e) => {
             if (!toggled) {
-                vnode.state.background_color = '#EDE7FF';
+                background_color = '#EDE7FF';
+                vnode.state.hover_on = true;
             }   
         }
 
         const mouse_leave_handler = (e) => {
-            vnode.state.background_color = (is_active && !contains_children) ? '#EDE7FF' : 'none';
+            background_color = (is_active && !contains_children) ? '#EDE7FF' : 'none';
+            vnode.state.hover_on = false;
         }
         
         return m('.SectionGroup', {
@@ -133,7 +133,7 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, background
         },[
             m('.SectionGroupTitle', {
                 onclick: (e) => click_handler(e),
-                style: `background-color: ${background_color}`,
+                style: `background-color: ${vnode.state.hover_on ? '#EDE7FF' : background_color}`,
             }, [
                 contains_children ? m('.carat', carat) : m('.no-carat'),
                 m(title_text_class, title), 
@@ -156,11 +156,17 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
     },
     view: (vnode) => {
 
-        const {title, onclick, onhover, display_data} = vnode.attrs;
+        const {title, onclick, toggle_disabled, display_data} = vnode.attrs;
         const {toggled, hover_color} = vnode.state;
 
         const click_handler = (e) => {
+            if (toggle_disabled) {
+                return;
+            }
             vnode.state.toggled = !toggled;
+            if (vnode.state.toggled) {
+                vnode.state.hover_color = 'none';
+            }
             onclick(e, vnode.state.toggled);
         }
 

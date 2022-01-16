@@ -222,11 +222,12 @@
 .Sidebar {
     max-height: 100%;
     position: fixed;
-    top: $layout-padding + 48;
+    top: $layout-padding + 47;
     left: $quick-switcher-width;
     z-index: 2;
     padding-bottom: 36px;
     min-width: $sidebar-width;
+    max-width: $sidebar-width;
     min-height: 100vh;
     background-color: $layout-color;
     border-right-color: $disable-grey;

@@ -131,7 +131,6 @@ const Sublayout: m.Component<{
 
     const sidebarOpen = app.chain !== null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
-    console.log("sidebarOpen:", sidebarOpen)
 
     return [
       m('.layout-container', [

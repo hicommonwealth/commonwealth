@@ -284,11 +284,9 @@
         color: $text-color-darker;
         text-align: center;
     }
-    .token-banner-content {
-    }
 
     .token-banner-terms {
-      background-color: #fdf5f9;
+      background-color: $layout-color;
       text-align: center;
       padding: 5px 0 5px 0;
       margin-left: $sidebar-width;
