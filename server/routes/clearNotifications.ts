@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
-import { DB } from '../database';
+import { DB, sequelize } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -10,7 +10,12 @@ export const Errors = {
   WrongOwner: 'Notification not owned by user',
 };
 
-export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -18,25 +23,25 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     return next(new Error(Errors.NoNotificationIds));
   }
 
-  let idOptions;
+  let notification_ids;
   if (typeof req.body['notification_ids[]'] === 'string') {
-    idOptions = { [Op.eq]: +req.body['notification_ids[]'] };
+    notification_ids = [+req.body['notification_ids[]']];
   } else {
-    idOptions = { [Op.in]: req.body['notification_ids[]'].map((n) => +n) };
+    notification_ids = req.body['notification_ids[]'].map((n) => +n);
   }
 
-  const notifications = await models.Notification.findAll({
-    where: { id: idOptions },
-    include: [ models.Subscription ]
+  await sequelize.query(
+    `
+      DELETE
+      FROM "NotificationsRead"
+      WHERE notification_id IN (?)
+        AND subscription_id IN (SELECT id FROM "Subscriptions" where subscriber_id = ?)
+	`,
+    { replacements: [notification_ids, req.user.id] }
+  );
+
+  return res.json({
+    status: 'Success',
+    result: 'Cleared notifications',
   });
-
-  if (notifications.find((n) => n.Subscription.subscriber_id !== req.user.id)) {
-    return next(new Error(Errors.WrongOwner));
-  }
-
-  await Promise.all(notifications.map((n) => {
-    return n.destroy();
-  }));
-
-  return res.json({ status: 'Success', result: 'Cleared notifications' });
 };

@@ -776,27 +776,6 @@ describe('Subscriptions Tests', () => {
         expect(res.body.error).to.not.be.null;
         expect(res.body.error).to.be.equal(MarkNotifErrors.NoNotificationIds);
       });
-      it('should fail when not the owner of the notification', async () => {
-        expect(notifications).to.not.be.null;
-        // create fake user who doesn't have any notifications
-        const user = await models.User.create({ email: 'test@dummy.com' });
-        // get existing notif in the DB
-        const notification_ids = (await models['Notification'].findAll()).map(
-          (n) => {
-            return n.id;
-          }
-        );
-        const result = await modelUtils.createAndVerifyAddress({ chain });
-        const newJwt = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
-        const res = await chai
-          .request(app)
-          .post('/api/markNotificationsRead')
-          .set('Accept', 'application/json')
-          .send({ jwt: newJwt, 'notification_ids[]': notification_ids });
-        expect(res.body).to.not.be.null;
-        expect(res.body.error).to.not.be.null;
-        expect(res.body.error).to.be.equal(MarkNotifErrors.WrongOwner);
-      });
     });
 
     describe('/clearReadNotifications', async () => {
