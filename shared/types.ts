@@ -101,7 +101,9 @@ export enum WebsocketEventType {
 
 export enum WebsocketMessageType {
   ChainEventNotification = 'chain-event-notification',
-  Message = 'message',
+  ChatMessage = 'chat-message',
+  JoinChatChannel = 'join-chat-channel',
+  LeaveChatChannel = 'leave-chat-channel',
   Heartbeat = 'heartbeat',
   HeartbeatPong = 'heartbeat-pong',
   InitializeScrollback = 'scrollback',
@@ -111,7 +113,8 @@ export enum WebsocketMessageType {
 }
 
 export enum WebsocketNamespaces {
-  ChainEvents = 'chain-events'
+  ChainEvents = 'chain-events',
+  Chat = 'chat'
 }
 
 export enum WebsocketEngineEvents {
