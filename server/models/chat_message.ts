@@ -3,11 +3,10 @@ import { Model, DataTypes } from 'sequelize';
 import { ModelStatic } from './types';
 
 export interface ChatMessageAttributes {
-  chain: string;
-  address: string;
-  text: string;
-  room: string;
   id?: number;
+  address: string;
+  message: string;
+  chat_channel_id;
   created_at?: Date;
   updated_at?: Date;
 }

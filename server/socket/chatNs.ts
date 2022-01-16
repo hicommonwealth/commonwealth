@@ -1,15 +1,16 @@
-import { Server } from 'socket.io';
-import { addPrefix, factory } from '../../shared/logging';
+import {Server} from 'socket.io';
+import {addPrefix, factory} from '../../shared/logging';
 import {
     WebsocketEngineEvents,
     WebsocketMessageType,
     WebsocketNamespaces,
 } from '../../shared/types';
-import { authenticate } from './index';
+import {authenticate} from './index';
+import {DB} from '../database';
 
 const log = factory.getLogger(addPrefix(__filename));
 
-export function createChatNamespace(io: Server) {
+export function createChatNamespace(io: Server, models: DB) {
     const ChatNs = io.of('/chat');
     io.use(authenticate)
 
@@ -34,8 +35,15 @@ export function createChatNamespace(io: Server) {
             }
         })
 
-        socket.on(WebsocketMessageType.ChatMessage, (chatChannel: string, chatMessage: string) => {
-            ChatNs.to(chatChannel).emit(WebsocketMessageType.ChatMessage, chatChannel, chatMessage);
+        socket.on(WebsocketMessageType.ChatMessage, (chatChannelName: string, chatChannelId: string,
+                                                     address: string, chatMessage: string) => {
+            models.ChatMessage.create({address, message: chatMessage, chat_channel_id: chatChannelId})
+                .then((res) => {
+                    ChatNs.to(chatChannelName).emit(WebsocketMessageType.ChatMessage, chatChannelId, address, chatMessage);
+                })
+                .catch((e) => {
+                    socket.emit('Error', e)
+                })
         })
     })
 

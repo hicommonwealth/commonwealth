@@ -43,7 +43,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 		},
 		include: {
 			model: models.ChatMessage,
-			required: true
+			required: false // should return channels with no chat messages
 		}
 	})
 
