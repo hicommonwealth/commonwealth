@@ -17,7 +17,7 @@ export class ChatNamesapce {
         this.chatNs.on(WebsocketMessageType.ChatMessage, this.onChatMessage.bind(this));
     }
 
-    private onChatMessage(chatChannel: string, chatMessage: string) {
+    private onChatMessage(chatChannelId: string, address: string, chatMessage: string) {
         // TOODO: add the message to the appropriate channel
     }
 
