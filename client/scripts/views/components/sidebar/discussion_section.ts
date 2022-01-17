@@ -26,7 +26,17 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 export const DiscussionSection: m.Component<{mobile: boolean}, {}> = {
     view: (vnode) => {
       // Conditional Render Details + 
-      const onAllDiscussionPage = (p) => p === `/${app.activeChainId()}/` || p === `/${app.activeChainId()}`;
+      const onAllDiscussionPage = (p) => {
+        const identifier = m.route.param('identifier');
+        if (identifier) {
+          const thread = app.threads.store.getByIdentifier(identifier.slice(0, identifier.indexOf('-')));
+          if (thread && !thread.topic) {
+            return true;
+          } 
+        }
+
+        return p === `/${app.activeChainId()}/` || p === `/${app.activeChainId()}`;
+      }
       const onDiscussionsPage = (p) => p === `/${app.activeChainId()}` || p === `/${app.activeChainId()}/`
         || p.startsWith(`/${app.activeChainId()}/discussions/`)
         || p.startsWith(`/${app.activeChainId()}/proposal/discussion/`)
@@ -36,11 +46,11 @@ export const DiscussionSection: m.Component<{mobile: boolean}, {}> = {
         const identifier = m.route.param('identifier');
         if (identifier) {
           const thread = app.threads.store.getByIdentifier(identifier.slice(0, identifier.indexOf('-')));
-          if (thread.topic.name === topic) {
+          if (thread.topic && thread.topic.name === topic) {
             return true;
           } 
         }
-        return decodeURI(p).endsWith(`/discussions/${topic}`);;
+        return decodeURI(p).endsWith(`/discussions/${topic}`);
       }
       const onMembersPage = (p) => p.startsWith(`/${app.activeChainId()}/members`)
         || p.startsWith(`/${app.activeChainId()}/account/`);
