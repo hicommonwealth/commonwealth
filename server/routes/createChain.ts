@@ -96,13 +96,7 @@ const createChain = async (
     const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
     if (ethChainUrl) {
       url = ethChainUrl;
-    } else {
-      // If using overridden URL, then user must be admin -- we do not allow users to submit
-      // custom URLs yet.
-      if (!req.user.isAdmin) {
-        return next(new Error(Errors.NotAdmin));
-      }
-    }
+    } 
     if (!url) {
       return next(new Error(Errors.InvalidChainIdOrUrl));
     }
