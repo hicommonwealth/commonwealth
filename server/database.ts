@@ -28,6 +28,9 @@ import ContractCategoryFactory, {
 import ContractItemFactory, {
   ContractItemModelStatic,
 } from './models/contract_item';
+import DiscordTokenGatingFactory, {
+  DiscordTokenGatingModelStatic
+} from "./models/discord_token_gating";
 import DiscussionDraftFactory, {
   DiscussionDraftModelStatic,
 } from './models/discussion_draft';
@@ -113,6 +116,7 @@ export type Models = {
   Collaboration: CollaborationModelStatic;
   ContractCategory: ContractCategoryModelStatic;
   ContractItem: ContractItemModelStatic;
+  DiscordTokenGating: DiscordTokenGatingModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
   EdgewareLockdropBalance: EdgewareLockdropBalanceModelStatic;
   EdgewareLockdropEvent: EdgewareLockdropEventModelStatic;
@@ -189,6 +193,7 @@ const models: Models = {
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
   ContractItem: ContractItemFactory(sequelize, DataTypes),
+  DiscordTokenGating: DiscordTokenGatingFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   EdgewareLockdropBalance: EdgewareLockdropBalanceFactory(sequelize, DataTypes),
   EdgewareLockdropEvent: EdgewareLockdropEventFactory(sequelize, DataTypes),
