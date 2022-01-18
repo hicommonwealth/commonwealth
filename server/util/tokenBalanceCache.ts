@@ -113,8 +113,8 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
         }
         const tokenBalance = await this.getBalance(
           topic.chain.base,
-          topic.chain.id,
           userAddress,
+          topic.chain.id,
           nodes[0].eth_chain_id,
         );
         log.info(`Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`);
@@ -129,14 +129,32 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async getBalance(base: string, contractId: string, address: string, chainId?: number): Promise<BN> {
+  public async getBalance(base: string, address: string, contractId?: string, chainId?: number, tokenAddress?: string): Promise<BN> {
+    if (!contractId && !tokenAddress) {
+      throw new Error('Must provide either a contract id or a contract address')
+    }
+
     let contractAddress: string;
+    const searchOptions = {
+      chainNode: {
+        eth_chain_id: chainId || null
+      },
+      token: {
+        chain_id: chainId
+      }
+    }
+
+    if (tokenAddress) {
+      searchOptions.chainNode['address'] = tokenAddress;
+      searchOptions.token['address'] = tokenAddress;
+    } else {
+      searchOptions.chainNode['chain'] = contractId;
+      searchOptions.token['id'] = contractId;
+    }
+
     // See if token is already in the database as a Chain
     const node = await this.models.ChainNode.findOne({
-      where: {
-        chain: contractId,
-        eth_chain_id: chainId || null,
-      }
+      where: searchOptions.chainNode
     });
     if (node?.address) {
       contractAddress = node.address;
@@ -145,10 +163,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // if token is not in the database, then query against the Token list
     if (!contractAddress && base === ChainBase.Ethereum) {
       const tokenMeta = await this.models.Token.findOne({
-        where: {
-          id: contractId,
-          chain_id: chainId,
-        }
+        where: searchOptions.token
       });
       if (!tokenMeta?.address) throw new Error('unsupported token');
       contractAddress = tokenMeta.address;

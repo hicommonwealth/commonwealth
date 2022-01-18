@@ -125,6 +125,8 @@ import updateAddress from './routes/updateAddress';
 import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 
+import getTokenBalance from './routes/getTokenBalance';
+
 function setupRouter(
   app: Express,
   models: DB,
@@ -612,6 +614,8 @@ function setupRouter(
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
+
+  router.get('/getTokenBalance', getTokenBalance.bind(this, models, tokenBalanceCache));
 
   app.use('/api', router);
 }
