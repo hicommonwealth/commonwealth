@@ -4,6 +4,7 @@ import { ModelStatic } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
+import { ProfileInstance, ProfileAttributes } from './profile';
 import { SocialAccountInstance, SocialAccountAttributes } from './social_account';
 
 export type EmailNotificationInterval = 'daily' | 'never';
@@ -24,6 +25,7 @@ export interface UserAttributes {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedNode?: ChainNodeAttributes | ChainNodeAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
+  Profiles?: ProfileAttributes[] | ProfileAttributes['id'][];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
   Chains?: ChainAttributes[] | ChainAttributes['id'][];
 }
@@ -36,6 +38,8 @@ export interface UserInstance extends Model<UserAttributes>, UserAttributes {
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
   setAddresses: Sequelize.HasManySetAssociationsMixin<AddressInstance, AddressInstance['id']>;
 
+  getProfiles: Sequelize.HasManyGetAssociationsMixin<ProfileInstance>;
+  
   getSocialAccounts: Sequelize.HasManyGetAssociationsMixin<SocialAccountInstance>;
   setSocialAccounts: Sequelize.HasManySetAssociationsMixin<SocialAccountInstance, SocialAccountInstance['id']>;
 }
@@ -85,6 +89,7 @@ export default (
   User.associate = (models) => {
     models.User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
     models.User.hasMany(models.Address);
+    models.User.hasMany(models.Profile);
     models.User.hasMany(models.SocialAccount);
     models.User.hasMany(models.StarredCommunity);
     models.User.belongsToMany(models.Chain, { through: models.WaitlistRegistration });
