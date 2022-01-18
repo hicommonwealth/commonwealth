@@ -50,7 +50,6 @@ import {
   IconIntent,
   WebsiteIcon,
 } from './icons';
-import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
 import { CWButton } from './cw_button';
 import { ButtonType } from './types';
@@ -62,6 +61,7 @@ import {
   CWEngagementButton,
   EngagementButtonSize,
 } from './cw_engagement_button';
+import { CWTextInput, TextInputStatus } from './cw_text_input';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -445,7 +445,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 600px;',
         },
         [
-          m(TextInput, {
+          m(CWTextInput, {
             name: 'Form field',
             oninput: (e) => null,
             inputValidationFn: (val: string): [TextInputStatus, string] => {
@@ -458,7 +458,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
             label: 'This input only accepts A-Z',
             placeholder: 'Placeholder',
           }),
-          m(TextInput, {
+          m(CWTextInput, {
             name: 'Text field',
             oninput: (e) => null,
             label: 'No status message or error validation',
