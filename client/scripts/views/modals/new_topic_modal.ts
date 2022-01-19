@@ -87,6 +87,7 @@ const NewTopicModal: m.Component<
     const decimals = app.chain?.meta.chain?.decimals
       ? app.chain.meta.chain.decimals
       : 18;
+
     return m('.NewTopicModal', [
       m('.compact-modal-title', [
         m('h3', 'New topic'),
@@ -97,7 +98,6 @@ const NewTopicModal: m.Component<
           m(CWTextInput, {
             name: 'name',
             label: 'Name',
-            className: 'topic-form-name',
             defaultValue: vnode.state.form.name,
             oninput: (e) => {
               vnode.state.form.name = (e.target as any).value;
@@ -117,14 +117,12 @@ const NewTopicModal: m.Component<
                 return [TextInputStatus.Validate, 'Valid topic name'];
               }
             },
-            otherAttrs: {
-              autocomplete: 'off',
-              tabindex: 1,
-              oncreate: (vvnode) => {
-                // use oncreate to focus because autofocus: true fails when component is recycled in a modal
-                setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
-              },
-              style: 'margin-bottom: 10px;',
+            autocomplete: 'off',
+            autofocus: true,
+            tabindex: 1,
+            oncreate: (vvnode) => {
+              // use oncreate to focus because autofocus: true fails when component is recycled in a modal
+              setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
             },
           }),
           m(FormGroup, [

@@ -11,71 +11,63 @@ export enum TextInputStatus {
 }
 
 type TextInputProps = {
-  name: string;
-  oninput?: (e) => void | null;
+  autocomplete?: string;
+  autofocus?: boolean;
+  defaultValue?: string;
   inputValidationFn?: (value: string) => [TextInputStatus, string];
   label?: string;
-  className?: string;
+  name: string;
+  oninput?: (e) => void;
   placeholder?: string;
-  defaultValue?: string;
-  otherAttrs?: any;
+  tabindex?: number;
 };
 
 type TextInputState = {
   statusMessage: string;
   statusType: TextInputStatus;
-  isTyping: boolean;
-  inputTimeout;
 };
 
 export const CWTextInput: m.Component<TextInputProps, TextInputState> = {
   view: (vnode) => {
     const {
-      name,
-      oninput,
+      autocomplete,
+      autofocus,
+      defaultValue,
       inputValidationFn,
       label,
-      className,
+      name,
+      oninput,
       placeholder,
-      defaultValue,
-      otherAttrs,
+      tabindex,
     } = vnode.attrs;
 
     const { statusMessage, statusType } = vnode.state;
 
     return (
-      <div class={ComponentType.TextInput} {...otherAttrs}>
+      <div class={ComponentType.TextInput}>
         {label && <label>{label}</label>}
-        <div class={`cui-input ${className || ``} ${statusType || ``}`}>
-          <input
-            name={name}
-            placeholder={placeholder}
-            oninput={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (oninput) {
-                clearTimeout(vnode.state.inputTimeout);
-                vnode.state.inputTimeout = setTimeout(() => {
-                  oninput(e);
-                  m.redraw();
-                }, 250);
+        <input
+          autofocus={autofocus}
+          autocomplete={autocomplete}
+          class={statusType}
+          tabindex={tabindex}
+          name={name}
+          placeholder={placeholder}
+          oninput={oninput}
+          onfocusout={(e) => {
+            if (inputValidationFn) {
+              if (!e.target.value?.length) {
+                delete vnode.state.statusType;
+                delete vnode.state.statusMessage;
+                m.redraw();
+              } else {
+                [vnode.state.statusType, vnode.state.statusMessage] =
+                  inputValidationFn(e.target.value);
               }
-            }}
-            onfocusout={(e) => {
-              if (inputValidationFn) {
-                if (!e.target.value?.length) {
-                  delete vnode.state.statusType;
-                  delete vnode.state.statusMessage;
-                  m.redraw();
-                } else {
-                  [vnode.state.statusType, vnode.state.statusMessage] =
-                    inputValidationFn(e.target.value);
-                }
-              }
-            }}
-            defaultValue={defaultValue}
-          />
-        </div>
+            }
+          }}
+          defaultValue={defaultValue}
+        />
         {statusMessage && (
           <div class={`status ${statusType}`}>{statusMessage}</div>
         )}

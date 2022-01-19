@@ -447,7 +447,6 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         [
           m(CWTextInput, {
             name: 'Form field',
-            oninput: (e) => null,
             inputValidationFn: (val: string): [TextInputStatus, string] => {
               if (val.match(/[^A-Za-z]/)) {
                 return [TextInputStatus.Error, 'Must enter characters A-Z'];
@@ -460,7 +459,6 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           }),
           m(CWTextInput, {
             name: 'Text field',
-            oninput: (e) => null,
             label: 'No status message or error validation',
             placeholder: 'Placeholder',
           }),
