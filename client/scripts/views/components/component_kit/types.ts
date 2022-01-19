@@ -6,6 +6,7 @@ export enum ComponentType {
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   EngagementButton = 'EngagementButton',
+  Card = 'Card',
 }
 
 export type StyleProps = {

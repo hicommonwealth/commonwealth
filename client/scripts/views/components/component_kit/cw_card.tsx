@@ -1,3 +1,5 @@
+/* @jsx m */
+
 import m from 'mithril';
 import 'components/component_kit/cw_card.scss';
 
@@ -10,10 +12,10 @@ export interface CardAttrs {
   class_name?: string;
   /** Adds interactive hover/active styling */
   interactive?: boolean;
-  onclick?: Function;
-  onmouseover?: Function;
-  onmouseenter?: Function;
-  onmouseleave?: Function;
+  onclick: (e?: MouseEvent) => void;
+  onmouseover?: (e?: MouseEvent) => void;
+  onmouseenter?: (e?: MouseEvent) => void;
+  onmouseleave?: (e?: MouseEvent) => void;
 }
 
 const appendTags = (base: string, attrs: CardAttrs) => {
@@ -27,7 +29,7 @@ const appendTags = (base: string, attrs: CardAttrs) => {
   return tag;
 };
 
-export const FaceliftCard: m.Component<CardAttrs, {}> = {
+export const CWCard: m.Component<CardAttrs> = {
   view: (vnode) => {
     const { onclick, onmouseover, onmouseenter, onmouseleave } = vnode.attrs;
     return m(
