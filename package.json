@@ -117,7 +117,7 @@
     "assert": "^2.0.0",
     "async-rwlock": "^1.1.1",
     "autoprefixer": "^10.2.5",
-    "aws-sdk": "^2.482.0",
+    "aws-sdk": "^2.814.0",
     "axios": "^0.21.2",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.4",
