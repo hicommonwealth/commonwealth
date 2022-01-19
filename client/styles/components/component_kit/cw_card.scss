@@ -14,9 +14,10 @@ $default-card-height: 100px;
   justify-content: center;
   min-height: $default-card-height;
   padding: 15px;
+  width: $default-card-width;
 
-  &.not-fluid {
-    width: $default-card-width;
+  &.full-width {
+    width: 100%;
   }
 
   &.elevation-1 {

@@ -5,9 +5,9 @@ import { Tag } from 'construct-ui';
 
 import app from 'state';
 import { ChainInfo, NodeInfo } from 'models';
-import { FaceliftCard } from '../../components/component_kit/cards';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ButtonType } from '../../components/component_kit/types';
+import { CardElevation, CWCard } from '../../components/component_kit/cw_card';
 
 var numeral = require('numeral');
 
@@ -61,11 +61,11 @@ const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
       nodeList[0].chain.iconUrl || (nodeList[0].chain as any).icon_url;
 
     return m(
-      FaceliftCard,
+      CWCard,
       {
-        elevation: 2,
+        elevation: CardElevation.Elevation2,
         interactive: true,
-        class_name: '.chain-card',
+        className: 'chain-card',
         onclick: redirectFunction,
       },
       [
@@ -117,11 +117,11 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
     }
 
     return m(
-      FaceliftCard,
+      CWCard,
       {
-        elevation: 2,
+        elevation: CardElevation.Elevation2,
         interactive: true,
-        class_name: '.chain-card',
+        className: 'chain-card',
         onclick: redirectFunction,
       },
       [
@@ -152,11 +152,11 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
 const LockdropToolsCard: m.Component = {
   view: (vnode) => {
     return m(
-      FaceliftCard,
+      CWCard,
       {
-        elevation: 2,
+        elevation: CardElevation.Elevation2,
         interactive: true,
-        class_name: '.chain-card',
+        className: 'chain-card',
       },
       [
         m('.lockdrop-card-body', [
@@ -189,11 +189,11 @@ const LockdropToolsCard: m.Component = {
 const NewCommunityCard: m.Component = {
   view: (vnode) => {
     return m(
-      FaceliftCard,
+      CWCard,
       {
-        elevation: 2,
+        elevation: CardElevation.Elevation2,
         interactive: true,
-        class_name: '.chain-card',
+        className: 'chain-card',
         onclick: (e) => {
           e.preventDefault();
           document.location =

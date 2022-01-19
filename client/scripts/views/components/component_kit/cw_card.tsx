@@ -3,39 +3,73 @@
 import m from 'mithril';
 import 'components/component_kit/cw_card.scss';
 
-export interface CardAttrs {
-  /** Degree of card shadow (Range 1-3) */
-  elevation?: number;
-  /** Fills width of parent container */
-  fluid?: boolean;
-  /** Custom styles */
-  class_name?: string;
-  /** Adds interactive hover/active styling */
+import { ComponentType } from './types';
+
+export enum CardElevation {
+  Elevation1 = 'elevation-1',
+  Elevation2 = 'elevation-2',
+  Elevation3 = 'elevation-3',
+}
+
+type CardStyleAttrs = {
+  elevation?: CardElevation;
+  fullWidth?: boolean;
+  className?: string;
   interactive?: boolean;
-  onclick: (e?: MouseEvent) => void;
+};
+
+type CardAttrs = {
+  onclick?: (e?: MouseEvent) => void;
   onmouseover?: (e?: MouseEvent) => void;
   onmouseenter?: (e?: MouseEvent) => void;
   onmouseleave?: (e?: MouseEvent) => void;
-}
+} & CardStyleAttrs;
 
-const appendTags = (base: string, attrs: CardAttrs) => {
-  const { elevation, fluid, class_name, interactive } = attrs;
-  let tag = base;
-  if (elevation > 0 && elevation < 4) tag += `.elevation-${elevation}`;
-  if (interactive) tag += '.interactive';
-  if (!fluid && fluid === false) tag += '.not-fluid';
-  if (class_name) tag += class_name;
-
-  return tag;
-};
+const getCardClasses = (
+  componentType: string,
+  styleAttrs: CardStyleAttrs
+): string =>
+  `${componentType} ${Object.entries(styleAttrs)
+    .filter(([key, value]) => key && value)
+    .map(([key, value]) => {
+      if (key === 'fullWidth') {
+        return value === true ? 'full-width' : null;
+      } else if (key === 'interactive') {
+        return value === true ? 'interactive' : null;
+      } else {
+        return value;
+      }
+    })
+    .join(' ')}`;
 
 export const CWCard: m.Component<CardAttrs> = {
   view: (vnode) => {
-    const { onclick, onmouseover, onmouseenter, onmouseleave } = vnode.attrs;
-    return m(
-      appendTags('.Card', vnode.attrs),
-      { onclick, onmouseover, onmouseenter, onmouseleave },
-      [vnode.children]
+    const {
+      className,
+      elevation,
+      fullWidth,
+      interactive,
+      onclick,
+      onmouseenter,
+      onmouseleave,
+      onmouseover,
+    } = vnode.attrs;
+
+    return (
+      <div
+        class={getCardClasses(ComponentType.Card, {
+          elevation,
+          fullWidth,
+          className,
+          interactive,
+        })}
+        onclick={onclick}
+        onmouseover={onmouseover}
+        onmouseenter={onmouseenter}
+        onmouseleave={onmouseleave}
+      >
+        {vnode.children}
+      </div>
     );
   },
 };
