@@ -9,7 +9,7 @@ export enum ComponentType {
   TextInput = 'TextInput',
 }
 
-export type StyleProps = {
+export type StyleAttrs = {
   disabled?: boolean;
   className?: string;
 };

@@ -4,7 +4,7 @@ import m from 'mithril';
 import 'components/component_kit/cw_engagement_button.scss';
 
 import { CreateIcon, IconSize, IconIntent } from './icons';
-import { ComponentType, StyleProps } from './types';
+import { ComponentType, StyleAttrs } from './types';
 import { getButtonClasses } from './helpers';
 
 export enum EngagementButtonSize {
@@ -12,16 +12,16 @@ export enum EngagementButtonSize {
   Large = 'lg',
 }
 
-export type EngagementButtonStyleProps = {
+export type EngagementButtonStyleAttrs = {
   size: EngagementButtonSize;
-} & StyleProps;
+} & StyleAttrs;
 
-type EngagementButtonProps = {
+type EngagementButtonAttrs = {
   label: string;
   onclick: (e?: MouseEvent) => void;
-} & EngagementButtonStyleProps;
+} & EngagementButtonStyleAttrs;
 
-export const CWEngagementButton: m.Component<EngagementButtonProps> = {
+export const CWEngagementButton: m.Component<EngagementButtonAttrs> = {
   view: (vnode) => {
     const { label, onclick, disabled, className, size } = vnode.attrs;
 

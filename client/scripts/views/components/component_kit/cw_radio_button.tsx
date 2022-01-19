@@ -5,7 +5,7 @@ import 'components/component_kit/cw_radio_button.scss';
 
 import { ComponentType } from './types';
 
-export type RadioButtonProps = {
+export type RadioButtonAttrs = {
   value: string;
   label?: string;
   checked: boolean;
@@ -18,7 +18,7 @@ export type RadioButtonProps = {
   disabled?: boolean;
 };
 
-export const CWRadioButton: m.Component<RadioButtonProps> = {
+export const CWRadioButton: m.Component<RadioButtonAttrs> = {
   view: (vnode) => {
     const { checked, value, label, groupName, onchange, className } =
       vnode.attrs;

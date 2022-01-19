@@ -5,9 +5,9 @@ import 'components/component_kit/cw_gradient_button.scss';
 
 import { ComponentType } from './types';
 import { getButtonClasses } from './helpers';
-import { ButtonProps } from './cw_button';
+import { ButtonAttrs } from './cw_button';
 
-export const CWGradientButton: m.Component<ButtonProps> = {
+export const CWGradientButton: m.Component<ButtonAttrs> = {
   view: (vnode) => {
     const { onclick, label, disabled, className, buttonType } = vnode.attrs;
     return (
