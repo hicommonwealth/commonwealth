@@ -191,7 +191,7 @@
     "passport-local": "^1.0.0",
     "passport-magic": "^1.0.0",
     "pg": "^8.0.3",
-    "postcss": "^8.2.10",
+    "postcss": "^8.2.13",
     "postcss-import": "^14.0.1",
     "postcss-loader": "4.2.0",
     "postcss-preset-env": "^6.7.0",
