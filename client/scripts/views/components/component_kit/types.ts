@@ -9,7 +9,7 @@ export enum ComponentType {
   Card = 'Card',
 }
 
-export type StyleProps = {
+export type StyleAttrs = {
   disabled?: boolean;
   className?: string;
 };

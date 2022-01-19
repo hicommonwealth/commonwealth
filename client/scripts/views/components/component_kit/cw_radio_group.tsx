@@ -6,7 +6,7 @@ import 'components/component_kit/cw_radio_group.scss';
 import { CWRadioButton } from './cw_radio_button';
 import { ComponentType } from './types';
 
-type RadioGroupProps = {
+type RadioGroupAttrs = {
   values: string[];
   labels?: string[];
   defaultValue: string;
@@ -21,7 +21,7 @@ type RadioGroupState = {
   toggledValue: string;
 };
 
-export const CWRadioGroup: m.Component<RadioGroupProps, RadioGroupState> = {
+export const CWRadioGroup: m.Component<RadioGroupAttrs, RadioGroupState> = {
   oninit: (vnode) => {
     if (!vnode.state.toggledValue) {
       vnode.state.toggledValue = vnode.attrs.defaultValue;
