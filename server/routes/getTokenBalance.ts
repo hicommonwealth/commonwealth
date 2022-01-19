@@ -25,12 +25,16 @@ const getTokenBalance = async (
     if (!tokenRoles) return next(new Error(Errors.NoTokenAddress));
 
     const balances: {[token: string]: BN} = {}
+    for (const token of tokenRoles) {
+        balances[`${token.name}`] = new BN(0);
+    }
+
     for (const address of addresses) {
         for (const token of tokenRoles) {
             try {
                 const balance = await tokenBalanceCache.getBalance(token.base, address.address, token.name,
                     token.eth_chain_id, token.tokenAddress);
-                balances[`${token.name}`] = (balances[`${token.name}`] || new BN(0)).add(balance);
+                balances[`${token.name}`] = balances[`${token.name}`].add(balance);
             } catch (e) {
                 return next(e);
             }
