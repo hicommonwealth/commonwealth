@@ -1,70 +1,121 @@
 @import '../../facelift.scss';
 
 .CrowdfundCard {
+    display: flex;
+
+    .CrowdfundHeaderPanel {
+        height: 100%;
+        background-color: $lite-gray;
+        .ChainIcon {
+            position: relative;
+        }
+    }
+
+    .CrowdfundCompletionBar {
+        flex: 1;
+        background-color: $disable-gray;
+        .completed-percentage {
+            height: 100%;
+            background-color: $carrib-green;
+        }
+    }
+
+    .CrowdfundInfoPanel {
+        background-color: $background-gray;
+        .cf-info-header {
+            display: flex;
+            justify-content: space-between;
+            h3.cf-title {
+                @include header;
+                font-size: 24px;
+                color: $midi-gray;
+                display: flex;
+                .ChainIcon {
+                    margin-right: 6px;
+                }
+            }
+            .cf-block-count {
+                height: 18px;
+                padding: 2px 4px 0;
+                font-size: 14px;
+                line-height: 17px;
+                color: $lite-gray;
+                background-color: $disable-gray;
+                border-radius: 6px;
+            }
+        }
+        .cf-info-body {
+            @include body;
+            color: $lite-gray;
+            font-size: 14px;
+            line-height: 17px;
+            text-overflow: ellipsis;
+            white-space: break-spaces;
+            overflow: hidden;
+            height: 48px;
+        }
+        .cf-info-footer {
+            margin-top: 5px;
+            .User {
+                display: flex;
+                .user-display-name {
+                    position: relative;
+                    top: 3px;
+                    margin-left: 4px;
+                    color: $lite-gray;
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+
     &.large {
-        display: flex;
         flex-direction: column;
         height: 256px;
         width: 400px;
         .CrowdfundHeaderPanel {
             flex: 32;
-            height: 100%;
             border-radius: 16px 16px 0 0;
-            background-color: $lite-gray;
             .ChainIcon {
-                position: relative;
                 top: 11px;
                 left: 342px;
             }
         }
-        .CrowdfundCompletionBar {
-            flex: 1;
-            background-color: $disable-gray;
-            .completed-percentage {
-                height: 100%;
-                background-color: $carrib-green;
-            }
-        }
-        .cf-info-panel {
+        .CrowdfundInfoPanel {
             flex: 32;
             border-radius: 0 0 16px 16px;
-            background-color: $background-gray;
             padding: 12px 10px 0 20px;
             .cf-info-header {
-                display: flex;
                 justify-content: space-between;
-                h3.cf-title {
-                    @include header;
-                    font-size: 24px;
-                    color: $midi-gray;
-                }
-                .cf-block-count {
-                    height: 18px;
-                    padding: 2px 4px 0;
-                    font-size: 14px;
-                    color: $lite-gray;
-                    background-color: $disable-gray;
-                    border-radius: 6px;
-                }
             }
-            .cf-info-body {
-                @include body;
-                color: $lite-gray;
-                font-size: 14px;
+        }
+    }
+
+    &.medium {
+        height: 114px;
+        width: 400px;
+        .CrowdfundHeaderPanel {
+            flex: 7;
+        }
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            flex: 18;
+            background-color: $background-gray;
+            .CrowdfundCompletionBar {
+                flex: 1;
             }
-            .cf-info-footer {
-                margin-top: 5px;
+            .CrowdfundInfoPanel {
+                flex: 13;
+                margin: 6px 1px 0 14px;
                 .User {
-                    display: flex;
+                    position: relative;
+                    top: -2px;
                     .user-display-name {
-                        position: relative;
-                        top: 3px;
-                        margin-left: 4px;
-                        color: $lite-gray;
-                        font-size: 14px;
+                        top: 1px;
                     }
                 }
             }
-        }
+        } 
     }
 }

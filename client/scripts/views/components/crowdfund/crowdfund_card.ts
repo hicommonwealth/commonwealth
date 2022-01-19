@@ -3,10 +3,10 @@ import 'components/crowdfund/crowdfund_card.scss';
 import m from 'mithril';
 import { AnonymousUser } from '../widgets/user';
 
-enum CrowdfundCardSize {
-  Small,
-  Medium,
-  Large
+export enum CrowdfundCardSize {
+  Small = 'small',
+  Medium = 'medium',
+  Large = 'large'
 }
 interface CrowdfundCardAttrs {
   crowdfund;
@@ -39,11 +39,11 @@ const DummyChainIcon: m.Component<{ chain, onclick, size: number }> = {
   }
 };
 
-const CrowdfundHeaderPanel: m.Component<{ iconSize }> = {
+const CrowdfundHeaderPanel: m.Component<{ iconSize?: number }> = {
   view: (vnode) => {
     const { iconSize } = vnode.attrs;
-    return m('.CrowdfundInfoPanel', [
-      m(DummyChainIcon, {
+    return m('.CrowdfundHeaderPanel', [
+      iconSize && m(DummyChainIcon, {
         chain: null,
         onclick: null,
         size: iconSize
@@ -52,22 +52,29 @@ const CrowdfundHeaderPanel: m.Component<{ iconSize }> = {
   }
 }
 
-const CrowdfundCompletionBar: m.Component<{ completionPercentage: number }> = {
+const CrowdfundCompletionBar: m.Component<{ completionPercent: number }> = {
   view: (vnode) => {
-    const completionPercentage = vnode.attrs;
+    const { completionPercent } = vnode.attrs;
     return m('.CrowdfundCompletionBar', [
       m('.completed-percentage', {
-        style: `width: ${completionPercentage * 400}px`
+        style: `width: ${completionPercent * 400}px`
       }),
     ]);
   }
 }
-const CrowdfundInfoPanel: m.Component<{ crowdfund, avatarSize: number }> = {
+const CrowdfundInfoPanel: m.Component<{ crowdfund, avatarSize: number, iconSize?: number }> = {
   view: (vnode) => {
-    const { crowdfund, avatarSize } = vnode.attrs;
-    return m('.cf-info-panel', [
+    const { crowdfund, avatarSize, iconSize } = vnode.attrs;
+    return m('.CrowdfundInfoPanel', [
       m('.cf-info-header', [
-        m('h3.cf-title', DummyCrowdfundData.CrowdfundTitle),
+        m('h3.cf-title', [
+          iconSize && m(DummyChainIcon, {
+            chain: null,
+            onclick: null,
+            size: iconSize
+          }),
+          DummyCrowdfundData.CrowdfundTitle
+        ]),
         m('.cf-block-count', `${DummyCrowdfundData.CrowdfundBlockCount} Blocks`)
       ]),
       m('.cf-info-body', DummyCrowdfundData.CrowdfundDescription),
@@ -91,15 +98,24 @@ const CrowdfundCard: m.Component<
     const CrowdfundCardLarge = m('.CrowdfundCard',
       { class: 'large' },
       [
-        m(CrowdfundHeaderPanel, { iconSize: 20 }),
-        m(CrowdfundCompletionBar, { completionPercentage: (DummyCrowdfundData.CrowdfundCompletionPercent as number) }),
-        m(CrowdfundInfoPanel, { crowdfund, avatarSize: 45 })
+        m(CrowdfundHeaderPanel, { iconSize: 45 }),
+        m(CrowdfundCompletionBar, { completionPercent: (DummyCrowdfundData.CrowdfundCompletionPercent as number) }),
+        m(CrowdfundInfoPanel, { crowdfund, avatarSize: 20 })
       ]
     );
 
-    const CrowdfundCardMedium;
+    const CrowdfundCardMedium= m('.CrowdfundCard',
+      { class: 'medium' },
+      [
+        m(CrowdfundHeaderPanel),
+        m('.right-panel', [
+          m(CrowdfundCompletionBar, { completionPercent: (DummyCrowdfundData.CrowdfundCompletionPercent as number) }),
+          m(CrowdfundInfoPanel, { crowdfund, avatarSize: 16, iconSize: 24 })
+        ])
+      ]
+    );
 
-    const CrowdfundCardSmall;
+    const CrowdfundCardSmall = null;
 
     switch (size) {
       case CrowdfundCardSize.Large:
