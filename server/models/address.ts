@@ -15,6 +15,7 @@ import * as ethUtil from 'ethereumjs-util';
 
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
 import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature } from '@cosmjs/amino';
+import { StargateClient } from '@cosmjs/stargate';
 
 import nacl from 'tweetnacl';
 import { NotificationCategories, ChainBase, ChainNetwork } from '../../shared/types';
@@ -26,7 +27,6 @@ import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_p
 import { RoleAttributes, RoleInstance } from './role';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
-import { StargateClient } from '@cosmjs/stargate';
 const log = factory.getLogger(formatFilename(__filename));
 
 export interface AddressAttributes {
@@ -327,6 +327,10 @@ export default (
           isValid = false;
         }
       }
+    } else if (chain.base === ChainBase.Ethereum && chain.network === ChainNetwork.AxieInfinity) {
+      // TODO: make this more flexible, maybe add a database flag for supports SSO?
+      // just check for validity
+      isValid = Web3.utils.isAddress(addressModel.address);
     } else if (chain.base === ChainBase.Ethereum) {
       //
       // ethereum address handling
