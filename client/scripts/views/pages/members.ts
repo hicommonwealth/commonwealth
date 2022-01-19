@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/members.scss';
 
 import m from 'mithril';
@@ -11,12 +12,7 @@ import { navigateToSubpage } from 'app';
 import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
-import { CommunityOptionsPopover } from './discussions';
-import { ConsoleLoggerImpl } from 'typescript-logging';
 import { Profile } from 'client/scripts/models';
-import address from 'server/models/address';
-import { min } from 'underscore';
-import ConfirmSnapshotVoteModal from '../modals/confirm_snapshot_vote_modal';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -34,20 +30,20 @@ interface ProfileInfo {
 
 
 const MembersPage : m.Component<
-  {}, 
-  { 
-    membersRequested: boolean, 
-    membersLoaded: MemberInfo[], 
-    profilesLoaded: ProfileInfo[], 
-    profilesFinishedLoading: boolean, 
-    numProfilesLoaded: number, 
-    initialProfilesLoaded: boolean, 
+  {},
+  {
+    membersRequested: boolean,
+    membersLoaded: MemberInfo[],
+    profilesLoaded: ProfileInfo[],
+    profilesFinishedLoading: boolean,
+    numProfilesLoaded: number,
+    initialProfilesLoaded: boolean,
     initialScrollFinished: boolean,
-    onscroll: any 
+    onscroll: any
   }
 > = {
   view: (vnode) => {
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntity = app.chain;
     if (!activeEntity) return m(PageLoading, {
       message: 'Loading members',
       title: [
@@ -58,7 +54,7 @@ const MembersPage : m.Component<
     });
 
      // get members once
-    const activeInfo = app.community ? app.community.meta : app.chain.meta.chain;
+    const activeInfo = app.chain.meta.chain;
     if (!vnode.state.membersRequested) {
       vnode.state.membersRequested = true;
       activeInfo.getMembers(activeInfo.id).then(() => {
@@ -79,7 +75,6 @@ const MembersPage : m.Component<
       });
     }
 
-
     if (!vnode.state.membersLoaded) return m(PageLoading, {
       message: 'Loading members',
       title: [
@@ -89,8 +84,8 @@ const MembersPage : m.Component<
       showNewProposalButton: true,
     });
 
-    const navigatedFromAccount = app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/${app.activeId()}/account/`)
-    && localStorage[`${app.activeId()}-members-scrollY`]
+    const navigatedFromAccount = app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/${app.activeChainId()}/account/`)
+    && localStorage[`${app.activeChainId()}-members-scrollY`]
 
     // Load default number of profiles on mount
     if (!vnode.state.initialProfilesLoaded) {
@@ -99,13 +94,13 @@ const MembersPage : m.Component<
 
       // Set initial number loaded (contingent on navigation)
       if (navigatedFromAccount) {
-        vnode.state.numProfilesLoaded = Math.min(Number(localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`]))
+        vnode.state.numProfilesLoaded = Math.min(Number(localStorage[`${app.activeChainId()}-members-numProfilesAlreadyLoaded`]))
       } else {
         vnode.state.numProfilesLoaded = Math.min(DEFAULT_MEMBER_REQ_SIZE, vnode.state.membersLoaded.length);
       }
       vnode.state.profilesFinishedLoading = vnode.state.numProfilesLoaded >= vnode.state.membersLoaded.length;
 
-      let profileInfos: ProfileInfo[] = vnode.state.membersLoaded.slice(0, vnode.state.numProfilesLoaded).map((member) => {
+      const profileInfos: ProfileInfo[] = vnode.state.membersLoaded.slice(0, vnode.state.numProfilesLoaded).map((member) => {
         return {profile: app.profiles.getProfile(member.chain, member.address), postCount: member.count}
       })
 
@@ -123,12 +118,12 @@ const MembersPage : m.Component<
     if (navigatedFromAccount && !vnode.state.initialScrollFinished) {
       vnode.state.initialScrollFinished = true
       setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeId()}-members-scrollY`]));
+        window.scrollTo(0, Number(localStorage[`${app.activeChainId()}-members-scrollY`]));
       }, 100);
     }
 
-    // Infinite Scroll 
-    $(window).off('scroll');    
+    // Infinite Scroll
+    $(window).off('scroll');
     vnode.state.onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
@@ -137,7 +132,7 @@ const MembersPage : m.Component<
           const lastLoadedProfileIndex = vnode.state.numProfilesLoaded
           const newBatchSize = Math.min(DEFAULT_MEMBER_REQ_SIZE, vnode.state.membersLoaded.length - lastLoadedProfileIndex)
           const newBatchEnd = lastLoadedProfileIndex + newBatchSize;
-          
+
           for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
             const member = vnode.state.membersLoaded[i];
             const profileInfo: ProfileInfo = {profile: app.profiles.getProfile(member.chain, member.address), postCount: member.count}
@@ -147,7 +142,7 @@ const MembersPage : m.Component<
           vnode.state.numProfilesLoaded += newBatchSize
           m.redraw();
         }
-      } 
+      }
     }, 400)
     $(window).on('scroll', vnode.state.onscroll)
 
@@ -169,11 +164,11 @@ const MembersPage : m.Component<
             return m('tr', [
               m('td.members-item-info', [
                 m('a', {
-                  href: `/${app.activeId()}/account/${profileInfo.profile.address}?base=${profileInfo.profile.chain}`,
+                  href: `/${app.activeChainId()}/account/${profileInfo.profile.address}?base=${profileInfo.profile.chain}`,
                   onclick: (e) => {
                     e.preventDefault();
-                    localStorage[`${app.activeId()}-members-scrollY`] = window.scrollY;
-                    localStorage[`${app.activeId()}-members-numProfilesAlreadyLoaded`] = vnode.state.numProfilesLoaded;
+                    localStorage[`${app.activeChainId()}-members-scrollY`] = window.scrollY;
+                    localStorage[`${app.activeChainId()}-members-numProfilesAlreadyLoaded`] = vnode.state.numProfilesLoaded;
                     navigateToSubpage(`/account/${profileInfo.profile.address}?base=${profileInfo.profile.chain}`);
                   }
                 }, [
@@ -184,7 +179,7 @@ const MembersPage : m.Component<
             ]);
         })]),
         m('.infinite-scroll-wrapper', [
-          vnode.state.profilesFinishedLoading ? 
+          vnode.state.profilesFinishedLoading ?
           m('.infinite-scroll-reached-end', [
             `Showing all ${vnode.state.membersLoaded.length} community members`,
           ]) :
@@ -199,7 +194,4 @@ const MembersPage : m.Component<
   }
 };
 
-const buildMemberProfiles = () => {
-
-}
 export default MembersPage;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'lib/normalize.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
@@ -18,7 +19,6 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import {
   ChainInfo,
-  CommunityInfo,
   NodeInfo,
   NotificationCategory,
   Notification,
@@ -26,7 +26,6 @@ import {
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
-import Community from 'controllers/chain/community/main';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -51,7 +50,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
     $.get(`${app.serverUrl()}/status`).then( async (data) => {
       app.config.chains.clear();
       app.config.nodes.clear();
-      app.config.communities.clear();
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active)
@@ -64,32 +62,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           address: node.address,
           token_name: node.token_name,
           eth_chain_id: node.eth_chain_id,
-        }));
-      });
-      data.communities.sort((a, b) => a.id - b.id).map((community) => {
-        return app.config.communities.add(CommunityInfo.fromJSON({
-          id: community.id,
-          name: community.name,
-          description: community.description,
-          icon_url: community.icon_url,
-          website: community.website,
-          discord: community.discord,
-          element: community.element,
-          telegram: community.telegram,
-          github: community.github,
-          default_chain: app.config.chains.getById(community.default_chain),
-          visible: community.visible,
-          collapsed_on_homepage: community.collapsed_on_homepage,
-          default_summary_view: community.default_summary_view,
-          invites_enabled: community.invites_enabled,
-          privacy_enabled: community.privacy_enabled,
-          featured_topics: community.featured_topics,
-          topics: community.topics,
-          stages_enabled: community.stages_enabled,
-          custom_stages: community.custom_stages,
-          custom_domain: community.custom_domain,
-          terms: community.terms,
-          admins_and_mods: [],
         }));
       });
       app.user.setRoles(data.roles);
@@ -135,11 +107,6 @@ export async function deinitChainOrCommunity() {
     console.log('Finished deinitializing chain');
     app.chain = null;
   }
-  if (app.community) {
-    await app.community.deinit();
-    console.log('Finished deinitializing community');
-    app.community = null;
-  }
   app.user.setSelectedNode(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
@@ -178,36 +145,6 @@ export async function handleUpdateEmailConfirmation() {
       notifySuccess('Email confirmed!');
     }
   }
-}
-
-export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
-  // Check for valid community selection, and that we need to switch
-  if (app.community && c === app.community.meta) return;
-
-  // Shut down old chain if applicable
-  await deinitChainOrCommunity();
-  document.title = `Commonwealth – ${c.name}`;
-
-  // Begin initializing the community
-  const newCommunity = new Community(c, app);
-  const finalizeInitialization = await newCommunity.init();
-
-  // If the user is still in the initializing community, finalize the
-  // initialization; otherwise, abort and return false
-  if (!finalizeInitialization) {
-    return false;
-  } else {
-    app.community = newCommunity;
-  }
-  console.log(`${c.name.toUpperCase()} started.`);
-
-  // Initialize available addresses
-  await updateActiveAddresses();
-
-  // Redraw with community fully loaded and return true to indicate
-  // initialization has finalized.
-  m.redraw();
-  return true;
 }
 
 // called by the user, when clicking on the chain/node switcher menu
@@ -395,15 +332,6 @@ export async function initChain(): Promise<void> {
   m.redraw();
 }
 
-export function initCommunity(communityId: string): Promise<boolean> {
-  const community = app.config.communities.getByCommunity(communityId);
-  if (community && community.length > 0) {
-    return selectCommunity(community[0]);
-  } else {
-    throw new Error(`No community found for '${communityId}'`);
-  }
-}
-
 export async function initNewTokenChain(address: string) {
   const response = await $.getJSON('/api/getTokenForum', { address, autocreate: true });
   if (response.status !== 'Success') {
@@ -445,7 +373,7 @@ m.route.set = (...args) => {
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
   if (!app.isCustomDomain()) {
-    args[0] = `/${app.activeId()}${args[0]}`;
+    args[0] = `/${app.activeChainId()}${args[0]}`;
   }
   m.route.set.apply(this, args);
 };

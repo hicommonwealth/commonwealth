@@ -10,7 +10,7 @@ class TopicStore extends IdStore<OffchainTopic> {
     // TODO: Remove this once we start enforcing an ordering in stores
     super.add(topic);
     this.getAll().sort(byAscendingCreationDate);
-    const parentEntity = topic.communityId ? topic.communityId : topic.chainId;
+    const parentEntity = topic.chainId;
     if (!this._topicsByCommunity[parentEntity]) {
       this._topicsByCommunity[parentEntity] = [];
     }
@@ -21,7 +21,7 @@ class TopicStore extends IdStore<OffchainTopic> {
 
   public remove(topic: OffchainTopic) {
     super.remove(topic);
-    const parentEntity = topic.communityId ? topic.communityId : topic.chainId;
+    const parentEntity = topic.chainId;
     const communityStore = this._topicsByCommunity[parentEntity];
     const matchingTopic = communityStore.filter((t) => t.id === topic.id)[0];
     const proposalIndex = communityStore.indexOf(matchingTopic);
