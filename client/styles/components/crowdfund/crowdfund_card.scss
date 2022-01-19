@@ -1,0 +1,14 @@
+@import '../../facelift.scss';
+
+.CrowdfundCard {
+    display: flex;
+    flex-direction: column;
+    .cf-header-panel {
+        flex: 1;
+        .cf-header-img {
+            height: 100%;
+            background-color: $disable-gray;
+        }
+    }
+    .cf
+}
