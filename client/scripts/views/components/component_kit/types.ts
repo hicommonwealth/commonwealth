@@ -8,7 +8,7 @@ export enum ComponentType {
   EngagementButton = 'EngagementButton',
 }
 
-export type StyleProps = {
+export type StyleAttrs = {
   disabled?: boolean;
   className?: string;
 };

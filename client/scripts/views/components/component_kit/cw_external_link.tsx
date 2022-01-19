@@ -11,14 +11,14 @@ export enum LinkType {
   Inline = 'inline',
 }
 
-type ExternalLinkProps = {
+type ExternalLinkAttrs = {
   label: string;
   target: string;
   linkType: LinkType;
 };
 
 // TODO: Graham 11/17/21 - Synchronize/reconcile against Mithril internal/external link helpers
-export const CWExternalLink: m.Component<ExternalLinkProps> = {
+export const CWExternalLink: m.Component<ExternalLinkAttrs> = {
   view: (vnode) => {
     const { label, target, linkType } = vnode.attrs;
     return (

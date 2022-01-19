@@ -3,19 +3,19 @@
 import m from 'mithril';
 import 'components/component_kit/cw_button.scss';
 
-import { ButtonType, ComponentType, StyleProps } from './types';
+import { ButtonType, ComponentType, StyleAttrs } from './types';
 import { getButtonClasses } from './helpers';
 
-export type ButtonStyleProps = {
+export type ButtonStyleAttrs = {
   buttonType: ButtonType;
-} & StyleProps;
+} & StyleAttrs;
 
-export type ButtonProps = {
+export type ButtonAttrs = {
   label: string;
   onclick: (e?: MouseEvent) => void;
-} & ButtonStyleProps;
+} & ButtonStyleAttrs;
 
-export const CWButton: m.Component<ButtonProps> = {
+export const CWButton: m.Component<ButtonAttrs> = {
   view: (vnode) => {
     const { onclick, label, disabled, className, buttonType } = vnode.attrs;
     return (
