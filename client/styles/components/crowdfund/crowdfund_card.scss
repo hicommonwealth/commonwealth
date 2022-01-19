@@ -1,66 +1,68 @@
 @import '../../facelift.scss';
 
 .CrowdfundCard {
-    display: flex;
-    flex-direction: column;
-    height: 256px;
-    width: 400px;
-    .cf-header-panel {
-        flex: 32;
-        height: 100%;
-        border-radius: 16px 16px 0 0;
-        background-color: $lite-gray;
-        .ChainIcon {
-            position: relative;
-            top: 11px;
-            left: 342px;
-        }
-    }
-    .cf-completion-bar {
-        flex: 1;
-        background-color: $disable-gray;
-        .completed-percentage {
+    &.large {
+        display: flex;
+        flex-direction: column;
+        height: 256px;
+        width: 400px;
+        .CrowdfundHeaderPanel {
+            flex: 32;
             height: 100%;
-            background-color: $carrib-green;
-        }
-    }
-    .cf-info-panel {
-        flex: 32;
-        border-radius: 0 0 16px 16px;
-        background-color: $background-gray;
-        padding: 12px 10px 0 20px;
-        .cf-info-header {
-            display: flex;
-            justify-content: space-between;
-            h3.cf-title {
-                @include header;
-                font-size: 24px;
-                color: $midi-gray;
-            }
-            .cf-block-count {
-                height: 18px;
-                padding: 2px 4px 0;
-                font-size: 14px;
-                color: $lite-gray;
-                background-color: $disable-gray;
-                border-radius: 6px;
+            border-radius: 16px 16px 0 0;
+            background-color: $lite-gray;
+            .ChainIcon {
+                position: relative;
+                top: 11px;
+                left: 342px;
             }
         }
-        .cf-info-body {
-            @include body;
-            color: $lite-gray;
-            font-size: 14px;
+        .CrowdfundCompletionBar {
+            flex: 1;
+            background-color: $disable-gray;
+            .completed-percentage {
+                height: 100%;
+                background-color: $carrib-green;
+            }
         }
-        .cf-info-footer {
-            margin-top: 5px;
-            .User {
+        .cf-info-panel {
+            flex: 32;
+            border-radius: 0 0 16px 16px;
+            background-color: $background-gray;
+            padding: 12px 10px 0 20px;
+            .cf-info-header {
                 display: flex;
-                .user-display-name {
-                    position: relative;
-                    top: 3px;
-                    margin-left: 4px;
-                    color: $lite-gray;
+                justify-content: space-between;
+                h3.cf-title {
+                    @include header;
+                    font-size: 24px;
+                    color: $midi-gray;
+                }
+                .cf-block-count {
+                    height: 18px;
+                    padding: 2px 4px 0;
                     font-size: 14px;
+                    color: $lite-gray;
+                    background-color: $disable-gray;
+                    border-radius: 6px;
+                }
+            }
+            .cf-info-body {
+                @include body;
+                color: $lite-gray;
+                font-size: 14px;
+            }
+            .cf-info-footer {
+                margin-top: 5px;
+                .User {
+                    display: flex;
+                    .user-display-name {
+                        position: relative;
+                        top: 3px;
+                        margin-left: 4px;
+                        color: $lite-gray;
+                        font-size: 14px;
+                    }
                 }
             }
         }
