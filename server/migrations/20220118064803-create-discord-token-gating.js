@@ -13,7 +13,7 @@ module.exports = {
       }, {transaction: t})
 
       // ensures that chain_id and token_id cannot both be null
-      await queryInterface.Sequelize.query(`
+      await queryInterface.sequelize.query(`
       ALTER TABLE "DiscordTokenGating"
         ADD CONSTRAINT CK_one_is_valid
           CHECK (

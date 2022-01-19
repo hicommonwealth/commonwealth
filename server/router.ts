@@ -615,7 +615,7 @@ function setupRouter(
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
 
-  router.get('/getTokenBalance', getTokenBalance.bind(this, models, tokenBalanceCache));
+  router.post('/getTokenBalance', getTokenBalance.bind(this, models, tokenBalanceCache));
 
   app.use('/api', router);
 }
