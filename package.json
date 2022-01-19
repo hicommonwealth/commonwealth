@@ -167,7 +167,7 @@
     "lity": "^2.3.1",
     "lodash": "^4.17.11",
     "magic-sdk": "^6.2.1",
-    "marked": "^2.0.5",
+    "marked": "^4.0.10",
     "mini-css-extract-plugin": "^0.4.4",
     "mithril": "^2.0.4",
     "mithril-datepicker": "^0.9.3",
