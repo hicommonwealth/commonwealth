@@ -20,11 +20,13 @@ import nacl from 'tweetnacl';
 import { StargateClient } from '@cosmjs/stargate';
 import { NotificationCategories, ChainBase, ChainNetwork } from '../../shared/types';
 import { ModelStatic } from './types';
+import { DB } from '../database';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes, UserInstance } from './user';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
+import { ProfileInstance } from './profile';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
@@ -72,6 +74,7 @@ export interface AddressCreationAttributes extends AddressAttributes {
 	) => Promise<AddressInstance>;
 
 	createWithToken?: (
+		models: DB,
 		user_id: number,
 		chain: string,
 		address: string,
@@ -93,7 +96,7 @@ export interface AddressCreationAttributes extends AddressAttributes {
 	) => Promise<AddressInstance>;
 
 	verifySignature?: (
-		models: any,
+		models: DB,
 		chain: ChainInstance,
 		addressModel: AddressInstance,
 		user_id: number,
@@ -155,7 +158,8 @@ export default (
 		return Address.create({ chain, address, verification_token, verification_token_expires });
 	};
 
-	Address.createWithToken = (
+	Address.createWithToken = async (
+		models: DB,
 		user_id: number,
 		chain: string,
 		address: string,
@@ -164,11 +168,11 @@ export default (
 		const verification_token = crypto.randomBytes(18).toString('hex');
 		const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
 		const last_active = new Date();
-		const default_profile = new models.Profiles.findOne({attributes:['id'],
-																										 where:{is_default: true,
-																														user_id: user_id}
-																										});
-		const profile_id = default_profile.get('id')
+		// TODO: is Profile guaranteed to exist?
+		const { id: profile_id } = await models.Profile.findOne({
+			attributes: ['id'],
+			where:{ is_default: true, user_id }},
+		);
 		return Address.create({
 			user_id, profile_id, chain, address, verification_token, verification_token_expires, keytype, last_active,
 		});
@@ -214,7 +218,7 @@ export default (
 	// passed from the frontend to show exactly what was signed.
 	// Supports Substrate, Ethereum, Cosmos, and NEAR.
 	Address.verifySignature = async (
-		models: any,
+		models: DB,
 		chain: ChainInstance,
 		addressModel: AddressInstance,
 		user_id: number,
@@ -402,7 +406,7 @@ export default (
 			addressModel.verified = new Date();
 			if (!addressModel.user_id) {
 				const user = await models.User.create({ email: null });
-				const profile = await models.Profile.create({ user_id: user.user_id });
+				const profile = await models.Profile.create({ user_id: user.id });
 				await models.Subscription.create({
 					subscriber_id: user.id,
 					category_id: NotificationCategories.NewMention,

@@ -2,11 +2,10 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 
 import { UserAttributes } from './user';
-import { AddressAttributes } from './address';
 import { ModelStatic } from './types';
 
 export interface ProfileAttributes {
-  id: number;
+  id?: number;
   user_id: number;
   created_at?: Date;
   updated_at?: Date;

@@ -76,6 +76,7 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
     // address doesn't exist, add it to the database
     try {
       const newObj = await models.Address.createWithToken(
+        models,
         req.user ? req.user.id : null,
         req.body.chain,
         encodedAddress,
