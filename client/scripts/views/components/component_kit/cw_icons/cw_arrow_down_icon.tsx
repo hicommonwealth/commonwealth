@@ -18,11 +18,7 @@ export const CWArrowDown: m.Component<IconStyleAttrs> = {
         fill="none"
         viewBox="0 0 15 10"
       >
-        <path
-          stroke="#999"
-          strokeLinecap="round"
-          d="M14.027.947L7.562 8.606 1.098.947"
-        />
+        <path stroke-linecap="round" d="M14.027.947L7.562 8.606 1.098.947" />
       </svg>
     );
   },
