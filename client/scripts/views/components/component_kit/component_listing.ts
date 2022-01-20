@@ -62,6 +62,7 @@ import {
   CWEngagementButton,
   EngagementButtonSize,
 } from './cw_engagement_button';
+import { CWIcon, IconType, IconSize as IconSize2 } from './cw_icon';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -130,6 +131,36 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
       ),
       m('h1', 'Redesign Icons'),
       m('.icon-listing', [
+        m(CWIcon, {
+          iconName: 'arrow-down',
+          iconSize: IconSize2.Small,
+          iconType: IconType.Primary,
+        }),
+        m(CWIcon, {
+          iconName: 'arrow-down',
+          iconSize: IconSize2.Medium,
+          iconType: IconType.Primary,
+        }),
+        m(CWIcon, {
+          iconName: 'arrow-down',
+          iconSize: IconSize2.Large,
+          iconType: IconType.Primary,
+        }),
+        m(CWIcon, {
+          iconName: 'arrow-right',
+          iconSize: IconSize2.Small,
+          iconType: IconType.Primary,
+        }),
+        m(CWIcon, {
+          iconName: 'arrow-right',
+          iconSize: IconSize2.Medium,
+          iconType: IconType.Primary,
+        }),
+        m(CWIcon, {
+          iconName: 'arrow-right',
+          iconSize: IconSize2.Large,
+          iconType: IconType.Primary,
+        }),
         displayIcons('14x14', {
           ArrowDownIcon: m(ArrowDownIcon, {
             size: IconSize.SM,

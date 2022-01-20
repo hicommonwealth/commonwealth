@@ -1,0 +1,55 @@
+@import 'client/styles/facelift';
+
+@mixin SVGIcon($color) {
+  path,
+  circle,
+  rect {
+    stroke: $color;
+  }
+}
+
+svg {
+  flex-shrink: 0;
+  height: 1em;
+  width: 1em;
+
+  &.small {
+    font-size: 14px;
+  }
+
+  &.medium {
+    font-size: 20px;
+  }
+
+  &.large {
+    font-size: 28px;
+  }
+
+  &.primary {
+    @include SVGIcon($black);
+  }
+
+  &.primary:hover {
+    @include SVGIcon($dark-purp);
+
+    &.disabled {
+      @include SVGIcon($disable-gray);
+    }
+  }
+
+  &.secondary {
+    @include SVGIcon($lite-gray);
+  }
+
+  &.secondary:hover {
+    @include SVGIcon($black);
+
+    &.disabled {
+      @include SVGIcon($disable-gray);
+    }
+  }
+
+  &.disabled {
+    @include SVGIcon($disable-gray);
+  }
+}

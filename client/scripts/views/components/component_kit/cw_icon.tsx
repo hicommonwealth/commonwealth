@@ -1,12 +1,14 @@
 /* @jsx m */
 
 import m from 'mithril';
-import 'components/component_kit/icons.scss';
+import 'components/component_kit/cw_icon.scss';
+
+import { IconName, icons } from './cw_icons/cw_icon_lookup';
 
 export enum IconSize {
-  'SM' = '14x14',
-  'MD' = '20x20',
-  'LG' = '28x28',
+  Small = 'small',
+  Medium = 'medium',
+  Large = 'large',
 }
 
 export enum IconType {
@@ -14,40 +16,18 @@ export enum IconType {
   Secondary = 'secondary',
 }
 
-export type IconAttrs = {
-  size?: IconSize;
+export type IconStyleAttrs = {
+  iconSize: IconSize;
   iconType: IconType;
   disabled?: boolean;
 };
 
-const appendTags = (attrs) => {
-  const { iconType, disabled, size } = attrs;
-  let tag = `svg.Icon`;
-  if (disabled) tag += '.disabled';
-  else if (iconType === IconType.Primary) tag += '.primary';
-  else if (iconType === IconType.Secondary) tag += '.secondary';
-  if (size === IconSize.SM) tag += '.sm';
-  if (size === IconSize.MD) tag += '.md';
-  if (size === IconSize.LG) tag += '.lg';
-  return tag;
-};
+export type IconAttrs = IconStyleAttrs & { iconName: IconName };
 
 export const CWIcon: m.Component<IconAttrs> = {
   view: (vnode) => {
-    return m(
-      appendTags(vnode.attrs),
-      {
-        width: '17',
-        height: '16',
-        fill: 'none',
-      },
-      [
-        m('path', {
-          d: 'm14.036 3.671-6.464 7.66-6.465-7.66',
-          'stroke-width': '2',
-          'stroke-linecap': 'round',
-        }),
-      ]
-    );
+    const { iconName, iconSize, iconType, disabled } = vnode.attrs;
+    const Icon = icons[iconName];
+    return m(Icon, { iconSize, iconType, disabled });
   },
 };
