@@ -1,8 +1,9 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 
-import { UserAttributes } from './user';
+import { UserAttributes, UserInstance } from './user';
 import { ModelStatic } from './types';
+import { AddressInstance } from './address';
 
 export interface ProfileAttributes {
   id?: number;
@@ -20,7 +21,10 @@ export interface ProfileAttributes {
 }
 
 export interface ProfileInstance
-extends Model<ProfileAttributes>, ProfileAttributes {}
+extends Model<ProfileAttributes>, ProfileAttributes {
+  getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
+  getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
+}
 
 export type ProfileModelStatic = ModelStatic<ProfileInstance>
 
@@ -30,15 +34,15 @@ export default (
 ): ProfileModelStatic => {
   const Profile = <ProfileModelStatic>sequelize.define(
     'Profile', {
-      id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
+      id: { type: dataTypes.INTEGER, autoIncrement: true, allowNull: false, primaryKey: true },
       user_id: { type: dataTypes.INTEGER, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
-      profile_name: { type: dataTypes.TEXT, allowNull: true },
-      email: { type: dataTypes.TEXT, allowNull: true },
-      website: { type: dataTypes.TEXT, allowNull: true },
+      profile_name: { type: dataTypes.STRING, allowNull: true },
+      email: { type: dataTypes.STRING, allowNull: true },
+      website: { type: dataTypes.STRING, allowNull: true },
       bio: { type: dataTypes.TEXT, allowNull: true },
-      is_default: { type: dataTypes.BOOLEAN, allowNull: false },
+      is_default: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     }, {
       tableName: 'Profiles',
       underscored: true,

@@ -112,6 +112,7 @@ const linkExistingAddressToChain = async (
     } else {
       const newObj = await models.Address.create({
         user_id: originalAddress.user_id,
+        profile_id: originalAddress.profile_id,
         address: encodedAddress,
         chain: req.body.chain,
         verification_token: verificationToken,

@@ -26,7 +26,7 @@ import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes, UserInstance } from './user';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
-import { ProfileInstance } from './profile';
+import { ProfileAttributes, ProfileInstance } from './profile';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 const log = factory.getLogger(formatFilename(__filename));
@@ -127,7 +127,7 @@ export default (
 		is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-		profile_id:    { type: dataTypes.INTEGER, allowNull: false, defaultValue: 0},
+		profile_id:    						  { type: dataTypes.INTEGER, allowNull: true },
 	}, {
 		timestamps: true,
 		createdAt: 'created_at',
@@ -169,10 +169,14 @@ export default (
 		const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
 		const last_active = new Date();
 		// TODO: is Profile guaranteed to exist?
-		const { id: profile_id } = await models.Profile.findOne({
-			attributes: ['id'],
-			where:{ is_default: true, user_id }},
-		);
+		let profile_id: number;
+		if (user_id) {
+			const profile = await models.Profile.findOne({
+				attributes: ['id'],
+				where: { is_default: true, user_id } },
+			);
+			profile_id = profile?.id;
+		}
 		return Address.create({
 			user_id, profile_id, chain, address, verification_token, verification_token_expires, keytype, last_active,
 		});
@@ -405,8 +409,8 @@ export default (
 			addressModel.verification_token_expires = null;
 			addressModel.verified = new Date();
 			if (!addressModel.user_id) {
-				const user = await models.User.create({ email: null });
-				const profile = await models.Profile.create({ user_id: user.id });
+				const user = await models.User.createWithProfile(models, { email: null });
+				addressModel.profile_id = (user.Profiles[0] as ProfileAttributes).id;
 				await models.Subscription.create({
 					subscriber_id: user.id,
 					category_id: NotificationCategories.NewMention,
@@ -426,6 +430,8 @@ export default (
 			addressModel.verification_token_expires = null;
 			addressModel.verified = new Date();
 			addressModel.user_id = user_id;
+			const profile = await models.Profile.findOne({ where: { user_id } });
+			addressModel.profile_id = profile.id;
 		}
 		await addressModel.save();
 		return isValid;
