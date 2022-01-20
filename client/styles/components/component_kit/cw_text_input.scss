@@ -29,32 +29,32 @@
       border: 2px solid $midi-purp;
     }
 
-    &.error {
-      border: 2px solid $pinky;
-      background-color: $flesh-pink;
-    }
-
-    &.validate {
+    &.success {
       border: 2px solid $dark-green;
       background-color: $mint-green;
     }
+
+    &.failure {
+      border: 2px solid $pinky;
+      background-color: $flesh-pink;
+    }
   }
 
-  &.error,
-  &.validate {
+  &.success,
+  &.failure {
     margin-bottom: 0px;
   }
 }
 
-.status {
+.validation-status {
   @include form-label;
   margin-top: 8px;
 
-  &.error {
-    color: $hype-red;
+  &.success {
+    color: $dark-green;
   }
 
-  &.validate {
-    color: $dark-green;
+  &.failure {
+    color: $hype-red;
   }
 }

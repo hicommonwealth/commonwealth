@@ -18,7 +18,7 @@ import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import TokenDecimalInput from '../components/token_decimal_input';
 import {
   CWTextInput,
-  TextInputStatus,
+  ValidationStatus,
 } from '../components/component_kit/cw_text_input';
 
 interface INewTopicModalForm {
@@ -106,7 +106,7 @@ const NewTopicModal: m.Component<
               const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
               if (disallowedCharMatches) {
                 return [
-                  TextInputStatus.Error,
+                  ValidationStatus.Failure,
                   `The ${pluralizeWithoutNumberPrefix(
                     disallowedCharMatches.length,
                     'char'
@@ -114,7 +114,7 @@ const NewTopicModal: m.Component<
                   ${disallowedCharMatches.join(', ')} are not permitted`,
                 ];
               } else {
-                return [TextInputStatus.Validate, 'Valid topic name'];
+                return [ValidationStatus.Success, 'Valid topic name'];
               }
             },
             autocomplete: 'off',

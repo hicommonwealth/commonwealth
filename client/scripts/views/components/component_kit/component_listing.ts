@@ -61,7 +61,7 @@ import {
   CWEngagementButton,
   EngagementButtonSize,
 } from './cw_engagement_button';
-import { CWTextInput, TextInputStatus } from './cw_text_input';
+import { CWTextInput, ValidationStatus } from './cw_text_input';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -447,11 +447,11 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         [
           m(CWTextInput, {
             name: 'Form field',
-            inputValidationFn: (val: string): [TextInputStatus, string] => {
+            inputValidationFn: (val: string): [ValidationStatus, string] => {
               if (val.match(/[^A-Za-z]/)) {
-                return [TextInputStatus.Error, 'Must enter characters A-Z'];
+                return [ValidationStatus.Failure, 'Must enter characters A-Z'];
               } else {
-                return [TextInputStatus.Validate, 'Input validated'];
+                return [ValidationStatus.Success, 'Input validated'];
               }
             },
             label: 'This input only accepts A-Z',

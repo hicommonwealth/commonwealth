@@ -5,16 +5,16 @@ import 'components/component_kit/cw_text_input.scss';
 
 import { ComponentType } from './types';
 
-export enum TextInputStatus {
-  Error = 'error',
-  Validate = 'validate',
+export enum ValidationStatus {
+  Success = 'success',
+  Failure = 'failure',
 }
 
 type TextInputProps = {
   autocomplete?: string;
   autofocus?: boolean;
   defaultValue?: string;
-  inputValidationFn?: (value: string) => [TextInputStatus, string];
+  inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   name: string;
   oninput?: (e) => void;
@@ -24,7 +24,7 @@ type TextInputProps = {
 
 type TextInputState = {
   statusMessage: string;
-  statusType: TextInputStatus;
+  validationStatus: ValidationStatus;
 };
 
 export const CWTextInput: m.Component<TextInputProps, TextInputState> = {
@@ -41,7 +41,7 @@ export const CWTextInput: m.Component<TextInputProps, TextInputState> = {
       tabindex,
     } = vnode.attrs;
 
-    const { statusMessage, statusType } = vnode.state;
+    const { statusMessage, validationStatus } = vnode.state;
 
     return (
       <div class={ComponentType.TextInput}>
@@ -49,7 +49,7 @@ export const CWTextInput: m.Component<TextInputProps, TextInputState> = {
         <input
           autofocus={autofocus}
           autocomplete={autocomplete}
-          class={statusType}
+          class={validationStatus}
           tabindex={tabindex}
           name={name}
           placeholder={placeholder}
@@ -57,11 +57,11 @@ export const CWTextInput: m.Component<TextInputProps, TextInputState> = {
           onfocusout={(e) => {
             if (inputValidationFn) {
               if (!e.target.value?.length) {
-                delete vnode.state.statusType;
+                delete vnode.state.validationStatus;
                 delete vnode.state.statusMessage;
                 m.redraw();
               } else {
-                [vnode.state.statusType, vnode.state.statusMessage] =
+                [vnode.state.validationStatus, vnode.state.statusMessage] =
                   inputValidationFn(e.target.value);
               }
             }
@@ -69,7 +69,9 @@ export const CWTextInput: m.Component<TextInputProps, TextInputState> = {
           defaultValue={defaultValue}
         />
         {statusMessage && (
-          <div class={`status ${statusType}`}>{statusMessage}</div>
+          <div class={`validation-status ${validationStatus}`}>
+            {statusMessage}
+          </div>
         )}
       </div>
     );
