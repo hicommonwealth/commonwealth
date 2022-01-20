@@ -23,10 +23,116 @@ import {
 import { NotificationCategories } from '../shared/types';
 import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
 
+enum Providers {
+  GITHUB = 'github',
+  DISCORD = 'discord',
+}
 const GithubStrategy = passportGithub.Strategy;
 const DiscordStrategy = passportDiscord.Strategy;
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
+
+async function authenticateSocialAccount(provider: Providers, req: Request, accessToken, refreshToken, profile, cb, models: DB) {
+  const str = '&state='
+  const splitState = req.url.substring(req.url.indexOf(str) + str.length)
+  const state = splitState.substring(splitState.indexOf('='));
+  if (state !== String(req.sessionID)) return cb(null, false)
+
+  const account = await models.SocialAccount.findOne({
+    where: {provider: provider, provider_userid: profile.id}
+  });
+
+  // Existing Github account. If there is already a user logged-in,
+  // transfer the Github link to the current user.
+  if (account !== null) {
+    // Handle OAuth for custom domains.
+    //
+    // If req.query.from is a valid custom domain for a community,
+    // associate our LoginToken with this Github account. We will
+    // redirect to [customdomain] afterwards and consume this
+    // LoginToken to get a new login session.
+    if ((req as any).loginTokenForRedirect) {
+      const tokenObj = await models.LoginToken.findOne({
+        where: {id: (req as any).loginTokenForRedirect}
+      });
+      tokenObj.social_account = account.id;
+      await tokenObj.save();
+    }
+
+    // Update profile data on the SocialAccount.
+    if (accessToken !== account.access_token
+        || refreshToken !== account.refresh_token
+        || profile.username !== account.provider_username) {
+      account.access_token = accessToken;
+      account.refresh_token = refreshToken;
+      account.provider_username = profile.username;
+      await account.save();
+    }
+
+    // Check associations and log in the correct user.
+    const user = await account.getUser();
+    if (req.user === null && user === null) {
+      const newUser = await models.User.create({email: null});
+      await account.setUser(newUser);
+      return cb(null, newUser);
+    } else if (req.user && req.user !== user) {
+      // Github user has a user attached, and we're logged in to
+      // a different user. Log out the previous user.
+      req.logout();
+      return cb(null, user);
+    } else {
+      // Github account has a user attached, and we either aren't
+      // logged in, or we're already logged in to that account.
+      return cb(null, user);
+    }
+  }
+
+  // New Github account. Either link it to the existing user, or
+  // create a new user. As a result it's possible that we end up
+  // with a user with multiple Github accounts linked.
+  const newAccount = await models.SocialAccount.create({
+    provider: provider,
+    provider_userid: profile.id,
+    provider_username: profile.username,
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
+
+  // Handle OAuth for custom domains.
+  //
+  // If req.query.from is a valid custom domain for a community,
+  // associate our LoginToken with this Github account. We will
+  // redirect to [customdomain] afterwards and consume this
+  // LoginToken to get a new login session.
+  if ((req as any).loginTokenForRedirect) {
+    const tokenObj = await models.LoginToken.findOne({
+      where: {id: (req as any).loginTokenForRedirect}
+    });
+    tokenObj.social_account = newAccount.id;
+    await tokenObj.save();
+  }
+
+  if (req.user) {
+    await newAccount.setUser(req.user);
+    return cb(null, req.user);
+  } else {
+    const newUser = await models.User.create({email: null});
+    await models.Subscription.create({
+      subscriber_id: newUser.id,
+      category_id: NotificationCategories.NewMention,
+      object_id: `user-${newUser.id}`,
+      is_active: true,
+    });
+    await models.Subscription.create({
+      subscriber_id: newUser.id,
+      category_id: NotificationCategories.NewCollaboration,
+      object_id: `user-${newUser.id}`,
+      is_active: true,
+    });
+    await newAccount.setUser(newUser);
+    return cb(null, newUser);
+  }
+}
 
 function setupPassport(models: DB) {
   passport.use(new JWTStrategy({
@@ -253,105 +359,7 @@ function setupPassport(models: DB) {
     callbackURL: GITHUB_OAUTH_CALLBACK,
     passReqToCallback: true,
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
-    const str = '&state='
-    const splitState = req.url.substring(req.url.indexOf(str) + str.length)
-    const state = splitState.substring(splitState.indexOf('='));
-    if (state !== String(req.sessionID)) return cb(null, false)
-
-    const githubAccount = await models.SocialAccount.findOne({
-      where: { provider: 'github', provider_userid: profile.id }
-    });
-
-    // Existing Github account. If there is already a user logged-in,
-    // transfer the Github link to the current user.
-    if (githubAccount !== null) {
-      // Handle OAuth for custom domains.
-      //
-      // If req.query.from is a valid custom domain for a community,
-      // associate our LoginToken with this Github account. We will
-      // redirect to [customdomain] afterwards and consume this
-      // LoginToken to get a new login session.
-      if ((req as any).loginTokenForRedirect) {
-        const tokenObj = await models.LoginToken.findOne({
-          where: { id: (req as any).loginTokenForRedirect }
-        });
-        tokenObj.social_account = githubAccount.id;
-        await tokenObj.save();
-      }
-
-      // Update profile data on the SocialAccount.
-      if (accessToken !== githubAccount.access_token
-        || refreshToken !== githubAccount.refresh_token
-        || profile.username !== githubAccount.provider_username) {
-        githubAccount.access_token = accessToken;
-        githubAccount.refresh_token = refreshToken;
-        githubAccount.provider_username = profile.username;
-        await githubAccount.save();
-      }
-
-      // Check associations and log in the correct user.
-      const user = await githubAccount.getUser();
-      if (req.user === null && user === null) {
-        const newUser = await models.User.create({ email: null });
-        await githubAccount.setUser(newUser);
-        return cb(null, newUser);
-      } else if (req.user && req.user !== user) {
-        // Github user has a user attached, and we're logged in to
-        // a different user. Log out the previous user.
-        req.logout();
-        return cb(null, user);
-      } else {
-        // Github account has a user attached, and we either aren't
-        // logged in, or we're already logged in to that account.
-        return cb(null, user);
-      }
-    }
-
-    // New Github account. Either link it to the existing user, or
-    // create a new user. As a result it's possible that we end up
-    // with a user with multiple Github accounts linked.
-    const newGithubAccount = await models.SocialAccount.create({
-      provider: 'github',
-      provider_userid: profile.id,
-      provider_username: profile.username,
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-
-    // Handle OAuth for custom domains.
-    //
-    // If req.query.from is a valid custom domain for a community,
-    // associate our LoginToken with this Github account. We will
-    // redirect to [customdomain] afterwards and consume this
-    // LoginToken to get a new login session.
-    if ((req as any).loginTokenForRedirect) {
-      const tokenObj = await models.LoginToken.findOne({
-        where: { id: (req as any).loginTokenForRedirect }
-      });
-      tokenObj.social_account = newGithubAccount.id;
-      await tokenObj.save();
-    }
-
-    if (req.user) {
-      await newGithubAccount.setUser(req.user);
-      return cb(null, req.user);
-    } else {
-      const newUser = await models.User.create({ email: null });
-      await models.Subscription.create({
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewMention,
-        object_id: `user-${newUser.id}`,
-        is_active: true,
-      });
-      await models.Subscription.create({
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${newUser.id}`,
-        is_active: true,
-      });
-      await newGithubAccount.setUser(newUser);
-      return cb(null, newUser);
-    }
+    await authenticateSocialAccount(Providers.GITHUB, req, accessToken, refreshToken, profile, cb, models)
   }));
 
   if (DISCORD_CLIENT_ID && DISCORD_CLIENT_SECRET && DISCORD_OAUTH_CALLBACK) passport.use(new DiscordStrategy({
@@ -362,107 +370,9 @@ function setupPassport(models: DB) {
     passReqToCallback: true,
     authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none'
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
-    // prevents Cross-site request forgery and Clickjacking
-    const str = '&state='
-    const splitState = req.url.substring(req.url.indexOf(str) + str.length)
-    const state = splitState.substring(splitState.indexOf('='));
-    if (state !== String(req.sessionID)) return cb(null, false)
-
-    const discordAccount = await models.SocialAccount.findOne({
-      where: { provider: 'discord', provider_userid: profile.id }
-    });
-
-    // Existing Discord account. If there is already a user logged-in,
-    // transfer the Discord link to the current user.
-    if (discordAccount !== null) {
-      // Handle OAuth for custom domains.
-      //
-      // If req.query.from is a valid custom domain for a community,
-      // associate our LoginToken with this Discord account. We will
-      // redirect to [customdomain] afterwards and consume this
-      // LoginToken to get a new login session.
-      if ((req as any).loginTokenForRedirect) {
-        const tokenObj = await models.LoginToken.findOne({
-          where: { id: (req as any).loginTokenForRedirect }
-        });
-        tokenObj.social_account = discordAccount.id;
-        await tokenObj.save();
-      }
-
-      // Update profile data on the SocialAccount.
-      if (accessToken !== discordAccount.access_token
-          || refreshToken !== discordAccount.refresh_token
-          || profile.username !== discordAccount.provider_username) {
-        discordAccount.access_token = accessToken;
-        discordAccount.refresh_token = refreshToken;
-        discordAccount.provider_username = profile.username;
-        await discordAccount.save();
-      }
-
-      // Check associations and log in the correct user.
-      const user = await discordAccount.getUser();
-      if (req.user === null && user === null) {
-        const newUser = await models.User.create({ email: null });
-        await discordAccount.setUser(newUser);
-        return cb(null, newUser);
-      } else if (req.user && req.user !== user) {
-        // Discord user has a user attached, and we're logged in to
-        // a different user. Log out the previous user.
-        req.logout();
-        return cb(null, user);
-      } else {
-        // Discord account has a user attached, and we either aren't
-        // logged in, or we're already logged in to that account.
-        return cb(null, user);
-      }
-    }
-
-    // New Discord account. Either link it to the existing user, or
-    // create a new user. As a result it's possible that we end up
-    // with a user with multiple Discord accounts linked.
-    const newDiscordAccount = await models.SocialAccount.create({
-      provider: 'discord',
-      provider_userid: profile.id,
-      provider_username: profile.username,
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-
-    // Handle OAuth for custom domains.
-    //
-    // If req.query.from is a valid custom domain for a community,
-    // associate our LoginToken with this Discord account. We will
-    // redirect to [customdomain] afterwards and consume this
-    // LoginToken to get a new login session.
-    if ((req as any).loginTokenForRedirect) {
-      const tokenObj = await models.LoginToken.findOne({
-        where: { id: (req as any).loginTokenForRedirect }
-      });
-      tokenObj.social_account = newDiscordAccount.id;
-      await tokenObj.save();
-    }
-
-    if (req.user) {
-      await newDiscordAccount.setUser(req.user);
-      return cb(null, req.user);
-    } else {
-      const newUser = await models.User.create({ email: null });
-      await models.Subscription.create({
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewMention,
-        object_id: `user-${newUser.id}`,
-        is_active: true,
-      });
-      await models.Subscription.create({
-        subscriber_id: newUser.id,
-        category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${newUser.id}`,
-        is_active: true,
-      });
-      await newDiscordAccount.setUser(newUser);
-      return cb(null, newUser);
-    }
+    await authenticateSocialAccount(Providers.DISCORD,  req, accessToken, refreshToken, profile, cb, models)
   }))
+
   passport.serializeUser<any>((user, done) => {
     getStatsDInstance().increment('cw.users.logged_in');
     if (user?.id) {
