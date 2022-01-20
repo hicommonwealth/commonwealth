@@ -96,18 +96,18 @@ const linkExistingAddressToChain = async (
       where: { chain: req.body.chain, address: encodedAddress }
     });
 
-    let addressId;
+    let addressId: number;
     if (existingAddress) {
       // refer edge case 2)
       // either if the existing address is owned by someone else or this user,
       //   we can just update with userId. this covers both edge case (1) & (2)
-      const updatedObj = await models.Address.updateWithTokenProvided(
-        existingAddress,
-        userId,
-        req.body.keytype,
-        verificationToken,
-        verificationTokenExpires
-      );
+      // Address.updateWithTokenProvided
+      existingAddress.user_id = userId;
+      existingAddress.keytype = req.body.keytype;
+      existingAddress.verification_token = verificationToken;
+      existingAddress.verification_token_expires = verificationTokenExpires;
+      existingAddress.last_active = new Date();
+		  const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
     } else {
       const newObj = await models.Address.create({
