@@ -53,15 +53,11 @@ import {
 import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
 import { CWButton } from './cw_button';
-import { ButtonType } from './types';
 import { CWGradientButton } from './cw_gradient_button';
 import { CWButtonGroup } from './cw_button_group';
-import { CWExternalLink, LinkType } from './cw_external_link';
+import { CWExternalLink } from './cw_external_link';
 import { CWRadioGroup } from './cw_radio_group';
-import {
-  CWEngagementButton,
-  EngagementButtonSize,
-} from './cw_engagement_button';
+import { CWEngagementButton } from './cw_engagement_button';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -238,29 +234,26 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         },
         [
           m(CWButton, {
-            buttonType: ButtonType.Primary,
             label: 'Primary',
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(CWButton, {
-            buttonType: ButtonType.Primary,
             disabled: true,
             label: 'Disabled',
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(CWButton, {
-            buttonType: ButtonType.Secondary,
+            buttonType: 'secondary',
             label: 'Secondary',
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(CWButton, {
-            buttonType: ButtonType.Secondary,
+            buttonType: 'secondary',
             disabled: true,
             label: 'Disabled',
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(CWGradientButton, {
-            buttonType: ButtonType.Primary,
             label: 'Primary',
             onclick: () => notifySuccess('Button clicked!'),
           }),
@@ -270,22 +263,18 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         m(CWButtonGroup, {
           children: [
             m(CWButton, {
-              buttonType: ButtonType.Primary,
               label: 'One',
               onclick: () => notifySuccess('One clicked!'),
             }),
             m(CWButton, {
-              buttonType: ButtonType.Primary,
               label: 'Two',
               onclick: () => notifySuccess('Two clicked!'),
             }),
             m(CWButton, {
-              buttonType: ButtonType.Primary,
               label: 'Three',
               onclick: () => notifySuccess('Three clicked!'),
             }),
             m(CWButton, {
-              buttonType: ButtonType.Primary,
               label: 'Four',
               onclick: () => notifySuccess('Four clicked!'),
             }),
@@ -301,12 +290,12 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           m(CWExternalLink, {
             label: 'Button external link',
             target: 'https://edgewa.re/',
-            linkType: LinkType.Button,
+            linkType: 'button',
           }),
           m(CWExternalLink, {
             label: 'Inline external link',
             target: 'https://edgewa.re/',
-            linkType: LinkType.Inline,
+            linkType: 'button',
           }),
         ]
       ),
@@ -332,23 +321,23 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         },
         [
           m(CWEngagementButton, {
-            size: EngagementButtonSize.Small,
+            buttonSize: 'sm',
             label: 'Small',
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(CWEngagementButton, {
-            size: EngagementButtonSize.Large,
+            buttonSize: 'lg',
             label: 'Big',
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(CWEngagementButton, {
-            size: EngagementButtonSize.Small,
+            buttonSize: 'sm',
             label: 'Small',
             disabled: true,
             onclick: () => notifySuccess('Button clicked!'),
           }),
           m(CWEngagementButton, {
-            size: EngagementButtonSize.Large,
+            buttonSize: 'lg',
             label: 'Big',
             disabled: true,
             onclick: () => notifySuccess('Button clicked!'),
