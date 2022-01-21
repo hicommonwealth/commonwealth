@@ -57,14 +57,6 @@ export class NearAccount extends Account<NearToken> {
       publicKey: Buffer.from(publicKey.data).toString('base64')
     });
   }
-
-  protected addressFromMnemonic(mnemonic: string): Promise<string> {
-    throw new Error('not valid on Near protocol');
-  }
-
-  protected addressFromSeed(seed: string): Promise<string> {
-    throw new Error('not valid on Near protocol');
-  }
 }
 
 export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
