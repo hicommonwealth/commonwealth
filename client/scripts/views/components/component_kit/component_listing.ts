@@ -61,7 +61,7 @@ import {
   CWEngagementButton,
   EngagementButtonSize,
 } from './cw_engagement_button';
-import { CardElevation, CWCard } from './cw_card';
+import { CWCard } from './cw_card';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -360,7 +360,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         m(
           CWCard,
           {
-            elevation: CardElevation.Elevation1,
+            elevation: 'elevation-1',
             interactive: true,
             onclick: () => notifySuccess('Card clicked!'),
           },
@@ -369,7 +369,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         m(
           CWCard,
           {
-            elevation: CardElevation.Elevation2,
+            elevation: 'elevation-2',
             interactive: true,
             onclick: () => notifySuccess('Card clicked!'),
           },
@@ -378,7 +378,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         m(
           CWCard,
           {
-            elevation: CardElevation.Elevation3,
+            elevation: 'elevation-3',
             interactive: true,
             onclick: () => notifySuccess('Card clicked!'),
           },
@@ -388,7 +388,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
       m(
         CWCard,
         {
-          elevation: CardElevation.Elevation1,
+          elevation: 'elevation-1',
           interactive: true,
           fullWidth: true,
         },
@@ -397,7 +397,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
       m(
         CWCard,
         {
-          elevation: CardElevation.Elevation1,
+          elevation: 'elevation-1',
           interactive: true,
           className: 'form-card',
         },

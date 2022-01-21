@@ -7,7 +7,7 @@ import app from 'state';
 import { ChainInfo, NodeInfo } from 'models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ButtonType } from '../../components/component_kit/types';
-import { CardElevation, CWCard } from '../../components/component_kit/cw_card';
+import { CWCard } from '../../components/component_kit/cw_card';
 
 var numeral = require('numeral');
 
@@ -63,7 +63,7 @@ const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
     return m(
       CWCard,
       {
-        elevation: CardElevation.Elevation2,
+        elevation: 'elevation-2',
         interactive: true,
         className: 'chain-card',
         onclick: redirectFunction,
@@ -119,7 +119,7 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
     return m(
       CWCard,
       {
-        elevation: CardElevation.Elevation2,
+        elevation: 'elevation-2',
         interactive: true,
         className: 'chain-card',
         onclick: redirectFunction,
@@ -154,7 +154,7 @@ const LockdropToolsCard: m.Component = {
     return m(
       CWCard,
       {
-        elevation: CardElevation.Elevation2,
+        elevation: 'elevation-2',
         interactive: true,
         className: 'chain-card',
       },
@@ -191,7 +191,7 @@ const NewCommunityCard: m.Component = {
     return m(
       CWCard,
       {
-        elevation: CardElevation.Elevation2,
+        elevation: 'elevation-2',
         interactive: true,
         className: 'chain-card',
         onclick: (e) => {

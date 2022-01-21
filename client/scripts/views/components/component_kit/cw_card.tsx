@@ -5,11 +5,7 @@ import 'components/component_kit/cw_card.scss';
 
 import { ComponentType } from './types';
 
-export enum CardElevation {
-  Elevation1 = 'elevation-1',
-  Elevation2 = 'elevation-2',
-  Elevation3 = 'elevation-3',
-}
+export type CardElevation = 'elevation-1' | 'elevation-2' | 'elevation-3';
 
 type CardStyleAttrs = {
   elevation?: CardElevation;
