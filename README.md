@@ -95,6 +95,9 @@ Environment variables used for external services include:
 - MAGIC_API_KEY
 - MAGIC_SUPPORTED_BASES
 - MAGIC_DEFAULT_CHAIN
+- DISCORD_CLIENT_ID: for Discord OAuth login
+- DISCORD_CLIENT_SECRET: for Discord OAuth login
+- DISCORD_OAUTH_SCOPES: scopes (usually just 'identify')
 
 We also use certain environment variables to configure the application itself:
 
