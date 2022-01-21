@@ -7,7 +7,6 @@ import app from 'state';
 import { ChainInfo, NodeInfo } from 'models';
 import { FaceliftCard } from '../../components/component_kit/cards';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ButtonType } from '../../components/component_kit/types';
 
 var numeral = require('numeral');
 
@@ -81,7 +80,7 @@ const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
           m('.card-description', { lang: 'en' }, pretty_description),
           m('.join-button-wrapper', [
             m(CWButton, {
-              buttonType: ButtonType.Secondary,
+              buttonType: 'secondary',
               label: 'See More',
               onclick: redirectFunction,
             }),
@@ -137,7 +136,7 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
           m('.card-description', { lang: 'en' }, pretty_description),
           m('.join-button-wrapper', [
             m(CWButton, {
-              buttonType: ButtonType.Secondary,
+              buttonType: 'secondary',
               disabled: false,
               label: 'See More',
               onclick: redirectFunction,
@@ -162,7 +161,6 @@ const LockdropToolsCard: m.Component = {
         m('.lockdrop-card-body', [
           m('h3', 'Edgeware Lockdrop Tools'),
           m(CWButton, {
-            buttonType: ButtonType.Primary,
             onclick: (e) => {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;
@@ -172,7 +170,6 @@ const LockdropToolsCard: m.Component = {
           }),
           m('.spacer', []),
           m(CWButton, {
-            buttonType: ButtonType.Primary,
             onclick: (e) => {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;

@@ -6,10 +6,7 @@ import 'components/component_kit/cw_external_link.scss';
 import { ExternalLinkIcon } from './icons';
 import { ComponentType } from './types';
 
-export enum LinkType {
-  Button = 'button',
-  Inline = 'inline',
-}
+export type LinkType = 'button' | 'inline';
 
 type ExternalLinkAttrs = {
   label: string;

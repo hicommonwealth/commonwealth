@@ -20,7 +20,6 @@ import { ChainIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { CommunityOptionsPopover } from './pages/discussions';
-import { ButtonType } from './components/component_kit/types';
 import { CWGradientButton } from './components/component_kit/cw_gradient_button';
 
 const Sublayout: m.Component<
@@ -100,7 +99,7 @@ const Sublayout: m.Component<
     ]);
 
     const hiringButton = m(CWGradientButton, {
-      buttonType: ButtonType.Secondary,
+      buttonType: 'secondary',
       disabled: false,
       className: 'hiringBtn',
       label: "We're hiring!",

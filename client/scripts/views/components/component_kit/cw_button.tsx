@@ -7,7 +7,7 @@ import { ButtonType, ComponentType, StyleAttrs } from './types';
 import { getButtonClasses } from './helpers';
 
 export type ButtonStyleAttrs = {
-  buttonType: ButtonType;
+  buttonType?: ButtonType;
 } & StyleAttrs;
 
 export type ButtonAttrs = {
@@ -17,7 +17,13 @@ export type ButtonAttrs = {
 
 export const CWButton: m.Component<ButtonAttrs> = {
   view: (vnode) => {
-    const { onclick, label, disabled, className, buttonType } = vnode.attrs;
+    const {
+      buttonType = 'primary',
+      className,
+      disabled = false,
+      label,
+      onclick,
+    } = vnode.attrs;
     return (
       <button
         class={getButtonClasses(ComponentType.Button, {
