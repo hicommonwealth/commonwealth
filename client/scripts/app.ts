@@ -797,6 +797,16 @@ Promise.all([
     } catch (e) {
       console.log('Error restoring path from localStorage');
     }
+  } else if (localStorage && localStorage.getItem && localStorage.getItem('discordPostAuthRedirect')) {
+    try {
+      const postAuth = JSON.parse(localStorage.getItem('discordPostAuthRedirect'));
+      if (postAuth.path && (+new Date() - postAuth.timestamp < 30 * 1000)) {
+        m.route.set(postAuth.path, {}, { replace: true });
+      }
+      localStorage.removeItem('discordPostAuthRedirect');
+    } catch (e) {
+      console.log('Error restoring path from localStorage');
+    }
   }
   if (m.route.param('loggedin')) {
     notifySuccess('Logged in!');
