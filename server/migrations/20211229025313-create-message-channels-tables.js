@@ -18,7 +18,8 @@ module.exports = {
       await queryInterface.addConstraint("ChatChannels", {
         type: 'unique',
         fields: ['name', 'community_id'],
-        name: 'chat_channel_unique_composite_constraint'
+        name: 'chat_channel_unique_composite_constraint',
+        transaction: t
       });
 
       await queryInterface.sequelize.query(`
