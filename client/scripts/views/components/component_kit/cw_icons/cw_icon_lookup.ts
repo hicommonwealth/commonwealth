@@ -1,9 +1,9 @@
-import { CWArrowDown } from './cw_arrow_down_icon';
-import { CWArrowRight } from './cw_arrow_right_icon';
+import * as Icons from './cw_icons';
 
 export const icons = {
-  'arrow-down': CWArrowDown,
-  'arrow-right': CWArrowRight,
+  views: Icons.CWViews,
+  create: Icons.CWCreate,
+  'external-link': Icons.CWExternalLink,
 };
 
 export type IconName = keyof typeof icons;

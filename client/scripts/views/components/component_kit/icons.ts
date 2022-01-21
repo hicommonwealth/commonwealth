@@ -26,60 +26,6 @@ const appendTags = (className: string, attrs) => {
   return tag;
 };
 
-export const ArrowDownIcon: m.Component<
-  {
-    size?: IconSize;
-    intent: IconIntent;
-    disabled?: boolean;
-  },
-  {}
-> = {
-  view: (vnode) => {
-    return m(
-      appendTags('ArrowDownIcon', vnode.attrs),
-      {
-        width: '17',
-        height: '16',
-        fill: 'none',
-      },
-      [
-        m('path', {
-          d: 'm14.036 3.671-6.464 7.66-6.465-7.66',
-          'stroke-width': '2',
-          'stroke-linecap': 'round',
-        }),
-      ]
-    );
-  },
-};
-
-export const ArrowRightIcon: m.Component<
-  {
-    size?: IconSize;
-    intent: IconIntent;
-    disabled?: boolean;
-  },
-  {}
-> = {
-  view: (vnode) => {
-    return m(
-      appendTags('ArrowRightIcon', vnode.attrs),
-      {
-        width: '15',
-        height: '15',
-        fill: 'none',
-      },
-      [
-        m('path', {
-          d: 'm4.027 1.036 7.658 6.465-7.658 6.464',
-          'stroke-width': '2',
-          'stroke-linecap': 'round',
-        }),
-      ]
-    );
-  },
-};
-
 export const ReplyIcon: m.Component<
   {
     size: IconSize;
@@ -356,29 +302,6 @@ export const AccountIcon: m.Component<
           ]
         ),
     ];
-  },
-};
-
-export const ExternalLinkIcon: m.Component<{
-  size?: IconSize;
-  disabled?: boolean;
-}> = {
-  view: (vnode) => {
-    return m(
-      appendTags('ExternalLinkIcon', vnode.attrs),
-      {
-        width: '15',
-        height: '15',
-        fill: 'none',
-      },
-      [
-        m('path', {
-          d: 'M5.673 1.273H3.036a2 2 0 0 0-2 2V12a2 2 0 0 0 2 2h8.727a2 2 0 0 0 2-2V9.364m-5.97-8.091h5.97m0 0v5.97m0-5.97L7.399 7.636',
-          'stroke-width': '1.5',
-          stroke: '#4723AD',
-        }),
-      ]
-    );
   },
 };
 

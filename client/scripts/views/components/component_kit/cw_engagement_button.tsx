@@ -3,9 +3,9 @@
 import m from 'mithril';
 import 'components/component_kit/cw_engagement_button.scss';
 
-import { CreateIcon, IconSize, IconIntent } from './icons';
 import { ComponentType, StyleAttrs } from './types';
 import { getButtonClasses } from './helpers';
+import { CWIcon } from './cw_icons/cw_icon';
 
 export enum EngagementButtonSize {
   Small = 'sm',
@@ -34,10 +34,9 @@ export const CWEngagementButton: m.Component<EngagementButtonAttrs> = {
         })}
         onclick={onclick}
       >
-        {m(CreateIcon, {
-          size: IconSize.MD,
+        {m(CWIcon, {
           disabled,
-          intent: IconIntent.Primary,
+          iconName: 'create',
         })}
         <span>{label}</span>
       </button>

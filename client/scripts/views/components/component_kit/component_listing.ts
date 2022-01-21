@@ -27,29 +27,6 @@ import {
   TabItem,
   Table,
 } from 'construct-ui';
-import {
-  ArrowDownIcon,
-  ArrowRightIcon,
-  LikesIcon,
-  ReplyIcon,
-  ViewsIcon,
-  ShareIcon,
-  AccountIcon,
-  CopyIcon,
-  CreateIcon,
-  NotificationIcon,
-  XIcon,
-  SearchIcon,
-  ElementIcon,
-  DiscordIcon,
-  TelegramIcon,
-  GithubIcon,
-  IconSize,
-  ExternalLinkIcon,
-  PinIcon,
-  IconIntent,
-  WebsiteIcon,
-} from './icons';
 import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
 import { CWButton } from './cw_button';
@@ -62,7 +39,7 @@ import {
   CWEngagementButton,
   EngagementButtonSize,
 } from './cw_engagement_button';
-import { CWIcon, IconType, IconSize as IconSize2 } from './cw_icon';
+import { CWIcon } from './cw_icons/cw_icon';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -80,15 +57,6 @@ const displayGradients = (gradientNames: string[]) => {
       m('.gradient-sample', { class: gradient }),
     ]);
   });
-};
-
-const displayIcons = (headerText: string, iconList) => {
-  return m('.icon-gallery', [
-    m('h2', headerText),
-    Object.entries(iconList).map(([k, v]) => {
-      return m('.icon-row', [m('.icon-name', k), v]);
-    }),
-  ]);
 };
 
 const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
@@ -132,133 +100,15 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
       m('h1', 'Redesign Icons'),
       m('.icon-listing', [
         m(CWIcon, {
-          iconName: 'arrow-down',
-          iconSize: IconSize2.Small,
-          iconType: IconType.Primary,
+          iconName: 'views',
+          iconSize: 'small',
         }),
         m(CWIcon, {
-          iconName: 'arrow-down',
-          iconSize: IconSize2.Medium,
-          iconType: IconType.Primary,
+          iconName: 'views',
         }),
         m(CWIcon, {
-          iconName: 'arrow-down',
-          iconSize: IconSize2.Large,
-          iconType: IconType.Primary,
-        }),
-        m(CWIcon, {
-          iconName: 'arrow-right',
-          iconSize: IconSize2.Small,
-          iconType: IconType.Primary,
-        }),
-        m(CWIcon, {
-          iconName: 'arrow-right',
-          iconSize: IconSize2.Medium,
-          iconType: IconType.Primary,
-        }),
-        m(CWIcon, {
-          iconName: 'arrow-right',
-          iconSize: IconSize2.Large,
-          iconType: IconType.Primary,
-        }),
-        displayIcons('14x14', {
-          ArrowDownIcon: m(ArrowDownIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: false,
-          }),
-          ArrowRightIcon: m(ArrowRightIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: false,
-          }),
-          ViewsIcon: m(ViewsIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: true,
-          }),
-          LikesIcon: m(LikesIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: true,
-          }),
-          ReplyIcon: m(ReplyIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: true,
-          }),
-          ExternalLinkIcon: m(ExternalLinkIcon, {
-            size: IconSize.SM,
-          }),
-        }),
-        // search, pin, create, notification, account
-        displayIcons('20x20', {
-          ShareIcon: m(ShareIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          SubscribeIcon: m(NotificationIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          CreateIcon: m(CreateIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          LikesIcon: m(LikesIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          ReplyIcon: m(ReplyIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          SearchIcon: m(SearchIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Secondary,
-          }),
-          PinIcon: m(PinIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Secondary,
-          }),
-          NotificationIcon: m(NotificationIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          AccountIcon: m(AccountIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          // FilterIcon: m(FilterIcon),
-        }),
-        displayIcons('28x28', {
-          CopyIcon: m(CopyIcon, {
-            size: IconSize.LG,
-            intent: IconIntent.Secondary,
-          }),
-          XIcon: m(XIcon, {
-            size: IconSize.LG,
-            intent: IconIntent.Secondary,
-          }),
-          AccountIcon: m(AccountIcon, {
-            size: IconSize.LG,
-            intent: IconIntent.Primary,
-          }),
-          // ReplyIcon: m(ReplyIcon, {
-          //   size: IconSize.LG,
-          //   intent: IconIntent.Primary,
-          // }),
-          NotificationIcon: m(NotificationIcon, {
-            size: IconSize.LG,
-            intent: IconIntent.Primary,
-          }),
-        }),
-        displayIcons('Social', {
-          ElementIcon: m(ElementIcon),
-          DiscordIcon: m(DiscordIcon),
-          TelegramIcon: m(TelegramIcon),
-          GithubIcon: m(GithubIcon),
-          WebsiteIcon: m(WebsiteIcon),
+          iconName: 'views',
+          iconSize: 'large',
         }),
       ]),
       m('h1', 'Redesign Buttons'),

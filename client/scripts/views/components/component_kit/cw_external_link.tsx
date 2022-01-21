@@ -3,8 +3,8 @@
 import m from 'mithril';
 import 'components/component_kit/cw_external_link.scss';
 
-import { ExternalLinkIcon } from './icons';
 import { ComponentType } from './types';
+import { CWIcon } from './cw_icons/cw_icon';
 
 export enum LinkType {
   Button = 'button',
@@ -29,7 +29,9 @@ export const CWExternalLink: m.Component<ExternalLinkAttrs> = {
         rel="noopener noreferrer"
       >
         <span>{label}</span>
-        {m(ExternalLinkIcon)}
+        {m(CWIcon, {
+          iconName: 'external-link',
+        })}
       </a>
     );
   },

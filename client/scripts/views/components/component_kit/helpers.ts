@@ -1,6 +1,6 @@
 import { ButtonStyleAttrs } from './cw_button';
 import { EngagementButtonStyleAttrs } from './cw_engagement_button';
-import { IconStyleAttrs } from './cw_icon';
+import { IconStyleAttrs } from './cw_icons/cw_icon';
 
 export const getButtonClasses = (
   componentType: string,
