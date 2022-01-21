@@ -14,9 +14,11 @@ import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
-import { ButtonIntent, FaceliftButton, FaceliftGradientButton, GradientType } from 'views/components/component_kit/buttons';
 import { SearchBar } from './components/search_bar';
 import { CommunityOptionsPopover } from './pages/discussions';
+import { ButtonIntent, FaceliftButton, FaceliftGradientButton, GradientType } from 'views/components/component_kit/buttons';
+import { ConsoleLoggerImpl } from 'typescript-logging';
+
 
 const Sublayout: m.Component<{
   // overrides
@@ -127,6 +129,7 @@ const Sublayout: m.Component<{
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }
 
+    const sidebarOpen = app.chain !== null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
     return [
@@ -158,11 +161,11 @@ const Sublayout: m.Component<{
                   localStorage.setItem(`${app.activeChainId()}-tos`, 'off');
                 } }, 'X')
             ]) : '',
-          m('.sublayout-body', [
+          m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
+            m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
+          ]),
+          m(!sidebarOpen ? '.sublayout-body' : '.sublayout-body-sidebar' , [
             m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
-              !hideSidebar && m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
-                m(Sidebar, { useQuickSwitcher }),
-              ]),
               m('.sublayout-main-col', {
                 class: !rightContent && 'no-right-content'
               }, [
