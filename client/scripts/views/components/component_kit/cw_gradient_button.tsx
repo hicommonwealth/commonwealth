@@ -9,7 +9,13 @@ import { ButtonAttrs } from './cw_button';
 
 export const CWGradientButton: m.Component<ButtonAttrs> = {
   view: (vnode) => {
-    const { onclick, label, disabled, className, buttonType } = vnode.attrs;
+    const {
+      buttonType = 'primary',
+      className,
+      disabled = false,
+      label,
+      onclick,
+    } = vnode.attrs;
     return (
       <button
         class={getButtonClasses(ComponentType.GradientButton, {

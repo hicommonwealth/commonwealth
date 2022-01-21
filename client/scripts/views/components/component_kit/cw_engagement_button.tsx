@@ -7,13 +7,10 @@ import { ComponentType, StyleAttrs } from './types';
 import { getButtonClasses } from './helpers';
 import { CWIcon } from './cw_icons/cw_icon';
 
-export enum EngagementButtonSize {
-  Small = 'sm',
-  Large = 'lg',
-}
+export type EngagementButtonSize = 'sm' | 'lg';
 
 export type EngagementButtonStyleAttrs = {
-  size: EngagementButtonSize;
+  buttonSize: EngagementButtonSize;
 } & StyleAttrs;
 
 type EngagementButtonAttrs = {
@@ -23,14 +20,20 @@ type EngagementButtonAttrs = {
 
 export const CWEngagementButton: m.Component<EngagementButtonAttrs> = {
   view: (vnode) => {
-    const { label, onclick, disabled, className, size } = vnode.attrs;
+    const {
+      label,
+      onclick,
+      disabled = false,
+      className,
+      buttonSize,
+    } = vnode.attrs;
 
     return (
       <button
         class={getButtonClasses(ComponentType.EngagementButton, {
           className,
           disabled,
-          size,
+          buttonSize,
         })}
         onclick={onclick}
       >
