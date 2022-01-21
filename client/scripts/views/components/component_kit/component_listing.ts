@@ -295,7 +295,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           m(CWExternalLink, {
             label: 'Inline external link',
             target: 'https://edgewa.re/',
-            linkType: 'button',
+            linkType: 'inline',
           }),
         ]
       ),
