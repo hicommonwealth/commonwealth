@@ -10,7 +10,7 @@ export enum ValidationStatus {
   Failure = 'failure',
 }
 
-type TextInputProps = {
+type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   defaultValue?: string;
@@ -27,7 +27,7 @@ type TextInputState = {
   validationStatus: ValidationStatus;
 };
 
-export const CWTextInput: m.Component<TextInputProps, TextInputState> = {
+export const CWTextInput: m.Component<TextInputAttrs, TextInputState> = {
   view: (vnode) => {
     const {
       autocomplete,
