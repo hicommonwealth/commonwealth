@@ -14,7 +14,4 @@ export type StyleAttrs = {
   className?: string;
 };
 
-export enum ButtonType {
-  Primary = 'primary',
-  Secondary = 'secondary',
-}
+export type ButtonType = 'primary' | 'secondary';
