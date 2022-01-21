@@ -3,7 +3,7 @@
 import m from 'mithril';
 import 'components/component_kit/cw_icon.scss';
 
-import { IconName, icons } from './cw_icon_lookup';
+import { IconName, iconLookup } from './cw_icon_lookup';
 
 export type IconSize = 'small' | 'medium' | 'large';
 
@@ -26,7 +26,7 @@ export const CWIcon: m.Component<IconAttrs> = {
       iconType = 'primary',
     } = vnode.attrs;
 
-    const Icon = icons[iconName];
+    const Icon = iconLookup[iconName];
 
     return m(Icon, { iconSize, iconType, disabled });
   },
