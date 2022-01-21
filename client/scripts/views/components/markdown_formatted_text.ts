@@ -6,7 +6,7 @@ import m from 'mithril';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
-import marked from 'marked';
+import { marked } from 'marked';
 
 const renderer = new marked.Renderer();
 renderer.link = (href, title, text) => {
