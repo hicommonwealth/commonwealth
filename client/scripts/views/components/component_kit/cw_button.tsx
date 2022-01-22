@@ -11,7 +11,7 @@ export type ButtonStyleAttrs = {
 } & StyleAttrs;
 
 export type ButtonAttrs = {
-  label: string;
+  label: string | Vnode<any>;
   onclick: (e?: MouseEvent) => void;
 } & ButtonStyleAttrs;
 

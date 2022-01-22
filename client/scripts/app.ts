@@ -62,6 +62,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           address: node.address,
           token_name: node.token_name,
           eth_chain_id: node.eth_chain_id,
+          alt_wallet_url: node.alt_wallet_url,
         }));
       });
       app.user.setRoles(data.roles);
@@ -793,6 +794,16 @@ Promise.all([
         m.route.set(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('githubPostAuthRedirect');
+    } catch (e) {
+      console.log('Error restoring path from localStorage');
+    }
+  } else if (localStorage && localStorage.getItem && localStorage.getItem('discordPostAuthRedirect')) {
+    try {
+      const postAuth = JSON.parse(localStorage.getItem('discordPostAuthRedirect'));
+      if (postAuth.path && (+new Date() - postAuth.timestamp < 30 * 1000)) {
+        m.route.set(postAuth.path, {}, { replace: true });
+      }
+      localStorage.removeItem('discordPostAuthRedirect');
     } catch (e) {
       console.log('Error restoring path from localStorage');
     }

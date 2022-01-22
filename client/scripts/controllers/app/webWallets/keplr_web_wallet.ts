@@ -87,10 +87,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           chainId: this._chainId,
           chainName: app.chain.meta.chain.name,
           rpc: url,
-          // TODO: this is a HACK -- this is not a valid REST url, it is only a duplicate of the
-          //    RPC URL. But Keplr will not use this to send transactions, as we only use Keplr
-          //    for offline signing, so it should not break tx functionality.
-          rest: url,
+          // Note that altWalletUrl on Cosmos chains should be the REST endpoint -- if not available, we
+          // use the RPC url as hack, which will break some querying functionality but not signing.
+          rest: app.chain.meta.altWalletUrl || url,
           bip44: {
               coinType: 118,
           },

@@ -118,7 +118,7 @@ export function defaultChainRows<T extends ChainFormState>(state: T, disabled = 
 }
 
 export interface EthChainAttrs {
-  ethChains: { [id: number]: string };
+  ethChains: { [id: number]: { url: string, alt_wallet_url: string } };
   ethChainNames: { [id: number]: string };
 }
 
@@ -126,6 +126,7 @@ export interface EthFormState extends ChainFormState {
   chain_string: string;
   chain_id: string;
   url: string;
+  alt_wallet_url: string;
   address: string;
   loaded: boolean;
 }
@@ -145,10 +146,12 @@ export function ethChainRows<
           const [id] = Object.entries(attrs.ethChainNames).find(([, name]) => name === value)
             || Object.keys(attrs.ethChains).find((cId) => `${cId}` === value);
           state.chain_id = id;
-          state.url = attrs.ethChains[id];
+          state.url = attrs.ethChains[id].url;
+          state.alt_wallet_url = attrs.ethChains[id].alt_wallet_url;
         } else {
           state.chain_id = '';
           state.url = '';
+          state.alt_wallet_url = '';
         }
         state.loaded = false;
       },
@@ -168,6 +171,15 @@ export function ethChainRows<
       placeholder: 'wss://... (leave empty for default)',
       onChangeHandler: async (v) => {
         state.url = v;
+        state.loaded = false;
+      }
+    }),
+    state.chain_string === 'Custom' && m(InputPropertyRow, {
+      title: 'HTTP URL',
+      defaultValue: state.alt_wallet_url,
+      placeholder: 'https://...  (leave empty for default)',
+      onChangeHandler: async (v) => {
+        state.alt_wallet_url = v;
         state.loaded = false;
       }
     }),
