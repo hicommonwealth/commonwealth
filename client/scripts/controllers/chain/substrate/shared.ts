@@ -504,7 +504,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             } else if (hexTxOrAddress) {
               unsubscribe = this.api.tx(hexTxOrAddress).send(txResultHandler);
             } else {
-              unsubscribe = txFunc(this.api).signAndSend(author.getKeyringPair(), txResultHandler);
+              throw new Error('no signer found');
             }
           } catch (err) {
             if (err.message.indexOf('1014: Priority is too low') !== -1) {

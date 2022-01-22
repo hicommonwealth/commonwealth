@@ -1,5 +1,6 @@
 import m from 'mithril';
 import 'pages/landing/landing_page_footer.scss';
+import app from 'state';
 
 interface IState {
   list: { text: string; redirectTo?: string, externalLink?: string }[];
@@ -10,7 +11,13 @@ const FooterLandingPage: m.Component<IState, IState> = {
     const redirectClick = (route) => {
       m.route.set(route);
     };
-    return m('footer.FooterLandingPage', { class: 'bg-footer bg-cover py-10' },
+    const sidebarOpen = app.chain !== null;
+    let footerClass = 'footer.FooterLandingPage';
+    if (sidebarOpen) {
+      footerClass = 'footer.FooterLandingPage.sidebar'
+    }
+
+    return m(footerClass, { class: 'bg-footer bg-cover py-10' },
       m('div', { class: 'mt-8 container mx-auto md:flex md:flex-row md:justify-between md:items-start' }, [
         m('div', [
           m('img', {

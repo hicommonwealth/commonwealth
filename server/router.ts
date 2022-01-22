@@ -53,7 +53,7 @@ import getInvites from './routes/getInvites';
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
-import deleteGithubAccount from './routes/deleteGithubAccount';
+import deleteSocialAccount from './routes/deleteSocialAccount';
 import getProfile from './routes/getProfile';
 
 import createRole from './routes/createRole';
@@ -489,8 +489,14 @@ function setupRouter(
   router.delete(
     '/githubAccount',
     passport.authenticate('jwt', { session: false }),
-    deleteGithubAccount.bind(this, models)
+    deleteSocialAccount.bind(this, models, 'github')
   );
+
+  router.delete(
+      '/discordAccount',
+      passport.authenticate('jwt', { session: false }),
+      deleteSocialAccount.bind(this, models, 'discord')
+  )
 
   // offchain viewCount
   router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
@@ -584,9 +590,12 @@ function setupRouter(
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
 
-  router.get('/auth/github', startOAuthLogin.bind(this, models));
-  router.get('/auth/github/callback', startOAuthLogin.bind(this, models));
+  router.get('/auth/github', startOAuthLogin.bind(this, models, 'github'));
+  router.get('/auth/github/callback', startOAuthLogin.bind(this, models, 'github'));
   router.get('/finishOAuthLogin', finishOAuthLogin.bind(this, models));
+
+  router.get('/auth/discord', startOAuthLogin.bind(this, models, 'discord'));
+  router.get('/auth/discord/callback', startOAuthLogin.bind(this, models, 'discord'));
 
   router.post(
     '/auth/magic',
