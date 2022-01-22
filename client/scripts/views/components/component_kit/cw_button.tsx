@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import m from 'mithril';
+import m, { Vnode } from 'mithril';
 import 'components/component_kit/cw_button.scss';
 
 import { ButtonType, ComponentType, StyleAttrs } from './types';
