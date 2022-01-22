@@ -26,6 +26,9 @@ $base-bg-color:     #ffffff;
 $primary-bg-color:  #4f6dbd; // also used for text
 $positive-bg-color: #41a360; // also used for text
 $negative-bg-color: #d4302f; // also used for text
+$disable-grey: #DDDDDD;
+
+$layout-color: #F6F6F6;
 
 $intermediate-icon-color: #ffa200;
 $positive-icon-color: #7ed320;
@@ -44,6 +47,7 @@ $text-color-black: #222;                // black text on any background
 
 $text-color-primary-light: tint($primary-bg-color, 75%);
 $text-color-primary: $primary-bg-color;
+
 
 //
 // background colors
