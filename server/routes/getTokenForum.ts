@@ -48,7 +48,7 @@ const getTokenForum = async (
     provider.disconnect(1000, 'finished');
     if (code === '0x') {
       // Account returns 0x, Smart contract returns bytecode
-      return res.json({ status: 'Failure', message: 'Must provide contract address' });
+      return res.json({ status: 'Failure', message: 'Must provide valid contract address' });
     }
     if (req.query.autocreate) {
       const result = await sequelize.transaction(async (t) => {

@@ -99,7 +99,6 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               vnode.state.decimals = decimals || 18;
               vnode.state.status = 'Success!';
             } catch (e) {
-              console.log(e);
               vnode.state.name = '';
               vnode.state.id = '';
               vnode.state.symbol = '';
