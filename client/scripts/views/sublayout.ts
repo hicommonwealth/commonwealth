@@ -145,6 +145,7 @@ const Sublayout: m.Component<
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }
 
+    const sidebarOpen = app.chain !== null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
     return [
@@ -172,48 +173,28 @@ const Sublayout: m.Component<
             : '',
           terms && tosStatus !== 'off'
             ? m('.token-banner-terms', [
-                m('span', 'Please read the '),
-                m(
-                  'a',
-                  {
-                    href: terms,
-                  },
-                  'terms and conditions'
-                ),
-                m('span', ' before interacting with this community.'),
-                m(
-                  'span',
-                  {
-                    class: 'close-button',
-                    onclick: () => {
-                      localStorage.setItem(`${app.activeChainId()}-tos`, 'off');
-                    },
-                  },
-                  'X'
-                ),
-              ])
-            : '',
-          m('.sublayout-body', [
-            m(
-              `.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`,
-              [
-                !hideSidebar &&
-                  m(
-                    useQuickSwitcher
-                      ? '.sublayout-quickswitcheronly-col'
-                      : '.sublayout-sidebar-col',
-                    [m(Sidebar, { useQuickSwitcher })]
-                  ),
-                m(
-                  '.sublayout-main-col',
-                  {
-                    class: !rightContent && 'no-right-content',
-                  },
-                  [vnode.children]
-                ),
-                rightContent && m('.sublayout-right-col', rightContent),
-              ]
-            ),
+              m('span', 'Please read the '),
+              m('a', {
+                href: terms,
+              }, 'terms and conditions'),
+              m('span', ' before interacting with this community.'),
+              m('span', { class: 'close-button',
+                onclick: () => {
+                  localStorage.setItem(`${app.activeChainId()}-tos`, 'off');
+                } }, 'X')
+            ]) : '',
+          m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
+            m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
+          ]),
+          m(!sidebarOpen ? '.sublayout-body' : '.sublayout-body-sidebar' , [
+            m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
+              m('.sublayout-main-col', {
+                class: !rightContent && 'no-right-content'
+              }, [
+                vnode.children
+              ]),
+              rightContent && m('.sublayout-right-col', rightContent),
+            ]),
           ]),
           !app.isCustomDomain() &&
             m(FooterLandingPage, {
