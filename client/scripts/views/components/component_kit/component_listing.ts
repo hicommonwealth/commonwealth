@@ -94,18 +94,58 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         ])
       ),
       m('h1', 'Redesign Icons'),
-      m('.icon-listing', [
-        m(CWIcon, {
-          iconName: 'views',
-          iconSize: 'small',
-        }),
-        m(CWIcon, {
-          iconName: 'views',
-        }),
-        m(CWIcon, {
-          iconName: 'views',
-          iconSize: 'large',
-        }),
+      m('.icon-gallery', [
+        [
+          m(
+            '.icon-row',
+            'Primary Small',
+            m(CWIcon, {
+              iconName: 'views',
+              iconSize: 'small',
+            })
+          ),
+        ],
+        [
+          m(
+            '.icon-row',
+            'Primary Medium',
+            m(CWIcon, {
+              iconName: 'views',
+            })
+          ),
+        ],
+        [
+          m(
+            '.icon-row',
+            'Primary Large',
+            m(CWIcon, {
+              iconName: 'views',
+              iconSize: 'large',
+            })
+          ),
+        ],
+        [
+          m(
+            '.icon-row',
+            'Secondary Large',
+            m(CWIcon, {
+              iconName: 'views',
+              iconSize: 'large',
+              iconType: 'secondary',
+            })
+          ),
+        ],
+        [
+          m(
+            '.icon-row',
+            'Disabled Large',
+            m(CWIcon, {
+              iconName: 'views',
+              iconSize: 'large',
+              disabled: true,
+            })
+          ),
+        ],
       ]),
       m('h1', 'Redesign Buttons'),
       m(
