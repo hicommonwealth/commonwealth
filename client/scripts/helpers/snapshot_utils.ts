@@ -82,6 +82,8 @@ export const PROPOSALS_QUERY = gql`
       end
       snapshot
       state
+      scores
+      scores_total
       author
       created
     }
@@ -140,6 +142,8 @@ export interface SnapshotProposal {
   snapshot: string;
   choices: string[];
   state: string;
+  scores: number[];
+  scores_total: number;
   strategies?: string;
 }
 
@@ -210,20 +214,6 @@ export async function getScore(space: SnapshotSpace, address: string) {
 
 /* Single Choice Voting */
 
-// Returns the total amount of the results
-export function sumOfResultsBalance(votes: SnapshotProposalVote[]) {
-  return votes.reduce((a, b: any) => a + b.power, 0);
-}
-
-//  Returns an array with the results for each choice
-export function resultsByVoteBalance(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {
-  return proposal.choices.map((choice, i) =>
-    votes
-      .filter((vote: any) => vote.choice === i + 1)
-      .reduce((a, b: any) => a + b.power, 0)
-  );
-}
-
 export async function getResults(space: SnapshotSpace, proposal: SnapshotProposal) {
   const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
   try {
@@ -234,7 +224,6 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
     const strategies = space.strategies;
 
     if (proposal.state !== 'pending') {
-      console.time('getProposal.scores');
       const scores = await Snapshot.utils.getScores(
         space.id,
         strategies,
@@ -243,9 +232,6 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
         proposal.snapshot,
         // provider,
       );
-      console.log(scores);
-      console.timeEnd('getProposal.scores');
-      console.log('Scores', scores);
 
       votes = votes.map((vote: any) => {
           vote.scores = strategies.map(
@@ -260,14 +246,13 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
 
     /* Get results */
     const results = {
-      resultsByVoteBalance: resultsByVoteBalance(proposal, votes),
-      // resultsByStrategyScore: resultsByStrategyScore(proposal, votes),
-      sumOfResultsBalance: sumOfResultsBalance(votes),
+      resultsByVoteBalance: proposal.scores,
+      sumOfResultsBalance: proposal.scores_total,
     };
 
     return { votes, results };
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return e;
   }
 }
@@ -290,16 +275,6 @@ export async function getPower(space: SnapshotSpace, address: string, snapshot: 
     totalScore: summedScores.reduce((a, b) => a + b, 0)
   };
 }
-
-// export function resultsByStrategyScore(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {
-//   return proposal.choices.map((choice, i) =>
-//     proposal.strategies.map((strategy, sI) =>
-//       this.votes
-//         .filter((vote: any) => vote.choice === i + 1)
-//         .reduce((a, b: any) => a + b.scores[sI], 0)
-//     )
-//   );
-// }
 
 export async function loadMultipleSpacesData(snapshot_spaces:string[]) {
   const spaces_data: Array<{space: SnapshotSpace, proposals: SnapshotProposal[]}> = [];
