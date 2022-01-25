@@ -39,7 +39,7 @@ export function createChatNamespace(io: Server, models: DB) {
                                                      address: string, chatMessage: string) => {
             models.ChatMessage.create({address, message: chatMessage, chat_channel_id: chatChannelId})
                 .then((res) => {
-                    ChatNs.to(chatChannelName).emit(WebsocketMessageType.ChatMessage, chatChannelId, address, chatMessage);
+                    ChatNs.to(`${chatChannelId}-${chatChannelName}`).emit(WebsocketMessageType.ChatMessage, chatChannelId, address, chatMessage);
                 })
                 .catch((e) => {
                     socket.emit('Error', e)
