@@ -42,11 +42,17 @@
     }
     .community-projects {
         max-width: 900px;
-        .trending-projects, 
-        .recommended-projects {
+        .project-discovery {
             display: flex;
-            flex-direction: column;
-            margin: 32px 0;
+            justify-content: space-between;
+            .trending-projects, 
+            .recommended-projects {
+                display: flex;
+                flex-direction: column;
+                .ProjectCard {
+                    margin: 12px 0;
+                }
+            }
         }
     }
 }

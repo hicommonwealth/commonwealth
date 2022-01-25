@@ -68,16 +68,18 @@ const ProjectListing: m.Component<ProjectListingAttrs, ProjectListingState> = {
       && m('.community-projects', [
         m('h1', 'Discover'),
         m('.project-discovery', [
-          m('h2', 'Trending'),
-          m('.trending-projects', trendingProjects.map((project) => {
-            return m(ProjectCard, { project, size: ProjectCardSize.Large })
-           })
-          ),
-          m('h2', 'Recommended'),
-          m('.recommended-projects', recommendedProjects.map((project) => {
-            return m(ProjectCard, { project, size: ProjectCardSize.Medium })
-           })
-          ),
+          m('.trending-projects', [
+            m('h2', 'Trending'),
+            trendingProjects.map((project) => {
+              return m(ProjectCard, { project, size: ProjectCardSize.Large })
+            })
+          ]),
+          m('.recommended-projects', [
+            m('h2', 'Recommended'),
+            recommendedProjects.map((project) => {
+              return m(ProjectCard, { project, size: ProjectCardSize.Medium })
+            })
+          ]),
         ]),
         // TODO: ModularizeSearch
         m(SearchBar)
