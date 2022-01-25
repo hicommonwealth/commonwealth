@@ -5,22 +5,22 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
 
       await queryInterface.bulkInsert('Chains', [{
-        id: 'phantom-dao-testnet',
+        id: 'phantom-dao-mainnet',
         network: 'compound',
         type: 'dao',
         symbol: 'gPHM',
         base: 'ethereum',
-        name: 'PhantomDao Testnet',
+        name: 'PhantomDao Mainnet',
         active: true,
       }], {
         transaction: t,
       });
       await queryInterface.bulkInsert('ChainNodes', [{
-        chain: 'phantom-dao-testnet',
-        eth_chain_id: 4002,
-        address: '0x1464f060D710cbCc6adc81120b197ec825B088A1',
-        url: 'wss://fantom-testnet-api.bwarelabs.com/ws/a1283302-9fa6-4cb5-8303-220f6c143520',
-        alt_wallet_url: 'https://rpc.testnet.fantom.network',
+        chain: 'phantom-dao-mainnet',
+        eth_chain_id: 250,
+        address: '0x38a51314E772245c0dEc231223117b73C980846d',
+        url: 'wss://wsapi.fantom.network/',
+        alt_wallet_url: 'https://rpc.ftm.tools/',
       }], {
         transaction: t,
       });
