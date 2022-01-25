@@ -3,7 +3,7 @@ import 'pages/crowdfund/index.scss';
 import m from 'mithril';
 import SearchBar from '../../components/search_bar';
 import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
-// import CrowdfundCard, { CrowdfundCardSize } from './crowdfund_card';
+// import CrowdfundCard, { CrowdfundCardSize } from './project_card';
 
 interface ProjectListingAttrs {
   project; // : Project;
