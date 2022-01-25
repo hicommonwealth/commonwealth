@@ -1,10 +1,16 @@
 import 'pages/crowdfund/index.scss';
 
 import m from 'mithril';
+import app from 'state';
+import { AddressInfo } from 'models';
 import SearchBar from '../../components/search_bar';
 import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
-// import CrowdfundCard, { CrowdfundCardSize } from './project_card';
+import ProjectCard, { ProjectCardSize } from './project_card';
 
+type Project = {
+  name: string;
+  backers: AddressInfo[];
+}
 interface ProjectListingAttrs {
   project; // : Project;
 }
@@ -14,56 +20,57 @@ interface ProjectListingState {
 
 const ProjectListing: m.Component<ProjectListingAttrs, ProjectListingState> = {
   view: (vnode) => {
-    // userCreatedProjects: Project[] = projects.filter(...);
-    // userBackedProjects: Project[] = projects.filter(...);
-    // userPreviouslyBackedProjects: Project[] = projects.filter(...);
-    // trendingCommunityProjects: Project[] = projects.filter(...);
-    // recommendedCommunityProjects: Project[] = projects.filter(...);
+    // const projects = (app.chain as any).projects;
+    const userCreatedProjects: Project[] = [ null ]; // projects.filter(...)
+    const userBackedProjects: Project[] = [ null ]; // projects.filter(...)
+    const userPreviouslyBackedProjects: Project[] = [ null ]; // projects.filter(...)
+    const trendingProjects: Project[] = [ null ]; // projects.filter(...)
+    const recommendedProjects: Project[] = [ null ]; // projects.filter(...)
     return m('.ProjectListing', [
-      // (userCreatedProjects || userBackedProjects || userPreviouslyBackedProjects) &&
+      (userCreatedProjects.length || userBackedProjects.length || userPreviouslyBackedProjects.length) &&
       m('.user-projects', [
-        // userCreatedProjects.length &&
-        m('.user-created-project-wrap', [
+        userCreatedProjects.length
+        && m('.user-created-project-wrap', [
           m('h1', 'Your Projects'),
           m(FaceliftButton, {
             intent: ButtonIntent.Primary,
             label: 'Create New Project',
-            onclick: () => true, // app.projects.createProject()
+            onclick: () => true, // m.route.set(`${app.activeId()}/createProject`)
           }),
-          // m('.user-created-projects', userCreatedProjects.map((project) => {
-          //      m(CrowdfundCard, { project, size: CrowdfundCardSize.Large })
-          //  })
-          // ),
+          m('.user-created-projects', userCreatedProjects.map((project) => {
+              return m(ProjectCard, { project, size: ProjectCardSize.Large })
+           })
+          ),
         ]),
         m('.user-backed-project-wrap', [
           m('h2', 'Currently Backing'),
-          // m('.user-backed-projects', userBackedProjects.map((project) => {
-          //      m(CrowdfundCard, { project, size: CrowdfundCardSize.Medium })
-          //  })
-          // ),
+          m('.user-backed-projects', userBackedProjects.map((project) => {
+              return m(ProjectCard, { project, size: ProjectCardSize.Medium })
+           })
+          ),
         ]),
         m('.user-previously-backed-project-wrap', [
           m('h3', 'Past Contributions'),
-          // m('.user-previously-backed-projects', userPreviouslyBackedProjects.map((project) => {
-          //      m(CrowdfundCard, { project, size: CrowdfundCardSize.Small })
-          //  })
-          // ),
+          m('.user-previously-backed-projects', userPreviouslyBackedProjects.map((project) => {
+            return m(ProjectCard, { project, size: ProjectCardSize.Small })
+           })
+          ),
         ])
       ]),
-      // communityHasProjects &&
-      m('.community-projects', [
+      (trendingProjects.length || recommendedProjects.length)
+      && m('.community-projects', [
         m('h1', 'Discover'),
         m('.project-discovery', [
           m('h2', 'Trending'),
-          // m('.trending-projects', trendingProjects.map((project) => {
-          //      m(CrowdfundCard, { project, size: CrowdfundCardSize.Large })
-          //  })
-          // ),
-          m('h2', 'Recommended')
-          // m('.recommended-projects', recommendedProjects.map((project) => {
-          //      m(CrowdfundCard, { project, size: CrowdfundCardSize.Medium })
-          //  })
-          // ),
+          m('.trending-projects', trendingProjects.map((project) => {
+            return m(ProjectCard, { project, size: ProjectCardSize.Large })
+           })
+          ),
+          m('h2', 'Recommended'),
+          m('.recommended-projects', recommendedProjects.map((project) => {
+            return m(ProjectCard, { project, size: ProjectCardSize.Medium })
+           })
+          ),
         ]),
         // TODO: ModularizeSearch
         m(SearchBar)

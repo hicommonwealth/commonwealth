@@ -126,7 +126,7 @@ const ProjectCard: m.Component<
         // TODO: Implement in kit
         // m(CWProjectStatus, { status: project.status })
         m(DummyChainIcon),
-        m(DummyProjectData.Chain)
+        m(DummyProjectData.ProjectChain)
       ]
     );
 

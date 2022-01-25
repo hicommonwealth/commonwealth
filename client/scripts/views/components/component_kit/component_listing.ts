@@ -67,7 +67,7 @@ import {
 } from './buttons';
 import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
-import CrowdfundCard, { CrowdfundCardSize } from '../crowdfund/crowdfund_card';
+import ProjectCard, { ProjectCardSize } from '../../pages/crowdfund/project_card';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -427,8 +427,9 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           ]),
         ]),
       ]),
-      m(CrowdfundCard, { crowdfund: null, size: CrowdfundCardSize.Large }),
-      m(CrowdfundCard, { crowdfund: null, size: CrowdfundCardSize.Medium }),
+      m(ProjectCard, { project: null, size: ProjectCardSize.Large }),
+      m(ProjectCard, { project: null, size: ProjectCardSize.Medium }),
+      m(ProjectCard, { project: null, size: ProjectCardSize.Small }),
       m('h1', 'Form Fields'),
       m(
         '.form-gallery',
