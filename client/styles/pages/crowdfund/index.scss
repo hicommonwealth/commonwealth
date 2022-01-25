@@ -23,7 +23,7 @@
                 flex-wrap: wrap;
                 justify-content: space-between;
                 .ProjectCard {
-                    margin: 12px;
+                    margin: 12px 0;
                 }
             }
         }
@@ -45,6 +45,7 @@
         .project-discovery {
             display: flex;
             justify-content: space-between;
+            margin: 32px 0;
             .trending-projects, 
             .recommended-projects {
                 display: flex;
