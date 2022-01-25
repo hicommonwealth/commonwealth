@@ -96,9 +96,10 @@ const CrowdfundCard: m.Component<
 > = {
   view: (vnode) => {
     const { project, size } = vnode.attrs;
+    const onclick = null; // = m.route.set(`${app.activeId()}/${project.id}-slugify(project.name))
 
     const CrowdfundCardLarge = m('.CrowdfundCard',
-      { class: 'large' },
+      { class: 'large', onclick },
       [
         m(CrowdfundHeaderPanel, { iconSize: 45 }),
         m(CrowdfundCompletionBar, { completionPercent: (DummyCrowdfundData.CrowdfundCompletionPercent as number) }),
@@ -107,7 +108,7 @@ const CrowdfundCard: m.Component<
     );
 
     const CrowdfundCardMedium= m('.CrowdfundCard',
-      { class: 'medium' },
+      { class: 'medium', onclick },
       [
         m(CrowdfundHeaderPanel),
         m('.right-panel', [
@@ -117,7 +118,9 @@ const CrowdfundCard: m.Component<
       ]
     );
 
-    const CrowdfundCardSmall = null;
+    const CrowdfundCardSmall = m('.CrowdfundCard',
+      { class: 'small', onclick }
+    );
 
     switch (size) {
       case CrowdfundCardSize.Large:

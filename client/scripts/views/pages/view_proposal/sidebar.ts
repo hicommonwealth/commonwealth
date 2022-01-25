@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
-import { Button, List, ListItem, Spinner } from 'construct-ui';
+import { Button, List, ListItem } from 'construct-ui';
 
 import app from 'state';
 
@@ -15,7 +15,6 @@ import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { loadMultipleSpacesData, SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import LinkedThreadModal from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
-import Sublayout from '../../sublayout';
 
 export const ProposalSidebarLinkedChainEntity: m.Component<{
   proposal: OffchainThread;

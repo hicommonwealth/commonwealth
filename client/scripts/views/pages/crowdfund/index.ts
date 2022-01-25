@@ -2,28 +2,34 @@ import 'pages/crowdfund/index.scss';
 
 import m from 'mithril';
 import SearchBar from '../../components/search_bar';
+import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
 // import CrowdfundCard, { CrowdfundCardSize } from './crowdfund_card';
 
-interface CrowdfundPageAttrs {
+interface ProjectListingAttrs {
   project; // : Project;
 }
 
-interface CrowdfundPageState {
+interface ProjectListingState {
 }
 
-const CrowdfundPage: m.Component<CrowdfundPageAttrs, CrowdfundPageState> = {
+const ProjectListing: m.Component<ProjectListingAttrs, ProjectListingState> = {
   view: (vnode) => {
     // userCreatedProjects: Project[] = projects.filter(...);
     // userBackedProjects: Project[] = projects.filter(...);
     // userPreviouslyBackedProjects: Project[] = projects.filter(...);
     // trendingCommunityProjects: Project[] = projects.filter(...);
     // recommendedCommunityProjects: Project[] = projects.filter(...);
-    return m('.CrowdfundPage', [
+    return m('.ProjectListing', [
       // (userCreatedProjects || userBackedProjects || userPreviouslyBackedProjects) &&
       m('.user-projects', [
         // userCreatedProjects.length &&
         m('.user-created-project-wrap', [
           m('h1', 'Your Projects'),
+          m(FaceliftButton, {
+            intent: ButtonIntent.Primary,
+            label: 'Create New Project',
+            onclick: () => true, // app.projects.createProject()
+          }),
           // m('.user-created-projects', userCreatedProjects.map((project) => {
           //      m(CrowdfundCard, { project, size: CrowdfundCardSize.Large })
           //  })
@@ -66,4 +72,4 @@ const CrowdfundPage: m.Component<CrowdfundPageAttrs, CrowdfundPageState> = {
   }
 }
 
-export default CrowdfundPage;
+export default ProjectListing;
