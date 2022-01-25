@@ -55,6 +55,7 @@ export class ChatNamespace {
         // check for admin?
         try {
             $.post(`${app.serverUrl()}/createChatChannel`, {
+                jwt: app.user.jwt,
                 name,
                 community_id
             }).then((res) => {
