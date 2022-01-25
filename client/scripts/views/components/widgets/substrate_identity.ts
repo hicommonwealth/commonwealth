@@ -71,7 +71,7 @@ const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubst
       return linkify
         ? link(
           `a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`,
-          profile ? `/${app.activeId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+          profile ? `/${app.activeChainId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           name
         )
         : m(`a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`, name);
@@ -80,7 +80,7 @@ const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubst
     // return offchain name while identity is loading
     return linkify
       ? link('a.user-display-name.username',
-        profile ? `/${app.activeId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+        profile ? `/${app.activeChainId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
         !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
           profile.displayName,
           m('.id-short', formatAddressShort(profile.address, profile.chain)),
@@ -115,7 +115,7 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
       return linkify
         ? link(
           `a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`,
-          profile ? `/${app.activeId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+          profile ? `/${app.activeChainId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           name
         )
         : m(`a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`, name);
@@ -124,7 +124,7 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
     // return offchain name while identity is loading
     return linkify
       ? link('a.user-display-name.username',
-        profile ? `/${app.activeId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
+        profile ? `/${app.activeChainId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
         !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
           profile.displayName,
           m('.id-short', formatAddressShort(profile.address, profile.chain)),

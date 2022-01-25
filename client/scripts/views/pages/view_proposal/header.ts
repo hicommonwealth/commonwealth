@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment';
@@ -14,7 +15,7 @@ import {
   extractDomain,
   offchainThreadStageToLabel,
 } from 'helpers';
-import { proposalSlugToFriendlyName } from 'identifiers';
+import { getProposalUrlPath, proposalSlugToFriendlyName } from 'identifiers';
 import {
   OffchainThread,
   OffchainThreadKind,
@@ -61,7 +62,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
 > = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
-    if (!proposal.offchainVotingEndsAt) return;
+    if (!proposal.offchainVotingEnabled) return;
 
     if (
       vnode.state.offchainVotes === undefined ||
@@ -75,8 +76,6 @@ export const ProposalHeaderOffchainPoll: m.Component<
         `/api/viewOffchainVotes?thread_id=${proposal.id}${
           app.activeChainId()
             ? `&chain=${app.activeChainId()}`
-            : app.activeCommunityId()
-            ? `&community=${app.activeCommunityId()}`
             : ''
         }`
       )
@@ -91,9 +90,8 @@ export const ProposalHeaderOffchainPoll: m.Component<
         });
     }
 
-    const pollingEnded = proposal.offchainVotingEndsAt?.isBefore(
-      moment().utc()
-    );
+    const pollingEnded = proposal.offchainVotingEndsAt
+      && proposal.offchainVotingEndsAt?.isBefore(moment().utc());
     const canVote =
       app.isLoggedIn() &&
       app.user.activeAccount &&
@@ -209,14 +207,16 @@ export const ProposalHeaderOffchainPoll: m.Component<
         })
       ),
       m('.offchain-poll-caption', [
-        !pollingEnded && [
-          // weird hack because we overwrote the moment formatter to display "just now" for future dates
-          moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
-          ' left',
-        ],
-        m('br'),
-        pollingEnded ? 'Ended ' : 'Ends ',
-        proposal.offchainVotingEndsAt?.format('lll'),
+        proposal.offchainVotingEndsAt
+          ? [
+              !pollingEnded && moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
+              !pollingEnded && ' left',
+              m('br'),
+              !pollingEnded && 'Ends ',
+              pollingEnded && 'Ended ',
+              proposal.offchainVotingEndsAt?.format('lll'),
+            ]
+          : 'Poll does not expire.'
       ]),
       m('.offchain-poll-header', 'Voters'),
       m('.offchain-poll-voters', [
@@ -286,7 +286,7 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
       return m('.ProposalHeaderThreadLink', [
         link(
           'a.thread-link',
-          `/${proposal['chain'] || app.activeId()}/proposal/discussion/${
+          `/${proposal['chain'] || app.activeChainId()}/discussion/${
             proposal.threadId
           }`,
           ['Go to discussion', m(Icon, { name: Icons.EXTERNAL_LINK })]
@@ -296,18 +296,18 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
   };
 
 export const ProposalHeaderSnapshotThreadLink: m.Component<{
-  threadId: string;
+  thread: {id: string, title: string}
 }> = {
   view: (vnode) => {
-    const { threadId } = vnode.attrs;
-    if (!threadId) return;
+    const { id, title } = vnode.attrs.thread;
+    if (!id) return;
     const proposalLink = `${
-      app.isCustomDomain() ? '' : `/${app.activeId()}`
-    }/proposal/discussion/${threadId}`;
+      app.isCustomDomain() ? '' : `/${app.activeChainId()}`
+    }/discussion/${id}`;
 
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [
-        'Go to discussion',
+        decodeURIComponent(title),
         m(Icon, { name: Icons.EXTERNAL_LINK }),
       ]),
     ]);
@@ -334,7 +334,7 @@ export const ProposalHeaderTopics: m.Component<{
     return m('.ProposalHeaderTopics', [
       link(
         'a.proposal-topic',
-        `/${app.activeId()}/discussions/${proposal.topic.name}`,
+        `/${app.activeChainId()}/discussions/${proposal.topic.name}`,
         [m('span.proposal-topic-name', `${proposal.topic?.name}`)]
       ),
     ]);
@@ -489,10 +489,7 @@ export const ProposalTitleSaveEdit: m.Component<{
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
     if (!proposal) return;
-    const proposalLink =
-      `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/${
-        proposal.slug
-      }/${proposal.identifier}` + `-${slugify(proposal.title)}`;
+    const proposalLink = getProposalUrlPath(proposal.slug, `${proposal.identifier}-${slugify(proposal.title)}`);
 
     return m('.ProposalTitleSaveEdit', [
       m(

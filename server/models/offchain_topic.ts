@@ -2,7 +2,6 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ModelStatic } from './types';
 import { ChainAttributes } from './chain';
-import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainThreadAttributes } from './offchain_thread';
 
 export interface OffchainTopicAttributes {
@@ -10,8 +9,7 @@ export interface OffchainTopicAttributes {
   featured_in_sidebar: boolean;
   featured_in_new_post: boolean;
   id?: number;
-  chain_id?: string;
-  community_id?: string;
+  chain_id: string;
   description?: string;
   telegram?: string;
   created_at?: Date;
@@ -21,7 +19,6 @@ export interface OffchainTopicAttributes {
   default_offchain_template?: string;
 
   // associations
-  community?: OffchainCommunityAttributes;
   chain?: ChainAttributes;
   threads?: OffchainThreadAttributes[] | OffchainTopicAttributes['id'][];
 }
@@ -42,8 +39,7 @@ export default (
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
     telegram: { type: dataTypes.STRING, allowNull: true },
-    chain_id: { type: dataTypes.STRING, allowNull: true },
-    community_id: { type: dataTypes.STRING, allowNull: true },
+    chain_id: { type: dataTypes.STRING, allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -67,11 +63,6 @@ export default (
   });
 
   OffchainTopic.associate = (models) => {
-    models.OffchainTopic.belongsTo(models.OffchainCommunity, {
-      as: 'community',
-      foreignKey: 'community_id',
-      targetKey: 'id',
-    });
     models.OffchainTopic.belongsTo(models.Chain, {
       as: 'chain',
       foreignKey: 'chain_id',

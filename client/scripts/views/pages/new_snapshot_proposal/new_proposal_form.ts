@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
@@ -46,10 +47,6 @@ const newThread = async (
   space: SnapshotSpace,
   snapshotId: string,
 ) => {
-  const topics = app.chain
-    ? app.chain.meta.chain.topics
-    : app.community.meta.topics;
-
   if (!form.name) {
     throw new Error(NewThreadErrors.NoTitle);
   }
@@ -146,7 +143,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
 }> = {
   view: (vnode) => {
     const getLoadingPage = () => m('.topic-loading-spinner-wrap', [ m(Spinner, { active: true, size: 'lg' }) ]);
-    if (!app.community && !app.chain) return getLoadingPage();
+    if (!app.chain) return getLoadingPage();
 
     const pathVars = m.parsePathname(window.location.href);
 
@@ -162,9 +159,9 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
         name: '',
         body: '',
         choices: ['Yes', 'No'],
-        range: '3d',
+        range: '5d',
         start: new Date().getTime(),
-        end: moment().add(3, 'days').toDate().getTime(),
+        end: moment().add(5, 'days').toDate().getTime(),
         snapshot: 0,
         metadata: {},
         type: 'single-choice'
@@ -208,15 +205,15 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
     }
 
     const saveToLocalStorage = () => {
-      localStorage.setItem(`${app.activeId()}-new-snapshot-proposal-name`, vnode.state.form.name);
+      localStorage.setItem(`${app.activeChainId()}-new-snapshot-proposal-name`, vnode.state.form.name);
     };
 
     const populateFromLocalStorage = () => {
-      vnode.state.form.name = localStorage.getItem(`${app.activeId()}-new-snapshot-proposal-name`);
+      vnode.state.form.name = localStorage.getItem(`${app.activeChainId()}-new-snapshot-proposal-name`);
     };
 
     const clearLocalStorage = () => {
-      localStorage.removeItem(`${app.activeId()}-new-snapshot-proposal-name`);
+      localStorage.removeItem(`${app.activeChainId()}-new-snapshot-proposal-name`);
     };
 
     const isMember = author
@@ -275,7 +272,7 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
                   e.redraw = false; // do not redraw on input
                   const { value } = e.target as any;
                   vnode.state.form.name = value;
-                  localStorage.setItem(`${app.activeId()}-new-snapshot-proposal-name`, vnode.state.form.name);
+                  localStorage.setItem(`${app.activeChainId()}-new-snapshot-proposal-name`, vnode.state.form.name);
                 },
                 defaultValue: vnode.state.form.name,
               }),
@@ -328,27 +325,15 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
               m(RadioGroup, {
                 name: 'period',
                 options: [
-                  { value: '3d', label: '3-day' },
-                  { value: '7d', label: '7-day' },
-                  { value: '2w', label: '2 weeks' },
-                  { value: '4w', label: '4 weeks' },
+                  { value: '5d', label: '5-day' },
                 ],
                 value: vnode.state.form.range,
                 onchange: (e: Event) => {
                   vnode.state.form.range = (e.target as any).value;
                   vnode.state.form.start = new Date().getTime();
                   switch (vnode.state.form.range) {
-                    case '3d':
-                      vnode.state.form.end = moment().add(3, 'days').toDate().getTime();
-                      break;
-                    case '7d':
-                      vnode.state.form.end = moment().add(7, 'days').toDate().getTime();
-                      break;
-                    case '2w':
-                      vnode.state.form.end = moment().add(2, 'weeks').toDate().getTime();
-                      break;
-                    case '4w':
-                      vnode.state.form.end = moment().add(4, 'weeks').toDate().getTime();
+                    case '5d':
+                      vnode.state.form.end = moment().add(5, 'days').toDate().getTime();
                       break;
                     default:
                       break;

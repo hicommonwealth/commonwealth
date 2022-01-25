@@ -6,9 +6,12 @@ import { Table, Button } from 'construct-ui';
 import $ from 'jquery';
 import { initAppState } from 'app';
 import { slugify } from 'utils';
+import Web3 from 'web3';
+import { providers } from 'ethers';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { isAddress } from 'web3-utils';
 import { notifyError } from 'controllers/app/notifications';
+import { IERC20Metadata__factory } from 'eth/types';
 import {
   InputPropertyRow
 } from 'views/components/metadata_rows';
@@ -32,7 +35,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
   oninit: (vnode) => {
     vnode.state.chain_string = 'Ethereum Mainnet';
     vnode.state.chain_id = '1';
-    vnode.state.url = vnode.attrs.ethChains[1];
+    vnode.state.url = vnode.attrs.ethChains[1].url;
     vnode.state.address = '';
     vnode.state.id = '';
     vnode.state.name = '';
@@ -61,27 +64,57 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
         allowUncached: true,
       };
       try {
+        console.log('Querying backend for token data');
         const res = await $.get(`${app.serverUrl()}/getTokenForum`, args);
         if (res.status === 'Success') {
-          vnode.state.name = res?.token?.name || '';
-          vnode.state.id = res?.token?.id && slugify(res?.token?.id);
-          vnode.state.symbol = res?.token?.symbol || '';
-          vnode.state.decimals = +res?.token?.decimals || 18;
-          vnode.state.icon_url =
-            res?.token?.icon_url || '';
-          if (vnode.state.icon_url.startsWith('/')) {
-            vnode.state.icon_url = `https://commonwealth.im${vnode.state.icon_url}`;
+          if (res?.token?.name) {
+            vnode.state.name = res.token.name || '';
+            vnode.state.id = res.token.id && slugify(res.token.id);
+            vnode.state.symbol = res.token.symbol || '';
+            vnode.state.decimals = +res.token.decimals || 18;
+            vnode.state.icon_url = res.token.icon_url || '';
+            if (vnode.state.icon_url.startsWith('/')) {
+              vnode.state.icon_url = `https://commonwealth.im${vnode.state.icon_url}`;
+            }
+            vnode.state.description = res.token.description || '';
+            vnode.state.website = res.token.website || '';
+            vnode.state.discord = res.token.discord || '';
+            vnode.state.element = res.token.element || '';
+            vnode.state.telegram = res.token.telegram || '';
+            vnode.state.github = res.token.github || '';
+            vnode.state.status = 'Success!';
+          } else {
+            // attempt to query ERC20Detailed token info from chain
+            console.log('Querying chain for ERC info');
+            const provider = new Web3.providers.WebsocketProvider(args.url);
+            try {
+              const ethersProvider = new providers.Web3Provider(provider);
+              const contract = IERC20Metadata__factory.connect(args.address, ethersProvider);
+              const name = await contract.name();
+              const symbol = await contract.symbol();
+              const decimals = await contract.decimals();
+              vnode.state.name = name || '';
+              vnode.state.id = name && slugify(name);
+              vnode.state.symbol = symbol || '';
+              vnode.state.decimals = decimals || 18;
+              vnode.state.status = 'Success!';
+            } catch (e) {
+              vnode.state.name = '';
+              vnode.state.id = '';
+              vnode.state.symbol = '';
+              vnode.state.decimals = 18;
+              vnode.state.status = 'Verified token but could not load metadata.';
+            }
+            vnode.state.icon_url = '';
+            vnode.state.description = '';
+            vnode.state.website = '';
+            vnode.state.discord = '';
+            vnode.state.element = '';
+            vnode.state.telegram = '';
+            vnode.state.github = '';
+            provider.disconnect(1000, 'finished');
           }
-          vnode.state.description =
-            res?.token?.description || '';
-          vnode.state.website = res?.token?.website || '';
-          vnode.state.discord = res?.token?.discord || '';
-          vnode.state.element = res?.token?.element || '';
-          vnode.state.telegram =
-            res?.token?.telegram || '';
-          vnode.state.github = res?.token?.github || '';
           vnode.state.loaded = true;
-          vnode.state.status = 'Success!';
         } else {
           vnode.state.error = res.message || 'Failed to load Token Information';
         }
@@ -173,6 +206,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             chain_id,
             url,
             decimals,
+            alt_wallet_url,
           } = vnode.state;
           vnode.state.saving = true;
           try {
@@ -194,7 +228,8 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               base: ChainBase.Ethereum,
               network: ChainNetwork.ERC20,
               node_url: url,
-              eth_chain_id: chain_id,
+              eth_chain_id: +chain_id,
+              alt_wallet_url,
             });
             await initAppState(false);
             m.route.set(`/${res.result.chain?.id}`);

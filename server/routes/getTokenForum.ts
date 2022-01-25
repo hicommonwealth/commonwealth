@@ -3,7 +3,7 @@ import Sequelize, { Op } from 'sequelize';
 import Web3 from 'web3';
 import { sequelize, DB } from '../database';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
-import { getUrlForEthChainId } from '../util/supportedEthChains';
+import { getUrlsForEthChainId } from '../util/supportedEthChains';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -26,8 +26,11 @@ const getTokenForum = async (
       chain_id,
     }
   });
-  let url = await getUrlForEthChainId(models, chain_id);
-  if (!url) {
+  const urls = await getUrlsForEthChainId(models, chain_id);
+  let url;
+  if (urls) {
+    url = urls.url;
+  } else {
     url = req.query.url;
     if (!url) {
       return res.json({ status: 'Failure', message: 'Unsupported chain' });
@@ -45,7 +48,7 @@ const getTokenForum = async (
     provider.disconnect(1000, 'finished');
     if (code === '0x') {
       // Account returns 0x, Smart contract returns bytecode
-      return res.json({ status: 'Failure', message: 'Must provide contract address' });
+      return res.json({ status: 'Failure', message: 'Must provide valid contract address' });
     }
     if (req.query.autocreate) {
       const result = await sequelize.transaction(async (t) => {

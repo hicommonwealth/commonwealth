@@ -21,7 +21,7 @@ const updateOffchainVote = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (!author) return next(new Error(Errors.InvalidUser));
@@ -31,13 +31,11 @@ const updateOffchainVote = async (
   // TODO: check and validate req.signature, instead of checking for author
 
   const thread = await models.OffchainThread.findOne({
-    where: community
-      ? { id: req.body.thread_id, community: community.id }
-      : { id: req.body.thread_id, chain: chain.id }
+    where: { id: req.body.thread_id, chain: chain.id }
   });
   if (!thread) return next(new Error(Errors.InvalidThread));
 
-  if (!thread.offchain_voting_ends_at || moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())) {
+  if (!thread.offchain_voting_ends_at && moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())) {
     return next(new Error(Errors.PollingClosed));
   }
 
@@ -51,12 +49,7 @@ const updateOffchainVote = async (
   await sequelize.transaction(async (t) => {
     // delete existing votes
     const destroyed = await models.OffchainVote.destroy({
-      where: community ? {
-        thread_id: req.body.thread_id,
-        address: req.body.address,
-        author_chain: req.body.author_chain,
-        community: req.body.community,
-      } : {
+      where: {
         thread_id: req.body.thread_id,
         address: req.body.address,
         author_chain: req.body.author_chain,
@@ -71,7 +64,6 @@ const updateOffchainVote = async (
       address: req.body.address,
       author_chain: req.body.author_chain,
       chain: req.body.chain,
-      community: req.body.community,
       option: req.body.option,
     }, { transaction: t });
 

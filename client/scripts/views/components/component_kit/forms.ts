@@ -10,12 +10,13 @@ export enum TextInputStatus {
 export const TextInput: m.Component<
   {
     name: string;
-    oninput?: (e) => null;
+    oninput?: (e) => void | null;
     inputValidationFn?: (value: string) => [TextInputStatus, string];
     label?: string;
     className?: string;
     placeholder?: string;
     defaultValue?: string;
+    otherAttrs?: any;
   },
   {
     statusMessage: string;
@@ -33,9 +34,10 @@ export const TextInput: m.Component<
       className,
       placeholder,
       defaultValue,
+      otherAttrs
     } = vnode.attrs;
     const { statusMessage, statusType } = vnode.state;
-    return m('.TextInput', [
+    return m('.TextInput', otherAttrs, [
       label && m('label', label),
       m(Input, {
         class: `${className || ''} ${statusType || ''}`,

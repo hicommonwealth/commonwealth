@@ -3,26 +3,29 @@ import 'pages/search.scss';
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
-import { Input, ListItem, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
+import { Button, ListItem, Select, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 
-import { link, pluralize } from 'helpers';
-import {
-  ReplyIcon,
-  AccountIcon
-} from '../components/component_kit/icons';
+import { pluralize } from 'helpers';
 import app from 'state';
-import { AddressInfo, Profile } from 'models';
+import { AddressInfo, Profile, SearchQuery } from 'models';
+import { SearchScope, SearchSort } from 'models/SearchQuery'
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
+import { ContentType } from 'controllers/server/search'
+import {
+  ReplyIcon,
+  AccountIcon,
+  IconIntent,
+  IconSize
+} from '../components/component_kit/icons';
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
-import { ContentType, initializeSearch, search, SearchType } from '../components/search_bar';
+import { search } from '../components/search_bar';
 
-export const ALL_RESULTS_KEY = 'COMMONWEALTH_ALL_RESULTS';
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
 export const getMemberResult = (addr, searchTerm) => {
@@ -35,7 +38,11 @@ export const getMemberResult = (addr, searchTerm) => {
   const userLink = `/${scope || addr.chain}/account/${addr.address}?base=${addr.chain}`;
 
   return m(ListItem, {
-    contentLeft: m(AccountIcon),
+    allowOnContentClick: true,
+    contentLeft: m(AccountIcon, {
+      size: IconSize.LG,
+      intent: IconIntent.Primary,
+    }),
     label: m('a.search-results-item', [
       m(UserBlock, {
         user: profile,
@@ -56,8 +63,6 @@ export const getCommunityResult = (community) => {
     ? { token: community }
     : community.contentType === ContentType.Chain
       ? { chain: community }
-      : community.contentType === ContentType.Community
-        ? { community }
         : null;
   params['size'] = 36;
   const onSelect = (e) => {
@@ -87,13 +92,18 @@ export const getDiscussionResult = (thread, searchTerm) => {
   if (app.isCustomDomain() && app.customDomainId() !== chainOrComm) return;
 
   return m(ListItem, {
-    onclick: (e) => {
-      m.route.set((thread.type === 'thread')
-        ? `/${chainOrComm}/proposal/discussion/${proposalId}`
-        : `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+    allowOnContentClick: true,
+    contentLeft: m(ReplyIcon, {
+      size: IconSize.MD,
+      intent: IconIntent.Primary,
+    }),
+    onclick: () => {
+      m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
     },
     label: m('a.search-results-item', [
-      thread.type === 'thread' ? [
+        m('.search-results-thread-header disabled', [
+          `discussion - ${thread.chain || thread.community}`
+        ]),
         m('.search-results-thread-title', [
           decodeURIComponent(thread.title),
         ]),
@@ -123,19 +133,41 @@ export const getDiscussionResult = (thread, searchTerm) => {
             }
           })(),
         ])
-      ] : [
+      ]
+    ),
+  });
+};
+
+export const getCommentResult = (comment, searchTerm) => {
+  const proposalId = comment.proposalid;
+  const chainOrComm = comment.chain || comment.offchain_community;
+
+  if (app.isCustomDomain() && app.customDomainId() !== chainOrComm) return;
+
+  return m(ListItem, {
+    allowOnContentClick: true,
+    contentLeft: m(ReplyIcon, {
+      size: IconSize.MD,
+      intent: IconIntent.Primary,
+    }),
+    onclick: (e) => {
+      m.route.set(`/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${proposalId.split('_')[1]}`);
+    },
+    label: m('a.search-results-item', [
+        m('.search-results-thread-header disabled', [
+          `comment - ${comment.chain || comment.community}`
+        ]),
         m('.search-results-thread-title', [
-          'Comment on ',
-          decodeURIComponent(thread.title),
+          decodeURIComponent(comment.title),
         ]),
         m('.search-results-thread-subtitle', [
-          m('span.created-at', moment(thread.created_at).fromNow()),
-          m(User, { user: new AddressInfo(thread.address_id, thread.address, thread.address_chain, null) }),
+          m('span.created-at', moment(comment.created_at).fromNow()),
+          m(User, { user: new AddressInfo(comment.address_id, comment.address, comment.address_chain, null) }),
         ]),
         m('.search-results-comment', [
           (() => {
             try {
-              const doc = JSON.parse(decodeURIComponent(thread.body));
+              const doc = JSON.parse(decodeURIComponent(comment.text));
               if (!doc.ops) throw new Error();
               return m(QuillFormattedText, {
                 doc,
@@ -144,7 +176,7 @@ export const getDiscussionResult = (thread, searchTerm) => {
                 searchTerm,
               });
             } catch (e) {
-              const doc = decodeURIComponent(thread.body);
+              const doc = decodeURIComponent(comment.text);
               return m(MarkdownFormattedText, {
                 doc,
                 hideFormatting: true,
@@ -153,41 +185,31 @@ export const getDiscussionResult = (thread, searchTerm) => {
               });
             }
           })(),
-        ]),
+        ])
       ]
-    ]),
-    contentLeft: m(ReplyIcon)
+    ),
   });
 };
 
-const getListing = (results: any, searchTerm: string, pageCount: number, searchType?: SearchType) => {
-  if (Object.keys(results).length === 0) return [];
-  const filter = searchType === SearchType.Top ? null : searchType;
-  const concatResults = () => {
-    let allResults = [];
-    [SearchType.Discussion, SearchType.Member, SearchType.Community].forEach((type) => {
-      if (results[type]?.length) {
-        allResults = allResults.concat(results[type]);
-      }
-    });
-    return allResults;
-  };
-  const tabScopedResults = (filter ? results[searchType] : concatResults())
-    .sort((a, b) => {
-      // TODO: Token-sorting approach
-      // Some users are not verified; we give them a default date of 1900
-      const aCreatedAt = moment(a.created_at || a.createdAt || a.verified || '1900-01-01T:00:00:00Z');
-      const bCreatedAt = moment(b.created_at || b.createdAt || b.verified || '1900-01-01T:00:00:00Z');
-      return bCreatedAt.diff(aCreatedAt);
-    })
+const getListing = (
+  results: any,
+  searchTerm: string,
+  pageCount: number,
+  sort: SearchSort,
+  searchType?: SearchScope
+) => {
+  if (Object.keys(results).length === 0 || !results[searchType]) return [];
+  const tabScopedResults = (results[searchType])
     .map((res) => {
-      return res.searchType === SearchType.Discussion
+      return res.searchType === SearchScope.Threads
         ? getDiscussionResult(res, searchTerm)
-        : res.searchType === SearchType.Member
+        : res.searchType === SearchScope.Members
           ? getMemberResult(res, searchTerm)
-          : res.searchType === SearchType.Community
+          : res.searchType === SearchScope.Communities
             ? getCommunityResult(res)
-            : null;
+            : res.searchType === SearchScope.Replies
+              ? getCommentResult(res, searchTerm)
+              : null;
     })
     .slice(0, pageCount * 50);
   return tabScopedResults;
@@ -196,18 +218,13 @@ const getListing = (results: any, searchTerm: string, pageCount: number, searchT
 const SearchPage : m.Component<{
   results: any[]
 }, {
-  activeTab: SearchType,
+  activeTab: SearchScope,
   results: any,
-  searchTerm: string,
-  searchPrefix: string,
   refreshResults: boolean,
-  overridePrefix: boolean,
   pageCount: number,
-  errorText: string
+  errorText: string,
+  searchQuery: SearchQuery
 }> = {
-  oncreate: () => {
-    initializeSearch();
-  },
   view: (vnode) => {
     const LoadingPage = m(PageLoading, {
       narrow: true,
@@ -218,41 +235,34 @@ const SearchPage : m.Component<{
       ],
     });
 
-    const communityScope = m.route.param('comm');
-    const chainScope = m.route.param('chain');
-    const scope = app.isCustomDomain() ? app.customDomainId() : (communityScope || chainScope);
+    const searchQuery = SearchQuery.fromUrlParams(m.route.param())
 
-    const searchTerm = m.route.param('q')?.toLowerCase();
-    if (!searchTerm) {
-      vnode.state.errorText = 'Must enter query to begin searching';
+    const { chainScope, searchTerm } = searchQuery
+    const scope = app.isCustomDomain() ? app.customDomainId() : (chainScope);
+
+    if (!app.search.isValidQuery(searchQuery)) {
+      vnode.state.errorText = 'Must enter query longer than 3 characters to begin searching';
       return m(PageNotFound, {
         title: 'Search',
-        message: 'Please enter a query to begin searching'
+        message: 'Please enter a query longer than 3 characters to begin searching'
       });
     }
 
-    if (!app.searchCache[ALL_RESULTS_KEY]?.loaded) {
-      return LoadingPage;
-    }
-
     // re-fetch results for new search if search term or URI has changed
-    if (searchTerm !== vnode.state.searchTerm || vnode.state.refreshResults) {
-      vnode.state.searchTerm = searchTerm;
+    if (!_.isEqual(searchQuery, vnode.state.searchQuery) || vnode.state.refreshResults) {
+      vnode.state.searchQuery = searchQuery;
       vnode.state.refreshResults = false;
       vnode.state.results = {};
-      if (!app.searchCache[vnode.state.searchTerm]) {
-        app.searchCache[vnode.state.searchTerm] = { loaded: false };
-      }
-      search(searchTerm, { communityScope, chainScope }, vnode.state);
+      search(searchQuery, vnode.state);
       return LoadingPage;
     }
 
-    if (!app.searchCache[searchTerm].loaded) {
+    if (!app.search.getByQuery(searchQuery)?.loaded) {
       return LoadingPage;
     }
 
     if (!vnode.state.activeTab) {
-      vnode.state.activeTab = SearchType.Top;
+      vnode.state.activeTab = searchQuery.getSearchScope()[0];
     }
     if (!vnode.state.pageCount) {
       vnode.state.pageCount = 1;
@@ -260,14 +270,38 @@ const SearchPage : m.Component<{
 
     const { results, pageCount, activeTab } = vnode.state;
 
-    const tabScopedListing = getListing(results, searchTerm, pageCount, activeTab);
-    const resultCount = activeTab === SearchType.Top
-      ? tabScopedListing.length === SEARCH_PAGE_SIZE
-        ? `${tabScopedListing.length}+ results`
-        : pluralize(tabScopedListing.length, 'result')
-      : tabScopedListing.length === SEARCH_PAGE_SIZE
-        ? `${tabScopedListing.length}+ ${pluralize(2, activeTab).replace('2 ', '')}`
-        : pluralize(tabScopedListing.length, activeTab);
+    const getTab = (searchScope: SearchScope) => {
+      return m(TabItem, {
+        label: `${searchScope}`,
+        active: vnode.state.activeTab === searchScope,
+        onclick: () => {
+          vnode.state.pageCount = 1;
+          vnode.state.activeTab = searchScope;
+        },
+      })
+    }
+
+    const tabs = vnode.state.searchQuery.getSearchScope().map(getTab)
+    const tabScopedListing = getListing(results, searchTerm, pageCount, searchQuery.sort, activeTab);
+    const resultCount = tabScopedListing.length === SEARCH_PAGE_SIZE
+        ? `${tabScopedListing.length}+ ${pluralize(2, activeTab.toLowerCase()).replace('2 ', '')}`
+        : pluralize(tabScopedListing.length, activeTab.toLowerCase());
+
+    const filterBar = m('.search-results-filters', [
+      m('h4', 'Sort By: '),
+      m(Select, {
+        basic: true,
+        options: ['Best', 'Newest', 'Oldest'],
+        value: vnode.state.searchQuery.sort,
+        onchange: (e) => {
+          searchQuery.sort = SearchSort[e.currentTarget["value"]]
+          m.route.set(`/search?${searchQuery.toUrlParams()}`);
+          setTimeout(() => {
+            vnode.state.refreshResults = true;
+          }, 0);
+        }
+      })
+    ])
 
     return m(Sublayout, {
       class: 'SearchPage',
@@ -278,43 +312,9 @@ const SearchPage : m.Component<{
       showNewProposalButton: true,
       alwaysShowTitle: true,
       centerGrid: true,
-    }, m(Tabs, [
-      m(TabItem, {
-        label: 'Top',
-        active: activeTab === SearchType.Top,
-        onclick: () => {
-          vnode.state.pageCount = 1;
-          vnode.state.activeTab = SearchType.Top;
-        },
-      }),
-      !scope && !app.isCustomDomain()
-      && m(TabItem, {
-        label: 'Communities',
-        active: activeTab === SearchType.Community,
-        onclick: () => {
-          vnode.state.pageCount = 1;
-          vnode.state.activeTab = SearchType.Community;
-        },
-      }),
-      m(TabItem, {
-        label: 'Discussion',
-        active: activeTab === SearchType.Discussion,
-        onclick: () => {
-          vnode.state.pageCount = 1;
-          vnode.state.activeTab = SearchType.Discussion;
-        },
-      }),
-      m(TabItem, {
-        label: 'Members',
-        active: activeTab === SearchType.Member,
-        onclick: () => {
-          vnode.state.pageCount = 1;
-          vnode.state.activeTab = SearchType.Member;
-        },
-      }),
-    ]),
+    }, m(Tabs, tabs),
     m('.search-results-wrapper', [
-      !app.searchCache[searchTerm].loaded ? m('.search-loading', [
+      !app.search.getByQuery(searchQuery)?.loaded ? m('.search-loading', [
         m(Spinner, {
           active: true,
           fill: true,
@@ -326,7 +326,7 @@ const SearchPage : m.Component<{
         m('.search-results-caption', [
           resultCount,
           ' matching \'',
-          vnode.state.searchTerm,
+          vnode.state.searchQuery.searchTerm,
           '\'',
           scope
             ? ` in ${capitalize(scope)}.`
@@ -337,8 +337,9 @@ const SearchPage : m.Component<{
               ' ',
               m('a.search-all-communities', {
                 href: '#',
-                onclick: (e) => {
-                  m.route.set(`/search?q=${searchTerm}`);
+                onclick: () => {
+                  searchQuery.chainScope = undefined
+                  m.route.set(`/search?${searchQuery.toUrlParams()}`);
                   setTimeout(() => {
                     vnode.state.refreshResults = true;
                   }, 0);
@@ -346,6 +347,7 @@ const SearchPage : m.Component<{
               }, 'Search all communities?')
             ]
         ]),
+        resultCount === '0' ? null : filterBar,
         m('.search-results-list', tabScopedListing),
       ]),
     ]));

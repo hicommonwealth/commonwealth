@@ -12,10 +12,13 @@ import InvitesMenu, { handleEmailInvites } from 'views/components/header/invites
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { CommunityOptionsPopover } from './pages/discussions';
+import { ButtonIntent, FaceliftButton, FaceliftGradientButton, GradientType } from 'views/components/component_kit/buttons';
+import { ConsoleLoggerImpl } from 'typescript-logging';
+
 
 const Sublayout: m.Component<{
   // overrides
@@ -53,41 +56,25 @@ const Sublayout: m.Component<{
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
-    const community = app.community ? app.community.meta : null;
     const narrowBrowserWidth = (window.innerWidth > 767.98) && (window.innerWidth < 850);
     const terms = app.chain ? chain.terms : null;
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
-      (!app.activeId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
+      (!app.activeChainId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
         m('h3', 'Commonwealth')
       ] : chain ? [
         m('.ChainIcon', [
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
+          link('a', (!app.isCustomDomain() ? `/${app.activeChainId()}` : '/'), [
             m(ChainIcon, { size: ICON_SIZE, chain })
           ])
         ]),
         m('h4.sublayout-header-heading', [
-          link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), chain.name),
-          title && m('span.breadcrumb', m.trust('/')), 
-          title,
-          m(CommunityOptionsPopover),
-        ])
-      ] : community ? [
-        m('.ChainIcon', [
-          link('a', (!app.isCustomDomain() ? `/${app.activeId()}` : '/'), [
-            m(CommunityIcon, { size: ICON_SIZE, community })
-          ])
-        ]),
-        m('h4.sublayout-header-heading', [
-          m('div.sublayout-header-heading-wrapper', [
-            link('a', (app.isCustomDomain() ? '/' : `/${app.activeId()}`), community.name),
-          ]),
-          community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
+          link('a', (app.isCustomDomain() ? '/' : `/${app.activeChainId()}`), chain.name),
           title && m('span.breadcrumb', m.trust('/')),
           title,
           m(CommunityOptionsPopover),
-        ]),
+        ])
       ] : alwaysShowTitle ? [
         m('h4.sublayout-header-heading.no-chain-or-community', title)
       ] : [
@@ -95,12 +82,27 @@ const Sublayout: m.Component<{
       ],
     ]);
 
+    const hiringButton = m(FaceliftGradientButton, {
+      intent: ButtonIntent.Secondary,
+      label: "We're hiring!",
+      onclick: () => {
+        window.open(
+          'https://angel.co/company/commonwealth-labs',
+          '_blank'
+        );
+      },
+      disabled: false,
+      className: '.hiringBtn',
+      gradient: GradientType.RAINBOW
+    });
+
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
       showNewProposalButton
       && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
+      !app.isCustomDomain() && hiringButton,
       // above threadOnly option assumes all chains have proposals beyond threads
     ]);
 
@@ -127,7 +129,8 @@ const Sublayout: m.Component<{
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }
 
-    const tosStatus = localStorage.getItem(`${app.activeId()}-tos`);
+    const sidebarOpen = app.chain !== null;
+    const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
     return [
       m('.layout-container', [
@@ -155,14 +158,14 @@ const Sublayout: m.Component<{
               m('span', ' before interacting with this community.'),
               m('span', { class: 'close-button',
                 onclick: () => {
-                  localStorage.setItem(`${app.activeId()}-tos`, 'off');
+                  localStorage.setItem(`${app.activeChainId()}-tos`, 'off');
                 } }, 'X')
             ]) : '',
-          m('.sublayout-body', [
+          m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
+            m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
+          ]),
+          m(!sidebarOpen ? '.sublayout-body' : '.sublayout-body-sidebar' , [
             m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
-              !hideSidebar && m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
-                m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
-              ]),
               m('.sublayout-main-col', {
                 class: !rightContent && 'no-right-content'
               }, [
@@ -177,7 +180,7 @@ const Sublayout: m.Component<{
               { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
               { text: 'Terms', redirectTo:  '/terms' },
               { text: 'Privacy', redirectTo: '/privacy' },
-              { text: 'Docs', redirectTo: 'https://docs.commonwealth.im' },
+              { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
               { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
               { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
               // { text:  'Use Cases' },

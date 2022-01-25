@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
 import moment from 'moment';
@@ -10,7 +11,6 @@ import {
   OffchainThread,
   OffchainAttachment,
   OffchainThreadStage,
-  CommunityInfo,
   NodeInfo,
   OffchainTopic,
   Profile,
@@ -53,11 +53,12 @@ export const modelFromServer = (thread) => {
     collaborators,
     chain_entities,
     ChainEntities,
+    offchain_voting_enabled,
     offchain_voting_options,
     offchain_voting_ends_at,
     offchain_voting_votes,
     reactions,
-    latestCommCreatedAt,
+    last_commented_on,
     linked_threads,
   } = thread;
 
@@ -117,12 +118,28 @@ export const modelFromServer = (thread) => {
     topicFromStore = app.topics.store.getById(topic.id);
   }
 
+  let decodedTitle;
+  try {
+    decodedTitle = decodeURIComponent(title);
+  } catch (err) {
+    console.error(`Could not decode title: "${title}"`);
+    decodedTitle = title;
+  }
+
+  let decodedBody;
+  try {
+    decodedBody = decodeURIComponent(body);
+  } catch (err) {
+    console.error(`Could not decode body: "${body}"`);
+    decodedBody = body;
+  }
+
   return new OffchainThread({
     id,
     author: thread.Address.address,
     authorChain: thread.Address.chain,
-    title: decodeURIComponent(title),
-    body: decodeURIComponent(body),
+    title: decodedTitle,
+    body: decodedBody,
     createdAt: moment(created_at),
     attachments,
     snapshotProposal: snapshot_proposal,
@@ -139,11 +156,12 @@ export const modelFromServer = (thread) => {
     chainEntities: chainEntitiesProcessed || ChainEntities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
+    offchainVotingEnabled: offchain_voting_enabled,
     offchainVotingOptions: offchain_voting_options,
     offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
-    latestCommCreatedAt: latestCommCreatedAt
-      ? moment(latestCommCreatedAt)
+    lastCommentedOn: last_commented_on
+      ? moment(last_commented_on)
       : null,
     linkedThreads: linked_threads,
   });
@@ -223,7 +241,6 @@ class ThreadsController {
     kind: string,
     stage: string,
     chainId: string,
-    communityId: string,
     title: string,
     topicName: string,
     topicId: number,
@@ -238,7 +255,6 @@ class ThreadsController {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         chain: chainId,
-        community: communityId,
         address,
         title: encodeURIComponent(title),
         body: encodeURIComponent(body),
@@ -260,13 +276,8 @@ class ThreadsController {
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
       this._listingStore.add(result, storeOptions);
-      const activeEntity = app.activeCommunityId() ? app.community : app.chain;
-      updateLastVisited(
-        app.activeCommunityId()
-          ? (activeEntity.meta as CommunityInfo)
-          : (activeEntity.meta as NodeInfo).chain,
-        true
-      );
+      const activeEntity = app.chain;
+      updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
       return result;
     } catch (err) {
       console.log('Failed to create thread');
@@ -295,7 +306,6 @@ class ThreadsController {
         author: JSON.stringify(app.user.activeAccount.profile),
         address: app.user.activeAccount.address,
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
         thread_id: proposal.id,
         kind: proposal.kind,
         stage: proposal.stage,
@@ -329,7 +339,6 @@ class ThreadsController {
   }
 
   public async delete(proposal) {
-    const _this = this;
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /thread
       $.post(`${app.serverUrl()}/deleteThread`, {
@@ -355,18 +364,19 @@ class ThreadsController {
     threadId: number;
     name: string;
     choices: string[];
+    customDuration?: string;
   }) {
-    const { threadId, name, choices } = args;
+    const { threadId, name, choices, customDuration } = args;
     // start polling
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadPolling`,
       type: 'POST',
       data: {
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
         jwt: app.user.jwt,
         thread_id: threadId,
         content: JSON.stringify({ name, choices }),
+        custom_duration: customDuration?.split(' ')[0],
       },
       success: (response) => {
         const thread = this._store.getByIdentifier(threadId);
@@ -375,11 +385,14 @@ class ThreadsController {
           location.reload();
           return;
         }
+        // TODO: This should be handled properly
+        // via controller/store & update method
+        thread.offchainVotingEnabled = true;
         thread.offchainVotingOptions = { name, choices };
         thread.offchainVotingNumVotes = 0;
-        thread.offchainVotingEndsAt = moment(
-          response.result.offchain_voting_ends_at
-        );
+        thread.offchainVotingEndsAt = response.result.offchain_voting_ends_at
+          ? moment(response.result.offchain_voting_ends_at)
+          : null;
       },
       error: (err) => {
         console.log('Failed to start polling');
@@ -401,7 +414,6 @@ class ThreadsController {
       type: 'POST',
       data: {
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
         thread_id: args.threadId,
         stage: args.stage,
         jwt: app.user.jwt,
@@ -512,7 +524,6 @@ class ThreadsController {
       type: 'POST',
       data: {
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
         thread_id: args.threadId,
         chain_entity_id: args.entities.map((ce) => ce.id),
         jwt: app.user.jwt,
@@ -548,7 +559,6 @@ class ThreadsController {
   ) {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
-      community: app.activeCommunityId(),
       linking_thread_id,
       linked_thread_id,
       address: app.user.activeAccount.address,
@@ -567,7 +577,6 @@ class ThreadsController {
   ) {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
-      community: app.activeCommunityId(),
       linking_thread_id,
       linked_thread_id,
       address: app.user.activeAccount.address,
@@ -581,17 +590,17 @@ class ThreadsController {
     this._store.add(modelFromServer(response.result));
   }
 
-  public async fetchThreadIdForSnapshot(args: { snapshot: string }) {
+  public async fetchThreadIdsForSnapshot(args: { snapshot: string }) {
     const response = await $.ajax({
       url: `${app.serverUrl()}/fetchThreadForSnapshot`,
       type: 'GET',
       data: {
         snapshot: args.snapshot,
-        chain: app.activeId(),
+        chain: app.activeChainId(),
       },
     });
-    if (response.status !== 'Success') {
-      return 'false';
+    if (response.status === 'Failure') {
+      return null;
     }
     return response.result;
   }
@@ -599,7 +608,6 @@ class ThreadsController {
   public async fetchThreadsFromId(ids: Array<number | string>): Promise<OffchainThread[]> {
     const params = {
       chain: app.activeChainId(),
-      community: app.activeCommunityId(),
       ids,
     };
     const response = await $.get(`${app.serverUrl()}/getThreads`, params);
@@ -675,15 +683,13 @@ class ThreadsController {
   // loadNextPage returns false if there are no more threads to load
   public async loadNextPage(options: {
     chainId: string;
-    communityId: string;
     cutoffDate: moment.Moment;
     topicId?: OffchainTopic;
     stage?: string;
   }): Promise<boolean> {
-    const { chainId, communityId, cutoffDate, topicId, stage } = options;
+    const { chainId, cutoffDate, topicId, stage } = options;
     const params = {
       chain: chainId,
-      community: communityId,
       cutoff_date: cutoffDate.toISOString(),
     };
     if (topicId) params['topic_id'] = topicId;
@@ -705,11 +711,10 @@ class ThreadsController {
     return !(threads.length < DEFAULT_PAGE_SIZE);
   }
 
-  public refreshAll(chainId: string, communityId: string, reset = false) {
+  public refreshAll(chainId: string, reset = false) {
     // TODO: Change to GET /threads
     return $.get(`${app.serverUrl()}/bulkThreads`, {
       chain: chainId,
-      community: communityId,
     }).then(
       (response) => {
         if (response.status !== 'Success') {

@@ -71,10 +71,6 @@ export default class NearSputnikDao extends ProposalModule<
   }
 
   public async proposeTx(description: string, kind: NearSputnikProposalKind) {
-    if (typeof kind === 'string') {
-      throw new Error(`invalid proposal kind: ${kind}`);
-    }
-
     // TODO: user pre-checks
 
     const contractId = this.app.activeChainId();
@@ -87,7 +83,7 @@ export default class NearSputnikDao extends ProposalModule<
     };
 
     const nextProposalId = this._nProposals;
-    const callbackUrl = `${window.location.origin}/${contractId}/proposal/${ProposalType.SputnikProposal}/${nextProposalId}`;
+    const callbackUrl = `${window.location.origin}/${contractId}/proposal/${nextProposalId}`;
     await this._Chain.redirectTx(
       contractId,
       methodName,

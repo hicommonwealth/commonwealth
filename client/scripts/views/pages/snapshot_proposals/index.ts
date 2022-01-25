@@ -62,11 +62,11 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
   view: (vnode) => {
     const { selectedFilter } = vnode.state;
     const { snapshotId } = vnode.attrs;
-    if (!app.snapshot.initialized) {
+    if (!app.snapshot.initialized || app.snapshot.space.id != snapshotId) {
       app.snapshot.init(snapshotId).then(() => {
         m.redraw();
       });
-      
+
       return m(Sublayout, {
         class: 'DiscussionsPage',
         title: 'Proposals',
@@ -107,7 +107,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
       description: '',
       showNewProposalButton: true,
     }, [
-      (app.chain || app.community) && [
+      (app.chain) && [
         m('.discussions-main', [
           m(SnapshotProposalStagesBar, { selected: selectedFilter, onChangeFilter }),
           m(Listing, {

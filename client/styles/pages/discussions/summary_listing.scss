@@ -1,67 +1,123 @@
+@import 'shared';
+@import 'facelift';
+@import 'mixins/responsive';
+
 .SummaryListing {
     display: flex;
     flex-direction: column;
-    .topic {
-        flex: 3;
-    }
-    .thread-count {
-        flex: 1;
-    }
-    .recent-threads {
-        flex: 4;
-    }
-    .row-header {
-        color: #666666;
-        font-size: 18px;
-        h4 {
-            font-weight: 500;
-        }
+
+    .SummaryRow {
         display: flex;
+        padding: 15px 0;
+        border-top: 1px solid $disable-gray;
+        max-width: 100%;
+
+        .recent-thread-cell {
+            display: flex;
+            flex-direction: column;
+            .thread-summary {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 15px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+                a.thread-title {
+                    flex: 4;
+                    color: $purp-blue;
+                    &:hover {
+                        text-decoration: none;
+                    }
+                }
+                .last-updated {
+                    flex: 1;
+                    text-align: left;
+                    min-width: max-content;                    
+                    span {
+                        color: $lite-gray;
+                    }
+                }
+            }
+        }
+        .topic-header, .topic-cell {
+            h3 {
+                font-size: 24px;
+                font-weight: 500;
+                cursor: pointer;
+            }
+        }
+    }
+
+    h4 {
+        color: $midi-gray;
+        font-size: 18px;
+        margin-bottom: 10px;
+        display: flex;
+        font-weight: 500;
     }
     .row-wrap {
         display: flex;
         flex-direction: column;
     }
-}
 
-.SummaryRow {
-    display: flex;
-    padding: 20px 0;
-    border-bottom: 1px solid #DDDDDD;
-    max-width: 100%;
-    > div {
-        padding-right: 15px;
-        &:last-child {
-            padding-right: 0;
+    .topic-header, .topic-cell {
+        flex: 385;
+    }
+    .recent-thread-header, .recent-thread-cell {
+        flex: 430;
+        .thread-title {
+            flex: 335;
+        }
+        .last-updated {
+            flex: 95;
+            width: auto;
+            // implement with "last commenter" icon
+            // margin-right: 25px;
         }
     }
-    &:last-child {
-        border-bottom: none;
+
+    @include lg-min {
+        .topic-header, .topic-cell,
+        .recent-thread-header, .thread-title {
+            margin-right: 50px;
+        }
     }
-    .recent-threads {
-        display: flex;
-        flex-direction: column;
+
+    @include lg-min {
+        .topic-header, .topic-cell,
+        .recent-thread-header, .thread-title {
+            margin-right: 40px;
+        }
+    }
+    
+    @include md-max {
+        .topic-header, .topic-cell {
+            flex: 225;
+            margin-right: 25px;
+        }
+        .recent-thread-header, .recent-thread-cell {
+            flex: 225;
+        }
         .thread-summary {
-            margin-bottom: 10px;
-            a {
-                color: #4723AD;
-                &:hover {
-                    text-decoration: none;
-                }
-            }
-            span {
-                color: #666666;
-                margin-left: 10px;
-            }
+            display: flex;
+            flex-direction: column;
         }
     }
-    .thread-count {
-        font-weight: 500;
-    }
-    .topic {
-        h3 {
-            font-size: 24px;
-            font-weight: 500;
+
+    @include sm-max {
+        .SummaryRow {
+            flex-direction: column;
+            .topic-header, .recent-thread-header {
+                margin-bottom: 7px;
+            }
+            .topic-cell {
+                margin-bottom: 15px;
+            }
+            .last-updated {
+                display: flex;
+                justify-content: space-between;
+            }
         }
     }
 }

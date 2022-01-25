@@ -6,7 +6,7 @@ import m from 'mithril';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
-const marked = require('marked');
+import { marked } from 'marked';
 
 const renderer = new marked.Renderer();
 renderer.link = (href, title, text) => {
@@ -38,7 +38,7 @@ const MarkdownFormattedText : m.Component<{
     if (searchTerm) {
       // TODO: Switch trim system to match QFT component
       if (JSON.stringify(doc) !== vnode.state.cachedDocWithHighlights) {
-        const unsanitized = marked(doc.toString());
+        const unsanitized = marked.parse(doc.toString());
         const sanitized = DOMPurify.sanitize(unsanitized, { ALLOWED_TAGS: ['a'], ADD_ATTR: ['target'] });
         const vnodes = m.trust(sanitized);
         const root = document.createElement('div');
@@ -72,7 +72,7 @@ const MarkdownFormattedText : m.Component<{
       }, vnode.state.cachedResultWithHighlights);
     }
 
-    const unsanitized = marked(doc.toString());
+    const unsanitized = marked.parse(doc.toString());
     const sanitized = hideFormatting
       ? DOMPurify.sanitize(unsanitized, { ALLOWED_TAGS: ['a'], ADD_ATTR: ['target'] })
       : DOMPurify.sanitize(unsanitized, { USE_PROFILES: { html: true }, ADD_ATTR: ['target'] });

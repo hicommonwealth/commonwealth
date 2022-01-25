@@ -13,7 +13,7 @@ import { ChainAttributes } from '../models/chain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 import { ChainBase, ChainType } from '../../shared/types';
-import { getUrlForEthChainId } from './supportedEthChains';
+import { getUrlsForEthChainId } from './supportedEthChains';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -171,10 +171,11 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     let balance: BN;
     const fetchedAt = moment();
     if (base === ChainBase.Ethereum) {
-      const url = await getUrlForEthChainId(this.models, chainId);
-      if (!url) {
+      const urls = await getUrlsForEthChainId(this.models, chainId);
+      if (!urls) {
         throw new Error(`unsupported eth chain id ${chainId}`);
       }
+      const url = urls.url;
       try {
         balance = await this._balanceProvider.getEthTokenBalance(url, contractAddress, address);
       } catch (e) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'lib/normalize.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
@@ -18,7 +19,6 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import {
   ChainInfo,
-  CommunityInfo,
   NodeInfo,
   NotificationCategory,
   Notification,
@@ -26,12 +26,12 @@ import {
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
-import Community from 'controllers/chain/community/main';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
+import { pathIsDiscussion } from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -50,7 +50,6 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
     $.get(`${app.serverUrl()}/status`).then( async (data) => {
       app.config.chains.clear();
       app.config.nodes.clear();
-      app.config.communities.clear();
       app.user.notifications.store.clear();
       app.user.notifications.clearSubscriptions();
       data.chains.filter((chain) => chain.active)
@@ -63,32 +62,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           address: node.address,
           token_name: node.token_name,
           eth_chain_id: node.eth_chain_id,
-        }));
-      });
-      data.communities.sort((a, b) => a.id - b.id).map((community) => {
-        return app.config.communities.add(CommunityInfo.fromJSON({
-          id: community.id,
-          name: community.name,
-          description: community.description,
-          icon_url: community.icon_url,
-          website: community.website,
-          discord: community.discord,
-          element: community.element,
-          telegram: community.telegram,
-          github: community.github,
-          default_chain: app.config.chains.getById(community.default_chain),
-          visible: community.visible,
-          collapsed_on_homepage: community.collapsed_on_homepage,
-          default_summary_view: community.default_summary_view,
-          invites_enabled: community.invites_enabled,
-          privacy_enabled: community.privacy_enabled,
-          featured_topics: community.featured_topics,
-          topics: community.topics,
-          stages_enabled: community.stages_enabled,
-          custom_stages: community.custom_stages,
-          custom_domain: community.custom_domain,
-          terms: community.terms,
-          admins_and_mods: [],
+          alt_wallet_url: node.alt_wallet_url,
         }));
       });
       app.user.setRoles(data.roles);
@@ -134,11 +108,6 @@ export async function deinitChainOrCommunity() {
     console.log('Finished deinitializing chain');
     app.chain = null;
   }
-  if (app.community) {
-    await app.community.deinit();
-    console.log('Finished deinitializing community');
-    app.community = null;
-  }
   app.user.setSelectedNode(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
@@ -177,36 +146,6 @@ export async function handleUpdateEmailConfirmation() {
       notifySuccess('Email confirmed!');
     }
   }
-}
-
-export async function selectCommunity(c?: CommunityInfo): Promise<boolean> {
-  // Check for valid community selection, and that we need to switch
-  if (app.community && c === app.community.meta) return;
-
-  // Shut down old chain if applicable
-  await deinitChainOrCommunity();
-  document.title = `Commonwealth – ${c.name}`;
-
-  // Begin initializing the community
-  const newCommunity = new Community(c, app);
-  const finalizeInitialization = await newCommunity.init();
-
-  // If the user is still in the initializing community, finalize the
-  // initialization; otherwise, abort and return false
-  if (!finalizeInitialization) {
-    return false;
-  } else {
-    app.community = newCommunity;
-  }
-  console.log(`${c.name.toUpperCase()} started.`);
-
-  // Initialize available addresses
-  await updateActiveAddresses();
-
-  // Redraw with community fully loaded and return true to indicate
-  // initialization has finalized.
-  m.redraw();
-  return true;
 }
 
 // called by the user, when clicking on the chain/node switcher menu
@@ -260,7 +199,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/main'
     )).default;
     newChain = new Ethereum(n, app);
-  } else if (n.chain.network === ChainNetwork.NEAR || n.chain.network == ChainNetwork.NEARTestnet) {
+  } else if (n.chain.network === ChainNetwork.NEAR || n.chain.network === ChainNetwork.NEARTestnet) {
     const Near = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "near-main" */
@@ -394,15 +333,6 @@ export async function initChain(): Promise<void> {
   m.redraw();
 }
 
-export function initCommunity(communityId: string): Promise<boolean> {
-  const community = app.config.communities.getByCommunity(communityId);
-  if (community && community.length > 0) {
-    return selectCommunity(community[0]);
-  } else {
-    throw new Error(`No community found for '${communityId}'`);
-  }
-}
-
 export async function initNewTokenChain(address: string) {
   const response = await $.getJSON('/api/getTokenForum', { address, autocreate: true });
   if (response.status !== 'Success') {
@@ -444,7 +374,7 @@ m.route.set = (...args) => {
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
   if (!app.isCustomDomain()) {
-    args[0] = `/${app.activeId()}${args[0]}`;
+    args[0] = `/${app.activeChainId()}${args[0]}`;
   }
   m.route.set.apply(this, args);
 };
@@ -576,7 +506,8 @@ Promise.all([
       // a special case because OffchainThreads and on-chain proposals are all viewed through the
       // same "/:scope/proposal/:type/:id" route.
       let deferChain = attrs.deferChain;
-      if (path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
+      const isDiscussion = vnode.attrs.type === 'discussion' || pathIsDiscussion(scope, window.location.pathname);
+      if (path === 'views/pages/view_proposal/index' && isDiscussion) {
         deferChain = true;
       }
       if (app.chain?.meta.chain.type === ChainType.Token) {
@@ -617,7 +548,7 @@ Promise.all([
       '/members':                importRoute('views/pages/members', { scoped: true, deferChain: true }),
       '/sputnik-daos':           importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/chat':                   importRoute('views/pages/chat', { scoped: true, deferChain: true }),
-      '/new/thread':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+      '/new/discussion':             importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
       '/account/:address':       importRoute('views/pages/profile', { scoped: true, deferChain: true }),
       '/account':                redirectRoute((a) => activeAcct ? `/account/${activeAcct.address}` : '/'),
@@ -627,7 +558,10 @@ Promise.all([
       '/council':                importRoute('views/pages/council', { scoped: true }),
       '/delegate':               importRoute('views/pages/delegate', { scoped: true, }),
       '/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/proposal/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/discussion/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
       '/new/proposal/:type':     importRoute('views/pages/new_proposal/index', { scoped: true }),
+      '/new/proposal':           importRoute('views/pages/new_proposal/index', { scoped: true }),
       // Treasury
       '/treasury':               importRoute('views/pages/treasury', { scoped: true }),
       '/bounties':               importRoute('views/pages/bounties', { scoped: true }),
@@ -645,6 +579,9 @@ Promise.all([
 
       '/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
+      ),
+      '/multiple-snapshots': importRoute(
+        'views/pages/view_multiple_snapshot_spaces', { scoped: true, deferChain: true }
       ),
       '/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
@@ -668,7 +605,7 @@ Promise.all([
       '/:scope/members':            redirectRoute(() => '/members'),
       '/:scope/sputnik-daos':       redirectRoute(() => '/sputnik-daos'),
       '/:scope/chat':               redirectRoute(() => '/chat'),
-      '/:scope/new/thread':         redirectRoute(() => '/new/thread'),
+      '/:scope/new/discussion':         redirectRoute(() => '/new/discussion'),
       '/:scope/account/:address':   redirectRoute((attrs) => `/account/${attrs.address}/`),
       '/:scope/account':            redirectRoute(() => activeAcct ? `/account/${activeAcct.address}` : '/'),
       '/:scope/referenda':          redirectRoute(() => '/referenda'),
@@ -676,7 +613,10 @@ Promise.all([
       '/:scope/council':            redirectRoute(() => '/council'),
       '/:scope/delegate':           redirectRoute(() => '/delegate'),
       '/:scope/proposal/:type/:identifier': redirectRoute((attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`),
+      '/:scope/proposal/:identifier': redirectRoute((attrs) => `/proposal/${attrs.identifier}/`),
+      '/:scope/discussion/:identifier': redirectRoute((attrs) => `/discussion/${attrs.identifier}/`),
       '/:scope/new/proposal/:type':  redirectRoute((attrs) => `/new/proposal/${attrs.type}/`),
+      '/:scope/new/proposal':        redirectRoute(() => '/new/proposal'),
       '/:scope/treasury':           redirectRoute(() => '/treasury'),
       '/:scope/bounties':           redirectRoute(() => '/bounties'),
       '/:scope/tips':               redirectRoute(() => '/tips'),
@@ -722,6 +662,10 @@ Promise.all([
       '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
       '/:scope/finishNearLogin':   importRoute('views/pages/finish_near_login', { scoped: true }),
+      // Settings
+      '/settings':                 redirectRoute(() => '/edgeware/settings'),
+      '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
+
       // Discussions
       '/home':                     redirectRoute('/'), // legacy redirect, here for compatibility only
       '/discussions':              redirectRoute('/'), // legacy redirect, here for compatibility only
@@ -733,7 +677,7 @@ Promise.all([
       '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
       '/:scope/sputnik-daos':      importRoute('views/pages/sputnikdaos', { scoped: true, deferChain: true }),
       '/:scope/chat':              importRoute('views/pages/chat', { scoped: true, deferChain: true }),
-      '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
+      '/:scope/new/discussion':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
       // Profiles
       '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
       '/:scope/account':           redirectRoute(
@@ -745,7 +689,10 @@ Promise.all([
       '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
       '/:scope/delegate':          importRoute('views/pages/delegate', { scoped: true, }),
       '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
-      '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
+      '/:scope/proposal/:identifier':   importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/:scope/discussion/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+      '/:scope/new/proposal/:type':     importRoute('views/pages/new_proposal/index', { scoped: true }),
+      '/:scope/new/proposal':           importRoute('views/pages/new_proposal/index', { scoped: true }),
 
       // Treasury
       '/:scope/treasury':          importRoute('views/pages/treasury', { scoped: true }),
@@ -757,8 +704,6 @@ Promise.all([
       '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
       '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
       // Admin
-      '/settings':                 importRoute('views/pages/settings', { scoped: false }),
-      '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
       '/manage':                 importRoute('views/pages/manage_community/index', { scoped: false }),
       '/:scope/manage':          importRoute('views/pages/manage_community/index', { scoped: true }),
@@ -767,6 +712,9 @@ Promise.all([
 
       '/:scope/snapshot/:snapshotId': importRoute(
         'views/pages/snapshot_proposals', { scoped: true, deferChain: true }
+      ),
+      '/:scope/multiple-snapshots': importRoute(
+        'views/pages/view_multiple_snapshot_spaces', { scoped: true, deferChain: true }
       ),
       '/:scope/snapshot/:snapshotId/:identifier': importRoute(
         'views/pages/view_snapshot_proposal', { scoped: true }
@@ -847,6 +795,16 @@ Promise.all([
         m.route.set(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('githubPostAuthRedirect');
+    } catch (e) {
+      console.log('Error restoring path from localStorage');
+    }
+  } else if (localStorage && localStorage.getItem && localStorage.getItem('discordPostAuthRedirect')) {
+    try {
+      const postAuth = JSON.parse(localStorage.getItem('discordPostAuthRedirect'));
+      if (postAuth.path && (+new Date() - postAuth.timestamp < 30 * 1000)) {
+        m.route.set(postAuth.path, {}, { replace: true });
+      }
+      localStorage.removeItem('discordPostAuthRedirect');
     } catch (e) {
       console.log('Error restoring path from localStorage');
     }

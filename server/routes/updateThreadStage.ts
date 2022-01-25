@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { ServerError } from '../util/errors';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
@@ -10,7 +11,7 @@ export const Errors = {
   NoStage: 'Must pass in stage',
   NoThread: 'Cannot find thread',
   NotAdminOrOwner: 'Not an admin or owner of this thread',
-  InvalidStage: 'Invalid stage',
+  InvalidStage: 'Please Select a Stage',
 };
 
 const updateThreadStage = async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -35,22 +36,19 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
         }
       });
       const role = roles.find((r) => {
-        return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
+        return r.chain_id === thread.chain;
       });
       if (!role) return next(new Error(Errors.NotAdminOrOwner));
     }
 
     // fetch available stages
     let custom_stages = [];
-    let entity;
-    if (thread.community) {
-      entity = await models.OffchainCommunity.findOne({ where: { id: thread.community } });
-    } else if (thread.chain) {
-      entity = await models.Chain.findOne({ where: { id: thread.chain } });
-    }
+    const entity = await models.Chain.findOne({ where: { id: thread.chain } });
     try {
       custom_stages = Array.from(JSON.parse(entity.custom_stages)).map((s) => s.toString()).filter((s) => s);
-    } catch (e) {}
+    } catch (e) {
+      throw new ServerError("Could not parse", e)
+    }
 
     // validate stage
     const availableStages = custom_stages.length === 0 ? [

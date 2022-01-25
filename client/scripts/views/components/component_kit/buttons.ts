@@ -25,8 +25,12 @@ export enum ButtonSize {
   LG = 'lg',
 }
 
+export enum GradientType {
+  RAINBOW = 'rainbow'
+}
+
 const appendTags = (base: string, attrs) => {
-  const { intent, disabled, className, style, size } = attrs;
+  const { intent, disabled, className, style, size, gradient } = attrs;
   let tag = base;
   if (disabled) tag += '.disabled';
   if (intent === ButtonIntent.Primary) tag += '.primary';
@@ -36,14 +40,15 @@ const appendTags = (base: string, attrs) => {
   if (size === ButtonSize.SM) tag += '.sm';
   if (size === ButtonSize.LG) tag += '.lg';
   if (className) tag += className;
+  if (gradient === GradientType.RAINBOW) tag += '.rainbow-gradient';
   return tag;
 };
 
 export const FaceliftButton: m.Component<
   {
     intent: ButtonIntent;
-    label: string;
-    onclick: Function;
+    label;
+    onclick?: Function;
     disabled?: boolean;
     className?: string;
   },
@@ -53,6 +58,25 @@ export const FaceliftButton: m.Component<
     const { onclick, label } = vnode.attrs;
     return m(appendTags('button.Button', vnode.attrs), { onclick }, [
       m('span.label', label),
+    ]);
+  },
+};
+
+export const FaceliftGradientButton: m.Component<
+  {
+    intent: ButtonIntent;
+    label;
+    onclick: Function;
+    disabled?: boolean;
+    className?: string;
+    gradient: GradientType;
+  },
+  {}
+> = {
+  view: (vnode) => {
+    const { onclick, label } = vnode.attrs;
+    return m(appendTags('button.GradientButton', vnode.attrs), { onclick }, [
+      m('.gradient-button-label', label),
     ]);
   },
 };

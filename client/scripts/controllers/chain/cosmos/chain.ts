@@ -4,7 +4,6 @@ import m from 'mithril';
 import _ from 'lodash';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
-import { BlocktimeHelper } from 'helpers';
 import BN from 'bn.js';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 
@@ -70,7 +69,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return new CosmosToken(this.denom, n);
   }
 
-  private _blocktimeHelper: BlocktimeHelper = new BlocktimeHelper();
   private _tmClient: Tendermint34Client;
   public async init(node: NodeInfo, reset = false) {
     const url = `${window.location.origin}/cosmosAPI/${node.chain.id}`;
@@ -87,19 +85,15 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
 
-    // Poll for new block immediately and then every 2s
-    const fetchBlockJob = async () => {
-      const { block } = await this._tmClient.block();
-      const height = +block.header.height;
-      if (height > this.app.chain.block.height) {
-        const time = moment.unix(block.header.time.valueOf() / 1000);
-        this._blocktimeHelper.stamp(time, height - this.app.chain.block.height);
-        this.app.chain.block.height = height;
-        m.redraw();
-      }
-    };
-    await fetchBlockJob();
-    this._blockSubscription = setInterval(fetchBlockJob, 6000);
+    // Poll for new block immediately
+    const { block } = await this._tmClient.block();
+    const height = +block.header.height;
+    const { block: prevBlock } = await this._tmClient.block(height - 1);
+    const time = moment.unix(block.header.time.valueOf() / 1000);
+    // TODO: check if this is correctly seconds or milliseconds
+    this.app.chain.block.duration = block.header.time.valueOf() - prevBlock.header.time.valueOf();
+    this.app.chain.block.lastTime = time;
+    this.app.chain.block.height = height;
 
     const { pool: { bondedTokens } } = await this._api.staking.pool();
     this._staked = this.coins(new BN(bondedTokens));
@@ -112,9 +106,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async deinit(): Promise<void> {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
-    if (this._blockSubscription) {
-      clearInterval(this._blockSubscription);
-    }
   }
 
   public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<readonly Event[]> {

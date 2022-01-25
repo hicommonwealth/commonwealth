@@ -1,6 +1,6 @@
 import app from 'state';
 
-import { SigningStargateClient } from '@cosmjs/stargate';
+import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase } from 'types';
@@ -23,7 +23,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _client: SigningStargateClient;
 
   public readonly name = 'keplr';
-  public readonly label = 'Cosmos Wallet (Keplr)';
+  public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
 
   public get available() {
@@ -70,8 +70,13 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     // enable
     this._enabling = true;
     try {
-      // enabling without version (i.e. cosmoshub instead of cosmoshub-4) should work
-      this._chainId = app.chain.meta.chain.id;
+      // fetch chain id from URL using stargate client
+      const url = `${window.location.origin}/cosmosAPI/${app.chain.id}`;
+      const client = await StargateClient.connect(url);
+      const chainId = await client.getChainId();
+      this._chainId = chainId;
+      client.disconnect();
+
       try {
         await window.keplr.enable(this._chainId);
       } catch (err) {
@@ -81,11 +86,10 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
         const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain.meta.chain.name,
-          rpc: app.chain.meta.url,
-          // TODO: this is a HACK -- this is not a valid REST url, it is only a duplicate of the
-          //    RPC URL. But Keplr will not use this to send transactions, as we only use Keplr
-          //    for offline signing, so it should not break tx functionality.
-          rest: app.chain.meta.url,
+          rpc: url,
+          // Note that altWalletUrl on Cosmos chains should be the REST endpoint -- if not available, we
+          // use the RPC url as hack, which will break some querying functionality but not signing.
+          rest: app.chain.meta.altWalletUrl || url,
           bip44: {
               coinType: 118,
           },

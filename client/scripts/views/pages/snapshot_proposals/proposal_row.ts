@@ -1,5 +1,3 @@
-import 'pages/discussions/discussion_row.scss';
-
 import m from 'mithril';
 import moment from 'moment';
 import _ from 'lodash';
@@ -22,6 +20,7 @@ const ProposalRow: m.Component<
     const time = moment(+proposal.end * 1000);
     const now = moment();
 
+    // TODO: display proposal.scores and proposal.scores_total on card
     return m('.ProposalCard', [
       m(
         '.proposal-card-top',
@@ -29,7 +28,7 @@ const ProposalRow: m.Component<
           onclick: (e) => {
             e.stopPropagation();
             e.preventDefault();
-            localStorage[`${app.activeId()}-proposals-scrollY`] =
+            localStorage[`${app.activeChainId()}-proposals-scrollY`] =
               window.scrollY;
             navigateToSubpage(proposalLink);
           },

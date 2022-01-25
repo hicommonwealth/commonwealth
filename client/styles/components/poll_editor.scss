@@ -30,8 +30,32 @@
         }
     }
 
-    .poll-editor-footer {
-        margin: 22px 0 0;
+    .poll-duration-copy {
+        margin: 22px 0 10px;
         color: $text-color-medium;
+    }
+    .poll-editor-duration {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .cui-switch {
+            color: $text-color-medium;
+            min-width: max-content;
+            margin-bottom: 0;
+        }
+    }
+}
+
+.custom-duration-items {
+    .cui-popover-content {
+        width: 175px;
+        padding: 15px 10px;
+        .duration-item {
+            cursor: pointer;
+            padding: 0 4px 1px 10px;
+            &:hover {
+                background-color: $background-color-white-hover;
+            }
+        }
     }
 }

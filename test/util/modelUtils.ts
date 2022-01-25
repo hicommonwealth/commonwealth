@@ -4,7 +4,7 @@ import 'chai/register-should';
 import Web3 from 'web3';
 import BN from 'bn.js';
 import wallet from 'ethereumjs-wallet';
-import * as ethUtil from 'ethereumjs-util';
+import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { factory, formatFilename } from '../../shared/logging';
@@ -12,6 +12,7 @@ import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
 import { TokenBalanceProvider } from '../../server/util/tokenBalanceCache';
+import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -32,12 +33,10 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({ address, chain });
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
-    const msgHash = ethUtil.hashPersonalMessage(Buffer.from(token));
-    const sig = ethUtil.ecsign(
-      msgHash,
-      Buffer.from(keypair.getPrivateKey(), 'hex')
-    );
-    const signature = ethUtil.toRpcSig(sig.v, sig.r, sig.s);
+    const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
+    const data = constructTypedMessage(chain_id, token);
+    const privateKey = Buffer.from(keypair.getPrivateKey(), 'hex');
+    const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')
@@ -96,7 +95,6 @@ export interface ThreadArgs {
   kind: string;
   stage: string;
   chainId: string;
-  communityId: string;
   title: string;
   topicName?: string;
   topicId?: number;
@@ -108,7 +106,6 @@ export interface ThreadArgs {
 export const createThread = async (args: ThreadArgs) => {
   const {
     chainId,
-    communityId,
     address,
     jwt,
     title,
@@ -127,8 +124,7 @@ export const createThread = async (args: ThreadArgs) => {
     .set('Accept', 'application/json')
     .send({
       author_chain: chainId,
-      chain: communityId ? undefined : chainId,
-      community: communityId,
+      chain: chainId,
       address,
       title: encodeURIComponent(title),
       body: encodeURIComponent(body),
@@ -144,8 +140,7 @@ export const createThread = async (args: ThreadArgs) => {
 };
 
 export interface CommentArgs {
-  chain?: string;
-  community?: string;
+  chain: string;
   address: string;
   jwt: any;
   text: any;
@@ -153,7 +148,7 @@ export interface CommentArgs {
   root_id?: any;
 }
 export const createComment = async (args: CommentArgs) => {
-  const { chain, community, address, jwt, text, parentCommentId, root_id } =
+  const { chain, address, jwt, text, parentCommentId, root_id } =
     args;
   const res = await chai.request
     .agent(app)
@@ -161,8 +156,7 @@ export const createComment = async (args: CommentArgs) => {
     .set('Accept', 'application/json')
     .send({
       author_chain: chain,
-      chain: community ? undefined : chain,
-      community,
+      chain,
       address,
       parent_id: parentCommentId,
       root_id,
@@ -252,8 +246,7 @@ export const createWebhook = async ({ chain, webhookUrl, jwt }) => {
 export interface AssignRoleArgs {
   address_id: number;
   chainOrCommObj: {
-    chain_id?: string;
-    offchain_community_id?: string;
+    chain_id: string;
   };
   role: Permission;
 }

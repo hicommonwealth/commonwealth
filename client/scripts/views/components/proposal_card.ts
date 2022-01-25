@@ -12,7 +12,7 @@ import { Coin } from 'adapters/currency';
 import { blocknumToDuration, formatNumberLong, formatPercentShort, link, pluralize } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, AddressInfo } from 'models';
 import { ProposalType } from 'types';
-import { proposalSlugToChainEntityType, chainEntityTypeToProposalShortName } from 'identifiers';
+import { proposalSlugToChainEntityType, chainEntityTypeToProposalShortName, getProposalUrlPath } from 'identifiers';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
@@ -179,9 +179,9 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         onclick: (e) => {
           e.stopPropagation();
           e.preventDefault();
-          localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-          navigateToSubpage(`/proposal/${proposal.slug}/${proposal.identifier}`
-                                   + `-${slugify(proposal.title)}`); // avoid resetting scroll point
+          localStorage[`${app.activeChainId()}-proposals-scrollY`] = window.scrollY;
+          const path = getProposalUrlPath(proposal.slug, `${proposal.identifier}-${slugify(proposal.title)}`, true);
+          navigateToSubpage(path); // avoid resetting scroll point
         },
       }, [
         m('.proposal-card-metadata', [
@@ -253,12 +253,12 @@ const ProposalCard: m.Component<{ proposal: AnyProposal, injectedContent? }> = {
         // thread link
         proposal.threadId && m('.proposal-thread-link', [
           m('a', {
-            href: `/${app.activeId()}/proposal/discussion/${proposal.threadId}`,
+            href: getProposalUrlPath(ProposalType.OffchainThread, `${proposal.threadId}`),
             onclick: (e) => {
               e.stopPropagation();
               e.preventDefault();
-              localStorage[`${app.activeId()}-proposals-scrollY`] = window.scrollY;
-              navigateToSubpage(`/proposal/discussion/${proposal.threadId}`);
+              localStorage[`${app.activeChainId()}-proposals-scrollY`] = window.scrollY;
+              navigateToSubpage(getProposalUrlPath(ProposalType.OffchainThread, `${proposal.threadId}`, true));
               // avoid resetting scroll point
             },
           }, [

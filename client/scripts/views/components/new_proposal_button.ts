@@ -13,10 +13,10 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]>, mobile?: boolean) => {
   const activeAccount = app.user.activeAccount;
   const showSnapshotOptions = app.user.activeAccount
-    && app.chain?.meta.chain.snapshot;
+    && app.chain?.meta.chain.snapshot.length > 0;
 
   const topics = app.topics.getByCommunity(
-    app.activeId()
+    app.activeChainId()
   ).reduce(
     (acc, current) => current.featuredInNewPost
       ? [...acc, current]
@@ -25,20 +25,20 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
 
   return [
     m(MenuItem, {
-      onclick: () => { navigateToSubpage('/new/thread'); },
+      onclick: () => { navigateToSubpage('/new/discussion'); },
       label: 'New thread',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     topics.map((t) => (
       m(MenuItem, {
         onclick: (e) => {
-          localStorage.setItem(`${app.activeId()}-active-topic`, t.name);
+          localStorage.setItem(`${app.activeChainId()}-active-topic`, t.name);
           if (t.defaultOffchainTemplate) {
-            localStorage.setItem(`${app.activeId()}-active-topic-default-template`, t.defaultOffchainTemplate);
+            localStorage.setItem(`${app.activeChainId()}-active-topic-default-template`, t.defaultOffchainTemplate);
           } else {
-            localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
+            localStorage.removeItem(`${app.activeChainId()}-active-topic-default-template`);
           }
-          navigateToSubpage('/new/thread');
+          navigateToSubpage('/new/discussion');
         },
         label: `New ${t.name} Thread`,
         iconLeft: mobile ? Icons.PLUS : undefined,
@@ -52,24 +52,18 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       && !mobile
       && m(MenuDivider),
     app.chain?.base === ChainBase.CosmosSDK && m(MenuItem, {
-      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.CosmosProposal
-      }),
+      onclick: (e) => navigateToSubpage('/new/proposal'),
       label: 'New text proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     app.chain?.base === ChainBase.Ethereum && app.chain?.network === ChainNetwork.Aave
      && m(MenuItem, {
-       onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-         type: ProposalType.AaveProposal
-       }),
-       label: 'New On-Chain Proposal',
-       iconLeft: mobile ? Icons.PLUS : undefined,
+      onclick: (e) => navigateToSubpage('/new/proposal'),
+      label: 'New On-Chain Proposal',
+      iconLeft: mobile ? Icons.PLUS : undefined,
      }),
     app.chain?.network === ChainNetwork.Compound && m(MenuItem, {
-      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.CompoundProposal
-      }),
+      onclick: (e) => navigateToSubpage('/new/proposal'),
       label: 'New On-Chain Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
@@ -112,16 +106,18 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
       }),
     ],
     app.chain.network === ChainNetwork.Sputnik && m(MenuItem, {
-      onclick: (e) => navigateToSubpage('/new/proposal/:type', {
-        type: ProposalType.SputnikProposal
-      }),
+      onclick: (e) => navigateToSubpage('/new/proposal'),
       label: 'New Sputnik proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
     }),
     showSnapshotOptions && m(MenuItem, {
       onclick: (e) => {
-        e.preventDefault();
-        navigateToSubpage(`/new/snapshot-proposal/${app.chain.meta.chain.snapshot}`);
+        const snapshotSpaces = app.chain.meta.chain.snapshot;
+        if (snapshotSpaces.length > 1) {
+          navigateToSubpage('/multiple-snapshots', {action: 'create-proposal'});
+        } else {
+          navigateToSubpage(`/new/snapshot/${snapshotSpaces}`);
+        }
       },
       label: 'New Snapshot Proposal',
       iconLeft: mobile ? Icons.PLUS : undefined,
@@ -129,11 +125,13 @@ export const getNewProposalMenu = (candidates?: Array<[SubstrateAccount, number]
   ];
 };
 
-export const MobileNewProposalButton: m.Component<{}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
+export const MobileNewProposalButton: m.Component<{
+
+}, { councilCandidates?: Array<[SubstrateAccount, number]> }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
-    if (!app.chain && !app.community) return;
-    if (!app.activeId()) return;
+    if (!app.chain) return;
+    if (!app.activeChainId()) return;
     return m('.NewProposalButton.MobileNewProposalButton', [
       m(PopoverMenu, {
         class: 'new-proposal-button-popover',
@@ -165,11 +163,11 @@ const NewProposalButton: m.Component<{
     const { fluid, threadOnly, councilCandidates } = vnode.attrs;
 
     if (!app.isLoggedIn()) return;
-    if (!app.chain && !app.community) return;
-    if (!app.activeId()) return;
+    if (!app.chain) return;
+    if (!app.activeChainId()) return;
 
     // just a button for communities, or chains without governance
-    if (app.community || threadOnly) {
+    if (threadOnly) {
       return m(Button, {
         class: 'NewProposalButton',
         label: 'New thread',

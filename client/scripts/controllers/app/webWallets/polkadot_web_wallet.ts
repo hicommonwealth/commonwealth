@@ -15,7 +15,7 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   private _enabling: boolean = false;
 
   public readonly name = 'polkadot';
-  public readonly label = 'polkadot-js';
+  public readonly label = 'polkadot.js';
   public readonly chain = ChainBase.Substrate;
 
   public get available() {

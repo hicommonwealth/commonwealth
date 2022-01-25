@@ -18,7 +18,7 @@ const deleteDraft = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+  const [chain, error] = await lookupCommunityIsVisibleToUser(
     models,
     req.body,
     req.user

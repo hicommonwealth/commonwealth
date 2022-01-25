@@ -41,7 +41,7 @@ export interface ChainAttributes {
   has_chain_events_listener?: boolean;
   default_summary_view?: boolean;
   terms?: string;
-  snapshot?: string;
+  snapshot?: string[];
   bech32_prefix?: string;
 
   // associations
@@ -126,7 +126,10 @@ export default (
         defaultValue: false,
       },
       default_summary_view: { type: dataTypes.BOOLEAN, allowNull: true },
-      snapshot: { type: dataTypes.STRING, allowNull: true },
+      snapshot: {
+        type: dataTypes.ARRAY(dataTypes.STRING),
+        allowNull: true,
+      },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
     },

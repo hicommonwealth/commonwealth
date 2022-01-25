@@ -3,7 +3,6 @@ import 'modals/tx_signing_modal.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { EventEmitter } from 'events';
-import { mnemonicValidate } from '@polkadot/util-crypto';
 import { Button, TextArea, Grid, Col, Spinner } from 'construct-ui';
 
 import app from 'state';
@@ -232,7 +231,7 @@ const TXSigningWebWalletOption: m.Component<{
         currentPrefix: (app.chain as Substrate).chain.ss58Format,
       }) === vnode.attrs.author.address;
     });
-    return m('.TXSigningSeedOrMnemonicOption', [
+    return m('.TXSigningWebWalletOption', [
       m('div', [
         'Use a ',
         link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', { target: '_blank' }),
@@ -259,62 +258,6 @@ const TXSigningWebWalletOption: m.Component<{
               ? 'Current address not in wallet'
               : 'Sign and send transaction'
       }),
-    ]);
-  }
-};
-
-type TXSigningSeedOrMnemonicOptionAttrs = ITXModalData & { next: NextFn };
-const TXSigningSeedOrMnemonicOption: m.Component<TXSigningSeedOrMnemonicOptionAttrs, {}> = {
-  view: (vnode: m.VnodeDOM<TXSigningSeedOrMnemonicOptionAttrs>) => {
-    const transact = () => {
-      setupEventListeners(vnode);
-      vnode.attrs.txData.transact();
-    };
-    return m('.TXSigningSeedOrMnemonicOption', [
-      (!vnode.attrs.author.getSeed() && !vnode.attrs.author.getMnemonic()) ? m('form', [
-        m('.instructions', 'Enter your key phrase to sign this transaction:'),
-        m('.warn', 'This is insecure. Only use key phrases for testnets or throwaway accounts.'),
-        m(TextArea, {
-          class: 'mnemonic',
-          placeholder: 'Key phrase or seed',
-          fluid: true,
-          oncreate: (vvnode) => $(vvnode.dom).focus()
-        }),
-        m(Button, {
-          intent: 'primary',
-          type: 'submit',
-          rounded: true,
-          onclick: async (e) => {
-            e.preventDefault();
-            const newKey = `${$(vnode.dom).find('textarea.mnemonic').val().toString()
-              .trim()}`;
-            try {
-              if (mnemonicValidate(newKey)) {
-                await vnode.attrs.author.setMnemonic(newKey);
-              } else {
-                await vnode.attrs.author.setSeed(newKey);
-              }
-              transact();
-            } catch (err) {
-              throw new Error('Key phrase or seed did not match this account');
-            }
-          },
-          label: 'Send transaction'
-        }),
-      ]) : [
-        m('div', 'This account is already unlocked. Click here to sign the transaction:'),
-        m(Button, {
-          intent: 'primary',
-          type: 'submit',
-          rounded: true,
-          onclick: (e) => {
-            e.preventDefault();
-            transact();
-          },
-          oncreate: (vvnode) => $(vvnode.dom).focus(),
-          label: 'Send transaction'
-        }),
-      ],
     ]);
   }
 };
@@ -358,8 +301,7 @@ const TXSigningModalStates: {
               next: vnode.attrs.next,
               wallet: polkaWallet,
             }),
-            selected: !(vnode.attrs.author.getSeed() || vnode.attrs.author.getMnemonic())
-              && polkaWallet
+            selected: polkaWallet
               && polkaWallet.available
               && polkaWallet.enabled
               && polkaWallet.accounts.find((v) => v.address === vnode.attrs.author.address),
@@ -371,18 +313,6 @@ const TXSigningModalStates: {
               author: vnode.attrs.author,
               next: vnode.attrs.next,
             }),
-          }, {
-            name: 'Key phrase',
-            content: m(TXSigningSeedOrMnemonicOption, {
-              txData: vnode.attrs.txData,
-              txType: vnode.attrs.txType,
-              author: vnode.attrs.author,
-              next: vnode.attrs.next,
-            }),
-            // select mnemonic if the account is already unlocked
-            selected: app.chain.base === ChainBase.Substrate
-              && (vnode.attrs.author.getSeed() || vnode.attrs.author.getMnemonic()),
-            disabled: app.chain.base !== ChainBase.Substrate,
           }]),
         ])
       ]);

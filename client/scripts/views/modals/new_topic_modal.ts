@@ -4,13 +4,12 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup, FormLabel, Checkbox } from 'construct-ui';
-import BN from 'bn.js';
 
 import QuillEditor from 'views/components/quill_editor';
 import { CompactModalExitButton } from 'views/modal';
-import { tokensToWei } from 'helpers';
-import { stubFalse } from 'lodash';
+import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import TokenDecimalInput from '../components/token_decimal_input';
+import { TextInput, TextInputStatus } from '../components/component_kit/forms';
 interface INewTopicModalForm {
   id: number,
   name: string,
@@ -35,7 +34,7 @@ const NewTopicModal: m.Component<{
 }> = {
   view: (vnode) => {
     if (!app.user.isSiteAdmin
-    && !app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) {
+    && !app.user.isAdminOfEntity({ chain: app.activeChainId() })) {
       return null;
     }
     const { id, name, description, tokenThreshold = '0', featuredInSidebar, featuredInNewPost } = vnode.attrs;
@@ -61,24 +60,36 @@ const NewTopicModal: m.Component<{
       ]),
       m('.compact-modal-body', [
         m(Form, [
-          m(FormGroup, [
-            m(FormLabel, { for: 'name' }, 'Name'),
-            m(Input, {
-              title: 'Name',
-              name: 'name',
-              class: 'topic-form-name',
-              tabindex: 1,
-              defaultValue: vnode.state.form.name,
+          m(TextInput, {
+            name: 'name',
+            label: 'Name',
+            className: 'topic-form-name',
+            defaultValue: vnode.state.form.name,
+            oninput: (e) => {
+              vnode.state.form.name = (e.target as any).value;
+            },
+            inputValidationFn: (text) => {
+              const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
+              if (disallowedCharMatches) {
+                return [
+                  TextInputStatus.Error,
+                  `The ${pluralizeWithoutNumberPrefix(disallowedCharMatches.length, 'char')} 
+                  ${disallowedCharMatches.join(', ')} are not permitted`
+                ];
+              } else {
+                return [TextInputStatus.Validate, 'Valid topic name'];
+              }
+            },
+            otherAttrs: {
               autocomplete: 'off',
+              tabindex: 1,
               oncreate: (vvnode) => {
                 // use oncreate to focus because autofocus: true fails when component is recycled in a modal
                 setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
               },
-              oninput: (e) => {
-                vnode.state.form.name = (e.target as any).value;
-              },
-            }),
-          ]),
+              style: 'margin-bottom: 10px;'
+            }
+          }),
           m(FormGroup, [
             m(FormLabel, { for: 'description' }, 'Description'),
             m(Input, {
@@ -92,7 +103,9 @@ const NewTopicModal: m.Component<{
             }),
           ]),
           app.activeChainId() && m(FormGroup, [
-            m(FormLabel, { for: 'tokenThreshold' }, `Number of tokens needed to post (${app.chain?.meta.chain.symbol})`),
+            m(FormLabel, {
+              for: 'tokenThreshold'
+            }, `Number of tokens needed to post (${app.chain?.meta.chain.symbol})`),
             m(TokenDecimalInput, {
               decimals,
               defaultValueInWei: '0',

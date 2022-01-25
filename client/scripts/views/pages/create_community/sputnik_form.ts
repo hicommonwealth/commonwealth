@@ -1,18 +1,16 @@
 import 'pages/create_community.scss';
 
+import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
+import { CodeResult } from 'near-api-js/lib/providers/provider';
 import m from 'mithril';
 import app from 'state';
 import { Table, Button } from 'construct-ui';
-import BN from 'bn.js';
 import $ from 'jquery';
-import { initAppState, initChain } from 'app';
+import { initAppState } from 'app';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
-import { NearAccount } from 'controllers/chain/near/account';
-import Near from 'controllers/chain/near/main';
 import { notifyError } from 'controllers/app/notifications';
 import {
-  InputPropertyRow,
-  TogglePropertyRow,
+  InputPropertyRow, TogglePropertyRow,
 } from 'views/components/metadata_rows';
 import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
 
@@ -20,18 +18,16 @@ type SputnikFormAttrs = Record<string, unknown>;
 
 interface SputnikFormState extends ChainFormState {
   name: string;
-  initialValue: string;
-  createNew: boolean;
   saving: boolean;
+  isMainnet: boolean;
 }
 
 const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
   oninit: (vnode) => {
     vnode.state.name = '';
-    vnode.state.initialValue = '';
     initChainForm(vnode.state);
-    vnode.state.createNew = false;
     vnode.state.saving = false;
+    vnode.state.isMainnet = true;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [
@@ -52,35 +48,19 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
             },
             placeholder: 'genesis',
           }),
-          /*
           m(TogglePropertyRow, {
-            title: 'Deploy',
-            defaultValue: vnode.state.createNew,
+            title: 'Network',
+            defaultValue: vnode.state.isMainnet,
             onToggle: (checked) => {
-              vnode.state.createNew = checked;
+              vnode.state.isMainnet = checked;
             },
-            caption: (checked) =>
-              app.chain?.base !== ChainBase.NEAR
-                ? 'Must be on NEAR chain to deploy'
-                : !(app.user?.activeAccount instanceof NearAccount)
-                  ? 'Must log into NEAR account to deploy'
-                  : checked
-                    ? 'Deploying new DAO'
-                    : 'Adding existing DAO',
-            disabled:
-              !(app.user?.activeAccount instanceof NearAccount) ||
-              app.chain?.base !== ChainBase.NEAR,
-          }),
-          m(InputPropertyRow, {
-            title: 'Initial Bond (Must be >= Ⓝ 5)',
-            defaultValue: vnode.state.initialValue,
-            disabled: !vnode.state.createNew,
-            onChangeHandler: (v) => {
-              vnode.state.initialValue = v;
+            caption: (checked) => {
+              if (checked !== vnode.state.isMainnet) {
+                return 'Unknown network!';
+              }
+              return checked ? 'Mainnet' : 'Testnet';
             },
-            placeholder: '5',
           }),
-          */
           // TODO: add divider to distinguish on-chain data
           ...defaultChainRows(vnode.state),
         ]
@@ -91,33 +71,28 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
         intent: 'primary',
         disabled: vnode.state.saving,
         onclick: async (e) => {
-          if (!app.chain || !app.activeChainId().includes('near')) {
-            notifyError('Must be on NEAR or NEAR testnet to add Sputnik DAO.');
-            return;
-          }
           const {
             name,
             description,
-            initialValue,
             icon_url,
             website,
             discord,
             element,
             telegram,
             github,
-            createNew,
           } = vnode.state;
           vnode.state.saving = true;
-          const isMainnet = (app.chain as Near).chain.isMainnet;
+          const isMainnet = vnode.state.isMainnet;
           const id = isMainnet
             ? `${name}.sputnik-dao.near`
             : `${name}.sputnikv2.testnet`;
+          const url = isMainnet
+            ? 'https://rpc.mainnet.near.org'
+            : 'https://rpc.testnet.near.org';
           const addChainNodeArgs = {
             name: id,
             description,
-            node_url: isMainnet
-              ? 'https://rpc.mainnet.near.org'
-              : 'https://rpc.testnet.near.org',
+            node_url: url,
             symbol: isMainnet ? 'NEAR' : 'tNEAR',
             icon_url,
             website,
@@ -131,41 +106,32 @@ const SputnikForm: m.Component<SputnikFormAttrs, SputnikFormState> = {
             base: ChainBase.NEAR,
             network: ChainNetwork.Sputnik,
           };
-          if (createNew) {
-            // TODO: we need to validate arguments prior to making this call/redirect, so that
-            //   /addChainNode doesn't fail after the DAO has been created
-            // https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/Selector.jsx#L159
-            try {
-              const account = app.user.activeAccount as NearAccount;
-              const v = new BN(initialValue);
-              // write addChainNode data to localstorage to call in finishNearLogin page
-              localStorage[id] = JSON.stringify(addChainNodeArgs);
-              // triggers a redirect
-              await (app.chain as Near).chain.createDaoTx(
-                account,
-                name,
-                description,
-                v
-              );
-            } catch (err) {
-              notifyError(err.responseJSON?.error || 'Creating DAO failed.');
-              console.error(err.responseJSON?.error || err.message);
-              vnode.state.saving = false;
-            }
-          } else {
-            try {
-              // verify the DAO exists
-              await (app.chain as Near).chain.query(id, 'get_last_proposal_id', {});
+          try {
+            // verify the DAO exists
+            const config: ConnectConfig = {
+              networkId: isMainnet ? 'mainnet' : 'testnet',
+              nodeUrl: url,
+              keyStore: new keyStores.BrowserLocalStorageKeyStore(localStorage),
+            };
+            const api = await nearConnect(config);
 
-              // POST object
-              const res = await $.post(`${app.serverUrl()}/addChainNode`, addChainNodeArgs);
-              await initAppState(false);
-              m.route.set(`${window.location.origin}/${res.result.chain}`);
-            } catch (err) {
-              notifyError(err.responseJSON?.error || 'Adding DAO failed.');
-              console.error(err.responseJSON?.error || err.message);
-              vnode.state.saving = false;
-            }
+            const rawResult = await api.connection.provider.query<CodeResult>({
+              request_type: 'call_function',
+              account_id: id,
+              method_name: 'get_last_proposal_id',
+              args_base64: Buffer.from(JSON.stringify({})).toString('base64'),
+              finality: 'optimistic',
+            });
+            const _validResponse = JSON.parse(Buffer.from(rawResult.result).toString());
+
+            // POST object
+            const res = await $.post(`${app.serverUrl()}/addChainNode`, addChainNodeArgs);
+            await initAppState(false);
+            m.route.set(`${window.location.origin}/${res.result.chain}`);
+          } catch (err) {
+            notifyError(err.responseJSON?.error || 'Adding DAO failed.');
+            console.error(err.responseJSON?.error || err.message);
+            vnode.state.saving = false;
           }
         },
       }),

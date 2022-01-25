@@ -13,7 +13,7 @@ Button.EngagementButton {
     min-width: 70px;
     height: 40px;
     border-radius: 8px;
-    padding: 6px 15px 2px;
+    padding: 6px 15px 0px;
     font-weight: 600;
     &.primary {
         color: white;
@@ -86,6 +86,75 @@ Button.EngagementButton {
             }
         }
     }
+}
+
+.gradient-button-label {
+    padding-top: 6px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.GradientButton {
+    min-width: 70px;
+    height: 40px;
+    padding: 1px;
+    font-weight: 600;
+    margin: 0 7px;
+    color: #4a4a4a;
+    font-weight: 500;
+    border: 1px double transparent;
+    --angle: 45deg;
+    border-radius: 8px;
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.rainbow-gradient {
+        background-image: linear-gradient(white, white), linear-gradient(
+            var(--angle),
+            #91BFFF,
+            #91FFA0,
+            #FBFF91,
+            #FF9191, 
+        );
+    }
+    
+    &.primary {
+        &:hover {
+            box-shadow: 0px 1px 3px 0px #0000001A;
+            animation: 5s rotate linear infinite;
+        }
+        &.disabled {
+            background-color: $white;
+            box-shadow: none;
+            cursor: default;
+        }
+    }
+    &.secondary {
+        &:hover {
+            box-shadow: 0px 1px 3px 0px #0000001A;
+            animation: 5s rotate linear infinite;
+        }
+        &.disabled {
+            color: $disable-gray;
+            box-shadow: none;
+            cursor: default;
+        }
+    }
+}
+
+@keyframes rotate {
+    to {
+        --angle: 360deg;
+    }
+}
+
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 45deg;
+    inherits: false;
 }
 
 .ExternalLinkElement {

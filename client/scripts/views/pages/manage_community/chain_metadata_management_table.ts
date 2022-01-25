@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
@@ -8,8 +9,15 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputPropertyRow, TogglePropertyRow } from 'views/components/metadata_rows';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 
-import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
+import { ChainInfo } from 'client/scripts/models';
 import ManageRolesRow from './manage_roles_row';
+
+interface IChainOrCommMetadataManagementAttrs {
+  chain?: ChainInfo;
+  onRoleUpdate: Function;
+  admins;
+  mods;
+}
 
 interface IChainMetadataManagementState {
   name: string;
@@ -30,7 +38,7 @@ interface IChainMetadataManagementState {
   defaultSummaryView: boolean;
   network: ChainNetwork;
   symbol: string;
-  snapshot: string;
+  snapshot: string[];
   uploadInProgress: boolean;
 }
 
@@ -180,11 +188,12 @@ const ChainMetadataManagementTable: m.Component<
           }),
           app.chain?.meta.chain.base === ChainBase.Ethereum &&
             m(InputPropertyRow, {
-              title: 'Snapshot',
+              title: 'Snapshot(s)',
               defaultValue: vnode.state.snapshot,
               placeholder: vnode.state.network,
               onChangeHandler: (v) => {
-                vnode.state.snapshot = v;
+                const snapshots = v.split(',').map((val) => val.trim()).filter((val) => val.length > 4);
+                vnode.state.snapshot = snapshots;
               },
             }),
           m(InputPropertyRow, {
@@ -243,19 +252,14 @@ const ChainMetadataManagementTable: m.Component<
               iconUrl,
               defaultSummaryView,
             } = vnode.state;
-
-            // /^[a-z]+\.eth/
-            if (
-              snapshot &&
-              snapshot !== '' &&
-              !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
-                snapshot
-              )
-            ) {
-              notifyError('Snapshot name must be in the form of *.eth');
-              return;
+            for (const space of snapshot) {
+              if (space !== '') {
+                if (space.slice(space.length-4) != '.eth') {
+                  notifyError('Snapshot name must be in the form of *.eth');
+                  return;
+                }
+              }
             }
-
             try {
               await vnode.attrs.chain.updateChainData({
                 name,

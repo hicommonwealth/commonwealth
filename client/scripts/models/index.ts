@@ -2,12 +2,10 @@ export { default as AbridgedThread } from './AbridgedThread';
 export { default as Account } from './Account';
 export { default as AddressInfo } from './AddressInfo';
 export { default as ChainInfo } from './ChainInfo';
-export { default as CommunityInfo } from './CommunityInfo';
 export { default as ContractCategory } from './ContractCategory';
 export { default as ContractItem } from './ContractItem';
 export { default as DiscussionDraft } from './DiscussionDraft';
 export { default as IChainAdapter } from './IChainAdapter';
-export { default as ICommunityAdapter } from './ICommunityAdapter';
 export { default as ITokenAdapter } from './ITokenAdapter';
 export { default as IWebWallet } from './IWebWallet';
 export { default as Identity } from './Identity';
@@ -26,6 +24,8 @@ export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
 export { default as RoleInfo } from './RoleInfo';
 export { default as RolePermission } from './RolePermission';
+export { default as SearchQuery } from './SearchQuery'
+export { default as SearchResult } from './SearchResult'
 export { default as SocialAccount } from './SocialAccount';
 export { default as StorageModule } from './StorageModule';
 export { default as ChainEventType } from './ChainEventType';
