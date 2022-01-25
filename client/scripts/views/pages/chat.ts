@@ -8,7 +8,7 @@ import moment from 'moment';
 import app from 'state';
 import { WebsocketMessageType } from 'types';
 
-import { AddressInfo, ChatMessage } from 'models';
+import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
