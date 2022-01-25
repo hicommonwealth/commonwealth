@@ -3,9 +3,9 @@
 import m from 'mithril';
 import 'components/component_kit/cw_engagement_button.scss';
 
+import { CWIcon } from './cw_icons/cw_icon';
 import { ComponentType, StyleAttrs } from './types';
 import { getButtonClasses } from './helpers';
-import { CWIcon } from './cw_icons/cw_icon';
 
 export type EngagementButtonSize = 'sm' | 'lg';
 

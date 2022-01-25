@@ -76,7 +76,7 @@
     "@ethersproject/units": "^5.0.1",
     "@ethersproject/wallet": "^5.0.1",
     "@glidejs/glide": "^3.4.1",
-    "@keplr-wallet/types": "^0.9.0-alpha.10",
+    "@keplr-wallet/types": "^0.9.10",
     "@magic-ext/polkadot": "^0.1.2",
     "@magic-sdk/admin": "^1.3.1",
     "@metamask/eth-sig-util": "^4.0.0",

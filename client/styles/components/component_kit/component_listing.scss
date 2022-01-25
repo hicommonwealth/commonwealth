@@ -15,13 +15,11 @@
     flex-direction: column;
     flex-wrap: wrap;
     max-height: 160px;
-
     .hex-row,
     .gradient-row {
       display: flex;
       justify-content: space-between;
       margin-right: 20px;
-
       .hex-sample,
       .gradient-sample {
         min-width: 100px;
@@ -43,7 +41,6 @@
         @include shadow-gradient;
       }
     }
-
     .gradient-row {
       max-width: 400px;
     }
@@ -75,7 +72,6 @@
     align-items: center;
     margin-bottom: 20px;
   }
-
   .TextInput {
     margin-bottom: 20px;
   }

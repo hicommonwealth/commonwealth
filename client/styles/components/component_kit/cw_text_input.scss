@@ -1,0 +1,62 @@
+@import 'client/styles/facelift';
+
+$text-input-border: 2px solid;
+
+.TextInput {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+
+  label {
+    @include form-label;
+    margin-bottom: 4px;
+  }
+
+  input {
+    border-radius: 4px;
+    border: $text-input-border $white;
+    background-color: $background-gray;
+    height: 42px;
+    padding: 8px 15px;
+
+    &:hover {
+      border: $text-input-border $lite-purp;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-within {
+      border: $text-input-border $midi-purp;
+    }
+
+    &.success {
+      border: $text-input-border $dark-green;
+      background-color: $mint-green;
+    }
+
+    &.failure {
+      border: $text-input-border $pinky;
+      background-color: $flesh-pink;
+    }
+  }
+
+  &.success,
+  &.failure {
+    margin-bottom: 0px;
+  }
+}
+
+.validation-status {
+  @include form-label;
+  margin-top: 8px;
+
+  &.success {
+    color: $dark-green;
+  }
+
+  &.failure {
+    color: $hype-red;
+  }
+}
