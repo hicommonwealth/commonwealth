@@ -46,12 +46,11 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(app.chain.meta.ethChainId, message);
+    const msgParams = constructTypedMessage(app.chain.meta.ethChainId || 1, message);
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
       params: [this._accounts[0], JSON.stringify(msgParams)],
     })
-    console.log(signature);
     return signature;
   }
 
@@ -68,9 +67,8 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
-      if (!app.chain?.meta.ethChainId) {
-        throw new Error('No chain id found!');
-      }
+      // default to ETH
+      const chainId = app.chain?.meta.ethChainId || 1;
 
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
@@ -78,11 +76,11 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts'
       });
-      const chainId = `0x${app.chain.meta.ethChainId.toString(16)}`;
+      const chainIdHex = `0x${chainId.toString(16)}`;
       try {
         await this._web3.givenProvider.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId }],
+          params: [{ chainId: chainIdHex }],
         });
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
@@ -92,7 +90,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [{
-              chainId,
+              chainId: chainIdHex,
               chainName: app.chain.meta.chain.name,
               nativeCurrency: {
                 name: app.chain.meta.chain.symbol,
