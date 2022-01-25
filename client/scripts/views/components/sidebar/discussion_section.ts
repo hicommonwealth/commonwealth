@@ -46,7 +46,7 @@ export const DiscussionSection: m.Component<{mobile: boolean}, {}> = {
         const identifier = m.route.param('identifier');
         if (identifier) {
           const thread = app.threads.store.getByIdentifier(identifier.slice(0, identifier.indexOf('-')));
-          if (thread.topic && thread.topic.name === topic) {
+          if (thread?.topic && thread.topic.name === topic) {
             return true;
           } 
         }
