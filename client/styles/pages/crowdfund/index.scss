@@ -1,26 +1,52 @@
+@import '../../facelift.scss';
+
 .ProjectListing {
     .user-projects {
+        max-width: 900px;
         .user-created-project-wrap {
+            margin: 32px 0;
+            .user-created-project-header {
+                display: flex;
+                justify-content: space-between;
+            }
             .user-created-projects {
                 display: flex;
                 justify-content: space-between;
-                .CrowdfundCard {
+                .ProjectCard {
                 }
             }
         }
         .user-backed-project-wrap {
+            margin: 32px 0;
             .user-backed-projects {
-                display: grid;
-                .CrowdfundCard {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                .ProjectCard {
+                    margin: 12px;
+                }
+            }
+        }
+        .user-previously-backed-project-wrap {
+            margin: 32px 0;
+            .user-previously-backed-projects {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                .ProjectCard {
+                    margin: 12px;
+                    border-bottom: 2px solid $lite-gray;
                 }
             }
         }
     }
     .community-projects {
+        max-width: 900px;
         .trending-projects, 
         .recommended-projects {
             display: flex;
             flex-direction: column;
+            margin: 32px 0;
         }
     }
 }

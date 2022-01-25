@@ -7,6 +7,7 @@ import QuillFormattedText from '../../components/quill_formatted_text';
 // import User from '../../components/widgets/user';
 import { DummyProjectData } from './project_card';
 import { Project } from './index';
+import Sublayout from '../../sublayout';
 
 interface ProjectPageAttrs {
   project: Project;
@@ -18,7 +19,11 @@ interface ProjectPageState {
 const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
-    return m('.ProjectPage', [
+    return m(Sublayout, {
+      class: 'ProjectPage',
+      title: 'Project',
+      showNewProposalButton: false,
+    }, [
       m('h1', DummyProjectData.ProjectTitle),
       // m('.project-metadata', [
       //  m('')
