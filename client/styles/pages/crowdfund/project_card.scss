@@ -1,9 +1,9 @@
 @import '../../facelift.scss';
 
-.CrowdfundCard {
+.ProjectCard {
     display: flex;
 
-    .CrowdfundHeaderPanel {
+    .ProjectHeaderPanel {
         height: 100%;
         background-color: $lite-gray;
         .ChainIcon {
@@ -11,7 +11,7 @@
         }
     }
 
-    .CrowdfundCompletionBar {
+    .ProjectCompletionBar {
         flex: 1;
         background-color: $disable-gray;
         .completed-percentage {
@@ -20,12 +20,12 @@
         }
     }
 
-    .CrowdfundInfoPanel {
+    .ProjectInfoPanel {
         background-color: $background-gray;
-        .cf-info-header {
+        .project-info-header {
             display: flex;
             justify-content: space-between;
-            h3.cf-title {
+            h3.project-title {
                 @include header;
                 font-size: 24px;
                 color: $midi-gray;
@@ -34,7 +34,7 @@
                     margin-right: 6px;
                 }
             }
-            .cf-block-count {
+            .project-block-count {
                 height: 18px;
                 padding: 2px 4px 0;
                 font-size: 14px;
@@ -44,7 +44,7 @@
                 border-radius: 6px;
             }
         }
-        .cf-info-body {
+        .project-info-body {
             @include body;
             color: $lite-gray;
             font-size: 14px;
@@ -54,7 +54,7 @@
             overflow: hidden;
             height: 48px;
         }
-        .cf-info-footer {
+        .project-info-footer {
             margin-top: 5px;
             .User {
                 display: flex;
@@ -73,7 +73,7 @@
         flex-direction: column;
         height: 256px;
         width: 400px;
-        .CrowdfundHeaderPanel {
+        .ProjectHeaderPanel {
             flex: 32;
             border-radius: 16px 16px 0 0;
             .ChainIcon {
@@ -81,11 +81,11 @@
                 left: 342px;
             }
         }
-        .CrowdfundInfoPanel {
+        .ProjectInfoPanel {
             flex: 32;
             border-radius: 0 0 16px 16px;
             padding: 12px 10px 0 20px;
-            .cf-info-header {
+            .project-info-header {
                 justify-content: space-between;
             }
         }
@@ -94,7 +94,7 @@
     &.medium {
         height: 114px;
         width: 400px;
-        .CrowdfundHeaderPanel {
+        .ProjectHeaderPanel {
             flex: 7;
         }
         .right-panel {
@@ -102,10 +102,10 @@
             flex-direction: column;
             flex: 18;
             background-color: $background-gray;
-            .CrowdfundCompletionBar {
+            .ProjectCompletionBar {
                 flex: 1;
             }
-            .CrowdfundInfoPanel {
+            .ProjectInfoPanel {
                 flex: 13;
                 margin: 6px 1px 0 14px;
                 .User {
@@ -117,5 +117,45 @@
                 }
             }
         } 
+    }
+
+    &.small {
+        flex-direction: column;
+        width: 272px;
+        padding: 4px;
+        &:hover {
+            background-color: $background-gray;
+        }
+        .top-panel {
+            display: flex;
+            justify-content: space-between;
+            h3 {
+                @include header;
+                color: $midi-gray;
+            }
+            .project-status {
+                font-size: 14px;
+                padding: 6px 12px 4px;
+                height: min-content;
+                border-radius: 6px;
+                &.funded {
+                    background-color: $foam-green;
+                    color: $greenery;
+                }
+            }
+        }
+        .bottom-panel {
+            display: flex;
+            justify-content: left;
+            .project-chain-name {
+                @include body;
+                margin-left: 7px;
+                color: $lite-gray;
+                font-size: 14px;
+                line-height: 17px;
+                position: relative;
+                top: 1px;
+            }
+        }
     }
 }

@@ -1,13 +1,13 @@
 import 'pages/crowdfund/index.scss';
 
 import m from 'mithril';
-import app from 'state';
+// import app from 'state';
 import { AddressInfo } from 'models';
 import SearchBar from '../../components/search_bar';
 import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
 import ProjectCard, { ProjectCardSize } from './project_card';
 
-type Project = {
+export type Project = {
   name: string;
   backers: AddressInfo[];
 }
@@ -21,11 +21,11 @@ interface ProjectListingState {
 const ProjectListing: m.Component<ProjectListingAttrs, ProjectListingState> = {
   view: (vnode) => {
     // const projects = (app.chain as any).projects;
-    const userCreatedProjects: Project[] = [ null ]; // projects.filter(...)
-    const userBackedProjects: Project[] = [ null ]; // projects.filter(...)
-    const userPreviouslyBackedProjects: Project[] = [ null ]; // projects.filter(...)
-    const trendingProjects: Project[] = [ null ]; // projects.filter(...)
-    const recommendedProjects: Project[] = [ null ]; // projects.filter(...)
+    const userCreatedProjects: Project[] = [ null, null ]; // projects.filter(...)
+    const userBackedProjects: Project[] = [ null, null, null, null ]; // projects.filter(...)
+    const userPreviouslyBackedProjects: Project[] = [ null, null, null, null, null, null ]; // projects.filter(...)
+    const trendingProjects: Project[] = [ null, null ]; // projects.filter(...)
+    const recommendedProjects: Project[] = [ null, null, null, null ]; // projects.filter(...)
     return m('.ProjectListing', [
       (userCreatedProjects.length || userBackedProjects.length || userPreviouslyBackedProjects.length) &&
       m('.user-projects', [

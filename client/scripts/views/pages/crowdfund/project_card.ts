@@ -1,7 +1,8 @@
-import 'components/crowdfund/project_card.scss';
+import 'pages/crowdfund/project_card.scss';
 
 import m from 'mithril';
 import { AnonymousUser } from '../../components/widgets/user';
+import { capitalize } from 'lodash';
 
 export enum ProjectCardSize {
   Small = 'small',
@@ -17,7 +18,7 @@ interface ProjectCardAttrs {
 interface ProjectCardState {
 }
 
-enum DummyProjectData {
+export enum DummyProjectData {
   ProjectTitle = 'Project Name',
   ProjectDescription = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
     + 'Sit ullamcorper tortor pretium amet eget leo. Venenatis id risus at mollis '
@@ -25,6 +26,8 @@ enum DummyProjectData {
   ProjectBlockCount = '16K',
   ProjectChain = 'Ethereum',
   ProjectCompletionPercent = 0.32,
+  ProjectCompletionSuccess = 'funded',
+  ProjectCompletionFailure = 'failed',
 }
 
 const DummyChainIcon: m.Component<{ chain, onclick, size: number }> = {
@@ -69,8 +72,8 @@ const ProjectInfoPanel: m.Component<{ project, avatarSize: number, iconSize?: nu
   view: (vnode) => {
     const { project, avatarSize, iconSize } = vnode.attrs;
     return m('.ProjectInfoPanel', [
-      m('.cf-info-header', [
-        m('h3.cf-title', [
+      m('.project-info-header', [
+        m('h3.project-title', [
           iconSize && m(DummyChainIcon, {
             chain: null,
             onclick: null,
@@ -78,10 +81,10 @@ const ProjectInfoPanel: m.Component<{ project, avatarSize: number, iconSize?: nu
           }),
           DummyProjectData.ProjectTitle
         ]),
-        m('.cf-block-count', `${DummyProjectData.ProjectBlockCount} Blocks`)
+        m('.project-block-count', `${DummyProjectData.ProjectBlockCount} Blocks`)
       ]),
-      m('.cf-info-body', DummyProjectData.ProjectDescription),
-      m('.cf-info-footer', [
+      m('.project-info-body', DummyProjectData.ProjectDescription),
+      m('.project-info-footer', [
         m(AnonymousUser, { // dummy user
             avatarSize,
             distinguishingKey: '123',
@@ -122,11 +125,21 @@ const ProjectCard: m.Component<
     const ProjectCardSmall = m('.ProjectCard',
       { class: 'small', onclick },
       [
-        m('h3', DummyProjectData.ProjectTitle),
-        // TODO: Implement in kit
-        // m(CWProjectStatus, { status: project.status })
-        m(DummyChainIcon),
-        m(DummyProjectData.ProjectChain)
+        m('.top-panel', [
+          m('h3', DummyProjectData.ProjectTitle),
+          // TODO: Implement label in kit
+          m(`.project-status ${DummyProjectData.ProjectCompletionSuccess}`,
+            capitalize(DummyProjectData.ProjectCompletionSuccess)
+          )
+        ]),
+        m('.bottom-panel', [
+          m(DummyChainIcon, {
+            chain: null,
+            onclick: null,
+            size: 12,
+          }),
+          m('.project-chain-name', DummyProjectData.ProjectChain)
+        ])
       ]
     );
 

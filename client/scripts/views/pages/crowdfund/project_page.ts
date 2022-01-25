@@ -5,10 +5,11 @@ import m from 'mithril';
 // import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
 import QuillFormattedText from '../../components/quill_formatted_text';
 // import User from '../../components/widgets/user';
-// import CrowdfundCard, { CrowdfundCardSize } from './crowdfund_card';
+import { DummyProjectData } from './project_card';
+import { Project } from './index';
 
 interface ProjectPageAttrs {
-  project; // : Project;
+  project: Project;
 }
 
 interface ProjectPageState {
@@ -18,12 +19,14 @@ const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
   view: (vnode) => {
     const { project } = vnode.attrs;
     return m('.ProjectPage', [
-      m('h1', project.name),
+      m('h1', DummyProjectData.ProjectTitle),
       // m('.project-metadata', [
       //  m('')
       // ])
       m('h2', 'About'),
-      m(QuillFormattedText), // project.description,
+      m(QuillFormattedText, {
+        doc: DummyProjectData.ProjectDescription
+      }),
       m('hr'),
       m('h2', 'Backers')
       // m(CWTable, {
