@@ -50,7 +50,6 @@ import {
   IconIntent,
   WebsiteIcon,
 } from './icons';
-import { TextInput, TextInputStatus } from './forms';
 import { FaceliftCard } from './cards';
 import { CWButton } from './cw_button';
 import { CWGradientButton } from './cw_gradient_button';
@@ -58,6 +57,7 @@ import { CWButtonGroup } from './cw_button_group';
 import { CWExternalLink } from './cw_external_link';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
+import { CWTextInput, ValidationStatus } from './cw_text_input';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -434,22 +434,20 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 600px;',
         },
         [
-          m(TextInput, {
+          m(CWTextInput, {
             name: 'Form field',
-            oninput: (e) => null,
-            inputValidationFn: (val: string): [TextInputStatus, string] => {
+            inputValidationFn: (val: string): [ValidationStatus, string] => {
               if (val.match(/[^A-Za-z]/)) {
-                return [TextInputStatus.Error, 'Must enter characters A-Z'];
+                return [ValidationStatus.Failure, 'Must enter characters A-Z'];
               } else {
-                return [TextInputStatus.Validate, 'Input validated'];
+                return [ValidationStatus.Success, 'Input validated'];
               }
             },
             label: 'This input only accepts A-Z',
             placeholder: 'Placeholder',
           }),
-          m(TextInput, {
+          m(CWTextInput, {
             name: 'Text field',
-            oninput: (e) => null,
             label: 'No status message or error validation',
             placeholder: 'Placeholder',
           }),
