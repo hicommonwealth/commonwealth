@@ -1,12 +1,12 @@
 import { io } from 'socket.io-client';
 import { ChainEventsNamespace } from 'controllers/server/socket/chainEventsNs';
-import {ChatNamesapce} from "controllers/server/socket/chatNs";
+import { ChatNamespace } from "controllers/server/socket/chatNs";
 
 export class WebSocketController {
   private _socket;
   private _isConnected = false;
   public readonly chainEventsNs: ChainEventsNamespace;
-  public readonly chatNs: ChatNamesapce;
+  public readonly chatNs: ChatNamespace;
 
   public constructor(jwt: string) {
     this._socket = io({
@@ -19,7 +19,7 @@ export class WebSocketController {
 
     // add all custom namespaces i.e. chain-event notifications, chat, thread notifications
     this.chainEventsNs = new ChainEventsNamespace();
-    this.chatNs = new ChatNamesapce();
+    this.chatNs = new ChatNamespace();
   }
 
   public async addListener(eventName: string, listener: (any) => void) {

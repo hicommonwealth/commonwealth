@@ -21,25 +21,29 @@ export function createChatNamespace(io: Server, models: DB) {
             log.info(`${socket.id} disconnected from Chat`);
         });
 
-        socket.on(WebsocketMessageType.JoinChatChannel, (chatChannels: string[]) => {
-            if (chatChannels.length > 0) {
-                log.info(`${socket.id} joining ${JSON.stringify(chatChannels)}`);
-                for (const channel of chatChannels) socket.join(channel);
+        socket.on(WebsocketMessageType.JoinChatChannel, (chatChannelIds: number[]) => {
+            if (chatChannelIds.length > 0) {
+                log.info(`${socket.id} joining ${JSON.stringify(chatChannelIds)}`);
+                for (const channel of chatChannelIds) socket.join(`${channel}`);
             }
         })
 
-        socket.on(WebsocketMessageType.LeaveChatChannel, (chatChannels: string[]) => {
-            if (chatChannels.length > 0) {
-                log.info(`${socket.id} leaving ${JSON.stringify(chatChannels)}`);
-                for (const channel of chatChannels) socket.leave(channel);
+        socket.on(WebsocketMessageType.LeaveChatChannel, (chatChannelIds: number[]) => {
+            if (chatChannelIds.length > 0) {
+                log.info(`${socket.id} leaving ${JSON.stringify(chatChannelIds)}`);
+                for (const channel of chatChannelIds) socket.leave(`${channel}`);
             }
         })
 
-        socket.on(WebsocketMessageType.ChatMessage, (chatChannelName: string, chatChannelId: string,
-                                                     address: string, chatMessage: string) => {
-            models.ChatMessage.create({address, message: chatMessage, chat_channel_id: chatChannelId})
+        socket.on(WebsocketMessageType.ChatMessage, (_message) => {
+            const { message, address, chat_channel_id } = _message
+            models.ChatMessage.create({ address, message, chat_channel_id })
                 .then((res) => {
-                    ChatNs.to(`${chatChannelId}-${chatChannelName}`).emit(WebsocketMessageType.ChatMessage, chatChannelId, address, chatMessage);
+                    console.log(res['dataValue'])
+                    const { id, created_at } = res
+                    ChatNs
+                      .to(`${chat_channel_id}`)
+                      .emit(WebsocketMessageType.ChatMessage, {id, address, message, chat_channel_id, created_at});
                 })
                 .catch((e) => {
                     socket.emit('Error', e)

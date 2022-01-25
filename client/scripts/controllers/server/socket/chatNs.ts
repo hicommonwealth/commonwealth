@@ -1,9 +1,10 @@
-import {WebsocketMessageType, WebsocketNamespaces} from 'types';
+import $ from 'jquery';
 import app from 'state';
-import {Notification, NotificationSubscription} from 'models';
-import {io} from 'socket.io-client';
+import { WebsocketMessageType, WebsocketNamespaces } from 'types';
+import { io } from 'socket.io-client';
 
-export class ChatNamesapce {
+export const MESSAGE_PAGE_SIZE = 50;
+export class ChatNamespace {
     private chatNs;
     private _isConnected = false;
 
@@ -14,11 +15,26 @@ export class ChatNamesapce {
 
         this.chatNs.on('connect', this.onConnect.bind(this));
         this.chatNs.on('disconnect', this.onDisconnect.bind(this));
-        this.chatNs.on(WebsocketMessageType.ChatMessage, this.onChatMessage.bind(this));
     }
 
-    private onChatMessage(chatChannelId: string, address: string, chatMessage: string) {
-        // TOODO: add the message to the appropriate channel
+    public async addListener(eventName: string, listener: (any) => void) {
+        this.chatNs.on(eventName, listener);
+    }
+
+    public async removeListener(eventName: string, listener?: (any) => void) {
+        this.chatNs.off(eventName, listener);
+    }
+
+    public sendMessage(message: any) {
+        this.chatNs.emit(WebsocketMessageType.ChatMessage, message)
+    }
+
+    public connectToChannels(channel_ids: number[]){
+        this.chatNs.emit(WebsocketMessageType.JoinChatChannel, channel_ids)
+    }
+
+    public disconnectFromChannels(channel_ids: number[]){
+        this.chatNs.emit(WebsocketMessageType.LeaveChatChannel, channel_ids)
     }
 
     private onConnect() {
@@ -33,5 +49,37 @@ export class ChatNamesapce {
 
     public get isConnected() {
         return this._isConnected;
+    }
+
+    public async createChatChannel(name, community_id) {
+        // check for admin?
+        try {
+            $.post(`${app.serverUrl()}/createChatChannel`, {
+                name,
+                community_id
+            }).then((res) => {
+                console.log(res)
+            }).catch((err) => {
+                throw new Error(`Failed to created chat channel with error: ${err}`)
+            })
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    public async getChatMessages(community_id) {
+        try {
+            $.get(`${app.serverUrl()}/getChatMessages`, {
+                community_id
+            }).then((res) => {
+                console.log(res)
+                return res
+            }).catch((err) => {
+                throw new Error(`Failed to created chat channel with error: ${err}`)
+            })
+        } catch (e) {
+            console.error(e)
+            return []
+        }
     }
 }

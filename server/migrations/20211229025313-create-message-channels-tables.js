@@ -25,7 +25,7 @@ module.exports = {
       await queryInterface.sequelize.query(`
         CREATE TABLE "ChatMessages" (
             id SERIAL PRIMARY KEY,
-            address VARCHAR(255) NOT NULL
+            address VARCHAR(255) NOT NULL,
             message TEXT NOT NULL,
             chat_channel_id INTEGER NOT NULL REFERENCES "ChatChannels" ON DELETE CASCADE,
             created_at DATE NOT NULL,
@@ -37,8 +37,8 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.dropTable('ChatChannels', { transaction: t });
       await queryInterface.dropTable('ChatMessages', { transaction: t });
+      await queryInterface.dropTable('ChatChannels', { transaction: t });
       await queryInterface.renameTable("OldChatMessages", "ChatMessages", { transaction: t });
     });
   }
