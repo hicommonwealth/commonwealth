@@ -50,13 +50,13 @@ import {
   IconIntent,
   WebsiteIcon,
 } from './icons';
-import { FaceliftCard } from './cards';
 import { CWButton } from './cw_button';
 import { CWGradientButton } from './cw_gradient_button';
 import { CWButtonGroup } from './cw_button_group';
 import { CWExternalLink } from './cw_external_link';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
+import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
 
 const displayColors = (hexList) => {
@@ -347,51 +347,48 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
       m('h1', 'Cards'),
       m('.card-gallery', [
         m(
-          FaceliftCard,
+          CWCard,
           {
-            elevation: 1,
+            elevation: 'elevation-1',
             interactive: true,
-            fluid: false,
             onclick: () => notifySuccess('Card clicked!'),
           },
           [m('h4', 'Card title'), m('div', 'Elevation: 1')]
         ),
         m(
-          FaceliftCard,
+          CWCard,
           {
-            elevation: 2,
+            elevation: 'elevation-2',
             interactive: true,
-            fluid: false,
             onclick: () => notifySuccess('Card clicked!'),
           },
           [m('h4', 'Card title'), m('div', 'Elevation: 2')]
         ),
         m(
-          FaceliftCard,
+          CWCard,
           {
-            elevation: 3,
+            elevation: 'elevation-3',
             interactive: true,
-            fluid: false,
             onclick: () => notifySuccess('Card clicked!'),
           },
           [m('h4', 'Card title'), m('div', 'Elevation: 3')]
         ),
       ]),
       m(
-        FaceliftCard,
+        CWCard,
         {
-          elevation: 1,
+          elevation: 'elevation-1',
           interactive: true,
-          fluid: true,
+          fullWidth: true,
         },
-        [m('h4', 'Card title'), m('div', 'Fluid: true')]
+        [m('h4', 'Card title'), m('div', 'Full width')]
       ),
       m(
-        FaceliftCard,
+        CWCard,
         {
-          elevation: 1,
+          elevation: 'elevation-1',
           interactive: true,
-          class_name: '.form-card',
+          className: 'form-card',
         },
         [
           m(Form, { gutter: 15 }, [
