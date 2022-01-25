@@ -566,6 +566,8 @@ Promise.all([
       '/bounties':               importRoute('views/pages/bounties', { scoped: true }),
       '/tips':                   importRoute('views/pages/tips', { scoped: true }),
       '/validators':             importRoute('views/pages/validators', { scoped: true }),
+      // Crowdfund
+      '/crowdfund':              importRoute('views/pages/crowdfund/index', { scoped: true }),
       // Settings
       '/login':                  importRoute('views/pages/login', { scoped: true, deferChain: true }),
       '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
@@ -620,6 +622,7 @@ Promise.all([
       '/:scope/bounties':           redirectRoute(() => '/bounties'),
       '/:scope/tips':               redirectRoute(() => '/tips'),
       '/:scope/validators':         redirectRoute(() => '/validators'),
+      '/:scope/crowdfund':          redirectRoute(() => '/crowdfund'),
       '/:scope/login':              redirectRoute(() => '/login'),
       '/:scope/web3login':          redirectRoute(() => '/web3login'),
       '/:scope/settings':           redirectRoute(() => '/settings'),
@@ -697,10 +700,15 @@ Promise.all([
       '/:scope/bounties':          importRoute('views/pages/bounties', { scoped: true }),
       '/:scope/tips':              importRoute('views/pages/tips', { scoped: true }),
       '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
+
+      // Crowdfund
+      '/:scope/crowdfund':        importRoute('views/pages/crowdfund/index', { scoped: true }),
+
       // Settings
       '/login':                    importRoute('views/pages/login', { scoped: false }),
       '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
       '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
+
       // Admin
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
       '/manage':                 importRoute('views/pages/manage_community/index', { scoped: false }),
