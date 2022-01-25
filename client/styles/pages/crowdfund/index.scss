@@ -1,0 +1,26 @@
+.CrowdfundPage {
+    .user-projects {
+        .user-created-project-wrap {
+            .user-created-projects {
+                display: flex;
+                justify-content: space-between;
+                .CrowdfundCard {
+                }
+            }
+        }
+        .user-backed-project-wrap {
+            .user-backed-projects {
+                display: grid;
+                .CrowdfundCard {
+                }
+            }
+        }
+    }
+    .community-projects {
+        .trending-projects, 
+        .recommended-projects {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}

@@ -1,15 +1,16 @@
 import 'components/crowdfund/crowdfund_card.scss';
 
 import m from 'mithril';
-import { AnonymousUser } from '../widgets/user';
+import { AnonymousUser } from '../../components/widgets/user';
 
 export enum CrowdfundCardSize {
   Small = 'small',
   Medium = 'medium',
   Large = 'large'
 }
+
 interface CrowdfundCardAttrs {
-  crowdfund;
+  project; // : Project;
   size: CrowdfundCardSize;
 }
 
@@ -62,7 +63,8 @@ const CrowdfundCompletionBar: m.Component<{ completionPercent: number }> = {
     ]);
   }
 }
-const CrowdfundInfoPanel: m.Component<{ crowdfund, avatarSize: number, iconSize?: number }> = {
+
+const CrowdfundInfoPanel: m.Component<{ project, avatarSize: number, iconSize?: number }> = {
   view: (vnode) => {
     const { crowdfund, avatarSize, iconSize } = vnode.attrs;
     return m('.CrowdfundInfoPanel', [
@@ -93,14 +95,14 @@ const CrowdfundCard: m.Component<
   CrowdfundCardState
 > = {
   view: (vnode) => {
-    const { crowdfund, size } = vnode.attrs;
+    const { project, size } = vnode.attrs;
 
     const CrowdfundCardLarge = m('.CrowdfundCard',
       { class: 'large' },
       [
         m(CrowdfundHeaderPanel, { iconSize: 45 }),
         m(CrowdfundCompletionBar, { completionPercent: (DummyCrowdfundData.CrowdfundCompletionPercent as number) }),
-        m(CrowdfundInfoPanel, { crowdfund, avatarSize: 20 })
+        m(CrowdfundInfoPanel, { project, avatarSize: 20 })
       ]
     );
 
@@ -110,7 +112,7 @@ const CrowdfundCard: m.Component<
         m(CrowdfundHeaderPanel),
         m('.right-panel', [
           m(CrowdfundCompletionBar, { completionPercent: (DummyCrowdfundData.CrowdfundCompletionPercent as number) }),
-          m(CrowdfundInfoPanel, { crowdfund, avatarSize: 16, iconSize: 24 })
+          m(CrowdfundInfoPanel, { project, avatarSize: 16, iconSize: 24 })
         ])
       ]
     );
