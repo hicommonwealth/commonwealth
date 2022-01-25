@@ -7,11 +7,35 @@ import SearchBar from '../../components/search_bar';
 import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
 import ProjectCard, { ProjectCardSize } from './project_card';
 import Sublayout from '../../sublayout';
+import { Address } from 'ethereumjs-util';
+
+type ProjectProgress = {
+  inBlocks: number;
+  asPercent: number;
+}
+
+type ProjectDeadline = {
+  inBlocks: number;
+  asPercent: number;
+}
+
+type ProjectFunds = {
+  inTokens: number;
+  inDollars: number;
+}
 
 export type Project = {
   name: string;
+  author: AddressInfo;
   backers: AddressInfo[];
+  description: string;
+  shortDescription?: string;
+  progress: ProjectProgress;
+  deadline: ProjectDeadline;
+  threshold: ProjectFunds;
+  raised: ProjectFunds;
 }
+
 interface ProjectListingAttrs {
   project; // : Project;
 }

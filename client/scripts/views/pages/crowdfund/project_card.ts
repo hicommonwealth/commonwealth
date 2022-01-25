@@ -57,7 +57,7 @@ const ProjectHeaderPanel: m.Component<{ iconSize?: number }> = {
   }
 }
 
-const ProjectCompletionBar: m.Component<{ completionPercent: number }> = {
+export const ProjectCompletionBar: m.Component<{ completionPercent: number }> = {
   view: (vnode) => {
     const { completionPercent } = vnode.attrs;
     return m('.ProjectCompletionBar', [
