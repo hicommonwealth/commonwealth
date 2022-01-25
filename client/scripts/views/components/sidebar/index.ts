@@ -248,10 +248,11 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
 const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
   view: (vnode) => {
     const { useQuickSwitcher } = vnode.attrs;
+    const isCustom = app.isCustomDomain();
 
     return [
-      !app.isCustomDomain() && m(SidebarQuickSwitcher),
-      !useQuickSwitcher && app.chain && m('.Sidebar', [
+      !isCustom && m(SidebarQuickSwitcher),
+      !useQuickSwitcher && app.chain && m(`.Sidebar${isCustom ? '.custom-domain' : ''}`, [
         m(DiscussionSection),
         m(GovernanceSection),
         m(ExternalLinksModule),
