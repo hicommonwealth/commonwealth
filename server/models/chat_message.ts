@@ -24,7 +24,7 @@ export default (
 ): ChatMessageModelStatic => {
   const ChatMessage = <ChatMessageModelStatic>sequelize.define('ChatMessage', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    address: { type: dataTypes.STRING, allowNull: false, references: { model: 'Address', key: 'address' } },
+    address: { type: dataTypes.STRING, allowNull: false },
     message: { type: dataTypes.TEXT, allowNull: false },
     chat_channel_id: { type: dataTypes.INTEGER, allowNull: false, references: { model: 'ChatChannel', key: 'id' } },
   }, {
