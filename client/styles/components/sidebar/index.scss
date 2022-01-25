@@ -238,6 +238,9 @@
     &::-webkit-scrollbar { /* Chrome */
         display: none;
     }
+    &.custom-domain {
+        left: 0;
+    }
     .sidebar-content {
         max-height: calc(100vh - 60px);
         padding-top: 16px;
