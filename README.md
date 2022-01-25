@@ -95,6 +95,9 @@ Environment variables used for external services include:
 - MAGIC_API_KEY
 - MAGIC_SUPPORTED_BASES
 - MAGIC_DEFAULT_CHAIN
+- DISCORD_CLIENT_ID: for Discord OAuth login
+- DISCORD_CLIENT_SECRET: for Discord OAuth login
+- DISCORD_OAUTH_SCOPES: scopes (usually just 'identify')
 
 We also use certain environment variables to configure the application itself:
 
@@ -219,9 +222,12 @@ To configure a custom domain, you should:
   row in the database, corresponding to the community to be served on
   that domain.
 
-You can test the custom domain by setting it in your /etc/hosts file
-and running a local SSL proxy, for example:
+To test, add a new entry to your /etc/hosts file:
+```
+127.0.0.1       <custom domain>
+```
 
+Then run a local SSL proxy, for example: 
 ```
 npm install -g local-ssl-proxy
 local-ssl-proxy --source 443 --target 8080

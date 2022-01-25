@@ -1,5 +1,6 @@
 import 'pages/settings/email_well.scss';
 import 'pages/settings/github_well.scss';
+import 'pages/settings/discord_well.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -16,6 +17,7 @@ interface IState {
   verificationSent: boolean;
   emailVerified: boolean;
   githubAccount: SocialAccount;
+  discordAccount: SocialAccount;
   errorMessage: string;
 }
 
@@ -30,10 +32,11 @@ const EmailWell: m.Component<IAttrs, IState> = {
     vnode.state.verificationSent = false;
     vnode.state.emailVerified = app.user.emailVerified;
     vnode.state.githubAccount = app.user.socialAccounts.find((sa) => sa.provider === 'github');
+    vnode.state.discordAccount = app.user.socialAccounts.find((sa) => sa.provider === 'discord');
     vnode.state.errorMessage = null;
   },
   view: (vnode) => {
-    const { email, githubAccount, emailInputUpdated, emailVerified, verificationSent, errorMessage } = vnode.state;
+    const { email, githubAccount, discordAccount, emailInputUpdated, emailVerified, verificationSent, errorMessage } = vnode.state;
     return [
       m('.EmailWell', [
         m('h4', 'Login'),
@@ -104,44 +107,84 @@ const EmailWell: m.Component<IAttrs, IState> = {
           ],
         errorMessage && m('p.error', errorMessage),
       ]),
-      vnode.attrs.github && m('.GithubWell', [
-        m('form', [
-          githubAccount && m(Input, {
-            value: `github.com/${githubAccount.username || ''}`,
-            contentLeft: m(Icon, { name: Icons.GITHUB }),
-            disabled: true,
-          }),
-          m(Button, {
-            label: githubAccount ? 'Unlink Github' : 'Link Github',
-            intent: githubAccount ? 'negative' : 'primary',
-            rounded: true,
-            onclick: () => {
-              if (githubAccount) {
-                $.ajax({
-                  url: `${app.serverUrl()}/githubAccount`,
-                  data: { jwt: app.user.jwt },
-                  type: 'DELETE',
-                  success: (result) => {
-                    vnode.state.githubAccount = null;
-                    m.redraw();
-                  },
-                  error: (err) => {
-                    console.dir(err);
-                    m.redraw();
-                  },
-                });
-              } else {
-                localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
-                  timestamp: (+new Date()).toString(),
-                  path: m.route.get()
-                }));
-                document.location = `${app.serverUrl()}/auth/github` as any;
-                m.redraw();
-              }
-            },
-          })
+      m('.LinkButtonWrapper', [
+        vnode.attrs.github && m('.GithubWell', [
+          m('form', [
+            githubAccount && m(Input, {
+              value: `github.com/${githubAccount.username || ''}`,
+              contentLeft: m(Icon, { name: Icons.GITHUB }),
+              disabled: true,
+            }),
+            m(Button, {
+              label: githubAccount ? 'Unlink Github' : 'Link Github',
+              intent: githubAccount ? 'negative' : 'primary',
+              rounded: true,
+              onclick: () => {
+                if (githubAccount) {
+                  $.ajax({
+                    url: `${app.serverUrl()}/githubAccount`,
+                    data: { jwt: app.user.jwt },
+                    type: 'DELETE',
+                    success: (result) => {
+                      vnode.state.githubAccount = null;
+                      m.redraw();
+                    },
+                    error: (err) => {
+                      console.dir(err);
+                      m.redraw();
+                    },
+                  });
+                } else {
+                  localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
+                    timestamp: (+new Date()).toString(),
+                    path: m.route.get()
+                  }));
+                  document.location = `${app.serverUrl()}/auth/github` as any;
+                  m.redraw();
+                }
+              },
+            })
+          ]),
         ]),
-      ])
+        m(".DiscordWell", [
+          m('form', [
+            discordAccount && m(Input, {
+              value: `${discordAccount.username || ''}`,
+              contentLeft: m(Icon, { name: Icons.DISC }), // TODO: add a discord icon
+              disabled: true,
+            }),
+            m(Button, {
+              label: discordAccount ? 'Unlink Discord' : 'Link Discord',
+              intent: discordAccount ? 'negative': 'primary',
+              rounded: true,
+              onclick: () => {
+                if (discordAccount) {
+                  $.ajax({
+                    url: `${app.serverUrl()}/discordAccount`,
+                    data: { jwt: app.user.jwt },
+                    type: 'DELETE',
+                    success: (result) => {
+                      vnode.state.discordAccount = null;
+                      m.redraw();
+                    },
+                    error: (err) => {
+                      console.dir(err);
+                      m.redraw();
+                    }
+                  })
+                } else {
+                  localStorage.setItem('discordPostAuthRedirect', JSON.stringify({
+                    timestamp: (+new Date()).toString(),
+                    path: m.route.get()
+                  }));
+                  document.location = `${app.serverUrl()}/auth/discord` as any;
+                  m.redraw();
+                }
+              }
+            })
+          ]),   
+        ])
+      ]),
     ];
   },
 };

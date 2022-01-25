@@ -4,11 +4,8 @@ import m from 'mithril';
 import app from 'state';
 import SubscriptionButton from 'views/components/subscription_button';
 
-import {
-  OffchainNavigationModule,
-  OnchainNavigationModule,
+import Sidebar, {
   ExternalLinksModule,
-  ChainStatusModule
 } from 'views/components/sidebar';
 import { Tabs, TabItem, Menu, MenuDivider, MenuItem, Icons, Dialog } from 'construct-ui';
 import { capitalize } from 'lodash';
@@ -16,6 +13,8 @@ import CommunitySelector from '../components/sidebar/community_selector';
 import { LoginSelectorMenuLeft, LoginSelectorMenuRight } from '../components/header/login_selector';
 import { getNewProposalMenu } from '../components/new_proposal_button';
 import LoginModal from '../modals/login_modal';
+import { DiscussionSection } from '../components/sidebar/discussion_section';
+import { GovernanceSection } from '../components/sidebar/governance_section';
 
 enum MenuTabs {
   currentCommunity = 'currentCommunity',
@@ -88,11 +87,10 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
           }
         }),
       m(MenuDivider),
-      (app.chain) && m(OffchainNavigationModule),
-      (app.chain) && m(OnchainNavigationModule),
+      (app.chain) && m(DiscussionSection, {mobile: true}),
+      (app.chain) && m(GovernanceSection, {mobile: true}),
+      m('.br', {style: 'height: 10px'}),
       (app.chain) && m(ExternalLinksModule),
-      app.isLoggedIn() && (app.chain) && m(SubscriptionButton),
-      app.chain && m(ChainStatusModule),
     ]);
     const AllCommunitiesMenu = m(Menu, { class: 'AllCommunitiesMenu' }, [
       m(CommunitySelector, { showListOnly: true, showHomeButtonAtTop: true })

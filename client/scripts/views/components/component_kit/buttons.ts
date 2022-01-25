@@ -48,7 +48,7 @@ export const FaceliftButton: m.Component<
   {
     intent: ButtonIntent;
     label;
-    onclick: Function;
+    onclick?: Function;
     disabled?: boolean;
     className?: string;
   },
