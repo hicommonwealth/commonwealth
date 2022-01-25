@@ -217,7 +217,7 @@ const VoteAction: m.Component<
         });
         vnode.state.votingModalOpen = true;
       } catch (err) {
-        console.log(err);
+        console.error(err);
         notifyError('Voting failed');
       }
     };
@@ -296,7 +296,7 @@ const ViewProposalPage: m.Component<
           m.redraw();
         });
       } catch (e) {
-        console.log(`Failed to fetch threads: ${e}`);
+        console.error(`Failed to fetch threads: ${e}`);
       }
     };
 

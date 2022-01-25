@@ -66,7 +66,7 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
       app.snapshot.init(snapshotId).then(() => {
         m.redraw();
       });
-      
+
       return m(Sublayout, {
         class: 'DiscussionsPage',
         title: 'Proposals',
