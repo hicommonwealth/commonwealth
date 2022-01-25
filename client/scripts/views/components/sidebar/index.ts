@@ -10,16 +10,14 @@ import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
 import { link } from 'helpers';
 import { ChainInfo, NodeInfo} from 'models';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 import { DiscordIcon, TelegramIcon, ElementIcon, GithubIcon, WebsiteIcon } from '../component_kit/icons';
-import SidebarSection, { SectionGroupProps, SidebarSectionProps, SubSectionProps } from './sidebar_section';
-import { ButtonIntent, FaceliftButton } from '../component_kit/buttons';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
+import { CWButton } from '../component_kit/cw_button';
 
 // Toggle Tree Definition (3 layers of depth, could add more if desired)
 export interface ToggleTree {
@@ -139,8 +137,8 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
     })));
 
     return m('.ChainStatusModule', [
-      app.chain.deferred ? m(FaceliftButton, {
-        intent: ButtonIntent.Primary,
+      app.chain.deferred ? m(CWButton, {
+        buttonType: 'primary',
         label: vnode.state.initializing ? 'Connecting...' : 'Connect to chain',
         disabled: vnode.state.initializing,
         onclick: async (e) => {
@@ -172,8 +170,8 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
             }
           });
         }),
-        trigger: m(FaceliftButton, {
-          intent: ButtonIntent.Secondary,
+        trigger: m(Button, {
+          // intent: ButtonIntent.Secondary,
           disabled: vnode.state.initializing,
           label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
             ? 'Connect to chain' : m(ChainStatusIndicator),

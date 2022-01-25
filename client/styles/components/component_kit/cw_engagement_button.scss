@@ -1,0 +1,56 @@
+@import 'client/styles/facelift';
+
+.EngagementButton {
+  display: flex;
+  align-items: center;
+  color: $black;
+  background: $white;
+  border: 1px solid $disable-gray;
+  border-radius: 20px;
+  height: 40px;
+  font-weight: 500;
+
+  .Icon {
+    margin-right: 12px;
+  }
+
+  span {
+    padding-top: 5.5px;
+  }
+
+  &:hover {
+    color: $dark-purp;
+    background: $xlite-purp;
+    border: 1px solid $dark-purp;
+    box-shadow: 0px 2px 6px 0px #0000001a;
+
+    .Icon path {
+      stroke: $dark-purp;
+    }
+  }
+
+  &.sm {
+    padding: 12px 20px;
+  }
+
+  &.lg {
+    padding: 12px 44px;
+  }
+
+  &.disabled {
+    color: $disable-gray;
+    background: $white;
+    cursor: default;
+
+    &:hover {
+      color: $disable-gray;
+      border: 1px solid $disable-gray;
+      background: $white;
+      box-shadow: none;
+
+      .Icon path {
+        stroke: $disable-gray;
+      }
+    }
+  }
+}

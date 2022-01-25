@@ -1,0 +1,63 @@
+@import 'client/styles/facelift';
+
+.GradientButton {
+  --angle: 45deg;
+  align-items: center;
+  background-clip: content-box, border-box;
+  background-origin: border-box;
+  border-radius: 8px;
+  border: 1px double transparent;
+  color: #4a4a4a;
+  display: flex;
+  font-weight: 600;
+  height: 40px;
+  justify-content: center;
+  min-width: 70px;
+  padding: 1px;
+  background-image: linear-gradient(white, white),
+    linear-gradient(var(--angle), #91bfff, #91ffa0, #fbff91, #ff9191);
+
+  span {
+    padding-top: 6px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  &.primary {
+    &:hover {
+      box-shadow: 0px 1px 3px 0px #0000001a;
+      animation: 5s rotate linear infinite;
+    }
+
+    &.disabled {
+      background-color: $white;
+      box-shadow: none;
+      cursor: default;
+    }
+  }
+
+  &.secondary {
+    &:hover {
+      box-shadow: 0px 1px 3px 0px #0000001a;
+      animation: 5s rotate linear infinite;
+    }
+
+    &.disabled {
+      color: $disable-gray;
+      box-shadow: none;
+      cursor: default;
+    }
+  }
+}
+
+@keyframes rotate {
+  to {
+    --angle: 360deg;
+  }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 45deg;
+  inherits: false;
+}

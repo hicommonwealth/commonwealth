@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import 'pages/landing/community_cards.scss';
 import m from 'mithril';
-import { Icon, Icons, Tag } from 'construct-ui';
+import { Tag } from 'construct-ui';
 
 import app from 'state';
 import { ChainInfo, NodeInfo } from 'models';
 import { FaceliftCard } from '../../components/component_kit/cards';
-import {
-  ButtonIntent,
-  FaceliftButton,
-} from '../../components/component_kit/buttons';
+import { CWButton } from '../../components/component_kit/cw_button';
+
 var numeral = require('numeral');
 
 const getNewTag = (labelCount = null) => {
@@ -81,10 +79,9 @@ const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
           m('.community-name', { lang: 'en' }, chainInfo.name),
           m('.card-description', { lang: 'en' }, pretty_description),
           m('.join-button-wrapper', [
-            m(FaceliftButton, {
-              intent: ButtonIntent.Secondary,
+            m(CWButton, {
+              buttonType: 'secondary',
               label: 'See More',
-              disabled: false,
               onclick: redirectFunction,
             }),
           ]),
@@ -138,10 +135,10 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
           m('.community-name', { lang: 'en' }, community.name),
           m('.card-description', { lang: 'en' }, pretty_description),
           m('.join-button-wrapper', [
-            m(FaceliftButton, {
-              intent: ButtonIntent.Secondary,
-              label: 'See More',
+            m(CWButton, {
+              buttonType: 'secondary',
               disabled: false,
+              label: 'See More',
               onclick: redirectFunction,
             }),
           ]),
@@ -163,24 +160,22 @@ const LockdropToolsCard: m.Component = {
       [
         m('.lockdrop-card-body', [
           m('h3', 'Edgeware Lockdrop Tools'),
-          m(FaceliftButton, {
-            intent: ButtonIntent.Primary,
+          m(CWButton, {
             onclick: (e) => {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;
               m.route.set('/edgeware/stats');
             },
-            label: ['Lockdrop stats '],
+            label: 'Lockdrop stats',
           }),
           m('.spacer', []),
-          m(FaceliftButton, {
-            intent: ButtonIntent.Primary,
+          m(CWButton, {
             onclick: (e) => {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;
               m.route.set('/edgeware/unlock');
             },
-            label: ['Unlock ETH '],
+            label: 'Unlock ETH',
           }),
         ]),
       ]
