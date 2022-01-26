@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import { NodeInfo } from 'models';
 import { ERC20Votes } from 'eth/types';
 import { BigNumber } from 'ethers';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI, { GovernorTokenType } from './api';
@@ -11,6 +12,10 @@ import CompoundAPI, { GovernorTokenType } from './api';
 // Also includes some API-but-not-Governance-related calls.
 export default class CompoundChain extends EthereumChain {
   public compoundApi: CompoundAPI;
+
+  public coins(n: number, inDollars?: boolean) {
+    return new EthereumCoin(this.app?.chain?.meta.chain.symbol || '???', n, inDollars);
+  }
 
   public async init(selectedNode: NodeInfo) {
     await super.resetApi(selectedNode);
