@@ -2,6 +2,7 @@ declare let window: any;
 
 import app from 'state';
 import Web3 from 'web3';
+import $ from 'jquery';
 import { provider } from 'web3-core';
 import { ChainBase } from 'types';
 import { Account, IWebWallet } from 'models';
@@ -87,17 +88,16 @@ class MetamaskWebWalletController implements IWebWallet<string> {
         if (switchError.code === 4902) {
           const wsRpcUrl = new URL(app.chain.meta.url);
           const rpcUrl = app.chain.meta.altWalletUrl || `https://${wsRpcUrl.host}`;
+
+          // TODO: we should cache this data!
+          const chains = await $.getJSON('https://chainid.network/chains.json');
+          const baseChain = chains.find((c) => c.chainId === chainId);
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [{
               chainId: chainIdHex,
-              chainName: app.chain.meta.chain.name,
-              nativeCurrency: {
-                name: app.chain.meta.chain.symbol,
-                symbol: app.chain.meta.chain.symbol,
-                // MetaMask does not yet support chains with native currencies that do not have 18 decimals
-                decimals: 18,
-              },
+              chainName: baseChain.name,
+              nativeCurrency: baseChain.nativeCurrency,
               rpcUrls: [rpcUrl]
             }]
           });
