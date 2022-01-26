@@ -455,9 +455,9 @@ export default class CompoundProposal extends Proposal<
       address,
       this._Gov.api.Contract,
     );
-    if (!(await this._Chain.isDelegate(address))) {
-      throw new Error('sender must be valid delegate');
-    }
+    // if (!(await this._Chain.isDelegate(address))) {
+    //   throw new Error('sender must be valid delegate');
+    // }
     if (!this._Gov.supportsAbstain && vote.choice === BravoVote.ABSTAIN) {
       throw new Error('Cannot vote abstain on governor alpha!');
     }
