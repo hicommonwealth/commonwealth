@@ -26,7 +26,6 @@ import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
-import { ButtonSize, DiscussButton, ShareButton, SubscribeButton } from './component_kit/buttons';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
