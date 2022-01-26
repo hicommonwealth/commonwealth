@@ -4,7 +4,7 @@ import m from 'mithril';
 // import app from 'state';
 import { AddressInfo } from 'models';
 import SearchBar from '../../components/search_bar';
-import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
+import { ButtonIntent, CWButton } from '../../components/component_kit/buttons';
 import ProjectCard, { ProjectCardSize } from './project_card';
 import Sublayout from '../../sublayout';
 import { Address } from 'ethereumjs-util';
@@ -62,7 +62,7 @@ const ProjectListing: m.Component<ProjectListingAttrs, ProjectListingState> = {
         && m('.user-created-project-wrap', [
           m('.user-created-project-header', [
             m('h1', 'Your Projects'),
-            m(FaceliftButton, {
+            m(CWButton, {
               intent: ButtonIntent.Primary,
               label: 'Create New Project',
               onclick: () => true, // m.route.set(`${app.activeId()}/createProject`)

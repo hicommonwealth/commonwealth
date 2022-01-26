@@ -2,14 +2,14 @@ import 'pages/crowdfund/project_page.scss';
 
 import m from 'mithril';
 // import SearchBar from '../../components/search_bar';
-// import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
+// import { ButtonIntent, CWButton } from '../../components/component_kit/buttons';
 import QuillFormattedText from '../../components/quill_formatted_text';
 // import User from '../../components/widgets/user';
 import { DummyProjectData, ProjectCompletionBar } from './project_card';
 import { Project } from './index';
 import Sublayout from '../../sublayout';
 import User from '../../components/widgets/user';
-import { ButtonIntent, FaceliftButton } from '../../components/component_kit/buttons';
+import { ButtonIntent, CWButton } from '../../components/component_kit/buttons';
 
 interface ProjectPageAttrs {
   project: Project;
@@ -50,7 +50,7 @@ const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
           ]),
         ]),
         m('.right-panel', [
-          m(FaceliftButton, {
+          m(CWButton, {
             intent: ButtonIntent.Primary,
             label: 'Contribute to this project',
             onclick: () => true,

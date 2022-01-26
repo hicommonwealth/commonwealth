@@ -3,7 +3,6 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
-import Web3 from 'web3';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 
@@ -12,6 +11,8 @@ import { KeyringOptions } from '@polkadot/keyring/types';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 import { KeypairType } from '@polkadot/util-crypto/types';
 import * as ethUtil from 'ethereumjs-util';
+import { StargateClient } from '@cosmjs/stargate';
+import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util';
 
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
 import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature } from '@cosmjs/amino';
@@ -26,7 +27,8 @@ import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_p
 import { RoleAttributes, RoleInstance } from './role';
 import { factory, formatFilename } from '../../shared/logging';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
-import { StargateClient } from '@cosmjs/stargate';
+import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export interface AddressAttributes {
@@ -331,22 +333,20 @@ export default (
       //
       // ethereum address handling
       //
-
-      const msgBuffer = Buffer.from(addressModel.verification_token.trim());
-      const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-      const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
-      const publicKey = ethUtil.ecrecover(
-        msgHash,
-        ethSignatureParams.v,
-        ethSignatureParams.r,
-        ethSignatureParams.s,
-      );
-      const addressBuffer = ethUtil.publicToAddress(publicKey);
-      const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
       try {
-        const address = Web3.utils.toChecksumAddress(lowercaseAddress);
-        isValid = (addressModel.address === address);
+        const [ node ] = await chain.getChainNodes();
+        const typedMessage = constructTypedMessage(node.eth_chain_id || 1, addressModel.verification_token.trim());
+        const address = recoverTypedSignature({
+          data: typedMessage,
+          signature: signatureString.trim(),
+          version: SignTypedDataVersion.V4
+        });
+        isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
+        if (!isValid) {
+          log.info(`Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`);
+        }
       } catch (e) {
+        log.info(`Eth verification failed for ${addressModel.address}: ${e.message}`)
         isValid = false;
       }
     } else if (chain.base === ChainBase.NEAR) {

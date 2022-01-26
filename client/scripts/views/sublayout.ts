@@ -1,44 +1,51 @@
 import 'sublayout.scss';
 
-import m, { Vnode } from 'mithril';
+import m from 'mithril';
 import app from 'state';
-import { EmptyState, Button, Icon, Icons, Grid, Col, Spinner } from 'construct-ui';
+import { EmptyState, Icons, Spinner } from 'construct-ui';
 import { link } from 'helpers';
 import { ITokenAdapter } from 'models';
 
-import NewProposalButton, { MobileNewProposalButton } from 'views/components/new_proposal_button';
+import NewProposalButton, {
+  MobileNewProposalButton,
+} from 'views/components/new_proposal_button';
 import NotificationsMenu from 'views/components/header/notifications_menu';
-import InvitesMenu, { handleEmailInvites } from 'views/components/header/invites_menu';
+import InvitesMenu, {
+  handleEmailInvites,
+} from 'views/components/header/invites_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon } from 'views/components/chain_icon';
 import FooterLandingPage from 'views/pages/landing/landing_page_footer';
-import { ButtonIntent, FaceliftButton, FaceliftGradientButton, GradientType } from 'views/components/component_kit/buttons';
 import { SearchBar } from './components/search_bar';
 import { CommunityOptionsPopover } from './pages/discussions';
+import { CWGradientButton } from './components/component_kit/cw_gradient_button';
 
-const Sublayout: m.Component<{
-  // overrides
-  loadingLayout?: boolean,
-  errorLayout?,
+const Sublayout: m.Component<
+  {
+    // overrides
+    loadingLayout?: boolean;
+    errorLayout?;
 
-  // content
-  class?: string,
-  title?: any,                        // displayed at the top of the layout
-  description?: string,               // displayed at the top of the layout
-  rightContent?: any,
-  hero?: any,
-  showNewProposalButton?: boolean,
-  showCouncilMenu?: boolean,
-  hideSidebar?: boolean,
-  hideSearch?: boolean,
-  centerGrid?: boolean,
-  alwaysShowTitle?: boolean,          // show page title even if app.chain and app.community are unavailable
-  useQuickSwitcher?: boolean,         // show quick switcher only, without the rest of the sidebar
-}, {
-  modalAutoTriggered: boolean
-}> = {
+    // content
+    class?: string;
+    title?: any; // displayed at the top of the layout
+    description?: string; // displayed at the top of the layout
+    rightContent?: any;
+    hero?: any;
+    showNewProposalButton?: boolean;
+    showCouncilMenu?: boolean;
+    hideSidebar?: boolean;
+    hideSearch?: boolean;
+    centerGrid?: boolean;
+    alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
+    useQuickSwitcher?: boolean; // show quick switcher only, without the rest of the sidebar
+  },
+  {
+    modalAutoTriggered: boolean;
+  }
+> = {
   view: (vnode) => {
     const {
       title,
@@ -50,83 +57,95 @@ const Sublayout: m.Component<{
       hideSidebar,
       hideSearch,
       alwaysShowTitle,
-      useQuickSwitcher
+      useQuickSwitcher,
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
-    const narrowBrowserWidth = (window.innerWidth > 767.98) && (window.innerWidth < 850);
+    const narrowBrowserWidth =
+      window.innerWidth > 767.98 && window.innerWidth < 850;
     const terms = app.chain ? chain.terms : null;
 
     const ICON_SIZE = 22;
     const sublayoutHeaderLeft = m('.sublayout-header-left', [
-      (!app.activeChainId() && !app.isCustomDomain() && (m.route.get() === '/' || m.route.get().startsWith('/?'))) ? [
-        m('h3', 'Commonwealth')
-      ] : chain ? [
-        m('.ChainIcon', [
-          link('a', (!app.isCustomDomain() ? `/${app.activeChainId()}` : '/'), [
-            m(ChainIcon, { size: ICON_SIZE, chain })
-          ])
-        ]),
-        m('h4.sublayout-header-heading', [
-          link('a', (app.isCustomDomain() ? '/' : `/${app.activeChainId()}`), chain.name),
-          title && m('span.breadcrumb', m.trust('/')),
-          title,
-          m(CommunityOptionsPopover),
-        ])
-      ] : alwaysShowTitle ? [
-        m('h4.sublayout-header-heading.no-chain-or-community', title)
-      ] : [
-        // empty since a chain or community is loading
-      ],
+      !app.activeChainId() &&
+      !app.isCustomDomain() &&
+      (m.route.get() === '/' || m.route.get().startsWith('/?'))
+        ? [m('h3', 'Commonwealth')]
+        : chain
+        ? [
+            m('.ChainIcon', [
+              link(
+                'a',
+                !app.isCustomDomain() ? `/${app.activeChainId()}` : '/',
+                [m(ChainIcon, { size: ICON_SIZE, chain })]
+              ),
+            ]),
+            m('h4.sublayout-header-heading', [
+              link(
+                'a',
+                app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,
+                chain.name
+              ),
+              title && m('span.breadcrumb', m.trust('/')),
+              title,
+              m(CommunityOptionsPopover),
+            ]),
+          ]
+        : alwaysShowTitle
+        ? [m('h4.sublayout-header-heading.no-chain-or-community', title)]
+        : [
+            // empty since a chain or community is loading
+          ],
     ]);
 
-    const hiringButton = m(FaceliftGradientButton, {
-      intent: ButtonIntent.Secondary,
+    const hiringButton = m(CWGradientButton, {
+      buttonType: 'secondary',
+      disabled: false,
+      className: 'hiringBtn',
       label: "We're hiring!",
       onclick: () => {
-        window.open(
-          'https://angel.co/company/commonwealth-labs',
-          '_blank'
-        );
+        window.open('https://angel.co/company/commonwealth-labs', '_blank');
       },
-      disabled: false,
-      className: '.hiringBtn',
-      gradient: GradientType.RAINBOW
     });
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),
       app.isLoggedIn() && m(InvitesMenu),
       app.isLoggedIn() && m(NotificationsMenu),
-      showNewProposalButton
-      && (narrowBrowserWidth ? m(MobileNewProposalButton) : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
+      showNewProposalButton &&
+        (narrowBrowserWidth
+          ? m(MobileNewProposalButton)
+          : m(NewProposalButton, { fluid: false, threadOnly: !chain })),
       !app.isCustomDomain() && hiringButton,
       // above threadOnly option assumes all chains have proposals beyond threads
     ]);
 
-    if (vnode.attrs.loadingLayout) return [
-      m('.layout-container', [
-        m('.LoadingLayout', [
-          m(Spinner, { active: true, fill: true, size: 'xl' }),
+    if (vnode.attrs.loadingLayout)
+      return [
+        m('.layout-container', [
+          m('.LoadingLayout', [
+            m(Spinner, { active: true, fill: true, size: 'xl' }),
+          ]),
         ]),
-      ]),
-    ];
+      ];
 
-    if (vnode.attrs.errorLayout) return [
-      m('.layout-container', [
-        m(EmptyState, {
-          fill: true,
-          icon: Icons.ALERT_TRIANGLE,
-          content: vnode.attrs.errorLayout,
-          style: 'color: #546e7b;'
-        }),
-      ]),
-    ];
+    if (vnode.attrs.errorLayout)
+      return [
+        m('.layout-container', [
+          m(EmptyState, {
+            fill: true,
+            icon: Icons.ALERT_TRIANGLE,
+            content: vnode.attrs.errorLayout,
+            style: 'color: #546e7b;',
+          }),
+        ]),
+      ];
 
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }
 
+    const sidebarOpen = app.chain !== null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
     return [
@@ -142,10 +161,16 @@ const Sublayout: m.Component<{
           ]),
           hero
             ? m('.sublayout-hero', hero)
-            : (app.isLoggedIn() && ITokenAdapter.instanceOf(app.chain) && !app.user.activeAccount)
-              ? m('.sublayout-hero.token-banner', [
-                m('.token-banner-content', `Link an address that holds ${chain.symbol} to participate in governance.`),
-              ]) : '',
+            : app.isLoggedIn() &&
+              ITokenAdapter.instanceOf(app.chain) &&
+              !app.user.activeAccount
+            ? m('.sublayout-hero.token-banner', [
+                m(
+                  '.token-banner-content',
+                  `Link an address that holds ${chain.symbol} to participate in governance.`
+                ),
+              ])
+            : '',
           terms && tosStatus !== 'off'
             ? m('.token-banner-terms', [
               m('span', 'Please read the '),
@@ -158,11 +183,11 @@ const Sublayout: m.Component<{
                   localStorage.setItem(`${app.activeChainId()}-tos`, 'off');
                 } }, 'X')
             ]) : '',
-          m('.sublayout-body', [
+          m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
+            m(Sidebar, { useQuickSwitcher: useQuickSwitcher }),
+          ]),
+          m(!sidebarOpen ? '.sublayout-body' : '.sublayout-body-sidebar' , [
             m(`.sublayout-grid${vnode.attrs.centerGrid ? '.flex-center' : ''}`, [
-              !hideSidebar && m((useQuickSwitcher ? '.sublayout-quickswitcheronly-col' : '.sublayout-sidebar-col'), [
-                m(Sidebar, { useQuickSwitcher }),
-              ]),
               m('.sublayout-main-col', {
                 class: !rightContent && 'no-right-content'
               }, [
@@ -171,26 +196,37 @@ const Sublayout: m.Component<{
               rightContent && m('.sublayout-right-col', rightContent),
             ]),
           ]),
-          !app.isCustomDomain() && m(FooterLandingPage, {
-            list: [
-              { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
-              { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
-              { text: 'Terms', redirectTo:  '/terms' },
-              { text: 'Privacy', redirectTo: '/privacy' },
-              { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
-              { text: 'Discord', externalLink: 'https://discord.gg/ZFQCKUMP' },
-              { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' }
-              // { text:  'Use Cases' },
-              // { text:  'Crowdfunding' },
-              // { text:  'Developers' },
-              // { text:  'About us' },
-              // { text:  'Careers' }
-            ],
-          }),
+          !app.isCustomDomain() &&
+            m(FooterLandingPage, {
+              list: [
+                { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
+                {
+                  text: 'Jobs',
+                  externalLink:
+                    'https://angel.co/company/commonwealth-labs/jobs',
+                },
+                { text: 'Terms', redirectTo: '/terms' },
+                { text: 'Privacy', redirectTo: '/privacy' },
+                { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
+                {
+                  text: 'Discord',
+                  externalLink: 'https://discord.gg/ZFQCKUMP',
+                },
+                {
+                  text: 'Telegram',
+                  externalLink: 'https://t.me/HiCommonwealth',
+                },
+                // { text:  'Use Cases' },
+                // { text:  'Crowdfunding' },
+                // { text:  'Developers' },
+                // { text:  'About us' },
+                // { text:  'Careers' }
+              ],
+            }),
         ]),
       ]),
     ];
-  }
+  },
 };
 
 export default Sublayout;

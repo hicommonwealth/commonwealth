@@ -7,12 +7,12 @@ const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 module.exports = {
   node: {
     fs: 'empty',
-    net: 'empty'
+    net: 'empty',
   },
   context: __dirname,
   devServer: {
     headers: {
-      'P3P': 'CP="Commonwealth does not have a P3P compact privacy policy"',
+      P3P: 'CP="Commonwealth does not have a P3P compact privacy policy"',
     },
   },
   plugins: [
@@ -20,7 +20,7 @@ module.exports = {
       { from: path.resolve(__dirname, '../static'), to: 'static' },
     ]),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, '../client/index.html')
+      template: path.resolve(__dirname, '../client/index.html'),
     }),
     new MomentLocalesPlugin(), // strip all locales except “en”
     new webpack.optimize.OccurrenceOrderPlugin(), // used for hot reloading
@@ -70,7 +70,7 @@ module.exports = {
           test: /[\\/]node_modules[\\/](?!(mithril|jquery|moment|lodash|mixpanel-browser|construct-ui|quill|bn|@snapshot-labs|@apollo|@tendermint|amino-js|supercop\.js|tendermint|@audius|ethers|@walletconnect|@ethersproject).*)/,
           name: 'vendors',
           chunks: 'all',
-        }
+        },
       },
     },
   },
@@ -80,9 +80,9 @@ module.exports = {
       '../client/scripts',
       '../client/styles',
       '../shared',
-      'node_modules',    // local node modules
+      'node_modules', // local node modules
       '../node_modules', // global node modules
-      '../eth/types'
+      '../eth/types',
     ],
   },
   module: {
@@ -91,13 +91,13 @@ module.exports = {
         test: /\.md$/,
         include: [
           path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared')
+          path.resolve(__dirname, '../shared'),
         ],
         use: [
           {
             loader: 'ignore-loader',
-          }
-        ]
+          },
+        ],
       },
       {
         test: /\.svg$/,
@@ -121,22 +121,34 @@ module.exports = {
         loader: 'esbuild-loader',
         options: {
           loader: 'ts',
-        }
+        },
+      },
+      {
+        // ignore ".spec.ts" test files in build
+        test: /^(?!.*\.spec\.tsx$).*(?:\.tsx)$/,
+        include: [
+          path.resolve(__dirname, '../client'),
+        ],
+        loader: 'esbuild-loader',
+        options: {
+          loader: 'tsx',
+        },
       },
       {
         test: /\.(js)$/,
         include: [
           path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared')
+          path.resolve(__dirname, '../shared'),
         ],
+        exclude: /\/node_modules\//,
         use: {
-          loader: 'babel-loader'
-        }
+          loader: 'babel-loader',
+        },
       },
       {
         test: /\.mjs$/,
         include: /node_modules/,
-        type: 'javascript/auto'
+        type: 'javascript/auto',
       },
       {
         test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
@@ -146,10 +158,10 @@ module.exports = {
         use: {
           loader: 'file-loader',
           options: {
-            name: '[path][name].[ext]'
-          }
-        }
+            name: '[path][name].[ext]',
+          },
+        },
       },
-    ]
-  }
+    ],
+  },
 };

@@ -214,6 +214,23 @@ const Login: m.Component<{}, {
         ]),
         m(Form, { gutter: 10 }, [
           m(FormGroup, { span: 12 }, [
+            m(Button, {
+              intent: 'primary',
+              fluid: true,
+              rounded: true,
+              href: `${app.serverUrl()}/auth/discord`,
+              onclick: (e) => {
+                localStorage.setItem('discordPostAuthRedirect', JSON.stringify({
+                  timestamp: (+new Date()).toString(),
+                  path: m.route.get()
+                }));
+              },
+              label: 'Continue with Discord'
+            }),
+          ]),
+        ]),
+        m(Form, { gutter: 10 }, [
+          m(FormGroup, { span: 12 }, [
             m(LoginWithWalletDropdown, {
               label: 'Continue with wallet',
               joiningChain: null,
