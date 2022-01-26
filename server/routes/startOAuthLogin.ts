@@ -2,13 +2,14 @@ import passport from 'passport';
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
 
-import { GITHUB_OAUTH_CALLBACK } from '../config';
+import {DISCORD_OAUTH_CALLBACK, GITHUB_OAUTH_CALLBACK} from '../config';
 
 const startOAuthLogin = async (
   models: DB,
+  provider: string,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   let successRedirect = '/';
   const failureRedirect = '#!/login';
@@ -26,13 +27,21 @@ const startOAuthLogin = async (
     }
   }
 
-  passport.authenticate('github', {
-    callbackURL: `${GITHUB_OAUTH_CALLBACK}?from=${encodeURIComponent(
-      req.hostname
-    )}`,
-    successRedirect,
-    failureRedirect,
-  } as any)(req, res, next); // TODO: extend AuthenticateOptions typing used here
+  if (provider === 'github')
+    passport.authenticate('github', {
+      callbackURL: `${GITHUB_OAUTH_CALLBACK}?from=${encodeURIComponent(
+        req.hostname
+      )}`,
+      successRedirect,
+      failureRedirect,
+      state: String(req.sessionID)
+    } as any)(req, res, next); // TODO: extend AuthenticateOptions typing used here
+  else
+    passport.authenticate('discord', {
+      successRedirect,
+      failureRedirect,
+      state: String(req.sessionID)
+    } as any)(req, res, next)
 };
 
 export default startOAuthLogin;

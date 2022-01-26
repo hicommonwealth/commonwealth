@@ -6,11 +6,12 @@ import { provider } from 'web3-core';
 import { ChainBase } from 'types';
 import { Account, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
+import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
-  private _enabling: boolean = false;
+  private _enabling = false;
   private _accounts: string[];
   private _provider: provider;
   private _web3: Web3;
@@ -40,13 +41,22 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.personal.sign(message, this.accounts[0], '');
+    const signature = await this._web3.eth.sign(message, this.accounts[0]);
+    return signature;
+  }
+
+  public async signLoginToken(message: string): Promise<string> {
+    const msgParams = constructTypedMessage(app.chain.meta.ethChainId || 1, message);
+    const signature = await this._web3.givenProvider.request({
+      method: 'eth_signTypedData_v4',
+      params: [this._accounts[0], JSON.stringify(msgParams)],
+    })
     return signature;
   }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
     // Sign with the method on eth_webwallet, because we don't have access to the private key
-    const webWalletSignature = await this.signMessage(account.validationToken);
+    const webWalletSignature = await this.signLoginToken(account.validationToken);
     return account.validate(webWalletSignature);
   }
 
@@ -57,9 +67,8 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
-      if (!app.chain?.meta.ethChainId) {
-        throw new Error('No chain id found!');
-      }
+      // default to ETH
+      const chainId = app.chain?.meta.ethChainId || 1;
 
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
@@ -67,11 +76,11 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts'
       });
-      const chainId = `0x${app.chain.meta.ethChainId.toString(16)}`;
+      const chainIdHex = `0x${chainId.toString(16)}`;
       try {
         await this._web3.givenProvider.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId }],
+          params: [{ chainId: chainIdHex }],
         });
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
@@ -81,7 +90,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [{
-              chainId,
+              chainId: chainIdHex,
               chainName: app.chain.meta.chain.name,
               nativeCurrency: {
                 name: app.chain.meta.chain.symbol,

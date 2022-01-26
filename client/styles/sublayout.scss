@@ -85,9 +85,6 @@
         flex: 1;
         padding-right: 48px;
         max-width: $sidebar-width;
-        .Sidebar {
-            max-width: 190px; // sidebar button width
-        }
     }
     @include sm-max {
         .sublayout-sidebar-col {
@@ -148,12 +145,12 @@
         position: sticky;
         top: 0;
         z-index: 10;
-        background: white;
         @include sm-max {
             display: none;
         }
         margin: 0 auto;
-        border-bottom: 1px solid $border-color-off-white;
+        border-bottom: 1px solid $disable-grey;
+        background-color: white;
         padding: 24px 0 22px;
         padding-right: 20px;
         @include md-max {
@@ -271,19 +268,28 @@
         padding: 1px 0; // prevent margins from flowing outside the container
         padding-bottom: 80px;
     }
+    .sublayout-body-sidebar {
+        position: relative;
+        min-height: calc(100vh - 140px);
+        padding: 1px 0; // prevent margins from flowing outside the container
+        padding-bottom: 80px;
+        margin-left: $sidebar-width;
+        @include sm-max {
+            margin-left: 0px;
+        }
+    }
     .token-banner {
         padding: 8px 0 2px;
         background: $background-color-white-hover;
         color: $text-color-darker;
         text-align: center;
     }
-    .token-banner-content {
-    }
 
     .token-banner-terms {
-      background-color: #fdf5f9;
+      background-color: $layout-color;
       text-align: center;
       padding: 5px 0 5px 0;
+      margin-left: $sidebar-width;
 
       .close-button {
         position: absolute;

@@ -6,7 +6,7 @@ import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
-import { getUrlForEthChainId } from '../util/supportedEthChains';
+import { getUrlsForEthChainId } from '../util/supportedEthChains';
 
 import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -81,21 +81,30 @@ const createChain = async (
   }
   let eth_chain_id: number = null;
   let url = req.body.node_url;
-  if (req.body.base === ChainBase.Ethereum && req.body.type === ChainType.Offchain) {
+  let altWalletUrl = req.body.alt_wallet_url;
+
+  // always generate a chain id
+  if (req.body.base === ChainBase.Ethereum) {
     if (!req.body.eth_chain_id || !+req.body.eth_chain_id) {
       return next(new Error(Errors.InvalidChainId));
     }
     eth_chain_id = +req.body.eth_chain_id;
   }
+
+  // if not offchain, also validate the address
   if (req.body.base === ChainBase.Ethereum && req.body.type !== ChainType.Offchain) {
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
     }
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
-    const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
-    if (ethChainUrl) {
+    const urls = await getUrlsForEthChainId(models, eth_chain_id);
+    if (urls) {
+      const { url: ethChainUrl, alt_wallet_url } = urls;
       url = ethChainUrl;
+      if (alt_wallet_url) {
+        altWalletUrl = alt_wallet_url;
+      }
     } else {
       // If using overridden URL, then user must be admin -- we do not allow users to submit
       // custom URLs yet.
@@ -107,6 +116,13 @@ const createChain = async (
       return next(new Error(Errors.InvalidChainIdOrUrl));
     }
 
+    const existingChainNode = await models.ChainNode.findOne({
+      where: { address: req.body.address, eth_chain_id }
+    });
+    if (existingChainNode) {
+      return next(new Error(Errors.ChainAddressExists));
+    }
+
     const provider = new Web3.providers.WebsocketProvider(url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
@@ -115,12 +131,7 @@ const createChain = async (
       return next(new Error(Errors.InvalidAddress));
     }
 
-    const existingChainNode = await models.ChainNode.findOne({
-      where: { address: req.body.address, eth_chain_id }
-    });
-    if (existingChainNode) {
-      return next(new Error(Errors.ChainAddressExists));
-    }
+    // TODO: test altWalletUrl if available
   } else if (req.body.base === ChainBase.Solana && req.body.type !== ChainType.Offchain) {
     let pubKey: solw3.PublicKey;
     try {
@@ -151,6 +162,8 @@ const createChain = async (
     } catch (err) {
       return next(new Error(Errors.InvalidNode));
     }
+
+    // TODO: test altWalletUrl if available
   } else {
     if (!url || !url.trim()) {
       return next(new Error(Errors.InvalidNodeUrl));
@@ -212,6 +225,7 @@ const createChain = async (
     address: req.body.address,
     eth_chain_id,
     token_name: req.body.token_name,
+    alt_wallet_url: altWalletUrl,
   };
 
   const node = await models.ChainNode.create(chainNodeContent);

@@ -65,7 +65,7 @@ abstract class Proposal<
     store: ProposalStore<Proposal<ApiT, C, ConstructorT, VoteT>>
   ): void {
     if (this._completed) {
-      throw new Error('cannot update state once marked completed');
+      console.warn(`Warning: state marked as complete multiple times on proposal ${this.identifier}`);
     }
     this._completed = true;
     this._initialized = true;
