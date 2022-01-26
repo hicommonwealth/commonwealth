@@ -1,0 +1,58 @@
+@import 'client/styles/facelift';
+
+$default-card-width: 300px;
+$default-card-height: 100px;
+
+.Card {
+  align-items: flex-start;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #dddddd;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: $default-card-height;
+  padding: 15px;
+  width: $default-card-width;
+
+  &.full-width {
+    width: 100%;
+  }
+
+  &.elevation-1 {
+    box-shadow: $elevation-1-shadow;
+
+    &.interactive {
+      &:hover {
+        box-shadow: $elevation-3-shadow;
+      }
+    }
+  }
+
+  &.elevation-2 {
+    box-shadow: $elevation-2-shadow;
+
+    &.interactive {
+      &:hover {
+        box-shadow: $elevation-4-shadow;
+      }
+    }
+  }
+
+  &.elevation-3 {
+    box-shadow: $elevation-3-shadow;
+
+    &.interactive {
+      &:hover {
+        box-shadow: $elevation-5-shadow;
+      }
+    }
+  }
+
+  &.interactive {
+    &:hover {
+      box-shadow: $elevation-1-shadow;
+    }
+  }
+}

@@ -99,19 +99,22 @@ describe('Event Handler Tests', () => {
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
     assert.deepEqual(dbEvent, handledDbEvent);
 
-    // expect results
-    const notifications = await models['Notification'].findAll({
+    const notifications = await models['Notifications'].findAll({
       where: {
         chain_event_id: dbEvent.id,
       },
       include: [{
-        model: models['Subscription'],
+        model: models['NotificationsRead'],
         include: [{
-          model: models['User'],
+          model: models['Subscription'],
+          where: {
+            subscriber_id: [aliceId, bobId]
+          }
         }]
       }]
-    });
-    const userIds = notifications.map((n) => n.Subscription.User.id);
+    })
+
+    const userIds = notifications.map((n) => n.NotificationsRead.Subscription.subscriber_id);
     assert.sameMembers(userIds, [ aliceId, bobId ]);
   });
 
@@ -135,21 +138,23 @@ describe('Event Handler Tests', () => {
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
     assert.deepEqual(dbEvent, handledDbEvent);
 
-    // expect results
-    const notifications = await models['Notification'].findAll({
+    const notifications = await models['Notifications'].findAll({
       where: {
         chain_event_id: dbEvent.id,
       },
       include: [{
-        model: models['Subscription'],
+        model: models['NotificationsRead'],
         include: [{
-          model: models['User'],
+          model: models['Subscription'],
+          where: {
+            subscriber_id: [aliceId, bobId]
+          }
         }]
       }]
     });
 
     // should only notify bob
-    const userIds = notifications.map((n) => n.Subscription.User.id);
+    const userIds = notifications.map((n) => n.NotificationsRead.Subscription.subscriber_id);
     assert.sameMembers(userIds, [ bobId ]);
   });
 
@@ -176,20 +181,23 @@ describe('Event Handler Tests', () => {
     assert.deepEqual(dbEvent, handledDbEvent);
 
     // expect results
-    const notifications = await models['Notification'].findAll({
+    const notifications = await models['Notifications'].findAll({
       where: {
         chain_event_id: dbEvent.id,
       },
       include: [{
-        model: models['Subscription'],
+        model: models['NotificationsRead'],
         include: [{
-          model: models['User'],
+          model: models['Subscription'],
+          where: {
+            subscriber_id: [aliceId, bobId]
+          }
         }]
       }]
     });
 
     // should only notify alice, excluding bob
-    const userIds = notifications.map((n) => n.Subscription.User.id);
+    const userIds = notifications.map((n) => n.NotificationsRead.Subscription.subscriber_id);
     assert.sameMembers(userIds, [ aliceId ]);
   });
 

@@ -17,6 +17,7 @@ import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
+import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -39,7 +40,7 @@ export interface SubscriptionAttributes {
 
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
-  Notifications?: NotificationAttributes[];
+  NotificationsRead?: NotificationsReadAttributes[];
   Chain?: ChainAttributes;
   OffchainThread?: OffchainThreadAttributes;
   OffchainComment?: OffchainCommentAttributes;
@@ -49,7 +50,7 @@ export interface SubscriptionAttributes {
 
 export interface SubscriptionInstance
 extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {
-  getNotifications: Sequelize.HasManyGetAssociationsMixin<NotificationInstance>;
+  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 }
 
 export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; }
@@ -104,12 +105,9 @@ export default (
     };
 
     // typeguard function to differentiate between chain event notifications as needed
-    const isChainEventData = (
-      n: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData
-    ): n is IChainEventNotificationData => {
-      return (n as IChainEventNotificationData).chainEvent !== undefined;
-    };
+    const isChainEventData = (<IChainEventNotificationData>notification_data).chainEvent !== undefined
 
+    // retrieve distinct user ids given a set of addresses
     const fetchUsersFromAddresses = async (addresses: string[]): Promise<number[]> => {
       // fetch user ids from address models
       const addressModels = await models.Address.findAll({
@@ -143,7 +141,35 @@ export default (
       }
     }
 
+    // get all relevant subscriptions
     const subscribers = await models.Subscription.findAll({ where: findOptions });
+
+    // get notification if it already exists
+    let notification;
+    notification = await models.Notification.findOne(isChainEventData ? {
+      where: {
+        chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id
+      }
+    } : {
+      where: {
+        notification_data: JSON.stringify(notification_data)
+      }
+    });
+
+    // if the notification does not yet exist create it here
+    if (!notification) {
+      notification = await models.Notification.create(isChainEventData ? {
+        notification_data: '',
+        chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
+        category_id: 'chain-event',
+        chain_id: (<IChainEventNotificationData>notification_data).chain_id
+      } : {
+        notification_data: JSON.stringify(notification_data),
+        category_id,
+        chain_id: (<IPostNotificationData>notification_data).chain_id || (<ICommunityNotificationData>notification_data).chain
+      })
+    }
+
     // create notifications (data should always exist, but we check anyway)
     if (!notification_data) {
       log.info('Subscription is missing notification data, will not trigger send emails or webhooks');
@@ -158,29 +184,26 @@ export default (
       console.trace(e);
     }
 
-    const notifications = await Promise.all(subscribers.map(async (subscription) => {
-      const notification = await models.Notification.create(
-        isChainEventData(notification_data)
-          ? {
-            subscription_id: subscription.id,
-            notification_data: '',
-            chain_event_id: notification_data.chainEvent.id
-          } : {
-            subscription_id: subscription.id,
-            notification_data: JSON.stringify(notification_data)
-          }
-      );
-      if (msg && isChainEventData(notification_data) && notification_data.chainEventType?.chain) {
+    // create NotificationsRead instances
+    const nReads = await Promise.all(subscribers.map(async (subscription) => {
+      // create NotificationsRead instance
+      const nRead = await models.NotificationsRead.create({
+        notification_id: notification.id,
+        subscription_id: subscription.id,
+        is_read: false
+      });
+
+      if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
         msg.dynamic_template_data.notification.path = `${
           SERVER_URL
         }/${
-          notification_data.chainEventType.chain
+          (<IChainEventNotificationData>notification_data).chainEventType.chain
         }/notificationsList?id=${
           notification.id
         }`;
       }
       if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
-      return notification;
+      return nRead;
     }));
 
     const erc20Tokens = (await models.Chain.findAll({
@@ -191,52 +214,21 @@ export default (
     })).map((o) => o.id);
 
     // send data to relevant webhooks
-    // TODO: currently skipping all erc20 events from webhooks - change?
     if (webhook_data && (
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      !webhook_data?.chainEventType?.chain
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-        || !erc20Tokens.includes(webhook_data.chainEventType.chain)
+      webhook_data.chainEventType?.chain || !erc20Tokens.includes(webhook_data.chainEventType?.chain)
     )) {
       await send(models, {
         notificationCategory: category_id,
         ...webhook_data
       });
     }
-
-    // // send websocket state updates
-    // // TODO: debug and figure out why this may fail and prevent calls from returning
-    // const created_at = new Date();
-    // if (wss) {
-    //   const payload: IWebsocketsPayload<any> = {
-    //     event: WebsocketMessageType.Notification,
-    //     data: {
-    //       topic: category_id,
-    //       object_id,
-    //       created_at,
-    //     }
-    //   };
-    //   if (isChainEventData(notification_data)) {
-    //     payload.data.notification_data = {};
-    //     payload.data.ChainEvent = notification_data.chainEvent.toJSON();
-    //     payload.data.ChainEvent.ChainEventType = notification_data.chainEventType.toJSON();
-    //   } else {
-    //     payload.data.notification_data = notification_data;
-    //   }
-    //   const subscriberIds: number[] = subscribers.map((s) => s.subscriber_id);
-    //   const userNotificationMap = _.object(subscriberIds, notifications);
-    //   wss.emit(WebsocketMessageType.Notification, payload, userNotificationMap);
-    // }
-
-    return notifications;
+    return nReads;
   };
 
   Subscription.associate = (models) => {
     models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
-    models.Subscription.hasMany(models.Notification, { onDelete: 'cascade' });
+    models.Subscription.hasMany(models.NotificationsRead, { foreignKey: 'subscription_id', onDelete: 'cascade' });
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainComment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });

@@ -86,7 +86,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
           const wsRpcUrl = new URL(app.chain.meta.url);
-          const rpcUrl = `https://${wsRpcUrl.host}`;
+          const rpcUrl = app.chain.meta.altWalletUrl || `https://${wsRpcUrl.host}`;
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [{

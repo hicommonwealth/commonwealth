@@ -574,7 +574,7 @@ describe('Thread Tests', () => {
         });
       expect(res.status).to.be.equal(200);
       expect(res.body.result.body).to.be.equal(newBody);
-    });
+    }).timeout(400000);
 
     it('should succeed in updating a thread title', async () => {
       const thread_id = thread.id;

@@ -3,7 +3,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { NotificationStore } from 'stores';
-import { ChainInfo, CommunityInfo, NotificationSubscription, Notification } from 'models';
+import { NotificationSubscription, Notification, ChainEventType, ChainInfo } from 'models';
 import app from 'state';
 
 const post = (route, args, callback) => {
@@ -137,24 +137,17 @@ class NotificationsController {
     // TODO: Change to PUT /notificationsRead
     const MAX_NOTIFICATIONS_READ = 100; // mark up to 100 notifications read at a time
     const unreadNotifications = notifications.filter((notif) => !notif.isRead);
-    if (unreadNotifications.length === 0) return;
-    return post(
-      '/markNotificationsRead',
-      {
-        'notification_ids[]': unreadNotifications
-          .slice(0, MAX_NOTIFICATIONS_READ)
-          .map((n) => n.id),
-      },
-      (result) => {
-        for (const n of unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ)) {
-          n.markRead();
-        }
-        if (unreadNotifications.slice(MAX_NOTIFICATIONS_READ).length > 0) {
-          this.markAsRead(unreadNotifications.slice(MAX_NOTIFICATIONS_READ));
-        }
-        // TODO: post(/markNotificationsRead) should wait on all notifications being marked as read before redrawing
+    if (unreadNotifications.length === 0) return $.Deferred().resolve().promise();
+    return post('/markNotificationsRead', {
+      'notification_ids[]': unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ).map((n) => n.id)
+    }, (result) => {
+      for (const n of unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ)) {
+        n.markRead();
       }
-    );
+      if (unreadNotifications.slice(MAX_NOTIFICATIONS_READ).length > 0) {
+        this.markAsRead(unreadNotifications.slice(MAX_NOTIFICATIONS_READ));
+      }
+    });
   }
 
   public clearAllRead() {
@@ -206,8 +199,7 @@ class NotificationsController {
     }
 
     // Get the user's joined community ids
-    const allCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
-      .concat(app.config.chains.getAll())
+    const allCommunities = app.config.chains.getAll()
       .filter((item) => {
         // only show chains with nodes
         return (item instanceof ChainInfo)
@@ -218,8 +210,6 @@ class NotificationsController {
     const isInCommunity = (item) => {
       if (item instanceof ChainInfo) {
         return app.user.getAllRolesInCommunity({ chain: item.id }).length > 0;
-      } else if (item instanceof CommunityInfo) {
-        return app.user.getAllRolesInCommunity({ community: item.id }).length > 0;
       } else {
         return false;
       }
@@ -228,29 +218,26 @@ class NotificationsController {
     const joinedCommunityIds = allCommunities.filter((c) => isInCommunity(c)).map(e => e.id);
     
     // TODO: Change to GET /notifications
-    return post(
-      '/viewNotifications',
-      { include_latest_activity_data: true, communityIds: joinedCommunityIds.join(',') },
-      (result) => {
-        this._store.clear();
-        this._subscriptions = [];
-        for (const subscriptionJSON of result) {
-          const subscription =
-            NotificationSubscription.fromJSON(subscriptionJSON);
-          this._subscriptions.push(subscription);
-          for (const notificationJSON of subscriptionJSON.Notifications) {
-            const notification = Notification.fromJSON(
-              notificationJSON,
-              subscription
-            );
-            
-            if(this._store.getAll().filter(e => e.data == notification.data).length == 0){
-              this._store.add(notification);
-            }
+    return post('/viewNotifications', { }, (result) => {
+      this._store.clear();
+      this._subscriptions = [];
+      for (const subscriptionJSON of result) {
+        const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
+        this._subscriptions.push(subscription);
+        let chainEventType = null;
+        if (subscriptionJSON.ChainEventType) {
+          chainEventType = ChainEventType.fromJSON(subscriptionJSON.ChainEventType);
+        }
+        for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
+          const data = {
+            is_read: notificationsReadJSON.is_read,
+            ...notificationsReadJSON.Notification
           }
+          const notification = Notification.fromJSON(data, subscription, chainEventType);
+          this._store.add(notification);
         }
       }
-    );
+    })
   }
 }
 
