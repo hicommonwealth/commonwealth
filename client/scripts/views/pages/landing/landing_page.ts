@@ -53,7 +53,6 @@ const StaticLandingPage: m.Component<Attributes, IState> = {
     });
 
     const myChains: any = Object.entries(chains);
-    const myCommunities: any = app.config.communities.getAll();
     const sortChains = (list: any[]) =>
       list
         .sort((a, b) => {

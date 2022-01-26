@@ -7,10 +7,10 @@ import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons, Spinner } from 'const
 
 import app from 'state';
 import { pluralize } from 'helpers';
-import { NodeInfo, CommunityInfo } from 'models';
+import { NodeInfo } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 import UserDashboardRow from 'views/components/user_dashboard_row';
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainIcon } from 'views/components/chain_icon';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import StaticLandingPage from './landing/landing_page';
@@ -73,50 +73,7 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
   }
 };
 
-const CommunityCard : m.Component<{ community: CommunityInfo }> = {
-  view: (vnode) => {
-    const { community } = vnode.attrs;
-    const { unseenPosts } = app.user;
-    const visitedCommunity = !!unseenPosts[community.id];
-    const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
-    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(community.id);
 
-    return m(Card, {
-      class: 'home-card',
-      onclick: (e) => {
-        e.preventDefault();
-        localStorage['home-scrollY'] = window.scrollY;
-        m.route.set(`/${community.id}`);
-      },
-    }, [
-      m('.card-top', [
-        m(CommunityIcon, { community }),
-        m('h3', [
-          community.name,
-          community.privacyEnabled && m(Icon, { name: Icons.LOCK, size: 'xs' }),
-        ]),
-      ]),
-      m('.card-bottom', [
-        m('p.card-description', community.description),
-        // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreadCount && [
-          m('span.recent-threads', monthlyThreadCount > 20 ? [
-            pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
-            ' this week',
-          ] : [
-            pluralize(monthlyThreadCount, 'thread'),
-            ' this month',
-          ]),
-          app.user.isMember({ account: app.user.activeAccount, community: community.id })
-            && [
-              app.isLoggedIn() && !visitedCommunity && getNewTag(),
-              updatedThreads > 0 && getNewTag(updatedThreads),
-            ],
-        ])
-      ]),
-    ]);
-  }
-};
 
 const notificationsRemaining = (contentLength, count) => {
   return (contentLength >= 10 && count < contentLength);
@@ -166,7 +123,6 @@ const UserDashboard: m.Component<{}, {
     });
 
     const myChains: any = Object.entries(chains);
-    const myCommunities: any = app.config.communities.getAll();
 
     const sortChainsAndCommunities = (list) => list.sort((a, b) => {
       const threadCountA = app.recentActivity.getCommunityThreadCount(Array.isArray(a) ? a[0] : a.id);
@@ -176,15 +132,12 @@ const UserDashboard: m.Component<{}, {
       if (Array.isArray(entity)) {
         const [chain, nodeList]: [string, any] = entity as any;
         return  m(ChainCard, { chain, nodeList });
-      } else if (entity.id) {
-        return m(CommunityCard, { community: entity });
-      }
+      } 
       return null;
     });
 
     const sortedChainsAndCommunities = sortChainsAndCommunities(
       myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
-        .concat(myCommunities.filter((c) => !c.collapsedOnHomepage))
     );
 
     vnode.state.onscroll = _.debounce(async () => {

@@ -128,7 +128,6 @@ export default async (
         const views = await models.OffchainViewCount.findOne({
           where: community_id
             ? {
-              community: community_id,
               object_id: `${root_id}`,
             }
             : {
