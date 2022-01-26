@@ -44,25 +44,6 @@ export default async (
     });
   }
 
-  // locate active subscriptions, filter by communityIds if specified
-  const communitySearchParams = {
-    subscriber_id: notifyUser.id,
-    [Op.or]: [
-      {
-        chain_id:
-        {
-          [Op.in]: req.body.communityIds ? req.body.communityIds.split(',') : []
-        }
-      },
-      {
-        community_id:
-        {
-          [Op.in]: req.body.communityIds ? req.body.communityIds.split(',') : []
-        }
-      }
-    ]
-  };
-
   const notificationParams: any = {
     model: models.NotificationsRead,
     required: false,
@@ -90,7 +71,6 @@ export default async (
     where: {
       [Op.or]: [
         { [Op.and]: userSearchParams },
-        communitySearchParams
       ]
     },
     include: [

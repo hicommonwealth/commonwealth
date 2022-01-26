@@ -26,6 +26,7 @@ import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
+import { CWEngagementButton } from './component_kit/cw_engagement_button';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -536,8 +537,9 @@ const UserDashboardRow: m.Component<
             m('.comment-body-excerpt', notificationBody),
             m('.comment-body-bottom', [
               m('.comment-body-bottom-left', [
-                m(DiscussButton, {
-                  size: ButtonSize.SM,
+                m(CWEngagementButton, {
+                  buttonSize: 'sm',
+                  label: "discuss",
                   onclick: (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -564,13 +566,15 @@ const UserDashboardRow: m.Component<
                       }
                     }),
                   ],
-                  trigger: m(ShareButton, {
-                    size: ButtonSize.SM,
+                  trigger: m(CWEngagementButton, {
+                    buttonSize: 'sm',
+                    label: 'share',
                     onclick: (e) => e.stopPropagation(),
                   }),
                 }),
-                m(SubscribeButton, {
-                  size: ButtonSize.SM,
+                m(CWEngagementButton, {
+                  buttonSize: 'sm',
+                  label: 'subscribe',
                   onclick: (e) => {
                     e.preventDefault();
                     e.stopPropagation();
