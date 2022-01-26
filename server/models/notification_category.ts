@@ -27,5 +27,9 @@ export default (
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
+  NotificationCategory.associate = (models) => {
+    models.NotificationCategory.hasMany(models.Notification, {foreignKey: 'category_id'});
+    models.NotificationCategory.hasMany(models.Subscription, {foreignKey: 'category_id'})
+  }
   return NotificationCategory;
 };
