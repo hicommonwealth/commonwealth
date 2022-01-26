@@ -1,16 +1,9 @@
 @import 'client/styles/facelift';
 
-@mixin SVGIcon($color) {
-  path,
-  circle,
-  rect {
-    stroke: $color;
-  }
-}
-
 svg {
   flex-shrink: 0;
   height: 1em;
+  stroke: currentColor;
   width: 1em;
 
   &.small {
@@ -26,30 +19,30 @@ svg {
   }
 
   &.primary {
-    @include SVGIcon($black);
+    color: $black;
   }
 
   &.primary:hover {
-    @include SVGIcon($dark-purp);
+    color: $dark-purp;
 
     &.disabled {
-      @include SVGIcon($disable-gray);
+      color: $disable-gray;
     }
   }
 
   &.secondary {
-    @include SVGIcon($lite-gray);
+    color: $lite-gray;
   }
 
   &.secondary:hover {
-    @include SVGIcon($black);
+    color: $black;
 
     &.disabled {
-      @include SVGIcon($disable-gray);
+      color: $disable-gray;
     }
   }
 
   &.disabled {
-    @include SVGIcon($disable-gray);
+    color: $disable-gray;
   }
 }

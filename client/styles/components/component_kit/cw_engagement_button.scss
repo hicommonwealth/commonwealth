@@ -24,8 +24,8 @@
     border: 1px solid $dark-purp;
     box-shadow: 0px 2px 6px 0px #0000001a;
 
-    svg path {
-      stroke: $dark-purp;
+    svg {
+      color: $dark-purp;
     }
   }
 
@@ -48,8 +48,8 @@
       background: $white;
       box-shadow: none;
 
-      svg path {
-        stroke: $disable-gray;
+      svg {
+        color: $disable-gray;
       }
     }
   }

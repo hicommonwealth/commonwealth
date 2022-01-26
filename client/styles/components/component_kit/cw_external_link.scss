@@ -18,8 +18,8 @@
     border: 1px solid $lite-purp;
     border-radius: 10px;
 
-    svg path {
-      stroke: $dark-purp;
+    svg {
+      color: $dark-purp;
     }
   }
 
@@ -27,16 +27,16 @@
     padding: 3px 6px 0;
     border-radius: 4px;
 
-    svg path {
-      stroke: $dark-purp;
+    svg {
+      color: $dark-purp;
     }
   }
 
   &:hover {
     background-color: $lite-purp;
 
-    svg path {
-      stroke: $dark-purp;
+    svg {
+      color: $dark-purp;
     }
   }
 }
