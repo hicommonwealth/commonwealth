@@ -482,7 +482,7 @@ export default class CompoundProposal extends Proposal<
       address,
       this._Gov.api.Contract,
     );
-    if (!(await this._Chain.isDelegate(address))) {
+    if (!(await this._Chain.isDelegate(address, this.data.startBlock))) {
       throw new Error('Must have voting balance at proposal start');
     }
     if (!this._Gov.supportsAbstain && vote.choice === BravoVote.ABSTAIN) {
