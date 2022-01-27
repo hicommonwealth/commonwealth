@@ -19,8 +19,9 @@ import ChainsCrowdfundingComponent from './crowdfunding_card_section';
 // Logged In Homepage View
 import 'pages/landing/index.scss';
 
-import CommunityCards from './community_cards';
+import CommunityCards from '../community_cards';
 import { handleEmailInvites } from '../../components/header/invites_menu';
+import UserDashboard from '../user_dashboard';
 
 export interface Chain {
   img: string;
@@ -353,11 +354,7 @@ const LandingPage: m.Component<{}, IState> = {
         }),
       ]);
     } else {
-      return m(Sublayout, {
-        class: 'Homepage',
-      }, [
-        m(CommunityCards),
-      ]);
+      return m(UserDashboard)
     }
   }
 };
