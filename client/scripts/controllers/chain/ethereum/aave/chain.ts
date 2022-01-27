@@ -1,5 +1,6 @@
 import { NodeInfo } from 'models';
 import { IAaveGovernanceV2__factory } from 'eth/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumChain from '../chain';
 import AaveApi from './api';
 import { attachSigner } from '../contractApi';
@@ -8,6 +9,10 @@ import { attachSigner } from '../contractApi';
 // on the Governance module works as expected.
 export default class AaveChain extends EthereumChain {
   public aaveApi: AaveApi;
+
+  public coins(n: number, inDollars?: boolean) {
+    return new EthereumCoin(this.app?.chain?.meta.chain.symbol || '???', n, inDollars);
+  }
 
   public async init(selectedNode: NodeInfo) {
     await super.resetApi(selectedNode);

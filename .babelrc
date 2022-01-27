@@ -6,9 +6,16 @@
         "useBuiltIns": "usage",
         "corejs": "2"
       }
-    ],
+    ]
   ],
   "plugins": [
+    [
+      "@babel/plugin-transform-react-jsx",
+      {
+        "pragma": "m",
+        "pragmaFrag": "'['"
+      }
+    ],
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-async-generator-functions"

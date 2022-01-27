@@ -1,0 +1,45 @@
+@import 'client/styles/facelift';
+
+.Button {
+  border-radius: 8px;
+  font-weight: 600;
+  height: 40px;
+  min-width: 70px;
+  padding: 6px 15px 0px;
+
+  &.primary {
+    color: white;
+    background-color: $midi-purp;
+
+    &:hover {
+      background-color: $dark-purp;
+      box-shadow: 0px 2px 6px 0px #0000001a;
+    }
+
+    &.disabled {
+      background-color: $disable-gray;
+      box-shadow: none;
+      cursor: default;
+    }
+  }
+
+  &.secondary {
+    color: $lite-gray;
+    background-color: $white;
+    border: 1px solid $lite-gray;
+
+    &:hover {
+      color: $midi-gray;
+      background-color: $background-gray;
+      box-shadow: 0px 2px 6px 0px #0000001a;
+    }
+
+    &.disabled {
+      color: $disable-gray;
+      background-color: $white;
+      border: 1px solid $disable-gray;
+      box-shadow: none;
+      cursor: default;
+    }
+  }
+}

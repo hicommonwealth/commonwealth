@@ -22,7 +22,7 @@ export const InputPropertyRow: m.Component<{
           placeholder,
           fluid: true,
           disabled: disabled || false,
-          onkeyup: (e) => { onChangeHandler((e.target as any).value); },
+          oninput: (e) => { onChangeHandler((e.target as any).value); },
         }),
       ]),
     ]);

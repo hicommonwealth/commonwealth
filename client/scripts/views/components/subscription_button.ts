@@ -6,6 +6,8 @@ import app from 'state';
 import { link } from 'helpers';
 import { NotificationCategories } from 'types';
 import { Button, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
+// import { ButtonIntent, FaceliftButton } from './component_kit/buttons';
+import { CWButton } from './component_kit/cw_button';
 
 const SubscriptionButton: m.Component<{}> = {
   view: (vnode) => {
@@ -14,10 +16,7 @@ const SubscriptionButton: m.Component<{}> = {
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeChainId());
     const communityOrChain = app.activeChainId();
 
-    return m(Button, {
-      class: 'SubscriptionButton',
-      rounded: true,
-      fluid: true,
+    return m(CWButton, {
       onclick: (e) => {
         e.preventDefault();
         if (communitySubscription) {
@@ -31,7 +30,7 @@ const SubscriptionButton: m.Component<{}> = {
         }
       },
       label: communitySubscription ? 'Notifications on' : 'Notifications off',
-      intent: communitySubscription ? 'primary' : 'none',
+      buttonType: communitySubscription ? 'primary' : 'secondary',
     });
   },
 };

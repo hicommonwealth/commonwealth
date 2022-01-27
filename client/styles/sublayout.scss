@@ -1,295 +1,301 @@
 @import 'client/styles/shared';
 
 @mixin narrowBrowserHeader {
-    .sublayout-header-right {
-        > .cui-button > .cui-button-label > .User {
-            .user-display-name {
-                display: none;
-            }
-            .user-avatar {
-                margin: 0px;
-                margin-right: 0px;
-                position: relative;
-                top: 2px;
-            }
-        }
-        .NewProposalButton {
-            .cui-button {
-                padding: 0 10px;
-                .cui-button-label {
-                    top: 2px;
-                }
-            }
-        }
-    }
-    .role-icon {
+  .sublayout-header-right {
+    > .cui-button > .cui-button-label > .User {
+      .user-display-name {
         display: none;
+      }
+      .user-avatar {
+        margin: 0px;
+        margin-right: 0px;
+        position: relative;
+        top: 2px;
+      }
     }
-    .LoginSelectorMenu .user-display-name {
-        display: inline;
+    .NewProposalButton {
+      .cui-button {
+        padding: 0 10px;
+        .cui-button-label {
+          top: 2px;
+        }
+      }
     }
-    .cui-button-label .cui-icon-user {
-        margin-right: 0;
-    }
-    .hiringBtn {
-        display: none;
-    }
+  }
+  .role-icon {
+    display: none;
+  }
+  .LoginSelectorMenu .user-display-name {
+    display: inline;
+  }
+  .cui-button-label .cui-icon-user {
+    margin-right: 0;
+  }
+  .hiringBtn {
+    display: none;
+  }
 }
 
 .Sublayout {
-    display: block;
+  display: block;
 
-    &.Homepage {
-        .sublayout-main-col {
-            position: relative;
-            min-height: calc(100vh - 140px);
-            padding-bottom: 80px;
-            &.no-right-content {
-                width: 100%;
-                max-width: 100%;
-                padding: 0
-            }
-            display: flex;
-        }
-        .sublayout-grid {
-            position: relative;
-            min-height: calc(100vh - 150px);
-            max-width: 100%;
-            padding: 0 0;
-            @include xs-max {
-                padding: 0 0;
-            }
-            &.flex-center {
-                display: flex;
-                align-items: flex-start;
-            }
-        }
-    }
-
-    .sublayout-grid {
-        position: relative;
-        display: flex;
-        margin: 0 auto;
-        min-height: calc(100vh - 150px);
-        max-width: $layout-max-width;
-        padding: 0 $layout-padding;
-        @include xs-max {
-            padding: 0 $layout-padding-xs;
-        }
-        &.flex-center {
-            display: flex;
-            justify-content: center;
-        }
-    }
-    .sublayout-sidebar-col {
-        flex: 1;
-        padding-right: 48px;
-        max-width: $sidebar-width;
-        .Sidebar {
-            max-width: 190px; // sidebar button width
-        }
-    }
-    @include sm-max {
-        .sublayout-sidebar-col {
-            display: none;
-        }
-    }
-    .hide-sidebar & {
-        .sublayout-sidebar-col {
-            display: none;
-        }
-    }
+  &.Homepage {
     .sublayout-main-col {
-        flex: 3;
+      position: relative;
+      min-height: calc(100vh - 140px);
+      padding-bottom: 80px;
+      &.no-right-content {
+        width: 100%;
+        max-width: 100%;
         padding: 0;
-        padding-right: 20px;
-        max-width: calc(100% - #{$sidebar-width});
-        &.no-right-content {
-            width: 100%;
-            max-width: 100%;
-        }
-        @include sm-max {
-            padding: 0;
-            max-width: 100%;
-        }
-        @include xs-max {
-            min-width: calc(100vw - 80px);
-        }
+      }
+      display: flex;
     }
-    .sublayout-right-col {
-        flex: 1.75;
-        padding: 36px 0 36px 36px;
-        max-width: calc(#{$sidebar-width} + 32px);
-        @include xl-min {
-            padding: 36px 20px 36px 32px;
-            max-width: calc(#{$sidebar-width} + 48px);
-        }
-        @include xs-max {
-            padding-left: 20px;
-            padding-right: 20px;
-            min-width: calc(#{$sidebar-width} + 20px);
-        }
-    }
-    .hide-sidebar & {
-        .sublayout-main-col {
-            width: 100%;
-            margin: 0 auto;
-            padding: 0;
-        }
-    }
-    @include md-max {
-        .sublayout-main-col {
-            width: calc(100% - #{$sidebar-width});
-            padding: 0;
-        }
-    }
-
-    .sublayout-header {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: white;
-        @include sm-max {
-            display: none;
-        }
-        margin: 0 auto;
-        border-bottom: 1px solid $border-color-off-white;
-        padding: 24px 0 22px;
-        padding-right: 20px;
-        @include md-max {
-            @include narrowBrowserHeader();
-            padding-right: 0;
-            // .sublayout-header-heading {
-            //     display: none !important;
-            // }
-        }
-        @include lg-max {
-            @include narrowBrowserHeader();
-        }
-        .hide-sidebar & {
-            padding-right: 0;
-        }
-        .sublayout-header-inner {
-            display: flex;
-            max-width: $layout-max-width;
-            padding: 0 $layout-padding;
-            margin: 0 auto;
-            .SearchBar {
-                flex: 8;
-            }
-            .hide-sidebar & {
-                max-width: 840px;
-                margin: 0 auto;
-            }
-            .hiringBtn {
-                min-width: 120px;
-                height: 36px;
-                margin: 0 7px;
-                color: #4a4a4a;
-                font-weight: 500;
-            }
-        }
-        .sublayout-header-left {
-            display: flex;
-            align-items: center;
-            margin-top: 0 !important;
-            flex: 2;
-            white-space: nowrap;
-            > .ChainIcon{
-                width: 22px;
-                height: 22px;
-                margin-right: 10px;
-            }
-            > .CommunityIcon {
-                display: inline-block;
-                margin-right: 14px;
-                position: relative;
-                .no-image {
-                    position: relative;
-                }
-            }
-            .CommunitySelector,
-            .sublayout-header-heading {
-                display: flex;
-                align-items: baseline;
-            }
-            h3 {
-                font-size: 1.15rem;
-                font-weight: 600;
-                margin: 8px 0 0;
-            }
-            h4.sublayout-header-heading {
-                font-size: 1.15rem;
-                font-weight: 600;
-                margin: 7px 0 0 0;
-                white-space: nowrap;
-                a {
-                    color: $text-color-black;
-                }
-                .breadcrumb {
-                    margin: 0 8px;
-                    color: $text-color-lightest;
-                }
-                .cui-tag {
-                    line-height: 1.1;
-                    margin: -1px 0;
-                }
-                .cui-icon {
-                    position: relative;
-                    &.cui-icon-chevron-down {
-                        top: 1px;
-                    }
-                    &::before {
-                        content: ' ';
-                        width: 5px;
-                    }
-                }
-
-                .sublayout-header-heading-wrapper {
-                    max-width: 200px;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-            }
-        }
-        .sublayout-header-right {
-            display: flex;
-            align-items: center;
-            flex: 3;
-            text-align: right;
-            flex-direction: row-reverse;
-            > .cui-button,
-            > .LoginSelector {
-                margin-left: 7px;
-            }
-        }
-    }
-    .sublayout-body {
-        position: relative;
-        min-height: calc(100vh - 140px);
-        padding: 1px 0; // prevent margins from flowing outside the container
-        padding-bottom: 80px;
-    }
-    .token-banner {
-        padding: 8px 0 2px;
-        background: $background-color-white-hover;
-        color: $text-color-darker;
-        text-align: center;
-    }
-    .token-banner-content {
-    }
-
-    .token-banner-terms {
-      background-color: #fdf5f9;
-      text-align: center;
-      padding: 5px 0 5px 0;
-
-      .close-button {
-        position: absolute;
-        right: 1rem;
-        line-height: 1.5;
-        cursor: pointer;
+    .sublayout-grid {
+      position: relative;
+      min-height: calc(100vh - 150px);
+      max-width: 100%;
+      padding: 0 0;
+      @include xs-max {
+        padding: 0 0;
+      }
+      &.flex-center {
+        display: flex;
+        align-items: flex-start;
       }
     }
+  }
+
+  .sublayout-grid {
+    position: relative;
+    display: flex;
+    margin: 0 auto;
+    min-height: calc(100vh - 150px);
+    max-width: $layout-max-width;
+    padding: 0 $layout-padding;
+    @include xs-max {
+      padding: 0 $layout-padding-xs;
+    }
+    &.flex-center {
+      display: flex;
+      justify-content: center;
+    }
+  }
+  .sublayout-sidebar-col {
+    flex: 1;
+    padding-right: 48px;
+    max-width: $sidebar-width;
+  }
+  @include sm-max {
+    .sublayout-sidebar-col {
+      display: none;
+    }
+  }
+  .hide-sidebar & {
+    .sublayout-sidebar-col {
+      display: none;
+    }
+  }
+  .sublayout-main-col {
+    flex: 3;
+    padding: 0;
+    padding-right: 20px;
+    max-width: calc(100% - #{$sidebar-width});
+    &.no-right-content {
+      width: 100%;
+      max-width: 100%;
+    }
+    @include sm-max {
+      padding: 0;
+      max-width: 100%;
+    }
+    @include xs-max {
+      min-width: calc(100vw - 80px);
+    }
+  }
+  .sublayout-right-col {
+    flex: 1.75;
+    padding: 36px 0 36px 36px;
+    max-width: calc(#{$sidebar-width} + 32px);
+    @include xl-min {
+      padding: 36px 20px 36px 32px;
+      max-width: calc(#{$sidebar-width} + 48px);
+    }
+    @include xs-max {
+      padding-left: 20px;
+      padding-right: 20px;
+      min-width: calc(#{$sidebar-width} + 20px);
+    }
+  }
+  .hide-sidebar & {
+    .sublayout-main-col {
+      width: 100%;
+      margin: 0 auto;
+      padding: 0;
+    }
+  }
+  @include md-max {
+    .sublayout-main-col {
+      width: calc(100% - #{$sidebar-width});
+      padding: 0;
+    }
+  }
+
+  .sublayout-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    @include sm-max {
+      display: none;
+    }
+    margin: 0 auto;
+    border-bottom: 1px solid $disable-grey;
+    background-color: white;
+    padding: 24px 0 22px;
+    padding-right: 20px;
+    @include md-max {
+      @include narrowBrowserHeader();
+      padding-right: 0;
+      // .sublayout-header-heading {
+      //     display: none !important;
+      // }
+    }
+    @include lg-max {
+      @include narrowBrowserHeader();
+    }
+    .hide-sidebar & {
+      padding-right: 0;
+    }
+    .sublayout-header-inner {
+      display: flex;
+      max-width: $layout-max-width;
+      padding: 0 $layout-padding;
+      margin: 0 auto;
+      .SearchBar {
+        flex: 8;
+      }
+      .hide-sidebar & {
+        max-width: 840px;
+        margin: 0 auto;
+      }
+      .hiringBtn {
+        min-width: 120px;
+        height: 36px;
+        margin: 0 7px;
+        color: #4a4a4a;
+        font-weight: 500;
+      }
+    }
+    .sublayout-header-left {
+      display: flex;
+      align-items: center;
+      margin-top: 0 !important;
+      flex: 2;
+      white-space: nowrap;
+      > .ChainIcon {
+        width: 22px;
+        height: 22px;
+        margin-right: 10px;
+      }
+      > .CommunityIcon {
+        display: inline-block;
+        margin-right: 14px;
+        position: relative;
+        .no-image {
+          position: relative;
+        }
+      }
+      .CommunitySelector,
+      .sublayout-header-heading {
+        display: flex;
+        align-items: baseline;
+      }
+      h3 {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin: 8px 0 0;
+      }
+      h4.sublayout-header-heading {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin: 7px 0 0 0;
+        white-space: nowrap;
+        a {
+          color: $text-color-black;
+        }
+        .breadcrumb {
+          margin: 0 8px;
+          color: $text-color-lightest;
+        }
+        .cui-tag {
+          line-height: 1.1;
+          margin: -1px 0;
+        }
+        .cui-icon {
+          position: relative;
+          &.cui-icon-chevron-down {
+            top: 1px;
+          }
+          &::before {
+            content: ' ';
+            width: 5px;
+          }
+        }
+
+        .sublayout-header-heading-wrapper {
+          max-width: 200px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+    .sublayout-header-right {
+      display: flex;
+      align-items: center;
+      flex: 3;
+      text-align: right;
+      flex-direction: row-reverse;
+      > .cui-button,
+      > .LoginSelector {
+        margin-left: 7px;
+      }
+    }
+  }
+  .sublayout-body {
+    position: relative;
+    min-height: calc(100vh - 140px);
+    padding: 1px 0; // prevent margins from flowing outside the container
+    padding-bottom: 80px;
+  }
+  .sublayout-body-sidebar {
+    position: relative;
+    min-height: calc(100vh - 140px);
+    padding: 1px 0; // prevent margins from flowing outside the container
+    padding-bottom: 80px;
+    margin-left: $sidebar-width;
+    @include sm-max {
+      margin-left: 0px;
+    }
+  }
+  .token-banner {
+    padding: 8px 0 2px;
+    background: $background-color-white-hover;
+    color: $text-color-darker;
+    text-align: center;
+  }
+
+  .token-banner-terms {
+    background-color: $layout-color;
+    text-align: center;
+    padding: 5px 0 5px 0;
+    margin-left: $sidebar-width;
+
+    .close-button {
+      position: absolute;
+      right: 1rem;
+      line-height: 1.5;
+      cursor: pointer;
+    }
+  }
 }

@@ -14,13 +14,7 @@ abstract class Account<C extends Coin> {
   public readonly ghost_address: ChainBase;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
-  public abstract signMessage(message: string): Promise<string>;
-  protected abstract addressFromMnemonic(mnemonic: string): Promise<string>;
-  protected abstract addressFromSeed(seed: string): Promise<string>;
 
-  // The account's seed or mnemonic, used to generate their private key
-  protected seed?: string;
-  protected mnemonic?: string;
   // validation token sent by server
   private _validationToken?: string;
   private _addressId?: number;
@@ -45,26 +39,6 @@ abstract class Account<C extends Coin> {
     this._encoding = encoding;
   }
 
-  public getSeed() {
-    return this.seed;
-  }
-  public getMnemonic() {
-    return this.mnemonic;
-  }
-  public async setSeed(seed: string): Promise<void> {
-    const address = await this.addressFromSeed(seed);
-    if (address !== this.address) {
-      throw new Error('address does not match seed');
-    }
-    this.seed = seed;
-  }
-  public async setMnemonic(mnemonic: string): Promise<void> {
-    const address = await this.addressFromMnemonic(mnemonic);
-    if (address !== this.address) {
-      throw new Error('address does not match mnemonic');
-    }
-    this.mnemonic = mnemonic;
-  }
   public setEncoding(encoding: number) {
     this._encoding = encoding;
   }
@@ -82,48 +56,38 @@ abstract class Account<C extends Coin> {
   public setValidationToken(token: string) {
     this._validationToken = token;
   }
-  public async validate(signature?: string) {
+  public async validate(signature: string) {
     if (!this._validationToken) {
       throw new Error('no validation token found');
     }
-
-    // We add a newline to the validation token because signing via the
-    // command line always adds an implicit newline.
-    if (!signature && (this.seed || this.mnemonic || this.chainBase === ChainBase.NEAR)) {
-      // construct signature from private key
-      signature = await this.signMessage(`${this._validationToken}\n`);
-    } else if (!signature) {
-      throw new Error('no signature or seed provided');
+    if (!signature) {
+      throw new Error('signature required for validation');
     }
 
-    if (signature) {
-      const params : any = {
-        address: this.address,
-        chain: this.chain.id,
-        isToken: this.chain.type === ChainType.Token,
-        jwt: this.app.user.jwt,
-        signature,
-      };
-      const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
-      if (result.status === 'Success') {
-        // update ghost address for discourse users
-        const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, chain }) => (
-            ghostAddress && this.chain.id === chain &&
-            app.user.activeAccounts.some((account) => account.address === address)
-        ))
-        if (hasGhostAddress) {
-          const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
-          if (success && ghostAddressId) {
-            // remove ghost address from addresses
-            app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
-              return !ghostAddress
-            }));
-            app.user.setActiveAccounts([]);
-          }
+    const params : any = {
+      address: this.address,
+      chain: this.chain.id,
+      isToken: this.chain.type === ChainType.Token,
+      jwt: this.app.user.jwt,
+      signature,
+    };
+    const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
+    if (result.status === 'Success') {
+      // update ghost address for discourse users
+      const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, chain }) => (
+          ghostAddress && this.chain.id === chain &&
+          app.user.activeAccounts.some((account) => account.address === address)
+      ))
+      if (hasGhostAddress) {
+        const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
+        if (success && ghostAddressId) {
+          // remove ghost address from addresses
+          app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
+            return !ghostAddress
+          }));
+          app.user.setActiveAccounts([]);
         }
       }
-    } else {
-      throw new Error('signature or key required for validation');
     }
   }
 }

@@ -11,6 +11,7 @@ import { KeyringOptions } from '@polkadot/keyring/types';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 import { KeypairType } from '@polkadot/util-crypto/types';
 import * as ethUtil from 'ethereumjs-util';
+import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util';
 
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
 import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature } from '@cosmjs/amino';
@@ -21,6 +22,7 @@ import { ChainInstance } from '../models/chain';
 import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
+import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 import { DynamicTemplate, ChainBase, NotificationCategories, ChainNetwork } from '../../shared/types';
@@ -167,22 +169,20 @@ const verifySignature = async (
     //
     // ethereum address handling
     //
-
-    const msgBuffer = Buffer.from(addressModel.verification_token.trim());
-    const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-    const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
-    const publicKey = ethUtil.ecrecover(
-      msgHash,
-      ethSignatureParams.v,
-      ethSignatureParams.r,
-      ethSignatureParams.s,
-    );
-    const addressBuffer = ethUtil.publicToAddress(publicKey);
-    const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
     try {
-      const address = Web3.utils.toChecksumAddress(lowercaseAddress);
-      isValid = (addressModel.address === address);
+      const [ node ] = await chain.getChainNodes();
+      const typedMessage = constructTypedMessage(node.eth_chain_id || 1, addressModel.verification_token.trim());
+      const address = recoverTypedSignature({
+        data: typedMessage,
+        signature: signatureString.trim(),
+        version: SignTypedDataVersion.V4
+      });
+      isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
+      if (!isValid) {
+        log.info(`Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`);
+      }
     } catch (e) {
+      log.info(`Eth verification failed for ${addressModel.address}: ${e.message}`)
       isValid = false;
     }
   } else if (chain.base === ChainBase.NEAR) {
