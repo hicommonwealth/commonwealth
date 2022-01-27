@@ -211,6 +211,15 @@ export const ComponentShowcase: m.Component = {
             <h4>Card title</h4>
             <div>Elevation: 1</div>
           </CWCard>
+          {/* {m(
+            CWCard,
+            {
+              elevation: 'elevation-1',
+              interactive: true,
+              onclick: () => notifySuccess('Card clicked!'),
+            },
+            [m('h4', 'Card title'), m('div', 'Elevation: 1')]
+          )} */}
         </div>
       </div>
     );

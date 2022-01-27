@@ -1,8 +1,6 @@
 /* @jsx m */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
-import { MithrilTsxComponent } from 'lib/mithril_tsx_component';
 import 'components/component_kit/cw_card.scss';
 
 import { ComponentType } from './types';
@@ -40,7 +38,7 @@ const getCardClasses = (
     })
     .join(' ')}`;
 
-export class CWCard extends MithrilTsxComponent<CardAttrs> {
+export class CWCard implements m.ClassComponent<CardAttrs> {
   view(vnode) {
     const {
       className,
