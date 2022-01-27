@@ -34,13 +34,16 @@ const startOAuthLogin = async (
       )}`,
       successRedirect,
       failureRedirect,
-      state: String(req.sessionID)
+      // state: req.sessionID
     } as any)(req, res, next); // TODO: extend AuthenticateOptions typing used here
   else
     passport.authenticate('discord', {
+      callbackURL: `${DISCORD_OAUTH_CALLBACK}?from=${encodeURIComponent(
+        req.hostname
+      )}`,
       successRedirect,
       failureRedirect,
-      state: String(req.sessionID)
+      // state: req.sessionID
     } as any)(req, res, next)
 };
 
