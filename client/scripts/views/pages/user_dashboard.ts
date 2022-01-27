@@ -13,7 +13,7 @@ import UserDashboardRow from 'views/components/user_dashboard_row';
 import { ChainIcon } from 'views/components/chain_icon';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import StaticLandingPage from './landing/landing_page';
+// import StaticLandingPage from './landing/landing_page';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -95,7 +95,7 @@ const UserDashboard: m.Component<{}, {
   },
   view: (vnode) => {
     if (!app.isLoggedIn()) {
-      return m(StaticLandingPage);
+      // return m(StaticLandingPage);
     }
     if (!vnode.state.activeTab) {
       vnode.state.activeTab = DashboardViews.Latest;
