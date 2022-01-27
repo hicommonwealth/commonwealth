@@ -7,6 +7,7 @@ export const iconLookup = {
   discord: Icons.CWDiscord,
   feedback: Icons.CWFeedback,
   search: Icons.CWSearch,
+  // test: Icons.Test,
   views: Icons.CWViews,
 };
 

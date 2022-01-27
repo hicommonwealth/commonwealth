@@ -1,6 +1,6 @@
 import m from 'mithril';
 import Sublayout from 'views/sublayout';
-import ComponentKit from '../components/component_kit/component_listing';
+import { ComponentShowcase } from '../components/component_kit/cw_component_showcase';
 
 const ComponentsPage: m.Component = {
   view: () => {
@@ -10,7 +10,7 @@ const ComponentsPage: m.Component = {
         title: 'Commonwealth UI Component Kit',
         alwaysShowTitle: true,
       },
-      [m(ComponentKit)]
+      [m(ComponentShowcase)]
     );
   },
 };
