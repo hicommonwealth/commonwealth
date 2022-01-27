@@ -21,7 +21,6 @@ import 'pages/landing/index.scss';
 
 import CommunityCards from './community_cards';
 import { handleEmailInvites } from '../../components/header/invites_menu';
-import StaticLandingPage from './landing_page';
 
 export interface Chain {
   img: string;
