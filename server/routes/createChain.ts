@@ -230,19 +230,6 @@ const createChain = async (
 
   const node = await models.ChainNode.create(chainNodeContent);
 
-  const ghostUser = await models.User.findOne({
-    where: {
-      email: 'notifications@commonwealth.im',
-    },
-  });
-  await models.Subscription.create({
-    subscriber_id: ghostUser.id,
-    category_id: NotificationCategories.NewThread,
-    object_id: chain.id,
-    chain_id: chain.id,
-    is_active: true,
-  });
-
   return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: node.toJSON() } });
 };
 

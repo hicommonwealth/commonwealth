@@ -116,7 +116,6 @@ const createThread = async (
           chain_id: chain?.id || null,
         },
       });
-      console.log(offchainTopic?.id);
       threadContent['topic_id'] = offchainTopic.id;
       topic_id = offchainTopic.id;
     } catch (err) {
@@ -151,7 +150,6 @@ const createThread = async (
   } catch (err) {
     return next(new Error(err));
   }
-  console.log(thread?.id);
   // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
   try {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
@@ -203,20 +201,6 @@ const createThread = async (
       object_id: `discussion_${finalThread.id}`,
       offchain_thread_id: finalThread.id,
       chain_id: finalThread.chain,
-      is_active: true,
-    });
-    const ghostUser = await models.User.findOne({
-      where: {
-        email: 'notifications@commonwealth.im',
-      },
-    });
-    console.log(ghostUser?.id);
-    await models.Subscription.create({
-      subscriber_id: ghostUser.id,
-      category_id: NotificationCategories.NewComment,
-      object_id: `discussion_${finalThread.id}`,
-      offchain_thread_id: finalThread.id,
-      chain_id: finalThread.chain || null,
       is_active: true,
     });
   } catch (err) {
