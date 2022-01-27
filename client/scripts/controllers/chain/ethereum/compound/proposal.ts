@@ -365,7 +365,6 @@ export default class CompoundProposal extends Proposal<
           this.data.calldatas,
           descriptionHash
         );
-        console.log(gasLimit);
         tx = await ozContract.cancel(
           this.data.targets,
           this.data.values,
@@ -511,7 +510,6 @@ export default class CompoundProposal extends Proposal<
         this.data.identifier,
         +vote.choice
       );
-      console.log(gasLimit);
       tx = await contract.castVote(
         this.data.identifier,
         +vote.choice,
