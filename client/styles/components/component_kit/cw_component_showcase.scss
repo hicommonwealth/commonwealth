@@ -1,6 +1,6 @@
 @import 'client/styles/facelift';
 
-.ComponentListing {
+.ComponentShowcase {
   > * {
     margin: 20px;
   }
@@ -43,6 +43,7 @@
         @include shadow-gradient;
       }
     }
+
     .gradient-row {
       max-width: 400px;
     }

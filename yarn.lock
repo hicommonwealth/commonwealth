@@ -12814,6 +12814,11 @@ mithril-transition-group@^0.2.0:
   resolved "https://registry.npmjs.org/mithril-transition-group/-/mithril-transition-group-0.2.0.tgz"
   integrity sha512-OJ8LeMLACxhJVUG5EPlHZ6KesW1vw4NgFjVOjo1CLnDL1yw7NwviV4NiIMwySFbCl6yxfommyOrqs3iReNUUqw==
 
+mithril-tsx-component@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/mithril-tsx-component/-/mithril-tsx-component-3.0.1.tgz#65dde883c15d49054a0ac4f2bea69b9a6c08e141"
+  integrity sha512-H/HiupcN3zzg96nSi+UxhW+nQta2qz853ye6I6adZozeduy6tPNDqGy80MMfWWwUMdwekSps8JXGz/BJ2jJk6g==
+
 mithril@^1.0.1, mithril@^1.1.6:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/mithril/-/mithril-1.1.7.tgz#505d7d77fe164ff16969de8f9b6eda42e0346cbe"

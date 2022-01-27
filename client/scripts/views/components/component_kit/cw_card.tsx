@@ -1,6 +1,8 @@
 /* @jsx m */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
+import { MithrilTsxComponent } from 'mithril-tsx-component';
 import 'components/component_kit/cw_card.scss';
 
 import { ComponentType } from './types';
@@ -37,9 +39,8 @@ const getCardClasses = (
       }
     })
     .join(' ')}`;
-
-export const CWCard: m.Component<CardAttrs> = {
-  view: (vnode) => {
+export class CWCard extends MithrilTsxComponent<CardAttrs> {
+  view(vnode) {
     const {
       className,
       elevation,
@@ -67,5 +68,5 @@ export const CWCard: m.Component<CardAttrs> = {
         {vnode.children}
       </div>
     );
-  },
-};
+  }
+}
