@@ -76,7 +76,6 @@ const User: m.Component<{
 
     if (vnode.attrs.user instanceof AddressInfo) {
       const chainId = vnode.attrs.user.chain;
-      if (!chainId) console.log(vnode.attrs.user);
       const address = vnode.attrs.user.address;
       if (!chainId || !address) return;
       // only load account if it's possible to, using the current chain
