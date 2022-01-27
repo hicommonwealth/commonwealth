@@ -34,13 +34,14 @@ const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
 async function authenticateSocialAccount(provider: Providers, req: Request, accessToken, refreshToken, profile, cb, models: DB) {
-  const str = '&state='
-  const splitState = req.url.substring(req.url.indexOf(str) + str.length)
-  const state = splitState.substring(splitState.indexOf('='));
-  if (state !== String(req.sessionID)) return cb(null, false)
+  // const str = '&state='
+  // const splitState = req.url.substring(req.url.indexOf(str) + str.length)
+  // const state = splitState.substring(splitState.indexOf('='));
+  // console.log(`State check: ${state} vs ${req.sessionID}`);
+  // if (state !== req.sessionID) return cb(null, false)
 
   const account = await models.SocialAccount.findOne({
-    where: {provider: provider, provider_userid: profile.id}
+    where: { provider, provider_userid: profile.id }
   });
 
   // Existing Github account. If there is already a user logged-in,
@@ -92,7 +93,7 @@ async function authenticateSocialAccount(provider: Providers, req: Request, acce
   // create a new user. As a result it's possible that we end up
   // with a user with multiple Github accounts linked.
   const newAccount = await models.SocialAccount.create({
-    provider: provider,
+    provider,
     provider_userid: profile.id,
     provider_username: profile.username,
     access_token: accessToken,
@@ -370,7 +371,6 @@ function setupPassport(models: DB) {
   if (DISCORD_CLIENT_ID && DISCORD_CLIENT_SECRET && DISCORD_OAUTH_CALLBACK) passport.use(new DiscordStrategy({
     clientID: DISCORD_CLIENT_ID,
     clientSecret: DISCORD_CLIENT_SECRET,
-    callbackURL: DISCORD_OAUTH_CALLBACK,
     scope: DISCORD_OAUTH_SCOPES,
     passReqToCallback: true,
     authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none'
