@@ -29,8 +29,8 @@ const NotificationButtons: m.Component<{ showingChainNotifications: boolean }> =
       m(Button, {
         label: 'See all',
         onclick: () => (app.activeChainId())
-          ? navigateToSubpage('/notificationsList')
-          : m.route.set('/notificationsList'),
+          ? navigateToSubpage('/notifications')
+          : m.route.set('/notifications'),
       }),
       showingChainNotifications ? m(Button, {
         label: 'Mark all read',
