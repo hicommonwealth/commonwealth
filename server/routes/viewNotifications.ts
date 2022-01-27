@@ -6,7 +6,6 @@ const Op = Sequelize.Op;
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NotifyUserNonExist: 'Notification account not found.'
 };
 
 export default async (
@@ -19,28 +18,18 @@ export default async (
     return next(new Error(Errors.NotLoggedIn));
   }
 
-  // get the fake user's data from the User model
-  const notifyUser = await models.User.findOne({
-    where: 
-      {
-        email: 'notifications@commonwealth.im'
-      },
-  });
-
-  if(!notifyUser){
-    return next(new Error(Errors.NotifyUserNonExist));
-  }
-
   // locate active subscriptions, filter by category if specified
-  const userSearchParams: any[] = [{ subscriber_id: req.user.id }];
+  const searchParams: any[] = [
+    { subscriber_id: req.user.id },
+  ];
   if (req.body.active_only) {
-    userSearchParams.push({ is_active: true });
+    searchParams.push({ is_active: true });
   }
   if (req.body.categories && req.body.categories.length) {
-    userSearchParams.push({
+    searchParams.push({
       category_id: {
         [Op.contained]: req.body.categories,
-      },
+      }
     });
   }
 
@@ -69,9 +58,7 @@ export default async (
   // perform the query
   const subscriptions = await models.Subscription.findAll({
     where: {
-      [Op.or]: [
-        { [Op.and]: userSearchParams },
-      ]
+      [Op.and]: searchParams
     },
     include: [
       notificationParams,
