@@ -198,25 +198,6 @@ class NotificationsController {
       throw new Error('must be logged in to refresh notifications');
     }
 
-    // Get the user's joined community ids
-    const allCommunities = app.config.chains.getAll()
-      .filter((item) => {
-        // only show chains with nodes
-        return (item instanceof ChainInfo)
-          ? app.config.nodes.getByChain(item.id)?.length
-          : true;
-      });
-
-    const isInCommunity = (item) => {
-      if (item instanceof ChainInfo) {
-        return app.user.getAllRolesInCommunity({ chain: item.id }).length > 0;
-      } else {
-        return false;
-      }
-    };
-    
-    const joinedCommunityIds = allCommunities.filter((c) => isInCommunity(c)).map(e => e.id);
-    
     // TODO: Change to GET /notifications
     return post('/viewNotifications', { }, (result) => {
       this._store.clear();
