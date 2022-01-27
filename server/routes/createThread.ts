@@ -184,7 +184,6 @@ const createThread = async (
   } catch (err) {
     return next(err);
   }
-  console.log(finalThread?.id);
   // auto-subscribe thread creator to comments & reactions
   try {
     await models.Subscription.create({

@@ -8,7 +8,7 @@ import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 import { getUrlsForEthChainId } from '../util/supportedEthChains';
 
-import { ChainBase, ChainType, NotificationCategories } from '../../shared/types';
+import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 

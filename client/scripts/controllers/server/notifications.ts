@@ -3,7 +3,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { NotificationStore } from 'stores';
-import { NotificationSubscription, Notification, ChainEventType, ChainInfo } from 'models';
+import { NotificationSubscription, Notification, ChainEventType } from 'models';
 import app from 'state';
 
 const post = (route, args, callback) => {
