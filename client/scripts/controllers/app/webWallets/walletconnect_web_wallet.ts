@@ -4,10 +4,11 @@ import app from 'state';
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
+import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
-  private _enabling: boolean = false;
+  private _enabling = false;
   private _accounts: string[];
   private _provider: WalletConnectProvider;
   private _web3: Web3;
@@ -34,13 +35,22 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.personal.sign(message, this.accounts[0], '');
+    const signature = await this._web3.eth.sign(message, this.accounts[0]);
+    return signature;
+  }
+
+  public async signLoginToken(message: string): Promise<string> {
+    const msgParams = constructTypedMessage(app.chain.meta.ethChainId || 1, message);
+    const signature = await this._provider.wc.signTypedData([
+      this.accounts[0],
+      JSON.stringify(msgParams),
+    ]);
     return signature;
   }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
-    // Sign with the method on eth_webwallet, because we don't have access to the private key
-    const webWalletSignature = await this.signMessage(account.validationToken);
+    // TODO: test whether signTypedData works on WC
+    const webWalletSignature = await this.signLoginToken(account.validationToken);
     return account.validate(webWalletSignature);
   }
 
@@ -49,11 +59,12 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // Create WalletConnect Provider
-      if (!app.chain?.meta.ethChainId) {
-        throw new Error(`No chain id found!`);
-      }
-      const rpc = { [app.chain.meta.ethChainId]: app.chain.meta.url };
-      this._provider = new WalletConnectProvider({ rpc, chainId: app.chain.meta.ethChainId });
+      const chainId = app.chain?.meta.ethChainId || 1;
+
+      // use alt wallet url if available
+      const rpc = { [chainId]: app.chain.meta.altWalletUrl || app.chain.meta.url };
+      console.log(rpc);
+      this._provider = new WalletConnectProvider({ rpc, chainId });
 
       //  Enable session (triggers QR Code modal)
       await this._provider.enable();

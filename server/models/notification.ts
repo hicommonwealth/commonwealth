@@ -1,21 +1,26 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ModelStatic } from './types';
-import { SubscriptionAttributes } from './subscription';
+import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
+import { ChainEventAttributes, ChainEventInstance } from './chain_event';
 
 export interface NotificationAttributes {
-  subscription_id: number;
   notification_data: string;
+  chain_id?: string;
+  category_id: string;
   id?: number;
-  is_read?: boolean;
   chain_event_id?: number;
   created_at?: Date;
   updated_at?: Date;
-  Subscription?: SubscriptionAttributes;
+  NotificationsRead?: NotificationsReadAttributes[];
+  ChainEvent?: ChainEventAttributes;
 }
 
 export interface NotificationInstance
-extends Model<NotificationAttributes>, NotificationAttributes {}
+extends Model<NotificationAttributes>, NotificationAttributes {
+  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
+  getChainEvent: Sequelize.HasOneGetAssociationMixin<ChainEventInstance>;
+}
 
 export type NotificationModelStatic = ModelStatic<NotificationInstance>
 
@@ -25,23 +30,22 @@ export default (
 ): NotificationModelStatic => {
   const Notification = <NotificationModelStatic>sequelize.define('Notification', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    subscription_id: { type: dataTypes.INTEGER, allowNull: false },
     notification_data: { type: dataTypes.TEXT, allowNull: false },
-    is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
+    chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
+    category_id: { type: dataTypes.STRING, allowNull: false}
   }, {
     tableName: 'Notifications',
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    indexes: [
-      { fields: ['subscription_id'] },
-    ],
   });
 
   Notification.associate = (models) => {
-    models.Notification.belongsTo(models.Subscription, { foreignKey: 'subscription_id', targetKey: 'id' });
+    models.Notification.hasMany(models.NotificationsRead, { foreignKey: 'notification_id', onDelete: 'cascade', hooks: true })
     models.Notification.belongsTo(models.ChainEvent, { foreignKey: 'chain_event_id', targetKey: 'id' });
+    models.Notification.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name'});
+    models.Notification.belongsTo(models.Chain, {foreignKey: 'chain_id', targetKey: 'id'});
   };
 
   return Notification;

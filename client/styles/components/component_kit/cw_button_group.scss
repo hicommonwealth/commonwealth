@@ -1,0 +1,8 @@
+.ButtonGroup {
+  display: flex;
+  flex-direction: row;
+
+  .Button:not(:last-child) {
+    margin: 0 8px 0 0;
+  }
+}

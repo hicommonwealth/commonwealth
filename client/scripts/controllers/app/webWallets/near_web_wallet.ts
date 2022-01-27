@@ -1,7 +1,8 @@
 import { ChainBase } from 'types';
 import { Account, IWebWallet } from 'models';
 
-// TODO
+// Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login
+// is handled through redirects involving the `/finishNearLogin` page.
 class NearWebWalletController implements IWebWallet<any> {
   public readonly name = 'near';
   public readonly label = 'NEAR Wallet';
@@ -9,7 +10,7 @@ class NearWebWalletController implements IWebWallet<any> {
   public readonly chain = ChainBase.NEAR;
   public readonly enabling = false;
 
-  private _enabled: boolean = false;
+  private _enabled = false;
 
   public get accounts() {
     return [];

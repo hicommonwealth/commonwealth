@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
 import { ApiPromise } from '@polkadot/api';
 import { decodeAddress } from '@polkadot/keyring';
@@ -7,7 +8,6 @@ import {
   AccountId, Exposure, Conviction, StakingLedger,
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
-import { mnemonicValidate } from '@polkadot/util-crypto';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 
 import { IApp } from 'state';
@@ -18,15 +18,6 @@ import { Codec } from '@polkadot/types/types';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
 import SubstrateChain from './shared';
-
-function addressFromSeed(seed: string, chain: SubstrateChain): string {
-  return `${(chain.keyring()).addFromUri(`//${seed}`).address}`;
-}
-
-function addressFromMnemonic(mnemonic: string, chain: SubstrateChain): string {
-  if (!mnemonicValidate(mnemonic)) throw new Error('Invalid mnemonic');
-  return `${(chain.keyring()).addFromMnemonic(mnemonic).address}`;
-}
 
 export interface IValidators {
   [address: string]: {
@@ -133,21 +124,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       });
   }
 
-  /*
-  // Accounts may set a proxy that can take council and democracy actions on behalf of their account
-  public get proxyFor(): Observable<SubstrateAccount> {
-    if (!this._Chain?.apiInitialized) return;
-    return this._Chain.api.query.democracy.proxy(this.address)
-      .then((proxy) => {
-        if (proxy && proxy.isSome) {
-          return this._Accounts.fromAddress(proxy.unwrap().toString());
-        } else {
-          return null;
-        }
-      });
-  }
-  */
-
   // Accounts may delegate their voting power for democracy referenda. This always incurs the maximum locktime
   public get delegation(): Promise<[ SubstrateAccount, number ]> {
     if (!this._Chain?.apiInitialized) return;
@@ -187,7 +163,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     address: string,
-    isEd25519: boolean = false
+    isEd25519 = false
   ) {
     if (!app.isModuleReady) {
       // defer chain initialization
@@ -208,39 +184,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     this.isEd25519 = isEd25519;
     this._Accounts = Accounts;
     this._Accounts.store.add(this);
-  }
-
-  public async signMessage(message: string): Promise<string> {
-    const keyring = this._Chain.keyring(this.isEd25519);
-    if (this.seed) {
-      keyring.addFromUri(`//${this.seed}`);
-    } else if (this.mnemonic) {
-      keyring.addFromMnemonic(this.mnemonic);
-    } else {
-      throw new Error('Account must have seed or mnemonic to sign messages');
-    }
-    const signature = keyring.getPair(this.address).sign(stringToU8a(message));
-    return u8aToHex(signature).slice(2); // remove hex prefix, will be re-added on server
-  }
-
-  // keys
-  protected async addressFromMnemonic(mnemonic: string) {
-    return addressFromMnemonic(mnemonic, this._Chain);
-  }
-
-  protected async addressFromSeed(seed: string) {
-    return addressFromSeed(seed, this._Chain);
-  }
-
-  public getKeyringPair(): KeyringPair {
-    if (!this.seed && !this.mnemonic) {
-      throw new Error('Seed or mnemonic not found!');
-    }
-    if (this.seed) {
-      return (this._Chain.keyring(this.isEd25519)).addFromUri(`//${this.seed}`);
-    } else {
-      return (this._Chain.keyring(this.isEd25519)).addFromMnemonic(this.mnemonic);
-    }
   }
 
   // TRANSACTIONS
@@ -346,7 +289,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 }
 class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccount> {
-  private _initialized: boolean = false;
+  private _initialized = false;
   private cachedValidators;
 
   public get initialized() { return this._initialized; }
@@ -394,20 +337,6 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
     } catch (e) {
       return new SubstrateAccount(this.app, this._Chain, this, address, isEd25519);
     }
-  }
-
-  public async fromSeed(seed: string): Promise<SubstrateAccount> {
-    const address = addressFromSeed(seed, this._Chain);
-    const acct = this.fromAddress(address);
-    await acct.setSeed(seed);
-    return acct;
-  }
-
-  public async fromMnemonic(mnemonic: string): Promise<SubstrateAccount> {
-    const address = addressFromMnemonic(mnemonic, this._Chain);
-    const acct = this.fromAddress(address);
-    await acct.setMnemonic(mnemonic);
-    return acct;
   }
 
   public getValidators() {

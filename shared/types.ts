@@ -153,6 +153,7 @@ export interface ICommunityNotificationData {
 export interface IChainEventNotificationData {
   chainEvent: any;
   chainEventType: any;
+  chain_id: string
 }
 
 export const PROFILE_NAME_MAX_CHARS = 40;

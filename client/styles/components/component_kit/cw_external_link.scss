@@ -1,0 +1,30 @@
+@import 'client/styles/facelift';
+
+.ExternalLink {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  max-width: fit-content;
+  font-weight: 500;
+  cursor: pointer;
+
+  span {
+    color: $dark-purp;
+    margin-right: 15px;
+  }
+
+  &.button {
+    padding: 6px 24px 2px;
+    border: 1px solid $lite-purp;
+    border-radius: 10px;
+  }
+
+  &.inline {
+    padding: 3px 6px 0;
+    border-radius: 4px;
+  }
+
+  &:hover {
+    background-color: $lite-purp;
+  }
+}

@@ -56,7 +56,8 @@ const validate = async (vnode: m.Vnode<{}, IState>, wallet: WalletConnection) =>
     // TODO: do we need to do this every time, or only on first connect?
     const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
     await createUserWithAddress(acct.address);
-    await acct.validate();
+    const signature = await acct.signMessage(`${acct.validationToken}\n`);
+    await acct.validate(signature);
     if (!app.isLoggedIn()) {
       await initAppState();
       const chain = app.user.selectedNode

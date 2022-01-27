@@ -1,17 +1,16 @@
 import 'components/sidebar/notification_row.scss';
 
-import { Icon, Icons, Tooltip, Spinner } from 'construct-ui';
+import { Icon, Icons, Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from '@commonwealth/chain-events';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { NotificationCategories } from 'types';
+import { NotificationCategories , IPostNotificationData, ProposalType } from 'types';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
-import { IPostNotificationData, ProposalType } from 'types';
+
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -289,9 +288,7 @@ const NotificationRow: m.Component<{
         null,
         () => {
           if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
-          const notificationArray: Notification[] = [];
-          notificationArray.push(notification);
-          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          app.user.notifications.markAsRead([notification]).then(() => m.redraw());
         },
         () => m.redraw.sync(),
       );

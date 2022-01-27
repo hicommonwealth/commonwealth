@@ -1,46 +1,15 @@
 import assert from 'assert';
-import hdkey from 'ethereumjs-wallet/hdkey';
-import { Wallet } from 'ethereumjs-wallet';
 import { IApp } from 'state';
 import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import bip39 from 'bip39';
 import EthereumChain from './chain';
 import EthereumAccount from './account';
-
-export function getWalletFromSeed(seed: string): Wallet {
-  return hdkey.fromMasterSeed(seed).getWallet();
-}
-
-export function addressFromSeed(seed: string): string {
-  return getWalletFromSeed(seed).getAddressString();
-}
-
-export function addressFromMnemonic(mnemonic: string): string {
-  if (!bip39.validateMnemonic(mnemonic)) throw new Error('Invalid mnemonic');
-  const seed = bip39.mnemonicToSeedSync('basket actual').toString('hex');
-  return addressFromSeed(seed);
-}
-
-export function getWalletFromMnemonic(mnemonic: string): Wallet {
-  if (!bip39.validateMnemonic(mnemonic)) throw new Error('Invalid mnemonic');
-  const seed = bip39.mnemonicToSeedSync('basket actual').toString('hex');
-  return getWalletFromSeed(seed);
-}
-
-/**
- * Gets the address from an EthereumJS Wallet
- * @param wallet EthereumJS-Wallet format
- */
-export function addressFromWallet(wallet: Wallet): string {
-  return wallet.getAddressString();
-}
 
 // NOTE: this is just a boilerplate class; not verified to work yet.
 // TODO: hook this up to rest of the application and verify that it works
 class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount> {
-  private _initialized: boolean = false;
+  private _initialized = false;
   public get initialized() { return this._initialized; }
 
   // STORAGE
@@ -72,26 +41,6 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
     } catch (e) {
       return new EthereumAccount(this.app, this._Chain, this, address);
     }
-  }
-
-  public async fromSeed(seed: string): Promise<EthereumAccount> {
-    const address = addressFromSeed(seed);
-    const acct = this.fromAddress(address);
-    await acct.setSeed(seed);
-    return acct;
-  }
-  public async fromMnemonic(mnemonic: string): Promise<EthereumAccount> {
-    const address = addressFromMnemonic(mnemonic);
-    const acct = this.fromAddress(address);
-    await acct.setMnemonic(mnemonic);
-    return acct;
-  }
-
-  public fromWallet(wallet: Wallet): EthereumAccount {
-    const address = addressFromWallet(wallet);
-    const acct = this.fromAddress(address);
-    acct.setWallet(wallet);
-    return acct;
   }
 
   public deinit() {

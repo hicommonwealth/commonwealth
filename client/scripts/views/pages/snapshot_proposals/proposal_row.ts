@@ -20,6 +20,7 @@ const ProposalRow: m.Component<
     const time = moment(+proposal.end * 1000);
     const now = moment();
 
+    // TODO: display proposal.scores and proposal.scores_total on card
     return m('.ProposalCard', [
       m(
         '.proposal-card-top',

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { ChainEventType } from 'models/index';
 import NotificationSubscription from './NotificationSubscription';
 import ChainEvent from './ChainEvent';
 
@@ -31,14 +32,14 @@ class Notification {
     }
   }
 
-  public static fromJSON(json, subscription: NotificationSubscription) {
+  public static fromJSON(json, subscription: NotificationSubscription, chainEventType?: ChainEventType) {
     return new Notification(
       json.id,
       json.notification_data,
       json.is_read,
       json.created_at,
       subscription,
-      json.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent) : undefined,
+      json.Notification?.ChainEvent ? ChainEvent.fromJSON(json.Notification.ChainEvent, chainEventType) : undefined
     );
   }
 }
