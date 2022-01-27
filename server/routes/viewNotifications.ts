@@ -35,7 +35,7 @@ export default async (
 
   const notificationParams: any = {
     model: models.NotificationsRead,
-    required: false, // send subscriptions regardless of whether user has notifications
+    required: false,
     include: [
       {
         model: models.Notification,

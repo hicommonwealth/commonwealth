@@ -5,7 +5,6 @@ import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
-import { NotificationAttributes, NotificationInstance } from './notification';
 import { ModelStatic } from './types';
 import {
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType,
@@ -198,7 +197,7 @@ export default (
           SERVER_URL
         }/${
           (<IChainEventNotificationData>notification_data).chainEventType.chain
-        }/notificationsList?id=${
+        }/notifications?id=${
           notification.id
         }`;
       }
@@ -222,8 +221,7 @@ export default (
         ...webhook_data
       });
     }
-
-    return notification;
+    return nReads;
   };
 
   Subscription.associate = (models) => {

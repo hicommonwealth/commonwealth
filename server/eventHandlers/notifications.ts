@@ -48,7 +48,7 @@ export default class extends IEventHandler {
       }
 
       // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
-      const dbNotification = await this._models.Subscription.emitNotifications(
+      const dbNotifications = await this._models.Subscription.emitNotifications(
         this._models,
         NotificationCategories.ChainEvent,
         dbEventType.id,
@@ -60,7 +60,7 @@ export default class extends IEventHandler {
       );
 
       // construct notification with all the necessary data from the DB (without having to re-query using joins)
-      const formattedEvent = dbNotification.toJSON()
+      const formattedEvent = dbNotifications.toJSON()
       formattedEvent.ChainEvent = dbEvent.toJSON()
       formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON()
 
