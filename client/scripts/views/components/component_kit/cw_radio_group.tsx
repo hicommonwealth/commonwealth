@@ -30,17 +30,19 @@ export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
     return (
       <div class={ComponentType.RadioGroup}>
         {values.map((val, idx) => {
-          return m(CWRadioButton, {
-            value: val,
-            label: labels[idx] || val,
-            checked: val === this.toggledValue,
-            groupName: name,
-            onchange: (e) => {
-              this.toggledValue = e?.target?.value;
-              onchange(e);
-            },
-            disabled,
-          });
+          return (
+            <CWRadioButton
+              value={val}
+              label={labels[idx] || val}
+              checked={val === this.toggledValue}
+              groupName={name}
+              onchange={(e) => {
+                this.toggledValue = e?.target?.value;
+                onchange(e);
+              }}
+              disabled={disabled}
+            />
+          );
         })}
       </div>
     );
