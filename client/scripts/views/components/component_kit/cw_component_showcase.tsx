@@ -36,8 +36,16 @@ const displayGradients = (gradientNames: string[]) => {
   });
 };
 
-export const ComponentShowcase: m.Component = {
-  view: () => {
+const radioGroupOptions = [
+  { label: 'This', value: 'This' },
+  { label: 'Is', value: 'Is' },
+  { label: 'A', value: 'A' },
+  { label: 'Radio', value: 'Radio' },
+  { label: 'Group', value: 'Group' },
+];
+
+export class ComponentShowcase implements m.ClassComponent {
+  view() {
     return (
       <div class="ComponentShowcase">
         <h1>Colors</h1>
@@ -160,9 +168,8 @@ export const ComponentShowcase: m.Component = {
         <h1>Radio Group</h1>
         <div class="button-gallery">
           <CWRadioGroup
-            values={['This', 'Is', 'A', 'Radio', 'Group']}
-            labels={['This', 'Is', 'A', 'Radio', 'Group']}
-            defaultValue="A"
+            options={radioGroupOptions}
+            defaultValue={radioGroupOptions[2]}
             name="RadioGroup"
             onchange={(e) => notifySuccess(`"${e.target.value}" selected`)}
           />
@@ -250,5 +257,5 @@ export const ComponentShowcase: m.Component = {
         </div>
       </div>
     );
-  },
-};
+  }
+}
