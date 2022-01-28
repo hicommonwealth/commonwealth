@@ -1,4 +1,5 @@
 import {Server} from 'socket.io';
+import moment from 'moment';
 import {addPrefix, factory} from '../../shared/logging';
 import {
     WebsocketEngineEvents,
@@ -36,14 +37,14 @@ export function createChatNamespace(io: Server, models: DB) {
         })
 
         socket.on(WebsocketMessageType.ChatMessage, (_message) => {
-            const { message, address, chat_channel_id } = _message
-            models.ChatMessage.create({ address, message, chat_channel_id })
+            const { message, address, chat_channel_id, now } = _message
+            const now_date = moment(now).toDate()
+            models.ChatMessage.create({ address, message, chat_channel_id, created_at: now_date, updated_at: now_date })
                 .then((res) => {
-                    console.log(res['dataValue'])
                     const { id, created_at } = res
                     ChatNs
                       .to(`${chat_channel_id}`)
-                      .emit(WebsocketMessageType.ChatMessage, {id, address, message, chat_channel_id, created_at});
+                      .emit(WebsocketMessageType.ChatMessage, { id, address, message, chat_channel_id, created_at });
                 })
                 .catch((e) => {
                     socket.emit('Error', e)

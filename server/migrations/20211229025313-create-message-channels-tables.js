@@ -28,8 +28,8 @@ module.exports = {
             address VARCHAR(255) NOT NULL,
             message TEXT NOT NULL,
             chat_channel_id INTEGER NOT NULL REFERENCES "ChatChannels" ON DELETE CASCADE,
-            created_at DATE NOT NULL,
-            updated_at DATE NOT NULL
+            created_at TIMESTAMP NOT NULL,
+            updated_at TIMESTAMP NOT NULL
         );
       `, { type: 'RAW', raw: true, transaction: t });
     });

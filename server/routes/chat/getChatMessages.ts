@@ -23,7 +23,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 	// check address
 	const addressAccount = await models.Address.findOne({
 		where: {
-			address: req.params.address,
+			address: req.query.address,
 			user_id: req.user.id
 		}
 	});
@@ -32,14 +32,15 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 	}
 
 	// check community id
-	if (!req.params.community_id) {
+	console.log(req.query)
+	if (!req.query.community_id) {
 		return next(new Error(Errors.NoCommunityId))
 	}
 
 	// get all messages
 	const messages = await models.ChatChannel.findAll({
 		where: {
-			community_id: req.params.community_id
+			community_id: req.query.community_id
 		},
 		include: {
 			model: models.ChatMessage,
@@ -47,6 +48,5 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 		}
 	})
 
-	// return
-	return res.json({ status: 'Success', result: JSON.stringify(messages) });
+	return res.json({ status: '200', result: JSON.stringify(messages) });
 }

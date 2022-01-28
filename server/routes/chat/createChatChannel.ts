@@ -25,5 +25,5 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
         community_id: req.body.community_id
     });
 
-    return res.json({ status: 'Success', result: { chat_channel: channel.toJSON() } });
+    return res.json({ status: '200', result: { chat_channel: channel.toJSON() } });
 }

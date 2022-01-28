@@ -7,6 +7,7 @@ export const MESSAGE_PAGE_SIZE = 50;
 export class ChatNamespace {
     private chatNs;
     private _isConnected = false;
+    private messages = {};
 
     constructor() {
         this.chatNs = io(`/${WebsocketNamespaces.Chat}`, {
@@ -68,16 +69,24 @@ export class ChatNamespace {
         }
     }
 
-    public async getChatMessages(community_id) {
+    public async getChatMessages() {
+        if(!app.user.activeAccount || !app.activeChainId()) {
+            // HACK: This gets called on load and beats the app's loading in a race. Can't have that.
+            await new Promise(r => setTimeout(r, 1000));
+        }
         try {
-            $.get(`${app.serverUrl()}/getChatMessages`, {
-                community_id
-            }).then((res) => {
-                console.log(res)
-                return res
-            }).catch((err) => {
-                throw new Error(`Failed to created chat channel with error: ${err}`)
+            const res = await $.get(`${app.serverUrl()}/getChatMessages`, {
+                jwt: app.user.jwt,
+                address: app.user.activeAccount.address,
+                community_id: app.activeChainId()
             })
+
+            if(res.status !== "200") {
+                throw new Error('Failed to get chat messages')
+            }
+
+            const raw = JSON.parse(res.result)
+            return raw
         } catch (e) {
             console.error(e)
             return []
