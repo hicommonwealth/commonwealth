@@ -5,7 +5,7 @@ import mixpanel from 'mixpanel-browser';
 import { Icon, Icons, Popover, Size } from 'construct-ui';
 
 import app from 'state';
-import { Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo, ITokenAdapter } from 'models';
+import { Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import BN from 'bn.js';
 
@@ -13,6 +13,7 @@ import $ from 'jquery';
 import ReactionCount from 'models/ReactionCount';
 import SelectAddressModal from '../modals/select_address_modal';
 import LoginModal from '../modals/login_modal';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
@@ -83,26 +84,21 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     let disabled = vnode.state.loading;
 
     // token balance check if needed
-    if (!app.community && ITokenAdapter.instanceOf(app.chain)) {
+    if (!app.community) {
       const tokenBalance = app.chain.tokenBalance;
       const isAdmin = app.user.isSiteAdmin
         || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
 
-      let tokenPostingThreshold: BN;
+      let topicName: string = "";
       if (post instanceof OffchainThread && post.topic && app.topics) {
-        tokenPostingThreshold = app.topics.getByName(
-          (post as OffchainThread).topic.name,
-          app.activeId()
-        )?.tokenThreshold;
+        topicName = (post as OffchainThread).topic.name
       } else if (post instanceof OffchainComment) {
         // post.rootProposal has typescript typedef number but in practice seems to be a string
         const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
-        tokenPostingThreshold = app.topics.getByName((parentThread).topic.name, app.activeId())?.tokenThreshold;
-      } else {
-        tokenPostingThreshold = new BN(0);
+        topicName = parentThread.topic.name
       }
       disabled = vnode.state.loading || (
-        !isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance)
+        !isAdmin && TopicGateCheck.isGatedTopic(topicName, tokenBalance)
       );
     }
 

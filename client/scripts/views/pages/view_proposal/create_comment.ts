@@ -6,7 +6,7 @@ import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, OffchainComment, AnyProposal, Account, ITokenAdapter } from 'models';
+import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -18,6 +18,7 @@ import { weiToTokens } from 'helpers';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 const CreateComment: m.Component<{
   callback: CallableFunction,
@@ -149,16 +150,13 @@ const CreateComment: m.Component<{
       || !app.user.activeAccount;
 
     // token balance check if needed
-    let tokenPostingThreshold: BN | null = null;
-    if (!app.community && ITokenAdapter.instanceOf(app.chain)) {
-      const tokenBalance = app.chain.tokenBalance;
-      tokenPostingThreshold = app.topics.getByName(
-        activeTopicName,
-        app.activeId()
-      )?.tokenThreshold;
+    let tokenPostingThreshold : BN | null = null;
+    if (!app.community) {
+      tokenPostingThreshold = TopicGateCheck.getTopicThreshold(activeTopicName);
+      let topicGated = TopicGateCheck.isGatedTopic(activeTopicName, app.chain.tokenBalance);
       disabled = disabled
         || !app.isAdapterReady
-        || (!isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
+        || (!isAdmin && topicGated);
     }
 
     const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
@@ -221,9 +219,7 @@ const CreateComment: m.Component<{
                   `Commenting in "${activeTopicName}" requires `,
                   `${weiToTokens(tokenPostingThreshold.toString(), decimals)} `,
                   `${app.chain.meta.chain.symbol}. `,
-                  !app.community
-                    && ITokenAdapter.instanceOf(app.chain)
-                    && app.chain.tokenBalance
+                  app.chain.tokenBalance
                     && app.user.activeAccount
                     && `You have ${
                       weiToTokens(app.chain.tokenBalance.toString(), decimals)

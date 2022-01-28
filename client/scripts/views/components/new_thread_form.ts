@@ -27,6 +27,7 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 interface IThreadForm {
   topicName?: string;
@@ -670,7 +671,7 @@ export const NewThreadForm: m.Component<{
                 topics: app.topics && app.topics.getByCommunity(app.activeId()).filter((t) => {
                   return isAdmin
                     || t.tokenThreshold.isZero()
-                    || (ITokenAdapter.instanceOf(app.chain) && (t.tokenThreshold).lte(app.chain.tokenBalance));
+                    || !TopicGateCheck.isGatedTopic(t.name, app.chain.tokenBalance);
                 }),
                 featuredTopics: app.topics.getByCommunity(app.activeId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
