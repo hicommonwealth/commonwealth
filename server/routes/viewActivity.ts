@@ -19,7 +19,7 @@ export default async (
   }
   const { id } = req.user;
 
-  const query = ``;
+  const query = ``; 
 
   const notifications = await sequelize.query(query);
 
