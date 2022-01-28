@@ -168,13 +168,13 @@ export const ComponentShowcase: m.Component = {
         </div>
         <h1>Radio Group</h1>
         <div class="button-gallery">
-          {m(CWRadioGroup, {
-            values: ['This', 'Is', 'A', 'Radio', 'Group'],
-            labels: ['This', 'Is', 'A', 'Radio', 'Group'],
-            defaultValue: 'This',
-            name: 'RadioGroup',
-            onchange: (e) => notifySuccess(`"${e.target.value}" selected`),
-          })}
+          <CWRadioGroup
+            values={['This', 'Is', 'A', 'Radio', 'Group']}
+            labels={['This', 'Is', 'A', 'Radio', 'Group']}
+            defaultValue = 'A'
+            name= 'RadioGroup'
+            onchange={(e) => notifySuccess(`"${e.target.value}" selected`)}
+          />
         </div>
         <h1>Engagement Buttons</h1>
         <div class="button-gallery">
