@@ -12,6 +12,7 @@ import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
+import { CWTextInput, ValidationStatus } from './cw_text_input';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -76,130 +77,120 @@ export const ComponentShowcase: m.Component = {
         <div class="icon-gallery">
           <div class="icon-row">
             Primary Small
-            {m(CWIcon, {
-              iconName: 'views',
-              iconSize: 'small',
-            })}
+            <CWIcon iconName="views" iconSize="small" />
           </div>
           <div class="icon-row">
             Primary Medium
-            {m(CWIcon, {
-              iconName: 'views',
-            })}
+            <CWIcon iconName="views" />
           </div>
           <div class="icon-row">
             Primary Large
-            {m(CWIcon, {
-              iconName: 'views',
-              iconSize: 'large',
-            })}
+            <CWIcon iconName="views" iconSize="large" />
+          </div>
+          <div class="icon-row">
+            Secondary Large
+            <CWIcon iconName="views" iconSize="large" iconType="secondary" />
           </div>
           <div class="icon-row">
             Disabled Large
-            {m(CWIcon, {
-              iconName: 'views',
-              iconSize: 'large',
-              disabled: true,
-            })}
+            <CWIcon iconName="views" iconSize="large" disabled={true} />
           </div>
         </div>
         <h1>Buttons</h1>
         <div class="button-gallery">
-          {m(CWButton, {
-            label: 'Primary',
-            onclick: () => notifySuccess('Button clicked!'),
-          })}
-          {m(CWButton, {
-            disabled: true,
-            label: 'Disabled',
-            onclick: () => notifySuccess('Button clicked!'),
-          })}
-          {m(CWButton, {
-            buttonType: 'secondary',
-            label: 'Secondary',
-            onclick: () => notifySuccess('Button clicked!'),
-          })}
-          {m(CWButton, {
-            buttonType: 'secondary',
-            disabled: true,
-            label: 'Disabled',
-            onclick: () => notifySuccess('Button clicked!'),
-          })}
-          {m(CWGradientButton, {
-            label: 'Primary',
-            onclick: () => notifySuccess('Button clicked!'),
-          })}
+          <CWButton
+            label="Primary"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Disabled"
+            disabled={true}
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary"
+            buttonType="secondary"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary"
+            buttonType="secondary"
+            disabled={true}
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWGradientButton
+            label="Primary"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
         </div>
         <h1>Button Group</h1>
         <div class="button-gallery">
-          {m(CWButtonGroup, {
-            children: [
-              m(CWButton, {
-                label: 'One',
-                onclick: () => notifySuccess('One clicked!'),
-              }),
-              m(CWButton, {
-                label: 'Two',
-                onclick: () => notifySuccess('Two clicked!'),
-              }),
-              m(CWButton, {
-                label: 'Three',
-                onclick: () => notifySuccess('Three clicked!'),
-              }),
-              m(CWButton, {
-                label: 'Four',
-                onclick: () => notifySuccess('Four clicked!'),
-              }),
-            ],
-          })}
+          <CWButtonGroup>
+            <CWButton
+              label="One"
+              onclick={() => notifySuccess('One clicked!')}
+            />
+            <CWButton
+              label="Two"
+              onclick={() => notifySuccess('Two clicked!')}
+            />
+            <CWButton
+              label="Three"
+              onclick={() => notifySuccess('Three clicked!')}
+            />
+            <CWButton
+              label="Four"
+              onclick={() => notifySuccess('Four clicked!')}
+            />
+          </CWButtonGroup>
         </div>
         <h1>External Link Buttons</h1>
         <div class="button-gallery">
-          {m(CWExternalLink, {
-            label: 'Button external link',
-            target: 'https://edgewa.re/',
-            linkType: 'button',
-          })}
-          {m(CWExternalLink, {
-            label: 'Inline external link',
-            target: 'https://edgewa.re/',
-            linkType: 'inline',
-          })}
+          <CWExternalLink
+            label="Button external link"
+            target="https://edgewa.re/"
+            linkType="button"
+          />
+          <CWExternalLink
+            label="Inline external link"
+            target="https://edgewa.re/"
+            linkType="inline"
+          />
         </div>
         <h1>Radio Group</h1>
         <div class="button-gallery">
           <CWRadioGroup
             values={['This', 'Is', 'A', 'Radio', 'Group']}
             labels={['This', 'Is', 'A', 'Radio', 'Group']}
-            defaultValue = 'A'
-            name= 'RadioGroup'
+            defaultValue="A"
+            name="RadioGroup"
             onchange={(e) => notifySuccess(`"${e.target.value}" selected`)}
           />
         </div>
         <h1>Engagement Buttons</h1>
         <div class="button-gallery">
-          {m(CWEngagementButton, {
-            buttonSize: 'sm',
-            label: 'Small',
-            onclick: () => notifySuccess('Button clicked!'),
-          })}
-          {m(CWEngagementButton, {
-            buttonSize: 'lg',
-            label: 'Big',
-            onclick: () => notifySuccess('Button clicked!'),
-          })}
-          {m(CWEngagementButton, {
-            buttonSize: 'sm',
-            label: 'Small',
-            disabled: true,
-            onclick: () => notifySuccess('Button clicked!'),
-          })}
-          {m(CWEngagementButton, {
-            buttonSize: 'lg',
-            label: 'Big',
-            disabled: true,
-            onclick: () => notifySuccess('Button clicked!'),
-          })}
+          <CWEngagementButton
+            buttonSize="sm"
+            label="Small"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWEngagementButton
+            buttonSize="lg"
+            label="Big"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWEngagementButton
+            buttonSize="sm"
+            label="Small"
+            disabled={true}
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWEngagementButton
+            buttonSize="lg"
+            label="Big"
+            disabled={true}
+            onclick={() => notifySuccess('Button clicked!')}
+          />
         </div>
         <h1>Cards</h1>
         <div class="card-gallery">
@@ -211,15 +202,51 @@ export const ComponentShowcase: m.Component = {
             <h4>Card title</h4>
             <div>Elevation: 1</div>
           </CWCard>
-          {/* {m(
-            CWCard,
-            {
-              elevation: 'elevation-1',
-              interactive: true,
-              onclick: () => notifySuccess('Card clicked!'),
-            },
-            [m('h4', 'Card title'), m('div', 'Elevation: 1')]
-          )} */}
+          <CWCard
+            elevation="elevation-2"
+            interactive={true}
+            onclick={() => notifySuccess('Card clicked!')}
+          >
+            <h4>Card title</h4>
+            <div>Elevation: 2</div>
+          </CWCard>
+          <CWCard
+            elevation="elevation-3"
+            interactive={true}
+            onclick={() => notifySuccess('Card clicked!')}
+          >
+            <h4>Card title</h4>
+            <div>Elevation: 3</div>
+          </CWCard>
+          <CWCard
+            elevation="elevation-1"
+            interactive={true}
+            fullWidth={true}
+            onclick={() => notifySuccess('Card clicked!')}
+          >
+            <h4>Card title</h4>
+            <div>Full width</div>
+          </CWCard>
+        </div>
+        <h1>Form fields</h1>
+        <div class="form-gallery">
+          <CWTextInput
+            name="Form field"
+            inputValidationFn={(val: string): [ValidationStatus, string] => {
+              if (val.match(/[^A-Za-z]/)) {
+                return [ValidationStatus.Failure, 'Must enter characters A-Z'];
+              } else {
+                return [ValidationStatus.Success, 'Input validated'];
+              }
+            }}
+            label="This input only accepts A-Z"
+            placeholder="Placeholder"
+          />
+          <CWTextInput
+            name="Text field"
+            label="No status message or error validation"
+            placeholder="Placeholder"
+          />
         </div>
       </div>
     );

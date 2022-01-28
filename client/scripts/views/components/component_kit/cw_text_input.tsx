@@ -22,13 +22,11 @@ type TextInputAttrs = {
   tabindex?: number;
 };
 
-type TextInputState = {
-  statusMessage: string;
-  validationStatus: ValidationStatus;
-};
+export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
+  statusMessage?: string;
+  validationStatus?: ValidationStatus;
 
-export const CWTextInput: m.Component<TextInputAttrs, TextInputState> = {
-  view: (vnode) => {
+  view(vnode) {
     const {
       autocomplete,
       autofocus,
@@ -41,15 +39,13 @@ export const CWTextInput: m.Component<TextInputAttrs, TextInputState> = {
       tabindex,
     } = vnode.attrs;
 
-    const { statusMessage, validationStatus } = vnode.state;
-
     return (
       <div class={ComponentType.TextInput}>
         {label && <label>{label}</label>}
         <input
           autofocus={autofocus}
           autocomplete={autocomplete}
-          class={validationStatus}
+          class={this.validationStatus}
           tabindex={tabindex}
           name={name}
           placeholder={placeholder}
@@ -57,23 +53,24 @@ export const CWTextInput: m.Component<TextInputAttrs, TextInputState> = {
           onfocusout={(e) => {
             if (inputValidationFn) {
               if (!e.target.value?.length) {
-                delete vnode.state.validationStatus;
-                delete vnode.state.statusMessage;
+                this.validationStatus = undefined;
+                this.statusMessage = undefined;
                 m.redraw();
               } else {
-                [vnode.state.validationStatus, vnode.state.statusMessage] =
-                  inputValidationFn(e.target.value);
+                [this.validationStatus, this.statusMessage] = inputValidationFn(
+                  e.target.value
+                );
               }
             }
           }}
           defaultValue={defaultValue}
         />
-        {statusMessage && (
-          <div class={`validation-status ${validationStatus}`}>
-            {statusMessage}
+        {this.statusMessage && (
+          <div class={`validation-status ${this.validationStatus}`}>
+            {this.statusMessage}
           </div>
         )}
       </div>
     );
-  },
-};
+  }
+}
