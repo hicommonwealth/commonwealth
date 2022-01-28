@@ -73,7 +73,12 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
   }
 };
 
-
+const fetchActivity = async () => {
+  const activity = await $.post(`${app.serverUrl()}/viewActivity`, {
+    jwt: app.user.jwt
+  });
+  return activity;
+}
 
 const notificationsRemaining = (contentLength, count) => {
   return (contentLength >= 10 && count < contentLength);
@@ -92,6 +97,10 @@ const UserDashboard: m.Component<{}, {
 }> = {
   oncreate: (vnode) => {
     vnode.state.count = 10;
+  },
+  oninit: (vnode) => {
+    console.log("initing")
+    
   },
   view: (vnode) => {
     if (!app.isLoggedIn()) {
@@ -112,6 +121,10 @@ const UserDashboard: m.Component<{}, {
 
     const notifications = app.user.notifications?.notifications || [];
     const sortedNotifications = sortNotifications(notifications).reverse();
+
+    fetchActivity().then((activity) => {
+      console.log("Activity:", activity)
+    });
 
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {

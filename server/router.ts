@@ -540,7 +540,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     viewNotifications.bind(this, models)
   );
-  router.get(
+  router.post(
     '/viewActivity',
     passport.authenticate('jwt', { session: false }),
     viewActivity.bind(this, models)
