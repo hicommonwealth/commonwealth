@@ -43,6 +43,7 @@ import disableSubscriptions from './routes/subscription/disableSubscriptions';
 import enableImmediateEmails from './routes/subscription/enableImmediateEmails';
 import disableImmediateEmails from './routes/subscription/disableImmediateEmails';
 import viewNotifications from './routes/viewNotifications';
+import viewActivity from './routes/viewActivity';
 import markNotificationsRead from './routes/markNotificationsRead';
 import clearReadNotifications from './routes/clearReadNotifications';
 import clearNotifications from './routes/clearNotifications';
@@ -538,6 +539,11 @@ function setupRouter(
     '/viewNotifications',
     passport.authenticate('jwt', { session: false }),
     viewNotifications.bind(this, models)
+  );
+  router.get(
+    '/viewActivity',
+    passport.authenticate('jwt', { session: false }),
+    viewActivity.bind(this, models)
   );
   router.post(
     '/markNotificationsRead',
