@@ -67,7 +67,7 @@ export class ComponentShowcase implements m.ClassComponent {
             Pinky: '#FFAFBE',
             FleshPink: '#FFEBEE',
             DarkGreen: '#008676',
-            CarribGreen: '#00C0A9',
+            CaribGreen: '#00C0A9',
             FoamGreen: '#B4F1EA',
             MintGreen: '#F3FFF9',
             CreamYellow: '#FFFBA1',
