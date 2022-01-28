@@ -16,31 +16,27 @@ type RadioGroupAttrs = {
   onchange: (e?: any) => void;
   disabled?: boolean;
 };
-
-type RadioGroupState = {
+export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
   toggledValue: string;
-};
 
-export const CWRadioGroup: m.Component<RadioGroupAttrs, RadioGroupState> = {
-  oninit: (vnode) => {
-    if (!vnode.state.toggledValue) {
-      vnode.state.toggledValue = vnode.attrs.defaultValue;
+  oninit(vnode) {
+    if (!this.toggledValue) {
+      this.toggledValue = vnode.attrs.defaultValue;
     }
-  },
-  view: (vnode) => {
-    const { values, labels, onchange, name, disabled } = vnode.attrs;
-    const { toggledValue } = vnode.state;
+  }
 
+  view(vnode) {
+    const { values, labels, onchange, name, disabled } = vnode.attrs;
     return (
       <div class={ComponentType.RadioGroup}>
         {values.map((val, idx) => {
           return m(CWRadioButton, {
             value: val,
             label: labels[idx] || val,
-            checked: val === toggledValue,
+            checked: val === this.toggledValue,
             groupName: name,
             onchange: (e) => {
-              vnode.state.toggledValue = e?.target?.value;
+              this.toggledValue = e?.target?.value;
               onchange(e);
             },
             disabled,
@@ -48,5 +44,5 @@ export const CWRadioGroup: m.Component<RadioGroupAttrs, RadioGroupState> = {
         })}
       </div>
     );
-  },
-};
+  }
+}
