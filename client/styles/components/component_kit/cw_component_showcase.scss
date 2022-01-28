@@ -1,34 +1,24 @@
 @import 'client/styles/facelift';
 
+$margin-bottom: 32px;
+$width: 360px;
+
 .ComponentShowcase {
-  > * {
-    margin: 20px;
-  }
-
-  > .gallery > * {
-    margin-right: 20px;
-  }
-
-  .hex-listing,
-  .gradient-listing {
+  .color-gallery {
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    max-height: 160px;
+    margin-bottom: $margin-bottom;
+    width: $width;
 
-    .hex-row,
-    .gradient-row {
+    .color-row {
+      align-items: center;
       display: flex;
       justify-content: space-between;
-      margin-right: 20px;
 
-      .hex-sample,
-      .gradient-sample {
-        min-width: 100px;
-        min-height: 10px;
-        max-width: 100px;
-        max-height: 10px;
-        border-radius: 5px;
+      .color {
+        border-radius: 6px;
+        height: 16px;
+        width: 88px;
       }
 
       .rainbow-gradient-horizontal {
@@ -43,45 +33,53 @@
         @include shadow-gradient;
       }
     }
-
-    .gradient-row {
-      max-width: 400px;
-    }
   }
 
   .icon-gallery {
-    align-items: center;
     display: flex;
     flex-direction: column;
-    height: 150px;
-    justify-content: space-between;
-    width: 250px;
+    height: 144px;
+    margin-bottom: $margin-bottom;
+    width: $width;
 
     .icon-row {
       align-items: center;
       display: flex;
       flex-direction: row;
+      height: 48px;
       justify-content: space-between;
-      width: 100%;
-      height: 50px;
       line-height: 1;
+      width: 100%;
     }
   }
 
-  .card-gallery,
   .button-gallery {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-  }
-  .TextInput {
-    margin-bottom: 20px;
-  }
-}
+    display: flex;
+    margin-bottom: $margin-bottom;
 
-.Card {
-  &.form-card {
-    max-width: 300px;
+    .Button,
+    .ExternalLink,
+    .EngagementButton {
+      margin-right: 8px;
+    }
+  }
+
+  .card-gallery {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: $margin-bottom;
+    width: 100%;
+
+    .top-card-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+  }
+
+  .form-gallery {
+    width: $width;
   }
 }

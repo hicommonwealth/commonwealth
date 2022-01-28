@@ -17,9 +17,9 @@ import { CWTextInput, ValidationStatus } from './cw_text_input';
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
     return (
-      <div class="hex-row">
-        <div class="hex-name">{k}</div>
-        <div class="hex-sample" style={`background: ${v};`} />
+      <div class="color-row">
+        {k}
+        <div class="color" style={`background: ${v};`} />
       </div>
     );
   });
@@ -28,9 +28,9 @@ const displayColors = (hexList) => {
 const displayGradients = (gradientNames: string[]) => {
   return gradientNames.map((gradient) => {
     return (
-      <div class="gradient-row">
-        <div class="gradient-name">{gradient}</div>
-        <div class={`gradient-sample ${gradient}`} />
+      <div class="color-row">
+        {gradient}
+        <div class={`color ${gradient}`} />
       </div>
     );
   });
@@ -49,7 +49,7 @@ export class ComponentShowcase implements m.ClassComponent {
     return (
       <div class="ComponentShowcase">
         <h1>Colors</h1>
-        <div class="hex-listing">
+        <div class="color-gallery">
           {displayColors({
             Black: '#000000',
             DarkGray: '#333333',
@@ -74,7 +74,7 @@ export class ComponentShowcase implements m.ClassComponent {
           })}
         </div>
         <h1>Gradients</h1>
-        <div class="gradient-listing">
+        <div class="color-gallery">
           {displayGradients([
             'rainbow-gradient-horizontal',
             'rainbow-gradient-diagonal',
@@ -201,30 +201,32 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <h1>Cards</h1>
         <div class="card-gallery">
-          <CWCard
-            elevation="elevation-1"
-            interactive={true}
-            onclick={() => notifySuccess('Card clicked!')}
-          >
-            <h4>Card title</h4>
-            <div>Elevation: 1</div>
-          </CWCard>
-          <CWCard
-            elevation="elevation-2"
-            interactive={true}
-            onclick={() => notifySuccess('Card clicked!')}
-          >
-            <h4>Card title</h4>
-            <div>Elevation: 2</div>
-          </CWCard>
-          <CWCard
-            elevation="elevation-3"
-            interactive={true}
-            onclick={() => notifySuccess('Card clicked!')}
-          >
-            <h4>Card title</h4>
-            <div>Elevation: 3</div>
-          </CWCard>
+          <div class="top-card-row">
+            <CWCard
+              elevation="elevation-1"
+              interactive={true}
+              onclick={() => notifySuccess('Card clicked!')}
+            >
+              <h4>Card title</h4>
+              <div>Elevation: 1</div>
+            </CWCard>
+            <CWCard
+              elevation="elevation-2"
+              interactive={true}
+              onclick={() => notifySuccess('Card clicked!')}
+            >
+              <h4>Card title</h4>
+              <div>Elevation: 2</div>
+            </CWCard>
+            <CWCard
+              elevation="elevation-3"
+              interactive={true}
+              onclick={() => notifySuccess('Card clicked!')}
+            >
+              <h4>Card title</h4>
+              <div>Elevation: 3</div>
+            </CWCard>
+          </div>
           <CWCard
             elevation="elevation-1"
             interactive={true}
