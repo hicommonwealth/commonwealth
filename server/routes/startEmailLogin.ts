@@ -48,15 +48,9 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   //
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
-  const [ chain, community, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
 
-  let magicChain;
-  if (chain?.id) {
-    magicChain = chain;
-  } else {
-    const chainId = community?.default_chain || MAGIC_DEFAULT_CHAIN;
-    magicChain = await models.Chain.findOne({ where: { id: chainId } });
-  }
+  const magicChain = chain;
 
   const isNewRegistration = !previousUser;
   const isExistingMagicUser = previousUser && !!previousUser.lastMagicLoginAt;

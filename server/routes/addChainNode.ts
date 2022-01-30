@@ -83,6 +83,7 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
     address: req.body.address || '',
     token_name: req.body.token_name || null,
     eth_chain_id: req.body.eth_chain_id || null, // TODO: will this work on nullable field?
+    alt_wallet_url: req.body.alt_wallet_url || null,
   });
 
   // TODO: trigger migration job if turning on chain events for Comp/Aave

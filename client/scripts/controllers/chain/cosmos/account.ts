@@ -35,18 +35,6 @@ export default class CosmosAccount extends Account<CosmosToken> {
     this._Accounts.store.add(this);
   }
 
-  protected async addressFromMnemonic(mnemonic: string): Promise<string> {
-    throw new Error('unsupported');
-  }
-
-  protected async addressFromSeed(seed: string): Promise<string> {
-    throw new Error('unsupported');
-  }
-
-  public async signMessage(message: string): Promise<string> {
-    throw new Error('unsupported');
-  }
-
   public updateBalance = _.throttle(async () => {
     try {
       const bal = await this._Chain.api.bank.balance(this.address, this._Chain.denom);

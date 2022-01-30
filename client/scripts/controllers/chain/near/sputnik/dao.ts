@@ -83,7 +83,7 @@ export default class NearSputnikDao extends ProposalModule<
     };
 
     const nextProposalId = this._nProposals;
-    const callbackUrl = `${window.location.origin}/${contractId}/proposal/${ProposalType.SputnikProposal}/${nextProposalId}`;
+    const callbackUrl = `${window.location.origin}/${contractId}/proposal/${nextProposalId}`;
     await this._Chain.redirectTx(
       contractId,
       methodName,

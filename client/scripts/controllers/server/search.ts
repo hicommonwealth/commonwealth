@@ -3,7 +3,7 @@ import moment from 'moment';
 import SearchStore from "stores/SearchStore";
 import app from 'state';
 import { SearchScope, SearchParams } from '../../models/SearchQuery';
-import { OffchainThread, CommunityInfo, SearchQuery } from "../../models";
+import { OffchainThread, SearchQuery } from "../../models";
 import { modelFromServer } from './threads';
 
 export const ALL_RESULTS_QUERY = new SearchQuery('COMMONWEALTH_ALL_RESULTS');
@@ -15,7 +15,6 @@ const SEARCH_HISTORY_SIZE = 10
 export enum ContentType {
     Thread = 'thread',
     Comment = 'comment',
-    Community = 'community',
     Chain = 'chain',
     Token = 'token',
     Member = 'member'
@@ -63,7 +62,7 @@ class SearchContoller {
       return this.getByQuery(searchQuery)
     }
     const searchCache = this._store.getOrAdd(searchQuery)
-    const { searchTerm, communityScope, chainScope, isSearchPreview, sort } = searchQuery;
+    const { searchTerm, chainScope, isSearchPreview, sort } = searchQuery;
     const resultSize = isSearchPreview ? SEARCH_PREVIEW_SIZE : SEARCH_PAGE_SIZE;
     const scope = searchQuery.getSearchScope()
 
@@ -72,7 +71,6 @@ class SearchContoller {
 
         const discussions = await this.searchDiscussions(searchTerm, {
           resultSize,
-          communityScope,
           chainScope,
           sort
         })
@@ -88,7 +86,7 @@ class SearchContoller {
       if (scope.includes(SearchScope.Members)){
         const addrs = await this.searchMentionableAddresses(
             searchTerm,
-            { resultSize, communityScope, chainScope },
+            { resultSize, chainScope },
             ['created_at', 'DESC']
           )
 
@@ -104,7 +102,6 @@ class SearchContoller {
       if (scope.includes(SearchScope.Replies)) {
         const comments = await this.searchComments(searchTerm, {
           resultSize,
-          communityScope,
           chainScope,
         })
 
@@ -126,7 +123,7 @@ class SearchContoller {
             return token;
         });
 
-        const allComms = (app.config.chains.getAll() as any).concat(app.config.communities.getAll() as any);
+        const allComms = (app.config.chains.getAll() as any);
         const filteredComms = allComms.filter((comm) => {
             return (
                 comm.name?.toLowerCase().includes(searchTerm) ||
@@ -134,11 +131,10 @@ class SearchContoller {
             );
         });
         searchCache.results[SearchScope.Communities] = searchCache.results[SearchScope.Communities]
-            .concat(filteredComms.map((commOrChain) => {
-              commOrChain.contentType = commOrChain instanceof CommunityInfo ?
-                ContentType.Community : ContentType.Chain;
-              commOrChain.searchType = SearchScope.Communities;
-              return commOrChain;
+            .concat(filteredComms.map((chain) => {
+              chain.contentType = ContentType.Chain;
+              chain.searchType = SearchScope.Communities;
+              return chain;
             })).sort(this.sortResults);
       }
     } finally {

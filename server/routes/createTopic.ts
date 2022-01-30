@@ -13,7 +13,7 @@ export const Errors = {
 };
 
 const createTopic = async (models: DB, req, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
@@ -23,20 +23,17 @@ const createTopic = async (models: DB, req, res: Response, next: NextFunction) =
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
-  const chainOrCommObj = community ? { offchain_community_id: community.id } : { chain_id: chain.id };
   const userAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
   const adminRoles = await models.Role.findAll({
     where: {
       address_id: { [Op.in]: userAddressIds },
       permission: { [Op.in]: ['admin', 'moderator'] },
-      ...chainOrCommObj,
+      chain_id: chain.id,
     },
   });
   if (!req.user.isAdmin && adminRoles.length === 0) {
     return next(new Error(Errors.MustBeAdmin));
   }
-
-  const chainOrCommObj2 = community ? { community_id: community.id } : { chain_id: chain.id };
 
   const token_threshold_test = parseInt(req.body.token_threshold, 10);
   if (Number.isNaN(token_threshold_test)) {
@@ -49,7 +46,7 @@ const createTopic = async (models: DB, req, res: Response, next: NextFunction) =
     featured_in_sidebar: !!(req.body.featured_in_sidebar === 'true'),
     featured_in_new_post: !!(req.body.featured_in_new_post === 'true'),
     default_offchain_template: req.body.default_offchain_template || '',
-    ...chainOrCommObj2,
+    chain_id: chain.id,
   };
 
   const newTopic = await models.OffchainTopic.findOrCreate({

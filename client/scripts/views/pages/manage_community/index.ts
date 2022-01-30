@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/manage_community.scss';
 
 import m from 'mithril';
@@ -7,7 +8,6 @@ import app from 'state';
 import { ChainInfo, RoleInfo, RolePermission, Webhook } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
-import CommunityMetadataManagementTable from './community_metadata_management_table';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
@@ -26,6 +26,7 @@ const deleteChainButton = (chain: ChainInfo) => {
         if (result.status !== 'Success') return;
         app.config.chains.remove(chain);
         notifySuccess('Deleted chain!');
+        m.route.set('/');
         // redirect to /
       }, (err) => {
         notifyError('Failed to delete chain!');
@@ -44,13 +45,10 @@ const ManageCommunityPage: m.Component<
   }
 > = {
   view: (vnode) => {
-    if (!app.activeChainId() && !app.activeCommunityId()) {
+    if (!app.activeChainId()) {
       return;
     }
-    const chainOrCommObj = app.chain
-      ? { chain: app.activeChainId() }
-      : { community: app.activeCommunityId() };
-    const isCommunity = !!app.activeCommunityId();
+    const chainOrCommObj = { chain: app.activeChainId() }
     const loadRoles = async () => {
       try {
         // TODO: Change to GET /members
@@ -108,9 +106,7 @@ const ManageCommunityPage: m.Component<
       );
       app.user.addRole(newRole);
       app.user.removeRole(predicate);
-      const { adminsAndMods } = app.community
-        ? app.community.meta
-        : app.chain.meta.chain;
+      const { adminsAndMods } = app.chain.meta.chain;
       if (
         oldRole.permission === 'admin' ||
         oldRole.permission === 'moderator'
@@ -131,7 +127,6 @@ const ManageCommunityPage: m.Component<
             newRole.Address.address,
             newRole.Address.chain,
             newRole.chain_id,
-            newRole.offchain_community_id,
             newRole.permission,
             newRole.is_user_default
           )
@@ -149,26 +144,15 @@ const ManageCommunityPage: m.Component<
     }, [
       m('.manage-community-wrapper', [
         m('.panel-top', [
-          isCommunity
-            ? vnode.state.loadingFinished &&
-              m(CommunityMetadataManagementTable, {
-                admins,
-                community: app.community.meta,
-                mods,
-                onRoleUpdate: (oldRole, newRole) =>
-                  onRoleUpdate(oldRole, newRole),
-              })
-            : vnode.state.loadingFinished &&
-              [
-                m(ChainMetadataManagementTable, {
-                admins,
-                chain: app.config.chains.getById(app.activeChainId()),
-                mods,
-                onRoleUpdate: (oldRole, newRole) =>
-                  onRoleUpdate(oldRole, newRole),
-              }),
-                app.user.isSiteAdmin && deleteChainButton(app.config.chains.getById(app.activeChainId()))
-            ],
+          vnode.state.loadingFinished &&
+            m(ChainMetadataManagementTable, {
+              admins,
+              chain: app.config.chains.getById(app.activeChainId()),
+              mods,
+              onRoleUpdate: (oldRole, newRole) =>
+                onRoleUpdate(oldRole, newRole),
+            }),
+            app.user.isSiteAdmin && deleteChainButton(app.config.chains.getById(app.activeChainId())),
         ]),
         m('.panel-bottom', [
           vnode.state.loadingFinished &&

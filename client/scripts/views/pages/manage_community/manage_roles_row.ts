@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import $ from 'jquery';
 import { Input, TextArea, Icon, Icons, Switch, Select } from 'construct-ui';
@@ -10,12 +11,8 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
-    const chainOrCommObj = app.community
-      ? { community: app.activeCommunityId() }
-      : { chain: app.activeChainId() };
-    const communityMeta = app.community
-      ? app.community.meta
-      : app.chain.meta.chain;
+    const chainOrCommObj = { chain: app.activeChainId() };
+    const communityMeta = app.chain.meta.chain;
 
     return m('.ManageRoleRow', [
       vnode.attrs.roledata?.map((role) => {
@@ -38,7 +35,7 @@ const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
             size: 'xs',
             class: 'role-x-icon',
             onclick: async () => {
-              const adminsAndMods = await communityMeta.getMembers(app.activeId());
+              const adminsAndMods = await communityMeta.getMembers(app.activeChainId());
               const userAdminsAndMods = adminsAndMods.filter((role_) => {
                 const belongsToUser = !!app.user.addresses
                   .filter((addr_) => addr_.id === role_.address_id)
@@ -83,7 +80,7 @@ const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
                 vnode.attrs.onRoleUpdate(role, newRole);
 
                 if (isLosingAdminPermissions) {
-                  m.route.set(`/${app.activeId()}`);
+                  m.route.set(`/${app.activeChainId()}`);
                 }
               } catch (err) {
                 const errMsg = err.responseJSON?.error || 'Failed to alter role.';

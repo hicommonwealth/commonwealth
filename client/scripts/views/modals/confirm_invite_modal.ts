@@ -87,9 +87,7 @@ const ConfirmInviteModal: m.Component<{}, {
         .map((account) => SelectAddress(account));
     }
 
-    const activeInvite = invites[location].community_id
-      ? app.config.communities.getById(invites[location].community_id)
-      : app.config.chains.getById(invites[location].chain_id);
+    const activeInvite = app.config.chains.getById(invites[location].chain_id);
     const hasTermsOfService = !!activeInvite?.terms;
 
     return m('.ConfirmInviteModal', [
@@ -151,19 +149,11 @@ const ConfirmInviteModal: m.Component<{}, {
                         if (app.config.invites.length === 0) {
                           $(e.target).trigger('modalexit');
                         }
-                        const communityId = invites[location].community_id;
                         const chainId = invites[location].chain_id;
-                        console.log({ communityId, chainId });
+                        console.log({ chainId });
                         // if private community, re-init app
-                        if (communityId && !app.config.communities.getByCommunity(communityId)) {
-                          initAppState().then(() => {
-                            m.route.set(`/${communityId}`);
-                            notifySuccess(`Successfully joined ${communityName}.`);
-                          });
-                        } else {
-                          m.route.set(`/${communityId || chainId}`);
-                          notifySuccess(`Successfully joined ${communityName}.`);
-                        }
+                        m.route.set(`/${chainId}`);
+                        notifySuccess(`Successfully joined ${communityName}.`);
                       }, (err) => {
                         notifyError('Error accepting invite');
                       });
@@ -206,7 +196,7 @@ const ConfirmInviteModal: m.Component<{}, {
                   // set defaults for the web3 login modal
                   // TODO: let the user select between different crypto wallets for linking an address
                   const defaultChainId = 'edgeware';
-                  const joiningCommunity = invites[vnode.state.location].community_id;
+                  const joiningCommunity = invites[vnode.state.location].chain_id;
                   const targetCommunity = joiningCommunity;
                   const prev = m.route.get();
                   const next = `/${joiningCommunity}`;
@@ -214,7 +204,7 @@ const ConfirmInviteModal: m.Component<{}, {
                   const web3loginParams = joiningCommunity ? { prev, next, joiningCommunity } : { prev, next };
 
                   // redirect to /web3login to connect to the chain
-                  if (app.activeId()) {
+                  if (app.activeChainId()) {
                     navigateToSubpage('/web3login', web3loginParams);
                   } else {
                     m.route.set(`${defaultChainId}/web3login`, web3loginParams);
@@ -233,12 +223,11 @@ const ConfirmInviteModal: m.Component<{}, {
               }, 'Connect a new address'),
               addresses.length === 0 && m(LoginWithWalletDropdown, {
                 loggingInWithAddress: false,
-                joiningCommunity: invites[vnode.state.location].community_id,
                 joiningChain: app.chain?.id || 'edgeware',
                 label: 'Connect an address',
                 onSuccess: (e) => {
                   // $('.ConfirmInviteModal').trigger('modalexit');
-                  m.route.set(`/${invites[vnode.state.location].community_id}`);
+                  m.route.set(`/${invites[vnode.state.location].chain_id}`);
                 }
               })
             ],

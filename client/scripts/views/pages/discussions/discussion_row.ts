@@ -8,7 +8,7 @@ import { Button, Icon, Icons, Tag } from 'construct-ui';
 
 import { slugify } from 'utils';
 import app from 'state';
-import { chainEntityTypeToProposalShortName } from 'identifiers';
+import { chainEntityTypeToProposalShortName, getProposalUrlPath } from 'identifiers';
 import {
   formatLastUpdated,
   link,
@@ -32,9 +32,9 @@ import ListingRow from 'views/components/listing_row';
 import DiscussionRowMenu from './discussion_row_menu';
 
 export const getLastUpdated = (proposal) => {
-  const { latestCommCreatedAt } = proposal;
-  const lastComment = latestCommCreatedAt
-    ? Number(latestCommCreatedAt.utc())
+  const { lastCommentedOn } = proposal;
+  const lastComment = lastCommentedOn
+    ? Number(lastCommentedOn.utc())
     : 0;
   const createdAt = Number(proposal.createdAt.utc());
   const lastUpdate = Math.max(createdAt, lastComment);
@@ -54,10 +54,7 @@ const DiscussionRow: m.Component<
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
     const pinned = proposal.pinned;
-    const discussionLink =
-      `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-` +
-      `${slugify(proposal.title)}`;
-
+    const discussionLink = getProposalUrlPath(proposal.slug, `${proposal.identifier}-${slugify(proposal.title)}`);
     const rowHeader: any = link('a', discussionLink, proposal.title);
     const rowSubheader = [
       proposal.readOnly && [
@@ -145,7 +142,7 @@ const DiscussionRow: m.Component<
         && [
           link(
             'a.proposal-topic',
-            `/${app.activeId()}/discussions/${proposal.topic.name}`,
+            `/${app.activeChainId()}/discussions/${proposal.topic.name}`,
             [m('span.proposal-topic-name', `${proposal.topic.name}`)]
           ),
           ' ', // em space
@@ -197,7 +194,7 @@ const DiscussionRow: m.Component<
     const rowMetadata = [
       m('.discussion-row-right-meta', [
         m(UserGallery, {
-          avatarSize: 20,
+          avatarSize: 36,
           popover: true,
           maxUsers: 2,
           addressesCount:
@@ -237,7 +234,7 @@ const DiscussionRow: m.Component<
         if ($(e.target).hasClass('cui-tag')) return;
         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         e.preventDefault();
-        localStorage[`${app.activeId()}-discussions-scrollY`] = window.scrollY;
+        localStorage[`${app.activeChainId()}-discussions-scrollY`] = window.scrollY;
         m.route.set(discussionLink);
       },
     });

@@ -4,11 +4,8 @@ import m from 'mithril';
 import app from 'state';
 import SubscriptionButton from 'views/components/subscription_button';
 
-import {
-  OffchainNavigationModule,
-  OnchainNavigationModule,
+import Sidebar, {
   ExternalLinksModule,
-  ChainStatusModule
 } from 'views/components/sidebar';
 import { Tabs, TabItem, Menu, MenuDivider, MenuItem, Icons, Dialog } from 'construct-ui';
 import { capitalize } from 'lodash';
@@ -16,6 +13,8 @@ import CommunitySelector from '../components/sidebar/community_selector';
 import { LoginSelectorMenuLeft, LoginSelectorMenuRight } from '../components/header/login_selector';
 import { getNewProposalMenu } from '../components/new_proposal_button';
 import LoginModal from '../modals/login_modal';
+import { DiscussionSection } from '../components/sidebar/discussion_section';
+import { GovernanceSection } from '../components/sidebar/governance_section';
 
 enum MenuTabs {
   currentCommunity = 'currentCommunity',
@@ -26,12 +25,10 @@ enum MenuTabs {
 const MobileAccountMenu: m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.isLoggedIn) return;
-    const isPrivateCommunity = app.community?.meta.privacyEnabled;
     const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
       return app.user.getRoleInCommunity({
         account,
         chain: app.activeChainId(),
-        community: app.activeCommunityId()
       });
     });
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
@@ -39,13 +36,12 @@ const MobileAccountMenu: m.Component<{}, {}> = {
     return m(Menu, { class: 'MobileAccountMenu' },
       app.isLoggedIn()
         ? [
-          app.activeId() && m(LoginSelectorMenuLeft, {
+          app.activeChainId() && m(LoginSelectorMenuLeft, {
             activeAddressesWithRole,
             nAccountsWithoutRole,
-            isPrivateCommunity,
             mobile: true
           }),
-          app.activeId() && m(MenuDivider),
+          app.activeChainId() && m(MenuDivider),
           m(LoginSelectorMenuRight, { mobile: true })
         ]
         : m(MenuItem, {
@@ -63,10 +59,10 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
     if (!app) return;
     let { activeTab } = vnode.state;
     const { showNewThreadOptions } = vnode.state;
-    if (!app.activeId() && !app.activeId()) {
+    if (!app.activeChainId() && !app.activeChainId()) {
       vnode.state.activeTab = MenuTabs.account;
     }
-    if (!activeTab) activeTab = app.activeId()
+    if (!activeTab) activeTab = app.activeChainId()
       ? MenuTabs.currentCommunity
       : MenuTabs.account;
     const CurrentCommunityMenu = m(Menu, { class: 'CurrentCommunityMenu' }, [
@@ -91,27 +87,26 @@ const MobileSidebar: m.Component<{}, { activeTab: string, showNewThreadOptions: 
           }
         }),
       m(MenuDivider),
-      (app.chain || app.community) && m(OffchainNavigationModule),
-      (app.chain || app.community) && m(OnchainNavigationModule),
-      (app.chain || app.community) && m(ExternalLinksModule),
-      app.isLoggedIn() && (app.chain || app.community) && m(SubscriptionButton),
-      app.chain && m(ChainStatusModule),
+      (app.chain) && m(DiscussionSection, {mobile: true}),
+      (app.chain) && m(GovernanceSection, {mobile: true}),
+      m('.br', {style: 'height: 10px'}),
+      (app.chain) && m(ExternalLinksModule),
     ]);
     const AllCommunitiesMenu = m(Menu, { class: 'AllCommunitiesMenu' }, [
       m(CommunitySelector, { showListOnly: true, showHomeButtonAtTop: true })
     ]);
     return m('.MobileSidebar', [
       m(Tabs, [
-        app.activeId()
+        app.activeChainId()
         && m(TabItem, {
-          label: capitalize(app.activeId()),
+          label: capitalize(app.activeChainId()),
           active: activeTab === MenuTabs.currentCommunity,
           onclick: (e) => {
             e.stopPropagation();
             vnode.state.activeTab = MenuTabs.currentCommunity;
           }
         }),
-        app.activeId()
+        app.activeChainId()
         && m(TabItem, {
           label: 'Communities',
           active: activeTab === MenuTabs.allCommunities,

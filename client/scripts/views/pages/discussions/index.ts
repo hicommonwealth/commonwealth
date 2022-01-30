@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/discussions/index.scss';
 import 'components/dropdown_icon.scss';
 
@@ -26,7 +27,6 @@ import {
 } from 'helpers';
 import {
   NodeInfo,
-  CommunityInfo,
   OffchainThreadStage,
   OffchainThread,
   ITokenAdapter,
@@ -72,14 +72,12 @@ export const CommunityOptionsPopover: m.Component<{}> = {
       app.user.isSiteAdmin ||
       app.user.isAdminOfEntity({
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       });
     const isMod = app.user.isRoleOfCommunity({
       role: 'moderator',
       chain: app.activeChainId(),
-      community: app.activeCommunityId(),
     });
-    if (!isAdmin && !isMod && !app.community?.meta.invitesEnabled) return;
+    if (!isAdmin && !isMod) return;
 
     // add extra width to compensate for an icon that isn't centered inside its boundaries
     const DropdownIcon = m('.dropdown-wrapper',
@@ -115,14 +113,12 @@ export const CommunityOptionsPopover: m.Component<{}> = {
               app.modals.create({ modal: EditTopicThresholdsModal });
             },
           }),
-        (app.community?.meta.invitesEnabled || isAdmin) &&
+        (isAdmin) &&
           m(MenuItem, {
             label: 'Invite members',
             onclick: (e) => {
               e.preventDefault();
-              const data = app.activeCommunityId()
-                ? { communityInfo: app.community.meta }
-                : { chainInfo: app.chain.meta.chain };
+              const data = { chainInfo: app.chain.meta.chain };
               app.modals.create({
                 modal: CreateInviteModal,
                 data,
@@ -131,10 +127,10 @@ export const CommunityOptionsPopover: m.Component<{}> = {
           }),
         isAdmin &&
           m(MenuItem, {
-            label: link('a', `${(app.isCustomDomain() ? '' : `/${app.activeId()}`)}/manage`, 'Manage community'),
+            label: link('a', `${(app.isCustomDomain() ? '' : `/${app.activeChainId()}`)}/manage`, 'Manage community'),
           }),
         (isAdmin || isMod) &&
-          app.activeId() &&
+          app.activeChainId() &&
           m(MenuItem, {
             label: 'Analytics',
             onclick: (e) => navigateToSubpage('/analytics'),
@@ -151,13 +147,13 @@ const DiscussionFilterBar: m.Component<
   view: (vnode) => {
     const { topic, stage, disabled } = vnode.attrs;
 
-    const communityInfo = app.chain?.meta?.chain || app.community?.meta;
+    const communityInfo = app.chain?.meta?.chain;
     if (!communityInfo) return;
     const { stagesEnabled, customStages } = communityInfo;
 
     const featuredTopicIds = communityInfo.featuredTopics;
     const topics = app.topics
-      .getByCommunity(app.activeId())
+      .getByCommunity(app.activeChainId())
       .map(
         ({
           id,
@@ -222,9 +218,9 @@ const DiscussionFilterBar: m.Component<
           class: 'TopicsFilterPopover',
           content: m('.discussions-topic-items', [
             m(MenuItem, {
-              active: m.route.get() === `/${app.activeId()}` || !topic,
+              active: m.route.get() === `/${app.activeChainId()}` || !topic,
               iconLeft:
-                m.route.get() === `/${app.activeId()}` || !topic
+                m.route.get() === `/${app.activeChainId()}` || !topic
                   ? Icons.CHECK
                   : null,
               label: 'All Topics',
@@ -253,7 +249,7 @@ const DiscussionFilterBar: m.Component<
                 ) => {
                   const active =
                     m.route.get() ===
-                      `/${app.activeId()}/discussions/${encodeURI(
+                      `/${app.activeChainId()}/discussions/${encodeURI(
                         name.toString().trim()
                       )}` ||
                     (topic && topic === name);
@@ -275,7 +271,6 @@ const DiscussionFilterBar: m.Component<
                       m('.topic-menu-item-name', name),
                       app.user?.isAdminOfEntity({
                         chain: app.activeChainId(),
-                        community: app.activeCommunityId(),
                       }) &&
                         m(Button, {
                           size: 'xs',
@@ -394,8 +389,8 @@ const DiscussionFilterBar: m.Component<
 // comparator
 const orderDiscussionsbyLastComment = (a, b) => {
   // tslint:disable-next-line
-  const tsB = Math.max(+b.createdAt, +(b.latestCommCreatedAt || 0));
-  const tsA = Math.max(+a.createdAt, +(a.latestCommCreatedAt || 0));
+  const tsB = Math.max(+b.createdAt, +(b.lastCommentedOn || 0));
+  const tsA = Math.max(+a.createdAt, +(a.lastCommentedOn || 0));
   return tsB - tsA;
 };
 
@@ -412,7 +407,7 @@ const DiscussionsPage: m.Component<
     onscroll: any;
     summaryView: boolean;
     summaryViewInitialized: boolean;
-    recentThreads: { threads: OffchainThread[]; activitySummary };
+    recentThreads: OffchainThread[];
     loadingRecentThreads: boolean;
     activityFetched: boolean;
   }
@@ -420,27 +415,27 @@ const DiscussionsPage: m.Component<
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
-      Scope: app.activeId(),
+      Scope: app.activeChainId(),
     });
 
     const returningFromThread =
       app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/proposal/discussion/');
+      app.lastNavigatedFrom().includes('/discussion/');
     if (
       returningFromThread &&
-      localStorage[`${app.activeId()}-discussions-scrollY`]
+      localStorage[`${app.activeChainId()}-discussions-scrollY`]
     ) {
       setTimeout(() => {
         window.scrollTo(
           0,
-          Number(localStorage[`${app.activeId()}-discussions-scrollY`])
+          Number(localStorage[`${app.activeChainId()}-discussions-scrollY`])
         );
       }, 100);
     }
 
-    if (app.user.unseenPosts[app.activeId()]) {
-      app.user.unseenPosts[app.activeId()]['activePosts'] = 0;
-      app.user.unseenPosts[app.activeId()]['threads'] = 0;
+    if (app.user.unseenPosts[app.activeChainId()]) {
+      app.user.unseenPosts[app.activeChainId()]['activePosts'] = 0;
+      app.user.unseenPosts[app.activeChainId()]['threads'] = 0;
     }
   },
   oninit: (vnode) => {
@@ -454,12 +449,12 @@ const DiscussionsPage: m.Component<
       topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
     const returningFromThread =
       app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/proposal/discussion/');
+      app.lastNavigatedFrom().includes('/discussion/');
     vnode.state.lookback[subpage] =
       returningFromThread &&
-      localStorage[`${app.activeId()}-lookback-${subpage}`]
+      localStorage[`${app.activeChainId()}-lookback-${subpage}`]
         ? moment.unix(
-            parseInt(localStorage[`${app.activeId()}-lookback-${subpage}`], 10)
+            parseInt(localStorage[`${app.activeChainId()}-lookback-${subpage}`], 10)
           )
         : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
@@ -468,9 +463,9 @@ const DiscussionsPage: m.Component<
   view: (vnode) => {
     let { topic } = vnode.attrs;
 
-    if (!app.community && !app.chain) return;
+    if (!app.chain) return;
     if (!vnode.state.summaryViewInitialized) {
-      if (app.community?.meta?.defaultSummaryView || app.chain?.meta?.chain?.defaultSummaryView) {
+      if (app.chain?.meta?.chain?.defaultSummaryView) {
         vnode.state.summaryView = true;
       }
       if (app.lastNavigatedBack()) {
@@ -491,8 +486,7 @@ const DiscussionsPage: m.Component<
     if (onSummaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
-        .getRecentCommunityActivity({
-          communityId: app.activeCommunityId(),
+        .getRecentTopicActivity({
           chainId: app.activeChainId(),
         })
         .then((res) => {
@@ -504,7 +498,7 @@ const DiscussionsPage: m.Component<
     }
 
     let stage = m.route.param('stage');
-    const activeEntity = app.community || app.chain;
+    const activeEntity = app.chain;
     if (!activeEntity)
       return m(PageLoading, {
         title: 'Discussions',
@@ -519,13 +513,6 @@ const DiscussionsPage: m.Component<
     const subpage =
       topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
-    // add chain compatibility (node info?)
-    if (app.community && !activeEntity?.serverLoaded)
-      return m(PageLoading, {
-        title: 'Discussions',
-        showNewProposalButton: true,
-      });
-
     const activeNode = app.chain?.meta;
     const selectedNodes = app.config.nodes
       .getAll()
@@ -538,12 +525,9 @@ const DiscussionsPage: m.Component<
           n.chain.id === activeNode.chain.id
       );
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    const selectedCommunity = app.community;
 
     const communityName = selectedNode
       ? selectedNode.chain.name
-      : selectedCommunity
-      ? selectedCommunity.meta.name
       : '';
 
     const allLastVisited =
@@ -552,18 +536,13 @@ const DiscussionsPage: m.Component<
         : app.user.lastVisited;
     if (!vnode.state.lastVisitedUpdated) {
       vnode.state.lastVisitedUpdated = true;
-      updateLastVisited(
-        app.community
-          ? (activeEntity.meta as CommunityInfo)
-          : (activeEntity.meta as NodeInfo).chain
+      updateLastVisited((activeEntity.meta as NodeInfo).chain
       );
     }
 
     // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
     // for easy comparison with weekly indexes' msecAgo
-    const id = (activeEntity.meta as NodeInfo).chain
-      ? (activeEntity.meta as NodeInfo).chain.id
-      : (activeEntity.meta as CommunityInfo).id;
+    const id = (activeEntity.meta as NodeInfo).chain.id
     const lastVisited = moment(allLastVisited[id]).utc();
 
     let sortedListing = [];
@@ -581,7 +560,7 @@ const DiscussionsPage: m.Component<
     }
 
     const allThreads = app.threads.listingStore
-      .getByCommunityTopicAndStage(app.activeId(), topic, stage)
+      .getByCommunityTopicAndStage(app.activeChainId(), topic, stage)
       .sort(orderDiscussionsbyLastComment);
 
     if (allThreads.length > 0) {
@@ -662,7 +641,7 @@ const DiscussionsPage: m.Component<
 
       let topicId;
       if (topic) {
-        topicId = app.topics.getByName(topic, app.activeId())?.id;
+        topicId = app.topics.getByName(topic, app.activeChainId())?.id;
         if (!topicId) {
           return m(
             Sublayout,
@@ -673,7 +652,7 @@ const DiscussionsPage: m.Component<
             },
             [
               m(EmptyListingPlaceholder, {
-                communityName: app.activeId(),
+                communityName: app.activeChainId(),
                 topicName: topic,
               }),
             ]
@@ -690,7 +669,6 @@ const DiscussionsPage: m.Component<
       // function as the query cutoff, fetching only threads older than it.
       const options = {
         chainId: app.activeChainId(),
-        communityId: app.activeCommunityId(),
         cutoffDate: vnode.state.lookback[subpage],
         topicId,
         stage,
@@ -740,15 +718,15 @@ const DiscussionsPage: m.Component<
 
     let topicName;
     let topicDescription;
-    if (topic && app.activeId()) {
-      const topics = app.topics.getByCommunity(app.activeId());
+    if (topic && app.activeChainId()) {
+      const topics = app.topics.getByCommunity(app.activeChainId());
       const topicObject = topics.find((t) => t.name === topic);
       topicName = topicObject?.name;
       topicDescription = topicObject?.description;
     }
 
     localStorage.setItem(
-      `${app.activeId()}-lookback-${subpage}`,
+      `${app.activeChainId()}-lookback-${subpage}`,
       `${vnode.state.lookback[subpage].unix()}`
     );
     const stillFetching =
@@ -777,7 +755,7 @@ const DiscussionsPage: m.Component<
         showNewProposalButton: true,
       },
       [
-        (app.chain || app.community) && [
+        (app.chain) && [
           m('.discussions-main', [
             !isEmpty &&
               m(DiscussionFilterBar, {

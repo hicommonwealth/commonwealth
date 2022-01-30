@@ -32,7 +32,7 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
 
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -91,18 +91,7 @@ const createThread = async (
   };
   const version_history : string[] = [ JSON.stringify(firstVersion) ];
 
-  const threadContent = community ? {
-    community: community.id,
-    address_id: author.id,
-    title,
-    body,
-    plaintext,
-    version_history,
-    kind,
-    stage,
-    url,
-    read_only: readOnly,
-  } : {
+  const threadContent = {
     chain: chain.id,
     address_id: author.id,
     title,
@@ -124,7 +113,6 @@ const createThread = async (
       [offchainTopic] = await models.OffchainTopic.findOrCreate({
         where: {
           name: topic_name,
-          community_id: community?.id || null,
           chain_id: chain?.id || null,
         },
       });
@@ -134,7 +122,7 @@ const createThread = async (
       return next(err);
     }
   } else {
-    if ((community || chain).topics?.length) {
+    if (chain.topics?.length) {
       return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
     }
   }
@@ -205,8 +193,7 @@ const createThread = async (
       category_id: NotificationCategories.NewComment,
       object_id: `discussion_${finalThread.id}`,
       offchain_thread_id: finalThread.id,
-      community_id: finalThread.community || null,
-      chain_id: finalThread.chain || null,
+      chain_id: finalThread.chain,
       is_active: true,
     });
     await models.Subscription.create({
@@ -214,8 +201,7 @@ const createThread = async (
       category_id: NotificationCategories.NewReaction,
       object_id: `discussion_${finalThread.id}`,
       offchain_thread_id: finalThread.id,
-      community_id: finalThread.community || null,
-      chain_id: finalThread.chain || null,
+      chain_id: finalThread.chain,
       is_active: true,
     });
   } catch (err) {
@@ -223,7 +209,7 @@ const createThread = async (
   }
   // auto-subscribe NewThread subscribers to NewComment as well
   // findOrCreate because redundant creation if author is also subscribed to NewThreads
-  const location = finalThread.community || finalThread.chain;
+  const location = finalThread.chain;
   const subscribers = await models.Subscription.findAll({
     where: {
       category_id: NotificationCategories.NewThread,
@@ -237,8 +223,7 @@ const createThread = async (
         category_id: NotificationCategories.NewComment,
         object_id: `discussion_${finalThread.id}`,
         offchain_thread_id: finalThread.id,
-        community_id: finalThread.community || null,
-        chain_id: finalThread.chain || null,
+        chain_id: finalThread.chain,
         is_active: true,
       },
     });
@@ -273,7 +258,7 @@ const createThread = async (
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(finalThread.Address.address);
 
-  // dispatch notifications to subscribers of the given chain/community
+  // dispatch notifications to subscribers of the given chain
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewThread,
@@ -285,7 +270,6 @@ const createThread = async (
       root_title: finalThread.title,
       comment_text: finalThread.body,
       chain_id: finalThread.chain,
-      community_id: finalThread.community,
       author_address: finalThread.Address.address,
       author_chain: finalThread.Address.chain,
     },
@@ -296,7 +280,6 @@ const createThread = async (
       title: req.body.title,
       bodyUrl: req.body.url,
       chain: finalThread.chain,
-      community: finalThread.community,
       body: finalThread.body,
     },
     req.wss,
@@ -307,18 +290,7 @@ const createThread = async (
   if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
     if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-    let shouldNotifyMentionedUser = true;
-    if (finalThread.community) {
-      const originCommunity = await models.OffchainCommunity.findOne({
-        where: { id: finalThread.community }
-      });
-      if (originCommunity.privacy_enabled) {
-        const destinationCommunity = mentionedAddress.Roles
-          .find((role) => role.offchain_community_id === originCommunity.id);
-        if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
-      }
-    }
-    if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
+    await models.Subscription.emitNotifications(
       models,
       NotificationCategories.NewMention,
       `user-${mentionedAddress.User.id}`,
@@ -329,7 +301,6 @@ const createThread = async (
         root_title: finalThread.title,
         comment_text: finalThread.body,
         chain_id: finalThread.chain,
-        community_id: finalThread.community,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.chain,
       },
@@ -339,7 +310,6 @@ const createThread = async (
         title: req.body.title,
         bodyUrl: req.body.url,
         chain: finalThread.chain,
-        community: finalThread.community,
         body: finalThread.body,
       },
       req.wss,
@@ -353,7 +323,6 @@ const createThread = async (
 
   // initialize view count (no await)
   models.OffchainViewCount.create({
-    community: finalThread.community,
     chain: finalThread.chain,
     object_id: finalThread.id,
     view_count: 0,

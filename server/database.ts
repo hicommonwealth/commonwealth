@@ -50,7 +50,6 @@ import IdentityCacheFactory, {
   IdentityCacheStatic,
 } from './models/identity_cache';
 import InviteCodeFactory, { InviteCodeModelStatic } from './models/invite_code';
-import InviteLinkFactory, { InviteLinkModelStatic } from './models/invite_link';
 import LinkedThread, { LinkedThreadModelStatic } from './models/linked_thread';
 import LoginTokenFactory, { LoginTokenModelStatic } from './models/login_token';
 import NotificationFactory, {
@@ -65,9 +64,6 @@ import OffchainAttachmentFactory, {
 import OffchainCommentFactory, {
   OffchainCommentModelStatic,
 } from './models/offchain_comment';
-import OffchainCommunityFactory, {
-  OffchainCommunityModelStatic,
-} from './models/offchain_community';
 import OffchainProfileFactory, {
   OffchainProfileModelStatic,
 } from './models/offchain_profile';
@@ -105,6 +101,7 @@ import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
+import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -125,14 +122,13 @@ export type Models = {
   HedgehogUser: HedgehogUserModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
-  InviteLink: InviteLinkModelStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
+  NotificationsRead: NotificationsReadModelStatic;
   OffchainAttachment: OffchainAttachmentModelStatic;
   OffchainComment: OffchainCommentModelStatic;
-  OffchainCommunity: OffchainCommunityModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
   OffchainReaction: OffchainReactionModelStatic;
   OffchainThread: OffchainThreadModelStatic;
@@ -206,14 +202,13 @@ const models: Models = {
   HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
-  InviteLink: InviteLinkFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
+  NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
   OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
-  OffchainCommunity: OffchainCommunityFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),
   OffchainThread: OffchainThreadFactory(sequelize, DataTypes),

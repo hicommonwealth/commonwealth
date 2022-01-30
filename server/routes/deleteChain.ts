@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { QueryTypes } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
@@ -27,90 +28,110 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.NotAcceptableAdmin));
   }
 
-  const chain = await models.Chain.findOne({
-    where: {
-      id: req.body.id,
+  await models.sequelize.transaction(async (t) => {
+    const chain = await models.Chain.findOne({
+      where: {
+        id: req.body.id,
+      }
+    });
+    if (!chain) {
+      return next(new Error(Errors.NoChain));
     }
+
+    await models.sequelize.query(`DELETE FROM "ChainNodes" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "ChainEntities" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainReactions" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainComments" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainTopics" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Roles" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "InviteCodes" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Subscriptions" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Webhooks" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Collaborations"
+        USING "Collaborations" AS c
+        LEFT JOIN "OffchainThreads" t ON offchain_thread_id = t.id
+        WHERE t.chain = '${chain.id}'
+        AND c.offchain_thread_id  = "Collaborations".offchain_thread_id 
+        AND c.address_id = "Collaborations".address_id `, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "LinkedThreads"
+        USING "LinkedThreads" AS l
+        LEFT JOIN "OffchainThreads" t ON linked_thread = t.id
+        WHERE t.chain = '${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainThreads" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "StarredCommunities" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainProfiles" AS profilesGettingDeleted
+        USING "OffchainProfiles" AS profilesBeingUsedAsReferences
+        LEFT JOIN "Addresses" a ON profilesBeingUsedAsReferences.address_id = a.id
+        WHERE a.chain = '${chain.id}'
+        AND profilesGettingDeleted.address_id  = profilesBeingUsedAsReferences.address_id;`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Addresses" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "ChainEventTypes" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await chain.destroy({transaction: t});
   });
-  if (!chain) {
-    return next(new Error(Errors.NoChain));
-  }
-
-  // delete all nodes first
-  const chainNodes = await models.ChainNode.findAll({
-    where: { chain: chain.id, },
-  });
-
-  const chainEntities = await models.ChainEntity.findAll({
-    where: { chain: chain.id, },
-    include: [ models.ChainEvent ],
-  });
-
-  const addresses = await models.Address.findAll({
-    where: { chain: chain.id, }
-  });
-
-  const threads = await models.OffchainThread.findAll({
-    where: { chain: chain.id, }
-  });
-
-  const comments = await models.OffchainComment.findAll({
-   where: { chain: chain.id, }
-  });
-
-  const reactions = await models.OffchainReaction.findAll({
-    where: { chain: chain.id, }
-  });
-
-  const topics = await models.OffchainTopic.findAll({
-    where: { chain_id: chain.id, }
-  });
-
-  const roles = await models.Role.findAll({
-    where: { chain_id: chain.id, }
-  });
-
-  const inviteCodes = await models.InviteCode.findAll({
-    where: { chain_id: chain.id, }
-  });
-
-  const inviteLinks = await models.InviteLink.findAll({
-    where: { chain_id: chain.id, }
-  });
-
-  const subscriptions = await models.Subscription.findAll({
-    where: { chain_id: chain.id, }
-  });
-
-  const webhooks = await models.Webhook.findAll({
-    where: { chain_id: chain.id, }
-  });
-
-  const starredCommunities = await models.StarredCommunity.findAll({
-    where: { chain: chain.id, }
-  });
-
-
-  await Promise.all(starredCommunities.map((n) => n.destroy()));
-
-  await Promise.all(topics.map((n) => n.destroy()));
-  await Promise.all(reactions.map((n) => n.destroy()));
-  await Promise.all(comments.map((n) => n.destroy()));
-  await Promise.all(threads.map((n) => n.destroy()));
-
-  await Promise.all(inviteCodes.map((n) => n.destroy()));
-  await Promise.all(inviteLinks.map((n) => n.destroy()));
-
-  await Promise.all(chainEntities.map((n) => n.destroy()));
-
-  await Promise.all(subscriptions.map((n) => n.destroy()));
-  await Promise.all(webhooks.map((n) => n.destroy()));
-
-  await Promise.all(roles.map((n) => n.destroy()));
-  await Promise.all(addresses.map((n) => n.destroy()));
-
-  await Promise.all(chainNodes.map((n) => n.destroy()));
-  await chain.destroy();
 
   return res.json({ status: 'Success', result: 'Deleted chain' });
 };

@@ -151,18 +151,12 @@ const linkExistingAddressToChain = async (
     const role = await models.Role.findOne({
       where: {
         address_id: addressId,
-        ...(req.body.community
-          ? { offchain_community_id: req.body.community }
-          : { chain_id: req.body.chain }),
+        chain_id: req.body.chain,
       }
     });
 
     if (!role) {
-      await models.Role.create(req.body.community ? {
-        address_id: addressId,
-        offchain_community_id: req.body.community,
-        permission: 'member',
-      } : {
+      await models.Role.create({
         address_id: addressId,
         chain_id: req.body.chain,
         permission: 'member',

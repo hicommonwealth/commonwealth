@@ -18,19 +18,17 @@ export const Errors = {
 const ValidRoles = ['admin', 'moderator', 'member'];
 
 const upgradeMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   const { address, new_role } = req.body;
   if (!address) return next(new Error(Errors.InvalidAddress));
   if (!new_role) return next(new Error(Errors.InvalidRole));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  // if chain is present we know we are dealing with a chain first community
-  const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
   const requesterAddresses = await req.user.getAddresses();
   const requesterAddressIds = requesterAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
   const requesterAdminRoles = await models.Role.findAll({
     where: {
-      ...chainOrCommObj,
+      chain_id: chain.id,
       address_id: { [Op.in]: requesterAddressIds },
       permission: 'admin',
     },
@@ -46,7 +44,7 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
       model: models.Role,
       required: true,
       where: {
-        ...chainOrCommObj
+        chain_id: chain.id,
       }
     }]
   });
@@ -59,7 +57,7 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
 
   const allCommunityAdmin = await models.Role.findAll({
     where: {
-      ...chainOrCommObj,
+      chain_id: chain.id,
       permission: 'admin',
     },
   });
