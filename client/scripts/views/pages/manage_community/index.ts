@@ -6,33 +6,35 @@ import $ from 'jquery';
 
 import app from 'state';
 import { ChainInfo, RoleInfo, RolePermission, Webhook } from 'models';
-import { CompactModalExitButton } from 'views/modal';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
-import { CommunityOptionsPopover } from '../discussions';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 const deleteChainButton = (chain: ChainInfo) => {
-  return m('a', {
-    href: '#',
+  return m(CWButton, {
+    label: 'DELETE CHAIN',
     onclick: (e) => {
       $.post(`${app.serverUrl()}/deleteChain`, {
         id: chain.id,
         auth: true,
         jwt: app.user.jwt,
       }).then((result) => {
+        console.log("success!")
         if (result.status !== 'Success') return;
         app.config.chains.remove(chain);
+        console.log("deleted from local config");
         notifySuccess('Deleted chain!');
         m.route.set('/');
+        console.log("post route shift")
         // redirect to /
       }, (err) => {
         notifyError('Failed to delete chain!');
       });
     }
-  }, 'DELETE CHAIN');
+  });
 }
 
 const ManageCommunityPage: m.Component<

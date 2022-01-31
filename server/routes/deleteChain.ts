@@ -24,9 +24,9 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
   if (!req.body.id) {
     return next(new Error(Errors.NeedChainId));
   }
-  if (!['george@commonwealth.im', 'zak@commonwealth.im', 'jake@commonwealth.im'].includes(req.user.email)) {
-    return next(new Error(Errors.NotAcceptableAdmin));
-  }
+  // if (!['george@commonwealth.im', 'zak@commonwealth.im', 'jake@commonwealth.im'].includes(req.user.email)) {
+  //   return next(new Error(Errors.NotAcceptableAdmin));
+  // }
 
   await models.sequelize.transaction(async (t) => {
     const chain = await models.Chain.findOne({
@@ -38,60 +38,83 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       return next(new Error(Errors.NoChain));
     }
 
+    console.log('1');
+
     await models.sequelize.query(`DELETE FROM "ChainNodes" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
+
+    console.log('2');
 
     await models.sequelize.query(`DELETE FROM "ChainEntities" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
 
+    console.log('3');
+
     await models.sequelize.query(`DELETE FROM "OffchainReactions" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
+
+    console.log('4');
 
     await models.sequelize.query(`DELETE FROM "OffchainComments" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
 
+    console.log('5');
+
     await models.sequelize.query(`DELETE FROM "OffchainTopics" WHERE chain_id='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
+
+    console.log('6');
 
     await models.sequelize.query(`DELETE FROM "Roles" WHERE chain_id='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
 
+    console.log('7');
+
     await models.sequelize.query(`DELETE FROM "InviteCodes" WHERE chain_id='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
+    console.log('8');
+
 
     await models.sequelize.query(`DELETE FROM "Subscriptions" WHERE chain_id='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
 
+    console.log('9');
+
     await models.sequelize.query(`DELETE FROM "Webhooks" WHERE chain_id='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
+
+    console.log('10');
 
     await models.sequelize.query(`DELETE FROM "Collaborations"
         USING "Collaborations" AS c
         LEFT JOIN "OffchainThreads" t ON offchain_thread_id = t.id
         WHERE t.chain = '${chain.id}'
         AND c.offchain_thread_id  = "Collaborations".offchain_thread_id 
-        AND c.address_id = "Collaborations".address_id `, {
+        AND c.address_id = "Collaborations".address_id;`, {
+      raw: true,
       type: QueryTypes.DELETE,
       transaction: t,
     });
+
+    console.log('11');
 
     await models.sequelize.query(`DELETE FROM "LinkedThreads"
         USING "LinkedThreads" AS l
@@ -101,15 +124,21 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       transaction: t,
     });
 
+    console.log('12');
+
     await models.sequelize.query(`DELETE FROM "OffchainThreads" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
 
+    console.log('13');
+
     await models.sequelize.query(`DELETE FROM "StarredCommunities" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
+
+    console.log('14');
 
     await models.sequelize.query(`DELETE FROM "OffchainProfiles" AS profilesGettingDeleted
         USING "OffchainProfiles" AS profilesBeingUsedAsReferences
@@ -120,17 +149,19 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       transaction: t,
     });
 
-    await models.sequelize.query(`DELETE FROM "Addresses" WHERE chain='${chain.id}';`, {
-      type: QueryTypes.DELETE,
-      transaction: t,
-    });
+    console.log('16');
 
     await models.sequelize.query(`DELETE FROM "ChainEventTypes" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
 
-    await chain.destroy({transaction: t});
+    console.log('17');
+    await models.sequelize.query(`DELETE FROM "Chains" WHERE id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+    console.log('done');
   });
 
   return res.json({ status: 'Success', result: 'Deleted chain' });
