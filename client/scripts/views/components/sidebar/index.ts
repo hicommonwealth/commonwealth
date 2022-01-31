@@ -19,12 +19,6 @@ import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
-import {
-  TelegramIcon,
-  ElementIcon,
-  GithubIcon,
-  WebsiteIcon,
-} from '../component_kit/icons';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
 import { CWButton } from '../component_kit/cw_button';
@@ -268,7 +262,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
           trigger: m(Button, {
             rounded: true,
             onclick: () => window.open(element),
-            label: m(ElementIcon),
+            label: m(CWIcon, { iconName: 'element' }),
             class: 'element-button',
           }),
         }),
@@ -279,7 +273,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
           trigger: m(Button, {
             rounded: true,
             onclick: () => window.open(telegram),
-            label: m(TelegramIcon),
+            label: m(CWIcon, { iconName: 'telegram' }),
             class: 'telegram-button',
           }),
         }),
@@ -290,7 +284,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
           trigger: m(Button, {
             rounded: true,
             onclick: () => window.open(github),
-            label: m(GithubIcon),
+            label: m(CWIcon, { iconName: 'github' }),
             class: 'github-button',
           }),
         }),
@@ -301,7 +295,7 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
           trigger: m(Button, {
             rounded: true,
             onclick: () => window.open(website),
-            label: m(WebsiteIcon),
+            label: m(CWIcon, { iconName: 'website' }),
             class: 'website-button',
           }),
         }),
