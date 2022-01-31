@@ -172,24 +172,3 @@ export const CWDiscord: m.Component<IconStyleAttrs> = {
     );
   },
 };
-
-// export const Test: m.Component<IconStyleAttrs> = {
-//   view: (vnode) => {
-//     return (
-//       <svg
-//         class={getIconClasses(vnode.attrs)}
-//         xmlns="http://www.w3.org/2000/svg"
-//         width="13"
-//         height="13"
-//         fill="none"
-//         viewBox="0 0 13 13"
-//       >
-//         <path
-//           stroke-miterlimit="16"
-//           stroke-width="1.5"
-//           d="M12 1v11H1V1h2.75M12 1L6 7m6-6H6.5"
-//         ></path>
-//       </svg>
-//     );
-//   },
-// };
