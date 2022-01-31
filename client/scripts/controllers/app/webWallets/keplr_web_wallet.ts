@@ -50,11 +50,24 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       this._chainId,
       account.validationToken
     );
+
+    // save and restore default options after setting to no fee/memo for login
+    const defaultOptions = window.keplr.defaultOptions;
+    window.keplr.defaultOptions = {
+      sign: {
+        preferNoSetFee: true,
+        preferNoSetMemo: true,
+        disableBalanceCheck: true,
+      }
+    };
+
     const signature = await window.keplr.signAmino(
       this._chainId,
       account.address,
       signDoc
     );
+
+    window.keplr.defaultOptions = defaultOptions;
     return account.validate(JSON.stringify(signature));
   }
 
@@ -131,6 +144,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
         await window.keplr.enable(this._chainId);
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
+
       this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
       this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;

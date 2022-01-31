@@ -82,12 +82,16 @@ const createChain = async (
   let eth_chain_id: number = null;
   let url = req.body.node_url;
   let altWalletUrl = req.body.alt_wallet_url;
-  if (req.body.base === ChainBase.Ethereum && req.body.type === ChainType.Offchain) {
+
+  // always generate a chain id
+  if (req.body.base === ChainBase.Ethereum) {
     if (!req.body.eth_chain_id || !+req.body.eth_chain_id) {
       return next(new Error(Errors.InvalidChainId));
     }
     eth_chain_id = +req.body.eth_chain_id;
   }
+
+  // if not offchain, also validate the address
   if (req.body.base === ChainBase.Ethereum && req.body.type !== ChainType.Offchain) {
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));

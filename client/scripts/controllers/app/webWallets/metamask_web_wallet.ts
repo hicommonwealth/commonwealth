@@ -2,6 +2,7 @@ declare let window: any;
 
 import app from 'state';
 import Web3 from 'web3';
+import $ from 'jquery';
 import { provider } from 'web3-core';
 import { ChainBase } from 'types';
 import { Account, IWebWallet } from 'models';
@@ -46,12 +47,11 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(app.chain.meta.ethChainId, message);
+    const msgParams = constructTypedMessage(app.chain.meta.ethChainId || 1, message);
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
       params: [this._accounts[0], JSON.stringify(msgParams)],
     })
-    console.log(signature);
     return signature;
   }
 
@@ -68,9 +68,8 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
-      if (!app.chain?.meta.ethChainId) {
-        throw new Error('No chain id found!');
-      }
+      // default to ETH
+      const chainId = app.chain?.meta.ethChainId || 1;
 
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
@@ -78,28 +77,27 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts'
       });
-      const chainId = `0x${app.chain.meta.ethChainId.toString(16)}`;
+      const chainIdHex = `0x${chainId.toString(16)}`;
       try {
         await this._web3.givenProvider.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId }],
+          params: [{ chainId: chainIdHex }],
         });
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
           const wsRpcUrl = new URL(app.chain.meta.url);
-          const rpcUrl = `https://${wsRpcUrl.host}`;
+          const rpcUrl = app.chain.meta.altWalletUrl || `https://${wsRpcUrl.host}`;
+
+          // TODO: we should cache this data!
+          const chains = await $.getJSON('https://chainid.network/chains.json');
+          const baseChain = chains.find((c) => c.chainId === chainId);
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
             params: [{
-              chainId,
-              chainName: app.chain.meta.chain.name,
-              nativeCurrency: {
-                name: app.chain.meta.chain.symbol,
-                symbol: app.chain.meta.chain.symbol,
-                // MetaMask does not yet support chains with native currencies that do not have 18 decimals
-                decimals: 18,
-              },
+              chainId: chainIdHex,
+              chainName: baseChain.name,
+              nativeCurrency: baseChain.nativeCurrency,
               rpcUrls: [rpcUrl]
             }]
           });

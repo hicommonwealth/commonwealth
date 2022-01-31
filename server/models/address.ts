@@ -335,7 +335,7 @@ export default (
       //
       try {
         const [ node ] = await chain.getChainNodes();
-        const typedMessage = constructTypedMessage(node.eth_chain_id, addressModel.verification_token.trim());
+        const typedMessage = constructTypedMessage(node.eth_chain_id || 1, addressModel.verification_token.trim());
         const address = recoverTypedSignature({
           data: typedMessage,
           signature: signatureString.trim(),

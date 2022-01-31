@@ -141,6 +141,21 @@ heroku pg:copy <PRODUCTION_APP>::<PRODUCTION_DB_URL> <STAGING_DB_URL> -a <STAGIN
 # turn on the web dynos in staging
 heroku maintenance:off -a <STAGING_APP>
 ```
+To copy a manageable subset of a large remote table to the local instance:
+```
+# log into the remote database
+heroku pg:psql -a <APP_NAME>
+# use query to create local .csv containing the desired records
+# example: \COPY (SELECT * FROM "ChainEvents" WHERE chain_event_type_id LIKE 'impactmarket%' LIMIT 200) TO '/var/www/html/commonwealth/ChainEvents.csv' WITH (delimiter ',', format CSV);
+\COPY (<QUERY>) TO '<LOCAL_PATH><FILENAME>.csv' WITH (delimiter ',', format CSV);
+# exit the remote server and log in to local instance
+exit
+psql -d commonwalth -U commonwealth
+# load the local .csv to the local database 
+# example: \COPY "ChainEvents" FROM '/var/www/html/commonwealth/ChainEvents.csv' CSV;
+\COPY "<TABLE_NAME>" FROM '<LOCAL_PATH><FILENAME>.csv' WITH (delimiter ',', format CSV);
+
+```
 
 ## Running Migrations
 
@@ -222,9 +237,12 @@ To configure a custom domain, you should:
   row in the database, corresponding to the community to be served on
   that domain.
 
-You can test the custom domain by setting it in your /etc/hosts file
-and running a local SSL proxy, for example:
+To test, add a new entry to your /etc/hosts file:
+```
+127.0.0.1       <custom domain>
+```
 
+Then run a local SSL proxy, for example: 
 ```
 npm install -g local-ssl-proxy
 local-ssl-proxy --source 443 --target 8080

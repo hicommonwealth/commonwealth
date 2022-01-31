@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "preserve",
     "allowJs": true,
     "target": "es6",
     "moduleResolution": "node",
@@ -20,9 +21,7 @@
     "./client/scripts",
     "./shared/adapters",
     "./test",
-    "./eth/types",
+    "./eth/types"
   ],
-  "exclude": [
-    "./node_modules",
-  ]
+  "exclude": ["./node_modules"]
 }

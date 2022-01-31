@@ -18,6 +18,7 @@ export interface WebhookContent {
   url?: string;
   user: any;
   chainEvent?: any;
+  chainEventType?: any;
 }
 
 const REGEX_IMAGE = /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;
@@ -255,11 +256,11 @@ const send = async (models, content: WebhookContent) => {
         // };
       } else if ((url.indexOf('telegram') !== -1) && process.env.TELEGRAM_BOT_TOKEN) {
         let getChatUsername = url.split('/@');
-        getChatUsername = '@' + getChatUsername[1];
+        getChatUsername = `@${  getChatUsername[1]}`;
 
         const botToken = process.env.TELEGRAM_BOT_TOKEN;
-        let getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
-        url = getUpdatesUrl + '/sendMessage';
+        const getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
+        url = `${getUpdatesUrl  }/sendMessage`;
 
         webhookData = isChainEvent ? {
           chat_id: getChatUsername,
