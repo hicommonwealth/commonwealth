@@ -424,6 +424,11 @@
     border-color: tint(#2480cc, 70%);
     color: #2480cc;
 
+    svg {
+      color: #2480cc;
+      fill: currentColor;
+    }
+
     &:hover {
       border-color: transparent;
     }
@@ -448,6 +453,11 @@
     border-color: tint(#0cbd8b, 70%);
     color: #0cbd8b;
 
+    svg {
+      color: #0cbd8b;
+      fill: currentColor;
+    }
+
     &:hover {
       border-color: transparent;
     }
@@ -470,6 +480,11 @@
   .cui-button.discord-button {
     border-color: tint(#677bc4, 70%);
     color: #677bc4;
+
+    svg {
+      color: #677bc4;
+      fill: currentColor;
+    }
 
     &:hover {
       border-color: transparent;

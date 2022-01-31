@@ -187,7 +187,6 @@ export const CWElement: m.Component<IconStyleAttrs> = {
         viewBox="0 0 29 28"
       >
         <g
-          fill="#000"
           fill-rule="evenodd"
           clip-path="url(#clip0_729_15085)"
           clip-rule="evenodd"
