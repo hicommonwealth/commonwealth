@@ -1,48 +1,27 @@
 @import 'client/styles/shared';
 
+@mixin mobile-max {
+    @media only screen and (max-width: 670px) { @content; }
+}
+
 .UserDashboardRow {
     display: flex;
     flex-direction: column;
     padding: 17px 22px;
-    margin: 0 0 0 -22px;
+    margin-right: 60px;
     line-height: 1.2;
     cursor: pointer;
-    // border-bottom: 1px solid $border-color-lightest;
     text-decoration: none !important;
     color: black !important;
     position: relative;
+    border-bottom: black;
+    border-bottom-width: 1px;
 
-    .UserDashboardRow-overwrite {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-    }
     &:hover {
-        // background: #f2f2f2;
-        // border-radius: 20px;
-
-        .UserDashboardRow-overwrite {
-            background: #f2f2f2;
-            border-radius: 20px;
-        }
+         background: #F7F4FF;
+         border-radius: 20px;
     }
-    &.unread {
-        // background: $background-color-unread;
-    }
-    > .User {
-        width: min-content;
-    }
-    > .User,
-    > .UserGallery {
-        margin-bottom: 17px;
-    }
-    > .UserGallery .User {
-        margin-right: 4px;
-    }
-    
+   
     .comment-body {
         flex: 1;
         &:first-child {
@@ -70,9 +49,14 @@
     }
     .comment-body-title {
         display: inline-block;
+        margin-bottom: 5px;
+        span {
+            color: #666666;
+        }
         .User .user-display-name,
         span.commented-obj {
             font-weight: 500;
+            color: black
         }
         span.comment-ago {
             margin-left: 25px;
@@ -88,7 +72,7 @@
         }
     }
     .comment-body-excerpt {
-        margin: 7px 0 8px 25px;
+        margin: 7px 0 8px 27px;
         color: black;
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -107,26 +91,11 @@
         justify-content: space-between;
         &-left {
             display: flex;
-            svg {
-                stroke: black;
-            }
+            margin-left: 20px;
+       
             button {
-                border: 1px solid #ddd;
-                margin-right: 25px;
-                color: black;
-                @include xs-max {
-                    margin-bottom: 6px;
-                }
-                &:hover {
-                    background: #F7F4FF;
-                    border: 1px solid #4723AD;
-                    color: #4723AD;
-                    cursor: pointer;
-
-                    svg {
-                        stroke: #4723AD;
-                    }
-                }
+              margin-right: 25px;
+              
             }
         }
         &-right {
@@ -137,6 +106,9 @@
                 border: none;
                 color: #666;
                 background: transparent;
+            }
+            @include lg-max {
+                display: none;
             }
         }
         .cui-menu{

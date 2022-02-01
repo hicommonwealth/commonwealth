@@ -20,8 +20,21 @@
         flex: 8;
     }
 }
-.UserDashboard {
 
+.UserDashboard {
+    .preview-chain-card {
+        .card-top {
+            display: flex;
+            h3 {
+                margin-left: 15px;
+                margin-top: 4px;
+            }
+        }
+        .card-bottom {
+            margin-top: 10px;
+        }
+        margin-bottom: 10px;
+    }
     .sublayout-main-col {
         max-width: 100%;
     }
@@ -53,10 +66,12 @@
     }
 
     .expore-communities-col {
-        @include xs-max {
-            margin-top: 20px;
+        @include md-max {
+            display: none;
         } 
-            
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .home-card {
@@ -99,15 +114,13 @@
         }
     }
 
-    .cui-card {
-        padding: 20px;
-        border: 1px solid #DDDDDD;
-        border-radius: 10px;
-        cursor: pointer;
+    
+}
 
-        &:hover {
-            background-color: #F7F4FF;
-            border: 1px solid #4723AD
+.UserDashboardRow {
+    .comment-body {
+        .comment-body-bottom {
+            
         }
     }
 }

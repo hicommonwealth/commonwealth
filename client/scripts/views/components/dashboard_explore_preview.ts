@@ -6,6 +6,7 @@ import app from 'state';
 import { NodeInfo } from 'client/scripts/models';
 import { ChainIcon } from './chain_icon';
 import { pluralize } from 'helpers';
+import { CWCard } from './component_kit/cw_card';
 
 const getNewTag = (labelCount = null) => {
     const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -30,11 +31,12 @@ const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
       const updatedThreads = unseenPosts[chain]?.activePosts || 0;
       const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(chain);
   
-      return m(Card, {
-        class: 'home-card',
+      return m(CWCard, {
+        elevation: 'elevation-1',
+        interactive: true,
+        className: 'preview-chain-card',
         onclick: (e) => {
           e.preventDefault();
-          localStorage['home-scrollY'] = window.scrollY;
           m.route.set(`/${chain}`);
         },
       }, [
@@ -96,7 +98,7 @@ const DashboardExplorePreview: m.Component<{}> = {
         );
 
         return (
-            m(Col, { span: { md: 3 }, class:'expore-communities-col' }, [
+            m(Col, { span: { md: 3 }, class:'expore-communities-col'}, [
                 m('.title', 'Explore Communities'),
                 m('.communities-list', [
                   sortedChainsAndCommunities.length > 3 ? sortedChainsAndCommunities.slice(0, 3) : sortedChainsAndCommunities,

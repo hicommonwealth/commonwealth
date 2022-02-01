@@ -32,7 +32,7 @@ const buildCommunityString = (numCommunities: number) => {
   return `${numberString} Communities`;
 };
 
-const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
+export const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
   view: (vnode) => {
     const { chain, nodeList } = vnode.attrs;
     const { unseenPosts } = app.user;

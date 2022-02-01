@@ -88,21 +88,22 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   } = data;
 
   const community_name = app.config.chains.getById(chain_id)?.name || 'Unknown chain';
-
   let notificationHeader;
   let notificationBody;
   const decoded_title = decodeURIComponent(root_title).trim();
 
+  // Extract Comment Text
   if (comment_text) {
     notificationBody = getCommentPreview(comment_text);
   } else if (root_type === ProposalType.OffchainThread) {
     notificationBody = null;
   }
 
+  // Get Author of Notification
   const actorName = m(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
-    hideAvatar: false,
     hideIdentityIcon: false,
+    linkify: true,
     onclick: (e: any) => {
       e.preventDefault();
       e.stopPropagation();
@@ -110,8 +111,10 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     },
   });
 
+  // Get creation time 
   const ago = getAgo(created_at);
 
+  // Conditionals for various Notification categories
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
     notificationHeader = parent_comment_id
@@ -170,6 +173,8 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
         m('span.comment-ago', ago),
       ]);
   }
+
+  // Get Path to Proposal
   const pseudoProposal = {
     id: root_id,
     title: root_title,
@@ -179,10 +184,13 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     ? [root_type, pseudoProposal, { id: comment_id }]
     : [root_type, pseudoProposal];
   const path = (getProposalUrl as any)(...args);
+
+  console.log("wtf", path)
   const pageJump = comment_id
     ? () => jumpHighlightComment(comment_id)
     : () => jumpHighlightComment('parent');
 
+  // Return notification data
   return {
     authorInfo: [[author_chain, author_address]],
     createdAt: moment.utc(created_at),
@@ -196,6 +204,9 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   };
 };
 
+
+// Extracts metadata from Notification
+// TODO: DELETE THIS GARBAGE
 const getBatchNotificationFields = (
   category,
   data: IPostNotificationData[]
@@ -203,8 +214,6 @@ const getBatchNotificationFields = (
   if (data.length === 1) {
     return getNotificationFields(category, data[0]);
   }
-
-  console.log("wtf:", data)
 
   const {
     created_at,
@@ -345,6 +354,8 @@ const getBatchNotificationFields = (
   };
 };
 
+
+
 const UserDashboardRow: m.Component<
   {
     notification: Notification;
@@ -369,11 +380,8 @@ const UserDashboardRow: m.Component<
   },
   view: (vnode) => {
     const { notification } = vnode.attrs;
-    let category = null;
-    if (notification.categoryId) {
-      category = notification.categoryId;
-    }
-    
+    let category = notification.categoryId;
+    // Conditional for Chain Event Notifications
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
@@ -492,8 +500,9 @@ const UserDashboardRow: m.Component<
         viewCount,
         likeCount,
         commentCount,
-      } = getBatchNotificationFields(category, [notificationData]);
+      } = getNotificationFields(category, notificationData);
 
+      // Handle custom domains
       if (app.isCustomDomain()) {
         if (
           path.indexOf(`https://commonwealth.im/${app.customDomainId()}/`) !==
@@ -503,51 +512,36 @@ const UserDashboardRow: m.Component<
           return;
         path = path
           .replace(`https://commonwealth.im/${app.customDomainId()}/`, '/')
-          .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
+          .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');  
       }
 
-      return link(
-        'a.UserDashboardRow',
-        path.replace(/ /g, '%20'),
-        [
-          // authorInfo.length === 1
-          //   ? m(User, {
-          //     user: new AddressInfo(
-          //       null,
-          //       (authorInfo[0] as [string, string])[1],
-          //       (authorInfo[0] as [string, string])[0],
-          //       null
-          //     ),
-          //     avatarOnly: true,
-          //     avatarSize: 26,
-          //   })
-          //   : m(UserGallery, {
-          //     users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
-          //     avatarSize: 26,
-          //   }),
-          m('.comment-body', {
-            onclick:(e) => {
-              if (e.target.innerText === 'Share') {
-                e.preventDefault();
-                e.stopPropagation();
-              }
-            },
-          },[
-            m('.comment-body-title', notificationHeader),
-            notificationBody &&
-            category !== `${NotificationCategories.NewReaction}` &&
-            category !== `${NotificationCategories.NewThread}` &&
-            m('.comment-body-excerpt', notificationBody),
-            m('.comment-body-bottom', [
-              m('.comment-body-bottom-left', [
-                m(CWEngagementButton, {
-                  buttonSize: 'sm',
-                  label: "discuss",
-                  onclick: (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  },
-                }),
+      return m('.UserDashboardRow', {
+        onclick: (e) => {
+          app.user.notifications.markAsRead([notification]);
+          m.route.set(path)
+        }
+      }, [
+        m('.comment-body', {},[
+          m('.comment-body-title', notificationHeader),
+          notificationBody &&
+          category !== `${NotificationCategories.NewReaction}` &&
+          category !== `${NotificationCategories.NewThread}` &&
+          m('.comment-body-excerpt', notificationBody),
+          m('.comment-body-bottom', [
+            m('.comment-body-bottom-left', [
+              m(CWEngagementButton, {
+                buttonSize: 'sm',
+                label: "discuss",
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                },
+              }),
+              m('.share-button', {
+                onclick: (e) => {
+                  e.stopPropagation();
+                }
+              }, [
                 m(PopoverMenu, {
                   transitionDuration: 0,
                   closeOnOutsideClick: true,
@@ -572,68 +566,40 @@ const UserDashboardRow: m.Component<
                   trigger: m(CWEngagementButton, {
                     buttonSize: 'sm',
                     label: 'share',
-                    onclick: (e) => e.stopPropagation(),
+                    className: 'share-button',
+                    onclick: (e) => {},
                   }),
                 }),
-                m(CWEngagementButton, {
-                  buttonSize: 'sm',
-                  label: 'subscribe',
-                  onclick: (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  },
-                }),
               ]),
-              m('.comment-body-bottom-right', [
-                m(Button, {
-                  iconLeft: Icons.EYE,
-                  label: viewCount,
-                  outlined: false,
-                }),
-                m(Button, {
-                  iconLeft: Icons.HEART,
-                  label: likeCount,
-                  outlined: false,
-                }),
-                m(Button, {
-                  iconLeft: Icons.MESSAGE_SQUARE,
-                  label: commentCount,
-                  outlined: false,
-                }),
-              ]),
+              m(CWEngagementButton, {
+                buttonSize: 'sm',
+                label: 'subscribe',
+                onclick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                },
+              }),
             ]),
-
-            m('.UserDashboardRow-overwrite'),
-            // m('.comment-body-bottom-wrap', [
-            //   m('.comment-body-created', moment(createdAt).fromNow()),
-            //   !notification.isRead && m('.comment-body-mark-as-read', {
-            //     onclick: (e) => {
-            //       e.preventDefault();
-            //       e.stopPropagation();
-            //       vnode.state.markingRead = true;
-            //       app.user.notifications.markAsRead(notifications)?.then(() => {
-            //         vnode.state.markingRead = false;
-            //         m.redraw();
-            //       }).catch(() => {
-            //         vnode.state.markingRead = false;
-            //         m.redraw();
-            //       });
-            //     }
-            //   }, [
-            //     vnode.state.markingRead ? m(Spinner, { size: 'xs', active: true }) : 'Mark as read',
-            //   ]),
-            // ])
+            m('.comment-body-bottom-right', [
+              m(Button, {
+                iconLeft: Icons.EYE,
+                label: viewCount,
+                outlined: false,
+              }),
+              m(Button, {
+                iconLeft: Icons.HEART,
+                label: likeCount,
+                outlined: false,
+              }),
+              m(Button, {
+                iconLeft: Icons.MESSAGE_SQUARE,
+                label: commentCount,
+                outlined: false,
+              }),
+            ]),
           ]),
-        ],
-        {
-          class: notification.isRead ? '' : 'unread',
-          key: notification.id,
-          id: notification.id,
-        },
-        null,
-        () => app.user.notifications.markAsRead([notification]),
-        pageJump ? () => setTimeout(() => pageJump(), 1) : null
-      );
+        ]),
+      ])
     }
   },
 };
