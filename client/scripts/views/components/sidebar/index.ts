@@ -6,21 +6,44 @@ import _ from 'lodash';
 import {
   Button, PopoverMenu, MenuItem, Icon, Icons, Tooltip
 } from 'construct-ui';
-
 import { selectNode, initChain, navigateToSubpage } from 'app';
 import app from 'state';
-import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'types';
 import { link } from 'helpers';
-import { ChainInfo, NodeInfo } from 'models';
-
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+import { ChainInfo, NodeInfo} from 'models';
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
-
-
 import { DiscordIcon, TelegramIcon, ElementIcon, GithubIcon, WebsiteIcon } from '../component_kit/icons';
+import { DiscussionSection } from './discussion_section';
+import { GovernanceSection } from './governance_section';
+import { CWButton } from '../component_kit/cw_button';
+
+// Toggle Tree Definition (3 layers of depth, could add more if desired)
+export interface ToggleTree {
+  toggled_state: boolean;
+  children: {
+    [child: string]: {
+      toggled_state: boolean;
+      children: {
+        [child: string]: {
+          toggled_state: boolean;
+        }
+      }
+    },
+  }
+}
+
+function comparisonCustomizer(value1, value2) {
+  if (typeof value1 === "boolean" && typeof value2 === "boolean") {
+    return true;
+  }
+}
+// Check that our current cached tree is structurally correct
+export function verifyCachedToggleTree(tree_name: string, toggle_tree: ToggleTree) {
+  const cached_tree = JSON.parse(localStorage[`${app.activeChainId()}-${tree_name}-toggle-tree`]);
+  return _.isEqualWith(cached_tree, toggle_tree, comparisonCustomizer);
+}
 
 const SidebarQuickSwitcherItem: m.Component<{ item, size }> = {
   view: (vnode) => {
@@ -86,371 +109,6 @@ const SidebarQuickSwitcher: m.Component<{}> = {
   }
 };
 
-export const OffchainNavigationModule: m.Component<{}, { dragulaInitialized: true }> = {
-  view: (vnode) => {
-    const onDiscussionsPage = (p) => p === `/${app.activeChainId()}` || p === `/${app.activeChainId()}/`
-      || p.startsWith(`/${app.activeChainId()}/discussions/`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/discussion/`)
-      || p.startsWith(`/${app.activeChainId()}?`);
-    const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
-    const onMembersPage = (p) => p.startsWith(`/${app.activeChainId()}/members`)
-      || p.startsWith(`/${app.activeChainId()}/account/`);
-    const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
-
-    const topics = app.topics.getByCommunity(app.activeChainId()).map(({ id, name, featuredInSidebar }) => {
-      return { id, name, featuredInSidebar };
-    }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
-
-    const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeChainId())) ? 'Forums' : 'Discussions';
-
-    return m('.OffchainNavigationModule.SidebarModule', [
-      // m('.section-header', 'Discuss'),
-      m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onDiscussionsPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : true),
-        label: discussionsLabel,
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/');
-        },
-      }),
-      topics.map((t) => (
-        m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onFeaturedDiscussionPage(m.route.get(), t.name),
-          label: t.name,
-          class: 'sub-button',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage(`/discussions/${encodeURI(t.name)}`);
-          },
-        })
-      )),
-      // m(Button, {
-      //   rounded: true,
-      //   fluid: true,
-      //   active: onSearchPage(m.route.get())
-      //     && (app.chain ? app.chain.serverLoaded : app.community ? app.community.serverLoaded : true),
-      //   label: 'Search',
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     navigateToSubpage('/search');
-      //   },
-      // }),
-      m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onMembersPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : true),
-        label: 'Members',
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/members');
-        },
-      }),
-      (app.activeChainId() === 'near'
-      ? m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onSputnikDaosPage(m.route.get())
-          && (app.chain ? app.chain.serverLoaded : true),
-        label: 'Sputnik DAOs',
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/sputnik-daos');
-        },
-      })
-      : '')
-      // m(Button, {
-      //   rounded: true,
-      //   fluid: true,
-      //   active: onChatPage(m.route.get()),
-      //   label: 'Chat',
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     navigateToSubpage('/chat');
-      //   },
-      // }),
-    ]);
-  }
-};
-
-export const OnchainNavigationModule: m.Component<{}, {}> = {
-  view: (vnode) => {
-    // // proposal counts
-    // const substrateGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.Substrate)
-    //   ? ((app.chain as any).democracy.store.getAll().filter((p) => !p.completed && !p.passed).length
-    //     + (app.chain as any).democracyProposals.store.getAll().filter((p) => !p.completed).length
-    //     + (app.chain as any).council.store.getAll().filter((p) => !p.completed).length
-    //     + (app.chain as any).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
-    // const allSubstrateGovernanceProposals = substrateGovernanceProposals;
-    // const cosmosGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.CosmosSDK)
-    //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
-    // const molochProposals = (app.chain?.loaded && app.chain?.network === ChainNetwork.Moloch)
-    //   ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
-
-    const hasProposals = app.chain && (
-      app.chain.base === ChainBase.CosmosSDK
-        || app.chain.network === ChainNetwork.Sputnik
-        || (app.chain.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Plasm)
-        || app.chain.network === ChainNetwork.Moloch
-        || app.chain.network === ChainNetwork.Compound
-        || app.chain.network === ChainNetwork.Aave
-        || app.chain.network === ChainNetwork.Commonwealth
-        || app.chain.meta.chain.snapshot);
-    if (!hasProposals) return;
-
-    const showMolochMenuOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
-    const showMolochMemberOptions = showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
-    const showCommonwealthMenuOptions = app.chain?.network === ChainNetwork.Commonwealth;
-
-    const showCompoundOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
-    const showAaveOptions = app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
-
-    const onSnapshotProposal = (p) => p.startsWith(`/${app.activeChainId()}/snapshot`);
-    const onSnapshotProposalCreation = (p) => p.startsWith(`/${app.activeChainId()}/new/snapshot/`);
-
-    const onProposalPage = (p) => (
-      p.startsWith(`/${app.activeChainId()}/proposals`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyProposal}`));
-    const onReferendaPage = (p) => p.startsWith(`/${app.activeChainId()}/referenda`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateDemocracyReferendum}`);
-
-    const onTreasuryPage = (p) => p.startsWith(`/${app.activeChainId()}/treasury`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryProposal}`);
-    const onBountiesPage = (p) => p.startsWith(`/${app.activeChainId()}/bounties`);
-    const onTipsPage = (p) => p.startsWith(`/${app.activeChainId()}/tips`)
-      || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`);
-
-    const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
-    const onMotionPage = (p) => (
-      p.startsWith(`/${app.activeChainId()}/motions`)
-        || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateCollectiveProposal}`));
-
-    const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
-    const onNotificationsPage = (p) => p.startsWith('/notifications');
-    if (onNotificationsPage(m.route.get())) return;
-    return m('.OnchainNavigationModule.SidebarModule', [
-      m('.sidebar-spacer'),
-      // referenda (substrate only)
-      app.chain?.base === ChainBase.Substrate
-        && app.chain.network !== ChainNetwork.Darwinia
-        && app.chain.network !== ChainNetwork.HydraDX
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onReferendaPage(m.route.get()),
-          label: 'Referenda',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/referenda');
-          },
-          contentRight: [], // TODO
-        }),
-      // proposals (substrate, cosmos, moloch & compound only)
-      app.chain && ((app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
-                  || app.chain?.base === ChainBase.CosmosSDK
-                  || app.chain?.network === ChainNetwork.Sputnik
-                  || app.chain?.network === ChainNetwork.Moloch
-                  || app.chain?.network === ChainNetwork.Compound
-                  || app.chain?.network === ChainNetwork.Aave)
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onProposalPage(m.route.get()),
-          label: 'Proposals',
-          class: app.chain?.base === ChainBase.Substrate ? 'sub-button' : '',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/proposals');
-          },
-        }),
-      // // motions (substrate only)
-      // !app.community && (app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Darwinia)
-      //   && m(Button, {
-      //     fluid: true,
-      //     rounded: true,
-      //     active: onMotionPage(m.route.get()),
-      //     label: 'Motions',
-      //     class: 'sub-button',
-      //     onclick: (e) => {
-      //       e.preventDefault();
-      //       navigateToSubpage(`/motions`);
-      //     },
-      //   }),
-      // council (substrate only)
-      app.chain?.base === ChainBase.Substrate
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onCouncilPage(m.route.get()),
-          label: 'Councillors',
-          class: 'sub-button',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/council');
-          },
-        }),
-      m('.sidebar-spacer'),
-      // treasury (substrate only)
-      app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onTreasuryPage(m.route.get()),
-          label: 'Treasury',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/treasury');
-          },
-        }),
-      // bounties (substrate only)
-      app.chain?.base === ChainBase.Substrate
-        && app.chain.network !== ChainNetwork.Centrifuge
-        && app.chain.network !== ChainNetwork.HydraDX
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onBountiesPage(m.route.get()),
-          label: 'Bounties',
-          class: 'sub-button',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/bounties');
-          },
-        }),
-      // tips (substrate only)
-      // TODO: which chains?
-      app.chain?.base === ChainBase.Substrate && app.chain.network !== ChainNetwork.Centrifuge
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onTipsPage(m.route.get()),
-          label: 'Tips',
-          class: 'sub-button',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/tips');
-          },
-        }),
-      m('.sidebar-spacer'),
-      // validators (substrate only)
-      app.chain?.base === ChainBase.Substrate
-        && app.chain?.network !== ChainNetwork.Kulupu && app.chain?.network !== ChainNetwork.Darwinia
-        && m(Button, {
-          fluid: true,
-          rounded: true,
-          active: onValidatorsPage(m.route.get()),
-          label: 'Validators',
-          onclick: (e) => {
-            e.preventDefault();
-            navigateToSubpage('/validators');
-          },
-        }),
-      showCompoundOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/delegate');
-        },
-        label: 'Delegate',
-        active: m.route.get() === `/${app.activeChainId()}/delegate`,
-      }),
-      showMolochMemberOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/new/proposal');
-        },
-        label: 'New proposal',
-      }),
-      showMolochMemberOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('update_delegate_modal', {
-            account: app.user.activeAccount,
-            delegateKey: (app.user.activeAccount as any).delegateKey,
-          });
-        },
-        label: 'Update delegate key',
-      }),
-      showMolochMemberOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.lazyCreate('ragequit_modal', { account: app.user.activeAccount });
-        },
-        label: 'Rage quit',
-      }),
-      m('.sidebar-spacer'),
-      app.chain?.meta.chain.snapshot.length > 0 && m(Button, {
-        rounded: true,
-        fluid: true,
-        active: onSnapshotProposal(m.route.get()),
-        label: 'Snapshots',
-        onclick: (e) => {
-          e.preventDefault();
-          // Check if we have multiple snapshots for conditional redirect
-          const snapshotSpaces = app.chain.meta.chain.snapshot;
-          if (snapshotSpaces.length > 1) {
-            navigateToSubpage('/multiple-snapshots', {action: 'select-space'});
-          } else {
-            navigateToSubpage(`/snapshot/${snapshotSpaces}`);
-          }
-        },
-      }),
-      // app.chain?.meta.chain.snapshot && app.user.activeAccount && m(Button, {
-      //   rounded: true,
-      //   fluid: true,
-      //   active: onSnapshotProposalCreation(m.route.get()),
-      //   label: 'New Snapshot Pr...',
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     m.route.set(`/${app.activeChainId()}/new/snapshot/${app.chain.meta.chain.snapshot}`);
-      //   },
-      // }),
-      showCommonwealthMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        label: 'Projects',
-        active: m.route.get().startsWith(`/${app.activeChainId()}/projects`),
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/projects');
-        },
-      }),
-      // showCommonwealthMenuOptions && m(Button, {
-      //   fluid: true,
-      //   rounded: true,
-      //   label: 'Backers',
-      //   active: m.route.get().startsWith(`/${app.activeChainId()}/backers`),
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     navigateToSubpage(`/backers`);
-      //   },
-      // }),
-      showCommonwealthMenuOptions && m(Button, {
-        fluid: true,
-        rounded: true,
-        label: 'Collectives',
-        active: m.route.get().startsWith(`/${app.activeChainId()}/collectives`),
-        onclick: (e) => {
-          e.preventDefault();
-          navigateToSubpage('/collectives');
-        },
-      }),
-    ]);
-  }
-};
-
 export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
   view: (vnode) => {
     const url = app.chain?.meta?.url;
@@ -479,10 +137,9 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
     })));
 
     return m('.ChainStatusModule', [
-      app.chain.deferred ? m(Button, {
+      app.chain.deferred ? m(CWButton, {
+        buttonType: 'primary',
         label: vnode.state.initializing ? 'Connecting...' : 'Connect to chain',
-        rounded: true,
-        fluid: true,
         disabled: vnode.state.initializing,
         onclick: async (e) => {
           e.preventDefault();
@@ -514,9 +171,7 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
           });
         }),
         trigger: m(Button, {
-          rounded: true,
-          class: 'chain-status-main',
-          fluid: true,
+          // intent: ButtonIntent.Secondary,
           disabled: vnode.state.initializing,
           label: vnode.state.initializing ? 'Connecting...' : app.chain.deferred
             ? 'Connect to chain' : m(ChainStatusIndicator),
@@ -591,15 +246,16 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
 const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {}> = {
   view: (vnode) => {
     const { useQuickSwitcher } = vnode.attrs;
+    const isCustom = app.isCustomDomain();
 
     return [
-      !app.isCustomDomain() && m(SidebarQuickSwitcher),
-      !useQuickSwitcher && m('.Sidebar', [
-        (app.chain) && m(OffchainNavigationModule),
-        (app.chain?.meta.chain.type !== ChainType.Offchain) && m(OnchainNavigationModule),
-        (app.chain) && m(ExternalLinksModule),
+      !isCustom && m(SidebarQuickSwitcher),
+      !useQuickSwitcher && app.chain && m(`.Sidebar${isCustom ? '.custom-domain' : ''}`, [
+        m(DiscussionSection),
+        m(GovernanceSection),
+        m(ExternalLinksModule),
         m('br'),
-        app.isLoggedIn() && (app.chain) && m(SubscriptionButton),
+        app.isLoggedIn() && app.chain && m('.subscription-button', m(SubscriptionButton)),
         app.chain && m(ChainStatusModule),
         app.isCustomDomain()
         && m('a', {
@@ -608,6 +264,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
             window.open('https://commonwealth.im/');
           },
         }),
+        m('.spacer', '')
       ]),
     ];
   },

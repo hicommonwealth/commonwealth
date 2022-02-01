@@ -4,7 +4,7 @@ import 'chai/register-should';
 import Web3 from 'web3';
 import BN from 'bn.js';
 import wallet from 'ethereumjs-wallet';
-import * as ethUtil from 'ethereumjs-util';
+import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { factory, formatFilename } from '../../shared/logging';
@@ -12,6 +12,7 @@ import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
 import { TokenBalanceProvider } from '../../server/util/tokenBalanceCache';
+import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -32,12 +33,10 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({ address, chain });
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
-    const msgHash = ethUtil.hashPersonalMessage(Buffer.from(token));
-    const sig = ethUtil.ecsign(
-      msgHash,
-      Buffer.from(keypair.getPrivateKey(), 'hex')
-    );
-    const signature = ethUtil.toRpcSig(sig.v, sig.r, sig.s);
+    const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
+    const data = constructTypedMessage(chain_id, token);
+    const privateKey = Buffer.from(keypair.getPrivateKey(), 'hex');
+    const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')

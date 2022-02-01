@@ -2,8 +2,6 @@ import m from 'mithril';
 import 'components/component_kit/component_listing.scss';
 import { notifySuccess } from 'controllers/app/notifications';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Icon,
   Icons,
   Input,
@@ -52,22 +50,14 @@ import {
   IconIntent,
   WebsiteIcon,
 } from './icons';
-import {
-  ButtonIntent,
-  ExternalLinkElement,
-  FaceliftButton,
-  FaceliftButtonGroup,
-  Justify,
-  LinkStyle,
-  FaceliftRadioGroup,
-  ButtonSize,
-  EngagementButton,
-  FaceliftGradientButton,
-  GradientType,
-} from './buttons';
-import { TextInput, TextInputStatus } from './forms';
-import { FaceliftCard } from './cards';
-import { stubTrue } from 'lodash';
+import { CWButton } from './cw_button';
+import { CWGradientButton } from './cw_gradient_button';
+import { CWButtonGroup } from './cw_button_group';
+import { CWExternalLink } from './cw_external_link';
+import { CWRadioGroup } from './cw_radio_group';
+import { CWEngagementButton } from './cw_engagement_button';
+import { CWCard } from './cw_card';
+import { CWTextInput, ValidationStatus } from './cw_text_input';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -243,60 +233,52 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 500px;',
         },
         [
-          m(FaceliftButton, {
-            intent: ButtonIntent.Primary,
+          m(CWButton, {
             label: 'Primary',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: false,
           }),
-          m(FaceliftButton, {
-            intent: ButtonIntent.Primary,
+          m(CWButton, {
+            disabled: true,
             label: 'Disabled',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: true,
           }),
-          m(FaceliftButton, {
-            intent: ButtonIntent.Secondary,
+          m(CWButton, {
+            buttonType: 'secondary',
             label: 'Secondary',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: false,
           }),
-          m(FaceliftButton, {
-            intent: ButtonIntent.Secondary,
+          m(CWButton, {
+            buttonType: 'secondary',
+            disabled: true,
             label: 'Disabled',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: true,
           }),
-          m(FaceliftGradientButton, {
-            intent: ButtonIntent.Primary,
+          m(CWGradientButton, {
             label: 'Primary',
             onclick: () => notifySuccess('Button clicked!'),
-            disabled: false,
-            gradient: GradientType.RAINBOW
           }),
         ]
       ),
       m('.button-gallery', [
-        m(FaceliftButtonGroup, {
-          secondaryLabel: 'Button',
-          primaryLabel: 'Group',
-          primaryOnClick: () => notifySuccess('Primary clicked!'),
-          secondaryOnClick: () => notifySuccess('Secondary clicked!'),
-          justify: Justify.Left,
-        }),
-        m(FaceliftButtonGroup, {
-          secondaryLabel: 'Center',
-          primaryLabel: 'Justified',
-          primaryOnClick: () => notifySuccess('Primary clicked!'),
-          secondaryOnClick: () => notifySuccess('Secondary clicked!'),
-          justify: Justify.Center,
-        }),
-        m(FaceliftButtonGroup, {
-          secondaryLabel: 'Right',
-          primaryLabel: 'Justified',
-          primaryOnClick: () => notifySuccess('Primary clicked!'),
-          secondaryOnClick: () => notifySuccess('Secondary clicked!'),
-          justify: Justify.Right,
+        m(CWButtonGroup, {
+          children: [
+            m(CWButton, {
+              label: 'One',
+              onclick: () => notifySuccess('One clicked!'),
+            }),
+            m(CWButton, {
+              label: 'Two',
+              onclick: () => notifySuccess('Two clicked!'),
+            }),
+            m(CWButton, {
+              label: 'Three',
+              onclick: () => notifySuccess('Three clicked!'),
+            }),
+            m(CWButton, {
+              label: 'Four',
+              onclick: () => notifySuccess('Four clicked!'),
+            }),
+          ],
         }),
       ]),
       m(
@@ -305,15 +287,15 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 420px;',
         },
         [
-          m(ExternalLinkElement, {
+          m(CWExternalLink, {
             label: 'Button external link',
             target: 'https://edgewa.re/',
-            style: LinkStyle.Button,
+            linkType: 'button',
           }),
-          m(ExternalLinkElement, {
+          m(CWExternalLink, {
             label: 'Inline external link',
             target: 'https://edgewa.re/',
-            style: LinkStyle.Inline,
+            linkType: 'inline',
           }),
         ]
       ),
@@ -323,7 +305,7 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 420px;',
         },
         [
-          m(FaceliftRadioGroup, {
+          m(CWRadioGroup, {
             values: ['This', 'Is', 'A', 'Radio', 'Group'],
             labels: ['This', 'Is', 'A', 'Radio', 'Group'],
             defaultValue: 'This',
@@ -338,24 +320,24 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 600px;',
         },
         [
-          m(EngagementButton, {
-            size: ButtonSize.SM,
+          m(CWEngagementButton, {
+            buttonSize: 'sm',
             label: 'Small',
             onclick: () => notifySuccess('Button clicked!'),
           }),
-          m(EngagementButton, {
-            size: ButtonSize.LG,
+          m(CWEngagementButton, {
+            buttonSize: 'lg',
             label: 'Big',
             onclick: () => notifySuccess('Button clicked!'),
           }),
-          m(EngagementButton, {
-            size: ButtonSize.SM,
+          m(CWEngagementButton, {
+            buttonSize: 'sm',
             label: 'Small',
             disabled: true,
             onclick: () => notifySuccess('Button clicked!'),
           }),
-          m(EngagementButton, {
-            size: ButtonSize.LG,
+          m(CWEngagementButton, {
+            buttonSize: 'lg',
             label: 'Big',
             disabled: true,
             onclick: () => notifySuccess('Button clicked!'),
@@ -363,70 +345,85 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         ]
       ),
       m('h1', 'Cards'),
-      m('.card-gallery', 
+      m('.card-gallery', [
+        m(
+          CWCard,
+          {
+            elevation: 'elevation-1',
+            interactive: true,
+            onclick: () => notifySuccess('Card clicked!'),
+          },
+          [m('h4', 'Card title'), m('div', 'Elevation: 1')]
+        ),
+        m(
+          CWCard,
+          {
+            elevation: 'elevation-2',
+            interactive: true,
+            onclick: () => notifySuccess('Card clicked!'),
+          },
+          [m('h4', 'Card title'), m('div', 'Elevation: 2')]
+        ),
+        m(
+          CWCard,
+          {
+            elevation: 'elevation-3',
+            interactive: true,
+            onclick: () => notifySuccess('Card clicked!'),
+          },
+          [m('h4', 'Card title'), m('div', 'Elevation: 3')]
+        ),
+      ]),
+      m(
+        CWCard,
+        {
+          elevation: 'elevation-1',
+          interactive: true,
+          fullWidth: true,
+        },
+        [m('h4', 'Card title'), m('div', 'Full width')]
+      ),
+      m(
+        CWCard,
+        {
+          elevation: 'elevation-1',
+          interactive: true,
+          className: 'form-card',
+        },
         [
-          m(FaceliftCard, {
-            elevation: 1,
-            interactive: true,
-            fluid: false,
-            onclick: () => notifySuccess('Card clicked!'),
-          }, [m('h4', 'Card title'), m('div', 'Elevation: 1')]),
-          m(FaceliftCard, {
-            elevation: 2,
-            interactive: true,
-            fluid: false,
-            onclick: () => notifySuccess('Card clicked!'),
-          }, [m('h4', 'Card title'), m('div', 'Elevation: 2')]),
-          m(FaceliftCard, {
-            elevation: 3,
-            interactive: true,
-            fluid: false,
-            onclick: () => notifySuccess('Card clicked!'),
-          }, [m('h4', 'Card title'), m('div', 'Elevation: 3')]),
+          m(Form, { gutter: 15 }, [
+            m(FormGroup, [
+              m(FormLabel, { for: 'name' }, 'Name'),
+              m(Input, {
+                id: 'name',
+                name: 'name',
+                placeholder: 'Name...',
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, { for: 'bio' }, 'Bio'),
+              m(TextArea, {
+                id: 'bio',
+                name: 'bio',
+                placeholder: 'Bio...',
+              }),
+            ]),
+            m(FormGroup, [
+              m(FormLabel, { for: 'privacy' }, 'Privacy'),
+              m(RadioGroup, {
+                options: ['Public', 'Private'],
+                name: 'privacy',
+                onchange: (e) => {
+                  vnode.state.radioGroupSelected = (
+                    e.currentTarget as HTMLInputElement
+                  ).value;
+                },
+                value: vnode.state.radioGroupSelected,
+              }),
+            ]),
+          ]),
         ]
       ),
-      m(FaceliftCard, {
-        elevation: 1,
-        interactive: true,
-        fluid: true,
-      }, [m('h4', 'Card title'), m('div', 'Fluid: true')]),
-      m(FaceliftCard, {
-        elevation: 1,
-        interactive: true,
-        class_name: '.form-card'
-      }, [
-        m(Form, { gutter: 15 }, [
-          m(FormGroup, [
-            m(FormLabel, { for: 'name' }, 'Name'),
-            m(Input, {
-              id: 'name',
-              name: 'name',
-              placeholder: 'Name...',
-            }),
-          ]),
-          m(FormGroup, [
-            m(FormLabel, { for: 'bio' }, 'Bio'),
-            m(TextArea, {
-              id: 'bio',
-              name: 'bio',
-              placeholder: 'Bio...',
-            }),
-          ]),
-          m(FormGroup, [
-            m(FormLabel, { for: 'privacy' }, 'Privacy'),
-            m(RadioGroup, {
-              options: ['Public', 'Private'],
-              name: 'privacy',
-              onchange: (e) => {
-                vnode.state.radioGroupSelected = (
-                  e.currentTarget as HTMLInputElement
-                ).value;
-              },
-              value: vnode.state.radioGroupSelected,
-            }),
-          ]),
-        ]),
-      ]),
       m('h1', 'Form Fields'),
       m(
         '.form-gallery',
@@ -434,22 +431,20 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
           style: 'max-width: 600px;',
         },
         [
-          m(TextInput, {
+          m(CWTextInput, {
             name: 'Form field',
-            oninput: (e) => null,
-            inputValidationFn: (val: string): [TextInputStatus, string] => {
+            inputValidationFn: (val: string): [ValidationStatus, string] => {
               if (val.match(/[^A-Za-z]/)) {
-                return [TextInputStatus.Error, 'Must enter characters A-Z'];
+                return [ValidationStatus.Failure, 'Must enter characters A-Z'];
               } else {
-                return [TextInputStatus.Validate, 'Input validated'];
+                return [ValidationStatus.Success, 'Input validated'];
               }
             },
             label: 'This input only accepts A-Z',
             placeholder: 'Placeholder',
           }),
-          m(TextInput, {
+          m(CWTextInput, {
             name: 'Text field',
-            oninput: (e) => null,
             label: 'No status message or error validation',
             placeholder: 'Placeholder',
           }),
