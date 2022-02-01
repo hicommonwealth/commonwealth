@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import 'pages/notificationsList.scss';
+import 'pages/notifications_page.scss';
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
@@ -34,7 +34,7 @@ const NotificationsPage: m.Component<{}> = {
     const sortedNotifications = sortNotifications(notifications).reverse();
 
     return m(Sublayout, {
-      class: 'NotificationsListPage',
+      class: 'NotificationsPage',
       title: [
         'Notifications ',
         m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })

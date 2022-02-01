@@ -214,6 +214,20 @@ export async function getScore(space: SnapshotSpace, address: string) {
 
 /* Single Choice Voting */
 
+// Returns the total amount of the results
+export function sumOfResultsBalance(votes: SnapshotProposalVote[]) {
+  return votes.reduce((a, b: any) => a + b.power, 0);
+}
+
+//  Returns an array with the results for each choice
+export function resultsByVoteBalance(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {
+  return proposal.choices.map((choice, i) =>
+    votes
+      .filter((vote: any) => vote.choice === i + 1)
+      .reduce((a, b: any) => a + b.power, 0)
+  );
+}
+
 export async function getResults(space: SnapshotSpace, proposal: SnapshotProposal) {
   const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
   try {
@@ -222,7 +236,6 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
     // const voters = votes.map(vote => vote.voter);
     // const provider = Snapshot.utils.getProvider(space.network);
     const strategies = space.strategies;
-
     if (proposal.state !== 'pending') {
       const scores = await Snapshot.utils.getScores(
         space.id,
@@ -245,9 +258,12 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
     }
 
     /* Get results */
-    const results = {
+    const results = proposal.scores_total ? {
       resultsByVoteBalance: proposal.scores,
       sumOfResultsBalance: proposal.scores_total,
+    } : {
+      resultsByVoteBalance: resultsByVoteBalance(proposal, votes),
+      sumOfResultsBalance: sumOfResultsBalance(votes),
     };
 
     return { votes, results };

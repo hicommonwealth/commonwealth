@@ -533,8 +533,8 @@ Promise.all([
       '/':                       importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/search':                 importRoute('views/pages/search', { scoped: false, deferChain: true }),
       // Notifications
-      '/notifications':          importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
-      '/notificationsList':      importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
+      '/notification-settings':  importRoute('views/pages/notification_settings', { scoped: true, deferChain: true }),
+      '/notifications':          importRoute('views/pages/notifications_page', { scoped: true, deferChain: true }),
       // CMN
       '/projects':               importRoute('views/pages/commonwealth/projects', { scoped: true }),
       '/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),
@@ -592,7 +592,7 @@ Promise.all([
 
       // Redirects
       '/:scope/notifications':      redirectRoute(() => '/notifications'),
-      '/:scope/notificationsList':  redirectRoute(() => '/notificationsList'),
+      '/:scope/notification-settings':  redirectRoute(() => '/notification-settings'),
       '/:scope/projects':           redirectRoute(() => '/projects'),
       '/:scope/backers':            redirectRoute(() => '/backers'),
       '/:scope/collectives':        redirectRoute(() => '/collectives'),
@@ -651,10 +651,10 @@ Promise.all([
       '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
       '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
       // Notifications
+      '/:scope/notifications':     importRoute('views/pages/notifications_page', { scoped: true, deferChain: true }),
       '/notifications':            redirectRoute(() => '/edgeware/notifications'),
-      '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
-      '/notificationsList':        redirectRoute(() => '/edgeware/notificationsList'),
-      '/:scope/notificationsList': importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
+      '/:scope/notification-settings': importRoute('views/pages/notification_settings', { scoped: true, deferChain: true }),
+      '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
       // CMN
       '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
       '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
