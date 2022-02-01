@@ -10,7 +10,7 @@
   height: 40px;
   font-weight: 500;
 
-  .Icon {
+  svg {
     margin-right: 12px;
   }
 
@@ -24,8 +24,8 @@
     border: 1px solid $dark-purp;
     box-shadow: 0px 2px 6px 0px #0000001a;
 
-    .Icon path {
-      stroke: $dark-purp;
+    svg {
+      color: $dark-purp;
     }
   }
 
@@ -48,8 +48,8 @@
       background: $white;
       box-shadow: none;
 
-      .Icon path {
-        stroke: $disable-gray;
+      svg {
+        color: $disable-gray;
       }
     }
   }

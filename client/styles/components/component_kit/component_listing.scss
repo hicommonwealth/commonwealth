@@ -4,9 +4,11 @@
   > * {
     margin: 20px;
   }
+
   > .gallery > * {
     margin-right: 20px;
   }
+
   .hex-listing,
   .gradient-listing {
     display: flex;
@@ -26,12 +28,15 @@
         max-height: 10px;
         border-radius: 5px;
       }
+
       .rainbow-gradient-horizontal {
         @include rainbow-gradient-horizontal;
       }
+
       .rainbow-gradient-diagonal {
         @include rainbow-gradient-diagonal;
       }
+
       .shadow-gradient {
         @include shadow-gradient;
       }
@@ -40,20 +45,26 @@
       max-width: 400px;
     }
   }
-  .icon-listing {
+
+  .icon-gallery {
+    align-items: center;
     display: flex;
-    .icon-gallery {
+    flex-direction: column;
+    height: 150px;
+    justify-content: space-between;
+    width: 250px;
+
+    .icon-row {
+      align-items: center;
       display: flex;
-      flex-direction: column;
-      width: 200px;
-      margin-right: 40px;
-      .icon-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-      }
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+      height: 50px;
+      line-height: 1;
     }
   }
+
   .card-gallery,
   .button-gallery {
     display: flex;

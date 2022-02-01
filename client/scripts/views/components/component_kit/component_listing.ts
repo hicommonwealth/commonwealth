@@ -27,35 +27,13 @@ import {
   TabItem,
   Table,
 } from 'construct-ui';
-import {
-  ArrowDownIcon,
-  ArrowRightIcon,
-  LikesIcon,
-  ReplyIcon,
-  ViewsIcon,
-  ShareIcon,
-  AccountIcon,
-  CopyIcon,
-  CreateIcon,
-  NotificationIcon,
-  XIcon,
-  SearchIcon,
-  ElementIcon,
-  DiscordIcon,
-  TelegramIcon,
-  GithubIcon,
-  IconSize,
-  ExternalLinkIcon,
-  PinIcon,
-  IconIntent,
-  WebsiteIcon,
-} from './icons';
 import { CWButton } from './cw_button';
 import { CWGradientButton } from './cw_gradient_button';
 import { CWButtonGroup } from './cw_button_group';
 import { CWExternalLink } from './cw_external_link';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
+import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
 
@@ -75,15 +53,6 @@ const displayGradients = (gradientNames: string[]) => {
       m('.gradient-sample', { class: gradient }),
     ]);
   });
-};
-
-const displayIcons = (headerText: string, iconList) => {
-  return m('.icon-gallery', [
-    m('h2', headerText),
-    Object.entries(iconList).map(([k, v]) => {
-      return m('.icon-row', [m('.icon-name', k), v]);
-    }),
-  ]);
 };
 
 const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
@@ -125,106 +94,58 @@ const ComponentListing: m.Component<{}, { radioGroupSelected; activeTab }> = {
         ])
       ),
       m('h1', 'Redesign Icons'),
-      m('.icon-listing', [
-        displayIcons('14x14', {
-          ArrowDownIcon: m(ArrowDownIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: false,
-          }),
-          ArrowRightIcon: m(ArrowRightIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: false,
-          }),
-          ViewsIcon: m(ViewsIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: true,
-          }),
-          LikesIcon: m(LikesIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: true,
-          }),
-          ReplyIcon: m(ReplyIcon, {
-            size: IconSize.SM,
-            intent: IconIntent.Secondary,
-            disabled: true,
-          }),
-          ExternalLinkIcon: m(ExternalLinkIcon, {
-            size: IconSize.SM,
-          }),
-        }),
-        // search, pin, create, notification, account
-        displayIcons('20x20', {
-          ShareIcon: m(ShareIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          SubscribeIcon: m(NotificationIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          CreateIcon: m(CreateIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          LikesIcon: m(LikesIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          ReplyIcon: m(ReplyIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          SearchIcon: m(SearchIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Secondary,
-          }),
-          PinIcon: m(PinIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Secondary,
-          }),
-          NotificationIcon: m(NotificationIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          AccountIcon: m(AccountIcon, {
-            size: IconSize.MD,
-            intent: IconIntent.Primary,
-          }),
-          // FilterIcon: m(FilterIcon),
-        }),
-        displayIcons('28x28', {
-          CopyIcon: m(CopyIcon, {
-            size: IconSize.LG,
-            intent: IconIntent.Secondary,
-          }),
-          XIcon: m(XIcon, {
-            size: IconSize.LG,
-            intent: IconIntent.Secondary,
-          }),
-          AccountIcon: m(AccountIcon, {
-            size: IconSize.LG,
-            intent: IconIntent.Primary,
-          }),
-          // ReplyIcon: m(ReplyIcon, {
-          //   size: IconSize.LG,
-          //   intent: IconIntent.Primary,
-          // }),
-          NotificationIcon: m(NotificationIcon, {
-            size: IconSize.LG,
-            intent: IconIntent.Primary,
-          }),
-        }),
-        displayIcons('Social', {
-          ElementIcon: m(ElementIcon),
-          DiscordIcon: m(DiscordIcon),
-          TelegramIcon: m(TelegramIcon),
-          GithubIcon: m(GithubIcon),
-          WebsiteIcon: m(WebsiteIcon),
-        }),
+      m('.icon-gallery', [
+        [
+          m(
+            '.icon-row',
+            'Primary Small',
+            m(CWIcon, {
+              iconName: 'views',
+              iconSize: 'small',
+            })
+          ),
+        ],
+        [
+          m(
+            '.icon-row',
+            'Primary Medium',
+            m(CWIcon, {
+              iconName: 'views',
+            })
+          ),
+        ],
+        [
+          m(
+            '.icon-row',
+            'Primary Large',
+            m(CWIcon, {
+              iconName: 'views',
+              iconSize: 'large',
+            })
+          ),
+        ],
+        [
+          m(
+            '.icon-row',
+            'Secondary Large',
+            m(CWIcon, {
+              iconName: 'views',
+              iconSize: 'large',
+              iconType: 'secondary',
+            })
+          ),
+        ],
+        [
+          m(
+            '.icon-row',
+            'Disabled Large',
+            m(CWIcon, {
+              iconName: 'views',
+              iconSize: 'large',
+              disabled: true,
+            })
+          ),
+        ],
       ]),
       m('h1', 'Redesign Buttons'),
       m(
