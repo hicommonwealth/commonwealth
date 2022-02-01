@@ -3,8 +3,8 @@
 import m from 'mithril';
 import 'components/component_kit/cw_external_link.scss';
 
-import { ExternalLinkIcon } from './icons';
 import { ComponentType } from './types';
+import { CWIcon } from './cw_icons/cw_icon';
 
 export type LinkType = 'button' | 'inline';
 
@@ -15,8 +15,8 @@ type ExternalLinkAttrs = {
 };
 
 // TODO: Graham 11/17/21 - Synchronize/reconcile against Mithril internal/external link helpers
-export const CWExternalLink: m.Component<ExternalLinkAttrs> = {
-  view: (vnode) => {
+export class CWExternalLink implements m.ClassComponent<ExternalLinkAttrs> {
+  view(vnode) {
     const { label, target, linkType } = vnode.attrs;
     return (
       <a
@@ -26,8 +26,8 @@ export const CWExternalLink: m.Component<ExternalLinkAttrs> = {
         rel="noopener noreferrer"
       >
         <span>{label}</span>
-        {m(ExternalLinkIcon)}
+        <CWIcon iconName="external-link" />
       </a>
     );
-  },
-};
+  }
+}

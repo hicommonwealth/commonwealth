@@ -1,0 +1,48 @@
+@import 'client/styles/facelift';
+
+svg {
+  flex-shrink: 0;
+  height: 1em;
+  stroke: currentColor;
+  width: 1em;
+
+  &.small {
+    font-size: 14px;
+  }
+
+  &.medium {
+    font-size: 20px;
+  }
+
+  &.large {
+    font-size: 28px;
+  }
+
+  &.primary {
+    color: $black;
+  }
+
+  &.primary:hover {
+    color: $dark-purp;
+
+    &.disabled {
+      color: $disable-gray;
+    }
+  }
+
+  &.secondary {
+    color: $lite-gray;
+  }
+
+  &.secondary:hover {
+    color: $black;
+
+    &.disabled {
+      color: $disable-gray;
+    }
+  }
+
+  &.disabled {
+    color: $disable-gray;
+  }
+}
