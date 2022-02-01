@@ -7,71 +7,14 @@ import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons, Spinner } from 'const
 
 import app from 'state';
 import { pluralize } from 'helpers';
-import { NodeInfo } from 'models';
+import { NodeInfo, Notification } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 import UserDashboardRow from 'views/components/user_dashboard_row';
 import { ChainIcon } from 'views/components/chain_icon';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-// import StaticLandingPage from './landing/landing_page';
+import DashboardExplorePreview from '../components/dashboard_explore_preview';
 
-const getNewTag = (labelCount = null) => {
-  const label = labelCount === null ? 'New' : `${labelCount} new`;
-  return m('span.chain-new', [
-    m(Tag, {
-      label,
-      size: 'xs',
-      rounded: true,
-      intent: 'primary',
-      style: 'margin-top: -3px; margin-left: 10px;',
-    })
-  ]);
-};
-
-const ChainCard : m.Component<{ chain: string, nodeList: NodeInfo[] }> = {
-  view: (vnode) => {
-    const { chain, nodeList } = vnode.attrs;
-    const { unseenPosts } = app.user;
-    const chainInfo = app.config.chains.getById(chain);
-    const visitedChain = !!unseenPosts[chain];
-    const updatedThreads = unseenPosts[chain]?.activePosts || 0;
-    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(chain);
-
-    return m(Card, {
-      class: 'home-card',
-      onclick: (e) => {
-        e.preventDefault();
-        localStorage['home-scrollY'] = window.scrollY;
-        m.route.set(`/${chain}`);
-      },
-    }, [
-      m('.card-top', [
-        m(ChainIcon, { chain: nodeList[0].chain }),
-        m('h3', chainInfo.name),
-      ]),
-      m('.card-bottom', [
-        m('p.card-description', chainInfo.description),
-        // if no recently active threads, hide this module altogether
-        m('.recent-activity', !!monthlyThreadCount && [
-          m('span.recent-threads', monthlyThreadCount > 20 ? [
-            pluralize(Math.floor(monthlyThreadCount / 5), 'thread'),
-            ' this week',
-          ] : [
-            pluralize(monthlyThreadCount, 'thread'),
-            ' this month',
-          ]),
-          app.user.isMember({
-            account: app.user.activeAccount,
-            chain,
-          }) && [
-            app.isLoggedIn() && !visitedChain && getNewTag(),
-            updatedThreads > 0 && getNewTag(updatedThreads),
-          ],
-        ])
-      ]),
-    ]);
-  }
-};
 
 const fetchActivity = async () => {
   const activity = await $.post(`${app.serverUrl()}/viewActivity`, {
@@ -90,71 +33,59 @@ export enum DashboardViews {
   Chain = 'chain',
 }
 
+/**
+ * Important Note:
+ * 
+ * The User Dashboard is currently displaying content that might be informally labeled "Activity"- comments,
+ * reactions, replies, etc. that occur within any community in which the logged in user is a member, regardless
+ * of whether they are directly implicated in any of that activity. These are queried using the
+ * /viewActivity route that has been added as part of this PR. This differs from the notion of "Notification" as 
+ * originally defined in scripts/models/Notification.ts- as events that relate to content interactions with the
+ * logged in user (i.e. a reply to the user's comment, a like on their thread, etc). The original intention was 
+ * that a user is subscribed to these notifications (hence the "subscription" field in the Notification class)
+ * and they can be queried using the /viewNotifications route.
+ * 
+ * In order to make this component compatible with the updates to our notifications system, we are forced to
+ * use the Notifications class here to represent the "Activity" concept discussed above. As a result, the 
+ * previously required "subscription", and "_isRead" fields have been set to optional in Notifications.ts. 
+ * When the type "Notification" is used in this file and in user_dashboard_row.ts, read conceptually as 
+ * "Activity", not "Activity that directly involves the logged in user". 
+ * 
+ * Note that nowhere else should the Notification class be used in this way; the subscription and _isRead fields
+ * should be included in all other instantiations.  
+ */
+
 const UserDashboard: m.Component<{}, {
   count: number;
   activeTab: DashboardViews;
   onscroll;
+  notifications: Notification[];
 }> = {
   oncreate: (vnode) => {
     vnode.state.count = 10;
   },
-  oninit: (vnode) => {
-    console.log("initing")
-    
-  },
   view: (vnode) => {
-    if (!app.isLoggedIn()) {
-      // return m(StaticLandingPage);
+    // Load activity
+    if (!vnode.state.notifications) {
+      fetchActivity().then((activity) => {
+        vnode.state.notifications = activity.result.map((notification) => Notification.fromJSON(notification, null));
+      });
+      m.redraw();
+      return m(PageLoading, {
+        title: [
+          'Notifications ',
+          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+        ],
+      })
     }
+
     if (!vnode.state.activeTab) {
       vnode.state.activeTab = DashboardViews.Latest;
     }
-    const { activeTab } = vnode.state;
-    // const activeEntity = app.community ? app.community : app.chain;
-    const activeEntity = 'edgeware';
-    if (!activeEntity) return m(PageLoading, {
-      title: [
-        'Notifications ',
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-      ],
-    });
-
-    const notifications = app.user.notifications?.notifications || [];
-    const sortedNotifications = sortNotifications(notifications).reverse();
-
-    fetchActivity().then((activity) => {
-      console.log("Activity:", activity)
-    });
-
-    const chains = {};
-    app.config.nodes.getAll().forEach((n) => {
-      if (chains[n.chain.id]) {
-        chains[n.chain.id].push(n);
-      } else {
-        chains[n.chain.id] = [n];
-      }
-    });
-
-    const myChains: any = Object.entries(chains);
-
-    const sortChainsAndCommunities = (list) => list.sort((a, b) => {
-      const threadCountA = app.recentActivity.getCommunityThreadCount(Array.isArray(a) ? a[0] : a.id);
-      const threadCountB = app.recentActivity.getCommunityThreadCount(Array.isArray(b) ? b[0] : b.id);
-      return (threadCountB - threadCountA);
-    }).map((entity) => {
-      if (Array.isArray(entity)) {
-        const [chain, nodeList]: [string, any] = entity as any;
-        return  m(ChainCard, { chain, nodeList });
-      } 
-      return null;
-    });
-
-    const sortedChainsAndCommunities = sortChainsAndCommunities(
-      myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
-    );
+    const { activeTab, notifications } = vnode.state;
 
     vnode.state.onscroll = _.debounce(async () => {
-      if (!notificationsRemaining(sortedNotifications.length, vnode.state.count)) return;
+      if (!notificationsRemaining(notifications.length, vnode.state.count)) return;
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
       if (scrollPos > (scrollHeight - 400)) {
@@ -191,13 +122,6 @@ const UserDashboard: m.Component<{}, {
               },
             }),
             m(TabItem, {
-              label: capitalize(DashboardViews.Trending),
-              active: activeTab === DashboardViews.Trending,
-              onclick: () => {
-                vnode.state.activeTab = DashboardViews.Trending;
-              },
-            }),
-            m(TabItem, {
               label: capitalize(DashboardViews.Chain),
               active: activeTab === DashboardViews.Chain,
               onclick: () => {
@@ -206,22 +130,12 @@ const UserDashboard: m.Component<{}, {
             }),
           ]),
           m('.dashboard-row-wrap', [
-            // sortedNotifications.length > 0
-            //   ? m(Infinite, {
-            //     maxPages: 1, // prevents rollover/repeat
-            //     key: sortedNotifications.length,
-            //     pageData: () => sortedNotifications,
-            //     item: (data, opts, index) => {
-            //       return m(UserDashboardRow, { notifications: data, onListPage: true, });
-            //     },
-            //   })
-            //   : m('.no-notifications', 'No Notifications'),
-            sortedNotifications.length > 0
+            notifications && notifications.length > 0
             ? [
-              sortedNotifications.slice(0, vnode.state.count).map((data) => {
-                return m(UserDashboardRow, { notifications: data, onListPage: true, });
+              notifications.slice(0, vnode.state.count).map((data) => {
+                return m(UserDashboardRow, { notification: data, onListPage: true, });
               }),
-              notificationsRemaining(sortedNotifications.length, vnode.state.count)
+              notificationsRemaining(notifications.length, vnode.state.count)
               ? m('.infinite-scroll-spinner-wrap .text-center', [
                 m(Spinner, { active: true })
               ])
@@ -230,25 +144,7 @@ const UserDashboard: m.Component<{}, {
             : m('.no-notifications', 'No Notifications'),
           ])
         ]),
-        m(Col, { span: { md: 3 }, class:'expore-communities-col' }, [
-          m('.title', 'Explore Communities'),
-          m('.communities-list', [
-            sortedChainsAndCommunities.length > 3 ? sortedChainsAndCommunities.slice(0, 3) : sortedChainsAndCommunities,
-            m('.clear'),
-          ]),
-          m('a',{
-            class:'link',
-            onclick: () => {
-              m.route.set('/communities');
-              m.redraw();
-            }
-          }, [
-            'View more communities',
-            m(Icon, {
-              name: Icons.EXTERNAL_LINK,
-            })
-          ]),
-        ])
+        m(DashboardExplorePreview)
       ]),
     ]);
   }

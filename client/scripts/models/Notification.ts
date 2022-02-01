@@ -7,19 +7,21 @@ class Notification {
   public readonly id: number;
   public readonly data: string;
   public readonly createdAt: moment.Moment;
-  public readonly subscription: NotificationSubscription;
+  public readonly categoryId?: string;
+  public readonly subscription?: NotificationSubscription;
   public readonly chainEvent?: ChainEvent;
 
-  private _isRead: boolean;
+  private _isRead?: boolean;
   public get isRead(): boolean {
     return this._isRead;
   }
 
-  constructor(id, data, isRead, createdAt, subscription, chainEvent?) {
+  constructor(id, data, isRead, createdAt, categoryId, subscription, chainEvent?) {
     this.id = id;
     this.data = data;
     this._isRead = !!isRead;
     this.createdAt = moment(createdAt);
+    this.categoryId = categoryId;
     this.subscription = subscription;
     this.chainEvent = chainEvent;
   }
@@ -38,6 +40,7 @@ class Notification {
       json.notification_data,
       json.is_read,
       json.created_at,
+      json.category_id,
       subscription,
       json.Notification?.ChainEvent ? ChainEvent.fromJSON(json.Notification.ChainEvent, chainEventType) : undefined
     );

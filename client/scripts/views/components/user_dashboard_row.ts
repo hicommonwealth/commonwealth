@@ -204,6 +204,8 @@ const getBatchNotificationFields = (
     return getNotificationFields(category, data[0]);
   }
 
+  console.log("wtf:", data)
+
   const {
     created_at,
     root_id,
@@ -345,7 +347,7 @@ const getBatchNotificationFields = (
 
 const UserDashboardRow: m.Component<
   {
-    notifications: Notification[];
+    notification: Notification;
     onListPage?: boolean;
   },
   {
@@ -356,19 +358,22 @@ const UserDashboardRow: m.Component<
     markingRead: boolean;
   }
 > = {
-  oncreate: (vnode) => {
+  oncreate: (vnode) => { 
     if (
       m.route.param('id') &&
       vnode.attrs.onListPage &&
-      m.route.param('id') === vnode.attrs.notifications[0].id.toString()
+      m.route.param('id') === vnode.attrs.notification.id.toString()
     ) {
       vnode.state.scrollOrStop = true;
     }
   },
   view: (vnode) => {
-    const { notifications } = vnode.attrs;
-    const notification = notifications[0];
-    const { category } = notifications[0].subscription;
+    const { notification } = vnode.attrs;
+    let category = null;
+    if (notification.categoryId) {
+      category = notification.categoryId;
+    }
+    
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
@@ -476,9 +481,7 @@ const UserDashboardRow: m.Component<
         () => m.redraw.sync()
       );
     } else {
-      const notificationData = notifications.map((notif) =>
-        typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data
-      );
+      const notificationData = JSON.parse(notification.data);
       let {
         authorInfo,
         createdAt,
@@ -489,7 +492,7 @@ const UserDashboardRow: m.Component<
         viewCount,
         likeCount,
         commentCount,
-      } = getBatchNotificationFields(category, notificationData);
+      } = getBatchNotificationFields(category, [notificationData]);
 
       if (app.isCustomDomain()) {
         if (
@@ -628,7 +631,7 @@ const UserDashboardRow: m.Component<
           id: notification.id,
         },
         null,
-        () => app.user.notifications.markAsRead(notifications),
+        () => app.user.notifications.markAsRead([notification]),
         pageJump ? () => setTimeout(() => pageJump(), 1) : null
       );
     }
