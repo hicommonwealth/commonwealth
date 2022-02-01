@@ -243,6 +243,9 @@ export const ExternalLinksModule: m.Component<{}, {}> = {
       meta;
     if (!website && !discord && !telegram && !github) return;
 
+    // TODO Gabe 1/31/22 - The css here (and for the whole sidebar) needs to be extensively refactored,
+    // I hacked together a short term fix for now (the hover color change is a little wonky)
+
     return m('.ExternalLinksModule.SidebarModule', [
       discord &&
         m(Tooltip, {

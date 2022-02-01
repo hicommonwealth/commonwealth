@@ -18,8 +18,10 @@ type EngagementButtonAttrs = {
   onclick: (e?: MouseEvent) => void;
 } & EngagementButtonStyleAttrs;
 
-export const CWEngagementButton: m.Component<EngagementButtonAttrs> = {
-  view: (vnode) => {
+export class CWEngagementButton
+  implements m.ClassComponent<EngagementButtonAttrs>
+{
+  view(vnode) {
     const {
       label,
       onclick,
@@ -36,13 +38,11 @@ export const CWEngagementButton: m.Component<EngagementButtonAttrs> = {
           buttonSize,
         })}
         onclick={onclick}
+        disabled={disabled}
       >
-        {m(CWIcon, {
-          disabled,
-          iconName: 'create',
-        })}
+        <CWIcon disabled={disabled} iconName="create" />
         <span>{label}</span>
       </button>
     );
-  },
-};
+  }
+}

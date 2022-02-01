@@ -11,6 +11,7 @@
       text-align: left;
     }
   }
+
   .cui-button.cui-active {
     background: linear-gradient(
       268.91deg,
@@ -427,25 +428,23 @@
     svg {
       color: #2480cc;
       fill: currentColor;
+      left: -1px;
+      position: relative;
+      top: -3px;
     }
 
     &:hover {
       border-color: transparent;
+
+      svg {
+        color: white;
+        fill: currentColor;
+      }
     }
 
     .cui-button-label {
       flex: 1;
       text-align: left;
-    }
-
-    svg {
-      left: -1px;
-      position: relative;
-      top: -3px;
-
-      path {
-        stroke: currentColor;
-      }
     }
   }
 
@@ -456,24 +455,22 @@
     svg {
       color: #0cbd8b;
       fill: currentColor;
+      position: relative;
+      top: -4px;
     }
 
     &:hover {
       border-color: transparent;
+
+      svg {
+        color: white;
+        fill: currentColor;
+      }
     }
 
     .cui-button-label {
       flex: 1;
       text-align: left;
-    }
-
-    svg {
-      position: relative;
-      top: -4px;
-
-      path {
-        stroke: currentColor;
-      }
     }
   }
 
@@ -484,24 +481,22 @@
     svg {
       color: #677bc4;
       fill: currentColor;
+      position: relative;
+      top: -4px;
     }
 
     &:hover {
       border-color: transparent;
+
+      svg {
+        color: white;
+        fill: currentColor;
+      }
     }
 
     .cui-button-label {
       flex: 1;
       text-align: left;
-    }
-
-    svg {
-      position: relative;
-      top: -4px;
-
-      path {
-        fill: currentColor;
-      }
     }
   }
 
@@ -510,22 +505,23 @@
     border-color: tint(#222222, 70%);
     color: #222222;
 
+    svg {
+      color: #222222;
+      position: relative;
+      top: -4px;
+    }
+
     &:hover {
       border-color: transparent;
+
+      svg {
+        color: white;
+      }
     }
 
     .cui-button-label {
       flex: 1;
       text-align: left;
-    }
-
-    svg {
-      position: relative;
-      top: -3px;
-
-      path {
-        fill: currentColor;
-      }
     }
   }
 

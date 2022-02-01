@@ -15,8 +15,8 @@ type ExternalLinkAttrs = {
 };
 
 // TODO: Graham 11/17/21 - Synchronize/reconcile against Mithril internal/external link helpers
-export const CWExternalLink: m.Component<ExternalLinkAttrs> = {
-  view: (vnode) => {
+export class CWExternalLink implements m.ClassComponent<ExternalLinkAttrs> {
+  view(vnode) {
     const { label, target, linkType } = vnode.attrs;
     return (
       <a
@@ -26,10 +26,8 @@ export const CWExternalLink: m.Component<ExternalLinkAttrs> = {
         rel="noopener noreferrer"
       >
         <span>{label}</span>
-        {m(CWIcon, {
-          iconName: 'external-link',
-        })}
+        <CWIcon iconName="external-link" />
       </a>
     );
-  },
-};
+  }
+}
