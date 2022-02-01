@@ -38,8 +38,8 @@ const getCardClasses = (
     })
     .join(' ')}`;
 
-export const CWCard: m.Component<CardAttrs> = {
-  view: (vnode) => {
+export class CWCard implements m.ClassComponent<CardAttrs> {
+  view(vnode) {
     const {
       className,
       elevation,
@@ -67,5 +67,5 @@ export const CWCard: m.Component<CardAttrs> = {
         {vnode.children}
       </div>
     );
-  },
-};
+  }
+}

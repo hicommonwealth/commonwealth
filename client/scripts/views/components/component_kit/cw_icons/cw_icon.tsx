@@ -17,8 +17,8 @@ export type IconStyleAttrs = {
 
 export type IconAttrs = IconStyleAttrs & { iconName: IconName };
 
-export const CWIcon: m.Component<IconAttrs> = {
-  view: (vnode) => {
+export class CWIcon implements m.ClassComponent<IconAttrs> {
+  view(vnode) {
     const {
       disabled = false,
       iconName,
@@ -28,6 +28,6 @@ export const CWIcon: m.Component<IconAttrs> = {
 
     const Icon = iconLookup[iconName];
 
-    return m(Icon, { iconSize, iconType, disabled });
-  },
-};
+    return <Icon iconSize={iconSize} iconType={iconType} disabled={disabled} />;
+  }
+}
