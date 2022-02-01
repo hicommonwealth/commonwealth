@@ -1,480 +1,598 @@
 @import 'client/styles/shared';
 
 @mixin sidebar {
-    .OffchainNavigationModule {
-        button {
-            height: 100%;
-        }
-        button > span {
-            white-space: normal;
-            text-align: left;
-        }
+  .OffchainNavigationModule {
+    button {
+      height: 100%;
     }
-    .cui-button.cui-active {
-        background: linear-gradient(268.91deg, #91BFFF -61.91%, #91FFA0 2.69%, #FBFF91 60.22%, #FF9191 131.89%);
-        border: 1px solid transparent;
-    }
-    .cui-button.sub-button {
-        margin-left: 18px;
-        width: calc(100% - 18px);
-    }
-    .cui-button.cui-align-center {
-        justify-content: left;
-    }
-    .ExternalLinksModule {
-        margin-top: 10px;
-    }
-    .cui-button.website-button, .cui-button.github-button, .cui-button.telegram-button,
-    .cui-button.element-button, .cui-button.discord-button {
-        padding: 0 10px;
-        margin-right: 8px;
-        &:last-child {
-            margin-right: 0;
-        }
-    }
-    .cui-button.telegram-button {
-        border-color: tint(#2480cc, 70%);
-        color: #2480cc;
-        &:hover {
-            border-color: transparent;
-        }
-        .cui-button-label {
-            flex: 1;
-            text-align: left;
-        }
-        svg {
-            position: relative;
-            top: -3px;
-            left: -1px;
-            path {
-                stroke: currentColor;
-            }
-        }
-    }
-    .cui-button.element-button {
-        border-color: tint(#0cbd8b, 70%);
-        color: #0cbd8b;
-        &:hover {
-            border-color: transparent;
-        }
-        .cui-button-label {
-            flex: 1;
-            text-align: left;
-        }
-        svg {
-            position: relative;
-            top: -4px;
-            path {
-                stroke: currentColor;
-            }
-        }
-    }
-    .cui-button.discord-button {
-        border-color: tint(#677bc4, 70%);
-        color: #677bc4;
-        &:hover {
-            border-color: transparent;
-        }
-        .cui-button-label {
-            flex: 1;
-            text-align: left;
-        }
-        svg {
-            position: relative;
-            top: -4px;
-            path {
-                fill: currentColor;
-            }
-        }
-    }
-    .cui-button.website-button, .cui-button.github-button {
-        border-color: tint(#222222, 70%);
-        color: #222222;
-        &:hover {
-            border-color: transparent;
-        }
-        .cui-button-label {
-            flex: 1;
-            text-align: left;
-        }
-        svg {
-            position: relative;
-            top: -3px;
-            path {
-                fill: currentColor;
-            }
-        }
-    }
-    .SubscriptionButton {
-        margin-bottom: 10px;
-    }
-    .ChainStatusModule {
-        .chain-deferred {
-            color: $text-color-medium;
-        }
 
-        // form stuff
-        .form-group {
-            margin-bottom: 0;
-            select {
-                width: 100%;
-                border-color: $border-color-lightest;
-                border-radius: 2px;
-                padding: 5px 6px;
-            }
-            .chain-status-main {
-                width: calc(100% - 28px);
-            }
-        }
-        .cui-button-label {
-            text-align: left;
-            width: 100%;
-        }
-        .cui-icon svg {
-            min-width: 12px;
-            min-height: 12px;
-            width: 12px;
-            height: 12px;
-        }
+    button > span {
+      white-space: normal;
+      text-align: left;
     }
+  }
+  .cui-button.cui-active {
+    background: linear-gradient(
+      268.91deg,
+      #91bfff -61.91%,
+      #91ffa0 2.69%,
+      #fbff91 60.22%,
+      #ff9191 131.89%
+    );
+
+    border: 1px solid transparent;
+  }
+
+  .cui-button.sub-button {
+    margin-left: 18px;
+    width: calc(100% - 18px);
+  }
+
+  .cui-button.cui-align-center {
+    justify-content: left;
+  }
+
+  .ExternalLinksModule {
+    margin-top: 10px;
+  }
+
+  .cui-button.website-button,
+  .cui-button.github-button,
+  .cui-button.telegram-button,
+  .cui-button.element-button,
+  .cui-button.discord-button {
+    margin-right: 8px;
+    padding: 0 10px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .cui-button.telegram-button {
+    border-color: tint(#2480cc, 70%);
+    color: #2480cc;
+
+    &:hover {
+      border-color: transparent;
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    svg {
+      left: -1px;
+      position: relative;
+      top: -3px;
+
+      path {
+        stroke: currentColor;
+      }
+    }
+  }
+  .cui-button.element-button {
+    border-color: tint(#0cbd8b, 70%);
+    color: #0cbd8b;
+
+    &:hover {
+      border-color: transparent;
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    svg {
+      position: relative;
+      top: -4px;
+
+      path {
+        stroke: currentColor;
+      }
+    }
+  }
+
+  .cui-button.discord-button {
+    border-color: tint(#677bc4, 70%);
+    color: #677bc4;
+
+    &:hover {
+      border-color: transparent;
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    svg {
+      position: relative;
+      top: -4px;
+
+      path {
+        fill: currentColor;
+      }
+    }
+  }
+
+  .cui-button.website-button,
+  .cui-button.github-button {
+    border-color: tint(#222222, 70%);
+    color: #222222;
+
+    &:hover {
+      border-color: transparent;
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    svg {
+      position: relative;
+      top: -3px;
+
+      path {
+        fill: currentColor;
+      }
+    }
+  }
+  .SubscriptionButton {
+    margin-bottom: 10px;
+  }
+
+  .ChainStatusModule {
+    .chain-deferred {
+      color: $text-color-medium;
+    }
+
+    // form stuff
+    .form-group {
+      margin-bottom: 0;
+      select {
+        width: 100%;
+        border-color: $border-color-lightest;
+        border-radius: 2px;
+        padding: 5px 6px;
+      }
+      .chain-status-main {
+        width: calc(100% - 28px);
+      }
+    }
+    .cui-button-label {
+      text-align: left;
+      width: 100%;
+    }
+    .cui-icon svg {
+      min-width: 12px;
+      min-height: 12px;
+      width: 12px;
+      height: 12px;
+    }
+  }
 }
 
 .SidebarQuickSwitcher {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: $quick-switcher-width;
-    border-right: 1px solid $disable-grey;;
-    z-index: 11;
-    display: flex;
-    flex-direction: column;
-    @include sm-max {
-        display: none;
-    }
-    .community-nav-bar {
-        padding: 0 14px;
-    }
-    .scrollable-community-bar {
-        padding: 0 14px;
-        overflow-y: auto;
-    }
-    .scrollable-community-bar::-webkit-scrollbar {
-        width: 0;
-        background: transparent;
-    }
-    .sidebar-home-link.cui-button {
-        margin: 15px 0 14px;
-        height: 38px;
-        width: 38px;
-        padding: 0;
-        .cui-icon {
-            position: relative;
-            top: -2px;
-        }
-    }
-    .CommunitySelector {
-        margin: 0 0 14px;
-    }
-    .create-community {
-        margin: 0 0 14px;
-        height: 38px;
-        width: 38px;
-        padding: 0;
+  border-right: 1px solid $disable-grey;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: $quick-switcher-width;
+  z-index: 11;
 
-        .cui-icon {
-            position: relative;
-            top: -2px;
-        }
+  @include sm-max {
+    display: none;
+  }
+
+  .community-nav-bar {
+    padding: 0 14px;
+  }
+
+  .scrollable-community-bar {
+    overflow-y: auto;
+    padding: 0 14px;
+  }
+
+  .scrollable-community-bar::-webkit-scrollbar {
+    background: transparent;
+    width: 0;
+  }
+
+  .sidebar-home-link.cui-button {
+    height: 38px;
+    margin: 15px 0 14px;
+    padding: 0;
+    width: 38px;
+
+    .cui-icon {
+      position: relative;
+      top: -2px;
     }
-    .SidebarQuickSwitcherItem {
-        height: 38px;
-        width: 38px;
-        margin-bottom: 14px;
-        border: 1px solid transparent;
-        border-radius: 9999px;
-        &:hover {
-            border-color: #111;
-        }
+  }
+
+  .CommunitySelector {
+    margin: 0 0 14px;
+  }
+
+  .create-community {
+    height: 38px;
+    margin: 0 0 14px;
+    padding: 0;
+    width: 38px;
+
+    .cui-icon {
+      position: relative;
+      top: -2px;
     }
-    > .SidebarQuickSwitcherItem .ChainIcon,
-    > .SidebarQuickSwitcherItem .CommunityIcon {
-        cursor: pointer;
-        opacity: 0.33;
+  }
+
+  .SidebarQuickSwitcherItem {
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    height: 38px;
+    margin-bottom: 14px;
+    width: 38px;
+
+    &:hover {
+      border-color: #111;
     }
-    .cui-overlay-inline {
-        display: block;
+  }
+
+  > .SidebarQuickSwitcherItem .ChainIcon,
+  > .SidebarQuickSwitcherItem .CommunityIcon {
+    cursor: pointer;
+    opacity: 0.33;
+  }
+
+  .cui-overlay-inline {
+    display: block;
+  }
+
+  .quick-switcher-option.active {
+    .ChainIcon,
+    .CommunityIcon {
+      opacity: 1;
     }
-    .quick-switcher-option.active {
-        .ChainIcon, .CommunityIcon {
-            opacity: 1;
-        }
-    }
+  }
 }
 
 .SidebarQuickSwitcherItemTooltip.cui-popover {
-    .cui-popover-content {
-        padding: 11px 16px 4px;
-        white-space: nowrap;
-    }
+  .cui-popover-content {
+    padding: 11px 16px 4px;
+    white-space: nowrap;
+  }
 }
 
 .Sidebar {
-    max-height: 100%;
-    position: fixed;
-    top: $layout-padding + 47;
-    left: $quick-switcher-width;
-    z-index: 2;
-    padding-bottom: 36px;
-    min-width: $sidebar-width;
-    max-width: $sidebar-width;
-    min-height: 100vh;
-    background-color: $layout-color;
-    border-right-color: $disable-grey;
-    border-right-width: 1px;
+  max-height: 100%;
+  position: fixed;
+  top: $layout-padding + 47;
+  left: $quick-switcher-width;
+  z-index: 2;
+  padding-bottom: 36px;
+  min-width: $sidebar-width;
+  max-width: $sidebar-width;
+  min-height: 100vh;
+  background-color: $layout-color;
+  border-right-color: $disable-grey;
+  border-right-width: 1px;
+  overflow-y: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    /* Chrome */
+    display: none;
+  }
+
+  &.custom-domain {
+    left: 0;
+  }
+
+  .sidebar-content {
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    padding-bottom: 60px;
+    padding-top: 16px;
+  }
+
+  @include sm-max {
+    max-height: calc(100vh - 60px); // $mobile-header-height
     overflow-y: scroll;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    &::-webkit-scrollbar { /* Chrome */
-        display: none;
-    }
-    &.custom-domain {
-        left: 0;
-    }
-    .sidebar-content {
-        max-height: calc(100vh - 60px);
-        padding-top: 16px;
-        padding-bottom: 60px;
-        overflow-y: auto;
-    }
-    @include sm-max {
-        padding-top: 30px;
-        max-height: calc(100vh - 60px); // $mobile-header-height
-        overflow-y: scroll;
-        .SidebarHeader {
-            display: none;
-        }
-    }
-    .sidebar-fadeout {
-        display: none; // TODO
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 80px;
-        z-index: 4;
-        pointer-events: none;
-        background: -webkit-linear-gradient(
-            rgba(255, 255, 255, 0) 0%,
-            $background-color-light 100%
-        );
-        background-image: -moz-linear-gradient(
-            rgba(255, 255, 255, 0) 0%,
-            $background-color-light 100%
-        );
-        background-image: -o-linear-gradient(
-            rgba(255, 255, 255, 0) 0%,
-            $background-color-light 100%
-        );
-        background-image: linear-gradient(
-            rgba(255, 255, 255, 0) 0%,
-            $background-color-light 100%
-        );
-        background-image: -ms-linear-gradient(
-            rgba(255, 255, 255, 0) 0%,
-            $background-color-light 100%
-        );
-    }
+    padding-top: 30px;
+
     .SidebarHeader {
-        border-bottom: 1px solid $border-color-lightest;
-        .cui-button {
-            padding: 0;
-            width: 100%;
-            height: initial;
-            background: none !important;
-            > .cui-button-label {
-                padding: 0 19px;
-                width: 100%;
-                display: flex;
-                > .CommunityLabel {
-                    padding: 20px 0 18px;
-                    max-width: calc(100% - 18px);
-                }
-                > .CommunityLabel.CommunityLabelPlaceholder {
-                    padding: 22px 0;
-                    padding-left: 5px;
-                    font-weight: 500;
-                }
-                .cui-icon {
-                    margin-top: 25px;
-                    margin-left: 6px;
-                }
-            }
-        }
+      display: none;
     }
-    .sidebar-spacer {
-        margin-bottom: 22px;
-    }
-    .section-header {
-        font-size: 18px;
-        color: $text-color-light;
-        margin-top: 20px;
-        margin-bottom: 6px;
-    }
-    .cui-button {
-        margin-bottom: 4px;
-    }
-    .cui-button.cui-rounded:active,
-    .cui-button.cui-rounded.cui-active,
-    .cui-button.cui-rounded:hover {
-        background: linear-gradient(to left, #91FFA0, #FBFF91, #FF9191);
-        border-color: white;
+  }
 
-        // @TODO: Remove this and figure out a better solution
-        background: #6966FF;
-        color: white;
-    }
-    .ExternalLinksModule {
-        margin-top: 20px;
-        display: flex;
-        justify-content: center;
-    }
-    .cui-button.website-button, .cui-button.github-button, .cui-button.telegram-button,
-    .cui-button.element-button, .cui-button.discord-button {
-        padding: 0 10px;
-        margin-right: 8px;
-        &:last-child {
-            margin-right: 0;
-        }
-    }
-    .cui-button.telegram-button {
-        border-color: tint(#2480cc, 70%);
-        color: #2480cc;
-        &:hover {
-            border-color: transparent;
-        }
-        .cui-button-label {
-            flex: 1;
-            text-align: left;
-        }
-        svg {
-            position: relative;
-            top: -3px;
-            left: -1px;
-            path {
-                stroke: currentColor;
-            }
-        }
-    }
-    .cui-button.element-button {
-        border-color: tint(#0cbd8b, 70%);
-        color: #0cbd8b;
-        &:hover {
-            border-color: transparent;
-        }
-        .cui-button-label {
-            flex: 1;
-            text-align: left;
-        }
-        svg {
-            position: relative;
-            top: -4px;
-            path {
-                stroke: currentColor;
-            }
-        }
-    }
-    .cui-button.discord-button {
-        border-color: tint(#677bc4, 70%);
-        color: #677bc4;
-        &:hover {
-            border-color: transparent;
-        }
-        .cui-button-label {
-            flex: 1;
-            text-align: left;
-        }
-        svg {
-            position: relative;
-            top: -4px;
-            path {
-                fill: currentColor;
-            }
-        }
-    }
-    .cui-button.website-button, .cui-button.github-button {
-        border-color: tint(#222222, 70%);
-        color: #222222;
-        &:hover {
-            border-color: transparent;
-        }
-        .cui-button-label {
-            flex: 1;
-            text-align: left;
-        }
-        svg {
-            position: relative;
-            top: -3px;
-            path {
-                fill: currentColor;
-            }
-        }
-    }
-    .subscription-button {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 15px;
-    }
-    .spacer {
-        height: 100px;
-    }
-    .ChainStatusModule {
-        .chain-deferred {
-            color: $text-color-medium;
-        }
-        display: flex;
-        justify-content: center;
-
-        // form stuff
-        .form-group {
-            margin-bottom: 0;
-            select {
-                width: 100%;
-                border-color: $border-color-lightest;
-                border-radius: 2px;
-                padding: 5px 6px;
-            }
-            .chain-status-main {
-                width: calc(100% - 28px);
-            }
-        }
-        .cui-button-label {
-            text-align: left;
-            width: 100%;
-        }
-        .cui-icon svg {
-            min-width: 12px;
-            min-height: 12px;
-            width: 12px;
-            height: 12px;
-        }
-    }
-}
-
-.PoweredBy{
-    height: 60.99px;
-    width: 171.43px;
+  .sidebar-fadeout {
+    bottom: 0;
+    display: none; // TODO
+    height: 80px;
+    pointer-events: none;
     position: absolute;
-    border-radius: 8px;
-    border-color: #F9F9F9;
-    font-size: 14px;
-    background-image: url("/static/img/powered-by.svg");
-    background-repeat: no-repeat;
-    background-position: center;
-    margin-top: 10%;
-    cursor: pointer;
+    width: 100%;
+    z-index: 4;
+
+    background: -webkit-linear-gradient(
+      rgba(255, 255, 255, 0) 0%,
+      $background-color-light 100%
+    );
+    background-image: -moz-linear-gradient(
+      rgba(255, 255, 255, 0) 0%,
+      $background-color-light 100%
+    );
+    background-image: -o-linear-gradient(
+      rgba(255, 255, 255, 0) 0%,
+      $background-color-light 100%
+    );
+    background-image: linear-gradient(
+      rgba(255, 255, 255, 0) 0%,
+      $background-color-light 100%
+    );
+    background-image: -ms-linear-gradient(
+      rgba(255, 255, 255, 0) 0%,
+      $background-color-light 100%
+    );
+  }
+
+  .SidebarHeader {
+    border-bottom: 1px solid $border-color-lightest;
+
+    .cui-button {
+      background: none !important;
+      height: initial;
+      padding: 0;
+      width: 100%;
+
+      > .cui-button-label {
+        display: flex;
+        padding: 0 19px;
+        width: 100%;
+
+        > .CommunityLabel {
+          padding: 20px 0 18px;
+          max-width: calc(100% - 18px);
+        }
+
+        > .CommunityLabel.CommunityLabelPlaceholder {
+          font-weight: 500;
+          padding-left: 5px;
+          padding: 22px 0;
+        }
+
+        .cui-icon {
+          margin-left: 6px;
+          margin-top: 25px;
+        }
+      }
+    }
+  }
+
+  .sidebar-spacer {
+    margin-bottom: 22px;
+  }
+
+  .section-header {
+    color: $text-color-light;
+    font-size: 18px;
+    margin-bottom: 6px;
+    margin-top: 20px;
+  }
+
+  .cui-button {
+    margin-bottom: 4px;
+  }
+
+  .cui-button.cui-rounded:active,
+  .cui-button.cui-rounded.cui-active,
+  .cui-button.cui-rounded:hover {
+    background: linear-gradient(to left, #91ffa0, #fbff91, #ff9191);
+    border-color: white;
+
+    // @TODO: Remove this and figure out a better solution
+    background: #6966ff;
+    color: white;
+  }
+
+  .ExternalLinksModule {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .cui-button.website-button,
+  .cui-button.github-button,
+  .cui-button.telegram-button,
+  .cui-button.element-button,
+  .cui-button.discord-button {
+    margin-right: 8px;
+    padding: 0 10px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  .cui-button.telegram-button {
+    border-color: tint(#2480cc, 70%);
+    color: #2480cc;
+
+    svg {
+      color: #2480cc;
+      fill: currentColor;
+    }
+
+    &:hover {
+      border-color: transparent;
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    svg {
+      left: -1px;
+      position: relative;
+      top: -3px;
+
+      path {
+        stroke: currentColor;
+      }
+    }
+  }
+
+  .cui-button.element-button {
+    border-color: tint(#0cbd8b, 70%);
+    color: #0cbd8b;
+
+    svg {
+      color: #0cbd8b;
+      fill: currentColor;
+    }
+
+    &:hover {
+      border-color: transparent;
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    svg {
+      position: relative;
+      top: -4px;
+
+      path {
+        stroke: currentColor;
+      }
+    }
+  }
+
+  .cui-button.discord-button {
+    border-color: tint(#677bc4, 70%);
+    color: #677bc4;
+
+    svg {
+      color: #677bc4;
+      fill: currentColor;
+    }
+
+    &:hover {
+      border-color: transparent;
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    svg {
+      position: relative;
+      top: -4px;
+
+      path {
+        fill: currentColor;
+      }
+    }
+  }
+
+  .cui-button.website-button,
+  .cui-button.github-button {
+    border-color: tint(#222222, 70%);
+    color: #222222;
+
+    &:hover {
+      border-color: transparent;
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    svg {
+      position: relative;
+      top: -3px;
+
+      path {
+        fill: currentColor;
+      }
+    }
+  }
+
+  .subscription-button {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  .spacer {
+    height: 100px;
+  }
+
+  .ChainStatusModule {
+    .chain-deferred {
+      color: $text-color-medium;
+    }
+
+    display: flex;
+    justify-content: center;
+
+    // form stuff
+    .form-group {
+      margin-bottom: 0;
+
+      select {
+        border-color: $border-color-lightest;
+        border-radius: 2px;
+        padding: 5px 6px;
+        width: 100%;
+      }
+
+      .chain-status-main {
+        width: calc(100% - 28px);
+      }
+    }
+
+    .cui-button-label {
+      text-align: left;
+      width: 100%;
+    }
+
+    .cui-icon svg {
+      height: 12px;
+      min-height: 12px;
+      min-width: 12px;
+      width: 12px;
+    }
+  }
 }
-.PoweredBy:hover{
-    background-image: url("/static/img/powered-by-2.svg");
+
+.PoweredBy {
+  background-image: url('/static/img/powered-by.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  border-color: #f9f9f9;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  height: 60.99px;
+  margin-top: 10%;
+  position: absolute;
+  width: 171.43px;
+}
+
+.PoweredBy:hover {
+  background-image: url('/static/img/powered-by-2.svg');
 }
 
 /* .Sidebar {
@@ -483,106 +601,116 @@
 
 .cui-popover.community-options-popover .cui-menu,
 .cui-popover.community-options-popover .cui-menu {
-    padding: 4px 0;
+  padding: 4px 0;
 }
 
-
 .SidebarSection {
+  border-bottom-color: $disable-grey;
+  border-bottom-width: 1px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  user-select: none;
+
+  .SidebarTitle {
+    align-items: center;
     display: flex;
-    flex-direction: column;
-    border-bottom-width: 1px;
-    border-bottom-color: $disable-grey;
-    cursor: pointer;
-    user-select: none; 
-    padding-bottom: 10px;
-    padding-top: 10px;
-    .SidebarTitle {
-        margin-top: 10px;
-        margin-left: 20px;
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 1px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        .toggle-icon {
-            margin-right: 10px;
-            margin-top: -6px;
-        }
+    font-size: 20px;
+    font-weight: 600;
+    justify-content: space-between;
+    margin-bottom: 1px;
+    margin-left: 20px;
+    margin-top: 10px;
+
+    .toggle-icon {
+      margin-right: 10px;
+      margin-top: -6px;
     }
+  }
 }
 
 .SectionGroup {
-    font-weight: 400;
-    font-size: 17px;
-    padding-left: 0px;
-    
-    .SectionGroupTitle {
-        padding-left: 5px;
-        padding-top: 6px;
-        display: flex; 
-        .section-title-text-standard {
-            margin-left: 3px;
-            margin-bottom: 1px;
-            margin-right: 10px;
-        }
-        .section-title-text-active {
-            margin-left: 3px;
-            margin-bottom: 1px;
-            font-weight: 500;
-            color: #3A0095;
-            margin-right: 10px;
-        }
-        .section-title-text-stale {
-            margin-left: 3px;
-            margin-bottom: 1px;
-            color: #999999;
-            margin-right: 10px;
-        }
-        .no-carat {
-            width: 22px;
-        }
-        .carat {
-            margin-left: 6px;
-            margin-top: -2px;
-        }
+  font-size: 17px;
+  font-weight: 400;
+  padding-left: 0px;
+
+  .SectionGroupTitle {
+    display: flex;
+    padding-left: 5px;
+    padding-top: 6px;
+
+    .section-title-text-standard {
+      margin-bottom: 1px;
+      margin-left: 3px;
+      margin-right: 10px;
     }
+
+    .section-title-text-active {
+      color: #3a0095;
+      font-weight: 500;
+      margin-bottom: 1px;
+      margin-left: 3px;
+      margin-right: 10px;
+    }
+
+    .section-title-text-stale {
+      color: #999999;
+      margin-bottom: 1px;
+      margin-left: 3px;
+      margin-right: 10px;
+    }
+
+    .no-carat {
+      width: 22px;
+    }
+
+    .carat {
+      margin-left: 6px;
+      margin-top: -2px;
+    }
+  }
 }
 
 .SubSection {
-    padding-left: 32px;
-    font-weight: 400;
-    font-size: 17px;
-    display: flex;
+  display: flex;
+  font-size: 17px;
+  font-weight: 400;
+  padding-left: 32px;
 
-    .title-standard {
-        padding-left: 4px;
-        margin-bottom: 1px;
-        margin-left: 4px;
-    }
-    .title-active {
-        padding-left: 4px;
-        margin-bottom: 1px;
-        font-weight: 500;
-        margin-left: 4px;
-        color: #3A0095;
-    }
-    .title-stale {
-        padding-left: 4px;
-        margin-bottom: 1px;
-        margin-left: 4px;
-        color: #999999;
-    }
+  .title-standard {
+    margin-bottom: 1px;
+    margin-left: 4px;
+    padding-left: 4px;
+  }
 
-    padding-top: 6px;
-    
-    .row-icon-active {
-        margin-top: -7px;
+  .title-active {
+    color: #3a0095;
+    font-weight: 500;
+    margin-bottom: 1px;
+    margin-left: 4px;
+    padding-left: 4px;
+  }
+
+  .title-stale {
+    color: #999999;
+    margin-bottom: 1px;
+    margin-left: 4px;
+    padding-left: 4px;
+  }
+
+  padding-top: 6px;
+
+  .row-icon-active {
+    margin-top: -7px;
+  }
+
+  .row-icon-inactive {
+    margin-top: -7px;
+
+    .cui-icon {
+      color: #999999;
     }
-    .row-icon-inactive {
-        margin-top: -7px;
-        .cui-icon {
-            color: #999999;
-        }
-    }
+  }
 }
