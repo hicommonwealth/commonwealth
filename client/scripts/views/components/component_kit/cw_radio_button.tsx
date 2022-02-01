@@ -18,8 +18,8 @@ export type RadioButtonAttrs = {
   disabled?: boolean;
 };
 
-export const CWRadioButton: m.Component<RadioButtonAttrs> = {
-  view: (vnode) => {
+export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
+  view(vnode) {
     const { checked, value, label, groupName, onchange, className } =
       vnode.attrs;
 
@@ -40,5 +40,5 @@ export const CWRadioButton: m.Component<RadioButtonAttrs> = {
         <span class="radio-label">{label || value}</span>
       </label>
     );
-  },
-};
+  }
+}

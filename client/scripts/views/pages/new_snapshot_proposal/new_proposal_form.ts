@@ -325,15 +325,15 @@ const NewProposalForm: m.Component<{snapshotId: string}, {
               m(RadioGroup, {
                 name: 'period',
                 options: [
-                  { value: '5d', label: '5-day' },
+                  { value: '4d', label: '4-day' },
                 ],
                 value: vnode.state.form.range,
                 onchange: (e: Event) => {
                   vnode.state.form.range = (e.target as any).value;
                   vnode.state.form.start = new Date().getTime();
                   switch (vnode.state.form.range) {
-                    case '5d':
-                      vnode.state.form.end = moment().add(5, 'days').toDate().getTime();
+                    case '4d':
+                      vnode.state.form.end = moment().add(4, 'days').toDate().getTime();
                       break;
                     default:
                       break;

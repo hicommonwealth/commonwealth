@@ -10,6 +10,14 @@
   height: 40px;
   font-weight: 500;
 
+  &.sm {
+    padding: 12px 20px;
+  }
+
+  &.lg {
+    padding: 12px 44px;
+  }
+
   svg {
     margin-right: 12px;
   }
@@ -29,28 +37,14 @@
     }
   }
 
-  &.sm {
-    padding: 12px 20px;
-  }
-
-  &.lg {
-    padding: 12px 44px;
-  }
-
   &.disabled {
     color: $disable-gray;
     background: $white;
     cursor: default;
+    pointer-events: none;
 
-    &:hover {
+    svg {
       color: $disable-gray;
-      border: 1px solid $disable-gray;
-      background: $white;
-      box-shadow: none;
-
-      svg {
-        color: $disable-gray;
-      }
     }
   }
 }
