@@ -1,3 +1,5 @@
+/* @jsx m */
+
 // Modals are Mithril components rendered within the Layout system,
 // which manages a stack of currently displayed modals on the screen.
 // They have a few unique properties:
@@ -34,13 +36,11 @@
 //  },
 // })
 
-import 'modal.scss';
-
 import m from 'mithril';
 import $ from 'jquery';
 
-import { Icon, Icons } from 'construct-ui';
 import app from 'state';
+import { CWModal } from './components/component_kit/cw_modal';
 
 // When the user exits a modal, we delay the exit callback by calling
 // setTimeout(exitCallback, 0) so the modal can be removed before
@@ -53,6 +53,7 @@ import app from 'state';
 const MODAL_REMOVE_DELAY = 0;
 
 function oncreate(spec, confirmExit, completeCallback, exitCallback, vnode) {
+  console.log(confirmExit);
   // unfocus currently selected button, to prevent keyboard actions creating multiple modals
   $(document.activeElement).blur();
 
@@ -89,55 +90,33 @@ async function onclickoverlay(spec, confirmExit, exitCallback) {
   }
 }
 
-const Modal: m.Component<{ spec }> = {
-  view: (vnode) => {
-    const spec = vnode.attrs.spec;
-    const completeCallback = spec.completeCallback || (() => undefined);
-    const exitCallback = spec.exitCallback || (() => undefined);
-    const confirmExit = spec.modal.confirmExit || (() => true);
+export class AppModals implements m.ClassComponent {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  escapeHandler: (e: any) => void; // TODO Gabe 2/2/22 - What kind of event?
 
-    return m('.Modal', {
-      oncreate: oncreate.bind(this, spec, confirmExit, completeCallback, exitCallback),
-    }, [
-      m('.overlay', {
-        onclick: onclickoverlay.bind(this, spec, confirmExit, exitCallback),
-      }, [
-        m('.popup', {
-          onclick: (e) => {
-            e.stopPropagation();
-          },
-        }, vnode.children),
-      ]),
-    ]);
-  },
-};
-
-export const CompactModalExitButton: m.Component<{}> = {
-  view: (vnode) => {
-    return m('.CompactModalExitButton', {
-      onclick: (e) => {
-        e.preventDefault();
-        $(e.target).trigger('modalexit');
-      }
-    }, m.trust('&times;'));
-  }
-};
-
-export const AppModals: m.Component<{}, { escapeHandler }> = {
-  oncreate: (vnode) => {
-    vnode.state.escapeHandler = (e) => {
+  oncreate() {
+    this.escapeHandler = (e) => {
       if (e.keyCode !== 27) return;
       app.modals.getList().pop();
       m.redraw();
     };
-    $(document).on('keyup', vnode.state.escapeHandler);
-  },
-  onremove: (vnode) => {
-    $(document).off('keyup', vnode.state.escapeHandler);
-  },
-  view: (vnode) => {
-    return app.modals.getList().map((spec) => m(Modal, { spec, key: spec.id || '-' }, m(spec.modal, spec.data)));
+    $(document).on('keyup', this.escapeHandler);
   }
-};
 
-export default Modal;
+  onremove() {
+    $(document).off('keyup', this.escapeHandler);
+  }
+
+  view() {
+    return app.modals.getList().map((spec) => (
+      <CWModal
+        spec={spec}
+        key={spec.id || '-'}
+        oncreate={() => oncreate}
+        onclick={onclickoverlay}
+      >
+        {m(spec.modal, spec.data)}
+      </CWModal>
+    ));
+  }
+}

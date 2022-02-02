@@ -4,19 +4,19 @@ import m from 'mithril';
 import app from 'state';
 import Quill from 'quill';
 import { OffchainThread, OffchainComment } from 'models';
-import { CompactModalExitButton } from 'views/modal';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { VersionHistory } from 'controllers/server/threads';
 import { Spinner } from 'construct-ui';
+import { CompactModalExitButton } from '../components/component_kit/cw_modal';
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {
   item: OffchainThread | OffchainComment<any>;
 }
 
-const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
+const VersionHistoryModal: m.Component<IVersionHistoryAttrs, {}> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
@@ -26,7 +26,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         // insertions cast in green:
         if (Object.prototype.hasOwnProperty.call(op, 'insert')) {
           op.attributes = {
-            added: true
+            added: true,
           };
         }
         // deletions cast in red & struckthru
@@ -35,7 +35,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
           delete op.delete;
           op.attributes = {
             deleted: true,
-            strike: true
+            strike: true,
           };
         }
       }
@@ -52,12 +52,14 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         showRole: false,
         linkify: true,
         popover: false,
-        hideAvatar: true
+        hideAvatar: true,
       };
       // TODO: Add diffing algorithm for Markdown posts
       try {
         const doc = new Delta(JSON.parse(edit.body));
-        let diff; let quillDiff; let prevDoc;
+        let diff;
+        let quillDiff;
+        let prevDoc;
         if (prevEdit) {
           try {
             prevDoc = new Delta(JSON.parse(prevEdit.body));
@@ -69,15 +71,14 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
             quillDiff = diff ? formatDiff(diff) : null;
           }
         }
-        const diffedDoc = (quillDiff && prevDoc) ? prevDoc.compose(quillDiff) : doc;
+        const diffedDoc =
+          quillDiff && prevDoc ? prevDoc.compose(quillDiff) : doc;
         return m('.version', [
           m('.panel-left', [
             m(User, userOptions),
             m('span.timestamp', timestamp),
           ]),
-          m('.panel-right', [
-            m(QuillFormattedText, { doc: diffedDoc }),
-          ])
+          m('.panel-right', [m(QuillFormattedText, { doc: diffedDoc })]),
         ]);
       } catch {
         return m('.version', [
@@ -85,9 +86,7 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
             m(User, userOptions),
             m('span.timestamp', timestamp),
           ]),
-          m('.panel-right', [
-            m(MarkdownFormattedText, { doc: edit.body })
-          ])
+          m('.panel-right', [m(MarkdownFormattedText, { doc: edit.body })]),
         ]);
       }
     };
@@ -98,20 +97,18 @@ const VersionHistoryModal : m.Component<IVersionHistoryAttrs, {}> = {
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
-        (item.versionHistory && item.versionHistory?.length)
+        item.versionHistory && item.versionHistory?.length
           ? m('.versions', [
-            item.versionHistory.map((edit, idx) => {
-              const prevEdit = item.versionHistory[idx + 1];
-              if (!edit) return null;
-              return getVersion(edit, prevEdit);
-            })
-          ])
-          : m('.versions.versions-loading', [
-            m(Spinner, { active: true })
-          ])
-      ])
+              item.versionHistory.map((edit, idx) => {
+                const prevEdit = item.versionHistory[idx + 1];
+                if (!edit) return null;
+                return getVersion(edit, prevEdit);
+              }),
+            ])
+          : m('.versions.versions-loading', [m(Spinner, { active: true })]),
+      ]),
     ]);
-  }
+  },
 };
 
 export default VersionHistoryModal;

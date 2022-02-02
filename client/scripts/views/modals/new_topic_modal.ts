@@ -13,13 +13,13 @@ import {
 } from 'construct-ui';
 
 import QuillEditor from 'views/components/quill_editor';
-import { CompactModalExitButton } from 'views/modal';
 import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import TokenDecimalInput from '../components/token_decimal_input';
 import {
   CWTextInput,
   ValidationStatus,
 } from '../components/component_kit/cw_text_input';
+import { CompactModalExitButton } from '../components/component_kit/cw_modal';
 
 interface INewTopicModalForm {
   id: number;
