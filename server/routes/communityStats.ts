@@ -1,4 +1,4 @@
-import { QueryTypes }  from 'sequelize';
+import { QueryTypes, Op }  from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
@@ -9,6 +9,19 @@ const communityStats = async (models: DB, req: Request, res: Response, next: Nex
 
   if (!req.user) {
     return next(new Error('Not logged in'));
+  }
+
+  // TODO: factor this pattern into a util
+  const userAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const adminRoles = await models.Role.findAll({
+    where: {
+      address_id: { [Op.in]: userAddressIds },
+      permission: { [Op.in]: ['admin', 'moderator'] },
+      chain_id: chain.id,
+    },
+  });
+  if (!req.user.isAdmin && adminRoles.length === 0) {
+    return next(new Error('Must be admin'));
   }
 
   // get new objects created over the last 14 days
