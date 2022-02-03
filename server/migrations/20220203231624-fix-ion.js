@@ -19,6 +19,9 @@ module.exports = {
         chain: 'ion',
       }, { transaction: t });
 
+      await queryInterface.bulkDelete('Roles', {
+        chain_id: 'ion',
+      }, { transaction: t });
     });
   },
 
@@ -37,6 +40,7 @@ module.exports = {
         alt_wallet_url: 'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
       }, {
         chain: 'ion',
-      }, { transaction: t });    });
+      }, { transaction: t });
+    });
   }
 };
