@@ -53,7 +53,6 @@ import { CWModal } from './components/component_kit/cw_modal';
 const MODAL_REMOVE_DELAY = 0;
 
 function oncreate(spec, confirmExit, completeCallback, exitCallback, vnode) {
-  console.log(confirmExit);
   // unfocus currently selected button, to prevent keyboard actions creating multiple modals
   $(document.activeElement).blur();
 
@@ -112,7 +111,7 @@ export class AppModals implements m.ClassComponent {
       <CWModal
         spec={spec}
         key={spec.id || '-'}
-        oncreate={() => oncreate}
+        oncreatemodal={oncreate}
         onclick={onclickoverlay}
       >
         {m(spec.modal, spec.data)}
