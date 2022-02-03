@@ -305,6 +305,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/tokenAdapter'
     )).default;
     newChain = new ERC20(n, app);
+  } else if (n.chain.network === ChainNetwork.ERC721) {
+    const ERC721 = (await import(
+    //   /* webpackMode: "lazy" */
+    //   /* webpackChunkName: "erc721-main" */
+      './controllers/chain/ethereum/NftAdapter'
+    )).default;
+    newChain = new ERC721(n, app);
   } else if (n.chain.network === ChainNetwork.SPL) {
     const SPL = (await import(
       //   /* webpackMode: "lazy" */
