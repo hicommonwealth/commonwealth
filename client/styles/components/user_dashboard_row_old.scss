@@ -9,17 +9,17 @@
     flex-direction: column;
     padding: 17px 22px;
     margin-right: 60px;
+    line-height: 1.2;
     cursor: pointer;
-    border-bottom-width: 2px;
-
-
-    @include md-max {
-        margin-right: 0;
-    } 
+    text-decoration: none !important;
+    color: black !important;
+    position: relative;
+    border-bottom: black;
+    border-bottom-width: 1px;
 
     &:hover {
          background: #F7F4FF;
-         border-radius: 15px;
+         border-radius: 20px;
     }
    
     .comment-body {
@@ -85,33 +85,26 @@
             text-overflow: ellipsis;
         }
     }
-    .icon-row {
+    .comment-body-bottom {
         margin-top: 16px;
-        margin-bottom: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         &-left {
             display: flex;
             margin-left: 20px;
-
-            @include sm-max { // For temporary break point behavior
-                flex-direction: column;
-            } 
        
             button {
                 border: 1px solid #ddd;
                 margin-right: 25px;
-
-                @include sm-max { // For temporary break point behavior
-                    margin-top: 5px;
-                } 
+                color: black;
            
                 &:hover {
                     background: #F7F4FF;
                     border: 1px solid #4723AD;
                     color: #4723AD;
                     cursor: pointer;
+
                     svg {
                         stroke: #4723AD;
                     }

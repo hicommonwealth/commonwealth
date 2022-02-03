@@ -7,7 +7,7 @@ import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons, Spinner } from 'const
 
 import app from 'state';
 import { pluralize } from 'helpers';
-import { NodeInfo, Notification } from 'models';
+import { NodeInfo, Notification, DashboardNotification, ChainEvent } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 import UserDashboardRow from 'views/components/user_dashboard_row';
 import { ChainIcon } from 'views/components/chain_icon';
@@ -28,9 +28,9 @@ const notificationsRemaining = (contentLength, count) => {
 };
 
 export enum DashboardViews {
-  Latest = 'latest',
-  Trending = 'trending',
-  Chain = 'chain',
+  FY = 'For You',
+  Global = 'Global',
+  Chain = 'Chain',
 }
 
 /**
@@ -59,17 +59,34 @@ const UserDashboard: m.Component<{}, {
   count: number;
   activeTab: DashboardViews;
   onscroll;
-  notifications: Notification[];
+  fy_notifications: DashboardNotification[];
+  global_notifications: DashboardNotification[],
+  chain_events: ChainEvent[];
 }> = {
   oncreate: (vnode) => {
     vnode.state.count = 10;
+    vnode.state.activeTab = DashboardViews.FY;
   },
   view: (vnode) => {
-    // Load activity
-    if (!vnode.state.notifications) {
-      fetchActivity().then((activity) => {
-        vnode.state.notifications = activity.result.map((notification) => Notification.fromJSON(notification, null));
-      });
+    const { activeTab, fy_notifications, global_notifications, chain_events } = vnode.state;
+
+    // Helper to load activity conditional on the selected tab
+    const handleToggle = (tab: DashboardViews) => {
+      if (tab === DashboardViews.FY) {
+        fetchActivity().then((activity) => {
+            vnode.state.fy_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null));
+        })
+      } else if (tab == DashboardViews.Global) {
+        fetchActivity().then((activity) => {
+          vnode.state.global_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null));
+         })
+      } else if (tab == DashboardViews.Chain) {
+        fetchActivity().then((activity) => {
+          vnode.state.chain_events = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null));
+         })
+      }
+   
+      vnode.state.activeTab = tab;
       m.redraw();
       return m(PageLoading, {
         title: [
@@ -79,13 +96,14 @@ const UserDashboard: m.Component<{}, {
       })
     }
 
+    // Load activity
     if (!vnode.state.activeTab) {
-      vnode.state.activeTab = DashboardViews.Latest;
+      handleToggle(DashboardViews.FY)
     }
-    const { activeTab, notifications } = vnode.state;
 
+    // Scroll
     vnode.state.onscroll = _.debounce(async () => {
-      if (!notificationsRemaining(notifications.length, vnode.state.count)) return;
+      if (!notificationsRemaining(fy_notifications.length, vnode.state.count)) return;
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
       if (scrollPos > (scrollHeight - 400)) {
@@ -95,6 +113,7 @@ const UserDashboard: m.Component<{}, {
     }, 400);
 
     $(window).on('scroll', vnode.state.onscroll);
+
 
     return m(Sublayout, {
       class: 'UserDashboard',
@@ -107,7 +126,7 @@ const UserDashboard: m.Component<{}, {
         class: 'forum-container',
         gutter: 20
       }, [
-        m(Col, { span: { md: 9 } }, [
+        m(Col, { span: { md: 9, sm: 12 } }, [
           m('.title', 'Activity'),
           m(Tabs, {
             align: 'left',
@@ -115,33 +134,70 @@ const UserDashboard: m.Component<{}, {
             fluid: true,
           }, [
             m(TabItem, {
-              label: capitalize(DashboardViews.Latest),
-              active: activeTab === DashboardViews.Latest,
+              label: DashboardViews.FY,
+              active: activeTab === DashboardViews.FY,
               onclick: () => {
-                vnode.state.activeTab = DashboardViews.Latest;
+                handleToggle(DashboardViews.FY);
+                m.redraw();
               },
             }),
             m(TabItem, {
-              label: capitalize(DashboardViews.Chain),
+              label: DashboardViews.Global,
+              active: activeTab === DashboardViews.Global,
+              onclick: () => {
+                handleToggle(DashboardViews.Global);
+                m.redraw();
+
+              },
+            }),
+            m(TabItem, {
+              label: DashboardViews.Chain,
               active: activeTab === DashboardViews.Chain,
               onclick: () => {
-                vnode.state.activeTab = DashboardViews.Chain;
+                handleToggle(DashboardViews.Chain);
               },
             }),
           ]),
           m('.dashboard-row-wrap', [
-            notifications && notifications.length > 0
-            ? [
-              notifications.slice(0, vnode.state.count).map((data) => {
-                return m(UserDashboardRow, { notification: data, onListPage: true, });
-              }),
-              notificationsRemaining(notifications.length, vnode.state.count)
-              ? m('.infinite-scroll-spinner-wrap .text-center', [
-                m(Spinner, { active: true })
-              ])
-              : ''
-            ]
-            : m('.no-notifications', 'No Notifications'),
+            (activeTab === DashboardViews.FY) && [
+              fy_notifications && fy_notifications.length > 0 ? [
+                fy_notifications.slice(0, vnode.state.count).map((data) => {
+                  return m(UserDashboardRow, { notification: data, onListPage: true, });
+                }),
+                notificationsRemaining(fy_notifications.length, vnode.state.count)
+                ? m('.Spinner', [
+                  m(Spinner, { active: true })
+                ])
+                : ''
+              ]
+              : m('.no-notifications', 'No Notifications'),
+            ],
+            (activeTab === DashboardViews.Global) && [
+              global_notifications && global_notifications.length > 0 ? [
+                global_notifications.slice(0, vnode.state.count).map((data) => {
+                  return m(UserDashboardRow, { notification: data, onListPage: true, });
+                }),
+                notificationsRemaining(global_notifications.length, vnode.state.count)
+                ? m('.Spinner', [
+                  m(Spinner, { active: true })
+                ])
+                : ''
+              ]
+              : m('.no-notifications', 'No Notifications'),
+            ],
+            (activeTab === DashboardViews.Chain) && [
+              chain_events && chain_events.length > 0 ? [
+                global_notifications.slice(0, vnode.state.count).map((data) => { // TODO: Change to reflect new chain events component
+                  return m(UserDashboardRow, { notification: data, onListPage: true, });
+                }),
+                notificationsRemaining(chain_events.length, vnode.state.count)
+                ? m('.Spinner', [
+                  m(Spinner, { active: true })
+                ])
+                : ''
+              ]
+              : m('.no-notifications', 'No Notifications'),
+            ],
           ])
         ]),
         m(DashboardExplorePreview)
