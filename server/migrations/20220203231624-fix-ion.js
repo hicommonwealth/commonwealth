@@ -5,15 +5,16 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkUpdate('Chains', {
         symbol: 'ION',
-        network: 'cosmos',
+        network: 'ion',
         base: 'cosmos',
+        bech32_prefix: 'ion',
       }, {
         id: 'ion',
       }, { transaction: t });
 
       await queryInterface.bulkUpdate('ChainNodes', {
-        url: '',
-        alt_wallet_url: '',
+        url: 'https://rpc-osmosis.keplr.app',
+        alt_wallet_url: NULL,
       }, {
         chain: 'ion',
       }, { transaction: t });
