@@ -5,7 +5,7 @@ import m from 'mithril';
 
 import app from 'state';
 import { NewThreadForm } from 'views/components/new_thread_form';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 
 const NewThreadModal: m.Component<{}> = {
   view: (vnode) => {

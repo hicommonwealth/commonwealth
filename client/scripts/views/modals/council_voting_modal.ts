@@ -14,7 +14,7 @@ import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elect
 import { MultipleButtonSelectorFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 
 const CouncilVotingModal: m.Component<
   { candidates },

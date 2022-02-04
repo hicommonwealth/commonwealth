@@ -23,7 +23,7 @@ import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 
 const createProposalTransactionLabels = {
   // substrate: accounts

@@ -7,9 +7,9 @@ import { navigateToSubpage } from 'app';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import User from 'views/components/widgets/user';
 import { formatAddressShort } from '../../../../shared/utils';
-import User from '../components/widgets/user';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
 
 interface IVoterRowAttrs {
   vote: PhragmenElectionVote;

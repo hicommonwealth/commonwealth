@@ -9,7 +9,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { VersionHistory } from 'controllers/server/threads';
 import { Spinner } from 'construct-ui';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {

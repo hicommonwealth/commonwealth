@@ -8,7 +8,7 @@ import { Button, Form } from 'construct-ui';
 import { OffchainTopic } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import TokenDecimalInput from 'views/components/token_decimal_input';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 
 interface INewTopicModalForm {
   id: number;

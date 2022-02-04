@@ -17,7 +17,7 @@ import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { ChainBase } from 'types';
 import { formatNumberShort } from 'adapters/currency';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 
 enum NewVoteErrors {
   SomethingWentWrong = 'Something went wrong!',

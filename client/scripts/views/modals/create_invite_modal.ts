@@ -27,7 +27,7 @@ import { ChainInfo, RoleInfo, Profile } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { UserBlock } from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 export interface SearchParams {
   communityScope?: string;
   chainScope?: string;

@@ -14,12 +14,12 @@ import {
 
 import QuillEditor from 'views/components/quill_editor';
 import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
-import TokenDecimalInput from '../components/token_decimal_input';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import TokenDecimalInput from 'views/components/token_decimal_input';
 import {
   CWTextInput,
   ValidationStatus,
-} from '../components/component_kit/cw_text_input';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+} from 'views/components/component_kit/cw_text_input';
 
 interface INewTopicModalForm {
   id: number;

@@ -4,8 +4,8 @@ import m from 'mithril';
 import $ from 'jquery';
 import { OffchainThread } from 'models';
 import { Button } from 'construct-ui';
-import { ThreadSelector } from '../components/thread_selector';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ThreadSelector } from 'views/components/thread_selector';
 
 const LinkedThreadModal: m.Component<
   {

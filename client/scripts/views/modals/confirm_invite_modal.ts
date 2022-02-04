@@ -13,8 +13,8 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { navigateToSubpage } from 'app';
 import { InviteCodeAttributes } from 'types';
 import { AddressInfo } from 'client/scripts/models';
-import LoginWithWalletDropdown from '../components/login_with_wallet_dropdown';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 
 const SideMenu: m.Component<{ invites; onChangeHandler; location }, {}> = {
   view: (vnode) => {
