@@ -21,6 +21,7 @@ const fetchActivity = async (request: string) => {
     request,
     jwt: app.user.jwt
   });
+  console.log(activity);
   return activity;
 }
 
