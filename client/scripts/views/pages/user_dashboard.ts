@@ -84,7 +84,7 @@ const UserDashboard: m.Component<{}, {
       } else if (tab == DashboardViews.Chain) {
         fetchActivity('chainEvents').then((activity) => {
           vnode.state.chain_events = activity.result.map((notification) => ChainEvent.fromJSON(notification, null));
-         })
+         });
       }
    
       vnode.state.activeTab = tab;
@@ -156,6 +156,7 @@ const UserDashboard: m.Component<{}, {
               active: activeTab === DashboardViews.Chain,
               onclick: () => {
                 handleToggle(DashboardViews.Chain);
+                m.redraw();
               },
             }),
           ]),
