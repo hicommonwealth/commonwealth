@@ -7,7 +7,7 @@ import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons, Spinner } from 'const
 
 import app from 'state';
 import { pluralize } from 'helpers';
-import { NodeInfo, Notification, DashboardNotification, ChainEvent } from 'models';
+import { DashboardNotification, ChainEvent } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 import UserDashboardRow from 'views/components/user_dashboard_row';
 import { ChainIcon } from 'views/components/chain_icon';
@@ -16,8 +16,9 @@ import PageLoading from 'views/pages/loading';
 import DashboardExplorePreview from '../components/dashboard_explore_preview';
 
 
-const fetchActivity = async () => {
+const fetchActivity = async (request: string) => {
   const activity = await $.post(`${app.serverUrl()}/viewActivity`, {
+    request,
     jwt: app.user.jwt
   });
   return activity;
@@ -73,16 +74,16 @@ const UserDashboard: m.Component<{}, {
     // Helper to load activity conditional on the selected tab
     const handleToggle = (tab: DashboardViews) => {
       if (tab === DashboardViews.FY) {
-        fetchActivity().then((activity) => {
+        fetchActivity('forYou').then((activity) => {
             vnode.state.fy_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null));
         })
       } else if (tab == DashboardViews.Global) {
-        fetchActivity().then((activity) => {
+        fetchActivity('global').then((activity) => {
           vnode.state.global_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null));
          })
       } else if (tab == DashboardViews.Chain) {
-        fetchActivity().then((activity) => {
-          vnode.state.chain_events = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null));
+        fetchActivity('chainEvents').then((activity) => {
+          vnode.state.chain_events = activity.result.map((notification) => ChainEvent.fromJSON(notification, null));
          })
       }
    
