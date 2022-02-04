@@ -22,6 +22,7 @@ import {
 } from './config';
 import { NotificationCategories } from '../shared/types';
 import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
+import { ProfileAttributes } from './models/profile';
 
 enum Providers {
   GITHUB = 'github',
@@ -73,7 +74,7 @@ async function authenticateSocialAccount(provider: Providers, req: Request, acce
     // Check associations and log in the correct user.
     const user = await account.getUser();
     if (req.user === null && user === null) {
-      const newUser = await models.User.create({email: null});
+      const newUser = await models.User.createWithProfile(models, { email: null });
       await account.setUser(newUser);
       return cb(null, newUser);
     } else if (req.user && req.user !== user) {
@@ -117,7 +118,7 @@ async function authenticateSocialAccount(provider: Providers, req: Request, acce
     await newAccount.setUser(req.user);
     return cb(null, req.user);
   } else {
-    const newUser = await models.User.create({email: null});
+    const newUser = await models.User.createWithProfile(models, { email: null });
     await models.Subscription.create({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewMention,
@@ -225,7 +226,7 @@ function setupPassport(models: DB) {
 
         const result = await sequelize.transaction(async (t) => {
           // create new user and unverified address if doesn't exist
-          const newUser = await models.User.create({
+          const newUser = await models.User.createWithProfile(models, {
             email: userMetadata.email,
             emailVerified: true,
             magicIssuer: userMetadata.issuer,
@@ -243,6 +244,7 @@ function setupPassport(models: DB) {
               verified: new Date(), // trust addresses from magic
               last_active: new Date(),
               user_id: newUser.id,
+              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
               is_magic: true,
             }, { transaction: t });
 
@@ -256,6 +258,7 @@ function setupPassport(models: DB) {
               verified: new Date(), // trust addresses from magic
               last_active: new Date(),
               user_id: newUser.id,
+              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
               is_magic: true,
             }, { transaction: t });
 
@@ -273,6 +276,7 @@ function setupPassport(models: DB) {
               verified: new Date(), // trust addresses from magic
               last_active: new Date(),
               user_id: newUser.id,
+              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
               is_magic: true,
             }, { transaction: t });
 
@@ -286,6 +290,7 @@ function setupPassport(models: DB) {
               verified: new Date(), // trust addresses from magic
               last_active: new Date(),
               user_id: newUser.id,
+              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
               is_magic: true,
             }, { transaction: t });
 

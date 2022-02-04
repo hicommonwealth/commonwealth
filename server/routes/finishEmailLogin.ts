@@ -83,7 +83,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response, next: N
     });
   } else {
     // If the user isn't in a partly-logged-in state, create a new user
-    const newUser = await models.User.create({
+    const newUser = await models.User.createWithProfile(models, {
       email,
       emailVerified: true,
     });
