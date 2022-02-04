@@ -1,10 +1,12 @@
 import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
+import { CreateOptions, DataTypes, Model } from 'sequelize';
 import { ModelStatic } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
+import { ProfileInstance, ProfileAttributes } from './profile';
 import { SocialAccountInstance, SocialAccountAttributes } from './social_account';
+import { DB } from '../database';
 
 export type EmailNotificationInterval = 'daily' | 'never';
 
@@ -24,11 +26,13 @@ export interface UserAttributes {
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedNode?: ChainNodeAttributes | ChainNodeAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
+  Profiles?: ProfileAttributes[] | ProfileAttributes['id'][];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
   Chains?: ChainAttributes[] | ChainAttributes['id'][];
 }
 
-export interface UserInstance extends Model<UserAttributes>, UserAttributes {
+// eslint-disable-next-line no-use-before-define
+export interface UserInstance extends Model<UserAttributes>, UserCreationAttributes {
   getSelectedNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
   setSelectedNode: Sequelize.BelongsToSetAssociationMixin<ChainNodeInstance, ChainNodeInstance['id']>;
 
@@ -36,11 +40,21 @@ export interface UserInstance extends Model<UserAttributes>, UserAttributes {
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
   setAddresses: Sequelize.HasManySetAssociationsMixin<AddressInstance, AddressInstance['id']>;
 
+  getProfiles: Sequelize.HasManyGetAssociationsMixin<ProfileInstance>;
+
   getSocialAccounts: Sequelize.HasManyGetAssociationsMixin<SocialAccountInstance>;
   setSocialAccounts: Sequelize.HasManySetAssociationsMixin<SocialAccountInstance, SocialAccountInstance['id']>;
 }
 
-export type UserModelStatic = ModelStatic<UserInstance>
+export interface UserCreationAttributes extends UserAttributes {
+  createWithProfile?: (
+    models: DB,
+    attrs: UserAttributes,
+    options?: CreateOptions,
+  ) => Promise<UserInstance>;
+}
+
+export type UserModelStatic = ModelStatic<UserInstance> & UserCreationAttributes;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -82,9 +96,22 @@ export default (
       withPrivateData: {}
     }
   });
+
+  User.createWithProfile = async (
+    models: DB,
+    attrs: UserAttributes,
+    options?: CreateOptions
+  ): Promise<UserInstance> => {
+    const newUser = await User.create(attrs, options);
+    const profile = await models.Profile.create({ user_id: newUser.id }, options);
+    newUser.Profiles = [ profile ];
+    return newUser;
+  };
+
   User.associate = (models) => {
     models.User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
     models.User.hasMany(models.Address);
+    models.User.hasMany(models.Profile);
     models.User.hasMany(models.SocialAccount);
     models.User.hasMany(models.StarredCommunity);
     models.User.belongsToMany(models.Chain, { through: models.WaitlistRegistration });
