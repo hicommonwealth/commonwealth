@@ -48,7 +48,7 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: N
       return res.redirect('/?loggedin=true&confirmation=success');
     });
   } else {
-    const newUser = await models.User.create({ email: null });
+    const newUser = await models.User.createWithProfile(models, { email: null });
 
     // Automatically create subscription to their own mentions
     await models.Subscription.create({
