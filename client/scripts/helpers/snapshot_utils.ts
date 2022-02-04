@@ -225,7 +225,6 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
     // const voters = votes.map(vote => vote.voter);
     // const provider = Snapshot.utils.getProvider(space.network);
     const strategies = proposal.strategies ?? space.strategies;
-    console.log(strategies);
     if (proposal.state !== 'pending') {
       const scores = await Snapshot.utils.getScores(
         space.id,
