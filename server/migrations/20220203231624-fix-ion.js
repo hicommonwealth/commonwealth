@@ -7,14 +7,14 @@ module.exports = {
         symbol: 'ION',
         network: 'ion',
         base: 'cosmos',
-        bech32_prefix: 'ion',
+        bech32_prefix: 'osmo',
       }, {
         id: 'ion',
       }, { transaction: t });
 
       await queryInterface.bulkUpdate('ChainNodes', {
-        url: 'https://rpc-osmosis.keplr.app',
-        alt_wallet_url: NULL,
+        url: 'https://rpc-osmosis.blockapsis.com',
+        alt_wallet_url: 'https://lcd-osmosis.blockapsis.com',
       }, {
         chain: 'ion',
       }, { transaction: t });
