@@ -30,6 +30,32 @@ import { CWEngagementButton } from './component_kit/cw_engagement_button';
 import { NumberList } from 'aws-sdk/clients/iot';
 import { Category } from 'typescript-logging';
 
+const getCommentPreview = (comment_text) => {
+  let decoded_comment_text;
+  try {
+    const doc = JSON.parse(decodeURIComponent(comment_text));
+    if (!doc.ops) throw new Error();
+    decoded_comment_text = m(QuillFormattedText, {
+      doc,
+      hideFormatting: true,
+      collapse: true,
+    });
+  } catch (e) {
+    let doc = decodeURIComponent(comment_text);
+    const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
+    const matches = doc['matchAll'](regexp);
+    Array.from(matches).forEach((match) => {
+      doc = doc.replace(match[0], match[1]);
+    });
+    decoded_comment_text = m(MarkdownFormattedText, {
+      doc: doc.slice(0, 140),
+      hideFormatting: true,
+      collapse: true,
+    });
+  }
+  return decoded_comment_text;
+};
+
 
 // Discuss, Share, and Subscribe Buttons
 const ButtonRow: m.Component<{
@@ -107,7 +133,7 @@ const ActivityIcons: m.Component<{
         const {viewCount, likeCount, commentCount} = vnode.attrs;
 
         return m('.icon-row-right', [
-            viewCount && ( 
+            viewCount && viewCount > 0 && ( 
                 m(Button, {
                   iconLeft: Icons.EYE,
                   label: viewCount,
@@ -115,7 +141,7 @@ const ActivityIcons: m.Component<{
                   outlined: false,
                 })
             ), 
-            likeCount && ( 
+            likeCount && likeCount > 0 && ( 
                 m(Button, {
                     iconLeft: Icons.HEART,
                     label: likeCount,
@@ -123,7 +149,7 @@ const ActivityIcons: m.Component<{
                     outlined: false,
                 })
             ), 
-            commentCount && ( 
+            commentCount && commentCount > 0 && ( 
                 m(Button, {
                     iconLeft: Icons.MESSAGE_SQUARE,
                     label: commentCount,
@@ -136,14 +162,74 @@ const ActivityIcons: m.Component<{
 }
 
 
-const ActivityHeader: m.Component<{
-    categoryId: string;
-    activityData: Object
+const ActivityContent: m.Component<{
+    activityData: any
 }> = {
     view: (vnode) => {
-        const {categoryId, activityData} = vnode.attrs;
+        const {
+          created_at,
+          chain_id,
+          root_id, 
+          root_title, 
+          author_chain,
+          author_address, 
+          comment_text, 
+          root_type,
+        } = JSON.parse(vnode.attrs.activityData.data);
 
-        console.log(categoryId, activityData)
+        const {likeCount, viewCount, commentCount} = vnode.attrs.activityData;
+        
+        const numericalCommentCount = parseInt(commentCount);
+
+        const community_name = app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+        const decoded_title = decodeURIComponent(root_title).trim();
+        const title_text = decoded_title.length > 50 ? decoded_title.slice(0, 47) + "..." : decoded_title;
+
+        // Get Author of Notification
+        const actorName = m(User, {
+          user: new AddressInfo(null, author_address, author_chain ?? chain_id, null),
+          hideIdentityIcon: false,
+          linkify: true,
+          onclick: (e: any) => {
+            e.preventDefault();
+            e.stopPropagation();
+            m.route.set(`/${author_chain}/account/${author_address}`);
+          },
+        });
+
+        if (comment_text) { // New Comment
+
+          return m('.new-comment', [
+            m("span.header", [
+              actorName,
+              m("span.comment-counts", [
+                numericalCommentCount > 1 ? 
+                ["and ", numericalCommentCount - 1, " others"] : '',
+                " commented on ",
+              ]),
+              m('span.community-title', [
+                title_text,
+              ]),
+              m("span.comment-counts", [" in "]),
+              m('span.community-link', {
+                onclick: (e) => { 
+                  e.preventDefault();
+                  e.stopPropagation();
+                  m.route.set(`/${chain_id}`)
+                }
+              }, [community_name])
+              
+              
+            ])
+          ])
+
+
+        }
+
+        return actorName
+
+
+        
 
     }
 }
@@ -163,21 +249,23 @@ const UserDashboardRow: m.Component<
 }
 > = {
     view: (vnode) => {
-        const category = vnode.attrs.notification.categoryId;
+        const {likeCount, viewCount, commentCount} = vnode.attrs.notification;
+
     
-        return m('.UserDashboardRow', {}, [
+        return m('.UserDashboardRow', {
+          onclick: () => console.log(vnode.attrs.notification, JSON.parse(vnode.attrs.notification.data))
+        }, [
             m('.activity-content', [
-                m(ActivityHeader, {
-                    categoryId: category,
-                    activityData: JSON.parse(vnode.attrs.notification.data)
+                m(ActivityContent, {
+                    activityData: vnode.attrs.notification
                 })
             ]),
             m('.icon-row', [
                 m(ButtonRow, {path: ''}),
                 m(ActivityIcons, {
-                    viewCount: 10,
-                    commentCount: null,
-                    likeCount: 10
+                    viewCount,
+                    commentCount,
+                    likeCount
                 })
 
             ])

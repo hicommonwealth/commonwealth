@@ -85,6 +85,33 @@
             text-overflow: ellipsis;
         }
     }
+
+    .activity-content {
+
+        .new-comment {
+            span.header {
+                font-weight: 600;
+                span.comment-counts {
+                    color: #666666;
+                    font-weight: 400;
+                }
+                span.community-title {
+                    font-weight: 500;
+                }
+                span.community-link {
+                    font-weight: 600;
+                    &:hover{
+                        text-decoration: underline;
+                    }
+                    
+                }
+            }
+        }
+
+            
+
+        
+    }
     .icon-row {
         margin-top: 16px;
         margin-bottom: 10px;

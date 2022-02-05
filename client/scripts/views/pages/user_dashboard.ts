@@ -14,6 +14,7 @@ import { ChainIcon } from 'views/components/chain_icon';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import DashboardExplorePreview from '../components/dashboard_explore_preview';
+import { LoadingLayout } from '../layout';
 
 
 const fetchActivity = async (request: string) => {
@@ -21,7 +22,6 @@ const fetchActivity = async (request: string) => {
     request,
     jwt: app.user.jwt
   });
-  console.log(activity);
   return activity;
 }
 
@@ -60,36 +60,24 @@ export enum DashboardViews {
 const UserDashboard: m.Component<{}, {
   count: number;
   activeTab: DashboardViews;
+  loadingData: boolean;
   onscroll;
   fy_notifications: DashboardNotification[];
   global_notifications: DashboardNotification[],
   chain_events: ChainEvent[];
 }> = {
-  oncreate: (vnode) => {
+  oninit: (vnode) => {
     vnode.state.count = 10;
-    vnode.state.activeTab = DashboardViews.FY;
+    vnode.state.loadingData = false;
+    vnode.state.fy_notifications = [];
+    vnode.state.global_notifications = [];
+    vnode.state.chain_events = [];
   },
   view: (vnode) => {
-    const { activeTab, fy_notifications, global_notifications, chain_events } = vnode.state;
+    const { activeTab, fy_notifications, global_notifications, chain_events, loadingData } = vnode.state;
 
-    // Helper to load activity conditional on the selected tab
-    const handleToggle = (tab: DashboardViews) => {
-      if (tab === DashboardViews.FY) {
-        fetchActivity('forYou').then((activity) => {
-            vnode.state.fy_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null));
-        })
-      } else if (tab == DashboardViews.Global) {
-        fetchActivity('global').then((activity) => {
-          vnode.state.global_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null));
-         })
-      } else if (tab == DashboardViews.Chain) {
-        fetchActivity('chainEvents').then((activity) => {
-          vnode.state.chain_events = activity.result.map((notification) => ChainEvent.fromJSON(notification, null));
-         });
-      }
-   
-      vnode.state.activeTab = tab;
-      m.redraw();
+    // Loading Spinner
+    if (loadingData) {
       return m(PageLoading, {
         title: [
           'Notifications ',
@@ -97,10 +85,37 @@ const UserDashboard: m.Component<{}, {
         ],
       })
     }
+    
+    // Helper to load activity conditional on the selected tab
+    const handleToggle = (tab: DashboardViews) => {
+      if (tab === DashboardViews.FY) {
+        if (fy_notifications.length === 0) vnode.state.loadingData = true;
+        fetchActivity('forYou').then((activity) => {
+            vnode.state.fy_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null)).reverse();
+            vnode.state.loadingData = false;
+            m.redraw();
+        })
+      } else if (tab == DashboardViews.Global) {
+        if (global_notifications.length === 0) vnode.state.loadingData = true;
+        fetchActivity('global').then((activity) => {
+          vnode.state.global_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null)).reverse();
+          vnode.state.loadingData = false;
+          m.redraw();
+         })
+      } else if (tab == DashboardViews.Chain) {
+        if (chain_events.length === 0) vnode.state.loadingData = true;
+        fetchActivity('chainEvents').then((activity) => {
+          vnode.state.chain_events = activity.result.map((notification) => ChainEvent.fromJSON(notification, null)).reverse();
+          vnode.state.loadingData = false;
+          m.redraw();
+         });
+      }
+      vnode.state.activeTab = tab;
+    }
 
     // Load activity
     if (!vnode.state.activeTab) {
-      handleToggle(DashboardViews.FY)
+      handleToggle(DashboardViews.FY);
     }
 
     // Scroll
