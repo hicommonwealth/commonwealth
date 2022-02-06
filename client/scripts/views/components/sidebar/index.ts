@@ -17,6 +17,7 @@ import CommunitySelector from 'views/components/sidebar/community_selector';
 import { DiscordIcon, TelegramIcon, ElementIcon, GithubIcon, WebsiteIcon } from '../component_kit/icons';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
+import { ChatSection } from '../chat/chat_section'
 import { CWButton } from '../component_kit/cw_button';
 
 // Toggle Tree Definition (3 layers of depth, could add more if desired)
@@ -253,6 +254,7 @@ const Sidebar: m.Component<{ hideQuickSwitcher?, useQuickSwitcher?: boolean }, {
       !useQuickSwitcher && app.chain && m(`.Sidebar${isCustom ? '.custom-domain' : ''}`, [
         m(DiscussionSection),
         m(GovernanceSection),
+        m(ChatSection),
         m(ExternalLinksModule),
         m('br'),
         app.isLoggedIn() && app.chain && m('.subscription-button', m(SubscriptionButton)),

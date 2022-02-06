@@ -1,7 +1,5 @@
 import { Icon, Icons } from 'construct-ui';
-import { isValueNode } from 'graphql';
 import m from 'mithril';
-import { ConsoleLoggerImpl } from 'typescript-logging';
 
 
 export interface SubSectionProps {
@@ -12,6 +10,7 @@ export interface SubSectionProps {
     onclick: Function;
     onhover?: Function;
     row_icon?: boolean;
+    right_icon?: m.Component;
 }
 
 export interface SectionGroupProps {
@@ -24,6 +23,7 @@ export interface SectionGroupProps {
     onclick: Function;
     onhover?: Function;
     display_data: SubSectionProps[] | null;
+    right_icon?: m.Component;
 }
 
 export interface SidebarSectionProps {
@@ -34,6 +34,7 @@ export interface SidebarSectionProps {
     onhover?: Function;
     display_data: SectionGroupProps[];
     toggle_disabled?: boolean;
+    right_icon?: m.Component;
 }
 
 const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
@@ -41,7 +42,7 @@ const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
         vnode.state.background_color = vnode.attrs.is_active ? '#EDE7FF' : 'none';
     },
     view: (vnode) => {
-        const {title, is_visible, is_active, onclick, row_icon, is_updated} = vnode.attrs;
+        const {title, is_visible, is_active, onclick, row_icon, is_updated, right_icon} = vnode.attrs;
         const { background_color } = vnode.state;
         if (!is_visible) {
             return;
@@ -74,6 +75,7 @@ const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
         }, [
             row_icon && m(title_text_class, [m(Icon, {name: Icons.HASH})]),
             m(title_text_class, title),
+            right_icon && m('.right_icon', [m(right_icon)])
         ])
     }
 }
@@ -83,7 +85,7 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, hover_on: 
         vnode.state.toggled = vnode.attrs.default_toggle;
     },
     view: (vnode) => {
-        const {title, contains_children, display_data, is_visible, is_updated, is_active, onclick, onhover} = vnode.attrs;
+        const {title, contains_children, display_data, is_visible, is_updated, is_active, onclick, onhover, right_icon} = vnode.attrs;
         const {toggled} = vnode.state;
 
         if (!is_visible) {
@@ -119,14 +121,14 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, hover_on: 
             if (!toggled) {
                 background_color = '#EDE7FF';
                 vnode.state.hover_on = true;
-            }   
+            }
         }
 
         const mouse_leave_handler = (e) => {
             background_color = (is_active && !contains_children) ? '#EDE7FF' : 'none';
             vnode.state.hover_on = false;
         }
-        
+
         return m('.SectionGroup', {
             onmouseenter: (e) => mouse_enter_handler(e),
             onmouseleave: (e) => mouse_leave_handler(e),
@@ -136,7 +138,8 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, hover_on: 
                 style: `background-color: ${vnode.state.hover_on ? '#EDE7FF' : background_color}`,
             }, [
                 contains_children ? m('.carat', carat) : m('.no-carat'),
-                m(title_text_class, title), 
+                m(title_text_class, title),
+                right_icon && m('.right_icon', [m(right_icon)])
             ]),
             contains_children && toggled && m('.subsections', [
                 display_data.map((subsection) => (
@@ -144,7 +147,7 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, hover_on: 
                 ))
             ])
         ])
-        
+
     }
 }
 
@@ -156,7 +159,7 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
     },
     view: (vnode) => {
 
-        const {title, onclick, toggle_disabled, display_data} = vnode.attrs;
+        const {title, onclick, toggle_disabled, display_data, right_icon} = vnode.attrs;
         const {toggled, hover_color} = vnode.state;
 
         const click_handler = (e) => {
@@ -173,7 +176,7 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
         const mouse_enter_handler = (e) => {
             if (!toggled) {
                 vnode.state.hover_color = '#EDE7FF';
-            }   
+            }
         }
 
         const mouse_leave_handler = (e) => {
@@ -185,16 +188,17 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
         }) : m(Icon, {
             name: Icons.CHEVRON_RIGHT,
         });
-        
-        return m('.SidebarSection', { 
+
+        return m('.SidebarSection', {
             onmouseenter: (e) => mouse_enter_handler(e),
             onmouseleave: (e) => mouse_leave_handler(e),
             style: `background-color: ${hover_color}`
         }, [
             m('.SidebarTitle', {
-                onclick: (e) => click_handler(e), 
+                onclick: (e) => click_handler(e),
             }, [
                 m('.title-text', title),
+                right_icon && m('.right_icon', [m(right_icon)]),
                 m('.toggle-icon', carat)
             ]),
             toggled && m('.section-groups', [

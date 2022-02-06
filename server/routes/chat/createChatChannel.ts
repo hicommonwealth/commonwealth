@@ -22,7 +22,8 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 
     const channel = await models.ChatChannel.create({
         name: req.body.name,
-        community_id: req.body.community_id
+        community_id: req.body.community_id,
+        category: req.body.category
     });
 
     return res.json({ status: '200', result: { chat_channel: channel.toJSON() } });

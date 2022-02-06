@@ -1,25 +1,5 @@
 @import 'client/styles/shared';
 
-.sublayout-grid {
-    padding: 0 !important;
-    padding-left: 5px;
-    margin: 0 !important;
-    width: 100%;
-    max-width: none !important;
-}
-
-.sublayout-main-col {
-    padding: 0 !important;
-}
-
-.sublayout-body-sidebar, .FooterLandingPage {
-    margin: 0 !important;
-}
-
-.Sidebar {
-    display: none !important;
-}
-
 .chat-page {
     display: flex;
     flex-direction: row;

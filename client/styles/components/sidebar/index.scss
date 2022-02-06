@@ -586,3 +586,39 @@
         }
     }
 }
+
+.right_icon {
+    margin-left: auto;
+    margin-right: 4px;
+    div {
+        .cui-icon {
+            color: #999999;
+
+            &:hover {
+                color: #3A0095;
+                opacity: 100%;
+            }
+        }
+        
+    }
+    .admin-menu {
+        position: fixed;
+        z-index: 10;
+        margin-left: 4px;
+    }
+}
+
+.cui-icon-edit {
+    margin-top: -3px;
+}
+
+.cui-icon-plus-circle {
+    margin-top: -3px;
+    opacity: 60%;
+}
+
+.cui-icon-hash {
+    scale: 0.85;
+    padding-bottom: 4px;
+    margin-right: -4px;
+}

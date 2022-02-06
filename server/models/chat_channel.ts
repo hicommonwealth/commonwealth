@@ -7,6 +7,7 @@ export interface ChatChannelAttributes {
   id?: number;
   name: string;
   community_id: string;
+  category: string;
   chat_messages?: ChatMessageAttributes[] | ChatMessageAttributes['id'][];
 }
 
@@ -41,6 +42,10 @@ export default (
           model: 'Chain',
           key: 'id',
         },
+      },
+      category: {
+        type: Sequelize.STRING(255),
+        allowNull: false
       },
       created_at: {
         type: Sequelize.DATE,

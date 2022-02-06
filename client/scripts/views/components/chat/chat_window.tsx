@@ -124,7 +124,6 @@ const ChatWindow: m.Component<IAttrs, IState> = {
     </div>;
   },
   onupdate: (vnode) => {
-    console.log(vnode.state.shouldScroll)
     if(vnode.state.shouldScroll) {
         vnode.state.scrollToBottom()
     }

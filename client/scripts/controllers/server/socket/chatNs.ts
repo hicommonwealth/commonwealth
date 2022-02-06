@@ -4,6 +4,11 @@ import { WebsocketMessageType, WebsocketNamespaces } from 'types';
 import { io } from 'socket.io-client';
 
 export const MESSAGE_PAGE_SIZE = 50;
+
+export const ChatErrors = {
+    'NOT_LOGGED_IN': new Error('User must be logged in to load chat')
+}
+
 export class ChatNamespace {
     private chatNs;
     private _isConnected = false;
@@ -74,6 +79,10 @@ export class ChatNamespace {
             // HACK: This gets called on load and beats the app's loading in a race. Can't have that.
             await new Promise(r => setTimeout(r, 1000));
         }
+
+        if(!app.user.activeAccount) {
+            throw ChatErrors.NOT_LOGGED_IN
+        }
         try {
             const res = await $.get(`${app.serverUrl()}/getChatMessages`, {
                 jwt: app.user.jwt,
@@ -87,6 +96,16 @@ export class ChatNamespace {
 
             const raw = JSON.parse(res.result)
             return raw
+        } catch (e) {
+            console.error(e)
+            return []
+        }
+    }
+
+    public async getChannels() {
+        try {
+            const messages = await this.getChatMessages()
+            return messages
         } catch (e) {
             console.error(e)
             return []

@@ -8,11 +8,9 @@ import moment from 'moment';
 
 import app from 'state';
 import ChatWindow from 'views/components/chat/chat_window';
-import ChannelBar from 'views/components/chat/channel_bar'
 import PageLoading from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { WebsocketMessageType } from 'types';
-import { Button } from 'construct-ui';
 
 interface IChannel {
   id: number,
@@ -66,29 +64,14 @@ const ChatPage: m.Component<never, IState> = {
     const activeEntity = app.chain;
     if (!activeEntity) return <PageLoading />;
 
-    const handleChannelSwitch = (channel_id) => {
-      vnode.state.activeChannel = Number(channel_id)
-      vnode.state.channels[vnode.state.activeChannel].unread = 0
-      m.redraw()
-    }
-
-    const channels = Object.keys(vnode.state.channels)
-      .map((k) => {
-        const {id, name, unread} = vnode.state.channels[k];
-        return {id, name, unread}
-      })
+    const activeChannel = Number(m.route.param()['channel'])
+    console.log(activeChannel)
 
     return vnode.state.loaded
       ? _.isEmpty(vnode.state.channels)
         ? <PageLoading />
         : <Sublayout>
             <div class="chat-page">
-              <ChannelBar
-                channels={channels}
-                handleClick={handleChannelSwitch.bind(vnode)}
-                activeChannel={vnode.state.activeChannel}
-                scrolldown={true}
-              />
               <ChatWindow
                 channel_id={vnode.state.activeChannel}
                 messages={vnode.state.channels[vnode.state.activeChannel].messages}
