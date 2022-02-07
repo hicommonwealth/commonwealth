@@ -509,6 +509,12 @@
             margin-right: 10px;
             margin-top: -6px;
         }
+        .right_icon {
+            .cui-icon-plus-circle {
+                margin-top: -10px;
+                opacity: 90%;
+            }        
+        }
     }
 }
 
@@ -519,32 +525,39 @@
     
     .SectionGroupTitle {
         padding-left: 5px;
-        padding-top: 6px;
+        padding-top: 3px;
+        padding-top: 3px;
+        height: 30px;
         display: flex; 
-        .section-title-text-standard {
+        align-items: center;
+
+        [class^="section-title-text"] {
             margin-left: 3px;
-            margin-bottom: 1px;
             margin-right: 10px;
+            padding-top: 3px;
+            display: inline-block;
         }
+
         .section-title-text-active {
-            margin-left: 3px;
-            margin-bottom: 1px;
             font-weight: 500;
             color: #3A0095;
-            margin-right: 10px;
         }
         .section-title-text-stale {
-            margin-left: 3px;
-            margin-bottom: 1px;
             color: #999999;
-            margin-right: 10px;
         }
         .no-carat {
             width: 22px;
         }
         .carat {
+            display: inline-block;
             margin-left: 6px;
             margin-top: -2px;
+        }
+
+        .right_icon {
+            .cui-icon-edit {
+                margin-top: -1px;
+            }        
         }
     }
 }
@@ -553,46 +566,58 @@
     padding-left: 32px;
     font-weight: 400;
     font-size: 17px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    height: 30px;
     display: flex;
+    flex-direction: row;
+    align-items: center;
 
-    .title-standard {
+    [class^="title"] {
+        display: inline-block;
+        padding-top: 3px;
         padding-left: 4px;
         margin-bottom: 1px;
         margin-left: 4px;
+        align-self: baseline;
     }
     .title-active {
-        padding-left: 4px;
-        margin-bottom: 1px;
         font-weight: 500;
-        margin-left: 4px;
         color: #3A0095;
     }
     .title-stale {
-        padding-left: 4px;
-        margin-bottom: 1px;
-        margin-left: 4px;
         color: #999999;
     }
 
-    padding-top: 6px;
-    
-    .row-icon-active {
-        margin-top: -7px;
+    .cui-icon-hash {
+        display: inline-block;
+        margin-top: 1px;
+        scale: 0.85;
+        padding-bottom: 4px;
     }
+    
     .row-icon-inactive {
-        margin-top: -7px;
         .cui-icon {
             color: #999999;
         }
+    }
+
+    .right_icon {
+        .cui-icon-edit {
+            margin-top: -1px;
+        }        
     }
 }
 
 .right_icon {
     margin-left: auto;
-    margin-right: 4px;
+    display: inline-block;
+
     div {
         .cui-icon {
             color: #999999;
+            padding-right: 5px;
+            padding-top: 2px;
 
             &:hover {
                 color: #3A0095;
@@ -604,21 +629,63 @@
     .admin-menu {
         position: fixed;
         z-index: 10;
-        margin-left: 4px;
+    }
+    .unread_icon {
+        background-color: #FF002E;
+        border-radius: 15px;
+        padding-left: 6px;
+        padding-right: 6px;
+        margin-right: 4px;
+        margin-top: 2px;
+        display: inline-block;
+        p {
+            margin-top: 2.75px;
+            position: relative;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+        }
     }
 }
 
-.cui-icon-edit {
-    margin-top: -3px;
-}
+.cui-overlay {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
 
-.cui-icon-plus-circle {
-    margin-top: -3px;
-    opacity: 60%;
-}
+    .Card {
+        z-index: 100;
+        position: relative;
+        width: 500px;
+        max-width: none;
+        cursor: default;
+        padding: 20px 25px;
 
-.cui-icon-hash {
-    scale: 0.85;
-    padding-bottom: 4px;
-    margin-right: -4px;
+        h4 {
+            color: #666666;
+            font-weight: 400;
+        }
+
+        .TextInput { 
+            width: 100%;
+        }
+
+        .cui-icon-x{
+            position: absolute;
+            color: #666666;
+            top: 15px;
+            left: calc(100% - 35px);
+        }
+
+        .button-bar {
+            display: flex;
+            flex-direction: row;
+            justify-content: end;
+            width: 100%;
+            button {
+                margin-left: 5px;
+            }
+        }
+    }
 }

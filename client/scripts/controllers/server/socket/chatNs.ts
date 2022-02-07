@@ -57,13 +57,14 @@ export class ChatNamespace {
         return this._isConnected;
     }
 
-    public async createChatChannel(name, community_id) {
+    public async createChatChannel(name, community_id, category) {
         // check for admin?
         try {
             $.post(`${app.serverUrl()}/createChatChannel`, {
                 jwt: app.user.jwt,
                 name,
-                community_id
+                community_id,
+                category
             }).then((res) => {
                 console.log(res)
             }).catch((err) => {

@@ -23,7 +23,6 @@ interface IState {
   loaded: boolean,
   onincomingmessage: (any: any) => void,
   channels: Record<number, IChannel>,
-  activeChannel: number;
 }
 
 const ChatPage: m.Component<never, IState> = {
@@ -36,8 +35,6 @@ const ChatPage: m.Component<never, IState> = {
       vnode.state.channels[id] = { id, name, unread: 0, messages: ChatMessages }
     });
 
-    if(all_messages.length > 0) vnode.state.activeChannel = all_messages[0].id
-
     vnode.state.onincomingmessage = (payload: any) => {
       const { id, address, message, chat_channel_id, created_at } = payload
       vnode.state.channels[chat_channel_id].messages.push({
@@ -46,9 +43,6 @@ const ChatPage: m.Component<never, IState> = {
         address,
         created_at: moment(created_at),
       })
-      if (chat_channel_id !== vnode.state.activeChannel) {
-        vnode.state.channels[chat_channel_id].unread++;
-      }
       m.redraw();
     }
     app.socket.chatNs.connectToChannels(Object.keys(vnode.state.channels).map(id => Number(id)))
@@ -65,7 +59,6 @@ const ChatPage: m.Component<never, IState> = {
     if (!activeEntity) return <PageLoading />;
 
     const activeChannel = Number(m.route.param()['channel'])
-    console.log(activeChannel)
 
     return vnode.state.loaded
       ? _.isEmpty(vnode.state.channels)
@@ -73,8 +66,8 @@ const ChatPage: m.Component<never, IState> = {
         : <Sublayout>
             <div class="chat-page">
               <ChatWindow
-                channel_id={vnode.state.activeChannel}
-                messages={vnode.state.channels[vnode.state.activeChannel].messages}
+                channel_id={activeChannel}
+                messages={vnode.state.channels[activeChannel].messages}
               />
             </div>
           </Sublayout>

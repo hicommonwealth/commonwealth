@@ -35,6 +35,7 @@ export interface SidebarSectionProps {
     display_data: SectionGroupProps[];
     toggle_disabled?: boolean;
     right_icon?: m.Component;
+    extra_components?: m.Vnode;
 }
 
 const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
@@ -73,7 +74,7 @@ const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
             onmouseenter: (e) => mouse_enter_handler(e),
             onmouseleave: (e) => mouse_leave_handler(e),
         }, [
-            row_icon && m(title_text_class, [m(Icon, {name: Icons.HASH})]),
+            row_icon && m(Icon, {name: Icons.HASH}),
             m(title_text_class, title),
             right_icon && m('.right_icon', [m(right_icon)])
         ])
@@ -159,7 +160,7 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
     },
     view: (vnode) => {
 
-        const {title, onclick, toggle_disabled, display_data, right_icon} = vnode.attrs;
+        const {title, onclick, toggle_disabled, display_data, right_icon, extra_components} = vnode.attrs;
         const {toggled, hover_color} = vnode.state;
 
         const click_handler = (e) => {
@@ -205,7 +206,8 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
                 display_data.map((section_group) => (
                     m(SectionGroup, {...section_group})
                 ))
-            ])
+            ]),
+            extra_components
         ])
     }
 };
