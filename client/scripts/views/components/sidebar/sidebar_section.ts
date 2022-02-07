@@ -40,6 +40,7 @@ export interface SidebarSectionProps {
 
 const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
     oninit: (vnode) => {
+        console.log('inting subsection')
         vnode.state.background_color = vnode.attrs.is_active ? '#EDE7FF' : 'none';
     },
     view: (vnode) => {
@@ -61,6 +62,10 @@ const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
         }
 
         const mouse_enter_handler = (e) => {
+            if(vnode.state.background_color === '#EDE7FF') {
+                e.redraw = false; // Prevent redraws of subcomponents if already fired
+                e.stopPropagation();
+            }
             vnode.state.background_color = '#EDE7FF';
         }
 
@@ -119,6 +124,10 @@ const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, hover_on: 
         }
 
         const mouse_enter_handler = (e) => {
+            if (toggled || vnode.state.hover_on) {
+                e.redraw = false;
+                e.stopPropagation();
+            }
             if (!toggled) {
                 background_color = '#EDE7FF';
                 vnode.state.hover_on = true;
@@ -175,6 +184,10 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_
         }
 
         const mouse_enter_handler = (e) => {
+            if (toggled || vnode.state.hover_color) {
+                e.redraw = false;
+                e.stopPropagation();
+            }
             if (!toggled) {
                 vnode.state.hover_color = '#EDE7FF';
             }

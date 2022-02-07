@@ -628,7 +628,6 @@
     }
     .admin-menu {
         position: fixed;
-        z-index: 10;
     }
     .unread_icon {
         background-color: #FF002E;
@@ -681,10 +680,18 @@
         .button-bar {
             display: flex;
             flex-direction: row;
-            justify-content: end;
+            justify-content: flex-end;
             width: 100%;
             button {
                 margin-left: 5px;
+
+                &.danger{
+                    background-color: #ff002f;
+                }
+
+                &.danger:hover{
+                    background-color: #CC0025;
+                }
             }
         }
     }

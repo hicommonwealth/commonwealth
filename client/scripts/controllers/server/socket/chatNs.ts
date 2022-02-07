@@ -106,10 +106,82 @@ export class ChatNamespace {
     public async getChannels() {
         try {
             const messages = await this.getChatMessages()
-            return messages
+            return messages.map(c => {return {id: c.id, category: c.category, name: c.name}})
         } catch (e) {
             console.error(e)
             return []
+        }
+    }
+
+    public async deleteChatChannel(channel_id: number) {
+        try {
+            const response = await $.ajax({
+                url: `${app.serverUrl()}/deleteChatChannel`,
+                data: {channel_id, community_id: app.activeChainId()},
+                type: 'DELETE'
+            });
+
+            if (response !== 'Success') {
+                throw new Error("Failed to delete chat channel")
+            }
+            return true
+        } catch (e) {
+            console.error(e)
+            return false
+        }
+    }
+
+    public async deleteChatCategory(category: string) {
+        try {
+            const response = await $.ajax({
+                url: `${app.serverUrl()}/deleteChatCategory`,
+                data: {category, community_id: app.activeChainId()},
+                type: 'DELETE'
+            });
+
+            if (response !== 'Success') {
+                throw new Error("Failed to delete chat category")
+            }
+            return true
+        } catch (e) {
+            console.error(e)
+            return false
+        }
+    }
+
+    public async renameChatCategory(category: string, new_category: string) {
+        try {
+            const response = await $.ajax({
+                url: `${app.serverUrl()}/renameChatCategory`,
+                data: {category, new_category, community_id: app.activeChainId()},
+                type: 'PUT'
+            });
+
+            if (response !== 'Success') {
+                throw new Error("Failed to rename chat category")
+            }
+            return true
+        } catch (e) {
+            console.error(e)
+            return false
+        }
+    }
+
+    public async renameChatChannel(channel_id: number, name: string) {
+        try {
+            const response = await $.ajax({
+                url: `${app.serverUrl()}/renameChatChannel`,
+                data: {channel_id, name, community_id: app.activeChainId()},
+                type: 'PUT'
+            });
+
+            if (response !== 'Success') {
+                throw new Error("Failed to rename chat channel")
+            }
+            return true
+        } catch (e) {
+            console.error(e)
+            return false
         }
     }
 }
