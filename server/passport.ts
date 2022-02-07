@@ -22,6 +22,7 @@ import {
 } from './config';
 import { NotificationCategories } from '../shared/types';
 import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
+import { ProfileAttributes } from './models/profile';
 
 enum Providers {
   GITHUB = 'github',
@@ -33,13 +34,14 @@ const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
 async function authenticateSocialAccount(provider: Providers, req: Request, accessToken, refreshToken, profile, cb, models: DB) {
-  const str = '&state='
-  const splitState = req.url.substring(req.url.indexOf(str) + str.length)
-  const state = splitState.substring(splitState.indexOf('='));
-  if (state !== String(req.sessionID)) return cb(null, false)
+  // const str = '&state='
+  // const splitState = req.url.substring(req.url.indexOf(str) + str.length)
+  // const state = splitState.substring(splitState.indexOf('='));
+  // console.log(`State check: ${state} vs ${req.sessionID}`);
+  // if (state !== req.sessionID) return cb(null, false)
 
   const account = await models.SocialAccount.findOne({
-    where: {provider: provider, provider_userid: profile.id}
+    where: { provider, provider_userid: profile.id }
   });
 
   // Existing Github account. If there is already a user logged-in,
@@ -72,7 +74,7 @@ async function authenticateSocialAccount(provider: Providers, req: Request, acce
     // Check associations and log in the correct user.
     const user = await account.getUser();
     if (req.user === null && user === null) {
-      const newUser = await models.User.create({email: null});
+      const newUser = await models.User.createWithProfile(models, { email: null });
       await account.setUser(newUser);
       return cb(null, newUser);
     } else if (req.user && req.user !== user) {
@@ -91,7 +93,7 @@ async function authenticateSocialAccount(provider: Providers, req: Request, acce
   // create a new user. As a result it's possible that we end up
   // with a user with multiple Github accounts linked.
   const newAccount = await models.SocialAccount.create({
-    provider: provider,
+    provider,
     provider_userid: profile.id,
     provider_username: profile.username,
     access_token: accessToken,
@@ -116,7 +118,7 @@ async function authenticateSocialAccount(provider: Providers, req: Request, acce
     await newAccount.setUser(req.user);
     return cb(null, req.user);
   } else {
-    const newUser = await models.User.create({email: null});
+    const newUser = await models.User.createWithProfile(models, { email: null });
     await models.Subscription.create({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewMention,
@@ -224,7 +226,7 @@ function setupPassport(models: DB) {
 
         const result = await sequelize.transaction(async (t) => {
           // create new user and unverified address if doesn't exist
-          const newUser = await models.User.create({
+          const newUser = await models.User.createWithProfile(models, {
             email: userMetadata.email,
             emailVerified: true,
             magicIssuer: userMetadata.issuer,
@@ -242,6 +244,7 @@ function setupPassport(models: DB) {
               verified: new Date(), // trust addresses from magic
               last_active: new Date(),
               user_id: newUser.id,
+              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
               is_magic: true,
             }, { transaction: t });
 
@@ -255,6 +258,7 @@ function setupPassport(models: DB) {
               verified: new Date(), // trust addresses from magic
               last_active: new Date(),
               user_id: newUser.id,
+              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
               is_magic: true,
             }, { transaction: t });
 
@@ -272,6 +276,7 @@ function setupPassport(models: DB) {
               verified: new Date(), // trust addresses from magic
               last_active: new Date(),
               user_id: newUser.id,
+              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
               is_magic: true,
             }, { transaction: t });
 
@@ -285,6 +290,7 @@ function setupPassport(models: DB) {
               verified: new Date(), // trust addresses from magic
               last_active: new Date(),
               user_id: newUser.id,
+              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
               is_magic: true,
             }, { transaction: t });
 
@@ -365,7 +371,6 @@ function setupPassport(models: DB) {
   if (DISCORD_CLIENT_ID && DISCORD_CLIENT_SECRET && DISCORD_OAUTH_CALLBACK) passport.use(new DiscordStrategy({
     clientID: DISCORD_CLIENT_ID,
     clientSecret: DISCORD_CLIENT_SECRET,
-    callbackURL: DISCORD_OAUTH_CALLBACK,
     scope: DISCORD_OAUTH_SCOPES,
     passReqToCallback: true,
     authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none'

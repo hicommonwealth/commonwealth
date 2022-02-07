@@ -32,6 +32,11 @@ export default async (
       }
     });
   }
+  if (req.body.chain_filter) {
+    searchParams.push({
+      chain_id: req.body.chain_filter,
+    });
+  }
 
   const notificationParams: any = {
     model: models.NotificationsRead,
