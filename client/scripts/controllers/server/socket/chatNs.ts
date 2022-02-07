@@ -117,11 +117,15 @@ export class ChatNamespace {
         try {
             const response = await $.ajax({
                 url: `${app.serverUrl()}/deleteChatChannel`,
-                data: {channel_id, community_id: app.activeChainId()},
+                data: {
+                    channel_id,
+                    community_id: app.activeChainId(),
+                    jwt: app.user.jwt
+                },
                 type: 'DELETE'
             });
 
-            if (response !== 'Success') {
+            if (response.status !== 'Success') {
                 throw new Error("Failed to delete chat channel")
             }
             return true
@@ -135,11 +139,15 @@ export class ChatNamespace {
         try {
             const response = await $.ajax({
                 url: `${app.serverUrl()}/deleteChatCategory`,
-                data: {category, community_id: app.activeChainId()},
+                data: {
+                    category,
+                    community_id: app.activeChainId(),
+                    jwt: app.user.jwt,
+                },
                 type: 'DELETE'
             });
 
-            if (response !== 'Success') {
+            if (response.status !== 'Success') {
                 throw new Error("Failed to delete chat category")
             }
             return true
@@ -153,11 +161,16 @@ export class ChatNamespace {
         try {
             const response = await $.ajax({
                 url: `${app.serverUrl()}/renameChatCategory`,
-                data: {category, new_category, community_id: app.activeChainId()},
+                data: {
+                    category,
+                    new_category,
+                    community_id: app.activeChainId(),
+                    jwt: app.user.jwts
+                },
                 type: 'PUT'
             });
 
-            if (response !== 'Success') {
+            if (response.status !== 'Success') {
                 throw new Error("Failed to rename chat category")
             }
             return true
@@ -169,13 +182,19 @@ export class ChatNamespace {
 
     public async renameChatChannel(channel_id: number, name: string) {
         try {
+            console.log(channel_id)
             const response = await $.ajax({
                 url: `${app.serverUrl()}/renameChatChannel`,
-                data: {channel_id, name, community_id: app.activeChainId()},
+                data: {
+                    channel_id,
+                    name,
+                    community_id: app.activeChainId(),
+                    jwt: app.user.jwt
+                },
                 type: 'PUT'
             });
 
-            if (response !== 'Success') {
+            if (response.status !== 'Success') {
                 throw new Error("Failed to rename chat channel")
             }
             return true

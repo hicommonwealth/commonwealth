@@ -77,17 +77,18 @@ export const CreateChannel: m.Component<{handleClose: Function, category: string
     }
 }
 
-export const RenameChannel: m.Component<{handleClose: Function, channel: channel},{channel_name: string}> = {
+export const RenameChannel: m.Component<
+  {handleClose: Function, channel: channel},{channel_name: string}> = {
     oninit: (vnode) => {
         vnode.state.channel_name = ""
     },
     view: (vnode) => {
         const handleSubmit = async () => {
-            await app.socket.chatNs.renameChatChannel(vnode.attrs.channel.id, vnode.state.channel_name)
             vnode.attrs.handleClose()
+            await app.socket.chatNs.renameChatChannel(vnode.attrs.channel.id, vnode.state.channel_name)
         }
 
-        const handleChange = evt => {vnode.state.channel_name = evt.target.value}
+        const handleChange = evt => { vnode.state.channel_name = evt.target.value }
 
         return <CWCard elevation='elevation-1' interactive={false}>
                 <Icon name={Icons.X} size={Size.XL} onclick={vnode.attrs.handleClose}></Icon>

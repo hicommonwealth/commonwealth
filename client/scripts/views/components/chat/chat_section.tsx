@@ -31,7 +31,6 @@ interface IState {
     adminModals: { [modal: string]: boolean },
     adminCategory: string,
     adminChannel: channel | {},
-    modal: boolean;
 }
 
 function setToggleTree(path: string, toggle: boolean) {
@@ -52,7 +51,6 @@ function setToggleTree(path: string, toggle: boolean) {
 export const ChatSection: m.Component<{mobile: boolean}, IState> = {
     oninit: async (vnode) => {
         vnode.state.loaded = false;
-        vnode.state.modal = false;
 
         const onMessage = (msg) => {
             console.log(msg) // TODO: Increment unread count
@@ -151,7 +149,7 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
                     <Icon
                         name={Icons.PLUS_CIRCLE}
                         onclick={(e) => {
-                            e.preventDefault();
+                            e.stopPropagation();
                             vnode.state.adminModals['CreateCategory'] = true
                         }}>
                     </Icon>
@@ -162,10 +160,9 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
         const categoryAdminButton = (category: string): m.Component<{},{}> => {
             return {
                 view: () => {
-                    const handleMouseout = (e) => {
+                    const handleMouseout = () => {
                         if(vnode.state.menu_toggle_tree['children'][category]['toggled_state']) {
                             vnode.state.menu_toggle_tree['children'][category]['toggled_state'] = false;
-                            vnode.state.adminCategory = ''
                         }
                     }
 
@@ -178,17 +175,24 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
                             e.stopPropagation();
                         }
                     }
+
+                    const handleMenuClick = (e, modal_name) => {
+                        e.stopPropagation();
+                        vnode.state.adminModals[modal_name] = true;
+                        handleMouseout();
+                    }
+
                     const menu_component = <Menu
                       class="admin-menu"
                       onmouseenter={handleMouseover}
                       onmouseleave={handleMouseout}
                     >
                             <MenuItem iconLeft={Icons.PLUS_CIRCLE} label="Add Channel"
-                              onclick={e => {e.stopPropagation(); vnode.state.adminModals['CreateChannel'] = true;}}/>
+                              onclick={e => {handleMenuClick(e, 'CreateChannel')}}/>
                             <MenuItem iconLeft={Icons.EDIT_2} label="Rename Category"
-                              onclick={e => {e.stopPropagation(); vnode.state.adminModals['RenameCategory'] = true;}}/>
+                              onclick={e => {handleMenuClick(e, 'RenameCategory')}}/>
                             <MenuItem iconLeft={Icons.DELETE} label="Delete Category"
-                              onclick={e => {e.stopPropagation(); vnode.state.adminModals['DeleteCategory'] = true;}}/>
+                              onclick={e => {handleMenuClick(e, 'DeleteCategory')}}/>
                     </Menu>
 
                     return <div>
@@ -200,10 +204,9 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
         }
 
         const channelRightIcon = (channel: channel): m.Component<{},{}>  => {
-            const handleMouseout = (e) => {
+            const handleMouseout = () => {
                 if(vnode.state.menu_toggle_tree['children'][channel.category]['children'][channel.name]['toggled_state']) {
                     vnode.state.menu_toggle_tree['children'][channel.category]['children'][channel.name]['toggled_state'] = false;
-                    vnode.state.adminChannel = {};
                 }
             }
 
@@ -217,19 +220,25 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
                 }
             }
 
+            const handleMenuClick = (e, modal_name) => {
+                e.stopPropagation();
+                vnode.state.adminModals[modal_name] = true;
+                handleMouseout()
+            }
+
             const menu_component = <Menu
               class="admin-menu"
               onmouseenter={handleMouseover}
               onmouseleave={handleMouseout}
             >
                 <MenuItem iconLeft={Icons.EDIT_2} label="Rename Channel"
-                    onclick={() => {vnode.state.adminModals['RenameChannel'] = true;}}/>
+                    onclick={e => {handleMenuClick(e, 'RenameChannel');}}/>
                 <MenuItem iconLeft={Icons.DELETE} label="Delete Channel"
-                    onclick={() => {vnode.state.adminModals['DeleteChannel'] = true;}}/>
+                    onclick={e => {handleMenuClick(e, 'DeleteChannel');}}/>
             </Menu>
             return {
                 view: () => {
-                    return <div >
+                    return <div>
                     {channel.unread > 0 && <div class="unread_icon"><p>{channel.unread}</p></div>}
                     <Icon name={Icons.EDIT} onmouseenter={handleMouseover} onmouseleave={handleMouseout}></Icon>
                     {vnode.state.menu_toggle_tree['children'][channel.category]['children'][channel.name]['toggled_state'] &&
@@ -272,24 +281,23 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
 
         const channel_data: SectionGroupProps[] = Object.keys(vnode.state.channels).map(categoryToSectionGroup)
 
-        vnode.state.modal = Object.values(vnode.state.adminModals).some(Boolean)
         const close_overlay = () => {
             Object.keys(vnode.state.adminModals).forEach(k => {
                 vnode.state.adminModals[k] = false;
         })}
         const overlay_content: m.Vnode = vnode.state.adminModals['CreateCategory']
-          ? <CreateCategory handleClose={close_overlay} />
+          ? <CreateCategory handleClose={close_overlay}/>
           : vnode.state.adminModals['CreateChannel']
           ? <CreateChannel handleClose={close_overlay} category={vnode.state.adminCategory} />
           : vnode.state.adminModals['RenameCategory']
           ? <RenameCategory handleClose={close_overlay} category={vnode.state.adminCategory} />
           : vnode.state.adminModals['RenameChannel']
-          ? <RenameChannel handleClose={close_overlay} channel={vnode.state.adminChannel} />
+          ? <RenameChannel handleClose={close_overlay} channel={vnode.state.adminChannel}/>
           : vnode.state.adminModals['DeleteCategory']
           ? <DeleteCategory handleClose={close_overlay} category={vnode.state.adminCategory} />
           : vnode.state.adminModals['DeleteChannel']
           ? <DeleteChannel handleClose={close_overlay} channel={vnode.state.adminChannel} />
-          : <div>Error</div>
+          : <div></div>
 
         const sidebar_section_data: SidebarSectionProps = {
             title: 'CHAT',
@@ -303,7 +311,7 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
             toggle_disabled: vnode.attrs.mobile,
             right_icon: sectionAdminButton,
             extra_components: <Overlay
-                isOpen={vnode.state.modal}
+                isOpen={Object.values(vnode.state.adminModals).some(Boolean)}
                 onClose={close_overlay}
                 closeOnOutsideClick={true}
                 content={overlay_content}

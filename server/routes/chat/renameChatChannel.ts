@@ -3,7 +3,7 @@ import {DB} from "../../database";
 
 export const Errors = {
     NotLoggedIn: 'Not logged in',
-    NotAdmin: 'Must be an admin to create a chat channel',
+    NotAdmin: 'Must be an admin to rename a chat channel',
     NoCommunityId: 'No community id given',
     NoChannelId: 'No channel id given',
     NoNewName: 'No new name given'
@@ -12,7 +12,7 @@ export const Errors = {
 export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
     if (!req.user) return next(new Error(Errors.NotLoggedIn));
 
-    if (!req.user.isAdmin) return next(new Error(Errors.NotAdmin))
+    // if (!req.user.isAdmin) return next(new Error(Errors.NotAdmin))
 
     if (!req.body.community_id) return next(new Error(Errors.NoCommunityId))
 
