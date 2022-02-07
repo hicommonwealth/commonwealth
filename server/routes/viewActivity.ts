@@ -20,7 +20,7 @@ export default async (
   const { id } = req.user;
   const { request } = req.body;
 
-  const global =`SELECT nt.thread_id, nt.last_activity, nts.notification_data,
+  const global =`SELECT nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id,
                   MAX(ovc.view_count) as view_count, 
                   COUNT(DISTINCT oc.id) AS comment_count,
                   COUNT(DISTINCT tr.id) + COUNT(DISTINCT cr.id) AS reaction_count
@@ -41,9 +41,9 @@ export default async (
                 LEFT JOIN "OffchainReactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
                 LEFT JOIN "OffchainReactions" cr ON oc.id = cr.comment_id
                 LEFT JOIN "OffchainThreads" thr ON thr.id = CAST(nt.thread_id AS int)
-                GROUP BY nt.thread_id, nt.last_activity, nts.notification_data;`;
+                GROUP BY nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id;`;
 
-  const forYou = `SELECT nt.thread_id, nt.last_activity, nts.notification_data,
+  const forYou = `SELECT nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id,
                     MAX(ovc.view_count) as view_count, 
                     COUNT(DISTINCT oc.id) AS comment_count,
                     COUNT(DISTINCT tr.id) + COUNT(DISTINCT cr.id) AS reaction_count
@@ -65,7 +65,7 @@ export default async (
                   LEFT JOIN "OffchainReactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
                   LEFT JOIN "OffchainReactions" cr ON oc.id = cr.comment_id
                   LEFT JOIN "OffchainThreads" thr ON thr.id = CAST(nt.thread_id AS int)
-                  GROUP BY nt.thread_id, nt.last_activity, nts.notification_data;`;
+                  GROUP BY nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id;`;
 
   const chainEvents = `SELECT ce.* FROM "ChainEvents" ce 
                       INNER JOIN "ChainEventTypes" cet ON ce.chain_event_type_id = cet.id 
