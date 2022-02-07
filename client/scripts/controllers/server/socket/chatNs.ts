@@ -165,7 +165,7 @@ export class ChatNamespace {
                     category,
                     new_category,
                     community_id: app.activeChainId(),
-                    jwt: app.user.jwts
+                    jwt: app.user.jwt
                 },
                 type: 'PUT'
             });
