@@ -36,6 +36,7 @@ export default async (
                   LIMIT 50
                   ) nt 
                 LEFT JOIN "Notifications" nts ON (nts.notification_data::jsonb->>'root_id') = nt.thread_id
+                    AND nts.category_id IN('new-thread-creation','new-comment-creation')
                 LEFT JOIN "OffchainViewCounts" ovc ON nt.thread_id = ovc.object_id
                 LEFT JOIN "OffchainComments" oc ON 'discussion_'||CAST(nt.thread_id AS VARCHAR) = oc.root_id --TODO: eval execution path with alternate aggregations
                 LEFT JOIN "OffchainReactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
@@ -60,6 +61,7 @@ export default async (
                     LIMIT 50
                     ) nt 
                   LEFT JOIN "Notifications" nts ON (nts.notification_data::jsonb->>'root_id') = nt.thread_id
+                    AND nts.category_id IN('new-thread-creation','new-comment-creation')
                   LEFT JOIN "OffchainViewCounts" ovc ON nt.thread_id = ovc.object_id
                   LEFT JOIN "OffchainComments" oc ON 'discussion_'||CAST(nt.thread_id AS VARCHAR) = oc.root_id --TODO: eval execution path with alternate aggregations
                   LEFT JOIN "OffchainReactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
