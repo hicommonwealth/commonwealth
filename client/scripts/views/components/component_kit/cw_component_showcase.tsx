@@ -72,7 +72,16 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWPopover
             isOpen={this.isPopoverOpen}
             closePopover={() => this.closePopover()}
-            content={<div class="popover-content">poop</div>}
+            content={
+              <div class="popover-example-container">
+                <div class="popover-example-body">
+                  This is the popover's contents
+                </div>
+                <div class="popover-example-footer">
+                  <CWButton onclick={() => this.closePopover()} label="Close" />
+                </div>
+              </div>
+            }
           />
         </div>
         <h1>Colors</h1>
