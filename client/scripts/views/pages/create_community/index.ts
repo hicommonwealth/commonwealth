@@ -13,8 +13,10 @@ import CosmosForm from './cosmos_form';
 import EthDaoForm from './eth_dao_form';
 import SplTokenForm from './spl_token_form';
 import { EthChainAttrs } from './chain_input_rows';
+import { OffchainFormTest } from './offchain_community_form_test';
 
 enum CommunityType {
+  OffchainCommunityTest = 'Offchain Community Test',
   OffchainCommunity = 'Offchain Community',
   Erc20Community = 'ERC20',
   SubstrateCommunity = 'Substrate',
@@ -37,95 +39,108 @@ interface CreateCommunityState extends EthChainAttrs {
   loadingEthChains: boolean;
 }
 
-const CreateCommunity: m.Component<
-  CreateCommunityAttrs,
-  CreateCommunityState
-> = {
-  oninit: (vnode) => {
-    vnode.state.activeForm = CommunityType.OffchainCommunity;
-    vnode.state.loadingEthChains = true;
-    vnode.state.ethChains = {};
-    vnode.state.ethChainNames = {};
+const CreateCommunity: m.Component<CreateCommunityAttrs, CreateCommunityState> =
+  {
+    oninit: (vnode) => {
+      vnode.state.activeForm = CommunityType.OffchainCommunityTest;
+      vnode.state.loadingEthChains = true;
+      vnode.state.ethChains = {};
+      vnode.state.ethChainNames = {};
 
-    // query eth chains
-    $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(async (res) => {
-      if (res.status === 'Success') {
-        vnode.state.ethChains = res.result;
-      }
+      // query eth chains
+      $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(
+        async (res) => {
+          if (res.status === 'Success') {
+            vnode.state.ethChains = res.result;
+          }
 
-      // query names from chainlist if possible
-      const chains = await $.getJSON('https://chainid.network/chains.json');
-      for (const id of Object.keys(vnode.state.ethChains)) {
-        const chain = chains.find((c) => c.chainId === +id);
-        if (chain) {
-          vnode.state.ethChainNames[id] = chain.name;
+          // query names from chainlist if possible
+          const chains = await $.getJSON('https://chainid.network/chains.json');
+          for (const id of Object.keys(vnode.state.ethChains)) {
+            const chain = chains.find((c) => c.chainId === +id);
+            if (chain) {
+              vnode.state.ethChainNames[id] = chain.name;
+            }
+          }
+          vnode.state.loadingEthChains = false;
+          m.redraw();
         }
-      }
-      vnode.state.loadingEthChains = false;
-      m.redraw();
-    })
-  },
-  view: (vnode: m.VnodeDOM<CreateCommunityAttrs, CreateCommunityState>) => {
-    const getActiveForm = () => {
-      const { ethChains, ethChainNames } = vnode.state;
-      switch (vnode.state.activeForm) {
-        case CommunityType.OffchainCommunity:
-          return m(OffchainCommunityForm);
-        case CommunityType.Erc20Community:
-          return m(ERC20Form, { ethChains, ethChainNames });
-        case CommunityType.SputnikDao:
-          return m(SputnikForm);
-        case CommunityType.SubstrateCommunity:
-          return m(SubstrateForm);
-        case CommunityType.Cosmos:
-          return m(CosmosForm);
-        case CommunityType.EthDao:
-          return m(EthDaoForm, { ethChains, ethChainNames });
-        case CommunityType.SplToken:
-          return m(SplTokenForm);
-        default:
-          throw new Error(`Invalid community type: ${vnode.state.activeForm}`)
-      }
-    };
-    return m(Sublayout, {
-      class: 'CreateCommunityPage',
-      title: 'Create Community',
-      useQuickSwitcher: true,
-    }, [
-      m('.create-community-wrapper', [
-        m('h3', 'New Commonwealth Community'),
-        vnode.state.loadingEthChains && m(Spinner, {
-          fill: true,
-          message: 'Loading...',
-          size: 'xl',
-          style: 'visibility: visible; opacity: 1;'
-        }),
-        !vnode.state.loadingEthChains && m(
-          Tabs,
-          {
-            align: 'center',
-            bordered: false,
-            fluid: true,
-          },
-          Object.values(CommunityType)
-            .filter((t) => {
-              return !ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin;
-            })
-            .map((t) => {
-              return m(TabItem, {
-                label: t.toString(),
-                active: vnode.state.activeForm === t,
-                onclick: () => {
-                  vnode.state.activeForm = t;
+      );
+    },
+    view: (vnode: m.VnodeDOM<CreateCommunityAttrs, CreateCommunityState>) => {
+      const getActiveForm = () => {
+        const { ethChains, ethChainNames } = vnode.state;
+        switch (vnode.state.activeForm) {
+          case CommunityType.OffchainCommunityTest:
+            return m(OffchainFormTest);
+          case CommunityType.OffchainCommunity:
+            return m(OffchainCommunityForm);
+          case CommunityType.Erc20Community:
+            return m(ERC20Form, { ethChains, ethChainNames });
+          case CommunityType.SputnikDao:
+            return m(SputnikForm);
+          case CommunityType.SubstrateCommunity:
+            return m(SubstrateForm);
+          case CommunityType.Cosmos:
+            return m(CosmosForm);
+          case CommunityType.EthDao:
+            return m(EthDaoForm, { ethChains, ethChainNames });
+          case CommunityType.SplToken:
+            return m(SplTokenForm);
+          default:
+            throw new Error(
+              `Invalid community type: ${vnode.state.activeForm}`
+            );
+        }
+      };
+      return m(
+        Sublayout,
+        {
+          class: 'CreateCommunityPage',
+          title: 'Create Community',
+          useQuickSwitcher: true,
+        },
+        [
+          m('.create-community-wrapper', [
+            m('h3', 'New Commonwealth Community'),
+            vnode.state.loadingEthChains &&
+              m(Spinner, {
+                fill: true,
+                message: 'Loading...',
+                size: 'xl',
+                style: 'visibility: visible; opacity: 1;',
+              }),
+            !vnode.state.loadingEthChains &&
+              m(
+                Tabs,
+                {
+                  align: 'center',
+                  bordered: false,
+                  fluid: true,
                 },
-                style: 'text-align: center'
-              })
-            }),
-        ),
-        !vnode.state.loadingEthChains && m('.community-creation-form', [getActiveForm()]),
-      ])
-    ]);
-  },
-};
+                Object.values(CommunityType)
+                  .filter((t) => {
+                    return (
+                      !ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin
+                    );
+                  })
+                  .map((t) => {
+                    return m(TabItem, {
+                      label: t.toString(),
+                      active: vnode.state.activeForm === t,
+                      onclick: () => {
+                        vnode.state.activeForm = t;
+                      },
+                      style: 'text-align: center',
+                    });
+                  })
+              ),
+            !vnode.state.loadingEthChains &&
+              m('.community-creation-form', [getActiveForm()]),
+          ]),
+        ]
+      );
+    },
+  };
 
 export default CreateCommunity;
