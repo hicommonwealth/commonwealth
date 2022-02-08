@@ -6,12 +6,10 @@ import $ from 'jquery';
 
 import app from 'state';
 import { RoleInfo, RolePermission, Webhook } from 'models';
-import { CompactModalExitButton } from 'views/modal';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
-import { CommunityOptionsPopover } from '../discussions';
 
 const ManageCommunityPage: m.Component<
   {},
@@ -26,7 +24,7 @@ const ManageCommunityPage: m.Component<
     if (!app.activeChainId()) {
       return;
     }
-    const chainOrCommObj = { chain: app.activeChainId() }
+    const chainOrCommObj = { chain: app.activeChainId() };
     const loadRoles = async () => {
       try {
         // TODO: Change to GET /members
@@ -113,36 +111,38 @@ const ManageCommunityPage: m.Component<
       m.redraw();
     };
 
-    return m(Sublayout, {
-      class: 'ManageCommunityPage',
-      title: [
-        'Manage Community',
-      ],
-      showNewProposalButton: true,
-    }, [
-      m('.manage-community-wrapper', [
-        m('.panel-top', [
-          vnode.state.loadingFinished &&
-            m(ChainMetadataManagementTable, {
-              admins,
-              chain: app.config.chains.getById(app.activeChainId()),
-              mods,
-              onRoleUpdate: (oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole),
-            }),
+    return m(
+      Sublayout,
+      {
+        class: 'ManageCommunityPage',
+        title: ['Manage Community'],
+        showNewProposalButton: true,
+      },
+      [
+        m('.manage-community-wrapper', [
+          m('.panel-top', [
+            vnode.state.loadingFinished &&
+              m(ChainMetadataManagementTable, {
+                admins,
+                chain: app.config.chains.getById(app.activeChainId()),
+                mods,
+                onRoleUpdate: (oldRole, newRole) =>
+                  onRoleUpdate(oldRole, newRole),
+              }),
+          ]),
+          m('.panel-bottom', [
+            vnode.state.loadingFinished &&
+              m(AdminPanelTabs, {
+                defaultTab: 1,
+                onRoleUpgrade: (oldRole, newRole) =>
+                  onRoleUpdate(oldRole, newRole),
+                roleData: vnode.state.roleData,
+                webhooks: vnode.state.webhooks,
+              }),
+          ]),
         ]),
-        m('.panel-bottom', [
-          vnode.state.loadingFinished &&
-            m(AdminPanelTabs, {
-              defaultTab: 1,
-              onRoleUpgrade: (oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole),
-              roleData: vnode.state.roleData,
-              webhooks: vnode.state.webhooks,
-            }),
-        ]),
-      ]),
-    ]);
+      ]
+    );
   },
 };
 
