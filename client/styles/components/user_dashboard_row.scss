@@ -22,72 +22,9 @@
          border-radius: 15px;
     }
    
-    .comment-body {
-        flex: 1;
-        &:first-child {
-            // chain notifications don't have a User/UserGallery
-            margin-top: 8px;
-        }
-        .chain-event-notification-top {
-            display: flex;
-            justify-content: space-between;
-            .cui-icon-action svg:hover {
-                color: $negative-bg-color;
-            }
-        }
-    }
-    .User {
-        padding: 3px 3px 0 3px;
-        // pointer-events: none;
-    }
-    .User:hover {
-        background: #F7F4FF;
-        border-radius: 10px;
-    }
-    .comment-body-title:hover ~ .UserDashboardRow-overwrite {
-        background: white;
-    }
-    .comment-body-title {
-        display: inline-block;
-        margin-bottom: 5px;
-        span {
-            color: #666666;
-            font-weight: 400;
-        }
-        .User .user-display-name,
-        span.commented-obj {
-            font-weight: 500;
-            color: black
-        }
-        span.comment-ago {
-            margin-left: 25px;
-            font-size: 18px;
-            color: #666;
-            text-align: right;
-            font-weight: 400;
-            line-height: 21.6px;
-
-            &:hover {
-                color: #4723AD;
-            }
-        }
-    }
-    .comment-body-excerpt {
-        margin: 7px 0 8px 27px;
-        color: black;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        .QuillFormattedText {
-            line-height: 1.2;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
 
     .activity-content {
-
+        display: flex;
         .new-comment {
             span.header {
                 font-weight: 600;
@@ -106,12 +43,22 @@
                     
                 }
             }
+            .comment-body {
+                margin: 7px 0 8px 32px;
+                &-concat {
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    margin: 7px 0 8px 32px;
+                }
+                
+                
+            }
         }
-
-            
-
-        
     }
+
     .icon-row {
         margin-top: 16px;
         margin-bottom: 10px;
@@ -123,7 +70,7 @@
             margin-left: 20px;
 
             @include sm-max { // For temporary break point behavior
-                flex-direction: column;
+                display: none;
             } 
        
             button {
@@ -154,9 +101,6 @@
                 color: #666;
                 background: transparent;
             }
-            @include lg-max {
-                display: none;
-            }
         }
         .cui-menu{
             button{
@@ -165,36 +109,6 @@
             }
         }
     }
-    .comment-body-bottom-wrap {
-        font-size: 15px;
-        margin-top: 12px; // needed because .comment-body-excerpt may not be present
-    }
-    .comment-body-created {
-        display: inline;
-        color: $text-color-medium;
-    }
-    .comment-body-mark-as-read {
-        display: inline;
-        color: $text-color-medium;
-        margin-left: 8px;
-        .cui-spinner {
-            position: relative;
-            top: -1px;
-            .cui-spinner-icon {
-                border-color: transparent;
-                border-top-color: $background-color-dark-accent !important;
-                border-right-color: $background-color-dark-accent !important;
-            }
-        }
-    }
-    .comment-body-mark-as-read:hover {
-        color: $background-color-dark-accent;
-    }
 }
 
-.UserDashboardRowMarkAsRead {
-    .cui-popover-content {
-        padding: 15px 20px 10px;
-    }
-}
 

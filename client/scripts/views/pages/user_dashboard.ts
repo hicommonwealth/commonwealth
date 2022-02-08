@@ -7,7 +7,7 @@ import { TabItem, Tabs, Tag, Col, Grid, Card, Icon, Icons, Spinner } from 'const
 
 import app from 'state';
 import { pluralize } from 'helpers';
-import { DashboardNotification, ChainEvent } from 'models';
+import { DashboardActivityNotification, ChainEvent } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 import UserDashboardRow from 'views/components/user_dashboard_row';
 import { ChainIcon } from 'views/components/chain_icon';
@@ -58,16 +58,20 @@ export enum DashboardViews {
  */
 
 const UserDashboard: m.Component<{}, {
-  count: number;
+  fy_count: number;
+  global_count: number;
+  chain_event_count: number;
   activeTab: DashboardViews;
   loadingData: boolean;
   onscroll;
-  fy_notifications: DashboardNotification[];
-  global_notifications: DashboardNotification[],
-  chain_events: ChainEvent[];
+  fy_notifications: DashboardActivityNotification[];
+  global_notifications: DashboardActivityNotification[],
+  chain_events: DashboardActivityNotification[];
 }> = {
   oninit: (vnode) => {
-    vnode.state.count = 10;
+    vnode.state.fy_count = 10;
+    vnode.state.global_count = 10;
+    vnode.state.chain_event_count = 10;
     vnode.state.loadingData = false;
     vnode.state.fy_notifications = [];
     vnode.state.global_notifications = [];
@@ -91,21 +95,21 @@ const UserDashboard: m.Component<{}, {
       if (tab === DashboardViews.FY) {
         if (fy_notifications.length === 0) vnode.state.loadingData = true;
         fetchActivity('forYou').then((activity) => {
-            vnode.state.fy_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null)).reverse();
+            vnode.state.fy_notifications = activity.result.map((notification) => DashboardActivityNotification.fromJSON(notification)).reverse();
             vnode.state.loadingData = false;
             m.redraw();
         })
       } else if (tab == DashboardViews.Global) {
         if (global_notifications.length === 0) vnode.state.loadingData = true;
         fetchActivity('global').then((activity) => {
-          vnode.state.global_notifications = activity.result.map((notification) => DashboardNotification.fromJSON(notification, null)).reverse();
+          vnode.state.global_notifications = activity.result.map((notification) => DashboardActivityNotification.fromJSON(notification)).reverse();
           vnode.state.loadingData = false;
           m.redraw();
          })
       } else if (tab == DashboardViews.Chain) {
         if (chain_events.length === 0) vnode.state.loadingData = true;
         fetchActivity('chainEvents').then((activity) => {
-          vnode.state.chain_events = activity.result.map((notification) => ChainEvent.fromJSON(notification, null)).reverse();
+          vnode.state.chain_events = activity.result.map((notification) => DashboardActivityNotification.fromJSON(notification)).reverse();
           vnode.state.loadingData = false;
           m.redraw();
          });
@@ -120,13 +124,32 @@ const UserDashboard: m.Component<{}, {
 
     // Scroll
     vnode.state.onscroll = _.debounce(async () => {
-      if (!notificationsRemaining(fy_notifications.length, vnode.state.count)) return;
-      const scrollHeight = $(document).height();
-      const scrollPos = $(window).height() + $(window).scrollTop();
-      if (scrollPos > (scrollHeight - 400)) {
-        vnode.state.count += 10;
-        m.redraw();
+      if (vnode.state.activeTab === DashboardViews.FY) {
+        if (!notificationsRemaining(fy_notifications.length, vnode.state.fy_count)) return;
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollPos > (scrollHeight - 400)) {
+          vnode.state.fy_count += 10;
+          m.redraw();
+        }
+      } else if (vnode.state.activeTab === DashboardViews.Global) {
+        if (!notificationsRemaining(global_notifications.length, vnode.state.global_count)) return;
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollPos > (scrollHeight - 400)) {
+          vnode.state.global_count += 10;
+          m.redraw();
+        }
+      } else {
+        if (!notificationsRemaining(chain_events.length, vnode.state.chain_event_count)) return;
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollPos > (scrollHeight - 400)) {
+          vnode.state.chain_event_count += 10;
+          m.redraw();
+        }
       }
+
     }, 400);
 
     $(window).on('scroll', vnode.state.onscroll);
@@ -144,7 +167,21 @@ const UserDashboard: m.Component<{}, {
         gutter: 20
       }, [
         m(Col, { span: { md: 9, sm: 12 } }, [
-          m('.title', 'Activity'),
+          m('.title', [
+            'Activity',
+            m('.communities-link',{
+              class:'link',
+              onclick: () => {
+                m.route.set('/communities');
+                m.redraw();
+              }
+            }, [
+              'View more communities',
+              m(Icon, {
+                name: Icons.EXTERNAL_LINK,
+              })
+            ]),
+          ]),
           m(Tabs, {
             align: 'left',
             bordered: false,
@@ -164,7 +201,6 @@ const UserDashboard: m.Component<{}, {
               onclick: () => {
                 handleToggle(DashboardViews.Global);
                 m.redraw();
-
               },
             }),
             m(TabItem, {
@@ -179,10 +215,10 @@ const UserDashboard: m.Component<{}, {
           m('.dashboard-row-wrap', [
             (activeTab === DashboardViews.FY) && [
               fy_notifications && fy_notifications.length > 0 ? [
-                fy_notifications.slice(0, vnode.state.count).map((data) => {
+                fy_notifications.slice(0, vnode.state.fy_count).map((data) => {
                   return m(UserDashboardRow, { notification: data, onListPage: true, });
                 }),
-                notificationsRemaining(fy_notifications.length, vnode.state.count)
+                notificationsRemaining(fy_notifications.length, vnode.state.fy_count)
                 ? m('.Spinner', [
                   m(Spinner, { active: true })
                 ])
@@ -192,10 +228,10 @@ const UserDashboard: m.Component<{}, {
             ],
             (activeTab === DashboardViews.Global) && [
               global_notifications && global_notifications.length > 0 ? [
-                global_notifications.slice(0, vnode.state.count).map((data) => {
+                global_notifications.slice(0, vnode.state.global_count).map((data) => {
                   return m(UserDashboardRow, { notification: data, onListPage: true, });
                 }),
-                notificationsRemaining(global_notifications.length, vnode.state.count)
+                notificationsRemaining(global_notifications.length, vnode.state.global_count)
                 ? m('.Spinner', [
                   m(Spinner, { active: true })
                 ])
@@ -205,10 +241,10 @@ const UserDashboard: m.Component<{}, {
             ],
             (activeTab === DashboardViews.Chain) && [
               chain_events && chain_events.length > 0 ? [
-                global_notifications.slice(0, vnode.state.count).map((data) => { // TODO: Change to reflect new chain events component
+                chain_events.slice(0, vnode.state.chain_event_count).map((data) => { // TODO: Change to reflect new chain events component
                   return m(UserDashboardRow, { notification: data, onListPage: true, });
                 }),
-                notificationsRemaining(chain_events.length, vnode.state.count)
+                notificationsRemaining(chain_events.length, vnode.state.chain_event_count)
                 ? m('.Spinner', [
                   m(Spinner, { active: true })
                 ])

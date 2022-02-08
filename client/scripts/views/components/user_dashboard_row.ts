@@ -16,7 +16,7 @@ import {
 
 import app from 'state';
 import { NotificationCategories, ProposalType } from 'types';
-import { Notification, AddressInfo, NotificationCategory, DashboardNotification } from 'models';
+import { Notification, AddressInfo, NotificationCategory, DashboardActivityNotification } from 'models';
 import { link, pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
 
@@ -29,6 +29,7 @@ import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import { CWEngagementButton } from './component_kit/cw_engagement_button';
 import { NumberList } from 'aws-sdk/clients/iot';
 import { Category } from 'typescript-logging';
+import { notifySuccess } from 'controllers/app/notifications';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -38,7 +39,7 @@ const getCommentPreview = (comment_text) => {
     decoded_comment_text = m(QuillFormattedText, {
       doc,
       hideFormatting: true,
-      collapse: true,
+      collapse: false,
     });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);
@@ -56,13 +57,39 @@ const getCommentPreview = (comment_text) => {
   return decoded_comment_text;
 };
 
+// Subscriptions
+const subscribeToThread = async (thread_id: string) => {
+  const adjusted_id = "discussion_" + thread_id;
+  const commentSubscription = app.user.notifications.subscriptions
+    .find((v) => v.objectId === adjusted_id && v.category === NotificationCategories.NewComment);
+  const reactionSubscription = app.user.notifications.subscriptions
+    .find((v) => v.objectId === adjusted_id && v.category === NotificationCategories.NewReaction);
+  const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
+
+  if (bothActive) {
+    await app.user.notifications.disableSubscriptions([commentSubscription, reactionSubscription]);
+      notifySuccess('Unsubscribed!');
+  } else if (!commentSubscription || !reactionSubscription) {
+    await Promise.all([
+      app.user.notifications.subscribe(NotificationCategories.NewReaction, adjusted_id),
+      app.user.notifications.subscribe(NotificationCategories.NewComment, adjusted_id),
+    ]);
+    notifySuccess('Subscribed!');
+  } else {
+    await app.user.notifications.enableSubscriptions([commentSubscription, reactionSubscription]);
+    notifySuccess('Subscribed!');
+  }
+}
+
 
 // Discuss, Share, and Subscribe Buttons
 const ButtonRow: m.Component<{
     path: string;
+    thread_id: string;
 }> = {
     view: (vnode) => {
-        const {path} = vnode.attrs;
+        const {path, thread_id} = vnode.attrs;
+        
         return m('.icon-row-left', [
             m(Button, {
               label: "discuss",
@@ -70,8 +97,8 @@ const ButtonRow: m.Component<{
               iconLeft: Icons.PLUS,
               rounded: true,
               onclick: (e) => {
-                e.preventDefault();
                 e.stopPropagation();
+                m.route.set(path);
               },
             }),
             m('.share-button', {
@@ -115,8 +142,8 @@ const ButtonRow: m.Component<{
               iconLeft: Icons.BELL,
               rounded: true,
               onclick: (e) => {
-                e.preventDefault();
                 e.stopPropagation();
+                subscribeToThread(thread_id);
               },
             }),
           ])
@@ -163,7 +190,8 @@ const ActivityIcons: m.Component<{
 
 
 const ActivityContent: m.Component<{
-    activityData: any
+    activityData: any;
+    category: string;
 }> = {
     view: (vnode) => {
         const {
@@ -175,7 +203,7 @@ const ActivityContent: m.Component<{
           author_address, 
           comment_text, 
           root_type,
-        } = JSON.parse(vnode.attrs.activityData.data);
+        } = JSON.parse(vnode.attrs.activityData.notification_data);
 
         const {likeCount, viewCount, commentCount} = vnode.attrs.activityData;
         
@@ -197,14 +225,14 @@ const ActivityContent: m.Component<{
           },
         });
 
-        if (comment_text) { // New Comment
 
+        if (vnode.attrs.category === 'new-comment-creation') { // New Comment
           return m('.new-comment', [
             m("span.header", [
               actorName,
               m("span.comment-counts", [
                 numericalCommentCount > 1 ? 
-                ["and ", numericalCommentCount - 1, " others"] : '',
+                [" and ", numericalCommentCount - 1, " others"] : '',
                 " commented on ",
               ]),
               m('span.community-title', [
@@ -218,26 +246,41 @@ const ActivityContent: m.Component<{
                   m.route.set(`/${chain_id}`)
                 }
               }, [community_name])
-              
-              
+            ]),
+            m(".comment-body-concat", [
+              getCommentPreview(comment_text)
             ])
           ])
-
-
+        } else if (vnode.attrs.category === 'new-thread-creation') {
+          return m('.new-comment', [
+            m("span.header", [
+              actorName,
+              m("span.comment-counts", [
+                " created new thread ",
+              ]),
+              m('span.community-title', [
+                title_text,
+              ]),
+              m("span.comment-counts", [" in "]),
+              m('span.community-link', {
+                onclick: (e) => { 
+                  e.preventDefault();
+                  e.stopPropagation();
+                  m.route.set(`/${chain_id}`)
+                }
+              }, [community_name])
+            ]),
+            
+          ])
         }
-
         return actorName
-
-
-        
-
     }
 }
 
 
 const UserDashboardRow: m.Component<
 {
-  notification: DashboardNotification;
+  notification: DashboardActivityNotification;
   onListPage?: boolean;
 },
 {
@@ -249,19 +292,54 @@ const UserDashboardRow: m.Component<
 }
 > = {
     view: (vnode) => {
-        const {likeCount, viewCount, commentCount} = vnode.attrs.notification;
+        const {likeCount, viewCount, commentCount, categoryId, thread_id, createdAt, typeId, updatedAt, blockNumber, chainEventId} = vnode.attrs.notification;
 
+        // ----------- Handle Chain Events ----------- //
+        if (categoryId === 'chain-event') {
+          const {
+            // Fill in with what we need
+
+          } = vnode.attrs.notification.eventData;
+
+          return;
+        }
+        
+        // ----------- Handle Notifications ----------- //
+        const {
+          created_at,
+          chain_id,
+          root_id, 
+          root_title, 
+          author_chain,
+          author_address, 
+          comment_text, 
+          root_type,
+        } = JSON.parse(vnode.attrs.notification.notification_data);
+
+        // Get Path to Proposal
+        const pseudoProposal = {
+          id: root_id,
+          title: root_title,
+          chain: chain_id,
+        };
+        const args = [root_type, pseudoProposal];
+        const path = (getProposalUrl as any)(...args);
     
         return m('.UserDashboardRow', {
-          onclick: () => console.log(vnode.attrs.notification, JSON.parse(vnode.attrs.notification.data))
+          onclick: () => {
+            m.route.set(path);
+            m.redraw();
+          }
         }, [
             m('.activity-content', [
+              //vnode.attrs.notification.categoryId === ''
                 m(ActivityContent, {
-                    activityData: vnode.attrs.notification
+                    activityData: vnode.attrs.notification,
+                    category: categoryId
                 })
             ]),
             m('.icon-row', [
-                m(ButtonRow, {path: ''}),
+                m(ButtonRow, {path, thread_id}),
                 m(ActivityIcons, {
                     viewCount,
                     commentCount,
