@@ -13,23 +13,33 @@ import Substrate from 'controllers/chain/substrate/main';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import { MultipleButtonSelectorFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
-import { CompactModalExitButton } from 'views/modal';
 import { createTXModal } from 'views/modals/tx_signing_modal';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 
-const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenStakeAmount }> = {
+const CouncilVotingModal: m.Component<
+  { candidates },
+  { votes; error; phragmenStakeAmount }
+> = {
   view: (vnode) => {
     const author = app.user.activeAccount;
     const candidates = vnode.attrs.candidates || [];
     if (!author) return m('div', 'Must be logged in');
-    if (!(author instanceof SubstrateAccount)) return m('div', 'Council voting only supported on Substrate.');
+    if (!(author instanceof SubstrateAccount))
+      return m('div', 'Council voting only supported on Substrate.');
 
     // get currently set approvals
-    const currentVote = (app.chain as Substrate).phragmenElections.activeElection.getVotes(author);
-    const currentStake = (currentVote[0]) ? currentVote[0].stake.inDollars : 0;
-    const currentApprovals = (currentVote && currentVote.length > 0 && currentVote[0].votes) || [];
+    const currentVote = (
+      app.chain as Substrate
+    ).phragmenElections.activeElection.getVotes(author);
+    const currentStake = currentVote[0] ? currentVote[0].stake.inDollars : 0;
+    const currentApprovals =
+      (currentVote && currentVote.length > 0 && currentVote[0].votes) || [];
     const hasApprovals = currentApprovals.length > 0;
     const defaultSelection = candidates
-      .filter(([candidate]) => currentApprovals && currentApprovals.includes(candidate.address))
+      .filter(
+        ([candidate]) =>
+          currentApprovals && currentApprovals.includes(candidate.address)
+      )
       .map(([candidate]) => candidate.address);
     if (vnode.state.votes === undefined) {
       vnode.state.votes = defaultSelection;
@@ -52,13 +62,24 @@ const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenSt
       }
 
       const voteAccts: string[] = vnode.state.votes;
-      const voteObj = new PhragmenElectionVote(app.user.activeAccount as SubstrateAccount, voteAccts, stake);
-      createTXModal((app.chain as Substrate).phragmenElections.activeElection.submitVoteTx(voteObj)).then(() => {
-        $(e.target).trigger('modalforceexit');
-      }, (err) => {
-        if (err) vnode.state.error = err;
-        m.redraw();
-      });
+      const voteObj = new PhragmenElectionVote(
+        app.user.activeAccount as SubstrateAccount,
+        voteAccts,
+        stake
+      );
+      createTXModal(
+        (app.chain as Substrate).phragmenElections.activeElection.submitVoteTx(
+          voteObj
+        )
+      ).then(
+        () => {
+          $(e.target).trigger('modalforceexit');
+        },
+        (err) => {
+          if (err) vnode.state.error = err;
+          m.redraw();
+        }
+      );
     };
     const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
 
@@ -70,13 +91,18 @@ const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenSt
       m('.compact-modal-body', [
         m('.chooser', [
           m('p', [
-            `Lock any amount of ${(app.chain && app.chain.chain && app.chain.chain.denom) || 'balance'} to vote. `,
-            'You may unlock at any time.'
+            `Lock any amount of ${
+              (app.chain && app.chain.chain && app.chain.chain.denom) ||
+              'balance'
+            } to vote. `,
+            'You may unlock at any time.',
           ]),
           m('p', [
-            `A ${formatCoin(votingBond)} bond will be reserved in case your vote becomes inactive (everyone you are `,
+            `A ${formatCoin(
+              votingBond
+            )} bond will be reserved in case your vote becomes inactive (everyone you are `,
             'voting for withdraws their candidacies). Once inactive, anyone can evict your voter record and claim ',
-            'your bond.'
+            'your bond.',
           ]),
           m(Input, {
             class: 'phragmen-vote-amount',
@@ -86,11 +112,17 @@ const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenSt
             placeholder: 'Amount to lock',
             autocomplete: 'off',
             oncreate: () => {
-              vnode.state.phragmenStakeAmount = app.chain.chain.coins(parseFloat(String(currentStake)), true);
+              vnode.state.phragmenStakeAmount = app.chain.chain.coins(
+                parseFloat(String(currentStake)),
+                true
+              );
             },
             oninput: (e) => {
-              vnode.state.phragmenStakeAmount = app.chain.chain.coins(parseFloat(e.target.value), true);
-            }
+              vnode.state.phragmenStakeAmount = app.chain.chain.coins(
+                parseFloat(e.target.value),
+                true
+              );
+            },
           }),
           m(MultipleButtonSelectorFormField, {
             name: 'candidate',
@@ -102,11 +134,12 @@ const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenSt
               // votes array has type string[]
               vnode.state.votes = result;
             },
-            defaultSelection
+            defaultSelection,
           }),
-          candidates.length === 0 && m('.no-candidates', 'No candidates to vote for'),
+          candidates.length === 0 &&
+            m('.no-candidates', 'No candidates to vote for'),
           vnode.state.error && m('.voting-error', vnode.state.error),
-        ])
+        ]),
       ]),
       m('.compact-modal-actions', [
         m(Button, {
@@ -117,28 +150,35 @@ const CouncilVotingModal: m.Component<{ candidates }, { votes, error, phragmenSt
           label: hasApprovals ? 'Update vote' : 'Submit vote',
           intent: 'primary',
         }),
-        hasApprovals && m(Button, {
-          class: 'retract-vote',
-          intent: 'negative',
-          fluid: true,
-          rounded: true,
-          style: 'margin-top: 10px;',
-          onclick: (e) => {
-            e.preventDefault();
-            const account = app.user.activeAccount as SubstrateAccount;
-            createTXModal((app.chain as Substrate).phragmenElections.activeElection.removeVoterTx(account))
-              .then(() => {
-                $(e.target).trigger('modalforceexit');
-              }, (err) => {
-                if (err) vnode.state.error = err;
-                m.redraw();
-              });
-          },
-          label: 'Retract vote'
-        }),
+        hasApprovals &&
+          m(Button, {
+            class: 'retract-vote',
+            intent: 'negative',
+            fluid: true,
+            rounded: true,
+            style: 'margin-top: 10px;',
+            onclick: (e) => {
+              e.preventDefault();
+              const account = app.user.activeAccount as SubstrateAccount;
+              createTXModal(
+                (
+                  app.chain as Substrate
+                ).phragmenElections.activeElection.removeVoterTx(account)
+              ).then(
+                () => {
+                  $(e.target).trigger('modalforceexit');
+                },
+                (err) => {
+                  if (err) vnode.state.error = err;
+                  m.redraw();
+                }
+              );
+            },
+            label: 'Retract vote',
+          }),
       ]),
     ]);
-  }
+  },
 };
 
 export default CouncilVotingModal;

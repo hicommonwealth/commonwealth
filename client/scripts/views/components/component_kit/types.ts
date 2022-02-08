@@ -1,12 +1,13 @@
 export enum ComponentType {
   Button = 'Button',
-  GradientButton = 'GradientButton',
   ButtonGroup = 'ButtonGroup',
+  Card = 'Card',
+  EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
+  GradientButton = 'GradientButton',
+  Modal = 'Modal',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
-  EngagementButton = 'EngagementButton',
-  Card = 'Card',
   TextInput = 'TextInput',
 }
 
