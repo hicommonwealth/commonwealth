@@ -16,7 +16,7 @@ import {
 
 import app from 'state';
 import { NotificationCategories, ProposalType } from 'types';
-import { Notification, AddressInfo, DashboardNotification } from 'models';
+import { Notification, AddressInfo, DashboardActivityNotification } from 'models';
 import { link, pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
 
@@ -353,11 +353,11 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   };
 }; */
 
-
+/* 
 
 const UserDashboardRow: m.Component<
   {
-    notification: DashboardNotification;
+    notification: DashboardActivityNotification;
     onListPage?: boolean;
   },
   {
@@ -609,3 +609,4 @@ const UserDashboardRow: m.Component<
 };
 
 export default UserDashboardRow;
+ */
