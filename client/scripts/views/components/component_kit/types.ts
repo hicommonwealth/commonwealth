@@ -5,6 +5,7 @@ export enum ComponentType {
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',
+  Modal = 'Modal',
   Overlay = 'Overlay',
   Popover = 'Popover',
   RadioButton = 'RadioButton',
