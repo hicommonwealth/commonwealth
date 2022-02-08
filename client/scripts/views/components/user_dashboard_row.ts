@@ -16,7 +16,7 @@ import {
 
 import app from 'state';
 import { NotificationCategories, ProposalType } from 'types';
-import { Notification, AddressInfo, NotificationCategory, DashboardActivityNotification } from 'models';
+import { Notification, AddressInfo, NotificationCategory, DashboardActivityNotification, NotificationSubscription } from 'models';
 import { link, pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
 
@@ -58,14 +58,8 @@ const getCommentPreview = (comment_text) => {
 };
 
 // Subscriptions
-const subscribeToThread = async (thread_id: string) => {
+const subscribeToThread = async (thread_id: string, bothActive: boolean, commentSubscription: NotificationSubscription, reactionSubscription: NotificationSubscription) => {
   const adjusted_id = "discussion_" + thread_id;
-  const commentSubscription = app.user.notifications.subscriptions
-    .find((v) => v.objectId === adjusted_id && v.category === NotificationCategories.NewComment);
-  const reactionSubscription = app.user.notifications.subscriptions
-    .find((v) => v.objectId === adjusted_id && v.category === NotificationCategories.NewReaction);
-  const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
-
   if (bothActive) {
     await app.user.notifications.disableSubscriptions([commentSubscription, reactionSubscription]);
       notifySuccess('Unsubscribed!');
@@ -89,6 +83,13 @@ const ButtonRow: m.Component<{
 }> = {
     view: (vnode) => {
         const {path, thread_id} = vnode.attrs;
+
+        const adjusted_id = "discussion_" + thread_id;
+        const commentSubscription = app.user.notifications.subscriptions
+          .find((v) => v.objectId === adjusted_id && v.category === NotificationCategories.NewComment);
+        const reactionSubscription = app.user.notifications.subscriptions
+          .find((v) => v.objectId === adjusted_id && v.category === NotificationCategories.NewReaction);
+        const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
         
         return m('.icon-row-left', [
             m(Button, {
@@ -138,12 +139,12 @@ const ButtonRow: m.Component<{
             ]),
             m(Button, {
               buttonSize: 'sm',
-              label: 'subscribe',
+              label: bothActive ? 'unsubscribe' : 'subscribe',
               iconLeft: Icons.BELL,
               rounded: true,
               onclick: (e) => {
                 e.stopPropagation();
-                subscribeToThread(thread_id);
+                subscribeToThread(thread_id, bothActive, commentSubscription, reactionSubscription);
               },
             }),
           ])
