@@ -4,6 +4,16 @@ $margin-bottom: 32px;
 $width: 360px;
 
 .ComponentShowcase {
+  .popover-gallery {
+    margin-bottom: $margin-bottom;
+
+    .popover-content {
+      background-color: white;
+      height: 360px;
+      width: $width;
+    }
+  }
+
   .color-gallery {
     display: flex;
     flex-direction: column;

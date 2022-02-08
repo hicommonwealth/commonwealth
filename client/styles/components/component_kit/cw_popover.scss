@@ -1,0 +1,18 @@
+.Popover {
+  .overlay-background {
+    background: rgba(0, 0, 0, 0.2);
+    bottom: 0;
+    display: flex;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 1002;
+  }
+
+  .popover-content-container {
+    position: absolute;
+    margin: auto;
+    z-index: 1003;
+  }
+}

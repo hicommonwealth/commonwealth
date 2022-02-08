@@ -6,6 +6,7 @@ export enum ComponentType {
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',
   Overlay = 'Overlay',
+  Popover = 'Popover',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   TextInput = 'TextInput',
