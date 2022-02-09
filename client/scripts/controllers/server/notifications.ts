@@ -166,8 +166,9 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
+    const options = app.isCustomDomain() ? { chain_filter: app.activeChainId() } : {};
     // TODO: Change to GET /notifications
-    return post('/viewNotifications', { }, (result) => {
+    return post('/viewNotifications', options, (result) => {
       this._store.clear();
       this._subscriptions = [];
       const ceSubs = []

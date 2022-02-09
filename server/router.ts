@@ -34,6 +34,7 @@ import starCommunity from './routes/starCommunity';
 import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
+import communityStats from './routes/communityStats';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -659,6 +660,7 @@ function setupRouter(
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
+  router.get('/communityStats', communityStats.bind(this, models));
 
   app.use('/api', router);
 }

@@ -4,28 +4,28 @@ $black: #000000;
 $dark-gray: #333333;
 $midi-gray: #666666;
 $lite-gray: #999999;
-$disable-gray: #DDDDDD;
-$background-gray: #F4F4F4;
-$white: #FFFFFF;
+$disable-gray: #dddddd;
+$background-gray: #f4f4f4;
+$white: #ffffff;
 
-$dark-purp: #4723AD;
-$midi-purp: #9075DC;
-$lite-purp: #C7B9EF;
-$xlite-purp: #F7F4FF;
+$dark-purp: #4723ad;
+$midi-purp: #9075dc;
+$lite-purp: #c7b9ef;
+$xlite-purp: #f7f4ff;
 
-$purp-blue: #6300FF;
-$purp-blue-lite: #F3EBFF;
+$purp-blue: #6300ff;
+$purp-blue-lite: #f3ebff;
 
-$hype-red: #FF002E;
-$pinky: #FFAFBE;
-$flesh-pink: #FFEBEE;
+$hype-red: #ff002e;
+$pinky: #ffafbe;
+$flesh-pink: #ffebee;
 
 $dark-green: #008676;
-$carrib-green: #00C0A9;
-$foam-green: #B4F1EA;
-$mint-green: #F3FFF9;
+$carib-green: #00c0a9;
+$foam-green: #b4f1ea;
+$mint-green: #f3fff9;
 
-$cream-yellow: #FFFBA1;
+$cream-yellow: #fffba1;
 
 $elevation-1-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
 $elevation-2-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
@@ -34,89 +34,73 @@ $elevation-4-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
 $elevation-5-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
 
 title {
-    font-family: $fonts;
-    font-size: 72px;
-    font-style: normal;
-    font-weight: 600;
+  font-family: $fonts;
+  font-size: 72px;
+  font-style: normal;
+  font-weight: 600;
 }
 
 @mixin header {
-    font-family: $fonts;
-    font-style: normal;
-    font-weight: 500;
+  font-family: $fonts;
+  font-style: normal;
+  font-weight: 500;
 }
 
 h1 {
-    @include header;
-    font-size: 48px;
+  @include header;
+  font-size: 48px;
 }
 
 h2 {
-    @include header;
-    font-size: 32px;
+  @include header;
+  font-size: 32px;
 }
 
 h3 {
-    @include header;
-    font-size: 24px;
+  @include header;
+  font-size: 24px;
 }
 
 @mixin body {
-    font-family: $fonts;
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 400;
+  font-family: $fonts;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
 }
 
 @mixin body-paragraph {
-    @include body;
-    p {
-        margin-bottom: 10px;
-    }
+  @include body;
+  p {
+    margin-bottom: 10px;
+  }
 }
 
 @mixin link {
-    @include body;
-    font-weight: 500;
-    color: #140994;
+  @include body;
+  font-weight: 500;
+  color: #140994;
 }
 
 @mixin button-label {
-    @include body;
-    font-weight: 600;
+  @include body;
+  font-weight: 600;
 }
 
 @mixin form-label {
-    @include body;
-    font-size: 14px;
-    line-height: 16.8px;
-    color: #666666;
+  @include body;
+  font-size: 14px;
+  line-height: 16.8px;
+  color: #666666;
 }
 
 @mixin rainbow-gradient-horizontal {
-    background: linear-gradient(
-        90deg,
-        #91BFFF,
-        #91FFA0,
-        #FBFF91,
-        #FF9191
-    );
+  background: linear-gradient(90deg, #91bfff, #91ffa0, #fbff91, #ff9191);
 }
 
 @mixin rainbow-gradient-diagonal {
-    background: linear-gradient(
-        45deg,
-        #91BFFF,
-        #91FFA0,
-        #FBFF91,
-        #FF9191
-    );
+  background: linear-gradient(45deg, #91bfff, #91ffa0, #fbff91, #ff9191);
 }
 
 @mixin shadow-gradient {
-    background: linear-gradient(
-        270deg, 
-        #17161E,
-        #07060D)
+  background: linear-gradient(270deg, #17161e, #07060d);
 }
-

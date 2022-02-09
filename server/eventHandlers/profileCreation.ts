@@ -66,8 +66,15 @@ export default class extends IEventHandler {
         return;
       }
 
-      // create a new address and profile
-      addressInstance = await this._models.Address.createEmpty(chain, address);
+      // Address.createEmpty
+      const verification_token = 'NO_USER';
+      const verification_token_expires = new Date(); // expired immediately
+      addressInstance = await this._models.Address.create({
+        chain,
+        address,
+        verification_token,
+        verification_token_expires
+      });
       await this._models.OffchainProfile.create({
         address_id: addressInstance.id,
       });

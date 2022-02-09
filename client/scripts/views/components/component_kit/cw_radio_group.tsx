@@ -6,47 +6,46 @@ import 'components/component_kit/cw_radio_group.scss';
 import { CWRadioButton } from './cw_radio_button';
 import { ComponentType } from './types';
 
+type RadioGroupOption = { label: string; value: string };
+
 type RadioGroupAttrs = {
-  values: string[];
-  labels?: string[];
-  defaultValue: string;
+  options: Array<RadioGroupOption>;
+  defaultValue: RadioGroupOption;
   name: string;
   // TODO: Gabe 1/14/22 type onchange for real
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onchange: (e?: any) => void;
   disabled?: boolean;
 };
-
-type RadioGroupState = {
+export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
   toggledValue: string;
-};
 
-export const CWRadioGroup: m.Component<RadioGroupAttrs, RadioGroupState> = {
-  oninit: (vnode) => {
-    if (!vnode.state.toggledValue) {
-      vnode.state.toggledValue = vnode.attrs.defaultValue;
+  oninit(vnode) {
+    if (!this.toggledValue) {
+      this.toggledValue = vnode.attrs.defaultValue.value;
     }
-  },
-  view: (vnode) => {
-    const { values, labels, onchange, name, disabled } = vnode.attrs;
-    const { toggledValue } = vnode.state;
+  }
 
+  view(vnode) {
+    const { options, onchange, name, disabled } = vnode.attrs;
     return (
       <div class={ComponentType.RadioGroup}>
-        {values.map((val, idx) => {
-          return m(CWRadioButton, {
-            value: val,
-            label: labels[idx] || val,
-            checked: val === toggledValue,
-            groupName: name,
-            onchange: (e) => {
-              vnode.state.toggledValue = e?.target?.value;
-              onchange(e);
-            },
-            disabled,
-          });
+        {options.map((o) => {
+          return (
+            <CWRadioButton
+              value={o.value}
+              label={o.label}
+              checked={o.value === this.toggledValue}
+              groupName={name}
+              onchange={(e) => {
+                this.toggledValue = e?.target?.value;
+                onchange(e);
+              }}
+              disabled={disabled}
+            />
+          );
         })}
       </div>
     );
-  },
-};
+  }
+}
