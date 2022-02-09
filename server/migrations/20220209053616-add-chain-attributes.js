@@ -14,7 +14,7 @@ module.exports = {
       // { category_name: ''} // TODO: Pre-populate with more
     ];
 
-    await queryInterface.sequelize.bulkInsert("ChainCategoryTypes", [...categoryTypes], { transaction: t });
+    await queryInterface.bulkInsert("ChainCategoryTypes", [...categoryTypes], { transaction: t });
 
     // creates a new table called ChainCategories
     await queryInterface.createTable("ChainCategories", {
@@ -24,6 +24,19 @@ module.exports = {
         type: Sequelize.INTEGER, allowNull: false, references: { model: "ChainCategoryTypes", key: "id" }
       }
     }, { transaction: t });
+
+    const chainCategories = [
+      {
+        chain_id: 'dydx',
+        category_type_id: 1,
+      },
+      {
+        chain_id: 'dydx',
+        category_type_id: 2,
+      },
+    ];
+    await queryInterface.bulkInsert("ChainCategories", [...chainCategories], { transaction: t });
+
     });
   },
 
