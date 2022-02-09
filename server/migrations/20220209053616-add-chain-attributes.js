@@ -21,8 +21,8 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
       await queryInterface.sequelize.transaction(async (t) => {
-          await queryInterface.dropTable('ChainCategoryTypes', { transaction: t });
-          await queryInterface.dropTable('ChainCategories', { transaction: t });
+        await queryInterface.dropTable('ChainCategories', { transaction: t });
+        await queryInterface.dropTable('ChainCategoryTypes', { transaction: t });
       });
   },
 };
