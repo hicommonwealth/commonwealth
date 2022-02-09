@@ -347,7 +347,6 @@ const UserDashboardRow: m.Component<
                   src: icon_url,
                 }),
                 m('.new-comment', [
-                  
                   m("span.header", [
                     m('span.community-title', [
                       label.heading,
