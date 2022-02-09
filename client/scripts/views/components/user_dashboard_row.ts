@@ -11,6 +11,8 @@ import {
   SupportedNetwork,
   CompoundEvents,
   AaveEvents,
+  CWEvent,
+  Label as ChainEventLabel
   // CompoundEvents
 } from '@commonwealth/chain-events';
 
@@ -29,7 +31,9 @@ import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import { CWEngagementButton } from './component_kit/cw_engagement_button';
 import { NumberList } from 'aws-sdk/clients/iot';
 import { Category } from 'typescript-logging';
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { ChainIcon } from './chain_icon';
+
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -80,9 +84,12 @@ const subscribeToThread = async (thread_id: string, bothActive: boolean, comment
 const ButtonRow: m.Component<{
     path: string;
     thread_id: string;
+    showDiscussion: boolean;
+    showShare: boolean;
+    showSubscribe: boolean;
 }> = {
     view: (vnode) => {
-        const {path, thread_id} = vnode.attrs;
+        const {path, thread_id, showDiscussion, showShare, showSubscribe} = vnode.attrs;
 
         const adjusted_id = "discussion_" + thread_id;
         const commentSubscription = app.user.notifications.subscriptions
@@ -92,6 +99,7 @@ const ButtonRow: m.Component<{
         const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
         
         return m('.icon-row-left', [
+          showDiscussion && (
             m(Button, {
               label: "discuss",
               buttonSize: 'sm',
@@ -101,7 +109,9 @@ const ButtonRow: m.Component<{
                 e.stopPropagation();
                 m.route.set(path);
               },
-            }),
+            })
+          ),
+          showShare && (
             m('.share-button', {
               onclick: (e) => {
                 e.stopPropagation();
@@ -136,18 +146,22 @@ const ButtonRow: m.Component<{
                   onclick: (e) => {},
                 }),
               }),
-            ]),
+            ])
+          ),
+          showSubscribe && (
             m(Button, {
               buttonSize: 'sm',
               label: bothActive ? 'unsubscribe' : 'subscribe',
               iconLeft: Icons.BELL,
               rounded: true,
+              class: bothActive ? 'subscribe-button' : '',
               onclick: (e) => {
                 e.stopPropagation();
                 subscribeToThread(thread_id, bothActive, commentSubscription, reactionSubscription);
               },
-            }),
-          ])
+            })
+          )
+        ])
     }
 }
 
@@ -293,16 +307,69 @@ const UserDashboardRow: m.Component<
 }
 > = {
     view: (vnode) => {
-        const {likeCount, viewCount, commentCount, categoryId, thread_id, createdAt, typeId, updatedAt, blockNumber, chainEventId} = vnode.attrs.notification;
+        const { likeCount, 
+                viewCount,
+                commentCount, 
+                categoryId, 
+                thread_id, 
+                createdAt, 
+                typeId, 
+                updatedAt, 
+                blockNumber, 
+                eventNetwork, 
+                chain, 
+                icon_url
+        } = vnode.attrs.notification;
 
         // ----------- Handle Chain Events ----------- //
         if (categoryId === 'chain-event') {
-          const {
-            // Fill in with what we need
+          const chainEvent: CWEvent = {
+            blockNumber: blockNumber,
+            network: eventNetwork,
+            data: vnode.attrs.notification.eventData,
+          };
+          const label = ChainEventLabel(chain, chainEvent);
+          const community_name = app.config.chains.getById(chain)?.name || 'Unknown chain';
 
-          } = vnode.attrs.notification.eventData;
-
-          return;
+          return m('.UserDashboardRow', {
+            onclick: () => {
+              if (label.linkUrl) {
+                m.route.set(label.linkUrl);
+              } else {
+                notifyError("No Link Available!")
+              }
+              m.redraw();
+            }
+          }, [
+              m('.activity-content', [
+                m('img.chain-icon', {
+                  style: `width: 25px; height: 25px;`,
+                  src: icon_url,
+                }),
+                m('.new-comment', [
+                  
+                  m("span.header", [
+                    m('span.community-title', [
+                      label.heading,
+                    ]),
+                    m("span.comment-counts", [" in "]),
+                    m('span.community-link', {
+                      onclick: (e) => { 
+                        e.preventDefault();
+                        e.stopPropagation();
+                        m.route.set(`/${chain}`)
+                      }
+                    }, [community_name]),
+                    m('span.block-number', [
+                      " Block " + blockNumber
+                    ]),
+                  ]),
+                  m(".event-body", [
+                    label.label
+                  ])
+                ])
+              ]),
+          ])
         }
         
         // ----------- Handle Notifications ----------- //
@@ -333,14 +400,19 @@ const UserDashboardRow: m.Component<
           }
         }, [
             m('.activity-content', [
-              //vnode.attrs.notification.categoryId === ''
                 m(ActivityContent, {
                     activityData: vnode.attrs.notification,
                     category: categoryId
                 })
             ]),
             m('.icon-row', [
-                m(ButtonRow, {path, thread_id}),
+                m(ButtonRow, {
+                  path, 
+                  thread_id,
+                  showDiscussion: true,
+                  showShare: true,
+                  showSubscribe: true
+                }),
                 m(ActivityIcons, {
                     viewCount,
                     commentCount,

@@ -69,9 +69,10 @@ export default async (
                   LEFT JOIN "OffchainThreads" thr ON thr.id = CAST(nt.thread_id AS int)
                   GROUP BY nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id;`;
 
-  const chainEvents = `SELECT ce.* FROM "ChainEvents" ce 
+  const chainEvents = `SELECT ce.*, cet.chain, cet.event_network, c.icon_url FROM "ChainEvents" ce
                       INNER JOIN "ChainEventTypes" cet ON ce.chain_event_type_id = cet.id 
                       INNER JOIN "Addresses" a ON a."chain" = cet."chain" 
+                      INNER JOIN "Chains" c ON c.id = cet.chain 
                       WHERE a.user_id = ${id}
                       ORDER BY ce.created_at DESC 
                       LIMIT 50;`;

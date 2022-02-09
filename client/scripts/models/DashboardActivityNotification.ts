@@ -1,4 +1,4 @@
-import { IChainEventData } from '@commonwealth/chain-events';
+import { IChainEventData, SupportedNetwork } from '@commonwealth/chain-events';
 import { NodeInfo, Notification, ChainEvent, NotificationSubscription, ChainEventType } from 'models';
 import moment from 'moment';
 
@@ -23,9 +23,12 @@ class DashboardActivityNotification {
     public readonly eventData?: IChainEventData;
     public readonly chainEventId?: number;
     public readonly updatedAt?: moment.Moment;
+    public readonly eventNetwork?: SupportedNetwork;
+    public readonly chain?: string;
+    public readonly icon_url?: string;
     
 
-    constructor(createdAt, thread_id?, category_id?, notification_data?, viewCount?, likeCount?, commentCount?, isRead?, type_id?, block_number?, event_data?, id?, updated_at?) {
+    constructor(createdAt, thread_id?, category_id?, notification_data?, viewCount?, likeCount?, commentCount?, isRead?, type_id?, block_number?, event_data?, id?, updated_at?, event_network?, chain?, icon_url?) {
         this.categoryId = category_id ? category_id : 'chain-event';
         this.thread_id = thread_id;
         this.notification_data = notification_data;
@@ -39,7 +42,9 @@ class DashboardActivityNotification {
         this.eventData = event_data;
         this.chainEventId = id;
         this.updatedAt = moment(updated_at);
-
+        this.eventNetwork = event_network;
+        this.chain = chain;
+        this.icon_url = icon_url;
     }
 
     public static fromJSON(json) {
@@ -56,7 +61,10 @@ class DashboardActivityNotification {
           json.block_number,
           json.event_data,
           json.id,
-          json.updated_at
+          json.updated_at,
+          json.event_network,
+          json.chain,
+          json.icon_url
         );
     }
 }

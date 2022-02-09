@@ -25,7 +25,12 @@
 
     .activity-content {
         display: flex;
+        .chain-icon {
+            border-radius: 9999px;
+            margin-right: 15px;
+        }
         .new-comment {
+            margin-top: 3px;
             span.header {
                 font-weight: 600;
                 span.comment-counts {
@@ -42,7 +47,12 @@
                     }
                     
                 }
-            }
+                span.block-number {
+                    color: #666666;
+                    font-weight: 400;
+                    margin-left: 20px;
+                }
+             }
             .comment-body {
                 margin: 7px 0 8px 32px;
                 &-concat {
@@ -53,18 +63,38 @@
                     -webkit-box-orient: vertical;
                     margin: 7px 0 8px 32px;
                 }
-                
-                
+            }
+
+            .event-body {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                margin: 7px 0 8px 0px;
             }
         }
     }
 
+    .subscribe-button {
+        background: #F7F4FF;
+        border: 1px solid #4723AD !important;
+        color: #4723AD;
+        cursor: pointer;
+        svg {
+            stroke: #4723AD;
+        }
+    }
+
     .icon-row {
-        margin-top: 16px;
+        margin-top: 10px;
         margin-bottom: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        &-events {
+            margin-left: 0px
+        }
         &-left {
             display: flex;
             margin-left: 20px;
@@ -80,6 +110,8 @@
                 @include sm-max { // For temporary break point behavior
                     margin-top: 5px;
                 } 
+
+                
            
                 &:hover {
                     background: #F7F4FF;
