@@ -8,6 +8,14 @@ module.exports = {
         category_name: { type: Sequelize.STRING, allowNull: true },
     }, { transaction: t });
 
+    const categoryTypes = [
+      { category_name: 'DeFi'},
+      { category_name: 'DAO'},
+      // { category_name: ''} // TODO: Pre-populate with more
+    ];
+
+    await queryInterface.sequelize.bulkInsert("ChainCategoryTypes", [...categoryTypes], { transaction: t });
+
     // creates a new table called ChainCategories
     await queryInterface.createTable("ChainCategories", {
       id: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
