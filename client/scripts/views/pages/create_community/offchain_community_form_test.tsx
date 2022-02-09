@@ -17,49 +17,38 @@ import {
 } from 'views/components/metadata_rows_test';
 import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
 import {
-  // ChainFormState,
-  // initChainForm,
+  ChainFormState,
+  initChainForm,
   defaultChainRows,
 } from './chain_input_rows_test';
 import { CWButton } from '../../components/component_kit/cw_button';
 
-export class OffchainFormTest implements m.ClassComponent {
+interface OffchainFormState extends ChainFormState {
   id: string;
   name: string;
   base: ChainBase;
   saving: boolean;
   loaded: boolean;
   loading: boolean;
+  status: string;
   symbol: string;
   error: string;
-  description: string;
-  icon_url: string;
-  website: string;
-  discord: string;
-  element: string;
-  telegram: string;
-  github: string;
-  uploadInProgress: boolean;
+}
 
-  oninit() {
-    this.id = '';
-    this.name = '';
-    this.base = ChainBase.Ethereum;
-    this.saving = false;
-    this.loaded = false;
-    this.loading = false;
-    this.symbol = 'XYZ';
-    this.error = '';
-    this.description = '';
-    this.icon_url = '';
-    this.website = '';
-    this.discord = '';
-    this.element = '';
-    this.telegram = '';
-    this.github = '';
-    this.uploadInProgress = false;
-  }
+const initState: OffchainFormState = {
+  id: '',
+  name: '',
+  symbol: 'XYZ',
+  base: ChainBase.Ethereum,
+  saving: false,
+  loaded: false,
+  loading: false,
+  status: '',
+  error: '',
+  ...initChainForm(),
+};
 
+export class OffchainFormTest implements m.ClassComponent {
   view() {
     return (
       <div class="CommunityMetadataManagementTable">
@@ -71,42 +60,42 @@ export class OffchainFormTest implements m.ClassComponent {
         >
           <InputPropertyRow
             title="Name"
-            defaultValue={this.name}
+            defaultValue={initState.name}
             onChangeHandler={(v) => {
-              this.name = v;
-              this.id = slugify(v);
+              initState.name = v;
+              initState.id = slugify(v);
             }}
           />
           <InputPropertyRow
             title="ID"
-            defaultValue={this.id}
-            value={this.id}
+            defaultValue={initState.id}
+            value={initState.id}
             onChangeHandler={(v) => {
-              this.id = v;
+              initState.id = v;
             }}
           />
           <InputPropertyRow
             title="Symbol"
-            defaultValue={this.symbol}
+            defaultValue={initState.symbol}
             onChangeHandler={(v) => {
-              this.symbol = v;
+              initState.symbol = v;
             }}
           />
           <SelectPropertyRow
             title="Base Chain"
             options={['cosmos', 'ethereum', 'near']}
-            value={this.base}
+            value={initState.base}
             onchange={(value) => {
-              this.base = value;
+              initState.base = value;
             }}
           />
         </Table>
-        {...defaultChainRows(this)}
+        {...defaultChainRows(initState)}
         <CWButton
           class="mt-3"
           label="Save changes"
           buttonType="primary"
-          disabled={this.saving}
+          disabled={initState.saving}
           onclick={async () => {
             const {
               id,
@@ -119,9 +108,9 @@ export class OffchainFormTest implements m.ClassComponent {
               telegram,
               github,
               symbol,
-            } = this;
+            } = initState;
 
-            this.saving = true;
+            initState.saving = true;
             const additionalArgs: {
               eth_chain_id?: number;
               node_url?: string;
@@ -129,7 +118,7 @@ export class OffchainFormTest implements m.ClassComponent {
             } = {};
 
             // defaults to be overridden when chain is no longer "offchain" type
-            switch (this.base) {
+            switch (initState.base) {
               case ChainBase.CosmosSDK: {
                 additionalArgs.node_url = 'https://rpc-osmosis.keplr.app';
                 additionalArgs.bech32_prefix = 'osmo';
@@ -170,8 +159,8 @@ export class OffchainFormTest implements m.ClassComponent {
                 github,
                 jwt: app.user.jwt,
                 type: ChainType.Offchain,
-                base: this.base,
-                network: baseToNetwork(this.base),
+                base: initState.base,
+                network: baseToNetwork(initState.base),
                 ...additionalArgs,
               });
               await initAppState(false);
@@ -182,7 +171,7 @@ export class OffchainFormTest implements m.ClassComponent {
                   'Creating new offchain community failed'
               );
             } finally {
-              this.saving = false;
+              initState.saving = false;
             }
           }}
         />

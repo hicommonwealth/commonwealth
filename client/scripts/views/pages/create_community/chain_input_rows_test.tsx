@@ -20,16 +20,18 @@ export interface ChainFormState {
   uploadInProgress: boolean;
 }
 
-export function initChainForm<T extends ChainFormState>(state: T) {
-  state.icon_url = '';
-  state.website = '';
-  state.discord = '';
-  state.element = '';
-  state.telegram = '';
-  state.github = '';
-  state.description = '';
-  state.uploadInProgress = false;
-}
+export const initChainForm = (): ChainFormState => {
+  return {
+    icon_url: '',
+    website: '',
+    discord: '',
+    element: '',
+    telegram: '',
+    github: '',
+    description: '',
+    uploadInProgress: false,
+  };
+};
 
 export function defaultChainRows<T extends ChainFormState>(
   state: T,
