@@ -24,49 +24,38 @@ import {
 
 type OffchainFormAttrs = Record<string, unknown>;
 
-interface OffchainFormState extends ChainFormState {
+interface OffchainFormStateAttributes extends ChainFormState {
   id: string;
   name: string;
   base: ChainBase;
   saving: boolean;
   loaded: boolean;
   loading: boolean;
-  status: string;
   symbol: string;
   error: string;
 }
 
+const OffchainFormState: OffchainFormStateAttributes = {
+  id: '',
+  name: '',
+  base: ChainBase.Ethereum,
+  saving: false,
+  loaded: false,
+  loading: false,
+  symbol: 'XYZ',
+  error: '',
+  description: '',
+  icon_url: '',
+  website: '',
+  discord: '',
+  element: '',
+  telegram: '',
+  github: '',
+  uploadInProgress: false
+}
+
 export class OffchainFormTest implements m.ClassComponent<OffchainFormAttrs> {
-  state: OffchainFormState;
-
-  // constructor() {
-  //   this.state.id = '';
-  //   this.state.name = '';
-  //   this.state.symbol = 'XYZ';
-  //   this.state.base = ChainBase.Ethereum;
-  //   initChainForm(this.state);
-  //   this.state.saving = false;
-  //   this.state.loaded = false;
-  //   this.state.loading = false;
-  //   this.state.status = '';
-  //   this.state.error = '';
-  // }
-
-  oncreate() {
-    this.state.id = '';
-    this.state.name = '';
-    this.state.symbol = 'XYZ';
-    this.state.base = ChainBase.Ethereum;
-    initChainForm(this.state);
-    this.state.saving = false;
-    this.state.loaded = false;
-    this.state.loading = false;
-    this.state.status = '';
-    this.state.error = '';
-  }
-
-  view() {
-    console.log(this.state);
+  view(vnode) {
     return m('.CommunityMetadataManagementTable', [
       m(
         Table,
@@ -79,43 +68,43 @@ export class OffchainFormTest implements m.ClassComponent<OffchainFormAttrs> {
         [
           m(InputPropertyRow, {
             title: 'Name',
-            defaultValue: this.state.name,
+            defaultValue: OffchainFormState.name,
             onChangeHandler: (v) => {
-              this.state.name = v;
-              this.state.id = slugify(v);
+              OffchainFormState.name = v;
+              OffchainFormState.id = slugify(v);
             },
           }),
           m(InputPropertyRow, {
             title: 'ID',
-            defaultValue: this.state.id,
-            value: this.state.id,
+            defaultValue: OffchainFormState.id,
+            value: OffchainFormState.id,
             onChangeHandler: (v) => {
-              this.state.id = v;
+              OffchainFormState.id = v;
             },
           }),
           m(InputPropertyRow, {
             title: 'Symbol',
-            defaultValue: this.state.symbol,
+            defaultValue: OffchainFormState.symbol,
             onChangeHandler: (v) => {
-              this.state.symbol = v;
+              OffchainFormState.symbol = v;
             },
           }),
           m(SelectPropertyRow, {
             title: 'Base Chain',
             options: ['cosmos', 'ethereum', 'near'],
-            value: this.state.base,
+            value: OffchainFormState.base,
             onchange: (value) => {
-              this.state.base = value;
+              OffchainFormState.base = value;
             },
           }),
-          ...defaultChainRows(this.state),
+          ...defaultChainRows(this),
         ]
       ),
       m(Button, {
         class: 'mt-3',
         label: 'Save changes',
         intent: 'primary',
-        disabled: this.state.saving,
+        disabled: OffchainFormState.saving,
         onclick: async () => {
           const {
             id,
@@ -128,9 +117,9 @@ export class OffchainFormTest implements m.ClassComponent<OffchainFormAttrs> {
             telegram,
             github,
             symbol,
-          } = this.state;
+          } = OffchainFormState;
 
-          this.state.saving = true;
+          OffchainFormState.saving = true;
           const additionalArgs: {
             eth_chain_id?: number;
             node_url?: string;
@@ -138,7 +127,7 @@ export class OffchainFormTest implements m.ClassComponent<OffchainFormAttrs> {
           } = {};
 
           // defaults to be overridden when chain is no longer "offchain" type
-          switch (this.state.base) {
+          switch (OffchainFormState.base) {
             case ChainBase.CosmosSDK: {
               additionalArgs.node_url = 'https://rpc-osmosis.keplr.app';
               additionalArgs.bech32_prefix = 'osmo';
@@ -179,8 +168,8 @@ export class OffchainFormTest implements m.ClassComponent<OffchainFormAttrs> {
               github,
               jwt: app.user.jwt,
               type: ChainType.Offchain,
-              base: this.state.base,
-              network: baseToNetwork(this.state.base),
+              base: OffchainFormState.base,
+              network: baseToNetwork(OffchainFormState.base),
               ...additionalArgs,
             });
             await initAppState(false);
@@ -191,7 +180,7 @@ export class OffchainFormTest implements m.ClassComponent<OffchainFormAttrs> {
                 'Creating new offchain community failed'
             );
           } finally {
-            this.state.saving = false;
+            OffchainFormState.saving = false;
           }
         },
       }),
