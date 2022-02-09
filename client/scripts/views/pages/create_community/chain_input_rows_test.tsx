@@ -36,19 +36,19 @@ export function defaultChainRows<T extends ChainFormState>(
   disabled = false
 ) {
   return [
-    m(InputPropertyRow, {
-      title: 'Description',
-      disabled,
-      defaultValue: state.description,
-      onChangeHandler: (v) => {
+    <InputPropertyRow
+      title="Description"
+      disabled={disabled}
+      defaultValue={state.description}
+      onChangeHandler={(v) => {
         state.description = v;
-      },
-      textarea: true,
-    }),
-    m('tr.AvatarUploadRow', [
-      m('td', 'Upload Icon'),
-      m('td', [
-        m(AvatarUpload, {
+      }}
+      textarea={true}
+    />,
+    <tr class="AvatarUploadRow">
+      <td>Upload Icon</td>
+      <td>
+        {m(AvatarUpload, {
           avatarScope: AvatarScope.Chain,
           uploadStartedCallback: () => {
             state.uploadInProgress = true;
@@ -63,63 +63,63 @@ export function defaultChainRows<T extends ChainFormState>(
             state.uploadInProgress = false;
             m.redraw();
           },
-        }),
-      ]),
-    ]),
-    m(InputPropertyRow, {
-      title: 'Icon URL',
-      disabled,
-      defaultValue: state.icon_url,
-      placeholder: 'https://',
-      onChangeHandler: (v) => {
+        })}
+      </td>
+    </tr>,
+    <InputPropertyRow
+      title="Icon URL"
+      disabled={disabled}
+      defaultValue={state.icon_url}
+      placeholder="https://"
+      onChangeHandler={(v) => {
         state.icon_url = v;
-      },
-    }),
-    m(InputPropertyRow, {
-      title: 'Website',
-      disabled,
-      defaultValue: state.website,
-      placeholder: 'https://example.com',
-      onChangeHandler: (v) => {
+      }}
+    />,
+    <InputPropertyRow
+      title="Website"
+      disabled={disabled}
+      defaultValue={state.website}
+      placeholder="https://example.com"
+      onChangeHandler={(v) => {
         state.website = v;
-      },
-    }),
-    m(InputPropertyRow, {
-      title: 'Discord',
-      disabled,
-      defaultValue: state.discord,
-      placeholder: 'https://discord.com/invite',
-      onChangeHandler: (v) => {
+      }}
+    />,
+    <InputPropertyRow
+      title="Discord"
+      disabled={disabled}
+      defaultValue={state.discord}
+      placeholder="https://discord.com/invite"
+      onChangeHandler={(v) => {
         state.discord = v;
-      },
-    }),
-    m(InputPropertyRow, {
-      title: 'Element',
-      disabled,
-      defaultValue: state.element,
-      placeholder: 'https://matrix.to/#',
-      onChangeHandler: (v) => {
+      }}
+    />,
+    <InputPropertyRow
+      title="Element"
+      disabled={disabled}
+      defaultValue={state.element}
+      placeholder="https://matrix.to/#"
+      onChangeHandler={(v) => {
         state.element = v;
-      },
-    }),
-    m(InputPropertyRow, {
-      title: 'Telegram',
-      disabled,
-      defaultValue: state.telegram,
-      placeholder: 'https://t.me',
-      onChangeHandler: (v) => {
+      }}
+    />,
+    <InputPropertyRow
+      title="Telegram"
+      disabled={disabled}
+      defaultValue={state.telegram}
+      placeholder="https://t.me"
+      onChangeHandler={(v) => {
         state.telegram = v;
-      },
-    }),
-    m(InputPropertyRow, {
-      title: 'Github',
-      disabled,
-      defaultValue: state.github,
-      placeholder: 'https://github.com',
-      onChangeHandler: (v) => {
+      }}
+    />,
+    <InputPropertyRow
+      title="Github"
+      disabled={disabled}
+      defaultValue={state.github}
+      placeholder="https://github.com"
+      onChangeHandler={(v) => {
         state.github = v;
-      },
-    }),
+      }}
+    />,
   ];
 }
 

@@ -15,8 +15,10 @@ type InputPropertyRowAttrs = {
   value?: string;
 };
 
-export const InputPropertyRow: m.Component<InputPropertyRowAttrs> = {
-  view: (vnode) => {
+export class InputPropertyRow
+  implements m.ClassComponent<InputPropertyRowAttrs>
+{
+  view(vnode) {
     const {
       defaultValue,
       disabled,
@@ -57,8 +59,8 @@ export const InputPropertyRow: m.Component<InputPropertyRowAttrs> = {
         </td>
       </tr>
     );
-  },
-};
+  }
+}
 
 type TogglePropertyRowAttrs = {
   caption?: (e) => void;
@@ -106,8 +108,10 @@ type SelectPropertyRowAttrs = {
   value: string;
 };
 
-export const SelectPropertyRow: m.Component<SelectPropertyRowAttrs> = {
-  view: (vnode) => {
+export class SelectPropertyRow
+  implements m.ClassComponent<SelectPropertyRowAttrs>
+{
+  view(vnode) {
     const { onchange, options, title, value } = vnode.attrs;
 
     return (
@@ -124,5 +128,5 @@ export const SelectPropertyRow: m.Component<SelectPropertyRowAttrs> = {
         </td>
       </tr>
     );
-  },
-};
+  }
+}

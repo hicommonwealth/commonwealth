@@ -36,23 +36,37 @@ interface OffchainFormState extends ChainFormState {
   error: string;
 }
 
-export const OffchainFormTest: m.Component<
-  OffchainFormAttrs,
-  OffchainFormState
-> = {
-  oninit: (vnode) => {
-    vnode.state.id = '';
-    vnode.state.name = '';
-    vnode.state.symbol = 'XYZ';
-    vnode.state.base = ChainBase.Ethereum;
-    initChainForm(vnode.state);
-    vnode.state.saving = false;
-    vnode.state.loaded = false;
-    vnode.state.loading = false;
-    vnode.state.status = '';
-    vnode.state.error = '';
-  },
-  view: (vnode) => {
+export class OffchainFormTest implements m.ClassComponent<OffchainFormAttrs> {
+  state: OffchainFormState;
+
+  // constructor() {
+  //   this.state.id = '';
+  //   this.state.name = '';
+  //   this.state.symbol = 'XYZ';
+  //   this.state.base = ChainBase.Ethereum;
+  //   initChainForm(this.state);
+  //   this.state.saving = false;
+  //   this.state.loaded = false;
+  //   this.state.loading = false;
+  //   this.state.status = '';
+  //   this.state.error = '';
+  // }
+
+  oncreate() {
+    this.state.id = '';
+    this.state.name = '';
+    this.state.symbol = 'XYZ';
+    this.state.base = ChainBase.Ethereum;
+    initChainForm(this.state);
+    this.state.saving = false;
+    this.state.loaded = false;
+    this.state.loading = false;
+    this.state.status = '';
+    this.state.error = '';
+  }
+
+  view() {
+    console.log(this.state);
     return m('.CommunityMetadataManagementTable', [
       m(
         Table,
@@ -65,44 +79,44 @@ export const OffchainFormTest: m.Component<
         [
           m(InputPropertyRow, {
             title: 'Name',
-            defaultValue: vnode.state.name,
+            defaultValue: this.state.name,
             onChangeHandler: (v) => {
-              vnode.state.name = v;
-              vnode.state.id = slugify(v);
+              this.state.name = v;
+              this.state.id = slugify(v);
             },
           }),
           m(InputPropertyRow, {
             title: 'ID',
-            defaultValue: vnode.state.id,
-            value: vnode.state.id,
+            defaultValue: this.state.id,
+            value: this.state.id,
             onChangeHandler: (v) => {
-              vnode.state.id = v;
+              this.state.id = v;
             },
           }),
           m(InputPropertyRow, {
             title: 'Symbol',
-            defaultValue: vnode.state.symbol,
+            defaultValue: this.state.symbol,
             onChangeHandler: (v) => {
-              vnode.state.symbol = v;
+              this.state.symbol = v;
             },
           }),
           m(SelectPropertyRow, {
             title: 'Base Chain',
             options: ['cosmos', 'ethereum', 'near'],
-            value: vnode.state.base,
+            value: this.state.base,
             onchange: (value) => {
-              vnode.state.base = value;
+              this.state.base = value;
             },
           }),
-          ...defaultChainRows(vnode.state),
+          ...defaultChainRows(this.state),
         ]
       ),
       m(Button, {
         class: 'mt-3',
         label: 'Save changes',
         intent: 'primary',
-        disabled: vnode.state.saving,
-        onclick: async (e) => {
+        disabled: this.state.saving,
+        onclick: async () => {
           const {
             id,
             name,
@@ -114,8 +128,9 @@ export const OffchainFormTest: m.Component<
             telegram,
             github,
             symbol,
-          } = vnode.state;
-          vnode.state.saving = true;
+          } = this.state;
+
+          this.state.saving = true;
           const additionalArgs: {
             eth_chain_id?: number;
             node_url?: string;
@@ -123,7 +138,7 @@ export const OffchainFormTest: m.Component<
           } = {};
 
           // defaults to be overridden when chain is no longer "offchain" type
-          switch (vnode.state.base) {
+          switch (this.state.base) {
             case ChainBase.CosmosSDK: {
               additionalArgs.node_url = 'https://rpc-osmosis.keplr.app';
               additionalArgs.bech32_prefix = 'osmo';
@@ -164,8 +179,8 @@ export const OffchainFormTest: m.Component<
               github,
               jwt: app.user.jwt,
               type: ChainType.Offchain,
-              base: vnode.state.base,
-              network: baseToNetwork(vnode.state.base),
+              base: this.state.base,
+              network: baseToNetwork(this.state.base),
               ...additionalArgs,
             });
             await initAppState(false);
@@ -176,10 +191,10 @@ export const OffchainFormTest: m.Component<
                 'Creating new offchain community failed'
             );
           } finally {
-            vnode.state.saving = false;
+            this.state.saving = false;
           }
         },
       }),
     ]);
-  },
-};
+  }
+}
