@@ -19,78 +19,63 @@ import {
 import { CWButton } from '../../components/component_kit/cw_button';
 
 export class OffchainFormTest implements m.ClassComponent {
-  private state = {
+  private form = {
     id: '',
     name: '',
     symbol: 'XYZ',
     base: ChainBase.Ethereum,
+    ...initChainForm(),
+  };
+  private state = {
     saving: false,
     loaded: false,
     loading: false,
     status: '',
     error: '',
-    ...initChainForm(),
-  }
-  oninit() { console.log('offchain form init'); }
-  oncreate() { console.log('offchain form create'); }
+  };
   view() {
-    console.log(this.state);
     return (
       <div class="CreateCommunityForm">
         <InputRow
           title="Name"
           placeholder="Enter the name of your community"
-          defaultValue={this.state.name}
+          defaultValue={this.form.name}
           onChangeHandler={(v) => {
-            this.state.name = v;
-            this.state.id = slugify(v);
+            this.form.name = v;
+            this.form.id = slugify(v);
           }}
         />
         <InputRow
           title="ID"
           placeholder="ID will show up here based on your name"
-          defaultValue={this.state.id}
-          value={this.state.id}
+          defaultValue={this.form.id}
+          value={this.form.id}
           onChangeHandler={(v) => {
-            this.state.id = v;
+            this.form.id = v;
           }}
         />
         <InputRow
           title="Symbol"
-          defaultValue={this.state.symbol}
+          defaultValue={this.form.symbol}
           onChangeHandler={(v) => {
-            this.state.symbol = v;
+            this.form.symbol = v;
           }}
         />
         <SelectRow
           title="Base Chain"
           options={['cosmos', 'ethereum', 'near']}
-          value={this.state.base}
+          value={this.form.base}
           onchange={(value) => {
-            this.state.base = value;
+            this.form.base = value;
           }}
         />
-        {...defaultChainRows(this.state)}
+        {...defaultChainRows(this.form)}
         <CWButton
           class="mt-3"
           label="Save changes"
           buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
-            console.log(this.state);
-            const {
-              id,
-              name,
-              description,
-              icon_url,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              symbol,
-            } = this.state;
-
             this.state.saving = true;
             const additionalArgs: {
               eth_chain_id?: number;
@@ -99,7 +84,7 @@ export class OffchainFormTest implements m.ClassComponent {
             } = {};
 
             // defaults to be overridden when chain is no longer "offchain" type
-            switch (this.state.base) {
+            switch (this.form.base) {
               case ChainBase.CosmosSDK: {
                 additionalArgs.node_url = 'https://rpc-osmosis.keplr.app';
                 additionalArgs.bech32_prefix = 'osmo';
@@ -128,20 +113,10 @@ export class OffchainFormTest implements m.ClassComponent {
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 address: '',
-                id,
-                name,
-                description,
-                icon_url,
-                symbol,
-                website,
-                discord,
-                element,
-                telegram,
-                github,
+                ...this.form,
                 jwt: app.user.jwt,
                 type: ChainType.Offchain,
-                base: this.state.base,
-                network: baseToNetwork(this.state.base),
+                network: baseToNetwork(this.form.base),
                 ...additionalArgs,
               });
               await initAppState(false);
