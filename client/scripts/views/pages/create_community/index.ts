@@ -13,10 +13,10 @@ import CosmosForm from './cosmos_form';
 import EthDaoForm from './eth_dao_form';
 import SplTokenForm from './spl_token_form';
 import { EthChainAttrs } from './chain_input_rows';
-import { OffchainFormTest } from './offchain_community_form_test';
+import { StarterFormTest } from './starter_community_form';
 
 enum CommunityType {
-  OffchainCommunityTest = 'Offchain Community Test',
+  StarterCommunityTest = 'Starter Community',
   OffchainCommunity = 'Offchain Community',
   Erc20Community = 'ERC20',
   SubstrateCommunity = 'Substrate',
@@ -42,7 +42,7 @@ interface CreateCommunityState extends EthChainAttrs {
 const CreateCommunity: m.Component<CreateCommunityAttrs, CreateCommunityState> =
   {
     oninit: (vnode) => {
-      vnode.state.activeForm = CommunityType.OffchainCommunityTest;
+      vnode.state.activeForm = CommunityType.StarterCommunityTest;
       vnode.state.loadingEthChains = true;
       vnode.state.ethChains = {};
       vnode.state.ethChainNames = {};
@@ -71,8 +71,8 @@ const CreateCommunity: m.Component<CreateCommunityAttrs, CreateCommunityState> =
       const getActiveForm = () => {
         const { ethChains, ethChainNames } = vnode.state;
         switch (vnode.state.activeForm) {
-          case CommunityType.OffchainCommunityTest:
-            return m(OffchainFormTest);
+          case CommunityType.StarterCommunityTest:
+            return m(StarterFormTest);
           case CommunityType.OffchainCommunity:
             return m(OffchainCommunityForm);
           case CommunityType.Erc20Community:

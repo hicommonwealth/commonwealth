@@ -22,24 +22,24 @@ import { CWButton } from '../../components/component_kit/cw_button';
 // TODO: ChainFormState contains "uploadInProgress" which is technically
 // not part of the form (what we pass to /createChain), but of the general view's state,
 // and should be located elsewhere.
-type CreateOffchainForm = {
+type CreateStarterForm = {
   base: ChainBase;
   id: string;
   name: string;
   symbol: string;
 } & ChainFormState;
 
-type CreateOffchainState = {
+type CreateStarterState = {
   error: string;
-  form: CreateOffchainForm;
+  form: CreateStarterForm;
   loaded: boolean;
   loading: boolean;
   saving: boolean;
   status: string;
 };
 
-export class OffchainFormTest implements m.ClassComponent {
-  private state: CreateOffchainState = {
+export class StarterFormTest implements m.ClassComponent {
+  private state: CreateStarterState = {
     error: '',
     loaded: false,
     loading: false,
@@ -103,7 +103,7 @@ export class OffchainFormTest implements m.ClassComponent {
               bech32_prefix?: string;
             } = {};
 
-            // defaults to be overridden when chain is no longer "offchain" type
+            // defaults to be overridden when chain is no longer "starter" type
             switch (this.state.form.base) {
               case ChainBase.CosmosSDK: {
                 additionalArgs.node_url = 'https://rpc-osmosis.keplr.app';
@@ -144,7 +144,7 @@ export class OffchainFormTest implements m.ClassComponent {
             } catch (err) {
               notifyError(
                 err.responseJSON?.error ||
-                  'Creating new offchain community failed'
+                  'Creating new starter community failed'
               );
             } finally {
               this.state.saving = false;
