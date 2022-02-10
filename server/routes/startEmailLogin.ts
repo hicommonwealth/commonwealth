@@ -48,7 +48,7 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   //
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
-  const context = req.body.chain || 'ethereum';
+  const context = req.body.chain || MAGIC_DEFAULT_CHAIN;
   const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, context, previousUser);
   const magicChain = chain;
 
