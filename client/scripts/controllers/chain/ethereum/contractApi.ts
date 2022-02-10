@@ -29,6 +29,8 @@ export async function attachSigner<CT extends Contract>(
   }
   const ct = contract.connect(signer) as CT;
   await ct.deployed();
+
+  // TODO: expose located wallet upon return so we can disable post-signature
   return ct;
 }
 

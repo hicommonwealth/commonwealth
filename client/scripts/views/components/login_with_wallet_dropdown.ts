@@ -77,7 +77,7 @@ const LoginWithWalletDropdown: m.Component<{
         ]),
         onclick: (e) => {
           $('.Login').trigger('modalexit');
-          const defaultChainId = webWallet?.specificChain || baseToNetwork(base);
+          const defaultChainId = baseToNetwork(base);
           if (app.activeChainId()) {
             navigateToSubpage('/web3login', web3loginParams);
           } else {

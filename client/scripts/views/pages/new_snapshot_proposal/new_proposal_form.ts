@@ -108,6 +108,7 @@ const newThread = async (
       throw new Error('Invalid wallet.');
     }
     msg.sig = await wallet.signMessage(msg.msg);
+    await wallet.disable();
 
     const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, { ...msg });
     if (result.status === 'Failure') {

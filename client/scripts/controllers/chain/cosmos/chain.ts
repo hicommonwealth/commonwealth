@@ -24,7 +24,6 @@ import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
 import { EncodeObject } from '@cosmjs/proto-signing';
 import CosmosAccount from './account';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
-import TerraStationWebWalletController from '../../app/webWallets/terra_station_web_wallet';
 
 export interface ICosmosTXData extends ITXData {
   chainId: string;
@@ -114,6 +113,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (this._app.chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
+    if (this._app.chain.network === ChainNetwork.Injective || this._app.chain.network === ChainNetwork.InjectiveTestnet) {
+      throw new Error('Tx not yet supported on Injective');
+    }
     const wallet = this.app.wallets.getByName('keplr') as KeplrWebWalletController;
     if (!wallet) throw new Error('Keplr wallet not found');
     if (!wallet.enabled) {
@@ -138,12 +140,14 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       } else if (isBroadcastTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
+        await wallet.disable();
         return txResult.result.events;
       } else {
         throw new Error('Unknown broadcast result');
       }
     } catch (err) {
       console.log(err.message);
+      await wallet.disable();
       throw err;
     }
   }

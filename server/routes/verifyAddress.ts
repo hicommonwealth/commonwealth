@@ -80,33 +80,33 @@ const verifySignature = async (
       log.error('Invalid keytype.');
       isValid = false;
     }
-  } else if (
-    chain.base === ChainBase.CosmosSDK &&
-    (chain.network === ChainNetwork.Injective ||
-      chain.network === ChainNetwork.InjectiveTestnet)
-  ) {
+  } else if (chain.base === ChainBase.Ethereum
+    || chain.network === ChainNetwork.Injective
+    || chain.network === ChainNetwork.InjectiveTestnet) {
     //
     // ethereum address handling
     //
-    const msgBuffer = Buffer.from(addressModel.verification_token.trim());
-    // toBuffer() doesn't work if there is a newline
-    const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-    const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
-    const publicKey = ethUtil.ecrecover(
-      msgHash,
-      ethSignatureParams.v,
-      ethSignatureParams.r,
-      ethSignatureParams.s
-    );
-
-    const addressBuffer = ethUtil.publicToAddress(publicKey);
-    const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
     try {
-      // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
-      const injAddrBuf = ethUtil.Address.fromString(lowercaseAddress.toString()).toBuffer();
-      const injAddress = bech32.encode('inj', bech32.toWords(injAddrBuf));
-      if (addressModel.address === injAddress) isValid = true;
+      const [ node ] = await chain.getChainNodes();
+      const typedMessage = constructTypedMessage(node.eth_chain_id || 1, addressModel.verification_token.trim());
+      const address = recoverTypedSignature({
+        data: typedMessage,
+        signature: signatureString.trim(),
+        version: SignTypedDataVersion.V4
+      });
+      if (chain.network !== ChainNetwork.Injective && chain.network !== ChainNetwork.InjectiveTestnet) {
+        isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
+      } else {
+        // special case for injective bech32 addresses
+        const injAddrBuf = ethUtil.Address.fromString(address.toLowerCase().toString()).toBuffer();
+        const injAddress = bech32.encode('inj', bech32.toWords(injAddrBuf));
+        isValid = addressModel.address === injAddress;
+      }
+      if (!isValid) {
+        log.info(`Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`);
+      }
     } catch (e) {
+      log.info(`Eth verification failed for ${addressModel.address}: ${e.message}`)
       isValid = false;
     }
   } else if (chain.base === ChainBase.CosmosSDK) {
@@ -164,26 +164,6 @@ const verifySignature = async (
         log.error(`Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`);
         isValid = false;
       }
-    }
-  } else if (chain.base === ChainBase.Ethereum) {
-    //
-    // ethereum address handling
-    //
-    try {
-      const [ node ] = await chain.getChainNodes();
-      const typedMessage = constructTypedMessage(node.eth_chain_id || 1, addressModel.verification_token.trim());
-      const address = recoverTypedSignature({
-        data: typedMessage,
-        signature: signatureString.trim(),
-        version: SignTypedDataVersion.V4
-      });
-      isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
-      if (!isValid) {
-        log.info(`Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`);
-      }
-    } catch (e) {
-      log.info(`Eth verification failed for ${addressModel.address}: ${e.message}`)
-      isValid = false;
     }
   } else if (chain.base === ChainBase.NEAR) {
     //

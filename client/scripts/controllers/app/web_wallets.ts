@@ -6,8 +6,6 @@ import WalletConnectWebWalletController from './webWallets/walletconnect_web_wal
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import NearWebWalletController from './webWallets/near_web_wallet';
-import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
-import InjectiveWebWalletController from './webWallets/injective_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 
 export default class WebWalletController {
@@ -17,20 +15,24 @@ export default class WebWalletController {
   }
 
   // TODO filter out wallets that are specific to a chain (and the current page isn't that chain)
-  public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
-    return this._wallets.filter((w) => w.available
-      && (!chain || w.chain === chain)
-      // if a specific chain is specified on a wallet AND a current chain is defined (aka not on home page) then load
-      // the wallet if the current chain is the same as the specific chain
-      && ((w.specificChain && app.chain?.meta?.chain.id) ? w.specificChain === app.chain.meta.chain.id : true));
+  public availableWallets(base?: ChainBase): IWebWallet<any>[] {
+    // for id, only return specific supported chains (i.e. injective)
+    if (app.chain?.id) {
+      const specificWallets = this._wallets.filter((w) => w.available && w.addlChains?.includes(app.chain?.id));
+      if (specificWallets?.length > 0) {
+        return specificWallets;
+      }
+    }
+    // otherwise, return using base
+    return this._wallets.filter((w) => w.available && (!base || w.chain === base))
   }
 
   public getByName(name: string): IWebWallet<any> | undefined {
     return this._wallets.find((w) => w.name === name);
   }
 
-  public async locateWallet(address: string, chain?: ChainBase): Promise<IWebWallet<any>> {
-    const availableWallets = this.availableWallets(chain);
+  public async locateWallet(address: string, base?: ChainBase): Promise<IWebWallet<any>> {
+    const availableWallets = this.availableWallets(base);
     if (availableWallets.length === 0) {
       throw new Error('No wallet available');
     }
@@ -44,7 +46,8 @@ export default class WebWalletController {
         console.log(`Found wallet: ${wallet.name}`);
         return wallet;
       }
-      // TODO: disable if not found
+      // disable if not found, otherwise leave enabled
+      await wallet.disable();
     }
     throw new Error(`No wallet found for ${address}`);
   }
@@ -56,8 +59,6 @@ export default class WebWalletController {
       new WalletConnectWebWalletController(),
       new KeplrWebWalletController(),
       new NearWebWalletController(),
-      new TerraStationWebWalletController(),
-      new InjectiveWebWalletController(),
       new PhantomWebWalletController(),
     ];
   }

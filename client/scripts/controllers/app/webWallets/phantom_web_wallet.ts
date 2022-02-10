@@ -56,6 +56,14 @@ class PhantomWebWalletController implements IWebWallet<string> {
       throw new Error('Could not connect to Phantom wallet!');
     }
   }
+
+  public async disable() {
+    if (window.solana.isConnected) {
+      await window.solana.disconnect();
+    }
+    this._enabled = false;
+    this._enabling = false;
+  }
 }
 
 export default PhantomWebWalletController;

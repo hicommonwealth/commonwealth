@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 import AddressSwapper from '../util/addressSwapper';
 import { DB } from '../database';
-import { ChainBase } from '../../shared/types';
+import { ChainBase, ChainNetwork } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 const log = factory.getLogger(formatFilename(__filename));

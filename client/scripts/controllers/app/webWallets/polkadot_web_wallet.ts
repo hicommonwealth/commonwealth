@@ -79,6 +79,12 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
       this._enabling = false;
     }
   }
+
+  public async disable() {
+    // do nothing
+    this._enabled = false;
+    this._enabling = false;
+  }
 }
 
 export default PolkadotWebWalletController;

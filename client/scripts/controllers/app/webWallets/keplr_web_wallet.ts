@@ -72,6 +72,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   // ACTIONS
+  private _keystorechangeListener: () => Promise<void>;
   public async enable() {
     console.log('Attempting to enable Keplr web wallet');
 
@@ -147,12 +148,26 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
 
       this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
       this._accounts = await this._offlineSigner.getAccounts();
+
+      // add event listener
+      this._keystorechangeListener = async () => {
+        console.log('Keplr keystore changed! Refreshing account info');
+        this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
+        this._accounts = await this._offlineSigner.getAccounts();
+      };
+      window.addEventListener('keplr_keystorechange', this._keystorechangeListener);
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
       console.error(`Failed to enable keplr wallet: ${error.message}`);
       this._enabling = false;
     }
+  }
+
+  public async disable() {
+    window.removeEventListener('keplr_keystorechange', this._keystorechangeListener);
+    this._enabled = false;
+    this._enabling = false;
   }
 }
 

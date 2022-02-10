@@ -74,7 +74,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
         throw new Error('WalletConnect fetched no accounts.');
       }
 
-      await this.initAccountsChanged();
+      this._initSubscriptions();
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
@@ -83,16 +83,46 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     }
   }
 
-  public async initAccountsChanged() {
-    await this._provider.on('accountsChanged', async (accounts: string[]) => {
+  private _accountsChangedHandler: (accounts: string[]) => Promise<void>;
+  private _chainChangedHandler: (chainId: string | number) => void;
+  private _initSubscriptions() {
+    this._accountsChangedHandler = async (accounts: string[]) => {
+      console.log(`Walletconnect accounts changed to ${accounts}...`);
       const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-    });
-    // TODO: chainChanged, disconnect events
+      if (updatedAddress) {
+        await setActiveAccount(updatedAddress);
+      }
+      this._accounts = accounts;
+    };
+
+    this._chainChangedHandler = (chainId) => {
+      console.log(`Walletconnect chain changed to ${chainId}, reloading...`);
+      // Handle the new chain.
+      // Correctly handling chain changes can be complicated.
+      // We recommend reloading the page unless you have good reason not to.
+      window.location.reload();
+    };
+
+    this._web3.givenProvider.on('accountsChanged', this._accountsChangedHandler);
+    this._web3.givenProvider.on('chainChanged', this._chainChangedHandler);
+    this._provider.on('disconnect', this.disable.bind(this));
   }
 
-  // TODO: disconnect
+  public async disable() {
+    if (this._provider.connected) {
+      this._provider.disconnect();
+    }
+    if (this._accountsChangedHandler) {
+      this._web3.givenProvider.removeListener('accountsChanged', this._accountsChangedHandler);
+      this._accountsChangedHandler = null;
+    }
+    if (this._chainChangedHandler) {
+      this._web3.givenProvider.removeListener('chainChanged', this._chainChangedHandler);
+      this._chainChangedHandler = null;
+    }
+    this._enabling = false;
+    this._enabled = false;
+  }
 }
 
 export default WalletConnectWebWalletController;

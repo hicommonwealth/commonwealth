@@ -4,10 +4,23 @@ import app from 'state';
 import Web3 from 'web3';
 import $ from 'jquery';
 import { provider } from 'web3-core';
-import { ChainBase } from 'types';
+import { ChainBase, ChainNetwork } from 'types';
+import detectEthereumProvider from '@metamask/detect-provider';
 import { Account, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
+import { Address } from 'ethereumjs-util';
+import { bech32 } from 'bech32';
+
+function bech32EncodeEthAddress(address: string): string {
+  return bech32.encode('inj', bech32.toWords(Address.fromString(address).toBuffer()));
+}
+
+function bech32Decode(address: string): string {
+  return `0x${Buffer.from(
+    bech32.fromWords(bech32.decode(address).words),
+  ).toString('hex')}`
+}
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -20,6 +33,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public readonly name = 'metamask';
   public readonly label = 'Metamask';
   public readonly chain = ChainBase.Ethereum;
+  public readonly addlChains = ['injective'];
 
   public get available() {
     return !!(window.ethereum);
@@ -42,7 +56,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.sign(message, this.accounts[0]);
+    const signature = await this._web3.eth.sign(message, bech32Decode(this.accounts[0]));
     return signature;
   }
 
@@ -50,8 +64,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     const msgParams = constructTypedMessage(app.chain.meta.ethChainId || 1, message);
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
-      params: [this._accounts[0], JSON.stringify(msgParams)],
-    })
+      params: [bech32Decode(this._accounts[0]), JSON.stringify(msgParams)],
+    });
+    console.log(signature);
     return signature;
   }
 
@@ -68,15 +83,18 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
+      // ensure we're on the correct chain
+
+      const metamaskProvider = await detectEthereumProvider({ mustBeMetaMask: true });
+      if (!metamaskProvider) {
+        throw new Error('Please install Metamask.');
+      }
+      this._web3 = new Web3(metamaskProvider as any);
+
+      // verify we are on expected chain
+
       // default to ETH
       const chainId = app.chain?.meta.ethChainId || 1;
-
-      // ensure we're on the correct chain
-      this._web3 = new Web3((window as any).ethereum);
-      // TODO: does this come after?
-      await this._web3.givenProvider.request({
-        method: 'eth_requestAccounts'
-      });
       const chainIdHex = `0x${chainId.toString(16)}`;
       try {
         await this._web3.givenProvider.request({
@@ -108,12 +126,15 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
       // fetch active accounts
       this._accounts = await this._web3.eth.getAccounts();
+      if (app.chain.network === ChainNetwork.Injective || app.chain.network === ChainNetwork.InjectiveTestnet) {
+        this._accounts = this._accounts.map((a) => bech32EncodeEthAddress(a));
+      }
       this._provider = this._web3.currentProvider;
       if (this._accounts.length === 0) {
         throw new Error('Metamask fetched no accounts');
       }
 
-      await this.initAccountsChanged();
+      this._initSubscriptions();
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
@@ -127,16 +148,45 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     }
   }
 
-  public async initAccountsChanged() {
-    await this._web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
+  private _accountsChangedHandler: (accounts: string[]) => Promise<void>;
+  private _chainChangedHandler: (chainId: string | number) => void;
+  private _initSubscriptions() {
+    this._accountsChangedHandler = async (accounts: string[]) => {
+      console.log(`Metamask accounts changed to ${accounts}...`);
       const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-    });
-    // TODO: chainChanged, disconnect events
+      if (updatedAddress) {
+        await setActiveAccount(updatedAddress);
+      }
+      this._accounts = accounts;
+      if (app.chain.network === ChainNetwork.Injective || app.chain.network === ChainNetwork.InjectiveTestnet) {
+        this._accounts = this._accounts.map((a) => bech32EncodeEthAddress(a));
+      }
+    };
+
+    this._chainChangedHandler = (chainId) => {
+      console.log(`Metamask chain changed to ${chainId}, reloading...`);
+      // Handle the new chain.
+      // Correctly handling chain changes can be complicated.
+      // We recommend reloading the page unless you have good reason not to.
+      window.location.reload();
+    };
+
+    this._web3.givenProvider.on('accountsChanged', this._accountsChangedHandler);
+    this._web3.givenProvider.on('chainChanged', this._chainChangedHandler);
   }
 
-  // TODO: disconnect
+  public async disable() {
+    if (this._accountsChangedHandler) {
+      this._web3.givenProvider.removeListener('accountsChanged', this._accountsChangedHandler);
+      this._accountsChangedHandler = null;
+    }
+    if (this._chainChangedHandler) {
+      this._web3.givenProvider.removeListener('chainChanged', this._chainChangedHandler);
+      this._chainChangedHandler = null;
+    }
+    this._enabling = false;
+    this._enabled = false;
+  }
 }
 
 export default MetamaskWebWalletController;

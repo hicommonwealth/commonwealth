@@ -9,12 +9,13 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabling: boolean;
   accounts: readonly AccountT[];
   enable: () => Promise<void>;
+  disable: () => Promise<void>;
   validateWithAccount: (account: Account<any>) => Promise<void>;
 
   chain: ChainBase;
 
-  // optional parameter used to specify the exact chain that a wallet is associated with (if any)
-  specificChain?: string;
+  // optional parameter used to specify off-base chains that a wallet is associated with (if any)
+  addlChains?: string[];
 }
 
 export default IWebWallet;

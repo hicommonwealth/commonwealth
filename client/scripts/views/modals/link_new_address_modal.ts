@@ -132,6 +132,7 @@ const LinkAccountItem: m.Component<{
           vnode.state.linking = true;
           m.redraw();
           await webWallet.validateWithAccount(signerAccount);
+          await webWallet.disable();
           vnode.state.linking = false;
           m.redraw();
           // return if user signs for two addresses
@@ -140,6 +141,7 @@ const LinkAccountItem: m.Component<{
           accountVerifiedCallback(signerAccount);
         } catch (err) {
           // catch when the user rejects the sign message prompt
+          await webWallet.disable();
           vnode.state.linking = false;
           errorCallback('Verification failed');
           m.redraw();
