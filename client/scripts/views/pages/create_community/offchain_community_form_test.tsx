@@ -13,81 +13,71 @@ import { notifyError } from 'controllers/app/notifications';
 import { InputRow, SelectRow } from 'views/components/metadata_rows_test';
 import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
 import {
-  ChainFormState,
   initChainForm,
   defaultChainRows,
 } from './chain_input_rows_test';
 import { CWButton } from '../../components/component_kit/cw_button';
 
-interface OffchainFormState extends ChainFormState {
-  id: string;
-  name: string;
-  base: ChainBase;
-  saving: boolean;
-  loaded: boolean;
-  loading: boolean;
-  status: string;
-  symbol: string;
-  error: string;
-}
-
-const initState: OffchainFormState = {
-  id: '',
-  name: '',
-  symbol: 'XYZ',
-  base: ChainBase.Ethereum,
-  saving: false,
-  loaded: false,
-  loading: false,
-  status: '',
-  error: '',
-  ...initChainForm(),
-};
-
 export class OffchainFormTest implements m.ClassComponent {
+  private state = {
+    id: '',
+    name: '',
+    symbol: 'XYZ',
+    base: ChainBase.Ethereum,
+    saving: false,
+    loaded: false,
+    loading: false,
+    status: '',
+    error: '',
+    ...initChainForm(),
+  }
+  oninit() { console.log('offchain form init'); }
+  oncreate() { console.log('offchain form create'); }
   view() {
+    console.log(this.state);
     return (
       <div class="CreateCommunityForm">
         <InputRow
           title="Name"
           placeholder="Enter the name of your community"
-          defaultValue={initState.name}
+          defaultValue={this.state.name}
           onChangeHandler={(v) => {
-            initState.name = v;
-            initState.id = slugify(v);
+            this.state.name = v;
+            this.state.id = slugify(v);
           }}
         />
         <InputRow
           title="ID"
           placeholder="ID will show up here based on your name"
-          defaultValue={initState.id}
-          value={initState.id}
+          defaultValue={this.state.id}
+          value={this.state.id}
           onChangeHandler={(v) => {
-            initState.id = v;
+            this.state.id = v;
           }}
         />
         <InputRow
           title="Symbol"
-          defaultValue={initState.symbol}
+          defaultValue={this.state.symbol}
           onChangeHandler={(v) => {
-            initState.symbol = v;
+            this.state.symbol = v;
           }}
         />
         <SelectRow
           title="Base Chain"
           options={['cosmos', 'ethereum', 'near']}
-          value={initState.base}
+          value={this.state.base}
           onchange={(value) => {
-            initState.base = value;
+            this.state.base = value;
           }}
         />
-        {...defaultChainRows(initState)}
+        {...defaultChainRows(this.state)}
         <CWButton
           class="mt-3"
           label="Save changes"
           buttonType="primary"
-          disabled={initState.saving}
+          disabled={this.state.saving}
           onclick={async () => {
+            console.log(this.state);
             const {
               id,
               name,
@@ -99,9 +89,9 @@ export class OffchainFormTest implements m.ClassComponent {
               telegram,
               github,
               symbol,
-            } = initState;
+            } = this.state;
 
-            initState.saving = true;
+            this.state.saving = true;
             const additionalArgs: {
               eth_chain_id?: number;
               node_url?: string;
@@ -109,7 +99,7 @@ export class OffchainFormTest implements m.ClassComponent {
             } = {};
 
             // defaults to be overridden when chain is no longer "offchain" type
-            switch (initState.base) {
+            switch (this.state.base) {
               case ChainBase.CosmosSDK: {
                 additionalArgs.node_url = 'https://rpc-osmosis.keplr.app';
                 additionalArgs.bech32_prefix = 'osmo';
@@ -150,8 +140,8 @@ export class OffchainFormTest implements m.ClassComponent {
                 github,
                 jwt: app.user.jwt,
                 type: ChainType.Offchain,
-                base: initState.base,
-                network: baseToNetwork(initState.base),
+                base: this.state.base,
+                network: baseToNetwork(this.state.base),
                 ...additionalArgs,
               });
               await initAppState(false);
@@ -162,7 +152,7 @@ export class OffchainFormTest implements m.ClassComponent {
                   'Creating new offchain community failed'
               );
             } finally {
-              initState.saving = false;
+              this.state.saving = false;
             }
           }}
         />
