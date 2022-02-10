@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Table } from 'construct-ui';
 import $ from 'jquery';
 
 import 'pages/create_community_test.scss';
@@ -11,10 +10,7 @@ import { initAppState } from 'app';
 import { slugify } from 'utils';
 import { ChainBase, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
-import {
-  InputPropertyRow,
-  SelectPropertyRow,
-} from 'views/components/metadata_rows_test';
+import { InputRow, SelectRow } from 'views/components/metadata_rows_test';
 import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
 import {
   ChainFormState,
@@ -51,45 +47,40 @@ const initState: OffchainFormState = {
 export class OffchainFormTest implements m.ClassComponent {
   view() {
     return (
-      <div class="CommunityMetadataManagementTable">
-        <Table
-          bordered={false}
-          interactive={false}
-          striped={false}
-          class="metadata-management-table"
-        >
-          <InputPropertyRow
-            title="Name"
-            defaultValue={initState.name}
-            onChangeHandler={(v) => {
-              initState.name = v;
-              initState.id = slugify(v);
-            }}
-          />
-          <InputPropertyRow
-            title="ID"
-            defaultValue={initState.id}
-            value={initState.id}
-            onChangeHandler={(v) => {
-              initState.id = v;
-            }}
-          />
-          <InputPropertyRow
-            title="Symbol"
-            defaultValue={initState.symbol}
-            onChangeHandler={(v) => {
-              initState.symbol = v;
-            }}
-          />
-          <SelectPropertyRow
-            title="Base Chain"
-            options={['cosmos', 'ethereum', 'near']}
-            value={initState.base}
-            onchange={(value) => {
-              initState.base = value;
-            }}
-          />
-        </Table>
+      <div class="CreateCommunityForm">
+        <InputRow
+          title="Name"
+          placeholder="Enter the name of your community"
+          defaultValue={initState.name}
+          onChangeHandler={(v) => {
+            initState.name = v;
+            initState.id = slugify(v);
+          }}
+        />
+        <InputRow
+          title="ID"
+          placeholder="ID will show up here based on your name"
+          defaultValue={initState.id}
+          value={initState.id}
+          onChangeHandler={(v) => {
+            initState.id = v;
+          }}
+        />
+        <InputRow
+          title="Symbol"
+          defaultValue={initState.symbol}
+          onChangeHandler={(v) => {
+            initState.symbol = v;
+          }}
+        />
+        <SelectRow
+          title="Base Chain"
+          options={['cosmos', 'ethereum', 'near']}
+          value={initState.base}
+          onchange={(value) => {
+            initState.base = value;
+          }}
+        />
         {...defaultChainRows(initState)}
         <CWButton
           class="mt-3"

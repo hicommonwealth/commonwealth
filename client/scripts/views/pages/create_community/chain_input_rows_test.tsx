@@ -4,7 +4,7 @@ import m from 'mithril';
 
 // import app from 'state';
 import {
-  InputPropertyRow,
+  InputRow,
   //   SelectPropertyRow,
 } from 'views/components/metadata_rows_test';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
@@ -38,7 +38,7 @@ export function defaultChainRows<T extends ChainFormState>(
   disabled = false
 ) {
   return [
-    <InputPropertyRow
+    <InputRow
       title="Description"
       disabled={disabled}
       defaultValue={state.description}
@@ -47,28 +47,26 @@ export function defaultChainRows<T extends ChainFormState>(
       }}
       textarea={true}
     />,
-    <tr class="AvatarUploadRow">
-      <td>Upload Icon</td>
-      <td>
-        {m(AvatarUpload, {
-          avatarScope: AvatarScope.Chain,
-          uploadStartedCallback: () => {
-            state.uploadInProgress = true;
-            m.redraw();
-          },
-          uploadCompleteCallback: (files) => {
-            files.forEach((f) => {
-              if (!f.uploadURL) return;
-              const url = f.uploadURL.replace(/\?.*/, '');
-              state.icon_url = url;
-            });
-            state.uploadInProgress = false;
-            m.redraw();
-          },
-        })}
-      </td>
-    </tr>,
-    <InputPropertyRow
+    <div class="AvatarUploadRow">
+      <label>Upload Icon</label>
+      {m(AvatarUpload, {
+        avatarScope: AvatarScope.Chain,
+        uploadStartedCallback: () => {
+          state.uploadInProgress = true;
+          m.redraw();
+        },
+        uploadCompleteCallback: (files) => {
+          files.forEach((f) => {
+            if (!f.uploadURL) return;
+            const url = f.uploadURL.replace(/\?.*/, '');
+            state.icon_url = url;
+          });
+          state.uploadInProgress = false;
+          m.redraw();
+        },
+      })}
+    </div>,
+    <InputRow
       title="Icon URL"
       disabled={disabled}
       defaultValue={state.icon_url}
@@ -77,7 +75,7 @@ export function defaultChainRows<T extends ChainFormState>(
         state.icon_url = v;
       }}
     />,
-    <InputPropertyRow
+    <InputRow
       title="Website"
       disabled={disabled}
       defaultValue={state.website}
@@ -86,7 +84,7 @@ export function defaultChainRows<T extends ChainFormState>(
         state.website = v;
       }}
     />,
-    <InputPropertyRow
+    <InputRow
       title="Discord"
       disabled={disabled}
       defaultValue={state.discord}
@@ -95,7 +93,7 @@ export function defaultChainRows<T extends ChainFormState>(
         state.discord = v;
       }}
     />,
-    <InputPropertyRow
+    <InputRow
       title="Element"
       disabled={disabled}
       defaultValue={state.element}
@@ -104,7 +102,7 @@ export function defaultChainRows<T extends ChainFormState>(
         state.element = v;
       }}
     />,
-    <InputPropertyRow
+    <InputRow
       title="Telegram"
       disabled={disabled}
       defaultValue={state.telegram}
@@ -113,7 +111,7 @@ export function defaultChainRows<T extends ChainFormState>(
         state.telegram = v;
       }}
     />,
-    <InputPropertyRow
+    <InputRow
       title="Github"
       disabled={disabled}
       defaultValue={state.github}

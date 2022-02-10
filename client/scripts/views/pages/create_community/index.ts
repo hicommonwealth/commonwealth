@@ -135,8 +135,7 @@ const CreateCommunity: m.Component<CreateCommunityAttrs, CreateCommunityState> =
                     });
                   })
               ),
-            !vnode.state.loadingEthChains &&
-              m('.community-creation-form', [getActiveForm()]),
+            !vnode.state.loadingEthChains && getActiveForm(),
           ]),
         ]
       );
