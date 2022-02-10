@@ -15,10 +15,10 @@ import User from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';
 import { weiToTokens } from 'helpers';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 const CreateComment: m.Component<{
   callback: CallableFunction,
@@ -84,11 +84,10 @@ const CreateComment: m.Component<{
       vnode.state.error = null;
       vnode.state.sendingComment = true;
       quillEditorState.editor.enable(false);
-      const chainId = app.activeCommunityId() ? null : app.activeChainId();
-      const communityId = app.activeCommunityId();
+      const chainId = app.activeChainId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, communityId, commentText, proposalPageState.parentCommentId, attachments);
+          chainId, commentText, proposalPageState.parentCommentId, attachments);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -117,7 +116,7 @@ const CreateComment: m.Component<{
         'Step No': 2,
         'Step': 'Create Comment',
         'Proposal Name': `${(rootProposal).slug}: ${(rootProposal).identifier}`,
-        'Scope': app.activeId(),
+        'Scope': app.activeChainId(),
       });
       mixpanel.people.increment('Comment');
       mixpanel.people.set({
@@ -131,15 +130,13 @@ const CreateComment: m.Component<{
     const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
 
     const isAdmin = app.user.isSiteAdmin
-      || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+      || app.user.isAdminOfEntity({ chain: app.activeChainId() });
 
-    let parentScopedClass: string = 'new-thread-child';
+    let parentScopedClass = 'new-thread-child';
     let parentAuthor: Account<any>;
     if (parentType === CommentParent.Comment) {
       parentScopedClass = 'new-comment-child';
-      parentAuthor = app.community
-        ? app.community.accounts.get(parentComment.author, parentComment.authorChain)
-        : app.chain.accounts.get(parentComment.author);
+      parentAuthor = app.chain.accounts.get(parentComment.author);
     }
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
@@ -150,14 +147,12 @@ const CreateComment: m.Component<{
       || !app.user.activeAccount;
 
     // token balance check if needed
-    let tokenPostingThreshold : BN | null = null;
-    if (!app.community) {
-      tokenPostingThreshold = TopicGateCheck.getTopicThreshold(activeTopicName);
-      let topicGated = TopicGateCheck.isGatedTopic(activeTopicName, app.chain.tokenBalance);
-      disabled = disabled
-        || !app.isAdapterReady
-        || (!isAdmin && topicGated);
-    }
+    const tokenPostingThreshold : BN = TopicGateCheck.getTopicThreshold(activeTopicName);
+    const userBalance : BN = TopicGateCheck.getUserBalance();
+    const topicGated = TopicGateCheck.isGatedTopic(activeTopicName);
+    disabled = disabled
+      || !app.isAdapterReady
+      || (!isAdmin && topicGated);
 
     const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
     return m('.CreateComment', {
@@ -185,7 +180,7 @@ const CreateComment: m.Component<{
               content: [
                 'You haven\'t set a display name yet. ',
                 m('a', {
-                  href: `/${app.activeId()}/account/${app.user.activeAccount.address}`
+                  href: `/${app.activeChainId()}/account/${app.user.activeAccount.address}`
                     + `?base=${app.user.activeAccount.chain}`,
                   onclick: (e) => {
                     e.preventDefault();
@@ -219,10 +214,10 @@ const CreateComment: m.Component<{
                   `Commenting in "${activeTopicName}" requires `,
                   `${weiToTokens(tokenPostingThreshold.toString(), decimals)} `,
                   `${app.chain.meta.chain.symbol}. `,
-                  app.chain.tokenBalance
+                    userBalance
                     && app.user.activeAccount
                     && `You have ${
-                      weiToTokens(app.chain.tokenBalance.toString(), decimals)
+                      weiToTokens(userBalance.toString(), decimals)
                     } ${app.chain.meta.chain.symbol}.`
                 ]
                 : null

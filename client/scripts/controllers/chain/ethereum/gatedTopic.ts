@@ -2,21 +2,21 @@ import app from 'state';
 import BN from 'bn.js';
 import { ITokenAdapter } from 'models';
 
-export default class TopicGateCheck {  
+export default class TopicGateCheck {
 
     // TODO do something with address
-    public static async isGatedTopic(topicName: string, tokenBalance: string, address?: string): Promise<boolean> {
+    public static isGatedTopic(topicName: string, address?: string): boolean {
         if (ITokenAdapter.instanceOf(app.chain) && topicName) {
-          let tokenPostingThreshold: BN = app.topics.getByName(
+          const tokenPostingThreshold: BN = app.topics.getByName(
             topicName,
             app.activeId()
           )?.tokenThreshold;
-          return tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance);
+          return tokenPostingThreshold && tokenPostingThreshold.gt(app.chain.tokenBalance);
         }
-        return false; 
-    };
+        return false;
+    }
 
-    public static async getTopicThreshold(topicName: string): Promise<BN> {
+    public static getTopicThreshold(topicName: string): BN {
         if (ITokenAdapter.instanceOf(app.chain) && topicName) {
           return app.topics.getByName(
             topicName,
@@ -24,5 +24,12 @@ export default class TopicGateCheck {
           )?.tokenThreshold;
         }
         return new BN('0', 10);
-    };
+    }
+
+    public static getUserBalance(): BN {
+        if (ITokenAdapter.instanceOf(app.chain)) {
+          return new BN(app.chain.tokenBalance, 10);
+        }
+        return new BN('0', 10);
+    }
 }

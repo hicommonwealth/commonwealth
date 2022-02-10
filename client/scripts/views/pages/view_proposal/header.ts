@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment';
@@ -75,8 +76,6 @@ export const ProposalHeaderOffchainPoll: m.Component<
         `/api/viewOffchainVotes?thread_id=${proposal.id}${
           app.activeChainId()
             ? `&chain=${app.activeChainId()}`
-            : app.activeCommunityId()
-            ? `&community=${app.activeCommunityId()}`
             : ''
         }`
       )
@@ -284,7 +283,7 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
       return m('.ProposalHeaderThreadLink', [
         link(
           'a.thread-link',
-          `/${proposal['chain'] || app.activeId()}/discussion/${
+          `/${proposal['chain'] || app.activeChainId()}/discussion/${
             proposal.threadId
           }`,
           ['Go to discussion', m(Icon, { name: Icons.EXTERNAL_LINK })]
@@ -300,7 +299,7 @@ export const ProposalHeaderSnapshotThreadLink: m.Component<{
     const { id, title } = vnode.attrs.thread;
     if (!id) return;
     const proposalLink = `${
-      app.isCustomDomain() ? '' : `/${app.activeId()}`
+      app.isCustomDomain() ? '' : `/${app.activeChainId()}`
     }/discussion/${id}`;
 
     return m('.ProposalHeaderThreadLink', [
@@ -332,7 +331,7 @@ export const ProposalHeaderTopics: m.Component<{
     return m('.ProposalHeaderTopics', [
       link(
         'a.proposal-topic',
-        `/${app.activeId()}/discussions/${proposal.topic.name}`,
+        `/${app.activeChainId()}/discussions/${proposal.topic.name}`,
         [m('span.proposal-topic-name', `${proposal.topic?.name}`)]
       ),
     ]);

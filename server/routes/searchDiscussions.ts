@@ -30,7 +30,7 @@ const searchDiscussions = async (
     if (!req.query.chain && !req.query.community) {
       return next(new Error(Errors.NoCommunity));
     }
-    const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+    const [chain, error] = await lookupCommunityIsVisibleToUser(
       models,
       req.query,
       req.user
@@ -38,6 +38,7 @@ const searchDiscussions = async (
     if (error) return next(new Error(error));
     const encodedSearchTerm = encodeURIComponent(req.query.search);
     const params = {
+      chain: chain.id,
       title: {
         [Op.or]: [
           { [Op.iLike]: `%${encodedSearchTerm}%` },
@@ -45,8 +46,7 @@ const searchDiscussions = async (
         ]
       },
     };
-    if (chain) params['chain'] = chain.id;
-    else if (community) params['community'] = community.id;
+
     try {
       const threads = await models.OffchainThread.findAll({
         where: params,
@@ -72,8 +72,8 @@ const searchDiscussions = async (
 
   // Community-scoped search
   let communityOptions = '';
-  if (req.query.chain || req.query.community) {
-    const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+  if (req.query.chain) {
+    const [chain, error] = await lookupCommunityIsVisibleToUser(
       models,
       req.query,
       req.user
@@ -81,12 +81,8 @@ const searchDiscussions = async (
     if (error) return next(new Error(error));
 
     // set up query parameters
-    communityOptions = community
-      ? `AND "OffchainThreads".community = $community `
-      : `AND "OffchainThreads".chain = $chain `;
-    bind = community
-      ? { community: community.id }
-      : { chain: chain.id };
+    communityOptions = `AND "OffchainThreads".chain = $chain `;
+    bind = { chain: chain.id };
   }
 
   const sort = req.query.sort === 'Newest'
@@ -113,7 +109,6 @@ const searchDiscussions = async (
       "Addresses".chain as address_chain,
       "OffchainThreads".created_at,
       "OffchainThreads".chain,
-      "OffchainThreads".community,
       ts_rank_cd("OffchainThreads"._search, query) as rank
     FROM "OffchainThreads"
     JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id, 

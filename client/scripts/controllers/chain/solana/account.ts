@@ -47,16 +47,4 @@ export default class SolanaAccount extends Account<SolanaToken> {
     this._Accounts = Accounts;
     this._Accounts.store.add(this);
   }
-
-  protected async addressFromMnemonic(mnemonic: string): Promise<string> {
-    throw new Error('unsupported');
-  }
-
-  protected async addressFromSeed(seed: string): Promise<string> {
-    throw new Error('unsupported');
-  }
-
-  public async signMessage(message: string): Promise<string> {
-    throw new Error('unsupported');
-  }
 }

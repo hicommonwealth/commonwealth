@@ -17,7 +17,7 @@ const updateLinkedThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+  const [chain, error] = await lookupCommunityIsVisibleToUser(
     models,
     req.body,
     req.user
@@ -80,8 +80,7 @@ const updateLinkedThreads = async (
         where: { id: linking_thread_id }
       });
       const threadsShareChain = linkedThread?.chain && linkedThread?.chain === linkingThread?.chain;
-      const threadsShareCommunity = linkedThread?.community && linkedThread?.community === linkingThread?.community;
-      if (threadsShareChain || threadsShareCommunity) {
+      if (threadsShareChain) {
         await models.LinkedThread.findOrCreate({ where: params });
       } else {
         return next(new Error(Errors.ThreadsMustShareCommunity));

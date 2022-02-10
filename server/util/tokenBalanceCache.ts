@@ -5,10 +5,7 @@ import BN from 'bn.js';
 import { providers } from 'ethers';
 import { WhereOptions } from 'sequelize/types';
 
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-
-import { ERC20__factory } from '../../shared/eth/types';
-import { ERC721__factory } from '../../shared/eth/types';
+import { ERC20__factory, ERC721__factory } from '../../shared/eth/types';
 
 import JobRunner from './cacheJobRunner';
 
@@ -16,7 +13,7 @@ import { ChainAttributes } from '../models/chain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 import { ChainNetwork, ChainBase, ChainType } from '../../shared/types';
-import { getUrlForEthChainId } from './supportedEthChains';
+import { getUrlsForEthChainId } from './supportedEthChains';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -34,19 +31,20 @@ interface CacheT {
 
 // Uses a tiny class so it's mockable for testing
 export class TokenBalanceProvider {
-  public async getERC20TokenBalance(url: string, tokenAddress: string, userAddress: string): Promise<BN> {
-    const provider = new Web3.providers.WebsocketProvider(url);
-    const api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider));
-    await api.deployed();
-    const balanceBigNum = await api.balanceOf(userAddress);
-    provider.disconnect(1000, 'finished');
-    return new BN(balanceBigNum.toString());
-  }
 
-  // TODO add Alchemy call if using ERC1155 or storing tokenIDs
-  public async getERC721TokenBalance(url: string, contractAddress: string, userAddress: string): Promise<BN> {
+  public async getEthTokenBalance(url: string, network: string,
+  tokenAddress: string, userAddress: string): Promise<BN> {
     const provider = new Web3.providers.WebsocketProvider(url);
-    const api = ERC721__factory.connect(contractAddress, new providers.Web3Provider(provider));
+    let api;
+    if(network === ChainNetwork.ERC20) {
+      api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider));
+    }
+    else if(network === ChainNetwork.ERC721) {
+      api = ERC721__factory.connect(tokenAddress, new providers.Web3Provider(provider));
+    }
+    else {
+      throw new Error('Invalid token chain network');
+    }
     await api.deployed();
     const balanceBigNum = await api.balanceOf(userAddress);
     provider.disconnect(1000, 'finished');
@@ -186,24 +184,15 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     let balance: BN;
     const fetchedAt = moment();
     if (base === ChainBase.Ethereum) {
-      const url = await getUrlForEthChainId(this.models, chainId);
-      if (!url) {
+      const urls = await getUrlsForEthChainId(this.models, chainId);
+      if (!urls) {
         throw new Error(`unsupported eth chain id ${chainId}`);
       }
-      if (network === ChainNetwork.ERC20) {
-        try {
-          balance = await this._balanceProvider.getERC20TokenBalance(url, contractAddress, address);
-        } catch (e) {
-          throw new Error(`Could not fetch token balance: ${e.message}`);
-      }
-      } else if (network === ChainNetwork.ERC721) {
-        try {
-          balance = await this._balanceProvider.getERC721TokenBalance(url, contractAddress, address);
-        } catch (e) {
-          throw new Error(`Could not fetch token balance: ${e.message}`);
-      }
-      } else {
-          throw new Error('Invalid token network');
+      const url = urls.url;
+      try {
+        balance = await this._balanceProvider.getEthTokenBalance(url, network, contractAddress, address);
+      } catch (e) {
+        throw new Error(`Could not fetch token balance: ${e.message}`);
       }
     } else if (base === ChainBase.Solana) {
       try {

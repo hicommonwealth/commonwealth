@@ -81,7 +81,6 @@ const Login: m.Component<{}, {
               try {
                 const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
                   'chain': app.activeChainId(),
-                  'community': app.activeCommunityId(),
                   email,
                   path,
                 });
@@ -149,7 +148,6 @@ const Login: m.Component<{}, {
               const path = m.route.get();
               const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
                 'chain': app.activeChainId(),
-                'community': app.activeCommunityId(),
                 email: vnode.state.showMagicLoginPromptEmail,
                 path,
                 forceEmailLogin: true,
@@ -216,10 +214,26 @@ const Login: m.Component<{}, {
         ]),
         m(Form, { gutter: 10 }, [
           m(FormGroup, { span: 12 }, [
+            m(Button, {
+              intent: 'primary',
+              fluid: true,
+              rounded: true,
+              href: `${app.serverUrl()}/auth/discord`,
+              onclick: (e) => {
+                localStorage.setItem('discordPostAuthRedirect', JSON.stringify({
+                  timestamp: (+new Date()).toString(),
+                  path: m.route.get()
+                }));
+              },
+              label: 'Continue with Discord'
+            }),
+          ]),
+        ]),
+        m(Form, { gutter: 10 }, [
+          m(FormGroup, { span: 12 }, [
             m(LoginWithWalletDropdown, {
               label: 'Continue with wallet',
               joiningChain: null,
-              joiningCommunity: null,
               loggingInWithAddress: true,
             }),
           ]),

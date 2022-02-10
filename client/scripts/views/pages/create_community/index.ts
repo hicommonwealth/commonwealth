@@ -6,7 +6,7 @@ import $ from 'jquery';
 import { Tabs, TabItem, Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import OffchainCommunityForm from './offchain_community_form';
-import ERC20Form from './erc20_form';
+import { ERC20Form, ERC721Form } from './erc20_form';
 import SubstrateForm from './substrate_form';
 import SputnikForm from './sputnik_form';
 import CosmosForm from './cosmos_form';
@@ -17,6 +17,7 @@ import { EthChainAttrs } from './chain_input_rows';
 enum CommunityType {
   OffchainCommunity = 'Offchain Community',
   Erc20Community = 'ERC20',
+  Erc721Community = 'ERC721',
   SubstrateCommunity = 'Substrate',
   SputnikDao = 'Sputnik (V2)',
   Cosmos = 'Cosmos',
@@ -73,6 +74,8 @@ const CreateCommunity: m.Component<
           return m(OffchainCommunityForm);
         case CommunityType.Erc20Community:
           return m(ERC20Form, { ethChains, ethChainNames });
+        case CommunityType.Erc721Community:
+          return m(ERC721Form, { ethChains, ethChainNames });
         case CommunityType.SputnikDao:
           return m(SputnikForm);
         case CommunityType.SubstrateCommunity:

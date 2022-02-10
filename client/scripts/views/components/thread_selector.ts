@@ -125,7 +125,6 @@ export const ThreadSelector: m.Component<
                     vnode.state.fetchingResults = true;
                     const params: SearchParams = {
                       chainScope: app.activeChainId(),
-                      communityScope: app.activeCommunityId(),
                       resultSize: 20,
                     };
                     app.search.searchThreadTitles(vnode.state.searchTerm, params)

@@ -25,6 +25,7 @@ interface CosmosFormState extends ChainFormState {
   symbol: string;
   bech32_prefix: string;
   decimals: string;
+  alt_wallet_url: string;
   saving: boolean;
   error: string;
 }
@@ -36,6 +37,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
     vnode.state.name = '';
     vnode.state.symbol = '';
     vnode.state.bech32_prefix = '';
+    vnode.state.alt_wallet_url = '';
     initChainForm(vnode.state);
     vnode.state.saving = false;
     vnode.state.error = '';
@@ -101,6 +103,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                 vnode.state.decimals = v;
               }
             }),
+            // TODO: add alt wallet URL field
             ...defaultChainRows(vnode.state),
           ]
         ),

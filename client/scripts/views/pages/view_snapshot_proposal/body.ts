@@ -19,7 +19,7 @@ export const ProposalBodyAuthor: m.Component<{ item: SnapshotProposal }> = {
 
     return m('.ProposalBodyAuthor', [
       m(User, {
-        user: new AddressInfo(null, item.author, app.activeId(), null), // TODO: activeID becomes chain_base, fix
+        user: new AddressInfo(null, item.author, app.activeChainId(), null), // TODO: activeID becomes chain_base, fix
         linkify: true,
         popover: true
       }),

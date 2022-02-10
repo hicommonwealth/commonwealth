@@ -16,7 +16,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, CommunityInfo, NodeInfo, ITokenAdapter } from 'models';
+import { OffchainTopic, OffchainThreadKind, OffchainThreadStage, NodeInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -25,9 +25,10 @@ import QuillEditor from 'views/components/quill_editor';
 import TopicSelector from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 interface IThreadForm {
   topicName?: string;
@@ -113,9 +114,7 @@ const newThread = async (
   stage = OffchainThreadStage.Discussion,
   readOnly?: boolean
 ) => {
-  const topics = app.chain
-    ? app.chain.meta.chain.topics
-    : app.community.meta.topics;
+  const topics = app.chain.meta.chain.topics
 
   if (kind === OffchainThreadKind.Forum) {
     if (!form.threadTitle) {
@@ -149,8 +148,7 @@ const newThread = async (
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
-  const chainId = app.activeCommunityId() ? null : app.activeChainId();
-  const communityId = app.activeCommunityId();
+  const chainId = app.activeChainId();
 
   let result;
   try {
@@ -160,7 +158,6 @@ const newThread = async (
       kind,
       stage,
       chainId,
-      communityId,
       title,
       topicName || 'General', // if no topic name set to default
       topicId,
@@ -175,10 +172,8 @@ const newThread = async (
     throw new Error(e);
   }
 
-  const activeEntity = app.activeCommunityId() ? app.community : app.chain;
-  updateLastVisited(app.activeCommunityId()
-    ? (activeEntity.meta as CommunityInfo)
-    : (activeEntity.meta as NodeInfo).chain, true);
+  const activeEntity = app.chain;
+  updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
 
   await app.user.notifications.refresh();
 
@@ -233,7 +228,7 @@ const checkForModifications = async (state, modalMsg) => {
     }
 
     const discardedDraft = app.user.discussionDrafts.store
-      .getByCommunity(app.activeId())
+      .getByCommunity(app.activeChainId())
       .filter((d) => d.id === fromDraft)[0];
     let discardedDelta;
     let discardedMarkdown;
@@ -292,7 +287,7 @@ export const loadDraft = async (dom, state, draft) => {
   titleInput.val(draft.title);
   state.form.threadTitle = draft.title;
 
-  localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, state.form.threadTitle);
+  localStorage.setItem(`${app.activeChainId()}-new-discussion-storedTitle`, state.form.threadTitle);
   state.activeTopic = draft.topic;
   state.form.topicName = draft.topic;
   state.fromDraft = draft.id;
@@ -321,7 +316,7 @@ export const loadDraft = async (dom, state, draft) => {
 // };
 
 const setTemplateContent = (parentState) => {
-  const defaultOffchainTemplate = localStorage.getItem(`${app.activeId()}-active-topic-default-template`);
+  const defaultOffchainTemplate = localStorage.getItem(`${app.activeChainId()}-active-topic-default-template`);
 
   if (defaultOffchainTemplate) {
     let newDraftMarkdown;
@@ -382,18 +377,18 @@ export const NewThreadForm: m.Component<{
     } catch (e) {
       // couldn't extract activeTopic
     }
-    if (localStorage.getItem(`${app.activeId()}-from-draft`)) {
-      vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeId()}-from-draft`));
-      localStorage.removeItem(`${app.activeId()}-from-draft`);
+    if (localStorage.getItem(`${app.activeChainId()}-from-draft`)) {
+      vnode.state.fromDraft = Number(localStorage.getItem(`${app.activeChainId()}-from-draft`));
+      localStorage.removeItem(`${app.activeChainId()}-from-draft`);
     }
     if (vnode.state.postType === undefined) {
-      vnode.state.postType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
+      vnode.state.postType = localStorage.getItem(`${app.activeChainId()}-post-type`) || PostType.Discussion;
     }
     if (vnode.state.postType === PostType.Discussion) {
-      vnode.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
+      vnode.state.form.threadTitle = localStorage.getItem(`${app.activeChainId()}-new-discussion-storedTitle`);
     } else {
-      vnode.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
-      vnode.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
+      vnode.state.form.url = localStorage.getItem(`${app.activeChainId()}-new-link-storedLink`);
+      vnode.state.form.linkTitle = localStorage.getItem(`${app.activeChainId()}-new-link-storedTitle`);
     }
   },
   onremove: async (vnode) => {
@@ -410,24 +405,24 @@ export const NewThreadForm: m.Component<{
           notifySuccess('Draft saved');
         }
       }
-      localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
-      localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
-      localStorage.removeItem(`${app.activeId()}-active-topic`);
-      localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
-      localStorage.removeItem(`${app.activeId()}-post-type`);
+      localStorage.removeItem(`${app.activeChainId()}-new-discussion-storedTitle`);
+      localStorage.removeItem(`${app.activeChainId()}-new-discussion-storedText`);
+      localStorage.removeItem(`${app.activeChainId()}-active-topic`);
+      localStorage.removeItem(`${app.activeChainId()}-active-topic-default-template`);
+      localStorage.removeItem(`${app.activeChainId()}-post-type`);
     }
   },
   view: (vnode) => {
-    if (!app.community && !app.chain) return;
+    if (!app.chain) return;
     const author = app.user.activeAccount;
-    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+    const activeEntityInfo = app.chain.meta.chain;
     const { isModal, hasTopics } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;
     }
 
     const updateTopicState = (topicName: string, topicId?: number) => {
-      localStorage.setItem(`${app.activeId()}-active-topic`, topicName);
+      localStorage.setItem(`${app.activeChainId()}-active-topic`, topicName);
       vnode.state.activeTopic = topicName;
       vnode.state.form.topicName = topicName;
       vnode.state.form.topicId = topicId;
@@ -436,44 +431,44 @@ export const NewThreadForm: m.Component<{
     const saveToLocalStorage = (type: PostType) => {
       if (type === PostType.Discussion) {
         if (vnode.state.form.threadTitle) {
-          localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
+          localStorage.setItem(`${app.activeChainId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
         }
       } else {
         if (vnode.state.form.url) {
-          localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
+          localStorage.setItem(`${app.activeChainId()}-new-link-storedLink`, vnode.state.form.url);
         }
         if (vnode.state.form.linkTitle) {
-          localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
+          localStorage.setItem(`${app.activeChainId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
         }
       }
     };
 
     const populateFromLocalStorage = (type: PostType) => {
       if (type === PostType.Discussion) {
-        vnode.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
+        vnode.state.form.threadTitle = localStorage.getItem(`${app.activeChainId()}-new-discussion-storedTitle`);
       } else {
-        vnode.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
-        vnode.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
+        vnode.state.form.url = localStorage.getItem(`${app.activeChainId()}-new-link-storedLink`);
+        vnode.state.form.linkTitle = localStorage.getItem(`${app.activeChainId()}-new-link-storedTitle`);
       }
     };
 
     const clearLocalStorage = (type: PostType) => {
       if (type === PostType.Discussion) {
-        localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
-        localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
-      } else if (localStorage.getItem(`${app.activeId()}-post-type`) === PostType.Link) {
-        localStorage.removeItem(`${app.activeId()}-new-link-storedText`);
-        localStorage.removeItem(`${app.activeId()}-new-link-storedTitle`);
-        localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
+        localStorage.removeItem(`${app.activeChainId()}-new-discussion-storedText`);
+        localStorage.removeItem(`${app.activeChainId()}-new-discussion-storedTitle`);
+      } else if (localStorage.getItem(`${app.activeChainId()}-post-type`) === PostType.Link) {
+        localStorage.removeItem(`${app.activeChainId()}-new-link-storedText`);
+        localStorage.removeItem(`${app.activeChainId()}-new-link-storedTitle`);
+        localStorage.removeItem(`${app.activeChainId()}-new-link-storedLink`);
       }
-      localStorage.removeItem(`${app.activeId()}-active-topic`);
-      localStorage.removeItem(`${app.activeId()}-active-topic-default-template`);
-      localStorage.removeItem(`${app.activeId()}-post-type`);
+      localStorage.removeItem(`${app.activeChainId()}-active-topic`);
+      localStorage.removeItem(`${app.activeChainId()}-active-topic-default-template`);
+      localStorage.removeItem(`${app.activeChainId()}-post-type`);
     };
 
-    const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
+    const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeChainId());
     const { fromDraft, postType, saving } = vnode.state;
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId() });
     const disableDiscussionSubmission = postType === PostType.Discussion
       && (!author
         || vnode.state.saving
@@ -505,7 +500,7 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 saveToLocalStorage(PostType.Link);
                 vnode.state.postType = PostType.Discussion;
-                localStorage.setItem(`${app.activeId()}-post-type`, PostType.Discussion);
+                localStorage.setItem(`${app.activeChainId()}-post-type`, PostType.Discussion);
                 populateFromLocalStorage(PostType.Discussion);
               },
               active: postType === PostType.Discussion,
@@ -515,13 +510,13 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 saveToLocalStorage(PostType.Discussion);
                 vnode.state.postType = PostType.Link;
-                localStorage.setItem(`${app.activeId()}-post-type`, PostType.Link);
+                localStorage.setItem(`${app.activeChainId()}-post-type`, PostType.Link);
                 populateFromLocalStorage(PostType.Link);
               },
               active: postType === PostType.Link,
             }),
             m('.tab-spacer', { style: 'flex: 1' }),
-            isModal && m.route.get() !== `${app.activeId()}/new/discussion` && m(TabItem, {
+            isModal && m.route.get() !== `${app.activeChainId()}/new/discussion` && m(TabItem, {
               class: 'tab-right',
               label: [
                 'Full editor',
@@ -529,7 +524,7 @@ export const NewThreadForm: m.Component<{
               ],
               onclick: (e) => {
                 vnode.state.overwriteConfirmationModal = true;
-                localStorage.setItem(`${app.activeId()}-from-draft`, `${fromDraft}`);
+                localStorage.setItem(`${app.activeChainId()}-from-draft`, `${fromDraft}`);
                 navigateToSubpage('/new/discussion');
                 $(e.target).trigger('modalexit');
               },
@@ -542,7 +537,7 @@ export const NewThreadForm: m.Component<{
           content: [
             'You haven\'t set a display name yet. ',
             m('a', {
-              href: `/${app.activeId()}/account/${app.user.activeAccount.address}?base=${app.user.activeAccount.chain}`,
+              href: `/${app.activeChainId()}/account/${app.user.activeAccount.address}?base=${app.user.activeAccount.chain}`,
               onclick: (e) => {
                 e.preventDefault();
                 app.modals.create({
@@ -560,9 +555,9 @@ export const NewThreadForm: m.Component<{
           hasTopics
             ? m(FormGroup, { span: { xs: 12, sm: 5 }, order: 1 }, [
               m(TopicSelector, {
-                defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-topic`),
-                topics: app.topics.getByCommunity(app.activeId()),
-                featuredTopics: app.topics.getByCommunity(app.activeId())
+                defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeChainId()}-active-topic`),
+                topics: app.topics.getByCommunity(app.activeChainId()),
+                featuredTopics: app.topics.getByCommunity(app.activeChainId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
                 updateFormData: updateTopicState,
                 tabindex: 1,
@@ -576,7 +571,7 @@ export const NewThreadForm: m.Component<{
                 e.redraw = false; // do not redraw on input
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
-                localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
+                localStorage.setItem(`${app.activeChainId()}-new-link-storedLink`, vnode.state.form.url);
               },
               defaultValue: vnode.state.form.url,
               tabindex: 2,
@@ -593,7 +588,7 @@ export const NewThreadForm: m.Component<{
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
                 vnode.state.form.linkTitle = value;
-                localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
+                localStorage.setItem(`${app.activeChainId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
               },
               defaultValue: vnode.state.form.linkTitle,
               tabindex: 3,
@@ -667,13 +662,13 @@ export const NewThreadForm: m.Component<{
               m(TopicSelector, {
                 defaultTopic: (vnode.state.activeTopic === false || vnode.state.activeTopic)
                   ? vnode.state.activeTopic
-                  : localStorage.getItem(`${app.activeId()}-active-topic`),
-                topics: app.topics && app.topics.getByCommunity(app.activeId()).filter((t) => {
+                  : localStorage.getItem(`${app.activeChainId()}-active-topic`),
+                topics: app.topics && app.topics.getByCommunity(app.activeChainId()).filter((t) => {
                   return isAdmin
                     || t.tokenThreshold.isZero()
-                    || !TopicGateCheck.isGatedTopic(t.name, app.chain.tokenBalance);
+                    || !TopicGateCheck.isGatedTopic(t.name);
                 }),
-                featuredTopics: app.topics.getByCommunity(app.activeId())
+                featuredTopics: app.topics.getByCommunity(app.activeChainId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
                 updateFormData: updateTopicState,
                 tabindex: 1,
@@ -692,7 +687,7 @@ export const NewThreadForm: m.Component<{
                   vnode.state.quillEditorState.alteredText = true;
                 }
                 vnode.state.form.threadTitle = value;
-                localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
+                localStorage.setItem(`${app.activeChainId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
               defaultValue: vnode.state.form.threadTitle,
               tabindex: 2,

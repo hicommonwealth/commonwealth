@@ -48,7 +48,7 @@ const User: m.Component<{
     if (!user) return;
 
     let account : Account<any>;
-    let profile; // profile is used to retrieve the chain and address later
+    let profile: Profile; // profile is used to retrieve the chain and address later
     let role;
     const addrShort = formatAddressShort(
       user.address,
@@ -59,9 +59,7 @@ const User: m.Component<{
     const friendlyChainName = app.config.chains
       .getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name;
 
-    const adminsAndMods = app.chain
-      ? app.chain.meta.chain.adminsAndMods
-      : app.community ? app.community.meta.adminsAndMods : [];
+    const adminsAndMods = app.chain?.meta.chain.adminsAndMods || [];
 
     if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !app.cachedIdentityWidget) {
       vnode.state.identityWidgetLoading = true;
@@ -82,7 +80,12 @@ const User: m.Component<{
       if (!chainId || !address) return;
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === chainId) {
-        account = app.chain.accounts.get(address);
+        try {
+          account = app.chain.accounts.get(address);
+        } catch (e) {
+          console.log('legacy account error, carry on');
+          account = null;
+        }
       }
       profile = app.profiles.getProfile(chainId, address);
       role = adminsAndMods.find((r) => r.address === address && r.address_chain === chainId);
@@ -90,7 +93,12 @@ const User: m.Component<{
       profile = vnode.attrs.user;
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
-        account = app.chain.accounts.get(profile.address);
+        try {
+          account = app.chain.accounts.get(profile.address);
+        } catch (e) {
+          console.error(e);
+          account = null;
+        }
       }
       role = adminsAndMods.find((r) => r.address === profile.address && r.address_chain === profile.chain);
     } else {
@@ -119,7 +127,7 @@ const User: m.Component<{
     ];
     const ghostAddress = app.user.addresses.some(({ address, ghostAddress }) => {
       if (this !== undefined) account.address === address && ghostAddress
-    })
+    });
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
         key: profile?.address || '-',
@@ -152,7 +160,7 @@ const User: m.Component<{
             linkify
               ? link('a.user-display-name.username',
                 (profile
-                  ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+                  ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
                   : 'javascript:'
                 ), [
                   !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
@@ -198,7 +206,7 @@ const User: m.Component<{
             showAddressWithDisplayName: false
           }) : link('a.user-display-name',
             profile
-              ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+              ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
               : 'javascript:',
             !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
               profile.displayName,
@@ -311,7 +319,7 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      ? `/${app.activeId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+      ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
       : 'javascript:';
 
     return linkify
@@ -334,7 +342,7 @@ export const AnonymousUser: m.Component<{
     const showAvatar = !hideAvatar;
     let profileAvatar;
     if (showAvatar) {
-      const pseudoAddress = distinguishingKey + moment('dddd, MMMM Do YYYY');
+      const pseudoAddress = distinguishingKey;
       profileAvatar = m('svg.Jdenticon', {
         width: avatarSize - 4,
         height: avatarSize - 4,
@@ -347,6 +355,7 @@ export const AnonymousUser: m.Component<{
         }
       })
     }
+
     return avatarOnly
       ? m('.User.avatar-only', {
         key: '-'

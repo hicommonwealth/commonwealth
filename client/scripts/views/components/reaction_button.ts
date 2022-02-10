@@ -7,13 +7,12 @@ import { Icon, Icons, Popover, Size } from 'construct-ui';
 import app from 'state';
 import { Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
-import BN from 'bn.js';
 
 import $ from 'jquery';
 import ReactionCount from 'models/ReactionCount';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import SelectAddressModal from '../modals/select_address_modal';
 import LoginModal from '../modals/login_modal';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
@@ -84,23 +83,20 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
     let disabled = vnode.state.loading;
 
     // token balance check if needed
-    if (!app.community) {
-      const tokenBalance = app.chain.tokenBalance;
-      const isAdmin = app.user.isSiteAdmin
-        || app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() });
+    const isAdmin = app.user.isSiteAdmin
+      || app.user.isAdminOfEntity({ chain: app.activeChainId()});
 
-      let topicName: string = "";
+      let topicName = "";
       if (post instanceof OffchainThread && post.topic && app.topics) {
-        topicName = (post as OffchainThread).topic.name
+        topicName = (post as OffchainThread).topic.name;
       } else if (post instanceof OffchainComment) {
         // post.rootProposal has typescript typedef number but in practice seems to be a string
         const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
-        topicName = parentThread.topic.name
+        topicName = parentThread.topic.name;
       }
       disabled = vnode.state.loading || (
-        !isAdmin && TopicGateCheck.isGatedTopic(topicName, tokenBalance)
+        !isAdmin && TopicGateCheck.isGatedTopic(topicName)
       );
-    }
 
     const activeAddress = app.user.activeAccount?.address;
     vnode.state.hasReacted = hasReacted;
@@ -127,8 +123,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
         } else {
           const { address: userAddress, chain } = app.user.activeAccount;
           // if it's a community use the app.user.activeAccount.chain.id instead of author chain
-          const chainId = app.activeCommunityId() ? null : app.activeChainId();
-          const communityId = app.activeCommunityId();
+          const chainId = app.activeChainId();
           if (hasReacted) {
             const reaction = (await fetchReactionsByPost(post)).find((r) => {
               return (r.reaction === hasReactedType && r.Address.address === activeAddress);
@@ -142,7 +137,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
               vnode.state.reactors = reactors.filter(({ Address }) => Address.address !== userAddress);
               if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
                 || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
-                app.reactions.create(userAddress, post, type, chainId, communityId).then(() => {
+                app.reactions.create(userAddress, post, type, chainId).then(() => {
                   vnode.state.loading = false;
                   m.redraw();
                 });
@@ -153,7 +148,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
             });
           } else {
             vnode.state.loading = true;
-            app.reactionCounts.create(userAddress, post, type, chainId, communityId)
+            app.reactionCounts.create(userAddress, post, type, chainId)
               .then(() => {
                 vnode.state.loading = false;
                 vnode.state.reactors = [ ...reactors, {
@@ -166,7 +161,7 @@ const ReactionButton: m.Component<ReactionButtonAttrs, ReactionButtonState> = {
             'Step No': 1,
             'Step': 'Create Reaction',
             'Post Name': `${post.slug}: ${post.identifier}`,
-            'Scope': app.activeId(),
+            'Scope': app.activeChainId(),
           });
           mixpanel.people.increment('Reaction');
           mixpanel.people.set({

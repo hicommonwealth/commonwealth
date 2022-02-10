@@ -48,7 +48,7 @@ const getProfileStatus = (account) => {
   let isUnjoinedJoinableAddress;
   let currentAddressInfo;
   if (!onOwnProfile && !onLinkedProfile) {
-    const communityOptions = { chain: app.activeChainId(), community: app.activeCommunityId() };
+    const communityOptions = { chain: app.activeChainId() };
     const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
     const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
     const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)
@@ -366,7 +366,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                 type: UserContent.All,
                 content: allContent,
                 // eslint-disable-next-line max-len
-                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
+                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
               })
             }, {
               name: threadsTabTitle,
@@ -375,7 +375,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                 type: UserContent.Threads,
                 content: proposals,
                 // eslint-disable-next-line max-len
-                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
+                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
               }),
             }, {
               name: commentsTabTitle,
@@ -384,7 +384,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                 type: UserContent.Comments,
                 content: comments,
                 // eslint-disable-next-line max-len
-                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeId()}-scrollY`,
+                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
               }),
             }]),
           ]),
