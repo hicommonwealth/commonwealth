@@ -9,27 +9,27 @@ import {
 } from 'views/components/metadata_rows_test';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 
-export interface ChainFormState {
+export type ChainFormState = {
   description: string;
-  icon_url: string;
-  website: string;
   discord: string;
   element: string;
-  telegram: string;
   github: string;
+  icon_url: string;
+  telegram: string;
   uploadInProgress: boolean;
-}
+  website: string;
+};
 
 export const initChainForm = (): ChainFormState => {
   return {
-    icon_url: '',
-    website: '',
+    description: '',
     discord: '',
     element: '',
-    telegram: '',
     github: '',
-    description: '',
+    icon_url: '',
+    telegram: '',
     uploadInProgress: false,
+    website: '',
   };
 };
 

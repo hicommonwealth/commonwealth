@@ -22,37 +22,38 @@ import { CWButton } from '../../components/component_kit/cw_button';
 // TODO: ChainFormState contains "uploadInProgress" which is technically
 // not part of the form (what we pass to /createChain), but of the general view's state,
 // and should be located elsewhere.
-interface CreateOffchainForm extends ChainFormState {
+type CreateOffchainForm = {
+  base: ChainBase;
   id: string;
   name: string;
   symbol: string;
-  base: ChainBase;
-}
+} & ChainFormState;
 
-interface CreateOffchainState {
-  saving: boolean;
-  loaded: boolean;
-  loading: boolean;
-  status: string;
+type CreateOffchainState = {
   error: string;
   form: CreateOffchainForm;
-}
+  loaded: boolean;
+  loading: boolean;
+  saving: boolean;
+  status: string;
+};
 
 export class OffchainFormTest implements m.ClassComponent {
   private state: CreateOffchainState = {
-    saving: false,
+    error: '',
     loaded: false,
     loading: false,
+    saving: false,
     status: '',
-    error: '',
     form: {
       id: '',
       name: '',
       symbol: 'XYZ',
       base: ChainBase.Ethereum,
       ...initChainForm(),
-    }
+    },
   };
+
   view() {
     return (
       <div class="CreateCommunityForm">
