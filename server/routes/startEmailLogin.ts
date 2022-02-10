@@ -48,12 +48,8 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   //
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
-  // const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, req.body, previousUser);
-  const chain = await models.Chain.findOne({
-    where: {
-      id: 'ethereum'
-    }
-  })
+  const context = req.body.chain || 'ethereum';
+  const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, context, previousUser);
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;
