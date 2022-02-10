@@ -7,7 +7,7 @@ import 'pages/create_community_test.scss';
 
 import app from 'state';
 import { initAppState } from 'app';
-import { slugify } from 'utils';
+import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import { InputRow, SelectRow } from 'views/components/metadata_rows_test';
@@ -63,18 +63,17 @@ export class OffchainFormTest implements m.ClassComponent {
           defaultValue={this.state.form.name}
           onChangeHandler={(v) => {
             this.state.form.name = v;
-            this.state.form.id = slugify(v);
+            this.state.form.id = slugifyPreserveDashes(v);
           }}
         />
-        <InputRow
-          title="ID"
-          placeholder="ID will show up here based on your name"
-          defaultValue={this.state.form.id}
-          value={this.state.form.id}
-          onChangeHandler={(v) => {
-            this.state.form.id = v;
-          }}
-        />
+        <div class="IDRow">
+          <label>ID</label>
+          <div class={`id ${!this.state.form.id.length && 'placeholder'}`}>
+            {!this.state.form.id.length
+              ? 'ID will show up here based on your name'
+              : this.state.form.id}
+          </div>
+        </div>
         <InputRow
           title="Symbol"
           defaultValue={this.state.form.symbol}

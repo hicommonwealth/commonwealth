@@ -19,6 +19,7 @@
     }
   }
 
+  .IDRow,
   .ToggleRow,
   .SelectRow,
   .AvatarUploadRow {
@@ -29,6 +30,18 @@
     label {
       @include form-label;
       margin-bottom: 4px;
+    }
+  }
+
+  .id {
+    background-color: #fffff3;
+    border-radius: 4px;
+    height: 42px;
+    padding: 8px 15px;
+
+    &.placeholder {
+      color: #cccccc;
+      font-style: italic;
     }
   }
 }
