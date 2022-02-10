@@ -48,8 +48,8 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   //
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
-  const context = req.body.chain || MAGIC_DEFAULT_CHAIN;
-  const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, context, previousUser);
+  const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;
@@ -93,7 +93,6 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
       loginLink,
     },
   };
-
   sgMail.send(msg).then((result) => {
     res.json({ status: 'Success' });
   }).catch((e) => {
