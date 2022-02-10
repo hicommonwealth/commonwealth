@@ -12,7 +12,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { isAddress } from 'web3-utils';
 import { notifyError } from 'controllers/app/notifications';
 // TODO Compile ERC721 Metadata factory
-import { IERC20Metadata__factory, IERC721__factory } from 'eth/types';
+import { IERC20Metadata__factory, IERC721Metadata__factory } from 'eth/types';
 import {
   InputPropertyRow
 } from 'views/components/metadata_rows';
@@ -315,7 +315,7 @@ const ERC721Form: m.Component<ERC721FormAttrs, ERC721FormState> = {
             const provider = new Web3.providers.WebsocketProvider(args.url);
             try {
               const ethersProvider = new providers.Web3Provider(provider);
-              const contract = IERC721__factory.connect(args.address, ethersProvider);
+              const contract = IERC721Metadata__factory.connect(args.address, ethersProvider);
               const name = await contract.name();
               const symbol = await contract.symbol();
               vnode.state.name = name || '';
@@ -468,4 +468,4 @@ const ERC721Form: m.Component<ERC721FormAttrs, ERC721FormState> = {
   },
 };
 
-export default { ERC20Form, ERC721Form };
+export { ERC20Form, ERC721Form };

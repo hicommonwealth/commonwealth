@@ -4,12 +4,11 @@ import { ITokenAdapter } from 'models';
 
 export default class TopicGateCheck {
 
-    // TODO do something with address
     public static isGatedTopic(topicName: string, address?: string): boolean {
         if (ITokenAdapter.instanceOf(app.chain) && topicName) {
           const tokenPostingThreshold: BN = app.topics.getByName(
             topicName,
-            app.activeId()
+            app.activeChainId()
           )?.tokenThreshold;
           return tokenPostingThreshold && tokenPostingThreshold.gt(app.chain.tokenBalance);
         }
@@ -20,7 +19,7 @@ export default class TopicGateCheck {
         if (ITokenAdapter.instanceOf(app.chain) && topicName) {
           return app.topics.getByName(
             topicName,
-            app.activeId()
+            app.activeChainId()
           )?.tokenThreshold;
         }
         return new BN('0', 10);

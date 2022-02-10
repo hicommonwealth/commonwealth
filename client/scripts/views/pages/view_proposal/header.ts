@@ -29,11 +29,10 @@ import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
-import LinkedThreadModal from '../../modals/linked_thread_modal';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 export const ProposalHeaderExternalLink: m.Component<{
   proposal: AnyProposal | OffchainThread;
@@ -101,7 +100,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
         app.user.activeAccount.address
       );
 
-    const tokenThresholdFailed = TopicGateCheck.isGatedTopic(proposal.topic.name, app.chain.tokenBalance);
+    const tokenThresholdFailed = TopicGateCheck.isGatedTopic(proposal.topic.name);
 
     const vote = async (option, hasVoted, isSelected) => {
       if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
