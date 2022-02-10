@@ -318,6 +318,6 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
             />
         }
 
-        return <SidebarSection {...sidebar_section_data}></SidebarSection>
+        return m(SidebarSection, {...sidebar_section_data})
     }
 }

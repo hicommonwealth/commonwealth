@@ -56,22 +56,22 @@ const ChatPage: m.Component<never, IState> = {
   },
   view: (vnode) => {
     const activeEntity = app.chain;
-    if (!activeEntity) return <PageLoading />;
+    if (!activeEntity) return m(PageLoading);
 
     const activeChannel = Number(m.route.param()['channel'])
 
     return vnode.state.loaded
       ? _.isEmpty(vnode.state.channels)
-        ? <PageLoading />
-        : <Sublayout>
-            <div class="chat-page">
-              <ChatWindow
-                channel_id={activeChannel}
-                messages={vnode.state.channels[activeChannel].messages}
-              />
-            </div>
-          </Sublayout>
-      : <PageLoading />
+        ? m(PageLoading)
+        : m(Sublayout, [
+            m(".chat-page", [
+              m(ChatWindow, {
+                channel_id: activeChannel,
+                messages: vnode.state.channels[activeChannel].messages
+              })
+            ])
+        ])
+      : m(PageLoading)
   },
 };
 

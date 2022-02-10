@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /* @jsx m */
 
 import m from 'mithril';
@@ -8,19 +9,23 @@ import { CWButton } from '../component_kit/cw_button'
 import { CWTextInput } from '../component_kit/cw_text_input';
 import { channel } from './chat_section';
 
-export const CreateCategory: m.Component<{handleClose: Function},{category: string, channel: string}> = {
-    oninit: (vnode) => {
-        vnode.state.category = ""
-        vnode.state.channel = ""
-    },
-    view: (vnode) => {
+export class CreateCategory implements m.ClassComponent<{handleClose: Function}> {
+    category: string;
+    channel: string;
+
+    oninit() {
+        this.category = "";
+        this.channel = "";
+    }
+
+    view(vnode) {
         const handleSubmit = async () => {
-            await app.socket.chatNs.createChatChannel(vnode.state.channel, app.activeChainId(), vnode.state.category)
+            await app.socket.chatNs.createChatChannel(this.channel, app.activeChainId(), this.category)
             vnode.attrs.handleClose()
         }
 
-        const handleCategoryChange = evt => {vnode.state.category = evt.target.value}
-        const handleChannelChange = evt => {vnode.state.channel = evt.target.value}
+        const handleCategoryChange = evt => {this.category = evt.target.value}
+        const handleChannelChange = evt => {this.channel = evt.target.value}
 
         return <CWCard elevation='elevation-1' interactive={false}>
                 <Icon name={Icons.X} size={Size.XL} onclick={vnode.attrs.handleClose}></Icon>
@@ -38,7 +43,7 @@ export const CreateCategory: m.Component<{handleClose: Function},{category: stri
                 />
                 <div class="button-bar">
                     <CWButton buttonType='secondary' label="Cancel" onclick={vnode.attrs.handleClose} />
-                    <CWButton disabled={!vnode.state.category.length || !vnode.state.channel.length}
+                    <CWButton disabled={!this.category.length || !this.channel.length}
                       label="Submit" onclick={handleSubmit} />
                 </div>
 
@@ -46,17 +51,18 @@ export const CreateCategory: m.Component<{handleClose: Function},{category: stri
     }
 }
 
-export const CreateChannel: m.Component<{handleClose: Function, category: string},{channel: string}> = {
-    oninit: (vnode) => {
-        vnode.state.channel = ""
-    },
-    view: (vnode) => {
+export class CreateChannel implements m.ClassComponent<{handleClose: Function, category: string}> {
+    channel: string;
+    oninit() {
+        this.channel = ""
+    }
+    view(vnode) {
         const handleSubmit = async () => {
-            await app.socket.chatNs.createChatChannel(vnode.state.channel, app.activeChainId(), vnode.attrs.category)
+            await app.socket.chatNs.createChatChannel(this.channel, app.activeChainId(), vnode.attrs.category)
             vnode.attrs.handleClose()
         }
 
-        const handleChannelChange = evt => {vnode.state.channel = evt.target.value}
+        const handleChannelChange = evt => {this.channel = evt.target.value}
 
         return <CWCard elevation='elevation-1' interactive={false}>
                 <Icon name={Icons.X} size={Size.XL} onclick={vnode.attrs.handleClose}></Icon>
@@ -69,7 +75,7 @@ export const CreateChannel: m.Component<{handleClose: Function, category: string
                 />
                 <div class="button-bar">
                     <CWButton buttonType='secondary' label="Cancel" onclick={vnode.attrs.handleClose} />
-                    <CWButton disabled={!vnode.state.channel.length}
+                    <CWButton disabled={!this.channel.length}
                       label="Submit" onclick={handleSubmit} />
                 </div>
 
@@ -77,18 +83,18 @@ export const CreateChannel: m.Component<{handleClose: Function, category: string
     }
 }
 
-export const RenameChannel: m.Component<
-  {handleClose: Function, channel: channel},{channel_name: string}> = {
-    oninit: (vnode) => {
-        vnode.state.channel_name = ""
-    },
-    view: (vnode) => {
+export class RenameChannel implements m.ClassComponent<{handleClose: Function, channel: channel}> {
+    channel_name: string
+    oninit() {
+        this.channel_name = ""
+    }
+    view(vnode) {
         const handleSubmit = async () => {
             vnode.attrs.handleClose()
-            await app.socket.chatNs.renameChatChannel(vnode.attrs.channel.id, vnode.state.channel_name)
+            await app.socket.chatNs.renameChatChannel(vnode.attrs.channel.id, this.channel_name)
         }
 
-        const handleChange = evt => { vnode.state.channel_name = evt.target.value }
+        const handleChange = evt => { this.channel_name = evt.target.value }
 
         return <CWCard elevation='elevation-1' interactive={false}>
                 <Icon name={Icons.X} size={Size.XL} onclick={vnode.attrs.handleClose}></Icon>
@@ -101,7 +107,7 @@ export const RenameChannel: m.Component<
                 />
                 <div class="button-bar">
                     <CWButton buttonType='secondary' label="Cancel" onclick={vnode.attrs.handleClose} />
-                    <CWButton disabled={!vnode.state.channel_name.length}
+                    <CWButton disabled={!this.channel_name.length}
                       label="Submit" onclick={handleSubmit} />
                 </div>
 
@@ -109,17 +115,18 @@ export const RenameChannel: m.Component<
     }
 }
 
-export const RenameCategory: m.Component<{handleClose: Function, category: string},{new_category: string}> = {
-    oninit: (vnode) => {
-        vnode.state.new_category = ""
-    },
-    view: (vnode) => {
+export class RenameCategory implements m.ClassComponent<{handleClose: Function, category: string}> {
+    new_category: string;
+    oninit() {
+        this.new_category = ""
+    }
+    view(vnode) {
         const handleSubmit = async () => {
-            await app.socket.chatNs.renameChatCategory(vnode.attrs.category, vnode.state.new_category)
+            await app.socket.chatNs.renameChatCategory(vnode.attrs.category, this.new_category)
             vnode.attrs.handleClose()
         }
 
-        const handleChange = evt => {vnode.state.new_category = evt.target.value}
+        const handleChange = evt => {this.new_category = evt.target.value}
 
         return <CWCard elevation='elevation-1' interactive={false}>
                 <Icon name={Icons.X} size={Size.XL} onclick={vnode.attrs.handleClose}></Icon>
@@ -132,7 +139,7 @@ export const RenameCategory: m.Component<{handleClose: Function, category: strin
                 />
                 <div class="button-bar">
                     <CWButton buttonType='secondary' label="Cancel" onclick={vnode.attrs.handleClose} />
-                    <CWButton disabled={!vnode.state.new_category.length}
+                    <CWButton disabled={!this.new_category.length}
                       label="Submit" onclick={handleSubmit} />
                 </div>
 
@@ -140,8 +147,8 @@ export const RenameCategory: m.Component<{handleClose: Function, category: strin
     }
 }
 
-export const DeleteChannel: m.Component<{handleClose: Function, channel: channel},{}> = {
-    view: (vnode) => {
+export class DeleteChannel implements m.ClassComponent<{handleClose: Function, channel: channel}> {
+    view(vnode) {
         const handleSubmit = async () => {
             await app.socket.chatNs.deleteChatChannel(vnode.attrs.channel.id)
             vnode.attrs.handleClose()
@@ -161,8 +168,8 @@ export const DeleteChannel: m.Component<{handleClose: Function, channel: channel
     }
 }
 
-export const DeleteCategory: m.Component<{handleClose: Function, category: string},{}> = {
-    view: (vnode) => {
+export class DeleteCategory implements m.ClassComponent<{handleClose: Function, category: string}> {
+    view(vnode) {
         const handleSubmit = async () => {
             await app.socket.chatNs.deleteChatCategory(vnode.attrs.category)
             vnode.attrs.handleClose()

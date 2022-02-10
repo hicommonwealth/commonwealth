@@ -96,14 +96,14 @@ const ChatWindow: m.Component<IAttrs, IState> = {
         <div class="chat-message-group">
           { grp.messages.map(msg =>
             <div class="chat-message-text">
-              <MarkdownFormattedText doc={msg.message}></MarkdownFormattedText>
+              {m(MarkdownFormattedText, { doc: msg.message })}
             </div>
           )}
           <div class="clear" />
-          <User
-            user={new AddressInfo(null, grp.address, app.activeChainId(), null)}
-            linkify={true}>
-          </User>
+          {m(User, {
+            user: new AddressInfo(null, grp.address, app.activeChainId(), null),
+            linkify: true
+          })}
           <div class="chat-message-group-timestamp">{formatTimestampForChat(grp.messages[0].created_at)}</div>
         </div>)}
       </div>
@@ -112,13 +112,13 @@ const ChatWindow: m.Component<IAttrs, IState> = {
           !app.user.activeAccount ? <div class='chat-composer-unavailable'>Set up an account to join chat</div> :
             !app.socket.chatNs.isConnected ? <div class='chat-composer-unavailable'>Waiting for connection</div> :
               <form class={`chat-composer${app.socket.chatNs.isConnected ? '' : ' disabled'}`}>
-                <ResizableTextarea
-                  name="chat"
-                  rows={1}
-                  disabled={!app.socket.chatNs.isConnected}
-                  placeholder={app.socket.chatNs.isConnected ? 'Enter a message...' : 'Disconnected'}
-                  onkeypress={handleSubmitMessage}
-                ></ResizableTextarea>
+                {m(ResizableTextarea, {
+                  name: "chat",
+                  rows: 1,
+                  disabled: !app.socket.chatNs.isConnected,
+                  placeholder: app.socket.chatNs.isConnected ? 'Enter a message...' : 'Disconnected',
+                  onkeypress: handleSubmitMessage
+                })}
               </form>
       }
     </div>;
