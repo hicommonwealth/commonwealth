@@ -48,8 +48,12 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   //
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
-  const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-
+  // const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, req.body, previousUser);
+  const chain = await models.Chain.findOne({
+    where: {
+      id: 'ethereum'
+    }
+  })
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;
@@ -93,6 +97,7 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
       loginLink,
     },
   };
+
   sgMail.send(msg).then((result) => {
     res.json({ status: 'Success' });
   }).catch((e) => {
