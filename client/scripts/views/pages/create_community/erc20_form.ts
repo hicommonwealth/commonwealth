@@ -11,7 +11,6 @@ import { providers } from 'ethers';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { isAddress } from 'web3-utils';
 import { notifyError } from 'controllers/app/notifications';
-// TODO Compile ERC721 Metadata factory
 import { IERC20Metadata__factory, IERC721Metadata__factory } from 'eth/types';
 import {
   InputPropertyRow
