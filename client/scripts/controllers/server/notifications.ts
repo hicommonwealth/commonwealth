@@ -51,8 +51,10 @@ class NotificationsController {
         },
         (result) => {
           const newSubscription = NotificationSubscription.fromJSON(result);
-          if (newSubscription.category === 'chain-event')
-          app.socket.chainEventsNs.addChainEventSubscriptions([newSubscription])this._subscriptions.push(newSubscription);
+          if (newSubscription.category === 'chain-event') {
+            app.socket.chainEventsNs.addChainEventSubscriptions([newSubscription]);
+          }
+          this._subscriptions.push(newSubscription);
         }
       );
     }
