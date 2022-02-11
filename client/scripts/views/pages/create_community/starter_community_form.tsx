@@ -10,35 +10,19 @@ import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
-import { InputRow, SelectRow } from 'views/components/metadata_rows_test';
+import { InputRow, SelectRow } from 'views/components/metadata_rows';
 import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
-import {
-  initChainForm,
-  defaultChainRows,
-  ChainFormState,
-} from './chain_input_rows_test';
+import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { ChainFormFields, ChainFormState } from './types';
 
 // TODO: ChainFormState contains "uploadInProgress" which is technically
 // not part of the form (what we pass to /createChain), but of the general view's state,
 // and should be located elsewhere.
-type CreateStarterForm = {
-  base: ChainBase;
-  id: string;
-  name: string;
-  symbol: string;
-} & ChainFormState;
+type CreateStarterForm = ChainFormFields & { base: ChainBase };
 
-type CreateStarterState = {
-  error: string;
-  form: CreateStarterForm;
-  loaded: boolean;
-  loading: boolean;
-  saving: boolean;
-  status: string;
-};
-
-export class StarterFormTest implements m.ClassComponent {
+type CreateStarterState = ChainFormState & { form: CreateStarterForm };
+export class StarterCommunityForm implements m.ClassComponent {
   private state: CreateStarterState = {
     error: '',
     loaded: false,

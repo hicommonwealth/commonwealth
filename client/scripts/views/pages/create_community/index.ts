@@ -5,19 +5,17 @@ import app from 'state';
 import $ from 'jquery';
 import { Tabs, TabItem, Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
-import OffchainCommunityForm from './offchain_community_form';
-import ERC20Form from './erc20_form';
+import { ERC20Form } from './erc20_form';
 import SubstrateForm from './substrate_form';
 import SputnikForm from './sputnik_form';
 import CosmosForm from './cosmos_form';
 import EthDaoForm from './eth_dao_form';
 import SplTokenForm from './spl_token_form';
-import { EthChainAttrs } from './chain_input_rows';
-import { StarterFormTest } from './starter_community_form';
+import { StarterCommunityForm } from './starter_community_form';
+import { EthChainAttrs } from './types';
 
 enum CommunityType {
-  StarterCommunityTest = 'Starter Community',
-  OffchainCommunity = 'Offchain Community',
+  StarterCommunity = 'Starter Community',
   Erc20Community = 'ERC20',
   SubstrateCommunity = 'Substrate',
   SputnikDao = 'Sputnik (V2)',
@@ -42,7 +40,7 @@ interface CreateCommunityState extends EthChainAttrs {
 const CreateCommunity: m.Component<CreateCommunityAttrs, CreateCommunityState> =
   {
     oninit: (vnode) => {
-      vnode.state.activeForm = CommunityType.StarterCommunityTest;
+      vnode.state.activeForm = CommunityType.StarterCommunity;
       vnode.state.loadingEthChains = true;
       vnode.state.ethChains = {};
       vnode.state.ethChainNames = {};
@@ -71,10 +69,8 @@ const CreateCommunity: m.Component<CreateCommunityAttrs, CreateCommunityState> =
       const getActiveForm = () => {
         const { ethChains, ethChainNames } = vnode.state;
         switch (vnode.state.activeForm) {
-          case CommunityType.StarterCommunityTest:
-            return m(StarterFormTest);
-          case CommunityType.OffchainCommunity:
-            return m(OffchainCommunityForm);
+          case CommunityType.StarterCommunity:
+            return m(StarterCommunityForm);
           case CommunityType.Erc20Community:
             return m(ERC20Form, { ethChains, ethChainNames });
           case CommunityType.SputnikDao:
