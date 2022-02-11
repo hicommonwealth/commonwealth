@@ -150,7 +150,6 @@ const createThread = async (
   } catch (err) {
     return next(new Error(err));
   }
-
   // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
   try {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
@@ -185,7 +184,6 @@ const createThread = async (
   } catch (err) {
     return next(err);
   }
-
   // auto-subscribe thread creator to comments & reactions
   try {
     await models.Subscription.create({

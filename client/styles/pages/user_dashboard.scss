@@ -1,0 +1,135 @@
+@import 'client/styles/shared';
+.Sublayout.UserDashboard {
+    .sublayout-sidebar-col {
+        padding-right: 0;
+        max-width: 0px;
+    }
+    .sublayout-main-col {
+        padding: 36px;
+        min-width: 100%;
+        max-width: calc(100% - 72px); // horizontal padding * 2
+    }
+    .sublayout-header-right,
+    .sublayout-header-left {
+        flex: 2;
+    }
+    .sublayout-header {
+        padding: 24px;
+    }
+    .SearchBar {
+        flex: 8;
+    }
+}
+
+.UserDashboard {
+    .preview-chain-card {
+        .card-top {
+            display: flex;
+            h3 {
+                margin-left: 15px;
+                margin-top: 4px;
+            }
+        }
+        .card-bottom {
+            margin-top: 10px;
+        }
+        margin-bottom: 10px;
+    }
+    .sublayout-main-col {
+        max-width: 100%;
+    }
+    .title {
+        font-size: 32px;
+        line-height: 38.4px;
+        font-weight: 500;
+        margin-bottom: 14px;
+        color: black;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .communities-link {
+            display: none;
+            font-size: 18px;
+            margin-bottom: 5px;
+            @include md-max {
+                display: block;
+            } 
+        }
+    }
+
+    .cui-tabs {
+        @include gradientTabs();
+        .cui-tabs-item {
+            padding: 13px 0 0 0;
+            margin: 0 34px 0 0 !important;
+            font-size: 24px;
+            font-weight: 500;
+            line-height: 28.8px;
+            color: #ddd;
+
+            &.cui-active {
+                color: black;
+            }
+        }
+    }
+    .dashboard-row-wrap {
+        margin-top: 20px;
+    }
+
+    .expore-communities-col {
+        @include md-max {
+            display: none;
+        } 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .home-card {
+        padding: 20px 16px;
+        margin-bottom: 20px;
+        .card-top {
+            display: flex;
+            align-items: center;
+
+            .ChainIcon {
+                margin-right: 15px;
+            }
+        }
+        .card-bottom {
+            margin-top: 15px;
+        }
+    }
+
+    .link {
+        color:#4723AD;
+        font-weight: 500;
+        position: relative;
+        float: right;
+        cursor: pointer;
+        padding: 8px 18px 3px 18px;
+        border-radius: 10px;
+
+        .cui-icon {
+            margin-left: 16px;
+            margin-top: -3px;
+
+            svg {
+                stroke: #4723AD;
+            }
+        }
+
+        &:hover {
+            text-decoration: none;
+            background-color: #F7F4FF;
+        }
+    }
+
+    
+}
+
+.Spinner {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
