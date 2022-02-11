@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import _ from 'lodash';
+import m from 'mithril';
 
 import { NotificationStore } from 'stores';
 import { NotificationSubscription, Notification, ChainEventType } from 'models';
@@ -50,7 +51,8 @@ class NotificationsController {
         },
         (result) => {
           const newSubscription = NotificationSubscription.fromJSON(result);
-          this._subscriptions.push(newSubscription);
+          if (newSubscription.category === 'chain-event')
+          app.socket.chainEventsNs.addChainEventSubscriptions([newSubscription])this._subscriptions.push(newSubscription);
         }
       );
     }
@@ -58,32 +60,30 @@ class NotificationsController {
 
   public enableSubscriptions(subscriptions: NotificationSubscription[]) {
     // TODO: Change to PUT /subscriptions
-    return post(
-      '/enableSubscriptions',
-      {
-        'subscription_ids[]': subscriptions.map((n) => n.id),
-      },
-      (result) => {
-        for (const s of subscriptions) {
-          s.enable();
-        }
+    return post('/enableSubscriptions', {
+      'subscription_ids[]': subscriptions.map((n) => n.id),
+    }, (result) => {
+      const ceSubs = []
+      for (const s of subscriptions) {
+        s.enable();
+        if (s.category === 'chain-event') ceSubs.push(s)
       }
-    );
+      app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs)
+    });
   }
 
   public disableSubscriptions(subscriptions: NotificationSubscription[]) {
     // TODO: Change to PUT /subscriptions
-    return post(
-      '/disableSubscriptions',
-      {
-        'subscription_ids[]': subscriptions.map((n) => n.id),
-      },
-      (result) => {
-        for (const s of subscriptions) {
-          s.disable();
-        }
+    return post('/disableSubscriptions', {
+      'subscription_ids[]': subscriptions.map((n) => n.id),
+    }, (result) => {
+      const ceSubs = []
+      for (const s of subscriptions) {
+        s.disable();
+        if (s.category === 'chain-event') ceSubs.push(s);
       }
-    );
+      app.socket.chainEventsNs.deleteChainEventSubscriptions(ceSubs);
+    });
   }
 
   public enableImmediateEmails(subscriptions: NotificationSubscription[]) {
@@ -129,7 +129,8 @@ class NotificationsController {
           throw new Error('subscription not found!');
         }
         this._subscriptions.splice(idx, 1);
-      }
+      if (subscription.category === 'chain-event')
+        app.socket.chainEventsNs.deleteChainEventSubscriptions([subscription]);}
     );
   }
 
@@ -186,10 +187,12 @@ class NotificationsController {
   public update(n: Notification) {
     if (!this._store.getById(n.id)) {
       this._store.add(n);
+      m.redraw();
     }
   }
 
   public clearSubscriptions() {
+    app.socket?.chainEventsNs.deleteChainEventSubscriptions(this._subscriptions)
     this._subscriptions = [];
   }
 
@@ -202,6 +205,7 @@ class NotificationsController {
     return post('/viewNotifications', options, (result) => {
       this._store.clear();
       this._subscriptions = [];
+      const ceSubs = []
       for (const subscriptionJSON of result) {
         const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
         this._subscriptions.push(subscription);
@@ -212,12 +216,14 @@ class NotificationsController {
         for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
           const data = {
             is_read: notificationsReadJSON.is_read,
-            ...notificationsReadJSON.Notification
+                ...notificationsReadJSON.Notification
           }
           const notification = Notification.fromJSON(data, subscription, chainEventType);
           this._store.add(notification);
         }
+        if (subscription.category === 'chain-event') ceSubs.push(subscription);
       }
+      app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
     })
   }
 }

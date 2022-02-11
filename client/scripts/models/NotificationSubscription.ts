@@ -53,11 +53,11 @@ class NotificationSubscription {
       json.is_active,
       json.created_at,
       json.immediate_email,
-      json.Chain,
-      json.ChainEventType,
-      json.OffchainComment,
-      json.OffchainCommunity,
-      json.OffchainThread,
+      json.Chain || json.chain_id,
+      json.ChainEventType || json.chain_event_type_id,
+      json.OffchainComment || json.offchain_comment_id,
+      json.OffchainCommunity || json.offchain_community_id,
+      json.OffchainThread || json.offchain_thread_id,
     );
   }
 }

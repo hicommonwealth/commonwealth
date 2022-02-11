@@ -100,6 +100,7 @@ export enum WebsocketEventType {
 }
 
 export enum WebsocketMessageType {
+  ChainEventNotification = 'chain-event-notification',
   Message = 'message',
   Heartbeat = 'heartbeat',
   HeartbeatPong = 'heartbeat-pong',
@@ -107,6 +108,15 @@ export enum WebsocketMessageType {
   Typing = 'typing',
   Notification = 'notification',
   ChainEntity = 'chain-entity',
+}
+
+export enum WebsocketNamespaces {
+  ChainEvents = 'chain-events'
+}
+
+export enum WebsocketEngineEvents {
+  CreateRoom = 'create-room',
+  DeleteRoom = 'delete-room'
 }
 
 export interface IWebsocketsPayload<T> {

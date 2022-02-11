@@ -21,8 +21,8 @@ class ChainEvent {
 
   public static fromJSON(json, chainEventType?: ChainEventType) {
     return new ChainEvent(
-      json.block_number,
-      json.event_data,
+      json.blockNumber || json.block_number,
+      json.data || json.event_data,
       chainEventType || ChainEventType.fromJSON(json.ChainEventType),
       json.id,
     );

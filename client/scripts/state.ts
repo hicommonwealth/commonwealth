@@ -8,6 +8,7 @@ import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import { InviteCodeAttributes } from 'types';
+import { WebSocketController } from 'controllers/server/socket';
 import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
@@ -17,7 +18,6 @@ import SearchController from './controllers/server/search'
 import ReactionsController from './controllers/server/reactions';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
-import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
@@ -36,7 +36,7 @@ export const enum LoginState {
 }
 
 export interface IApp {
-  socket: WebsocketController;
+  socket: WebSocketController;
   chain: IChainAdapter<any, any>;
 
   chainPreloading: boolean;

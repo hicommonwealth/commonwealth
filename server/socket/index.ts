@@ -1,147 +1,126 @@
-import WebSocket from 'ws';
-import * as jwt from 'jsonwebtoken';
-import http from 'http';
-import express from 'express';
-import * as net from 'net';
-import { WebsocketEventType, WebsocketMessageType, IWebsocketsPayload } from '../../shared/types';
-import { JWT_SECRET } from '../config';
+// Use https://admin.socket.io/#/ to monitor
 
+// TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
+
+import { Server, Socket } from 'socket.io';
+import { instrument } from '@socket.io/admin-ui';
+import { BrokerConfig } from 'rascal';
+import * as jwt from 'jsonwebtoken';
+import { ExtendedError } from 'socket.io/dist/namespace';
+import http from 'http';
+import { createAdapter } from '@socket.io/postgres-adapter';
+import { Pool } from 'pg';
+import { createCeNamespace, publishToCERoom } from './chainEventsNs';
+import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
+import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+import { DATABASE_URI, JWT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
-const ALIVE_TIMEOUT = 30 * 1000; // heartbeats are 15 seconds
-const EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutes, same as session expiration
+const origin = process.env.SERVER_URL || 'http://localhost:8080';
 
-class AuthWebSocket extends WebSocket {
-  isAlive?: boolean;
-  aliveTimer?: NodeJS.Timeout;
-  expirationTimer?: NodeJS.Timeout;
-  isAuthenticated?: boolean;
-  user?: any;
-}
-
-const userMap: { [user: number]: AuthWebSocket } = {};
-const sessionMap: { [session: string]: AuthWebSocket } = {};
-
-export default function (
-  wss: WebSocket.Server,
-  server: http.Server,
-  sessionParser: express.RequestHandler,
-  logging: boolean
-) {
-  server.on(WebsocketEventType.Upgrade, (req: express.Request, socket: net.Socket, head) => {
-    log.trace('\nParsing session from request...\n');
-    sessionParser(req, {} as express.Response, () => {
-      if (!req.session) {
-        log.error('No session found.');
-        socket.destroy();
-        return;
+export const authenticate = (
+  socket: Socket,
+  next: (err?: ExtendedError) => void
+) => {
+  if (socket.handshake.query?.token) {
+    jwt.verify(
+      <string>socket.handshake.query.token,
+      JWT_SECRET,
+      (err, decodedUser) => {
+        if (err)
+          return next(new Error('Authentication Error: incorrect JWT token'));
+        (<any>socket).user = decodedUser;
+        next();
       }
+    );
+  } else {
+    next(new Error('Authentication Error: no JWT token given'));
+  }
+};
 
-      log.trace('Session is parsed!');
+export function setupWebSocketServer(httpServer: http.Server) {
+  // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
+  // library to the user since we already import it + disable http long-polling to avoid sticky session issues
+  const io = new Server(httpServer, {
+    transports: ['websocket'],
+    cors: {
+      origin,
+      methods: ['GET', 'POST'],
+    },
+  });
 
-      wss.handleUpgrade(req, socket, head, (ws) => {
-        wss.emit(WebsocketEventType.Connection, ws, req);
-      });
+  io.use(authenticate);
+
+  io.on('connection', (socket) => {
+    log.trace(`${socket.id} connected`);
+    socket.on('disconnect', () => {
+      log.trace(`${socket.id} disconnected`);
     });
   });
 
-  wss.on(WebsocketEventType.Connection, (ws: AuthWebSocket, req: express.Request) => {
-    const sessionId = req.sessionID;
-    sessionMap[sessionId] = ws;
+  io.engine.on('connection_error', (err) => {
+    // log.error(err.req);      // the request object
+    // console.log(err.code);     // the error code, for example 1
+    // console.log(err.message);  // the error message, for example "Session ID unknown"
+    // console.log(err.context);  // some additional error context
+    log.error('A WebSocket connection error has occurred', err);
+  });
 
-    let userId: number;
-    if (req.session && req.session.passport && req.session.passport.user) {
-      userId = req.session.passport.user;
-      userMap[userId] = ws;
-    }
-    ws.on(WebsocketEventType.Message, (message) => {
-      log.trace(`Received message ${message} from session ${sessionId}`);
-      try {
-        const payload: IWebsocketsPayload<any> = JSON.parse(message.toString());
-        if (payload.event === WebsocketMessageType.Heartbeat) {
-          ws.isAlive = true;
+  // create the chain-events namespace
+  const ceNamespace = createCeNamespace(io);
 
-          // reset liveness timers
-          if (ws.aliveTimer) clearTimeout(ws.aliveTimer);
-          ws.aliveTimer = global.setTimeout(() => { ws.isAlive = false; }, ALIVE_TIMEOUT);
+  // enables the admin analytics dashboard (creates /admin namespace)
+  instrument(io, {
+    auth: false,
+  });
 
-          if (ws.expirationTimer) clearTimeout(ws.expirationTimer);
-          ws.expirationTimer = global.setTimeout(() => {
-            // TODO: do i need to manually close the socket here?
-            log.trace(`Websocket ${sessionId} expired, emitting close`);
-            wss.emit(WebsocketEventType.Close);
-          }, EXPIRATION_TIME);
-
-          // get user if verified
-          if (payload.jwt) {
-            jwt.verify(payload.jwt, JWT_SECRET, async (err, decodedUser) => {
-              if (err) {
-                log.info(`received message with malformed JWT: ${payload.jwt}`);
-              } else {
-                ws.isAuthenticated = true;
-                ws.user = decodedUser;
-              }
-            });
-          }
-        } else {
-          log.error('received malformed message');
-        }
-      } catch (e) {
-        log.error('received malformed message');
-      }
+  const pool = new Pool({
+    connectionString: DATABASE_URI,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  });
+  pool
+    .query(
+      `
+          CREATE TABLE IF NOT EXISTS socket_io_attachments
+          (
+              id         bigserial UNIQUE,
+              created_at timestamptz DEFAULT NOW(),
+              payload    bytea
+          );
+			`
+    )
+    .then((res) => {
+      log.info('Socket.io query successful');
+    })
+    .catch((e) => {
+      log.error(
+        'Postgres Adapter will not work so cross server websocket rooms will not be available.',
+        e
+      );
     });
 
-    ws.on(WebsocketEventType.Close, () => {
-      log.trace(`Received close event for websocket ${sessionId}`);
-      if (sessionMap[sessionId]) {
-        delete sessionMap[sessionId];
-      }
-      if (userId && userMap[userId]) {
-        delete userMap[userId];
-      }
+  io.adapter(<any>createAdapter(pool));
+
+  try {
+    const rabbitController = new RabbitMQController(
+      <BrokerConfig>RabbitMQConfig
+    );
+    rabbitController.init().then(() => {
+      return rabbitController.startSubscription(
+        publishToCERoom.bind(ceNamespace),
+        'ChainEventsNotificationsSubscription'
+      );
     });
-  });
-
-  // TODO: maybe unify these, or else remove the event type from payload and add it manually here?
-  wss.on(WebsocketMessageType.InitializeScrollback, (payload: IWebsocketsPayload<any>, userIds: number[]) => {
-    if (logging) log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(userIds)}`);
-    for (const user of userIds) {
-      if (user && user in userMap && userMap[user].isAlive) {
-        userMap[user].send(JSON.stringify(payload));
-      }
-    }
-  });
-
-  wss.on(
-    WebsocketMessageType.Notification,
-    (payload: IWebsocketsPayload<any>, notifications: { [user: number]: any }) => {
-      if (logging) {
-        log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(Object.keys(notifications))}`);
-      }
-      for (const [ user, notification ] of Object.entries(notifications)) {
-        if (user && user in userMap && userMap[user].isAlive) {
-          // augment notification with unique database id
-          payload.data.id = notification.id;
-          payload.data.subscription_id = notification.subscription_id;
-          userMap[user].send(JSON.stringify(payload));
-        }
-      }
-    }
-  );
-
-  wss.on(WebsocketMessageType.ChainEntity, (payload: IWebsocketsPayload<any>) => {
-    if (logging) log.info(`Payloading ${JSON.stringify(payload)}`);
-    for (const [ session, sessionSocket ] of Object.entries(sessionMap)) {
-      if (sessionSocket && sessionSocket.isAlive) {
-        sessionSocket.send(JSON.stringify(payload), (err?) => {
-          if (err) {
-            log.error(`Failed to send chain entity to session: ${session}`);
-            log.error(`Error: ${err}.`);
-            // TODO: remove from map if err is that it's closed?
-          }
-        });
-      }
-    }
-  });
+  } catch (e) {
+    log.warn(
+      `Failure connecting to ${
+        `${process.env.NODE_ENV} ` || ''
+      }RabbitMQ server. Please fix the RabbitMQ server configuration`
+    );
+    log.error(e);
+  }
 }

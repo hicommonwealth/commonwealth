@@ -221,7 +221,8 @@ export default (
         ...webhook_data
       });
     }
-    return nReads;
+
+    return notification;
   };
 
   Subscription.associate = (models) => {
