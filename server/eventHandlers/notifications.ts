@@ -60,7 +60,7 @@ export default class extends IEventHandler {
       );
 
       // construct notification with all the necessary data from the DB (without having to re-query using joins)
-      const formattedEvent = dbNotification.toJSON()
+      const formattedEvent = dbNotification.toJSON();
       formattedEvent.ChainEvent = dbEvent.toJSON()
       formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON()
 
