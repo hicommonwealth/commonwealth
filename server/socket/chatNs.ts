@@ -22,28 +22,28 @@ export function createChatNamespace(io: Server, models: DB) {
             log.info(`${socket.id} disconnected from Chat`);
         });
 
-        socket.on(WebsocketMessageType.JoinChatChannel, (chatChannelIds: number[]) => {
+        socket.on(WebsocketMessageType.JoinChatChannel, (chatChannelIds: string[]) => {
             if (chatChannelIds.length > 0) {
                 log.info(`${socket.id} joining ${JSON.stringify(chatChannelIds)}`);
-                for (const channel of chatChannelIds) socket.join(`${channel}`);
+                for (const channel of chatChannelIds) socket.join(channel);
             }
         })
 
-        socket.on(WebsocketMessageType.LeaveChatChannel, (chatChannelIds: number[]) => {
+        socket.on(WebsocketMessageType.LeaveChatChannel, (chatChannelIds: string[]) => {
             if (chatChannelIds.length > 0) {
                 log.info(`${socket.id} leaving ${JSON.stringify(chatChannelIds)}`);
-                for (const channel of chatChannelIds) socket.leave(`${channel}`);
+                for (const channel of chatChannelIds) socket.leave(channel);
             }
         })
 
         socket.on(WebsocketMessageType.ChatMessage, (_message) => {
-            const { message, address, chat_channel_id, now } = _message
+            const { message, address, chat_channel_id, now, socket_room } = _message
             const now_date = moment(now).toDate()
             models.ChatMessage.create({ address, message, chat_channel_id, created_at: now_date, updated_at: now_date })
                 .then((res) => {
                     const { id, created_at } = res
                     ChatNs
-                      .to(`${chat_channel_id}`)
+                      .to(`${socket_room}`)
                       .emit(WebsocketMessageType.ChatMessage, { id, address, message, chat_channel_id, created_at });
                 })
                 .catch((e) => {

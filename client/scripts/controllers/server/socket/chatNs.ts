@@ -2,17 +2,29 @@ import $ from 'jquery';
 import app from 'state';
 import { WebsocketMessageType, WebsocketNamespaces } from 'types';
 import { io } from 'socket.io-client';
+import _ from 'lodash';
 
 export const MESSAGE_PAGE_SIZE = 50;
 
-export const ChatErrors = {
-    'NOT_LOGGED_IN': new Error('User must be logged in to load chat')
+export enum ChatErrors {
+    NOT_LOGGED_IN='User must be logged in to load chat'
+}
+
+export interface IChannel {
+    id: number,
+    name: string,
+    category: string,
+    community_id: string,
+    created_at: string,
+    updated_at: string,
+    unread: number,
+    ChatMessages?: any[]
 }
 
 export class ChatNamespace {
     private chatNs;
     private _isConnected = false;
-    private messages = {};
+    public channels: Record<string, IChannel> = {};
 
     constructor() {
         this.chatNs = io(`/${WebsocketNamespaces.Chat}`, {
@@ -31,15 +43,18 @@ export class ChatNamespace {
         this.chatNs.off(eventName, listener);
     }
 
-    public sendMessage(message: any) {
-        this.chatNs.emit(WebsocketMessageType.ChatMessage, message)
+    public sendMessage(message: Record<string, any>, channel: IChannel) {
+        this.chatNs.emit(WebsocketMessageType.ChatMessage, {
+            socket_room: this.channelToRoomId(channel),
+            ...message
+        })
     }
 
-    public connectToChannels(channel_ids: number[]){
+    public connectToChannels(channel_ids: string[]){
         this.chatNs.emit(WebsocketMessageType.JoinChatChannel, channel_ids)
     }
 
-    public disconnectFromChannels(channel_ids: number[]){
+    public disconnectFromChannels(channel_ids: string[]){
         this.chatNs.emit(WebsocketMessageType.LeaveChatChannel, channel_ids)
     }
 
@@ -57,32 +72,75 @@ export class ChatNamespace {
         return this._isConnected;
     }
 
+    public hasChannels() {
+        return !_.isEmpty(this.channels)
+    }
+
+    public async initialize(channels: any) {
+        channels.forEach(c => {
+            this.channels[c.id] = { unread: 0, ...c }
+        });
+
+        this.addListener(WebsocketMessageType.ChatMessage, this.onMessage.bind(this))
+        this.connectToChannels(Object.values(this.channels).map(this.channelToRoomId))
+    }
+
+    public async deinit() {
+        this.removeListener(WebsocketMessageType.ChatMessage, this.onMessage.bind(this))
+        this.disconnectFromChannels(Object.values(this.channels).map(this.channelToRoomId))
+        this.channels = {}
+    }
+
+    private async reinit() {
+        const raw_channels = await this.getChatMessages()
+        const channels = {}
+        raw_channels.forEach(c => {
+            channels[c.id] = { unread: this.channels[c.id] || 0, ...c }
+        });
+        const new_channel_ids = Object.keys(channels).filter(x => !Object.keys(this.channels).includes(x));
+        const removed_channel_ids = Object.keys(this.channels).filter(x => !Object.keys(channels).includes(x));
+        this.disconnectFromChannels(removed_channel_ids.map(id => this.channels[id]).map(this.channelToRoomId))
+        this.connectToChannels(new_channel_ids.map(id => channels[id]).map(this.channelToRoomId))
+        this.channels = channels
+    }
+
+    private onMessage(msg) {
+        this.channels[msg.chat_channel_id].ChatMessages.push(msg)
+        this.channels[msg.chat_channel_id].unread++
+    }
+
+    public readMessages(channel_id: string) {
+        this.channels[channel_id].unread = 0;
+    }
+
+    private channelToRoomId(channel: IChannel) {
+        return `${channel.community_id}-${channel.id}`
+    }
+
     public async createChatChannel(name, community_id, category) {
         // check for admin?
         try {
-            $.post(`${app.serverUrl()}/createChatChannel`, {
+            const res = await $.post(`${app.serverUrl()}/createChatChannel`, {
                 jwt: app.user.jwt,
                 name,
                 community_id,
                 category
-            }).then((res) => {
-                console.log(res)
-            }).catch((err) => {
-                throw new Error(`Failed to created chat channel with error: ${err}`)
             })
+
+            if(res.status !== "200"){
+                throw new Error("Failed to create chat channel")
+            }
+
+            await this.reinit()
+            return true
         } catch (e) {
             console.error(e)
         }
     }
 
     public async getChatMessages() {
-        if(!app.user.activeAccount || !app.activeChainId()) {
-            // HACK: This gets called on load and beats the app's loading in a race. Can't have that.
-            await new Promise(r => setTimeout(r, 1000));
-        }
-
         if(!app.user.activeAccount) {
-            throw ChatErrors.NOT_LOGGED_IN
+            throw new Error(ChatErrors.NOT_LOGGED_IN)
         }
         try {
             const res = await $.get(`${app.serverUrl()}/getChatMessages`, {
@@ -97,16 +155,6 @@ export class ChatNamespace {
 
             const raw = JSON.parse(res.result)
             return raw
-        } catch (e) {
-            console.error(e)
-            return []
-        }
-    }
-
-    public async getChannels() {
-        try {
-            const messages = await this.getChatMessages()
-            return messages.map(c => {return {id: c.id, category: c.category, name: c.name}})
         } catch (e) {
             console.error(e)
             return []
@@ -128,6 +176,8 @@ export class ChatNamespace {
             if (response.status !== 'Success') {
                 throw new Error("Failed to delete chat channel")
             }
+
+            await this.reinit()
             return true
         } catch (e) {
             console.error(e)
@@ -150,6 +200,7 @@ export class ChatNamespace {
             if (response.status !== 'Success') {
                 throw new Error("Failed to delete chat category")
             }
+            await this.reinit()
             return true
         } catch (e) {
             console.error(e)
@@ -173,6 +224,7 @@ export class ChatNamespace {
             if (response.status !== 'Success') {
                 throw new Error("Failed to rename chat category")
             }
+            await this.reinit()
             return true
         } catch (e) {
             console.error(e)
@@ -182,7 +234,6 @@ export class ChatNamespace {
 
     public async renameChatChannel(channel_id: number, name: string) {
         try {
-            console.log(channel_id)
             const response = await $.ajax({
                 url: `${app.serverUrl()}/renameChatChannel`,
                 data: {
@@ -197,6 +248,7 @@ export class ChatNamespace {
             if (response.status !== 'Success') {
                 throw new Error("Failed to rename chat channel")
             }
+            await this.reinit()
             return true
         } catch (e) {
             console.error(e)

@@ -734,6 +734,10 @@
         color: #999999;
     }
 
+    &.active, &:hover {
+        background-color: #EDE7FF;
+    }
+    
     .cui-icon-hash {
         display: inline-block;
         margin-top: 1px;

@@ -27,8 +27,7 @@ const formatTimestampForChat = (timestamp) => {
 };
 
 interface IAttrs {
-  channel_id: number,
-  messages: any[],
+  channel_id: string
 }
 
 interface IState {
@@ -49,6 +48,7 @@ const ChatWindow: m.Component<IAttrs, IState> = {
         if(chat_channel_id === vnode.attrs.channel_id) {
             vnode.state.shouldScroll = false;
         }
+        m.redraw()
     }
     app.socket.chatNs.addListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage.bind(vnode));
   },
@@ -56,9 +56,11 @@ const ChatWindow: m.Component<IAttrs, IState> = {
     app.socket.chatNs.removeListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage)
   },
   view: (vnode) => {
-    const { channel_id, messages } = vnode.attrs;
+    const { channel_id } = vnode.attrs
+    app.socket.chatNs.readMessages(channel_id)
+    const channel = app.socket.chatNs.channels[channel_id]
     // group messages; break up groups when the sender changes, or there is a delay of MESSAGE_GROUPING_DELAY
-    const groupedMessages = messages.reduce((acc, msg) => {
+    const groupedMessages = channel.ChatMessages.reduce((acc, msg) => {
       if (acc.length > 0
        && acc[acc.length - 1].address === msg.address
        && moment(msg.created_at).diff(
@@ -80,10 +82,10 @@ const ChatWindow: m.Component<IAttrs, IState> = {
         const message = {
             message: $textarea.val(),
             address: app.user.activeAccount.address,
-            chat_channel_id: channel_id,
+            chat_channel_id: channel.id,
             now: moment().toISOString()
         };
-        app.socket.chatNs.sendMessage(message);
+        app.socket.chatNs.sendMessage(message, channel);
         $textarea.val('');
       }
     }

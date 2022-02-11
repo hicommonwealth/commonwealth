@@ -7,30 +7,37 @@ import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Spinner, Overlay } from 'construct-ui'
 import { navigateToSubpage } from 'app';
 import app from 'state';
-import { ChatErrors } from 'controllers/server/socket/chatNs';
+import { ChatErrors, IChannel } from 'controllers/server/socket/chatNs';
+import { WebsocketMessageType } from 'types';
 import SidebarSection, { SidebarSectionProps, SectionGroupProps, SubSectionProps } from '../sidebar/sidebar_section';
 import { ToggleTree, verifyCachedToggleTree } from '../sidebar';
-import { CreateCategory, CreateChannel, RenameCategory, RenameChannel, DeleteCategory, DeleteChannel } from './admin_modals'
+import {
+    CreateCategory,
+    CreateChannel,
+    RenameCategory,
+    RenameChannel,
+    DeleteCategory,
+    DeleteChannel } from './admin_modals'
+import ErrorPage from '../../pages/error';
 
-export type channel = {
-    id: number,
-    name: string,
-    unread: number,
-    category: string
+enum Errors {
+    None= '',
+    NotEnabled= 'Chat is not enabled',
+    NotLoggedIn= "Must be logged in to read chat"
 }
-
 interface IState {
     channels: {
-        [category: string] : channel[]
+        [category: string] : IChannel[]
     };
     loaded: boolean;
-    error: string;
+    error: Errors;
     channelToToggleTree: Function,
     categoryToToggleTree: Function,
     menu_toggle_tree: ToggleTree,
     adminModals: { [modal: string]: boolean },
     adminCategory: string,
-    adminChannel: channel | {},
+    adminChannel: IChannel | {},
+    onincomingmessage: (any: any) => void
 }
 
 function setToggleTree(path: string, toggle: boolean) {
@@ -48,15 +55,11 @@ function setToggleTree(path: string, toggle: boolean) {
     localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(new_tree);
 }
 
-export const ChatSection: m.Component<{mobile: boolean}, IState> = {
+export const ChatSection: m.Component<{channels: IChannel[], activeChannel: string}, IState> = {
     oninit: async (vnode) => {
         vnode.state.loaded = false;
 
-        const onMessage = (msg) => {
-            console.log(msg) // TODO: Increment unread count
-        }
-
-        vnode.state.channelToToggleTree = (channels: channel[]) => {
+        vnode.state.channelToToggleTree = (channels: IChannel[]) => {
             const toggle_tree = {}
             channels.forEach(k => {toggle_tree[k.name] = {toggled_state: false}})
             return toggle_tree
@@ -86,41 +89,48 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
         vnode.state.adminCategory = ""
         vnode.state.adminChannel = {}
 
-        try {
-            const channels = await app.socket.chatNs.getChannels()
-            vnode.state.channels = {}
-            channels.forEach(c => {
-                const metadata = { unread: 0, ...c }
-                vnode.state.channels[c.category]
-                ? vnode.state.channels[c.category].push(metadata)
-                : vnode.state.channels[c.category] = [metadata]
-            });
+        vnode.state.channels = {}
+        vnode.attrs.channels.forEach(c => {
+            const { ChatMessages, ...metadata } = c
+            vnode.state.channels[metadata.category]
+            ? vnode.state.channels[metadata.category].push(metadata)
+            : vnode.state.channels[metadata.category] = [metadata]
+        });
 
-            if(_.isEmpty(channels)){ // TODO: and check if user is admin
-                vnode.state.error = `Chat is not enabled for ${app.chain.name}`
+        vnode.state.onincomingmessage = (msg) => {
+            if(vnode.attrs.activeChannel) app.socket.chatNs.readMessages(vnode.attrs.activeChannel)
+            if(msg.chat_channel_id === vnode.attrs.activeChannel){
+                vnode.attrs.channels.find(c => c.id === msg.chat_channel_id).unread = 0;
             }
-
-            vnode.state.menu_toggle_tree = { // Used to track admin menu render status for hover
-                toggled_state: false,
-                children: vnode.state.categoryToToggleTree(Object.keys(vnode.state.channels), false)
-            }
-        } catch (e) {
-            if(e === ChatErrors.NOT_LOGGED_IN) {
-                vnode.state.error = "Must be logged in to read chat"
-            } else {
-                vnode.state.error = ""
-            }
-        } finally {
-            vnode.state.loaded = true;
-            m.redraw()
+            console.log(vnode.attrs.channels)
+            m.redraw.sync()
         }
+        app.socket.chatNs.addListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage.bind(vnode));
+
+        vnode.state.loaded = true
+    },
+    onremove: (vnode) => {
+        app.socket.chatNs.removeListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage)
     },
     view: (vnode) => {
         if(!vnode.state.loaded) return <Spinner />
-        // TODO: If user is admin, see option to enable chat
-        if(vnode.state.error) {
-            console.error(vnode.state.error)
-            return; // Disable chat option and add error as tooltip
+
+        vnode.state.channels = {}
+        vnode.attrs.channels.forEach(c => {
+            const { ChatMessages, ...metadata } = c
+            vnode.state.channels[metadata.category]
+            ? vnode.state.channels[metadata.category].push(metadata)
+            : vnode.state.channels[metadata.category] = [metadata]
+        });
+
+        if(_.isEmpty(vnode.attrs.channels)){ // TODO: and check if user is admin
+            console.error("Cannot fetch chat channels")
+            return m(ErrorPage)
+        }
+
+        vnode.state.menu_toggle_tree = { // Used to track admin menu render status for hover
+            toggled_state: false,
+            children: vnode.state.categoryToToggleTree(Object.keys(vnode.state.channels), false)
         }
 
         const channel_toggle_tree: ToggleTree = {
@@ -136,10 +146,7 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
             console.log("setting discussions toggle tree since the cached version differs from the updated version")
             localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(channel_toggle_tree);
         }
-        let toggle_tree_state = JSON.parse(localStorage[`${app.activeChainId()}-chat-toggle-tree`]);
-        if (vnode.attrs.mobile) {
-            toggle_tree_state = channel_toggle_tree;
-        }
+        const toggle_tree_state = JSON.parse(localStorage[`${app.activeChainId()}-chat-toggle-tree`]);
 
         // ---------- Build Section Props ---------- //
 
@@ -203,7 +210,7 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
             }
         }
 
-        const channelRightIcon = (channel: channel): m.Component<{},{}>  => {
+        const channelRightIcon = (channel: IChannel): m.Component<{},{}>  => {
             const handleMouseout = () => {
                 if(vnode.state.menu_toggle_tree['children'][channel.category]['children'][channel.name]['toggled_state']) {
                     vnode.state.menu_toggle_tree['children'][channel.category]['children'][channel.name]['toggled_state'] = false;
@@ -248,9 +255,9 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
             }
         }
 
-        const channelToSubSectionProps = (channel: channel): SubSectionProps => {
+        const channelToSubSectionProps = (channel: IChannel): SubSectionProps => {
             const onChannelPage = (p) => p.startsWith(`/${app.activeChainId()}/chat/${channel.id}`) ||
-            (app.isCustomDomain() && p.startsWith(`/chat/${channel.id}`));
+              (app.isCustomDomain() && p.startsWith(`/chat/${channel.id}`));
             return {
                 title: channel.name,
                 row_icon: true,
@@ -258,7 +265,6 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
                 is_active: onChannelPage(m.route.get()),
                 is_updated: channel.unread > 0,
                 onclick: (e) => {
-                    e.preventDefault();
                     navigateToSubpage(`/chat/${channel.id}`);
                 },
                 right_icon: channelRightIcon(channel)
@@ -284,7 +290,9 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
         const close_overlay = () => {
             Object.keys(vnode.state.adminModals).forEach(k => {
                 vnode.state.adminModals[k] = false;
-        })}
+            })
+            m.redraw()
+        }
         const overlay_content: m.Vnode = vnode.state.adminModals['CreateCategory']
           ? <CreateCategory handleClose={close_overlay}/>
           : vnode.state.adminModals['CreateChannel']
@@ -308,7 +316,6 @@ export const ChatSection: m.Component<{mobile: boolean}, IState> = {
             },
             display_data: channel_data,
             is_active: false,
-            toggle_disabled: vnode.attrs.mobile,
             right_icon: sectionAdminButton,
             extra_components: <Overlay
                 isOpen={Object.values(vnode.state.adminModals).some(Boolean)}

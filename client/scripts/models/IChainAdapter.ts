@@ -67,12 +67,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
 
     const {
-      threads, topics, admins, activeUsers, numVotingThreads
+      threads, topics, admins, activeUsers, numVotingThreads, chatChannels
     } = response.result;
     this.app.threads.initialize(threads, numVotingThreads, true);
     this.app.topics.initialize(topics, true);
     this.meta.chain.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
+    await this.app.socket.chatNs.initialize(JSON.parse(chatChannels))
 
     this._serverLoaded = true;
     return true;
@@ -88,6 +89,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
     this.app.reactionCounts.deinit();
     this.app.threadUniqueAddressesCount.deinit();
+    this.app.socket.chatNs.deinit();
     console.log(`${this.meta.chain.name} stopped`);
   }
 

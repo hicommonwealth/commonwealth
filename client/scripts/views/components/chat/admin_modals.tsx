@@ -4,10 +4,10 @@
 import m from 'mithril';
 import app from 'state';
 import { Icon, Icons, Size } from 'construct-ui';
+import { IChannel } from 'client/scripts/controllers/server/socket/chatNs';
 import { CWCard } from '../component_kit/cw_card';
 import { CWButton } from '../component_kit/cw_button'
 import { CWTextInput } from '../component_kit/cw_text_input';
-import { channel } from './chat_section';
 
 export class CreateCategory implements m.ClassComponent<{handleClose: Function}> {
     category: string;
@@ -83,7 +83,7 @@ export class CreateChannel implements m.ClassComponent<{handleClose: Function, c
     }
 }
 
-export class RenameChannel implements m.ClassComponent<{handleClose: Function, channel: channel}> {
+export class RenameChannel implements m.ClassComponent<{handleClose: Function, channel: IChannel}> {
     channel_name: string
     oninit() {
         this.channel_name = ""
@@ -147,7 +147,7 @@ export class RenameCategory implements m.ClassComponent<{handleClose: Function, 
     }
 }
 
-export class DeleteChannel implements m.ClassComponent<{handleClose: Function, channel: channel}> {
+export class DeleteChannel implements m.ClassComponent<{handleClose: Function, channel: IChannel}> {
     view(vnode) {
         const handleSubmit = async () => {
             await app.socket.chatNs.deleteChatChannel(vnode.attrs.channel.id)

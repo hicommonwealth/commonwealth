@@ -322,7 +322,10 @@ const Sidebar: m.Component<
         m(`.Sidebar${isCustom ? '.custom-domain' : ''}`, [
           m(DiscussionSection),
           m(GovernanceSection),
-          m(ChatSection),
+          m(ChatSection, {
+            channels: Object.values(app.socket.chatNs.channels),
+            activeChannel: m.route.param()['channel']
+          }),
           m(ExternalLinksModule),
           m('br'),
           app.isLoggedIn() &&

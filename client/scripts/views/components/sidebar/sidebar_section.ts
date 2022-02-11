@@ -38,14 +38,9 @@ export interface SidebarSectionProps {
     extra_components?: m.Vnode;
 }
 
-const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
-    oninit: (vnode) => {
-        console.log('inting subsection')
-        vnode.state.background_color = vnode.attrs.is_active ? '#EDE7FF' : 'none';
-    },
+const SubSection: m.Component<SubSectionProps, never> = {
     view: (vnode) => {
         const {title, is_visible, is_active, onclick, row_icon, is_updated, right_icon} = vnode.attrs;
-        const { background_color } = vnode.state;
         if (!is_visible) {
             return;
         }
@@ -61,23 +56,9 @@ const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
             title_text_class = '.title-stale'
         }
 
-        const mouse_enter_handler = (e) => {
-            if(vnode.state.background_color === '#EDE7FF') {
-                e.redraw = false; // Prevent redraws of subcomponents if already fired
-                e.stopPropagation();
-            }
-            vnode.state.background_color = '#EDE7FF';
-        }
-
-        const mouse_leave_handler = (e) => {
-            vnode.state.background_color = (is_active) ? '#EDE7FF' : 'none';
-        }
-
         return m('.SubSection',{
             onclick: (e) => click_handler(e),
-            style: `background-color: ${background_color}`,
-            onmouseenter: (e) => mouse_enter_handler(e),
-            onmouseleave: (e) => mouse_leave_handler(e),
+            className: `${is_active ? 'active' : ''}`,
         }, [
             row_icon && m(Icon, {name: Icons.HASH}),
             m(title_text_class, title),
