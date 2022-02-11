@@ -11,6 +11,7 @@ export const ChainCommunityErrors = {
 const lookupCommunityIsVisibleToUser = async (
   models, params, user
 ): Promise<[ChainInstance, string]> => {
+  if (!params.chain) return [null, ChainCommunityErrors.ChainDNE];
   const chain = await models.Chain.findOne({
     where: {
       id: params.chain,
