@@ -35,28 +35,6 @@ export enum DashboardViews {
   Chain = 'Chain',
 }
 
-/**
- * Important Note:
- * 
- * The User Dashboard is currently displaying content that might be informally labeled "Activity"- comments,
- * reactions, replies, etc. that occur within any community in which the logged in user is a member, regardless
- * of whether they are directly implicated in any of that activity. These are queried using the
- * /viewActivity route that has been added as part of this PR. This differs from the notion of "Notification" as 
- * originally defined in scripts/models/Notification.ts- as events that relate to content interactions with the
- * logged in user (i.e. a reply to the user's comment, a like on their thread, etc). The original intention was 
- * that a user is subscribed to these notifications (hence the "subscription" field in the Notification class)
- * and they can be queried using the /viewNotifications route.
- * 
- * In order to make this component compatible with the updates to our notifications system, we are forced to
- * use the Notifications class here to represent the "Activity" concept discussed above. As a result, the 
- * previously required "subscription", and "_isRead" fields have been set to optional in Notifications.ts. 
- * When the type "Notification" is used in this file and in user_dashboard_row.ts, read conceptually as 
- * "Activity", not "Activity that directly involves the logged in user". 
- * 
- * Note that nowhere else should the Notification class be used in this way; the subscription and _isRead fields
- * should be included in all other instantiations.  
- */
-
 const UserDashboard: m.Component<{}, {
   fy_count: number;
   global_count: number;
@@ -79,16 +57,6 @@ const UserDashboard: m.Component<{}, {
   },
   view: (vnode) => {
     const { activeTab, fy_notifications, global_notifications, chain_events, loadingData } = vnode.state;
-
-    // Loading Spinner
-    if (loadingData) {
-      return m(PageLoading, {
-        title: [
-          'Notifications ',
-          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-        ],
-      })
-    }
     
     // Helper to load activity conditional on the selected tab
     const handleToggle = (tab: DashboardViews) => {
@@ -212,7 +180,13 @@ const UserDashboard: m.Component<{}, {
               },
             }),
           ]),
+          loadingData && 
           m('.dashboard-row-wrap', [
+            m('.Spinner', [
+              m(Spinner, { active: true })
+            ])
+          ]),
+          !loadingData && m('.dashboard-row-wrap', [
             (activeTab === DashboardViews.FY) && [
               fy_notifications && fy_notifications.length > 0 ? [
                 fy_notifications.slice(0, vnode.state.fy_count).map((data) => {
