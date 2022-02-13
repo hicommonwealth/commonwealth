@@ -4,7 +4,7 @@ import {DB} from "../../database";
 export const Errors = {
     NotLoggedIn: 'Not logged in',
     NotAdmin: 'Must be an admin to delete a chat category',
-    NoCommunityId: 'No community id given',
+    NoChainId: 'No chain id given',
     NoCategory: 'No category name given'
 };
 
@@ -13,12 +13,13 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
         return next(new Error(Errors.NotLoggedIn));
     }
 
+    // TODO: re-enable
     // if (!req.user.isAdmin) {
     //     return next(new Error(Errors.NotAdmin))
     // }
 
-    if (!req.body.community_id) {
-        return next(new Error(Errors.NoCommunityId))
+    if (!req.body.chain_id) {
+        return next(new Error(Errors.NoChainId))
     }
 
     if (!req.body.category) {
@@ -28,7 +29,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     // finds all channels with category and deletes them
     const channels = await models.ChatChannel.findAll({
         where: {
-            community_id: req.body.community_id,
+            chain_id: req.body.chain_id,
             category: req.body.category
         }
     });

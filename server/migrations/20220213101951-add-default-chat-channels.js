@@ -12,8 +12,8 @@ module.exports = {
             INSERT INTO "ChatChannels"
             SELECT nextval('"ChatChannels_id_seq"'::regclass) as id,
                    'General'                                  as name,
-                   id                                         as community_id,
-                   ''                                         as category_id,
+                   id                                         as chain_id,
+                   ''                                         as category,
                    CURRENT_TIMESTAMP                          as created_at,
                    CURRENT_TIMESTAMP                          as updated_at
             FROM "Chains";

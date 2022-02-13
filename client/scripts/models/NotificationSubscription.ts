@@ -56,7 +56,7 @@ class NotificationSubscription {
       json.Chain || json.chain_id,
       json.ChainEventType || json.chain_event_type_id,
       json.OffchainComment || json.offchain_comment_id,
-      json.OffchainCommunity || json.offchain_community_id,
+      json.OffchainCommunity || json.offchain_community_id, // TODO: safe to remove?
       json.OffchainThread || json.offchain_thread_id,
     );
   }

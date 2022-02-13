@@ -18,7 +18,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     //     return next(new Error(Errors.NotAdmin))
     // }
 
-    if (!req.body.community_id) {
+    if (!req.body.chain_id) {
         return next(new Error(Errors.NoCommunityId))
     }
 
@@ -33,7 +33,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     // finds all channels with category and renames category
     const channels = await models.ChatChannel.findAll({
         where: {
-            community_id: req.body.community_id,
+            chain_id: req.body.chain_id,
             category: req.body.category
         }
     });

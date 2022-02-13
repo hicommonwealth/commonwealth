@@ -230,6 +230,12 @@ const createChain = async (
 
   const node = await models.ChainNode.create(chainNodeContent);
 
+  const chatChannels = await models.ChatChannel.create({
+    name: 'General',
+    chain_id: chain.id,
+    category: '' // TODO: update?
+  });
+
   return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: node.toJSON() } });
 };
 

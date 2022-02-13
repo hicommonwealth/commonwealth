@@ -4,7 +4,7 @@ import {DB} from "../../database";
 export const Errors = {
     NotLoggedIn: 'Not logged in',
     NotAdmin: 'Must be an admin to rename a chat channel',
-    NoCommunityId: 'No community id given',
+    NoChainId: 'No chain id given',
     NoChannelId: 'No channel id given',
     NoNewName: 'No new name given'
 };
@@ -14,7 +14,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 
     // if (!req.user.isAdmin) return next(new Error(Errors.NotAdmin))
 
-    if (!req.body.community_id) return next(new Error(Errors.NoCommunityId))
+    if (!req.body.chain_id) return next(new Error(Errors.NoChainId))
 
     if (!req.body.channel_id) return next(new Error(Errors.NoChannelId))
 
@@ -24,7 +24,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     const channel = await models.ChatChannel.findOne({
         where: {
             id: req.body.channel_id,
-            community_id: req.body.community_id
+            chain_id: req.body.chain_id
         }
     });
     channel.name = req.body.name

@@ -151,7 +151,7 @@ const bulkOffchain = async (
       ),
       models.ChatChannel.findAll({
         where: {
-          community_id: chain.id
+          chain_id: chain.id
         },
         include: {
           model: models.ChatMessage,

@@ -33,14 +33,14 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 
 	// check community id
 	console.log(req.query)
-	if (!req.query.community_id) {
+	if (!req.query.chain_id) {
 		return next(new Error(Errors.NoCommunityId))
 	}
 
 	// get all messages
 	const messages = await models.ChatChannel.findAll({
 		where: {
-			community_id: req.query.community_id
+			chain_id: req.query.chain_id
 		},
 		include: {
 			model: models.ChatMessage,

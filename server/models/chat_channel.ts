@@ -6,7 +6,7 @@ import { ChatMessageAttributes, ChatMessageInstance } from './chat_message';
 export interface ChatChannelAttributes {
   id?: number;
   name: string;
-  community_id: string;
+  chain_id: string;
   category: string;
   chat_messages?: ChatMessageAttributes[] | ChatMessageAttributes['id'][];
 }
@@ -35,7 +35,7 @@ export default (
         type: Sequelize.STRING(255),
         allowNull: false,
       },
-      community_id: {
+      chain_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {

@@ -14,7 +14,7 @@ export interface IChannel {
     id: number,
     name: string,
     category: string,
-    community_id: string,
+    chain_id: string,
     created_at: string,
     updated_at: string,
     unread: number,
@@ -45,7 +45,7 @@ export class ChatNamespace {
 
     public sendMessage(message: Record<string, any>, channel: IChannel) {
         this.chatNs.emit(WebsocketMessageType.ChatMessage, {
-            socket_room: this.channelToRoomId(channel),
+            socket_room: ChatNamespace.channelToRoomId(channel),
             ...message
         })
     }
@@ -82,12 +82,12 @@ export class ChatNamespace {
         });
 
         this.addListener(WebsocketMessageType.ChatMessage, this.onMessage.bind(this))
-        this.connectToChannels(Object.values(this.channels).map(this.channelToRoomId))
+        this.connectToChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
     }
 
     public async deinit() {
         this.removeListener(WebsocketMessageType.ChatMessage, this.onMessage.bind(this))
-        this.disconnectFromChannels(Object.values(this.channels).map(this.channelToRoomId))
+        this.disconnectFromChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
         this.channels = {}
     }
 
@@ -99,8 +99,8 @@ export class ChatNamespace {
         });
         const new_channel_ids = Object.keys(channels).filter(x => !Object.keys(this.channels).includes(x));
         const removed_channel_ids = Object.keys(this.channels).filter(x => !Object.keys(channels).includes(x));
-        this.disconnectFromChannels(removed_channel_ids.map(id => this.channels[id]).map(this.channelToRoomId))
-        this.connectToChannels(new_channel_ids.map(id => channels[id]).map(this.channelToRoomId))
+        this.disconnectFromChannels(removed_channel_ids.map(id => this.channels[id]).map(ChatNamespace.channelToRoomId))
+        this.connectToChannels(new_channel_ids.map(id => channels[id]).map(ChatNamespace.channelToRoomId))
         this.channels = channels
     }
 
@@ -113,17 +113,17 @@ export class ChatNamespace {
         this.channels[channel_id].unread = 0;
     }
 
-    private channelToRoomId(channel: IChannel) {
-        return `${channel.community_id}-${channel.id}`
+    private static channelToRoomId(channel: IChannel) {
+        return `${channel.chain_id}-${channel.id}`
     }
 
-    public async createChatChannel(name, community_id, category) {
+    public async createChatChannel(name, chain_id, category) {
         // check for admin?
         try {
             const res = await $.post(`${app.serverUrl()}/createChatChannel`, {
                 jwt: app.user.jwt,
                 name,
-                community_id,
+                chain_id,
                 category
             })
 
@@ -146,7 +146,7 @@ export class ChatNamespace {
             const res = await $.get(`${app.serverUrl()}/getChatMessages`, {
                 jwt: app.user.jwt,
                 address: app.user.activeAccount.address,
-                community_id: app.activeChainId()
+                chain_id: app.activeChainId()
             })
 
             if(res.status !== "200") {
@@ -167,7 +167,7 @@ export class ChatNamespace {
                 url: `${app.serverUrl()}/deleteChatChannel`,
                 data: {
                     channel_id,
-                    community_id: app.activeChainId(),
+                    chain_id: app.activeChainId(),
                     jwt: app.user.jwt
                 },
                 type: 'DELETE'
@@ -191,7 +191,7 @@ export class ChatNamespace {
                 url: `${app.serverUrl()}/deleteChatCategory`,
                 data: {
                     category,
-                    community_id: app.activeChainId(),
+                    chain_id: app.activeChainId(),
                     jwt: app.user.jwt,
                 },
                 type: 'DELETE'
@@ -215,7 +215,7 @@ export class ChatNamespace {
                 data: {
                     category,
                     new_category,
-                    community_id: app.activeChainId(),
+                    chain_id: app.activeChainId(),
                     jwt: app.user.jwt
                 },
                 type: 'PUT'
@@ -239,7 +239,7 @@ export class ChatNamespace {
                 data: {
                     channel_id,
                     name,
-                    community_id: app.activeChainId(),
+                    chain_id: app.activeChainId(),
                     jwt: app.user.jwt
                 },
                 type: 'PUT'

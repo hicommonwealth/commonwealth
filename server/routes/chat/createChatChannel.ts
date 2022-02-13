@@ -4,7 +4,7 @@ import {DB} from "../../database";
 export const Errors = {
     NotLoggedIn: 'Not logged in',
     NotAdmin: 'Must be an admin to create a chat channel',
-    NoCommunityId: 'No community id given'
+    NoChainId: 'No chain id given'
 };
 
 export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -16,13 +16,13 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     //     return next(new Error(Errors.NotAdmin))
     // }
 
-    if (!req.body.community_id) {
-        return next(new Error(Errors.NoCommunityId))
+    if (!req.body.chain_id) {
+        return next(new Error(Errors.NoChainId))
     }
 
     const channel = await models.ChatChannel.create({
         name: req.body.name,
-        community_id: req.body.community_id,
+        chain_id: req.body.chain_id,
         category: req.body.category
     });
 
