@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { ApiStatus, IApp } from 'state';
+import { ApiStatus, IApp, LoginState } from 'state';
 import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
@@ -9,6 +9,7 @@ import { ChainBase } from 'types';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { Account, NodeInfo, ProposalModule } from '.';
+import { WebSocketController } from '../controllers/server/socket';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -73,7 +74,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.topics.initialize(topics, true);
     this.meta.chain.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
-    await this.app.socket.chatNs.initialize(JSON.parse(chatChannels))
+    if (this.app.socket && this.app.loginState === LoginState.LoggedIn) {
+      await this.app.socket.chatNs.initialize(JSON.parse(chatChannels))
+    }
 
     this._serverLoaded = true;
     return true;
@@ -89,7 +92,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
     this.app.reactionCounts.deinit();
     this.app.threadUniqueAddressesCount.deinit();
-    this.app.socket.chatNs.deinit();
+    if(this.app.socket) this.app.socket.chatNs.deinit();
     console.log(`${this.meta.chain.name} stopped`);
   }
 

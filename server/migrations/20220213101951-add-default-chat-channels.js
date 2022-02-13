@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         /**
@@ -13,7 +11,7 @@ module.exports = {
             SELECT nextval('"ChatChannels_id_seq"'::regclass) as id,
                    'General'                                  as name,
                    id                                         as chain_id,
-                   ''                                         as category,
+                   'General'                                  as category,
                    CURRENT_TIMESTAMP                          as created_at,
                    CURRENT_TIMESTAMP                          as updated_at
             FROM "Chains";

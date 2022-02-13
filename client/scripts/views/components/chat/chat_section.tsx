@@ -59,6 +59,11 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
     oninit: async (vnode) => {
         vnode.state.loaded = false;
 
+        if(_.isEmpty(vnode.attrs.channels)){
+            await app.socket.chatNs.reinit()
+            vnode.attrs.channels = Object.values(app.socket.chatNs.channels)
+        }
+
         vnode.state.channelToToggleTree = (channels: IChannel[]) => {
             const toggle_tree = {}
             channels.forEach(k => {toggle_tree[k.name] = {toggled_state: false}})
@@ -106,15 +111,16 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
             m.redraw.sync()
         }
         app.socket.chatNs.addListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage.bind(vnode));
-
-        vnode.state.loaded = true
+        vnode.state.loaded = true;
     },
     onremove: (vnode) => {
-        app.socket.chatNs.removeListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage)
+        if(app.socket){
+            app.socket.chatNs.removeListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage)
+        }
     },
     view: (vnode) => {
-        if(!vnode.state.loaded) return <Spinner />
-
+        if(!app.socket) return;
+        if(!vnode.state.loaded) return <Spinner></Spinner>
         vnode.state.channels = {}
         vnode.attrs.channels.forEach(c => {
             const { ChatMessages, ...metadata } = c
@@ -122,11 +128,6 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
             ? vnode.state.channels[metadata.category].push(metadata)
             : vnode.state.channels[metadata.category] = [metadata]
         });
-
-        if(_.isEmpty(vnode.attrs.channels)){ // TODO: and check if user is admin
-            console.error("Cannot fetch chat channels")
-            return m(ErrorPage)
-        }
 
         vnode.state.menu_toggle_tree = { // Used to track admin menu render status for hover
             toggled_state: false,

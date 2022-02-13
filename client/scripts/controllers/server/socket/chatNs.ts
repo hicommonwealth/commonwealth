@@ -24,6 +24,7 @@ export interface IChannel {
 export class ChatNamespace {
     private chatNs;
     private _isConnected = false;
+    private _intialized = false;
     public channels: Record<string, IChannel> = {};
 
     constructor() {
@@ -76,6 +77,10 @@ export class ChatNamespace {
         return !_.isEmpty(this.channels)
     }
 
+    public intialized() {
+        return this._intialized
+    }
+
     public async initialize(channels: any) {
         channels.forEach(c => {
             this.channels[c.id] = { unread: 0, ...c }
@@ -83,15 +88,17 @@ export class ChatNamespace {
 
         this.addListener(WebsocketMessageType.ChatMessage, this.onMessage.bind(this))
         this.connectToChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
+        this._intialized = true;
     }
 
     public async deinit() {
+        this._intialized = false;
         this.removeListener(WebsocketMessageType.ChatMessage, this.onMessage.bind(this))
         this.disconnectFromChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
         this.channels = {}
     }
 
-    private async reinit() {
+    public async reinit() {
         const raw_channels = await this.getChatMessages()
         const channels = {}
         raw_channels.forEach(c => {
