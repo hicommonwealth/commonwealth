@@ -78,10 +78,12 @@ export function setupWebSocketServer(httpServer: http.Server) {
 
   const pool = new Pool({
     connectionString: DATABASE_URI,
-    ssl: {
+    ssl: process.env.NODE_ENV !== 'production' ? false : {
       rejectUnauthorized: false,
     },
+    max: 3,
   });
+
   pool
     .query(
       `
