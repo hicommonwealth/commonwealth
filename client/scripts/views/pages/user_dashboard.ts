@@ -36,48 +36,48 @@ export enum DashboardViews {
 }
 
 const UserDashboard: m.Component<{}, {
-  fy_count: number;
-  global_count: number;
-  chain_event_count: number;
+  fyCount: number;
+  globalCount: number;
+  chainEventCount: number;
   activeTab: DashboardViews;
   loadingData: boolean;
   onscroll;
-  fy_notifications: DashboardActivityNotification[];
-  global_notifications: DashboardActivityNotification[],
-  chain_events: DashboardActivityNotification[];
+  fyNotifications: DashboardActivityNotification[];
+  globalNotifications: DashboardActivityNotification[],
+  chainEvents: DashboardActivityNotification[];
 }> = {
   oninit: (vnode) => {
-    vnode.state.fy_count = 10;
-    vnode.state.global_count = 10;
-    vnode.state.chain_event_count = 10;
+    vnode.state.fyCount = 10;
+    vnode.state.globalCount = 10;
+    vnode.state.chainEventCount = 10;
     vnode.state.loadingData = false;
-    vnode.state.fy_notifications = [];
-    vnode.state.global_notifications = [];
-    vnode.state.chain_events = [];
+    vnode.state.fyNotifications = [];
+    vnode.state.globalNotifications = [];
+    vnode.state.chainEvents = [];
   },
   view: (vnode) => {
-    const { activeTab, fy_notifications, global_notifications, chain_events, loadingData } = vnode.state;
+    const { activeTab, fyNotifications, globalNotifications, chainEvents, loadingData } = vnode.state;
     
     // Helper to load activity conditional on the selected tab
     const handleToggle = (tab: DashboardViews) => {
       if (tab === DashboardViews.FY) {
-        if (fy_notifications.length === 0) vnode.state.loadingData = true;
+        if (fyNotifications.length === 0) vnode.state.loadingData = true;
         fetchActivity('forYou').then((activity) => {
-            vnode.state.fy_notifications = activity.result.map((notification) => DashboardActivityNotification.fromJSON(notification)).reverse();
+            vnode.state.fyNotifications = activity.result.map((notification) => DashboardActivityNotification.fromJSON(notification)).reverse();
             vnode.state.loadingData = false;
             m.redraw();
         })
       } else if (tab == DashboardViews.Global) {
-        if (global_notifications.length === 0) vnode.state.loadingData = true;
+        if (globalNotifications.length === 0) vnode.state.loadingData = true;
         fetchActivity('global').then((activity) => {
-          vnode.state.global_notifications = activity.result.map((notification) => DashboardActivityNotification.fromJSON(notification)).reverse();
+          vnode.state.globalNotifications = activity.result.map((notification) => DashboardActivityNotification.fromJSON(notification)).reverse();
           vnode.state.loadingData = false;
           m.redraw();
          })
       } else if (tab == DashboardViews.Chain) {
-        if (chain_events.length === 0) vnode.state.loadingData = true;
+        if (chainEvents.length === 0) vnode.state.loadingData = true;
         fetchActivity('chainEvents').then((activity) => {
-          vnode.state.chain_events = activity.result.map((notification) => DashboardActivityNotification.fromJSON(notification)).reverse();
+          vnode.state.chainEvents = activity.result.map((notification) => DashboardActivityNotification.fromJSON(notification)).reverse();
           vnode.state.loadingData = false;
           m.redraw();
          });
@@ -93,27 +93,27 @@ const UserDashboard: m.Component<{}, {
     // Scroll
     vnode.state.onscroll = _.debounce(async () => {
       if (vnode.state.activeTab === DashboardViews.FY) {
-        if (!notificationsRemaining(fy_notifications.length, vnode.state.fy_count)) return;
+        if (!notificationsRemaining(fyNotifications.length, vnode.state.fyCount)) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
-          vnode.state.fy_count += 10;
+          vnode.state.fyCount += 10;
           m.redraw();
         }
       } else if (vnode.state.activeTab === DashboardViews.Global) {
-        if (!notificationsRemaining(global_notifications.length, vnode.state.global_count)) return;
+        if (!notificationsRemaining(globalNotifications.length, vnode.state.globalCount)) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
-          vnode.state.global_count += 10;
+          vnode.state.globalCount += 10;
           m.redraw();
         }
       } else {
-        if (!notificationsRemaining(chain_events.length, vnode.state.chain_event_count)) return;
+        if (!notificationsRemaining(chainEvents.length, vnode.state.chainEventCount)) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > (scrollHeight - 400)) {
-          vnode.state.chain_event_count += 10;
+          vnode.state.chainEventCount += 10;
           m.redraw();
         }
       }
@@ -121,7 +121,6 @@ const UserDashboard: m.Component<{}, {
     }, 400);
 
     $(window).on('scroll', vnode.state.onscroll);
-
 
     return m(Sublayout, {
       class: 'UserDashboard',
@@ -188,11 +187,11 @@ const UserDashboard: m.Component<{}, {
           ]),
           !loadingData && m('.dashboard-row-wrap', [
             (activeTab === DashboardViews.FY) && [
-              fy_notifications && fy_notifications.length > 0 ? [
-                fy_notifications.slice(0, vnode.state.fy_count).map((data) => {
+              fyNotifications && fyNotifications.length > 0 ? [
+                fyNotifications.slice(0, vnode.state.fyCount).map((data) => {
                   return m(UserDashboardRow, { notification: data, onListPage: true, });
                 }),
-                notificationsRemaining(fy_notifications.length, vnode.state.fy_count)
+                notificationsRemaining(fyNotifications.length, vnode.state.fyCount)
                 ? m('.Spinner', [
                   m(Spinner, { active: true })
                 ])
@@ -201,11 +200,11 @@ const UserDashboard: m.Component<{}, {
               : m('.no-notifications', 'No Notifications'),
             ],
             (activeTab === DashboardViews.Global) && [
-              global_notifications && global_notifications.length > 0 ? [
-                global_notifications.slice(0, vnode.state.global_count).map((data) => {
+              globalNotifications && globalNotifications.length > 0 ? [
+                globalNotifications.slice(0, vnode.state.globalCount).map((data) => {
                   return m(UserDashboardRow, { notification: data, onListPage: true, });
                 }),
-                notificationsRemaining(global_notifications.length, vnode.state.global_count)
+                notificationsRemaining(globalNotifications.length, vnode.state.globalCount)
                 ? m('.Spinner', [
                   m(Spinner, { active: true })
                 ])
@@ -214,17 +213,18 @@ const UserDashboard: m.Component<{}, {
               : m('.no-notifications', 'No Notifications'),
             ],
             (activeTab === DashboardViews.Chain) && [
-              chain_events && chain_events.length > 0 ? [
-                chain_events.slice(0, vnode.state.chain_event_count).map((data) => { // TODO: Change to reflect new chain events component
+              chainEvents && chainEvents.length > 0 
+                ? [
+                chainEvents.slice(0, vnode.state.chainEventCount).map((data) => { 
                   return m(UserDashboardRow, { notification: data, onListPage: true, });
                 }),
-                notificationsRemaining(chain_events.length, vnode.state.chain_event_count)
-                ? m('.Spinner', [
-                  m(Spinner, { active: true })
-                ])
-                : ''
-              ]
-              : m('.no-notifications', 'No Notifications'),
+                notificationsRemaining(chainEvents.length, vnode.state.chainEventCount)
+                  ? m('.Spinner', [
+                    m(Spinner, { active: true })
+                  ])
+                  : ''
+                ]
+                : m('.no-notifications', 'No Notifications'),
             ],
           ])
         ]),

@@ -35,42 +35,47 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { ChainIcon } from './chain_icon';
 
 
-const getCommentPreview = (comment_text) => {
-  let decoded_comment_text;
+const getCommentPreview = (commentText) => {
+  let decodedCommentText;
   try {
-    const doc = JSON.parse(decodeURIComponent(comment_text));
+    const doc = JSON.parse(decodeURIComponent(commentText));
     if (!doc.ops) throw new Error();
-    decoded_comment_text = m(QuillFormattedText, {
+    decodedCommentText = m(QuillFormattedText, {
       doc,
       hideFormatting: true,
       collapse: false,
     });
   } catch (e) {
-    let doc = decodeURIComponent(comment_text);
+    let doc = decodeURIComponent(commentText);
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
     const matches = doc['matchAll'](regexp);
     Array.from(matches).forEach((match) => {
       doc = doc.replace(match[0], match[1]);
     });
-    decoded_comment_text = m(MarkdownFormattedText, {
+    decodedCommentText = m(MarkdownFormattedText, {
       doc: doc.slice(0, 140),
       hideFormatting: true,
       collapse: true,
     });
   }
-  return decoded_comment_text;
+  return decodedCommentText;
 };
 
 // Subscriptions
-const subscribeToThread = async (thread_id: string, bothActive: boolean, commentSubscription: NotificationSubscription, reactionSubscription: NotificationSubscription) => {
-  const adjusted_id = "discussion_" + thread_id;
+const subscribeToThread = async (
+                          threadId: string, 
+                          bothActive: boolean, 
+                          commentSubscription: NotificationSubscription, 
+                          reactionSubscription: NotificationSubscription
+                          ) => {
+  const adjustedId = 'discussion_' + threadId;
   if (bothActive) {
     await app.user.notifications.disableSubscriptions([commentSubscription, reactionSubscription]);
       notifySuccess('Unsubscribed!');
   } else if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
-      app.user.notifications.subscribe(NotificationCategories.NewReaction, adjusted_id),
-      app.user.notifications.subscribe(NotificationCategories.NewComment, adjusted_id),
+      app.user.notifications.subscribe(NotificationCategories.NewReaction, adjustedId),
+      app.user.notifications.subscribe(NotificationCategories.NewComment, adjustedId),
     ]);
     notifySuccess('Subscribed!');
   } else {
@@ -83,25 +88,25 @@ const subscribeToThread = async (thread_id: string, bothActive: boolean, comment
 // Discuss, Share, and Subscribe Buttons
 const ButtonRow: m.Component<{
     path: string;
-    thread_id: string;
+    threadId: string;
     showDiscussion: boolean;
     showShare: boolean;
     showSubscribe: boolean;
 }> = {
     view: (vnode) => {
-        const {path, thread_id, showDiscussion, showShare, showSubscribe} = vnode.attrs;
+        const {path, threadId, showDiscussion, showShare, showSubscribe} = vnode.attrs;
 
-        const adjusted_id = "discussion_" + thread_id;
+        const adjustedId = 'discussion_' + threadId;
         const commentSubscription = app.user.notifications.subscriptions
-          .find((v) => v.objectId === adjusted_id && v.category === NotificationCategories.NewComment);
+          .find((v) => v.objectId === adjustedId && v.category === NotificationCategories.NewComment);
         const reactionSubscription = app.user.notifications.subscriptions
-          .find((v) => v.objectId === adjusted_id && v.category === NotificationCategories.NewReaction);
+          .find((v) => v.objectId === adjustedId && v.category === NotificationCategories.NewReaction);
         const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
         
         return m('.icon-row-left', [
           showDiscussion && (
             m(Button, {
-              label: "discuss",
+              label: 'discuss',
               buttonSize: 'sm',
               iconLeft: Icons.PLUS,
               rounded: true,
@@ -157,7 +162,7 @@ const ButtonRow: m.Component<{
               class: bothActive ? 'subscribe-button' : '',
               onclick: (e) => {
                 e.stopPropagation();
-                subscribeToThread(thread_id, bothActive, commentSubscription, reactionSubscription);
+                subscribeToThread(threadId, bothActive, commentSubscription, reactionSubscription);
               },
             })
           )
@@ -167,9 +172,9 @@ const ButtonRow: m.Component<{
 
 // The Likes, Comments, Views Counters
 const ActivityIcons: m.Component<{
-    viewCount: number | null;
-    likeCount: number | null;
-    commentCount: number | null;
+    viewCount: number;
+    likeCount: number;
+    commentCount: number;
 }> = {
     view: (vnode) => {
         const {viewCount, likeCount, commentCount} = vnode.attrs;
@@ -218,15 +223,15 @@ const ActivityContent: m.Component<{
           author_address, 
           comment_text, 
           root_type,
-        } = JSON.parse(vnode.attrs.activityData.notification_data);
+        } = JSON.parse(vnode.attrs.activityData.notificationData);
 
         const {likeCount, viewCount, commentCount} = vnode.attrs.activityData;
         
         const numericalCommentCount = parseInt(commentCount);
 
-        const community_name = app.config.chains.getById(chain_id)?.name || 'Unknown chain';
-        const decoded_title = decodeURIComponent(root_title).trim();
-        const title_text = decoded_title.length > 50 ? decoded_title.slice(0, 47) + "..." : decoded_title;
+        const communityName = app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+        const decodedTitle = decodeURIComponent(root_title).trim();
+        const titleText = decodedTitle.length > 50 ? decodedTitle.slice(0, 47) + '...' : decodedTitle;
 
         // Get Author of Notification
         const actorName = m(User, {
@@ -243,47 +248,47 @@ const ActivityContent: m.Component<{
 
         if (vnode.attrs.category === 'new-comment-creation') { // New Comment
           return m('.new-comment', [
-            m("span.header", [
+            m('span.header', [
               actorName,
-              m("span.comment-counts", [
+              m('span.comment-counts', [
                 numericalCommentCount > 1 ? 
-                [" and ", numericalCommentCount - 1, " others"] : '',
-                " commented on ",
+                [' and ', numericalCommentCount - 1, ' others'] : '',
+                ' commented on ',
               ]),
               m('span.community-title', [
-                title_text,
+                titleText,
               ]),
-              m("span.comment-counts", [" in "]),
+              m('span.comment-counts', [' in ']),
               m('span.community-link', {
                 onclick: (e) => { 
                   e.preventDefault();
                   e.stopPropagation();
                   m.route.set(`/${chain_id}`)
                 }
-              }, [community_name])
+              }, [communityName])
             ]),
-            m(".comment-body-concat", [
+            m('.comment-body-concat', [
               getCommentPreview(comment_text)
             ])
           ])
         } else if (vnode.attrs.category === 'new-thread-creation') {
           return m('.new-comment', [
-            m("span.header", [
+            m('span.header', [
               actorName,
-              m("span.comment-counts", [
-                " created new thread ",
+              m('span.comment-counts', [
+                ' created new thread ',
               ]),
               m('span.community-title', [
-                title_text,
+                titleText,
               ]),
-              m("span.comment-counts", [" in "]),
+              m('span.comment-counts', [' in ']),
               m('span.community-link', {
                 onclick: (e) => { 
                   e.preventDefault();
                   e.stopPropagation();
                   m.route.set(`/${chain_id}`)
                 }
-              }, [community_name])
+              }, [communityName])
             ]),
             
           ])
@@ -307,18 +312,19 @@ const UserDashboardRow: m.Component<
 }
 > = {
     view: (vnode) => {
-        const { likeCount, 
-                viewCount,
-                commentCount, 
-                categoryId, 
-                thread_id, 
-                createdAt, 
-                typeId, 
-                updatedAt, 
-                blockNumber, 
-                eventNetwork, 
-                chain, 
-                icon_url
+        const { 
+          likeCount, 
+          viewCount,
+          commentCount, 
+          categoryId, 
+          threadId, 
+          createdAt, 
+          typeId, 
+          updatedAt, 
+          blockNumber, 
+          eventNetwork, 
+          chain, 
+          iconUrl
         } = vnode.attrs.notification;
 
         // ----------- Handle Chain Events ----------- //
@@ -329,14 +335,16 @@ const UserDashboardRow: m.Component<
             data: vnode.attrs.notification.eventData,
           };
           const label = ChainEventLabel(chain, chainEvent);
-          const community_name = app.config.chains.getById(chain)?.name || 'Unknown chain';
+          const chainEventLink = `/${chain}`;
+
+          const communityName = app.config.chains.getById(chain)?.name || 'Unknown chain';
 
           return m('.UserDashboardRow', {
             onclick: () => {
               if (label.linkUrl) {
                 m.route.set(label.linkUrl);
               } else {
-                notifyError("No Link Available!")
+                notifyError('No Link Available!')
               }
               m.redraw();
             }
@@ -344,26 +352,26 @@ const UserDashboardRow: m.Component<
               m('.activity-content', [
                 m('img.chain-icon', {
                   style: `width: 25px; height: 25px;`,
-                  src: icon_url,
+                  src: iconUrl,
                 }),
                 m('.new-comment', [
-                  m("span.header", [
+                  m('span.header', [
                     m('span.community-title', [
                       label.heading,
                     ]),
-                    m("span.comment-counts", [" in "]),
+                    m('span.comment-counts', [' in ']),
                     m('span.community-link', {
                       onclick: (e) => { 
                         e.preventDefault();
                         e.stopPropagation();
                         m.route.set(`/${chain}`)
                       }
-                    }, [community_name]),
+                    }, [communityName]),
                     m('span.block-number', [
-                      " Block " + blockNumber
+                      ' Block ' + blockNumber
                     ]),
                   ]),
-                  m(".event-body", [
+                  m('.event-body', [
                     label.label
                   ])
                 ])
@@ -381,7 +389,7 @@ const UserDashboardRow: m.Component<
           author_address, 
           comment_text, 
           root_type,
-        } = JSON.parse(vnode.attrs.notification.notification_data);
+        } = JSON.parse(vnode.attrs.notification.notificationData);
 
         // Get Path to Proposal
         const pseudoProposal = {
@@ -407,7 +415,7 @@ const UserDashboardRow: m.Component<
             m('.icon-row', [
                 m(ButtonRow, {
                   path, 
-                  thread_id,
+                  threadId: threadId,
                   showDiscussion: true,
                   showShare: true,
                   showSubscribe: true

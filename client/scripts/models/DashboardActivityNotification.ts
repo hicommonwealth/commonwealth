@@ -9,8 +9,8 @@ class DashboardActivityNotification {
     public readonly likeCount?: number;
     public readonly commentCount?: number;
     public readonly createdAt: moment.Moment;
-    public readonly notification_data?: string;
-    public readonly thread_id?: string;
+    public readonly notificationData?: string;
+    public readonly threadId?: string;
     private _isRead?: boolean;
 
     public get isRead(): boolean {
@@ -25,49 +25,82 @@ class DashboardActivityNotification {
     public readonly updatedAt?: moment.Moment;
     public readonly eventNetwork?: SupportedNetwork;
     public readonly chain?: string;
-    public readonly icon_url?: string;
+    public readonly iconUrl?: string;
     
 
-    constructor(createdAt, thread_id?, category_id?, notification_data?, viewCount?, likeCount?, commentCount?, isRead?, type_id?, block_number?, event_data?, id?, updated_at?, event_network?, chain?, icon_url?) {
-        this.categoryId = category_id ? category_id : 'chain-event';
-        this.thread_id = thread_id;
-        this.notification_data = notification_data;
+    constructor({
+        createdAt, 
+        threadId, 
+        categoryId, 
+        notificationData, 
+        viewCount, 
+        likeCount, 
+        commentCount, 
+        isRead, 
+        typeId, 
+        blockNumber, 
+        eventData, 
+        id, 
+        updatedAt, 
+        eventNetwork, 
+        chain, 
+        iconUrl} : {
+            createdAt: string, 
+            threadId?: string, 
+            categoryId?: string, 
+            notificationData?: string, 
+            viewCount?: number, 
+            likeCount?: number, 
+            commentCount?: number, 
+            isRead?: boolean, 
+            typeId?: ChainEventType, 
+            blockNumber?: number, 
+            eventData?: IChainEventData, 
+            id?: number, 
+            updatedAt?: string, 
+            eventNetwork?: SupportedNetwork, 
+            chain?: string, 
+            iconUrl?: string
+        }) {
+        this.categoryId = categoryId ? categoryId : 'chain-event';
+        this.threadId = threadId;
+        this.notificationData = notificationData;
         this.createdAt = moment(createdAt);
         this.viewCount = viewCount;
         this.likeCount = likeCount;
         this.commentCount = commentCount;
         this._isRead = isRead;
-        this.typeId = type_id;
-        this.blockNumber = block_number;
-        this.eventData = event_data;
+        this.typeId = typeId;
+        this.blockNumber = blockNumber;
+        this.eventData = eventData;
         this.chainEventId = id;
-        this.updatedAt = moment(updated_at);
-        this.eventNetwork = event_network;
+        this.updatedAt = moment(updatedAt);
+        this.eventNetwork = eventNetwork;
         this.chain = chain;
-        this.icon_url = icon_url;
+        this.iconUrl = iconUrl;
     }
 
     public static fromJSON(json) {
         return new DashboardActivityNotification(
-          json.created_at,
-          json.thread_id,
-          json.category_id,
-          json.notification_data,
-          json.view_count,
-          json.like_count,
-          json.comment_count,
-          json.is_read,
-          json.chain_event_type_id,
-          json.block_number,
-          json.event_data,
-          json.id,
-          json.updated_at,
-          json.event_network,
-          json.chain,
-          json.icon_url
-        );
+          {
+            createdAt: json.created_at,
+            threadId: json.thread_id,
+            categoryId: json.category_id,
+            notificationData: json.notification_data,
+            viewCount: json.view_count,
+            likeCount: json.like_count,
+            commentCount: json.comment_count,
+            isRead: json.is_read,
+            typeId: json.chain_event_type_id,
+            blockNumber: json.block_number,
+            eventData: json.event_data,
+            id: json.id,  
+            updatedAt: json.updated_at,
+            eventNetwork: json.event_network,
+            chain: json.chain,
+            iconUrl: json.icon_url
+        });
     }
 }
 
 export default DashboardActivityNotification;
-

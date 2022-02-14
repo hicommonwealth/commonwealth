@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { DB, sequelize} from '../database';
 
-const Op = Sequelize.Op;
+const { Op } = Sequelize;
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -18,9 +18,9 @@ export default async (
     return next(new Error(Errors.NotLoggedIn));
   }
   const { id } = req.user;
-  const { request } = req.body;
+  const { request: activity_type } = req.body;
 
-  const global =`SELECT nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id,
+  const global_activity =`SELECT nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id,
                   MAX(ovc.view_count) as view_count, 
                   COUNT(DISTINCT oc.id) AS comment_count,
                   COUNT(DISTINCT tr.id) + COUNT(DISTINCT cr.id) AS reaction_count
@@ -44,7 +44,7 @@ export default async (
                 LEFT JOIN "OffchainThreads" thr ON thr.id = CAST(nt.thread_id AS int)
                 GROUP BY nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id;`;
 
-  const forYou = `SELECT nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id,
+  const user_activity = `SELECT nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id,
                     MAX(ovc.view_count) as view_count, 
                     COUNT(DISTINCT oc.id) AS comment_count,
                     COUNT(DISTINCT tr.id) + COUNT(DISTINCT cr.id) AS reaction_count
@@ -69,7 +69,7 @@ export default async (
                   LEFT JOIN "OffchainThreads" thr ON thr.id = CAST(nt.thread_id AS int)
                   GROUP BY nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id;`;
 
-  const chainEvents = `SELECT ce.*, cet.chain, cet.event_network, c.icon_url FROM "ChainEvents" ce
+  const chain_events = `SELECT ce.*, cet.chain, cet.event_network, c.icon_url FROM "ChainEvents" ce
                       INNER JOIN "ChainEventTypes" cet ON ce.chain_event_type_id = cet.id 
                       INNER JOIN "Addresses" a ON a."chain" = cet."chain" 
                       INNER JOIN "Chains" c ON c.id = cet.chain 
@@ -78,16 +78,16 @@ export default async (
                       LIMIT 50;`;
 
   let query;
-  switch (request) {
+  switch (activity_type) {
     case 'global':
-      query = global;
+      query = global_activity;
       break;
     case 'chainEvents':
-      query = chainEvents;
+      query = chain_events;
       break;
     case 'forYou': 
     default: 
-      query = forYou;
+      query = user_activity;
   }
 
   const notifications = await models.sequelize.query(
