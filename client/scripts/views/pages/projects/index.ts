@@ -1,13 +1,13 @@
 import 'pages/crowdfund/index.scss';
 
 import m from 'mithril';
-// import app from 'state';
+import app from 'state';
 import { AddressInfo } from 'models';
 import SearchBar from '../../components/search_bar';
-import { ButtonIntent, CWButton } from '../../components/component_kit/buttons';
+import { CWButton } from '../../components/component_kit/cw_button';
 import ProjectCard, { ProjectCardSize } from './project_card';
 import Sublayout from '../../sublayout';
-import { Address } from 'ethereumjs-util';
+import { DummyProject } from './dummy_project';
 
 type ProjectProgress = {
   inBlocks: number;
@@ -16,7 +16,7 @@ type ProjectProgress = {
 
 type ProjectDeadline = {
   inBlocks: number;
-  asPercent: number;
+  asDate: Date;
 }
 
 type ProjectFunds = {
@@ -25,32 +25,34 @@ type ProjectFunds = {
 }
 
 export type Project = {
-  name: string;
-  author: AddressInfo;
-  backers: AddressInfo[];
+  title: string;
   description: string;
   shortDescription?: string;
+  token: any;
+  creator: AddressInfo;
+  beneficiary: AddressInfo;
+  backers: AddressInfo[];
+  curators: AddressInfo[];
+  createdAt: Date;
   progress: ProjectProgress;
   deadline: ProjectDeadline;
   threshold: ProjectFunds;
   raised: ProjectFunds;
 }
 
-interface ProjectListingAttrs {
-  project; // : Project;
-}
+// interface ProjectListingState {
+// }
 
-interface ProjectListingState {
-}
-
-const ProjectListing: m.Component<ProjectListingAttrs, ProjectListingState> = {
+const ProjectListing: m.Component = {
   view: (vnode) => {
-    // const projects = (app.chain as any).projects;
-    const userCreatedProjects: Project[] = [ null, null ]; // projects.filter(...)
-    const userBackedProjects: Project[] = [ null, null, null, null ]; // projects.filter(...)
-    const userPreviouslyBackedProjects: Project[] = [ null, null, null, null, null, null ]; // projects.filter(...)
-    const trendingProjects: Project[] = [ null, null ]; // projects.filter(...)
-    const recommendedProjects: Project[] = [ null, null, null, null ]; // projects.filter(...)
+    const projects = app.activeChainId()
+      ? app.projects.filter((project) => project.chain === app.activeChainId())
+      : app.projects;
+    const userCreatedProjects: Project[] = Array(2).fill(DummyProject); // projects.filter(...)
+    const userBackedProjects: Project[] = Array(4).fill(DummyProject); // projects.filter(...)
+    const userPreviouslyBackedProjects: Project[] = Array(6).fill(DummyProject); // projects.filter(...)
+    const trendingProjects: Project[] = Array(2).fill(DummyProject); // projects.filter(...)
+    const recommendedProjects: Project[] = Array(4).fill(DummyProject) // projects.filter(...)
     return m(Sublayout, {
       class: 'ProjectListing',
       title: 'Projects',
@@ -63,7 +65,7 @@ const ProjectListing: m.Component<ProjectListingAttrs, ProjectListingState> = {
           m('.user-created-project-header', [
             m('h1', 'Your Projects'),
             m(CWButton, {
-              intent: ButtonIntent.Primary,
+              intent: 'primary',
               label: 'Create New Project',
               onclick: () => true, // m.route.set(`${app.activeId()}/createProject`)
             }),

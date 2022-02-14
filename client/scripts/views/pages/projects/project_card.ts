@@ -1,8 +1,8 @@
 import 'pages/crowdfund/project_card.scss';
 
 import m from 'mithril';
-import { AnonymousUser } from '../../components/widgets/user';
 import { capitalize } from 'lodash';
+import { AnonymousUser } from '../../components/widgets/user';
 
 export enum ProjectCardSize {
   Small = 'small',
@@ -16,18 +16,6 @@ interface ProjectCardAttrs {
 }
 
 interface ProjectCardState {
-}
-
-export enum DummyProjectData {
-  ProjectTitle = 'Project Name',
-  ProjectDescription = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
-    + 'Sit ullamcorper tortor pretium amet eget leo. Venenatis id risus at mollis '
-    + 'orci sapien integer id non eget.',
-  ProjectBlockCount = '16K',
-  ProjectChain = 'Ethereum',
-  ProjectCompletionPercent = 0.32,
-  ProjectCompletionSuccess = 'funded',
-  ProjectCompletionFailure = 'failed',
 }
 
 const DummyChainIcon: m.Component<{ chain, onclick, size: number }> = {
@@ -79,11 +67,11 @@ const ProjectInfoPanel: m.Component<{ project, avatarSize: number, iconSize?: nu
             onclick: null,
             size: iconSize
           }),
-          DummyProjectData.ProjectTitle
+          project.title
         ]),
-        m('.project-block-count', `${DummyProjectData.ProjectBlockCount} Blocks`)
+        m('.project-block-count', `${project.progress.inBlocks} Blocks`)
       ]),
-      m('.project-info-body', DummyProjectData.ProjectDescription),
+      m('.project-info-body', project.shortDescription || project.description),
       m('.project-info-footer', [
         m(AnonymousUser, { // dummy user
             avatarSize,
@@ -101,12 +89,14 @@ const ProjectCard: m.Component<
   view: (vnode) => {
     const { project, size } = vnode.attrs;
     const onclick = null; // = m.route.set(`${app.activeId()}/${project.id}-slugify(project.name))
+    const projectStatus = project.raised.inTokens > project.threshold.inTokens ? 'succeeded' : 'failed';
+
 
     const ProjectCardLarge = m('.ProjectCard',
       { class: 'large', onclick },
       [
         m(ProjectHeaderPanel, { iconSize: 45 }),
-        m(ProjectCompletionBar, { completionPercent: (DummyProjectData.ProjectCompletionPercent as number) }),
+        m(ProjectCompletionBar, { completionPercent: (project.progress.asPercent) }),
         m(ProjectInfoPanel, { project, avatarSize: 20 })
       ]
     );
@@ -116,7 +106,7 @@ const ProjectCard: m.Component<
       [
         m(ProjectHeaderPanel),
         m('.right-panel', [
-          m(ProjectCompletionBar, { completionPercent: (DummyProjectData.ProjectCompletionPercent as number) }),
+          m(ProjectCompletionBar, { completionPercent: (project.progress.asPercent) }),
           m(ProjectInfoPanel, { project, avatarSize: 16, iconSize: 24 })
         ])
       ]
@@ -126,10 +116,10 @@ const ProjectCard: m.Component<
       { class: 'small', onclick },
       [
         m('.top-panel', [
-          m('h3', DummyProjectData.ProjectTitle),
+          m('h3', project.title),
           // TODO: Implement label in kit
-          m(`.project-status ${DummyProjectData.ProjectCompletionSuccess}`,
-            capitalize(DummyProjectData.ProjectCompletionSuccess)
+          m(`.project-status.${projectStatus}`,
+            capitalize(projectStatus)
           )
         ]),
         m('.bottom-panel', [
@@ -138,7 +128,7 @@ const ProjectCard: m.Component<
             onclick: null,
             size: 12,
           }),
-          m('.project-chain-name', DummyProjectData.ProjectChain)
+          m('.project-token-name', project.token)
         ])
       ]
     );

@@ -50,6 +50,7 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
+  projects: any[]; // ProjectsController;
   search: SearchController;
   snapshot: SnapshotController;
   reactions: ReactionsController;
@@ -115,6 +116,7 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
+  projects: [], // new ProjectsController(),
   search: new SearchController(),
   snapshot: new SnapshotController(),
   reactions: new ReactionsController(),

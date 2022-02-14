@@ -1,15 +1,13 @@
 import 'pages/crowdfund/project_page.scss';
 
 import m from 'mithril';
-// import SearchBar from '../../components/search_bar';
-// import { ButtonIntent, CWButton } from '../../components/component_kit/buttons';
+import { Tag } from 'construct-ui';
 import QuillFormattedText from '../../components/quill_formatted_text';
-// import User from '../../components/widgets/user';
-import { DummyProjectData, ProjectCompletionBar } from './project_card';
+import { ProjectCompletionBar } from './project_card';
 import { Project } from './index';
 import Sublayout from '../../sublayout';
 import User from '../../components/widgets/user';
-import { ButtonIntent, CWButton } from '../../components/component_kit/buttons';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 interface ProjectPageAttrs {
   project: Project;
@@ -26,12 +24,11 @@ const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
       title: 'Project',
       showNewProposalButton: false,
     }, [
-      m('h1', DummyProjectData.ProjectTitle),
+      m('h1', project.title),
       m('.project-metadata', [
-        // m(ChainIndicator, { chain: app.activeChainId() }),
-        m(User, { user: project.author }),
-        // m(CWTag, { label: project.createdAt }),
-        // m(CWTag, { label: project.deadline.asBlocks }),
+        m(User, { user: project.creator }),
+        m(Tag, { label: `${project.createdAt}` }),
+        m(Tag, { label: `${project.deadline.inBlocks}` }),
       ]),
       m('.project-short-description', project.shortDescription || project.description.slice(0, 100)),
       m('img.project-header-img'),
@@ -51,7 +48,7 @@ const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
         ]),
         m('.right-panel', [
           m(CWButton, {
-            intent: ButtonIntent.Primary,
+            intent: 'primary',
             label: 'Contribute to this project',
             onclick: () => true,
           })
@@ -60,7 +57,7 @@ const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
       m('.project-about', [
         m('h2', 'About'),
         m(QuillFormattedText, {
-          doc: DummyProjectData.ProjectDescription
+          doc: project.description
         }),
       ]),
       m('hr'),

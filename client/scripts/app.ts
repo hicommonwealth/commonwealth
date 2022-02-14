@@ -21,7 +21,6 @@ import {
   ChainInfo,
   NodeInfo,
   NotificationCategory,
-  Notification,
 } from 'models';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
@@ -514,11 +513,12 @@ Promise.all([
   const activeAcct = app.user.activeAccount;
   m.route(document.body, '/', {
     // Sitewide pages
-    '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
-    '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
-    '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
-    '/components':               importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
+    '/about':                   importRoute('views/pages/landing/about', { scoped: false }),
+    '/terms':                   importRoute('views/pages/landing/terms', { scoped: false }),
+    '/privacy':                 importRoute('views/pages/landing/privacy', { scoped: false }),
+    '/components':              importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
     '/createCommunity':         importRoute('views/pages/create_community', { scoped: false }),
+    '/projects':               importRoute('views/pages/projects/index', { scoped: false }),
     ...(isCustomDomain ? {
       //
       // Custom domain routes
@@ -529,7 +529,7 @@ Promise.all([
       '/notification-settings':  importRoute('views/pages/notification_settings', { scoped: true, deferChain: true }),
       '/notifications':          importRoute('views/pages/notifications_page', { scoped: true, deferChain: true }),
       // CMN
-      '/projects':               importRoute('views/pages/commonwealth/projects', { scoped: true }),
+      '/projects':               importRoute('views/pages/projects/index', { scoped: true }),
       '/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),
       '/collectives':            importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
@@ -652,7 +652,7 @@ Promise.all([
       '/:scope/notification-settings': importRoute('views/pages/notification_settings', { scoped: true, deferChain: true }),
       '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
       // CMN
-      '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
+      '/:scope/projects':          importRoute('views/pages/projects/index', { scoped: true }),
       '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
       '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
