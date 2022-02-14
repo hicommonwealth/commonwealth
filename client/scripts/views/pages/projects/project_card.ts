@@ -36,6 +36,7 @@ const ProjectHeaderPanel: m.Component<{ iconSize?: number }> = {
   view: (vnode) => {
     const { iconSize } = vnode.attrs;
     return m('.ProjectHeaderPanel', [
+      // TODO: Cover image
       iconSize && m(DummyChainIcon, {
         chain: null,
         onclick: null,

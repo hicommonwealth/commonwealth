@@ -28,6 +28,7 @@ export type Project = {
   title: string;
   description: string;
   shortDescription?: string;
+  coverImage: string;
   token: any;
   creator: AddressInfo;
   beneficiary: AddressInfo;

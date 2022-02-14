@@ -1,209 +1,200 @@
 import { Icon, Icons } from 'construct-ui';
-import { isValueNode } from 'graphql';
 import m from 'mithril';
-import { ConsoleLoggerImpl } from 'typescript-logging';
-
 
 export interface SubSectionProps {
-    title: string;
-    is_visible: boolean;
-    is_active: boolean; // Is this the current page
-    is_updated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
-    onclick: Function;
-    onhover?: Function;
-    row_icon?: boolean;
+  title: string;
+  isVisible: boolean;
+  isActive: boolean; // Is this the current page
+  isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
+  onclick: Function;
+  onhover?: Function;
+  rowIcon?: boolean;
 }
 
 export interface SectionGroupProps {
-    title: string;
-    contains_children: boolean;
-    default_toggle: boolean;
-    is_visible: boolean; // Is this section shown as an option
-    is_active: boolean; // Is this the current page
-    is_updated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
-    onclick: Function;
-    onhover?: Function;
-    display_data: SubSectionProps[] | null;
+  title: string;
+  containsChildren: boolean;
+  defaultToggle: boolean;
+  isVisible: boolean; // Is this section shown as an option
+  isActive: boolean; // Is this the current page
+  isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
+  onclick: Function;
+  onhover?: Function;
+  displayData: SubSectionProps[] | null;
 }
 
 export interface SidebarSectionProps {
-    title: string;
-    default_toggle: boolean;
-    is_active: boolean;
-    onclick: Function;
-    onhover?: Function;
-    display_data: SectionGroupProps[];
-    toggle_disabled?: boolean;
+  title: string;
+  defaultToggle: boolean;
+  isActive: boolean;
+  onclick: Function;
+  onhover?: Function;
+  displayData: SectionGroupProps[];
+  toggle_disabled?: boolean;
 }
 
-const SubSection: m.Component<SubSectionProps, {background_color: string}> = {
-    oninit: (vnode) => {
-        vnode.state.background_color = vnode.attrs.is_active ? '#EDE7FF' : 'none';
-    },
-    view: (vnode) => {
-        const {title, is_visible, is_active, onclick, row_icon, is_updated} = vnode.attrs;
-        const { background_color } = vnode.state;
-        if (!is_visible) {
-            return;
-        }
+const SubSection: m.Component<SubSectionProps, {backgroundColor: string}> = {
+  oninit: (vnode) => {
+    vnode.state.backgroundColor = vnode.attrs.isActive ? '#EDE7FF' : 'none';
+  },
+  view: (vnode) => {
+    const {title, isVisible, isActive, onclick, rowIcon, isUpdated} = vnode.attrs;
+    const { backgroundColor } = vnode.state;
+    if (!isVisible) {
+      return;
+    }
 
-        const click_handler = (e) => {
-            onclick(e);
-        }
+    const clickHandler = (e) => {
+      onclick(e);
+    }
 
-        let title_text_class = '.title-standard';
-        if (is_active) {
-            title_text_class = '.title-active'
-        } else if (!is_updated) {
-            title_text_class = '.title-stale'
-        }
+    let titleTextClass = '.title-standard';
+    if (isActive) {
+      titleTextClass = '.title-active'
+    } else if (!isUpdated) {
+      titleTextClass = '.title-stale'
+    }
 
-        const mouse_enter_handler = (e) => {
-            vnode.state.background_color = '#EDE7FF';
-        }
+    const mouseEnterHandler = (e) => {
+      vnode.state.backgroundColor = '#EDE7FF';
+    }
 
-        const mouse_leave_handler = (e) => {
-            vnode.state.background_color = (is_active) ? '#EDE7FF' : 'none';
-        }
+    const mouseLeaveHandler = (e) => {
+      vnode.state.backgroundColor = (isActive) ? '#EDE7FF' : 'none';
+    }
 
-        return m('.SubSection',{
-            onclick: (e) => click_handler(e),
-            style: `background-color: ${background_color}`,
-            onmouseenter: (e) => mouse_enter_handler(e),
-            onmouseleave: (e) => mouse_leave_handler(e),
-        }, [
-            row_icon && m(title_text_class, [m(Icon, {name: Icons.HASH})]),
-            m(title_text_class, title),
-        ])
+    return m('.SubSection', {
+        onclick: (e) => clickHandler(e),
+        style: `background-color: ${backgroundColor}`,
+        onmouseenter: (e) => mouseEnterHandler(e),
+        onmouseleave: (e) => mouseLeaveHandler(e),
+      }, [
+        rowIcon && m(titleTextClass, [m(Icon, {name: Icons.HASH})]),
+        m(titleTextClass, title),
+      ])
     }
 }
 
-const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, hover_on: boolean}> = {
-    oninit: (vnode) => {
-        vnode.state.toggled = vnode.attrs.default_toggle;
-    },
-    view: (vnode) => {
-        const {title, contains_children, display_data, is_visible, is_updated, is_active, onclick, onhover} = vnode.attrs;
-        const {toggled} = vnode.state;
+const SectionGroup: m.Component<SectionGroupProps, {toggled: boolean, hoverOn: boolean}> = {
+  oninit: (vnode) => {
+    vnode.state.toggled = vnode.attrs.defaultToggle;
+  },
+  view: (vnode) => {
+    const {title, containsChildren, displayData, isVisible, isUpdated, isActive, onclick, onhover} = vnode.attrs;
+    const {toggled} = vnode.state;
 
-        if (!is_visible) {
-            return;
-        }
-
-        const click_handler = (e) => {
-            if (contains_children) {
-                vnode.state.toggled = !toggled;
-            }
-            onclick(e, vnode.state.toggled);
-        }
-
-        const carat = toggled ? m(Icon, {
-                name: Icons.CHEVRON_DOWN,
-            }) : m(Icon, {
-                name: Icons.CHEVRON_RIGHT,
-            });
-
-        let title_text_class = '.section-title-text-standard';
-        if (is_active && !contains_children) {
-            title_text_class = '.section-title-text-active'
-        } else if (!is_updated) {
-            title_text_class = '.section-title-text-stale'
-        }
-
-        let background_color = 'none';
-        if (is_active && !contains_children) {
-            background_color = '#EDE7FF'
-        }
-
-        const mouse_enter_handler = (e) => {
-            if (!toggled) {
-                background_color = '#EDE7FF';
-                vnode.state.hover_on = true;
-            }   
-        }
-
-        const mouse_leave_handler = (e) => {
-            background_color = (is_active && !contains_children) ? '#EDE7FF' : 'none';
-            vnode.state.hover_on = false;
-        }
-        
-        return m('.SectionGroup', {
-            onmouseenter: (e) => mouse_enter_handler(e),
-            onmouseleave: (e) => mouse_leave_handler(e),
-        },[
-            m('.SectionGroupTitle', {
-                onclick: (e) => click_handler(e),
-                style: `background-color: ${vnode.state.hover_on ? '#EDE7FF' : background_color}`,
-            }, [
-                contains_children ? m('.carat', carat) : m('.no-carat'),
-                m(title_text_class, title), 
-            ]),
-            contains_children && toggled && m('.subsections', [
-                display_data.map((subsection) => (
-                    m(SubSection, {...subsection})
-                ))
-            ])
-        ])
-        
+    if (!isVisible) {
+      return;
     }
+
+    const clickHandler = (e) => {
+      if (containsChildren) {
+        vnode.state.toggled = !toggled;
+      }
+      onclick(e, vnode.state.toggled);
+    }
+
+    const carat = toggled
+      ? m(Icon, { name: Icons.CHEVRON_DOWN })
+      : m(Icon, { name: Icons.CHEVRON_RIGHT });
+
+    let titleTextClass = '.section-title-text-standard';
+    if (isActive && !containsChildren) {
+      titleTextClass = '.section-title-text-active'
+    } else if (!isUpdated) {
+      titleTextClass = '.section-title-text-stale'
+    }
+
+    let backgroundColor = 'none';
+    if (isActive && !containsChildren) {
+      backgroundColor = '#EDE7FF'
+    }
+
+    const mouseEnterHandler = (e) => {
+    if (!toggled) {
+    backgroundColor = '#EDE7FF';
+    vnode.state.hoverOn = true;
+    }
+    }
+
+    const mouseLeaveHandler = (e) => {
+    backgroundColor = (isActive && !containsChildren) ? '#EDE7FF' : 'none';
+    vnode.state.hoverOn = false;
+    }
+    return m('.SectionGroup', {
+      onmouseenter: (e) => mouseEnterHandler(e),
+      onmouseleave: (e) => mouseLeaveHandler(e),
+    }, [
+      m('.SectionGroupTitle', {
+        onclick: (e) => clickHandler(e),
+        style: `background-color: ${vnode.state.hoverOn ? '#EDE7FF' : backgroundColor}`,
+      }, [
+        containsChildren ? m('.carat', carat) : m('.no-carat'),
+        m(titleTextClass, title),
+      ]),
+      containsChildren && toggled
+      && m('.subsections', [
+        displayData.map((subsection) => (
+          m(SubSection, {...subsection})
+        ))
+      ])
+    ])
+  }
 }
 
 
-const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hover_color: string}> = {
-    oninit: (vnode) => {
-        vnode.state.toggled = vnode.attrs.default_toggle;
-        vnode.state.hover_color = 'none';
-    },
-    view: (vnode) => {
+const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hoverColor: string}> = {
+  oninit: (vnode) => {
+    vnode.state.toggled = vnode.attrs.defaultToggle;
+    vnode.state.hoverColor = 'none';
+  },
+  view: (vnode) => {
+    const { title, onclick, toggle_disabled, displayData } = vnode.attrs;
+    const { toggled, hoverColor } = vnode.state;
 
-        const {title, onclick, toggle_disabled, display_data} = vnode.attrs;
-        const {toggled, hover_color} = vnode.state;
-
-        const click_handler = (e) => {
-            if (toggle_disabled) {
-                return;
-            }
-            vnode.state.toggled = !toggled;
-            if (vnode.state.toggled) {
-                vnode.state.hover_color = 'none';
-            }
-            onclick(e, vnode.state.toggled);
-        }
-
-        const mouse_enter_handler = (e) => {
-            if (!toggled) {
-                vnode.state.hover_color = '#EDE7FF';
-            }   
-        }
-
-        const mouse_leave_handler = (e) => {
-            vnode.state.hover_color = 'none';
-        }
-
-        const carat = toggled ? m(Icon, {
-            name: Icons.CHEVRON_DOWN,
-        }) : m(Icon, {
-            name: Icons.CHEVRON_RIGHT,
-        });
-        
-        return m('.SidebarSection', { 
-            onmouseenter: (e) => mouse_enter_handler(e),
-            onmouseleave: (e) => mouse_leave_handler(e),
-            style: `background-color: ${hover_color}`
-        }, [
-            m('.SidebarTitle', {
-                onclick: (e) => click_handler(e), 
-            }, [
-                m('.title-text', title),
-                m('.toggle-icon', carat)
-            ]),
-            toggled && m('.section-groups', [
-                display_data.map((section_group) => (
-                    m(SectionGroup, {...section_group})
-                ))
-            ])
-        ])
+    const clickHandler = (e) => {
+      if (toggle_disabled) {
+        return;
+      }
+      vnode.state.toggled = !toggled;
+      if (vnode.state.toggled) {
+        vnode.state.hoverColor = 'none';
+      }
+      onclick(e, vnode.state.toggled);
     }
+
+    const mouseEnterHandler = (e) => {
+      if (!toggled) {
+        vnode.state.hoverColor = '#EDE7FF';
+      }
+    }
+
+    const mouseLeaveHandler = (e) => {
+      vnode.state.hoverColor = 'none';
+    }
+
+    const carat = toggled
+      ? m(Icon, { name: Icons.CHEVRON_DOWN })
+      : m(Icon, { name: Icons.CHEVRON_RIGHT });
+
+    return m('.SidebarSection', {
+      onmouseenter: (e) => mouseEnterHandler(e),
+      onmouseleave: (e) => mouseLeaveHandler(e),
+      style: `background-color: ${hoverColor}`
+      }, [
+      m('.SidebarTitle', {
+        onclick: (e) => clickHandler(e),
+      }, [
+        m('.title-text', title),
+        m('.toggle-icon', carat)
+      ]),
+      toggled && m('.section-groups', [
+        displayData.map((sectionGroup) => (
+          m(SectionGroup, {...sectionGroup})
+        ))
+      ])
+    ])
+  }
 };
 
 
