@@ -37,7 +37,7 @@ class ChainInfo {
   public readonly bech32Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
-  public showProjects: boolean;
+  public hideProjects: boolean;
 
   constructor({
     id,
@@ -68,7 +68,7 @@ class ChainInfo {
     type,
     decimals,
     substrateSpec,
-    showProjects,
+    hideProjects,
   }) {
     this.id = id;
     this.network = network;
@@ -99,7 +99,7 @@ class ChainInfo {
     this.bech32Prefix = bech32Prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
-    this.showProjects = showProjects;
+    this.hideProjects = hideProjects;
   }
 
   public static fromJSON({
@@ -131,7 +131,7 @@ class ChainInfo {
     type,
     decimals,
     substrate_spec,
-    show_projects,
+    hide_projects,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -169,7 +169,7 @@ class ChainInfo {
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
-      showProjects: show_projects,
+      hideProjects: hide_projects,
     });
   }
 
@@ -234,6 +234,7 @@ class ChainInfo {
     element,
     telegram,
     github,
+    hideProjects,
     stagesEnabled,
     customStages,
     customDomain,
@@ -252,6 +253,7 @@ class ChainInfo {
       element,
       telegram,
       github,
+      hide_projects: hideProjects,
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
@@ -269,6 +271,7 @@ class ChainInfo {
     this.element = updatedChain.element;
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
+    this.hideProjects = updatedChain.hide_projects;
     this.stagesEnabled = updatedChain.stages_enabled;
     this.customStages = updatedChain.custom_stages;
     this.customDomain = updatedChain.custom_domain;

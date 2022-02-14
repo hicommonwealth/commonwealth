@@ -31,6 +31,7 @@ interface IChainMetadataManagementState {
   loadingFinished: boolean;
   loadingStarted: boolean;
   iconUrl: string;
+  hideProjects: boolean;
   stagesEnabled: boolean;
   customStages: string;
   customDomain: string;
@@ -54,6 +55,7 @@ const ChainMetadataManagementTable: m.Component<
     vnode.state.element = vnode.attrs.chain.element;
     vnode.state.telegram = vnode.attrs.chain.telegram;
     vnode.state.github = vnode.attrs.chain.github;
+    vnode.state.hideProjects = vnode.attrs.chain.hideProjects;
     vnode.state.stagesEnabled = vnode.attrs.chain.stagesEnabled;
     vnode.state.customStages = vnode.attrs.chain.customStages;
     vnode.state.customDomain = vnode.attrs.chain.customDomain;
@@ -169,6 +171,17 @@ const ChainMetadataManagementTable: m.Component<
                 ? 'Discussion listing defaults to summary view'
                 : 'Discussion listing defaults to latest activity view',
           }),
+          m(TogglePropertyRow, {
+            title: 'Hide Projects',
+            defaultValue: vnode.attrs.chain.hideProjects,
+            onToggle: (checked) => {
+              vnode.state.hideProjects = checked;
+            },
+            caption: (checked) =>
+              checked
+                ? 'Projects are displayed in sidebar'
+                : 'Projects are hidden from sidebar',
+          }),
           m(InputPropertyRow, {
             title: 'Custom Stages',
             defaultValue: vnode.state.customStages,
@@ -244,6 +257,7 @@ const ChainMetadataManagementTable: m.Component<
               element,
               telegram,
               github,
+              hideProjects,
               stagesEnabled,
               customStages,
               customDomain,
@@ -269,6 +283,7 @@ const ChainMetadataManagementTable: m.Component<
                 element,
                 telegram,
                 github,
+                hideProjects,
                 stagesEnabled,
                 customStages,
                 customDomain,

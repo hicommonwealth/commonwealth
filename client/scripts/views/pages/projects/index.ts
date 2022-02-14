@@ -3,7 +3,6 @@ import 'pages/crowdfund/index.scss';
 import m from 'mithril';
 import app from 'state';
 import { AddressInfo } from 'models';
-import SearchBar from '../../components/search_bar';
 import { CWButton } from '../../components/component_kit/cw_button';
 import ProjectCard, { ProjectCardSize } from './project_card';
 import Sublayout from '../../sublayout';
@@ -109,8 +108,6 @@ const ProjectListing: m.Component = {
             })
           ]),
         ]),
-        // TODO: ModularizeSearch
-        m(SearchBar)
       ])
     ])
   }

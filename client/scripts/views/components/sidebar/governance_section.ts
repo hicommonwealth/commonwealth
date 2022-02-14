@@ -58,7 +58,7 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
                             || app.chain?.network === ChainNetwork.Moloch
                             || app.chain?.network === ChainNetwork.Compound
                             || app.chain?.network === ChainNetwork.Aave);
-    const showProjects = true; // app.chain.meta.chain.showProjects; TODO
+    const hideProjects = true; // app.chain.meta.chain.hideProjects; TODO
     const showCouncillors = isNotOffchain && app.chain?.base === ChainBase.Substrate;
     const showTreasury = isNotOffchain && app.chain?.base === ChainBase.Substrate
       && app.chain.network !== ChainNetwork.Centrifuge;
@@ -114,7 +114,7 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
             children: {}
           }
         },
-        ...(showProjects) && {
+        ...(hideProjects) && {
           'Projects': {
             toggledState: false,
             children: {}
@@ -329,13 +329,13 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
     const projectsData: SectionGroupProps = {
       title: 'Projects',
       containsChildren: false,
-      defaultToggle: showProjects ? toggleTreeState['children']['Projects']['toggledState'] : false,
+      defaultToggle: hideProjects ? toggleTreeState['children']['Projects']['toggledState'] : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
         navigateToSubpage('/projects');
         setGovernanceToggleTree('children.Projects.toggledState', toggle)
       },
-      isVisible: showProjects,
+      isVisible: hideProjects,
       isUpdated: true,
       isActive: onProjectsPage(m.route.get()),
       displayData: null
