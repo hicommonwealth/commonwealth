@@ -91,9 +91,8 @@ const ProjectCard: m.Component<
 > = {
   view: (vnode) => {
     const { project, size } = vnode.attrs;
-    const onclick = m.route.set(`${app.activeChainId()}/${project.id}-${slugify(project.title)}`);
+    const onclick = () => m.route.set(`${app.activeChainId()}/project/${project.id}-${slugify(project.title)}`);
     const projectStatus = project.raised.inTokens > project.threshold.inTokens ? 'succeeded' : 'failed';
-
 
     const ProjectCardLarge = m('.ProjectCard',
       { class: 'large', onclick },

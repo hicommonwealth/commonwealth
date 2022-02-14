@@ -33,7 +33,7 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
         || app.chain.network === ChainNetwork.Moloch
         || app.chain.network === ChainNetwork.Compound
         || app.chain.network === ChainNetwork.Aave
-        || app.chain.network === ChainNetwork.Commonwealth
+      //  || app.chain.network === ChainNetwork.Commonwealth // TODO: Not implemented
         || app.chain.meta.chain.snapshot);
     if (!hasProposals) return;
 

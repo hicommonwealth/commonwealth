@@ -612,6 +612,7 @@ Promise.all([
       '/:scope/discussion/:identifier': redirectRoute((attrs) => `/discussion/${attrs.identifier}/`),
       '/:scope/new/proposal/:type':  redirectRoute((attrs) => `/new/proposal/${attrs.type}/`),
       '/:scope/new/proposal':        redirectRoute(() => '/new/proposal'),
+      '/:scope/project/:identifier': redirectRoute((attrs) => `/project/${attrs.identifier}`),
       '/:scope/treasury':           redirectRoute(() => '/treasury'),
       '/:scope/bounties':           redirectRoute(() => '/bounties'),
       '/:scope/tips':               redirectRoute(() => '/tips'),
@@ -652,7 +653,6 @@ Promise.all([
       '/:scope/notification-settings': importRoute('views/pages/notification_settings', { scoped: true, deferChain: true }),
       '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
       // CMN
-      '/:scope/projects':          importRoute('views/pages/projects/index', { scoped: true }),
       '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
       '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
@@ -696,7 +696,8 @@ Promise.all([
       '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
 
       // Crowdfund
-      '/:scope/crowdfund':        importRoute('views/pages/crowdfund/index', { scoped: true }),
+      '/:scope/projects':             importRoute('views/pages/projects/index', { scoped: true }),
+      '/:scope/project/:identifier':  importRoute('views/pages/project/view_project', { scoped: true }),
 
       // Settings
       '/login':                    importRoute('views/pages/login', { scoped: false }),

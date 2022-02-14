@@ -7,6 +7,8 @@ export const DummyProject: Project = {
     + 'Sit ullamcorper tortor pretium amet eget leo. Venenatis id risus at mollis '
     + 'orci sapien integer id non eget.',
   shortDescription: 'Lorem ipsum dolor sit amet.',
+  // eslint-disable-next-line max-len
+  coverImage: 'https://d2w9rnfcy7mm78.cloudfront.net/15140445/original_934fcfa7b50e51b160a22542ebd14bc7.png?1644683177?bc=0',
   token: 'Ethereum',
   creator: null,
   beneficiary: null,

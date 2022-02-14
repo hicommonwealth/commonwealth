@@ -21,6 +21,7 @@ interface ProjectPageState {
 const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
   view: (vnode) => {
     const { identifier } = vnode.attrs;
+    console.log(identifier);
     if (typeof identifier !== 'string') {
       return m(PageNotFound, { title: 'Projects' });
     }
