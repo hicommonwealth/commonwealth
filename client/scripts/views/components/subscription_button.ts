@@ -6,7 +6,7 @@ import app from 'state';
 import { link } from 'helpers';
 import { NotificationCategories } from 'types';
 import { Button, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
-// import { ButtonIntent, FaceliftButton } from './component_kit/buttons';
+// import { ButtonIntent, CWButton } from './component_kit/buttons';
 import { CWButton } from './component_kit/cw_button';
 
 const SubscriptionButton: m.Component<{}> = {

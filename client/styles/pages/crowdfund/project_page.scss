@@ -1,0 +1,27 @@
+@import '../../facelift.scss';
+
+.ProjectPage {
+    .project-metadata {
+
+    }
+    .project-header-img {
+
+    }
+    .project-funding-data {
+        display: flex;
+        justify-content: space-between;
+        .project-funds-raised,
+        .project-funds-goal {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+    .project-about {
+
+    }
+    .project-backers-wrap {
+        .CWTable {
+
+        }
+    }
+}
