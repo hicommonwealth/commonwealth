@@ -36,10 +36,10 @@ export default (
         allowNull: false,
       },
       chain_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
         references: {
-          model: 'Chain',
+          model: 'Chains',
           key: 'id',
         },
       },
