@@ -2,14 +2,13 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('Chains', 'terms', {
+    return queryInterface.addColumn('Chains', 'show_projects', {
       type: Sequelize.BOOLEAN,
-      allowNull: false,
-      default: false,
+      allowNull: true,
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn('Chains', 'terms');
+    return queryInterface.removeColumn('Chains', 'show_projects');
   }
 };

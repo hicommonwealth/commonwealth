@@ -131,7 +131,7 @@ export default (
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,
       },
-      show_projects: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      show_projects: { type: dataTypes.BOOLEAN, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
     },
