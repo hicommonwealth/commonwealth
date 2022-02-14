@@ -43,6 +43,7 @@ export interface ChainAttributes {
   terms?: string;
   snapshot?: string[];
   bech32_prefix?: string;
+  show_projects?: boolean;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -130,6 +131,7 @@ export default (
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,
       },
+      show_projects: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
     },
