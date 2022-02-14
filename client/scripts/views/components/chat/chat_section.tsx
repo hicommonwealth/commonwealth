@@ -107,7 +107,6 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
             if(msg.chat_channel_id === vnode.attrs.activeChannel){
                 vnode.attrs.channels.find(c => c.id === msg.chat_channel_id).unread = 0;
             }
-            console.log(vnode.attrs.channels)
             m.redraw.sync()
         }
         app.socket.chatNs.addListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage.bind(vnode));

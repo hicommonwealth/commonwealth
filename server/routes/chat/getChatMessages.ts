@@ -32,7 +32,6 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 	}
 
 	// check community id
-	console.log(req.query)
 	if (!req.query.chain_id) {
 		return next(new Error(Errors.NoCommunityId))
 	}
