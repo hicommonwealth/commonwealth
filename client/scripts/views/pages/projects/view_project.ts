@@ -6,10 +6,11 @@ import QuillFormattedText from '../../components/quill_formatted_text';
 import { ProjectCompletionBar } from './project_card';
 import { Project } from './index';
 import Sublayout from '../../sublayout';
-import User from '../../components/widgets/user';
+import User, { AnonymousUser } from '../../components/widgets/user';
 import { CWButton } from '../../components/component_kit/cw_button';
 import PageNotFound from '../404';
 import { DummyProject } from './dummy_project';
+import MarkdownFormattedText from '../../components/markdown_formatted_text';
 
 interface ProjectPageAttrs {
   identifier: string;
@@ -18,71 +19,87 @@ interface ProjectPageAttrs {
 interface ProjectPageState {
 }
 
+const ProjectCompletionBar: m.Component<{ completionPercent: number }> = {
+  view: (vnode) => {
+    const { completionPercent } = vnode.attrs;
+    console.log(completionPercent);
+    return m('.ProjectCompletionBar', [
+      m('.completed-percentage', {
+        style: `width: ${completionPercent * 100}%`
+      }),
+    ]);
+  }
+}
+
 const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
   view: (vnode) => {
     const { identifier } = vnode.attrs;
-    console.log(identifier);
     if (typeof identifier !== 'string') {
       return m(PageNotFound, { title: 'Projects' });
     }
     const projectId = identifier.split('-')[0];
-    const project = DummyProject; // TODO: Fetch via controller
+    const project: Project = DummyProject; // TODO: Fetch via controller
 
     return m(Sublayout, {
       class: 'ProjectPage',
       title: 'Project',
       showNewProposalButton: false,
-    }, [
-      m('h1', project.title),
-      m('.project-metadata', [
-        m(User, { user: project.creator }),
-        m(Tag, { label: `${project.createdAt}` }),
-        m(Tag, { label: `${project.deadline.inBlocks}` }),
-      ]),
-      m('.project-short-description', project.shortDescription || project.description.slice(0, 100)),
-      m('img.project-header-img'),
-      m(ProjectCompletionBar, { completionPercent: project.progress.asPercent }),
-      m('.project-funding-data', [
-        m('.left-panel', [
-          m('.project-funds-raised', [
-            m('h3', 'Funds raised'),
-            m('p', project.raised.inTokens),
-            m('p', project.raised.inDollars)
+    }, m('.project-wrap', [
+        m('h1', project.title),
+        m('.project-metadata', [
+          m('.metadata-left', [
+            m('h2', project.token),
+            // TODO: replace with // m(User, { user: project.creator }),
+            m(AnonymousUser, { distinguishingKey: '1' }),
           ]),
-          m('.project-funds-goal', [
-            m('h3', 'Goal'),
-            m('p', project.threshold.inTokens),
-            m('p', project.threshold.inDollars)
-          ]),
+          m('.metadata-right', [
+            m(Tag, { label: `${project.createdAt.format('MMMM D, YYYY')}` }),
+            m(Tag, { label: `${project.deadline.inBlocks} Blocks` }),
+          ])
         ]),
-        m('.right-panel', [
-          m(CWButton, {
-            intent: 'primary',
-            label: 'Contribute to this project',
-            onclick: () => true,
-          })
+        m('h3.project-short-description', project.shortDescription || project.description.slice(0, 100)),
+        m('img.project-header-img', { src: project.coverImage }),
+        m(ProjectCompletionBar, { completionPercent: project.progress.asPercent }),
+        m('.project-funding-data', [
+          m('.left-panel', [
+            m('.project-funds-raised', [
+              m('h3', 'Funds raised'),
+              m('h1', `${project.raised.inTokens} ETH`), // TODO: ETH shouldn't be hardcoded
+            ]),
+            m('.project-funds-goal', [
+              m('h3', 'Goal'),
+              m('h1', `${project.threshold.inTokens} ETH`), // TODO: ETH shouldn't be hardcoded
+            ]),
+          ]),
+          m('.right-panel', [
+            m(CWButton, {
+              intent: 'primary',
+              label: 'Contribute to this project',
+              onclick: () => true,
+            })
+          ])
+        ]),
+        m('.project-about', [
+          m('h2', 'About'),
+          m(MarkdownFormattedText, {
+            doc: project.description
+          }),
+        ]),
+        m('hr'),
+        m('.project-backers', [
+          m('h2', 'Backers')
+          // m(CWTable, {
+          //  className: 'project-backer-table'
+          //  entries: project.backers.map((backer) => {
+          //    m('.backer-row', [
+          //      m(User),
+          //      m('.contribution', backer.contribution)
+          //     ])
+          //  })
+          // })
         ])
-      ]),
-      m('.project-about', [
-        m('h2', 'About'),
-        m(QuillFormattedText, {
-          doc: project.description
-        }),
-      ]),
-      m('hr'),
-      m('.project-backers', [
-        m('h2', 'Backers')
-        // m(CWTable, {
-        //  className: 'project-backer-table'
-        //  entries: project.backers.map((backer) => {
-        //    m('.backer-row', [
-        //      m(User),
-        //      m('.contribution', backer.contribution)
-        //     ])
-        //  })
-        // })
       ])
-    ]);
+    );
   }
 }
 

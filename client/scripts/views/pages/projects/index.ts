@@ -15,7 +15,7 @@ type ProjectProgress = {
 
 type ProjectDeadline = {
   inBlocks: number;
-  asDate: Date;
+  asDate: moment.Moment;
 }
 
 type ProjectFunds = {
@@ -34,7 +34,7 @@ export type Project = {
   beneficiary: AddressInfo;
   backers: AddressInfo[];
   curators: AddressInfo[];
-  createdAt: Date;
+  createdAt: moment.Moment;
   progress: ProjectProgress;
   deadline: ProjectDeadline;
   threshold: ProjectFunds;

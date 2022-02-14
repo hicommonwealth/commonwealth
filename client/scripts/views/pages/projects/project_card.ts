@@ -48,7 +48,7 @@ const ProjectHeaderPanel: m.Component<{ iconSize?: number }> = {
   }
 }
 
-export const ProjectCompletionBar: m.Component<{ completionPercent: number }> = {
+const ProjectCompletionBar: m.Component<{ completionPercent: number }> = {
   view: (vnode) => {
     const { completionPercent } = vnode.attrs;
     return m('.ProjectCompletionBar', [
@@ -91,7 +91,10 @@ const ProjectCard: m.Component<
 > = {
   view: (vnode) => {
     const { project, size } = vnode.attrs;
-    const onclick = () => m.route.set(`${app.activeChainId()}/project/${project.id}-${slugify(project.title)}`);
+    const onclick = () => {
+      console.log(`/${app.activeChainId()}/project/${project.id}-${slugify(project.title)}`);
+      m.route.set(`/${app.activeChainId()}/project/${project.id}-${slugify(project.title)}`);
+    }
     const projectStatus = project.raised.inTokens > project.threshold.inTokens ? 'succeeded' : 'failed';
 
     const ProjectCardLarge = m('.ProjectCard',

@@ -1,3 +1,4 @@
+import moment from "moment";
 import { Project } from ".";
 
 export const DummyProject: Project = {
@@ -14,9 +15,9 @@ export const DummyProject: Project = {
   beneficiary: null,
   backers: [null],
   curators: [null],
-  createdAt: new Date(),
+  createdAt: moment(),
   progress: { inBlocks: 16000, asPercent: 0.32 },
-  deadline: { inBlocks: 48000, asDate: new Date() },
-  threshold: { inTokens: 10000000, inDollars: 30000 },
-  raised: { inTokens: 3200000, inDollars: 9000 },
+  deadline: { inBlocks: 48000, asDate: moment() },
+  threshold: { inTokens: 12, inDollars: 30000 },
+  raised: { inTokens: 3.8, inDollars: 9000 },
 }

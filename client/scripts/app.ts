@@ -561,7 +561,7 @@ Promise.all([
       '/validators':             importRoute('views/pages/validators', { scoped: true }),
       // Crowdfund
       '/projects':               importRoute('views/pages/projects/index', { scoped: true }),
-      '/project/:identifier':    importRoute('views/pages/project/view_project', { scoped: true }),
+      '/project/:identifier':    importRoute('views/pages/projects/view_project', { scoped: true }),
       // Settings
       '/login':                  importRoute('views/pages/login', { scoped: true, deferChain: true }),
       '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
@@ -697,7 +697,7 @@ Promise.all([
 
       // Crowdfund
       '/:scope/projects':             importRoute('views/pages/projects/index', { scoped: true }),
-      '/:scope/project/:identifier':  importRoute('views/pages/project/view_project', { scoped: true }),
+      '/:scope/project/:identifier':  importRoute('views/pages/projects/view_project', { scoped: true }),
 
       // Settings
       '/login':                    importRoute('views/pages/login', { scoped: false }),

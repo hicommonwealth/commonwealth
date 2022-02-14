@@ -91,7 +91,7 @@ h3 {
   @include body;
   font-size: 14px;
   line-height: 16.8px;
-  color: #666666;
+  color: $midi-gray;
 }
 
 @mixin rainbow-gradient-horizontal {
