@@ -9,30 +9,30 @@ import SidebarSection, { SectionGroupProps, SidebarSectionProps } from './sideba
 import { ToggleTree, verifyCachedToggleTree } from '.';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
-    let current_tree = JSON.parse(localStorage[`${app.activeChainId()}-discussions-toggle-tree`]);
+    let currentTree = JSON.parse(localStorage[`${app.activeChainId()}-discussions-toggle-tree`]);
     const split = path.split('.');
     for (const field of split.slice(0, split.length-1)) {
-      if (current_tree.hasOwnProperty(field)) {
-        current_tree = current_tree[field];
+      if (Object.prototype.hasOwnProperty.call(currentTree, field)) {
+        currentTree = currentTree[field];
       } else {
         return;
       }
     }
-    current_tree[split[split.length-1]] = toggle;
-    let new_tree = current_tree;
-    localStorage[`${app.activeChainId()}-discussions-toggle-tree`] = JSON.stringify(new_tree);
+    currentTree[split[split.length - 1]] = toggle;
+    const newTree = currentTree;
+    localStorage[`${app.activeChainId()}-discussions-toggle-tree`] = JSON.stringify(newTree);
   }
 
 export const DiscussionSection: m.Component<{mobile: boolean}, {}> = {
     view: (vnode) => {
-      // Conditional Render Details + 
+      // Conditional Render Details +
       const onAllDiscussionPage = (p) => {
         const identifier = m.route.param('identifier');
         if (identifier) {
           const thread = app.threads.store.getByIdentifier(identifier.slice(0, identifier.indexOf('-')));
           if (thread && !thread.topic) {
             return true;
-          } 
+          }
         }
 
         return p === `/${app.activeChainId()}/` || p === `/${app.activeChainId()}`;
@@ -41,44 +41,44 @@ export const DiscussionSection: m.Component<{mobile: boolean}, {}> = {
         || p.startsWith(`/${app.activeChainId()}/discussions/`)
         || p.startsWith(`/${app.activeChainId()}/proposal/discussion/`)
         || p.startsWith(`/${app.activeChainId()}?`);
-            
+
       const onFeaturedDiscussionPage = (p, topic) => {
         const identifier = m.route.param('identifier');
         if (identifier) {
           const thread = app.threads.store.getByIdentifier(identifier.slice(0, identifier.indexOf('-')));
           if (thread?.topic && thread.topic.name === topic) {
             return true;
-          } 
+          }
         }
         return decodeURI(p).endsWith(`/discussions/${topic}`);
       }
       const onMembersPage = (p) => p.startsWith(`/${app.activeChainId()}/members`)
         || p.startsWith(`/${app.activeChainId()}/account/`);
       const onSputnikDaosPage = (p) => p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
-  
+
       const topics = app.topics.getByCommunity(app.activeChainId()).map(({ id, name, featuredInSidebar }) => {
         return { id, name, featuredInSidebar };
       }).filter((t) => t.featuredInSidebar).sort((a, b) => a.name.localeCompare(b.name));
-  
+
       const discussionsLabel = (['vesuvius', 'olympus'].includes(app.activeChainId())) ? 'FORUMS' : 'DISCUSSIONS';
-  
-      // Build Toggle Tree 
-      let discussions_default_toggle_tree: ToggleTree = {
-        toggled_state: true,
+
+      // Build Toggle Tree
+      const discussionsDefaultToggleTree: ToggleTree = {
+        toggledState: true,
         children: {}
       }
-  
+
       for (const topic of topics) {
         if (topic.featuredInSidebar) {
-          discussions_default_toggle_tree.children[topic.name] = {
-            toggled_state: true,
+          discussionsDefaultToggleTree.children[topic.name] = {
+            toggledState: true,
             children: {
               'All': {
-                toggled_state: false,
-              }, 
+                toggledState: false,
+              },
               ...(app.activeChainId() === 'near') && {
                 'SputnikDaos': {
-                  toggled_state: false,
+                  toggledState: false,
                 }
               }
             }
@@ -89,78 +89,77 @@ export const DiscussionSection: m.Component<{mobile: boolean}, {}> = {
       // Check if an existing toggle tree is stored
       if (!localStorage[`${app.activeChainId()}-discussions-toggle-tree`]) {
         console.log("setting discussions toggle tree since it doesn't exist")
-        localStorage[`${app.activeChainId()}-discussions-toggle-tree`] = JSON.stringify(discussions_default_toggle_tree);
-      } else if (!verifyCachedToggleTree('discussions', discussions_default_toggle_tree)) {
+        localStorage[`${app.activeChainId()}-discussions-toggle-tree`] = JSON.stringify(discussionsDefaultToggleTree);
+      } else if (!verifyCachedToggleTree('discussions', discussionsDefaultToggleTree)) {
         console.log("setting discussions toggle tree since the cached version differs from the updated version")
-        localStorage[`${app.activeChainId()}-discussions-toggle-tree`] = JSON.stringify(discussions_default_toggle_tree);
+        localStorage[`${app.activeChainId()}-discussions-toggle-tree`] = JSON.stringify(discussionsDefaultToggleTree);
       }
-      let toggle_tree_state = JSON.parse(localStorage[`${app.activeChainId()}-discussions-toggle-tree`]);
+      let toggleTreeState = JSON.parse(localStorage[`${app.activeChainId()}-discussions-toggle-tree`]);
       if (vnode.attrs.mobile) {
-        toggle_tree_state = discussions_default_toggle_tree;
-      } 
-  
-      const discussions_group_data: SectionGroupProps[] = [{
+        toggleTreeState = discussionsDefaultToggleTree;
+      }
+
+      const discussionsGroupData: SectionGroupProps[] = [{
         title: 'All',
-        contains_children: false,
-        default_toggle: false,
-        is_visible: true,
-        is_updated: true,
-        is_active: onAllDiscussionPage(m.route.get()),
+        containsChildren: false,
+        defaultToggle: false,
+        isVisible: true,
+        isUpdated: true,
+        isActive: onAllDiscussionPage(m.route.get()),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(`children.All.toggled_state`, toggle);
+          setDiscussionsToggleTree(`children.All.toggledState`, toggle);
           navigateToSubpage("/");
         },
-        display_data: null
+        displayData: null
       },
       (app.activeChainId() === 'near') && {
         title: 'Sputnik Daos',
-        contains_children: false,
-        default_toggle: false,
-        is_visible: true,
-        is_updated: true,
-        is_active: onSputnikDaosPage(m.route.get())
-                      && (app.chain ? app.chain.serverLoaded : true),
+        containsChildren: false,
+        defaultToggle: false,
+        isVisible: true,
+        isUpdated: true,
+        isActive: onSputnikDaosPage(m.route.get()) && (app.chain ? app.chain.serverLoaded : true),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(`children.SputnikDAOs.toggled_state`, toggle);
+          setDiscussionsToggleTree(`children.SputnikDAOs.toggledState`, toggle);
           navigateToSubpage('/sputnik-daos');
         },
-        display_data: null
+        displayData: null
       }];
-  
+
       for (const topic of topics) {
         if (topic.featuredInSidebar) {
-          const discussion_section_group: SectionGroupProps = {
+          const discussionSectionGroup: SectionGroupProps = {
             title: topic.name,
-            contains_children: false,
-            default_toggle: false,
-            is_visible: true,
-            is_updated: true,
-            is_active: onFeaturedDiscussionPage(m.route.get(), topic.name),
+            containsChildren: false,
+            defaultToggle: false,
+            isVisible: true,
+            isUpdated: true,
+            isActive: onFeaturedDiscussionPage(m.route.get(), topic.name),
             onclick: (e, toggle: boolean) => {
               e.preventDefault();
-              setDiscussionsToggleTree(`children.${topic.name}.toggled_state`, toggle);
+              setDiscussionsToggleTree(`children.${topic.name}.toggledState`, toggle);
               navigateToSubpage(`/discussions/${encodeURI(topic.name)}`);
             },
-            display_data: null
+            displayData: null
           }
-          discussions_group_data.push(discussion_section_group)
+          discussionsGroupData.push(discussionSectionGroup)
         }
       }
-  
-      const sidebar_section_data: SidebarSectionProps = {
+
+      const sidebarSectionData: SidebarSectionProps = {
         title: discussionsLabel,
-        default_toggle: toggle_tree_state['toggled_state'],
+        defaultToggle: toggleTreeState['toggledState'],
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree('toggled_state', toggle);
+          setDiscussionsToggleTree('toggledState', toggle);
         },
-        display_data: discussions_group_data,
-        is_active: true,
-        toggle_disabled: vnode.attrs.mobile
+        displayData: discussionsGroupData,
+        isActive: true,
+        toggleDisabled: vnode.attrs.mobile
       }
-  
-      return m(SidebarSection, {...sidebar_section_data});
+
+      return m(SidebarSection, {...sidebarSectionData});
     }
   }

@@ -37,6 +37,7 @@ class ChainInfo {
   public readonly bech32Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
+  public showProjects: boolean;
 
   constructor({
     id,
@@ -62,11 +63,12 @@ class ChainInfo {
     topics,
     adminsAndMods,
     base,
-    ss58_prefix,
-    bech32_prefix,
+    ss58Prefix,
+    bech32Prefix,
     type,
     decimals,
     substrateSpec,
+    showProjects,
   }) {
     this.id = id;
     this.network = network;
@@ -93,10 +95,11 @@ class ChainInfo {
     this.topics = topics ? topics.map((t) => new OffchainTopic(t)) : [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
-    this.ss58Prefix = ss58_prefix;
-    this.bech32Prefix = bech32_prefix;
+    this.ss58Prefix = ss58Prefix;
+    this.bech32Prefix = bech32Prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
+    this.showProjects = showProjects;
   }
 
   public static fromJSON({
@@ -128,6 +131,7 @@ class ChainInfo {
     type,
     decimals,
     substrate_spec,
+    show_projects,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -160,11 +164,12 @@ class ChainInfo {
       topics,
       adminsAndMods,
       base,
-      ss58_prefix,
-      bech32_prefix,
+      ss58Prefix: ss58_prefix,
+      bech32Prefix: bech32_prefix,
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
+      showProjects: show_projects,
     });
   }
 

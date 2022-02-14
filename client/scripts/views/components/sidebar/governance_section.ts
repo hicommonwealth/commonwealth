@@ -11,7 +11,7 @@ import { ToggleTree, verifyCachedToggleTree } from '.';
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(localStorage[`${app.activeChainId()}-governance-toggle-tree`]);
   const split = path.split('.');
-  for (const field of split.slice(0, split.length-1)) {
+  for (const field of split.slice(0, split.length - 1)) {
     if (Object.prototype.hasOwnProperty.call(currentTree, field)) {
       currentTree = currentTree[field];
     } else {
@@ -58,6 +58,7 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
                             || app.chain?.network === ChainNetwork.Moloch
                             || app.chain?.network === ChainNetwork.Compound
                             || app.chain?.network === ChainNetwork.Aave);
+    const showProjects = true; // app.chain.meta.chain.showProjects; TODO
     const showCouncillors = isNotOffchain && app.chain?.base === ChainBase.Substrate;
     const showTreasury = isNotOffchain && app.chain?.base === ChainBase.Substrate
       && app.chain.network !== ChainNetwork.Centrifuge;
@@ -71,63 +72,69 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
 
     // ---------- Build Toggle Tree ---------- //
     const governanceDefaultToggleTree: ToggleTree = {
-      toggled_state: true,
+      toggledState: true,
       children: {
         'Members': {
-          toggled_state: false,
+          toggledState: false,
           children: {}
         },
         ...(showSnapshotOptions) && {
           'Snapshots': {
-            toggled_state: false,
+            toggledState: false,
             children: {}
           }
         },
         ...(showCompoundOptions) && {
           'Delegate': {
-            toggled_state: true,
+            toggledState: true,
             children: {}
           }
         },
         ...(showTreasury) && {
           'Treasury': {
-            toggled_state: false,
+            toggledState: false,
             children: {}
           }
         },
         ...(showBounties) && {
           'Bounties': {
-            toggled_state: false,
+            toggledState: false,
             children: {}
           }
         },
         ...(showReferenda) && {
           'Referenda': {
-            toggled_state: false,
+            toggledState: false,
             children: {}
           }
         },
         ...(showProposals) && {
           'Proposals': {
-            toggled_state: false,
+            toggledState: false,
+            children: {}
+          }
+        },
+        ...(showProjects) && {
+          'Projects': {
+            toggledState: false,
             children: {}
           }
         },
         ...(showTips) && {
           'Tips': {
-            toggled_state: false,
+            toggledState: false,
             children: {}
           }
         },
         ...(showCouncillors) && {
           'Councillors': {
-            toggled_state: false,
+            toggledState: false,
             children: {}
           }
         },
         ...(showValidators) && {
           'Validators': {
-            toggled_state: false,
+            toggledState: false,
             children: {}
           }
         }
@@ -142,9 +149,9 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
       console.log("setting discussions toggle tree since the cached version differs from the updated version")
       localStorage[`${app.activeChainId()}-governance-toggle-tree`] = JSON.stringify(governanceDefaultToggleTree);
     }
-    let toggle_tree_state = JSON.parse(localStorage[`${app.activeChainId()}-governance-toggle-tree`]);
+    let toggleTreeState = JSON.parse(localStorage[`${app.activeChainId()}-governance-toggle-tree`]);
     if (vnode.attrs.mobile) {
-      toggle_tree_state = governanceDefaultToggleTree;
+      toggleTreeState = governanceDefaultToggleTree;
     }
 
     const onSnapshotProposal = (p) => p.startsWith(`/${app.activeChainId()}/snapshot`);
@@ -164,6 +171,7 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
       p.startsWith(`/${app.activeChainId()}/motions`)
         || p.startsWith(`/${app.activeChainId()}/proposal/${ProposalType.SubstrateCollectiveProposal}`));
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    const onProjectsPage = (p) => p.startsWith(`/${app.activeChainId()}/projects`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
     const onMembersPage = (p) => p.startsWith(`/${app.activeChainId()}/members`)
     || p.startsWith(`/${app.activeChainId()}/account/`);
@@ -173,33 +181,33 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
     // ---------- Build Section Props ---------- //
 
     // Members
-    const members_data: SectionGroupProps = {
+    const membersData: SectionGroupProps = {
       title: 'Members',
       containsChildren: false,
-      defaultToggle: toggle_tree_state['children']['Members']['toggled_state'],
+      defaultToggle: toggleTreeState['children']['Members']['toggledState'],
       isVisible: true,
       isUpdated: true,
       isActive: onMembersPage(m.route.get())
-                    && (app.chain ? app.chain.serverLoaded : true),
+        && (app.chain ? app.chain.serverLoaded : true),
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        setGovernanceToggleTree('children.Members.toggled_state', toggle)
+        setGovernanceToggleTree('children.Members.toggledState', toggle)
         navigateToSubpage('/members')
       },
       displayData: null
     }
 
     // Snapshots
-    const snapshot_data: SectionGroupProps = {
+    const snapshotData: SectionGroupProps = {
       title: 'Snapshots',
       containsChildren: false,
-      defaultToggle: showSnapshotOptions ? toggle_tree_state['children']['Snapshots']['toggled_state'] : false,
+      defaultToggle: showSnapshotOptions ? toggleTreeState['children']['Snapshots']['toggledState'] : false,
       isVisible: showSnapshotOptions,
       isActive: onSnapshotProposal(m.route.get()),
       isUpdated: true,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        setGovernanceToggleTree('children.Snapshots.toggled_state', toggle)
+        setGovernanceToggleTree('children.Snapshots.toggledState', toggle)
         // Check if we have multiple snapshots for conditional redirect
         const snapshotSpaces = app.chain.meta.chain.snapshot;
         if (snapshotSpaces.length > 1) {
@@ -212,14 +220,14 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
     }
 
     // Proposals
-    const proposals_data: SectionGroupProps = {
+    const proposalsData: SectionGroupProps = {
       title: 'Proposals',
       containsChildren: false,
-      defaultToggle: showProposals ? toggle_tree_state['children']['Proposals']['toggled_state'] : false,
+      defaultToggle: showProposals ? toggleTreeState['children']['Proposals']['toggledState'] : false,
       onclick: (e, toggle: boolean) => {
-        e.preventDefault(); 
+        e.preventDefault();
         navigateToSubpage('/proposals');
-        setGovernanceToggleTree('children.Proposals.toggled_state', toggle)
+        setGovernanceToggleTree('children.Proposals.toggledState', toggle)
       },
       isVisible: showProposals,
       isUpdated: true,
@@ -228,14 +236,14 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
     }
 
     // Treasury
-    const treasury_data: SectionGroupProps = {
+    const treasuryData: SectionGroupProps = {
       title: 'Treasury',
       containsChildren: false,
-      defaultToggle: showTreasury ? toggle_tree_state['children']['Treasury']['toggled_state'] : false,
+      defaultToggle: showTreasury ? toggleTreeState['children']['Treasury']['toggledState'] : false,
       onclick: (e, toggle: boolean) => {
-        e.preventDefault(); 
+        e.preventDefault();
         navigateToSubpage('/treasury');
-        setGovernanceToggleTree('children.Treasury.toggled_state', toggle)
+        setGovernanceToggleTree('children.Treasury.toggledState', toggle)
       },
       isVisible: showTreasury,
       isUpdated: true,
@@ -243,14 +251,14 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
       displayData: null
     }
 
-    const bounty_data: SectionGroupProps = {
+    const bountyData: SectionGroupProps = {
       title: 'Bounties',
       containsChildren: false,
-      defaultToggle: showBounties ? toggle_tree_state['children']['Bounties']['toggled_state'] : false,
+      defaultToggle: showBounties ? toggleTreeState['children']['Bounties']['toggledState'] : false,
       onclick: (e, toggle: boolean) => {
-        e.preventDefault(); 
+        e.preventDefault();
         navigateToSubpage('/bounties');
-        setGovernanceToggleTree('children.Bounties.toggled_state', toggle)
+        setGovernanceToggleTree('children.Bounties.toggledState', toggle)
       },
       isVisible: showBounties,
       isUpdated: true,
@@ -258,14 +266,14 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
       displayData: null
     }
 
-    const referenda_data: SectionGroupProps = {
+    const referendaData: SectionGroupProps = {
       title: 'Referenda',
       containsChildren: false,
-      defaultToggle: showReferenda ? toggle_tree_state['children']['Referenda']['toggled_state'] : false,
+      defaultToggle: showReferenda ? toggleTreeState['children']['Referenda']['toggledState'] : false,
       onclick: (e, toggle: boolean) => {
-        e.preventDefault(); 
+        e.preventDefault();
         navigateToSubpage('/referenda');
-        setGovernanceToggleTree('children.Referenda.toggled_state', toggle)
+        setGovernanceToggleTree('children.Referenda.toggledState', toggle)
       },
       isVisible: showReferenda,
       isUpdated: true,
@@ -276,11 +284,11 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
     const tipsData: SectionGroupProps = {
       title: 'Tips',
       containsChildren: false,
-      defaultToggle: showTips ? toggle_tree_state['children']['Tips']['toggled_state'] : false,
+      defaultToggle: showTips ? toggleTreeState['children']['Tips']['toggledState'] : false,
       onclick: (e, toggle: boolean) => {
-        e.preventDefault(); 
+        e.preventDefault();
         navigateToSubpage('/tips');
-        setGovernanceToggleTree('children.Tips.toggled_state', toggle)
+        setGovernanceToggleTree('children.Tips.toggledState', toggle)
       },
       isVisible: showTips,
       isUpdated: true,
@@ -291,11 +299,11 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
     const counsillorsData: SectionGroupProps = {
       title: 'Councillors',
       containsChildren: false,
-      defaultToggle: showCouncillors ? toggle_tree_state['children']['Councillors']['toggled_state'] : false,
+      defaultToggle: showCouncillors ? toggleTreeState['children']['Councillors']['toggledState'] : false,
       onclick: (e, toggle: boolean) => {
-        e.preventDefault(); 
+        e.preventDefault();
         navigateToSubpage('/council');
-        setGovernanceToggleTree('children.Councillors.toggled_state', toggle)
+        setGovernanceToggleTree('children.Councillors.toggledState', toggle)
       },
       isVisible: showCouncillors,
       isUpdated: true,
@@ -306,11 +314,11 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
     const validatorsData: SectionGroupProps = {
       title: 'Validators',
       containsChildren: false,
-      defaultToggle: showValidators ? toggle_tree_state['children']['Validators']['toggled_state'] : false,
+      defaultToggle: showValidators ? toggleTreeState['children']['Validators']['toggledState'] : false,
       onclick: (e, toggle: boolean) => {
-        e.preventDefault(); 
+        e.preventDefault();
         navigateToSubpage('/validators');
-        setGovernanceToggleTree('children.Validators.toggled_state', toggle)
+        setGovernanceToggleTree('children.Validators.toggledState', toggle)
       },
       isVisible: showValidators,
       isUpdated: true,
@@ -318,41 +326,55 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
       displayData: null
     }
 
+    const projectsData: SectionGroupProps = {
+      title: 'Projects',
+      containsChildren: false,
+      defaultToggle: showProjects ? toggleTreeState['children']['Projects']['toggledState'] : false,
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        navigateToSubpage('/projects');
+        setGovernanceToggleTree('children.Projects.toggledState', toggle)
+      },
+      isVisible: showProjects,
+      isUpdated: true,
+      isActive: onProjectsPage(m.route.get()),
+      displayData: null
+    }
 
     // Delegate
     const delegateData: SectionGroupProps = {
       title: 'Delegate',
       containsChildren: false,
-      defaultToggle: showCompoundOptions ? toggle_tree_state['children']['Delegate']['toggled_state'] : false,
+      defaultToggle: showCompoundOptions ? toggleTreeState['children']['Delegate']['toggledState'] : false,
       isVisible: showCompoundOptions,
       isUpdated: true,
       isActive: m.route.get() === `/${app.activeChainId()}/delegate`,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        setGovernanceToggleTree('children.Delegate.toggled_state', toggle)
+        setGovernanceToggleTree('children.Delegate.toggledState', toggle)
         navigateToSubpage('/delegate')
       },
       displayData: null
     }
 
-    const governance_group_data: SectionGroupProps[] = [
-      members_data, snapshot_data, delegateData, treasury_data,
-      bounty_data, referenda_data, proposals_data, tipsData,
-      counsillorsData, validatorsData
+    const governanceGroupData: SectionGroupProps[] = [
+      membersData, snapshotData, delegateData, treasuryData,
+      bountyData, referendaData, proposalsData, tipsData,
+      counsillorsData, validatorsData, projectsData
     ];
 
-    const sidebar_section_data: SidebarSectionProps = {
+    const sidebarSectionData: SidebarSectionProps = {
       title: 'GOVERNANCE',
-      defaultToggle: toggle_tree_state['toggled_state'],
+      defaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        setGovernanceToggleTree('toggled_state', toggle);
+        setGovernanceToggleTree('toggledState', toggle);
       },
-      displayData: governance_group_data,
+      displayData: governanceGroupData,
       isActive: false,
-      toggle_disabled: vnode.attrs.mobile
+      toggleDisabled: vnode.attrs.mobile
     }
 
-    return m(SidebarSection, {...sidebar_section_data});
+    return m(SidebarSection, {...sidebarSectionData});
   }
 }

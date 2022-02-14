@@ -30,7 +30,7 @@ export interface SidebarSectionProps {
   onclick: Function;
   onhover?: Function;
   displayData: SectionGroupProps[];
-  toggle_disabled?: boolean;
+  toggleDisabled?: boolean;
 }
 
 const SubSection: m.Component<SubSectionProps, {backgroundColor: string}> = {
@@ -149,11 +149,11 @@ const SidebarSection: m.Component<SidebarSectionProps, {toggled: boolean, hoverC
     vnode.state.hoverColor = 'none';
   },
   view: (vnode) => {
-    const { title, onclick, toggle_disabled, displayData } = vnode.attrs;
+    const { title, onclick, toggleDisabled, displayData } = vnode.attrs;
     const { toggled, hoverColor } = vnode.state;
 
     const clickHandler = (e) => {
-      if (toggle_disabled) {
+      if (toggleDisabled) {
         return;
       }
       vnode.state.toggled = !toggled;
