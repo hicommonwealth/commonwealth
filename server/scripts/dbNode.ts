@@ -54,7 +54,7 @@ async function handleFatalError(
       process.exit(1);
       break;
     default:
-      log.error(`${chain ? `[${chain}]: ` : ''}${JSON.stringify(error)}`);
+      log.error(`${chain ? `[${chain}]: ` : ''} ${error.message}`);
 
       if (chain && chain.indexOf('erc20') === -1 && chainErrors[chain] >= 4) {
         listeners[chain].unsubscribe();
