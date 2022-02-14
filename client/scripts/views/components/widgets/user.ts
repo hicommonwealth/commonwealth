@@ -345,8 +345,7 @@ export const AnonymousUser: m.Component<{
     if (showAvatar) {
       const pseudoAddress = distinguishingKey;
       profileAvatar = m('svg.Jdenticon', {
-        width: avatarSize - 4,
-        height: avatarSize - 4,
+        style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         'data-address': pseudoAddress,
         oncreate: (vnode_) => {
           jdenticon.update(vnode_.dom as HTMLElement, pseudoAddress);
