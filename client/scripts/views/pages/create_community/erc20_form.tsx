@@ -10,7 +10,7 @@ import 'pages/create_community_test.scss';
 
 import app from 'state';
 import { initAppState } from 'app';
-import { slugify } from 'utils';
+import { slugify, slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import { IERC20Metadata__factory } from 'eth/types';
@@ -42,31 +42,34 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
     form: {
       address: '',
       alt_wallet_url: '',
-      chain_id: '1',
+      eth_chain_id: 1,
       chain_string: 'Ethereum Mainnet',
       decimals: 18,
       id: '',
       name: '',
       symbol: 'XYZ',
-      // vnode.state.url = vnode.attrs.ethChains[1].url;
-      url: '',
+      node_url: '',
       ...initChainForm(),
     },
   };
+
+  oninit(vnode) {
+    this.state.form.node_url = vnode.attrs.ethChains[1].url;
+  }
 
   view(vnode) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
     const updateTokenForum = async () => {
-      if (!this.state.form.address || !this.state.form.chain_id) return;
+      if (!this.state.form.address || !this.state.form.eth_chain_id) return;
       this.state.status = '';
       this.state.error = '';
       this.state.loading = true;
       const args = {
         address: this.state.form.address,
-        chain_id: this.state.form.chain_id,
-        url: this.state.form.url,
+        chain_id: this.state.form.eth_chain_id,
+        url: this.state.form.node_url,
         allowUncached: true,
       };
       try {
@@ -144,41 +147,34 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
           disabled={
             this.state.saving ||
             !validAddress ||
-            !this.state.form.chain_id ||
+            !this.state.form.eth_chain_id ||
             this.state.loading
           }
           onclick={async (e) => {
             await updateTokenForum();
           }}
         />
-        {this.state.error &&
-          m('tr', [
-            m('td', { class: 'title-column' }, 'Error'),
-            m('td', { class: 'error-column' }, this.state.error),
-          ])}
-        {this.state.status &&
-          m('tr', [
-            m('td', { class: 'title-column' }, 'Test Status'),
-            m('td', { class: 'status-column' }, `${this.state.status}`),
-          ])}
+        <div class="validation-container">
+          {this.state.error && <div class="error">{this.state.error}</div>}
+          {this.state.status && <div class="status">{this.state.status}</div>}
+        </div>
         <InputRow
           title="Name"
           defaultValue={this.state.form.name}
           disabled={disableField}
           onChangeHandler={(v) => {
             this.state.form.name = v;
-            this.state.form.id = slugify(v);
+            this.state.form.id = slugifyPreserveDashes(v);
           }}
         />
-        <InputRow
-          title="ID"
-          defaultValue={this.state.form.id}
-          value={this.state.form.id}
-          disabled={disableField}
-          onChangeHandler={(v) => {
-            this.state.form.id = v;
-          }}
-        />
+        <div class="IDRow">
+          <label>ID</label>
+          <div class={`id ${!this.state.form.id.length && 'placeholder'}`}>
+            {!this.state.form.id.length
+              ? 'ID will show up here based on your name'
+              : this.state.form.id}
+          </div>
+        </div>
         <InputRow
           title="Symbol"
           disabled={disableField}
@@ -190,50 +186,18 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
         />
         {...defaultChainRows(this.state.form, disableField)}
         <CWButton
-          class="mt-3"
           label="Save changes"
           buttonType="primary"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
-          onclick={async (e) => {
-            const {
-              address,
-              id,
-              name,
-              description,
-              symbol,
-              icon_url,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              chain_id,
-              url,
-              decimals,
-              alt_wallet_url,
-            } = this.state.form;
+          onclick={async () => {
             this.state.saving = true;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
-                address,
-                id,
-                name,
-                description,
-                icon_url,
-                symbol,
-                website,
-                discord,
-                element,
-                telegram,
-                github,
-                decimals,
                 jwt: app.user.jwt,
                 type: ChainType.Token,
                 base: ChainBase.Ethereum,
                 network: ChainNetwork.ERC20,
-                node_url: url,
-                eth_chain_id: +chain_id,
-                alt_wallet_url,
+                ...this.state.form,
               });
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);

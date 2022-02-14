@@ -4,6 +4,7 @@ import m from 'mithril';
 import 'components/component_kit/cw_text_input.scss';
 
 import { ComponentType } from './types';
+import { getTextInputClasses } from './helpers';
 
 export enum ValidationStatus {
   Success = 'success',
@@ -14,6 +15,7 @@ type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   defaultValue?: string;
+  disabled?: boolean;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   name: string;
@@ -22,15 +24,21 @@ type TextInputAttrs = {
   tabindex?: number;
 };
 
-export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
-  statusMessage?: string;
+export type InputStyleAttrs = {
+  disabled?: boolean;
   validationStatus?: ValidationStatus;
+};
+
+export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
+  private statusMessage?: string = '';
+  private validationStatus?: ValidationStatus = undefined;
 
   view(vnode) {
     const {
       autocomplete,
       autofocus,
       defaultValue,
+      disabled,
       inputValidationFn,
       label,
       name,
@@ -45,7 +53,11 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
         <input
           autofocus={autofocus}
           autocomplete={autocomplete}
-          class={this.validationStatus}
+          class={getTextInputClasses({
+            validationStatus: this.validationStatus,
+            disabled,
+          })}
+          disabled={disabled}
           tabindex={tabindex}
           name={name}
           placeholder={placeholder}

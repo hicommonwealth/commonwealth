@@ -136,12 +136,12 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
             Object.entries(attrs.ethChainNames).find(
               ([, name]) => name === value
             ) || Object.keys(attrs.ethChains).find((cId) => `${cId}` === value);
-          state.chain_id = id;
-          state.url = attrs.ethChains[id].url;
+          state.eth_chain_id = id;
+          state.node_url = attrs.ethChains[id].url;
           state.alt_wallet_url = attrs.ethChains[id].alt_wallet_url;
         } else {
-          state.chain_id = '';
-          state.url = '';
+          state.eth_chain_id = '';
+          state.node_url = '';
           state.alt_wallet_url = '';
         }
         state.loaded = false;
@@ -150,10 +150,10 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
     state.chain_string === 'Custom' && (
       <InputRow
         title="Chain ID"
-        defaultValue={state.chain_id}
+        defaultValue={state.eth_chain_id}
         placeholder="1"
         onChangeHandler={async (v) => {
-          state.chain_id = v;
+          state.eth_chain_id = v;
           state.loaded = false;
         }}
       />
@@ -161,10 +161,10 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
     state.chain_string === 'Custom' && (
       <InputRow
         title="Websocket URL"
-        defaultValue={state.url}
+        defaultValue={state.node_url}
         placeholder="wss://... (leave empty for default)"
         onChangeHandler={async (v) => {
-          state.url = v;
+          state.node_url = v;
           state.loaded = false;
         }}
       />

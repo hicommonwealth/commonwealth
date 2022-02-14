@@ -44,4 +44,18 @@
       font-style: italic;
     }
   }
+
+  .validation-container {
+    @include form-label;
+    height: 20px;
+
+    .error {
+      color: $hype-red;
+      margin-top: 8px;
+    }
+
+    .status {
+      margin-top: 8px;
+    }
+  }
 }

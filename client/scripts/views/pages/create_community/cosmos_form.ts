@@ -7,10 +7,10 @@ import $ from 'jquery';
 import { initAppState } from 'app';
 import { slugify } from 'utils';
 import { ChainBase, ChainType } from 'types';
-import {
-  InputPropertyRow
-} from 'views/components/metadata_rows';
-import { ChainFormState, initChainForm, defaultChainRows } from './chain_input_rows';
+
+import { initChainForm, defaultChainRows } from './chain_input_rows';
+import { ChainFormState } from './types';
+import { InputRow } from '../../components/metadata_rows';
 
 //
 // TODO: populate additional fields
@@ -54,15 +54,15 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
             class: 'metadata-management-table',
           },
           [
-            m(InputPropertyRow, {
+            m(InputRow, {
               title: 'RPC URL',
               defaultValue: vnode.state.url,
               placeholder: 'http://my-rpc.cosmos-chain.com:26657/',
               onChangeHandler: async (v) => {
                 vnode.state.url = v;
-              }
+              },
             }),
-            m(InputPropertyRow, {
+            m(InputRow, {
               title: 'Name',
               defaultValue: vnode.state.name,
               onChangeHandler: (v) => {
@@ -70,7 +70,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                 vnode.state.id = slugify(v);
               },
             }),
-            m(InputPropertyRow, {
+            m(InputRow, {
               title: 'ID',
               defaultValue: vnode.state.id,
               value: vnode.state.id,
@@ -78,7 +78,7 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                 vnode.state.id = v;
               },
             }),
-            m(InputPropertyRow, {
+            m(InputRow, {
               title: 'Symbol',
               defaultValue: vnode.state.symbol,
               placeholder: 'XYZ',
@@ -86,22 +86,22 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
                 vnode.state.symbol = v;
               },
             }),
-            m(InputPropertyRow, {
+            m(InputRow, {
               title: 'Bech32 Prefix',
               defaultValue: vnode.state.bech32_prefix,
               placeholder: 'cosmos',
               onChangeHandler: async (v) => {
                 vnode.state.bech32_prefix = v;
-              }
+              },
             }),
             // TODO: validate this as number
-            m(InputPropertyRow, {
+            m(InputRow, {
               title: 'Decimals',
               defaultValue: vnode.state.decimals,
               placeholder: '6',
               onChangeHandler: async (v) => {
                 vnode.state.decimals = v;
-              }
+              },
             }),
             // TODO: add alt wallet URL field
             ...defaultChainRows(vnode.state),
@@ -152,17 +152,20 @@ const CosmosForm: m.Component<CosmosFormAttrs, CosmosFormState> = {
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
-              vnode.state.error = err.responseJSON?.error || 'Creating new Cosmos community failed';
+              vnode.state.error =
+                err.responseJSON?.error ||
+                'Creating new Cosmos community failed';
             } finally {
               vnode.state.saving = false;
               m.redraw();
             }
           },
         }),
-        vnode.state.error && m('tr', [
-          m('td', { class: 'title-column', }, 'Error'),
-          m('td', { class: 'error-column' }, vnode.state.error),
-        ]),
+        vnode.state.error &&
+          m('tr', [
+            m('td', { class: 'title-column' }, 'Error'),
+            m('td', { class: 'error-column' }, vnode.state.error),
+          ]),
       ]),
     ]);
   },
