@@ -1,4 +1,4 @@
-import 'pages/crowdfund/project_page.scss';
+import 'pages/crowdfund/view_project.scss';
 
 import m from 'mithril';
 import { Tag } from 'construct-ui';
@@ -8,9 +8,11 @@ import { Project } from './index';
 import Sublayout from '../../sublayout';
 import User from '../../components/widgets/user';
 import { CWButton } from '../../components/component_kit/cw_button';
+import PageNotFound from '../404';
+import { DummyProject } from './dummy_project';
 
 interface ProjectPageAttrs {
-  project: Project;
+  identifier: string;
 }
 
 interface ProjectPageState {
@@ -18,7 +20,13 @@ interface ProjectPageState {
 
 const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
   view: (vnode) => {
-    const { project } = vnode.attrs;
+    const { identifier } = vnode.attrs;
+    if (typeof identifier !== 'string') {
+      return m(PageNotFound, { title: 'Projects' });
+    }
+    const projectId = identifier.split('-')[0];
+    const project = DummyProject; // TODO: Fetch via controller
+
     return m(Sublayout, {
       class: 'ProjectPage',
       title: 'Project',

@@ -1,7 +1,9 @@
 import 'pages/crowdfund/project_card.scss';
 
 import m from 'mithril';
+import app from 'state';
 import { capitalize } from 'lodash';
+import { slugify } from 'utils';
 import { AnonymousUser } from '../../components/widgets/user';
 
 export enum ProjectCardSize {
@@ -89,7 +91,7 @@ const ProjectCard: m.Component<
 > = {
   view: (vnode) => {
     const { project, size } = vnode.attrs;
-    const onclick = null; // = m.route.set(`${app.activeId()}/${project.id}-slugify(project.name))
+    const onclick = m.route.set(`${app.activeChainId()}/${project.id}-${slugify(project.title)}`);
     const projectStatus = project.raised.inTokens > project.threshold.inTokens ? 'succeeded' : 'failed';
 
 

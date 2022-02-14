@@ -25,6 +25,7 @@ type ProjectFunds = {
 }
 
 export type Project = {
+  id: number;
   title: string;
   description: string;
   shortDescription?: string;

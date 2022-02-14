@@ -1,8 +1,13 @@
 @import '../../facelift.scss';
 
 .ProjectListing {
+    .sublayout-main-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
     .user-projects {
-        max-width: 900px;
+        width: 900px;
         .user-created-project-wrap {
             margin: 32px 0;
             .user-created-project-header {
@@ -41,7 +46,7 @@
         }
     }
     .community-projects {
-        max-width: 900px;
+        width: 900px;
         .project-discovery {
             display: flex;
             justify-content: space-between;

@@ -173,7 +173,7 @@ export const GovernanceSection: m.Component<{mobile: boolean}, {}> = {
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onProjectsPage = (p) => p.startsWith(`/${app.activeChainId()}/projects`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
-    const onMembersPage = (p) => p.startsWith(`/${app.activepChainId()}/members`)
+    const onMembersPage = (p) => p.startsWith(`/${app.activeChainId()}/members`)
     || p.startsWith(`/${app.activeChainId()}/account/`);
 
     if (onNotificationsPage(m.route.get())) return;

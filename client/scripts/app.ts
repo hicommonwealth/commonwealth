@@ -518,7 +518,7 @@ Promise.all([
     '/privacy':                 importRoute('views/pages/landing/privacy', { scoped: false }),
     '/components':              importRoute('views/pages/components', { scoped: false, hideSidebar: true }),
     '/createCommunity':         importRoute('views/pages/create_community', { scoped: false }),
-    '/projects':               importRoute('views/pages/projects/index', { scoped: false }),
+    '/projects':                importRoute('views/pages/projects/index', { scoped: false }),
     ...(isCustomDomain ? {
       //
       // Custom domain routes
@@ -529,7 +529,6 @@ Promise.all([
       '/notification-settings':  importRoute('views/pages/notification_settings', { scoped: true, deferChain: true }),
       '/notifications':          importRoute('views/pages/notifications_page', { scoped: true, deferChain: true }),
       // CMN
-      '/projects':               importRoute('views/pages/projects/index', { scoped: true }),
       '/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),
       '/collectives':            importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
@@ -561,7 +560,8 @@ Promise.all([
       '/tips':                   importRoute('views/pages/tips', { scoped: true }),
       '/validators':             importRoute('views/pages/validators', { scoped: true }),
       // Crowdfund
-      '/crowdfund':              importRoute('views/pages/crowdfund/index', { scoped: true }),
+      '/projects':               importRoute('views/pages/projects/index', { scoped: true }),
+      '/project/:identifier':    importRoute('views/pages/project/view_project', { scoped: true }),
       // Settings
       '/login':                  importRoute('views/pages/login', { scoped: true, deferChain: true }),
       '/web3login':              importRoute('views/pages/web3login', { scoped: true }),

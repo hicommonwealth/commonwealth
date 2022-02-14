@@ -1,6 +1,7 @@
 import { Project } from ".";
 
 export const DummyProject: Project = {
+  id: 1,
   title: 'Project Name',
   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
     + 'Sit ullamcorper tortor pretium amet eget leo. Venenatis id risus at mollis '
