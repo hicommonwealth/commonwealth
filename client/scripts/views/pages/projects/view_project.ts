@@ -11,6 +11,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import PageNotFound from '../404';
 import { DummyProject } from './dummy_project';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import { CWTable } from '../../components/component_kit/cw_table';
 
 interface ProjectPageAttrs {
   identifier: string;
@@ -80,23 +81,24 @@ const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
           ])
         ]),
         m('.project-about', [
-          m('h2', 'About'),
+          m('h1', 'About'),
           m(MarkdownFormattedText, {
             doc: project.description
           }),
         ]),
         m('hr'),
         m('.project-backers', [
-          m('h2', 'Backers')
-          // m(CWTable, {
-          //  className: 'project-backer-table'
-          //  entries: project.backers.map((backer) => {
-          //    m('.backer-row', [
-          //      m(User),
-          //      m('.contribution', backer.contribution)
-          //     ])
-          //  })
-          // })
+          m(CWTable, {
+           className: 'project-backer-table',
+           tableName: 'Backers',
+           headers: ['Backer', 'Amount'],
+           entries: project.backers.map((backer) => {
+             return [
+               m('span', `${backer.backerAddress}`), // TODO: ETH not hardcoded
+               m('span', `${backer.backerAmount} ETH`)
+              ]
+           })
+          })
         ])
       ])
     );

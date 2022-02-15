@@ -34,6 +34,7 @@
         }
         .project-short-description {
             color: $midi-gray;
+            margin-bottom: 16px;
         }
         .project-header-img {
             width: 100%;
@@ -77,14 +78,22 @@
             }
             .right-panel {
                 .Button {
-                    // font-size: 32px;
-                    // width: 400px;
-                    // height: 56px;
+                    font-size: 32px;
+                    width: 400px;
+                    height: 56px;
                 }
             }
         }
+        hr {
+            border-top: 3px solid $background-gray;
+            margin: 48px 0;
+        }
         .project-about {
-    
+            .MarkdownFormattedText > p {
+                font-size: 32px;
+                font-weight: 500;
+                color: $dark-gray;
+            }
         }
         .project-backers-wrap {
             .CWTable {

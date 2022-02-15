@@ -7,6 +7,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import ProjectCard, { ProjectCardSize } from './project_card';
 import Sublayout from '../../sublayout';
 import { DummyProject } from './dummy_project';
+import { CWBacker, CWCurator } from 'client/scripts/controllers/chain/ethereum/projects/participants';
 
 type ProjectProgress = {
   inBlocks: number;
@@ -32,8 +33,8 @@ export type Project = {
   token: any;
   creator: AddressInfo;
   beneficiary: AddressInfo;
-  backers: AddressInfo[];
-  curators: AddressInfo[];
+  backers: CWBacker[];
+  curators: CWCurator[];
   createdAt: moment.Moment;
   progress: ProjectProgress;
   deadline: ProjectDeadline;
