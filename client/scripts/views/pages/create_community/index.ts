@@ -5,14 +5,14 @@ import app from 'state';
 import $ from 'jquery';
 import { Tabs, TabItem, Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
+import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
-import { SputnikForm } from './sputnik_form';
 import { SplTokenForm } from './spl_token_form';
+import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
+import { SubstrateForm } from './substrate_form';
 import { EthChainAttrs } from './types';
-import CosmosForm from './cosmos_form';
 import EthDaoForm from './eth_dao_form';
-import SubstrateForm from './substrate_form';
 
 enum CommunityType {
   StarterCommunity = 'Starter Community',

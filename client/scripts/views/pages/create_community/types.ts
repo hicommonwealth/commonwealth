@@ -31,9 +31,9 @@ export type EthChainAttrs = {
 };
 
 export type EthFormFields = {
-  chain_string: string;
-  eth_chain_id: string | number;
-  node_url: string;
-  alt_wallet_url: string;
-  address: string;
+  chain_string?: string;
+  eth_chain_id?: string | number;
+  node_url?: string;
+  alt_wallet_url?: string;
+  address?: string;
 };
