@@ -61,7 +61,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
 }
 
 type ToggleRowAttrs = {
-  caption?: (e) => void;
+  label?: (e) => void;
   defaultValue: boolean;
   disabled?: boolean;
   onToggle: (e) => void;
@@ -76,20 +76,22 @@ export class ToggleRow implements m.ClassComponent<ToggleRowAttrs> {
   }
 
   view(vnode) {
-    const { caption, disabled, onToggle, title } = vnode.attrs;
+    const { label, disabled, onToggle, title } = vnode.attrs;
 
     return (
       <div class="ToggleRow">
         <label>{title}</label>
-        <Switch
-          checked={this.checked}
-          disabled={disabled || false}
-          onchange={() => {
-            this.checked = !this.checked;
-            onToggle(this.checked);
-          }}
-        />
-        {caption && <div class="switch-caption">{caption(this.checked)}</div>}
+        <div class="toggle-and-label">
+          <Switch
+            checked={this.checked}
+            disabled={disabled || false}
+            onchange={() => {
+              this.checked = !this.checked;
+              onToggle(this.checked);
+            }}
+          />
+          {label && <div class="switch-label">{label(this.checked)}</div>}
+        </div>
       </div>
     );
   }

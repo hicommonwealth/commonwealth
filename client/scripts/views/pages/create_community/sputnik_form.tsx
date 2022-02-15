@@ -47,7 +47,7 @@ export class SputnikForm implements m.ClassComponent {
           onToggle={(checked) => {
             vnode.state.isMainnet = checked;
           }}
-          caption={(checked) => {
+          label={(checked) => {
             if (checked !== this.state.form.isMainnet) {
               return 'Unknown network!';
             }
@@ -103,7 +103,9 @@ export class SputnikForm implements m.ClassComponent {
             };
 
             try {
-              // verify the DAO exists (not used)
+              // Gabe 2/14/22 Commenting this bit out because it isn't actually used, but maybe it will be someday?
+              //
+              // verify the DAO exists
               //   const config: ConnectConfig = {
               //     networkId: isMainnet ? 'mainnet' : 'testnet',
               //     nodeUrl: url,
