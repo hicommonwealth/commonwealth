@@ -1,6 +1,6 @@
-import { CWBacker } from "controllers/chain/ethereum/projects/participants";
-import moment from "moment";
-import { Project } from ".";
+import { CWBacker } from 'controllers/chain/ethereum/projects/participants';
+import moment from 'moment';
+import { Project } from '.';
 
 export const DummyProject: Project = {
   id: 1,

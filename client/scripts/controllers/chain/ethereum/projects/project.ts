@@ -6,18 +6,32 @@ import { BigNumber, providers } from 'ethers';
 import { IProject, IProject__factory } from 'eth/types';
 import ParticipantStore from './participant_store';
 import { CWBacker, CWCurator } from './participants';
+import { attachSigner } from '../contractApi';
 
 export class CWProject {
   private _Contract: IProject;
+  public get Contract() { return this._Contract; }
+
   private _Provider: providers.Provider;
+  public get Provider() { return this._Provider; }
+
   private _address: string;
-  // AAVE has equivalent—controllers/chain/ethereum/aave/proposal init call
-  // $.getJSON(`https://ipfs.infura.io:5001/api/v0/cat?arg=${this._ipfsAddress}`).then((ipfsData) => {
-  //   this._ipfsData = ipfsData;
-  // }).catch((e) => console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`));
+  public get address() { return this._address; }
 
   private _initialized: boolean;
   public get initialized() { return this._initialized; }
+
+  private _id: number;
+  public get id() { return this._id; }
+
+  private _ipfsHash: string;
+  public get ipfsHash() { return this._ipfsHash; }
+
+  private _beneficiary: string;
+  public get beneficiary() { return this._beneficiary; }
+
+  private _creator: string;
+  public get creator() { return this._creator; }
 
   private _title: string;
   public get title() { return this._title; }
@@ -44,19 +58,23 @@ export class CWProject {
   public get curators() { return this._curators; }
 
   constructor(
-    public readonly provider: providers.Provider,
-    public readonly address: string,
-    public readonly id: number,
-    public readonly ipfsHash: string,
-    public readonly beneficiary: string,
-    public readonly creator: string,
+    provider: providers.Provider,
+    address: string,
+    id: number,
+    ipfsHash: string,
+    beneficiary: string,
+    creator: string,
     title: string,
     description: string,
     deadline: moment.Moment,
     threshold: string,
     curatorFee: number,
   ) {
+    this._id = id;
     this._Provider = provider;
+    this._ipfsHash = ipfsHash;
+    this._beneficiary = beneficiary;
+    this._creator = creator;
     this._address = address;
     this._title = title;
     this._description = description;
@@ -77,11 +95,13 @@ export class CWProject {
 
   // Wll not work until we figure out how to get a wallet
   public async back(value: string) {
-    // throw an error—UI element shouldn't be availble til this._initialized
-    // TODO: get a signer / provider?
-    const tx = await this._Contract.back('token', value, { from: 'callers address' });
+    if (!this.initialized) {
+      throw new Error('Project not initialized')
+    }
+    const backerAddress = app.user.activeAccount.address;
+    const contract = await attachSigner(app.wallets, backerAddress, this.Contract);
+    const tx = await contract.back('token', value, { from: 'callers address' });
     const txReceipt = await tx.wait();
-    // attachSigner, activeAddress as from
     if (txReceipt.status !== 1) {
       throw new Error('Failed to back');
     }
@@ -110,7 +130,12 @@ export class CWProject {
   }
 
   public async curate(value: string) {
-    const tx = await this._Contract.curate('token', value, { from: 'callers address' });
+    if (!this.initialized) {
+      throw new Error('Project not initialized')
+    }
+    const curatorAddress = app.user.activeAccount.address;
+    const contract = await attachSigner(app.wallets, curatorAddress, this.Contract);
+    const tx = await contract.curate('token', value, { from: 'callers address' });
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to back');
@@ -137,28 +162,47 @@ export class CWProject {
   }
 
   public async beneficiaryWithdraw() {
-    const tx = await this._Contract.beneficiaryWithdraw(); // TODO: Flesh out
+    if (!this.initialized) {
+      throw new Error('Project not initialized')
+    }
+
+    const contract = await attachSigner(app.wallets, this.beneficiary, this.Contract);
+    const tx = await contract.beneficiaryWithdraw(); // TODO: Flesh out
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
-      throw new Error('Failed to back');
+      throw new Error('Failed to withdraw funds');
     }
     return txReceipt;
   }
 
   public async backerWithdraw() {
-    const tx = await this._Contract.backerWithdraw(); // TODO: Flesh out
+    if (!this.initialized) {
+      throw new Error('Project not initialized')
+    }
+    // TODO: Do we want to check/list/display which addresses they've backed under, to
+    // prevent confusion / them searching through looking for funds?
+    const backerAddress = app.user.activeAccount.address;
+    const contract = await attachSigner(app.wallets, backerAddress, this.Contract);
+    const tx = await contract.backerWithdraw(); // TODO: Flesh out
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
-      throw new Error('Failed to back');
+      throw new Error('Failed to withdraw funds');
     }
     return txReceipt;
   }
 
   public async curatorWithdraw() {
-    const tx = await this._Contract.curatorWithdraw(); // TODO: Flesh out
+    if (!this.initialized) {
+      throw new Error('Project not initialized')
+    }
+    // TODO: Do we want to check/list/display which addresses they've curated under, to
+    // prevent confusion / them searching through looking for funds?
+    const curatorAddress = app.user.activeAccount.address;
+    const contract = await attachSigner(app.wallets, curatorAddress, this.Contract);
+    const tx = await contract.curatorWithdraw(); // TODO: Flesh out
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
-      throw new Error('Failed to back');
+      throw new Error('Failed to withdraw funds');
     }
     return txReceipt;
   }

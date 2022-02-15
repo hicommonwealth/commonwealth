@@ -1,9 +1,10 @@
 import { providers } from 'ethers';
 import moment from 'moment';
-import app from 'state';
-import { IProjectFactory, IProjectFactory__factory } from 'eth/types';
+import app, { IApp } from 'state';
+import { IProjectFactory, IProjectFactory__factory } from 'shared/eth/types';
 import { AddressInfo } from 'models';
 import { CWProject } from './project';
+import { attachSigner } from '../contractApi';
 
 // For project creation input
 interface IProjectCreationData {
@@ -28,6 +29,7 @@ export class CWProjectFactory {
   // Prefer true readonly if you can set it in constructor
   // Consider passing in a single variable
   private _Provider: providers.Provider;
+  public get Provider() { return this._Provider; }
 
   private _Contract: IProjectFactory;
   public get Contract() { return this._Contract; }
@@ -63,21 +65,33 @@ export class CWProjectFactory {
   public async init(url: string, contractAddress: string, activeUserId: number) {
     this._Provider = new providers.WebSocketProvider(url);
     this._Contract = IProjectFactory__factory.connect(contractAddress, this._Provider);
-    // might need an await this._Contract.deployed
+    await this._Contract.deployed();
     const response = await $.post(`${app.serverUrl()}/getUserProjects`, {
       'user': activeUserId,
     });
     this._Projects = response.result.map((project) => {
-      // switch to passing in object
+      // switch to passing in object?
       // check out chain controllers—initAPI vs initData
       return new CWProject(
         this._Provider,
-        project
+        project.ipfsHash, // TODO: Reconcile this against address
+        project.id,
+        project.ipfsHash,
+        project.beneficiary,
+        project.creator,
+        project.title,
+        project.description,
+        moment(project.deadline),
+        project.threshold,
+        project.curatorFee,
       )
     })
   }
 
-  public async createProject(projectData: IProjectCreationData, chain, creator) {
+  public async createProject(projectData: IProjectCreationData, chain) {
+    // TODO: Create Project form should notify users that on-chain title will be truncated
+    // to 32 chars
+    // Form should represent token addresses as dropdown input (discrete options)
     if (!this.acceptedTokens.includes(projectData.token)) {
       throw new Error('Invalid token');
     }
@@ -88,40 +102,48 @@ export class CWProjectFactory {
       throw new Error('Invalid threshold/goal');
     }
 
-    const curatorFee = Math.min(projectData.curatorFee, 10000 - this._protocolFee);
-    // const title = // TODO: Shorten on-chain title automatically to max length to save space?
-    const contractProject = await this._Contract.create(
-      projectData.title,
-      projectData.beneficiary,
-      projectData.token,
-      projectData.threshold,
-      projectData.deadline,
+    const curatorFee = Math.min(projectData.curatorFee, 10000 - this.protocolFee);
+
+    const { beneficiary, title, description, token, threshold, deadline } = projectData;
+    const creator = this.app.user.activeAccount.address;
+    const contract = await attachSigner(this.app.wallets, creator, this.Contract);
+
+    const tx = await contract.create(
+      creator,
+      beneficiary,
+      title.slice(0, 32),
+      token,
+      threshold,
+      deadline,
       curatorFee
     );
-    // look up attachSigner fn b/c you'll need a wallet tx
-    // contractProject is a tx object; wait for it to complete
-    // make sure isnt' added to db if fail
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error(`Failed to create project contract`);
+    }
+
+    console.log({ tx, txReceipt });
+    // if contractProject.success (roughly) -->
 
     try {
       const response = await $.post(`${app.serverUrl()}/createProject`, {
         // 'ipfsHash': ipfsHash, TODO: How to get IPFS Hash
         'chain': chain,
         'creator': creator,
-        'beneficiary': projectData.beneficiary,
-        'title': projectData.title,
-        'description': projectData.description,
-        'token': projectData.token,
-        'threshold': projectData.threshold,
-        'deadline': projectData.deadline,
-        'curatorFee': projectData.curatorFee
+        'beneficiary': beneficiary,
+        'title': title,
+        'description': description,
+        'token': token,
+        'threshold': threshold,
+        'deadline': deadline,
+        'curatorFee': curatorFee
       });
 
       const { result } = response;
 
       const project = new CWProject(
         this._Provider,
-        // TODO reconcile against other hashes/addresses, understand how they are similar or distinct
-        contractProject.hash,
+        txReceipt.hash,
         result.id,
         result.ipfsHash,
         result.beneficiary,
@@ -130,7 +152,7 @@ export class CWProjectFactory {
         result.description,
         moment(result.deadline),
         result.threshold,
-        result.curatorFee
+        result.curatorFee,
       );
 
       this._Projects.push(project);
