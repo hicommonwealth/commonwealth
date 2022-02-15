@@ -7,7 +7,7 @@ import { Tabs, TabItem, Spinner } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import { ERC20Form } from './erc20_form';
 import SubstrateForm from './substrate_form';
-import SputnikForm from './sputnik_form';
+import { SputnikForm } from './sputnik_form';
 import CosmosForm from './cosmos_form';
 import EthDaoForm from './eth_dao_form';
 import SplTokenForm from './spl_token_form';

@@ -150,7 +150,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             !this.state.form.eth_chain_id ||
             this.state.loading
           }
-          onclick={async (e) => {
+          onclick={async () => {
             await updateTokenForum();
           }}
         />

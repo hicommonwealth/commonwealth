@@ -1,7 +1,7 @@
 export type ChainFormIdFields = {
-  id: string;
+  id?: string;
   name: string;
-  symbol: string;
+  symbol?: string;
 };
 
 export type ChainFormDefaultFields = {
