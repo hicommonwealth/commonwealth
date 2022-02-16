@@ -373,7 +373,8 @@ function setupPassport(models: DB) {
     clientSecret: DISCORD_CLIENT_SECRET,
     scope: DISCORD_OAUTH_SCOPES,
     passReqToCallback: true,
-    authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none'
+    authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none',
+    callbackURL: DISCORD_OAUTH_CALLBACK
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     await authenticateSocialAccount(Providers.DISCORD,  req, accessToken, refreshToken, profile, cb, models)
   }))
