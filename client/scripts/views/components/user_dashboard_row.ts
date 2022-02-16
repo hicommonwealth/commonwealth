@@ -12,13 +12,19 @@ import {
   CompoundEvents,
   AaveEvents,
   CWEvent,
-  Label as ChainEventLabel
+  Label as ChainEventLabel,
   // CompoundEvents
 } from '@commonwealth/chain-events';
 
 import app from 'state';
 import { NotificationCategories, ProposalType } from 'types';
-import { Notification, AddressInfo, NotificationCategory, DashboardActivityNotification, NotificationSubscription } from 'models';
+import {
+  Notification,
+  AddressInfo,
+  NotificationCategory,
+  DashboardActivityNotification,
+  NotificationSubscription,
+} from 'models';
 import { link, pluralize } from 'helpers';
 import { IPostNotificationData } from 'shared/types';
 
@@ -33,7 +39,6 @@ import { NumberList } from 'aws-sdk/clients/iot';
 import { Category } from 'typescript-logging';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { ChainIcon } from './chain_icon';
-
 
 const getCommentPreview = (commentText) => {
   let decodedCommentText;
@@ -63,372 +68,411 @@ const getCommentPreview = (commentText) => {
 
 // Subscriptions
 const subscribeToThread = async (
-                          threadId: string, 
-                          bothActive: boolean, 
-                          commentSubscription: NotificationSubscription, 
-                          reactionSubscription: NotificationSubscription
-                          ) => {
+  threadId: string,
+  bothActive: boolean,
+  commentSubscription: NotificationSubscription,
+  reactionSubscription: NotificationSubscription
+) => {
   const adjustedId = 'discussion_' + threadId;
   if (bothActive) {
-    await app.user.notifications.disableSubscriptions([commentSubscription, reactionSubscription]);
-      notifySuccess('Unsubscribed!');
+    await app.user.notifications.disableSubscriptions([
+      commentSubscription,
+      reactionSubscription,
+    ]);
+    notifySuccess('Unsubscribed!');
   } else if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
-      app.user.notifications.subscribe(NotificationCategories.NewReaction, adjustedId),
-      app.user.notifications.subscribe(NotificationCategories.NewComment, adjustedId),
+      app.user.notifications.subscribe(
+        NotificationCategories.NewReaction,
+        adjustedId
+      ),
+      app.user.notifications.subscribe(
+        NotificationCategories.NewComment,
+        adjustedId
+      ),
     ]);
     notifySuccess('Subscribed!');
   } else {
-    await app.user.notifications.enableSubscriptions([commentSubscription, reactionSubscription]);
+    await app.user.notifications.enableSubscriptions([
+      commentSubscription,
+      reactionSubscription,
+    ]);
     notifySuccess('Subscribed!');
   }
-}
-
+};
 
 // Discuss, Share, and Subscribe Buttons
 const ButtonRow: m.Component<{
-    path: string;
-    threadId: string;
-    showDiscussion: boolean;
-    showShare: boolean;
-    showSubscribe: boolean;
+  path: string;
+  threadId: string;
+  showDiscussion: boolean;
+  showShare: boolean;
+  showSubscribe: boolean;
 }> = {
-    view: (vnode) => {
-        const {path, threadId, showDiscussion, showShare, showSubscribe} = vnode.attrs;
+  view: (vnode) => {
+    const { path, threadId, showDiscussion, showShare, showSubscribe } =
+      vnode.attrs;
 
-        const adjustedId = 'discussion_' + threadId;
-        const commentSubscription = app.user.notifications.subscriptions
-          .find((v) => v.objectId === adjustedId && v.category === NotificationCategories.NewComment);
-        const reactionSubscription = app.user.notifications.subscriptions
-          .find((v) => v.objectId === adjustedId && v.category === NotificationCategories.NewReaction);
-        const bothActive = (commentSubscription?.isActive && reactionSubscription?.isActive);
-        
-        return m('.icon-row-left', [
-          showDiscussion && (
-            m(Button, {
-              label: 'discuss',
-              buttonSize: 'sm',
-              iconLeft: Icons.PLUS,
-              rounded: true,
-              onclick: (e) => {
-                e.stopPropagation();
-                m.route.set(path);
-              },
-            })
-          ),
-          showShare && (
-            m('.share-button', {
-              onclick: (e) => {
-                e.stopPropagation();
-              }
-            }, [
-              m(PopoverMenu, {
-                transitionDuration: 0,
-                closeOnOutsideClick: true,
-                closeOnContentClick: true,
-                menuAttrs: { size: 'default' },
-                content: [
-                  m(MenuItem, {
-                    iconLeft: Icons.COPY,
-                    label: 'Copy URL',
-                    onclick: async (e) => {
-                      await navigator.clipboard.writeText(path);
-                    },
-                  }),
-                  m(MenuItem, {
-                    iconLeft: Icons.TWITTER,
-                    label: 'Share on Twitter',
-                    onclick: async (e) => {
-                      await window.open(`https://twitter.com/intent/tweet?text=${path}`, '_blank');
-                    }
-                  }),
-                ],
-                trigger: m(Button, {
-                  buttonSize: 'sm',
-                  label: 'share',
-                  iconLeft: Icons.SHARE,
-                  rounded: true,
-                  onclick: (e) => {},
+    const adjustedId = 'discussion_' + threadId;
+    const commentSubscription = app.user.notifications.subscriptions.find(
+      (v) =>
+        v.objectId === adjustedId &&
+        v.category === NotificationCategories.NewComment
+    );
+    const reactionSubscription = app.user.notifications.subscriptions.find(
+      (v) =>
+        v.objectId === adjustedId &&
+        v.category === NotificationCategories.NewReaction
+    );
+    const bothActive =
+      commentSubscription?.isActive && reactionSubscription?.isActive;
+
+    return m('.icon-row-left', [
+      showDiscussion &&
+        m(Button, {
+          label: 'discuss',
+          buttonSize: 'sm',
+          iconLeft: Icons.PLUS,
+          rounded: true,
+          onclick: (e) => {
+            e.stopPropagation();
+            m.route.set(path);
+          },
+        }),
+      showShare &&
+        m(
+          '.share-button',
+          {
+            onclick: (e) => {
+              e.stopPropagation();
+            },
+          },
+          [
+            m(PopoverMenu, {
+              transitionDuration: 0,
+              closeOnOutsideClick: true,
+              closeOnContentClick: true,
+              menuAttrs: { size: 'default' },
+              content: [
+                m(MenuItem, {
+                  iconLeft: Icons.COPY,
+                  label: 'Copy URL',
+                  onclick: async (e) => {
+                    await navigator.clipboard.writeText(path);
+                  },
                 }),
+                m(MenuItem, {
+                  iconLeft: Icons.TWITTER,
+                  label: 'Share on Twitter',
+                  onclick: async (e) => {
+                    await window.open(
+                      `https://twitter.com/intent/tweet?text=${path}`,
+                      '_blank'
+                    );
+                  },
+                }),
+              ],
+              trigger: m(Button, {
+                buttonSize: 'sm',
+                label: 'share',
+                iconLeft: Icons.SHARE,
+                rounded: true,
+                onclick: (e) => {},
               }),
-            ])
-          ),
-          showSubscribe && (
-            m(Button, {
-              buttonSize: 'sm',
-              label: bothActive ? 'unsubscribe' : 'subscribe',
-              iconLeft: Icons.BELL,
-              rounded: true,
-              class: bothActive ? 'subscribe-button' : '',
-              onclick: (e) => {
-                e.stopPropagation();
-                subscribeToThread(threadId, bothActive, commentSubscription, reactionSubscription);
-              },
-            })
-          )
-        ])
-    }
-}
+            }),
+          ]
+        ),
+      showSubscribe &&
+        m(Button, {
+          buttonSize: 'sm',
+          label: bothActive ? 'unsubscribe' : 'subscribe',
+          iconLeft: Icons.BELL,
+          rounded: true,
+          class: bothActive ? 'subscribe-button' : '',
+          onclick: (e) => {
+            e.stopPropagation();
+            subscribeToThread(
+              threadId,
+              bothActive,
+              commentSubscription,
+              reactionSubscription
+            );
+          },
+        }),
+    ]);
+  },
+};
 
 // The Likes, Comments, Views Counters
 const ActivityIcons: m.Component<{
-    viewCount: number;
-    likeCount: number;
-    commentCount: number;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
 }> = {
-    view: (vnode) => {
-        const {viewCount, likeCount, commentCount} = vnode.attrs;
+  view: (vnode) => {
+    const { viewCount, likeCount, commentCount } = vnode.attrs;
 
-        return m('.icon-row-right', [
-            viewCount && viewCount > 0 && ( 
-                m(Button, {
-                  iconLeft: Icons.EYE,
-                  label: viewCount,
-                  compact: true,
-                  outlined: false,
-                })
-            ), 
-            likeCount && likeCount > 0 && ( 
-                m(Button, {
-                    iconLeft: Icons.HEART,
-                    label: likeCount,
-                    compact: true,
-                    outlined: false,
-                })
-            ), 
-            commentCount && commentCount > 0 && ( 
-                m(Button, {
-                    iconLeft: Icons.MESSAGE_SQUARE,
-                    label: commentCount,
-                    compact: true,
-                    outlined: false,
-                })
-            ), 
-        ])
-    }
-}
-
+    return m('.icon-row-right', [
+      viewCount &&
+        viewCount > 0 &&
+        m(Button, {
+          iconLeft: Icons.EYE,
+          label: viewCount,
+          compact: true,
+          outlined: false,
+        }),
+      likeCount &&
+        likeCount > 0 &&
+        m(Button, {
+          iconLeft: Icons.HEART,
+          label: likeCount,
+          compact: true,
+          outlined: false,
+        }),
+      commentCount &&
+        commentCount > 0 &&
+        m(Button, {
+          iconLeft: Icons.MESSAGE_SQUARE,
+          label: commentCount,
+          compact: true,
+          outlined: false,
+        }),
+    ]);
+  },
+};
 
 const ActivityContent: m.Component<{
-    activityData: any;
-    category: string;
+  activityData: any;
+  category: string;
 }> = {
-    view: (vnode) => {
-        const {
-          created_at,
-          chain_id,
-          root_id, 
-          root_title, 
-          author_chain,
-          author_address, 
-          comment_text, 
-          root_type,
-        } = JSON.parse(vnode.attrs.activityData.notificationData);
+  view: (vnode) => {
+    const {
+      created_at,
+      chain_id,
+      root_id,
+      root_title,
+      author_chain,
+      author_address,
+      comment_text,
+      root_type,
+    } = JSON.parse(vnode.attrs.activityData.notificationData);
 
-        const {likeCount, viewCount, commentCount} = vnode.attrs.activityData;
-        
-        const numericalCommentCount = parseInt(commentCount);
+    const { likeCount, viewCount, commentCount } = vnode.attrs.activityData;
 
-        const communityName = app.config.chains.getById(chain_id)?.name || 'Unknown chain';
-        const decodedTitle = decodeURIComponent(root_title).trim();
-        const titleText = decodedTitle.length > 50 ? decodedTitle.slice(0, 47) + '...' : decodedTitle;
+    const numericalCommentCount = parseInt(commentCount);
 
-        // Get Author of Notification
-        const actorName = m(User, {
-          user: new AddressInfo(null, author_address, author_chain ?? chain_id, null),
-          hideIdentityIcon: false,
-          linkify: true,
-          onclick: (e: any) => {
-            e.preventDefault();
-            e.stopPropagation();
-            m.route.set(`/${author_chain}/account/${author_address}`);
-          },
-        });
+    const communityName =
+      app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    const decodedTitle = decodeURIComponent(root_title).trim();
+    const titleText =
+      decodedTitle.length > 50
+        ? decodedTitle.slice(0, 47) + '...'
+        : decodedTitle;
 
+    // Get Author of Notification
+    const actorName = m(User, {
+      user: new AddressInfo(
+        null,
+        author_address,
+        author_chain ?? chain_id,
+        null
+      ),
+      hideIdentityIcon: false,
+      linkify: true,
+      onclick: (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+        m.route.set(`/${author_chain}/account/${author_address}`);
+      },
+    });
 
-        if (vnode.attrs.category === 'new-comment-creation') { // New Comment
-          return m('.new-comment', [
-            m('span.header', [
-              actorName,
-              m('span.comment-counts', [
-                numericalCommentCount > 1 ? 
-                [' and ', numericalCommentCount - 1, ' others'] : '',
-                ' commented on ',
-              ]),
-              m('span.community-title', [
-                titleText,
-              ]),
-              m('span.comment-counts', [' in ']),
-              m('span.community-link', {
-                onclick: (e) => { 
-                  e.preventDefault();
-                  e.stopPropagation();
-                  m.route.set(`/${chain_id}`)
-                }
-              }, [communityName])
-            ]),
-            m('.comment-body-concat', [
-              getCommentPreview(comment_text)
-            ])
-          ])
-        } else if (vnode.attrs.category === 'new-thread-creation') {
-          return m('.new-comment', [
-            m('span.header', [
-              actorName,
-              m('span.comment-counts', [
-                ' created new thread ',
-              ]),
-              m('span.community-title', [
-                titleText,
-              ]),
-              m('span.comment-counts', [' in ']),
-              m('span.community-link', {
-                onclick: (e) => { 
-                  e.preventDefault();
-                  e.stopPropagation();
-                  m.route.set(`/${chain_id}`)
-                }
-              }, [communityName])
-            ]),
-            
-          ])
-        }
-        return actorName
+    if (vnode.attrs.category === 'new-comment-creation') {
+      // New Comment
+      return m('.new-comment', [
+        m('span.header', [
+          actorName,
+          m('span.comment-counts', [
+            numericalCommentCount > 1
+              ? [' and ', numericalCommentCount - 1, ' others']
+              : '',
+            ' commented on ',
+          ]),
+          m('span.community-title', [titleText]),
+          m('span.comment-counts', [' in ']),
+          m(
+            'span.community-link',
+            {
+              onclick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                m.route.set(`/${chain_id}`);
+              },
+            },
+            [communityName]
+          ),
+        ]),
+        m('.comment-body-concat', [getCommentPreview(comment_text)]),
+      ]);
+    } else if (vnode.attrs.category === 'new-thread-creation') {
+      return m('.new-comment', [
+        m('span.header', [
+          actorName,
+          m('span.comment-counts', [' created new thread ']),
+          m('span.community-title', [titleText]),
+          m('span.comment-counts', [' in ']),
+          m(
+            'span.community-link',
+            {
+              onclick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                m.route.set(`/${chain_id}`);
+              },
+            },
+            [communityName]
+          ),
+        ]),
+      ]);
     }
-}
-
+    return actorName;
+  },
+};
 
 const UserDashboardRow: m.Component<
-{
-  notification: DashboardActivityNotification;
-  onListPage?: boolean;
-},
-{
-  Labeler: any;
-  MolochTypes: any;
-  SubstrateTypes: any;
-  scrollOrStop: boolean;
-  markingRead: boolean;
-}
+  {
+    notification: DashboardActivityNotification;
+    onListPage?: boolean;
+  },
+  {
+    Labeler: any;
+    MolochTypes: any;
+    SubstrateTypes: any;
+    scrollOrStop: boolean;
+    markingRead: boolean;
+  }
 > = {
-    view: (vnode) => {
-        const { 
-          likeCount, 
-          viewCount,
-          commentCount, 
-          categoryId, 
-          threadId, 
-          createdAt, 
-          typeId, 
-          updatedAt, 
-          blockNumber, 
-          eventNetwork, 
-          chain, 
-          iconUrl
-        } = vnode.attrs.notification;
+  view: (vnode) => {
+    const {
+      likeCount,
+      viewCount,
+      commentCount,
+      categoryId,
+      threadId,
+      createdAt,
+      typeId,
+      updatedAt,
+      blockNumber,
+      eventNetwork,
+      chain,
+      iconUrl,
+    } = vnode.attrs.notification;
 
-        // ----------- Handle Chain Events ----------- //
-        if (categoryId === 'chain-event') {
-          const chainEvent: CWEvent = {
-            blockNumber: blockNumber,
-            network: eventNetwork,
-            data: vnode.attrs.notification.eventData,
-          };
-          const label = ChainEventLabel(chain, chainEvent);
-          const chainEventLink = `/${chain}`;
+    // ----------- Handle Chain Events ----------- //
+    if (categoryId === 'chain-event') {
+      const chainEvent: CWEvent = {
+        blockNumber: blockNumber,
+        network: eventNetwork,
+        data: vnode.attrs.notification.eventData,
+      };
+      const label = ChainEventLabel(chain, chainEvent);
+      const communityName =
+        app.config.chains.getById(chain)?.name || 'Unknown chain';
 
-          const communityName = app.config.chains.getById(chain)?.name || 'Unknown chain';
-
-          return m('.UserDashboardRow', {
-            onclick: () => {
-              if (label.linkUrl) {
-                m.route.set(label.linkUrl);
-              } else {
-                notifyError('No Link Available!')
-              }
-              m.redraw();
-            }
-          }, [
-              m('.activity-content', [
-                m('img.chain-icon', {
-                  style: `width: 25px; height: 25px;`,
-                  src: iconUrl,
-                }),
-                m('.new-comment', [
-                  m('span.header', [
-                    m('span.community-title', [
-                      label.heading,
-                    ]),
-                    m('span.comment-counts', [' in ']),
-                    m('span.community-link', {
-                      onclick: (e) => { 
-                        e.preventDefault();
-                        e.stopPropagation();
-                        m.route.set(`/${chain}`)
-                      }
-                    }, [communityName]),
-                    m('span.block-number', [
-                      ' Block ' + blockNumber
-                    ]),
-                  ]),
-                  m('.event-body', [
-                    label.label
-                  ])
-                ])
-              ]),
-          ])
-        }
-        
-        // ----------- Handle Notifications ----------- //
-        const {
-          created_at,
-          chain_id,
-          root_id, 
-          root_title, 
-          author_chain,
-          author_address, 
-          comment_text, 
-          root_type,
-        } = JSON.parse(vnode.attrs.notification.notificationData);
-
-        // Get Path to Proposal
-        const pseudoProposal = {
-          id: root_id,
-          title: root_title,
-          chain: chain_id,
-        };
-        const args = [root_type, pseudoProposal];
-        const path = (getProposalUrl as any)(...args);
-    
-        return m('.UserDashboardRow', {
+      return m(
+        '.UserDashboardRow',
+        {
           onclick: () => {
-            m.route.set(path);
+            if (label.linkUrl) {
+              m.route.set(label.linkUrl);
+            } else {
+              notifyError('No Link Available!');
+            }
             m.redraw();
-          }
-        }, [
-            m('.activity-content', [
-                m(ActivityContent, {
-                    activityData: vnode.attrs.notification,
-                    category: categoryId
-                })
+          },
+        },
+        [
+          m('.activity-content', [
+            m('img.chain-icon', {
+              style: `width: 25px; height: 25px;`,
+              src: iconUrl,
+            }),
+            m('.new-comment', [
+              m('span.header', [
+                m('span.community-title', [label.heading]),
+                m('span.comment-counts', [' in ']),
+                m(
+                  'span.community-link',
+                  {
+                    onclick: (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      m.route.set(`/${chain}`);
+                    },
+                  },
+                  [communityName]
+                ),
+                m('span.block-number', [' Block ' + blockNumber]),
+              ]),
+              m('.event-body', [label.label]),
             ]),
-            m('.icon-row', [
-                m(ButtonRow, {
-                  path, 
-                  threadId: threadId,
-                  showDiscussion: true,
-                  showShare: true,
-                  showSubscribe: true
-                }),
-                m(ActivityIcons, {
-                    viewCount,
-                    commentCount,
-                    likeCount
-                })
-
-            ])
-        ])
+          ]),
+        ]
+      );
     }
-}
+
+    // ----------- Handle Notifications ----------- //
+    const {
+      created_at,
+      chain_id,
+      root_id,
+      root_title,
+      author_chain,
+      author_address,
+      comment_text,
+      root_type,
+    } = JSON.parse(vnode.attrs.notification.notificationData);
+
+    // Get Path to Proposal
+    const pseudoProposal = {
+      id: root_id,
+      title: root_title,
+      chain: chain_id,
+    };
+    const args = [root_type, pseudoProposal];
+    const path = (getProposalUrl as any)(...args);
+
+    return m(
+      '.UserDashboardRow',
+      {
+        onclick: () => {
+          m.route.set(path);
+          m.redraw();
+        },
+      },
+      [
+        m('.activity-content', [
+          m(ActivityContent, {
+            activityData: vnode.attrs.notification,
+            category: categoryId,
+          }),
+        ]),
+        m('.icon-row', [
+          m(ButtonRow, {
+            path,
+            threadId: threadId,
+            showDiscussion: true,
+            showShare: true,
+            showSubscribe: true,
+          }),
+          m(ActivityIcons, {
+            viewCount,
+            commentCount,
+            likeCount,
+          }),
+        ]),
+      ]
+    );
+  },
+};
 
 export default UserDashboardRow;
