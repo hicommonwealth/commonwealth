@@ -1,21 +1,12 @@
 @import 'client/styles/shared';
 @import 'client/styles/facelift';
 
-.CreateCommunityPage {
+.CreateCommunityIndex {
   width: 100%;
 
-  @include sm-max {
-    width: initial;
-  }
-
-  .create-community-wrapper {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-
-    h3 {
-      margin-top: 16px;
-    }
+  h3 {
+    margin: 16px auto;
+    text-align: center;
   }
 
   .CreateCommunityForm {
