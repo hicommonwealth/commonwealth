@@ -9,7 +9,12 @@ import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
-import { InputRow, SelectRow } from 'views/components/metadata_rows';
+import {
+  IdRow,
+  InputRow,
+  SelectRow,
+  ValidationRow,
+} from 'views/components/metadata_rows';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -100,10 +105,7 @@ export class SplTokenForm implements m.ClassComponent {
             await updateTokenForum();
           }}
         />
-        <div class="validation-container">
-          {this.state.error && <div class="error">{this.state.error}</div>}
-          {this.state.status && <div class="status">{this.state.status}</div>}
-        </div>
+        <ValidationRow error={this.state.error} status={this.state.status} />
         <InputRow
           title="Name"
           defaultValue={this.state.form.name}
@@ -113,14 +115,7 @@ export class SplTokenForm implements m.ClassComponent {
             this.state.form.id = slugifyPreserveDashes(v);
           }}
         />
-        <div class="IDRow">
-          <label>ID</label>
-          <div class={`id ${!this.state.form.id.length && 'placeholder'}`}>
-            {!this.state.form.id.length
-              ? 'ID will show up here based on your name'
-              : this.state.form.id}
-          </div>
-        </div>
+        <IdRow id={this.state.form.id} />
         <InputRow
           title="Symbol"
           disabled={disableField}

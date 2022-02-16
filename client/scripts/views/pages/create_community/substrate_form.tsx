@@ -77,6 +77,7 @@ export class SubstrateForm implements m.ClassComponent {
         />
         <CWButton
           label="Test Connection"
+          className="button-margin-bottom"
           onclick={async () => {
             // deinit substrate API if one exists
             if (app.chain?.apiInitialized) {

@@ -10,7 +10,7 @@ import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
-import { InputRow, SelectRow } from 'views/components/metadata_rows';
+import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
 import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -50,14 +50,7 @@ export class StarterCommunityForm implements m.ClassComponent {
             this.state.form.id = slugifyPreserveDashes(v);
           }}
         />
-        <div class="IDRow">
-          <label>ID</label>
-          <div class={`id ${!this.state.form.id.length && 'placeholder'}`}>
-            {!this.state.form.id.length
-              ? 'ID will show up here based on your name'
-              : this.state.form.id}
-          </div>
-        </div>
+        <IdRow id={this.state.form.id} />
         <InputRow
           title="Symbol"
           defaultValue={this.state.form.symbol}

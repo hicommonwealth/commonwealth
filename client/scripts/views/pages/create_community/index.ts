@@ -1,9 +1,10 @@
-import 'pages/create_community.scss';
-
 import m from 'mithril';
-import app from 'state';
 import $ from 'jquery';
 import { Tabs, TabItem, Spinner } from 'construct-ui';
+
+import 'pages/create_community.scss';
+
+import app from 'state';
 import Sublayout from 'views/sublayout';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';

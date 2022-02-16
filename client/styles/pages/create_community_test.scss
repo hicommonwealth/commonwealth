@@ -50,6 +50,10 @@
     }
   }
 
+  .button-margin-bottom {
+    margin-bottom: 20px;
+  }
+
   .validation-container {
     @include form-label;
     height: 20px;

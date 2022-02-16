@@ -4,6 +4,7 @@ import m from 'mithril';
 import { Select, Switch, TextArea } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
+import { Strings } from 'aws-sdk/clients/opsworks';
 
 type InputRowAttrs = {
   defaultValue: string;
@@ -118,6 +119,41 @@ export class SelectRow implements m.ClassComponent<SelectRowAttrs> {
           }}
           defaultValue={value}
         />
+      </div>
+    );
+  }
+}
+
+type IdRowAttrs = { id: string };
+
+export class IdRow implements m.ClassComponent<IdRowAttrs> {
+  view(vnode) {
+    const { id } = vnode.attrs;
+
+    return (
+      <div class="IDRow">
+        <label>ID</label>
+        <div class={`id ${!id.length && 'placeholder'}`}>
+          {!id.length ? 'ID will show up here based on your name' : id}
+        </div>
+      </div>
+    );
+  }
+}
+
+type ValidationRowAttrs = {
+  error?: string;
+  status?: string;
+};
+
+export class ValidationRow implements m.ClassComponent<ValidationRowAttrs> {
+  view(vnode) {
+    const { error, status } = vnode.attrs;
+
+    return (
+      <div class="validation-container">
+        {error && <div class="error">{error}</div>}
+        {status && <div class="status">{status}</div>}
       </div>
     );
   }

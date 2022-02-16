@@ -14,7 +14,7 @@ import { slugify, slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import { IERC20Metadata__factory } from 'eth/types';
-import { InputRow } from 'views/components/metadata_rows';
+import { IdRow, InputRow, ValidationRow } from 'views/components/metadata_rows';
 import {
   initChainForm,
   defaultChainRows,
@@ -154,10 +154,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             await updateTokenForum();
           }}
         />
-        <div class="validation-container">
-          {this.state.error && <div class="error">{this.state.error}</div>}
-          {this.state.status && <div class="status">{this.state.status}</div>}
-        </div>
+        <ValidationRow error={this.state.error} status={this.state.status} />
         <InputRow
           title="Name"
           defaultValue={this.state.form.name}
@@ -167,14 +164,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             this.state.form.id = slugifyPreserveDashes(v);
           }}
         />
-        <div class="IDRow">
-          <label>ID</label>
-          <div class={`id ${!this.state.form.id.length && 'placeholder'}`}>
-            {!this.state.form.id.length
-              ? 'ID will show up here based on your name'
-              : this.state.form.id}
-          </div>
-        </div>
+        <IdRow id={this.state.form.id} />
         <InputRow
           title="Symbol"
           disabled={disableField}

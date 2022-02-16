@@ -11,7 +11,7 @@ import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'types';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState, EthFormFields } from './types';
-import { InputRow } from '../../components/metadata_rows';
+import { IdRow, InputRow, ValidationRow } from '../../components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 
 // TODO: populate additional fields
@@ -60,14 +60,7 @@ export class CosmosForm implements m.ClassComponent {
             this.state.form.id = slugifyPreserveDashes(v);
           }}
         />
-        <div class="IDRow">
-          <label>ID</label>
-          <div class={`id ${!this.state.form.id.length && 'placeholder'}`}>
-            {!this.state.form.id.length
-              ? 'ID will show up here based on your name'
-              : this.state.form.id}
-          </div>
-        </div>
+        <IdRow id={this.state.form.id} />
         <InputRow
           title="Symbol"
           defaultValue={this.state.form.symbol}
@@ -120,9 +113,7 @@ export class CosmosForm implements m.ClassComponent {
             }
           }}
         />
-        <div class="validation-container">
-          {this.state.error && <div class="error">{this.state.error}</div>}
-        </div>
+        <ValidationRow error={this.state.error} />
       </div>
     );
   }
