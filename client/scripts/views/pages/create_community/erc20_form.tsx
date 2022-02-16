@@ -6,7 +6,7 @@ import Web3 from 'web3';
 import { providers } from 'ethers';
 import { isAddress } from 'web3-utils';
 
-import 'pages/create_community_test.scss';
+import 'pages/create_community.scss';
 
 import app from 'state';
 import { initAppState } from 'app';

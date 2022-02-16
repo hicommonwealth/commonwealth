@@ -1,4 +1,5 @@
 @import 'client/styles/shared';
+@import 'client/styles/facelift';
 
 .CreateCommunityPage {
   width: 100%;
@@ -7,56 +8,50 @@
     width: initial;
   }
 
-  .community-creation-form {
-    margin: 0 auto;
-    max-width: 600px;
-    width: 100%;
-  }
-
   .create-community-wrapper {
     align-items: center;
     display: flex;
     flex-direction: column;
 
     h3 {
-      margin-top: 11px;
+      margin-top: 16px;
     }
+  }
 
-    .CommunityMetadataManagementTable {
-      td {
-        padding: 11px 20px;
+  .CreateCommunityForm {
+    margin: 32px auto auto;
+    width: 480px;
+
+    .InputRow {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        @include form-label;
+        margin-bottom: 4px;
       }
 
-      .cui-button {
-        display: block;
-        margin: 26px auto;
-        min-width: 150px;
-        width: 40%;
-      }
-
-      .cui-tabs {
-        margin-top: 0 !important;
-      }
-    }
-
-    .cui-table.metadata-management-table {
-      td {
-        border-bottom: none !important;
-        line-height: 1.1;
-        padding: 5px 0 5px 28px !important;
-      }
-
-      tr:first-child td {
-        padding-top: 18px !important;
+      textarea {
+        resize: none;
       }
     }
 
-    .cui-tabs {
-      border-bottom-color: $background-color-light;
-      margin-top: 2px !important;
+    .AvatarUploadRow,
+    .IDRow,
+    .SelectRow,
+    .ToggleRow {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
 
-      > :first-child {
-        margin-left: 15px !important;
+      label {
+        @include form-label;
+        margin-bottom: 4px;
+      }
+
+      .toggle-and-label {
+        display: flex;
+        flex-direction: row;
       }
     }
 
@@ -67,64 +62,34 @@
       width: 92px;
     }
 
-    .error-column {
-      @include error-text;
-    }
+    .id {
+      background-color: #fffff3;
+      border-radius: 4px;
+      height: 42px;
+      padding: 8px 15px;
 
-    .InputPropertyRow {
-      width: 100%;
-
-      .title-column {
-        width: 150px;
-      }
-
-      textarea {
-        height: auto !important;
-        min-height: 25px !important;
-        resize: vertical !important;
-        width: 100% !important;
+      &.placeholder {
+        color: #cccccc;
+        font-style: italic;
       }
     }
 
-    .TogglePropertyRow {
-      td:first-child {
-        padding-top: 7px !important;
-      }
-
-      td {
-        padding-bottom: 4px !important;
-        padding-top: 14px !important;
-      }
-
-      .cui-switch {
-        display: inline-block;
-        margin-right: 5px;
-        position: relative;
-        top: -2px;
-      }
-
-      .switch-caption {
-        color: $text-color-light;
-        display: inline-block;
-        font-size: 94%;
-        position: relative;
-        top: 1px;
-      }
+    .button-margin-bottom {
+      margin-bottom: 20px;
     }
 
-    .SelectPropertyRow {
-      td:first-child {
-        padding-top: 7px !important;
+    .validation-container {
+      @include form-label;
+      height: 20px;
+
+      .error {
+        color: $hype-red;
+        margin-top: 8px;
       }
 
-      td {
-        padding-bottom: 4px !important;
-        padding-top: 14px !important;
+      .status {
+        margin-top: 8px;
       }
     }
   }
-}
-
-.CompactModalExitButton {
-  color: $text-color-medium;
 }

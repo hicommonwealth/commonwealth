@@ -5,7 +5,7 @@ import $ from 'jquery';
 // import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
 // import { CodeResult } from 'near-api-js/lib/providers/provider';
 
-import 'pages/create_community_test.scss';
+import 'pages/create_community.scss';
 
 import app from 'state';
 import { initAppState } from 'app';

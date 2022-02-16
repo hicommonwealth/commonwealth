@@ -3,7 +3,7 @@
 import m from 'mithril';
 import $ from 'jquery';
 
-import 'pages/create_community_test.scss';
+import 'pages/create_community.scss';
 
 import app from 'state';
 import { initAppState } from 'app';
