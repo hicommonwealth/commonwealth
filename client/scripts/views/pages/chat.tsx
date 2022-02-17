@@ -13,6 +13,8 @@ const ChatPage: m.Component<never, never> = {
     const activeEntity = app.chain;
     if (!activeEntity) return m(PageLoading);
 
+    if (!app.socket) m.route.set(`/${app.activeChainId()}`) // Stops un-logged in access
+
     const channel_id = m.route.param()['channel']
 
     return !app.socket.chatNs.hasChannels()
