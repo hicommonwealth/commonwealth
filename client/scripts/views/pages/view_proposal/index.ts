@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/ban-types */
 import 'pages/view_proposal/index.scss';
 import 'pages/view_proposal/tips.scss';
 
@@ -836,7 +838,7 @@ const ViewProposalPage: m.Component<
       'Step No': 1,
       Step: 'Viewing Proposal',
       'Proposal Name': `${vnode.attrs.type}: ${vnode.attrs.identifier}`,
-      Scope: app.activeId(),
+      Scope: app.activeChainId(),
     });
     if (!vnode.state.editing) {
       vnode.state.editing = false;
@@ -844,7 +846,7 @@ const ViewProposalPage: m.Component<
   },
   view: (vnode) => {
     const { identifier } = vnode.attrs;
-    const isDiscussion = pathIsDiscussion(app.activeId(), window.location.pathname);
+    const isDiscussion = pathIsDiscussion(app.activeChainId(), m.route.get());
     if (!app.chain?.meta && !isDiscussion) {
       return m(PageLoading, {
         narrow: true,
@@ -977,10 +979,7 @@ const ViewProposalPage: m.Component<
 
     // load comments
     if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
-      (app.activeCommunityId()
-        ? app.comments.refresh(proposal, null, app.activeCommunityId())
-        : app.comments.refresh(proposal, app.activeChainId(), null)
-      )
+      (app.comments.refresh(proposal, app.activeChainId()))
         .then(async (result) => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
@@ -1038,7 +1037,6 @@ const ViewProposalPage: m.Component<
     ) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
         object_id: proposal.id, // (proposal instanceof OffchainThread) ? proposal.id : proposal.slug,
       })
         .then((response) => {
@@ -1139,7 +1137,7 @@ const ViewProposalPage: m.Component<
     const authorChain =
       proposal instanceof OffchainThread
         ? proposal.authorChain
-        : app.activeId();
+        : app.activeChainId();
     const authorAddress =
       proposal instanceof OffchainThread
         ? proposal.author
@@ -1158,12 +1156,10 @@ const ViewProposalPage: m.Component<
       app.user.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       }) ||
       app.user.isRoleOfCommunity({
         role: 'moderator',
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       });
 
     if (proposal instanceof SubstrateTreasuryTip) {

@@ -1,0 +1,102 @@
+@import 'client/styles/shared';
+
+.Modal {
+  .overlay {
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 101;
+  }
+
+  &:last-child .overlay {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .popup {
+    @include popout();
+
+    background: $text-color-white;
+    border-radius: 3px;
+    max-height: 96%;
+    max-width: 800px;
+    max-width: 92%;
+    min-width: 380px;
+    overflow-y: auto;
+    overflow: hidden;
+    position: relative;
+    z-index: 20;
+  }
+
+  @include xs-max {
+    .popup {
+      max-height: calc(100vh - 20px);
+      min-width: calc(100vw - 20px);
+    }
+  }
+
+  .compact-modal-title {
+    background: $primary-bg-color;
+    color: $text-color-white;
+    line-height: 1.2;
+    padding: 23px 27px 15px;
+
+    h1,
+    h2,
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin: 0;
+      padding: 0;
+    }
+
+    .subtitle {
+      margin-bottom: 2px;
+      margin-top: 1px;
+    }
+  }
+
+  .compact-modal-body {
+    line-height: 1.2;
+    padding: 22px 28px 0;
+
+    &:last-child {
+      padding-bottom: 28px;
+    }
+  }
+
+  .compact-modal-actions {
+    padding: 2px 28px 28px;
+  }
+
+  @include xs-max {
+    .compact-modal-title {
+      padding: 20px 20px 12px;
+    }
+
+    .compact-modal-body,
+    .compact-modal-actions {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
+}
+
+.CompactModalExitButton {
+  color: $text-color-white;
+  cursor: pointer;
+  font-size: 1.65rem;
+  opacity: 0.4;
+  position: absolute;
+  right: 0.75em;
+  top: 0.6em;
+
+  &:hover {
+    opacity: 0.6;
+  }
+}

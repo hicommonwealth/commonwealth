@@ -61,7 +61,7 @@ const ProposalContent: m.Component<
                 user: new AddressInfo(
                   null,
                   proposal.author,
-                  app.activeId(),
+                  app.activeChainId(),
                   null
                 ),
                 linkify: true,
@@ -100,13 +100,13 @@ const ProposalContent: m.Component<
             m('.vote-row', [
               m('.user-column', [
                 m(User, {
-                  user: new AddressInfo(null, vote.voter, app.activeId(), null),
+                  user: new AddressInfo(null, vote.voter, app.activeChainId(), null),
                   linkify: true,
                   popover: true,
                 }),
               ]),
               m('.vote-column', proposal.choices[vote.choice - 1]),
-              m('.power-column', `${formatNumberLong(vote.power)} ${symbol}`),
+              m('.power-column', `${formatNumberLong(vote.balance)} ${symbol}`),
             ])
           ),
           m(
@@ -217,7 +217,7 @@ const VoteAction: m.Component<
         });
         vnode.state.votingModalOpen = true;
       } catch (err) {
-        console.log(err);
+        console.error(err);
         notifyError('Voting failed');
       }
     };
@@ -296,7 +296,7 @@ const ViewProposalPage: m.Component<
           m.redraw();
         });
       } catch (e) {
-        console.log(`Failed to fetch threads: ${e}`);
+        console.error(`Failed to fetch threads: ${e}`);
       }
     };
 
@@ -397,7 +397,7 @@ const ViewProposalPage: m.Component<
                         user: new AddressInfo(
                           null,
                           proposal.author,
-                          app.activeId(),
+                          app.activeChainId(),
                           null
                         ),
                         linkify: true,

@@ -17,7 +17,7 @@ export const Errors = {
 };
 
 const editTopic = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
   if (error) return next(new Error(error));
   if (!req.body.id) {
     return next(new Error(Errors.NoTopicId));
@@ -41,12 +41,9 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
   const roleWhere = {
     address_id: adminAddress.id,
     permission: 'admin',
+    chain_id: chain.id,
   };
-  if (community) {
-    roleWhere['offchain_community_id'] = community.id;
-  } else if (chain) {
-    roleWhere['chain_id'] = chain.id;
-  }
+
   const requesterIsAdminOrMod = await models.Role.findOne({
     where: roleWhere,
   });
@@ -76,9 +73,7 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     await topic.save();
 
     if (featured_order) {
-      const activeEntity = community
-        ? await models.OffchainCommunity.findOne({ where: { id: community.id } })
-        : await models.Chain.findOne({ where: { id: chain.id } });
+      const activeEntity = await models.Chain.findOne({ where: { id: chain.id } });
       let { featured_topics } = activeEntity;
       if (featured_order === 'true' && !featured_topics.includes(`${id}`)) {
         featured_topics.push(`${id}`);

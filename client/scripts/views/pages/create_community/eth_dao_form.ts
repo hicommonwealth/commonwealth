@@ -36,7 +36,7 @@ const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
   oninit: (vnode) => {
     vnode.state.chain_string = 'Ethereum Mainnet';
     vnode.state.chain_id = '1';
-    vnode.state.url = vnode.attrs.ethChains[1];
+    vnode.state.url = vnode.attrs.ethChains[1].url;
     vnode.state.address = '';
     vnode.state.token_name = 'token';
     vnode.state.id = '';
@@ -216,7 +216,7 @@ const EthDaoForm: m.Component<EthDaoFormAttrs, EthDaoFormState> = {
               network: vnode.state.network,
               token_name,
               node_url: url,
-              eth_chain_id: chain_id,
+              eth_chain_id: +chain_id,
             });
             await initAppState(false);
             // TODO: notify about needing to run event migration

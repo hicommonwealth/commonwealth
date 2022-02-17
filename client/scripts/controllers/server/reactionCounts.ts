@@ -25,11 +25,10 @@ class ReactionCountController {
       return this._store.getReactionCountByPost(post);
     }
 
-    public async create(address: string, post: any, reaction: string, chainId: string, communityId: string) {
+    public async create(address: string, post: any, reaction: string, chainId: string) {
       const options = {
         author_chain: app.user.activeAccount.chain.id,
         chain: chainId,
-        community: communityId,
         address,
         reaction,
         jwt: app.user.jwt,

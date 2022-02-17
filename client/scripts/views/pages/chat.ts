@@ -173,10 +173,10 @@ const Chat: m.Component<IAttrs, IState> = {
 
 const ChatPage = {
   view: (vnode) => {
-    const activeEntity = app.chain ? app.chain : app.community;
+    const activeEntity = app.chain;
     if (!activeEntity) return m(PageLoading);
     const room = activeEntity.id;
-    const name = app.chain ? app.chain.meta.chain.name : app.community.meta.name;
+    const name = app.chain.meta.chain.name;
 
     return m(Sublayout, {
       class: 'ChatPage',

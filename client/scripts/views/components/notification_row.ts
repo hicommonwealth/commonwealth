@@ -1,17 +1,16 @@
 import 'components/sidebar/notification_row.scss';
 
-import { Icon, Icons, Tooltip, Spinner } from 'construct-ui';
+import { Icon, Icons, Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from '@commonwealth/chain-events';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { NotificationCategories } from 'types';
+import { NotificationCategories , IPostNotificationData, ProposalType } from 'types';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
-import { IPostNotificationData, ProposalType } from 'types';
+
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -41,11 +40,9 @@ const getCommentPreview = (comment_text) => {
 
 const getNotificationFields = (category, data: IPostNotificationData) => {
   const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
-    parent_comment_text, chain_id, community_id, author_address, author_chain } = data;
+    parent_comment_text, chain_id, author_address, author_chain } = data;
 
-  const community_name = community_id
-    ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-    : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+  const community_name = (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
 
   let notificationHeader;
   let notificationBody;
@@ -83,7 +80,6 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     id: root_id,
     title: root_title,
     chain: chain_id,
-    community: community_id,
   };
   const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
   const path = (getProposalUrl as any)(...args);
@@ -105,14 +101,12 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
   }
 
   const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
-    parent_comment_text, chain_id, community_id, author_address, author_chain } = data[0];
+    parent_comment_text, chain_id, author_address, author_chain } = data[0];
 
   const authorInfo = _.uniq(data.map((d) => `${d.author_chain}#${d.author_address}`))
     .map((u) => u.split('#'));
   const length = authorInfo.length - 1;
-  const community_name = community_id
-    ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-    : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+  const community_name = (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
 
   let notificationHeader;
   let notificationBody;
@@ -185,13 +179,12 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     id: root_id,
     title: root_title,
     chain: chain_id,
-    community: community_id,
   };
   const args = comment_id
     ? [root_type, pseudoProposal, { id: comment_id }]
     : [root_type, pseudoProposal];
   const path = category === NotificationCategories.NewThread
-    ? (getCommunityUrl as any)(community_id || chain_id)
+    ? (getCommunityUrl as any)(chain_id)
     : (getProposalUrl as any)(...args);
   const pageJump = comment_id
     ? () => jumpHighlightComment(comment_id)
@@ -263,7 +256,7 @@ const NotificationRow: m.Component<{
       }
       return link(
         'a.NotificationRow',
-        `/notificationsList?id=${notification.id}`,
+        `/notifications?id=${notification.id}`,
         [
           m('.comment-body', [
             m('.comment-body-top.chain-event-notification-top', [
@@ -295,9 +288,7 @@ const NotificationRow: m.Component<{
         null,
         () => {
           if (vnode.state.scrollOrStop) { vnode.state.scrollOrStop = false; return; }
-          const notificationArray: Notification[] = [];
-          notificationArray.push(notification);
-          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          app.user.notifications.markAsRead([notification]).then(() => m.redraw());
         },
         () => m.redraw.sync(),
       );

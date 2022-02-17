@@ -96,22 +96,23 @@ const linkExistingAddressToChain = async (
       where: { chain: req.body.chain, address: encodedAddress }
     });
 
-    let addressId;
+    let addressId: number;
     if (existingAddress) {
       // refer edge case 2)
       // either if the existing address is owned by someone else or this user,
       //   we can just update with userId. this covers both edge case (1) & (2)
-      const updatedObj = await models.Address.updateWithTokenProvided(
-        existingAddress,
-        userId,
-        req.body.keytype,
-        verificationToken,
-        verificationTokenExpires
-      );
+      // Address.updateWithTokenProvided
+      existingAddress.user_id = userId;
+      existingAddress.keytype = req.body.keytype;
+      existingAddress.verification_token = verificationToken;
+      existingAddress.verification_token_expires = verificationTokenExpires;
+      existingAddress.last_active = new Date();
+		  const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
     } else {
       const newObj = await models.Address.create({
         user_id: originalAddress.user_id,
+        profile_id: originalAddress.profile_id,
         address: encodedAddress,
         chain: req.body.chain,
         verification_token: verificationToken,
@@ -151,18 +152,12 @@ const linkExistingAddressToChain = async (
     const role = await models.Role.findOne({
       where: {
         address_id: addressId,
-        ...(req.body.community
-          ? { offchain_community_id: req.body.community }
-          : { chain_id: req.body.chain }),
+        chain_id: req.body.chain,
       }
     });
 
     if (!role) {
-      await models.Role.create(req.body.community ? {
-        address_id: addressId,
-        offchain_community_id: req.body.community,
-        permission: 'member',
-      } : {
+      await models.Role.create({
         address_id: addressId,
         chain_id: req.body.chain,
         permission: 'member',

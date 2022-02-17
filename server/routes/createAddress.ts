@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { bech32 } from 'bech32';
+import crypto from 'crypto';
 
 import AddressSwapper from '../util/addressSwapper';
 import { DB } from '../database';
 import { ChainBase } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -55,18 +57,30 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
     // if you own it, or if it's unverified, associate with address immediately
     const updatedId = (req.user && ((!existingAddress.verified && isExpired) || isDisowned || isCurrUser))
       ? req.user.id : null;
-    const updatedObj = await models.Address.updateWithToken(existingAddress, updatedId, req.body.keytype);
+
+    // Address.updateWithToken
+		const verification_token = crypto.randomBytes(18).toString('hex');
+		const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
+		if (updatedId) {
+			existingAddress.user_id = updatedId;
+		}
+		existingAddress.keytype = req.body.keytype;
+		existingAddress.verification_token = verification_token;
+		existingAddress.verification_token_expires = verification_token_expires;
+		existingAddress.last_active = new Date();
+
+		const updatedObj = await existingAddress.save();
 
     // even if this is the existing address, there is a case to login to community through this address's chain
     // if req.body.community is valid, then we should create a role between this community vs address
     if (req.body.community) {
       const role = await models.Role.findOne({
-        where: { address_id: updatedObj.id, offchain_community_id: req.body.community }
+        where: { address_id: updatedObj.id, chain_id: req.body.community }
       });
       if (!role) {
         await models.Role.create({
           address_id: updatedObj.id,
-          offchain_community_id: req.body.community,
+          chain_id: req.body.community,
           permission: 'member',
         });
       }
@@ -75,21 +89,34 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
   } else {
     // address doesn't exist, add it to the database
     try {
-      const newObj = await models.Address.createWithToken(
-        req.user ? req.user.id : null,
-        req.body.chain,
-        encodedAddress,
-        req.body.keytype
-      );
+      // Address.createWithToken
+      const verification_token = crypto.randomBytes(18).toString('hex');
+      const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
+      const last_active = new Date();
+      let profile_id: number;
+      const user_id = req.user ? req.user.id : null;
+      if (user_id) {
+        const profile = await models.Profile.findOne({
+          attributes: ['id'],
+          where: { is_default: true, user_id } },
+        );
+        profile_id = profile?.id;
+      }
+      const newObj = await models.Address.create({
+        user_id,
+        profile_id,
+        chain: req.body.chain,
+        address: encodedAddress,
+        verification_token,
+        verification_token_expires,
+        keytype: req.body.keytype,
+        last_active,
+      });
 
       // if req.user.id is undefined, the address is being used to create a new user,
       // and we should automatically give it a Role in its native chain (or community)
       if (!req.user) {
-        await models.Role.create(req.body.community ? {
-          address_id: newObj.id,
-          offchain_community_id: req.body.community,
-          permission: 'member',
-        } : {
+        await models.Role.create({
           address_id: newObj.id,
           chain_id: req.body.chain,
           permission: 'member',

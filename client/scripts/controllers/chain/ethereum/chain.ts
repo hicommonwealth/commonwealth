@@ -70,16 +70,27 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     }
 
     this.app.chain.networkStatus = ApiStatus.Connected;
-    this._api.eth.getBlockNumber().then(async (blockNumber) => {
-      const headers = await this._api.eth.getBlock(`${blockNumber}`);
-      const prevHeaders = await this._api.eth.getBlock(`${blockNumber - 1}`);
-      if (this.app.chain) {
-        this.app.chain.block.height = headers.number;
-        this.app.chain.block.duration = +headers.timestamp - +prevHeaders.timestamp;
-        this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
-        m.redraw();
+    const blockNumber = await this._api.eth.getBlockNumber();
+    const headers = await this._api.eth.getBlock(`${blockNumber}`);
+    if (this.app.chain && this.app.chain.meta.ethChainId !== 1) {
+      this.app.chain.block.height = headers.number;
+      this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
+
+      // compute the average block time
+      // TODO: cache the average blocktime on server rather than computing it here every time
+      const nHeadersForBlocktime = 5;
+      let totalDuration = 0;
+      let lastBlockTime = +headers.timestamp;
+      for (let n = 0; n < nHeadersForBlocktime; n++) {
+        const prevHeader = await this._api.eth.getBlock(`${blockNumber - 1 - n}`);
+        const duration = lastBlockTime -+prevHeader.timestamp;
+        lastBlockTime = +prevHeader.timestamp;
+        totalDuration += duration;
       }
-    });
+      this.app.chain.block.duration = totalDuration / nHeadersForBlocktime;
+      console.log(`Computed block duration: ${this.app.chain.block.duration}`);
+      m.redraw();
+    }
     return this._api;
   }
 

@@ -24,7 +24,7 @@ const bulkOffchain = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
+  const [chain, error] = await lookupCommunityIsVisibleToUser(
     models,
     req.query,
     req.user
@@ -32,12 +32,8 @@ const bulkOffchain = async (
   if (error) return next(new Error(error));
 
   // globally shared SQL replacements
-  const communityOptions = community
-    ? 'community = :community'
-    : 'chain = :chain';
-  const replacements = community
-    ? { community: community.id }
-    : { chain: chain.id };
+  const communityOptions = 'chain = :chain';
+  const replacements = { chain: chain.id };
 
   // parallelized queries
   const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting] =
@@ -54,15 +50,12 @@ const bulkOffchain = async (
     >Promise.all([
       // topics
       models.OffchainTopic.findAll({
-        where: community
-          ? { community_id: community.id }
-          : { chain_id: chain.id },
+        where: { chain_id: chain.id },
       }),
       // threads, comments, reactions
       new Promise(async (resolve, reject) => {
         try {
           const threadParams = Object.assign(replacements, { pinned: true });
-
           const rawPinnedThreads = await models.OffchainThread.findAll({
             where: threadParams,
             include: [
@@ -72,7 +65,6 @@ const bulkOffchain = async (
               },
               {
                 model: models.Address,
-                // through: models.Collaboration,
                 as: 'collaborators',
               },
               {
@@ -102,15 +94,10 @@ const bulkOffchain = async (
       }),
       // admins
       models.Role.findAll({
-        where: chain
-          ? {
-              chain_id: chain.id,
-              permission: { [Op.in]: ['admin', 'moderator'] },
-            }
-          : {
-              offchain_community_id: community.id,
-              permission: { [Op.in]: ['admin', 'moderator'] },
-            },
+        where: {
+          chain_id: chain.id,
+          permission: { [Op.in]: ['admin', 'moderator'] },
+        },
         include: [models.Address],
         order: [['created_at', 'DESC']],
       }),
@@ -121,9 +108,7 @@ const bulkOffchain = async (
             (new Date() as any) - 1000 * 24 * 60 * 60 * 30
           );
           const activeUsers = {};
-          const where = { updated_at: { [Op.gt]: thirtyDaysAgo } };
-          if (community) where['community'] = community.id;
-          else where['chain'] = chain.id;
+          const where = { updated_at: { [Op.gt]: thirtyDaysAgo }, chain: chain.id };
 
           const monthlyComments = await models.OffchainComment.findAll({
             where,

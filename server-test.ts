@@ -9,6 +9,7 @@ import session from 'express-session';
 import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
+import BN from 'bn.js';
 
 import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
@@ -23,8 +24,7 @@ import {
 } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
-import TokenBalanceCache from './server/util/tokenBalanceCache';
-import { MockTokenBalanceProvider } from './test/util/modelUtils';
+import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 
 require('express-async-errors');
@@ -36,6 +36,21 @@ const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(10 * 60);
 
 // always prune both token and non-token holders asap
+class MockTokenBalanceProvider extends TokenBalanceProvider {
+  public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
+
+  public async getEthTokenBalance(
+    tokenAddress: string,
+    userAddress: string
+  ): Promise<BN> {
+    if (this.balanceFn) {
+      return this.balanceFn(tokenAddress, userAddress);
+    } else {
+      throw new Error('unable to fetch token balance');
+    }
+  }
+}
+
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
 const tokenBalanceCache = new TokenBalanceCache(
   models,
@@ -83,11 +98,12 @@ app.use((req, res, next) => {
 
 const resetServer = (debug = false): Promise<void> => {
   if (debug) console.log('Resetting database...');
-
-  return new Promise((resolve) => {
-    models.sequelize.sync({ force: true }).then(async () => {
+  return new Promise(async (resolve) => {
+    try {
+      await models.sequelize.sync({ force: true });
+      console.log('done syncing.');
       if (debug) console.log('Initializing default models...');
-      const drew = await models['User'].create({
+      const drew = await models.User.create({
         email: 'drewstone329@gmail.com',
         emailVerified: true,
         isAdmin: true,
@@ -95,19 +111,19 @@ const resetServer = (debug = false): Promise<void> => {
       });
 
       // For all smart contract support chains
-      await models['ContractCategory'].create({
+      await models.ContractCategory.create({
         name: 'Tokens',
         description: 'Token related contracts',
         color: '#4a90e2',
       });
-      await models['ContractCategory'].create({
+      await models.ContractCategory.create({
         name: 'DAOs',
         description: 'DAO related contracts',
         color: '#9013fe',
       });
 
       // Initialize different chain + node URLs
-      const edgMain = await models['Chain'].create({
+      const edgMain = await models.Chain.create({
         id: 'edgeware',
         network: ChainNetwork.Edgeware,
         symbol: 'EDG',
@@ -119,7 +135,7 @@ const resetServer = (debug = false): Promise<void> => {
         ss58_prefix: 7,
         has_chain_events_listener: false,
       });
-      const eth = await models['Chain'].create({
+      const eth = await models.Chain.create({
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
         symbol: 'ETH',
@@ -130,7 +146,7 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
       });
-      const alex = await models['Chain'].create({
+      const alex = await models.Chain.create({
         id: 'alex',
         network: ChainNetwork.ERC20,
         symbol: 'ALEX',
@@ -141,7 +157,7 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
       });
-      const yearn = await models['Chain'].create({
+      const yearn = await models.Chain.create({
         id: 'yearn',
         network: ChainNetwork.ERC20,
         symbol: 'YFI',
@@ -152,7 +168,7 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
       });
-      const sushi = await models['Chain'].create({
+      const sushi = await models.Chain.create({
         id: 'sushi',
         network: ChainNetwork.ERC20,
         symbol: 'SUSHI',
@@ -166,7 +182,7 @@ const resetServer = (debug = false): Promise<void> => {
 
       // Admin roles for specific communities
       await Promise.all([
-        models['Address'].create({
+        models.Address.create({
           user_id: 1,
           address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
           chain: 'ethereum',
@@ -175,7 +191,7 @@ const resetServer = (debug = false): Promise<void> => {
           verification_token_expires: null,
           verified: new Date(),
         }),
-        models['Address'].create({
+        models.Address.create({
           address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
@@ -183,7 +199,7 @@ const resetServer = (debug = false): Promise<void> => {
           verified: new Date(),
           keytype: 'sr25519',
         }),
-        models['Address'].create({
+        models.Address.create({
           address: 'ik52qFh92pboSctWPSFKtQwGEpypzz2m6D5ZRP8AYxqjHpM',
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
@@ -191,7 +207,7 @@ const resetServer = (debug = false): Promise<void> => {
           verified: new Date(),
           keytype: 'sr25519',
         }),
-        models['Address'].create({
+        models.Address.create({
           address: 'js4NB7G3bqEsSYq4ruj9Lq24QHcoKaqauw6YDPD7hMr1Roj',
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
@@ -202,56 +218,63 @@ const resetServer = (debug = false): Promise<void> => {
       ]);
 
       // Notification Categories
-      await models['NotificationCategory'].create({
+      await models.NotificationCategory.create({
         name: NotificationCategories.NewCommunity,
         description: 'someone makes a new community',
       });
-      await models['NotificationCategory'].create({
+      await models.NotificationCategory.create({
         name: NotificationCategories.NewThread,
         description: 'someone makes a new thread',
       });
-      await models['NotificationCategory'].create({
+      await models.NotificationCategory.create({
         name: NotificationCategories.NewComment,
         description: 'someone makes a new comment',
       });
-      await models['NotificationCategory'].create({
+      await models.NotificationCategory.create({
         name: NotificationCategories.NewMention,
         description: 'someone @ mentions a user',
       });
-      await models['NotificationCategory'].create({
+      await models.NotificationCategory.create({
         name: NotificationCategories.NewCollaboration,
         description: 'someone collaborates with a user',
       });
-      await models['NotificationCategory'].create({
+      await models.NotificationCategory.create({
         name: NotificationCategories.ChainEvent,
         description: 'a chain event occurs',
       });
-      await models['NotificationCategory'].create({
+      await models.NotificationCategory.create({
         name: NotificationCategories.NewReaction,
         description: 'someone reacts to a post',
       });
+      await models.NotificationCategory.create({
+        name: NotificationCategories.ThreadEdit,
+        description: 'someone edited a thread'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.CommentEdit,
+        description: 'someoned edited a comment'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.NewRoleCreation,
+        description: 'someone created a role'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.EntityEvent,
+        description: 'an entity-event as occurred'
+      })
 
       // Admins need to be subscribed to mentions and collaborations
-      await models['Subscription'].create({
+      await models.Subscription.create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewMention,
         object_id: `user-${drew.id}`,
         is_active: true,
       });
-      await models['Subscription'].create({
+      await models.Subscription.create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewCollaboration,
         object_id: `user-${drew.id}`,
         is_active: true,
-      });
-
-      // Communities
-      await models['OffchainCommunity'].create({
-        id: 'staking',
-        name: 'Staking',
-        creator_id: 1,
-        description: 'All things staking',
-        default_chain: 'ethereum',
       });
 
       const nodes = [
@@ -284,7 +307,7 @@ const resetServer = (debug = false): Promise<void> => {
 
       await Promise.all(
         nodes.map(([url, chain, address, eth_chain_id]) =>
-          models['ChainNode'].create({
+          models.ChainNode.create({
             chain,
             url,
             address,
@@ -294,8 +317,10 @@ const resetServer = (debug = false): Promise<void> => {
       );
 
       if (debug) console.log('Database reset!');
-      resolve();
-    });
+    } catch (error) {
+      console.log('error', error);
+    }
+    resolve();
   });
 };
 
@@ -313,7 +338,7 @@ const setupServer = () => {
         process.exit(1);
         break;
       case 'EADDRINUSE':
-        console.error('Port is already in use');
+        console.error(`Port ${port} already in use`);
         process.exit(1);
         break;
       default:

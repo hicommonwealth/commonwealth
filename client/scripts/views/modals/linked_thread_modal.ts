@@ -4,13 +4,16 @@ import m from 'mithril';
 import $ from 'jquery';
 import { OffchainThread } from 'models';
 import { Button } from 'construct-ui';
-import { CompactModalExitButton } from '../modal';
-import { ThreadSelector } from '../components/thread_selector';
+import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ThreadSelector } from 'views/components/thread_selector';
 
-const LinkedThreadModal: m.Component<{
-  linkingThread: OffchainThread,
-  onclose: () => null,
-}, {}> = {
+const LinkedThreadModal: m.Component<
+  {
+    linkingThread: OffchainThread;
+    onclose: () => null;
+  },
+  {}
+> = {
   view: (vnode) => {
     const { linkingThread, onclose } = vnode.attrs;
     return m('.LinkedThreadModal', [

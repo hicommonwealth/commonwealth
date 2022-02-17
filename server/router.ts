@@ -31,13 +31,10 @@ import bulkReactions from './routes/bulkReactions';
 import reactionsCounts from './routes/reactionsCounts';
 import threadsUsersCountAndAvatars from './routes/threadsUsersCountAndAvatars';
 import starCommunity from './routes/starCommunity';
-import createCommunity from './routes/createCommunity';
-import deleteCommunity from './routes/deleteCommunity';
-import updateCommunity from './routes/updateCommunity';
-import communityStats from './routes/communityStats';
 import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
+import communityStats from './routes/communityStats';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -57,10 +54,7 @@ import getInvites from './routes/getInvites';
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
-import createInviteLink from './routes/createInviteLink';
-import acceptInviteLink from './routes/acceptInviteLink';
-import getInviteLinks from './routes/getInviteLinks';
-import deleteGithubAccount from './routes/deleteGithubAccount';
+import deleteSocialAccount from './routes/deleteSocialAccount';
 import getProfile from './routes/getProfile';
 
 import createRole from './routes/createRole';
@@ -223,26 +217,6 @@ function setupRouter(
   );
 
   // offchain community admin routes
-  router.post(
-    '/createCommunity',
-    passport.authenticate('jwt', { session: false }),
-    createCommunity.bind(this, models)
-  );
-  router.post(
-    '/deleteCommunity',
-    passport.authenticate('jwt', { session: false }),
-    deleteCommunity.bind(this, models)
-  );
-  router.post(
-    '/updateCommunity',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunity.bind(this, models)
-  );
-  router.get(
-    '/communityStats',
-    passport.authenticate('jwt', { session: false }),
-    communityStats.bind(this, models)
-  );
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get('/getSupportedEthChains', getSupportedEthChains.bind(this, models));
@@ -427,19 +401,6 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models)
   );
 
-  // generic invite link
-  router.post(
-    '/createInviteLink',
-    passport.authenticate('jwt', { session: false }),
-    createInviteLink.bind(this, models)
-  );
-  router.get('/acceptInviteLink', acceptInviteLink.bind(this, models));
-  router.get(
-    '/getInviteLinks',
-    passport.authenticate('jwt', { session: false }),
-    getInviteLinks.bind(this, models)
-  );
-
   // roles + permissions
   router.get('/bulkMembers', bulkMembers.bind(this, models));
   router.post(
@@ -529,8 +490,14 @@ function setupRouter(
   router.delete(
     '/githubAccount',
     passport.authenticate('jwt', { session: false }),
-    deleteGithubAccount.bind(this, models)
+    deleteSocialAccount.bind(this, models, 'github')
   );
+
+  router.delete(
+      '/discordAccount',
+      passport.authenticate('jwt', { session: false }),
+      deleteSocialAccount.bind(this, models, 'discord')
+  )
 
   // offchain viewCount
   router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
@@ -624,9 +591,12 @@ function setupRouter(
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
 
-  router.get('/auth/github', startOAuthLogin.bind(this, models));
-  router.get('/auth/github/callback', startOAuthLogin.bind(this, models));
+  router.get('/auth/github', startOAuthLogin.bind(this, models, 'github'));
+  router.get('/auth/github/callback', startOAuthLogin.bind(this, models, 'github'));
   router.get('/finishOAuthLogin', finishOAuthLogin.bind(this, models));
+
+  router.get('/auth/discord', startOAuthLogin.bind(this, models, 'discord'));
+  router.get('/auth/discord/callback', startOAuthLogin.bind(this, models, 'discord'));
 
   router.post(
     '/auth/magic',
@@ -652,6 +622,7 @@ function setupRouter(
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
+  router.get('/communityStats', communityStats.bind(this, models));
 
   app.use('/api', router);
 }

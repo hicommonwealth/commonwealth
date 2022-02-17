@@ -82,6 +82,8 @@ export const PROPOSALS_QUERY = gql`
       end
       snapshot
       state
+      scores
+      scores_total
       author
       created
     }
@@ -140,7 +142,12 @@ export interface SnapshotProposal {
   snapshot: string;
   choices: string[];
   state: string;
-  strategies?: string;
+  scores: number[];
+  scores_total: number;
+  strategies?: Array<{
+    name: string;
+    params: any;
+  }>;
 }
 
 export interface SnapshotProposalVote {
@@ -148,7 +155,7 @@ export interface SnapshotProposalVote {
   voter: string;
   created: number;
   choice: number;
-  power: number;
+  balance: number;
 }
 
 export async function getVersion(): Promise<string> {
@@ -210,20 +217,6 @@ export async function getScore(space: SnapshotSpace, address: string) {
 
 /* Single Choice Voting */
 
-// Returns the total amount of the results
-export function sumOfResultsBalance(votes: SnapshotProposalVote[]) {
-  return votes.reduce((a, b: any) => a + b.power, 0);
-}
-
-//  Returns an array with the results for each choice
-export function resultsByVoteBalance(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {
-  return proposal.choices.map((choice, i) =>
-    votes
-      .filter((vote: any) => vote.choice === i + 1)
-      .reduce((a, b: any) => a + b.power, 0)
-  );
-}
-
 export async function getResults(space: SnapshotSpace, proposal: SnapshotProposal) {
   const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
   try {
@@ -231,43 +224,38 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
 
     // const voters = votes.map(vote => vote.voter);
     // const provider = Snapshot.utils.getProvider(space.network);
-    const strategies = space.strategies;
-
+    const strategies = proposal.strategies ?? space.strategies;
     if (proposal.state !== 'pending') {
-      console.time('getProposal.scores');
       const scores = await Snapshot.utils.getScores(
         space.id,
         strategies,
         space.network,
-        (votes).map((vote) => vote.voter),
-        proposal.snapshot,
+        votes.map((vote) => vote.voter),
+        parseInt(proposal.snapshot, 10),
         // provider,
       );
-      console.log(scores);
-      console.timeEnd('getProposal.scores');
-      console.log('Scores', scores);
-
       votes = votes.map((vote: any) => {
           vote.scores = strategies.map(
             (strategy, i) => scores[i][vote.voter] || 0
           );
-          vote.power = vote.scores.reduce((a, b: any) => a + b, 0);
+          vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
           return vote;
         })
-        .sort((a, b) => b.power - a.power)
-        .filter(vote => vote.power > 0);
+        .sort((a, b) => b.balance - a.balance)
+        .filter(vote => vote.balance > 0);
     }
 
     /* Get results */
+    const votingClass = new Snapshot.utils.voting[proposal.type](proposal, votes, strategies);
     const results = {
-      resultsByVoteBalance: resultsByVoteBalance(proposal, votes),
-      // resultsByStrategyScore: resultsByStrategyScore(proposal, votes),
-      sumOfResultsBalance: sumOfResultsBalance(votes),
+      resultsByVoteBalance: votingClass.resultsByVoteBalance(),
+      resultsByStrategyScore: votingClass.resultsByStrategyScore(),
+      sumOfResultsBalance: votingClass.sumOfResultsBalance()
     };
 
     return { votes, results };
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return e;
   }
 }
@@ -290,16 +278,6 @@ export async function getPower(space: SnapshotSpace, address: string, snapshot: 
     totalScore: summedScores.reduce((a, b) => a + b, 0)
   };
 }
-
-// export function resultsByStrategyScore(proposal: SnapshotProposal, votes: SnapshotProposalVote[]) {
-//   return proposal.choices.map((choice, i) =>
-//     proposal.strategies.map((strategy, sI) =>
-//       this.votes
-//         .filter((vote: any) => vote.choice === i + 1)
-//         .reduce((a, b: any) => a + b.scores[sI], 0)
-//     )
-//   );
-// }
 
 export async function loadMultipleSpacesData(snapshot_spaces:string[]) {
   const spaces_data: Array<{space: SnapshotSpace, proposals: SnapshotProposal[]}> = [];
