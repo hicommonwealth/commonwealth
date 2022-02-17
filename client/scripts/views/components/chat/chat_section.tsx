@@ -111,6 +111,25 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
         }
         app.socket.chatNs.addListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage.bind(vnode));
         vnode.state.loaded = true;
+
+        vnode.state.menu_toggle_tree = { // Used to track admin menu render status for hover
+            toggled_state: false,
+            children: vnode.state.categoryToToggleTree(Object.keys(vnode.state.channels), false)
+        }
+    },
+    onbeforeupdate: (vnode, old) => {
+        if(!_.isEqual(vnode.attrs.channels, old.attrs.channels)) {
+            vnode.attrs.channels.forEach(c => {
+                const { ChatMessages, ...metadata } = c
+                vnode.state.channels[metadata.category]
+                ? vnode.state.channels[metadata.category].push(metadata)
+                : vnode.state.channels[metadata.category] = [metadata]
+            });
+            vnode.state.menu_toggle_tree = {
+                toggled_state: false,
+                children: vnode.state.categoryToToggleTree(Object.keys(vnode.state.channels), false)
+            }
+        }
     },
     onremove: (vnode) => {
         if(app.socket){
@@ -118,7 +137,7 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
         }
     },
     view: (vnode) => {
-        if(!app.socket) return;
+        if(!app.socket) return <div>No</div>;
         if(!vnode.state.loaded) return <Spinner></Spinner>
         vnode.state.channels = {}
         vnode.attrs.channels.forEach(c => {
@@ -127,11 +146,6 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
             ? vnode.state.channels[metadata.category].push(metadata)
             : vnode.state.channels[metadata.category] = [metadata]
         });
-
-        vnode.state.menu_toggle_tree = { // Used to track admin menu render status for hover
-            toggled_state: false,
-            children: vnode.state.categoryToToggleTree(Object.keys(vnode.state.channels), false)
-        }
 
         const channel_toggle_tree: ToggleTree = {
             toggled_state: true,
@@ -143,7 +157,7 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
             console.log("setting toggle tree from scratch")
             localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(channel_toggle_tree);
         } else if (!verifyCachedToggleTree('chat', channel_toggle_tree)) {
-            console.log("setting discussions toggle tree since the cached version differs from the updated version")
+            console.log("setting chat toggle tree since the cached version differs from the updated version")
             localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(channel_toggle_tree);
         }
         const toggle_tree_state = JSON.parse(localStorage[`${app.activeChainId()}-chat-toggle-tree`]);
@@ -318,6 +332,7 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
             is_active: false,
             right_icon: sectionAdminButton,
             extra_components: <Overlay
+                class='chatAdminOverlay'
                 isOpen={Object.values(vnode.state.adminModals).some(Boolean)}
                 onClose={close_overlay}
                 closeOnOutsideClick={true}

@@ -23,7 +23,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     // delete the channel and cascade delete all of its messages
     await models.ChatChannel.destroy({
         where: {
-            id: req.body.id,
+            id: req.body.channel_id,
             chain_id: req.body.chain_id
         }
     });
