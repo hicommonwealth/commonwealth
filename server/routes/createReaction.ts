@@ -178,7 +178,6 @@ const createReaction = async (
       chain: finalReaction.chain,
       body: (comment_id) ? comment.text : '',
     },
-    req.wss,
     [ finalReaction.Address.address ],
   );
   // update author.last_active (no await)

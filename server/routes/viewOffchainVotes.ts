@@ -1,24 +1,26 @@
-import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { OffchainVoteAttributes } from '../models/offchain_vote';
+import { TypedRequestQuery, TypedResponse } from '../types';
 
 export const Errors = {
   InvalidThread: 'Invalid thread',
 };
 
+type ViewOffchainVotesReq = { thread_id: string, chain: string };
+type ViewOffchainVotesResp = OffchainVoteAttributes[];
+
 const viewOffchainVotes = async (
   models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestQuery<ViewOffchainVotesReq>,
+  res: TypedResponse<ViewOffchainVotesResp>
 ) => {
   let chain, error;
   try {
     [chain, error] = await lookupCommunityIsVisibleToUser(
       models,
       req.query,
-      req.user
     );
   } catch (err) {
     throw new AppError(err);

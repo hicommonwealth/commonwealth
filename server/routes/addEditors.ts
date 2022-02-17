@@ -125,7 +125,6 @@ const addEditors = async (models: DB, req: Request, res: Response, next: NextFun
         chain: thread.chain,
         body: thread.body,
       },
-      req.wss,
       [ author.address ]
     );
   }));

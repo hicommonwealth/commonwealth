@@ -127,7 +127,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
         title: proposal.title || '',
         chain: finalComment.chain,
       },
-      req.wss,
       [ finalComment.Address.address ],
     );
 
@@ -196,7 +195,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
             chain: finalComment.chain,
             body: finalComment.text,
           },
-          req.wss,
           [ finalComment.Address.address ],
         );
       }));

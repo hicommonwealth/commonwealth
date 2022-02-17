@@ -90,7 +90,6 @@ export default (
     object_id: string,
     notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData,
     webhook_data?: WebhookContent,
-    wss?: WebSocket.Server,
     excludeAddresses?: string[],
     includeAddresses?: string[],
   ) => {

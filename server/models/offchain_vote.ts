@@ -1,9 +1,9 @@
 import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { DataTypes } from 'sequelize';
+import { ModelStatic, ModelInstance } from './types';
 import { OffchainThreadAttributes } from './offchain_thread';
 
-export interface OffchainVoteAttributes {
+export type OffchainVoteAttributes = {
   thread_id: number;
   option: string;
   address: string;
@@ -15,10 +15,9 @@ export interface OffchainVoteAttributes {
 
   // associations
   thread?: OffchainThreadAttributes | OffchainThreadAttributes['id'];
-}
+};
 
-export interface OffchainVoteInstance
-extends Model<OffchainVoteAttributes>, OffchainVoteAttributes {}
+export interface OffchainVoteInstance extends ModelInstance<OffchainVoteAttributes> { }
 
 export type OffchainVoteModelStatic = ModelStatic<OffchainVoteInstance>
 

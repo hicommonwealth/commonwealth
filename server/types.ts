@@ -1,11 +1,36 @@
-import WebSocket from 'ws';
+import { Response } from 'express';
 import { UserInstance } from './models/user';
 
-// create req.session.passport.user type on standard Request object
-// and extend User to be "any" (really should be a models.User instance,
-// but we don't support typescript on server yet)
-// based on: https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
+export interface TypedRequestQuery<
+  Q extends Record<string, unknown> = Record<string, unknown>
+> extends Express.Request {
+  user?: Express.User & UserInstance;
+  query?: Q;
+}
+
+export interface TypedRequestBody<
+  B extends Record<string, unknown> = Record<string, unknown>
+> extends Express.Request {
+  user?: Express.User & UserInstance;
+  body?: B;
+}
+
+export interface TypedRequest<
+  B extends Record<string, unknown> = Record<string, unknown>,
+  Q extends Record<string, unknown> = Record<string, unknown>
+> extends Express.Request {
+  user?: Express.User & UserInstance;
+  body?: B;
+  query?: Q;
+}
+
+export interface TypedResponse<T> extends Response<{ result: T } & { status: 'Success' | 'Failure' }> {
+
+}
+
+// TODO: legacy overrides, convert all routes and remove
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface User extends UserInstance {
       [key: string]: any;
@@ -13,15 +38,6 @@ declare global {
 
     interface Request {
       user?: User;
-      wss: WebSocket.Server;
-      session: any;
-      sessionID: any;
-    }
-
-    interface SessionData {
-      passport?: {
-        user?: number;
-      }
     }
   }
 }

@@ -282,7 +282,6 @@ const createThread = async (
       chain: finalThread.chain,
       body: finalThread.body,
     },
-    req.wss,
     excludedAddrs,
   );
 
@@ -312,7 +311,6 @@ const createThread = async (
         chain: finalThread.chain,
         body: finalThread.body,
       },
-      req.wss,
       [ finalThread.Address.address ],
     );
   }));
