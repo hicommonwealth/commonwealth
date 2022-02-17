@@ -139,41 +139,18 @@ export class SplTokenForm implements m.ClassComponent {
           buttonType="primary"
           disabled={this.state.saving || !this.state.loaded}
           onclick={async () => {
-            const {
-              cluster,
-              decimals,
-              description,
-              discord,
-              element,
-              github,
-              icon_url,
-              id,
-              mint,
-              name,
-              symbol,
-              telegram,
-              website,
-            } = this.state.form;
+            const { cluster, iconUrl, mint } = this.state.form;
             this.state.saving = true;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 address: mint,
-                decimals,
-                description,
-                discord,
-                element,
-                github,
-                icon_url,
-                id,
-                name,
-                symbol,
-                telegram,
-                website,
-                jwt: app.user.jwt,
-                type: ChainType.Token,
                 base: ChainBase.Solana,
+                icon_url: iconUrl,
+                jwt: app.user.jwt,
                 network: ChainNetwork.SPL,
                 node_url: cluster,
+                type: ChainType.Token,
+                ...this.state.form,
               });
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);

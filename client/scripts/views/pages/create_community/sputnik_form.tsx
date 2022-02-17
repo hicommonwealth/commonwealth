@@ -61,16 +61,7 @@ export class SputnikForm implements m.ClassComponent {
           buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
-            const {
-              name,
-              description,
-              icon_url,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-            } = this.state.form;
+            const { iconUrl, name } = this.state.form;
 
             this.state.saving = true;
 
@@ -85,21 +76,16 @@ export class SputnikForm implements m.ClassComponent {
               : 'https://rpc.testnet.near.org';
 
             const addChainNodeArgs = {
+              base: ChainBase.NEAR,
+              icon_url: iconUrl,
+              id,
+              jwt: app.user.jwt,
               name: id,
-              description,
+              network: ChainNetwork.Sputnik,
               node_url: url,
               symbol: isMainnet ? 'NEAR' : 'tNEAR',
-              icon_url,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              jwt: app.user.jwt,
               type: ChainType.DAO,
-              id,
-              base: ChainBase.NEAR,
-              network: ChainNetwork.Sputnik,
+              ...this.state.form,
             };
 
             try {

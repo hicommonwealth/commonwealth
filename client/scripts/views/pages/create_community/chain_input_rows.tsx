@@ -18,7 +18,7 @@ export const initChainForm = (): ChainFormDefaultFields => {
     discord: '',
     element: '',
     github: '',
-    icon_url: '',
+    iconUrl: '',
     telegram: '',
     uploadInProgress: false,
     website: '',
@@ -51,7 +51,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
           files.forEach((f) => {
             if (!f.uploadURL) return;
             const url = f.uploadURL.replace(/\?.*/, '');
-            state.icon_url = url;
+            state.iconUrl = url;
           });
           state.uploadInProgress = false;
           m.redraw();
@@ -61,10 +61,10 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <InputRow
       title="Icon URL"
       disabled={disabled}
-      defaultValue={state.icon_url}
+      defaultValue={state.iconUrl}
       placeholder="https://"
       onChangeHandler={(v) => {
-        state.icon_url = v;
+        state.iconUrl = v;
       }}
     />,
     <InputRow
@@ -128,54 +128,54 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
         ),
         ...addlChainStrings,
       ]}
-      value={state.chain_string}
+      value={state.chainString}
       onchange={(value) => {
-        state.chain_string = value;
+        state.chainString = value;
         if (value !== 'Custom') {
           const [id] =
             Object.entries(attrs.ethChainNames).find(
               ([, name]) => name === value
             ) || Object.keys(attrs.ethChains).find((cId) => `${cId}` === value);
-          state.eth_chain_id = id;
-          state.node_url = attrs.ethChains[id].url;
-          state.alt_wallet_url = attrs.ethChains[id].alt_wallet_url;
+          state.ethChainId = id;
+          state.nodeUrl = attrs.ethChains[id].url;
+          state.altWalletUrl = attrs.ethChains[id].alt_wallet_url;
         } else {
-          state.eth_chain_id = '';
-          state.node_url = '';
-          state.alt_wallet_url = '';
+          state.ethChainId = '';
+          state.nodeUrl = '';
+          state.altWalletUrl = '';
         }
         state.loaded = false;
       }}
     />,
-    state.chain_string === 'Custom' && (
+    state.chainString === 'Custom' && (
       <InputRow
         title="Chain ID"
-        defaultValue={state.eth_chain_id}
+        defaultValue={state.ethChainId}
         placeholder="1"
         onChangeHandler={async (v) => {
-          state.eth_chain_id = v;
+          state.ethChainId = v;
           state.loaded = false;
         }}
       />
     ),
-    state.chain_string === 'Custom' && (
+    state.chainString === 'Custom' && (
       <InputRow
         title="Websocket URL"
-        defaultValue={state.node_url}
+        defaultValue={state.nodeUrl}
         placeholder="wss://... (leave empty for default)"
         onChangeHandler={async (v) => {
-          state.node_url = v;
+          state.nodeUrl = v;
           state.loaded = false;
         }}
       />
     ),
-    state.chain_string === 'Custom' && (
+    state.chainString === 'Custom' && (
       <InputRow
         title="HTTP URL"
-        defaultValue={state.alt_wallet_url}
+        defaultValue={state.altWalletUrl}
         placeholder="https://...  (leave empty for default)"
         onChangeHandler={async (v) => {
-          state.alt_wallet_url = v;
+          state.altWalletUrl = v;
           state.loaded = false;
         }}
       />

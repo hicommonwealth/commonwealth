@@ -19,7 +19,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 
 type SubstrateFormFields = {
   nodeUrl: string;
-  substrate_spec: string;
+  substrateSpec: string;
 };
 
 type CreateSubstrateForm = ChainFormFields & SubstrateFormFields;
@@ -32,7 +32,7 @@ export class SubstrateForm implements m.ClassComponent {
     form: {
       name: '',
       nodeUrl: '',
-      substrate_spec: '',
+      substrateSpec: '',
       symbol: '',
       ...initChainForm(),
     },
@@ -66,13 +66,13 @@ export class SubstrateForm implements m.ClassComponent {
         />
         <InputRow
           title="Spec (JSON)"
-          defaultValue={this.state.form.substrate_spec}
+          defaultValue={this.state.form.substrateSpec}
           // TODO: how to make this resizable vertically?
           //   looks like CUI specifies an !important height tag, which prevents this
           textarea={true}
           placeholder='{"types": {"Address": "MultiAddress", "ChainId": "u8", "Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", "VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": "VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, "VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, "TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": ["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", "VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", "outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": "AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", "VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", "DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", "ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", "votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": {"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", "vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}}'
           onChangeHandler={(v) => {
-            this.state.form.substrate_spec = v;
+            this.state.form.substrateSpec = v;
           }}
         />
         <CWButton
@@ -94,7 +94,7 @@ export class SubstrateForm implements m.ClassComponent {
               const api = await ApiPromise.create({
                 throwOnConnect: true,
                 provider,
-                ...JSON.parse(this.state.form.substrate_spec),
+                ...JSON.parse(this.state.form.substrateSpec),
               });
               await api.disconnect();
               notifySuccess('Test has passed');
@@ -110,43 +110,24 @@ export class SubstrateForm implements m.ClassComponent {
           buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
-            const {
-              name,
-              description,
-              nodeUrl,
-              symbol,
-              icon_url,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              substrate_spec,
-            } = this.state.form;
+            const { name, nodeUrl, iconUrl, substrateSpec } = this.state.form;
             try {
-              JSON.parse(substrate_spec);
+              JSON.parse(substrateSpec);
             } catch (err) {
               notifyError('Spec provided has invalid JSON');
               return;
             }
             this.state.saving = true;
             $.post(`${app.serverUrl()}/addChainNode`, {
-              name,
-              description,
-              node_url: nodeUrl,
-              icon_url,
-              symbol,
-              website,
-              discord,
-              element,
-              telegram,
-              github,
-              substrate_spec,
-              jwt: app.user.jwt,
-              type: ChainType.Chain,
-              id: slugify(name),
               base: ChainBase.Substrate,
+              icon_url: iconUrl,
+              id: slugify(name),
+              jwt: app.user.jwt,
               network: slugify(name),
+              node_url: nodeUrl,
+              substrate_spec: substrateSpec,
+              type: ChainType.Chain,
+              ...this.state.form,
             })
               .then(async (res) => {
                 await initAppState(false);

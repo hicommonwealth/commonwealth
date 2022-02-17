@@ -41,20 +41,20 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
     status: '',
     form: {
       address: '',
-      alt_wallet_url: '',
-      eth_chain_id: 1,
-      chain_string: 'Ethereum Mainnet',
+      altWalletUrl: '',
+      ethChainId: 1,
+      chainString: 'Ethereum Mainnet',
       decimals: 18,
       id: '',
       name: '',
       symbol: 'XYZ',
-      node_url: '',
+      nodeUrl: '',
       ...initChainForm(),
     },
   };
 
   oninit(vnode) {
-    this.state.form.node_url = vnode.attrs.ethChains[1].url;
+    this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
   view(vnode) {
@@ -62,14 +62,14 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
     const disableField = !validAddress || !this.state.loaded;
 
     const updateTokenForum = async () => {
-      if (!this.state.form.address || !this.state.form.eth_chain_id) return;
+      if (!this.state.form.address || !this.state.form.ethChainId) return;
       this.state.status = '';
       this.state.error = '';
       this.state.loading = true;
       const args = {
         address: this.state.form.address,
-        chain_id: this.state.form.eth_chain_id,
-        url: this.state.form.node_url,
+        chain_id: this.state.form.ethChainId,
+        url: this.state.form.nodeUrl,
         allowUncached: true,
       };
       try {
@@ -81,9 +81,9 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             this.state.form.id = res.token.id && slugify(res.token.id);
             this.state.form.symbol = res.token.symbol || '';
             this.state.form.decimals = +res.token.decimals || 18;
-            this.state.form.icon_url = res.token.icon_url || '';
-            if (this.state.form.icon_url.startsWith('/')) {
-              this.state.form.icon_url = `https://commonwealth.im${this.state.form.icon_url}`;
+            this.state.form.iconUrl = res.token.icon_url || '';
+            if (this.state.form.iconUrl.startsWith('/')) {
+              this.state.form.iconUrl = `https://commonwealth.im${this.state.form.iconUrl}`;
             }
             this.state.form.description = res.token.description || '';
             this.state.form.website = res.token.website || '';
@@ -117,7 +117,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
               this.state.form.decimals = 18;
               this.state.status = 'Verified token but could not load metadata.';
             }
-            this.state.form.icon_url = '';
+            this.state.form.iconUrl = '';
             this.state.form.description = '';
             this.state.form.website = '';
             this.state.form.discord = '';
@@ -147,7 +147,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
           disabled={
             this.state.saving ||
             !validAddress ||
-            !this.state.form.eth_chain_id ||
+            !this.state.form.ethChainId ||
             this.state.loading
           }
           onclick={async () => {
@@ -180,13 +180,19 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
           buttonType="primary"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
+            const { altWalletUrl, chainString, ethChainId, nodeUrl } =
+              this.state.form;
             this.state.saving = true;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
-                jwt: app.user.jwt,
-                type: ChainType.Token,
+                alt_wallet_url: altWalletUrl,
                 base: ChainBase.Ethereum,
+                chain_string: chainString,
+                eth_chain_id: ethChainId,
+                jwt: app.user.jwt,
                 network: ChainNetwork.ERC20,
+                node_url: nodeUrl,
+                type: ChainType.Token,
                 ...this.state.form,
               });
               await initAppState(false);

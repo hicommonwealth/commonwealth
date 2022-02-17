@@ -9,7 +9,7 @@ export type ChainFormDefaultFields = {
   discord: string;
   element: string;
   github: string;
-  icon_url: string;
+  iconUrl: string;
   telegram: string;
   uploadInProgress: boolean;
   website: string;
@@ -32,8 +32,8 @@ export type EthChainAttrs = {
 
 export type EthFormFields = {
   address?: string;
-  alt_wallet_url?: string;
-  chain_string?: string;
-  eth_chain_id?: string | number;
-  node_url?: string;
+  altWalletUrl?: string;
+  chainString?: string;
+  ethChainId?: string | number;
+  nodeUrl?: string;
 };

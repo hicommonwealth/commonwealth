@@ -40,7 +40,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
-  token_name: string;
+  tokenName: string;
 };
 
 type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
@@ -56,20 +56,20 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
     status: '',
     form: {
       address: '',
-      chain_string: 'Ethereum Mainnet',
-      eth_chain_id: 1,
+      chainString: 'Ethereum Mainnet',
+      ethChainId: 1,
       id: '',
       name: '',
       network: ChainNetwork.Compound,
-      node_url: '',
+      nodeUrl: '',
       symbol: '',
-      token_name: 'token',
+      tokenName: 'token',
       ...initChainForm(),
     },
   };
 
   oninit(vnode) {
-    this.state.form.node_url = vnode.attrs.ethChains[1].url;
+    this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
   view(vnode) {
@@ -79,8 +79,8 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
     const updateDAO = async () => {
       if (
         !this.state.form.address ||
-        !this.state.form.eth_chain_id ||
-        !this.state.form.node_url
+        !this.state.form.ethChainId ||
+        !this.state.form.nodeUrl
       )
         return;
       this.state.loading = true;
@@ -89,14 +89,14 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
       try {
         if (this.state.form.network === ChainNetwork.Compound) {
           const provider = new Web3.providers.WebsocketProvider(
-            this.state.form.node_url
+            this.state.form.nodeUrl
           );
           const compoundApi = new CompoundAPI(
             null,
             this.state.form.address,
             provider
           );
-          await compoundApi.init(this.state.form.token_name);
+          await compoundApi.init(this.state.form.tokenName);
           if (!compoundApi.Token) {
             throw new Error(
               'Could not find governance token. Is "Token Name" field valid?'
@@ -107,7 +107,7 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
           this.state.status = `Found ${govType} with token type ${tokenType}`;
         } else if (this.state.form.network === ChainNetwork.Aave) {
           const provider = new Web3.providers.WebsocketProvider(
-            this.state.form.node_url
+            this.state.form.nodeUrl
           );
           const aaveApi = new AaveApi(
             IAaveGovernanceV2__factory.connect,
@@ -145,9 +145,9 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
         {this.state.form.network === ChainNetwork.Compound && (
           <InputRow
             title="Token Name (Case Sensitive)"
-            defaultValue={this.state.form.token_name}
+            defaultValue={this.state.form.tokenName}
             onChangeHandler={(v) => {
-              this.state.form.token_name = v;
+              this.state.form.tokenName = v;
               this.state.loaded = false;
             }}
           />
@@ -158,7 +158,7 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
           disabled={
             this.state.saving ||
             !validAddress ||
-            !this.state.form.eth_chain_id ||
+            !this.state.form.ethChainId ||
             this.state.loading
           }
           onclick={async () => {
@@ -191,13 +191,19 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
           buttonType="primary"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
+            const { chainString, ethChainId, nodeUrl, tokenName } =
+              this.state.form;
             this.state.saving = true;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
-                jwt: app.user.jwt,
-                type: ChainType.DAO,
                 base: ChainBase.Ethereum,
+                chain_string: chainString,
+                eth_chain_id: ethChainId,
+                jwt: app.user.jwt,
                 network: this.state.form.network,
+                node_url: nodeUrl,
+                token_name: tokenName,
+                type: ChainType.DAO,
                 ...this.state.form,
               });
               await initAppState(false);

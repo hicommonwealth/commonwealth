@@ -17,7 +17,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 // TODO: populate additional fields
 
 type CosmosFormFields = {
-  bech32_prefix: string;
+  bech32Prefix: string;
   decimals: number;
 };
 
@@ -30,13 +30,13 @@ export class CosmosForm implements m.ClassComponent {
     error: '',
     saving: false,
     form: {
-      alt_wallet_url: '',
-      bech32_prefix: '',
+      altWalletUrl: '',
+      bech32Prefix: '',
       decimals: 6,
       id: '',
       name: '',
       symbol: 'XYZ',
-      node_url: '',
+      nodeUrl: '',
       ...initChainForm(),
     },
   };
@@ -46,10 +46,10 @@ export class CosmosForm implements m.ClassComponent {
       <div class="CreateCommunityForm">
         <InputRow
           title="RPC URL"
-          defaultValue={this.state.form.node_url}
+          defaultValue={this.state.form.nodeUrl}
           placeholder="http://my-rpc.cosmos-chain.com:26657/"
           onChangeHandler={async (v) => {
-            this.state.form.node_url = v;
+            this.state.form.nodeUrl = v;
           }}
         />
         <InputRow
@@ -71,10 +71,10 @@ export class CosmosForm implements m.ClassComponent {
         />
         <InputRow
           title="Bech32 Prefix"
-          defaultValue={this.state.form.bech32_prefix}
+          defaultValue={this.state.form.bech32Prefix}
           placeholder="cosmos"
           onChangeHandler={async (v) => {
-            this.state.form.bech32_prefix = v;
+            this.state.form.bech32Prefix = v;
           }}
         />
         <InputRow
@@ -92,13 +92,25 @@ export class CosmosForm implements m.ClassComponent {
           buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
+            const {
+              altWalletUrl,
+              bech32Prefix,
+              chainString,
+              ethChainId,
+              nodeUrl,
+            } = this.state.form;
             this.state.saving = true;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
-                jwt: app.user.jwt,
-                type: ChainType.Chain,
+                alt_wallet_url: altWalletUrl,
                 base: ChainBase.CosmosSDK,
+                bech32_prefix: bech32Prefix,
+                chain_string: chainString,
+                eth_chain_id: ethChainId,
+                jwt: app.user.jwt,
                 network: this.state.form.id,
+                node_url: nodeUrl,
+                type: ChainType.Chain,
                 ...this.state.form,
               });
               await initAppState(false);
