@@ -1,7 +1,7 @@
 import 'pages/user_dashboard.scss';
 
 import m from 'mithril';
-import _, { capitalize } from 'lodash';
+import _ from 'lodash';
 import $ from 'jquery';
 import {
   TabItem,
@@ -9,22 +9,16 @@ import {
   Tag,
   Col,
   Grid,
-  Card,
   Icon,
   Icons,
   Spinner,
 } from 'construct-ui';
 
 import app from 'state';
-import { pluralize } from 'helpers';
-import { DashboardActivityNotification, ChainEvent } from 'models';
-import { sortNotifications } from 'helpers/notifications';
+import { DashboardActivityNotification } from 'models';
 import UserDashboardRow from 'views/components/user_dashboard_row';
-import { ChainIcon } from 'views/components/chain_icon';
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
 import DashboardExplorePreview from '../components/dashboard_explore_preview';
-import { LoadingLayout } from '../layout';
 
 const fetchActivity = async (request: string) => {
   const activity = await $.post(`${app.serverUrl()}/viewActivity`, {

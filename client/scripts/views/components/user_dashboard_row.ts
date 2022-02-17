@@ -1,44 +1,28 @@
 import 'components/user_dashboard_row.scss';
 
-import { Icon, Icons, Button, MenuItem, PopoverMenu } from 'construct-ui';
+import { Icons, Button, MenuItem, PopoverMenu } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
-import moment from 'moment';
 import {
-  SubstrateEvents,
-  MolochEvents,
-  IEventLabel,
-  SupportedNetwork,
-  CompoundEvents,
-  AaveEvents,
   CWEvent,
   Label as ChainEventLabel,
   // CompoundEvents
 } from '@commonwealth/chain-events';
 
 import app from 'state';
-import { NotificationCategories, ProposalType } from 'types';
+import { NotificationCategories } from 'types';
 import {
-  Notification,
   AddressInfo,
-  NotificationCategory,
   DashboardActivityNotification,
   NotificationSubscription,
 } from 'models';
-import { link, pluralize } from 'helpers';
-import { IPostNotificationData } from 'shared/types';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 
-import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
-import { CWEngagementButton } from './component_kit/cw_engagement_button';
-import { NumberList } from 'aws-sdk/clients/iot';
-import { Category } from 'typescript-logging';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { ChainIcon } from './chain_icon';
+import { getProposalUrl } from '../../../../shared/utils';
+import { notifySuccess } from 'controllers/app/notifications';
 
 const getCommentPreview = (commentText) => {
   let decodedCommentText;
