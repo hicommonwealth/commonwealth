@@ -384,11 +384,10 @@ const UserDashboardRow: m.Component<
           onclick: () => {
             if (label.linkUrl) {
               m.route.set(label.linkUrl);
-            } else {
-              notifyError('No Link Available!');
             }
             m.redraw();
           },
+          style: label.linkUrl ? 'cursor: pointer;' : '',
         },
         [
           m('.activity-content', [
@@ -448,6 +447,7 @@ const UserDashboardRow: m.Component<
           m.route.set(path);
           m.redraw();
         },
+        style: path ? 'cursor: pointer;' : '',
       },
       [
         m('.activity-content', [

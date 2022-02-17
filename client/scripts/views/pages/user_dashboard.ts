@@ -103,11 +103,9 @@ const UserDashboard: m.Component<
       } else if (tab == DashboardViews.Chain) {
         if (chainEvents.length === 0) vnode.state.loadingData = true;
         fetchActivity('chainEvents').then((activity) => {
-          vnode.state.chainEvents = activity.result
-            .map((notification) =>
-              DashboardActivityNotification.fromJSON(notification)
-            )
-            .reverse();
+          vnode.state.chainEvents = activity.result.map((notification) =>
+            DashboardActivityNotification.fromJSON(notification)
+          );
           vnode.state.loadingData = false;
           m.redraw();
         });

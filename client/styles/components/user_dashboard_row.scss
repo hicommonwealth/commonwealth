@@ -11,7 +11,6 @@
   flex-direction: column;
   padding: 17px 22px;
   margin-right: 60px;
-  cursor: pointer;
   border-bottom-width: 2px;
 
   @include md-max {
@@ -42,6 +41,7 @@
         }
         span.community-link {
           font-weight: 600;
+          cursor: pointer;
           &:hover {
             text-decoration: underline;
           }
