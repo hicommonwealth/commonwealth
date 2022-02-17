@@ -267,7 +267,7 @@ const UserDashboard: m.Component<
                         ]
                       : m(
                           '.no-notifications',
-                          'Join some communities to see Activity'
+                          'Join some communities to see Activity!'
                         ),
                   ],
                   activeTab === DashboardViews.Global && [
@@ -310,7 +310,7 @@ const UserDashboard: m.Component<
                         ]
                       : m(
                           '.no-notifications',
-                          'Join some communities that have governance to see Chain Events'
+                          'Join some communities that have governance to see Chain Events!'
                         ),
                   ],
                 ]),
