@@ -72,6 +72,7 @@ const UserDashboard: m.Component<
 
     // Helper to load activity conditional on the selected tab
     const handleToggle = (tab: DashboardViews) => {
+      vnode.state.loadingData = false;
       if (tab === DashboardViews.FY) {
         if (fyNotifications.length === 0) vnode.state.loadingData = true;
         fetchActivity('forYou').then((activity) => {
@@ -92,6 +93,7 @@ const UserDashboard: m.Component<
             )
             .reverse();
           vnode.state.loadingData = false;
+          console.log('okay');
           m.redraw();
         });
       } else if (tab == DashboardViews.Chain) {

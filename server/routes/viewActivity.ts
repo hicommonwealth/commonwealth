@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import { DB, sequelize} from '../database';
+import { DB, sequelize } from '../database';
 
 const { Op } = Sequelize;
 
@@ -20,7 +20,7 @@ export default async (
   const { id } = req.user;
   const { request: activity_type } = req.body;
 
-  const global_activity =`SELECT nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id,
+  const global_activity = `SELECT nt.thread_id, nt.last_activity, nts.notification_data, nts.category_id,
                   MAX(ovc.view_count) as view_count, 
                   COUNT(DISTINCT oc.id) AS comment_count,
                   COUNT(DISTINCT tr.id) + COUNT(DISTINCT cr.id) AS reaction_count
@@ -85,17 +85,15 @@ export default async (
     case 'chainEvents':
       query = chain_events;
       break;
-    case 'forYou': 
-    default: 
+    case 'forYou':
+    default:
       query = user_activity;
   }
 
-  const notifications = await models.sequelize.query(
-    query,
-    {
-      type: 'SELECT',
-      raw: true,
-    });
+  const notifications = await models.sequelize.query(query, {
+    type: 'SELECT',
+    raw: true,
+  });
 
   return res.json({ status: 'Success', result: notifications });
 };
