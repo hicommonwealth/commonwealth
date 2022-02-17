@@ -7,8 +7,8 @@ import { ComponentType } from './types';
 import { getButtonClasses } from './helpers';
 import { ButtonAttrs } from './cw_button';
 
-export const CWGradientButton: m.Component<ButtonAttrs> = {
-  view: (vnode) => {
+export class CWGradientButton implements m.ClassComponent<ButtonAttrs> {
+  view(vnode) {
     const {
       buttonType = 'primary',
       className,
@@ -29,5 +29,5 @@ export const CWGradientButton: m.Component<ButtonAttrs> = {
         <span>{label}</span>
       </button>
     );
-  },
-};
+  }
+}

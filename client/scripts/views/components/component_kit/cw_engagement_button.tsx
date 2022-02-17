@@ -3,7 +3,7 @@
 import m from 'mithril';
 import 'components/component_kit/cw_engagement_button.scss';
 
-import { CreateIcon, IconSize, IconIntent } from './icons';
+import { CWIcon } from './cw_icons/cw_icon';
 import { ComponentType, StyleAttrs } from './types';
 import { getButtonClasses } from './helpers';
 
@@ -18,8 +18,10 @@ type EngagementButtonAttrs = {
   onclick: (e?: MouseEvent) => void;
 } & EngagementButtonStyleAttrs;
 
-export const CWEngagementButton: m.Component<EngagementButtonAttrs> = {
-  view: (vnode) => {
+export class CWEngagementButton
+  implements m.ClassComponent<EngagementButtonAttrs>
+{
+  view(vnode) {
     const {
       label,
       onclick,
@@ -36,14 +38,11 @@ export const CWEngagementButton: m.Component<EngagementButtonAttrs> = {
           buttonSize,
         })}
         onclick={onclick}
+        disabled={disabled}
       >
-        {m(CreateIcon, {
-          size: IconSize.MD,
-          disabled,
-          intent: IconIntent.Primary,
-        })}
+        <CWIcon disabled={disabled} iconName="create" />
         <span>{label}</span>
       </button>
     );
-  },
-};
+  }
+}
