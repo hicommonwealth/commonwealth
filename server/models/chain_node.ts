@@ -1,9 +1,9 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { Model, DataTypes } from 'sequelize';
 import { ChainInstance, ChainAttributes } from './chain';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface ChainNodeAttributes {
+export type ChainNodeAttributes = {
   chain: string;
   url: string;
   id?: number;
@@ -17,9 +17,7 @@ export interface ChainNodeAttributes {
   Chain?: ChainAttributes;
 }
 
-export interface ChainNodeInstance
-  extends Model<ChainNodeAttributes>,
-    ChainNodeAttributes {
+export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
   // TODO: add mixins as needed
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
 }
