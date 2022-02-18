@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
 export const Errors = {
@@ -13,7 +13,7 @@ export const Errors = {
 };
 
 const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) => {
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));

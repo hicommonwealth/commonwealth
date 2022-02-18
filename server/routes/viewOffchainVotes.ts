@@ -1,4 +1,4 @@
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
 import { OffchainVoteAttributes } from '../models/offchain_vote';
@@ -20,11 +20,7 @@ const viewOffchainVotes = async (
   //   maybe something like https://www.npmjs.com/package/runtime-typescript-checker
   let chain, error;
   try {
-    [chain, error] = await lookupCommunityIsVisibleToUser(
-      models,
-      req.query,
-      req.user
-    );
+    [chain, error] = await validateChain(models, req.query);
   } catch (err) {
     throw new AppError(err);
   }
