@@ -5,7 +5,7 @@ import { Icon, Icons } from 'construct-ui';
 
 import 'components/sidebar/sidebar_section.scss';
 
-export type SubSectionProps = {
+export type SubSectionAttrs = {
   isActive: boolean; // Is this the current page
   isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
   isVisible: boolean;
@@ -16,7 +16,7 @@ export type SubSectionProps = {
   title: string;
 };
 
-class SubSection implements m.ClassComponent<SubSectionProps> {
+class SubSection implements m.ClassComponent<SubSectionAttrs> {
   view(vnode) {
     const {
       isActive,
@@ -36,7 +36,7 @@ class SubSection implements m.ClassComponent<SubSectionProps> {
       onclick(e);
     };
 
-    let titleTextClass = 'title-standard';
+    let titleTextClass = '';
 
     if (isActive) {
       titleTextClass = 'title-active';
@@ -57,9 +57,9 @@ class SubSection implements m.ClassComponent<SubSectionProps> {
   }
 }
 
-export type SectionGroupProps = {
+export type SectionGroupAttrs = {
   containsChildren: boolean;
-  displayData: SubSectionProps[] | null;
+  displayData: SubSectionAttrs[] | null;
   hasDefaultToggle: boolean;
   isActive: boolean; // Is this the current page
   isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
@@ -70,7 +70,7 @@ export type SectionGroupProps = {
   title: string;
 };
 
-class SectionGroup implements m.ClassComponent<SectionGroupProps> {
+class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
 
@@ -110,7 +110,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
           name: Icons.CHEVRON_RIGHT,
         });
 
-    let titleTextClass = 'section-title-text-standard';
+    let titleTextClass = '';
 
     if (isActive && !containsChildren) {
       titleTextClass = 'section-title-text-active';
@@ -135,7 +135,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
       }
     };
 
-    const mouseLeaveHandler = (e) => {
+    const mouseLeaveHandler = () => {
       backgroundColor = isActive && !containsChildren ? '#EDE7FF' : 'none';
       this.hoverOn = false;
     };
@@ -144,7 +144,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
       <div
         class="SectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
-        onmouseleave={(e) => mouseLeaveHandler(e)}
+        onmouseleave={() => mouseLeaveHandler()}
       >
         <div
           class="SectionGroupTitle"
@@ -173,9 +173,9 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
   }
 }
 
-export type SidebarSectionProps = {
+export type SidebarSectionAttrs = {
   hasDefaultToggle: boolean;
-  displayData: SectionGroupProps[];
+  displayData: SectionGroupAttrs[];
   extraComponents?: m.Vnode;
   isActive: boolean;
   onclick: any;
@@ -185,7 +185,7 @@ export type SidebarSectionProps = {
   toggleDisabled?: boolean;
 };
 
-export class SidebarSection implements m.ClassComponent<SidebarSectionProps> {
+export class SidebarSection implements m.ClassComponent<SidebarSectionAttrs> {
   private toggled: boolean;
   private hoverColor: string;
 

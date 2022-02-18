@@ -10,13 +10,13 @@ import { Icon, Icons, Menu, MenuItem, Spinner, Overlay } from 'construct-ui';
 
 import { navigateToSubpage } from 'app';
 import app from 'state';
-import { ChatErrors, IChannel } from 'controllers/server/socket/chatNs';
+import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageType } from 'types';
 import {
   SidebarSection,
-  SidebarSectionProps,
-  SectionGroupProps,
-  SubSectionProps,
+  SidebarSectionAttrs,
+  SectionGroupAttrs,
+  SubSectionAttrs,
 } from '../sidebar/sidebar_section';
 import { ToggleTree, verifyCachedToggleTree } from '../sidebar';
 import {
@@ -27,7 +27,6 @@ import {
   DeleteCategory,
   DeleteChannel,
 } from './admin_modals';
-import ErrorPage from '../../pages/error';
 
 enum Errors {
   None = '',
@@ -42,7 +41,7 @@ interface IState {
   error: Errors;
   channelToToggleTree: Function;
   categoryToToggleTree: Function;
-  menu_toggle_tree: ToggleTree;
+  menuToggleTree: ToggleTree;
   adminModals: { [modal: string]: boolean };
   adminCategory: string;
   adminChannel: IChannel | {};
@@ -50,21 +49,21 @@ interface IState {
 }
 
 function setToggleTree(path: string, toggle: boolean) {
-  let current_tree = JSON.parse(
+  let currentTree = JSON.parse(
     localStorage[`${app.activeChainId()}-chat-toggle-tree`]
   );
   const split = path.split('.');
   for (const field of split.slice(0, split.length - 1)) {
-    if (current_tree.hasOwnProperty(field)) {
-      current_tree = current_tree[field];
+    if (currentTree.hasOwnProperty(field)) {
+      currentTree = currentTree[field];
     } else {
       return;
     }
   }
-  current_tree[split[split.length - 1]] = toggle;
-  const new_tree = current_tree;
+  currentTree[split[split.length - 1]] = toggle;
+  const newTree = currentTree;
   localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-    JSON.stringify(new_tree);
+    JSON.stringify(newTree);
 }
 
 export const ChatSection: m.Component<
@@ -80,28 +79,28 @@ export const ChatSection: m.Component<
     }
 
     vnode.state.channelToToggleTree = (channels: IChannel[]) => {
-      const toggle_tree = {};
+      const toggleTree = {};
       channels.forEach((k) => {
-        toggle_tree[k.name] = { toggled_state: false };
+        toggleTree[k.name] = { toggledState: false };
       });
-      return toggle_tree;
+      return toggleTree;
     };
 
     vnode.state.categoryToToggleTree = (
       categories: string[],
-      default_state: boolean
+      defaultState: boolean
     ) => {
-      const toggle_tree = {};
+      const toggleTree = {};
       categories.forEach((category) => {
         const channelToggleTree = vnode.state.channelToToggleTree(
           vnode.state.channels[category]
         );
-        toggle_tree[category] = {
-          toggled_state: default_state,
+        toggleTree[category] = {
+          toggledState: defaultState,
           children: channelToggleTree,
         };
       });
-      return toggle_tree;
+      return toggleTree;
     };
 
     vnode.state.adminModals = {
@@ -140,9 +139,9 @@ export const ChatSection: m.Component<
     );
     vnode.state.loaded = true;
 
-    vnode.state.menu_toggle_tree = {
+    vnode.state.menuToggleTree = {
       // Used to track admin menu render status for hover
-      toggled_state: false,
+      toggledState: false,
       children: vnode.state.categoryToToggleTree(
         Object.keys(vnode.state.channels),
         false
@@ -157,8 +156,8 @@ export const ChatSection: m.Component<
           ? vnode.state.channels[metadata.category].push(metadata)
           : (vnode.state.channels[metadata.category] = [metadata]);
       });
-      vnode.state.menu_toggle_tree = {
-        toggled_state: false,
+      vnode.state.menuToggleTree = {
+        toggledState: false,
         children: vnode.state.categoryToToggleTree(
           Object.keys(vnode.state.channels),
           false
@@ -185,8 +184,8 @@ export const ChatSection: m.Component<
         : (vnode.state.channels[metadata.category] = [metadata]);
     });
 
-    const channel_toggle_tree: ToggleTree = {
-      toggled_state: true,
+    const channelToggleTree: ToggleTree = {
+      toggledState: true,
       children: vnode.state.categoryToToggleTree(
         Object.keys(vnode.state.channels),
         true
@@ -197,15 +196,15 @@ export const ChatSection: m.Component<
     if (!localStorage[`${app.activeChainId()}-chat-toggle-tree`]) {
       console.log('setting toggle tree from scratch');
       localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-        JSON.stringify(channel_toggle_tree);
-    } else if (!verifyCachedToggleTree('chat', channel_toggle_tree)) {
+        JSON.stringify(channelToggleTree);
+    } else if (!verifyCachedToggleTree('chat', channelToggleTree)) {
       console.log(
         'setting chat toggle tree since the cached version differs from the updated version'
       );
       localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-        JSON.stringify(channel_toggle_tree);
+        JSON.stringify(channelToggleTree);
     }
-    const toggle_tree_state = JSON.parse(
+    const toggleTreeState = JSON.parse(
       localStorage[`${app.activeChainId()}-chat-toggle-tree`]
     );
 
@@ -223,19 +222,15 @@ export const ChatSection: m.Component<
 
     const categoryAdminButton = (category: string): m.Vnode => {
       const handleMouseout = () => {
-        if (
-          vnode.state.menu_toggle_tree['children'][category]['toggled_state']
-        ) {
-          vnode.state.menu_toggle_tree['children'][category]['toggled_state'] =
+        if (vnode.state.menuToggleTree['children'][category]['toggledState']) {
+          vnode.state.menuToggleTree['children'][category]['toggledState'] =
             false;
         }
       };
 
       const handleMouseover = (e) => {
-        if (
-          !vnode.state.menu_toggle_tree['children'][category]['toggled_state']
-        ) {
-          vnode.state.menu_toggle_tree['children'][category]['toggled_state'] =
+        if (!vnode.state.menuToggleTree['children'][category]['toggledState']) {
+          vnode.state.menuToggleTree['children'][category]['toggledState'] =
             true;
           vnode.state.adminCategory = category;
         } else {
@@ -244,13 +239,13 @@ export const ChatSection: m.Component<
         }
       };
 
-      const handleMenuClick = (e, modal_name) => {
+      const handleMenuClick = (e, modalName) => {
         e.stopPropagation();
-        vnode.state.adminModals[modal_name] = true;
+        vnode.state.adminModals[modalName] = true;
         handleMouseout();
       };
 
-      const menu_component = (
+      const menuComponent = (
         <Menu
           class="admin-menu"
           onmouseenter={handleMouseover}
@@ -287,9 +282,8 @@ export const ChatSection: m.Component<
             onmouseenter={handleMouseover}
             onmouseleave={handleMouseout}
           />
-          {vnode.state.menu_toggle_tree['children'][category][
-            'toggled_state'
-          ] && menu_component}
+          {vnode.state.menuToggleTree['children'][category]['toggledState'] &&
+            menuComponent}
         </div>
       );
     };
@@ -297,25 +291,25 @@ export const ChatSection: m.Component<
     const channelRightIcon = (channel: IChannel) => {
       const handleMouseout = () => {
         if (
-          vnode.state.menu_toggle_tree['children'][channel.category][
-            'children'
-          ][channel.name]['toggled_state']
+          vnode.state.menuToggleTree['children'][channel.category]['children'][
+            channel.name
+          ]['toggledState']
         ) {
-          vnode.state.menu_toggle_tree['children'][channel.category][
-            'children'
-          ][channel.name]['toggled_state'] = false;
+          vnode.state.menuToggleTree['children'][channel.category]['children'][
+            channel.name
+          ]['toggledState'] = false;
         }
       };
 
       const handleMouseover = (e) => {
         if (
-          !vnode.state.menu_toggle_tree['children'][channel.category][
-            'children'
-          ][channel.name]['toggled_state']
+          !vnode.state.menuToggleTree['children'][channel.category]['children'][
+            channel.name
+          ]['toggledState']
         ) {
-          vnode.state.menu_toggle_tree['children'][channel.category][
-            'children'
-          ][channel.name]['toggled_state'] = true;
+          vnode.state.menuToggleTree['children'][channel.category]['children'][
+            channel.name
+          ]['toggledState'] = true;
           vnode.state.adminChannel = channel;
         } else {
           e.redraw = false;
@@ -323,13 +317,13 @@ export const ChatSection: m.Component<
         }
       };
 
-      const handleMenuClick = (e, modal_name) => {
+      const handleMenuClick = (e, modalName) => {
         e.stopPropagation();
-        vnode.state.adminModals[modal_name] = true;
+        vnode.state.adminModals[modalName] = true;
         handleMouseout();
       };
 
-      const menu_component = (
+      const menuComponent = (
         <Menu
           class="admin-menu"
           onmouseenter={handleMouseover}
@@ -355,7 +349,7 @@ export const ChatSection: m.Component<
       return (
         <div>
           {channel.unread > 0 && (
-            <div class="unread_icon">
+            <div class="unread-icon">
               <p>{channel.unread}</p>
             </div>
           )}
@@ -364,14 +358,14 @@ export const ChatSection: m.Component<
             onmouseenter={handleMouseover}
             onmouseleave={handleMouseout}
           />
-          {vnode.state.menu_toggle_tree['children'][channel.category][
-            'children'
-          ][channel.name]['toggled_state'] && menu_component}
+          {vnode.state.menuToggleTree['children'][channel.category]['children'][
+            channel.name
+          ]['toggledState'] && menuComponent}
         </div>
       );
     };
 
-    const channelToSubSectionProps = (channel: IChannel): SubSectionProps => {
+    const channelToSubSectionProps = (channel: IChannel): SubSectionAttrs => {
       const onChannelPage = (p) =>
         p.startsWith(`/${app.activeChainId()}/chat/${channel.id}`) ||
         (app.isCustomDomain() && p.startsWith(`/chat/${channel.id}`));
@@ -381,19 +375,18 @@ export const ChatSection: m.Component<
         isVisible: true,
         isActive: onChannelPage(m.route.get()),
         isUpdated: channel.unread > 0,
-        onclick: (e) => {
+        onclick: () => {
           navigateToSubpage(`/chat/${channel.id}`);
         },
         rightIcon: channelRightIcon(channel),
       };
     };
 
-    const categoryToSectionGroup = (category: string): SectionGroupProps => {
+    const categoryToSectionGroup = (category: string): SectionGroupAttrs => {
       return {
         title: category,
         containsChildren: true,
-        hasDefaultToggle:
-          toggle_tree_state['children'][category]['toggled_state'],
+        hasDefaultToggle: toggleTreeState['children'][category]['toggledState'],
         isVisible: true,
         isActive: false, // TODO: if any child is active
         isUpdated: false, // TODO: is collapsed and children has unread
@@ -407,70 +400,70 @@ export const ChatSection: m.Component<
       };
     };
 
-    const channel_data: SectionGroupProps[] = Object.keys(
+    const channelData: SectionGroupAttrs[] = Object.keys(
       vnode.state.channels
     ).map(categoryToSectionGroup);
 
-    const close_overlay = () => {
+    const closeOverlay = () => {
       Object.keys(vnode.state.adminModals).forEach((k) => {
         vnode.state.adminModals[k] = false;
       });
       m.redraw();
     };
-    const overlay_content: m.Vnode = vnode.state.adminModals[
+    const overlayContent: m.Vnode = vnode.state.adminModals[
       'CreateCategory'
     ] ? (
-      <CreateCategory handleClose={close_overlay} />
+      <CreateCategory handleClose={closeOverlay} />
     ) : vnode.state.adminModals['CreateChannel'] ? (
       <CreateChannel
-        handleClose={close_overlay}
+        handleClose={closeOverlay}
         category={vnode.state.adminCategory}
       />
     ) : vnode.state.adminModals['RenameCategory'] ? (
       <RenameCategory
-        handleClose={close_overlay}
+        handleClose={closeOverlay}
         category={vnode.state.adminCategory}
       />
     ) : vnode.state.adminModals['RenameChannel'] ? (
       <RenameChannel
-        handleClose={close_overlay}
+        handleClose={closeOverlay}
         channel={vnode.state.adminChannel}
       />
     ) : vnode.state.adminModals['DeleteCategory'] ? (
       <DeleteCategory
-        handleClose={close_overlay}
+        handleClose={closeOverlay}
         category={vnode.state.adminCategory}
       />
     ) : vnode.state.adminModals['DeleteChannel'] ? (
       <DeleteChannel
-        handleClose={close_overlay}
+        handleClose={closeOverlay}
         channel={vnode.state.adminChannel}
       />
     ) : (
       <div></div>
     );
 
-    const sidebar_section_data: SidebarSectionProps = {
+    const sidebarSectionData: SidebarSectionAttrs = {
       title: 'CHAT',
-      hasDefaultToggle: toggle_tree_state['toggled_state'],
+      hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        setToggleTree('toggled_state', toggle);
+        setToggleTree('toggledState', toggle);
       },
-      displayData: channel_data,
+      displayData: channelData,
       isActive: false,
       rightIcon: sectionAdminButton,
       extraComponents: (
         <Overlay
           class="chatAdminOverlay"
           isOpen={Object.values(vnode.state.adminModals).some(Boolean)}
-          onClose={close_overlay}
+          onClose={closeOverlay}
           closeOnOutsideClick={true}
-          content={overlay_content}
+          content={overlayContent}
         />
       ),
     };
 
-    return m(SidebarSection, { ...sidebar_section_data });
+    return m(SidebarSection, { ...sidebarSectionData });
   },
 };

@@ -11,7 +11,8 @@ import {
   Icons,
   Tooltip,
 } from 'construct-ui';
-import { selectNode, initChain, navigateToSubpage } from 'app';
+
+import { selectNode, initChain } from 'app';
 import app from 'state';
 import { link } from 'helpers';
 import { ChainInfo, NodeInfo } from 'models';
@@ -27,13 +28,13 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 // Toggle Tree Definition (3 layers of depth, could add more if desired)
 export interface ToggleTree {
-  toggled_state: boolean;
+  toggledState: boolean;
   children: {
     [child: string]: {
-      toggled_state: boolean;
+      toggledState: boolean;
       children: {
         [child: string]: {
-          toggled_state: boolean;
+          toggledState: boolean;
         };
       };
     };
@@ -47,13 +48,13 @@ function comparisonCustomizer(value1, value2) {
 }
 // Check that our current cached tree is structurally correct
 export function verifyCachedToggleTree(
-  tree_name: string,
-  toggle_tree: ToggleTree
+  treeName: string,
+  toggleTree: ToggleTree
 ) {
-  const cached_tree = JSON.parse(
-    localStorage[`${app.activeChainId()}-${tree_name}-toggle-tree`]
+  const cachedTree = JSON.parse(
+    localStorage[`${app.activeChainId()}-${treeName}-toggle-tree`]
   );
-  return _.isEqualWith(cached_tree, toggle_tree, comparisonCustomizer);
+  return _.isEqualWith(cachedTree, toggleTree, comparisonCustomizer);
 }
 
 const SidebarQuickSwitcherItem: m.Component<{ item; size }> = {
@@ -89,7 +90,7 @@ const SidebarQuickSwitcherItem: m.Component<{ item; size }> = {
 };
 
 const SidebarQuickSwitcher: m.Component<{}> = {
-  view: (vnode) => {
+  view: () => {
     const allCommunities = app.config.chains
       .getAll()
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -237,11 +238,10 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
 };
 
 export const ExternalLinksModule: m.Component<{}, {}> = {
-  view: (vnode) => {
+  view: () => {
     if (!app.chain) return;
     const meta = app.chain.meta.chain;
-    const { name, description, website, discord, element, telegram, github } =
-      meta;
+    const { website, discord, element, telegram, github } = meta;
     if (!website && !discord && !telegram && !github) return;
 
     // TODO Gabe 1/31/22 - The css here (and for the whole sidebar) needs to be extensively refactored,

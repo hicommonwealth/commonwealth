@@ -6,27 +6,27 @@ import { navigateToSubpage } from 'app';
 import app from 'state';
 import {
   SidebarSection,
-  SectionGroupProps,
-  SidebarSectionProps,
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
 } from './sidebar_section';
 import { ToggleTree, verifyCachedToggleTree } from '.';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
-  let current_tree = JSON.parse(
+  let currentTree = JSON.parse(
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
   );
   const split = path.split('.');
   for (const field of split.slice(0, split.length - 1)) {
-    if (current_tree.hasOwnProperty(field)) {
-      current_tree = current_tree[field];
+    if (currentTree.hasOwnProperty(field)) {
+      currentTree = currentTree[field];
     } else {
       return;
     }
   }
-  current_tree[split[split.length - 1]] = toggle;
-  const new_tree = current_tree;
+  currentTree[split[split.length - 1]] = toggle;
+  const newTree = currentTree;
   localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
-    JSON.stringify(new_tree);
+    JSON.stringify(newTree);
 }
 
 export const DiscussionSection: m.Component<{ mobile: boolean }, {}> = {
@@ -87,22 +87,22 @@ export const DiscussionSection: m.Component<{ mobile: boolean }, {}> = {
       : 'DISCUSSIONS';
 
     // Build Toggle Tree
-    const discussions_default_toggle_tree: ToggleTree = {
-      toggled_state: true,
+    const discussionsDefaultToggleTree: ToggleTree = {
+      toggledState: true,
       children: {},
     };
 
     for (const topic of topics) {
       if (topic.featuredInSidebar) {
-        discussions_default_toggle_tree.children[topic.name] = {
-          toggled_state: true,
+        discussionsDefaultToggleTree.children[topic.name] = {
+          toggledState: true,
           children: {
             All: {
-              toggled_state: false,
+              toggledState: false,
             },
             ...(app.activeChainId() === 'near' && {
               SputnikDaos: {
-                toggled_state: false,
+                toggledState: false,
               },
             }),
           },
@@ -114,24 +114,24 @@ export const DiscussionSection: m.Component<{ mobile: boolean }, {}> = {
     if (!localStorage[`${app.activeChainId()}-discussions-toggle-tree`]) {
       console.log("setting discussions toggle tree since it doesn't exist");
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
-        JSON.stringify(discussions_default_toggle_tree);
+        JSON.stringify(discussionsDefaultToggleTree);
     } else if (
-      !verifyCachedToggleTree('discussions', discussions_default_toggle_tree)
+      !verifyCachedToggleTree('discussions', discussionsDefaultToggleTree)
     ) {
       console.log(
         'setting discussions toggle tree since the cached version differs from the updated version'
       );
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
-        JSON.stringify(discussions_default_toggle_tree);
+        JSON.stringify(discussionsDefaultToggleTree);
     }
-    let toggle_tree_state = JSON.parse(
+    let toggleTreeState = JSON.parse(
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
     );
     if (vnode.attrs.mobile) {
-      toggle_tree_state = discussions_default_toggle_tree;
+      toggleTreeState = discussionsDefaultToggleTree;
     }
 
-    const discussions_group_data: SectionGroupProps[] = [
+    const discussionsGroupData: SectionGroupAttrs[] = [
       {
         title: 'All',
         containsChildren: false,
@@ -141,7 +141,7 @@ export const DiscussionSection: m.Component<{ mobile: boolean }, {}> = {
         isActive: onAllDiscussionPage(m.route.get()),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(`children.All.toggled_state`, toggle);
+          setDiscussionsToggleTree(`children.All.toggledState`, toggle);
           navigateToSubpage('/');
         },
         displayData: null,
@@ -157,10 +157,7 @@ export const DiscussionSection: m.Component<{ mobile: boolean }, {}> = {
           (app.chain ? app.chain.serverLoaded : true),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(
-            `children.SputnikDAOs.toggled_state`,
-            toggle
-          );
+          setDiscussionsToggleTree(`children.SputnikDAOs.toggledState`, toggle);
           navigateToSubpage('/sputnik-daos');
         },
         displayData: null,
@@ -169,7 +166,7 @@ export const DiscussionSection: m.Component<{ mobile: boolean }, {}> = {
 
     for (const topic of topics) {
       if (topic.featuredInSidebar) {
-        const discussion_section_group: SectionGroupProps = {
+        const discussionSectionGroup: SectionGroupAttrs = {
           title: topic.name,
           containsChildren: false,
           hasDefaultToggle: false,
@@ -179,29 +176,29 @@ export const DiscussionSection: m.Component<{ mobile: boolean }, {}> = {
           onclick: (e, toggle: boolean) => {
             e.preventDefault();
             setDiscussionsToggleTree(
-              `children.${topic.name}.toggled_state`,
+              `children.${topic.name}.toggledState`,
               toggle
             );
             navigateToSubpage(`/discussions/${encodeURI(topic.name)}`);
           },
           displayData: null,
         };
-        discussions_group_data.push(discussion_section_group);
+        discussionsGroupData.push(discussionSectionGroup);
       }
     }
 
-    const sidebar_section_data: SidebarSectionProps = {
+    const sidebarSectionData: SidebarSectionAttrs = {
       title: discussionsLabel,
-      hasDefaultToggle: toggle_tree_state['toggled_state'],
+      hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        setDiscussionsToggleTree('toggled_state', toggle);
+        setDiscussionsToggleTree('toggledState', toggle);
       },
-      displayData: discussions_group_data,
+      displayData: discussionsGroupData,
       isActive: true,
       toggleDisabled: vnode.attrs.mobile,
     };
 
-    return m(SidebarSection, { ...sidebar_section_data });
+    return m(SidebarSection, { ...sidebarSectionData });
   },
 };
