@@ -1,18 +1,23 @@
-import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { OffchainVoteAttributes } from '../models/offchain_vote';
+import { TypedRequestQuery, TypedResponse, success } from '../types';
 
 export const Errors = {
   InvalidThread: 'Invalid thread',
 };
 
+type ViewOffchainVotesReq = { thread_id: string, chain: string };
+type ViewOffchainVotesResp = OffchainVoteAttributes[];
+
 const viewOffchainVotes = async (
   models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestQuery<ViewOffchainVotesReq>,
+  res: TypedResponse<ViewOffchainVotesResp>
 ) => {
+  // TODO: runtime validation based on params
+  //   maybe something like https://www.npmjs.com/package/runtime-typescript-checker
   let chain, error;
   try {
     [chain, error] = await lookupCommunityIsVisibleToUser(
@@ -36,10 +41,7 @@ const viewOffchainVotes = async (
     const votes = await models.OffchainVote.findAll({
       where: { thread_id: req.query.thread_id, chain: chain.id },
     });
-    return res.json({
-      status: 'Success',
-      result: votes.map((v) => v.toJSON()),
-    });
+    return success(res, votes.map((v) => v.toJSON()));
   } catch (err) {
     throw new ServerError(err);
   }
