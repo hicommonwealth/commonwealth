@@ -9,7 +9,7 @@ export type NotificationCategoryAttributes = {
   updated_at?: Date;
 }
 
-export type NotificationCategoryInstance = ModelInstance<NotificationCategoryAttributes> & {};
+export type NotificationCategoryInstance = ModelInstance<NotificationCategoryAttributes>;
 
 export type NotificationCategoryModelStatic = ModelStatic<NotificationCategoryInstance>;
 

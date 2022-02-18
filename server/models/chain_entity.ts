@@ -22,7 +22,7 @@ export type ChainEntityAttributes = {
   ChainEvents?: ChainEventAttributes[];
 }
 
-export type ChainEntityInstance = ModelInstance<ChainEntityAttributes> & {};
+export type ChainEntityInstance = ModelInstance<ChainEntityAttributes>;
 
 export type ChainEntityModelStatic = ModelStatic<ChainEntityInstance>;
 

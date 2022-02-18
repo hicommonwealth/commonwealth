@@ -13,7 +13,7 @@ export type ChainEventTypeAttributes = {
   Chain?: ChainAttributes;
 }
 
-export type ChainEventTypeInstance = ModelInstance<ChainEventTypeAttributes> & {};
+export type ChainEventTypeInstance = ModelInstance<ChainEventTypeAttributes>;
 
 export type ChainEventTypeModelStatic = ModelStatic<ChainEventTypeInstance>;
 

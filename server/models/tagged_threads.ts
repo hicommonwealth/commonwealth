@@ -9,7 +9,7 @@ export type TaggedThreadAttributes = {
   updated_at?: Date;
 }
 
-export type TaggedThreadInstance = ModelInstance<TaggedThreadAttributes> & {};
+export type TaggedThreadInstance = ModelInstance<TaggedThreadAttributes>;
 
 export type TaggedThreadModelStatic = ModelStatic<TaggedThreadInstance>;
 

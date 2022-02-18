@@ -10,7 +10,7 @@ export type HedgehogAuthenticationAttributes = {
   updated_at?: Date;
 }
 
-export type HedgehogAuthenticationInstance = ModelInstance<HedgehogAuthenticationAttributes> & {};
+export type HedgehogAuthenticationInstance = ModelInstance<HedgehogAuthenticationAttributes>;
 
 export type HedgehogAuthenticationModelStatic = ModelStatic<HedgehogAuthenticationInstance>;
 

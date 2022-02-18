@@ -15,7 +15,7 @@ export type OffchainProfileAttributes = {
   Address?: AddressAttributes;
 }
 
-export type OffchainProfileInstance = ModelInstance<OffchainProfileAttributes> & {};
+export type OffchainProfileInstance = ModelInstance<OffchainProfileAttributes>;
 
 export type OffchainProfileModelStatic = ModelStatic<OffchainProfileInstance>;
 

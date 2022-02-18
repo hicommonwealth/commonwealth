@@ -12,7 +12,7 @@ export type NotificationsReadAttributes = {
 	Notification?: NotificationAttributes;
 }
 
-export type NotificationsReadInstance = ModelInstance<NotificationsReadAttributes> & {};
+export type NotificationsReadInstance = ModelInstance<NotificationsReadAttributes>;
 
 export type NotificationsReadModelStatic = ModelStatic<NotificationsReadInstance>;
 

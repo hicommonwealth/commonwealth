@@ -9,7 +9,7 @@ export type EdgewareLockdropEverythingAttributes = {
   updated_at?: Date;
 }
 
-export type EdgewareLockdropEverythingInstance = ModelInstance<EdgewareLockdropEverythingAttributes> & {};
+export type EdgewareLockdropEverythingInstance = ModelInstance<EdgewareLockdropEverythingAttributes>;
 
 export type EdgewareLockdropEverythingModelStatic = ModelStatic<EdgewareLockdropEverythingInstance>;
 

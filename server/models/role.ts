@@ -20,7 +20,7 @@ export type RoleAttributes = {
   Chain?: ChainAttributes;
 }
 
-export type RoleInstance = ModelInstance<RoleAttributes> & {};
+export type RoleInstance = ModelInstance<RoleAttributes>;
 
 export type RoleModelStatic = ModelStatic<RoleInstance>;
 

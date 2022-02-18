@@ -16,7 +16,7 @@ export type InviteCodeAttributes = {
   Chain?: ChainAttributes;
 }
 
-export type InviteCodeInstance = ModelInstance<InviteCodeAttributes> & {};
+export type InviteCodeInstance = ModelInstance<InviteCodeAttributes>;
 
 export type InviteCodeModelStatic = ModelStatic<InviteCodeInstance>;
 

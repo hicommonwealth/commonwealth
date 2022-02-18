@@ -13,7 +13,7 @@ export type WebhookAttributes = {
   Chain?: ChainAttributes;
 }
 
-export type WebhookInstance = ModelInstance<WebhookAttributes> & {};
+export type WebhookInstance = ModelInstance<WebhookAttributes>;
 
 export type WebhookModelStatic = ModelStatic<WebhookInstance>;
 

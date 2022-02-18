@@ -18,7 +18,7 @@ export type OffchainReactionAttributes = {
   Address?: AddressAttributes;
 }
 
-export type OffchainReactionInstance = ModelInstance<OffchainReactionAttributes> & {};
+export type OffchainReactionInstance = ModelInstance<OffchainReactionAttributes>;
 
 export type OffchainReactionModelStatic = ModelStatic<OffchainReactionInstance>;
 

@@ -11,7 +11,7 @@ export type EdgewareLockdropEventAttributes = {
   data?: string;
 }
 
-export type EdgewareLockdropEventInstance = ModelInstance<EdgewareLockdropEventAttributes> & {};
+export type EdgewareLockdropEventInstance = ModelInstance<EdgewareLockdropEventAttributes>;
 
 export type EdgewareLockdropEventModelStatic = ModelStatic<EdgewareLockdropEventInstance>;
 

@@ -12,7 +12,7 @@ export type DiscussionDraftAttributes = {
   attachment?: string;
 }
 
-export type DiscussionDraftInstance = ModelInstance<DiscussionDraftAttributes> & {};
+export type DiscussionDraftInstance = ModelInstance<DiscussionDraftAttributes>;
 
 export type DiscussionDraftModelStatic = ModelStatic<DiscussionDraftInstance>;
 

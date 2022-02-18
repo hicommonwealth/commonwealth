@@ -11,7 +11,7 @@ export type ContractCategoryAttributes = {
   updated_at?: Date;
 }
 
-export type ContractCategoryInstance = ModelInstance<ContractCategoryAttributes> & {};
+export type ContractCategoryInstance = ModelInstance<ContractCategoryAttributes>;
 
 export type ContractCategoryModelStatic = ModelStatic<ContractCategoryInstance>;
 

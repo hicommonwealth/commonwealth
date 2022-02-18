@@ -18,7 +18,7 @@ export type OffchainAttachmentAttributes = {
   thread?: OffchainThreadAttributes | OffchainThreadAttributes['id'];
 }
 
-export type OffchainAttachmentInstance = ModelInstance<OffchainAttachmentAttributes> & {};
+export type OffchainAttachmentInstance = ModelInstance<OffchainAttachmentAttributes>;
 
 export type OffchainAttachmentModelStatic = ModelStatic<OffchainAttachmentInstance>;
 

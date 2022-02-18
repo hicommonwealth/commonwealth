@@ -10,7 +10,7 @@ export type HedgehogUserAttributes = {
   updated_at?: Date;
 }
 
-export type HedgehogUserInstance = ModelInstance<HedgehogUserAttributes> & {};
+export type HedgehogUserInstance = ModelInstance<HedgehogUserAttributes>;
 
 export type HedgehogUserModelStatic = ModelStatic<HedgehogUserInstance>;
 

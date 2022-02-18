@@ -18,7 +18,7 @@ export type ContractItemAttributes = {
   ContractCategory?: ContractCategoryAttributes;
 }
 
-export type ContractItemInstance = ModelInstance<ContractItemAttributes> & {};
+export type ContractItemInstance = ModelInstance<ContractItemAttributes>;
 
 export type ContractItemModelStatic = ModelStatic<ContractItemInstance>;
 

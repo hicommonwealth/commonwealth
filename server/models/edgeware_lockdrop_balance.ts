@@ -9,7 +9,7 @@ export type EdgewareLockdropBalanceAttributes = {
   id?: number;
 }
 
-export type EdgewareLockdropBalanceInstance = ModelInstance<EdgewareLockdropBalanceAttributes> & {};
+export type EdgewareLockdropBalanceInstance = ModelInstance<EdgewareLockdropBalanceAttributes>;
 
 export type EdgewareLockdropBalanceModelStatic = ModelStatic<EdgewareLockdropBalanceInstance>;
 
