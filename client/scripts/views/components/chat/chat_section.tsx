@@ -1,10 +1,13 @@
-/* eslint-disable @typescript-eslint/ban-types */
 /* @jsx m */
+
 import 'components/sidebar/index.scss';
+
+/* eslint-disable @typescript-eslint/ban-types */
 
 import m from 'mithril';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Spinner, Overlay } from 'construct-ui';
+
 import { navigateToSubpage } from 'app';
 import app from 'state';
 import { ChatErrors, IChannel } from 'controllers/server/socket/chatNs';
@@ -209,15 +212,13 @@ export const ChatSection: m.Component<
     // ---------- Build Section Props ---------- //
 
     const sectionAdminButton: m.Vnode = (
-      <div>
-        <Icon
-          name={Icons.PLUS_CIRCLE}
-          onclick={(e) => {
-            e.stopPropagation();
-            vnode.state.adminModals['CreateCategory'] = true;
-          }}
-        ></Icon>
-      </div>
+      <Icon
+        name={Icons.PLUS_CIRCLE}
+        onclick={(e) => {
+          e.stopPropagation();
+          vnode.state.adminModals['CreateCategory'] = true;
+        }}
+      />
     );
 
     const categoryAdminButton = (category: string): m.Vnode => {
@@ -362,7 +363,7 @@ export const ChatSection: m.Component<
             name={Icons.EDIT}
             onmouseenter={handleMouseover}
             onmouseleave={handleMouseout}
-          ></Icon>
+          />
           {vnode.state.menu_toggle_tree['children'][channel.category][
             'children'
           ][channel.name]['toggled_state'] && menu_component}
@@ -458,15 +459,7 @@ export const ChatSection: m.Component<
       },
       displayData: channel_data,
       isActive: false,
-      rightIcon: (
-        <Icon
-          name={Icons.PLUS_CIRCLE}
-          onclick={(e) => {
-            e.stopPropagation();
-            vnode.state.adminModals['CreateCategory'] = true;
-          }}
-        ></Icon>
-      ),
+      rightIcon: sectionAdminButton,
       extraComponents: (
         <Overlay
           class="chatAdminOverlay"

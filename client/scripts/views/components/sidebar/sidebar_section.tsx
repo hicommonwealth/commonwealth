@@ -36,20 +36,22 @@ class SubSection implements m.ClassComponent<SubSectionProps> {
       onclick(e);
     };
 
-    let titleTextClass = '.title-standard';
+    let titleTextClass = 'title-standard';
 
     if (isActive) {
-      titleTextClass = '.title-active';
+      titleTextClass = 'title-active';
     } else if (!isUpdated) {
-      titleTextClass = '.title-stale';
+      titleTextClass = 'title-stale';
     }
 
     return (
-      <div class="SubSection" onclick={(e) => clickHandler(e)}>
-        {rowIcon && (
-          <div class={titleTextClass}>{m(Icon, { name: Icons.HASH })}</div>
-        )}
-        <div class={titleTextClass}>{title}</div>]
+      <div
+        class="SubSection"
+        className={`${isActive ? 'active' : ''}`}
+        onclick={(e) => clickHandler(e)}
+      >
+        {rowIcon && m(Icon, { name: Icons.HASH })}
+        <div class={titleTextClass}>{title}</div>
         {rightIcon && <div class="right-icon">{rightIcon}</div>}
       </div>
     );
@@ -78,7 +80,6 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
   }
 
   view(vnode) {
-    console.log(vnode.attrs);
     const {
       containsChildren,
       displayData,
@@ -110,12 +111,12 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
           name: Icons.CHEVRON_RIGHT,
         });
 
-    let titleTextClass = '.section-title-text-standard';
+    let titleTextClass = 'section-title-text-standard';
 
     if (isActive && !containsChildren) {
-      titleTextClass = '.section-title-text-active';
+      titleTextClass = 'section-title-text-active';
     } else if (!isUpdated) {
-      titleTextClass = '.section-title-text-stale';
+      titleTextClass = 'section-title-text-stale';
     }
 
     let backgroundColor = 'none';
@@ -160,14 +161,14 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
           )}
           <div class={titleTextClass}>{title}</div>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
-          {containsChildren && toggled && (
-            <div class="subsections">
-              {displayData.map((subsection) => (
-                <SubSection {...subsection} />
-              ))}
-            </div>
-          )}
         </div>
+        {containsChildren && toggled && (
+          <div class="subsections">
+            {displayData.map((subsection) => (
+              <SubSection {...subsection} />
+            ))}
+          </div>
+        )}
       </div>
     );
   }
