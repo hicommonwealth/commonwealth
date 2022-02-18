@@ -87,13 +87,12 @@ const UserDashboard: m.Component<
       } else if (tab == DashboardViews.Global) {
         if (globalNotifications.length === 0) vnode.state.loadingData = true;
         fetchActivity('global').then((activity) => {
-          vnode.state.globalNotifications = activity.result
-            .map((notification) =>
+          vnode.state.globalNotifications = activity.result.map(
+            (notification) =>
               DashboardActivityNotification.fromJSON(notification)
-            )
-            .reverse();
+          );
           vnode.state.loadingData = false;
-          console.log('okay');
+          console.log(vnode.state.globalNotifications);
           m.redraw();
         });
       } else if (tab == DashboardViews.Chain) {
