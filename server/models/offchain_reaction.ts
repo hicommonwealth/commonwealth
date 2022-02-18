@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes } from './chain';
 import { AddressAttributes } from './address';
 
-export interface OffchainReactionAttributes {
+export type OffchainReactionAttributes = {
   address_id: number;
   reaction: string;
   id?: number;
@@ -18,10 +18,9 @@ export interface OffchainReactionAttributes {
   Address?: AddressAttributes;
 }
 
-export interface OffchainReactionInstance
-extends Model<OffchainReactionAttributes>, OffchainReactionAttributes {}
+export type OffchainReactionInstance = ModelInstance<OffchainReactionAttributes> & {};
 
-export type OffchainReactionModelStatic = ModelStatic<OffchainReactionInstance>
+export type OffchainReactionModelStatic = ModelStatic<OffchainReactionInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

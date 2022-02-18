@@ -1,8 +1,8 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface DiscussionDraftAttributes {
+export type DiscussionDraftAttributes = {
   id: number;
   address_id: number;
   title?: string;
@@ -12,10 +12,9 @@ export interface DiscussionDraftAttributes {
   attachment?: string;
 }
 
-export interface DiscussionDraftInstance
-    extends Model<DiscussionDraftAttributes>, DiscussionDraftAttributes {}
+export type DiscussionDraftInstance = ModelInstance<DiscussionDraftAttributes> & {};
 
-export type DiscussionDraftModelStatic = ModelStatic<DiscussionDraftInstance>
+export type DiscussionDraftModelStatic = ModelStatic<DiscussionDraftInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

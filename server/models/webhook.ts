@@ -1,9 +1,9 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ChainAttributes } from './chain';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface WebhookAttributes {
+export type WebhookAttributes = {
   url: string;
   categories: string[];
   id?: number;
@@ -13,9 +13,9 @@ export interface WebhookAttributes {
   Chain?: ChainAttributes;
 }
 
-export interface WebhookInstance extends Model<WebhookAttributes>, WebhookAttributes {}
+export type WebhookInstance = ModelInstance<WebhookAttributes> & {};
 
-export type WebhookModelStatic = ModelStatic<WebhookInstance>
+export type WebhookModelStatic = ModelStatic<WebhookInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

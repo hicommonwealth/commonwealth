@@ -1,11 +1,11 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
 import { ChainAttributes } from './chain';
 import { ContractCategoryAttributes } from './contract_category';
 
-export interface ContractItemAttributes {
+export type ContractItemAttributes = {
   chain: string;
   name: string;
   description: string;
@@ -18,10 +18,9 @@ export interface ContractItemAttributes {
   ContractCategory?: ContractCategoryAttributes;
 }
 
-export interface ContractItemInstance
-extends Model<ContractItemAttributes>, ContractItemAttributes {}
+export type ContractItemInstance = ModelInstance<ContractItemAttributes> & {};
 
-export type ContractItemModelStatic = ModelStatic<ContractItemInstance>
+export type ContractItemModelStatic = ModelStatic<ContractItemInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -3,9 +3,9 @@ import { Model, DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { ChainEventAttributes } from './chain_event';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface ChainEntityAttributes {
+export type ChainEntityAttributes = {
   chain: string;
   type: string;
   type_id: string;
@@ -22,10 +22,9 @@ export interface ChainEntityAttributes {
   ChainEvents?: ChainEventAttributes[];
 }
 
-export interface ChainEntityInstance
-extends Model<ChainEntityAttributes>, ChainEntityAttributes {}
+export type ChainEntityInstance = ModelInstance<ChainEntityAttributes> & {};
 
-export type ChainEntityModelStatic = ModelStatic<ChainEntityInstance>
+export type ChainEntityModelStatic = ModelStatic<ChainEntityInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

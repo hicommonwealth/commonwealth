@@ -1,8 +1,8 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface HedgehogUserAttributes {
+export type HedgehogUserAttributes = {
   username: string;
   walletAddress: string;
   id?: number;
@@ -10,9 +10,9 @@ export interface HedgehogUserAttributes {
   updated_at?: Date;
 }
 
-export interface HedgehogUserInstance extends Model<HedgehogUserAttributes>, HedgehogUserAttributes {}
+export type HedgehogUserInstance = ModelInstance<HedgehogUserAttributes> & {};
 
-export type HedgehogUserModelStatic = ModelStatic<HedgehogUserInstance>
+export type HedgehogUserModelStatic = ModelStatic<HedgehogUserInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

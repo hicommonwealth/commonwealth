@@ -3,9 +3,9 @@ import { Model, DataTypes } from 'sequelize';
 
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { AddressAttributes } from './address';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface OffchainProfileAttributes {
+export type OffchainProfileAttributes = {
   address_id: number;
   identity?: string;   // display name from chain
   judgements?: { [registrar: string]: SubstrateTypes.IdentityJudgement }
@@ -15,10 +15,9 @@ export interface OffchainProfileAttributes {
   Address?: AddressAttributes;
 }
 
-export interface OffchainProfileInstance
-extends Model<OffchainProfileAttributes>, OffchainProfileAttributes {}
+export type OffchainProfileInstance = ModelInstance<OffchainProfileAttributes> & {};
 
-export type OffchainProfileModelStatic = ModelStatic<OffchainProfileInstance>
+export type OffchainProfileModelStatic = ModelStatic<OffchainProfileInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

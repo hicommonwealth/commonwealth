@@ -1,18 +1,17 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface TaggedThreadAttributes {
+export type TaggedThreadAttributes = {
   topic_id: string;
   thread_id: number;
   created_at?: Date;
   updated_at?: Date;
 }
 
-export interface TaggedThreadInstance
-extends Model<TaggedThreadAttributes>, TaggedThreadAttributes {}
+export type TaggedThreadInstance = ModelInstance<TaggedThreadAttributes> & {};
 
-export type TaggedThreadModelStatic = ModelStatic<TaggedThreadInstance>
+export type TaggedThreadModelStatic = ModelStatic<TaggedThreadInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
