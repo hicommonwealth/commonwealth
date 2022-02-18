@@ -11,7 +11,7 @@ export type SubSectionProps = {
   isVisible: boolean;
   onclick: any;
   onhover?: () => void;
-  rightIcon?: m.Component;
+  rightIcon?: m.Vnode;
   rowIcon?: boolean;
   title: string;
 };
@@ -65,7 +65,7 @@ export type SectionGroupProps = {
   isVisible: boolean; // Is this section shown as an option
   onclick: any;
   onhover?: () => void;
-  rightIcon?: m.Component;
+  rightIcon?: m.Vnode;
   title: string;
 };
 
@@ -78,6 +78,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
   }
 
   view(vnode) {
+    console.log(vnode.attrs);
     const {
       containsChildren,
       displayData,
@@ -88,6 +89,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
       rightIcon,
       title,
     } = vnode.attrs;
+    const { toggled } = this;
 
     if (!isVisible) {
       return;
@@ -95,7 +97,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
 
     const clickHandler = (e) => {
       if (containsChildren) {
-        this.toggled = !this.toggled;
+        this.toggled = !toggled;
       }
       onclick(e, this.toggled);
     };
@@ -123,7 +125,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
     }
 
     const mouseEnterHandler = (e) => {
-      if (this.toggled || this.hoverOn) {
+      if (toggled || this.hoverOn) {
         e.redraw = false;
         e.stopPropagation();
       }
@@ -133,7 +135,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
       }
     };
 
-    const mouseLeaveHandler = () => {
+    const mouseLeaveHandler = (e) => {
       backgroundColor = isActive && !containsChildren ? '#EDE7FF' : 'none';
       this.hoverOn = false;
     };
@@ -142,7 +144,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
       <div
         class="SectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
-        onmouseleave={() => mouseLeaveHandler()}
+        onmouseleave={(e) => mouseLeaveHandler(e)}
       >
         <div
           class="SectionGroupTitle"
@@ -158,7 +160,7 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
           )}
           <div class={titleTextClass}>{title}</div>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
-          {containsChildren && this.toggled && (
+          {containsChildren && toggled && (
             <div class="subsections">
               {displayData.map((subsection) => (
                 <SubSection {...subsection} />
@@ -201,13 +203,14 @@ export class SidebarSection implements m.ClassComponent<SidebarSectionProps> {
       title,
       toggleDisabled,
     } = vnode.attrs;
+    const { toggled, hoverColor } = this;
 
     const clickHandler = (e) => {
       if (toggleDisabled) {
         return;
       }
 
-      this.toggled = !this.toggled;
+      this.toggled = !toggled;
 
       if (this.toggled) {
         this.hoverColor = 'none';
@@ -217,11 +220,11 @@ export class SidebarSection implements m.ClassComponent<SidebarSectionProps> {
     };
 
     const mouseEnterHandler = (e) => {
-      if (this.toggled || this.hoverColor) {
+      if (toggled || this.hoverColor) {
         e.redraw = false;
         e.stopPropagation();
       }
-      if (!this.toggled) {
+      if (!toggled) {
         this.hoverColor = '#EDE7FF';
       }
     };
@@ -230,7 +233,7 @@ export class SidebarSection implements m.ClassComponent<SidebarSectionProps> {
       this.hoverColor = 'none';
     };
 
-    const carat = this.toggled
+    const carat = toggled
       ? m(Icon, {
           name: Icons.CHEVRON_DOWN,
         })
@@ -243,7 +246,7 @@ export class SidebarSection implements m.ClassComponent<SidebarSectionProps> {
         class="SidebarSection"
         onmouseenter={(e) => mouseEnterHandler(e)}
         onmouseleave={() => mouseLeaveHandler()}
-        style={`background-color: ${this.hoverColor}`}
+        style={`background-color: ${hoverColor}`}
       >
         <div class="SidebarTitle" onclick={(e) => clickHandler(e)}>
           <div class="title-text">{title}</div>
