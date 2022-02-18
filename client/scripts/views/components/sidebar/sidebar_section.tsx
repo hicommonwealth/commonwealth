@@ -46,8 +46,7 @@ class SubSection implements m.ClassComponent<SubSectionProps> {
 
     return (
       <div
-        class="SubSection"
-        className={`${isActive ? 'active' : ''}`}
+        class={`SubSection${isActive ? ' active' : ''}`}
         onclick={(e) => clickHandler(e)}
       >
         {rowIcon && m(Icon, { name: Icons.HASH })}
