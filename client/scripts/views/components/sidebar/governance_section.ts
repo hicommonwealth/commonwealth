@@ -18,7 +18,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
   );
   const split = path.split('.');
   for (const field of split.slice(0, split.length - 1)) {
-    if (currentTree.hasOwnProperty(field)) {
+    if (Object.prototype.hasOwnProperty.call(currentTree, field)) {
       currentTree = currentTree[field];
     } else {
       return;

@@ -45,7 +45,7 @@ interface IState {
   adminModals: { [modal: string]: boolean };
   adminCategory: string;
   adminChannel: IChannel | {};
-  onincomingmessage: (any: any) => void;
+  onIncomingMessage: (any: any) => void;
 }
 
 function setToggleTree(path: string, toggle: boolean) {
@@ -54,7 +54,7 @@ function setToggleTree(path: string, toggle: boolean) {
   );
   const split = path.split('.');
   for (const field of split.slice(0, split.length - 1)) {
-    if (currentTree.hasOwnProperty(field)) {
+    if (Object.prototype.hasOwnProperty.call(currentTree, field)) {
       currentTree = currentTree[field];
     } else {
       return;
@@ -123,7 +123,7 @@ export const ChatSection: m.Component<
         : (vnode.state.channels[metadata.category] = [metadata]);
     });
 
-    vnode.state.onincomingmessage = (msg) => {
+    vnode.state.onIncomingMessage = (msg) => {
       if (vnode.attrs.activeChannel)
         app.socket.chatNs.readMessages(vnode.attrs.activeChannel);
       if (msg.chat_channel_id === vnode.attrs.activeChannel) {
@@ -135,7 +135,7 @@ export const ChatSection: m.Component<
     };
     app.socket.chatNs.addListener(
       WebsocketMessageType.ChatMessage,
-      vnode.state.onincomingmessage.bind(vnode)
+      vnode.state.onIncomingMessage.bind(vnode)
     );
     vnode.state.loaded = true;
 
@@ -169,7 +169,7 @@ export const ChatSection: m.Component<
     if (app.socket) {
       app.socket.chatNs.removeListener(
         WebsocketMessageType.ChatMessage,
-        vnode.state.onincomingmessage
+        vnode.state.onIncomingMessage
       );
     }
   },
