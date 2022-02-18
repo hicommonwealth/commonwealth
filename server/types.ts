@@ -3,14 +3,14 @@ import { UserInstance } from './models/user';
 
 export type TypedRequestQuery<
   Q extends Record<string, unknown> = Record<string, unknown>
-> = Request & {
+> = Express.Request & {
   user?: Express.User & UserInstance;
   query?: Q;
 }
 
 export type TypedRequestBody<
   B extends Record<string, unknown> = Record<string, unknown>
-> = Request & {
+> = Express.Request & {
   user?: Express.User & UserInstance;
   body?: B;
 }
@@ -18,7 +18,7 @@ export type TypedRequestBody<
 export type TypedRequest<
   B extends Record<string, unknown> = Record<string, unknown>,
   Q extends Record<string, unknown> = Record<string, unknown>
-> = Request & {
+> = Express.Request & {
   user?: Express.User & UserInstance;
   body?: B;
   query?: Q;

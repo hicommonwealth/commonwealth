@@ -19,7 +19,7 @@ export type OffchainVoteAttributes = {
 
 export type OffchainVoteInstance = ModelInstance<OffchainVoteAttributes>;
 
-export type OffchainVoteModelStatic = ModelStatic<OffchainVoteInstance>
+export type OffchainVoteModelStatic = ModelStatic<OffchainVoteInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

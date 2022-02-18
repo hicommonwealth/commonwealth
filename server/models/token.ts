@@ -1,8 +1,8 @@
 import * as Sequelize from 'sequelize';
 import { Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface TokenAttributes {
+export type TokenAttributes = {
   id: string;
   decimals: number;
   name: string;
@@ -12,11 +12,11 @@ export interface TokenAttributes {
   icon_url?: string;
 }
 
-export interface TokenInstance extends Model<TokenAttributes>, TokenAttributes {
+export type TokenInstance = ModelInstance<TokenAttributes> & {
 
 }
 
-export type TokenModelStatic = ModelStatic<TokenInstance>
+export type TokenModelStatic = ModelStatic<TokenInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

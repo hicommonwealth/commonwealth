@@ -6,7 +6,7 @@ import {
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -49,7 +49,7 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
   const context = req.body.chain ? req.body : { chain: MAGIC_DEFAULT_CHAIN };
-  const [ chain, error ] = await lookupCommunityIsVisibleToUser(models, context, previousUser);
+  const [ chain, error ] = await validateChain(models, context);
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;

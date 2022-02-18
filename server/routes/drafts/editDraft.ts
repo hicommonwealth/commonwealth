@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from '../../../shared/logging';
-import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../../util/validateChain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,7 +14,7 @@ export const Errors = {
 };
 
 const editDraft = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
