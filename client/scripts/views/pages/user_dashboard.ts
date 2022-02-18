@@ -92,7 +92,6 @@ const UserDashboard: m.Component<
               DashboardActivityNotification.fromJSON(notification)
           );
           vnode.state.loadingData = false;
-          console.log(vnode.state.globalNotifications);
           m.redraw();
         });
       } else if (tab == DashboardViews.Chain) {
