@@ -626,222 +626,52 @@
   padding: 4px 0;
 }
 
-.SidebarSection {
-  border-bottom-color: $disable-grey;
-  border-bottom-width: 1px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  user-select: none;
-
-  .SidebarTitle {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    margin-left: 20px;
-    .title-text {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 1px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .toggle-icon {
-      margin-right: 10px;
-      margin-top: -6px;
-    }
-    .right_icon {
-      .cui-icon-plus-circle {
-          margin-top: -10px;
-          opacity: 90%;
-      }        
-  }
-  }
-}
-
-.SectionGroup {
-    font-weight: 400;
-    font-size: 17px;
-    padding-left: 0px;
-    
-    .SectionGroupTitle {
-        padding-left: 5px;
-        padding-top: 3px;
-        padding-bottom: 3px;
-        height: 30px;
-        display: flex; 
-        align-items: center;
-
-        [class^="section-title-text"] {
-            margin-left: 3px;
-            margin-right: 10px;
-            padding-top: 5px;
-            display: inline-block;
-        }
-
-        .section-title-text-active {
-            font-weight: 500;
-            color: #3A0095;
-        }
-        .section-title-text-stale {
-            color: #999999;
-        }
-        .no-carat {
-            width: 22px;
-        }
-        .carat {
-            display: inline-block;
-            margin-left: 6px;
-            margin-top: -2px;
-        }
-
-        .right_icon {
-            .cui-icon-edit {
-                margin-top: -1px;
-            }        
-        }
-    }
-}
-
-.SubSection {
-    padding-left: 32px;
-    font-weight: 400;
-    font-size: 17px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    height: 30px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    [class^="title"] {
-        display: inline-block;
-        padding-top: 3px;
-        padding-left: 4px;
-        margin-bottom: 1px;
-        margin-left: 4px;
-        align-self: baseline;
-    }
-    .title-active {
-        font-weight: 500;
-        color: #3A0095;
-    }
-    .title-stale {
-        color: #999999;
-    }
-
-    &.active, &:hover {
-        background-color: #EDE7FF;
-    }
-    
-    .cui-icon-hash {
-        display: inline-block;
-        margin-top: 1px;
-        scale: 0.85;
-        padding-bottom: 4px;
-    }
-    
-    .row-icon-inactive {
-        .cui-icon {
-            color: #999999;
-        }
-    }
-
-    .right_icon {
-        .cui-icon-edit {
-            margin-top: -1px;
-        }        
-    }
-}
-
-.right_icon {
-    margin-left: auto;
-    display: inline-block;
-
-    div {
-        .cui-icon {
-            color: #999999;
-            padding-right: 5px;
-            padding-top: 2px;
-
-            &:hover {
-                color: #3A0095;
-                opacity: 100%;
-            }
-        }
-        
-    }
-    .admin-menu {
-        position: fixed;
-    }
-    .unread_icon {
-        background-color: #FF002E;
-        border-radius: 15px;
-        padding-left: 6px;
-        padding-right: 6px;
-        margin-right: 4px;
-        margin-top: 2px;
-        display: inline-block;
-        p {
-            margin-top: 2.75px;
-            position: relative;
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-        }
-    }
-}
-
 .chatAdminOverlay {
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
 
-    .Card {
-        z-index: 100;
-        position: relative;
-        width: 500px;
-        max-width: none;
-        cursor: default;
-        padding: 20px 25px;
+  .Card {
+    z-index: 100;
+    position: relative;
+    width: 500px;
+    max-width: none;
+    cursor: default;
+    padding: 20px 25px;
 
-        h4 {
-            color: #666666;
-            font-weight: 400;
-        }
-
-        .TextInput { 
-            width: 100%;
-        }
-
-        .cui-icon-x{
-            position: absolute;
-            color: #666666;
-            top: 15px;
-            left: calc(100% - 35px);
-        }
-
-        .button-bar {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-end;
-            width: 100%;
-            button {
-                margin-left: 5px;
-
-                &.danger{
-                    background-color: #ff002f;
-                }
-
-                &.danger:hover{
-                    background-color: #CC0025;
-                }
-            }
-        }
+    h4 {
+      color: #666666;
+      font-weight: 400;
     }
+
+    .TextInput {
+      width: 100%;
+    }
+
+    .cui-icon-x {
+      position: absolute;
+      color: #666666;
+      top: 15px;
+      left: calc(100% - 35px);
+    }
+
+    .button-bar {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      width: 100%;
+      button {
+        margin-left: 5px;
+
+        &.danger {
+          background-color: #ff002f;
+        }
+
+        &.danger:hover {
+          background-color: #cc0025;
+        }
+      }
+    }
+  }
 }
