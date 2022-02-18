@@ -1,9 +1,11 @@
+/* @jsx m */
+
 import m from 'mithril';
 import { Icon, Icons } from 'construct-ui';
 
 import 'components/sidebar/sidebar_section.scss';
 
-type SubSectionProps = {
+export type SubSectionProps = {
   isActive: boolean; // Is this the current page
   isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
   isVisible: boolean;
@@ -12,31 +14,6 @@ type SubSectionProps = {
   rightIcon?: m.Component;
   rowIcon?: boolean;
   title: string;
-};
-
-export type SectionGroupProps = {
-  containsChildren: boolean;
-  displayData: SubSectionProps[] | null;
-  hasDefaultToggle: boolean;
-  isActive: boolean; // Is this the current page
-  isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
-  isVisible: boolean; // Is this section shown as an option
-  onclick: any;
-  onhover?: () => void;
-  rightIcon?: m.Component;
-  title: string;
-};
-
-export type SidebarSectionProps = {
-  defaultToggle: boolean;
-  displayData: SectionGroupProps[];
-  extraComponents?: m.Vnode;
-  isActive: boolean;
-  onclick: any;
-  onhover?: () => void;
-  rightIcon?: m.Component;
-  title: string;
-  toggleDisabled?: boolean;
 };
 
 class SubSection implements m.ClassComponent<SubSectionProps> {
@@ -78,6 +55,19 @@ class SubSection implements m.ClassComponent<SubSectionProps> {
     );
   }
 }
+
+export type SectionGroupProps = {
+  containsChildren: boolean;
+  displayData: SubSectionProps[] | null;
+  hasDefaultToggle: boolean;
+  isActive: boolean; // Is this the current page
+  isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
+  isVisible: boolean; // Is this section shown as an option
+  onclick: any;
+  onhover?: () => void;
+  rightIcon?: m.Component;
+  title: string;
+};
 
 class SectionGroup implements m.ClassComponent<SectionGroupProps> {
   private toggled: boolean;
@@ -181,6 +171,18 @@ class SectionGroup implements m.ClassComponent<SectionGroupProps> {
   }
 }
 
+export type SidebarSectionProps = {
+  hasDefaultToggle: boolean;
+  displayData: SectionGroupProps[];
+  extraComponents?: m.Vnode;
+  isActive: boolean;
+  onclick: any;
+  onhover?: () => void;
+  rightIcon?: m.Vnode;
+  title: string;
+  toggleDisabled?: boolean;
+};
+
 export class SidebarSection implements m.ClassComponent<SidebarSectionProps> {
   private toggled: boolean;
   private hoverColor: string;
@@ -247,14 +249,14 @@ export class SidebarSection implements m.ClassComponent<SidebarSectionProps> {
           <div class="title-text">{title}</div>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
           <div class="toggle-icon">{carat}</div>
-          {this.toggled && (
-            <div class="section-groups">
-              {displayData.map((sectionGroup) => (
-                <SectionGroup {...sectionGroup} />
-              ))}
-            </div>
-          )}
         </div>
+        {this.toggled && (
+          <div class="section-groups">
+            {displayData.map((sectionGroup) => (
+              <SectionGroup {...sectionGroup} />
+            ))}
+          </div>
+        )}
         {extraComponents}
       </div>
     );
