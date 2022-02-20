@@ -10,24 +10,24 @@ import 'simplepicker/dist/simplepicker.css';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { FocusManager } from 'construct-ui';
+import {FocusManager} from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
-import app, { ApiStatus, LoginState } from 'state';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
-import { ChainInfo,  NodeInfo, NotificationCategory, } from 'models';
+import app, {ApiStatus, LoginState} from 'state';
+import {ChainBase, ChainNetwork, ChainType} from 'types';
+import {ChainInfo, NodeInfo, NotificationCategory,} from 'models';
 
-import { WebSocketController } from 'controllers/server/socket';
+import {WebSocketController} from 'controllers/server/socket';
 
-import { notifyError, notifyInfo, notifySuccess } from 'controllers/app/notifications';
-import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import {notifyError, notifyInfo, notifySuccess} from 'controllers/app/notifications';
+import {updateActiveAddresses, updateActiveUser} from 'controllers/app/login';
 
-import { Layout } from 'views/layout';
+import {Layout} from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
-import { alertModalWithText } from 'views/modals/alert_modal';
-import { pathIsDiscussion } from './identifiers';
+import {alertModalWithText} from 'views/modals/alert_modal';
+import {pathIsDiscussion} from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -823,20 +823,18 @@ Promise.all([
 
   // initialize the app
   initAppState(true, customDomain).then(async () => {
-    // setup notifications and websocket if not already set up
-    if (!app.socket) {
-      if (app.loginState === LoginState.LoggedIn) {
-        // refresh notifications once
-        app.user.notifications.refresh().then(() => m.redraw());
-        // grab all discussion drafts
-        app.user.discussionDrafts.refreshAll().then(() => m.redraw());
-        app.socket = new WebSocketController(app.user.jwt);
-      }
-
-      handleInviteLinkRedirect();
-      // If the user updates their email
-      handleUpdateEmailConfirmation();
+    if (app.loginState === LoginState.LoggedIn) {
+      // refresh notifications once
+      app.user.notifications.refresh().then(() => m.redraw());
+      // grab all discussion drafts
+      app.user.discussionDrafts.refreshAll().then(() => m.redraw());
     }
+
+
+    handleInviteLinkRedirect();
+    // If the user updates their email
+    handleUpdateEmailConfirmation();
+
     m.redraw();
   }).catch((err) => {
     m.redraw();
