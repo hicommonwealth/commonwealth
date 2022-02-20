@@ -182,7 +182,7 @@ class NotificationsController {
         for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
           const data = {
             is_read: notificationsReadJSON.is_read,
-                ...notificationsReadJSON.Notification
+            ...notificationsReadJSON.Notification
           }
           const notification = Notification.fromJSON(data, subscription, chainEventType);
           this._store.add(notification);
