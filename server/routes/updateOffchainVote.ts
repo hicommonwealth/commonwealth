@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
 
 import { sequelize, DB } from '../database';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 
@@ -21,7 +21,7 @@ const updateOffchainVote = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (!author) return next(new Error(Errors.InvalidUser));

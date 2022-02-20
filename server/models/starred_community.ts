@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { UserAttributes } from './user';
 import { ChainAttributes } from './chain';
 
-export interface StarredCommunityAttributes {
+export type StarredCommunityAttributes = {
   user_id: number;
   id?: number;
   chain: string;
@@ -16,12 +16,11 @@ export interface StarredCommunityAttributes {
   Chain?: ChainAttributes;
 }
 
-export interface StarredCommunityInstance extends Model<StarredCommunityAttributes>,
-StarredCommunityAttributes {
+export type StarredCommunityInstance = ModelInstance<StarredCommunityAttributes> & {
   // no mixins used
 }
 
-export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>
+export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

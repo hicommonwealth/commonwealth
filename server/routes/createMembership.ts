@@ -1,5 +1,5 @@
 // import { Request, Response, NextFunction } from 'express';
-// import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+// import validateChain from '../util/validateChain';
 // import { factory, formatFilename } from '../../shared/logging';
 // import { DB } from '../database';
 //
@@ -12,7 +12,7 @@
 // };
 //
 // const createMembership = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-//   const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+//   const [chain, community, error] = await validateChain(models, req.body);
 //   if (error) return next(new Error(error));
 //   if (!req.user) return next(new Error(Errors.NotLoggedIn));
 //
