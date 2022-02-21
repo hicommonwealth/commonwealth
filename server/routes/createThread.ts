@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
 import { NotificationCategories, ProposalType, ChainType } from '../../shared/types';
 
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
@@ -32,7 +32,7 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
 
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -150,7 +150,6 @@ const createThread = async (
   } catch (err) {
     return next(new Error(err));
   }
-
   // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
   try {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
@@ -185,7 +184,6 @@ const createThread = async (
   } catch (err) {
     return next(err);
   }
-
   // auto-subscribe thread creator to comments & reactions
   try {
     await models.Subscription.create({

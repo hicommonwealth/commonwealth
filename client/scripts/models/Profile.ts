@@ -95,8 +95,7 @@ class Profile {
     } else {
       const html = jdenticon.toSvg(this.address, size);
       return m('svg.Jdenticon', {
-        width: size,
-        height: size,
+        style: `width: ${size}px; height: ${size}px;`,
         'data-address': this.address.toString(),
         oncreate: (vnode) => {
           jdenticon.update(vnode.dom as HTMLElement, this.address);

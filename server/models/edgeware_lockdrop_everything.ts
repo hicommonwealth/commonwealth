@@ -1,18 +1,17 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface EdgewareLockdropEverythingAttributes {
+export type EdgewareLockdropEverythingAttributes = {
   createdAt: Date;
   id?: number;
   data?: string;
   updated_at?: Date;
 }
 
-export interface EdgewareLockdropEverythingInstance
-extends Model<EdgewareLockdropEverythingAttributes>, EdgewareLockdropEverythingAttributes {}
+export type EdgewareLockdropEverythingInstance = ModelInstance<EdgewareLockdropEverythingAttributes>;
 
-export type EdgewareLockdropEverythingModelStatic = ModelStatic<EdgewareLockdropEverythingInstance>
+export type EdgewareLockdropEverythingModelStatic = ModelStatic<EdgewareLockdropEverythingInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
