@@ -46,6 +46,10 @@ export class ChainEventsNamespace {
     const subscription = app.user.notifications.subscriptions.find(
       (sub) => sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
     );
+    if (!subscription) {
+      console.log("Local subscription not found. Re-sync subscriptions!");
+      return;
+    }
     const notificationObj = Notification.fromJSON(notification, subscription);
     app.user.notifications.update(notificationObj);
   }
