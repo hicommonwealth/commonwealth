@@ -1,10 +1,10 @@
-import {ChainEventNotification, WebsocketMessageType, WebsocketNamespaces} from 'types';
+import {ChainEventNotification, WebsocketMessageNames, WebsocketNamespaces} from 'types';
 import app from 'state';
 import { Notification, NotificationSubscription } from 'models';
-import { io } from 'socket.io-client';
+import {io, Socket} from 'socket.io-client';
 
 export class ChainEventsNamespace {
-  private ceNs;
+  private ceNs: Socket;
   private _isConnected = false;
 
   constructor() {
@@ -14,7 +14,7 @@ export class ChainEventsNamespace {
     this.ceNs.on('connect', this.onconnect.bind(this));
     this.ceNs.on('disconnect', this.ondisconnect.bind(this));
     this.ceNs.on(
-      WebsocketMessageType.ChainEventNotification,
+      WebsocketMessageNames.ChainEventNotification,
       this.onChainEvent.bind(this)
     );
   }
@@ -23,7 +23,7 @@ export class ChainEventsNamespace {
     if (this._isConnected) {
       const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
       console.log('Adding Websocket subscriptions for:', eventTypes);
-      this.ceNs.emit('newSubscriptions', eventTypes);
+      this.ceNs.emit(WebsocketMessageNames.NewSubscriptions, eventTypes);
     } else {
       console.log('ChainEventsNamespace is not connected');
     }
@@ -34,7 +34,7 @@ export class ChainEventsNamespace {
       const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
       console.log('Deleting Websocket subscriptions for:', eventTypes);
       this.ceNs.emit(
-        'deleteSubscriptions',
+        WebsocketMessageNames.DeleteSubscriptions,
         subs.map((x) => x.ChainEventType?.id)
       );
     } else {

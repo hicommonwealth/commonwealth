@@ -14,7 +14,7 @@ import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import StorageHandler from '../../../server/eventHandlers/storage';
 import EntityArchivalHandler from '../../../server/eventHandlers/entityArchival';
-import { WebsocketMessageType } from '../../../shared/types';
+import { WebsocketMessageNames } from '../../../shared/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;
@@ -47,8 +47,8 @@ describe('Edgeware Archival Event Handler Tests', () => {
 
     // set up wss expected results
     const mockWssServer = new EventEmitter();
-    mockWssServer.on(WebsocketMessageType.ChainEntity, (payload) => {
-      assert.equal(payload.event, WebsocketMessageType.ChainEntity);
+    mockWssServer.on(WebsocketMessageNames.ChainEntity, (payload) => {
+      assert.equal(payload.event, WebsocketMessageNames.ChainEntity);
       assert.deepEqual(payload.data.chainEvent, dbEvent.toJSON());
       assert.deepEqual(payload.data.chainEventType, dbEventType.toJSON());
       assert.equal(payload.data.chainEntity.chain, 'edgeware');
@@ -102,8 +102,8 @@ describe('Edgeware Archival Event Handler Tests', () => {
     // set up wss expected results
     const mockWssServer = new EventEmitter();
     let nEmissions = 0;
-    mockWssServer.on(WebsocketMessageType.ChainEntity, (payload) => {
-      assert.equal(payload.event, WebsocketMessageType.ChainEntity);
+    mockWssServer.on(WebsocketMessageNames.ChainEntity, (payload) => {
+      assert.equal(payload.event, WebsocketMessageNames.ChainEntity);
       if (nEmissions === 0) {
         assert.deepEqual(payload.data.chainEvent, createDbEvent.toJSON());
         assert.deepEqual(payload.data.chainEventType, createDbEventType.toJSON());
@@ -153,7 +153,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
 
     // set up wss expected results
     const mockWssServer = new EventEmitter();
-    mockWssServer.on(WebsocketMessageType.ChainEntity, (payload) => {
+    mockWssServer.on(WebsocketMessageNames.ChainEntity, (payload) => {
       assert.fail('should not emit event');
     });
     const eventHandler = new EntityArchivalHandler(models, 'edgeware', mockWssServer as any);

@@ -94,22 +94,10 @@ export enum ChainNetwork {
   SPL = 'spl', // solana token
 }
 
-export enum WebsocketEventType {
-  Connection = 'connection',
-  Message = 'message',
-  Upgrade = 'upgrade',
-  Close = 'close',
-}
-
-export enum WebsocketMessageType {
+export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
-  Message = 'message',
-  Heartbeat = 'heartbeat',
-  HeartbeatPong = 'heartbeat-pong',
-  InitializeScrollback = 'scrollback',
-  Typing = 'typing',
-  Notification = 'notification',
-  ChainEntity = 'chain-entity',
+  NewSubscriptions = 'new-subscriptions',
+  DeleteSubscriptions = 'delete-subscriptions'
 }
 
 export enum WebsocketNamespaces {
@@ -130,14 +118,6 @@ export type ChainEventNotification = {
 export enum WebsocketEngineEvents {
   CreateRoom = 'create-room',
   DeleteRoom = 'delete-room'
-}
-
-export interface IWebsocketsPayload<T> {
-  event: WebsocketMessageType;
-  jwt?: string; // for outgoing payloads
-  chain?: string; // for incoming payloads
-  address?: string; // for incoming payloads
-  data?: T;
 }
 
 export interface InviteCodeAttributes {
