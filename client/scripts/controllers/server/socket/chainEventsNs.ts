@@ -62,8 +62,7 @@ export class ChainEventsNamespace {
 
   private ondisconnect(reason) {
     this._isConnected = false;
-    console.log(reason);
-    // TODO: notify user that live chain-events notifications are disabled?
+    console.log('ChainEvents Namespace Disconnected:', reason);
   }
 
   public get isConnected() {
