@@ -1,7 +1,7 @@
 import 'components/user_dashboard_row.scss';
 
 import { Icons, Button, MenuItem, PopoverMenu } from 'construct-ui';
-import _ from 'lodash';
+import { capitalize } from 'lodash';
 import m from 'mithril';
 import {
   CWEvent,
@@ -21,8 +21,8 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 
-import { getProposalUrl } from '../../../../shared/utils';
 import { notifySuccess } from 'controllers/app/notifications';
+import { getProposalUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (commentText) => {
   let decodedCommentText;
@@ -249,9 +249,11 @@ const ActivityContent: m.Component<{
       app.config.chains.getById(chain_id)?.name || 'Unknown chain';
     const decodedTitle = decodeURIComponent(root_title).trim();
     const titleText =
-      decodedTitle.length > 50
-        ? decodedTitle.slice(0, 47) + '...'
-        : decodedTitle;
+      decodedTitle.length < 1
+        ? `${capitalize(root_type)} ${root_id}`
+        : decodedTitle.length > 50
+          ? `${decodedTitle.slice(0, 47)}...`
+          : decodedTitle;
 
     // Get Author of Notification
     const actorName = m(User, {
