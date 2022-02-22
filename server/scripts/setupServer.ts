@@ -1,4 +1,6 @@
 import http from 'http';
+import https from 'https';
+import fs from 'fs';
 import { Express } from 'express-serve-static-core';
 import { DEFAULT_PORT } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
@@ -8,7 +10,14 @@ const log = factory.getLogger(formatFilename(__filename));
 const setupServer = (app: Express) => {
   const port = process.env.PORT || DEFAULT_PORT;
   app.set('port', port);
-  const server = http.createServer(app);
+  // TODO: Temp(?) for https local dev.
+  // You need to follow https://web.dev/how-to-use-local-https/ to create a TLS certificate
+  // in order to make this work
+  const options = {
+    key: fs.readFileSync('./localhost-key.pem'),
+    cert: fs.readFileSync('./localhost.pem'),
+  };
+  const server = https.createServer(options, app);
   setupWebSocketServer(server);
 
   const onError = (error) => {
