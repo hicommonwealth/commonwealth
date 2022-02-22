@@ -5,7 +5,7 @@ class NotificationSubscription {
   public readonly category: string;
   public readonly objectId: string;
   public readonly createdAt: moment.Moment;
-  public readonly Chain: any;
+  public readonly Chain: string;
   public readonly ChainEventType: any;
   public readonly OffchainComment: any;
   public readonly OffchainThread: any;
@@ -53,10 +53,10 @@ class NotificationSubscription {
       json.is_active,
       json.created_at,
       json.immediate_email,
-      json.Chain || json.chain_id,
+      json.chain_id,
       json.ChainEventType || json.chain_event_type_id,
       json.OffchainComment || json.offchain_comment_id,
-      json.OffchainCommunity || json.offchain_community_id,
+      json.OffchainCommunity || json.offchain_community_id, // TODO: safe to remove?
       json.OffchainThread || json.offchain_thread_id,
     );
   }
