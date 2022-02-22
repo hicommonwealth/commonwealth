@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
 import { ChainAttributes } from './chain';
 
-export interface InviteCodeAttributes {
+export type InviteCodeAttributes = {
   creator_id: number;
   id?: string;
   community_name?: string;
@@ -16,10 +16,9 @@ export interface InviteCodeAttributes {
   Chain?: ChainAttributes;
 }
 
-export interface InviteCodeInstance
-extends Model<InviteCodeAttributes>, InviteCodeAttributes {}
+export type InviteCodeInstance = ModelInstance<InviteCodeAttributes>;
 
-export type InviteCodeModelStatic = ModelStatic<InviteCodeInstance>
+export type InviteCodeModelStatic = ModelStatic<InviteCodeInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

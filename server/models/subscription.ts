@@ -5,7 +5,7 @@ import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import {
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType,
 } from '../../shared/types';
@@ -22,7 +22,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 
-export interface SubscriptionAttributes {
+export type SubscriptionAttributes = {
   subscriber_id: number;
   category_id: string;
   object_id: string;
@@ -52,7 +52,7 @@ extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 }
 
-export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; }
+export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; };
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -1,11 +1,15 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction } from 'express';
 import Web3 from 'web3';
 import * as solw3 from '@solana/web3.js';
+import { Cluster } from '@solana/web3.js';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
+import { ChainAttributes } from '../models/chain';
+import { ChainNodeAttributes } from '../models/chain_node';
 import { DB } from '../database';
+import { TypedRequestBody, TypedResponse, success } from '../types';
 import { getUrlsForEthChainId } from '../util/supportedEthChains';
 
 import { ChainBase, ChainType } from '../../shared/types';
@@ -39,10 +43,20 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
+type CreateChainReq = ChainAttributes & ChainNodeAttributes & {
+  id: string;
+  node_url: string;
+};
+
+type CreateChainResp = {
+  chain: ChainAttributes;
+  node: ChainNodeAttributes;
+};
+
 const createChain = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<CreateChainReq>,
+  res: TypedResponse<CreateChainResp>,
   next: NextFunction
 ) => {
   if (!req.user) {
@@ -140,7 +154,7 @@ const createChain = async (
       return next(new Error(Errors.InvalidAddress));
     }
     try {
-      const clusterUrl = solw3.clusterApiUrl(url);
+      const clusterUrl = solw3.clusterApiUrl(url as Cluster);
       const connection = new solw3.Connection(clusterUrl);
       const supply = await connection.getTokenSupply(pubKey);
       const { decimals, amount } = supply.value;
@@ -173,7 +187,25 @@ const createChain = async (
     }
   }
 
-  const { website, discord, element, telegram, github, icon_url } = req.body;
+  const {
+    id,
+    name,
+    symbol,
+    icon_url,
+    description,
+    network,
+    type,
+    website,
+    discord,
+    telegram,
+    github,
+    element,
+    base,
+    bech32_prefix,
+    decimals,
+    address,
+    token_name
+  } = req.body;
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
@@ -198,37 +230,33 @@ const createChain = async (
     return next(new Error(Errors.ChainNameExists));
   }
 
-  const chainContent = {
-    id: req.body.id,
-    name: req.body.name,
-    symbol: req.body.symbol,
-    icon_url: req.body.icon_url,
-    description: req.body.description,
+  const chain = await models.Chain.create({
+    id,
+    name,
+    symbol,
+    icon_url,
+    description,
+    network,
+    type,
+    website,
+    discord,
+    telegram,
+    github,
+    element,
+    base,
+    bech32_prefix,
+    decimals,
     active: true,
-    network: req.body.network,
-    type: req.body.type,
-    website: req.body.website,
-    discord: req.body.discord,
-    telegram: req.body.telegram,
-    github: req.body.github,
-    element: req.body.element,
-    base: req.body.base,
-    bech32_prefix: req.body.bech32_prefix,
-    decimals: req.body.decimals,
-  };
+  });
 
-  const chain = await models.Chain.create(chainContent);
-
-  const chainNodeContent = {
-    chain: req.body.id,
+  const node = await models.ChainNode.create({
+    chain: id,
     url,
-    address: req.body.address,
+    address,
     eth_chain_id,
-    token_name: req.body.token_name,
+    token_name,
     alt_wallet_url: altWalletUrl,
-  };
-
-  const node = await models.ChainNode.create(chainNodeContent);
+  });
 
   const chatChannels = await models.ChatChannel.create({
     name: 'General',
@@ -236,7 +264,7 @@ const createChain = async (
     category: '' // TODO: update?
   });
 
-  return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: node.toJSON() } });
+  return success(res, { chain: chain.toJSON(), node: node.toJSON() });
 };
 
 export default createChain;

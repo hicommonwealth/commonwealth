@@ -1,10 +1,10 @@
 import { QueryTypes, Op }  from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
 const communityStats = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
   if (!req.user) {
