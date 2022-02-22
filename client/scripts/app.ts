@@ -21,7 +21,6 @@ import {
   ChainInfo,
   NodeInfo,
   NotificationCategory,
-  Notification,
 } from 'models';
 
 import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
@@ -264,6 +263,13 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<boolea
       './controllers/chain/ethereum/commonwealth/adapter'
     )).default;
     newChain = new Commonwealth(n, app);
+  } else if (n.chain.base === ChainBase.Ethereum && n.chain.type === ChainType.Offchain) {
+    const Ethereum = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "ethereum-main" */
+      './controllers/chain/ethereum/main'
+    )).default;
+    newChain = new Ethereum(n, app);
   } else {
     throw new Error('Invalid chain');
   }

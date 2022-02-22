@@ -2,12 +2,12 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 
-import { ChainNetwork } from 'shared/types';
+import { ChainNetwork } from 'types';
 
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
-import { initAppState } from 'client/scripts/app';
-import { setActiveAccount, updateActiveAddresses } from 'client/scripts/controllers/app/login';
+import { initAppState } from 'app';
+import { setActiveAccount, updateActiveAddresses } from 'controllers/app/login';
 
 interface IState {
   validating: boolean;

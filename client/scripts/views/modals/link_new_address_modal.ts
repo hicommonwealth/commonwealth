@@ -9,7 +9,7 @@ import { Button, Input, TextArea, Spinner } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
-import { ChainBase } from 'types';
+import { ChainBase, ChainNetwork } from 'types';
 import { AddressInfo, Account, IWebWallet } from 'models';
 import app, { ApiStatus } from 'state';
 
@@ -439,21 +439,31 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                 },
                 label: 'Continue to NEAR wallet'
               }) ]
-              : app.chain.networkStatus !== ApiStatus.Connected && app.chain.base === ChainBase.Substrate
-                ? [ ]
-                : [ webWallet?.accounts.map(
-                  (addressOrAccount) => m(LinkAccountItem, {
-                    account: typeof addressOrAccount === 'string'
-                      ? { address: addressOrAccount }
-                      : addressOrAccount,
-                    base: app.chain.base,
-                    targetCommunity,
-                    accountVerifiedCallback,
-                    errorCallback: (error) => { notifyError(error); },
-                    linkNewAddressModalVnode: vnode,
-                    webWallet,
-                  })
-                )]
+              : app.chain.network === ChainNetwork.AxieInfinity
+                ? [m(Button, {
+                  intent: 'primary',
+                  rounded: true,
+                  onclick: async (e) => {
+                    // redirect to axie page for login
+                    window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=1`; // TODO
+                  },
+                  label: 'Continue to Ronin wallet'
+                }) ]
+                : app.chain.networkStatus !== ApiStatus.Connected && app.chain.base === ChainBase.Substrate
+                  ? [ ]
+                  : [ webWallet?.accounts.map(
+                    (addressOrAccount) => m(LinkAccountItem, {
+                      account: typeof addressOrAccount === 'string'
+                        ? { address: addressOrAccount }
+                        : addressOrAccount,
+                      base: app.chain.base,
+                      targetCommunity,
+                      accountVerifiedCallback,
+                      errorCallback: (error) => { notifyError(error); },
+                      linkNewAddressModalVnode: vnode,
+                      webWallet,
+                    })
+                  )]
           ]),
           vnode.state.error && m('.error-message', vnode.state.error),
         ]),
