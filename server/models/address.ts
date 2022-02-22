@@ -1,13 +1,13 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes, UserInstance } from './user';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
 import { ProfileInstance } from './profile';
 
-export interface AddressAttributes {
+export type AddressAttributes = {
 	address: string;
 	chain: string;
 	verification_token: string;
@@ -33,7 +33,7 @@ export interface AddressAttributes {
 }
 
 // eslint-disable-next-line no-use-before-define
-export interface AddressInstance extends Model<AddressAttributes>, AddressAttributes {
+export type AddressInstance = ModelInstance<AddressAttributes> & {
 	// no mixins used yet
 	getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
 	getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;

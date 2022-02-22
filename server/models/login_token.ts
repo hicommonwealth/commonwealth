@@ -3,9 +3,9 @@ import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import { LOGIN_TOKEN_EXPIRES_IN } from '../config';
 import { SocialAccountAttributes } from './social_account';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface LoginTokenAttributes {
+export type LoginTokenAttributes = {
   token: string;
   expires: Date;
   id?: number;
@@ -22,16 +22,17 @@ export interface LoginTokenAttributes {
   SocialAccounts?: SocialAccountAttributes[];
 }
 
-export interface LoginTokenCreationAttributes extends  LoginTokenAttributes {
+
+export type LoginTokenInstance = ModelInstance<LoginTokenAttributes> & {
+  // no mixins used yet
+}
+
+export type LoginTokenCreationAttributes = LoginTokenAttributes & {
   createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
   createForOAuth?: (domain: string, social_account?: number) => Promise<LoginTokenInstance>;
 }
 
-export interface LoginTokenInstance extends Model<LoginTokenAttributes>, LoginTokenAttributes {
-  // no mixins used yet
-}
-
-export type LoginTokenModelStatic = ModelStatic<LoginTokenInstance> & LoginTokenCreationAttributes
+export type LoginTokenModelStatic = ModelStatic<LoginTokenInstance> & LoginTokenCreationAttributes;
 
 export default (
   sequelize: Sequelize.Sequelize,

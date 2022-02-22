@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { parseUserMentions } from '../util/parseUserMentions';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
@@ -29,7 +29,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));

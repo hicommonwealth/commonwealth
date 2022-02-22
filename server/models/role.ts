@@ -2,11 +2,11 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
 export type Permission = 'admin' | 'moderator' | 'member';
 
-export interface RoleAttributes {
+export type RoleAttributes = {
   address_id: number;
   permission: Permission;
   id?: number;
@@ -20,9 +20,9 @@ export interface RoleAttributes {
   Chain?: ChainAttributes;
 }
 
-export interface RoleInstance extends Model<RoleAttributes>, RoleAttributes {}
+export type RoleInstance = ModelInstance<RoleAttributes>;
 
-export type RoleModelStatic = ModelStatic<RoleInstance>
+export type RoleModelStatic = ModelStatic<RoleInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

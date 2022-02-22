@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 
@@ -17,11 +17,7 @@ const updateLinkedThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await lookupCommunityIsVisibleToUser(
-    models,
-    req.body,
-    req.user
-  );
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
 
   const { linked_thread_id, linking_thread_id, remove_link } = req.body;
