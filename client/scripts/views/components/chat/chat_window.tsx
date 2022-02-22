@@ -104,7 +104,8 @@ const ChatWindow: m.Component<IAttrs, IState> = {
           <div class="clear" />
           {m(User, {
             user: new AddressInfo(null, grp.address, app.activeChainId(), null),
-            linkify: true
+            linkify: true,
+            popover: true,
           })}
           <div class="chat-message-group-timestamp">{formatTimestampForChat(grp.messages[0].created_at)}</div>
         </div>)}
