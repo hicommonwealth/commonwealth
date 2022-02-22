@@ -1,4 +1,6 @@
 import { ChainAttributes } from 'server/models/chain';
+import { ChainEventAttributes } from "server/models/chain_event";
+import moment from "moment";
 
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
@@ -112,6 +114,17 @@ export enum WebsocketMessageType {
 
 export enum WebsocketNamespaces {
   ChainEvents = 'chain-events'
+}
+
+export type ChainEventNotification = {
+  id: string;
+  notification_data: "";
+  chain_event_id: string;
+  category_id: "chain-event";
+  chain_id: string;
+  updated_at: moment.Moment;
+  created_at: moment.Moment;
+  ChainEvent: ChainEventAttributes;
 }
 
 export enum WebsocketEngineEvents {

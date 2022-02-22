@@ -1,4 +1,4 @@
-import { WebsocketMessageType, WebsocketNamespaces } from 'types';
+import {ChainEventNotification, WebsocketMessageType, WebsocketNamespaces} from 'types';
 import app from 'state';
 import { Notification, NotificationSubscription } from 'models';
 import { io } from 'socket.io-client';
@@ -42,11 +42,12 @@ export class ChainEventsNamespace {
     }
   }
 
-  private onChainEvent(notification: any) {
+  private onChainEvent(notification: ChainEventNotification) {
     const subscription = app.user.notifications.subscriptions.find(
       (sub) => sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
     );
     if (!subscription) {
+      // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally
       console.log("Local subscription not found. Re-sync subscriptions!");
       return;
     }

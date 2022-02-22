@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { addPrefix, factory } from '../../shared/logging';
 import {
+  ChainEventNotification,
   WebsocketEngineEvents,
   WebsocketMessageType,
   WebsocketNamespaces,
@@ -52,7 +53,7 @@ export function createCeNamespace(io: Server) {
  * received from the queue to the appropriate room. The context (this) should be the chain-events namespace
  * @param notification A Notification model instance
  */
-export function publishToCERoom(this: Server, notification: any) {
+export function publishToCERoom(this: Server, notification: ChainEventNotification) {
   this.to(notification.ChainEvent.ChainEventType.id).emit(
     WebsocketMessageType.ChainEventNotification,
     notification
