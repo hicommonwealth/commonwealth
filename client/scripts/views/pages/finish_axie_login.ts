@@ -52,26 +52,27 @@ const validate = async (token: string, chain: string): Promise<void> => {
 }
 
 const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
-  oncreate: (vnode) => {
-    vnode.state.validating = false;
-  },
-  view: (vnode) => {
-    // TODO: do we need to kick off loading?
-    if (!app.chain || !app.chain.loaded || vnode.state.validating) {
-      return m(PageLoading);
-    }
-    // TODO: generalize this to any SSO chain
-    if (app.chain.network !== ChainNetwork.AxieInfinity) {
-      return m(PageNotFound);
-    }
-    vnode.state.validating = true;
-
+  oninit: (vnode) => {
     // grab token
     // TODO: how to use state id?
     const token = m.route.param('token');
+    console.log(token);
+    validate(token, 'axie-infinity');
+  },
+  view: (vnode) => {
+    console.log('finish axie login');
+    // TODO: do we need to kick off loading?
+    // if (!app.chain || !app.chain.loaded || vnode.state.validating) {
+    //   return m(PageLoading);
+    // }
+    // TODO: generalize this to any SSO chain
+    // if (app.chain.network !== ChainNetwork.AxieInfinity) {
+    //   return m(PageNotFound);
+    // }
+
 
     // send token to server for login
-    validate(token, app.activeChainId());
+    // TODO: see oninit
   }
 };
 

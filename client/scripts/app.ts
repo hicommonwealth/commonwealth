@@ -547,7 +547,7 @@ Promise.all([
       '/collectives':            importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
       '/finishNearLogin':        importRoute('views/pages/finish_near_login', { scoped: true }),
-      '/finishAxieLogin':        importRoute('views/pages/finish_axie_login', { scoped: true }),
+      '/finishaxielogin':        importRoute('views/pages/finish_axie_login', { scoped: true }),
       // Discussions
       '/home':                   redirectRoute((attrs) => `/${attrs.scope}/`),
       '/discussions':            redirectRoute((attrs) => `/${attrs.scope}/`),
@@ -604,7 +604,7 @@ Promise.all([
       '/:scope/backers':            redirectRoute(() => '/backers'),
       '/:scope/collectives':        redirectRoute(() => '/collectives'),
       '/:scope/finishNearLogin':    redirectRoute(() => '/finishNearLogin'),
-      '/:scope/finishAxieLogin':    redirectRoute(() => '/finishAxieLogin'),
+      '/:scope/finishaxielogin':    redirectRoute(() => '/finishaxielogin'),
       '/:scope/home':               redirectRoute(() => '/'),
       '/:scope/discussions':        redirectRoute(() => '/'),
       '/:scope':                    redirectRoute(() => '/'),
@@ -669,7 +669,7 @@ Promise.all([
       '/:scope/collectives':       importRoute('views/pages/commonwealth/collectives', { scoped: true }),
       // NEAR
       '/:scope/finishNearLogin':   importRoute('views/pages/finish_near_login', { scoped: true }),
-      '/:scope/finishAxieLogin':   importRoute('views/pages/finish_axie_login', { scoped: true }),
+      '/finishaxielogin':          importRoute('views/pages/finish_axie_login', { scoped: false }),
       // Settings
       '/settings':                 redirectRoute(() => '/edgeware/settings'),
       '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),

@@ -338,6 +338,8 @@ const verifyWithSignature = async (
   return encodedAddress;
 };
 
+// TODO: factor this + the magic code in passport.ts into a util which creates a user/address
+//   (if needed) from a known-valid address
 const verifyWithToken = async (
   models: DB,
   chain: ChainInstance,
@@ -360,6 +362,7 @@ const verifyWithToken = async (
     if (typeof decoded === 'string') {
       throw new Error('Token must be object');
     }
+    console.log(decoded); // { iat } will be a number = unix time
     const { roninAddress } = decoded as { roninAddress: string };
     address = roninAddress;
   } catch (e) {

@@ -366,7 +366,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
       vnode.state.step === LinkNewAddressSteps.Step1VerifyWithWebWallet ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
-          webWallet?.accounts?.length === 0 && app.chain.base !== ChainBase.NEAR
+          webWallet?.accounts?.length === 0 && app.chain.base !== ChainBase.NEAR && app.chain.network !== ChainNetwork.AxieInfinity
             && m(Button, {
               class: 'account-adder',
               intent: 'primary',
@@ -445,7 +445,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                   rounded: true,
                   onclick: async (e) => {
                     // redirect to axie page for login
-                    window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=1`; // TODO
+                    window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=2`; // TODO
                   },
                   label: 'Continue to Ronin wallet'
                 }) ]
