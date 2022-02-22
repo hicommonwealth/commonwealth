@@ -62,6 +62,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
           address: node.address,
           token_name: node.token_name,
           eth_chain_id: node.eth_chain_id,
+          alt_wallet_url: node.alt_wallet_url,
         }));
       });
       app.user.setRoles(data.roles);
@@ -532,8 +533,8 @@ Promise.all([
       '/':                       importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
       '/search':                 importRoute('views/pages/search', { scoped: false, deferChain: true }),
       // Notifications
-      '/notifications':          importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
-      '/notificationsList':      importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
+      '/notification-settings':  importRoute('views/pages/notification_settings', { scoped: true, deferChain: true }),
+      '/notifications':          importRoute('views/pages/notifications_page', { scoped: true, deferChain: true }),
       // CMN
       '/projects':               importRoute('views/pages/commonwealth/projects', { scoped: true }),
       '/backers':                importRoute('views/pages/commonwealth/backers', { scoped: true }),
@@ -569,7 +570,7 @@ Promise.all([
       '/validators':             importRoute('views/pages/validators', { scoped: true }),
       // Settings
       '/login':                  importRoute('views/pages/login', { scoped: true, deferChain: true }),
-      '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
+      '/web3login':              importRoute('views/pages/web3login', { scoped: true, deferChain: true }),
       // Admin
       '/admin':                  importRoute('views/pages/admin', { scoped: true }),
       '/manage':                 importRoute('views/pages/manage_community/index', { scoped: true }),
@@ -592,7 +593,7 @@ Promise.all([
 
       // Redirects
       '/:scope/notifications':      redirectRoute(() => '/notifications'),
-      '/:scope/notificationsList':  redirectRoute(() => '/notificationsList'),
+      '/:scope/notification-settings':  redirectRoute(() => '/notification-settings'),
       '/:scope/projects':           redirectRoute(() => '/projects'),
       '/:scope/backers':            redirectRoute(() => '/backers'),
       '/:scope/collectives':        redirectRoute(() => '/collectives'),
@@ -652,10 +653,10 @@ Promise.all([
       '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
       '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
       // Notifications
+      '/:scope/notifications':     importRoute('views/pages/notifications_page', { scoped: true, deferChain: true }),
       '/notifications':            redirectRoute(() => '/edgeware/notifications'),
-      '/:scope/notifications':     importRoute('views/pages/notifications', { scoped: true, deferChain: true }),
-      '/notificationsList':        redirectRoute(() => '/edgeware/notificationsList'),
-      '/:scope/notificationsList': importRoute('views/pages/notificationsList', { scoped: true, deferChain: true }),
+      '/:scope/notification-settings': importRoute('views/pages/notification_settings', { scoped: true, deferChain: true }),
+      '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
       // CMN
       '/:scope/projects':          importRoute('views/pages/commonwealth/projects', { scoped: true }),
       '/:scope/backers':           importRoute('views/pages/commonwealth/backers', { scoped: true }),
@@ -703,7 +704,7 @@ Promise.all([
       // Settings
       '/login':                    importRoute('views/pages/login', { scoped: false }),
       '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
-      '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
+      '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true, deferChain: true }),
       // Admin
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
       '/manage':                 importRoute('views/pages/manage_community/index', { scoped: false }),
@@ -796,6 +797,16 @@ Promise.all([
         m.route.set(postAuth.path, {}, { replace: true });
       }
       localStorage.removeItem('githubPostAuthRedirect');
+    } catch (e) {
+      console.log('Error restoring path from localStorage');
+    }
+  } else if (localStorage && localStorage.getItem && localStorage.getItem('discordPostAuthRedirect')) {
+    try {
+      const postAuth = JSON.parse(localStorage.getItem('discordPostAuthRedirect'));
+      if (postAuth.path && (+new Date() - postAuth.timestamp < 30 * 1000)) {
+        m.route.set(postAuth.path, {}, { replace: true });
+      }
+      localStorage.removeItem('discordPostAuthRedirect');
     } catch (e) {
       console.log('Error restoring path from localStorage');
     }

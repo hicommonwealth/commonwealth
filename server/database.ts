@@ -82,6 +82,7 @@ import OffchainViewCountFactory, {
 import OffchainVoteFactory, {
   OffchainVoteModelStatic,
 } from './models/offchain_vote';
+import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
@@ -101,6 +102,7 @@ import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
+import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -125,6 +127,7 @@ export type Models = {
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
+  NotificationsRead: NotificationsReadModelStatic;
   OffchainAttachment: OffchainAttachmentModelStatic;
   OffchainComment: OffchainCommentModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
@@ -133,6 +136,7 @@ export type Models = {
   OffchainTopic: OffchainTopicModelStatic;
   OffchainViewCount: OffchainViewCountModelStatic;
   OffchainVote: OffchainVoteModelStatic;
+  Profile: ProfileModelStatic;
   Role: RoleModelStatic;
   SocialAccount: SocialAccountModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
@@ -204,6 +208,7 @@ const models: Models = {
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
+  NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
   OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
@@ -212,6 +217,7 @@ const models: Models = {
   OffchainTopic: OffchainTopicFactory(sequelize, DataTypes),
   OffchainViewCount: OffchainViewCountFactory(sequelize, DataTypes),
   OffchainVote: OffchainVoteFactory(sequelize, DataTypes),
+  Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),

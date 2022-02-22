@@ -163,7 +163,9 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
 
     let keyring;
     try {
-      keyring = author.getKeyringPair();
+      // keyring = author.getKeyringPair();
+      // TODO: FIXME: we do not support unlocking with seed/mnemonic, so we will need to use
+      //   the signer from Polkadotjs web wallet to perform sudo actions.
     } catch (e) {
       return m('.SudoForm', {
         style: 'padding: 20px 24px; border: 1px solid #eee; margin-bottom: 40px;'

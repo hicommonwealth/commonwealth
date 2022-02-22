@@ -50,11 +50,24 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       this._chainId,
       account.validationToken
     );
+
+    // save and restore default options after setting to no fee/memo for login
+    const defaultOptions = window.keplr.defaultOptions;
+    window.keplr.defaultOptions = {
+      sign: {
+        preferNoSetFee: true,
+        preferNoSetMemo: true,
+        disableBalanceCheck: true,
+      }
+    };
+
     const signature = await window.keplr.signAmino(
       this._chainId,
       account.address,
       signDoc
     );
+
+    window.keplr.defaultOptions = defaultOptions;
     return account.validate(JSON.stringify(signature));
   }
 
@@ -87,10 +100,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           chainId: this._chainId,
           chainName: app.chain.meta.chain.name,
           rpc: url,
-          // TODO: this is a HACK -- this is not a valid REST url, it is only a duplicate of the
-          //    RPC URL. But Keplr will not use this to send transactions, as we only use Keplr
-          //    for offline signing, so it should not break tx functionality.
-          rest: url,
+          // Note that altWalletUrl on Cosmos chains should be the REST endpoint -- if not available, we
+          // use the RPC url as hack, which will break some querying functionality but not signing.
+          rest: app.chain.meta.altWalletUrl || url,
           bip44: {
               coinType: 118,
           },
@@ -132,6 +144,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
         await window.keplr.enable(this._chainId);
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
+
       this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
       this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;

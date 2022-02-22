@@ -11,10 +11,10 @@ import {
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 
-export interface ChainAttributes {
+export type ChainAttributes = {
   name: string;
   symbol: string;
   network: ChainNetwork;
@@ -61,7 +61,7 @@ export interface ChainAttributes {
   ChainObjectVersion?; // TODO
 }
 
-export interface ChainInstance extends Model<ChainAttributes>, ChainAttributes {
+export type ChainInstance = ModelInstance<ChainAttributes> & {
   // add mixins as needed
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<
@@ -143,6 +143,7 @@ export default (
   Chain.associate = (models) => {
     models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
+    models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' })
     models.Chain.hasMany(models.OffchainTopic, {
       as: 'topics',
       foreignKey: 'chain_id',

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
 export const Errors = {
@@ -7,7 +7,7 @@ export const Errors = {
 };
 
 const starCommunity = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
 
   if (req.body.star === 'true') {

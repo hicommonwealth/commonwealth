@@ -19,7 +19,7 @@ export const validationTokenToSignDoc = (
       // initial_deposit: [{ denom: 'stake', amount: '0' }]
     }
   };
-  fee = fee || { gas: '1', amount: [{ denom: 'astr', amount: '2500000000000000' }] };
+  fee = fee || { gas: '1', amount: [{ denom: 'astr', amount: '0' }] };
   memo = memo || '';
   const signDoc = makeSignDoc(msgs || [jsonTx], fee, chainId, memo, '0', '0');
   return signDoc;

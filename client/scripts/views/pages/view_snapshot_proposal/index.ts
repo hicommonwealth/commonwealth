@@ -106,7 +106,7 @@ const ProposalContent: m.Component<
                 }),
               ]),
               m('.vote-column', proposal.choices[vote.choice - 1]),
-              m('.power-column', `${formatNumberLong(vote.power)} ${symbol}`),
+              m('.power-column', `${formatNumberLong(vote.balance)} ${symbol}`),
             ])
           ),
           m(
@@ -217,7 +217,7 @@ const VoteAction: m.Component<
         });
         vnode.state.votingModalOpen = true;
       } catch (err) {
-        console.log(err);
+        console.error(err);
         notifyError('Voting failed');
       }
     };
@@ -296,7 +296,7 @@ const ViewProposalPage: m.Component<
           m.redraw();
         });
       } catch (e) {
-        console.log(`Failed to fetch threads: ${e}`);
+        console.error(`Failed to fetch threads: ${e}`);
       }
     };
 

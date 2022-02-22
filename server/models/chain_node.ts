@@ -1,9 +1,9 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { Model, DataTypes } from 'sequelize';
 import { ChainInstance, ChainAttributes } from './chain';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface ChainNodeAttributes {
+export type ChainNodeAttributes = {
   chain: string;
   url: string;
   id?: number;
@@ -11,14 +11,13 @@ export interface ChainNodeAttributes {
   token_name?: string;
   ce_verbose?: boolean;
   eth_chain_id?: number;
+  alt_wallet_url?: string;
 
   // associations
   Chain?: ChainAttributes;
 }
 
-export interface ChainNodeInstance
-  extends Model<ChainNodeAttributes>,
-    ChainNodeAttributes {
+export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
   // TODO: add mixins as needed
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
 }
@@ -39,6 +38,7 @@ export default (
       token_name: { type: dataTypes.STRING, allowNull: true },
       ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
+      alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'ChainNodes',

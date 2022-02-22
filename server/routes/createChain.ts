@@ -1,12 +1,16 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction } from 'express';
 import Web3 from 'web3';
 import * as solw3 from '@solana/web3.js';
+import { Cluster } from '@solana/web3.js';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
+import { ChainAttributes } from '../models/chain';
+import { ChainNodeAttributes } from '../models/chain_node';
 import { DB } from '../database';
-import { getUrlForEthChainId } from '../util/supportedEthChains';
+import { TypedRequestBody, TypedResponse, success } from '../types';
+import { getUrlsForEthChainId } from '../util/supportedEthChains';
 
 import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -39,10 +43,20 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
+type CreateChainReq = ChainAttributes & ChainNodeAttributes & {
+  id: string;
+  node_url: string;
+};
+
+type CreateChainResp = {
+  chain: ChainAttributes;
+  node: ChainNodeAttributes;
+};
+
 const createChain = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<CreateChainReq>,
+  res: TypedResponse<CreateChainResp>,
   next: NextFunction
 ) => {
   if (!req.user) {
@@ -81,21 +95,30 @@ const createChain = async (
   }
   let eth_chain_id: number = null;
   let url = req.body.node_url;
-  if (req.body.base === ChainBase.Ethereum && req.body.type === ChainType.Offchain) {
+  let altWalletUrl = req.body.alt_wallet_url;
+
+  // always generate a chain id
+  if (req.body.base === ChainBase.Ethereum) {
     if (!req.body.eth_chain_id || !+req.body.eth_chain_id) {
       return next(new Error(Errors.InvalidChainId));
     }
     eth_chain_id = +req.body.eth_chain_id;
   }
+
+  // if not offchain, also validate the address
   if (req.body.base === ChainBase.Ethereum && req.body.type !== ChainType.Offchain) {
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
     }
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
-    const ethChainUrl = await getUrlForEthChainId(models, eth_chain_id);
-    if (ethChainUrl) {
+    const urls = await getUrlsForEthChainId(models, eth_chain_id);
+    if (urls) {
+      const { url: ethChainUrl, alt_wallet_url } = urls;
       url = ethChainUrl;
+      if (alt_wallet_url) {
+        altWalletUrl = alt_wallet_url;
+      }
     } else {
       // If using overridden URL, then user must be admin -- we do not allow users to submit
       // custom URLs yet.
@@ -107,6 +130,13 @@ const createChain = async (
       return next(new Error(Errors.InvalidChainIdOrUrl));
     }
 
+    const existingChainNode = await models.ChainNode.findOne({
+      where: { address: req.body.address, eth_chain_id }
+    });
+    if (existingChainNode) {
+      return next(new Error(Errors.ChainAddressExists));
+    }
+
     const provider = new Web3.providers.WebsocketProvider(url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
@@ -115,12 +145,7 @@ const createChain = async (
       return next(new Error(Errors.InvalidAddress));
     }
 
-    const existingChainNode = await models.ChainNode.findOne({
-      where: { address: req.body.address, eth_chain_id }
-    });
-    if (existingChainNode) {
-      return next(new Error(Errors.ChainAddressExists));
-    }
+    // TODO: test altWalletUrl if available
   } else if (req.body.base === ChainBase.Solana && req.body.type !== ChainType.Offchain) {
     let pubKey: solw3.PublicKey;
     try {
@@ -129,7 +154,7 @@ const createChain = async (
       return next(new Error(Errors.InvalidAddress));
     }
     try {
-      const clusterUrl = solw3.clusterApiUrl(url);
+      const clusterUrl = solw3.clusterApiUrl(url as Cluster);
       const connection = new solw3.Connection(clusterUrl);
       const supply = await connection.getTokenSupply(pubKey);
       const { decimals, amount } = supply.value;
@@ -151,6 +176,8 @@ const createChain = async (
     } catch (err) {
       return next(new Error(Errors.InvalidNode));
     }
+
+    // TODO: test altWalletUrl if available
   } else {
     if (!url || !url.trim()) {
       return next(new Error(Errors.InvalidNodeUrl));
@@ -160,7 +187,25 @@ const createChain = async (
     }
   }
 
-  const { website, discord, element, telegram, github, icon_url } = req.body;
+  const {
+    id,
+    name,
+    symbol,
+    icon_url,
+    description,
+    network,
+    type,
+    website,
+    discord,
+    telegram,
+    github,
+    element,
+    base,
+    bech32_prefix,
+    decimals,
+    address,
+    token_name
+  } = req.body;
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
@@ -185,38 +230,35 @@ const createChain = async (
     return next(new Error(Errors.ChainNameExists));
   }
 
-  const chainContent = {
-    id: req.body.id,
-    name: req.body.name,
-    symbol: req.body.symbol,
-    icon_url: req.body.icon_url,
-    description: req.body.description,
+  const chain = await models.Chain.create({
+    id,
+    name,
+    symbol,
+    icon_url,
+    description,
+    network,
+    type,
+    website,
+    discord,
+    telegram,
+    github,
+    element,
+    base,
+    bech32_prefix,
+    decimals,
     active: true,
-    network: req.body.network,
-    type: req.body.type,
-    website: req.body.website,
-    discord: req.body.discord,
-    telegram: req.body.telegram,
-    github: req.body.github,
-    element: req.body.element,
-    base: req.body.base,
-    bech32_prefix: req.body.bech32_prefix,
-    decimals: req.body.decimals,
-  };
+  });
 
-  const chain = await models.Chain.create(chainContent);
-
-  const chainNodeContent = {
-    chain: req.body.id,
+  const node = await models.ChainNode.create({
+    chain: id,
     url,
-    address: req.body.address,
+    address,
     eth_chain_id,
-    token_name: req.body.token_name,
-  };
+    token_name,
+    alt_wallet_url: altWalletUrl,
+  });
 
-  const node = await models.ChainNode.create(chainNodeContent);
-
-  return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: node.toJSON() } });
+  return success(res, { chain: chain.toJSON(), node: node.toJSON() });
 };
 
 export default createChain;
