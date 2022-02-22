@@ -16,7 +16,12 @@ import mixpanel from 'mixpanel-browser';
 import favicon from 'serve-favicon';
 
 import app, { ApiStatus, LoginState } from 'state';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
+import {
+  ChainBase,
+  ChainEventNotification,
+  ChainNetwork,
+  ChainType,
+} from 'types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
 import { WebSocketController } from 'controllers/server/socket';
@@ -148,19 +153,26 @@ export function fireBrowserNotification(
 export async function requestBrowserNotifications() {
   if (Notification.permission !== 'denied') {
     try {
-      Notification.requestPermission().then((permission) => {
+      Notification.requestPermission().then(() => {
         console.log('permission granted');
-        setTimeout(() => {
-          fireBrowserNotification('title' + Math.random(), 'body', 'tage', () =>
-            console.log('clicked!')
-          );
-          console.log('should be notifying');
-        }, 1000);
       });
     } catch (e) {
       console.log(e);
     }
   }
+}
+
+export function fireChainEventBrowserNotification(
+  notification: ChainEventNotification
+) {
+  const { chain_id } = notification;
+
+  fireBrowserNotification(
+    'Chain Event Notif',
+    `chain_id: ${chain_id}`,
+    'tag',
+    () => console.log('clicked')
+  );
 }
 
 export async function deinitChainOrCommunity() {
