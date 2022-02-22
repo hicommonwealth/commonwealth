@@ -4,7 +4,6 @@ import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 
 import { StargateClient } from '@cosmjs/stargate';
-import Web3 from 'web3';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 
@@ -47,113 +46,6 @@ export const Errors = {
   CouldNotVerifySignature: 'Failed to verify signature',
   BadSecret: 'Invalid jwt secret',
   BadToken: 'Invalid login token',
-};
-
-const processAddress = async (
-  models: DB,
-  chain: ChainInstance,
-  address: string,
-  signature?: string,
-  user?: Express.User
-): Promise<void> => {
-  const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: chain.id, address }
-  });
-  if (!existingAddress) {
-    throw new AppError(Errors.AddressNF);
-  }
-
-  // first, check whether the token has expired
-  // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
-  const expiration = existingAddress.verification_token_expires;
-  if (expiration && +expiration <= +(new Date())) {
-    throw new AppError(Errors.ExpiredToken);
-  }
-  // check for validity
-  const isAddressTransfer = !!existingAddress.verified && user && existingAddress.user_id !== user.id;
-  const oldId = existingAddress.user_id;
-  try {
-    const valid = await models.Address.verifySignature(
-      models, chain, existingAddress, (user ? user.id : null), signature
-    );
-    if (!valid) {
-      throw new AppError(Errors.InvalidSignature);
-    }
-  } catch (e) {
-    log.warn(`Failed to verify signature for ${address}: ${e.message}`);
-    throw new AppError(Errors.CouldNotVerifySignature);
-  }
-
-  // if someone else already verified it, send an email letting them know ownership
-  // has been transferred to someone else
-  if (isAddressTransfer) {
-    try {
-      const oldUser = await models.User.scope('withPrivateData').findOne({ where: { id: oldId } });
-      if (!oldUser) {
-        // users who register thru github don't have emails by default
-        throw new Error(Errors.NoEmail);
-      }
-      const msg = {
-        to: user.email,
-        from: 'Commonwealth <no-reply@commonwealth.im>',
-        templateId: DynamicTemplate.VerifyAddress,
-        dynamic_template_data: {
-          address,
-          chain: chain.name,
-        },
-      };
-      await sgMail.send(msg);
-      log.info(`Sent address move email: ${address} transferred to a new account`);
-    } catch (e) {
-      log.error(`Could not send address move email for: ${address}`);
-    }
-  }
-};
-
-const verifyWithSignature = async (
-  models: DB,
-  chain: ChainInstance,
-  address: string,
-  signature: string,
-  user?: Express.User
-): Promise<string> => {
-  const encodedAddress = chain.base === ChainBase.Substrate
-    ? AddressSwapper({ address, currentPrefix: chain.ss58_prefix })
-    : address;
-  await processAddress(models, chain, encodedAddress, signature, user);
-  return encodedAddress;
-};
-
-const verifyWithToken = async (
-  models: DB,
-  chain: ChainInstance,
-  token: string,
-  user?: Express.User
-): Promise<string> => {
-  // TODO: make this more flexible
-  // decode token using secret
-  if (!AXIE_SHARED_SECRET) {
-    throw new ServerError(Errors.BadSecret)
-  }
-
-  // verify token and get address
-  let address: string;
-  try {
-    // TODO: correct options
-    const decoded = jwt.verify(token, AXIE_SHARED_SECRET, { issuer: 'AxieInfinity' });
-
-    // token must be object
-    if (typeof decoded === 'string') {
-      throw new Error('Token must be object');
-    }
-    const { roninAddress } = decoded as { roninAddress: string };
-    address = roninAddress;
-  } catch (e) {
-    log.info(`Axie token decoding error: ${e.message}`);
-    throw new AppError(Errors.BadToken);
-  }
-  await processAddress(models, chain, address, null, user);
-  return address;
 };
 
 // Address.verifySignature
@@ -370,6 +262,113 @@ const verifySignature = async (
   await addressModel.save();
   return isValid;
 }
+
+const processAddress = async (
+  models: DB,
+  chain: ChainInstance,
+  address: string,
+  signature?: string,
+  user?: Express.User
+): Promise<void> => {
+  const existingAddress = await models.Address.scope('withPrivateData').findOne({
+    where: { chain: chain.id, address }
+  });
+  if (!existingAddress) {
+    throw new AppError(Errors.AddressNF);
+  }
+
+  // first, check whether the token has expired
+  // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
+  const expiration = existingAddress.verification_token_expires;
+  if (expiration && +expiration <= +(new Date())) {
+    throw new AppError(Errors.ExpiredToken);
+  }
+  // check for validity
+  const isAddressTransfer = !!existingAddress.verified && user && existingAddress.user_id !== user.id;
+  const oldId = existingAddress.user_id;
+  try {
+    const valid = await verifySignature(
+      models, chain, existingAddress, (user ? user.id : null), signature
+    );
+    if (!valid) {
+      throw new AppError(Errors.InvalidSignature);
+    }
+  } catch (e) {
+    log.warn(`Failed to verify signature for ${address}: ${e.message}`);
+    throw new AppError(Errors.CouldNotVerifySignature);
+  }
+
+  // if someone else already verified it, send an email letting them know ownership
+  // has been transferred to someone else
+  if (isAddressTransfer) {
+    try {
+      const oldUser = await models.User.scope('withPrivateData').findOne({ where: { id: oldId } });
+      if (!oldUser) {
+        // users who register thru github don't have emails by default
+        throw new Error(Errors.NoEmail);
+      }
+      const msg = {
+        to: user.email,
+        from: 'Commonwealth <no-reply@commonwealth.im>',
+        templateId: DynamicTemplate.VerifyAddress,
+        dynamic_template_data: {
+          address,
+          chain: chain.name,
+        },
+      };
+      await sgMail.send(msg);
+      log.info(`Sent address move email: ${address} transferred to a new account`);
+    } catch (e) {
+      log.error(`Could not send address move email for: ${address}`);
+    }
+  }
+};
+
+const verifyWithSignature = async (
+  models: DB,
+  chain: ChainInstance,
+  address: string,
+  signature: string,
+  user?: Express.User
+): Promise<string> => {
+  const encodedAddress = chain.base === ChainBase.Substrate
+    ? AddressSwapper({ address, currentPrefix: chain.ss58_prefix })
+    : address;
+  await processAddress(models, chain, encodedAddress, signature, user);
+  return encodedAddress;
+};
+
+const verifyWithToken = async (
+  models: DB,
+  chain: ChainInstance,
+  token: string,
+  user?: Express.User
+): Promise<string> => {
+  // TODO: make this more flexible
+  // decode token using secret
+  if (!AXIE_SHARED_SECRET) {
+    throw new ServerError(Errors.BadSecret)
+  }
+
+  // verify token and get address
+  let address: string;
+  try {
+    // TODO: correct options
+    const decoded = jwt.verify(token, AXIE_SHARED_SECRET, { issuer: 'AxieInfinity' });
+
+    // token must be object
+    if (typeof decoded === 'string') {
+      throw new Error('Token must be object');
+    }
+    const { roninAddress } = decoded as { roninAddress: string };
+    address = roninAddress;
+  } catch (e) {
+    log.info(`Axie token decoding error: ${e.message}`);
+    throw new AppError(Errors.BadToken);
+  }
+  await processAddress(models, chain, address, null, user);
+  return address;
+};
 
 const verifyAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.chain) {
