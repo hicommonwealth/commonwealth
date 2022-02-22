@@ -39,6 +39,20 @@ the RabbitMQ Management plugin MUST be enabled: https://www.rabbitmq.com/managem
 For more information on RabbitMQ setup/debugging refer to the ce-rabbitmq-plugin repo found here:
 https://github.com/hicommonwealth/ce-rabbitmq-plugin
 
+**mkcert - optional**
+
+*Installing mkcert is only necessary if you need to run the localhost webserver with https*
+
+- Linux
+  - Run `sudo apt install libnss3-tools -y` to install dependencies
+  - Run the following from the directory you want to install mkcert in:
+  ```
+    wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64 \
+    && sudo cp mkcert-v1.4.3-linux-amd64 /usr/local/bin/mkcert \
+    && sudo chmod +x /usr/local/bin/mkcert
+    ```
+  - Navigate to the root directory of this repo/projecet and run `mkcert -install`
+
 **nvm**
 
 For development, you should also install nvm:
