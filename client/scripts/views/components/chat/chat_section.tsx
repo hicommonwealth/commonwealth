@@ -8,7 +8,7 @@ import { Icon, Icons, Menu, MenuItem, Spinner, Overlay } from 'construct-ui'
 import { navigateToSubpage } from 'app';
 import app from 'state';
 import { ChatErrors, IChannel } from 'controllers/server/socket/chatNs';
-import { WebsocketMessageType } from 'types';
+import { WebsocketMessageNames } from 'types';
 import SidebarSection, { SidebarSectionProps, SectionGroupProps, SubSectionProps } from '../sidebar/sidebar_section';
 import { ToggleTree, verifyCachedToggleTree } from '../sidebar';
 import {
@@ -109,7 +109,7 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
             }
             m.redraw.sync()
         }
-        app.socket.chatNs.addListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage.bind(vnode));
+        app.socket.chatNs.addListener(WebsocketMessageNames.ChatMessage, vnode.state.onincomingmessage.bind(vnode));
         vnode.state.loaded = true;
 
         vnode.state.menu_toggle_tree = { // Used to track admin menu render status for hover
@@ -133,7 +133,7 @@ export const ChatSection: m.Component<{channels: IChannel[], activeChannel: stri
     },
     onremove: (vnode) => {
         if(app.socket){
-            app.socket.chatNs.removeListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage)
+            app.socket.chatNs.removeListener(WebsocketMessageNames.ChatMessage, vnode.state.onincomingmessage)
         }
     },
     view: (vnode) => {

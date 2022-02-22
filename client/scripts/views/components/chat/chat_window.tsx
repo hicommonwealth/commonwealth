@@ -13,7 +13,7 @@ import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import { WebsocketMessageType } from 'types';
+import { WebsocketMessageNames } from 'types';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -50,10 +50,10 @@ const ChatWindow: m.Component<IAttrs, IState> = {
         }
         m.redraw()
     }
-    app.socket.chatNs.addListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage.bind(vnode));
+    app.socket.chatNs.addListener(WebsocketMessageNames.ChatMessage, vnode.state.onincomingmessage.bind(vnode));
   },
   onremove: (vnode) => {
-    app.socket.chatNs.removeListener(WebsocketMessageType.ChatMessage, vnode.state.onincomingmessage)
+    app.socket.chatNs.removeListener(WebsocketMessageNames.ChatMessage, vnode.state.onincomingmessage)
   },
   view: (vnode) => {
     const { channel_id } = vnode.attrs
