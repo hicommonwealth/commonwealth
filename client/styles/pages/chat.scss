@@ -1,10 +1,21 @@
 @import 'client/styles/shared';
 
-.Chat {
+.chat-page {
+    display: flex;
+    flex-direction: row;
+}
+
+.channel-bar {
+    flex-grow: 1;
+}
+
+.chat-window {
     position: relative;
+    flex-grow: 5;
     height: calc(100vh - 100px);
     background: $background-color-white;
     border: 1px solid $border-color-off-white;
+    margin-right: 10px;
 
     .chat-messages,
     .chat-composer-unavailable {
@@ -14,7 +25,7 @@
         position: absolute;
         top: 0;
         width: 100%;
-        height: calc(100vh - 100px);
+        height: calc(100vh - 150px);
         border-bottom: 1px solid $border-color-off-white;
         overflow-y: scroll;
         .chat-message-placeholder {

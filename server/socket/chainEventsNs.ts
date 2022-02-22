@@ -22,12 +22,17 @@ export function createCeNamespace(io: Server) {
     });
 
     socket.on(WebsocketMessageNames.NewSubscriptions, (chainEventTypes: string[]) => {
-      log.info(`${socket.id} joining ${JSON.stringify(chainEventTypes)}`);
-      if (chainEventTypes.length > 0) socket.join(chainEventTypes);
+      if (chainEventTypes.length > 0) {
+        log.info(`${socket.id} joining ${JSON.stringify(chainEventTypes)}`);
+        socket.join(chainEventTypes);
+      }
     });
 
     socket.on(WebsocketMessageNames.DeleteSubscriptions, (chainEventTypes: string[]) => {
-      for (const eventType of chainEventTypes) socket.leave(eventType);
+      if (chainEventTypes.length > 0) {
+        log.info(`${socket.id} leaving ${JSON.stringify(chainEventTypes)}`);
+        for (const eventType of chainEventTypes) socket.leave(eventType);
+      }
     });
   });
 

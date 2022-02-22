@@ -21,6 +21,7 @@ import { ChainIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
+import { ChatSection } from '../chat/chat_section'
 import { CWButton } from '../component_kit/cw_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
@@ -321,6 +322,10 @@ const Sidebar: m.Component<
         m(`.Sidebar${isCustom ? '.custom-domain' : ''}`, [
           m(DiscussionSection),
           m(GovernanceSection),
+          app.socket && m(ChatSection, {
+            channels: Object.values(app.socket.chatNs.channels),
+            activeChannel: m.route.param()['channel']
+          }),
           m(ExternalLinksModule),
           m('br'),
           app.isLoggedIn() &&

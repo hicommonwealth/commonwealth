@@ -97,11 +97,15 @@ export enum ChainNetwork {
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
   NewSubscriptions = 'new-subscriptions',
-  DeleteSubscriptions = 'delete-subscriptions'
+  DeleteSubscriptions = 'delete-subscriptions',
+  ChatMessage = 'chat-message',
+  JoinChatChannel = 'join-chat-channel',
+  LeaveChatChannel = 'leave-chat-channel'
 }
 
 export enum WebsocketNamespaces {
-  ChainEvents = 'chain-events'
+  ChainEvents = 'chain-events',
+  Chat = 'chat'
 }
 
 export type ChainEventNotification = {

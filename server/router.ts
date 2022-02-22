@@ -104,6 +104,12 @@ import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
 import setTopicThreshold from './routes/setTopicThreshold';
+import getChatMessages from './routes/chat/getChatMessages';
+import createChatChannel from './routes/chat/createChatChannel';
+import deleteChatChannel from './routes/chat/deleteChatChannel';
+import deleteChatCategory from './routes/chat/deleteChatCategory';
+import renameChatChannel from './routes/chat/renameChatChannel';
+import renameChatCategory from './routes/chat/renameChatCategory';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -565,6 +571,38 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     disableImmediateEmails.bind(this, models)
   );
+
+  // chat
+  router.get('/getChatMessages',
+      passport.authenticate('jwt', { session: false }),
+      getChatMessages.bind(this, models)
+  );
+
+  router.post('/createChatChannel',
+      passport.authenticate('jwt', { session: false }),
+      createChatChannel.bind(this, models)
+  );
+
+  router.delete('/deleteChatChannel',
+      passport.authenticate('jwt', { session: false }),
+      deleteChatChannel.bind(this, models)
+  )
+
+  router.delete('/deleteChatCategory',
+      passport.authenticate('jwt', { session: false }),
+      deleteChatCategory.bind(this, models)
+  )
+
+
+  router.put('/renameChatChannel',
+      passport.authenticate('jwt', { session: false }),
+      renameChatChannel.bind(this, models)
+  )
+
+  router.put('/renameChatCategory',
+      passport.authenticate('jwt', { session: false }),
+      renameChatCategory.bind(this, models)
+  )
 
   // settings
   router.post(

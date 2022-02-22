@@ -258,7 +258,13 @@ const createChain = async (
     alt_wallet_url: altWalletUrl,
   });
 
-  return success(res, { chain: chain.toJSON(), node: node.toJSON() });
+  const chatChannels = await models.ChatChannel.create({
+    name: 'General',
+    chain_id: chain.id,
+    category: '' // TODO: update?
+  });
+
+  return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: node.toJSON() } });
 };
 
 export default createChain;
