@@ -3,15 +3,7 @@ import 'pages/search.scss';
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
-import {
-  Button,
-  ListItem,
-  Select,
-  Spinner,
-  TabItem,
-  Tabs,
-  Tag,
-} from 'construct-ui';
+import { ListItem, Select, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 
 import { pluralize } from 'helpers';
 import app from 'state';
@@ -24,10 +16,10 @@ import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { ContentType } from 'controllers/server/search';
-import { CommunityLabel } from '../components/sidebar/community_selector';
 import PageNotFound from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
+import { CommunityLabel } from '../components/community_label';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 

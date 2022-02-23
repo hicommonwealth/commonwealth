@@ -3,7 +3,6 @@ import 'pages/search.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import _, { capitalize } from 'lodash';
 import {
   ControlGroup,
   Icon,
@@ -24,10 +23,9 @@ import { ContentType } from 'controllers/server/search';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
-import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
 import { ChainIcon } from './chain_icon';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CommunityLabel } from './community_label';
 
 export const getMemberPreview = (
   addr,
