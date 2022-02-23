@@ -28,7 +28,6 @@ export type UserAttributes = {
   Profiles?: ProfileAttributes[];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
   Chains?: ChainAttributes[] | ChainAttributes['id'][];
-  SsoTokens?: SsoTokenAttributes[];
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -44,8 +43,6 @@ export type UserInstance = ModelInstance<UserAttributes> & {
 
   getSocialAccounts: Sequelize.HasManyGetAssociationsMixin<SocialAccountInstance>;
   setSocialAccounts: Sequelize.HasManySetAssociationsMixin<SocialAccountInstance, SocialAccountInstance['id']>;
-
-  getSsoTokens: Sequelize.HasManyGetAssociationsMixin<SsoTokenInstance>;
 }
 
 export type UserCreationAttributes = UserAttributes & {
@@ -114,7 +111,6 @@ export default (
     models.User.hasMany(models.Profile);
     models.User.hasMany(models.SocialAccount);
     models.User.hasMany(models.StarredCommunity);
-    models.User.hasMany(models.SsoToken);
     models.User.belongsToMany(models.Chain, { through: models.WaitlistRegistration });
   };
 

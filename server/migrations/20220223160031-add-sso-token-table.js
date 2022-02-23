@@ -8,7 +8,6 @@ module.exports = {
         id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
         issued_at: { type: Sequelize.INTEGER, allowNull: false },
         issuer: { type: Sequelize.STRING, allowNull: false },
-        user_id: { type: Sequelize.INTEGER, allowNull: false },
         address_id: { type: Sequelize.INTEGER, allowNull: false },
         state_id: { type: Sequelize.STRING, allowNull: true },
         created_at: { type: Sequelize.DATE, allowNull: false },
@@ -17,11 +16,11 @@ module.exports = {
 
       // add indexes
       await queryInterface.addIndex('SsoTokens', ['id'], { transaction: t });
-      await queryInterface.addIndex('SsoTokens', ['issuer', 'user_id'], { transaction: t });
+      await queryInterface.addIndex('SsoTokens', ['issuer', 'address_id'], { transaction: t });
 
       // migrate existing user data
-      // TODO: fetch all Users with magicIssuer/lastMagicLoginAt + Addresses with "is_magic = true"
-      //   and create SsoTokens for them using user_id, address_id, issuer, issued_at
+      // TODO: fetch all Addresses with "is_magic = true", and query their users
+      //   and create SsoTokens for them using  address_id, issuer, issued_at
 
       // remove user data columns
       await queryInterface.removeColumn('Users', 'magicIssuer', { transaction: t });

@@ -45,10 +45,10 @@ export function useMagicAuth(models: DB) {
           email: userMetadata.email,
         },
         include: [{
-          model: models.SsoToken,
-          where: { issuer: userMetadata.issuer },
+          model: models.Address,
+          where: { is_magic: true },
           required: false,
-        }],
+        }]
       });
 
       // unsupported chain -- client should send through old email flow
@@ -181,8 +181,7 @@ export function useMagicAuth(models: DB) {
           }, { transaction: t });
 
           // create token with provided user/address
-          const newToken = await models.SsoToken.create({
-            user_id: newUser.id,
+          await models.SsoToken.create({
             issuer: userMetadata.issuer,
             issued_at: user.claim.iat,
             address_id: newAddress.id,
@@ -199,9 +198,18 @@ export function useMagicAuth(models: DB) {
           include: [ models.Address ],
         });
         return cb(null, newUser);
-      } else if (existingUser.SsoTokens) {
+      } else if (existingUser.Addresses) {
         // each user should only ever have one token issued by Magic
-        const ssoToken = await models.SsoToken.findOne({ where: { id: existingUser.SsoTokens[0].id } });
+        const ssoToken = await models.SsoToken.findOne({
+          where: {
+            issuer: user.issuer
+          },
+          include: [{
+            model: models.Address,
+            where: { address: user.publicAddress },
+            required: true,
+          }]
+        });
         // login user if they registered via magic
         if (user.claim.iat <= ssoToken.issued_at) {
           console.log('Replay attack detected.');
