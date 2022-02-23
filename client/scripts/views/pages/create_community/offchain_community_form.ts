@@ -110,13 +110,14 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
             symbol,
           } = vnode.state;
           vnode.state.saving = true;
-          const additionalArgs: { eth_chain_id?: number, node_url?: string, bech32_prefix?: string } = {};
+          const additionalArgs: { eth_chain_id?: number, node_url?: string, bech32_prefix?: string, alt_wallet_url?: string } = {};
 
           // defaults to be overridden when chain is no longer "offchain" type
           switch (vnode.state.base) {
             case ChainBase.CosmosSDK: {
-              additionalArgs.node_url = 'https://rpc-osmosis.keplr.app';
+              additionalArgs.node_url = 'https://rpc-osmosis.blockapsis.com';
               additionalArgs.bech32_prefix = 'osmo';
+              additionalArgs.alt_wallet_url = 'https://lcd-osmosis.blockapsis.com';
               break;
             }
             case ChainBase.NEAR: {
@@ -136,6 +137,8 @@ const OffchainForm: m.Component<OffchainFormAttrs, OffchainFormState> = {
               additionalArgs.eth_chain_id = 1;
               additionalArgs.node_url =
                 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
+              additionalArgs.alt_wallet_url =
+                'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
               break;
             }
           }
