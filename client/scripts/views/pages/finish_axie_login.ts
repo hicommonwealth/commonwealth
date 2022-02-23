@@ -14,9 +14,9 @@ interface IState {
 }
 
 // creates address, initializes account, and redirects to main page
-const validate = async (token: string, chain: string): Promise<void> => {
+const validate = async (token: string, stateId: string, chain: string): Promise<void> => {
   // verifyAddress against token, returns user if not logged in
-  const result = await $.post(`${app.serverUrl()}/auth/axie`, { token });
+  const result = await $.post(`${app.serverUrl()}/auth/axie/callback`, { token, issuer: 'AxieInfinity', stateId });
   if (result.status === 'Success') {
     if (result.result.user) {
       // TODO: refactor/DRY this against finish_near_login
@@ -56,8 +56,9 @@ const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
     // grab token
     // TODO: how to use state id?
     const token = m.route.param('token');
+    const stateId = m.route.param('stateId');
     console.log(token);
-    validate(token, 'axie-infinity');
+    validate(token, stateId, 'axie-infinity');
   },
   view: (vnode) => {
     console.log('finish axie login');

@@ -9,7 +9,6 @@ import { useMagicAuth } from './magic';
 import '../types';
 
 import { getStatsDInstance } from '../util/metrics';
-import { useSsoAuth } from './sso';
 const log = factory.getLogger(formatFilename(__filename));
 
 const JWTStrategy = passportJWT.Strategy;
@@ -43,7 +42,6 @@ function setupPassport(models: DB) {
   useDefaultUserAuth(models);
   useSocialAccountAuth(models);
   useMagicAuth(models);
-  useSsoAuth(models);
 
   passport.serializeUser<any>((user, done) => {
     getStatsDInstance().increment('cw.users.logged_in');

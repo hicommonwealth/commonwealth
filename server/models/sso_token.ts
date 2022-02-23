@@ -5,9 +5,9 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type SsoTokenAttributes = {
   id?: number;
-  issued_at: number;
-  issuer: string;
-  address_id: number;
+  issued_at?: number;
+  issuer?: string;
+  address_id?: number;
   state_id?: string;
   created_at?: Date;
   updated_at?: Date;
@@ -26,9 +26,9 @@ export default (
 ): SsoTokenModelStatic => {
   const SsoToken = <SsoTokenModelStatic>sequelize.define('SsoToken', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    issued_at: { type: dataTypes.INTEGER, allowNull: false },
-    issuer: { type: dataTypes.STRING, allowNull: false },
-    address_id: { type: dataTypes.INTEGER, allowNull: false },
+    issued_at: { type: dataTypes.INTEGER, allowNull: true },
+    issuer: { type: dataTypes.STRING, allowNull: true },
+    address_id: { type: dataTypes.INTEGER, allowNull: true },
     state_id: { type: dataTypes.STRING, allowNull: true },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },

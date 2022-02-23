@@ -444,8 +444,16 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                   intent: 'primary',
                   rounded: true,
                   onclick: async (e) => {
-                    // redirect to axie page for login
-                    window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=2`; // TODO
+                    // get a state id from the server
+                    const result = await $.post(`${app.serverUrl()}/auth/axie`, { issuer: 'AxieInfinity' });
+                    if (result.status === 'Success' && result.result.stateId) {
+                      const stateId = result.result.stateId;
+
+                      // redirect to axie page for login
+                      window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+                    } else {
+                      vnode.state.error(result.error || 'Could not login');
+                    }
                   },
                   label: 'Continue to Ronin wallet'
                 }) ]

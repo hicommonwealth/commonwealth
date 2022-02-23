@@ -115,6 +115,8 @@ import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
 
+import startSsoLogin from './routes/startSsoLogin';
+import finishSsoLogin from './routes/finishSsoLogin';
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
@@ -606,15 +608,11 @@ function setupRouter(
     }
   );
 
-  // TODO: generalize this SSO
+  router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(
-    '/auth/axie',
+    '/auth/sso/callback',
     passport.authenticate('jwt', { session: false }),
-    passport.authenticate('AxieInfinity'),
-    (req, res, next) => {
-      // TOOD: is this correct?
-      return res.json({ status: 'Success', result: req.user.toJSON() });
-    }
+    finishSsoLogin.bind(this, models),
   );
 
   // logout
