@@ -606,6 +606,17 @@ function setupRouter(
     }
   );
 
+  // TODO: generalize this SSO
+  router.post(
+    '/auth/axie',
+    passport.authenticate('jwt', { session: false }),
+    passport.authenticate('AxieInfinity'),
+    (req, res, next) => {
+      // TOOD: is this correct?
+      return res.json({ status: 'Success', result: req.user.toJSON() });
+    }
+  );
+
   // logout
   router.get('/logout', logout.bind(this, models));
 

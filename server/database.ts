@@ -87,6 +87,9 @@ import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
 } from './models/social_account';
+import SsoTokenFactory, {
+  SsoTokenModelStatic,
+} from './models/sso_token';
 import StarredCommunityFactory, {
   StarredCommunityModelStatic,
 } from './models/starred_community';
@@ -139,6 +142,7 @@ export type Models = {
   Profile: ProfileModelStatic;
   Role: RoleModelStatic;
   SocialAccount: SocialAccountModelStatic;
+  SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
   Subscription: SubscriptionModelStatic;
   Token: TokenModelStatic;
@@ -220,6 +224,7 @@ const models: Models = {
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
+  SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),

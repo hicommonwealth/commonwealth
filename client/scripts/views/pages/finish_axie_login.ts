@@ -16,7 +16,7 @@ interface IState {
 // creates address, initializes account, and redirects to main page
 const validate = async (token: string, chain: string): Promise<void> => {
   // verifyAddress against token, returns user if not logged in
-  const result = await $.post(`${app.serverUrl()}/verifyAddress`, { token, chain });
+  const result = await $.post(`${app.serverUrl()}/auth/axie`, { token });
   if (result.status === 'Success') {
     if (result.result.user) {
       // TODO: refactor/DRY this against finish_near_login

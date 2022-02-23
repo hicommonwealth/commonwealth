@@ -29,7 +29,6 @@ import { DB } from '../database';
 import { DynamicTemplate, ChainBase, NotificationCategories, ChainNetwork } from '../../shared/types';
 import AddressSwapper from '../util/addressSwapper';
 import { AppError, ServerError } from '../util/errors';
-import { AXIE_SHARED_SECRET } from '../config';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -324,55 +323,6 @@ const processAddress = async (
   }
 };
 
-const verifyWithSignature = async (
-  models: DB,
-  chain: ChainInstance,
-  address: string,
-  signature: string,
-  user?: Express.User
-): Promise<string> => {
-  const encodedAddress = chain.base === ChainBase.Substrate
-    ? AddressSwapper({ address, currentPrefix: chain.ss58_prefix })
-    : address;
-  await processAddress(models, chain, encodedAddress, signature, user);
-  return encodedAddress;
-};
-
-// TODO: factor this + the magic code in passport.ts into a util which creates a user/address
-//   (if needed) from a known-valid address
-const verifyWithToken = async (
-  models: DB,
-  chain: ChainInstance,
-  token: string,
-  user?: Express.User
-): Promise<string> => {
-  // TODO: make this more flexible
-  // decode token using secret
-  if (!AXIE_SHARED_SECRET) {
-    throw new ServerError(Errors.BadSecret)
-  }
-
-  // verify token and get address
-  let address: string;
-  try {
-    // TODO: correct options
-    const decoded = jwt.verify(token, AXIE_SHARED_SECRET, { issuer: 'AxieInfinity' });
-
-    // token must be object
-    if (typeof decoded === 'string') {
-      throw new Error('Token must be object');
-    }
-    console.log(decoded); // { iat } will be a number = unix time
-    const { roninAddress } = decoded as { roninAddress: string };
-    address = roninAddress;
-  } catch (e) {
-    log.info(`Axie token decoding error: ${e.message}`);
-    throw new AppError(Errors.BadToken);
-  }
-  await processAddress(models, chain, address, null, user);
-  return address;
-};
-
 const verifyAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.chain) {
     throw new AppError(Errors.NoChain);
@@ -384,14 +334,14 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
     return next(new Error(Errors.InvalidChain));
   }
 
-  let address: string;
-  if (req.body.token) {
-    address = await verifyWithToken(models, chain, req.body.token, req.user);
-  } else if (req.body.address && req.body.signature) {
-    address = await verifyWithSignature(models, chain, req.body.address, req.body.signature, req.user);
-  } else {
+  if (!req.body.address || !req.body.signature) {
     throw new AppError(Errors.InvalidArguments);
   }
+
+  const address = chain.base === ChainBase.Substrate
+    ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
+    : req.body.address;
+  await processAddress(models, chain, address, req.body.signature, req.user);
 
   if (req.user) {
     // if user was already logged in, we're done
