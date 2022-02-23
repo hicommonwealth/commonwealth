@@ -611,7 +611,7 @@ function setupRouter(
   router.post('/auth/sso', startSsoLogin.bind(this, models));
   router.post(
     '/auth/sso/callback',
-    passport.authenticate('jwt', { session: false }),
+    // passport.authenticate('jwt', { session: false }),
     finishSsoLogin.bind(this, models),
   );
 

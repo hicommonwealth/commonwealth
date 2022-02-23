@@ -16,7 +16,14 @@ interface IState {
 // creates address, initializes account, and redirects to main page
 const validate = async (token: string, stateId: string, chain: string): Promise<void> => {
   // verifyAddress against token, returns user if not logged in
-  const result = await $.post(`${app.serverUrl()}/auth/axie/callback`, { token, issuer: 'AxieInfinity', stateId });
+  let result;
+  try {
+    result = await $.post(`${app.serverUrl()}/auth/sso/callback`, { token, issuer: 'AxieInfinity', stateId });
+  } catch (e) {
+    console.error(`Post request error: ${e.responseText}`);
+    return;
+  }
+  console.log(result);
   if (result.status === 'Success') {
     if (result.result.user) {
       // TODO: refactor/DRY this against finish_near_login

@@ -19,8 +19,21 @@ module.exports = {
       await queryInterface.addIndex('SsoTokens', ['issuer', 'address_id'], { transaction: t });
 
       // migrate existing user data
-      // TODO: fetch all Addresses with "is_magic = true", and query their users
-      //   and create SsoTokens for them using  address_id, issuer, issued_at
+      await queryInterface.sequelize.query(`
+        INSERT INTO "SsoTokens" (address_id, issuer, issued_at, created_at, updated_at)
+        SELECT sso.address_id, sso.issuer, sso.issued_at, NOW(), NOW()
+        FROM 
+          (SELECT a.user_id, a."chain",
+            DENSE_RANK() OVER (PARTITION BY a.user_id ORDER BY CASE a."chain" WHEN 'ethereum' THEN 1 WHEN 'edgeware' THEN 5 ELSE 9 END) AS pref,
+            a.id AS address_id, u."magicIssuer"AS issuer, u."lastMagicLoginAt" AS issued_at
+          FROM "Addresses" a 
+            INNER JOIN "Users" u ON a.user_id = u.id 
+          WHERE a.is_magic = TRUE 
+          ) sso
+        WHERE sso.pref = 1;
+      `, {
+          raw: true, type: 'RAW', transaction: t,
+      });
 
       // remove user data columns
       await queryInterface.removeColumn('Users', 'magicIssuer', { transaction: t });
@@ -32,10 +45,19 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       // restore User columns
       await queryInterface.addColumn('Users', 'magicIssuer', { type: Sequelize.STRING, allowNull: true }, { transaction: t });
-      await queryInterface.addColumn('Users', { type: Sequelize.INTEGER, allowNull: true }, { transaction: t });
+      await queryInterface.addColumn('Users', 'lastMagicLoginAt', { type: Sequelize.INTEGER, allowNull: true }, { transaction: t });
 
       // migrate data from SsoTokens
-      // TODO: query all SsoTokens attached to addresses where "is_magic = true", and re-add issuer/issued_at to their associated User
+      await queryInterface.sequelize.query(`
+        UPDATE "Users"
+        SET "magicIssuer" = s.issuer, 
+          "lastMagicLoginAt" = s.issued_at
+        FROM "SsoTokens" s
+          INNER JOIN "Addresses" a ON s.address_id = a.id 
+        WHERE a.user_id = "Users".id;
+      `, {
+          raw: true, type: 'RAW', transactione: t,
+      });
 
       // drop SsoTokens table
       await queryInterface.dropTable('SsoTokens', { transaction: t });

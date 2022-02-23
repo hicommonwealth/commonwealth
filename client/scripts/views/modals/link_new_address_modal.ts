@@ -445,7 +445,7 @@ const LinkNewAddressModal: m.Component<ILinkNewAddressModalAttrs, ILinkNewAddres
                   rounded: true,
                   onclick: async (e) => {
                     // get a state id from the server
-                    const result = await $.post(`${app.serverUrl()}/auth/axie`, { issuer: 'AxieInfinity' });
+                    const result = await $.post(`${app.serverUrl()}/auth/sso`, { issuer: 'AxieInfinity' });
                     if (result.status === 'Success' && result.result.stateId) {
                       const stateId = result.result.stateId;
 

@@ -23,14 +23,14 @@ export enum Issuers {
 
 type AxieInfinityJwt = {
   iat: number; // issued at time
-  Iss: string; // should be "AxieInfinity"
+  iss: string; // should be "AxieInfinity"
   jti: string; // random UUID
   roninAddress: string; // eth address
 };
 
 function isAxieInfinityJwt(token: any): token is AxieInfinityJwt {
   return typeof token.iat === 'number'
-    && typeof token.Iss === 'string'
+    && typeof token.iss === 'string'
     && typeof token.jti === 'string'
     && typeof token.roninAddress === 'string';
 }
@@ -81,6 +81,7 @@ const finishSsoLogin = async (
   let jwtPayload: AxieInfinityJwt;
   try {
     const decoded = jwt.verify(tokenString, AXIE_SHARED_SECRET, { issuer: 'AxieInfinity' });
+    console.log(decoded);
     if (isAxieInfinityJwt(decoded)) {
       jwtPayload = decoded;
     } else {
@@ -92,7 +93,7 @@ const finishSsoLogin = async (
   }
 
   // verify issuer
-  if (jwtPayload.Iss !== Issuers.AxieInfinity) {
+  if (jwtPayload.iss !== Issuers.AxieInfinity) {
     throw new AppError(Errors.TokenBadIssuer);
   }
 
@@ -113,7 +114,7 @@ const finishSsoLogin = async (
     where: { address: jwtPayload.roninAddress },
     include: [{
       model: models.SsoToken,
-      where: { issuer: jwtPayload.Iss },
+      where: { issuer: jwtPayload.iss },
       required: true,
     }],
   });
@@ -186,7 +187,7 @@ const finishSsoLogin = async (
     let profile: ProfileAttributes;
     if (!reqUser) {
       // create new user
-      user = await models.User.createWithProfile(models, { email: '' }, { transaction: t });
+      user = await models.User.createWithProfile(models, { email: null }, { transaction: t });
       profile = user.Profiles[0];
     } else {
       user = reqUser;
@@ -228,7 +229,7 @@ const finishSsoLogin = async (
     }, { transaction: t });
 
     // populate token
-    emptyTokenInstance.issuer = jwtPayload.Iss;
+    emptyTokenInstance.issuer = jwtPayload.iss;
     emptyTokenInstance.issued_at = jwtPayload.iat;
     emptyTokenInstance.address_id = newAddress.id;
     await emptyTokenInstance.save({ transaction: t });
