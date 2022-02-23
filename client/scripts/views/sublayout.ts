@@ -210,7 +210,7 @@ const Sublayout: m.Component<
                 { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
                 {
                   text: 'Discord',
-                  externalLink: 'https://discord.gg/KBVcXG4s',
+                  externalLink: 'https://discord.gg/vYcfQ758',
                 },
                 {
                   text: 'Telegram',
