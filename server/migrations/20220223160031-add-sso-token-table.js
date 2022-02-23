@@ -56,7 +56,7 @@ module.exports = {
           INNER JOIN "Addresses" a ON s.address_id = a.id 
         WHERE a.user_id = "Users".id;
       `, {
-          raw: true, type: 'RAW', transactione: t,
+          raw: true, type: 'RAW', transaction: t,
       });
 
       // drop SsoTokens table
