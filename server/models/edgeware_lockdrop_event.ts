@@ -1,8 +1,8 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface EdgewareLockdropEventAttributes {
+export type EdgewareLockdropEventAttributes = {
   origin: string;
   blocknum: number;
   id?: number;
@@ -11,10 +11,9 @@ export interface EdgewareLockdropEventAttributes {
   data?: string;
 }
 
-export interface EdgewareLockdropEventInstance
-extends Model<EdgewareLockdropEventAttributes>, EdgewareLockdropEventAttributes {}
+export type EdgewareLockdropEventInstance = ModelInstance<EdgewareLockdropEventAttributes>;
 
-export type EdgewareLockdropEventModelStatic = ModelStatic<EdgewareLockdropEventInstance>
+export type EdgewareLockdropEventModelStatic = ModelStatic<EdgewareLockdropEventInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -2,10 +2,10 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 
 import { UserAttributes, UserInstance } from './user';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance } from './address';
 
-export interface ProfileAttributes {
+export type ProfileAttributes = {
   id?: number;
   user_id: number;
   created_at?: Date;
@@ -20,13 +20,12 @@ export interface ProfileAttributes {
   User?: UserAttributes;
 }
 
-export interface ProfileInstance
-extends Model<ProfileAttributes>, ProfileAttributes {
+export type ProfileInstance = ModelInstance<ProfileAttributes> & {
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
 }
 
-export type ProfileModelStatic = ModelStatic<ProfileInstance>
+export type ProfileModelStatic = ModelStatic<ProfileInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

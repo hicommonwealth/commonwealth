@@ -1,6 +1,7 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
 // If a community is found, also check that the user is allowed to see it.
 
+import { DB } from '../database';
 import { ChainInstance } from '../models/chain';
 
 export const ChainCommunityErrors = {
@@ -8,9 +9,7 @@ export const ChainCommunityErrors = {
 };
 
 // sequelize 5.0 does not accept undefined key in where clause
-const lookupCommunityIsVisibleToUser = async (
-  models, params, user
-): Promise<[ChainInstance, string]> => {
+const validateChain = async (models: DB, params): Promise<[ChainInstance, string]> => {
   if (!params.chain) return [null, ChainCommunityErrors.ChainDNE];
   const chain = await models.Chain.findOne({
     where: {
@@ -30,4 +29,4 @@ const lookupCommunityIsVisibleToUser = async (
   return [chain, null];
 };
 
-export default lookupCommunityIsVisibleToUser;
+export default validateChain;

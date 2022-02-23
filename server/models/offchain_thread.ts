@@ -1,13 +1,13 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
 
-export interface OffchainThreadAttributes {
+export type OffchainThreadAttributes = {
   address_id: number;
   title: string;
   kind: string;
@@ -45,9 +45,7 @@ export interface OffchainThreadAttributes {
   linked_threads?: LinkedThreadAttributes[];
 }
 
-export interface OffchainThreadInstance
-  extends Model<OffchainThreadAttributes>,
-    OffchainThreadAttributes {
+export type OffchainThreadInstance = ModelInstance<OffchainThreadAttributes> & {
   // no mixins used
 }
 
