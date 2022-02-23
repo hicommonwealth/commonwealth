@@ -5,8 +5,9 @@ import { Tag } from 'construct-ui';
 
 import app from 'state';
 import { ChainInfo, NodeInfo } from 'models';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWCard } from '../../components/component_kit/cw_card';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWCard } from '../components/component_kit/cw_card';
+import Sublayout from '../sublayout';
 
 var numeral = require('numeral');
 
@@ -31,7 +32,7 @@ const buildCommunityString = (numCommunities: number) => {
   return `${numberString} Communities`;
 };
 
-const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
+export const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
   view: (vnode) => {
     const { chain, nodeList } = vnode.attrs;
     const { unseenPosts } = app.user;
@@ -276,4 +277,14 @@ const HomepageCommunityCards: m.Component = {
   },
 };
 
-export default HomepageCommunityCards;
+const CommunityCardPage: m.Component = {
+  view: (vnode) => {
+    return m(Sublayout, {
+      class: 'Homepage',
+    }, [
+      m(HomepageCommunityCards),
+    ]);
+  }
+}
+
+export default CommunityCardPage;

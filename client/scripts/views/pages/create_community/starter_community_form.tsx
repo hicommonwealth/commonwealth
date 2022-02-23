@@ -77,12 +77,13 @@ export class StarterCommunityForm implements m.ClassComponent {
               eth_chain_id?: number;
               node_url?: string;
               bech32_prefix?: string;
+              alt_wallet_url?: string;
             } = {};
 
             // defaults to be overridden when chain is no longer "starter" type
             switch (this.state.form.base) {
               case ChainBase.CosmosSDK: {
-                additionalArgs.node_url = 'https://rpc-osmosis.keplr.app';
+                additionalArgs.node_url = 'https://rpc-osmosis.blockapsis.com';
                 additionalArgs.bech32_prefix = 'osmo';
                 break;
               }
@@ -103,6 +104,8 @@ export class StarterCommunityForm implements m.ClassComponent {
                 additionalArgs.eth_chain_id = 1;
                 additionalArgs.node_url =
                   'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
+                additionalArgs.alt_wallet_url =
+                  'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
                 break;
               }
             }
