@@ -81,8 +81,10 @@ export const getCommunityPreview = (
       : community.contentType === ContentType.Chain
       ? { chain: community }
       : null;
+
   params['size'] = 36;
-  const onSelect = (e) => {
+
+  const onSelect = () => {
     if (params.token) {
       m.route.set(params.token.address ? `/${params.token.address}` : '/');
     } else {
@@ -90,6 +92,7 @@ export const getCommunityPreview = (
     }
     closeResultsFn();
   };
+
   return m(ListItem, {
     tabIndex,
     label: m('a.search-results-item.community-result', [
@@ -98,7 +101,7 @@ export const getCommunityPreview = (
     onclick: onSelect,
     onkeyup: (e) => {
       if (e.key === 'Enter') {
-        onSelect(e);
+        onSelect();
       }
     },
     onmouseover: () => setUsingFilterMenuFn(true),

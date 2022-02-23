@@ -70,14 +70,17 @@ export const getCommunityResult = (community) => {
       : community.contentType === ContentType.Chain
       ? { chain: community }
       : null;
+
   params['size'] = 36;
-  const onSelect = (e) => {
+
+  const onSelect = () => {
     if (params.token) {
       m.route.set(params.token.address ? `/${params.token.address}` : '/');
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
     }
   };
+
   return m(ListItem, {
     label: m('a.search-results-item.community-result', [
       m(CommunityLabel, params),
@@ -85,7 +88,7 @@ export const getCommunityResult = (community) => {
     onclick: onSelect,
     onkeyup: (e) => {
       if (e.key === 'Enter') {
-        onSelect(e);
+        onSelect();
       }
     },
   });

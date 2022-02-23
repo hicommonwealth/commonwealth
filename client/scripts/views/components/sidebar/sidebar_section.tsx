@@ -5,16 +5,11 @@ import { Icon, Icons } from 'construct-ui';
 
 import 'components/sidebar/sidebar_section.scss';
 
-export type SubSectionAttrs = {
-  isActive: boolean; // Is this the current page
-  isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
-  isVisible: boolean;
-  onclick: any;
-  onhover?: () => void;
-  rightIcon?: m.Vnode;
-  rowIcon?: boolean;
-  title: string;
-};
+import {
+  SubSectionAttrs,
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
+} from './types';
 
 class SubSection implements m.ClassComponent<SubSectionAttrs> {
   view(vnode) {
@@ -56,20 +51,6 @@ class SubSection implements m.ClassComponent<SubSectionAttrs> {
     );
   }
 }
-
-export type SectionGroupAttrs = {
-  containsChildren: boolean;
-  displayData: SubSectionAttrs[] | null;
-  hasDefaultToggle: boolean;
-  isActive: boolean; // Is this the current page
-  isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
-  isVisible: boolean; // Is this section shown as an option
-  onclick: any;
-  onhover?: () => void;
-  rightIcon?: m.Vnode;
-  title: string;
-};
-
 class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
@@ -172,18 +153,6 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
     );
   }
 }
-
-export type SidebarSectionAttrs = {
-  hasDefaultToggle: boolean;
-  displayData: SectionGroupAttrs[];
-  extraComponents?: m.Vnode;
-  isActive: boolean;
-  onclick: any;
-  onhover?: () => void;
-  rightIcon?: m.Vnode;
-  title: string;
-  toggleDisabled?: boolean;
-};
 
 export class SidebarSection implements m.ClassComponent<SidebarSectionAttrs> {
   private toggled: boolean;

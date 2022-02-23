@@ -19,27 +19,13 @@ import { ChainInfo, NodeInfo } from 'models';
 import SubscriptionButton from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon } from 'views/components/chain_icon';
-import CommunitySelector from 'views/components/sidebar/community_selector';
+import { CommunitySelector } from 'views/components/sidebar/community_selector';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
 import { ChatSection } from '../chat/chat_section';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-
-// Toggle Tree Definition (3 layers of depth, could add more if desired)
-export interface ToggleTree {
-  toggledState: boolean;
-  children: {
-    [child: string]: {
-      toggledState: boolean;
-      children: {
-        [child: string]: {
-          toggledState: boolean;
-        };
-      };
-    };
-  };
-}
+import { ToggleTree } from './types';
 
 function comparisonCustomizer(value1, value2) {
   if (typeof value1 === 'boolean' && typeof value2 === 'boolean') {

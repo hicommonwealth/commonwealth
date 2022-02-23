@@ -1,16 +1,20 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import 'components/sidebar/index.scss';
+/* @jsx m */
 
 import m from 'mithril';
+
+import 'components/sidebar/index.scss';
+
 import { navigateToSubpage } from 'app';
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'types';
+import { SidebarSection } from './sidebar_section';
+import { verifyCachedToggleTree } from '.';
 import {
-  SidebarSection,
+  MobileSidebarSectionAttrs,
   SectionGroupAttrs,
   SidebarSectionAttrs,
-} from './sidebar_section';
-import { ToggleTree, verifyCachedToggleTree } from '.';
+  ToggleTree,
+} from './types';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -30,8 +34,10 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export const GovernanceSection: m.Component<{ mobile: boolean }, {}> = {
-  view: (vnode) => {
+export class GovernanceSection
+  implements m.ClassComponent<MobileSidebarSectionAttrs>
+{
+  view(vnode) {
     // Conditional Render Details
     const hasProposals =
       app.chain &&
@@ -447,6 +453,6 @@ export const GovernanceSection: m.Component<{ mobile: boolean }, {}> = {
       toggleDisabled: vnode.attrs.mobile,
     };
 
-    return m(SidebarSection, { ...sidebarSectionData });
-  },
-};
+    return <SidebarSection {...sidebarSectionData} />;
+  }
+}

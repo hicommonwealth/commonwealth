@@ -12,13 +12,8 @@ import { navigateToSubpage } from 'app';
 import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageType } from 'types';
-import {
-  SidebarSection,
-  SidebarSectionAttrs,
-  SectionGroupAttrs,
-  SubSectionAttrs,
-} from '../sidebar/sidebar_section';
-import { ToggleTree, verifyCachedToggleTree } from '../sidebar';
+import { SidebarSection } from '../sidebar/sidebar_section';
+import { verifyCachedToggleTree } from '../sidebar';
 import {
   CreateCategory,
   CreateChannel,
@@ -27,6 +22,12 @@ import {
   DeleteCategory,
   DeleteChannel,
 } from './admin_modals';
+import {
+  ToggleTree,
+  SubSectionAttrs,
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
+} from '../sidebar/types';
 
 enum Errors {
   None = '',
