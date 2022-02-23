@@ -84,7 +84,7 @@ const UserDashboard: m.Component<
           vnode.state.loadingData = false;
           m.redraw();
         });
-      } else if (tab == DashboardViews.Global) {
+      } else if (tab === DashboardViews.Global) {
         if (globalNotifications.length === 0) vnode.state.loadingData = true;
         fetchActivity('global').then((activity) => {
           vnode.state.globalNotifications = activity.result.map(
@@ -94,7 +94,7 @@ const UserDashboard: m.Component<
           vnode.state.loadingData = false;
           m.redraw();
         });
-      } else if (tab == DashboardViews.Chain) {
+      } else if (tab === DashboardViews.Chain) {
         if (chainEvents.length === 0) vnode.state.loadingData = true;
         fetchActivity('chainEvents').then((activity) => {
           vnode.state.chainEvents = activity.result.map((notification) =>

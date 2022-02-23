@@ -57,7 +57,7 @@ const subscribeToThread = async (
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription
 ) => {
-  const adjustedId = 'discussion_' + threadId;
+  const adjustedId = `discussion_${threadId}`;
   if (bothActive) {
     await app.user.notifications.disableSubscriptions([
       commentSubscription,
@@ -97,7 +97,7 @@ const ButtonRow: m.Component<{
     const { path, threadId, showDiscussion, showShare, showSubscribe } =
       vnode.attrs;
 
-    const adjustedId = 'discussion_' + threadId;
+    const adjustedId = `discussion_${threadId}`;
     const commentSubscription = app.user.notifications.subscriptions.find(
       (v) =>
         v.objectId === adjustedId &&
@@ -356,7 +356,7 @@ const UserDashboardRow: m.Component<
     // ----------- Handle Chain Events ----------- //
     if (categoryId === 'chain-event') {
       const chainEvent: CWEvent = {
-        blockNumber: blockNumber,
+        blockNumber,
         network: eventNetwork,
         data: vnode.attrs.notification.eventData,
       };
@@ -396,7 +396,7 @@ const UserDashboardRow: m.Component<
                   },
                   [communityName]
                 ),
-                m('span.block-number', [' Block ' + blockNumber]),
+                m('span.block-number', [` Block ${blockNumber}`]),
               ]),
               m('.event-body', [label.label]),
             ]),
@@ -445,7 +445,7 @@ const UserDashboardRow: m.Component<
         m('.icon-row', [
           m(ButtonRow, {
             path,
-            threadId: threadId,
+            threadId,
             showDiscussion: true,
             showShare: true,
             showSubscribe: true,

@@ -68,7 +68,7 @@ class DashboardActivityNotification {
     chain?: string;
     iconUrl?: string;
   }) {
-    this.categoryId = categoryId ? categoryId : 'chain-event';
+    this.categoryId = categoryId || 'chain-event';
     this.threadId = threadId;
     this.notificationData = notificationData;
     this.createdAt = moment(createdAt);

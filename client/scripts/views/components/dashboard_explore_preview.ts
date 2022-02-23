@@ -4,8 +4,8 @@ import m from 'mithril';
 import { Col, Icon, Icons, Tag } from 'construct-ui';
 import app from 'state';
 import { NodeInfo } from 'client/scripts/models';
-import { ChainIcon } from './chain_icon';
 import { pluralize } from 'helpers';
+import { ChainIcon } from './chain_icon';
 import { CWCard } from './component_kit/cw_card';
 
 const getNewTag = (labelCount = null) => {
@@ -77,7 +77,7 @@ const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
   },
 };
 
-const DashboardExplorePreview: m.Component<{}> = {
+const DashboardExplorePreview: m.Component = {
   view: (vnode) => {
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
