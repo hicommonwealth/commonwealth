@@ -323,7 +323,7 @@ const LandingPage: m.Component<{}, IState> = {
             { text: 'Privacy', redirectTo: '/privacy' },
             { text: 'Docs', externalLink: 'https://docs.commonwealth.im'},
             { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-            { text: 'Discord', externalLink: 'https://discord.gg/frnQxxZG5S' },
+            { text: 'Discord', externalLink: 'https://discord.gg/vYcfQ758' },
             { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
             { text: 'Twitter', externalLink: 'https://twitter.com/hicommonwealth' }
           ],
