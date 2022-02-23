@@ -159,15 +159,16 @@ export class CommunitySelector
             class="CommunitySelectList"
             content={
               <div>
-                app.isLoggedIn() &&
-                <div>
-                  <h4>Your communities</h4>
-                  {joinedCommunities.map(renderCommunity)}
-                  {joinedCommunities.length === 0 && (
-                    <div class="community-placeholder">None</div>
-                  )}
-                  <h4>Other communities</h4>
-                </div>
+                {app.isLoggedIn() && (
+                  <div>
+                    <h4>Your communities</h4>
+                    {joinedCommunities.map(renderCommunity)}
+                    {joinedCommunities.length === 0 && (
+                      <div class="community-placeholder">None</div>
+                    )}
+                    <h4>Other communities</h4>
+                  </div>
+                )}
                 {unjoinedCommunities.map(renderCommunity)}
                 {renderCommunity('home')}
               </div>
