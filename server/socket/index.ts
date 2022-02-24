@@ -74,22 +74,27 @@ export function setupWebSocketServer(httpServer: http.Server, models: DB) {
         auth: false,
     });
 
+    log.info(`Connecting to Redis at: ${REDIS_URL}`);
     const pubClient = createClient({url: REDIS_URL});
-    pubClient.on("connect", () => {
-        log.info(`Redis successfully connected on server: ${process.env.HEROKU_DYNO_ID}`);
-    })
+    pubClient.connect().then((res) => {
+        pubClient.on('error', (err) => console.log('Redis Client Error', err));
 
-    pubClient.set('testKey', 'testValue').then((res) => {
-        log.info("Test key inserted");
-    }).catch((error) => {
-        log.error("Failed to insert key in Redis", error);
-    })
+        pubClient.on("connect", () => {
+            log.info(`Redis successfully connected on server: ${process.env.HEROKU_DYNO_ID}`);
+        })
 
-    const subClient = pubClient.duplicate();
+        pubClient.set('testKey', 'testValue').then((result) => {
+            log.info("Test key inserted");
+        }).catch((error) => {
+            log.error("Failed to insert key in Redis", error);
+        });
 
-    Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-        io.adapter(<any>createAdapter(pubClient, subClient));
-    })
+        const subClient = pubClient.duplicate();
+
+        Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+            io.adapter(<any>createAdapter(pubClient, subClient));
+        })
+    });
 
     // create the chain-events namespace
     const ceNamespace = createCeNamespace(io);
