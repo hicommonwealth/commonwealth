@@ -11,7 +11,6 @@ import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageType } from 'types';
 import { SidebarSection } from '../sidebar/sidebar_section';
-import { verifyCachedToggleTree } from '../sidebar';
 import {
   CreateCategory,
   CreateChannel,
@@ -26,6 +25,7 @@ import {
   SectionGroupAttrs,
   SidebarSectionAttrs,
 } from '../sidebar/types';
+import { verifyCachedToggleTree } from '../sidebar/helpers';
 
 enum Errors {
   None = '',

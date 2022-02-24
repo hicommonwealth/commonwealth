@@ -8,13 +8,13 @@ import { navigateToSubpage } from 'app';
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'types';
 import { SidebarSection } from './sidebar_section';
-import { verifyCachedToggleTree } from '.';
 import {
   MobileSidebarSectionAttrs,
   SectionGroupAttrs,
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
+import { verifyCachedToggleTree } from './helpers';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(

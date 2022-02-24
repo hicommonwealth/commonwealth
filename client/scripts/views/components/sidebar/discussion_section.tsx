@@ -7,13 +7,13 @@ import 'components/sidebar/index.scss';
 import { navigateToSubpage } from 'app';
 import app from 'state';
 import { SidebarSection } from './sidebar_section';
-import { verifyCachedToggleTree } from '.';
 import {
   MobileSidebarSectionAttrs,
   SectionGroupAttrs,
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
+import { verifyCachedToggleTree } from './helpers';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(

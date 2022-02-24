@@ -15,7 +15,6 @@ type ChainIconAttrs = BaseChainIconAttrs & { chain: ChainInfo };
 
 export class ChainIcon implements m.ClassComponent<ChainIconAttrs> {
   view(vnode) {
-    console.log(vnode.attrs.chain.id === 'aapl' && vnode.attrs.chain.iconUrl);
     const { onclick, size = 32 } = vnode.attrs;
     const iconUrl =
       vnode.attrs.chain.iconUrl || (vnode.attrs.chain as any).icon_url;

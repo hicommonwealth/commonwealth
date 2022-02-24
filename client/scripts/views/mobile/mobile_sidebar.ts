@@ -11,7 +11,6 @@ import {
 import 'mobile/mobile_sidebar.scss';
 
 import app from 'state';
-import { ExternalLinksModule } from 'views/components/sidebar';
 import { capitalize } from 'lodash';
 import { CommunitySelector } from '../components/sidebar/community_selector';
 import {
@@ -22,6 +21,7 @@ import { getNewProposalMenu } from '../components/new_proposal_button';
 import LoginModal from '../modals/login_modal';
 import { DiscussionSection } from '../components/sidebar/discussion_section';
 import { GovernanceSection } from '../components/sidebar/governance_section';
+import { ExternalLinksModule } from '../components/sidebar/external_links_module';
 
 enum MenuTabs {
   currentCommunity = 'currentCommunity',
