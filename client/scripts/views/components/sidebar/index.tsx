@@ -34,21 +34,22 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
               />
             )}
             <ExternalLinksModule />
-            <br />
-            {app.isLoggedIn() && app.chain && (
-              <div class="subscription-button">
-                <SubscriptionButton />
-              </div>
-            )}
-            {app.chain && <ChainStatusModule />}
-            {app.isCustomDomain() && (
-              <a
-                class="PoweredBy"
-                onclick={() => {
-                  window.open('https://commonwealth.im/');
-                }}
-              />
-            )}
+            <div class="buttons-container">
+              {app.isLoggedIn() && app.chain && (
+                <div class="subscription-button">
+                  <SubscriptionButton />
+                </div>
+              )}
+              {app.chain && <ChainStatusModule />}
+              {app.isCustomDomain() && (
+                <a
+                  class="PoweredBy"
+                  onclick={() => {
+                    window.open('https://commonwealth.im/');
+                  }}
+                />
+              )}
+            </div>
           </div>
         )}
       </div>

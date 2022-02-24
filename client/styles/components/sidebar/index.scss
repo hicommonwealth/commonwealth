@@ -26,16 +26,6 @@
     left: 0;
   }
 
-  @include sm-max {
-    max-height: calc(100vh - 60px); // $mobile-header-height
-    overflow-y: scroll;
-    padding-top: 30px;
-  }
-
-  .sidebar-spacer {
-    margin-bottom: 22px;
-  }
-
   .section-header {
     color: $text-color-light;
     font-size: 18px;
@@ -43,14 +33,20 @@
     margin-top: 20px;
   }
 
-  .cui-button {
-    margin-bottom: 4px;
+  .buttons-container {
+    margin: 24px 0;
+
+    .subscription-button {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
   }
 
-  .subscription-button {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 15px;
+  @include sm-max {
+    max-height: calc(100vh - 60px); // $mobile-header-height
+    overflow-y: scroll;
+    padding-top: 30px;
   }
 }
 
