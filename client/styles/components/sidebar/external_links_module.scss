@@ -2,4 +2,156 @@
   margin-top: 20px;
   display: flex;
   justify-content: center;
+
+  .cui-button.cui-rounded:active,
+  .cui-button.cui-rounded.cui-active,
+  .cui-button.cui-rounded:hover {
+    background: linear-gradient(to left, #91ffa0, #fbff91, #ff9191);
+    border-color: white;
+
+    // @TODO: Remove this and figure out a better solution
+    background: #6966ff;
+    color: white;
+  }
+
+  .cui-button.website-button,
+  .cui-button.github-button,
+  .cui-button.telegram-button,
+  .cui-button.element-button,
+  .cui-button.discord-button {
+    margin-right: 8px;
+    padding: 0 10px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .cui-button.telegram-button {
+    border-color: tint(#2480cc, 70%);
+    color: #2480cc;
+
+    svg {
+      color: #2480cc;
+      fill: currentColor;
+      left: -1px;
+      position: relative;
+      top: -3px;
+    }
+
+    &:hover {
+      border-color: transparent;
+
+      svg {
+        color: white;
+        fill: currentColor;
+      }
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+  }
+
+  .cui-button.element-button {
+    border-color: tint(#0cbd8b, 70%);
+    color: #0cbd8b;
+
+    svg {
+      color: #0cbd8b;
+      fill: currentColor;
+      position: relative;
+      top: -4px;
+    }
+
+    &:hover {
+      border-color: transparent;
+
+      svg {
+        color: white;
+        fill: currentColor;
+      }
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+  }
+
+  .cui-button.discord-button {
+    border-color: tint(#677bc4, 70%);
+    color: #677bc4;
+
+    svg {
+      color: #677bc4;
+      fill: currentColor;
+      position: relative;
+      top: -4px;
+    }
+
+    &:hover {
+      border-color: transparent;
+
+      svg {
+        color: white;
+        fill: currentColor;
+      }
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+  }
+
+  .cui-button.website-button {
+    border-color: tint(#222222, 70%);
+    color: #222222;
+
+    svg {
+      color: #222222;
+      position: relative;
+      top: -4px;
+    }
+
+    &:hover {
+      border-color: transparent;
+
+      svg {
+        color: white;
+      }
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+  }
+
+  .cui-button.github-button {
+    border-color: tint(#222222, 70%);
+    color: #222222;
+
+    svg {
+      color: #222222;
+      fill: currentColor;
+      position: relative;
+      top: -4px;
+    }
+
+    &:hover {
+      border-color: transparent;
+
+      svg {
+        color: white;
+      }
+    }
+
+    .cui-button-label {
+      flex: 1;
+      text-align: left;
+    }
+  }
 }
