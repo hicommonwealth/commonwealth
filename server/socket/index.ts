@@ -76,36 +76,36 @@ export function setupWebSocketServer(httpServer: http.Server) {
     auth: false,
   });
 
-  const pool = new Pool({
-    connectionString: DATABASE_URI,
-    ssl: process.env.NODE_ENV !== 'production' ? false : {
-      rejectUnauthorized: false,
-    },
-    max: 3,
-  });
+  // const pool = new Pool({
+  //   connectionString: DATABASE_URI,
+  //   ssl: process.env.NODE_ENV !== 'production' ? false : {
+  //     rejectUnauthorized: false,
+  //   },
+  //   max: 3,
+  // });
 
-  pool
-    .query(
-      `
-          CREATE TABLE IF NOT EXISTS socket_io_attachments
-          (
-              id         bigserial UNIQUE,
-              created_at timestamptz DEFAULT NOW(),
-              payload    bytea
-          );
-			`
-    )
-    .then((res) => {
-      log.info('Socket.io query successful');
-    })
-    .catch((e) => {
-      log.error(
-        'Postgres Adapter will not work so cross server websocket rooms will not be available.',
-        e
-      );
-    });
+  // pool
+  //   .query(
+  //     `
+  //         CREATE TABLE IF NOT EXISTS socket_io_attachments
+  //         (
+  //             id         bigserial UNIQUE,
+  //             created_at timestamptz DEFAULT NOW(),
+  //             payload    bytea
+  //         );
+	// 		`
+  //   )
+  //   .then((res) => {
+  //     log.info('Socket.io query successful');
+  //   })
+  //   .catch((e) => {
+  //     log.error(
+  //       'Postgres Adapter will not work so cross server websocket rooms will not be available.',
+  //       e
+  //     );
+  //   });
 
-  io.adapter(<any>createAdapter(pool));
+  // io.adapter(<any>createAdapter(pool));
 
   try {
     const rabbitController = new RabbitMQController(
