@@ -569,7 +569,7 @@ Promise.all([
       '/validators':             importRoute('views/pages/validators', { scoped: true }),
       // Settings
       '/login':                  importRoute('views/pages/login', { scoped: true, deferChain: true }),
-      '/web3login':              importRoute('views/pages/web3login', { scoped: true }),
+      '/web3login':              importRoute('views/pages/web3login', { scoped: true, deferChain: true }),
       // Admin
       '/admin':                  importRoute('views/pages/admin', { scoped: true }),
       '/manage':                 importRoute('views/pages/manage_community/index', { scoped: true }),
@@ -648,6 +648,7 @@ Promise.all([
       // Scoped routes
       //
       '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: false }),
+      '/communities':              importRoute('views/pages/community_cards', { scoped: false, hideSidebar: false }),
       '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
       '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
       // Notifications
@@ -701,7 +702,7 @@ Promise.all([
       // Settings
       '/login':                    importRoute('views/pages/login', { scoped: false }),
       '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
-      '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
+      '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true, deferChain: true }),
       // Admin
       '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
       '/manage':                 importRoute('views/pages/manage_community/index', { scoped: false }),

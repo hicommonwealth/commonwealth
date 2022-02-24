@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
 const Errors = {
@@ -29,11 +29,7 @@ const searchComments = async (
   // Community-scoped search
   let communityOptions = '';
   if (req.query.chain || req.query.community) {
-    const [chain, error] = await lookupCommunityIsVisibleToUser(
-      models,
-      req.query,
-      req.user
-    );
+    const [chain, error] = await validateChain(models, req.query);
     if (error) return next(new Error(error));
 
     // set up query parameters

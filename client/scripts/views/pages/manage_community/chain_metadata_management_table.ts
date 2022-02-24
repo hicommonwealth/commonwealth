@@ -6,7 +6,7 @@ import { Button, Table } from 'construct-ui';
 
 import { ChainBase, ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputPropertyRow, TogglePropertyRow } from 'views/components/metadata_rows';
+import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 
 import { ChainInfo } from 'client/scripts/models';
@@ -92,14 +92,14 @@ const ChainMetadataManagementTable: m.Component<
           class: 'metadata-management-table',
         },
         [
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Name',
             defaultValue: vnode.state.name,
             onChangeHandler: (v) => {
               vnode.state.name = v;
             },
           }),
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Description',
             defaultValue: vnode.state.description,
             onChangeHandler: (v) => {
@@ -107,7 +107,7 @@ const ChainMetadataManagementTable: m.Component<
             },
             textarea: true,
           }),
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Website',
             defaultValue: vnode.state.website,
             placeholder: 'https://example.com',
@@ -115,7 +115,7 @@ const ChainMetadataManagementTable: m.Component<
               vnode.state.website = v;
             },
           }),
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Discord',
             defaultValue: vnode.state.discord,
             placeholder: 'https://discord.com/invite',
@@ -123,7 +123,7 @@ const ChainMetadataManagementTable: m.Component<
               vnode.state.discord = v;
             },
           }),
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Element',
             defaultValue: vnode.state.element,
             placeholder: 'https://matrix.to/#',
@@ -131,7 +131,7 @@ const ChainMetadataManagementTable: m.Component<
               vnode.state.element = v;
             },
           }),
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Telegram',
             defaultValue: vnode.state.telegram,
             placeholder: 'https://t.me',
@@ -139,7 +139,7 @@ const ChainMetadataManagementTable: m.Component<
               vnode.state.telegram = v;
             },
           }),
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Github',
             defaultValue: vnode.state.github,
             placeholder: 'https://github.com',
@@ -147,7 +147,7 @@ const ChainMetadataManagementTable: m.Component<
               vnode.state.github = v;
             },
           }),
-          m(TogglePropertyRow, {
+          m(ToggleRow, {
             title: 'Stages',
             defaultValue: vnode.attrs.chain.stagesEnabled,
             onToggle: (checked) => {
@@ -158,7 +158,7 @@ const ChainMetadataManagementTable: m.Component<
                 ? 'Show proposal progress on threads'
                 : "Don't show progress on threads",
           }),
-          m(TogglePropertyRow, {
+          m(ToggleRow, {
             title: 'Summary view',
             defaultValue: vnode.attrs.chain.defaultSummaryView,
             onToggle: (checked) => {
@@ -169,7 +169,7 @@ const ChainMetadataManagementTable: m.Component<
                 ? 'Discussion listing defaults to summary view'
                 : 'Discussion listing defaults to latest activity view',
           }),
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Custom Stages',
             defaultValue: vnode.state.customStages,
             placeholder: '["Temperature Check", "Consensus Check"]',
@@ -177,7 +177,7 @@ const ChainMetadataManagementTable: m.Component<
               vnode.state.customStages = v;
             },
           }),
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Domain',
             defaultValue: vnode.state.customDomain,
             placeholder: 'Contact support', // gov.edgewa.re
@@ -187,16 +187,19 @@ const ChainMetadataManagementTable: m.Component<
             disabled: true, // Custom domains should be admin configurable only
           }),
           app.chain?.meta.chain.base === ChainBase.Ethereum &&
-            m(InputPropertyRow, {
+            m(InputRow, {
               title: 'Snapshot(s)',
               defaultValue: vnode.state.snapshot,
               placeholder: vnode.state.network,
               onChangeHandler: (v) => {
-                const snapshots = v.split(',').map((val) => val.trim()).filter((val) => val.length > 4);
+                const snapshots = v
+                  .split(',')
+                  .map((val) => val.trim())
+                  .filter((val) => val.length > 4);
                 vnode.state.snapshot = snapshots;
               },
             }),
-          m(InputPropertyRow, {
+          m(InputRow, {
             title: 'Terms of Service',
             defaultValue: vnode.state.terms,
             placeholder: 'Url that new users see',
@@ -254,7 +257,7 @@ const ChainMetadataManagementTable: m.Component<
             } = vnode.state;
             for (const space of snapshot) {
               if (space !== '') {
-                if (space.slice(space.length-4) != '.eth') {
+                if (space.slice(space.length - 4) != '.eth') {
                   notifyError('Snapshot name must be in the form of *.eth');
                   return;
                 }
@@ -283,7 +286,7 @@ const ChainMetadataManagementTable: m.Component<
             }
           },
         }),
-      ])
+      ]),
     ]);
   },
 };

@@ -106,7 +106,7 @@ const ProposalContent: m.Component<
                 }),
               ]),
               m('.vote-column', proposal.choices[vote.choice - 1]),
-              m('.power-column', `${formatNumberLong(vote.power)} ${symbol}`),
+              m('.power-column', `${formatNumberLong(vote.balance)} ${symbol}`),
             ])
           ),
           m(

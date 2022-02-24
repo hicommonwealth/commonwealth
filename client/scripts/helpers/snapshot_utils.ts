@@ -155,7 +155,7 @@ export interface SnapshotProposalVote {
   voter: string;
   created: number;
   choice: number;
-  power: number;
+  balance: number;
 }
 
 export async function getVersion(): Promise<string> {
@@ -234,7 +234,6 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
         parseInt(proposal.snapshot, 10),
         // provider,
       );
-
       votes = votes.map((vote: any) => {
           vote.scores = strategies.map(
             (strategy, i) => scores[i][vote.voter] || 0
