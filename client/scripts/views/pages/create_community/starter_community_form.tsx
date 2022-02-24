@@ -85,6 +85,7 @@ export class StarterCommunityForm implements m.ClassComponent {
               case ChainBase.CosmosSDK: {
                 additionalArgs.node_url = 'https://rpc-osmosis.blockapsis.com';
                 additionalArgs.bech32_prefix = 'osmo';
+                additionalArgs.alt_wallet_url = 'https://lcd-osmosis.blockapsis.com';
                 break;
               }
               case ChainBase.NEAR: {
