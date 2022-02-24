@@ -1,7 +1,6 @@
 // Use https://admin.socket.io/#/ to monitor
-import { DB } from '../database';
-// TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 
+// TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 import { Server, Socket } from 'socket.io';
 import { instrument } from '@socket.io/admin-ui';
 import { BrokerConfig } from 'rascal';
@@ -16,6 +15,7 @@ import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 import { DATABASE_URI, JWT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import {createChatNamespace} from "./chatNs";
+import { sequelize, DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -85,7 +85,7 @@ export function setupWebSocketServer(httpServer: http.Server, models: DB) {
   //   },
   //   max: 3,
   // });
-
+  //
   // pool
   //   .query(
   //     `
@@ -107,7 +107,7 @@ export function setupWebSocketServer(httpServer: http.Server, models: DB) {
   //     );
   //   });
 
-  // io.adapter(<any>createAdapter(pool));
+  io.adapter(<any>createAdapter(sequelize));
 
   try {
     const rabbitController = new RabbitMQController(
