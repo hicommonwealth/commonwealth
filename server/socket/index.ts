@@ -75,6 +75,16 @@ export function setupWebSocketServer(httpServer: http.Server, models: DB) {
     });
 
     const pubClient = createClient({url: REDIS_URL});
+    pubClient.on("connect", () => {
+        log.info(`Redis successfully connected on server: ${process.env.HEROKU_DYNO_ID}`);
+    })
+
+    pubClient.set('testKey', 'testValue').then((res) => {
+        log.info("Test key inserted");
+    }).catch((error) => {
+        log.error("Failed to insert key in Redis", error);
+    })
+
     const subClient = pubClient.duplicate();
 
     Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
