@@ -13,7 +13,7 @@ import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
-import { CWPopover } from './cw_popover';
+import { CWPopover, CWTooltip } from './cw_popover';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -46,43 +46,20 @@ const radioGroupOptions = [
 ];
 
 export class ComponentShowcase implements m.ClassComponent {
-  isPopoverOpen: boolean;
-
-  constructor() {
-    this.isPopoverOpen = false;
-  }
-
-  openPopover() {
-    this.isPopoverOpen = true;
-  }
-
-  closePopover() {
-    this.isPopoverOpen = false;
-  }
-
   view() {
     return (
       <div class="ComponentShowcase">
         <div class="popover-gallery">
-          <h1>Popover</h1>
-          <CWButton
-            onclick={() => this.openPopover()}
-            label="Click to show Popover"
-          />
-          <CWPopover
-            isOpen={this.isPopoverOpen}
-            closePopover={() => this.closePopover()}
-            content={
+          <CWTooltip
+            triggerLabel='something to see here?'
+            tooltipContent={
               <div class="popover-example-container">
                 <div class="popover-example-body">
                   This is the popover's contents
                 </div>
-                <div class="popover-example-footer">
-                  <CWButton onclick={() => this.closePopover()} label="Close" />
-                </div>
               </div>
             }
-          />
+            />
         </div>
         <h1>Colors</h1>
         <div class="color-gallery">

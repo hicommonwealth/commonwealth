@@ -11,6 +11,7 @@ export enum ComponentType {
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   TextInput = 'TextInput',
+  Tooltip = 'Tooltip',
 }
 
 export type StyleAttrs = {
