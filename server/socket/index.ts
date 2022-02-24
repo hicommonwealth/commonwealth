@@ -6,13 +6,13 @@ import {instrument} from '@socket.io/admin-ui';
 import {BrokerConfig} from 'rascal';
 import * as jwt from 'jsonwebtoken';
 import {ExtendedError} from 'socket.io/dist/namespace';
-import {createAdapter} from '@socket.io/postgres-adapter';
-import {Pool} from 'pg';
 import * as http from "http";
+import {createAdapter} from "@socket.io/redis-adapter";
+import {createClient} from "redis";
 import {createCeNamespace, publishToCERoom} from './chainEventsNs';
 import {RabbitMQController} from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import {DATABASE_URI, JWT_SECRET} from '../config';
+import {DATABASE_URI, JWT_SECRET, REDIS_URL} from '../config';
 import {factory, formatFilename} from '../../shared/logging';
 import {createChatNamespace} from "./chatNs";
 import {sequelize, DB} from '../database';
@@ -69,58 +69,21 @@ export function setupWebSocketServer(httpServer: http.Server, models: DB) {
         log.error('A WebSocket connection error has occurred', err);
     });
 
-    // create the chain-events namespace
-    const ceNamespace = createCeNamespace(io);
-    const chatNamespace = createChatNamespace(io, models);
-
     // enables the admin analytics dashboard (creates /admin namespace)
     instrument(io, {
         auth: false,
     });
 
-    // const pool = new Pool({
-    //   connectionString: DATABASE_URI,
-    //   ssl: process.env.NODE_ENV !== 'production' ? false : {
-    //     rejectUnauthorized: false,
-    //   },
-    //   max: 3,
-    // });
-    //
-    // pool
-    //   .query(
-    //     `
-    //         CREATE TABLE IF NOT EXISTS socket_io_attachments
-    //         (
-    //             id         bigserial UNIQUE,
-    //             created_at timestamptz DEFAULT NOW(),
-    //             payload    bytea
-    //         );
-    // 		`
-    //   )
-    //   .then((res) => {
-    //     log.info('Socket.io query successful');
-    //   })
-    //   .catch((e) => {
-    //     log.error(
-    //       'Postgres Adapter will not work so cross server websocket rooms will not be available.',
-    //       e
-    //     );
-    //   });
-    sequelize.query(`
-                CREATE TABLE IF NOT EXISTS socket_io_attachments
-                (
-                    id         bigserial UNIQUE,
-                    created_at timestamptz DEFAULT NOW(),
-                    payload    bytea
-                );
-        `
-    ).then((result) => {
-        log.info("Socket.io table created");
-    }).catch((error) => {
-        log.error("Failed to create the Socket.io table. Messages over 8000 bytes will fail to be delivered across Socket.io instances", error);
-    });
+    const pubClient = createClient({url: REDIS_URL});
+    const subClient = pubClient.duplicate();
 
-    io.adapter(<any>createAdapter(sequelize));
+    Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+        io.adapter(<any>createAdapter(pubClient, subClient));
+    })
+
+    // create the chain-events namespace
+    const ceNamespace = createCeNamespace(io);
+    const chatNamespace = createChatNamespace(io, models);
 
     try {
         const rabbitController = new RabbitMQController(
