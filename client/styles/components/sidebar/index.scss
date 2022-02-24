@@ -26,89 +26,10 @@
     left: 0;
   }
 
-  .sidebar-content {
-    max-height: calc(100vh - 60px);
-    overflow-y: auto;
-    padding-bottom: 60px;
-    padding-top: 16px;
-  }
-
   @include sm-max {
     max-height: calc(100vh - 60px); // $mobile-header-height
     overflow-y: scroll;
     padding-top: 30px;
-
-    .SidebarHeader {
-      display: none;
-    }
-  }
-
-  .sidebar-fadeout {
-    bottom: 0;
-    display: none; // TODO
-    height: 80px;
-    pointer-events: none;
-    position: absolute;
-    width: 100%;
-    z-index: 4;
-
-    background: -webkit-linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-
-    background-image: -moz-linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-
-    background-image: -o-linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-
-    background-image: linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-
-    background-image: -ms-linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-  }
-
-  .SidebarHeader {
-    border-bottom: 1px solid $border-color-lightest;
-
-    .cui-button {
-      background: none !important;
-      height: initial;
-      padding: 0;
-      width: 100%;
-
-      > .cui-button-label {
-        display: flex;
-        padding: 0 19px;
-        width: 100%;
-
-        > .CommunityLabel {
-          padding: 20px 0 18px;
-          max-width: calc(100% - 18px);
-        }
-
-        > .CommunityLabel.CommunityLabelPlaceholder {
-          font-weight: 500;
-          padding-left: 5px;
-          padding: 22px 0;
-        }
-
-        .cui-icon {
-          margin-left: 6px;
-          margin-top: 25px;
-        }
-      }
-    }
   }
 
   .sidebar-spacer {
@@ -130,10 +51,6 @@
     display: flex;
     justify-content: center;
     margin-bottom: 15px;
-  }
-
-  .spacer {
-    height: 100px;
   }
 }
 

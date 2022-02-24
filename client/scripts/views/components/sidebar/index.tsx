@@ -49,7 +49,6 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
                 }}
               />
             )}
-            <div class="spacer" />
           </div>
         )}
       </div>
