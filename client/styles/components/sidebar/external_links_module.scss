@@ -1,157 +1,122 @@
+$border-color-tint-percentage: 70%;
+$telegram-color: #2480cc;
+$element-color: #0cbd8b;
+$discord-color: #677bc4;
+$default-color: #222222;
+
+@mixin brand-hover {
+  border-color: transparent;
+
+  svg {
+    color: white;
+    fill: currentColor;
+  }
+}
+
+@mixin icon-position {
+  position: relative;
+  top: -4px;
+}
+
+@mixin default-hover {
+  border-color: transparent;
+
+  svg {
+    color: white;
+  }
+}
+
 .ExternalLinksModule {
-  margin-top: 20px;
   display: flex;
   justify-content: center;
+  margin-top: 24px;
 
-  .cui-button.cui-rounded:active,
-  .cui-button.cui-rounded.cui-active,
-  .cui-button.cui-rounded:hover {
-    background: linear-gradient(to left, #91ffa0, #fbff91, #ff9191);
-    border-color: white;
+  :not(:last-child) {
+    margin-right: 8px;
+  }
 
-    // @TODO: Remove this and figure out a better solution
+  .cui-button:hover {
     background: #6966ff;
     color: white;
   }
 
-  .cui-button.website-button,
-  .cui-button.github-button,
-  .cui-button.telegram-button,
-  .cui-button.element-button,
-  .cui-button.discord-button {
-    margin-right: 8px;
-    padding: 0 10px;
-
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-
-  .cui-button.telegram-button {
-    border-color: tint(#2480cc, 70%);
-    color: #2480cc;
+  .telegram-button {
+    border-color: tint($telegram-color, $border-color-tint-percentage);
+    color: $telegram-color;
+    padding: 8px;
 
     svg {
-      color: #2480cc;
+      color: $telegram-color;
       fill: currentColor;
+      @include icon-position;
       left: -1px;
-      position: relative;
-      top: -3px;
     }
 
     &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-        fill: currentColor;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
+      @include brand-hover;
     }
   }
 
-  .cui-button.element-button {
-    border-color: tint(#0cbd8b, 70%);
-    color: #0cbd8b;
+  .element-button {
+    border-color: tint($element-color, $border-color-tint-percentage);
+    color: $element-color;
+    padding: 8px;
 
     svg {
-      color: #0cbd8b;
+      color: $element-color;
       fill: currentColor;
-      position: relative;
-      top: -4px;
+      @include icon-position;
     }
 
     &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-        fill: currentColor;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
+      @include brand-hover;
     }
   }
 
-  .cui-button.discord-button {
-    border-color: tint(#677bc4, 70%);
-    color: #677bc4;
+  .discord-button {
+    border-color: tint($discord-color, $border-color-tint-percentage);
+    color: $discord-color;
+    padding: 8px;
 
     svg {
-      color: #677bc4;
+      color: $discord-color;
       fill: currentColor;
-      position: relative;
-      top: -4px;
+      @include icon-position;
     }
 
     &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-        fill: currentColor;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
+      @include brand-hover;
     }
   }
 
-  .cui-button.website-button {
-    border-color: tint(#222222, 70%);
-    color: #222222;
+  .website-button {
+    border-color: tint($default-color, $border-color-tint-percentage);
+    color: $default-color;
+    padding: 8px;
 
     svg {
-      color: #222222;
-      position: relative;
-      top: -4px;
+      color: $default-color;
+      @include icon-position;
     }
 
     &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
+      @include default-hover;
     }
   }
 
-  .cui-button.github-button {
-    border-color: tint(#222222, 70%);
-    color: #222222;
+  .github-button {
+    border-color: tint($default-color, $border-color-tint-percentage);
+    color: $default-color;
+    padding: 8px;
 
     svg {
-      color: #222222;
+      color: $default-color;
       fill: currentColor;
-      position: relative;
-      top: -4px;
+      @include icon-position;
     }
 
     &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
+      @include default-hover;
     }
   }
 }

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button, Tooltip } from 'construct-ui';
+import { Button } from 'construct-ui';
 
 import 'components/sidebar/external_links_module.scss';
 
@@ -19,73 +19,48 @@ export class ExternalLinksModule implements m.ClassComponent {
     return (
       <div class="ExternalLinksModule">
         {discord && (
-          <Tooltip
-            transitionDuration={100}
-            content="Discord"
-            trigger={
-              <Button
-                rounded={true}
-                onclick={() => window.open(discord)}
-                label={<CWIcon iconName="discord" />}
-                class="discord-button"
-              />
-            }
+          <Button
+            rounded={true}
+            title="Discord"
+            onclick={() => window.open(discord)}
+            label={<CWIcon iconName="discord" />}
+            class="discord-button"
           />
         )}
         {element && (
-          <Tooltip
-            transitionDuration={100}
-            content="Element"
-            trigger={
-              <Button
-                rounded={true}
-                onclick={() => window.open(element)}
-                label={<CWIcon iconName="element" />}
-                class="element-button"
-              />
-            }
+          <Button
+            rounded={true}
+            title="Element"
+            onclick={() => window.open(element)}
+            label={<CWIcon iconName="element" />}
+            class="element-button"
           />
         )}
         {telegram && (
-          <Tooltip
-            transitionDuration={100}
-            content="Telegram"
-            trigger={
-              <Button
-                rounded={true}
-                onclick={() => window.open(telegram)}
-                label={<CWIcon iconName="telegram" />}
-                class="telegram-button"
-              />
-            }
+          <Button
+            rounded={true}
+            title="Telegram"
+            onclick={() => window.open(telegram)}
+            label={<CWIcon iconName="telegram" />}
+            class="telegram-button"
           />
         )}
         {github && (
-          <Tooltip
-            transitionDuration={100}
-            content="Github"
-            trigger={
-              <Button
-                rounded={true}
-                onclick={() => window.open(github)}
-                label={<CWIcon iconName="github" />}
-                class="github-button"
-              />
-            }
+          <Button
+            rounded={true}
+            title="Github"
+            onclick={() => window.open(github)}
+            label={<CWIcon iconName="github" />}
+            class="github-button"
           />
         )}
         {website && (
-          <Tooltip
-            transitionDuration={100}
-            content="Homepage"
-            trigger={
-              <Button
-                rounded={true}
-                onclick={() => window.open(website)}
-                label={<CWIcon iconName="website" />}
-                class="website-button"
-              />
-            }
+          <Button
+            rounded={true}
+            title="Homepage"
+            onclick={() => window.open(website)}
+            label={<CWIcon iconName="website" />}
+            class="website-button"
           />
         )}
       </div>
