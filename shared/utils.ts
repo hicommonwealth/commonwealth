@@ -35,6 +35,21 @@ export const slugify = (str: string): string => {
     .replace(/ +/g, '-');
 };
 
+export const slugifyPreserveDashes = (str: string): string => {
+  // Remove any character that isn't a alphanumeric character, a
+  // space, or a dash, and then replace any sequence of spaces with a single dash.
+
+  // return str
+  //   .toLowerCase()
+  //   .trim()
+  //   .replace(/[^A-Za-z0-9]+/g, '-');
+
+  return str
+    .replace(/[^a-z0-9 -]/g, '')
+    .replace(/(\s|-)+/g, '-')
+    .replace(/^-|-$/g, '');
+};
+
 export const requiresTypeSlug = (type: ProposalType): boolean => {
   return (
     type === ProposalType.SubstrateDemocracyReferendum ||
