@@ -76,6 +76,7 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
       });
 
       // update the login status
+      console.log(data);
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
       app.user.setStarredCommunities(data.user ? data.user.starredCommunities : []);

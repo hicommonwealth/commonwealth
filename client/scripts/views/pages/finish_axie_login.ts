@@ -2,60 +2,37 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 
-import { ChainNetwork } from 'types';
-
 import PageLoading from 'views/pages/loading';
-import PageNotFound from 'views/pages/404';
 import { initAppState } from 'app';
-import { setActiveAccount, updateActiveAddresses } from 'controllers/app/login';
+import { updateActiveAddresses } from 'controllers/app/login';
+import ErrorPage from './error';
 
 interface IState {
   validating: boolean;
+  error: string;
 }
 
 // creates address, initializes account, and redirects to main page
-const validate = async (token: string, stateId: string, chain: string): Promise<void> => {
+const validate = async (token: string, stateId: string, chain: string): Promise<void | string> => {
   // verifyAddress against token, returns user if not logged in
   let result;
   try {
     result = await $.post(`${app.serverUrl()}/auth/sso/callback`, { token, issuer: 'AxieInfinity', stateId });
   } catch (e) {
     console.error(`Post request error: ${e.responseText}`);
-    return;
+    return `Login Error: ${e.responseText}`;
   }
   console.log(result);
   if (result.status === 'Success') {
-    if (result.result.user) {
-      // TODO: refactor/DRY this against finish_near_login
-      // new login
-      if (app.isLoggedIn()) {
-        // TODO: something on error
-        console.error('Already logged in? Should not have created a new user');
-      }
-      await initAppState();
-      const selectedChainMeta = app.user.selectedNode
-        ? app.user.selectedNode.chain
-        : app.config.nodes.getByChain(chain)[0].chain;
-      await updateActiveAddresses(selectedChainMeta);
-    }
-    if (result.result.address) {
-      try {
-        // should be an ETH account, for Axie
-        const acct = app.chain.accounts.get(result.result.address);
-        await setActiveAccount(acct);
-      } catch (e) {
-        // TODO: something on error
-        console.error(`Failed to create Axie address: ${e.message}`);
-      }
-    } else {
-      // TODO: something on error
-      console.error('Did not receive an address from verifyAddress... what happened?');
-    }
+    await initAppState();
+    const selectedChainMeta = app.config.chains.getById('axie-infinity');
+    await updateActiveAddresses(selectedChainMeta);
+    console.log('Navigating to axie infinite community');
+    m.route.set('/axie-infinity');
   } else {
-    // TODO: something on error
     console.error(`Got login error: ${JSON.stringify(result)}`);
+    return `Login error: ${JSON.stringify(result)}`;
   }
-  // TODO: redirect
 }
 
 const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
@@ -65,22 +42,20 @@ const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
     const token = m.route.param('token');
     const stateId = m.route.param('stateId');
     console.log(token);
-    validate(token, stateId, 'axie-infinity');
+    validate(token, stateId, 'axie-infinity').then((res) => {
+      if (typeof res === 'string') {
+        vnode.state.error = res;
+        m.redraw();
+      }
+    })
   },
   view: (vnode) => {
     console.log('finish axie login');
-    // TODO: do we need to kick off loading?
-    // if (!app.chain || !app.chain.loaded || vnode.state.validating) {
-    //   return m(PageLoading);
-    // }
-    // TODO: generalize this to any SSO chain
-    // if (app.chain.network !== ChainNetwork.AxieInfinity) {
-    //   return m(PageNotFound);
-    // }
-
-
-    // send token to server for login
-    // TODO: see oninit
+    if (vnode.state.error) {
+      return m(ErrorPage, { title: 'Login Error', message: vnode.state.error });
+    } else {
+      return m(PageLoading);
+    }
   }
 };
 

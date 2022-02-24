@@ -12,6 +12,7 @@ import { UserAttributes } from '../models/user';
 import { AddressAttributes } from '../models/address';
 
 import { factory, formatFilename } from '../../shared/logging';
+import { redirectWithLoginError, redirectWithLoginSuccess } from './finishEmailLogin';
 const log = factory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -49,6 +50,7 @@ const Errors = {
   TokenBadAddress: 'Invalid token address',
   AlreadyLoggedIn: 'User is already logged in',
   ReplayAttack: 'Invalid token. Try again',
+  AccountCreationFailed: 'Failed to create account',
 };
 
 type FinishSsoLoginReq = { token: string, issuer: Issuers, stateId: string };
@@ -119,9 +121,21 @@ const finishSsoLogin = async (
     }],
   });
   if (existingAddress) {
-    if (reqUser && reqUser.id === existingAddress.user_id) {
-      // user is already logged in and address already exists, nothing to do
-      throw new AppError(Errors.AlreadyLoggedIn);
+    // TODO: transactionalize
+    // if the address was removed by /deleteAddress, we need to re-verify it
+    if (!existingAddress.verified) {
+      existingAddress.verified = new Date();
+      await existingAddress.save();
+    }
+
+    if (reqUser?.id && reqUser.id === existingAddress.user_id) {
+      const newUser = await models.User.findOne({
+        where: {
+          id: reqUser.id,
+        },
+        include: [ models.Address ],
+      });
+      return success(res, { user: newUser });
     }
 
     // check login token, if the user has already logged in before with SSO
@@ -165,8 +179,13 @@ const finishSsoLogin = async (
         log.error(`Could not send address move email for: ${existingAddress}`);
       }
 
+      const newProfiles = await reqUser.getProfiles();
       existingAddress.user_id = reqUser.id;
+      existingAddress.profile_id = newProfiles[0].id;
       await existingAddress.save();
+
+      const newAddress = await models.Address.findOne({ where: { id: existingAddress.id }});
+      return success(res, { address: newAddress })
     } else {
       // user is not logged in, so we log them in
       const user = await models.User.findOne({
@@ -176,81 +195,92 @@ const finishSsoLogin = async (
         include: [ models.Address ],
       });
       // TODO: should we req.login here, or not?
+      req.login(user, (err) => {
+        if (err) return redirectWithLoginError(res, `Could not log in with ronin wallet`);
+      });
       return success(res, { user });
     }
   }
 
   // create new address and user if needed + populate sso token
-  const result = await sequelize.transaction(async (t) => {
-    let user: Express.User;
-    // TODO: this profile fetching will eventually need to assume more than one profile
-    let profile: ProfileAttributes;
-    if (!reqUser) {
-      // create new user
-      user = await models.User.createWithProfile(models, { email: null }, { transaction: t });
-      profile = user.Profiles[0];
-    } else {
-      user = reqUser;
-      profile = await user.getProfiles()[0];
-    }
+  try {
+    const result = await sequelize.transaction(async (t) => {
+      let user: Express.User;
+      // TODO: this profile fetching will eventually need to assume more than one profile
+      let profile: ProfileAttributes;
+      if (!reqUser) {
+        // create new user
+        user = await models.User.createWithProfile(models, { email: null }, { transaction: t });
+        profile = user.Profiles[0];
+      } else {
+        user = reqUser;
+        profile = await user.getProfiles()[0];
+      }
 
-    // create new address
-    const newAddress = await models.Address.create({
-      address: jwtPayload.roninAddress,
-      chain: AXIE_INFINITY_CHAIN_ID,
-      verification_token: 'SSO',
-      verification_token_expires: null,
-      verified: new Date(), // trust addresses from magic
-      last_active: new Date(),
-      user_id: user.id,
-      profile_id: profile.id,
-    }, { transaction: t });
+      // create new address
+      const newAddress = await models.Address.create({
+        address: jwtPayload.roninAddress,
+        chain: AXIE_INFINITY_CHAIN_ID,
+        verification_token: 'SSO',
+        verification_token_expires: null,
+        verified: new Date(), // trust addresses from magic
+        last_active: new Date(),
+        user_id: user.id,
+        profile_id: profile.id,
+      }, { transaction: t });
 
-    await models.Role.create({
-      address_id: newAddress.id,
-      chain_id: AXIE_INFINITY_CHAIN_ID,
-      permission: 'member',
-    }, { transaction: t });
+      await models.Role.create({
+        address_id: newAddress.id,
+        chain_id: AXIE_INFINITY_CHAIN_ID,
+        permission: 'member',
+      }, { transaction: t });
 
-    // Automatically create subscription to their own mentions
-    await models.Subscription.create({
-      subscriber_id: user.id,
-      category_id: NotificationCategories.NewMention,
-      object_id: `user-${user.id}`,
-      is_active: true,
-    }, { transaction: t });
+      // Automatically create subscription to their own mentions
+      await models.Subscription.create({
+        subscriber_id: user.id,
+        category_id: NotificationCategories.NewMention,
+        object_id: `user-${user.id}`,
+        is_active: true,
+      }, { transaction: t });
 
-    // Automatically create a subscription to collaborations
-    await models.Subscription.create({
-      subscriber_id: user.id,
-      category_id: NotificationCategories.NewCollaboration,
-      object_id: `user-${user.id}`,
-      is_active: true,
-    }, { transaction: t });
+      // Automatically create a subscription to collaborations
+      await models.Subscription.create({
+        subscriber_id: user.id,
+        category_id: NotificationCategories.NewCollaboration,
+        object_id: `user-${user.id}`,
+        is_active: true,
+      }, { transaction: t });
 
-    // populate token
-    emptyTokenInstance.issuer = jwtPayload.iss;
-    emptyTokenInstance.issued_at = jwtPayload.iat;
-    emptyTokenInstance.address_id = newAddress.id;
-    await emptyTokenInstance.save({ transaction: t });
+      // populate token
+      emptyTokenInstance.issuer = jwtPayload.iss;
+      emptyTokenInstance.issued_at = jwtPayload.iat;
+      emptyTokenInstance.address_id = newAddress.id;
+      await emptyTokenInstance.save({ transaction: t });
 
-    return user;
-  });
-
-  if (reqUser) {
-    // re-fetch address if existing user
-    const newAddress = await models.Address.findOne({ where: { address: jwtPayload.roninAddress }});
-    return success(res, { address: newAddress });
-  } else {
-    // re-fetch user to include address object, if freshly created
-    const newUser = await models.User.findOne({
-      where: {
-        id: result.id,
-      },
-      include: [ models.Address ],
+      return user;
     });
-    // TODO: should we req.login here? or not?
-    return success(res, { user: newUser });
+
+    if (reqUser) {
+      // re-fetch address if existing user
+      const newAddress = await models.Address.findOne({ where: { address: jwtPayload.roninAddress }});
+      return success(res, { address: newAddress });
+    } else {
+      // re-fetch user to include address object, if freshly created
+      const newUser = await models.User.findOne({
+        where: {
+          id: result.id,
+        },
+        include: [ models.Address ],
+      });
+      // TODO: should we req.login here? or not?
+      req.login(newUser, (err) => {
+        if (err) return redirectWithLoginError(res, `Could not log in with ronin wallet`);
+      });
+      return success(res, { user: newUser });
+    }
+  } catch (e) {
+    log.error(e.message);
+    throw new ServerError(Errors.AccountCreationFailed);
   }
 };
 
