@@ -56,17 +56,17 @@ export const getProposalUrl = (type, proposal, comment?) => {
   const cId = comment ? `?comment=${comment.id}` : '';
 
   if (requiresTypeSlug(type)) {
-    return `${
-      window.location.origin
-    }/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`;
+    return (process.env.NODE_ENV === 'production')
+    ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`
+    : `http://localhost:8080/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`;
   } else if (type === ProposalType.OffchainThread) {
-    return `${
-      window.location.origin
-    }/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+    return (process.env.NODE_ENV === 'production')
+      ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
+      : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
   } else {
-    return `${
-      window.location.origin
-    }/${aId}/proposal/${tId}${tTitle.toLowerCase()}${cId}`;
+    return (process.env.NODE_ENV === 'production')
+      ? `https://commonwealth.im/${aId}/proposal/${tId}${tTitle.toLowerCase()}${cId}`
+      : `http://localhost:8080/${aId}/proposal/${tId}${tTitle.toLowerCase()}${cId}`;
   }
 };
 
