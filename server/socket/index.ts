@@ -76,46 +76,46 @@ export function setupWebSocketServer(httpServer: http.Server, models: DB) {
 
     log.info(`Connecting to Redis at: ${REDIS_URL}`);
     const pubClient = createClient({url: REDIS_URL});
-    pubClient.connect().then((res) => {
-        pubClient.on('error', (err) => console.log('Redis Client Error', err));
+    // pubClient.connect().then((res) => {
+    //     pubClient.on('error', (err) => console.log('Redis Client Error', err));
+    //
+    //     pubClient.on("connect", () => {
+    //         log.info(`Redis successfully connected on server: ${process.env.HEROKU_DYNO_ID}`);
+    //     })
+    //
+    //     pubClient.set('testKey', 'testValue').then((result) => {
+    //         log.info("Test key inserted");
+    //     }).catch((error) => {
+    //         log.error("Failed to insert key in Redis", error);
+    //     });
+    // });
+    const subClient = pubClient.duplicate();
 
-        pubClient.on("connect", () => {
-            log.info(`Redis successfully connected on server: ${process.env.HEROKU_DYNO_ID}`);
-        })
+    Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+        io.adapter(<any>createAdapter(pubClient, subClient));
+    }).then(() => {
 
-        pubClient.set('testKey', 'testValue').then((result) => {
-            log.info("Test key inserted");
-        }).catch((error) => {
-            log.error("Failed to insert key in Redis", error);
-        });
+        // create the chain-events namespace
+        const ceNamespace = createCeNamespace(io);
+        const chatNamespace = createChatNamespace(io, models);
 
-        const subClient = pubClient.duplicate();
-
-        Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-            io.adapter(<any>createAdapter(pubClient, subClient));
-        })
-    });
-
-    // create the chain-events namespace
-    const ceNamespace = createCeNamespace(io);
-    const chatNamespace = createChatNamespace(io, models);
-
-    try {
-        const rabbitController = new RabbitMQController(
-            <BrokerConfig>RabbitMQConfig
-        );
-        rabbitController.init().then(() => {
-            return rabbitController.startSubscription(
-                publishToCERoom.bind(ceNamespace),
-                'ChainEventsNotificationsSubscription'
+        try {
+            const rabbitController = new RabbitMQController(
+                <BrokerConfig>RabbitMQConfig
             );
-        });
-    } catch (e) {
-        log.warn(
-            `Failure connecting to ${
-                `${process.env.NODE_ENV} ` || ''
-            }RabbitMQ server. Please fix the RabbitMQ server configuration`
-        );
-        log.error(e);
-    }
+            rabbitController.init().then(() => {
+                return rabbitController.startSubscription(
+                    publishToCERoom.bind(ceNamespace),
+                    'ChainEventsNotificationsSubscription'
+                );
+            });
+        } catch (e) {
+            log.warn(
+                `Failure connecting to ${
+                    `${process.env.NODE_ENV} ` || ''
+                }RabbitMQ server. Please fix the RabbitMQ server configuration`
+            );
+            log.error(e);
+        }
+    })
 }

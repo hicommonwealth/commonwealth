@@ -15,6 +15,10 @@ export function createCeNamespace(io: Server) {
   io.use(authenticate);
 
   CeNs.on('connection', (socket) => {
+    // Non-RabbitMQ cross-server testing
+    socket.join("Test_Room");
+    io.to("Test_Room").emit(String(Math.random()));
+
     log.info(`${socket.id} connected to Chain-Events`);
 
     socket.on('disconnect', () => {
