@@ -15,9 +15,9 @@ export function createCeNamespace(io: Server) {
   io.use(authenticate);
 
   CeNs.on('connection', (socket) => {
+    log.info("Emitting to Test_Room");
     // Non-RabbitMQ cross-server testing
-    socket.join("Test_Room");
-    io.to("Test_Room").emit(String(Math.random()));
+    CeNs.to("Test_Room").emit(String(Math.random()));
 
     log.info(`${socket.id} connected to Chain-Events`);
 
@@ -29,6 +29,8 @@ export function createCeNamespace(io: Server) {
       if (chainEventTypes.length > 0) {
         log.info(`${socket.id} joining ${JSON.stringify(chainEventTypes)}`);
         socket.join(chainEventTypes);
+        socket.join("Test_Room");
+        log.info("Joined Test_Room");
       }
     });
 
