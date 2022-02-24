@@ -1,12 +1,10 @@
 /* @jsx m */
 
-import 'components/sidebar/index.scss';
-
-/* eslint-disable @typescript-eslint/ban-types */
-
 import m from 'mithril';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Spinner, Overlay } from 'construct-ui';
+
+import 'components/sidebar/index.scss';
 
 import { navigateToSubpage } from 'app';
 import app from 'state';
@@ -34,20 +32,6 @@ enum Errors {
   NotEnabled = 'Chat is not enabled',
   NotLoggedIn = 'Must be logged in to read chat',
 }
-interface IState {
-  channels: {
-    [category: string]: IChannel[];
-  };
-  loaded: boolean;
-  error: Errors;
-  channelToToggleTree: Function;
-  categoryToToggleTree: Function;
-  menuToggleTree: ToggleTree;
-  adminModals: { [modal: string]: boolean };
-  adminCategory: string;
-  adminChannel: IChannel | {};
-  onIncomingMessage: (any: any) => void;
-}
 
 function setToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -67,19 +51,32 @@ function setToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export const ChatSection: m.Component<
-  { channels: IChannel[]; activeChannel: string },
-  IState
-> = {
-  oninit: async (vnode) => {
-    vnode.state.loaded = false;
+export class ChatSection
+  implements m.ClassComponent<{ channels: IChannel[]; activeChannel: string }>
+{
+  channels: {
+    [category: string]: IChannel[];
+  };
+  loaded: boolean;
+  error: Errors;
+  channelToToggleTree: any;
+  categoryToToggleTree: any;
+  menuToggleTree: ToggleTree;
+  adminModals: { [modal: string]: boolean };
+  adminCategory: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  adminChannel: IChannel | {};
+  onIncomingMessage: (any: any) => void;
+
+  async oninit(vnode) {
+    this.loaded = false;
 
     if (_.isEmpty(vnode.attrs.channels)) {
       await app.socket.chatNs.reinit();
       vnode.attrs.channels = Object.values(app.socket.chatNs.channels);
     }
 
-    vnode.state.channelToToggleTree = (channels: IChannel[]) => {
+    this.channelToToggleTree = (channels: IChannel[]) => {
       const toggleTree = {};
       channels.forEach((k) => {
         toggleTree[k.name] = { toggledState: false };
@@ -87,14 +84,14 @@ export const ChatSection: m.Component<
       return toggleTree;
     };
 
-    vnode.state.categoryToToggleTree = (
+    this.categoryToToggleTree = (
       categories: string[],
       defaultState: boolean
     ) => {
       const toggleTree = {};
       categories.forEach((category) => {
-        const channelToggleTree = vnode.state.channelToToggleTree(
-          vnode.state.channels[category]
+        const channelToggleTree = this.channelToToggleTree(
+          this.channels[category]
         );
         toggleTree[category] = {
           toggledState: defaultState,
@@ -104,7 +101,7 @@ export const ChatSection: m.Component<
       return toggleTree;
     };
 
-    vnode.state.adminModals = {
+    this.adminModals = {
       CreateCategory: false,
       CreateChannel: false,
       RenameCategory: false,
@@ -113,18 +110,18 @@ export const ChatSection: m.Component<
       DeleteChannel: false,
     };
 
-    vnode.state.adminCategory = '';
-    vnode.state.adminChannel = {};
+    this.adminCategory = '';
+    this.adminChannel = {};
 
-    vnode.state.channels = {};
+    this.channels = {};
     vnode.attrs.channels.forEach((c) => {
       const { ChatMessages, ...metadata } = c;
-      vnode.state.channels[metadata.category]
-        ? vnode.state.channels[metadata.category].push(metadata)
-        : (vnode.state.channels[metadata.category] = [metadata]);
+      this.channels[metadata.category]
+        ? this.channels[metadata.category].push(metadata)
+        : (this.channels[metadata.category] = [metadata]);
     });
 
-    vnode.state.onIncomingMessage = (msg) => {
+    this.onIncomingMessage = (msg) => {
       if (vnode.attrs.activeChannel)
         app.socket.chatNs.readMessages(vnode.attrs.activeChannel);
       if (msg.chat_channel_id === vnode.attrs.activeChannel) {
@@ -136,61 +133,55 @@ export const ChatSection: m.Component<
     };
     app.socket.chatNs.addListener(
       WebsocketMessageType.ChatMessage,
-      vnode.state.onIncomingMessage.bind(vnode)
+      this.onIncomingMessage.bind(vnode)
     );
-    vnode.state.loaded = true;
+    this.loaded = true;
 
-    vnode.state.menuToggleTree = {
+    this.menuToggleTree = {
       // Used to track admin menu render status for hover
       toggledState: false,
-      children: vnode.state.categoryToToggleTree(
-        Object.keys(vnode.state.channels),
-        false
-      ),
+      children: this.categoryToToggleTree(Object.keys(this.channels), false),
     };
-  },
-  onbeforeupdate: (vnode, old) => {
+  }
+
+  onbeforeupdate(vnode, old) {
     if (!_.isEqual(vnode.attrs.channels, old.attrs.channels)) {
       vnode.attrs.channels.forEach((c) => {
         const { ChatMessages, ...metadata } = c;
-        vnode.state.channels[metadata.category]
-          ? vnode.state.channels[metadata.category].push(metadata)
-          : (vnode.state.channels[metadata.category] = [metadata]);
+        this.channels[metadata.category]
+          ? this.channels[metadata.category].push(metadata)
+          : (this.channels[metadata.category] = [metadata]);
       });
-      vnode.state.menuToggleTree = {
+      this.menuToggleTree = {
         toggledState: false,
-        children: vnode.state.categoryToToggleTree(
-          Object.keys(vnode.state.channels),
-          false
-        ),
+        children: this.categoryToToggleTree(Object.keys(this.channels), false),
       };
     }
-  },
-  onremove: (vnode) => {
+  }
+
+  onremove() {
     if (app.socket) {
       app.socket.chatNs.removeListener(
         WebsocketMessageType.ChatMessage,
-        vnode.state.onIncomingMessage
+        this.onIncomingMessage
       );
     }
-  },
-  view: (vnode) => {
+  }
+
+  view(vnode) {
     if (!app.socket) return <div>No</div>;
-    if (!vnode.state.loaded) return <Spinner></Spinner>;
-    vnode.state.channels = {};
+    if (!this.loaded) return <Spinner></Spinner>;
+    this.channels = {};
     vnode.attrs.channels.forEach((c) => {
       const { ChatMessages, ...metadata } = c;
-      vnode.state.channels[metadata.category]
-        ? vnode.state.channels[metadata.category].push(metadata)
-        : (vnode.state.channels[metadata.category] = [metadata]);
+      this.channels[metadata.category]
+        ? this.channels[metadata.category].push(metadata)
+        : (this.channels[metadata.category] = [metadata]);
     });
 
     const channelToggleTree: ToggleTree = {
       toggledState: true,
-      children: vnode.state.categoryToToggleTree(
-        Object.keys(vnode.state.channels),
-        true
-      ),
+      children: this.categoryToToggleTree(Object.keys(this.channels), true),
     };
 
     // Check if an existing toggle tree is stored
@@ -216,24 +207,22 @@ export const ChatSection: m.Component<
         name={Icons.PLUS_CIRCLE}
         onclick={(e) => {
           e.stopPropagation();
-          vnode.state.adminModals['CreateCategory'] = true;
+          this.adminModals['CreateCategory'] = true;
         }}
       />
     );
 
     const categoryAdminButton = (category: string): m.Vnode => {
       const handleMouseout = () => {
-        if (vnode.state.menuToggleTree['children'][category]['toggledState']) {
-          vnode.state.menuToggleTree['children'][category]['toggledState'] =
-            false;
+        if (this.menuToggleTree['children'][category]['toggledState']) {
+          this.menuToggleTree['children'][category]['toggledState'] = false;
         }
       };
 
       const handleMouseover = (e) => {
-        if (!vnode.state.menuToggleTree['children'][category]['toggledState']) {
-          vnode.state.menuToggleTree['children'][category]['toggledState'] =
-            true;
-          vnode.state.adminCategory = category;
+        if (!this.menuToggleTree['children'][category]['toggledState']) {
+          this.menuToggleTree['children'][category]['toggledState'] = true;
+          this.adminCategory = category;
         } else {
           e.redraw = false;
           e.stopPropagation();
@@ -242,7 +231,7 @@ export const ChatSection: m.Component<
 
       const handleMenuClick = (e, modalName) => {
         e.stopPropagation();
-        vnode.state.adminModals[modalName] = true;
+        this.adminModals[modalName] = true;
         handleMouseout();
       };
 
@@ -283,7 +272,7 @@ export const ChatSection: m.Component<
             onmouseenter={handleMouseover}
             onmouseleave={handleMouseout}
           />
-          {vnode.state.menuToggleTree['children'][category]['toggledState'] &&
+          {this.menuToggleTree['children'][category]['toggledState'] &&
             menuComponent}
         </div>
       );
@@ -292,11 +281,11 @@ export const ChatSection: m.Component<
     const channelRightIcon = (channel: IChannel) => {
       const handleMouseout = () => {
         if (
-          vnode.state.menuToggleTree['children'][channel.category]['children'][
+          this.menuToggleTree['children'][channel.category]['children'][
             channel.name
           ]['toggledState']
         ) {
-          vnode.state.menuToggleTree['children'][channel.category]['children'][
+          this.menuToggleTree['children'][channel.category]['children'][
             channel.name
           ]['toggledState'] = false;
         }
@@ -304,14 +293,14 @@ export const ChatSection: m.Component<
 
       const handleMouseover = (e) => {
         if (
-          !vnode.state.menuToggleTree['children'][channel.category]['children'][
+          !this.menuToggleTree['children'][channel.category]['children'][
             channel.name
           ]['toggledState']
         ) {
-          vnode.state.menuToggleTree['children'][channel.category]['children'][
+          this.menuToggleTree['children'][channel.category]['children'][
             channel.name
           ]['toggledState'] = true;
-          vnode.state.adminChannel = channel;
+          this.adminChannel = channel;
         } else {
           e.redraw = false;
           e.stopPropagation();
@@ -320,7 +309,7 @@ export const ChatSection: m.Component<
 
       const handleMenuClick = (e, modalName) => {
         e.stopPropagation();
-        vnode.state.adminModals[modalName] = true;
+        this.adminModals[modalName] = true;
         handleMouseout();
       };
 
@@ -359,7 +348,7 @@ export const ChatSection: m.Component<
             onmouseenter={handleMouseover}
             onmouseleave={handleMouseout}
           />
-          {vnode.state.menuToggleTree['children'][channel.category]['children'][
+          {this.menuToggleTree['children'][channel.category]['children'][
             channel.name
           ]['toggledState'] && menuComponent}
         </div>
@@ -394,52 +383,39 @@ export const ChatSection: m.Component<
         onclick: (e) => {
           e.preventDefault();
         },
-        displayData: vnode.state.channels[category].map(
-          channelToSubSectionProps
-        ),
+        displayData: this.channels[category].map(channelToSubSectionProps),
         rightIcon: categoryAdminButton(category),
       };
     };
 
-    const channelData: SectionGroupAttrs[] = Object.keys(
-      vnode.state.channels
-    ).map(categoryToSectionGroup);
+    const channelData: SectionGroupAttrs[] = Object.keys(this.channels).map(
+      categoryToSectionGroup
+    );
 
     const closeOverlay = () => {
-      Object.keys(vnode.state.adminModals).forEach((k) => {
-        vnode.state.adminModals[k] = false;
+      Object.keys(this.adminModals).forEach((k) => {
+        this.adminModals[k] = false;
       });
       m.redraw();
     };
-    const overlayContent: m.Vnode = vnode.state.adminModals[
-      'CreateCategory'
-    ] ? (
+    const overlayContent: m.Vnode = this.adminModals['CreateCategory'] ? (
       <CreateCategory handleClose={closeOverlay} />
-    ) : vnode.state.adminModals['CreateChannel'] ? (
-      <CreateChannel
-        handleClose={closeOverlay}
-        category={vnode.state.adminCategory}
-      />
-    ) : vnode.state.adminModals['RenameCategory'] ? (
+    ) : this.adminModals['CreateChannel'] ? (
+      <CreateChannel handleClose={closeOverlay} category={this.adminCategory} />
+    ) : this.adminModals['RenameCategory'] ? (
       <RenameCategory
         handleClose={closeOverlay}
-        category={vnode.state.adminCategory}
+        category={this.adminCategory}
       />
-    ) : vnode.state.adminModals['RenameChannel'] ? (
-      <RenameChannel
-        handleClose={closeOverlay}
-        channel={vnode.state.adminChannel}
-      />
-    ) : vnode.state.adminModals['DeleteCategory'] ? (
+    ) : this.adminModals['RenameChannel'] ? (
+      <RenameChannel handleClose={closeOverlay} channel={this.adminChannel} />
+    ) : this.adminModals['DeleteCategory'] ? (
       <DeleteCategory
         handleClose={closeOverlay}
-        category={vnode.state.adminCategory}
+        category={this.adminCategory}
       />
-    ) : vnode.state.adminModals['DeleteChannel'] ? (
-      <DeleteChannel
-        handleClose={closeOverlay}
-        channel={vnode.state.adminChannel}
-      />
+    ) : this.adminModals['DeleteChannel'] ? (
+      <DeleteChannel handleClose={closeOverlay} channel={this.adminChannel} />
     ) : (
       <div></div>
     );
@@ -457,7 +433,7 @@ export const ChatSection: m.Component<
       extraComponents: (
         <Overlay
           class="chatAdminOverlay"
-          isOpen={Object.values(vnode.state.adminModals).some(Boolean)}
+          isOpen={Object.values(this.adminModals).some(Boolean)}
           onClose={closeOverlay}
           closeOnOutsideClick={true}
           content={overlayContent}
@@ -465,6 +441,6 @@ export const ChatSection: m.Component<
       ),
     };
 
-    return m(SidebarSection, { ...sidebarSectionData });
-  },
-};
+    return <SidebarSection {...sidebarSectionData} />;
+  }
+}
