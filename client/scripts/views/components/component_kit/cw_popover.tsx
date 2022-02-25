@@ -27,7 +27,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 type TooltipAttrs = {
   triggerLabel: string;
   tooltipContent: m.Vnode;
-}
+};
 export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
   isPopoverOpen: boolean;
 
@@ -48,16 +48,13 @@ export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
 
     return (
       <div class={ComponentType.Tooltip}>
-          <CWButton
-            onclick={() => this.openPopover()}
-            label={triggerLabel}
-          />
-          <CWPopover
-            isOpen={this.isPopoverOpen}
-            closePopover={() => this.closePopover()}
-            content={tooltipContent}
-          />
+        <CWButton onclick={() => this.openPopover()} label={triggerLabel} />
+        <CWPopover
+          isOpen={this.isPopoverOpen}
+          closePopover={() => this.closePopover()}
+          content={tooltipContent}
+        />
       </div>
-    )
+    );
   }
 }
