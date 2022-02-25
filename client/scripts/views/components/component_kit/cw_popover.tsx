@@ -17,7 +17,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     return isOpen ? (
       <div class={ComponentType.Popover}>
         {content}
-        <div onclick={closePopover} class="overlay-background"></div>
+        <div onclick={closePopover} class={ComponentType.Overlay}></div>
       </div>
     ) : null;
   }
