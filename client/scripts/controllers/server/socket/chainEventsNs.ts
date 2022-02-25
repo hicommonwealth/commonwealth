@@ -17,9 +17,9 @@ export class ChainEventsNamespace {
       WebsocketMessageNames.ChainEventNotification,
       this.onChainEvent.bind(this)
     );
-    this.ceNs.on("test_msg", (msg) => {
-      console.log("Message from Test_Room received:", msg);
-    })
+    // this.ceNs.on("test_msg", (msg) => {
+    //   console.log("Message from Test_Room received:", msg);
+    // })
   }
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
