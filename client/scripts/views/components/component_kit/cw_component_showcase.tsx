@@ -13,7 +13,7 @@ import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
-import { CWTooltip } from './cw_popover';
+import { CWTooltip } from './cw_tooltip';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -53,13 +53,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="popover-gallery">
           <CWTooltip
             triggerLabel="Click me"
-            tooltipContent={
-              <div class="popover-example-container">
-                <div class="popover-example-body">
-                  This is the popover's contents
-                </div>
-              </div>
-            }
+            tooltipContent="This is the popover's contents"
           />
         </div>
         <h1>Colors</h1>

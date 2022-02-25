@@ -1,3 +1,9 @@
+@mixin popover-child-position {
+  margin-top: 8px;
+  position: absolute;
+  z-index: 1001;
+}
+
 .Popover {
   .overlay-background {
     bottom: 0;
@@ -7,11 +13,5 @@
     right: 0;
     top: 0;
     z-index: 1000;
-  }
-
-  .popover-content-container {
-    margin-top: 8px;
-    position: absolute;
-    z-index: 1001;
   }
 }
