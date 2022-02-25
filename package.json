@@ -211,7 +211,7 @@
     "rxjs": "^7.3.0",
     "sass-loader": "^10.1.1",
     "secp256k1": "^4.0.2",
-    "sequelize": "^6.6.5",
+    "sequelize": "^6.16.1",
     "sequelize-cli": "^6.2.0",
     "serve-favicon": "^2.5.0",
     "simplepicker": "^2.0.4",

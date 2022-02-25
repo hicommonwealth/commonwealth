@@ -17,6 +17,7 @@ coverage/
 *.sw*
 .env
 *yalc*
+*.pem
 
 # Database downloads
 latest.dump

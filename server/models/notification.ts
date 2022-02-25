@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
 import { ChainEventAttributes, ChainEventInstance } from './chain_event';
 
-export interface NotificationAttributes {
+export type NotificationAttributes = {
   notification_data: string;
   chain_id?: string;
   category_id: string;
@@ -16,13 +16,12 @@ export interface NotificationAttributes {
   ChainEvent?: ChainEventAttributes;
 }
 
-export interface NotificationInstance
-extends Model<NotificationAttributes>, NotificationAttributes {
+export type NotificationInstance = ModelInstance<NotificationAttributes> & {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
   getChainEvent: Sequelize.HasOneGetAssociationMixin<ChainEventInstance>;
 }
 
-export type NotificationModelStatic = ModelStatic<NotificationInstance>
+export type NotificationModelStatic = ModelStatic<NotificationInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

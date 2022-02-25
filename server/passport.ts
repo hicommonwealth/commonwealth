@@ -21,7 +21,7 @@ import {
   MAGIC_DEFAULT_CHAIN, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_OAUTH_CALLBACK, DISCORD_OAUTH_SCOPES
 } from './config';
 import { NotificationCategories } from '../shared/types';
-import lookupCommunityIsVisibleToUser from './util/lookupCommunityIsVisibleToUser';
+import validateChain from './util/validateChain';
 import { ProfileAttributes } from './models/profile';
 
 enum Providers {
@@ -167,7 +167,7 @@ function setupPassport(models: DB) {
       // determine login location
       let chain, error;
       if (req.body.chain || req.body.community) {
-        [ chain, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+        [ chain, error ] = await validateChain(models, req.body);
         if (error) return cb(error);
       }
       const registrationChain = chain;

@@ -40,6 +40,13 @@ $text-input-border: 2px solid;
       border: $text-input-border $pinky;
       background-color: $flesh-pink;
     }
+
+    &.disabled {
+      background-color: $background-gray;
+      border: none;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
   }
 
   &.success,
