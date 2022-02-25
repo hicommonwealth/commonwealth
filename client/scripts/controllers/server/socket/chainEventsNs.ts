@@ -63,7 +63,7 @@ export class ChainEventsNamespace {
     }
     const notificationObj = Notification.fromJSON(notification, subscription);
     app.user.notifications.update(notificationObj);
-    fireChainEventBrowserNotification(notification);
+    fireChainEventBrowserNotification(notificationObj);
   }
 
   private onconnect() {

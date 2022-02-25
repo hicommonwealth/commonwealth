@@ -22,7 +22,12 @@ import {
   ChainNetwork,
   ChainType,
 } from 'types';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+import {
+  ChainInfo,
+  NodeInfo,
+  NotificationCategory,
+  Notification as CWNotification,
+} from 'models';
 
 import { WebSocketController } from 'controllers/server/socket';
 
@@ -38,6 +43,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
+import { CWEvent, Label as ChainEventLabel } from '@commonwealth/chain-events';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -147,7 +153,7 @@ export function fireBrowserNotification(
   // Close after 4 seconds
   setTimeout(() => {
     notification.close();
-  }, 4000);
+  }, 6000);
 }
 
 export async function requestBrowserNotifications() {
@@ -163,15 +169,24 @@ export async function requestBrowserNotifications() {
 }
 
 export function fireChainEventBrowserNotification(
-  notification: ChainEventNotification
+  notification: CWNotification
 ) {
-  const { chain_id } = notification;
+  const chainId = notification.chainEvent.type.chain;
+
+  // construct compatible CW event from DB by inserting network from type
+  const chainEvent: CWEvent = {
+    blockNumber: notification.chainEvent.blockNumber,
+    network: notification.chainEvent.type.eventNetwork,
+    data: notification.chainEvent.data,
+  };
+  const chainName = app.config.chains.getById(chainId)?.name;
+  const label = ChainEventLabel(chainId, chainEvent);
 
   fireBrowserNotification(
-    'Chain Event Notif',
-    `chain_id: ${chain_id}`,
-    'tag',
-    () => console.log('clicked')
+    `${label.heading} on ${chainName}`,
+    `Block ${notification.chainEvent.blockNumber}`,
+    'default_tag',
+    () => {}
   );
 }
 

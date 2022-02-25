@@ -9,15 +9,29 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const setupServer = (app: Express) => {
   const port = process.env.PORT || DEFAULT_PORT;
+  const https_enabled = process.env.HTTPS === 'true';
   app.set('port', port);
-  // TODO: Temp(?) for https local dev.
-  // You need to follow https://web.dev/how-to-use-local-https/ to create a TLS certificate
-  // in order to make this work
-  const options = {
-    key: fs.readFileSync('./localhost-key.pem'),
-    cert: fs.readFileSync('./localhost.pem'),
-  };
-  const server = https.createServer(options, app);
+
+  let server;
+  if (https_enabled) {
+    try {
+      const options = {
+        key: fs.readFileSync('./localhost-key.pem'),
+        cert: fs.readFileSync('./localhost.pem'),
+      };
+      server = https.createServer(options, app);
+    } catch (e) {
+      console.log(
+        `\n\n\nWARNING: You might not have your .pem files configured! 
+         \nFollow steps 1-3 at https://web.dev/how-to-use-local-https/ to create a TLS certificate.
+         \nRunning with http in the meantime..\n\n\n`
+      );
+      server = http.createServer(app);
+    }
+  } else {
+    server = http.createServer(app);
+  }
+
   setupWebSocketServer(server);
 
   const onError = (error) => {
