@@ -162,154 +162,139 @@ const UserDashboard: m.Component<
       Sublayout,
       {
         class: 'UserDashboard',
-        title: [
-          'Dashboard ',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
       },
       [
-        m(
-          Grid,
-          {
-            class: 'forum-container',
-            gutter: 20,
-          },
-          [
-            m(Col, { span: { md: 9, sm: 12 } }, [
-              m('.title', [
-                'Activity',
-                m(
-                  '.communities-link',
-                  {
-                    class: 'link',
-                    onclick: () => {
-                      m.route.set('/communities');
-                      m.redraw();
-                    },
-                  },
-                  [
-                    'View more communities',
-                    m(Icon, {
-                      name: Icons.EXTERNAL_LINK,
-                    }),
-                  ]
-                ),
-              ]),
+        m('.dashboard-wrapper', [
+          m('.dashboard-header', [
+            m('.title', [
+              'Activity',
               m(
-                Tabs,
+                '.communities-link',
                 {
-                  align: 'left',
-                  bordered: false,
-                  fluid: true,
+                  class: 'link',
+                  onclick: () => {
+                    m.route.set('/communities');
+                    m.redraw();
+                  },
                 },
                 [
-                  m(TabItem, {
-                    label: DashboardViews.FY,
-                    active: activeTab === DashboardViews.FY,
-                    onclick: () => {
-                      handleToggle(DashboardViews.FY);
-                      m.redraw();
-                    },
-                  }),
-                  m(TabItem, {
-                    label: DashboardViews.Global,
-                    active: activeTab === DashboardViews.Global,
-                    onclick: () => {
-                      handleToggle(DashboardViews.Global);
-                      m.redraw();
-                    },
-                  }),
-                  m(TabItem, {
-                    label: DashboardViews.Chain,
-                    active: activeTab === DashboardViews.Chain,
-                    onclick: () => {
-                      handleToggle(DashboardViews.Chain);
-                      m.redraw();
-                    },
+                  'View more communities',
+                  m(Icon, {
+                    name: Icons.EXTERNAL_LINK,
                   }),
                 ]
               ),
-              loadingData &&
-                m('.dashboard-row-wrap', [
-                  m('.Spinner', [m(Spinner, { active: true })]),
-                ]),
-              !loadingData &&
-                m('.dashboard-row-wrap', [
-                  activeTab === DashboardViews.FY && [
-                    fyNotifications && fyNotifications.length > 0
-                      ? [
-                          fyNotifications
-                            .slice(0, vnode.state.fyCount)
-                            .map((data) => {
-                              return m(UserDashboardRow, {
-                                notification: data,
-                                onListPage: true,
-                              });
-                            }),
-                          notificationsRemaining(
-                            fyNotifications.length,
-                            vnode.state.fyCount
-                          )
-                            ? m('.Spinner', [m(Spinner, { active: true })])
-                            : '',
-                        ]
-                      : m(
-                          '.no-notifications',
-                          'Join some communities to see Activity!'
-                        ),
-                  ],
-                  activeTab === DashboardViews.Global && [
-                    globalNotifications && globalNotifications.length > 0
-                      ? [
-                          globalNotifications
-                            .slice(0, vnode.state.globalCount)
-                            .map((data) => {
-                              return m(UserDashboardRow, {
-                                notification: data,
-                                onListPage: true,
-                              });
-                            }),
-                          notificationsRemaining(
-                            globalNotifications.length,
-                            vnode.state.globalCount
-                          )
-                            ? m('.Spinner', [m(Spinner, { active: true })])
-                            : '',
-                        ]
-                      : m('.no-notifications', 'No Activity'),
-                  ],
-                  activeTab === DashboardViews.Chain && [
-                    chainEvents && chainEvents.length > 0
-                      ? [
-                          chainEvents
-                            .slice(0, vnode.state.chainEventCount)
-                            .map((data) => {
-                              return m(UserDashboardRow, {
-                                notification: data,
-                                onListPage: true,
-                              });
-                            }),
-                          notificationsRemaining(
-                            chainEvents.length,
-                            vnode.state.chainEventCount
-                          )
-                            ? m('.Spinner', [m(Spinner, { active: true })])
-                            : '',
-                        ]
-                      : m(
-                          '.no-notifications',
-                          'Join some communities that have governance to see Chain Events!'
-                        ),
-                  ],
-                ]),
             ]),
-            m(DashboardExplorePreview),
-          ]
-        ),
+            m(
+              Tabs,
+              {
+                align: 'left',
+                bordered: false,
+                fluid: true,
+              },
+              [
+                m(TabItem, {
+                  label: DashboardViews.FY,
+                  active: activeTab === DashboardViews.FY,
+                  onclick: () => {
+                    handleToggle(DashboardViews.FY);
+                    m.redraw();
+                  },
+                }),
+                m(TabItem, {
+                  label: DashboardViews.Global,
+                  active: activeTab === DashboardViews.Global,
+                  onclick: () => {
+                    handleToggle(DashboardViews.Global);
+                    m.redraw();
+                  },
+                }),
+                m(TabItem, {
+                  label: DashboardViews.Chain,
+                  active: activeTab === DashboardViews.Chain,
+                  onclick: () => {
+                    handleToggle(DashboardViews.Chain);
+                    m.redraw();
+                  },
+                }),
+              ]
+            ),
+            loadingData &&
+              m('.dashboard-row-wrap', [
+                m('.Spinner', [m(Spinner, { active: true })]),
+              ]),
+            !loadingData &&
+              m('.dashboard-row-wrap', [
+                activeTab === DashboardViews.FY && [
+                  fyNotifications && fyNotifications.length > 0
+                    ? [
+                        fyNotifications
+                          .slice(0, vnode.state.fyCount)
+                          .map((data) => {
+                            return m(UserDashboardRow, {
+                              notification: data,
+                              onListPage: true,
+                            });
+                          }),
+                        notificationsRemaining(
+                          fyNotifications.length,
+                          vnode.state.fyCount
+                        )
+                          ? m('.Spinner', [m(Spinner, { active: true })])
+                          : '',
+                      ]
+                    : m(
+                        '.no-notifications',
+                        'Join some communities to see Activity!'
+                      ),
+                ],
+                activeTab === DashboardViews.Global && [
+                  globalNotifications && globalNotifications.length > 0
+                    ? [
+                        globalNotifications
+                          .slice(0, vnode.state.globalCount)
+                          .map((data) => {
+                            return m(UserDashboardRow, {
+                              notification: data,
+                              onListPage: true,
+                            });
+                          }),
+                        notificationsRemaining(
+                          globalNotifications.length,
+                          vnode.state.globalCount
+                        )
+                          ? m('.Spinner', [m(Spinner, { active: true })])
+                          : '',
+                      ]
+                    : m('.no-notifications', 'No Activity'),
+                ],
+                activeTab === DashboardViews.Chain && [
+                  chainEvents && chainEvents.length > 0
+                    ? [
+                        chainEvents
+                          .slice(0, vnode.state.chainEventCount)
+                          .map((data) => {
+                            return m(UserDashboardRow, {
+                              notification: data,
+                              onListPage: true,
+                            });
+                          }),
+                        notificationsRemaining(
+                          chainEvents.length,
+                          vnode.state.chainEventCount
+                        )
+                          ? m('.Spinner', [m(Spinner, { active: true })])
+                          : '',
+                      ]
+                    : m(
+                        '.no-notifications',
+                        'Join some communities that have governance to see Chain Events!'
+                      ),
+                ],
+              ]),
+          ]),
+          m(DashboardExplorePreview),
+        ]),
       ]
     );
   },
