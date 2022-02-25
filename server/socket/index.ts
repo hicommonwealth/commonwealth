@@ -40,7 +40,7 @@ export const authenticate = (
     }
 };
 
-export function setupWebSocketServer(httpServer: http.Server, models: DB) {
+export function setupWebSocketServer(httpServer: http.Server) {
     // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
     // library to the user since we already import it + disable http long-polling to avoid sticky session issues
     const io = new Server(httpServer, {
