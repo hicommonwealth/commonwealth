@@ -19,7 +19,7 @@ import LoginSelector from 'views/components/header/login_selector';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
 import { ChainIcon } from 'views/components/chain_icon';
-import FooterLandingPage from 'views/pages/landing/landing_page_footer';
+import { FooterLandingPage } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { CommunityOptionsPopover } from './pages/discussions';
 import { CWGradientButton } from './components/component_kit/cw_gradient_button';
@@ -42,6 +42,8 @@ type SublayoutAttrs = {
 };
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
+  private modalAutoTriggered: boolean; // what's going on here?
+
   view(vnode) {
     const {
       title,
@@ -70,7 +72,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
         (m.route.get() === '/' || m.route.get().startsWith('/?')) ? (
           <h3>Commonwealth</h3>
         ) : chain ? (
-          <div>
+          <div class="inner-heading-container">
             <div class="ChainIcon">
               {link(
                 'a',
@@ -147,7 +149,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     }
 
     if (m.route.param('triggerInvite') === 't') {
-      setTimeout(() => handleEmailInvites(vnode.state), 0);
+      setTimeout(() => handleEmailInvites(this), 0);
     }
 
     const sidebarOpen = app.chain !== null;
@@ -220,9 +222,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               )}
             </div>
           </div>
-          {!app.isCustomDomain() &&
-            m(FooterLandingPage, {
-              list: [
+          {!app.isCustomDomain() && (
+            <FooterLandingPage
+              list={[
                 { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
                 {
                   text: 'Jobs',
@@ -245,8 +247,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 // { text:  'Developers' },
                 // { text:  'About us' },
                 // { text:  'Careers' }
-              ],
-            })}
+              ]}
+            />
+          )}
         </div>
       </div>
     );
