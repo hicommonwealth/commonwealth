@@ -5,15 +5,15 @@
 import m from 'mithril';
 import 'components/component_kit/cw_icon.scss';
 
-import { IconAttrs, IconStyleAttrs } from './cw_icon';
+import { IconAttrs } from './cw_icon';
 import { getIconClasses } from '../helpers';
 
 export const CWViews: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="20"
         height="15"
@@ -42,10 +42,10 @@ export const CWViews: m.Component<IconAttrs> = {
 
 export const CWCreate: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="21"
         height="21"
@@ -65,10 +65,10 @@ export const CWCreate: m.Component<IconAttrs> = {
 
 export const CWExternalLink: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="16"
         height="16"
@@ -88,10 +88,10 @@ export const CWExternalLink: m.Component<IconAttrs> = {
 
 export const CWFeedback: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="19"
         height="20"
@@ -112,10 +112,10 @@ export const CWFeedback: m.Component<IconAttrs> = {
 
 export const CWAccount: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="21"
         height="22"
@@ -141,10 +141,10 @@ export const CWAccount: m.Component<IconAttrs> = {
 
 export const CWSearch: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="28"
         height="28"
@@ -165,10 +165,10 @@ export const CWSearch: m.Component<IconAttrs> = {
 
 export const CWDiscord: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="29"
         height="28"
@@ -191,10 +191,10 @@ export const CWDiscord: m.Component<IconAttrs> = {
 
 export const CWElement: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="29"
         height="28"
@@ -221,10 +221,10 @@ export const CWElement: m.Component<IconAttrs> = {
 
 export const CWTelegram: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="29"
         height="28"
@@ -244,10 +244,10 @@ export const CWTelegram: m.Component<IconAttrs> = {
 
 export const CWWebsite: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="30"
         height="30"
@@ -266,10 +266,10 @@ export const CWWebsite: m.Component<IconAttrs> = {
 
 export const CWGithub: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { className, disabled, iconSize, iconType, onclick } = vnode.attrs;
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, iconType, className })}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="33"
         height="32"
