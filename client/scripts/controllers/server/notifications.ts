@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import _ from 'lodash';
+import m from 'mithril';
 
 import { NotificationStore } from 'stores';
 import { NotificationSubscription, Notification, ChainEventType } from 'models';
@@ -24,6 +24,7 @@ class NotificationsController {
   public get store() {
     return this._store;
   }
+
   public get notifications(): Notification[] {
     return this._store.getAll();
   }
@@ -50,6 +51,10 @@ class NotificationsController {
         },
         (result) => {
           const newSubscription = NotificationSubscription.fromJSON(result);
+          if (newSubscription.category === 'chain-event')
+            app.socket.chainEventsNs.addChainEventSubscriptions([
+              newSubscription,
+            ]);
           this._subscriptions.push(newSubscription);
         }
       );
@@ -64,9 +69,12 @@ class NotificationsController {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
       (result) => {
+        const ceSubs = [];
         for (const s of subscriptions) {
           s.enable();
+          if (s.category === 'chain-event') ceSubs.push(s);
         }
+        app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
       }
     );
   }
@@ -79,9 +87,12 @@ class NotificationsController {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
       (result) => {
+        const ceSubs = [];
         for (const s of subscriptions) {
           s.disable();
+          if (s.category === 'chain-event') ceSubs.push(s);
         }
+        app.socket.chainEventsNs.deleteChainEventSubscriptions(ceSubs);
       }
     );
   }
@@ -129,6 +140,10 @@ class NotificationsController {
           throw new Error('subscription not found!');
         }
         this._subscriptions.splice(idx, 1);
+        if (subscription.category === 'chain-event')
+          app.socket.chainEventsNs.deleteChainEventSubscriptions([
+            subscription,
+          ]);
       }
     );
   }
@@ -137,17 +152,24 @@ class NotificationsController {
     // TODO: Change to PUT /notificationsRead
     const MAX_NOTIFICATIONS_READ = 100; // mark up to 100 notifications read at a time
     const unreadNotifications = notifications.filter((notif) => !notif.isRead);
-    if (unreadNotifications.length === 0) return $.Deferred().resolve().promise();
-    return post('/markNotificationsRead', {
-      'notification_ids[]': unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ).map((n) => n.id)
-    }, (result) => {
-      for (const n of unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ)) {
-        n.markRead();
+    if (unreadNotifications.length === 0)
+      return $.Deferred().resolve().promise();
+    return post(
+      '/markNotificationsRead',
+      {
+        'notification_ids[]': unreadNotifications
+          .slice(0, MAX_NOTIFICATIONS_READ)
+          .map((n) => n.id),
+      },
+      (result) => {
+        for (const n of unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ)) {
+          n.markRead();
+        }
+        if (unreadNotifications.slice(MAX_NOTIFICATIONS_READ).length > 0) {
+          this.markAsRead(unreadNotifications.slice(MAX_NOTIFICATIONS_READ));
+        }
       }
-      if (unreadNotifications.slice(MAX_NOTIFICATIONS_READ).length > 0) {
-        this.markAsRead(unreadNotifications.slice(MAX_NOTIFICATIONS_READ));
-      }
-    });
+    );
   }
 
   public clearAllRead() {
@@ -186,10 +208,14 @@ class NotificationsController {
   public update(n: Notification) {
     if (!this._store.getById(n.id)) {
       this._store.add(n);
+      m.redraw();
     }
   }
 
   public clearSubscriptions() {
+    app.socket?.chainEventsNs.deleteChainEventSubscriptions(
+      this._subscriptions
+    );
     this._subscriptions = [];
   }
 
@@ -197,28 +223,40 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
-    const options = app.isCustomDomain() ? { chain_filter: app.activeChainId() } : {};
+    const options = app.isCustomDomain()
+      ? { chain_filter: app.activeChainId() }
+      : {};
     // TODO: Change to GET /notifications
     return post('/viewNotifications', options, (result) => {
       this._store.clear();
       this._subscriptions = [];
+      const ceSubs = [];
       for (const subscriptionJSON of result) {
-        const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
+        const subscription =
+          NotificationSubscription.fromJSON(subscriptionJSON);
         this._subscriptions.push(subscription);
         let chainEventType = null;
         if (subscriptionJSON.ChainEventType) {
-          chainEventType = ChainEventType.fromJSON(subscriptionJSON.ChainEventType);
+          chainEventType = ChainEventType.fromJSON(
+            subscriptionJSON.ChainEventType
+          );
         }
         for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
           const data = {
             is_read: notificationsReadJSON.is_read,
-            ...notificationsReadJSON.Notification
-          }
-          const notification = Notification.fromJSON(data, subscription, chainEventType);
+            ...notificationsReadJSON.Notification,
+          };
+          const notification = Notification.fromJSON(
+            data,
+            subscription,
+            chainEventType
+          );
           this._store.add(notification);
         }
+        if (subscription.category === 'chain-event') ceSubs.push(subscription);
       }
-    })
+      app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
+    });
   }
 }
 

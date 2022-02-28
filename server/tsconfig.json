@@ -5,31 +5,32 @@
     "moduleResolution": "node",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
-    "outDir": "./build",
-    "baseUrl": ".",
+    "outDir": "../build",
+    "baseUrl": "..",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
     "traceResolution": false
   },
   "files": [
-    "server/scripts/chainEventsConsumer.ts",
-    "server/scripts/dbNode.ts",
-    "shared/logging.ts"
+    "scripts/chainEventsConsumer.ts",
+    "scripts/dbNode.ts",
   ],
   "include": [
-    "server/models/*",
-    "server/models/"
+    "models/*",
+    "models/",
+    "socket/*",
+    "scripts",
+    "eventHandlers",
   ],
   "exclude": [
-    "server/passport.ts",
-    "server/scripts/setupChainEventListeners.ts",
+    "./node_modules",
+    "passport.ts",
     "server/router.ts",
     "server/webhookNotifier.ts",
-    "server/socket",
     "server/migrations",
     "node_modules",
     "build",
-    "dist",
+    "dist"
   ]
 }
