@@ -85,9 +85,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       },
     });
   }
-  if (!thread) {
-    return next(new Error('No thread with that id found'));
-  }
+  if (!thread) return next(new Error('No thread with that id found'));
 
   try {
     let latestVersion;
