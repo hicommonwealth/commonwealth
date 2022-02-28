@@ -9,34 +9,49 @@ import app from 'state';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
-  return $.post(app.serverUrl() + route, args).then((resp) => {
-    if (resp.status === 'Success') {
-      callback(resp.result);
-    } else {
-      console.error(resp);
-    }
-  }).catch((e) => console.error(e));
+  return $.post(app.serverUrl() + route, args)
+    .then((resp) => {
+      if (resp.status === 'Success') {
+        callback(resp.result);
+      } else {
+        console.error(resp);
+      }
+    })
+    .catch((e) => console.error(e));
 };
 
 class NotificationsController {
   private _store: NotificationStore = new NotificationStore();
-  public get store() { return this._store; }
-  public get notifications(): Notification[] { return this._store.getAll(); }
+  public get store() {
+    return this._store;
+  }
+  public get notifications(): Notification[] {
+    return this._store.getAll();
+  }
 
   private _subscriptions: NotificationSubscription[] = [];
-  public get subscriptions() { return this._subscriptions; }
+  public get subscriptions() {
+    return this._subscriptions;
+  }
 
   public subscribe(category: string, objectId: string) {
-    const subscription = this.subscriptions.find((v) => v.category === category && v.objectId === objectId);
+    const subscription = this.subscriptions.find(
+      (v) => v.category === category && v.objectId === objectId
+    );
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
       // TODO: Change to POST /subscription
-      return post('/createSubscription', {
-        'category': category, 'object_id': objectId, 'is_active': true
-      }, (result) => {
-        const newSubscription = NotificationSubscription.fromJSON(result);
-        if (newSubscription.category === 'chain-event')
+      return post(
+        '/createSubscription',
+        {
+          category,
+          object_id: objectId,
+          is_active: true,
+        },
+        (result) => {
+          const newSubscription = NotificationSubscription.fromJSON(result);
+          if (newSubscription.category === 'chain-event')
           app.socket.chainEventsNs.addChainEventSubscriptions([newSubscription])
         this._subscriptions.push(newSubscription);
       });
@@ -73,31 +88,42 @@ class NotificationsController {
 
   public enableImmediateEmails(subscriptions: NotificationSubscription[]) {
     // TODO: Change to PUT /immediateEmails
-    return post('/enableImmediateEmails', {
-      'subscription_ids[]': subscriptions.map((n) => n.id),
-    }, (result) => {
-      for (const s of subscriptions) {
-        s.enableImmediateEmail();
+    return post(
+      '/enableImmediateEmails',
+      {
+        'subscription_ids[]': subscriptions.map((n) => n.id),
+      },
+      (result) => {
+        for (const s of subscriptions) {
+          s.enableImmediateEmail();
+        }
       }
-    });
+    );
   }
 
   public disableImmediateEmails(subscriptions: NotificationSubscription[]) {
     // TODO: Change to PUT /immediateEmails
-    return post('/disableImmediateEmails', {
-      'subscription_ids[]': subscriptions.map((n) => n.id),
-    }, (result) => {
-      for (const s of subscriptions) {
-        s.disableImmediateEmail();
+    return post(
+      '/disableImmediateEmails',
+      {
+        'subscription_ids[]': subscriptions.map((n) => n.id),
+      },
+      (result) => {
+        for (const s of subscriptions) {
+          s.disableImmediateEmail();
+        }
       }
-    });
+    );
   }
 
   public deleteSubscription(subscription: NotificationSubscription) {
     // TODO: Change to DELETE /subscription
-    return post('/deleteSubscription', {
-      'subscription_id': subscription.id,
-    }, (result) => {
+    return post(
+      '/deleteSubscription',
+      {
+        subscription_id: subscription.id,
+      },
+      (result) => {
       const idx = this._subscriptions.indexOf(subscription);
       if (idx === -1) {
         throw new Error('subscription not found!');
@@ -126,7 +152,7 @@ class NotificationsController {
   }
 
   public clearAllRead() {
-    return post('/clearReadNotifications', { }, (result) => {
+    return post('/clearReadNotifications', {}, (result) => {
       const toClear = this._store.getAll().filter((n) => n.isRead);
       for (const n of toClear) {
         this._store.remove(n);
@@ -139,15 +165,23 @@ class NotificationsController {
     const MAX_NOTIFICATIONS_CLEAR = 100; // clear up to 100 notifications at a time
 
     if (notifications.length === 0) return;
-    return post('/clearNotifications', {
-      'notification_ids[]': notifications.slice(0, MAX_NOTIFICATIONS_CLEAR).map((n) => n.id)
-    }, async (result) => {
-      notifications.slice(0, MAX_NOTIFICATIONS_CLEAR).map((n) => this._store.remove(n));
-      if (notifications.slice(MAX_NOTIFICATIONS_CLEAR).length > 0) {
-        this.clear(notifications.slice(MAX_NOTIFICATIONS_CLEAR));
+    return post(
+      '/clearNotifications',
+      {
+        'notification_ids[]': notifications
+          .slice(0, MAX_NOTIFICATIONS_CLEAR)
+          .map((n) => n.id),
+      },
+      async (result) => {
+        notifications
+          .slice(0, MAX_NOTIFICATIONS_CLEAR)
+          .map((n) => this._store.remove(n));
+        if (notifications.slice(MAX_NOTIFICATIONS_CLEAR).length > 0) {
+          this.clear(notifications.slice(MAX_NOTIFICATIONS_CLEAR));
+        }
+        // TODO: post(/clearNotifications) should wait on all notifications being marked as read before redrawing
       }
-      // TODO: post(/clearNotifications) should wait on all notifications being marked as read before redrawing
-    });
+    );
   }
 
   public update(n: Notification) {
@@ -190,7 +224,7 @@ class NotificationsController {
         if (subscription.category === 'chain-event') ceSubs.push(subscription);
       }
       app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
-    });
+    })
   }
 }
 
