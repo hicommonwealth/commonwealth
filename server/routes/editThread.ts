@@ -62,7 +62,16 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       address_id: { [Op.in]: userOwnedAddressIds }
     }
   });
-  if (collaboration) {
+
+  const admin = await models.Role.findOne({
+    where: {
+      chain_id: chain.id,
+      address_id: { [Op.in]: userOwnedAddressIds },
+      permission: 'admin'
+    }
+  });
+
+  if (collaboration || admin) {
     thread = await models.OffchainThread.findOne({
       where: {
         id: thread_id
@@ -76,7 +85,14 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       },
     });
   }
-  if (!thread) return next(new Error('No thread with that id found'));
+
+
+  if (!thread) {
+    return next(new Error('No thread with that id found'));
+  }
+
+
+
   try {
     let latestVersion;
     try {
@@ -115,8 +131,10 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
         return next(new Error(Errors.InvalidLink));
       }
     }
+
     await thread.save();
     await attachFiles();
+
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
       include: [

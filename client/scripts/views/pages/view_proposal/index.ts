@@ -299,7 +299,7 @@ const ProposalHeader: m.Component<
                         closeOnContentClick: true,
                         menuAttrs: { size: 'default' },
                         content: [
-                          (isEditor || isAuthor) &&
+                          (isEditor || isAuthor || isAdmin) &&
                             m(ProposalBodyEditMenuItem, {
                               item: proposal,
                               proposalPageState: vnode.attrs.proposalPageState,
