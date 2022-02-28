@@ -1,96 +1,83 @@
-import { IWebsocketsPayload, WebsocketMessageType } from 'types';
+import { io } from 'socket.io-client';
+import { ChainEventsNamespace } from 'controllers/server/socket/chainEventsNs';
 
-// how long to wait after being disconnected
-export const RECONNECT_DELAY = 5000;
-// how often to send heartbeats to avoid being disconnected
-export const HEARTBEAT_DELAY = 15000;
+export class WebSocketController {
+  private _socket;
+  private _isConnected = false;
+  public readonly chainEventsNs: ChainEventsNamespace;
 
-export type WebsocketMessageHandler = (payload: IWebsocketsPayload<any>) => void;
-const DefaultWebsocketHandler = (
-  key: WebsocketMessageType,
-  payload: IWebsocketsPayload<any>
-) => console.log(`No WS handler available for ${key}`);
+  public constructor(jwt: string) {
+    this._socket = io({
+      transports: ['websocket'],
+      query: { token: jwt },
+    });
+    this._socket.on('connect', this.onconnect.bind(this));
+    this._socket.on('connect_error', this.onconnect_error.bind(this));
+    this._socket.on('disconnect', this.ondisconnect.bind(this));
 
-class WebsocketController {
-  public get ws() { return this._ws; }
-  public _ws : WebSocket;
-
-  public get isConnected() { return this._isConnected; }
-  public _isConnected : boolean;
-
-  public _onStatusChange : (b: boolean) => void;
-  public _heartbeatTimer : number;
-  public _init : (() => void);
-  private _listeners: { [key in WebsocketMessageType]: WebsocketMessageHandler };
-
-  constructor(url, jwt, onStatusChange) {
-    this._listeners = Object.assign(
-      {},
-      ...Object.values(WebsocketMessageType)
-        .map((key) => ({
-          [key]: DefaultWebsocketHandler.bind(null, key),
-        }))
-    );
-    this._onStatusChange = onStatusChange || (() => { });
-    this._init = () => {
-      // tear down old heartbeat timer
-      if (this._heartbeatTimer) clearInterval(this._heartbeatTimer);
-      const ws = new WebSocket(url);
-      ws.onopen = this.onopen.bind(this);
-      ws.onclose = this.onclose.bind(this);
-      ws.onerror = this.onerror.bind(this);
-      ws.onmessage = this.onmessage.bind(this);
-      this._ws = ws;
-
-      // set up new heartbeat time
-      const heartbeatTimer = setInterval(() => {
-        const heartbeat: IWebsocketsPayload<any> = { event: WebsocketMessageType.Heartbeat, jwt };
-        if (ws.readyState !== ws.OPEN) return;
-        ws.send(JSON.stringify(heartbeat));
-      }, HEARTBEAT_DELAY);
-      this._heartbeatTimer = +heartbeatTimer;
-    };
-    this._init();
+    // add all custom namespaces i.e. chain-event notifications, chat, thread notifications
+    this.chainEventsNs = new ChainEventsNamespace();
   }
 
-  public onopen() {
+  public async addListener(eventName: string, listener: (any) => void) {
+    this._socket.on(eventName, listener);
+  }
+
+  public async removeListener(eventName: string, listener?: (any) => void) {
+    this._socket.removeListener(eventName, listener);
+  }
+
+  private onconnect_error(err) {
+    // TODO: https://socket.io/docs/v4/client-socket-instance/#connect_error
+    console.error('An error occurred connecting to the WebSocket server', err);
+  }
+
+  private onconnect() {
     this._isConnected = true;
-    this._onStatusChange(true);
+    console.log('Websocket connected! ID:', this._socket.id);
   }
 
-  public onerror(error) {
-    console.error('Websocket error', error);
-  }
-
-  public onclose() {
-    console.log('Websocket closed');
+  private ondisconnect(reason) {
     this._isConnected = false;
-    this._onStatusChange(false);
-    setTimeout(this._init, RECONNECT_DELAY);
+    switch (reason) {
+      case 'io server disconnect':
+        // client will not attempt reconnection
+        console.log(
+          'The server has forcefully disconnected the socket with socket.disconnect()'
+        );
+        break;
+      case 'io client disconnect':
+        // client will not attempt reconnection
+        console.log(
+          'The socket was manually disconnected using socket.disconnect()'
+        );
+        break;
+      case 'ping timeout':
+        console.log(
+          'The server did not send a PING within the pingInterval + pingTimeout range'
+        );
+        break;
+      case 'transport close':
+        console.log(
+          'The connection was closed (example: the network was changed from WiFi to 4G)'
+        );
+        break;
+      case 'transport error':
+        console.log(
+          'The connection has encountered an error (example: the server was killed during a HTTP long-polling cycle)'
+        );
+        break;
+      default:
+        console.log('Unknown WebSocket disconnect reason');
+        break;
+    }
   }
 
-  public async onmessage(event: MessageEvent) {
-    const payload: IWebsocketsPayload<any> = JSON.parse(event.data);
-    console.log('Websocket received payload', payload);
-    this._listeners[payload.event](payload);
+  public disconnect(): void {
+    this._socket.disconnect();
   }
 
-  // senders
-  public send(event = WebsocketMessageType.Message, data, chain, address, jwt) {
-    const payload : IWebsocketsPayload<any> = { event, jwt, address, chain, data };
-    this._ws.send(JSON.stringify(payload));
-  }
-
-  // listeners
-  public addListener(type: WebsocketMessageType, listener: WebsocketMessageHandler) {
-    this._listeners[type] = listener;
-  }
-  public removeListener(type: WebsocketMessageType) {
-    this._listeners[type] = DefaultWebsocketHandler.bind(null, type);
-  }
-  public getListeners() {
-    return this._listeners;
+  public get isConnected() {
+    return this._isConnected;
   }
 }
-
-export default WebsocketController;

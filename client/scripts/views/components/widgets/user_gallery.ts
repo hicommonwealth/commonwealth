@@ -33,7 +33,7 @@ const UserGallery: m.Component<
     return m('.UserGallery', { class: vnode.attrs.class }, [
       (users).slice(0, Math.min(userCount, maxUsers))
         .map((user: Account<any> | AddressInfo) => {
-          if (user.chain !== app.chain.id && user.chain !== app.chain.base) {
+          if (user.chain !== app.chain?.id && user.chain !== app.chain?.base) {
             return m(AnonymousUser, {
               avatarOnly: true,
               avatarSize: 40,
