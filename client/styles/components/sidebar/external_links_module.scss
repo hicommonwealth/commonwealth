@@ -4,119 +4,46 @@ $element-color: #0cbd8b;
 $discord-color: #677bc4;
 $default-color: #222222;
 
-@mixin brand-hover {
-  border-color: transparent;
-
-  svg {
-    color: white;
-    fill: currentColor;
-  }
-}
-
-@mixin icon-position {
-  position: relative;
-  top: -4px;
-}
-
-@mixin default-hover {
-  border-color: transparent;
-
-  svg {
-    color: white;
-  }
-}
-
 .ExternalLinksModule {
   display: flex;
   justify-content: center;
   margin-top: 24px;
 
   :not(:last-child) {
-    margin-right: 8px;
+    margin-right: 16px;
   }
 
-  .cui-button:hover {
+  .cui-link:hover {
     background: #6966ff;
     color: white;
   }
 
-  .telegram-button {
-    border-color: tint($telegram-color, $border-color-tint-percentage);
+  .telegram-link {
     color: $telegram-color;
-    padding: 8px;
-
-    svg {
-      color: $telegram-color;
-      fill: currentColor;
-      @include icon-position;
-      left: -1px;
-    }
-
-    &:hover {
-      @include brand-hover;
-    }
+    cursor: pointer;
+    fill: currentColor;
   }
 
-  .element-button {
-    border-color: tint($element-color, $border-color-tint-percentage);
+  .element-link {
     color: $element-color;
-    padding: 8px;
-
-    svg {
-      color: $element-color;
-      fill: currentColor;
-      @include icon-position;
-    }
-
-    &:hover {
-      @include brand-hover;
-    }
+    cursor: pointer;
+    fill: currentColor;
   }
 
-  .discord-button {
-    border-color: tint($discord-color, $border-color-tint-percentage);
+  .discord-link {
     color: $discord-color;
-    padding: 8px;
-
-    svg {
-      color: $discord-color;
-      fill: currentColor;
-      @include icon-position;
-    }
-
-    &:hover {
-      @include brand-hover;
-    }
+    cursor: pointer;
+    fill: currentColor;
   }
 
-  .website-button {
-    border-color: tint($default-color, $border-color-tint-percentage);
+  .website-link {
     color: $default-color;
-    padding: 8px;
-
-    svg {
-      color: $default-color;
-      @include icon-position;
-    }
-
-    &:hover {
-      @include default-hover;
-    }
+    cursor: pointer;
   }
 
-  .github-button {
-    border-color: tint($default-color, $border-color-tint-percentage);
+  .github-link {
     color: $default-color;
-    padding: 8px;
-
-    svg {
-      color: $default-color;
-      fill: currentColor;
-      @include icon-position;
-    }
-
-    &:hover {
-      @include default-hover;
-    }
+    cursor: pointer;
+    fill: currentColor;
   }
 }

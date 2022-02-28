@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'components/sidebar/external_links_module.scss';
 
@@ -19,48 +18,38 @@ export class ExternalLinksModule implements m.ClassComponent {
     return (
       <div class="ExternalLinksModule">
         {discord && (
-          <Button
-            rounded={true}
-            title="Discord"
+          <CWIcon
+            iconName="discord"
+            className="discord-link"
             onclick={() => window.open(discord)}
-            label={<CWIcon iconName="discord" />}
-            class="discord-button"
           />
         )}
         {element && (
-          <Button
-            rounded={true}
-            title="Element"
+          <CWIcon
+            iconName="element"
+            className="element-link"
             onclick={() => window.open(element)}
-            label={<CWIcon iconName="element" />}
-            class="element-button"
           />
         )}
         {telegram && (
-          <Button
-            rounded={true}
-            title="Telegram"
+          <CWIcon
+            iconName="telegram"
+            className="telegram-link"
             onclick={() => window.open(telegram)}
-            label={<CWIcon iconName="telegram" />}
-            class="telegram-button"
           />
         )}
         {github && (
-          <Button
-            rounded={true}
-            title="Github"
+          <CWIcon
+            iconName="github"
+            className="github-link"
             onclick={() => window.open(github)}
-            label={<CWIcon iconName="github" />}
-            class="github-button"
           />
         )}
         {website && (
-          <Button
-            rounded={true}
-            title="Homepage"
+          <CWIcon
+            iconName="website"
+            className="website-link"
             onclick={() => window.open(website)}
-            label={<CWIcon iconName="website" />}
-            class="website-button"
           />
         )}
       </div>
