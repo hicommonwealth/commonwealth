@@ -41,6 +41,32 @@ type SublayoutAttrs = {
   useQuickSwitcher?: boolean; // show quick switcher only, without the rest of the sidebar
 };
 
+const footercontents = [
+  { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
+  {
+    text: 'Jobs',
+    externalLink: 'https://angel.co/company/commonwealth-labs/jobs',
+  },
+  { text: 'Terms', redirectTo: '/terms' },
+  { text: 'Privacy', redirectTo: '/privacy' },
+  { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
+  {
+    text: 'Discord',
+    externalLink: 'https://discord.gg/vYcfQ758',
+  },
+  {
+    text: 'Telegram',
+    externalLink: 'https://t.me/HiCommonwealth',
+  },
+  // { text:  'Use Cases' },
+  // { text:  'Crowdfunding' },
+  // { text:  'Developers' },
+  // { text:  'About us' },
+  // { text:  'Careers' }
+];
+
+const ICON_SIZE = 22;
+
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private modalAutoTriggered: boolean; // what's going on here?
 
@@ -62,8 +88,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const narrowBrowserWidth =
       window.innerWidth > 767.98 && window.innerWidth < 850;
     const terms = app.chain ? chain.terms : null;
-
-    const ICON_SIZE = 22;
 
     const sublayoutHeaderLeft = (
       <div class="sublayout-header-left">
@@ -99,18 +123,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       </div>
     );
 
-    const hiringButton = (
-      <CWGradientButton
-        buttonType="secondary"
-        disabled={false}
-        className="hiringBtn"
-        label="We're hiring!"
-        onclick={() => {
-          window.open('https://angel.co/company/commonwealth-labs', '_blank');
-        }}
-      />
-    );
-
     const sublayoutHeaderRight = (
       <div class="sublayout-header-right">
         {m(LoginSelector)}
@@ -120,7 +132,20 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           (narrowBrowserWidth
             ? m(MobileNewProposalButton)
             : m(NewProposalButton, { fluid: false, threadOnly: !chain }))}
-        {!app.isCustomDomain() && hiringButton}
+        {!app.isCustomDomain() && (
+          <CWGradientButton
+            buttonType="secondary"
+            disabled={false}
+            className="hiringBtn"
+            label="We're hiring!"
+            onclick={() => {
+              window.open(
+                'https://angel.co/company/commonwealth-labs',
+                '_blank'
+              );
+            }}
+          />
+        )}
         {/* above threadOnly option assumes all chains have proposals beyond threads */}
       </div>
     );
@@ -222,34 +247,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               )}
             </div>
           </div>
-          {!app.isCustomDomain() && (
-            <FooterLandingPage
-              list={[
-                { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
-                {
-                  text: 'Jobs',
-                  externalLink:
-                    'https://angel.co/company/commonwealth-labs/jobs',
-                },
-                { text: 'Terms', redirectTo: '/terms' },
-                { text: 'Privacy', redirectTo: '/privacy' },
-                { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
-                {
-                  text: 'Discord',
-                  externalLink: 'https://discord.gg/vYcfQ758',
-                },
-                {
-                  text: 'Telegram',
-                  externalLink: 'https://t.me/HiCommonwealth',
-                },
-                // { text:  'Use Cases' },
-                // { text:  'Crowdfunding' },
-                // { text:  'Developers' },
-                // { text:  'About us' },
-                // { text:  'Careers' }
-              ]}
-            />
-          )}
+          {!app.isCustomDomain() && <FooterLandingPage list={footercontents} />}
         </div>
       </div>
     );
