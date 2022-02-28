@@ -80,6 +80,14 @@ const ProjectPage: m.Component<ProjectPageAttrs, ProjectPageState> = {
             })
           ])
         ]),
+        m('.project-curator-data', [
+          m(CWButton, {
+            buttonType: 'secondary',
+            disabled: true,
+            label: project.beneficiary.address.slice(0, 7),
+          }),
+          m('h3', `Curator receives ${project.curatorCut * 100}% of funds.`)
+        ]),
         m('.project-about', [
           m('h1', 'About'),
           m(MarkdownFormattedText, {

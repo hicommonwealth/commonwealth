@@ -3,11 +3,12 @@ import 'pages/crowdfund/index.scss';
 import m from 'mithril';
 import app from 'state';
 import { AddressInfo } from 'models';
+import { CWBacker, CWCurator } from 'controllers/chain/ethereum/projects/participants';
 import { CWButton } from '../../components/component_kit/cw_button';
 import ProjectCard, { ProjectCardSize } from './project_card';
 import Sublayout from '../../sublayout';
 import { DummyProject } from './dummy_project';
-import { CWBacker, CWCurator } from 'client/scripts/controllers/chain/ethereum/projects/participants';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
 type ProjectProgress = {
   inBlocks: number;
@@ -24,8 +25,19 @@ type ProjectFunds = {
   inDollars: number;
 }
 
+interface ICreateProjectForm {
+  name: string,
+  token: string,
+  threshold: number,
+  fundraiseLength: number,
+  beneficiary: string,
+  shortDescription: string,
+  description: string,
+}
+
 export type Project = {
   id: number;
+  chain: string;
   title: string;
   description: string;
   shortDescription?: string;
@@ -34,6 +46,7 @@ export type Project = {
   creator: AddressInfo;
   beneficiary: AddressInfo;
   backers: CWBacker[];
+  curatorCut: number;
   curators: CWCurator[];
   createdAt: moment.Moment;
   progress: ProjectProgress;
@@ -45,7 +58,7 @@ export type Project = {
 // interface ProjectListingState {
 // }
 
-const ProjectListing: m.Component = {
+const ProjectListing: m.Component<{}, { form: ICreateProjectForm }> = {
   view: (vnode) => {
     const projects = app.activeChainId()
       ? app.projects.filter((project) => project.chain === app.activeChainId())
@@ -109,6 +122,57 @@ const ProjectListing: m.Component = {
             })
           ]),
         ]),
+      ]),
+      m('.CreateProjectForm', [
+        m(CWTextInput, {
+          label: 'Name',
+          name: 'Name',
+          oninput: (e) => {
+            vnode.state.form.name = e.target.value;
+          }
+        }),
+        m(CWTextInput, {
+          label: 'Raise In',
+          name: 'Raise In',
+          oninput: (e) => {
+            vnode.state.form.token = e.target.value;
+          }
+        }),
+        m(CWTextInput, {
+          label: 'Minimum Raise',
+          name: 'Minimum Raise',
+          oninput: (e) => {
+            vnode.state.form.threshold = Number(e.target.value);
+          }
+        }),
+        m(CWTextInput, {
+          label: 'Fundraise Length',
+          name: 'Fundraise Length',
+          oninput: (e) => {
+            vnode.state.form.fundraiseLength = e.target.value;
+          }
+        }),
+        m(CWTextInput, {
+          label: 'Beneficiary Address',
+          name: 'Beneficiary Address',
+          oninput: (e) => {
+            vnode.state.form.beneficiary = e.target.value;
+          }
+        }),
+        m(CWTextInput, {
+          label: 'Summary',
+          name: 'Summary',
+          oninput: (e) => {
+            vnode.state.form.shortDescription = e.target.value;
+          }
+        }),
+        m(CWTextInput, {
+          label: 'Description',
+          name: 'Description',
+          oninput: (e) => {
+            vnode.state.form.description = e.target.value;
+          }
+        }),
       ])
     ])
   }

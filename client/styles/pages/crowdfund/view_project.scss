@@ -51,7 +51,8 @@
                 background: linear-gradient(268.96deg, #00DB8C 2.02%, #1BDEBB 94.68%);
             }
         } 
-        .project-funding-data {
+        .project-funding-data,
+        .project-curator-data {
             display: flex;
             justify-content: space-between;
             align-items: center;

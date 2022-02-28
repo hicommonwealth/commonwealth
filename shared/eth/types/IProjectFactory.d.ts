@@ -21,16 +21,14 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IProjectFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "acceptedTokens(uint256)": FunctionFragment;
     "addAcceptedTokens(address[])": FunctionFragment;
-    "allProjects(uint256)": FunctionFragment;
-    "createProject(bytes32,bytes32,bytes32,address,address[],address[],uint256,uint256,uint256)": FunctionFragment;
-    "getAllAcceptedTokens()": FunctionFragment;
-    "getAllProjects()": FunctionFragment;
-    "getProtocolData()": FunctionFragment;
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)": FunctionFragment;
     "isAcceptedToken(address)": FunctionFragment;
+    "numProjects()": FunctionFragment;
     "owner()": FunctionFragment;
     "projectImp()": FunctionFragment;
+    "projects(uint32)": FunctionFragment;
+    "protocolData()": FunctionFragment;
     "setCWTokenImpl(address)": FunctionFragment;
     "setFeeTo(address)": FunctionFragment;
     "setProjectImpl(address)": FunctionFragment;
@@ -38,16 +36,8 @@ interface IProjectFactoryInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(
-    functionFragment: "acceptedTokens",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "addAcceptedTokens",
     values: [string[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "allProjects",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "createProject",
@@ -56,32 +46,31 @@ interface IProjectFactoryInterface extends ethers.utils.Interface {
       BytesLike,
       BytesLike,
       string,
-      string[],
-      string[],
+      string,
       BigNumberish,
       BigNumberish,
       BigNumberish
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "getAllAcceptedTokens",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getAllProjects",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getProtocolData",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "isAcceptedToken",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "numProjects",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "projectImp",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "projects",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "protocolData",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -99,15 +88,7 @@ interface IProjectFactoryInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "acceptedTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "addAcceptedTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "allProjects",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -115,23 +96,20 @@ interface IProjectFactoryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getAllAcceptedTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAllProjects",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getProtocolData",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "isAcceptedToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "numProjects",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "projectImp", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "projects", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "protocolData",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setCWTokenImpl",
     data: BytesLike
@@ -147,10 +125,10 @@ interface IProjectFactoryInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
-    "ProjectCreation(bytes32,address)": EventFragment;
+    "ProjectCreated(uint256,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "ProjectCreation"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ProjectCreated"): EventFragment;
 }
 
 export class IProjectFactory extends Contract {
@@ -197,16 +175,6 @@ export class IProjectFactory extends Contract {
   interface: IProjectFactoryInterface;
 
   functions: {
-    acceptedTokens(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "acceptedTokens(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     addAcceptedTokens(
       _tokens: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -217,85 +185,43 @@ export class IProjectFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    allProjects(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "allProjects(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     createProject(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _cwUrl: BytesLike,
       _beneficiary: string,
-      _acceptedTokens: string[],
-      _nominations: string[],
+      _acceptedToken: string,
       _threshold: BigNumberish,
       _deadline: BigNumberish,
       _curatorFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createProject(bytes32,bytes32,bytes32,address,address[],address[],uint256,uint256,uint256)"(
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _cwUrl: BytesLike,
       _beneficiary: string,
-      _acceptedTokens: string[],
-      _nominations: string[],
+      _acceptedToken: string,
       _threshold: BigNumberish,
       _deadline: BigNumberish,
       _curatorFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getAllAcceptedTokens(overrides?: CallOverrides): Promise<[string[]]>;
-
-    "getAllAcceptedTokens()"(overrides?: CallOverrides): Promise<[string[]]>;
-
-    getAllProjects(overrides?: CallOverrides): Promise<[string[]]>;
-
-    "getAllProjects()"(overrides?: CallOverrides): Promise<[string[]]>;
-
-    getProtocolData(
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        [BigNumber, BigNumber, string, string] & {
-          protocolFee: BigNumber;
-          maxFee: BigNumber;
-          cwTokenImp: string;
-          feeTo: string;
-        }
-      ]
-    >;
-
-    "getProtocolData()"(
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        [BigNumber, BigNumber, string, string] & {
-          protocolFee: BigNumber;
-          maxFee: BigNumber;
-          cwTokenImp: string;
-          feeTo: string;
-        }
-      ]
-    >;
-
     isAcceptedToken(
-      _token: string,
+      token: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     "isAcceptedToken(address)"(
-      _token: string,
+      token: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    numProjects(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "numProjects()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -304,6 +230,40 @@ export class IProjectFactory extends Contract {
     projectImp(overrides?: CallOverrides): Promise<[string]>;
 
     "projectImp()"(overrides?: CallOverrides): Promise<[string]>;
+
+    projects(
+      projectIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "projects(uint32)"(
+      projectIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    protocolData(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [BigNumber, BigNumber, string] & {
+          protocolFee: BigNumber;
+          maxFee: BigNumber;
+          feeTo: string;
+        }
+      ]
+    >;
+
+    "protocolData()"(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [BigNumber, BigNumber, string] & {
+          protocolFee: BigNumber;
+          maxFee: BigNumber;
+          feeTo: string;
+        }
+      ]
+    >;
 
     setCWTokenImpl(
       _cwToken: string,
@@ -346,16 +306,6 @@ export class IProjectFactory extends Contract {
     ): Promise<ContractTransaction>;
   };
 
-  acceptedTokens(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  "acceptedTokens(uint256)"(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   addAcceptedTokens(
     _tokens: string[],
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -366,75 +316,40 @@ export class IProjectFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  allProjects(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-  "allProjects(uint256)"(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   createProject(
     _name: BytesLike,
     _ipfsHash: BytesLike,
     _cwUrl: BytesLike,
     _beneficiary: string,
-    _acceptedTokens: string[],
-    _nominations: string[],
+    _acceptedToken: string,
     _threshold: BigNumberish,
     _deadline: BigNumberish,
     _curatorFee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createProject(bytes32,bytes32,bytes32,address,address[],address[],uint256,uint256,uint256)"(
+  "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
     _name: BytesLike,
     _ipfsHash: BytesLike,
     _cwUrl: BytesLike,
     _beneficiary: string,
-    _acceptedTokens: string[],
-    _nominations: string[],
+    _acceptedToken: string,
     _threshold: BigNumberish,
     _deadline: BigNumberish,
     _curatorFee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getAllAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
-
-  "getAllAcceptedTokens()"(overrides?: CallOverrides): Promise<string[]>;
-
-  getAllProjects(overrides?: CallOverrides): Promise<string[]>;
-
-  "getAllProjects()"(overrides?: CallOverrides): Promise<string[]>;
-
-  getProtocolData(
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, string, string] & {
-      protocolFee: BigNumber;
-      maxFee: BigNumber;
-      cwTokenImp: string;
-      feeTo: string;
-    }
-  >;
-
-  "getProtocolData()"(
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, string, string] & {
-      protocolFee: BigNumber;
-      maxFee: BigNumber;
-      cwTokenImp: string;
-      feeTo: string;
-    }
-  >;
-
-  isAcceptedToken(_token: string, overrides?: CallOverrides): Promise<boolean>;
+  isAcceptedToken(token: string, overrides?: CallOverrides): Promise<boolean>;
 
   "isAcceptedToken(address)"(
-    _token: string,
+    token: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  numProjects(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "numProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -443,6 +358,36 @@ export class IProjectFactory extends Contract {
   projectImp(overrides?: CallOverrides): Promise<string>;
 
   "projectImp()"(overrides?: CallOverrides): Promise<string>;
+
+  projects(
+    projectIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "projects(uint32)"(
+    projectIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  protocolData(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, string] & {
+      protocolFee: BigNumber;
+      maxFee: BigNumber;
+      feeTo: string;
+    }
+  >;
+
+  "protocolData()"(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, string] & {
+      protocolFee: BigNumber;
+      maxFee: BigNumber;
+      feeTo: string;
+    }
+  >;
 
   setCWTokenImpl(
     _cwToken: string,
@@ -485,16 +430,6 @@ export class IProjectFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    acceptedTokens(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "acceptedTokens(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     addAcceptedTokens(
       _tokens: string[],
       overrides?: CallOverrides
@@ -505,78 +440,40 @@ export class IProjectFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    allProjects(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    "allProjects(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     createProject(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _cwUrl: BytesLike,
       _beneficiary: string,
-      _acceptedTokens: string[],
-      _nominations: string[],
+      _acceptedToken: string,
       _threshold: BigNumberish,
       _deadline: BigNumberish,
       _curatorFee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createProject(bytes32,bytes32,bytes32,address,address[],address[],uint256,uint256,uint256)"(
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _cwUrl: BytesLike,
       _beneficiary: string,
-      _acceptedTokens: string[],
-      _nominations: string[],
+      _acceptedToken: string,
       _threshold: BigNumberish,
       _deadline: BigNumberish,
       _curatorFee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    getAllAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
-
-    "getAllAcceptedTokens()"(overrides?: CallOverrides): Promise<string[]>;
-
-    getAllProjects(overrides?: CallOverrides): Promise<string[]>;
-
-    "getAllProjects()"(overrides?: CallOverrides): Promise<string[]>;
-
-    getProtocolData(
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string, string] & {
-        protocolFee: BigNumber;
-        maxFee: BigNumber;
-        cwTokenImp: string;
-        feeTo: string;
-      }
-    >;
-
-    "getProtocolData()"(
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string, string] & {
-        protocolFee: BigNumber;
-        maxFee: BigNumber;
-        cwTokenImp: string;
-        feeTo: string;
-      }
-    >;
-
-    isAcceptedToken(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
+    isAcceptedToken(token: string, overrides?: CallOverrides): Promise<boolean>;
 
     "isAcceptedToken(address)"(
-      _token: string,
+      token: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    numProjects(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "numProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -585,6 +482,36 @@ export class IProjectFactory extends Contract {
     projectImp(overrides?: CallOverrides): Promise<string>;
 
     "projectImp()"(overrides?: CallOverrides): Promise<string>;
+
+    projects(
+      projectIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "projects(uint32)"(
+      projectIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    protocolData(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, string] & {
+        protocolFee: BigNumber;
+        maxFee: BigNumber;
+        feeTo: string;
+      }
+    >;
+
+    "protocolData()"(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, string] & {
+        protocolFee: BigNumber;
+        maxFee: BigNumber;
+        feeTo: string;
+      }
+    >;
 
     setCWTokenImpl(_cwToken: string, overrides?: CallOverrides): Promise<void>;
 
@@ -622,26 +549,16 @@ export class IProjectFactory extends Contract {
   };
 
   filters: {
-    ProjectCreation(
-      projectHash: null,
-      project: null
+    ProjectCreated(
+      projectIndex: null,
+      newProject: null
     ): TypedEventFilter<
-      [string, string],
-      { projectHash: string; project: string }
+      [BigNumber, string],
+      { projectIndex: BigNumber; newProject: string }
     >;
   };
 
   estimateGas: {
-    acceptedTokens(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "acceptedTokens(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     addAcceptedTokens(
       _tokens: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -652,63 +569,43 @@ export class IProjectFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    allProjects(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "allProjects(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     createProject(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _cwUrl: BytesLike,
       _beneficiary: string,
-      _acceptedTokens: string[],
-      _nominations: string[],
+      _acceptedToken: string,
       _threshold: BigNumberish,
       _deadline: BigNumberish,
       _curatorFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createProject(bytes32,bytes32,bytes32,address,address[],address[],uint256,uint256,uint256)"(
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _cwUrl: BytesLike,
       _beneficiary: string,
-      _acceptedTokens: string[],
-      _nominations: string[],
+      _acceptedToken: string,
       _threshold: BigNumberish,
       _deadline: BigNumberish,
       _curatorFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getAllAcceptedTokens(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getAllAcceptedTokens()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getAllProjects(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getAllProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getProtocolData(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getProtocolData()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     isAcceptedToken(
-      _token: string,
+      token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "isAcceptedToken(address)"(
-      _token: string,
+      token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    numProjects(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "numProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -717,6 +614,20 @@ export class IProjectFactory extends Contract {
     projectImp(overrides?: CallOverrides): Promise<BigNumber>;
 
     "projectImp()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    projects(
+      projectIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "projects(uint32)"(
+      projectIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    protocolData(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "protocolData()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     setCWTokenImpl(
       _cwToken: string,
@@ -760,16 +671,6 @@ export class IProjectFactory extends Contract {
   };
 
   populateTransaction: {
-    acceptedTokens(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "acceptedTokens(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     addAcceptedTokens(
       _tokens: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -780,71 +681,43 @@ export class IProjectFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    allProjects(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "allProjects(uint256)"(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     createProject(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _cwUrl: BytesLike,
       _beneficiary: string,
-      _acceptedTokens: string[],
-      _nominations: string[],
+      _acceptedToken: string,
       _threshold: BigNumberish,
       _deadline: BigNumberish,
       _curatorFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createProject(bytes32,bytes32,bytes32,address,address[],address[],uint256,uint256,uint256)"(
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _cwUrl: BytesLike,
       _beneficiary: string,
-      _acceptedTokens: string[],
-      _nominations: string[],
+      _acceptedToken: string,
       _threshold: BigNumberish,
       _deadline: BigNumberish,
       _curatorFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getAllAcceptedTokens(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getAllAcceptedTokens()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getAllProjects(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "getAllProjects()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getProtocolData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "getProtocolData()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     isAcceptedToken(
-      _token: string,
+      token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "isAcceptedToken(address)"(
-      _token: string,
+      token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    numProjects(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "numProjects()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -853,6 +726,20 @@ export class IProjectFactory extends Contract {
     projectImp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "projectImp()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    projects(
+      projectIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "projects(uint32)"(
+      projectIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    protocolData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "protocolData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setCWTokenImpl(
       _cwToken: string,

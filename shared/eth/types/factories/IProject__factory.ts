@@ -39,7 +39,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "Curate",
+    name: "Back",
     type: "event",
   },
   {
@@ -64,7 +64,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "Deposit",
+    name: "Curate",
     type: "event",
   },
   {
@@ -75,7 +75,20 @@ const _abi = [
   },
   {
     anonymous: false,
-    inputs: [],
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
     name: "Succeeded",
     type: "event",
   },
@@ -99,12 +112,33 @@ const _abi = [
     type: "event",
   },
   {
-    inputs: [
+    inputs: [],
+    name: "acceptedToken",
+    outputs: [
       {
         internalType: "address",
-        name: "_token",
+        name: "",
         type: "address",
       },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "bToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
       {
         internalType: "uint256",
         name: "_value",
@@ -124,7 +158,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "backWithETH",
+    name: "backersWithdraw",
     outputs: [
       {
         internalType: "bool",
@@ -132,19 +166,53 @@ const _abi = [
         type: "bool",
       },
     ],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "beneficiary",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "beneficiaryWithdraw",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "cToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_token",
-        type: "address",
-      },
-      {
         internalType: "uint256",
-        name: "_value",
+        name: "_amount",
         type: "uint256",
       },
     ],
@@ -161,7 +229,20 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "curateWithETH",
+    name: "curatorFee",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "curatorsWithdraw",
     outputs: [
       {
         internalType: "bool",
@@ -169,20 +250,7 @@ const _abi = [
         type: "bool",
       },
     ],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "curatorFee",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -206,57 +274,6 @@ const _abi = [
         internalType: "bool",
         name: "",
         type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getAcceptedTokens",
-    outputs: [
-      {
-        internalType: "address[]",
-        name: "",
-        type: "address[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_token",
-        type: "address",
-      },
-    ],
-    name: "getBToken",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_token",
-        type: "address",
-      },
-    ],
-    name: "getCToken",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
       },
     ],
     stateMutability: "view",
@@ -292,34 +309,61 @@ const _abi = [
             type: "address",
           },
         ],
-        internalType: "struct DataTypes.MetaData",
+        internalType: "struct DataTypes.ProjectMetaData",
         name: "_metaData",
         type: "tuple",
       },
       {
-        internalType: "address[]",
-        name: "_acceptedTokens",
-        type: "address[]",
-      },
-      {
-        internalType: "address[]",
-        name: "_nominations",
-        type: "address[]",
-      },
-      {
-        internalType: "uint256",
-        name: "_threshold",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_deadline",
-        type: "uint256",
+        components: [
+          {
+            internalType: "uint256",
+            name: "threshold",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "deadline",
+            type: "uint256",
+          },
+          {
+            internalType: "address payable",
+            name: "beneficiary",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "acceptedToken",
+            type: "address",
+          },
+        ],
+        internalType: "struct DataTypes.ProjectData",
+        name: "_pData",
+        type: "tuple",
       },
       {
         internalType: "uint256",
         name: "_curatorFee",
         type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_protocolFee",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_protocolFeeTo",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_bToken",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_cToken",
+        type: "address",
       },
     ],
     name: "initialize",
@@ -347,50 +391,94 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
+    inputs: [],
+    name: "metaData",
+    outputs: [
       {
-        internalType: "address",
-        name: "_token",
-        type: "address",
+        components: [
+          {
+            internalType: "uint256",
+            name: "id",
+            type: "uint256",
+          },
+          {
+            internalType: "bytes32",
+            name: "name",
+            type: "bytes32",
+          },
+          {
+            internalType: "bytes32",
+            name: "ipfsHash",
+            type: "bytes32",
+          },
+          {
+            internalType: "bytes32",
+            name: "cwUrl",
+            type: "bytes32",
+          },
+          {
+            internalType: "address",
+            name: "creator",
+            type: "address",
+          },
+        ],
+        internalType: "struct DataTypes.ProjectMetaData",
+        name: "",
+        type: "tuple",
       },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "protocolFee",
+    outputs: [
       {
         internalType: "uint256",
-        name: "_valueToRemove",
+        name: "",
         type: "uint256",
       },
     ],
-    name: "redeemBToken",
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "protocolFeeTo",
     outputs: [
       {
-        internalType: "bool",
+        internalType: "address",
         name: "",
-        type: "bool",
+        type: "address",
       },
     ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_ipfsHash",
+        type: "bytes32",
+      },
+    ],
+    name: "setIpfsHash",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_token",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_valueToRemove",
-        type: "uint256",
+        internalType: "bytes32",
+        name: "_name",
+        type: "bytes32",
       },
     ],
-    name: "redeemCToken",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
+    name: "setName",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -409,6 +497,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "totalCuratorFunding",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "totalFunding",
     outputs: [
       {
@@ -418,19 +519,6 @@ const _abi = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "withdraw",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "nonpayable",
     type: "function",
   },
 ];

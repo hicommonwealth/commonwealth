@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {DataTypes} from './DataTypes.sol';
+import './IPriceOracleAggregator.sol';
+import {DataTypes} from '../DataTypes.sol';
 
 interface IProjectFactory {
     event ProjectCreation(bytes32 projectHash, address project);
@@ -27,6 +28,8 @@ interface IProjectFactory {
     function acceptedTokens(uint256) external view returns (address);
 
     function getAllAcceptedTokens() external view returns (address[] memory);
+
+    function priceOracleAggregator() external view returns (IPriceOracleAggregator);
 
     function isAcceptedToken(address _token) external view returns (bool);
 

@@ -22,38 +22,19 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "projectHash",
-        type: "bytes32",
+        internalType: "uint256",
+        name: "projectIndex",
+        type: "uint256",
       },
       {
         indexed: false,
         internalType: "address",
-        name: "project",
+        name: "newProject",
         type: "address",
       },
     ],
-    name: "ProjectCreation",
+    name: "ProjectCreated",
     type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    name: "acceptedTokens",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
   },
   {
     inputs: [
@@ -66,25 +47,6 @@ const _abi = [
     name: "addAcceptedTokens",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    name: "allProjects",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -110,14 +72,9 @@ const _abi = [
         type: "address",
       },
       {
-        internalType: "address[]",
-        name: "_acceptedTokens",
-        type: "address[]",
-      },
-      {
-        internalType: "address[]",
-        name: "_nominations",
-        type: "address[]",
+        internalType: "address",
+        name: "_acceptedToken",
+        type: "address",
       },
       {
         internalType: "uint256",
@@ -139,7 +96,7 @@ const _abi = [
     outputs: [
       {
         internalType: "address",
-        name: "project",
+        name: "",
         type: "address",
       },
     ],
@@ -147,71 +104,10 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "getAllAcceptedTokens",
-    outputs: [
-      {
-        internalType: "address[]",
-        name: "",
-        type: "address[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getAllProjects",
-    outputs: [
-      {
-        internalType: "address[]",
-        name: "",
-        type: "address[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getProtocolData",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "protocolFee",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "maxFee",
-            type: "uint256",
-          },
-          {
-            internalType: "address",
-            name: "cwTokenImp",
-            type: "address",
-          },
-          {
-            internalType: "address payable",
-            name: "feeTo",
-            type: "address",
-          },
-        ],
-        internalType: "struct DataTypes.ProtocolData",
-        name: "",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "address",
-        name: "_token",
+        name: "token",
         type: "address",
       },
     ],
@@ -221,6 +117,19 @@ const _abi = [
         internalType: "bool",
         name: "",
         type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "numProjects",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -247,6 +156,55 @@ const _abi = [
         internalType: "address",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint32",
+        name: "projectIndex",
+        type: "uint32",
+      },
+    ],
+    name: "projects",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "protocolData",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "protocolFee",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "maxFee",
+            type: "uint256",
+          },
+          {
+            internalType: "address payable",
+            name: "feeTo",
+            type: "address",
+          },
+        ],
+        internalType: "struct DataTypes.ProtocolData",
+        name: "",
+        type: "tuple",
       },
     ],
     stateMutability: "view",

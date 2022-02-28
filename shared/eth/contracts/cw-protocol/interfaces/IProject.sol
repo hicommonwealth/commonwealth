@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {DataTypes} from './DataTypes.sol';
+import { DataTypes } from '../DataTypes.sol';
 
 interface IProject {
     event Deposit(address sender, address token, uint256 amount);
@@ -29,7 +29,7 @@ interface IProject {
     function getAcceptedTokens() external view returns (address[] memory);
 
     function initialize(
-        DataTypes.MetaData memory _metaData,
+        DataTypes.ProjectMetaData memory _metaData,
         address[] memory _acceptedTokens,
         address[] memory _nominations,
         uint256 _threshold,

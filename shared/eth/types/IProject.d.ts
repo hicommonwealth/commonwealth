@@ -12,7 +12,6 @@ import {
   Contract,
   ContractTransaction,
   Overrides,
-  PayableOverrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -22,53 +21,63 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IProjectInterface extends ethers.utils.Interface {
   functions: {
-    "back(address,uint256)": FunctionFragment;
-    "backWithETH()": FunctionFragment;
-    "curate(address,uint256)": FunctionFragment;
-    "curateWithETH()": FunctionFragment;
+    "acceptedToken()": FunctionFragment;
+    "bToken()": FunctionFragment;
+    "back(uint256)": FunctionFragment;
+    "backersWithdraw()": FunctionFragment;
+    "beneficiary()": FunctionFragment;
+    "beneficiaryWithdraw()": FunctionFragment;
+    "cToken()": FunctionFragment;
+    "curate(uint256)": FunctionFragment;
     "curatorFee()": FunctionFragment;
+    "curatorsWithdraw()": FunctionFragment;
     "deadline()": FunctionFragment;
     "funded()": FunctionFragment;
-    "getAcceptedTokens()": FunctionFragment;
-    "getBToken(address)": FunctionFragment;
-    "getCToken(address)": FunctionFragment;
-    "initialize(tuple,address[],address[],uint256,uint256,uint256)": FunctionFragment;
+    "initialize(tuple,tuple,uint256,uint256,address,address,address)": FunctionFragment;
     "lockedWithdraw()": FunctionFragment;
-    "redeemBToken(address,uint256)": FunctionFragment;
-    "redeemCToken(address,uint256)": FunctionFragment;
+    "metaData()": FunctionFragment;
+    "protocolFee()": FunctionFragment;
+    "protocolFeeTo()": FunctionFragment;
+    "setIpfsHash(bytes32)": FunctionFragment;
+    "setName(bytes32)": FunctionFragment;
     "threshold()": FunctionFragment;
+    "totalCuratorFunding()": FunctionFragment;
     "totalFunding()": FunctionFragment;
-    "withdraw()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "back",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "backWithETH",
+    functionFragment: "acceptedToken",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "bToken", values?: undefined): string;
+  encodeFunctionData(functionFragment: "back", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "backersWithdraw",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "beneficiary",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "beneficiaryWithdraw",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "cToken", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "curate",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "curateWithETH",
-    values?: undefined
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "curatorFee",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "deadline", values?: undefined): string;
-  encodeFunctionData(functionFragment: "funded", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getAcceptedTokens",
+    functionFragment: "curatorsWithdraw",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "getBToken", values: [string]): string;
-  encodeFunctionData(functionFragment: "getCToken", values: [string]): string;
+  encodeFunctionData(functionFragment: "deadline", values?: undefined): string;
+  encodeFunctionData(functionFragment: "funded", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "initialize",
     values: [
@@ -79,81 +88,113 @@ interface IProjectInterface extends ethers.utils.Interface {
         cwUrl: BytesLike;
         creator: string;
       },
-      string[],
-      string[],
+      {
+        threshold: BigNumberish;
+        deadline: BigNumberish;
+        beneficiary: string;
+        acceptedToken: string;
+      },
       BigNumberish,
       BigNumberish,
-      BigNumberish
+      string,
+      string,
+      string
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "lockedWithdraw",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "metaData", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "redeemBToken",
-    values: [string, BigNumberish]
+    functionFragment: "protocolFee",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "redeemCToken",
-    values: [string, BigNumberish]
+    functionFragment: "protocolFeeTo",
+    values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "setIpfsHash",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(functionFragment: "setName", values: [BytesLike]): string;
   encodeFunctionData(functionFragment: "threshold", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "totalCuratorFunding",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "totalFunding",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
+  decodeFunctionResult(
+    functionFragment: "acceptedToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "bToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "back", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "backWithETH",
+    functionFragment: "backersWithdraw",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "curate", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "curateWithETH",
+    functionFragment: "beneficiary",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "beneficiaryWithdraw",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "cToken", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "curate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "curatorFee", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "curatorsWithdraw",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "deadline", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "funded", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getAcceptedTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "getBToken", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getCToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lockedWithdraw",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "metaData", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "redeemBToken",
+    functionFragment: "protocolFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "redeemCToken",
+    functionFragment: "protocolFeeTo",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setIpfsHash",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setName", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "threshold", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalCuratorFunding",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "totalFunding",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
+    "Back(address,address,uint256)": EventFragment;
     "Curate(address,address,uint256)": EventFragment;
-    "Deposit(address,address,uint256)": EventFragment;
     "Failed()": EventFragment;
-    "Succeeded()": EventFragment;
+    "Succeeded(uint256,uint256)": EventFragment;
     "Withdraw(address,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "Back"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Curate"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Failed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Succeeded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
@@ -203,49 +244,69 @@ export class IProject extends Contract {
   interface: IProjectInterface;
 
   functions: {
+    acceptedToken(overrides?: CallOverrides): Promise<[string]>;
+
+    "acceptedToken()"(overrides?: CallOverrides): Promise<[string]>;
+
+    bToken(overrides?: CallOverrides): Promise<[string]>;
+
+    "bToken()"(overrides?: CallOverrides): Promise<[string]>;
+
     back(
-      _token: string,
       _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "back(address,uint256)"(
-      _token: string,
+    "back(uint256)"(
       _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    backWithETH(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    backersWithdraw(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "backWithETH()"(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    "backersWithdraw()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    beneficiary(overrides?: CallOverrides): Promise<[string]>;
+
+    "beneficiary()"(overrides?: CallOverrides): Promise<[string]>;
+
+    beneficiaryWithdraw(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "beneficiaryWithdraw()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    cToken(overrides?: CallOverrides): Promise<[string]>;
+
+    "cToken()"(overrides?: CallOverrides): Promise<[string]>;
 
     curate(
-      _token: string,
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "curate(address,uint256)"(
-      _token: string,
-      _value: BigNumberish,
+    "curate(uint256)"(
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    curateWithETH(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    curatorFee(overrides?: CallOverrides): Promise<[string]>;
+
+    "curatorFee()"(overrides?: CallOverrides): Promise<[string]>;
+
+    curatorsWithdraw(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "curateWithETH()"(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    "curatorsWithdraw()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    curatorFee(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "curatorFee()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     deadline(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -255,24 +316,6 @@ export class IProject extends Contract {
 
     "funded()"(overrides?: CallOverrides): Promise<[boolean]>;
 
-    getAcceptedTokens(overrides?: CallOverrides): Promise<[string[]]>;
-
-    "getAcceptedTokens()"(overrides?: CallOverrides): Promise<[string[]]>;
-
-    getBToken(_token: string, overrides?: CallOverrides): Promise<[string]>;
-
-    "getBToken(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    getCToken(_token: string, overrides?: CallOverrides): Promise<[string]>;
-
-    "getCToken(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     initialize(
       _metaData: {
         id: BigNumberish;
@@ -281,15 +324,21 @@ export class IProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _acceptedTokens: string[],
-      _nominations: string[],
-      _threshold: BigNumberish,
-      _deadline: BigNumberish,
+      _pData: {
+        threshold: BigNumberish;
+        deadline: BigNumberish;
+        beneficiary: string;
+        acceptedToken: string;
+      },
       _curatorFee: BigNumberish,
+      _protocolFee: BigNumberish,
+      _protocolFeeTo: string,
+      _bToken: string,
+      _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),address[],address[],uint256,uint256,uint256)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -297,11 +346,17 @@ export class IProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _acceptedTokens: string[],
-      _nominations: string[],
-      _threshold: BigNumberish,
-      _deadline: BigNumberish,
+      _pData: {
+        threshold: BigNumberish;
+        deadline: BigNumberish;
+        beneficiary: string;
+        acceptedToken: string;
+      },
       _curatorFee: BigNumberish,
+      _protocolFee: BigNumberish,
+      _protocolFeeTo: string,
+      _bToken: string,
+      _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -309,27 +364,59 @@ export class IProject extends Contract {
 
     "lockedWithdraw()"(overrides?: CallOverrides): Promise<[boolean]>;
 
-    redeemBToken(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    metaData(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [BigNumber, string, string, string, string] & {
+          id: BigNumber;
+          name: string;
+          ipfsHash: string;
+          cwUrl: string;
+          creator: string;
+        }
+      ]
+    >;
+
+    "metaData()"(
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [BigNumber, string, string, string, string] & {
+          id: BigNumber;
+          name: string;
+          ipfsHash: string;
+          cwUrl: string;
+          creator: string;
+        }
+      ]
+    >;
+
+    protocolFee(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "protocolFee()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    protocolFeeTo(overrides?: CallOverrides): Promise<[string]>;
+
+    "protocolFeeTo()"(overrides?: CallOverrides): Promise<[string]>;
+
+    setIpfsHash(
+      _ipfsHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "redeemBToken(address,uint256)"(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    "setIpfsHash(bytes32)"(
+      _ipfsHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    redeemCToken(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    setName(
+      _name: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "redeemCToken(address,uint256)"(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    "setName(bytes32)"(
+      _name: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -337,62 +424,78 @@ export class IProject extends Contract {
 
     "threshold()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    totalCuratorFunding(overrides?: CallOverrides): Promise<[string]>;
+
+    "totalCuratorFunding()"(overrides?: CallOverrides): Promise<[string]>;
+
     totalFunding(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "withdraw()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
 
+  acceptedToken(overrides?: CallOverrides): Promise<string>;
+
+  "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
+
+  bToken(overrides?: CallOverrides): Promise<string>;
+
+  "bToken()"(overrides?: CallOverrides): Promise<string>;
+
   back(
-    _token: string,
     _value: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "back(address,uint256)"(
-    _token: string,
+  "back(uint256)"(
     _value: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  backWithETH(
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  backersWithdraw(
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "backWithETH()"(
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  "backersWithdraw()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  beneficiary(overrides?: CallOverrides): Promise<string>;
+
+  "beneficiary()"(overrides?: CallOverrides): Promise<string>;
+
+  beneficiaryWithdraw(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "beneficiaryWithdraw()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  cToken(overrides?: CallOverrides): Promise<string>;
+
+  "cToken()"(overrides?: CallOverrides): Promise<string>;
 
   curate(
-    _token: string,
-    _value: BigNumberish,
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "curate(address,uint256)"(
-    _token: string,
-    _value: BigNumberish,
+  "curate(uint256)"(
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  curateWithETH(
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  curatorFee(overrides?: CallOverrides): Promise<string>;
+
+  "curatorFee()"(overrides?: CallOverrides): Promise<string>;
+
+  curatorsWithdraw(
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "curateWithETH()"(
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  "curatorsWithdraw()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  curatorFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "curatorFee()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   deadline(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -402,24 +505,6 @@ export class IProject extends Contract {
 
   "funded()"(overrides?: CallOverrides): Promise<boolean>;
 
-  getAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
-
-  "getAcceptedTokens()"(overrides?: CallOverrides): Promise<string[]>;
-
-  getBToken(_token: string, overrides?: CallOverrides): Promise<string>;
-
-  "getBToken(address)"(
-    _token: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  getCToken(_token: string, overrides?: CallOverrides): Promise<string>;
-
-  "getCToken(address)"(
-    _token: string,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   initialize(
     _metaData: {
       id: BigNumberish;
@@ -428,15 +513,21 @@ export class IProject extends Contract {
       cwUrl: BytesLike;
       creator: string;
     },
-    _acceptedTokens: string[],
-    _nominations: string[],
-    _threshold: BigNumberish,
-    _deadline: BigNumberish,
+    _pData: {
+      threshold: BigNumberish;
+      deadline: BigNumberish;
+      beneficiary: string;
+      acceptedToken: string;
+    },
     _curatorFee: BigNumberish,
+    _protocolFee: BigNumberish,
+    _protocolFeeTo: string,
+    _bToken: string,
+    _cToken: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize((uint256,bytes32,bytes32,bytes32,address),address[],address[],uint256,uint256,uint256)"(
+  "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
     _metaData: {
       id: BigNumberish;
       name: BytesLike;
@@ -444,11 +535,17 @@ export class IProject extends Contract {
       cwUrl: BytesLike;
       creator: string;
     },
-    _acceptedTokens: string[],
-    _nominations: string[],
-    _threshold: BigNumberish,
-    _deadline: BigNumberish,
+    _pData: {
+      threshold: BigNumberish;
+      deadline: BigNumberish;
+      beneficiary: string;
+      acceptedToken: string;
+    },
     _curatorFee: BigNumberish,
+    _protocolFee: BigNumberish,
+    _protocolFeeTo: string,
+    _bToken: string,
+    _cToken: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -456,27 +553,55 @@ export class IProject extends Contract {
 
   "lockedWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
 
-  redeemBToken(
-    _token: string,
-    _valueToRemove: BigNumberish,
+  metaData(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, string, string, string, string] & {
+      id: BigNumber;
+      name: string;
+      ipfsHash: string;
+      cwUrl: string;
+      creator: string;
+    }
+  >;
+
+  "metaData()"(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, string, string, string, string] & {
+      id: BigNumber;
+      name: string;
+      ipfsHash: string;
+      cwUrl: string;
+      creator: string;
+    }
+  >;
+
+  protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  protocolFeeTo(overrides?: CallOverrides): Promise<string>;
+
+  "protocolFeeTo()"(overrides?: CallOverrides): Promise<string>;
+
+  setIpfsHash(
+    _ipfsHash: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "redeemBToken(address,uint256)"(
-    _token: string,
-    _valueToRemove: BigNumberish,
+  "setIpfsHash(bytes32)"(
+    _ipfsHash: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  redeemCToken(
-    _token: string,
-    _valueToRemove: BigNumberish,
+  setName(
+    _name: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "redeemCToken(address,uint256)"(
-    _token: string,
-    _valueToRemove: BigNumberish,
+  "setName(bytes32)"(
+    _name: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -484,54 +609,60 @@ export class IProject extends Contract {
 
   "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  totalCuratorFunding(overrides?: CallOverrides): Promise<string>;
+
+  "totalCuratorFunding()"(overrides?: CallOverrides): Promise<string>;
+
   totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
   "totalFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  withdraw(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "withdraw()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
-    back(
-      _token: string,
+    acceptedToken(overrides?: CallOverrides): Promise<string>;
+
+    "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
+
+    bToken(overrides?: CallOverrides): Promise<string>;
+
+    "bToken()"(overrides?: CallOverrides): Promise<string>;
+
+    back(_value: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+
+    "back(uint256)"(
       _value: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "back(address,uint256)"(
-      _token: string,
-      _value: BigNumberish,
+    backersWithdraw(overrides?: CallOverrides): Promise<boolean>;
+
+    "backersWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
+
+    beneficiary(overrides?: CallOverrides): Promise<string>;
+
+    "beneficiary()"(overrides?: CallOverrides): Promise<string>;
+
+    beneficiaryWithdraw(overrides?: CallOverrides): Promise<boolean>;
+
+    "beneficiaryWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
+
+    cToken(overrides?: CallOverrides): Promise<string>;
+
+    "cToken()"(overrides?: CallOverrides): Promise<string>;
+
+    curate(_amount: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+
+    "curate(uint256)"(
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    backWithETH(overrides?: CallOverrides): Promise<boolean>;
+    curatorFee(overrides?: CallOverrides): Promise<string>;
 
-    "backWithETH()"(overrides?: CallOverrides): Promise<boolean>;
+    "curatorFee()"(overrides?: CallOverrides): Promise<string>;
 
-    curate(
-      _token: string,
-      _value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
+    curatorsWithdraw(overrides?: CallOverrides): Promise<boolean>;
 
-    "curate(address,uint256)"(
-      _token: string,
-      _value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    curateWithETH(overrides?: CallOverrides): Promise<boolean>;
-
-    "curateWithETH()"(overrides?: CallOverrides): Promise<boolean>;
-
-    curatorFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "curatorFee()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "curatorsWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
 
     deadline(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -541,24 +672,6 @@ export class IProject extends Contract {
 
     "funded()"(overrides?: CallOverrides): Promise<boolean>;
 
-    getAcceptedTokens(overrides?: CallOverrides): Promise<string[]>;
-
-    "getAcceptedTokens()"(overrides?: CallOverrides): Promise<string[]>;
-
-    getBToken(_token: string, overrides?: CallOverrides): Promise<string>;
-
-    "getBToken(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getCToken(_token: string, overrides?: CallOverrides): Promise<string>;
-
-    "getCToken(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     initialize(
       _metaData: {
         id: BigNumberish;
@@ -567,15 +680,21 @@ export class IProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _acceptedTokens: string[],
-      _nominations: string[],
-      _threshold: BigNumberish,
-      _deadline: BigNumberish,
+      _pData: {
+        threshold: BigNumberish;
+        deadline: BigNumberish;
+        beneficiary: string;
+        acceptedToken: string;
+      },
       _curatorFee: BigNumberish,
+      _protocolFee: BigNumberish,
+      _protocolFeeTo: string,
+      _bToken: string,
+      _cToken: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),address[],address[],uint256,uint256,uint256)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -583,11 +702,17 @@ export class IProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _acceptedTokens: string[],
-      _nominations: string[],
-      _threshold: BigNumberish,
-      _deadline: BigNumberish,
+      _pData: {
+        threshold: BigNumberish;
+        deadline: BigNumberish;
+        beneficiary: string;
+        acceptedToken: string;
+      },
       _curatorFee: BigNumberish,
+      _protocolFee: BigNumberish,
+      _protocolFeeTo: string,
+      _bToken: string,
+      _cToken: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -595,45 +720,67 @@ export class IProject extends Contract {
 
     "lockedWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
 
-    redeemBToken(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    metaData(
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<
+      [BigNumber, string, string, string, string] & {
+        id: BigNumber;
+        name: string;
+        ipfsHash: string;
+        cwUrl: string;
+        creator: string;
+      }
+    >;
 
-    "redeemBToken(address,uint256)"(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    "metaData()"(
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<
+      [BigNumber, string, string, string, string] & {
+        id: BigNumber;
+        name: string;
+        ipfsHash: string;
+        cwUrl: string;
+        creator: string;
+      }
+    >;
 
-    redeemCToken(
-      _token: string,
-      _valueToRemove: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
+    protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "redeemCToken(address,uint256)"(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    protocolFeeTo(overrides?: CallOverrides): Promise<string>;
+
+    "protocolFeeTo()"(overrides?: CallOverrides): Promise<string>;
+
+    setIpfsHash(_ipfsHash: BytesLike, overrides?: CallOverrides): Promise<void>;
+
+    "setIpfsHash(bytes32)"(
+      _ipfsHash: BytesLike,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
+
+    setName(_name: BytesLike, overrides?: CallOverrides): Promise<void>;
+
+    "setName(bytes32)"(
+      _name: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     threshold(overrides?: CallOverrides): Promise<BigNumber>;
 
     "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    totalCuratorFunding(overrides?: CallOverrides): Promise<string>;
+
+    "totalCuratorFunding()"(overrides?: CallOverrides): Promise<string>;
+
     totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    withdraw(overrides?: CallOverrides): Promise<boolean>;
-
-    "withdraw()"(overrides?: CallOverrides): Promise<boolean>;
   };
 
   filters: {
-    Curate(
+    Back(
       sender: null,
       token: null,
       amount: null
@@ -642,7 +789,7 @@ export class IProject extends Contract {
       { sender: string; token: string; amount: BigNumber }
     >;
 
-    Deposit(
+    Curate(
       sender: null,
       token: null,
       amount: null
@@ -653,7 +800,13 @@ export class IProject extends Contract {
 
     Failed(): TypedEventFilter<[], {}>;
 
-    Succeeded(): TypedEventFilter<[], {}>;
+    Succeeded(
+      timestamp: null,
+      amount: null
+    ): TypedEventFilter<
+      [BigNumber, BigNumber],
+      { timestamp: BigNumber; amount: BigNumber }
+    >;
 
     Withdraw(
       sender: null,
@@ -665,49 +818,69 @@ export class IProject extends Contract {
   };
 
   estimateGas: {
+    acceptedToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "acceptedToken()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    bToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "bToken()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     back(
-      _token: string,
       _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "back(address,uint256)"(
-      _token: string,
+    "back(uint256)"(
       _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    backWithETH(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    backersWithdraw(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "backWithETH()"(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    "backersWithdraw()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    beneficiary(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "beneficiary()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    beneficiaryWithdraw(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "beneficiaryWithdraw()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    cToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "cToken()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     curate(
-      _token: string,
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "curate(address,uint256)"(
-      _token: string,
-      _value: BigNumberish,
+    "curate(uint256)"(
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    curateWithETH(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "curateWithETH()"(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     curatorFee(overrides?: CallOverrides): Promise<BigNumber>;
 
     "curatorFee()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    curatorsWithdraw(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "curatorsWithdraw()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     deadline(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -717,24 +890,6 @@ export class IProject extends Contract {
 
     "funded()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getAcceptedTokens(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getAcceptedTokens()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getBToken(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getBToken(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getCToken(_token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    "getCToken(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     initialize(
       _metaData: {
         id: BigNumberish;
@@ -743,15 +898,21 @@ export class IProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _acceptedTokens: string[],
-      _nominations: string[],
-      _threshold: BigNumberish,
-      _deadline: BigNumberish,
+      _pData: {
+        threshold: BigNumberish;
+        deadline: BigNumberish;
+        beneficiary: string;
+        acceptedToken: string;
+      },
       _curatorFee: BigNumberish,
+      _protocolFee: BigNumberish,
+      _protocolFeeTo: string,
+      _bToken: string,
+      _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),address[],address[],uint256,uint256,uint256)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -759,11 +920,17 @@ export class IProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _acceptedTokens: string[],
-      _nominations: string[],
-      _threshold: BigNumberish,
-      _deadline: BigNumberish,
+      _pData: {
+        threshold: BigNumberish;
+        deadline: BigNumberish;
+        beneficiary: string;
+        acceptedToken: string;
+      },
       _curatorFee: BigNumberish,
+      _protocolFee: BigNumberish,
+      _protocolFeeTo: string,
+      _bToken: string,
+      _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -771,27 +938,35 @@ export class IProject extends Contract {
 
     "lockedWithdraw()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    redeemBToken(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    metaData(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "metaData()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    protocolFeeTo(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "protocolFeeTo()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setIpfsHash(
+      _ipfsHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "redeemBToken(address,uint256)"(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    "setIpfsHash(bytes32)"(
+      _ipfsHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    redeemCToken(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    setName(
+      _name: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "redeemCToken(address,uint256)"(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    "setName(bytes32)"(
+      _name: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -799,63 +974,79 @@ export class IProject extends Contract {
 
     "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    totalCuratorFunding(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "totalCuratorFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "withdraw()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    acceptedToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "acceptedToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    bToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "bToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     back(
-      _token: string,
       _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "back(address,uint256)"(
-      _token: string,
+    "back(uint256)"(
       _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    backWithETH(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    backersWithdraw(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "backWithETH()"(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    "backersWithdraw()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    beneficiary(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "beneficiary()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    beneficiaryWithdraw(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "beneficiaryWithdraw()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    cToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "cToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     curate(
-      _token: string,
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "curate(address,uint256)"(
-      _token: string,
-      _value: BigNumberish,
+    "curate(uint256)"(
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    curateWithETH(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "curateWithETH()"(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     curatorFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "curatorFee()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    curatorsWithdraw(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "curatorsWithdraw()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     deadline(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -865,32 +1056,6 @@ export class IProject extends Contract {
 
     "funded()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getAcceptedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "getAcceptedTokens()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getBToken(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getBToken(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getCToken(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "getCToken(address)"(
-      _token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     initialize(
       _metaData: {
         id: BigNumberish;
@@ -899,15 +1064,21 @@ export class IProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _acceptedTokens: string[],
-      _nominations: string[],
-      _threshold: BigNumberish,
-      _deadline: BigNumberish,
+      _pData: {
+        threshold: BigNumberish;
+        deadline: BigNumberish;
+        beneficiary: string;
+        acceptedToken: string;
+      },
       _curatorFee: BigNumberish,
+      _protocolFee: BigNumberish,
+      _protocolFeeTo: string,
+      _bToken: string,
+      _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),address[],address[],uint256,uint256,uint256)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -915,11 +1086,17 @@ export class IProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _acceptedTokens: string[],
-      _nominations: string[],
-      _threshold: BigNumberish,
-      _deadline: BigNumberish,
+      _pData: {
+        threshold: BigNumberish;
+        deadline: BigNumberish;
+        beneficiary: string;
+        acceptedToken: string;
+      },
       _curatorFee: BigNumberish,
+      _protocolFee: BigNumberish,
+      _protocolFeeTo: string,
+      _bToken: string,
+      _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -929,27 +1106,35 @@ export class IProject extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    redeemBToken(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    metaData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "metaData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    protocolFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "protocolFee()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    protocolFeeTo(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "protocolFeeTo()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    setIpfsHash(
+      _ipfsHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "redeemBToken(address,uint256)"(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    "setIpfsHash(bytes32)"(
+      _ipfsHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    redeemCToken(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    setName(
+      _name: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "redeemCToken(address,uint256)"(
-      _token: string,
-      _valueToRemove: BigNumberish,
+    "setName(bytes32)"(
+      _name: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -957,16 +1142,16 @@ export class IProject extends Contract {
 
     "threshold()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    totalCuratorFunding(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "totalCuratorFunding()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     totalFunding(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "withdraw()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
   };
 }

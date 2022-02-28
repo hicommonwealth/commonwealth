@@ -17,8 +17,8 @@ interface ProjectCardAttrs {
   size: ProjectCardSize;
 }
 
-interface ProjectCardState {
-}
+// interface ProjectCardState {
+// }
 
 const DummyChainIcon: m.Component<{ chain, onclick, size: number }> = {
   view: (vnode) => {
@@ -91,11 +91,12 @@ const ProjectCard: m.Component<
 > = {
   view: (vnode) => {
     const { project, size } = vnode.attrs;
-    const onclick = () => {
-      console.log(`/${app.activeChainId()}/project/${project.id}-${slugify(project.title)}`);
-      m.route.set(`/${app.activeChainId()}/project/${project.id}-${slugify(project.title)}`);
-    }
+
     const projectStatus = project.raised.inTokens > project.threshold.inTokens ? 'succeeded' : 'failed';
+
+    const onclick = () => {
+      m.route.set(`/${project.chain}/project/${project.id}-${slugify(project.title)}`);
+    }
 
     const ProjectCardLarge = m('.ProjectCard',
       { class: 'large', onclick },
