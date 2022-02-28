@@ -70,7 +70,7 @@ export class StarterCommunityForm implements m.ClassComponent {
         <CWButton
           label="Save changes"
           buttonType="primary"
-          disabled={this.state.saving}
+          disabled={this.state.saving || this.state.form.id.length < 1}
           onclick={async () => {
             this.state.saving = true;
             const additionalArgs: {
