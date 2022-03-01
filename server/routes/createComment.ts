@@ -5,7 +5,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { ChainType, NotificationCategories, ProposalType } from '../../shared/types';
 import { DB } from '../database';
 
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
@@ -37,7 +37,7 @@ const createComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));

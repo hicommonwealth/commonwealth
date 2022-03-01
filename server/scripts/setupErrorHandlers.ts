@@ -1,4 +1,5 @@
 import Rollbar from 'rollbar';
+import { Request, Response, Express } from 'express';
 import { ROLLBAR_SERVER_TOKEN } from '../config';
 import { ServerError, AppError } from '../util/errors';
 
@@ -6,7 +7,7 @@ import { ServerError, AppError } from '../util/errors';
 // 401 Unauthorized errors are handled by Express' middleware and returned
 // before this handler. Errors that hit the final condition should be either
 // (1) thrown as ServerErrors or AppErrors or (2) triaged as a critical bug.
-const setupErrorHandlers = (app) => {
+const setupErrorHandlers = (app: Express) => {
   // Rollbar notifications
   const rollbar = new Rollbar({
     accessToken: ROLLBAR_SERVER_TOKEN,
@@ -17,7 +18,7 @@ const setupErrorHandlers = (app) => {
   app.use(rollbar.errorHandler());
 
   // Handle 404 errors
-  app.use((req, res, next) => {
+  app.use((req: Request, res: Response, next) => {
     res.status(404);
     res.json({
       status: 404,
@@ -26,7 +27,7 @@ const setupErrorHandlers = (app) => {
   });
 
   // Handle our ServerErrors (500), AppErrors (400), or unknown errors.
-  app.use((error, req, res, next) => {
+  app.use((error, req, res: Response, next) => {
     if (error instanceof ServerError) {
       rollbar.error(error); // expected server error
       res.status(error.status).send({

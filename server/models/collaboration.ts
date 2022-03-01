@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { OffchainThreadInstance, OffchainThreadAttributes } from './offchain_thread';
 
-export interface CollaborationAttributes {
+export type CollaborationAttributes = {
   address_id: number;
   offchain_thread_id: number;
   created_at?: Date;
@@ -14,8 +14,7 @@ export interface CollaborationAttributes {
   OffchainThread: OffchainThreadAttributes;
 }
 
-export interface CollaborationInstance
-extends Model<CollaborationAttributes>, CollaborationAttributes {
+export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {
   // no mixins used yet
   getAddress: Sequelize.BelongsToGetAssociationMixin<AddressInstance>;
   setAddress: Sequelize.BelongsToSetAssociationMixin<AddressInstance, AddressInstance['id']>;
@@ -23,7 +22,7 @@ extends Model<CollaborationAttributes>, CollaborationAttributes {
   setOffchainThread: Sequelize.BelongsToSetAssociationMixin<OffchainThreadInstance, OffchainThreadInstance['id']>;
 }
 
-export type CollaborationModelStatic = ModelStatic<CollaborationInstance>
+export type CollaborationModelStatic = ModelStatic<CollaborationInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

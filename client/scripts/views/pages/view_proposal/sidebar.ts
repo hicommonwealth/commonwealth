@@ -165,9 +165,7 @@ export const ProposalLinkedThreadsEditorModule: m.Component<{
         !!vnode.state.linkedThreads?.length &&
         m('.linked-threads-title', 'Linked Threads:'),
         m(List, vnode.state.linkedThreads.map((thread) => {
-            const discussionLink =
-            `/${app.activeChainId()}/proposal/${thread.slug}/${thread.identifier}-` +
-            `${slugify(thread.title)}`;
+            const discussionLink = getProposalUrlPath(thread.slug, `${thread.identifier}-${slugify(thread.title)}`);
             return m(ListItem, {
               label: link(
                 'a.linked-thread',

@@ -17,6 +17,8 @@ import {
   Tag,
 } from 'construct-ui';
 import app from 'state';
+import { getProposalUrlPath } from 'identifiers';
+import { ProposalType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
@@ -120,7 +122,9 @@ export const getDiscussionPreview = (
       notifyError('Discussion not found.');
       return;
     }
-    m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
+
+    const path = getProposalUrlPath(ProposalType.OffchainThread, proposalId, false, chainOrComm);
+    m.route.set(path);
     closeResultsFn();
   };
   return m(ListItem, {
@@ -186,11 +190,10 @@ export const getCommentPreview = (
       notifyError('Discussion not found.');
       return;
     }
-    m.route.set(
-      `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${
-        proposalId.split('_')[1]
-      }`
-    );
+
+    const [slug, id] = proposalId.split('_');
+    const path = getProposalUrlPath(slug, id, false, chainOrComm);
+    m.route.set(path);
     closeResultsFn();
   };
   return m(ListItem, {

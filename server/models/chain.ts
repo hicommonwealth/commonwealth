@@ -11,10 +11,10 @@ import {
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 
-export interface ChainAttributes {
+export type ChainAttributes = {
   name: string;
   symbol: string;
   network: ChainNetwork;
@@ -62,7 +62,7 @@ export interface ChainAttributes {
   ChainObjectVersion?; // TODO
 }
 
-export interface ChainInstance extends Model<ChainAttributes>, ChainAttributes {
+export type ChainInstance = ModelInstance<ChainAttributes> & {
   // add mixins as needed
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<
