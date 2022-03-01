@@ -40,9 +40,3 @@ stats.json
 
 # Test account artefacts
 test_accounts.txt
-
-node_modules
-
-#Hardhat files
-cache
-artifacts

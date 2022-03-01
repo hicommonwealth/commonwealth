@@ -112,7 +112,6 @@
     "@types/moment": "^2.13.0",
     "@types/passport": "^1.0.5",
     "@types/passport-jwt": "^3.0.3",
-    "@types/quill": "^2.0.9",
     "@types/underscore": "^1.9.4",
     "@types/websocket": "^1.0.0",
     "@types/ws": "^7.2.4",
