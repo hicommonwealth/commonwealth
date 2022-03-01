@@ -7,10 +7,10 @@ class Notification {
   public readonly id: number;
   public readonly data: string;
   public readonly createdAt: moment.Moment;
-  public readonly subscription: NotificationSubscription;
+  public readonly subscription?: NotificationSubscription;
   public readonly chainEvent?: ChainEvent;
+  private _isRead?: boolean;
 
-  private _isRead: boolean;
   public get isRead(): boolean {
     return this._isRead;
   }

@@ -1,21 +1,19 @@
 // Use https://admin.socket.io/#/ to monitor
-import { DB } from '../database';
-// TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 
+// TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 import { Server, Socket } from 'socket.io';
 import { instrument } from '@socket.io/admin-ui';
 import { BrokerConfig } from 'rascal';
 import * as jwt from 'jsonwebtoken';
 import { ExtendedError } from 'socket.io/dist/namespace';
-import { createAdapter } from '@socket.io/postgres-adapter';
-import { Pool } from 'pg';
-import * as http from "http";
+import * as http from 'http';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { createClient } from 'redis';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import { DATABASE_URI, JWT_SECRET } from '../config';
+import { JWT_SECRET, REDIS_URL } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
-import {createChatNamespace} from "./chatNs";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -41,7 +39,7 @@ export const authenticate = (
   }
 };
 
-export function setupWebSocketServer(httpServer: http.Server, models: DB) {
+export function setupWebSocketServer(httpServer: http.Server) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
   const io = new Server(httpServer, {
@@ -69,20 +67,9 @@ export function setupWebSocketServer(httpServer: http.Server, models: DB) {
     log.error('A WebSocket connection error has occurred', err);
   });
 
-  // create the chain-events namespace
-  const ceNamespace = createCeNamespace(io);
-  const chatNamespace = createChatNamespace(io, models);
-
   // enables the admin analytics dashboard (creates /admin namespace)
   instrument(io, {
     auth: false,
-  });
-
-  const pool = new Pool({
-    connectionString: DATABASE_URI,
-    ssl: {
-      rejectUnauthorized: false,
-    },
   });
   pool
     .query(
@@ -105,24 +92,36 @@ export function setupWebSocketServer(httpServer: http.Server, models: DB) {
       );
     });
 
-  io.adapter(<any>createAdapter(pool));
+  log.info(`Connecting to Redis at: ${REDIS_URL}`);
+  const pubClient = createClient({ url: REDIS_URL });
 
-  try {
-    const rabbitController = new RabbitMQController(
-      <BrokerConfig>RabbitMQConfig
-    );
-    rabbitController.init().then(() => {
-      return rabbitController.startSubscription(
-        publishToCERoom.bind(ceNamespace),
-        'ChainEventsNotificationsSubscription'
-      );
+  const subClient = pubClient.duplicate();
+
+  Promise.all([pubClient.connect(), subClient.connect()])
+    .then(() => {
+      io.adapter(<any>createAdapter(pubClient, subClient));
+    })
+    .then(() => {
+      // create the chain-events namespace
+      const ceNamespace = createCeNamespace(io);
+
+      try {
+        const rabbitController = new RabbitMQController(
+          <BrokerConfig>RabbitMQConfig
+        );
+        rabbitController.init().then(() => {
+          return rabbitController.startSubscription(
+            publishToCERoom.bind(ceNamespace),
+            'ChainEventsNotificationsSubscription'
+          );
+        });
+      } catch (e) {
+        log.warn(
+          `Failure connecting to ${
+            `${process.env.NODE_ENV} ` || ''
+          }RabbitMQ server. Please fix the RabbitMQ server configuration`
+        );
+        log.error(e);
+      }
     });
-  } catch (e) {
-    log.warn(
-      `Failure connecting to ${
-        `${process.env.NODE_ENV} ` || ''
-      }RabbitMQ server. Please fix the RabbitMQ server configuration`
-    );
-    log.error(e);
-  }
 }

@@ -13,9 +13,9 @@ export class WebSocketController {
       transports: ['websocket'],
       query: { token: jwt },
     });
-    this._socket.on('connect', this.onConnect.bind(this));
-    this._socket.on('connect_error', this.onConnectError.bind(this));
-    this._socket.on('disconnect', this.onDisconnect.bind(this));
+    this._socket.on('connect', this.onconnect.bind(this));
+    this._socket.on('connect_error', this.onconnect_error.bind(this));
+    this._socket.on('disconnect', this.ondisconnect.bind(this));
 
     // add all custom namespaces i.e. chain-event notifications, chat, thread notifications
     this.chainEventsNs = new ChainEventsNamespace();
@@ -30,17 +30,17 @@ export class WebSocketController {
     this._socket.removeListener(eventName, listener);
   }
 
-  private onConnectError(err) {
+  private onconnect_error(err) {
     // TODO: https://socket.io/docs/v4/client-socket-instance/#connect_error
     console.error('An error occurred connecting to the WebSocket server', err);
   }
 
-  private onConnect() {
+  private onconnect() {
     this._isConnected = true;
     console.log('Websocket connected! ID:', this._socket.id);
   }
 
-  private onDisconnect(reason) {
+  private ondisconnect(reason) {
     this._isConnected = false;
     switch (reason) {
       case 'io server disconnect':

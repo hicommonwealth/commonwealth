@@ -315,7 +315,7 @@ async function main() {
       process.exit(exitCode);
     }
   }
-  setupServer(app, models);
+  setupServer(app);
 }
 
 main();

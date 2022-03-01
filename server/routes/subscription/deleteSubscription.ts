@@ -1,11 +1,6 @@
-import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
 import { NotificationCategories } from '../../../shared/types';
-import { factory, formatFilename } from '../../../shared/logging';
-
-const Op = Sequelize.Op;
-const log = factory.getLogger(formatFilename(__filename));
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {

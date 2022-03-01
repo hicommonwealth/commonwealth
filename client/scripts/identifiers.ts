@@ -12,7 +12,7 @@ export const pathIsDiscussion = (scope: string | null, path: string): boolean =>
 
 // returns a URL path to a proposal based on its type and id, taking into account
 // custom domain prefixes as well.
-export const getProposalUrlPath = (type: ProposalType, id: string, omitActiveId = false): string => {
+export const getProposalUrlPath = (type: ProposalType, id: string, omitActiveId = false, chainId?: string): string => {
   let basePath: string;
   const useTypeSlug = requiresTypeSlug(type);
   if (type === ProposalType.OffchainThread) {
@@ -22,10 +22,10 @@ export const getProposalUrlPath = (type: ProposalType, id: string, omitActiveId 
   } else {
     basePath = `/proposal/${id}`;
   }
-  if (!app.isCustomDomain() && !omitActiveId) {
-    return `/${app.activeChainId()}${basePath}`;
-  } else {
+  if (omitActiveId || (app.isCustomDomain() && !chainId)) {
     return basePath;
+  } else {
+    return `/${chainId || app.activeChainId()}${basePath}`;
   }
 }
 

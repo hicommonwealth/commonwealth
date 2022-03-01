@@ -22,7 +22,14 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
   if (!req.user.isAdmin && req.body?.base !== ChainBase.NEAR) {
     return next(new Error(Errors.MustBeAdmin));
   }
-  if (!req.body.id || !req.body.name || !req.body.symbol || !req.body.network || !req.body.node_url || !req.body.base) {
+  if (
+    !req.body.id?.trim()
+    || !req.body.name?.trim()
+    || !req.body.symbol?.trim()
+    || !req.body.network?.trim()
+    || !req.body.node_url?.trim()
+    || !req.body.base?.trim()
+  ) {
     return next(new Error(Errors.MissingParams));
   }
 

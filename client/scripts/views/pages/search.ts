@@ -8,7 +8,10 @@ import { ListItem, Select, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 import { pluralize } from 'helpers';
 import app from 'state';
 import { AddressInfo, Profile, SearchQuery } from 'models';
-import { SearchScope, SearchSort } from 'models/SearchQuery';
+import { getProposalUrlPath } from 'identifiers';
+import { ProposalType } from 'types';
+
+import { SearchScope, SearchSort } from 'models/SearchQuery'
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -98,7 +101,8 @@ export const getDiscussionResult = (thread, searchTerm) => {
       iconName: 'feedback',
     }),
     onclick: () => {
-      m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
+      const path = getProposalUrlPath(ProposalType.OffchainThread, proposalId, false, chainOrComm);
+      m.route.set(path);
     },
     label: m('a.search-results-item', [
       m('.search-results-thread-header disabled', [
@@ -154,11 +158,9 @@ export const getCommentResult = (comment, searchTerm) => {
       iconName: 'feedback',
     }),
     onclick: (e) => {
-      m.route.set(
-        `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${
-          proposalId.split('_')[1]
-        }`
-      );
+      const [slug, id] = proposalId.split('_');
+      const path = getProposalUrlPath(slug, id, false, chainOrComm);
+      m.route.set(path);
     },
     label: m('a.search-results-item', [
       m('.search-results-thread-header disabled', [
