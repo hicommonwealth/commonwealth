@@ -5,19 +5,21 @@
 import m from 'mithril';
 import 'components/component_kit/cw_icon.scss';
 
-import { IconStyleAttrs } from './cw_icon';
+import { IconAttrs } from './cw_icon';
 import { getIconClasses } from '../helpers';
 
-export const CWViews: m.Component<IconStyleAttrs> = {
+export const CWViews: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="20"
         height="15"
         fill="none"
         viewBox="0 0 20 15"
+        onclick={onclick}
       >
         <path
           stroke-linecap="round"
@@ -38,16 +40,18 @@ export const CWViews: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWCreate: m.Component<IconStyleAttrs> = {
+export const CWCreate: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="21"
         height="21"
         fill="none"
         viewBox="0 0 21 21"
+        onclick={onclick}
       >
         <path
           stroke-linecap="round"
@@ -59,16 +63,18 @@ export const CWCreate: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWExternalLink: m.Component<IconStyleAttrs> = {
+export const CWExternalLink: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="16"
         height="16"
         fill="none"
         viewBox="0 0 16 16"
+        onclick={onclick}
       >
         <path
           stroke-miterlimit="16"
@@ -80,16 +86,18 @@ export const CWExternalLink: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWFeedback: m.Component<IconStyleAttrs> = {
+export const CWFeedback: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="19"
         height="20"
         fill="none"
         viewBox="0 0 19 20"
+        onclick={onclick}
       >
         <path
           stroke-linecap="round"
@@ -102,16 +110,18 @@ export const CWFeedback: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWAccount: m.Component<IconStyleAttrs> = {
+export const CWAccount: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="21"
         height="22"
         fill="none"
         viewBox="0 0 21 22"
+        onclick={onclick}
       >
         <path
           stroke-linecap="round"
@@ -129,16 +139,18 @@ export const CWAccount: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWSearch: m.Component<IconStyleAttrs> = {
+export const CWSearch: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="28"
         height="28"
         fill="none"
         viewBox="0 0 28 28"
+        onclick={onclick}
       >
         <path
           stroke-linecap="round"
@@ -151,16 +163,18 @@ export const CWSearch: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWDiscord: m.Component<IconStyleAttrs> = {
+export const CWDiscord: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="29"
         height="28"
         fill="none"
         viewBox="0 0 29 28"
+        onclick={onclick}
       >
         <g clip-path="url(#clip0_729_15084)">
           <path d="M25.556 5.908s-3.093-2.42-6.743-2.697l-.33.659c3.3.808 4.815 1.964 6.398 3.387-2.728-1.393-5.421-2.698-10.114-2.698-4.694 0-7.386 1.305-10.115 2.698C6.235 5.834 8.037 4.549 11.05 3.87l-.33-.66c-3.83.362-6.742 2.698-6.742 2.698S.524 10.916-.068 20.743c3.48 4.014 8.766 4.046 8.766 4.046l1.106-1.473c-1.878-.652-3.995-1.817-5.826-3.921 2.183 1.652 5.478 3.371 10.789 3.371 5.31 0 8.605-1.72 10.789-3.371-1.83 2.104-3.948 3.269-5.826 3.921l1.106 1.473s5.286-.032 8.766-4.046c-.593-9.827-4.046-14.835-4.046-14.835zM10.384 18.046c-1.305 0-2.36-1.207-2.36-2.697s1.056-2.698 2.36-2.698c1.304 0 2.36 1.207 2.36 2.698 0 1.49-1.056 2.697-2.36 2.697zm8.766 0c-1.304 0-2.36-1.207-2.36-2.697s1.056-2.698 2.36-2.698c1.304 0 2.36 1.207 2.36 2.698 0 1.49-1.056 2.697-2.36 2.697z"></path>
@@ -175,16 +189,18 @@ export const CWDiscord: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWElement: m.Component<IconStyleAttrs> = {
+export const CWElement: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="29"
         height="28"
         fill="none"
         viewBox="0 0 29 28"
+        onclick={onclick}
       >
         <g
           fill-rule="evenodd"
@@ -203,16 +219,18 @@ export const CWElement: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWTelegram: m.Component<IconStyleAttrs> = {
+export const CWTelegram: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="29"
         height="28"
         fill="none"
         viewBox="0 0 29 28"
+        onclick={onclick}
       >
         <path
           fill-rule="evenodd"
@@ -224,16 +242,18 @@ export const CWTelegram: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWWebsite: m.Component<IconStyleAttrs> = {
+export const CWWebsite: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="30"
         height="30"
         fill="none"
         viewBox="0 0 30 30"
+        onclick={onclick}
       >
         <circle cx="15" cy="15" r="14" stroke-width="1.5"></circle>
         <ellipse cx="15" cy="15" stroke-width="1.5" rx="9" ry="14"></ellipse>
@@ -244,16 +264,18 @@ export const CWWebsite: m.Component<IconStyleAttrs> = {
   },
 };
 
-export const CWGithub: m.Component<IconStyleAttrs> = {
+export const CWGithub: m.Component<IconAttrs> = {
   view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses(vnode.attrs)}
+        class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="33"
         height="32"
         fill="none"
         viewBox="0 0 33 32"
+        onclick={onclick}
       >
         <g clipPath="url(#clip0_796_10037)">
           <path

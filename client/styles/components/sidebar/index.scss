@@ -1,294 +1,21 @@
 @import 'client/styles/shared';
 
-@mixin sidebar {
-  .OffchainNavigationModule {
-    button {
-      height: 100%;
-    }
-
-    button > span {
-      white-space: normal;
-      text-align: left;
-    }
-  }
-
-  .cui-button.cui-active {
-    background: linear-gradient(
-      268.91deg,
-      #91bfff -61.91%,
-      #91ffa0 2.69%,
-      #fbff91 60.22%,
-      #ff9191 131.89%
-    );
-
-    border: 1px solid transparent;
-  }
-
-  .cui-button.sub-button {
-    margin-left: 18px;
-    width: calc(100% - 18px);
-  }
-
-  .cui-button.cui-align-center {
-    justify-content: left;
-  }
-
-  .ExternalLinksModule {
-    margin-top: 10px;
-  }
-
-  .cui-button.website-button,
-  .cui-button.github-button,
-  .cui-button.telegram-button,
-  .cui-button.element-button,
-  .cui-button.discord-button {
-    margin-right: 8px;
-    padding: 0 10px;
-
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-
-  .cui-button.telegram-button {
-    border-color: tint(#2480cc, 70%);
-    color: #2480cc;
-
-    &:hover {
-      border-color: transparent;
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
-    }
-
-    svg {
-      left: -1px;
-      position: relative;
-      top: -3px;
-
-      path {
-        stroke: currentColor;
-      }
-    }
-  }
-  .cui-button.element-button {
-    border-color: tint(#0cbd8b, 70%);
-    color: #0cbd8b;
-
-    &:hover {
-      border-color: transparent;
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
-    }
-
-    svg {
-      position: relative;
-      top: -4px;
-
-      path {
-        stroke: currentColor;
-      }
-    }
-  }
-
-  .cui-button.discord-button {
-    border-color: tint(#677bc4, 70%);
-    color: #677bc4;
-
-    &:hover {
-      border-color: transparent;
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
-    }
-
-    svg {
-      position: relative;
-      top: -4px;
-
-      path {
-        fill: currentColor;
-      }
-    }
-  }
-
-  .cui-button.website-button,
-  .cui-button.github-button {
-    border-color: tint(#222222, 70%);
-    color: #222222;
-
-    &:hover {
-      border-color: transparent;
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
-    }
-
-    svg {
-      fill: currentColor;
-      position: relative;
-      top: -3px;
-    }
-  }
-
-  .SubscriptionButton {
-    margin-bottom: 10px;
-  }
-
-  .ChainStatusModule {
-    .chain-deferred {
-      color: $text-color-medium;
-    }
-
-    // form stuff
-    .form-group {
-      margin-bottom: 0;
-
-      select {
-        width: 100%;
-        border-color: $border-color-lightest;
-        border-radius: 2px;
-        padding: 5px 6px;
-      }
-
-      .chain-status-main {
-        width: calc(100% - 28px);
-      }
-    }
-
-    .cui-button-label {
-      text-align: left;
-      width: 100%;
-    }
-
-    .cui-icon svg {
-      min-width: 12px;
-      min-height: 12px;
-      width: 12px;
-      height: 12px;
-    }
-  }
-}
-
-.SidebarQuickSwitcher {
-  border-right: 1px solid $disable-grey;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: $quick-switcher-width;
-  z-index: 11;
-
-  @include sm-max {
-    display: none;
-  }
-
-  .community-nav-bar {
-    padding: 0 14px;
-  }
-
-  .scrollable-community-bar {
-    overflow-y: auto;
-    padding: 0 14px;
-  }
-
-  .scrollable-community-bar::-webkit-scrollbar {
-    background: transparent;
-    width: 0;
-  }
-
-  .sidebar-home-link.cui-button {
-    height: 38px;
-    margin: 15px 0 14px;
-    padding: 0;
-    width: 38px;
-
-    .cui-icon {
-      position: relative;
-      top: -2px;
-    }
-  }
-
-  .CommunitySelector {
-    margin: 0 0 14px;
-  }
-
-  .create-community {
-    height: 38px;
-    margin: 0 0 14px;
-    padding: 0;
-    width: 38px;
-
-    .cui-icon {
-      position: relative;
-      top: -2px;
-    }
-  }
-
-  .SidebarQuickSwitcherItem {
-    border-radius: 9999px;
-    border: 1px solid transparent;
-    height: 38px;
-    margin-bottom: 14px;
-    width: 38px;
-
-    &:hover {
-      border-color: #111;
-    }
-  }
-
-  > .SidebarQuickSwitcherItem .ChainIcon,
-  > .SidebarQuickSwitcherItem .CommunityIcon {
-    cursor: pointer;
-    opacity: 0.33;
-  }
-
-  .cui-overlay-inline {
-    display: block;
-  }
-
-  .quick-switcher-option.active {
-    .ChainIcon,
-    .CommunityIcon {
-      opacity: 1;
-    }
-  }
-}
-
-.SidebarQuickSwitcherItemTooltip.cui-popover {
-  .cui-popover-content {
-    padding: 11px 16px 4px;
-    white-space: nowrap;
-  }
-}
-
 .Sidebar {
-  max-height: 100%;
-  position: fixed;
-  top: $layout-padding + 47;
-  left: $quick-switcher-width;
-  z-index: 2;
-  padding-bottom: 36px;
-  min-width: $sidebar-width;
-  max-width: $sidebar-width;
-  min-height: 100vh;
+  -ms-overflow-style: none; /* IE and Edge */
   background-color: $layout-color;
   border-right-color: $disable-grey;
   border-right-width: 1px;
+  left: $quick-switcher-width;
+  max-height: 100%;
+  max-width: $sidebar-width;
+  min-height: 100vh;
+  min-width: $sidebar-width;
   overflow-y: scroll;
-  -ms-overflow-style: none; /* IE and Edge */
+  padding-bottom: 36px;
+  position: fixed;
   scrollbar-width: none; /* Firefox */
+  top: $layout-padding + 47;
+  z-index: 2;
 
   &::-webkit-scrollbar {
     /* Chrome */
@@ -299,91 +26,6 @@
     left: 0;
   }
 
-  .sidebar-content {
-    max-height: calc(100vh - 60px);
-    overflow-y: auto;
-    padding-bottom: 60px;
-    padding-top: 16px;
-  }
-
-  @include sm-max {
-    max-height: calc(100vh - 60px); // $mobile-header-height
-    overflow-y: scroll;
-    padding-top: 30px;
-
-    .SidebarHeader {
-      display: none;
-    }
-  }
-
-  .sidebar-fadeout {
-    bottom: 0;
-    display: none; // TODO
-    height: 80px;
-    pointer-events: none;
-    position: absolute;
-    width: 100%;
-    z-index: 4;
-
-    background: -webkit-linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-    background-image: -moz-linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-    background-image: -o-linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-    background-image: linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-    background-image: -ms-linear-gradient(
-      rgba(255, 255, 255, 0) 0%,
-      $background-color-light 100%
-    );
-  }
-
-  .SidebarHeader {
-    border-bottom: 1px solid $border-color-lightest;
-
-    .cui-button {
-      background: none !important;
-      height: initial;
-      padding: 0;
-      width: 100%;
-
-      > .cui-button-label {
-        display: flex;
-        padding: 0 19px;
-        width: 100%;
-
-        > .CommunityLabel {
-          padding: 20px 0 18px;
-          max-width: calc(100% - 18px);
-        }
-
-        > .CommunityLabel.CommunityLabelPlaceholder {
-          font-weight: 500;
-          padding-left: 5px;
-          padding: 22px 0;
-        }
-
-        .cui-icon {
-          margin-left: 6px;
-          margin-top: 25px;
-        }
-      }
-    }
-  }
-
-  .sidebar-spacer {
-    margin-bottom: 22px;
-  }
-
   .section-header {
     color: $text-color-light;
     font-size: 18px;
@@ -391,211 +33,20 @@
     margin-top: 20px;
   }
 
-  .cui-button {
-    margin-bottom: 4px;
-  }
+  .buttons-container {
+    margin: 24px 0;
 
-  .cui-button.cui-rounded:active,
-  .cui-button.cui-rounded.cui-active,
-  .cui-button.cui-rounded:hover {
-    background: linear-gradient(to left, #91ffa0, #fbff91, #ff9191);
-    border-color: white;
-
-    // @TODO: Remove this and figure out a better solution
-    background: #6966ff;
-    color: white;
-  }
-
-  .ExternalLinksModule {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
-  .cui-button.website-button,
-  .cui-button.github-button,
-  .cui-button.telegram-button,
-  .cui-button.element-button,
-  .cui-button.discord-button {
-    margin-right: 8px;
-    padding: 0 10px;
-
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-  .cui-button.telegram-button {
-    border-color: tint(#2480cc, 70%);
-    color: #2480cc;
-
-    svg {
-      color: #2480cc;
-      fill: currentColor;
-      left: -1px;
-      position: relative;
-      top: -3px;
-    }
-
-    &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-        fill: currentColor;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
+    .subscription-button {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
     }
   }
 
-  .cui-button.element-button {
-    border-color: tint(#0cbd8b, 70%);
-    color: #0cbd8b;
-
-    svg {
-      color: #0cbd8b;
-      fill: currentColor;
-      position: relative;
-      top: -4px;
-    }
-
-    &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-        fill: currentColor;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
-    }
-  }
-
-  .cui-button.discord-button {
-    border-color: tint(#677bc4, 70%);
-    color: #677bc4;
-
-    svg {
-      color: #677bc4;
-      fill: currentColor;
-      position: relative;
-      top: -4px;
-    }
-
-    &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-        fill: currentColor;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
-    }
-  }
-
-  .cui-button.website-button {
-    border-color: tint(#222222, 70%);
-    color: #222222;
-
-    svg {
-      color: #222222;
-      position: relative;
-      top: -4px;
-    }
-
-    &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
-    }
-  }
-
-  .cui-button.github-button {
-    border-color: tint(#222222, 70%);
-    color: #222222;
-
-    svg {
-      color: #222222;
-      fill: currentColor;
-      position: relative;
-      top: -4px;
-    }
-
-    &:hover {
-      border-color: transparent;
-
-      svg {
-        color: white;
-      }
-    }
-
-    .cui-button-label {
-      flex: 1;
-      text-align: left;
-    }
-  }
-
-  .subscription-button {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 15px;
-  }
-
-  .spacer {
-    height: 100px;
-  }
-
-  .ChainStatusModule {
-    .chain-deferred {
-      color: $text-color-medium;
-    }
-
-    display: flex;
-    justify-content: center;
-
-    // form stuff
-    .form-group {
-      margin-bottom: 0;
-
-      select {
-        border-color: $border-color-lightest;
-        border-radius: 2px;
-        padding: 5px 6px;
-        width: 100%;
-      }
-
-      .chain-status-main {
-        width: calc(100% - 28px);
-      }
-    }
-
-    .cui-button-label {
-      text-align: left;
-      width: 100%;
-    }
-
-    .cui-icon svg {
-      height: 12px;
-      min-height: 12px;
-      min-width: 12px;
-      width: 12px;
-    }
+  @include sm-max {
+    max-height: calc(100vh - 60px); // $mobile-header-height
+    overflow-y: scroll;
+    padding-top: 30px;
   }
 }
 
@@ -617,231 +68,58 @@
   background-image: url('/static/img/powered-by-2.svg');
 }
 
-/* .Sidebar {
-    @include sidebar();
-} */
-
 .cui-popover.community-options-popover .cui-menu,
 .cui-popover.community-options-popover .cui-menu {
   padding: 4px 0;
 }
 
-.SidebarSection {
-  border-bottom-color: $disable-grey;
-  border-bottom-width: 1px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  user-select: none;
-
-  .SidebarTitle {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    margin-left: 20px;
-    .title-text {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 1px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .toggle-icon {
-      margin-right: 10px;
-      margin-top: -6px;
-    }
-    .right_icon {
-      .cui-icon-plus-circle {
-          margin-top: -10px;
-          opacity: 90%;
-      }        
-  }
-  }
-}
-
-.SectionGroup {
-    font-weight: 400;
-    font-size: 17px;
-    padding-left: 0px;
-    
-    .SectionGroupTitle {
-        padding-left: 5px;
-        padding-top: 3px;
-        padding-bottom: 3px;
-        height: 30px;
-        display: flex; 
-        align-items: center;
-
-        [class^="section-title-text"] {
-            margin-left: 3px;
-            margin-right: 10px;
-            padding-top: 5px;
-            display: inline-block;
-        }
-
-        .section-title-text-active {
-            font-weight: 500;
-            color: #3A0095;
-        }
-        .section-title-text-stale {
-            color: #999999;
-        }
-        .no-carat {
-            width: 22px;
-        }
-        .carat {
-            display: inline-block;
-            margin-left: 6px;
-            margin-top: -2px;
-        }
-
-        .right_icon {
-            .cui-icon-edit {
-                margin-top: -1px;
-            }        
-        }
-    }
-}
-
-.SubSection {
-    padding-left: 32px;
-    font-weight: 400;
-    font-size: 17px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    height: 30px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    [class^="title"] {
-        display: inline-block;
-        padding-top: 3px;
-        padding-left: 4px;
-        margin-bottom: 1px;
-        margin-left: 4px;
-        align-self: baseline;
-    }
-    .title-active {
-        font-weight: 500;
-        color: #3A0095;
-    }
-    .title-stale {
-        color: #999999;
-    }
-
-    &.active, &:hover {
-        background-color: #EDE7FF;
-    }
-    
-    .cui-icon-hash {
-        display: inline-block;
-        margin-top: 1px;
-        scale: 0.85;
-        padding-bottom: 4px;
-    }
-    
-    .row-icon-inactive {
-        .cui-icon {
-            color: #999999;
-        }
-    }
-
-    .right_icon {
-        .cui-icon-edit {
-            margin-top: -1px;
-        }        
-    }
-}
-
-.right_icon {
-    margin-left: auto;
-    display: inline-block;
-
-    div {
-        .cui-icon {
-            color: #999999;
-            padding-right: 5px;
-            padding-top: 2px;
-
-            &:hover {
-                color: #3A0095;
-                opacity: 100%;
-            }
-        }
-        
-    }
-    .admin-menu {
-        position: fixed;
-    }
-    .unread_icon {
-        background-color: #FF002E;
-        border-radius: 15px;
-        padding-left: 6px;
-        padding-right: 6px;
-        margin-right: 4px;
-        margin-top: 2px;
-        display: inline-block;
-        p {
-            margin-top: 2.75px;
-            position: relative;
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-        }
-    }
-}
-
 .chatAdminOverlay {
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
+  align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
 
-    .Card {
-        z-index: 100;
-        position: relative;
-        width: 500px;
-        max-width: none;
-        cursor: default;
-        padding: 20px 25px;
+  .Card {
+    cursor: default;
+    max-width: none;
+    padding: 20px 25px;
+    position: relative;
+    width: 500px;
+    z-index: 100;
 
-        h4 {
-            color: #666666;
-            font-weight: 400;
-        }
-
-        .TextInput { 
-            width: 100%;
-        }
-
-        .cui-icon-x{
-            position: absolute;
-            color: #666666;
-            top: 15px;
-            left: calc(100% - 35px);
-        }
-
-        .button-bar {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-end;
-            width: 100%;
-            button {
-                margin-left: 5px;
-
-                &.danger{
-                    background-color: #ff002f;
-                }
-
-                &.danger:hover{
-                    background-color: #CC0025;
-                }
-            }
-        }
+    h4 {
+      color: #666666;
+      font-weight: 400;
     }
+
+    .TextInput {
+      width: 100%;
+    }
+
+    .cui-icon-x {
+      color: #666666;
+      left: calc(100% - 35px);
+      position: absolute;
+      top: 15px;
+    }
+
+    .button-bar {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      width: 100%;
+
+      button {
+        margin-left: 5px;
+
+        &.danger {
+          background-color: #ff002f;
+        }
+
+        &.danger:hover {
+          background-color: #cc0025;
+        }
+      }
+    }
+  }
 }

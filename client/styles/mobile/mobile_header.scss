@@ -1,169 +1,276 @@
 @import 'client/styles/shared';
-@import 'components/sidebar';
+
+@mixin sidebar {
+  .OffchainNavigationModule {
+    button {
+      height: 100%;
+    }
+
+    button > span {
+      white-space: normal;
+      text-align: left;
+    }
+  }
+
+  .cui-button.cui-active {
+    background: linear-gradient(
+      268.91deg,
+      #91bfff -61.91%,
+      #91ffa0 2.69%,
+      #fbff91 60.22%,
+      #ff9191 131.89%
+    );
+
+    border: 1px solid transparent;
+  }
+
+  .cui-button.sub-button {
+    margin-left: 18px;
+    width: calc(100% - 18px);
+  }
+
+  .cui-button.cui-align-center {
+    justify-content: left;
+  }
+
+  .ExternalLinksModule {
+    margin-top: 10px;
+  }
+
+  .SubscriptionButton {
+    margin-bottom: 10px;
+  }
+
+  .ChainStatusModule {
+    .chain-deferred {
+      color: $text-color-medium;
+    }
+
+    // form stuff
+    .form-group {
+      margin-bottom: 0;
+
+      select {
+        width: 100%;
+        border-color: $border-color-lightest;
+        border-radius: 2px;
+        padding: 5px 6px;
+      }
+
+      .chain-status-main {
+        width: calc(100% - 28px);
+      }
+    }
+
+    .cui-button-label {
+      text-align: left;
+      width: 100%;
+    }
+
+    .cui-icon svg {
+      min-width: 12px;
+      min-height: 12px;
+      width: 12px;
+      height: 12px;
+    }
+  }
+}
 
 .MobileHeader {
-    * {
-        -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
-    }
-    // only content styles here. layout styles are in layout.scss
-    background: $background-color-white;
-    border-bottom: 1px solid $border-color-lightest;
+  * {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  }
+  // only content styles here. layout styles are in layout.scss
+  background: $background-color-white;
+  border-bottom: 1px solid $border-color-lightest;
 
-    img.mobile-logo {
-        height: 34px;
-        top: 1px;
+  img.mobile-logo {
+    height: 34px;
+    position: relative;
+    top: 1px;
+  }
+
+  .mobile-header-center {
+    flex: 1;
+    max-width: calc(100% - 100px);
+
+    &.logged-in {
+      max-width: calc(100% - 242px);
+    }
+
+    &.logged-in.no-community {
+      max-width: calc(100% - 142px);
+    }
+  }
+
+  // TODO: split this up so CSS classes aren't duplicated
+  .mobile-header-left,
+  .mobile-header-center,
+  .mobile-header-right {
+    .CommunitySelector .cui-button {
+      background: $background-color-white;
+      border-radius: 4px !important;
+      border: 1px solid #c5cdd1 !important;
+      overflow: hidden;
+      padding: 0 14px;
+      width: 100%;
+
+      .cui-icon-menu {
+        display: none;
+      }
+    }
+
+    > .MobileNewProposalButton,
+    > .cui-button,
+    > .cui-overlay {
+      display: inline-block;
+    }
+
+    > .LoginSelector > .cui-button > .cui-button-label > * {
+      display: inline-block;
+    }
+
+    > .cui-button,
+    > .MobileNewProposalButton,
+    > .community-label,
+    > .LoginSelector {
+      margin-left: 5px;
+    }
+
+    > .cui-button {
+      &.no-border {
+        border: none;
+      }
+
+      .cui-button-label {
+        display: inline-block;
         position: relative;
-    }
-    .mobile-header-center {
-        flex: 1;
-        max-width: calc(100% - 100px);
-        &.logged-in {
-            max-width: calc(100% - 242px);
+        top: 1px;
+
+        .CustomHamburgerIcon {
+          position: relative;
+          right: 1.5px;
         }
-        &.logged-in.no-community {
-            max-width: calc(100% - 142px);
-        }
+      }
     }
 
-    // TODO: split this up so CSS classes aren't duplicated
-    .mobile-header-left,
-    .mobile-header-center,
-    .mobile-header-right {
-        .CommunitySelector .cui-button {
-            width: 100%;
-            padding: 0 14px;
-            background: $background-color-white;
-            overflow: hidden;
-            border: 1px solid #c5cdd1 !important;
-            border-radius: 4px !important;
-            .cui-icon-menu {
-                display: none;
-            }
-        }
-        > .MobileNewProposalButton,
-        > .cui-button,
-        > .cui-overlay {
-            display: inline-block;
-        }
-        > .LoginSelector > .cui-button > .cui-button-label > * {
-            display: inline-block;
-        }
-        > .cui-button,
-        > .MobileNewProposalButton,
-        > .community-label,
-        > .LoginSelector {
-            margin-left: 5px;
-        }
-        > .cui-button {
-            &.no-border {
-                border: none;
-            }
-            .cui-button-label {
-                display: inline-block;
-                position: relative;
-                top: 1px;
-                .CustomHamburgerIcon {
-                    position: relative;
-                    right: 1.5px;
-                }
-            }
-        }
-        .mobile-header-trigger {
-            box-sizing: content-box;
-            width: 26px;
-            .cui-icon-x > svg {
-                height: 26px;
-                width: 26px;
-                stroke: black;
-            }
-        }
-        @include xs-max {
-            .MobileNewProposalButton .cui-button {
-                .cui-button-label {
-                    top: 0 !important;
-                }
-            }
-        }
-        @include sm-max {
-            .MobileNewProposalButton .cui-button {
-                padding: 0 10px;
-                .cui-button-label {
-                    top: 2px;
-                }
-            }
-            .cui-button.mobile-header-trigger {
-                padding-left: 12px;
-                padding-right: 12px;
-                .cui-icon {
-                    margin-left: -2px;
-                    margin-right: -2px;
-                }
-            }
-            .community-label .CommunityLabel .community-label-left {
-                padding-right: 8px;
-            }
-            .LoginSelector {
-                // responsive logged-in state
-                .User {
-                    position: relative;
-                    top: -1px;
-                }
-                .user-avatar {
-                    margin-right: 0;
-                }
-                .user-display-name {
-                    display: none;
-                }
-                .role-icon {
-                    display: none;
-                }
-                .LoginSelectorMenu .user-display-name {
-                    display: inline;
-                }
-                .cui-button-label .cui-icon-user {
-                    margin-right: 0;
-                }
-                .hidden-sm {
-                    display: none !important;
-                }
-                // responsive logged-out state
-                .login-selector-user .cui-button {
-                    padding-left: 12px;
-                    padding-right: 12px;
-                }
-                .login-selector-user .cui-icon-user {
-                    margin-right: 0;
-                }
-                .login-selector-user .cui-button-label {
-                    display: none;
-                }
-            }
-        }
+    .mobile-header-trigger {
+      box-sizing: content-box;
+      width: 26px;
+
+      .cui-icon-x > svg {
+        height: 26px;
+        width: 26px;
+        stroke: black;
+      }
     }
+
+    @include xs-max {
+      .MobileNewProposalButton .cui-button {
+        .cui-button-label {
+          top: 0 !important;
+        }
+      }
+    }
+
+    @include sm-max {
+      .MobileNewProposalButton .cui-button {
+        padding: 0 10px;
+        .cui-button-label {
+          top: 2px;
+        }
+      }
+
+      .cui-button.mobile-header-trigger {
+        padding-left: 12px;
+        padding-right: 12px;
+
+        .cui-icon {
+          margin-left: -2px;
+          margin-right: -2px;
+        }
+      }
+
+      .community-label .CommunityLabel .community-label-left {
+        padding-right: 8px;
+      }
+
+      .LoginSelector {
+        // responsive logged-in state
+        .User {
+          position: relative;
+          top: -1px;
+        }
+
+        .user-avatar {
+          margin-right: 0;
+        }
+
+        .user-display-name {
+          display: none;
+        }
+
+        .role-icon {
+          display: none;
+        }
+
+        .LoginSelectorMenu .user-display-name {
+          display: inline;
+        }
+
+        .cui-button-label .cui-icon-user {
+          margin-right: 0;
+        }
+
+        .hidden-sm {
+          display: none !important;
+        }
+        // responsive logged-out state
+        .login-selector-user .cui-button {
+          padding-left: 12px;
+          padding-right: 12px;
+        }
+
+        .login-selector-user .cui-icon-user {
+          margin-right: 0;
+        }
+
+        .login-selector-user .cui-button-label {
+          display: none;
+        }
+      }
+    }
+  }
 }
 
 .MobileHeaderPopoverMenu {
-    @include sidebar();
-    transform: none !important;
-    position: absolute;
-    top: 61px !important;
-    will-change: initial !important;
-    .cui-menu {
-        border: none;
-    }
-    .sidebar-spacer {
-        margin-top: 20px;
-    }
-    .section-header {
-        font-size: 18px;
-        color: $text-color-light;
-        margin-top: 20px;
-        margin-bottom: 6px;
-    }
-    .cui-popover-arrow {
-        display: none;
-    }
-    .cui-button {
-        margin-bottom: 6px;
-    }
+  @include sidebar();
+
+  position: absolute;
+  top: 61px !important;
+  transform: none !important;
+  will-change: initial !important;
+
+  .cui-menu {
+    border: none;
+  }
+
+  .sidebar-spacer {
+    margin-top: 20px;
+  }
+
+  .section-header {
+    color: $text-color-light;
+    font-size: 18px;
+    margin-bottom: 6px;
+    margin-top: 20px;
+  }
+
+  .cui-popover-arrow {
+    display: none;
+  }
+
+  .cui-button {
+    margin-bottom: 6px;
+  }
 }

@@ -3,7 +3,6 @@ import 'pages/search.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import _, { capitalize } from 'lodash';
 import {
   ControlGroup,
   Icon,
@@ -24,10 +23,9 @@ import { ContentType } from 'controllers/server/search';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
-import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
 import { ChainIcon } from './chain_icon';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CommunityLabel } from './community_label';
 
 export const getMemberPreview = (
   addr,
@@ -81,8 +79,10 @@ export const getCommunityPreview = (
       : community.contentType === ContentType.Chain
       ? { chain: community }
       : null;
+
   params['size'] = 36;
-  const onSelect = (e) => {
+
+  const onSelect = () => {
     if (params.token) {
       m.route.set(params.token.address ? `/${params.token.address}` : '/');
     } else {
@@ -90,6 +90,7 @@ export const getCommunityPreview = (
     }
     closeResultsFn();
   };
+
   return m(ListItem, {
     tabIndex,
     label: m('a.search-results-item.community-result', [
@@ -98,7 +99,7 @@ export const getCommunityPreview = (
     onclick: onSelect,
     onkeyup: (e) => {
       if (e.key === 'Enter') {
-        onSelect(e);
+        onSelect();
       }
     },
     onmouseover: () => setUsingFilterMenuFn(true),

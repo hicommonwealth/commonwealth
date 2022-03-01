@@ -18,31 +18,34 @@ svg {
     font-size: 28px;
   }
 
-  &.primary {
-    color: $black;
-  }
-
-  &.primary:hover {
-    color: $dark-purp;
-
-    &.disabled {
-      color: $disable-gray;
-    }
-  }
-
-  &.secondary {
-    color: $lite-gray;
-  }
-
-  &.secondary:hover {
-    color: $black;
-
-    &.disabled {
-      color: $disable-gray;
-    }
-  }
-
   &.disabled {
     color: $disable-gray;
   }
+
+  // Gabe 2/28/22 - These styles shouldn't be applied on the icon itself,
+  // better to wait for an icon button component
+
+  // &.primary {
+  //   color: $black;
+  // }
+
+  // &.primary:hover {
+  //   color: $dark-purp;
+
+  //   &.disabled {
+  //     color: $disable-gray;
+  //   }
+  // }
+
+  // &.secondary {
+  //   color: $lite-gray;
+  // }
+
+  // &.secondary:hover {
+  //   color: $black;
+
+  //   &.disabled {
+  //     color: $disable-gray;
+  //   }
+  // }
 }
