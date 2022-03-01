@@ -348,7 +348,7 @@ const SearchPage: m.Component<
         title: ['Search ', capitalize(scope) || 'Commonwealth'],
         showNewProposalButton: true,
         alwaysShowTitle: true,
-        centerGrid: true,
+        hasCenterGrid: true,
       },
       m(Tabs, tabs),
       m('.search-results-wrapper', [

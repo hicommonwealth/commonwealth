@@ -6,34 +6,26 @@ import { EmptyState, Icons, Spinner } from 'construct-ui';
 import 'sublayout.scss';
 
 import app from 'state';
-import { link } from 'helpers';
 import { ITokenAdapter } from 'models';
-import NewProposalButton, {
-  MobileNewProposalButton,
-} from 'views/components/new_proposal_button';
-import NotificationsMenu from 'views/components/header/notifications_menu';
-import InvitesMenu, {
-  handleEmailInvites,
-} from 'views/components/header/invites_menu';
-import LoginSelector from 'views/components/header/login_selector';
+import { handleEmailInvites } from 'views/components/header/invites_menu';
 import Sidebar from 'views/components/sidebar';
 import MobileHeader from 'views/mobile/mobile_header';
-import { ChainIcon } from 'views/components/chain_icon';
 import { FooterLandingPage } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
-import { CommunityOptionsPopover } from './pages/discussions';
-import { CWGradientButton } from './components/component_kit/cw_gradient_button';
+import { SublayoutHeaderLeft } from './components/sublayout_header_left';
+import { SublayoutHeaderRight } from './components/sublayout_header_right';
+import { isNotUndefined, isUndefined } from '../helpers/typeGuards';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
-  centerGrid?: boolean;
+  hasCenterGrid?: boolean;
   class?: string;
   description?: string; // displayed at the top of the layout
-  errorLayout?;
+  errorLayout?: m.Vnode<any, any>[];
   hero?: any;
   hideSearch?: boolean;
   hideSidebar?: boolean;
-  loadingLayout?: boolean;
+  isLoadingLayout?: boolean;
   rightContent?: any;
   showCouncilMenu?: boolean;
   showNewProposalButton?: boolean;
@@ -65,92 +57,79 @@ const footercontents = [
   // { text:  'Careers' }
 ];
 
-const ICON_SIZE = 22;
-
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private modalAutoTriggered: boolean; // what's going on here?
 
   view(vnode) {
     const {
-      title,
-      description,
-      rightContent,
-      hero,
-      showNewProposalButton,
-      showCouncilMenu,
-      hideSidebar,
-      hideSearch,
       alwaysShowTitle,
+      description, // ?
+      errorLayout,
+      hasCenterGrid,
+      hero,
+      hideSearch,
+      hideSidebar, // ?
+      isLoadingLayout,
+      rightContent,
+      showCouncilMenu, // ?
+      showNewProposalButton,
+      title,
       useQuickSwitcher,
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
-    const narrowBrowserWidth =
-      window.innerWidth > 767.98 && window.innerWidth < 850;
     const terms = app.chain ? chain.terms : null;
+    const sidebarOpen = app.chain !== null;
+    const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
-    const sublayoutHeaderLeft = (
-      <div class="sublayout-header-left">
-        {!app.activeChainId() &&
-        !app.isCustomDomain() &&
-        (m.route.get() === '/' || m.route.get().startsWith('/?')) ? (
-          <h3>Commonwealth</h3>
-        ) : chain ? (
-          <div class="inner-heading-container">
-            <div class="ChainIcon">
-              {link(
-                'a',
-                !app.isCustomDomain() ? `/${app.activeChainId()}` : '/',
-                <ChainIcon size={ICON_SIZE} chain={chain} />
-              )}
+    const heroContent = () => {
+      if (isNotUndefined(hero)) {
+        return <div class="sublayout-hero">{hero}</div>;
+      } else if (
+        app.isLoggedIn() &&
+        ITokenAdapter.instanceOf(app.chain) &&
+        !app.user.activeAccount
+      ) {
+        return (
+          <div class="sublayout-hero token-banner">
+            <div class="token-banner-content">
+              Link an address that holds {chain.symbol} to participate in
+              governance.
             </div>
-            <h4 class="sublayout-header-heading">
-              {link(
-                'a',
-                app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,
-                chain.name
-              )}
-              {title && <span class="breadcrumb">{m.trust('/')}</span>}
-              {title}
-              {m(CommunityOptionsPopover)}
-            </h4>
           </div>
-        ) : alwaysShowTitle ? (
-          <h4 class="sublayout-header-heading.no-chain-or-community">
-            {title}
-          </h4>
-        ) : null}
-      </div>
-    );
+        );
+      } else {
+        return null;
+      }
+    };
 
-    const sublayoutHeaderRight = (
-      <div class="sublayout-header-right">
-        {m(LoginSelector)}
-        {app.isLoggedIn() && m(InvitesMenu)}
-        {app.isLoggedIn() && m(NotificationsMenu)}
-        {showNewProposalButton &&
-          (narrowBrowserWidth
-            ? m(MobileNewProposalButton)
-            : m(NewProposalButton, { fluid: false, threadOnly: !chain }))}
-        {!app.isCustomDomain() && (
-          <CWGradientButton
-            buttonType="secondary"
-            disabled={false}
-            className="hiringBtn"
-            label="We're hiring!"
-            onclick={() => {
-              window.open(
-                'https://angel.co/company/commonwealth-labs',
-                '_blank'
-              );
-            }}
-          />
-        )}
-        {/* above threadOnly option assumes all chains have proposals beyond threads */}
-      </div>
-    );
+    const termsContent = () => {
+      if (isNotUndefined(terms) && tosStatus !== 'off') {
+        return (
+          <div class="token-banner-terms">
+            <span>Please read the </span>
+            <a href={terms}>terms and conditions</a>
+            <span> before interacting with this community.</span>
+            <span
+              class="close-button"
+              onclick={() => {
+                localStorage.setItem(`${app.activeChainId()}-tos`, 'off');
+              }}
+            >
+              X
+            </span>
+          </div>
+        );
+      } else {
+        return null;
+      }
+    };
 
-    if (vnode.attrs.loadingLayout) {
+    if (m.route.param('triggerInvite') === 't') {
+      setTimeout(() => handleEmailInvites(this), 0);
+    }
+
+    if (isLoadingLayout) {
       return (
         <div class="layout-container">
           <div class="LoadingLayout">
@@ -160,64 +139,41 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       );
     }
 
-    if (vnode.attrs.errorLayout) {
+    if (isNotUndefined(errorLayout)) {
       return (
         <div class="layout-container">
           <EmptyState
             fill={true}
             icon={Icons.ALERT_TRIANGLE}
-            content={vnode.attrs.errorLayout}
+            content={errorLayout}
             style="color: #546e7b;"
           />
         </div>
       );
     }
 
-    if (m.route.param('triggerInvite') === 't') {
-      setTimeout(() => handleEmailInvites(this), 0);
-    }
-
-    const sidebarOpen = app.chain !== null;
-    const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
-
     return (
       <div class="layout-container">
         <div class={`Sublayout ${vnode.attrs.class}`}>
           {m(MobileHeader)}
-          <div class={`sublayout-header ${!title ? 'no-title' : ''}`}>
+          <div
+            class={`sublayout-header ${isUndefined(title) ? 'no-title' : ''}`}
+          >
             <div class="sublayout-header-inner">
-              {sublayoutHeaderLeft}
-              {!vnode.attrs.loadingLayout && !hideSearch && m(SearchBar)}
-              {sublayoutHeaderRight}
+              <SublayoutHeaderLeft
+                alwaysShowTitle={alwaysShowTitle}
+                chain={chain}
+                title={title}
+              />
+              {!isLoadingLayout && !hideSearch && m(SearchBar)}
+              <SublayoutHeaderRight
+                chain={chain}
+                showNewProposalButton={showNewProposalButton}
+              />
             </div>
           </div>
-          {hero ? (
-            <div class="sublayout-hero">{hero}</div>
-          ) : app.isLoggedIn() &&
-            ITokenAdapter.instanceOf(app.chain) &&
-            !app.user.activeAccount ? (
-            <div class="sublayout-hero.token-banner">
-              <div class="token-banner-content">
-                Link an address that holds {chain.symbol} to participate in
-                governance.
-              </div>
-            </div>
-          ) : null}
-          {terms && tosStatus !== 'off' ? (
-            <div class="token-banner-terms">
-              <span>Please read the </span>
-              <a href={terms}>terms and conditions</a>
-              <span> before interacting with this community.</span>
-              <span
-                class="close-button"
-                onclick={() => {
-                  localStorage.setItem(`${app.activeChainId()}-tos`, 'off');
-                }}
-              >
-                X
-              </span>
-            </div>
-          ) : null}
+          {heroContent()}
+          {termsContent()}
           <div
             class={
               useQuickSwitcher
@@ -230,19 +186,15 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           <div
             class={!sidebarOpen ? 'sublayout-body' : 'sublayout-body-sidebar'}
           >
-            <div
-              class={`sublayout-grid ${
-                vnode.attrs.centerGrid ? 'flex-center' : ''
-              }`}
-            >
+            <div class={`sublayout-grid ${hasCenterGrid ? 'flex-center' : ''}`}>
               <div
                 class={`sublayout-main-col ${
-                  !rightContent && 'no-right-content'
+                  isNotUndefined(rightContent) && 'no-right-content'
                 }`}
               >
                 {vnode.children}
               </div>
-              {rightContent && (
+              {isNotUndefined(rightContent) && (
                 <div class="sublayout-right-col">{rightContent}</div>
               )}
             </div>

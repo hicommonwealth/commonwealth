@@ -26,7 +26,7 @@ export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
         class: app.isCustomDomain() ? 'custom-domain' : '',
       },
       [
-        m(Sublayout, { loadingLayout: true, hideSidebar }),
+        m(Sublayout, { isLoadingLayout: true, hideSidebar }),
         m(AppModals),
         m(AppToasts),
       ]
