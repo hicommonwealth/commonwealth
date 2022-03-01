@@ -22,6 +22,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 
 import { notifySuccess } from 'controllers/app/notifications';
+import { getProposalUrlPath } from '../../../../client/scripts/identifiers';
 import { getProposalUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (commentText) => {
@@ -417,14 +418,7 @@ const UserDashboardRow: m.Component<
       root_type,
     } = JSON.parse(vnode.attrs.notification.notificationData);
 
-    // Get Path to Proposal
-    const pseudoProposal = {
-      id: root_id,
-      title: root_title,
-      chain: chain_id,
-    };
-    const args = [root_type, pseudoProposal];
-    const path = (getProposalUrl as any)(...args);
+    const path = (getProposalUrlPath(root_type, root_id, false, chain_id));
 
     return m(
       '.UserDashboardRow',

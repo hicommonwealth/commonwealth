@@ -13,21 +13,17 @@ import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
-import _ from 'underscore';
 
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
-import {
-  ChainInfo,
-  NodeInfo,
-  NotificationCategory,
-  Notification,
-} from 'models';
+import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+
+import { WebSocketController } from 'controllers/server/socket';
 
 import {
   notifyError,
-  notifySuccess,
   notifyInfo,
+  notifySuccess,
 } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
@@ -85,11 +81,21 @@ export async function initAppState(
         );
         app.config.invites = data.invites;
 
-        // add recentActivity
-        const { recentThreads } = data;
-        Object.entries(recentThreads).forEach(([comm, count]) => {
-          app.recentActivity.setCommunityThreadCounts(comm, count);
-        });
+        // update the login status
+        updateActiveUser(data.user);
+        app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+
+        if (!app.socket && app.loginState === LoginState.LoggedIn) {
+          app.socket = new WebSocketController(app.user.jwt);
+          app.user.notifications.refresh().then(() => m.redraw());
+        } else if (app.socket && app.loginState === LoginState.LoggedOut) {
+          app.socket.disconnect();
+          app.socket = undefined;
+        }
+
+        app.user.setStarredCommunities(
+          data.user ? data.user.starredCommunities : []
+        );
 
         // update the login status
         updateActiveUser(data.user);
@@ -1131,51 +1137,17 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     // initialize the app
     initAppState(true, customDomain)
       .then(async () => {
-        // setup notifications and websocket if not already set up
-        if (!app.socket) {
-          let jwt;
+        if (app.loginState === LoginState.LoggedIn) {
           // refresh notifications once
-          if (app.loginState === LoginState.LoggedIn) {
-            app.user.notifications.refresh().then(() => m.redraw());
-            jwt = app.user.jwt;
-          }
-          // grab discussion drafts
-          if (app.loginState === LoginState.LoggedIn) {
-            app.user.discussionDrafts.refreshAll().then(() => m.redraw());
-          }
-
-          handleInviteLinkRedirect();
-
-          // If the user updates their email
-          handleUpdateEmailConfirmation();
-
-          // subscribe to notifications
-          // const wsUrl = document.location.origin
-          //   .replace('http://', 'ws://')
-          //   .replace('https://', 'wss://');
-          // app.socket = new WebsocketController(wsUrl, jwt, null);
-          // if (app.loginState === LoginState.LoggedIn) {
-          //   app.socket.addListener(
-          //     WebsocketMessageType.Notification,
-          //     (payload: IWebsocketsPayload<any>) => {
-          //       if (payload.data && payload.data.subscription_id) {
-          //         const subscription = app.user.notifications.subscriptions.find(
-          //           (sub) => sub.id === payload.data.subscription_id
-          //         );
-          //         // note that payload.data should have the correct JSON form
-          //         if (subscription) {
-          //           console.log('adding new notification from websocket:', payload.data);
-          //           const notification = Notification.fromJSON(payload.data, subscription);
-          //           app.user.notifications.update(notification);
-          //           m.redraw();
-          //         }
-          //       } else {
-          //         console.error('got invalid notification payload:', payload);
-          //       }
-          //     },
-          //   );
-          // }
+          app.user.notifications.refresh().then(() => m.redraw());
+          // grab all discussion drafts
+          app.user.discussionDrafts.refreshAll().then(() => m.redraw());
         }
+
+        handleInviteLinkRedirect();
+        // If the user updates their email
+        handleUpdateEmailConfirmation();
+
         m.redraw();
       })
       .catch((err) => {

@@ -308,7 +308,7 @@ const ProposalHeader: m.Component<
                         closeOnContentClick: true,
                         menuAttrs: { size: 'default' },
                         content: [
-                          (isEditor || isAuthor) &&
+                          (isEditor || isAuthor || isAdmin) &&
                             m(ProposalBodyEditMenuItem, {
                               item: proposal,
                               proposalPageState: vnode.attrs.proposalPageState,
@@ -1183,6 +1183,11 @@ const ViewProposalPage: m.Component<
         role: 'moderator',
         chain: app.activeChainId(),
       });
+    const isAdminOnly =
+      app.user.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+      });
 
     if (proposal instanceof SubstrateTreasuryTip) {
       const {
@@ -1352,7 +1357,7 @@ const ViewProposalPage: m.Component<
           proposalPageState: vnode.state,
           isAuthor,
           isEditor,
-          isAdmin,
+          isAdmin: isAdminOnly,
           stageEditorIsOpen: vnode.state.stageEditorIsOpen,
           pollEditorIsOpen: vnode.state.pollEditorIsOpen,
           closeStageEditor: () => {
