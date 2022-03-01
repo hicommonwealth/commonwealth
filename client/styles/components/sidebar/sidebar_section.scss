@@ -58,6 +58,9 @@
       margin-right: 10px;
       padding-top: 3px;
       display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .section-title-text-active {
@@ -105,6 +108,9 @@
     margin-bottom: 1px;
     margin-left: 4px;
     align-self: baseline;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .title-active {

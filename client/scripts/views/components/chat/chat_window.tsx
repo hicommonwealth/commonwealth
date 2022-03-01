@@ -113,7 +113,7 @@ const ChatWindow: m.Component<IAttrs, IState> = {
             <div class="chat-message-group">
               {grp.messages.map((msg) => (
                 <div class="chat-message-text">
-                  {m(MarkdownFormattedText, { doc: msg.message })}
+                  {m(MarkdownFormattedText, { doc: msg.message, openLinksInNewTab: true })}
                 </div>
               ))}
               <div class="clear" />
