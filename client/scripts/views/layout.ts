@@ -15,8 +15,6 @@ import AppToasts from 'views/toast';
 import PageNotFound from 'views/pages/404';
 import { AppModals } from './app_modals';
 
-const CHAIN_LOADING_TIMEOUT = 3000;
-
 export const LoadingLayout: m.Component<{ hideSidebar?: boolean }> = {
   view: (vnode) => {
     const { hideSidebar } = vnode.attrs;

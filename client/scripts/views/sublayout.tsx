@@ -14,7 +14,11 @@ import { FooterLandingPage } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './components/sublayout_header_left';
 import { SublayoutHeaderRight } from './components/sublayout_header_right';
-import { isNotUndefined, isUndefined } from '../helpers/typeGuards';
+import {
+  isNonEmptyString,
+  isNotUndefined,
+  isUndefined,
+} from '../helpers/typeGuards';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
@@ -104,7 +108,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     };
 
     const termsContent = () => {
-      if (isNotUndefined(terms) && tosStatus !== 'off') {
+      if (isNonEmptyString(terms) && tosStatus !== 'off') {
         return (
           <div class="token-banner-terms">
             <span>Please read the </span>
@@ -189,7 +193,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             <div class={`sublayout-grid ${hasCenterGrid ? 'flex-center' : ''}`}>
               <div
                 class={`sublayout-main-col ${
-                  isNotUndefined(rightContent) && 'no-right-content'
+                  isUndefined(rightContent) ? 'no-right-content' : ''
                 }`}
               >
                 {vnode.children}

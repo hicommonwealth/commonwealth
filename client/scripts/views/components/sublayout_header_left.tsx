@@ -7,7 +7,7 @@ import 'sublayout.scss';
 import app from 'state';
 import { link } from 'helpers';
 import { ChainIcon } from 'views/components/chain_icon';
-import { isNotUndefined, isUndefined } from 'helpers/typeGuards';
+import { isNotNil, isNotUndefined, isUndefined } from 'helpers/typeGuards';
 import { ChainInfo } from 'client/scripts/models';
 import { CommunityOptionsPopover } from '../pages/discussions';
 
@@ -31,7 +31,7 @@ export class SublayoutHeaderLeft
     const headerLeftContent = () => {
       if (hasDefaultHeader) {
         return <h3>Commonwealth</h3>;
-      } else if (isNotUndefined(chain)) {
+      } else if (isNotNil(chain)) {
         return (
           <div class="inner-heading-container">
             <div class="ChainIcon">
