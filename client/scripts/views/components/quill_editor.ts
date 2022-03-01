@@ -20,6 +20,7 @@ import SettingsController from 'controllers/app/settings';
 import { Profile } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 // Rich text and Markdown editor.
 //
@@ -1035,6 +1036,26 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
             content: m('.quill-editor-tooltip', 'Click for Markdown'),
           }),
       ]),
+      m('.preview-button-wrap', [
+        m(Tag, {
+          label: m('.preview-button', [
+            m(CWIcon, { iconName: 'search', iconSize: 'small '}),
+            m('span', 'Preview')
+          ]),
+          size: 'xs',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: PreviewModal,
+              data: {
+                doc: vnode.state.markdownMode
+                  ? vnode.state.editor.getText()
+                  : JSON.stringify(vnode.state.editor.getContents()),
+              },
+            });
+          },
+        })
+      ])
     ]);
   }
 };
