@@ -43,7 +43,7 @@ interface IProjectBase {
 
     function setIpfsHash(bytes32 _ipfsHash) external;
 
-    function back(uint256 _value) external returns (bool);
+    function back(uint256 _amount) external returns (bool);
 
     function beneficiaryWithdraw() external returns (bool);
 

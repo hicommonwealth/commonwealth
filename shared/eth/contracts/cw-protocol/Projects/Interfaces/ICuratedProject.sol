@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./IProjectBase.sol";
 
-interface IProject is IProjectBase {
+interface ICuratedProject is IProjectBase {
     event Curate(address sender, address token, uint256 amount);
 
     function bToken() external view returns (address);

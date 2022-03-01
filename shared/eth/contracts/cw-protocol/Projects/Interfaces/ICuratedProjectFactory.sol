@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./IProjectBaseFactory.sol";
 
-interface IProjectFactory is IProjectBaseFactory {
+interface ICuratedProjectFactory is IProjectBaseFactory {
     function setCWTokenImpl(address _cwToken) external;
 
     function createProject(

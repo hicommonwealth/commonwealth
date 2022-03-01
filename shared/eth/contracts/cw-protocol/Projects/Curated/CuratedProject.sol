@@ -7,10 +7,8 @@ import '../../external/util/Initializable.sol';
 import '../../CWToken.sol';
 import '../ProjectBase.sol';
 import {DataTypes} from '../../DataTypes.sol';
-import "../Interfaces/IProject.sol";
 
-
-contract Project is ProjectBase, Initializable {
+contract CuratedProject is ProjectBase, Initializable {
     using SafeERC20 for IERC20;
     using DataTypes for DataTypes.ProjectMetaData;
 
@@ -27,10 +25,6 @@ contract Project is ProjectBase, Initializable {
 
     /// @notice Project fee awarded to curators on project success
     uint256 public curatorFee;
-
-    // TODO: once contracts compile, reevaluate arguments stored in each contract vs factory contract
-    // TODO: 6k gas for external contract call < 20k to store the values in storage with SSTORE opcode
-    // TODO: So its either 6k + 20k = 26k for external call or 20k + 20k = 40k for internal storage (~3-10$)
 
     function initialize(
         DataTypes.ProjectMetaData memory _metaData,

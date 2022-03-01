@@ -350,7 +350,7 @@
 		"remappings": []
 	},
 	"sources": {
-		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+		"@openzeppelin/contracts-governance/token/ERC20/IERC20.sol": {
 			"keccak256": "0x027b891937d20ccf213fdb9c31531574256de774bda99d3a70ecef6e1913ed2a",
 			"license": "MIT",
 			"urls": [
@@ -358,7 +358,7 @@
 				"dweb:/ipfs/Qmbn5Mj7aUn8hJuQ8VrQjjEXRsXyJKykgnjR9p4C3nfLtL"
 			]
 		},
-		"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol": {
+		"@openzeppelin/contracts-governance/token/ERC20/utils/SafeERC20.sol": {
 			"keccak256": "0x02348b2e4b9f3200c7e3907c5c2661643a6d8520e9f79939fbb9b4005a54894d",
 			"license": "MIT",
 			"urls": [
@@ -366,7 +366,7 @@
 				"dweb:/ipfs/QmYDo7MvMsvuDxuJZ9RC9zFganS3Tm8RYzSmBP5qSmJfuY"
 			]
 		},
-		"@openzeppelin/contracts/utils/Address.sol": {
+		"@openzeppelin/contracts-governance/utils/Address.sol": {
 			"keccak256": "0x3b4820cac4f127869f6eb496c1d74fa6ac86ed24071e0f94742e6aef20e7252c",
 			"license": "MIT",
 			"urls": [

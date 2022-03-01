@@ -186,12 +186,12 @@ export class IProjectBase extends Contract {
     "acceptedToken()"(overrides?: CallOverrides): Promise<[string]>;
 
     back(
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "back(uint256)"(
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -297,12 +297,12 @@ export class IProjectBase extends Contract {
   "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
 
   back(
-    _value: BigNumberish,
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "back(uint256)"(
-    _value: BigNumberish,
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -403,10 +403,10 @@ export class IProjectBase extends Contract {
 
     "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
 
-    back(_value: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+    back(_amount: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
     "back(uint256)"(
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -524,12 +524,12 @@ export class IProjectBase extends Contract {
     "acceptedToken()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     back(
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "back(uint256)"(
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -612,12 +612,12 @@ export class IProjectBase extends Contract {
     "acceptedToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     back(
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "back(uint256)"(
-      _value: BigNumberish,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

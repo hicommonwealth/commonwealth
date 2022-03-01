@@ -3,13 +3,12 @@ pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts-governance/proxy/Clones.sol';
 import {DataTypes} from '../../DataTypes.sol';
-import "../Interfaces/IProjectFactory.sol";
-import "../Interfaces/IProject.sol";
+import "../Interfaces/ICuratedProject.sol";
 import "../ProjectBaseFactory.sol";
 import "../../CWToken.sol";
 
 
-contract ProjectFactory is ProjectBaseFactory {
+contract CuratedProjectFactory is ProjectBaseFactory {
     using Clones for address;
 
     address public cwTokenImp;
@@ -103,7 +102,7 @@ contract ProjectFactory is ProjectBaseFactory {
         CWToken(cToken).initialize(_acceptedToken, true, newProjectAddress);
 
         // initialize the new project
-        IProject(newProjectAddress).initialize(
+        ICuratedProject(newProjectAddress).initialize(
             metaData,
             pData,
             _curatorFee,
