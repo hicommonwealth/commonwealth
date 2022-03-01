@@ -25,7 +25,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { ContentType } from 'controllers/server/search';
 import { CommunityLabel } from '../components/sidebar/community_selector';
-import PageNotFound from './404';
+import { PageNotFound } from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
