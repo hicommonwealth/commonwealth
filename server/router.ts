@@ -124,6 +124,7 @@ import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
 import updateAddress from './routes/updateAddress';
+import pinIPFS from './routes/pinIPFS';
 import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 
@@ -153,6 +154,11 @@ function setupRouter(
     '/updateAddress',
     passport.authenticate('jwt', { session: false }),
     updateAddress.bind(this, models)
+  );
+  router.post(
+    '/ipfsPin',
+    passport.authenticate('jwt', { session: false }),
+    pinIPFS.bind(this, models)
   );
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
