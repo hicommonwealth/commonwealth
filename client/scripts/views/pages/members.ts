@@ -34,6 +34,7 @@ const MembersPage : m.Component<
   {
     membersRequested: boolean,
     membersLoaded: MemberInfo[],
+    totalMembersCount: number,
     profilesLoaded: ProfileInfo[],
     profilesFinishedLoading: boolean,
     numProfilesLoaded: number,
@@ -59,6 +60,7 @@ const MembersPage : m.Component<
       vnode.state.membersRequested = true;
       activeInfo.getMembers(activeInfo.id).then(() => {
         const activeMembersHash = {};
+        vnode.state.totalMembersCount = activeInfo.members.length;
         const membersActive: MemberInfo[] = app.recentActivity.getMostActiveUsers().map((user) => {
           const { chain, address } = user.info;
           activeMembersHash[`${chain}##${address}`] = true;
@@ -84,8 +86,9 @@ const MembersPage : m.Component<
       showNewProposalButton: true,
     });
 
-    const navigatedFromAccount = app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/${app.activeChainId()}/account/`)
-    && localStorage[`${app.activeChainId()}-members-scrollY`]
+    const navigatedFromAccount = app.lastNavigatedBack()
+      && app.lastNavigatedFrom().includes(`/${app.activeChainId()}/account/`)
+      && localStorage[`${app.activeChainId()}-members-scrollY`];
 
     // Load default number of profiles on mount
     if (!vnode.state.initialProfilesLoaded) {
@@ -94,15 +97,17 @@ const MembersPage : m.Component<
 
       // Set initial number loaded (contingent on navigation)
       if (navigatedFromAccount) {
-        vnode.state.numProfilesLoaded = Math.min(Number(localStorage[`${app.activeChainId()}-members-numProfilesAlreadyLoaded`]))
+        vnode.state.numProfilesLoaded = Number(localStorage[`${app.activeChainId()}-members-numProfilesLoaded`]);
       } else {
         vnode.state.numProfilesLoaded = Math.min(DEFAULT_MEMBER_REQ_SIZE, vnode.state.membersLoaded.length);
       }
       vnode.state.profilesFinishedLoading = vnode.state.numProfilesLoaded >= vnode.state.membersLoaded.length;
 
-      const profileInfos: ProfileInfo[] = vnode.state.membersLoaded.slice(0, vnode.state.numProfilesLoaded).map((member) => {
-        return {profile: app.profiles.getProfile(member.chain, member.address), postCount: member.count}
-      })
+      const profileInfos: ProfileInfo[] = vnode.state.membersLoaded
+        .slice(0, vnode.state.numProfilesLoaded)
+        .map((member) => {
+          return ({ profile: app.profiles.getProfile(member.chain, member.address), postCount: member.count });
+        });
 
       vnode.state.profilesLoaded = profileInfos;
     }
@@ -130,12 +135,17 @@ const MembersPage : m.Component<
       if (scrollPos > scrollHeight - 400) {
         if (!vnode.state.profilesFinishedLoading) {
           const lastLoadedProfileIndex = vnode.state.numProfilesLoaded
-          const newBatchSize = Math.min(DEFAULT_MEMBER_REQ_SIZE, vnode.state.membersLoaded.length - lastLoadedProfileIndex)
+          const newBatchSize = Math.min(
+            DEFAULT_MEMBER_REQ_SIZE,
+            vnode.state.membersLoaded.length - lastLoadedProfileIndex
+          );
           const newBatchEnd = lastLoadedProfileIndex + newBatchSize;
 
           for (let i = lastLoadedProfileIndex; i < newBatchEnd; i++) {
             const member = vnode.state.membersLoaded[i];
-            const profileInfo: ProfileInfo = {profile: app.profiles.getProfile(member.chain, member.address), postCount: member.count}
+            const profileInfo: ProfileInfo = {
+              profile: app.profiles.getProfile(member.chain, member.address), postCount: member.count
+            }
             vnode.state.profilesLoaded.push(profileInfo);
           }
 
@@ -143,8 +153,16 @@ const MembersPage : m.Component<
           m.redraw();
         }
       }
-    }, 400)
-    $(window).on('scroll', vnode.state.onscroll)
+    }, 400);
+    $(window).on('scroll', vnode.state.onscroll);
+
+    const {
+      membersLoaded,
+      numProfilesLoaded,
+      profilesFinishedLoading,
+      profilesLoaded,
+      totalMembersCount
+    } = vnode.state;
 
     return m(Sublayout, {
       class: 'MembersPage',
@@ -154,41 +172,42 @@ const MembersPage : m.Component<
       ],
       showNewProposalButton: true,
     }, [
-      m('.title', 'Members'),
+      m('.title', totalMembersCount ? `Members (${totalMembersCount})` : 'Members'),
       m(Table, [
         m('tr', [
           m('th', 'Member'),
           m('th.align-right', 'Posts / Month'),
         ]),
-        vnode.state.profilesLoaded.map((profileInfo) => {
-            return m('tr', [
-              m('td.members-item-info', [
-                m('a', {
-                  href: `/${app.activeChainId()}/account/${profileInfo.profile.address}?base=${profileInfo.profile.chain}`,
-                  onclick: (e) => {
-                    e.preventDefault();
-                    localStorage[`${app.activeChainId()}-members-scrollY`] = window.scrollY;
-                    localStorage[`${app.activeChainId()}-members-numProfilesAlreadyLoaded`] = vnode.state.numProfilesLoaded;
-                    navigateToSubpage(`/account/${profileInfo.profile.address}?base=${profileInfo.profile.chain}`);
-                  }
-                }, [
-                  m(User, { user: profileInfo.profile, showRole: true }),
-                ]),
+        profilesLoaded.map((profileInfo) => {
+          const { address, chain } = profileInfo.profile;
+          return m('tr', [
+            m('td.members-item-info', [
+              m('a', {
+                href: `/${app.activeChainId()}/account/${address}?base=${chain}`,
+                onclick: (e) => {
+                  e.preventDefault();
+                  localStorage[`${app.activeChainId()}-members-scrollY`] = window.scrollY;
+                  localStorage[`${app.activeChainId()}-members-numProfilesLoaded`] = numProfilesLoaded;
+                  navigateToSubpage(`/account/${address}?base=${chain}`);
+                }
+              }, [
+                m(User, { user: profileInfo.profile, showRole: true }),
               ]),
-              m('td.align-right', profileInfo.postCount),
-            ]);
+            ]),
+            m('td.align-right', profileInfo.postCount),
+          ]);
         })]),
         m('.infinite-scroll-wrapper', [
-          vnode.state.profilesFinishedLoading ?
-          m('.infinite-scroll-reached-end', [
-            `Showing all ${vnode.state.membersLoaded.length} community members`,
-          ]) :
-          m('.infinite-scroll-spinner-wrap', [
-            m(Spinner, {
-              active: true,
-              size: 'lg',
-            }),
-          ])
+          profilesFinishedLoading
+            ? m('.infinite-scroll-reached-end', [
+              `Showing all ${membersLoaded.length} community members`,
+            ])
+            : m('.infinite-scroll-spinner-wrap', [
+              m(Spinner, {
+                active: true,
+                size: 'lg',
+              }),
+            ])
         ]),
       ])
   }
