@@ -97,6 +97,7 @@
       rgba(96, 134, 209, 1) 100%
     );
   }
+
   .gradient-0 {
     background: linear-gradient(
       0deg,
@@ -104,12 +105,13 @@
       rgba(96, 134, 209, 1) 100%
     );
   }
-   .btn-primary {
-    @apply bg-black text-white rounded p-3 pb-2 leading-none transition duration-300 ease-in-out ;
+
+  .btn-primary {
+    @apply bg-black text-white rounded p-3 pb-2 leading-none transition duration-300 ease-in-out;
   }
 
   .btn-outline {
-    @apply bg-transparent border border-black text-black rounded p-3 pb-2 leading-none transition duration-300 ease-in-out ;
+    @apply bg-transparent border border-black text-black rounded p-3 pb-2 leading-none transition duration-300 ease-in-out;
   }
 
   .btn-white {
@@ -122,7 +124,7 @@
 
   .btn-gradient:after {
     @apply top-0 right-0 bottom-0 left-0 absolute z-0;
-    content: "";
+    content: '';
     background: linear-gradient(
       224.02deg,
       #79e0e8 3.58%,
@@ -138,10 +140,10 @@
 
   .btn-gradient > span {
     @apply z-10 relative;
-  } 
+  }
 
   section.LandingPageTokenHolders {
-    @apply mx-auto pt-20
+    @apply mx-auto pt-20;
   }
 
   .menu-open {
