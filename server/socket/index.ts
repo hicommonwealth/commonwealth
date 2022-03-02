@@ -71,26 +71,6 @@ export function setupWebSocketServer(httpServer: http.Server) {
   instrument(io, {
     auth: false,
   });
-  pool
-    .query(
-      `
-          CREATE TABLE IF NOT EXISTS socket_io_attachments
-          (
-              id         bigserial UNIQUE,
-              created_at timestamptz DEFAULT NOW(),
-              payload    bytea
-          );
-			`
-    )
-    .then((res) => {
-      log.info('Socket.io query successful');
-    })
-    .catch((e) => {
-      log.error(
-        'Postgres Adapter will not work so cross server websocket rooms will not be available.',
-        e
-      );
-    });
 
   log.info(`Connecting to Redis at: ${REDIS_URL}`);
   const pubClient = createClient({ url: REDIS_URL });
