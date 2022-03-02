@@ -54,7 +54,7 @@ async function handleFatalError(
       process.exit(1);
       break;
     default:
-      log.error(`${chain ? `[${chain}]: ` : ''}${JSON.stringify(error)}`);
+      log.error(`${chain ? `[${chain}]: ` : ''} ${error.message}`);
 
       if (chain && chain.indexOf('erc20') === -1 && chainErrors[chain] >= 4) {
         listeners[chain].unsubscribe();
@@ -447,7 +447,7 @@ async function initializer(): Promise<void> {
   // setup sql client pool
   pool = new Pool({
     connectionString: DATABASE_URI,
-    ssl: {
+    ssl: process.env.NODE_ENV !== 'production' ? false : {
       rejectUnauthorized: false,
     },
     max: 3,

@@ -22,6 +22,7 @@ import {
   OffchainThreadStage,
   AnyProposal,
 } from 'models';
+import { ProposalType } from 'types';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { getStatusClass, getStatusText } from 'views/components/proposal_card';
@@ -279,12 +280,11 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
     view: (vnode) => {
       const { proposal } = vnode.attrs;
       if (!proposal || !proposal.threadId) return;
+      const path = getProposalUrlPath(ProposalType.OffchainThread, `${proposal.threadId}`, false, proposal['chain']);
       return m('.ProposalHeaderThreadLink', [
         link(
           'a.thread-link',
-          `/${proposal['chain'] || app.activeChainId()}/discussion/${
-            proposal.threadId
-          }`,
+          path,
           ['Go to discussion', m(Icon, { name: Icons.EXTERNAL_LINK })]
         ),
       ]);
@@ -297,9 +297,7 @@ export const ProposalHeaderSnapshotThreadLink: m.Component<{
   view: (vnode) => {
     const { id, title } = vnode.attrs.thread;
     if (!id) return;
-    const proposalLink = `${
-      app.isCustomDomain() ? '' : `/${app.activeChainId()}`
-    }/discussion/${id}`;
+    const proposalLink = getProposalUrlPath(ProposalType.OffchainThread, id)
 
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [

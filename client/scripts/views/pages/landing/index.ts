@@ -6,7 +6,6 @@ import Glide from '@glidejs/glide';
 import app, { LoginState } from 'state';
 
 import { ChainInfo } from 'client/scripts/models';
-import Sublayout from 'views/sublayout';
 import HeaderLandingPage from './landing_page_header';
 import FooterLandingPage from './landing_page_footer';
 import JoinCommonWealthSection from './landing_page_pre_footer';
@@ -19,8 +18,8 @@ import ChainsCrowdfundingComponent from './crowdfunding_card_section';
 // Logged In Homepage View
 import 'pages/landing/index.scss';
 
-import CommunityCards from './community_cards';
 import { handleEmailInvites } from '../../components/header/invites_menu';
+import UserDashboard from '../user_dashboard';
 
 export interface Chain {
   img: string;
@@ -353,11 +352,7 @@ const LandingPage: m.Component<{}, IState> = {
         }),
       ]);
     } else {
-      return m(Sublayout, {
-        class: 'Homepage',
-      }, [
-        m(CommunityCards),
-      ]);
+      return m(UserDashboard)
     }
   }
 };
