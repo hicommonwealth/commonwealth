@@ -20,6 +20,8 @@ const getTokenForum = async (
 
   // default to mainnet
   const chain_id = +req.query.chain_id || 1;
+  // default to ERC20
+  const chain_network = req.query.chain_network? req.query.chain_network : ChainNetwork.ERC20;
   const token = await models.Token.findOne({
     where: {
       address: { [Op.iLike]: address },
@@ -56,7 +58,7 @@ const getTokenForum = async (
           where: { id: token.id },
           defaults: {
             active: true,
-            network: ChainNetwork.ERC20,
+            network: chain_network,
             type: ChainType.Token,
             icon_url: token.icon_url,
             symbol: token.symbol,

@@ -11,19 +11,19 @@ import { providers } from 'ethers';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { isAddress } from 'web3-utils';
 import { notifyError } from 'controllers/app/notifications';
-import { IERC20Metadata__factory } from 'eth/types';
+import { IERC721Metadata__factory } from 'eth/types';
 import {
   InputPropertyRow
 } from 'views/components/metadata_rows';
 import { EthFormState, initChainForm, defaultChainRows, EthChainAttrs, ethChainRows } from './chain_input_rows';
 
-type ERC20FormAttrs = EthChainAttrs;
+type ERC721FormAttrs = EthChainAttrs;
 
-interface ERC20FormState extends EthFormState {
+
+interface ERC721FormState extends EthFormState {
   id: string;
   name: string;
   symbol: string;
-  decimals: number;
   saving: boolean;
   loaded: boolean;
   loading: boolean;
@@ -31,7 +31,7 @@ interface ERC20FormState extends EthFormState {
   error: string;
 }
 
-const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
+const ERC721Form: m.Component<ERC721FormAttrs, ERC721FormState> = {
   oninit: (vnode) => {
     vnode.state.chain_string = 'Ethereum Mainnet';
     vnode.state.chain_id = '1';
@@ -40,7 +40,6 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
     vnode.state.id = '';
     vnode.state.name = '';
     vnode.state.symbol = '';
-    vnode.state.decimals = 18;
     initChainForm(vnode.state);
     vnode.state.saving = false;
     vnode.state.loaded = false;
@@ -60,7 +59,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
       const args = {
         address: vnode.state.address,
         chain_id: vnode.state.chain_id,
-        chain_network: ChainNetwork.ERC20,
+        chain_network: ChainNetwork.ERC721,
         url: vnode.state.url,
         allowUncached: true,
       };
@@ -72,7 +71,6 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             vnode.state.name = res.token.name || '';
             vnode.state.id = res.token.id && slugify(res.token.id);
             vnode.state.symbol = res.token.symbol || '';
-            vnode.state.decimals = +res.token.decimals || 18;
             vnode.state.icon_url = res.token.icon_url || '';
             if (vnode.state.icon_url.startsWith('/')) {
               vnode.state.icon_url = `https://commonwealth.im${vnode.state.icon_url}`;
@@ -85,25 +83,22 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             vnode.state.github = res.token.github || '';
             vnode.state.status = 'Success!';
           } else {
-            // attempt to query ERC20Detailed token info from chain
+            // attempt to query ERC721Detailed token info from chain
             console.log('Querying chain for ERC info');
             const provider = new Web3.providers.WebsocketProvider(args.url);
             try {
               const ethersProvider = new providers.Web3Provider(provider);
-              const contract = IERC20Metadata__factory.connect(args.address, ethersProvider);
+              const contract = IERC721Metadata__factory.connect(args.address, ethersProvider);
               const name = await contract.name();
               const symbol = await contract.symbol();
-              const decimals = await contract.decimals();
               vnode.state.name = name || '';
               vnode.state.id = name && slugify(name);
               vnode.state.symbol = symbol || '';
-              vnode.state.decimals = decimals || 18;
               vnode.state.status = 'Success!';
             } catch (e) {
               vnode.state.name = '';
               vnode.state.id = '';
               vnode.state.symbol = '';
-              vnode.state.decimals = 18;
               vnode.state.status = 'Verified token but could not load metadata.';
             }
             vnode.state.icon_url = '';
@@ -206,7 +201,6 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
             github,
             chain_id,
             url,
-            decimals,
             alt_wallet_url,
           } = vnode.state;
           vnode.state.saving = true;
@@ -223,11 +217,10 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
               element,
               telegram,
               github,
-              decimals,
               jwt: app.user.jwt,
               type: ChainType.Token,
               base: ChainBase.Ethereum,
-              network: ChainNetwork.ERC20,
+              network: ChainNetwork.ERC721,
               node_url: url,
               eth_chain_id: +chain_id,
               alt_wallet_url,
@@ -237,7 +230,7 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
           } catch (err) {
             notifyError(
               err.responseJSON?.error ||
-              'Creating new ERC20 community failed'
+              'Creating new ERC721 community failed'
             );
           } finally {
             vnode.state.saving = false;
@@ -248,4 +241,4 @@ const ERC20Form: m.Component<ERC20FormAttrs, ERC20FormState> = {
   },
 };
 
-export default ERC20Form;
+export default ERC721Form;

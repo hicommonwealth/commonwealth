@@ -341,7 +341,8 @@ export async function initChain(): Promise<void> {
 }
 
 export async function initNewTokenChain(address: string) {
-  const response = await $.getJSON('/api/getTokenForum', { address, autocreate: true });
+  const chain_network = app.chain.network;
+  const response = await $.getJSON('/api/getTokenForum', { address, chain_network, autocreate: true });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');

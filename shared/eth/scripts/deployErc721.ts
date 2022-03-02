@@ -2,7 +2,7 @@ import { providers } from 'ethers';
 import Web3 from 'web3';
 
 import {
-  ERC721MintAtConstruction__factory as TokenFactory,
+  ERC721Mintable__factory as TokenFactory,
 } from '../types';
 
 async function main() {

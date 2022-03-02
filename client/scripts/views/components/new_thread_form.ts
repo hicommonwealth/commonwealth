@@ -556,7 +556,11 @@ export const NewThreadForm: m.Component<{
             ? m(FormGroup, { span: { xs: 12, sm: 5 }, order: 1 }, [
               m(TopicSelector, {
                 defaultTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeChainId()}-active-topic`),
-                topics: app.topics.getByCommunity(app.activeChainId()),
+                topics: app.topics && app.topics.getByCommunity(app.activeChainId()).filter((t) => {
+                  return isAdmin
+                    || t.tokenThreshold.isZero()
+                    || !TopicGateCheck.isGatedTopic(t.name);
+                }),
                 featuredTopics: app.topics.getByCommunity(app.activeChainId())
                   .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
                 updateFormData: updateTopicState,
