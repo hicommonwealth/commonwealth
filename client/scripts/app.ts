@@ -10,27 +10,24 @@ import 'simplepicker/dist/simplepicker.css';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { FocusManager } from 'construct-ui';
+import {FocusManager} from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
-import _ from 'underscore';
 
-import app, { ApiStatus, LoginState } from 'state';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
-import {
-  ChainInfo,
-  NodeInfo,
-  NotificationCategory,
-} from 'models';
+import app, {ApiStatus, LoginState} from 'state';
+import {ChainBase, ChainNetwork, ChainType} from 'types';
+import {ChainInfo, NodeInfo, NotificationCategory,} from 'models';
 
-import { notifyError, notifySuccess, notifyInfo } from 'controllers/app/notifications';
-import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import {WebSocketController} from 'controllers/server/socket';
 
-import { Layout } from 'views/layout';
+import {notifyError, notifyInfo, notifySuccess} from 'controllers/app/notifications';
+import {updateActiveAddresses, updateActiveUser} from 'controllers/app/login';
+
+import {Layout} from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import LoginModal from 'views/modals/login_modal';
-import { alertModalWithText } from 'views/modals/alert_modal';
-import { pathIsDiscussion } from './identifiers';
+import {alertModalWithText} from 'views/modals/alert_modal';
+import {pathIsDiscussion} from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -45,6 +42,7 @@ const APPLICATION_UPDATE_ACTION = 'Okay';
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true, customDomain = null): Promise<void> {
+
   return new Promise((resolve, reject) => {
     $.get(`${app.serverUrl()}/status`).then( async (data) => {
       app.config.chains.clear();
@@ -79,6 +77,15 @@ export async function initAppState(updateSelectedNode = true, customDomain = nul
       console.log(data);
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+
+      if (!app.socket && app.loginState === LoginState.LoggedIn) {
+        app.socket = new WebSocketController(app.user.jwt);
+        app.user.notifications.refresh().then(() => m.redraw());
+      } else if (app.socket && app.loginState === LoginState.LoggedOut) {
+        app.socket.disconnect();
+        app.socket = undefined;
+      }
+
       app.user.setStarredCommunities(data.user ? data.user.starredCommunities : []);
 
       // update the selectedNode, unless we explicitly want to avoid
@@ -657,6 +664,7 @@ Promise.all([
       // Scoped routes
       //
       '/':                         importRoute('views/pages/landing', { scoped: false, hideSidebar: false }),
+      '/communities':              importRoute('views/pages/community_cards', { scoped: false, hideSidebar: false }),
       '/search':                   importRoute('views/pages/search', { scoped: false, deferChain: true }),
       '/whyCommonwealth':          importRoute('views/pages/commonwealth', { scoped: false, hideSidebar: true }),
       // Notifications
@@ -827,51 +835,18 @@ Promise.all([
 
   // initialize the app
   initAppState(true, customDomain).then(async () => {
-    // setup notifications and websocket if not already set up
-    if (!app.socket) {
-      let jwt;
+    if (app.loginState === LoginState.LoggedIn) {
       // refresh notifications once
-      if (app.loginState === LoginState.LoggedIn) {
-        app.user.notifications.refresh().then(() => m.redraw());
-        jwt = app.user.jwt;
-      }
-      // grab discussion drafts
-      if (app.loginState === LoginState.LoggedIn) {
-        app.user.discussionDrafts.refreshAll().then(() => m.redraw());
-      }
-
-      handleInviteLinkRedirect();
-
-      // If the user updates their email
-      handleUpdateEmailConfirmation();
-
-      // subscribe to notifications
-      // const wsUrl = document.location.origin
-      //   .replace('http://', 'ws://')
-      //   .replace('https://', 'wss://');
-      // app.socket = new WebsocketController(wsUrl, jwt, null);
-      // if (app.loginState === LoginState.LoggedIn) {
-      //   app.socket.addListener(
-      //     WebsocketMessageType.Notification,
-      //     (payload: IWebsocketsPayload<any>) => {
-      //       if (payload.data && payload.data.subscription_id) {
-      //         const subscription = app.user.notifications.subscriptions.find(
-      //           (sub) => sub.id === payload.data.subscription_id
-      //         );
-      //         // note that payload.data should have the correct JSON form
-      //         if (subscription) {
-      //           console.log('adding new notification from websocket:', payload.data);
-      //           const notification = Notification.fromJSON(payload.data, subscription);
-      //           app.user.notifications.update(notification);
-      //           m.redraw();
-      //         }
-      //       } else {
-      //         console.error('got invalid notification payload:', payload);
-      //       }
-      //     },
-      //   );
-      // }
+      app.user.notifications.refresh().then(() => m.redraw());
+      // grab all discussion drafts
+      app.user.discussionDrafts.refreshAll().then(() => m.redraw());
     }
+
+
+    handleInviteLinkRedirect();
+    // If the user updates their email
+    handleUpdateEmailConfirmation();
+
     m.redraw();
   }).catch((err) => {
     m.redraw();

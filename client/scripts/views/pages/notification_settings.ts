@@ -127,9 +127,7 @@ const BatchedSubscriptionRow: m.Component<{
     if (!subscriptions) return;
 
     const singleLabel = (subscription: NotificationSubscription) => {
-      const chain = subscription.Chain
-        ? subscription.Chain.id
-        : null;
+      const chain = subscription.Chain || null;
       switch (subscription.category) {
         case (NotificationCategories.NewComment): {
           const threadOrComment = subscription.OffchainThread
@@ -175,9 +173,7 @@ const BatchedSubscriptionRow: m.Component<{
 
     const batchLabel = (batchLabelSubscriptions: NotificationSubscription[]) => {
       const subscription = batchLabelSubscriptions[0];
-      const chain = subscription.Chain
-        ? subscription.Chain.id
-        : null;
+      const chain = subscription.Chain || null;
 
       const threadOrComment = subscription.OffchainThread
         ? decodeURIComponent(subscription.OffchainThread.title)
@@ -546,7 +542,7 @@ const IndividualCommunityNotifications: m.Component<{
   view: (vnode) => {
     const { community, subscriptions } = vnode.attrs;
     const filteredSubscriptions = subscriptions.filter(
-      (s) => (s.Chain?.id === community.id)
+      (s) => (s.Chain === community.id)
         && s.category !== NotificationCategories.NewThread
         && s.category !== NotificationCategories.NewMention
         && s.category !== NotificationCategories.NewCollaboration
