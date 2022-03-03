@@ -344,7 +344,7 @@ const ProposalHeader: m.Component<
                                 if (snapshotSpaces.length > 1) {
                                   navigateToSubpage('/multiple-snapshots', {
                                     action: 'create-from-thread',
-                                    proposal: proposal,
+                                    proposal,
                                   });
                                 } else {
                                   navigateToSubpage(
@@ -1183,11 +1183,10 @@ const ViewProposalPage: m.Component<
         role: 'moderator',
         chain: app.activeChainId(),
       });
-    const isAdminOnly =
-      app.user.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-      });
+    const isAdminOnly = app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+    });
 
     if (proposal instanceof SubstrateTreasuryTip) {
       const {
@@ -1343,7 +1342,7 @@ const ViewProposalPage: m.Component<
           showLinkedThreadOptions &&
             proposal instanceof OffchainThread &&
             m(ProposalLinkedThreadsEditorModule, {
-              proposal,
+              proposalId: proposal.id,
               allowLinking: isAuthor || isAdmin,
             }),
         ],
