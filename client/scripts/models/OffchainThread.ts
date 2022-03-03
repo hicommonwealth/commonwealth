@@ -20,8 +20,8 @@ interface IOffchainVotingOptions {
 
 export interface LinkedThreadRelation {
   id: string;
-  linked_thread: string;
-  linking_thread: string;
+  linkedThread: string;
+  linkingThread: string;
 }
 
 interface IThreadCollaborator {
@@ -228,7 +228,7 @@ class OffchainThread implements IUniqueId {
     this.offchainVotingNumVotes = offchainVotingNumVotes;
     this.offchainVotes = offchainVotes || [];
     this.lastEdited = lastEdited;
-    this.linkedThreads = linkedThreads;
+    this.linkedThreads = linkedThreads || [];
   }
 }
 
