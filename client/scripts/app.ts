@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import 'lib/normalize.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
 import '../styles/lib/style.css';
