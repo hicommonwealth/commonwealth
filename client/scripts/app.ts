@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import 'lib/normalize.css';
-import 'lib/flexboxgrid.css';
-import 'lity/dist/lity.min.css';
-import 'construct.scss';
-// import 'tailwindcss/tailwind.css';
-import '../styles/style.css';
+
 import '../styles/lib/style.css';
-import 'simplepicker/dist/simplepicker.css';
+import 'construct.scss';
+import 'lity/dist/lity.min.css';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -81,6 +77,12 @@ export async function initAppState(
         );
         app.config.invites = data.invites;
 
+        // add recentActivity
+        const { recentThreads } = data;
+        Object.entries(recentThreads).forEach(([comm, count]) => {
+          app.recentActivity.setCommunityThreadCounts(comm, count);
+        });
+
         // update the login status
         updateActiveUser(data.user);
         app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
@@ -93,13 +95,6 @@ export async function initAppState(
           app.socket = undefined;
         }
 
-        app.user.setStarredCommunities(
-          data.user ? data.user.starredCommunities : []
-        );
-
-        // update the login status
-        updateActiveUser(data.user);
-        app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
         app.user.setStarredCommunities(
           data.user ? data.user.starredCommunities : []
         );
