@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import 'lity/dist/lity.min.css';
-import 'construct.scss';
 import '../styles/lib/style.css';
+import 'construct.scss';
+import 'lity/dist/lity.min.css';
 
 import m from 'mithril';
 import $ from 'jquery';
