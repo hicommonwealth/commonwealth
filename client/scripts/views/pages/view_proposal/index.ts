@@ -61,7 +61,7 @@ import ProposalVotingActions, {
 } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import PageLoading from 'views/pages/loading';
-import PageNotFound from 'views/pages/404';
+import { PageNotFound } from 'views/pages/404';
 
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
