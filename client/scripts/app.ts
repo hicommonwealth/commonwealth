@@ -3,7 +3,6 @@
 import 'lib/normalize.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
-import '../styles/style.css';
 import '../styles/lib/style.css';
 
 import m from 'mithril';
