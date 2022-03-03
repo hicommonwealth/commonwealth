@@ -162,8 +162,37 @@
     }
   }
   @include xs-max {
-    .ql-toolbar .ql-formats:last-child {
-      padding-right: 80px;
+    .type-selector {
+      position: absolute;
+      display: flex;
+      right: 100px;
+      top: 6px;
+      user-select: none;
+      .cui-tag {
+        cursor: pointer;
+        margin-top: 3px;
+        margin-right: 0;
+      }
+    }
+    .preview-button-wrap {
+      position: absolute;
+      display: flex;
+      right: 10px;
+      top: 6px;
+      user-select: none;
+      .preview-button {
+        display: flex;
+      }
+      .cui-tag {
+        cursor: pointer;
+        margin-top: 3px;
+        margin-right: 0;
+      }
+      svg {
+        margin-right: 5px;
+        top: -1px;
+        position: relative;
+      }
     }
   }
 

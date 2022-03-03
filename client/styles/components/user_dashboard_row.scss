@@ -53,14 +53,14 @@
         }
       }
       .comment-body {
-        margin: 7px 0 8px 32px;
+        margin: 7px 0 8px 25px;
         &-concat {
           text-overflow: ellipsis;
           overflow: hidden;
           display: -webkit-box;
           -webkit-line-clamp: 3;
           -webkit-box-orient: vertical;
-          margin: 7px 0 8px 32px;
+          margin: 7px 0 8px 25px;
           .MarkdownFormattedText {
             white-space: inherit !important;
           }
