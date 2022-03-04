@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import '../styles/lib/style.css';
+import '../styles/normalize.css';
+import '../styles/tailwind_reset.css';
+import '../styles/shared.scss';
 import 'construct.scss';
 import 'lity/dist/lity.min.css';
 
