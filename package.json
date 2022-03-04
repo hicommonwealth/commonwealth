@@ -5,7 +5,7 @@
     "build": "webpack --config webpack/webpack.config.prod.js --progress",
     "build-scripts": "tsc --project server/tsconfig.json",
     "build-contracts": "cd shared/eth && npx hardhat compile",
-    "build:css": "NODE_ENV=production build client/styles/lib/style.css",
+    "build:css": "NODE_ENV=production build client/styles/shared.scss",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "check-types": "tsc --noEmit",
     "stylelint": "stylelint client/styles/*",
