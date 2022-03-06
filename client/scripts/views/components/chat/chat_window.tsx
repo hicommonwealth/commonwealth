@@ -111,12 +111,6 @@ const ChatWindow: m.Component<IAttrs, IState> = {
           )}
           {groupedMessages.map((grp) => (
             <div class="chat-message-group">
-              {grp.messages.map((msg) => (
-                <div class="chat-message-text">
-                  {m(MarkdownFormattedText, { doc: msg.message, openLinksInNewTab: true })}
-                </div>
-              ))}
-              <div class="clear" />
               {m(User, {
                 user: new AddressInfo(
                   null,
@@ -124,11 +118,18 @@ const ChatWindow: m.Component<IAttrs, IState> = {
                   app.activeChainId(),
                   null
                 ),
+                avatarSize: 24,
                 linkify: true,
               })}
               <div class="chat-message-group-timestamp">
                 {formatTimestampForChat(grp.messages[0].created_at)}
               </div>
+              <div class="clear" />
+              {grp.messages.map((msg) => (
+                <div class="chat-message-text">
+                  {m(MarkdownFormattedText, { doc: msg.message, openLinksInNewTab: true })}
+                </div>
+              ))}
             </div>
           ))}
         </div>

@@ -34,6 +34,10 @@
         }
         .chat-message-group {
             margin: 18px 0;
+
+            .User > .user-avatar {
+                top: 3px;
+            }
         }
         .chat-message-group + .chat-message-group {
             margin-top: 20px;
@@ -43,7 +47,7 @@
             color: $text-color-light;
         }
         .chat-message-text {
-            margin: 2px 0;
+            margin: -2px 0px 0px 32px;
         }
         .User {
             margin-bottom: 2px;
