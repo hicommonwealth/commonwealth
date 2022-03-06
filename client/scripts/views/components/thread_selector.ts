@@ -26,12 +26,14 @@ const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
     label: m('.linked-thread-info', [
       m('.linked-thread-top', thread.title),
       m('.linked-thread-bottom', [
-        author.name ? `${author.name} • ${formatAddressShort(thread.author)}` : thread.author,
+        author.name
+          ? `${author.name} • ${formatAddressShort(thread.author)}`
+          : thread.author,
       ]),
     ]),
     selected,
     key: idx,
-    style: state.selectInProgress ? 'cursor: wait' : ''
+    style: state.selectInProgress ? 'cursor: wait' : '',
   });
 };
 
@@ -41,10 +43,12 @@ const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
 export const ThreadSelector: m.Component<
   {
     linkingThread: OffchainThread;
+    linkedThreads: OffchainThread[];
   },
   {
     linkedThreads: OffchainThread[];
-    linkedThreadsFetched: boolean;
+    fetchLinkedThreads: boolean;
+    loading: boolean;
     showOnlyLinkedThreads: boolean;
     inputTimeout;
     searchTerm: string;
@@ -56,47 +60,40 @@ export const ThreadSelector: m.Component<
   oninit: (vnode) => {
     vnode.state.showOnlyLinkedThreads = true;
     vnode.state.searchResults = [];
-    vnode.state.linkedThreads = [];
+    vnode.state.linkedThreads = vnode.attrs.linkedThreads;
   },
   view: (vnode) => {
     const { linkingThread } = vnode.attrs;
-    const { linkedThreads, linkedThreadsFetched, searchResults } = vnode.state;
-    // The modal kicks off by fetching the offchain threads linked to by a given parent.
-    const hasLinkedThreads = !!linkingThread.linkedThreads?.length;
-    if (!hasLinkedThreads) {
-      vnode.state.linkedThreadsFetched = true;
-      m.redraw();
-    } else if (!linkedThreadsFetched) {
-      app.threads
-        .fetchThreadsFromId(
-          linkingThread.linkedThreads.map(
-            (relation: LinkedThreadRelation) => relation.linked_thread
-          )
-        )
-        .then((result) => {
-          vnode.state.linkedThreads = result;
-          vnode.state.linkedThreadsFetched = true;
-          m.redraw();
-        })
-        .catch((err) => {
-          console.error(err);
-          vnode.state.linkedThreadsFetched = true;
-        });
+    const { searchResults } = vnode.state;
+
+    if (!vnode.state.linkedThreads) {
+      vnode.state.linkedThreads = [];
     }
+    const { linkedThreads } = vnode.state;
 
     const queryLength = vnode.state.searchTerm?.trim()?.length;
-    const emptyContentMessage =
-      queryLength > 0 && queryLength <= 4
-        ? 'Query too short'
-        : queryLength > 4 && !searchResults?.length
-        ? 'No threads found'
-        : !vnode.state.linkedThreads?.length
-        ? 'No currently linked threads'
-        : null;
+
+    let emptyContentMessage;
+    if (queryLength > 0 && queryLength < 5) {
+      emptyContentMessage = 'Query too short';
+    } else if (queryLength >= 5 && !searchResults.length) {
+      emptyContentMessage = 'No threads found';
+    } else if (!linkedThreads?.length) {
+      emptyContentMessage = 'No currently linked threads';
+    }
 
     return m('.ThreadSelector', [
-      linkedThreadsFetched
-        ? m(ControlGroup, [
+      vnode.state.loading
+        ? m('.linked-threads-selector-placeholder', [
+            m('.linked-threads-selector-placeholder-text', [
+              m(Spinner, {
+                active: true,
+                fill: true,
+                message: 'Loading offchain threads...',
+              }),
+            ]),
+          ])
+        : m(ControlGroup, [
             m(Input, {
               placeholder: 'Search thread titles...',
               name: 'thread-search',
@@ -120,20 +117,23 @@ export const ThreadSelector: m.Component<
                 vnode.state.searchTerm = target.value;
                 vnode.state.showOnlyLinkedThreads = false;
                 vnode.state.inputTimeout = setTimeout(async () => {
-                  m.redraw();
                   if (target.value?.trim().length > 4) {
                     vnode.state.fetchingResults = true;
                     const params: SearchParams = {
                       chainScope: app.activeChainId(),
                       resultSize: 20,
                     };
-                    app.search.searchThreadTitles(vnode.state.searchTerm, params)
+                    app.search
+                      .searchThreadTitles(vnode.state.searchTerm, params)
                       .then((results) => {
                         vnode.state.fetchingResults = false;
                         vnode.state.searchResults = results;
                         results.forEach((thread) => {
-                          app.profiles.getProfile(thread.authorChain, thread.author);
-                        })
+                          app.profiles.getProfile(
+                            thread.authorChain,
+                            thread.author
+                          );
+                        });
                         m.redraw();
                       })
                       .catch(() => {
@@ -152,9 +152,10 @@ export const ThreadSelector: m.Component<
                 placeholder: 'Search for offchain thread to link...',
               },
               emptyContent: emptyContentMessage,
-              items: (vnode.state.showOnlyLinkedThreads && !queryLength)
-                ? linkedThreads
-                : searchResults,
+              items:
+                vnode.state.showOnlyLinkedThreads && !queryLength
+                  ? linkedThreads
+                  : searchResults,
               itemRender: (item: OffchainThread, idx) =>
                 renderThreadPreview(vnode.state, item, idx),
               onSelect: (thread: OffchainThread) => {
@@ -189,15 +190,6 @@ export const ThreadSelector: m.Component<
                 }
               },
             }),
-          ])
-        : m('.linked-threads-selector-placeholder', [
-            m('.linked-threads-selector-placeholder-text', [
-              m(Spinner, {
-                active: true,
-                fill: true,
-                message: 'Loading offchain threads...',
-              }),
-            ]),
           ]),
     ]);
   },

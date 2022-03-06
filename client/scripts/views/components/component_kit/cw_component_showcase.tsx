@@ -84,20 +84,16 @@ export class ComponentShowcase implements m.ClassComponent {
         <h1>Icons</h1>
         <div class="icon-gallery">
           <div class="icon-row">
-            Primary Small
+            Small
             <CWIcon iconName="views" iconSize="small" />
           </div>
           <div class="icon-row">
-            Primary Medium
+            Medium
             <CWIcon iconName="views" />
           </div>
           <div class="icon-row">
-            Primary Large
+            Large
             <CWIcon iconName="views" iconSize="large" />
-          </div>
-          <div class="icon-row">
-            Secondary Large
-            <CWIcon iconName="views" iconSize="large" iconType="secondary" />
           </div>
           <div class="icon-row">
             Disabled Large
