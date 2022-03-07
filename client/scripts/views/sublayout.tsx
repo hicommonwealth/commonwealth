@@ -48,7 +48,7 @@ const footercontents = [
   { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
   {
     text: 'Discord',
-    externalLink: 'https://discord.gg/vYcfQ758',
+    externalLink: 'https://discord.gg/t9XscHdZrG',
   },
   {
     text: 'Telegram',
