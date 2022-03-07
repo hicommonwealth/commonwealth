@@ -176,7 +176,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
           ssl: { rejectUnauthorized: false },
         },
   pool: {
-    max: 5,
+    max: 10,
     min: 5,
     acquire: 40000,
     idle: 40000,
