@@ -258,7 +258,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           },
           { text: 'Terms', redirectTo: '/terms' },
           { text: 'Privacy', redirectTo: '/privacy' },
-          { text: 'Discord', externalLink: 'https://discord.gg/vYcfQ758' },
+          { text: 'Discord', externalLink: 'https://discord.gg/t9XscHdZrG' },
           { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
           {
             text: 'Twitter',

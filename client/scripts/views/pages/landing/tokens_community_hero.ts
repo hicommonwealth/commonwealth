@@ -164,7 +164,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                         'a',
                         {
                           class: 'ml-4',
-                          href: 'https://discord.gg/vYcfQ758',
+                          href: 'https://discord.gg/t9XscHdZrG',
                           target: '_blank'
                         },
                         [
