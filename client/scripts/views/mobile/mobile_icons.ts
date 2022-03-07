@@ -61,6 +61,45 @@ export const CustomCommentIcon = {
   },
 };
 
+export const CustomEyeIcon = {
+  view: (vnode) => {
+    return m(
+      'svg.CustomEyeIcon',
+      {
+        width: '35',
+        height: '34',
+        viewBox: '0 0 35 34',
+        fill: 'none',
+        xmlns: 'http://www.w3.org/2000/svg',
+      },
+      [
+        m('path', {
+          'fill-rule': 'evenodd',
+          'clip-rule': 'evenodd',
+          d: `M2.39893 16.9998C2.39893 16.9998 8.06559 5.6665 17.9823 5.6665C27.8989 
+          5.6665 33.5656 16.9998 33.5656 16.9998C33.5656 16.9998 27.8989 28.3332 17.9823 
+          28.3332C8.06559 28.3332 2.39893 16.9998 2.39893 16.9998Z`,
+          stroke: '#666666',
+          'stroke-width': '2',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }),
+        m('path', {
+          'fill-rule': 'evenodd',
+          'clip-rule': 'evenodd',
+          d: `M17.9821 23.2913C21.4566 23.2913 24.2732 20.4746 24.2732 17.0001C24.2732 
+          13.5256 21.4566 10.709 17.9821 10.709C14.5076 10.709 11.6909 13.5256 11.6909 
+          17.0001C11.6909 20.4746 14.5076 23.2913 17.9821 23.2913Z`,
+          stroke: '#666666',
+          'stroke-width': '2',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }),
+      ]
+    );
+  },
+};
+
 export const CustomPencilIcon = {
   view: (vnode) => {
     return m(
