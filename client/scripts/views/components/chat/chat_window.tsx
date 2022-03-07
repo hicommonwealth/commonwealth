@@ -13,6 +13,7 @@ import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { WebsocketMessageNames } from 'types';
+import {Icon, Icons, Size} from 'construct-ui';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -86,7 +87,7 @@ const ChatWindow: m.Component<IAttrs, IState> = {
     }, []);
 
     const handleSubmitMessage = (e) => {
-      if (e.keyCode === 13 && !e.shiftKey) {
+      if (e.type === 'click' || (e.keyCode === 13 && !e.shiftKey)) {
         e.preventDefault();
         if (!app.socket.chatNs.isConnected) return;
         const $textarea = $(e.target)
@@ -111,12 +112,6 @@ const ChatWindow: m.Component<IAttrs, IState> = {
           )}
           {groupedMessages.map((grp) => (
             <div class="chat-message-group">
-              {grp.messages.map((msg) => (
-                <div class="chat-message-text">
-                  {m(MarkdownFormattedText, { doc: msg.message, openLinksInNewTab: true })}
-                </div>
-              ))}
-              <div class="clear" />
               {m(User, {
                 user: new AddressInfo(
                   null,
@@ -125,10 +120,17 @@ const ChatWindow: m.Component<IAttrs, IState> = {
                   null
                 ),
                 linkify: true,
+                avatarSize: 24,
               })}
               <div class="chat-message-group-timestamp">
                 {formatTimestampForChat(grp.messages[0].created_at)}
               </div>
+              <div class="clear" />
+              {grp.messages.map((msg) => (
+                  <div class="chat-message-text">
+                    {m(MarkdownFormattedText, { doc: msg.message, openLinksInNewTab: true })}
+                  </div>
+              ))}
             </div>
           ))}
         </div>
@@ -156,6 +158,7 @@ const ChatWindow: m.Component<IAttrs, IState> = {
                 : 'Disconnected',
               onkeypress: handleSubmitMessage,
             })}
+            <Icon name={Icons.SEND} onclick={handleSubmitMessage} size={Size.LG}/>
           </form>
         )}
       </div>

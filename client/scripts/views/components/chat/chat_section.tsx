@@ -169,8 +169,10 @@ export class ChatSection
   }
 
   view(vnode) {
-    if (!app.socket) return <div>No</div>;
-    if (!this.loaded) return <Spinner></Spinner>;
+    if (!app.socket) return;
+    if (!this.loaded) return <Spinner/>;
+
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId()})
     this.channels = {};
     vnode.attrs.channels.forEach((c) => {
       const { ChatMessages, ...metadata } = c;
@@ -368,7 +370,7 @@ export class ChatSection
         onclick: () => {
           navigateToSubpage(`/chat/${channel.id}`);
         },
-        rightIcon: channelRightIcon(channel),
+        rightIcon: isAdmin && channelRightIcon(channel),
       };
     };
 
@@ -384,7 +386,7 @@ export class ChatSection
           e.preventDefault();
         },
         displayData: this.channels[category].map(channelToSubSectionProps),
-        rightIcon: categoryAdminButton(category),
+        rightIcon: isAdmin && categoryAdminButton(category),
       };
     };
 
@@ -429,7 +431,7 @@ export class ChatSection
       },
       displayData: channelData,
       isActive: false,
-      rightIcon: sectionAdminButton,
+      rightIcon: isAdmin && sectionAdminButton,
       extraComponents: (
         <Overlay
           class="chatAdminOverlay"

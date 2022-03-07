@@ -13,10 +13,9 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
         return next(new Error(Errors.NotLoggedIn));
     }
 
-    // TODO: re-enable
-    // if (!req.user.isAdmin) {
-    //     return next(new Error(Errors.NotAdmin))
-    // }
+    if (!req.user.isAdmin) {
+        return next(new Error(Errors.NotAdmin))
+    }
 
     if (!req.body.chain_id) {
         return next(new Error(Errors.NoChainId))
