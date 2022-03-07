@@ -3,7 +3,7 @@ import moment from 'moment';
 import {addPrefix, factory} from '../../shared/logging';
 import {
     WebsocketEngineEvents,
-    WebsocketMessageType,
+    WebsocketMessageNames,
     WebsocketNamespaces,
 } from '../../shared/types';
 import {authenticate} from './index';
@@ -12,7 +12,7 @@ import {DB} from '../database';
 const log = factory.getLogger(addPrefix(__filename));
 
 export function createChatNamespace(io: Server, models: DB) {
-    const ChatNs = io.of('/chat');
+    const ChatNs = io.of(`/${WebsocketNamespaces.Chat}`);
     io.use(authenticate)
 
     ChatNs.on('connection', (socket) => {
@@ -22,21 +22,21 @@ export function createChatNamespace(io: Server, models: DB) {
             log.info(`${socket.id} disconnected from Chat`);
         });
 
-        socket.on(WebsocketMessageType.JoinChatChannel, (chatChannelIds: string[]) => {
+        socket.on(WebsocketMessageNames.JoinChatChannel, (chatChannelIds: string[]) => {
             if (chatChannelIds.length > 0) {
                 log.info(`${socket.id} joining ${JSON.stringify(chatChannelIds)}`);
                 for (const channel of chatChannelIds) socket.join(channel);
             }
         })
 
-        socket.on(WebsocketMessageType.LeaveChatChannel, (chatChannelIds: string[]) => {
+        socket.on(WebsocketMessageNames.LeaveChatChannel, (chatChannelIds: string[]) => {
             if (chatChannelIds.length > 0) {
                 log.info(`${socket.id} leaving ${JSON.stringify(chatChannelIds)}`);
                 for (const channel of chatChannelIds) socket.leave(channel);
             }
         })
 
-        socket.on(WebsocketMessageType.ChatMessage, (_message) => {
+        socket.on(WebsocketMessageNames.ChatMessage, (_message) => {
             const { message, address, chat_channel_id, now, socket_room } = _message
             const now_date = moment(now).toDate()
             models.ChatMessage.create({ address, message, chat_channel_id, created_at: now_date, updated_at: now_date })
@@ -44,7 +44,7 @@ export function createChatNamespace(io: Server, models: DB) {
                     const { id, created_at } = res
                     ChatNs
                       .to(`${socket_room}`)
-                      .emit(WebsocketMessageType.ChatMessage, { id, address, message, chat_channel_id, created_at });
+                      .emit(WebsocketMessageNames.ChatMessage, { id, address, message, chat_channel_id, created_at });
                 })
                 .catch((e) => {
                     socket.emit('Error', e)

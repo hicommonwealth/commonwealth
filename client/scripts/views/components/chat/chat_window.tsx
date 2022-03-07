@@ -12,7 +12,7 @@ import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import { WebsocketMessageType } from 'types';
+import { WebsocketMessageNames } from 'types';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -53,13 +53,13 @@ const ChatWindow: m.Component<IAttrs, IState> = {
       m.redraw();
     };
     app.socket.chatNs.addListener(
-      WebsocketMessageType.ChatMessage,
+      WebsocketMessageNames.ChatMessage,
       vnode.state.onIncomingMessage.bind(vnode)
     );
   },
   onremove: (vnode) => {
     app.socket.chatNs.removeListener(
-      WebsocketMessageType.ChatMessage,
+      WebsocketMessageNames.ChatMessage,
       vnode.state.onIncomingMessage
     );
   },

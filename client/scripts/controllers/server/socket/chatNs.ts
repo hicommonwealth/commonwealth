@@ -1,10 +1,8 @@
 import $ from 'jquery';
 import app from 'state';
-import { WebsocketMessageType, WebsocketNamespaces } from 'types';
+import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import { io } from 'socket.io-client';
 import _ from 'lodash';
-
-export const MESSAGE_PAGE_SIZE = 50;
 
 export enum ChatErrors {
     NOT_LOGGED_IN='User must be logged in to load chat'
@@ -45,18 +43,18 @@ export class ChatNamespace {
     }
 
     public sendMessage(message: Record<string, any>, channel: IChannel) {
-        this.chatNs.emit(WebsocketMessageType.ChatMessage, {
+        this.chatNs.emit(WebsocketMessageNames.ChatMessage, {
             socket_room: ChatNamespace.channelToRoomId(channel),
             ...message
         })
     }
 
     public connectToChannels(channel_ids: string[]){
-        this.chatNs.emit(WebsocketMessageType.JoinChatChannel, channel_ids)
+        this.chatNs.emit(WebsocketMessageNames.JoinChatChannel, channel_ids)
     }
 
     public disconnectFromChannels(channel_ids: string[]){
-        this.chatNs.emit(WebsocketMessageType.LeaveChatChannel, channel_ids)
+        this.chatNs.emit(WebsocketMessageNames.LeaveChatChannel, channel_ids)
     }
 
     private onConnect() {
@@ -86,14 +84,14 @@ export class ChatNamespace {
             this.channels[c.id] = { unread: 0, ...c }
         });
 
-        this.addListener(WebsocketMessageType.ChatMessage, this.onMessage.bind(this))
+        this.addListener(WebsocketMessageNames.ChatMessage, this.onMessage.bind(this))
         this.connectToChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
         this._intialized = true;
     }
 
     public async deinit() {
         this._intialized = false;
-        this.removeListener(WebsocketMessageType.ChatMessage, this.onMessage.bind(this))
+        this.removeListener(WebsocketMessageNames.ChatMessage, this.onMessage.bind(this))
         this.disconnectFromChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
         this.channels = {}
     }

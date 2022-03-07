@@ -11,7 +11,7 @@ import { authenticate } from './index';
 const log = factory.getLogger(addPrefix(__filename));
 
 export function createCeNamespace(io: Server) {
-  const CeNs = io.of('/chain-events');
+  const CeNs = io.of(`/${WebsocketNamespaces.ChainEvents}`);
   io.use(authenticate);
 
   CeNs.on('connection', (socket) => {

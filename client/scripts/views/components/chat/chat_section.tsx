@@ -9,7 +9,7 @@ import 'components/sidebar/index.scss';
 import { navigateToSubpage } from 'app';
 import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
-import { WebsocketMessageType } from 'types';
+import { WebsocketMessageNames } from 'types';
 import { SidebarSection } from '../sidebar/sidebar_section';
 import {
   CreateCategory,
@@ -132,7 +132,7 @@ export class ChatSection
       m.redraw.sync();
     };
     app.socket.chatNs.addListener(
-      WebsocketMessageType.ChatMessage,
+      WebsocketMessageNames.ChatMessage,
       this.onIncomingMessage.bind(vnode)
     );
     this.loaded = true;
@@ -162,7 +162,7 @@ export class ChatSection
   onremove() {
     if (app.socket) {
       app.socket.chatNs.removeListener(
-        WebsocketMessageType.ChatMessage,
+        WebsocketMessageNames.ChatMessage,
         this.onIncomingMessage
       );
     }
