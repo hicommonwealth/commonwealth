@@ -79,22 +79,17 @@ export class MobileSidebar implements m.ClassComponent {
   private activeTab: string;
   private showNewThreadOptions: boolean;
 
-  view() {
-    if (!app) return;
-
-    let { activeTab } = this;
-
-    const { showNewThreadOptions } = this;
-
-    if (!app.activeChainId() && !app.activeChainId()) {
+  oninit() {
+    if (app && !app.activeChainId()) {
       this.activeTab = MenuTabs.Account;
-    }
-
-    if (!activeTab)
-      activeTab = app.activeChainId()
+    } else {
+      this.activeTab = app.activeChainId()
         ? MenuTabs.CurrentCommunity
         : MenuTabs.Account;
+    }
+  }
 
+  view() {
     const CurrentCommunityMenu = (
       <Menu class="CurrentCommunityMenu">
         {app.isLoggedIn() ? (
@@ -104,10 +99,10 @@ export class MobileSidebar implements m.ClassComponent {
               iconLeft={Icons.PLUS}
               onclick={(e) => {
                 e.stopPropagation();
-                this.showNewThreadOptions = !showNewThreadOptions;
+                this.showNewThreadOptions = !this.showNewThreadOptions;
               }}
             />
-            {showNewThreadOptions && getNewProposalMenu([], true)}
+            {this.showNewThreadOptions && getNewProposalMenu([], true)}
           </Menu>
         ) : (
           <MenuItem
@@ -121,7 +116,6 @@ export class MobileSidebar implements m.ClassComponent {
         <MenuDivider />
         {app.chain && m(DiscussionSection, { mobile: true })}
         {app.chain && m(GovernanceSection, { mobile: true })}
-        <br style="height: 10px" />
         {app.chain && m(ExternalLinksModule)}
       </Menu>
     );
@@ -132,7 +126,7 @@ export class MobileSidebar implements m.ClassComponent {
           {app.activeChainId() && (
             <TabItem
               label={capitalize(app.activeChainId())}
-              active={activeTab === MenuTabs.CurrentCommunity}
+              active={this.activeTab === MenuTabs.CurrentCommunity}
               onclick={(e) => {
                 e.stopPropagation();
                 this.activeTab = MenuTabs.CurrentCommunity;
@@ -142,7 +136,7 @@ export class MobileSidebar implements m.ClassComponent {
           {app.activeChainId() && (
             <TabItem
               label="Communities"
-              active={activeTab === MenuTabs.AllCommunities}
+              active={this.activeTab === MenuTabs.AllCommunities}
               onclick={(e) => {
                 e.stopPropagation();
                 this.activeTab = MenuTabs.AllCommunities;
@@ -151,16 +145,16 @@ export class MobileSidebar implements m.ClassComponent {
           )}
           <TabItem
             label="Account"
-            active={activeTab === MenuTabs.Account}
+            active={this.activeTab === MenuTabs.Account}
             onclick={(e) => {
               e.stopPropagation();
               this.activeTab = MenuTabs.Account;
             }}
           />
         </Tabs>
-        {activeTab === MenuTabs.CurrentCommunity ? (
+        {this.activeTab === MenuTabs.CurrentCommunity ? (
           CurrentCommunityMenu
-        ) : activeTab === MenuTabs.AllCommunities ? (
+        ) : this.activeTab === MenuTabs.AllCommunities ? (
           <Menu class="AllCommunitiesMenu">
             {m(CommunitySelector, {
               showListOnly: true,
