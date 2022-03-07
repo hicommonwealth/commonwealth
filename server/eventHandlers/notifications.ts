@@ -7,7 +7,7 @@ import {
   CWEvent,
   IChainEventKind,
 } from '@commonwealth/chain-events';
-import { NotificationCategories } from '../../shared/types';
+import {ChainEventNotification, NotificationCategories} from '../../shared/types';
 
 import { addPrefix, factory, formatFilename } from '../../shared/logging';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
@@ -60,7 +60,7 @@ export default class extends IEventHandler {
       );
 
       // construct notification with all the necessary data from the DB (without having to re-query using joins)
-      const formattedEvent = dbNotification.toJSON();
+      const formattedEvent: ChainEventNotification = dbNotification.toJSON();
       formattedEvent.ChainEvent = dbEvent.toJSON()
       formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON()
 

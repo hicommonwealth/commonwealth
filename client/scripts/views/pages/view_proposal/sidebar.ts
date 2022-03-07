@@ -12,7 +12,11 @@ import {
 } from 'identifiers';
 import { OffchainThread } from 'models';
 import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
-import { loadMultipleSpacesData, SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import {
+  loadMultipleSpacesData,
+  SnapshotProposal,
+  SnapshotSpace,
+} from 'helpers/snapshot_utils';
 import LinkedThreadModal from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
 import Sublayout from '../../sublayout';
@@ -60,7 +64,7 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;
       loadMultipleSpacesData(app.chain.meta.chain.snapshot).then((data) => {
-        for (const {space, proposals} of data) {
+        for (const { space, proposals } of data) {
           const matching_snapshot = proposals.find(
             (sn) => sn.id === proposal.snapshotProposal
           );
@@ -129,85 +133,94 @@ export const ProposalSidebarPollEditorModule: m.Component<
   },
 };
 
-export const ProposalLinkedThreadsEditorModule: m.Component<{
-  proposal: OffchainThread;
-  allowLinking: boolean;
-}, {
-  linkedThreadsFetched: boolean;
-  linkedThreads: OffchainThread[];
-} > = {
+export const ProposalLinkedThreadsEditorModule: m.Component<
+  {
+    proposalId: number;
+    allowLinking: boolean;
+  },
+  {
+    fetchLinkedThreads: boolean;
+    loading: boolean;
+    linkedThreads: OffchainThread[];
+  }
+> = {
+  oninit: (vnode) => {
+    vnode.state.fetchLinkedThreads = true;
+  },
   view: (vnode) => {
-    const { proposal, allowLinking } = vnode.attrs;
-    const { linkedThreadsFetched } = vnode.state;
-    if (!linkedThreadsFetched) {
-      if (!proposal.linkedThreads?.length) {
-        vnode.state.linkedThreads = [];
-        vnode.state.linkedThreadsFetched = true;
-      } else {
-        const refreshedProposal = app.threads.getById(proposal.id);
-        app.threads
-          .fetchThreadsFromId(
-            refreshedProposal.linkedThreads.map(
-              (relation: LinkedThreadRelation) => relation.linked_thread
-            )
+    const { allowLinking, proposalId } = vnode.attrs;
+    const proposal = app.threads.getById(proposalId);
+    if (!vnode.state.linkedThreads) {
+      vnode.state.linkedThreads = [];
+    }
+    if (!proposal.linkedThreads?.length) {
+      vnode.state.fetchLinkedThreads = false;
+    }
+    if (vnode.state.fetchLinkedThreads) {
+      vnode.state.fetchLinkedThreads = false;
+      vnode.state.loading = true;
+      app.threads
+        .fetchThreadsFromId(
+          proposal.linkedThreads.map(
+            (relation: LinkedThreadRelation) => relation.linkedThread
           )
-          .then((result) => {
-            vnode.state.linkedThreads = result;
-            vnode.state.linkedThreadsFetched = true;
-            m.redraw();
-          })
-          .catch((err) => {
-            console.error(err);
-            vnode.state.linkedThreadsFetched = true;
-          });
-      }
-    } else if (allowLinking || proposal.linkedThreads.length) {
+        )
+        .then((result) => {
+          vnode.state.linkedThreads = result;
+          vnode.state.loading = false;
+        })
+        .catch((err) => {
+          console.error(err);
+          vnode.state.loading = false;
+        });
+      return null;
+    }
+    console.log(vnode.state.linkedThreads);
+    if (allowLinking || proposal.linkedThreads.length) {
       return m('.ProposalLinkedThreadsEditorModule', [
         !!vnode.state.linkedThreads?.length &&
-        m('.linked-threads-title', 'Linked Threads:'),
-        m(List, vnode.state.linkedThreads.map((thread) => {
-            const discussionLink =
-            `/${app.activeChainId()}/proposal/${thread.slug}/${thread.identifier}-` +
-            `${slugify(thread.title)}`;
+          m('.linked-threads-title', 'Linked Threads:'),
+        m(
+          List,
+          vnode.state.linkedThreads.map((thread) => {
+            const discussionLink = getProposalUrlPath(
+              thread.slug,
+              `${thread.identifier}-${slugify(thread.title)}`
+            );
             return m(ListItem, {
-              label: link(
-                'a.linked-thread',
-                discussionLink,
-                thread.title,
-              )
+              label: link('a.linked-thread', discussionLink, thread.title),
             });
           })
         ),
         allowLinking &&
-        m(Button, {
-          rounded: true,
-          compact: true,
-          fluid: true,
-          label: proposal.linkedThreads?.length
-            ? 'Link another Thread'
-            : 'Link threads',
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({
-              modal: LinkedThreadModal,
-              data: {
-                linkingThread: proposal,
-                onclose: () => {
-                  vnode.state.linkedThreadsFetched = false;
+          m(Button, {
+            disabled: vnode.state.loading,
+            rounded: true,
+            compact: true,
+            fluid: true,
+            label: proposal.linkedThreads?.length
+              ? 'Link another thread'
+              : 'Link threads',
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.create({
+                modal: LinkedThreadModal,
+                data: {
+                  linkingThread: proposal,
+                  linkedThreads: vnode.state.linkedThreads,
                 },
-              },
-            });
-          },
-        }),
+              });
+            },
+          }),
       ]);
     }
-  }
-}
+  },
+};
 
 export const ProposalSidebarLinkedViewer: m.Component<{
   proposal: OffchainThread;
   openStageEditor: Function;
-  showAddProposalButton: boolean
+  showAddProposalButton: boolean;
 }> = {
   view: (vnode) => {
     const { proposal, openStageEditor, showAddProposalButton } = vnode.attrs;
@@ -233,18 +246,18 @@ export const ProposalSidebarLinkedViewer: m.Component<{
       proposal.snapshotProposal?.length > 0 &&
         m(ProposalSidebarLinkedSnapshot, { proposal }),
       showAddProposalButton &&
-      m('.ConnectProposalButtonWrapper', [
-        m(Button, {
-          rounded: true,
-          compact: true,
-          fluid: true,
-          label: app.chain ? 'Connect a proposal' : 'Update status',
-          onclick: (e) => {
-            e.preventDefault();
-            openStageEditor();
-          },
-        }),
-      ])
+        m('.ConnectProposalButtonWrapper', [
+          m(Button, {
+            rounded: true,
+            compact: true,
+            fluid: true,
+            label: app.chain ? 'Connect a proposal' : 'Update status',
+            onclick: (e) => {
+              e.preventDefault();
+              openStageEditor();
+            },
+          }),
+        ]),
     ]);
   },
 };

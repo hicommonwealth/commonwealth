@@ -1,10 +1,10 @@
-import { WebsocketMessageType, WebsocketNamespaces } from 'types';
+import {ChainEventNotification, WebsocketMessageNames, WebsocketNamespaces} from 'types';
 import app from 'state';
 import { Notification, NotificationSubscription } from 'models';
-import { io } from 'socket.io-client';
+import {io, Socket} from 'socket.io-client';
 
 export class ChainEventsNamespace {
-  private ceNs;
+  private ceNs: Socket;
   private _isConnected = false;
 
   constructor() {
@@ -14,7 +14,7 @@ export class ChainEventsNamespace {
     this.ceNs.on('connect', this.onConnect.bind(this));
     this.ceNs.on('disconnect', this.onDisconnect.bind(this));
     this.ceNs.on(
-      WebsocketMessageType.ChainEventNotification,
+      WebsocketMessageNames.ChainEventNotification,
       this.onChainEvent.bind(this)
     );
   }
@@ -23,7 +23,7 @@ export class ChainEventsNamespace {
     if (this._isConnected) {
       const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
       console.log('Adding Websocket subscriptions for:', eventTypes);
-      this.ceNs.emit('newSubscriptions', eventTypes);
+      this.ceNs.emit(WebsocketMessageNames.NewSubscriptions, eventTypes);
     } else {
       console.log('ChainEventsNamespace is not connected');
     }
@@ -34,7 +34,7 @@ export class ChainEventsNamespace {
       const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
       console.log('Deleting Websocket subscriptions for:', eventTypes);
       this.ceNs.emit(
-        'deleteSubscriptions',
+        WebsocketMessageNames.DeleteSubscriptions,
         subs.map((x) => x.ChainEventType?.id)
       );
     } else {
@@ -42,10 +42,15 @@ export class ChainEventsNamespace {
     }
   }
 
-  private onChainEvent(notification: any) {
+  private onChainEvent(notification: ChainEventNotification) {
     const subscription = app.user.notifications.subscriptions.find(
       (sub) => sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
     );
+    if (!subscription) {
+      // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally
+      console.log("Local subscription not found. Re-sync subscriptions!");
+      return;
+    }
     const notificationObj = Notification.fromJSON(notification, subscription);
     app.user.notifications.update(notificationObj);
   }
@@ -58,8 +63,7 @@ export class ChainEventsNamespace {
 
   private onDisconnect(reason) {
     this._isConnected = false;
-    console.log(reason);
-    // TODO: notify user that live chain-events notifications are disabled?
+    console.log('ChainEvents Namespace Disconnected:', reason);
   }
 
   public get isConnected() {

@@ -17,6 +17,7 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
+  NoId: 'Must provide id',
   NoName: 'Must provide name',
   InvalidNameLength: 'Name should not exceed 255',
   NoSymbol: 'Must provide symbol',
@@ -43,7 +44,7 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
-type CreateChainReq = ChainAttributes & ChainNodeAttributes & {
+type CreateChainReq = ChainAttributes & Omit<ChainNodeAttributes, 'id'> & {
   id: string;
   node_url: string;
 };
@@ -67,6 +68,9 @@ const createChain = async (
     if (!req.user.isAdmin) {
       return next(new Error(Errors.NotAdmin));
     }
+  }
+  if (!req.body.id || !req.body.id.trim()) {
+    return next(new Error(Errors.NoId));
   }
   if (!req.body.name || !req.body.name.trim()) {
     return next(new Error(Errors.NoName));

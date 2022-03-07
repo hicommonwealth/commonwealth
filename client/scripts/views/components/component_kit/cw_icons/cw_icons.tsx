@@ -293,3 +293,24 @@ export const CWGithub: m.Component<IconAttrs> = {
     );
   },
 };
+
+export const CWPin: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="22"
+        fill="none"
+        viewBox="0 0 14 22"
+        onclick={onclick}
+      >
+        <path d="M.25 12.125c0-.207.168-.375.375-.375h12.75c.207 0 .375.168.375.375v.75a.375.375 0 01-.375.375H.625a.375.375 0 01-.375-.375v-.75z"></path>
+        <path d="M7.375 4.25c.207 0 .375.206.375.461v15.677c0 .461-.543 1.112-.75 1.112-.207 0-.75-.65-.75-1.112V4.711c0-.255.168-.461.375-.461h.75zM1.75.875c0-.207.13-.375.292-.375h9.916c.161 0 .292.168.292.375v.75c0 .207-.13.375-.292.375H2.042c-.161 0-.292-.168-.292-.375v-.75z"></path>
+        <path d="M2.917.5h8.166l1.167 12.75H1.75L2.917.5z"></path>
+      </svg>
+    );
+  },
+};

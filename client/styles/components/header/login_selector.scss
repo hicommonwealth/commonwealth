@@ -1,5 +1,39 @@
 @import 'client/styles/shared';
 
+.CommunityLabel {
+  text-align: left;
+  flex: 1;
+  display: flex;
+  font-weight: 400;
+  align-items: center;
+
+  &.CommunityLabelPlaceholder {
+    font-weight: 500;
+  }
+  .site-brand {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .community-label-left {
+    padding-right: 12px;
+  }
+  .community-label-right {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .community-name-row,
+  .community-id {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .community-name-row {
+    font-weight: 500;
+    line-height: 1.25;
+  }
+}
+
 .LoginSelector {
   > button.cui-button .cui-icon:last-child {
     position: relative;

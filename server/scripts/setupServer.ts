@@ -1,4 +1,6 @@
-import * as http from 'http';
+import WebSocket from 'ws';
+import http from 'http';
+import express from 'express';
 import { Express } from 'express-serve-static-core';
 import { DEFAULT_PORT } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
