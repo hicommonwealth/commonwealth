@@ -15,31 +15,32 @@ export function createCeNamespace(io: Server) {
   io.use(authenticate);
 
   CeNs.on('connection', (socket) => {
-    // log.info("Emitting to Test_Room");
-    // // Non-RabbitMQ cross-server testing
-    // CeNs.to("Test_Room").emit(String(Math.random()));
-
     log.info(`${socket.id} connected to Chain-Events`);
 
     socket.on('disconnect', () => {
       log.info(`${socket.id} disconnected from Chain-Events`);
     });
 
-    socket.on(WebsocketMessageNames.NewSubscriptions, (chainEventTypes: string[]) => {
-      if (chainEventTypes.length > 0) {
-        log.info(`${socket.id} joining ${JSON.stringify(chainEventTypes)}`);
-        socket.join(chainEventTypes);
-        // socket.join("Test_Room");
-        // log.info("Joined Test_Room");
+    socket.on(
+      WebsocketMessageNames.NewSubscriptions,
+      (chainEventTypes: string[]) => {
+        if (chainEventTypes.length > 0) {
+          log.info(`${socket.id} joining ${JSON.stringify(chainEventTypes)}`);
+          socket.join(chainEventTypes);
+        }
       }
-    });
+    );
 
-    socket.on(WebsocketMessageNames.DeleteSubscriptions, (chainEventTypes: string[]) => {
-      if (chainEventTypes.length > 0) {
-        log.info(`${socket.id} leaving ${JSON.stringify(chainEventTypes)}`);
-        for (const eventType of chainEventTypes) socket.leave(eventType);
+    socket.on(
+      WebsocketMessageNames.DeleteSubscriptions,
+      (chainEventTypes: string[]) => {
+        if (chainEventTypes.length > 0) {
+          log.info(`${socket.id} leaving ${JSON.stringify(chainEventTypes)}`);
+          for (const eventType of chainEventTypes) socket.leave(eventType);
+
+        }
       }
-    });
+    );
   });
 
   io.of(`/${WebsocketNamespaces.ChainEvents}`).adapter.on(
@@ -64,7 +65,10 @@ export function createCeNamespace(io: Server) {
  * received from the queue to the appropriate room. The context (this) should be the chain-events namespace
  * @param notification A Notification model instance
  */
-export function publishToCERoom(this: Server, notification: ChainEventNotification) {
+export function publishToCERoom(
+  this: Server,
+  notification: ChainEventNotification
+) {
   this.to(notification.ChainEvent.ChainEventType.id).emit(
     WebsocketMessageNames.ChainEventNotification,
     notification
