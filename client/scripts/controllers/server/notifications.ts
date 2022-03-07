@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import m from 'mithril';
-import m from 'mithril';
 
 import { NotificationStore } from 'stores';
 import { NotificationSubscription, Notification, ChainEventType } from 'models';
