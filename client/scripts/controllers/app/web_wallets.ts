@@ -18,18 +18,26 @@ export default class WebWalletController {
 
   // TODO filter out wallets that are specific to a chain (and the current page isn't that chain)
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
-    return this._wallets.filter((w) => w.available
-      && (!chain || w.chain === chain)
-      // if a specific chain is specified on a wallet AND a current chain is defined (aka not on home page) then load
-      // the wallet if the current chain is the same as the specific chain
-      && ((w.specificChain && app.chain?.meta?.chain.id) ? w.specificChain === app.chain.meta.chain.id : true));
+    return this._wallets.filter(
+      (w) =>
+        w.available &&
+        (!chain || w.chain === chain) &&
+        // if a specific chain is specified on a wallet AND a current chain is defined (aka not on home page) then load
+        // the wallet if the current chain is the same as the specific chain
+        (w.specificChain && app.chain?.meta?.chain.id
+          ? w.specificChain === app.chain.meta.chain.id
+          : true)
+    );
   }
 
   public getByName(name: string): IWebWallet<any> | undefined {
     return this._wallets.find((w) => w.name === name);
   }
 
-  public async locateWallet(address: string, chain?: ChainBase): Promise<IWebWallet<any>> {
+  public async locateWallet(
+    address: string,
+    chain?: ChainBase
+  ): Promise<IWebWallet<any>> {
     const availableWallets = this.availableWallets(chain);
     if (availableWallets.length === 0) {
       throw new Error('No wallet available');

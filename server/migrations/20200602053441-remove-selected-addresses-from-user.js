@@ -6,8 +6,10 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn(
-      'Users', 'selectedAddresses', { type: Sequelize.TEXT, allowNull: false, defaultValue: '{}' }
-    );
-  }
+    return queryInterface.addColumn('Users', 'selectedAddresses', {
+      type: Sequelize.TEXT,
+      allowNull: false,
+      defaultValue: '{}',
+    });
+  },
 };

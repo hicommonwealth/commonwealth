@@ -30,15 +30,18 @@ const AccountBalance = {
   oninit: (vnode: m.VnodeDOM<IProfileSummaryAttrs, IProfileSummaryState>) => {
     app.runWhenReady(async () => {
       vnode.state.balance = await vnode.attrs.account.balance;
-      vnode.state.lockedBalance = vnode.attrs.account instanceof SubstrateAccount
-        ? await vnode.attrs.account.lockedBalance
-        : null;
-      vnode.state.unlockedBalance = vnode.attrs.account instanceof SubstrateAccount
-        ? await vnode.attrs.account.freeBalance
-        : null;
-      vnode.state.locks = vnode.attrs.account instanceof SubstrateAccount
-        ? await vnode.attrs.account.locks
-        : null;
+      vnode.state.lockedBalance =
+        vnode.attrs.account instanceof SubstrateAccount
+          ? await vnode.attrs.account.lockedBalance
+          : null;
+      vnode.state.unlockedBalance =
+        vnode.attrs.account instanceof SubstrateAccount
+          ? await vnode.attrs.account.freeBalance
+          : null;
+      vnode.state.locks =
+        vnode.attrs.account instanceof SubstrateAccount
+          ? await vnode.attrs.account.locks
+          : null;
       // vnode.state.delegations = vnode.attrs.account instanceof CosmosAccount
       //   ? await vnode.attrs.account.delegations
       //   : null;
@@ -46,65 +49,87 @@ const AccountBalance = {
     });
   },
   view: (vnode) => {
-    const isSubstrate = (vnode.attrs.account instanceof SubstrateAccount);
-    const isCosmos = (vnode.attrs.account instanceof CosmosAccount);
-    const isNear = (vnode.attrs.account instanceof NearAccount);
-    const isMoloch = (vnode.attrs.account instanceof MolochMember);
+    const isSubstrate = vnode.attrs.account instanceof SubstrateAccount;
+    const isCosmos = vnode.attrs.account instanceof CosmosAccount;
+    const isNear = vnode.attrs.account instanceof NearAccount;
+    const isMoloch = vnode.attrs.account instanceof MolochMember;
     const state = vnode.state;
 
     return m('.AccountBalance', [
-      isNear && m('div.near-balance', [
-        m('div.balance-type', [
-          m('div.label', 'BALANCE'),
-          m('div.balance', state.balance !== undefined
-            ? formatCoin(state.balance) : '--')
+      isNear &&
+        m('div.near-balance', [
+          m('div.balance-type', [
+            m('div.label', 'BALANCE'),
+            m(
+              'div.balance',
+              state.balance !== undefined ? formatCoin(state.balance) : '--'
+            ),
+          ]),
         ]),
-      ]),
-      isMoloch && m('div.moloch-balance', [
-        m('div.balance-type', [
-          m('div.label', 'IS MEMBER'),
-          m('div.balance', (vnode.attrs.account as MolochMember).isMember ? 'YES' : 'NO'),
+      isMoloch &&
+        m('div.moloch-balance', [
+          m('div.balance-type', [
+            m('div.label', 'IS MEMBER'),
+            m(
+              'div.balance',
+              (vnode.attrs.account as MolochMember).isMember ? 'YES' : 'NO'
+            ),
+          ]),
+          m('div.balance-type', [
+            m('div.label', 'SHARES'),
+            // don't use denom label for share holdings -- should always be round number
+            m(
+              'div.balance',
+              state.balance !== undefined ? `${state.balance.toNumber()}` : '--'
+            ),
+          ]),
         ]),
-        m('div.balance-type', [
-          m('div.label', 'SHARES'),
-          // don't use denom label for share holdings -- should always be round number
-          m('div.balance', state.balance !== undefined
-            ? `${state.balance.toNumber()}` : '--')
-        ]),
-      ]),
       isSubstrate && [
         m('div.substrate-liquidity', [
           m('div.balance-type', [
             m('div.label', 'LIQUID'),
-            m('div.balance', state.unlockedBalance !== undefined
-              ? formatCoin(state.unlockedBalance) : '--')
+            m(
+              'div.balance',
+              state.unlockedBalance !== undefined
+                ? formatCoin(state.unlockedBalance)
+                : '--'
+            ),
           ]),
           m('div.balance-type', [
             m('div.label', 'ILLIQUID'),
-            m('div.balance', state.lockedBalance !== undefined
-              ? formatCoin(state.lockedBalance) : '--')
-          ])
+            m(
+              'div.balance',
+              state.lockedBalance !== undefined
+                ? formatCoin(state.lockedBalance)
+                : '--'
+            ),
+          ]),
         ]),
         m('div.balance-type.controlling-row', [
           m('div.label', 'CONTROLLING'),
-          m('div.balance', state.balance !== undefined
-            ? formatCoin(state.balance) : '--')
-        ])
-      ],
-      isCosmos && m('div.cosmos-balance', [
-        m('div.balance-type', [
-          m('div.label', 'LIQUID'),
-          m('div.balance', state.balance !== undefined
-            ? formatCoin(state.balance) : '--')
+          m(
+            'div.balance',
+            state.balance !== undefined ? formatCoin(state.balance) : '--'
+          ),
         ]),
-        // m('div.balance-type', [
-        //   m('div.label', 'DELEGATORS'),
-        //   m('div.balance', state.delegations !== undefined ? state.delegations : '--')
-        // ])
-      ]),
-      m('a.btn', 'Manage Staking')
+      ],
+      isCosmos &&
+        m('div.cosmos-balance', [
+          m('div.balance-type', [
+            m('div.label', 'LIQUID'),
+            m(
+              'div.balance',
+              state.balance !== undefined ? formatCoin(state.balance) : '--'
+            ),
+          ]),
+          // m('div.balance-type', [
+          //   m('div.label', 'DELEGATORS'),
+          //   m('div.balance', state.delegations !== undefined ? state.delegations : '--')
+          // ])
+        ]),
+      m('a.btn', 'Manage Staking'),
     ]);
-  }
+  },
 };
 
 export default AccountBalance;

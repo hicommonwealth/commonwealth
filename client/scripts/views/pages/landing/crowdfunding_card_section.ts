@@ -6,7 +6,10 @@ import { ICardListItem } from 'models/interfaces';
 import LandingPageButton from './landing_page_button';
 import ItemListsMapper from './list_mapper_with_item';
 
-const ChainsCrowdfundingComponent: m.Component<{ chains: ICardListItem[] }, {}> = {
+const ChainsCrowdfundingComponent: m.Component<
+  { chains: ICardListItem[] },
+  {}
+> = {
   view: (vnode) => {
     const { chains } = vnode.attrs;
 
@@ -38,7 +41,7 @@ const ChainsCrowdfundingComponent: m.Component<{ chains: ICardListItem[] }, {}> 
           cardItems: chains,
           tabHoverColorClick: 'bg-gray-300',
           textType: 'black',
-          variant: 'ChainsCrowsfundingTextList'
+          variant: 'ChainsCrowsfundingTextList',
         }),
       ]
     );

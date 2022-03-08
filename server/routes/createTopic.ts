@@ -9,21 +9,32 @@ export const Errors = {
   MustBeAdmin: 'Must be an admin',
   InvalidTokenThreshold: 'Invalid token threshold',
   DefaultTemplateRequired: 'Default Template required',
-  InvalidTopicName: 'Only alphanumeric chars allowed'
+  InvalidTopicName: 'Only alphanumeric chars allowed',
 };
 
-const createTopic = async (models: DB, req, res: Response, next: NextFunction) => {
+const createTopic = async (
+  models: DB,
+  req,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
-  if (req.body.name.match(/["<>%{}|\\/^`]/g)) return next(new Error(Errors.InvalidTopicName))
-  if (req.body.featured_in_new_post === 'true'
-    && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
+  if (req.body.name.match(/["<>%{}|\\/^`]/g))
+    return next(new Error(Errors.InvalidTopicName));
+  if (
+    req.body.featured_in_new_post === 'true' &&
+    (!req.body.default_offchain_template ||
+      !req.body.default_offchain_template.trim())
+  ) {
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
-  const userAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const userAddressIds = (await req.user.getAddresses())
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
   const adminRoles = await models.Role.findAll({
     where: {
       address_id: { [Op.in]: userAddressIds },

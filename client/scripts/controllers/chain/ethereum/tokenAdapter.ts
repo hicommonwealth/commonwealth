@@ -7,7 +7,7 @@ import { NodeInfo, ITokenAdapter } from 'models';
 import { IApp } from 'state';
 import BN from 'bn.js';
 
-class TokenApi extends ContractApi<ERC20> { }
+class TokenApi extends ContractApi<ERC20> {}
 
 export default class Token extends Ethereum implements ITokenAdapter {
   // required implementations for ITokenAdapter
@@ -21,8 +21,13 @@ export default class Token extends Ethereum implements ITokenAdapter {
     const account = this.accounts.get(activeAddress);
 
     // query balance
-    const balanceBN = await this.contractApi.Contract.balanceOf(account.address);
-    const balance = new ERC20Token(this.contractAddress, new BN(balanceBN.toString(), 10));
+    const balanceBN = await this.contractApi.Contract.balanceOf(
+      account.address
+    );
+    const balance = new ERC20Token(
+      this.contractAddress,
+      new BN(balanceBN.toString(), 10)
+    );
     this.hasToken = balance && !balance.isZero();
     if (balance) this.tokenBalance = balance;
     return this.hasToken;
@@ -36,7 +41,11 @@ export default class Token extends Ethereum implements ITokenAdapter {
 
   public async initApi() {
     await super.initApi();
-    const api = new TokenApi(ERC20__factory.connect, this.meta.address, this.chain.api.currentProvider as any);
+    const api = new TokenApi(
+      ERC20__factory.connect,
+      this.meta.address,
+      this.chain.api.currentProvider as any
+    );
     await api.init();
     this.contractApi = api;
   }

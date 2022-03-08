@@ -13,21 +13,21 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface FlashAttacksInterface extends ethers.utils.Interface {
   functions: {
-    "flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)": FunctionFragment;
-    "flashVote(uint256,uint256,bool)": FunctionFragment;
-    "flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)": FunctionFragment;
+    'flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)': FunctionFragment;
+    'flashVote(uint256,uint256,bool)': FunctionFragment;
+    'flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "flashProposal",
+    functionFragment: 'flashProposal',
     values: [
       BigNumberish,
       string,
@@ -40,11 +40,11 @@ interface FlashAttacksInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "flashVote",
+    functionFragment: 'flashVote',
     values: [BigNumberish, BigNumberish, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "flashVotePermit",
+    functionFragment: 'flashVotePermit',
     values: [
       BigNumberish,
       BigNumberish,
@@ -56,12 +56,12 @@ interface FlashAttacksInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "flashProposal",
+    functionFragment: 'flashProposal',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "flashVote", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'flashVote', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "flashVotePermit",
+    functionFragment: 'flashVotePermit',
     data: BytesLike
   ): Result;
 
@@ -124,7 +124,7 @@ export class FlashAttacks extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+    'flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
       proposalPower: BigNumberish,
       executor: string,
       targets: string[],
@@ -143,7 +143,7 @@ export class FlashAttacks extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "flashVote(uint256,uint256,bool)"(
+    'flashVote(uint256,uint256,bool)'(
       votePower: BigNumberish,
       proposalId: BigNumberish,
       support: boolean,
@@ -160,7 +160,7 @@ export class FlashAttacks extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)"(
+    'flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)'(
       votePower: BigNumberish,
       proposalId: BigNumberish,
       support: boolean,
@@ -183,7 +183,7 @@ export class FlashAttacks extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+  'flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
     proposalPower: BigNumberish,
     executor: string,
     targets: string[],
@@ -202,7 +202,7 @@ export class FlashAttacks extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "flashVote(uint256,uint256,bool)"(
+  'flashVote(uint256,uint256,bool)'(
     votePower: BigNumberish,
     proposalId: BigNumberish,
     support: boolean,
@@ -219,7 +219,7 @@ export class FlashAttacks extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)"(
+  'flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)'(
     votePower: BigNumberish,
     proposalId: BigNumberish,
     support: boolean,
@@ -242,7 +242,7 @@ export class FlashAttacks extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+    'flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
       proposalPower: BigNumberish,
       executor: string,
       targets: string[],
@@ -261,7 +261,7 @@ export class FlashAttacks extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "flashVote(uint256,uint256,bool)"(
+    'flashVote(uint256,uint256,bool)'(
       votePower: BigNumberish,
       proposalId: BigNumberish,
       support: boolean,
@@ -278,7 +278,7 @@ export class FlashAttacks extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)"(
+    'flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)'(
       votePower: BigNumberish,
       proposalId: BigNumberish,
       support: boolean,
@@ -304,7 +304,7 @@ export class FlashAttacks extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+    'flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
       proposalPower: BigNumberish,
       executor: string,
       targets: string[],
@@ -323,7 +323,7 @@ export class FlashAttacks extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "flashVote(uint256,uint256,bool)"(
+    'flashVote(uint256,uint256,bool)'(
       votePower: BigNumberish,
       proposalId: BigNumberish,
       support: boolean,
@@ -340,7 +340,7 @@ export class FlashAttacks extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)"(
+    'flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)'(
       votePower: BigNumberish,
       proposalId: BigNumberish,
       support: boolean,
@@ -364,7 +364,7 @@ export class FlashAttacks extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+    'flashProposal(uint256,address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
       proposalPower: BigNumberish,
       executor: string,
       targets: string[],
@@ -383,7 +383,7 @@ export class FlashAttacks extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "flashVote(uint256,uint256,bool)"(
+    'flashVote(uint256,uint256,bool)'(
       votePower: BigNumberish,
       proposalId: BigNumberish,
       support: boolean,
@@ -400,7 +400,7 @@ export class FlashAttacks extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)"(
+    'flashVotePermit(uint256,uint256,bool,uint8,bytes32,bytes32)'(
       votePower: BigNumberish,
       proposalId: BigNumberish,
       support: boolean,

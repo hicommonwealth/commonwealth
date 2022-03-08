@@ -3,7 +3,18 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import {
-  Tabs, TabItem, Button, Input, FormGroup, ListItem, Icons, Icon, List, RadioGroup, Form, Tag
+  Tabs,
+  TabItem,
+  Button,
+  Input,
+  FormGroup,
+  ListItem,
+  Icons,
+  Icon,
+  List,
+  RadioGroup,
+  Form,
+  Tag,
 } from 'construct-ui';
 import app from 'state';
 import { RolePermission, Webhook } from 'models';
@@ -28,7 +39,9 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
 
     const createWebhook = (e) => {
       e.preventDefault();
-      const $webhookInput = $(e.target).closest('form').find('[name="webhookUrl"]');
+      const $webhookInput = $(e.target)
+        .closest('form')
+        .find('[name="webhookUrl"]');
       const webhookUrl = $webhookInput.val();
       if (webhookUrl === null) return;
 
@@ -41,137 +54,168 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         webhookUrl,
         auth: true,
         jwt: app.user.jwt,
-      }).then((result) => {
-        vnode.state.disabled = false;
-        if (result.status === 'Success') {
-          vnode.state.success = true;
-          const newWebhook = Webhook.fromJSON(result.result);
-          vnode.attrs.webhooks.push(newWebhook);
-          app.modals.create({
-            modal: WebhookSettingsModal,
-            data: {
-              webhook: newWebhook,
-              updateSuccessCallback: (webhook) => {
-                const idx = vnode.attrs.webhooks.findIndex((wh) => wh.id === webhook.id);
-                vnode.attrs.webhooks[idx].categories = webhook.categories;
-              }
-            }
-          });
-          $webhookInput.val('');
-        } else {
+      }).then(
+        (result) => {
+          vnode.state.disabled = false;
+          if (result.status === 'Success') {
+            vnode.state.success = true;
+            const newWebhook = Webhook.fromJSON(result.result);
+            vnode.attrs.webhooks.push(newWebhook);
+            app.modals.create({
+              modal: WebhookSettingsModal,
+              data: {
+                webhook: newWebhook,
+                updateSuccessCallback: (webhook) => {
+                  const idx = vnode.attrs.webhooks.findIndex(
+                    (wh) => wh.id === webhook.id
+                  );
+                  vnode.attrs.webhooks[idx].categories = webhook.categories;
+                },
+              },
+            });
+            $webhookInput.val('');
+          } else {
+            vnode.state.failure = true;
+            notifyError(result.message);
+          }
+          m.redraw();
+        },
+        (err) => {
           vnode.state.failure = true;
-          notifyError(result.message);
+          vnode.state.disabled = false;
+          notifyError(err?.responseJSON?.error || 'Unknown error');
+          m.redraw();
         }
-        m.redraw();
-      }, (err) => {
-        vnode.state.failure = true;
-        vnode.state.disabled = false;
-        notifyError(err?.responseJSON?.error || 'Unknown error');
-        m.redraw();
-      });
+      );
     };
 
-    return m(Form, {
-      class: 'WebhooksForm',
-    }, [
-      m(FormGroup, [
-        m(List, {
-          interactive: false,
-          class: 'active-webhooks'
-        }, [
-          webhooks.map((webhook) => {
-            const label = (webhook.url.indexOf('discord') !== -1) ? 'Discord'
-              : (webhook.url.indexOf('slack') !== -1) ? 'Slack'
-                : null;
-            return m(ListItem, {
-              contentLeft: [
-                m('.top', { style: 'display: block;' }, webhook.url),
-                m('.bottom', [
-                  label && m(Tag, { size: 'xs', label }),
-                  m(Button, {
-                    class: 'settings-button',
-                    iconRight: Icons.SETTINGS,
-                    rounded: true,
+    return m(
+      Form,
+      {
+        class: 'WebhooksForm',
+      },
+      [
+        m(FormGroup, [
+          m(
+            List,
+            {
+              interactive: false,
+              class: 'active-webhooks',
+            },
+            [
+              webhooks.map((webhook) => {
+                const label =
+                  webhook.url.indexOf('discord') !== -1
+                    ? 'Discord'
+                    : webhook.url.indexOf('slack') !== -1
+                    ? 'Slack'
+                    : null;
+                return m(ListItem, {
+                  contentLeft: [
+                    m('.top', { style: 'display: block;' }, webhook.url),
+                    m('.bottom', [
+                      label && m(Tag, { size: 'xs', label }),
+                      m(Button, {
+                        class: 'settings-button',
+                        iconRight: Icons.SETTINGS,
+                        rounded: true,
+                        onclick: (e) => {
+                          e.preventDefault();
+                          app.modals.create({
+                            modal: WebhookSettingsModal,
+                            data: {
+                              webhook,
+                              updateSuccessCallback: (wh) => {
+                                const idx = vnode.attrs.webhooks.findIndex(
+                                  (wh2) => wh2.id === wh.id
+                                );
+                                vnode.attrs.webhooks[idx].categories =
+                                  wh.categories;
+                              },
+                            },
+                          });
+                        },
+                      }),
+                      m(Tag, {
+                        size: 'xs',
+                        label: pluralize(webhook.categories.length, 'event'),
+                      }),
+                    ]),
+                  ],
+                  contentRight: m(Icon, {
+                    name: Icons.X,
+                    class: vnode.state.disabled ? 'disabled' : '',
                     onclick: (e) => {
                       e.preventDefault();
-                      app.modals.create({
-                        modal: WebhookSettingsModal,
-                        data: {
-                          webhook,
-                          updateSuccessCallback: (wh) => {
-                            const idx = vnode.attrs.webhooks.findIndex((wh2) => wh2.id === wh.id);
-                            vnode.attrs.webhooks[idx].categories = wh.categories;
+                      vnode.state.disabled = true;
+                      vnode.state.success = false;
+                      vnode.state.failure = false;
+                      // TODO: Change to DELETE /webhook
+                      $.post(`${app.serverUrl()}/deleteWebhook`, {
+                        ...chainOrCommObj,
+                        webhookUrl: webhook.url,
+                        auth: true,
+                        jwt: app.user.jwt,
+                      }).then(
+                        (result) => {
+                          vnode.state.disabled = false;
+                          if (result.status === 'Success') {
+                            const idx = vnode.attrs.webhooks.findIndex(
+                              (w) => w.url === webhook.url
+                            );
+                            if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
+                            vnode.state.success = true;
+                            notifySuccess('Success! Webhook deleted');
+                          } else {
+                            vnode.state.failure = true;
+                            notifyError(result.message);
                           }
+                          m.redraw();
+                        },
+                        (err) => {
+                          vnode.state.failure = true;
+                          vnode.state.disabled = false;
+                          notifyError(
+                            err?.responseJSON?.error || 'Unknown error'
+                          );
+                          m.redraw();
                         }
-                      });
-                    }
+                      );
+                    },
                   }),
-                  m(Tag, { size: 'xs', label: pluralize(webhook.categories.length, 'event') }),
-                ])],
-              contentRight: m(Icon, {
-                name: Icons.X,
-                class: vnode.state.disabled ? 'disabled' : '',
-                onclick: (e) => {
-                  e.preventDefault();
-                  vnode.state.disabled = true;
-                  vnode.state.success = false;
-                  vnode.state.failure = false;
-                  // TODO: Change to DELETE /webhook
-                  $.post(`${app.serverUrl()}/deleteWebhook`, {
-                    ...chainOrCommObj,
-                    webhookUrl: webhook.url,
-                    auth: true,
-                    jwt: app.user.jwt,
-                  }).then((result) => {
-                    vnode.state.disabled = false;
-                    if (result.status === 'Success') {
-                      const idx = vnode.attrs.webhooks.findIndex((w) => w.url === webhook.url);
-                      if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
-                      vnode.state.success = true;
-                      notifySuccess('Success! Webhook deleted');
-                    } else {
-                      vnode.state.failure = true;
-                      notifyError(result.message);
-                    }
-                    m.redraw();
-                  }, (err) => {
-                    vnode.state.failure = true;
-                    vnode.state.disabled = false;
-                    notifyError(err?.responseJSON?.error || 'Unknown error');
-                    m.redraw();
-                  });
-                }
+                });
               }),
-            });
-          }),
-          webhooks.length === 0 && m(ListItem, {
-            contentLeft: [
-              'No webhooks yet. Slack, Discord, and Telegram webhooks are supported. For more information and examples for setting these up, please view our ',
-              link('a', ('https://docs.commonwealth.im'), [
-                'documentation.'
-              ])
+              webhooks.length === 0 &&
+                m(ListItem, {
+                  contentLeft: [
+                    'No webhooks yet. Slack, Discord, and Telegram webhooks are supported. For more information and examples for setting these up, please view our ',
+                    link('a', 'https://docs.commonwealth.im', [
+                      'documentation.',
+                    ]),
+                  ],
+                }),
             ]
+          ),
+        ]),
+        m(FormGroup, [
+          m(Input, {
+            name: 'webhookUrl',
+            id: 'webhookUrl',
+            autocomplete: 'off',
+            placeholder: 'https://hooks.slack.com/services/',
+          }),
+          m(Button, {
+            class: 'admin-panel-tab-button',
+            intent: 'none',
+            label: 'Add webhook',
+            style: 'margin: 10px 0',
+            onclick: createWebhook,
+            rounded: true,
           }),
         ]),
-      ]),
-      m(FormGroup, [
-        m(Input, {
-          name: 'webhookUrl',
-          id: 'webhookUrl',
-          autocomplete: 'off',
-          placeholder: 'https://hooks.slack.com/services/',
-        }),
-        m(Button, {
-          class: 'admin-panel-tab-button',
-          intent: 'none',
-          label: 'Add webhook',
-          style: 'margin: 10px 0',
-          onclick: createWebhook,
-          rounded: true,
-        }),
-      ]),
-    ]);
-  }
+      ]
+    );
+  },
 };
 
 interface IUpgradeRolesFormAttrs {
@@ -184,16 +228,28 @@ interface IUpgradeRolesFormState {
   user: string;
 }
 
-const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormState> = {
+const UpgradeRolesForm: m.Component<
+  IUpgradeRolesFormAttrs,
+  IUpgradeRolesFormState
+> = {
   view: (vnode) => {
     const { roleData, onRoleUpgrade } = vnode.attrs;
     const noAdmins = roleData.filter((role) => {
-      return (role.permission === RolePermission.member) || (role.permission === RolePermission.moderator);
+      return (
+        role.permission === RolePermission.member ||
+        role.permission === RolePermission.moderator
+      );
     });
     const names: string[] = noAdmins.map((role) => {
-      const displayName = app.profiles.getProfile(role.Address.chain, role.Address.address).displayName;
-      const roletext = (role.permission === 'moderator') ? '(moderator)' : '';
-      return `${displayName}: ${role.Address.address.slice(0, 6)}...${roletext}`;
+      const displayName = app.profiles.getProfile(
+        role.Address.chain,
+        role.Address.address
+      ).displayName;
+      const roletext = role.permission === 'moderator' ? '(moderator)' : '';
+      return `${displayName}: ${role.Address.address.slice(
+        0,
+        6
+      )}...${roletext}`;
     });
     const chainOrCommObj = { chain: app.activeChainId() };
     return m('.UpgradeRolesForm', [
@@ -202,25 +258,33 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
         class: 'members-list',
         options: names,
         value: vnode.state.user,
-        onchange: (e: Event) => { vnode.state.user = (e.currentTarget as HTMLInputElement).value; },
+        onchange: (e: Event) => {
+          vnode.state.user = (e.currentTarget as HTMLInputElement).value;
+        },
       }),
       m('.upgrade-buttons-wrap', [
         m(RadioGroup, {
           name: 'roles',
           options: ['Admin', 'Moderator'],
           value: vnode.state.role,
-          onchange: (e: Event) => { vnode.state.role = (e.currentTarget as HTMLInputElement).value; },
+          onchange: (e: Event) => {
+            vnode.state.role = (e.currentTarget as HTMLInputElement).value;
+          },
         }),
         m('.button-container', [
           m(Button, {
             class: 'admin-panel-tab-button',
             label: 'Upgrade Member',
-            disabled: (!vnode.state.role || !vnode.state.user),
+            disabled: !vnode.state.role || !vnode.state.user,
             onclick: () => {
               const indexOfName = names.indexOf(vnode.state.user);
               const user = noAdmins[indexOfName];
-              const newRole = (vnode.state.role === 'Admin') ? 'admin'
-                : (vnode.state.role === 'Moderator') ? 'moderator' : '';
+              const newRole =
+                vnode.state.role === 'Admin'
+                  ? 'admin'
+                  : vnode.state.role === 'Moderator'
+                  ? 'moderator'
+                  : '';
               if (!user) return;
               if (!newRole) return;
               $.post(`${app.serverUrl()}/upgradeMember`, {
@@ -242,9 +306,9 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
             },
           }),
         ]),
-      ])
+      ]),
     ]);
-  }
+  },
 };
 
 interface IAdminPanelTabsAttrs {
@@ -254,35 +318,43 @@ interface IAdminPanelTabsAttrs {
   webhooks: Webhook[];
 }
 
-const AdminPanelTabs: m.Component<IAdminPanelTabsAttrs, {index: number, }> = {
+const AdminPanelTabs: m.Component<IAdminPanelTabsAttrs, { index: number }> = {
   oninit: (vnode) => {
     vnode.state.index = vnode.attrs.defaultTab;
   },
   view: (vnode) => {
     return m('.AdminPanelTabs', [
-      m(Tabs, {
-        align: 'left',
-        bordered: true,
-        fluid: true,
-      }, [
-        m(TabItem, {
-          label: 'Webhooks',
-          active: vnode.state.index === 2,
-          onclick: () => { vnode.state.index = 2; },
-        }),
-        m(TabItem, {
-          label: 'Admins',
-          active: vnode.state.index === 1,
-          onclick: () => { vnode.state.index = 1; },
-        }),
-      ]),
-      (vnode.state.index === 1)
-        && m(UpgradeRolesForm, {
+      m(
+        Tabs,
+        {
+          align: 'left',
+          bordered: true,
+          fluid: true,
+        },
+        [
+          m(TabItem, {
+            label: 'Webhooks',
+            active: vnode.state.index === 2,
+            onclick: () => {
+              vnode.state.index = 2;
+            },
+          }),
+          m(TabItem, {
+            label: 'Admins',
+            active: vnode.state.index === 1,
+            onclick: () => {
+              vnode.state.index = 1;
+            },
+          }),
+        ]
+      ),
+      vnode.state.index === 1 &&
+        m(UpgradeRolesForm, {
           roleData: vnode.attrs.roleData,
           onRoleUpgrade: (x, y) => vnode.attrs.onRoleUpgrade(x, y),
         }),
-      (vnode.state.index === 2)
-        && m(WebhooksForm, { webhooks: vnode.attrs.webhooks }),
+      vnode.state.index === 2 &&
+        m(WebhooksForm, { webhooks: vnode.attrs.webhooks }),
     ]);
   },
 };

@@ -21,7 +21,7 @@ class Webhook {
       json.url,
       json.categories,
       json.chain_id,
-      json.Chain,
+      json.Chain
     );
   }
 }

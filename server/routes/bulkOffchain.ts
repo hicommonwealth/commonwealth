@@ -104,7 +104,10 @@ const bulkOffchain = async (
             (new Date() as any) - 1000 * 24 * 60 * 60 * 30
           );
           const activeUsers = {};
-          const where = { updated_at: { [Op.gt]: thirtyDaysAgo }, chain: chain.id };
+          const where = {
+            updated_at: { [Op.gt]: thirtyDaysAgo },
+            chain: chain.id,
+          };
 
           const monthlyComments = await models.OffchainComment.findAll({
             where,

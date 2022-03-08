@@ -1,16 +1,21 @@
 import BN from 'bn.js';
 import moment from 'moment';
 import _ from 'underscore';
-import {
-  ITXModalData,
-  ProposalModule,
-} from 'models';
+import { ITXModalData, ProposalModule } from 'models';
 import { fromAscii } from '@cosmjs/encoding';
 import { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
-import { Proposal, TextProposal, ProposalStatus, TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import {
+  Proposal,
+  TextProposal,
+  ProposalStatus,
+  TallyResult,
+} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import {
-  ICosmosProposal, CosmosToken, ICosmosProposalTally, CosmosProposalState
+  ICosmosProposal,
+  CosmosToken,
+  ICosmosProposalTally,
+  CosmosProposalState,
 } from 'controllers/chain/cosmos/types';
 import CosmosAccount from './account';
 import CosmosAccounts from './accounts';
@@ -19,12 +24,18 @@ import { CosmosProposal } from './proposal';
 
 const stateEnumToString = (status: ProposalStatus): CosmosProposalState => {
   switch (status) {
-    case ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD: return 'DepositPeriod';
-    case ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD: return 'VotingPeriod';
-    case ProposalStatus.PROPOSAL_STATUS_PASSED: return 'Passed';
-    case ProposalStatus.PROPOSAL_STATUS_FAILED: return 'Failed';
-    case ProposalStatus.PROPOSAL_STATUS_REJECTED: return 'Rejected';
-    default: throw new Error(`Invalid proposal state: ${status}`);
+    case ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD:
+      return 'DepositPeriod';
+    case ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD:
+      return 'VotingPeriod';
+    case ProposalStatus.PROPOSAL_STATUS_PASSED:
+      return 'Passed';
+    case ProposalStatus.PROPOSAL_STATUS_FAILED:
+      return 'Failed';
+    case ProposalStatus.PROPOSAL_STATUS_REJECTED:
+      return 'Rejected';
+    default:
+      throw new Error(`Invalid proposal state: ${status}`);
   }
 };
 
@@ -36,7 +47,7 @@ const asciiLiteralToDecimal = (n: Uint8Array) => {
   // 500000000000000000 = 0.5
   // dividing by 1000000000000000 gives 3 decimal digits of precision
   const nStr = fromAscii(n);
-  return +((new BN(nStr)).div(new BN('1000000000000000'))) / 1000;
+  return +new BN(nStr).div(new BN('1000000000000000')) / 1000;
 };
 
 export const marshalTally = (tally: TallyResult): ICosmosProposalTally => {
@@ -59,16 +70,29 @@ class CosmosGovernance extends ProposalModule<
   private _vetoThreshold: number;
   private _maxDepositPeriodS: number;
   private _minDeposit: CosmosToken;
-  public get votingPeriodNs() { return this._votingPeriodS; }
-  public get yesThreshold() { return this._yesThreshold; }
-  public get vetoThreshold() { return this._vetoThreshold; }
-  public get maxDepositPeriodNs() { return this._maxDepositPeriodS; }
-  public get minDeposit() { return this._minDeposit; }
+  public get votingPeriodNs() {
+    return this._votingPeriodS;
+  }
+  public get yesThreshold() {
+    return this._yesThreshold;
+  }
+  public get vetoThreshold() {
+    return this._vetoThreshold;
+  }
+  public get maxDepositPeriodNs() {
+    return this._maxDepositPeriodS;
+  }
+  public get minDeposit() {
+    return this._minDeposit;
+  }
 
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
 
-  public async init(ChainInfo: CosmosChain, Accounts: CosmosAccounts): Promise<void> {
+  public async init(
+    ChainInfo: CosmosChain,
+    Accounts: CosmosAccounts
+  ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
 
@@ -82,11 +106,13 @@ class CosmosGovernance extends ProposalModule<
     this._maxDepositPeriodS = depositParams.maxDepositPeriod.seconds.toNumber();
 
     // TODO: support off-denom deposits
-    const depositCoins = depositParams.minDeposit.find(({ denom }) => denom === this._Chain.denom);
+    const depositCoins = depositParams.minDeposit.find(
+      ({ denom }) => denom === this._Chain.denom
+    );
     if (depositCoins) {
       this._minDeposit = new CosmosToken(
         depositCoins.denom,
-        new BN(depositCoins.amount),
+        new BN(depositCoins.amount)
       );
     } else {
       console.error('Gov minDeposit in wrong denom:', depositParams.minDeposit);
@@ -119,17 +145,24 @@ class CosmosGovernance extends ProposalModule<
           completed: isCompleted(status),
           status,
           // TODO: handle non-default amount
-          totalDeposit: p.totalDeposit && p.totalDeposit[0] ? new BN(p.totalDeposit[0].amount) : new BN(0),
+          totalDeposit:
+            p.totalDeposit && p.totalDeposit[0]
+              ? new BN(p.totalDeposit[0].amount)
+              : new BN(0),
           depositors: [],
           voters: [],
           tally: p.finalTallyResult && marshalTally(p.finalTallyResult),
-        }
+        },
       };
     };
 
     let cosmosProposals: CosmosProposal[];
     if (!proposalId) {
-      const { proposals, pagination } = await this._Chain.api.gov.proposals(0, '', '');
+      const { proposals, pagination } = await this._Chain.api.gov.proposals(
+        0,
+        '',
+        ''
+      );
 
       // fetch all proposals
       // TODO: only fetch next page of proposals on scroll
@@ -149,13 +182,24 @@ class CosmosGovernance extends ProposalModule<
         .map((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
     } else {
       const { proposal } = await this._Chain.api.gov.proposal(proposalId);
-      cosmosProposals = [ new CosmosProposal(this._Chain, this._Accounts, this, msgToIProposal(proposal)) ];
+      cosmosProposals = [
+        new CosmosProposal(
+          this._Chain,
+          this._Accounts,
+          this,
+          msgToIProposal(proposal)
+        ),
+      ];
     }
     await Promise.all(cosmosProposals.map((p) => p.init()));
   }
 
   public createTx(
-    sender: CosmosAccount, title: string, description: string, initialDeposit: CosmosToken, memo: string = ''
+    sender: CosmosAccount,
+    title: string,
+    description: string,
+    initialDeposit: CosmosToken,
+    memo: string = ''
   ): ITXModalData {
     throw new Error('unsupported');
   }
@@ -166,26 +210,28 @@ class CosmosGovernance extends ProposalModule<
     sender: CosmosAccount,
     title: string,
     description: string,
-    initialDeposit: CosmosToken,
+    initialDeposit: CosmosToken
   ): Promise<number> {
     const tProp = TextProposal.fromPartial({ title, description });
     const msg: MsgSubmitProposalEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
       value: {
-        initialDeposit: [ initialDeposit.toCoinObject() ],
+        initialDeposit: [initialDeposit.toCoinObject()],
         proposer: sender.address,
         content: Any.fromPartial({
           typeUrl: '/cosmos.gov.v1beta1.TextProposal',
           value: Uint8Array.from(TextProposal.encode(tProp).finish()),
         }),
-      }
+      },
     };
 
     // fetch completed proposal from returned events
     const events = await this._Chain.sendTx(sender, msg);
     console.log(events);
     const submitEvent = events.find((e) => e.type === 'submit_proposal');
-    const idAttribute = submitEvent.attributes.find(({ key }) => fromAscii(key) === 'proposal_id');
+    const idAttribute = submitEvent.attributes.find(
+      ({ key }) => fromAscii(key) === 'proposal_id'
+    );
     const id = +fromAscii(idAttribute.value);
     await this._initProposals(id);
     return id;

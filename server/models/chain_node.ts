@@ -15,12 +15,12 @@ export type ChainNodeAttributes = {
 
   // associations
   Chain?: ChainAttributes;
-}
+};
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
   // TODO: add mixins as needed
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
-}
+};
 
 export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 

@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import { DB} from '../database';
+import { DB } from '../database';
 
 const Op = Sequelize.Op;
 
@@ -19,9 +19,7 @@ export default async (
   }
 
   // locate active subscriptions, filter by category if specified
-  const searchParams: any[] = [
-    { subscriber_id: req.user.id },
-  ];
+  const searchParams: any[] = [{ subscriber_id: req.user.id }];
   if (req.body.active_only) {
     searchParams.push({ is_active: true });
   }
@@ -29,7 +27,7 @@ export default async (
     searchParams.push({
       category_id: {
         [Op.contained]: req.body.categories,
-      }
+      },
     });
   }
   if (req.body.chain_filter) {
@@ -63,7 +61,7 @@ export default async (
   // perform the query
   const subscriptions = await models.Subscription.findAll({
     where: {
-      [Op.and]: searchParams
+      [Op.and]: searchParams,
     },
     include: [
       notificationParams,
@@ -74,5 +72,8 @@ export default async (
     ],
   });
 
-  return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: subscriptions.map((s) => s.toJSON()),
+  });
 };

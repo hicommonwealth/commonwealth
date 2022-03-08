@@ -119,9 +119,12 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       // update block heights and times
       this.app.chain.block.lastTime = moment(latest_block_time);
       this.app.chain.block.height = latest_block_height;
-      const prevBlock = await this._api.connection.provider.block(latest_block_height - 1)
+      const prevBlock = await this._api.connection.provider.block(
+        latest_block_height - 1
+      );
       // TODO: check ms vs seconds here
-      this.app.chain.block.duration = +latest_block_time - prevBlock.header.timestamp;
+      this.app.chain.block.duration =
+        +latest_block_time - prevBlock.header.timestamp;
       if (this.app.chain.networkStatus !== ApiStatus.Connected) {
         this.app.chain.networkStatus = ApiStatus.Connected;
         m.redraw();

@@ -6,15 +6,19 @@ import { BountyStatus } from 'models/types';
 import { IIdentifiable, ICompletable } from '../../shared';
 import { Coin } from '../../currency';
 
-export function formatCall(c: Call | { section: string, method: string, args: string[] }): string {
+export function formatCall(
+  c: Call | { section: string; method: string; args: string[] }
+): string {
   // build args string
   const args: (string | Codec)[] = c.args;
-  const argsStr = args.map((v: Codec | string): string => {
-    if (!v) return '[unknown]';
-    const vStr = v.toString();
-    if (vStr.length < 16) return vStr;
-    return `${vStr.slice(0, 15)}…`;
-  }).join(', ');
+  const argsStr = args
+    .map((v: Codec | string): string => {
+      if (!v) return '[unknown]';
+      const vStr = v.toString();
+      if (vStr.length < 16) return vStr;
+      return `${vStr.slice(0, 15)}…`;
+    })
+    .join(', ');
 
   // finish format
   return `${c.section}.${c.method}(${argsStr})`;
@@ -25,7 +29,7 @@ export class SubstrateCoin extends Coin {
     denom: string,
     n: number | u128 | BN | SubstrateCoin | Compact<u128>,
     dollar: BN,
-    inDollars: boolean = false,
+    inDollars: boolean = false
   ) {
     if (n instanceof SubstrateCoin) {
       super(denom, n.asBN, inDollars, dollar);

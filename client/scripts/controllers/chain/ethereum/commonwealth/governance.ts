@@ -1,7 +1,12 @@
 import BN from 'bn.js';
 import EthDater from 'ethereum-block-by-date';
 
-import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models';
+import {
+  ProposalModule,
+  ITXModalData,
+  ChainEntity,
+  IChainModule,
+} from 'models';
 
 import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 // import { ICommonwealthProposalResponse } from 'adapters/chain/moloch/types';
@@ -53,8 +58,12 @@ export default class CommonwealthGovernance extends ProposalModule<
   //   return ((Date.now() / 1000) - this.summoningTime.toNumber()) / this.periodDuration.toNumber();
   // }
 
-  public get api() { return this._api; }
-  public get usingServerChainEntities() { return this._usingServerChainEntities; }
+  public get api() {
+    return this._api;
+  }
+  public get usingServerChainEntities() {
+    return this._usingServerChainEntities;
+  }
 
   // INIT / DEINIT
   constructor(app: IApp, private _usingServerChainEntities = false) {

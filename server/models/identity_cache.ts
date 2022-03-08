@@ -5,7 +5,7 @@ import { ModelStatic, ModelInstance } from './types';
 export type IdentityCacheAttributes = {
   chain: string;
   address: string;
-}
+};
 
 export interface IdentityCacheInstance
   extends Sequelize.Model<IdentityCacheAttributes>,
@@ -21,7 +21,7 @@ export default (
     'IdentityCache',
     {
       chain: { type: dataTypes.STRING, allowNull: false },
-      address: { type: dataTypes.STRING, allowNull: false }
+      address: { type: dataTypes.STRING, allowNull: false },
     },
     { timestamps: false }
   );
@@ -30,7 +30,10 @@ export default (
   IdentityCache.removeAttribute('id');
 
   IdentityCache.associate = (models) => {
-    models.IdentityCache.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.IdentityCache.belongsTo(models.Chain, {
+      foreignKey: 'chain',
+      targetKey: 'id',
+    });
   };
 
   return IdentityCache;

@@ -279,12 +279,14 @@ const HomepageCommunityCards: m.Component = {
 
 const CommunityCardPage: m.Component = {
   view: (vnode) => {
-    return m(Sublayout, {
-      class: 'Homepage',
-    }, [
-      m(HomepageCommunityCards),
-    ]);
-  }
-}
+    return m(
+      Sublayout,
+      {
+        class: 'Homepage',
+      },
+      [m(HomepageCommunityCards)]
+    );
+  },
+};
 
 export default CommunityCardPage;

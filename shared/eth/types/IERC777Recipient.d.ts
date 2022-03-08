@@ -13,24 +13,24 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface IERC777RecipientInterface extends ethers.utils.Interface {
   functions: {
-    "tokensReceived(address,address,address,uint256,bytes,bytes)": FunctionFragment;
+    'tokensReceived(address,address,address,uint256,bytes,bytes)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "tokensReceived",
+    functionFragment: 'tokensReceived',
     values: [string, string, string, BigNumberish, BytesLike, BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "tokensReceived",
+    functionFragment: 'tokensReceived',
     data: BytesLike
   ): Result;
 
@@ -91,7 +91,7 @@ export class IERC777Recipient extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+    'tokensReceived(address,address,address,uint256,bytes,bytes)'(
       operator: string,
       from: string,
       to: string,
@@ -112,7 +112,7 @@ export class IERC777Recipient extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+  'tokensReceived(address,address,address,uint256,bytes,bytes)'(
     operator: string,
     from: string,
     to: string,
@@ -133,7 +133,7 @@ export class IERC777Recipient extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+    'tokensReceived(address,address,address,uint256,bytes,bytes)'(
       operator: string,
       from: string,
       to: string,
@@ -157,7 +157,7 @@ export class IERC777Recipient extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+    'tokensReceived(address,address,address,uint256,bytes,bytes)'(
       operator: string,
       from: string,
       to: string,
@@ -179,7 +179,7 @@ export class IERC777Recipient extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "tokensReceived(address,address,address,uint256,bytes,bytes)"(
+    'tokensReceived(address,address,address,uint256,bytes,bytes)'(
       operator: string,
       from: string,
       to: string,

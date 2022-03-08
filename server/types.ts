@@ -6,14 +6,14 @@ export type TypedRequestQuery<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   query?: Q;
-}
+};
 
 export type TypedRequestBody<
   B extends Record<string, unknown> = Record<string, unknown>
 > = Express.Request & {
   user?: Express.User & UserInstance;
   body?: B;
-}
+};
 
 export type TypedRequest<
   B extends Record<string, unknown> = Record<string, unknown>,
@@ -22,9 +22,11 @@ export type TypedRequest<
   user?: Express.User & UserInstance;
   body?: B;
   query?: Q;
-}
+};
 
-export type TypedResponse<T> = Response<{ result: T } & { status: 'Success' | 'Failure' | number }>;
+export type TypedResponse<T> = Response<
+  { result: T } & { status: 'Success' | 'Failure' | number }
+>;
 
 export function success<T>(res: TypedResponse<T>, result: T) {
   return res.json({

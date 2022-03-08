@@ -13,81 +13,81 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface AccessControlInterface extends ethers.utils.Interface {
   functions: {
-    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "getRoleAdmin(bytes32)": FunctionFragment;
-    "grantRole(bytes32,address)": FunctionFragment;
-    "hasRole(bytes32,address)": FunctionFragment;
-    "renounceRole(bytes32,address)": FunctionFragment;
-    "revokeRole(bytes32,address)": FunctionFragment;
-    "supportsInterface(bytes4)": FunctionFragment;
+    'DEFAULT_ADMIN_ROLE()': FunctionFragment;
+    'getRoleAdmin(bytes32)': FunctionFragment;
+    'grantRole(bytes32,address)': FunctionFragment;
+    'hasRole(bytes32,address)': FunctionFragment;
+    'renounceRole(bytes32,address)': FunctionFragment;
+    'revokeRole(bytes32,address)': FunctionFragment;
+    'supportsInterface(bytes4)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
+    functionFragment: 'DEFAULT_ADMIN_ROLE',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getRoleAdmin",
+    functionFragment: 'getRoleAdmin',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "grantRole",
+    functionFragment: 'grantRole',
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "hasRole",
+    functionFragment: 'hasRole',
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "renounceRole",
+    functionFragment: 'renounceRole',
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeRole",
+    functionFragment: 'revokeRole',
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "supportsInterface",
+    functionFragment: 'supportsInterface',
     values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
+    functionFragment: 'DEFAULT_ADMIN_ROLE',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getRoleAdmin",
+    functionFragment: 'getRoleAdmin',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'grantRole', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'hasRole', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceRole",
+    functionFragment: 'renounceRole',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'revokeRole', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "supportsInterface",
+    functionFragment: 'supportsInterface',
     data: BytesLike
   ): Result;
 
   events: {
-    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-    "RoleGranted(bytes32,address,address)": EventFragment;
-    "RoleRevoked(bytes32,address,address)": EventFragment;
+    'RoleAdminChanged(bytes32,bytes32,bytes32)': EventFragment;
+    'RoleGranted(bytes32,address,address)': EventFragment;
+    'RoleRevoked(bytes32,address,address)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'RoleAdminChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'RoleGranted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'RoleRevoked'): EventFragment;
 }
 
 export class AccessControl extends Contract {
@@ -136,11 +136,11 @@ export class AccessControl extends Contract {
   functions: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    "DEFAULT_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<[string]>;
+    'DEFAULT_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<[string]>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
 
-    "getRoleAdmin(bytes32)"(
+    'getRoleAdmin(bytes32)'(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<[string]>;
@@ -151,7 +151,7 @@ export class AccessControl extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "grantRole(bytes32,address)"(
+    'grantRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -163,7 +163,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "hasRole(bytes32,address)"(
+    'hasRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -175,7 +175,7 @@ export class AccessControl extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "renounceRole(bytes32,address)"(
+    'renounceRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -187,7 +187,7 @@ export class AccessControl extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "revokeRole(bytes32,address)"(
+    'revokeRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -198,7 +198,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
@@ -206,11 +206,11 @@ export class AccessControl extends Contract {
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  "DEFAULT_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<string>;
+  'DEFAULT_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
-  "getRoleAdmin(bytes32)"(
+  'getRoleAdmin(bytes32)'(
     role: BytesLike,
     overrides?: CallOverrides
   ): Promise<string>;
@@ -221,7 +221,7 @@ export class AccessControl extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "grantRole(bytes32,address)"(
+  'grantRole(bytes32,address)'(
     role: BytesLike,
     account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -233,7 +233,7 @@ export class AccessControl extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "hasRole(bytes32,address)"(
+  'hasRole(bytes32,address)'(
     role: BytesLike,
     account: string,
     overrides?: CallOverrides
@@ -245,7 +245,7 @@ export class AccessControl extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "renounceRole(bytes32,address)"(
+  'renounceRole(bytes32,address)'(
     role: BytesLike,
     account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -257,7 +257,7 @@ export class AccessControl extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "revokeRole(bytes32,address)"(
+  'revokeRole(bytes32,address)'(
     role: BytesLike,
     account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -268,7 +268,7 @@ export class AccessControl extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "supportsInterface(bytes4)"(
+  'supportsInterface(bytes4)'(
     interfaceId: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
@@ -276,11 +276,11 @@ export class AccessControl extends Contract {
   callStatic: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    "DEFAULT_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<string>;
+    'DEFAULT_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
-    "getRoleAdmin(bytes32)"(
+    'getRoleAdmin(bytes32)'(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
@@ -291,7 +291,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "grantRole(bytes32,address)"(
+    'grantRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -303,7 +303,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "hasRole(bytes32,address)"(
+    'hasRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -315,7 +315,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "renounceRole(bytes32,address)"(
+    'renounceRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -327,7 +327,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "revokeRole(bytes32,address)"(
+    'revokeRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -338,7 +338,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -376,14 +376,14 @@ export class AccessControl extends Contract {
   estimateGas: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "DEFAULT_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'DEFAULT_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getRoleAdmin(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getRoleAdmin(bytes32)"(
+    'getRoleAdmin(bytes32)'(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -394,7 +394,7 @@ export class AccessControl extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "grantRole(bytes32,address)"(
+    'grantRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -406,7 +406,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "hasRole(bytes32,address)"(
+    'hasRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -418,7 +418,7 @@ export class AccessControl extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "renounceRole(bytes32,address)"(
+    'renounceRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -430,7 +430,7 @@ export class AccessControl extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "revokeRole(bytes32,address)"(
+    'revokeRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -441,7 +441,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -452,7 +452,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "DEFAULT_ADMIN_ROLE()"(
+    'DEFAULT_ADMIN_ROLE()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -461,7 +461,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getRoleAdmin(bytes32)"(
+    'getRoleAdmin(bytes32)'(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -472,7 +472,7 @@ export class AccessControl extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "grantRole(bytes32,address)"(
+    'grantRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -484,7 +484,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "hasRole(bytes32,address)"(
+    'hasRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -496,7 +496,7 @@ export class AccessControl extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "renounceRole(bytes32,address)"(
+    'renounceRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -508,7 +508,7 @@ export class AccessControl extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "revokeRole(bytes32,address)"(
+    'revokeRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -519,7 +519,7 @@ export class AccessControl extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

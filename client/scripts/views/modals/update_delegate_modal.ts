@@ -34,7 +34,7 @@ const UpdateDelegateModal: m.Component<IAttrs, IState> = {
             oninput: (e) => {
               const result = (e.target as any).value;
               vnode.state.newDelegateKey = result;
-            }
+            },
           }),
         ]),
         m(Button, {
@@ -43,18 +43,19 @@ const UpdateDelegateModal: m.Component<IAttrs, IState> = {
           rounded: true,
           onclick: (e) => {
             e.preventDefault();
-            vnode.attrs.account.updateDelegateKeyTx(vnode.state.newDelegateKey)
+            vnode.attrs.account
+              .updateDelegateKeyTx(vnode.state.newDelegateKey)
               .then((result) => {
                 $(vnode.dom).trigger('modalforceexit');
                 m.redraw();
               })
               .catch((err) => notifyError(err.toString()));
           },
-          label: 'Update Delegate'
+          label: 'Update Delegate',
         }),
       ]),
     ]);
-  }
+  },
 };
 
 export default UpdateDelegateModal;

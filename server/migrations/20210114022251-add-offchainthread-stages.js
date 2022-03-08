@@ -11,5 +11,5 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn('OffchainThreads', 'stage');
-  }
+  },
 };

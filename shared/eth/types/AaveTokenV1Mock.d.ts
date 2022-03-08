@@ -13,88 +13,88 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface AaveTokenV1MockInterface extends ethers.utils.Interface {
   functions: {
-    "DOMAIN_SEPARATOR()": FunctionFragment;
-    "EIP712_REVISION()": FunctionFragment;
-    "PERMIT_TYPEHASH()": FunctionFragment;
-    "REVISION()": FunctionFragment;
-    "_aaveGovernance()": FunctionFragment;
-    "_countsSnapshots(address)": FunctionFragment;
-    "_nonces(address)": FunctionFragment;
-    "_snapshots(address,uint256)": FunctionFragment;
-    "allowance(address,address)": FunctionFragment;
-    "approve(address,uint256)": FunctionFragment;
-    "balanceOf(address)": FunctionFragment;
-    "decimals()": FunctionFragment;
-    "decreaseAllowance(address,uint256)": FunctionFragment;
-    "increaseAllowance(address,uint256)": FunctionFragment;
-    "initialize(address,address,address)": FunctionFragment;
-    "name()": FunctionFragment;
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "symbol()": FunctionFragment;
-    "totalSupply()": FunctionFragment;
-    "transfer(address,uint256)": FunctionFragment;
-    "transferFrom(address,address,uint256)": FunctionFragment;
+    'DOMAIN_SEPARATOR()': FunctionFragment;
+    'EIP712_REVISION()': FunctionFragment;
+    'PERMIT_TYPEHASH()': FunctionFragment;
+    'REVISION()': FunctionFragment;
+    '_aaveGovernance()': FunctionFragment;
+    '_countsSnapshots(address)': FunctionFragment;
+    '_nonces(address)': FunctionFragment;
+    '_snapshots(address,uint256)': FunctionFragment;
+    'allowance(address,address)': FunctionFragment;
+    'approve(address,uint256)': FunctionFragment;
+    'balanceOf(address)': FunctionFragment;
+    'decimals()': FunctionFragment;
+    'decreaseAllowance(address,uint256)': FunctionFragment;
+    'increaseAllowance(address,uint256)': FunctionFragment;
+    'initialize(address,address,address)': FunctionFragment;
+    'name()': FunctionFragment;
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment;
+    'symbol()': FunctionFragment;
+    'totalSupply()': FunctionFragment;
+    'transfer(address,uint256)': FunctionFragment;
+    'transferFrom(address,address,uint256)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "DOMAIN_SEPARATOR",
+    functionFragment: 'DOMAIN_SEPARATOR',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "EIP712_REVISION",
+    functionFragment: 'EIP712_REVISION',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "PERMIT_TYPEHASH",
+    functionFragment: 'PERMIT_TYPEHASH',
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "REVISION", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'REVISION', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "_aaveGovernance",
+    functionFragment: '_aaveGovernance',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "_countsSnapshots",
+    functionFragment: '_countsSnapshots',
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "_nonces", values: [string]): string;
+  encodeFunctionData(functionFragment: '_nonces', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "_snapshots",
+    functionFragment: '_snapshots',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "allowance",
+    functionFragment: 'allowance',
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "approve",
+    functionFragment: 'approve',
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
-  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'balanceOf', values: [string]): string;
+  encodeFunctionData(functionFragment: 'decimals', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "decreaseAllowance",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "increaseAllowance",
+    functionFragment: 'decreaseAllowance',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
+    functionFragment: 'increaseAllowance',
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'initialize',
     values: [string, string, string]
   ): string;
-  encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'name', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "permit",
+    functionFragment: 'permit',
     values: [
       string,
       string,
@@ -105,78 +105,78 @@ interface AaveTokenV1MockInterface extends ethers.utils.Interface {
       BytesLike
     ]
   ): string;
-  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'symbol', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "totalSupply",
+    functionFragment: 'totalSupply',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "transfer",
+    functionFragment: 'transfer',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferFrom",
+    functionFragment: 'transferFrom',
     values: [string, string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "DOMAIN_SEPARATOR",
+    functionFragment: 'DOMAIN_SEPARATOR',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "EIP712_REVISION",
+    functionFragment: 'EIP712_REVISION',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "PERMIT_TYPEHASH",
+    functionFragment: 'PERMIT_TYPEHASH',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "REVISION", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'REVISION', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "_aaveGovernance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "_countsSnapshots",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "_nonces", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "_snapshots", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "decreaseAllowance",
+    functionFragment: '_aaveGovernance',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "increaseAllowance",
+    functionFragment: '_countsSnapshots',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: '_nonces', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: '_snapshots', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'allowance', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'decimals', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "totalSupply",
+    functionFragment: 'decreaseAllowance',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "transferFrom",
+    functionFragment: 'increaseAllowance',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'permit', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'symbol', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'totalSupply',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'transfer', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'transferFrom',
     data: BytesLike
   ): Result;
 
   events: {
-    "Approval(address,address,uint256)": EventFragment;
-    "SnapshotDone(address,uint128,uint128)": EventFragment;
-    "Transfer(address,address,uint256)": EventFragment;
+    'Approval(address,address,uint256)': EventFragment;
+    'SnapshotDone(address,uint128,uint128)': EventFragment;
+    'Transfer(address,address,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SnapshotDone"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Approval'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'SnapshotDone'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Transfer'): EventFragment;
 }
 
 export class AaveTokenV1Mock extends Contract {
@@ -225,37 +225,37 @@ export class AaveTokenV1Mock extends Contract {
   functions: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<[string]>;
+    'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<[string]>;
 
     EIP712_REVISION(overrides?: CallOverrides): Promise<[string]>;
 
-    "EIP712_REVISION()"(overrides?: CallOverrides): Promise<[string]>;
+    'EIP712_REVISION()'(overrides?: CallOverrides): Promise<[string]>;
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
-    "PERMIT_TYPEHASH()"(overrides?: CallOverrides): Promise<[string]>;
+    'PERMIT_TYPEHASH()'(overrides?: CallOverrides): Promise<[string]>;
 
     REVISION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "REVISION()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'REVISION()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     _aaveGovernance(overrides?: CallOverrides): Promise<[string]>;
 
-    "_aaveGovernance()"(overrides?: CallOverrides): Promise<[string]>;
+    '_aaveGovernance()'(overrides?: CallOverrides): Promise<[string]>;
 
     _countsSnapshots(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "_countsSnapshots(address)"(
+    '_countsSnapshots(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     _nonces(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "_nonces(address)"(
+    '_nonces(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -268,7 +268,7 @@ export class AaveTokenV1Mock extends Contract {
       [BigNumber, BigNumber] & { blockNumber: BigNumber; value: BigNumber }
     >;
 
-    "_snapshots(address,uint256)"(
+    '_snapshots(address,uint256)'(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -282,7 +282,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       owner: string,
       spender: string,
       overrides?: CallOverrides
@@ -294,7 +294,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -302,14 +302,14 @@ export class AaveTokenV1Mock extends Contract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<[number]>;
+    'decimals()'(overrides?: CallOverrides): Promise<[number]>;
 
     decreaseAllowance(
       spender: string,
@@ -317,7 +317,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "decreaseAllowance(address,uint256)"(
+    'decreaseAllowance(address,uint256)'(
       spender: string,
       subtractedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -329,27 +329,27 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "increaseAllowance(address,uint256)"(
+    'increaseAllowance(address,uint256)'(
       spender: string,
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,address)"(
+    'initialize(address,address,address)'(
       migrator: string,
       distributor: string,
       aaveGovernance: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address)"(
+    'initialize(address)'(
       minter: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    "name()"(overrides?: CallOverrides): Promise<[string]>;
+    'name()'(overrides?: CallOverrides): Promise<[string]>;
 
     permit(
       owner: string,
@@ -362,7 +362,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -375,11 +375,11 @@ export class AaveTokenV1Mock extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<[string]>;
+    'symbol()'(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transfer(
       recipient: string,
@@ -387,7 +387,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       recipient: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -400,7 +400,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -410,34 +410,34 @@ export class AaveTokenV1Mock extends Contract {
 
   DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
-  "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<string>;
+  'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<string>;
 
   EIP712_REVISION(overrides?: CallOverrides): Promise<string>;
 
-  "EIP712_REVISION()"(overrides?: CallOverrides): Promise<string>;
+  'EIP712_REVISION()'(overrides?: CallOverrides): Promise<string>;
 
   PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-  "PERMIT_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+  'PERMIT_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
   REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'REVISION()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   _aaveGovernance(overrides?: CallOverrides): Promise<string>;
 
-  "_aaveGovernance()"(overrides?: CallOverrides): Promise<string>;
+  '_aaveGovernance()'(overrides?: CallOverrides): Promise<string>;
 
   _countsSnapshots(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "_countsSnapshots(address)"(
+  '_countsSnapshots(address)'(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   _nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "_nonces(address)"(
+  '_nonces(address)'(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -450,7 +450,7 @@ export class AaveTokenV1Mock extends Contract {
     [BigNumber, BigNumber] & { blockNumber: BigNumber; value: BigNumber }
   >;
 
-  "_snapshots(address,uint256)"(
+  '_snapshots(address,uint256)'(
     arg0: string,
     arg1: BigNumberish,
     overrides?: CallOverrides
@@ -464,7 +464,7 @@ export class AaveTokenV1Mock extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "allowance(address,address)"(
+  'allowance(address,address)'(
     owner: string,
     spender: string,
     overrides?: CallOverrides
@@ -476,7 +476,7 @@ export class AaveTokenV1Mock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "approve(address,uint256)"(
+  'approve(address,uint256)'(
     spender: string,
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -484,14 +484,14 @@ export class AaveTokenV1Mock extends Contract {
 
   balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "balanceOf(address)"(
+  'balanceOf(address)'(
     account: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   decimals(overrides?: CallOverrides): Promise<number>;
 
-  "decimals()"(overrides?: CallOverrides): Promise<number>;
+  'decimals()'(overrides?: CallOverrides): Promise<number>;
 
   decreaseAllowance(
     spender: string,
@@ -499,7 +499,7 @@ export class AaveTokenV1Mock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "decreaseAllowance(address,uint256)"(
+  'decreaseAllowance(address,uint256)'(
     spender: string,
     subtractedValue: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -511,27 +511,27 @@ export class AaveTokenV1Mock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "increaseAllowance(address,uint256)"(
+  'increaseAllowance(address,uint256)'(
     spender: string,
     addedValue: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,address)"(
+  'initialize(address,address,address)'(
     migrator: string,
     distributor: string,
     aaveGovernance: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address)"(
+  'initialize(address)'(
     minter: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  "name()"(overrides?: CallOverrides): Promise<string>;
+  'name()'(overrides?: CallOverrides): Promise<string>;
 
   permit(
     owner: string,
@@ -544,7 +544,7 @@ export class AaveTokenV1Mock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+  'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
     owner: string,
     spender: string,
     value: BigNumberish,
@@ -557,11 +557,11 @@ export class AaveTokenV1Mock extends Contract {
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  "symbol()"(overrides?: CallOverrides): Promise<string>;
+  'symbol()'(overrides?: CallOverrides): Promise<string>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   transfer(
     recipient: string,
@@ -569,7 +569,7 @@ export class AaveTokenV1Mock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transfer(address,uint256)"(
+  'transfer(address,uint256)'(
     recipient: string,
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -582,7 +582,7 @@ export class AaveTokenV1Mock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transferFrom(address,address,uint256)"(
+  'transferFrom(address,address,uint256)'(
     sender: string,
     recipient: string,
     amount: BigNumberish,
@@ -592,37 +592,37 @@ export class AaveTokenV1Mock extends Contract {
   callStatic: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<string>;
+    'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<string>;
 
     EIP712_REVISION(overrides?: CallOverrides): Promise<string>;
 
-    "EIP712_REVISION()"(overrides?: CallOverrides): Promise<string>;
+    'EIP712_REVISION()'(overrides?: CallOverrides): Promise<string>;
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-    "PERMIT_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+    'PERMIT_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
     REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'REVISION()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     _aaveGovernance(overrides?: CallOverrides): Promise<string>;
 
-    "_aaveGovernance()"(overrides?: CallOverrides): Promise<string>;
+    '_aaveGovernance()'(overrides?: CallOverrides): Promise<string>;
 
     _countsSnapshots(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "_countsSnapshots(address)"(
+    '_countsSnapshots(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     _nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_nonces(address)"(
+    '_nonces(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -635,7 +635,7 @@ export class AaveTokenV1Mock extends Contract {
       [BigNumber, BigNumber] & { blockNumber: BigNumber; value: BigNumber }
     >;
 
-    "_snapshots(address,uint256)"(
+    '_snapshots(address,uint256)'(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -649,7 +649,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       owner: string,
       spender: string,
       overrides?: CallOverrides
@@ -661,7 +661,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       amount: BigNumberish,
       overrides?: CallOverrides
@@ -669,14 +669,14 @@ export class AaveTokenV1Mock extends Contract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     decimals(overrides?: CallOverrides): Promise<number>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<number>;
+    'decimals()'(overrides?: CallOverrides): Promise<number>;
 
     decreaseAllowance(
       spender: string,
@@ -684,7 +684,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "decreaseAllowance(address,uint256)"(
+    'decreaseAllowance(address,uint256)'(
       spender: string,
       subtractedValue: BigNumberish,
       overrides?: CallOverrides
@@ -696,27 +696,27 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "increaseAllowance(address,uint256)"(
+    'increaseAllowance(address,uint256)'(
       spender: string,
       addedValue: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "initialize(address,address,address)"(
+    'initialize(address,address,address)'(
       migrator: string,
       distributor: string,
       aaveGovernance: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address)"(
+    'initialize(address)'(
       minter: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    "name()"(overrides?: CallOverrides): Promise<string>;
+    'name()'(overrides?: CallOverrides): Promise<string>;
 
     permit(
       owner: string,
@@ -729,7 +729,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -742,11 +742,11 @@ export class AaveTokenV1Mock extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<string>;
+    'symbol()'(overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
       recipient: string,
@@ -754,7 +754,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       recipient: string,
       amount: BigNumberish,
       overrides?: CallOverrides
@@ -767,7 +767,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -807,37 +807,37 @@ export class AaveTokenV1Mock extends Contract {
   estimateGas: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     EIP712_REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "EIP712_REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'EIP712_REVISION()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "PERMIT_TYPEHASH()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'PERMIT_TYPEHASH()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'REVISION()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     _aaveGovernance(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_aaveGovernance()"(overrides?: CallOverrides): Promise<BigNumber>;
+    '_aaveGovernance()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     _countsSnapshots(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "_countsSnapshots(address)"(
+    '_countsSnapshots(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     _nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "_nonces(address)"(
+    '_nonces(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -848,7 +848,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "_snapshots(address,uint256)"(
+    '_snapshots(address,uint256)'(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -860,7 +860,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       owner: string,
       spender: string,
       overrides?: CallOverrides
@@ -872,7 +872,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -880,14 +880,14 @@ export class AaveTokenV1Mock extends Contract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'decimals()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     decreaseAllowance(
       spender: string,
@@ -895,7 +895,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "decreaseAllowance(address,uint256)"(
+    'decreaseAllowance(address,uint256)'(
       spender: string,
       subtractedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -907,27 +907,27 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "increaseAllowance(address,uint256)"(
+    'increaseAllowance(address,uint256)'(
       spender: string,
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,address,address)"(
+    'initialize(address,address,address)'(
       migrator: string,
       distributor: string,
       aaveGovernance: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address)"(
+    'initialize(address)'(
       minter: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'name()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     permit(
       owner: string,
@@ -940,7 +940,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -953,11 +953,11 @@ export class AaveTokenV1Mock extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'symbol()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
       recipient: string,
@@ -965,7 +965,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       recipient: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -978,7 +978,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -989,29 +989,29 @@ export class AaveTokenV1Mock extends Contract {
   populateTransaction: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "DOMAIN_SEPARATOR()"(
+    'DOMAIN_SEPARATOR()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     EIP712_REVISION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "EIP712_REVISION()"(
+    'EIP712_REVISION()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "PERMIT_TYPEHASH()"(
+    'PERMIT_TYPEHASH()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     REVISION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "REVISION()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'REVISION()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     _aaveGovernance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "_aaveGovernance()"(
+    '_aaveGovernance()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1020,7 +1020,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "_countsSnapshots(address)"(
+    '_countsSnapshots(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1030,7 +1030,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "_nonces(address)"(
+    '_nonces(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1041,7 +1041,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "_snapshots(address,uint256)"(
+    '_snapshots(address,uint256)'(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -1053,7 +1053,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       owner: string,
       spender: string,
       overrides?: CallOverrides
@@ -1065,7 +1065,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1076,14 +1076,14 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'decimals()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     decreaseAllowance(
       spender: string,
@@ -1091,7 +1091,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "decreaseAllowance(address,uint256)"(
+    'decreaseAllowance(address,uint256)'(
       spender: string,
       subtractedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1103,27 +1103,27 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "increaseAllowance(address,uint256)"(
+    'increaseAllowance(address,uint256)'(
       spender: string,
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,address)"(
+    'initialize(address,address,address)'(
       migrator: string,
       distributor: string,
       aaveGovernance: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address)"(
+    'initialize(address)'(
       minter: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'name()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     permit(
       owner: string,
@@ -1136,7 +1136,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -1149,11 +1149,11 @@ export class AaveTokenV1Mock extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'symbol()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transfer(
       recipient: string,
@@ -1161,7 +1161,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       recipient: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1174,7 +1174,7 @@ export class AaveTokenV1Mock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,

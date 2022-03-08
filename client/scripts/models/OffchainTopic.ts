@@ -11,8 +11,12 @@ class OffchainTopic {
   public readonly defaultOffchainTemplate?: string;
 
   private _tokenThreshold?: BN;
-  public get tokenThreshold() { return this._tokenThreshold; }
-  public setTokenThreshold(t: BN) { this._tokenThreshold = t; }
+  public get tokenThreshold() {
+    return this._tokenThreshold;
+  }
+  public setTokenThreshold(t: BN) {
+    this._tokenThreshold = t;
+  }
 
   constructor({
     name,
@@ -25,15 +29,15 @@ class OffchainTopic {
     default_offchain_template,
     token_threshold,
   }: {
-      name: string,
-      id: number,
-      description: string,
-      telegram?: string,
-      chain_id?: string,
-      featured_in_sidebar?: boolean,
-      featured_in_new_post?: boolean,
-      default_offchain_template?: string,
-      token_threshold?: BN | string | number,
+    name: string;
+    id: number;
+    description: string;
+    telegram?: string;
+    chain_id?: string;
+    featured_in_sidebar?: boolean;
+    featured_in_new_post?: boolean;
+    default_offchain_template?: string;
+    token_threshold?: BN | string | number;
   }) {
     this.name = name;
     this.id = id;

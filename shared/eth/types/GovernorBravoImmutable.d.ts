@@ -14,337 +14,337 @@ import {
   Overrides,
   PayableOverrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface GovernorBravoImmutableInterface extends ethers.utils.Interface {
   functions: {
-    "BALLOT_TYPEHASH()": FunctionFragment;
-    "DOMAIN_TYPEHASH()": FunctionFragment;
-    "MAX_PROPOSAL_THRESHOLD()": FunctionFragment;
-    "MAX_VOTING_DELAY()": FunctionFragment;
-    "MAX_VOTING_PERIOD()": FunctionFragment;
-    "MIN_PROPOSAL_THRESHOLD()": FunctionFragment;
-    "MIN_VOTING_DELAY()": FunctionFragment;
-    "MIN_VOTING_PERIOD()": FunctionFragment;
-    "_acceptAdmin()": FunctionFragment;
-    "_initiate()": FunctionFragment;
-    "_setPendingAdmin(address)": FunctionFragment;
-    "_setProposalThreshold(uint256)": FunctionFragment;
-    "_setVotingDelay(uint256)": FunctionFragment;
-    "_setVotingPeriod(uint256)": FunctionFragment;
-    "admin()": FunctionFragment;
-    "cancel(uint256)": FunctionFragment;
-    "castVote(uint256,uint8)": FunctionFragment;
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)": FunctionFragment;
-    "castVoteWithReason(uint256,uint8,string)": FunctionFragment;
-    "comp()": FunctionFragment;
-    "execute(uint256)": FunctionFragment;
-    "getActions(uint256)": FunctionFragment;
-    "getReceipt(uint256,address)": FunctionFragment;
-    "implementation()": FunctionFragment;
-    "initialProposalId()": FunctionFragment;
-    "initialize(address,address,uint256,uint256,uint256)": FunctionFragment;
-    "latestProposalIds(address)": FunctionFragment;
-    "name()": FunctionFragment;
-    "pendingAdmin()": FunctionFragment;
-    "proposalCount()": FunctionFragment;
-    "proposalMaxOperations()": FunctionFragment;
-    "proposalThreshold()": FunctionFragment;
-    "proposals(uint256)": FunctionFragment;
-    "propose(address[],uint256[],string[],bytes[],string)": FunctionFragment;
-    "queue(uint256)": FunctionFragment;
-    "quorumVotes()": FunctionFragment;
-    "state(uint256)": FunctionFragment;
-    "timelock()": FunctionFragment;
-    "votingDelay()": FunctionFragment;
-    "votingPeriod()": FunctionFragment;
+    'BALLOT_TYPEHASH()': FunctionFragment;
+    'DOMAIN_TYPEHASH()': FunctionFragment;
+    'MAX_PROPOSAL_THRESHOLD()': FunctionFragment;
+    'MAX_VOTING_DELAY()': FunctionFragment;
+    'MAX_VOTING_PERIOD()': FunctionFragment;
+    'MIN_PROPOSAL_THRESHOLD()': FunctionFragment;
+    'MIN_VOTING_DELAY()': FunctionFragment;
+    'MIN_VOTING_PERIOD()': FunctionFragment;
+    '_acceptAdmin()': FunctionFragment;
+    '_initiate()': FunctionFragment;
+    '_setPendingAdmin(address)': FunctionFragment;
+    '_setProposalThreshold(uint256)': FunctionFragment;
+    '_setVotingDelay(uint256)': FunctionFragment;
+    '_setVotingPeriod(uint256)': FunctionFragment;
+    'admin()': FunctionFragment;
+    'cancel(uint256)': FunctionFragment;
+    'castVote(uint256,uint8)': FunctionFragment;
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)': FunctionFragment;
+    'castVoteWithReason(uint256,uint8,string)': FunctionFragment;
+    'comp()': FunctionFragment;
+    'execute(uint256)': FunctionFragment;
+    'getActions(uint256)': FunctionFragment;
+    'getReceipt(uint256,address)': FunctionFragment;
+    'implementation()': FunctionFragment;
+    'initialProposalId()': FunctionFragment;
+    'initialize(address,address,uint256,uint256,uint256)': FunctionFragment;
+    'latestProposalIds(address)': FunctionFragment;
+    'name()': FunctionFragment;
+    'pendingAdmin()': FunctionFragment;
+    'proposalCount()': FunctionFragment;
+    'proposalMaxOperations()': FunctionFragment;
+    'proposalThreshold()': FunctionFragment;
+    'proposals(uint256)': FunctionFragment;
+    'propose(address[],uint256[],string[],bytes[],string)': FunctionFragment;
+    'queue(uint256)': FunctionFragment;
+    'quorumVotes()': FunctionFragment;
+    'state(uint256)': FunctionFragment;
+    'timelock()': FunctionFragment;
+    'votingDelay()': FunctionFragment;
+    'votingPeriod()': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "BALLOT_TYPEHASH",
+    functionFragment: 'BALLOT_TYPEHASH',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "DOMAIN_TYPEHASH",
+    functionFragment: 'DOMAIN_TYPEHASH',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MAX_PROPOSAL_THRESHOLD",
+    functionFragment: 'MAX_PROPOSAL_THRESHOLD',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MAX_VOTING_DELAY",
+    functionFragment: 'MAX_VOTING_DELAY',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MAX_VOTING_PERIOD",
+    functionFragment: 'MAX_VOTING_PERIOD',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MIN_PROPOSAL_THRESHOLD",
+    functionFragment: 'MIN_PROPOSAL_THRESHOLD',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MIN_VOTING_DELAY",
+    functionFragment: 'MIN_VOTING_DELAY',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MIN_VOTING_PERIOD",
+    functionFragment: 'MIN_VOTING_PERIOD',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "_acceptAdmin",
+    functionFragment: '_acceptAdmin',
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "_initiate", values?: undefined): string;
+  encodeFunctionData(functionFragment: '_initiate', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "_setPendingAdmin",
+    functionFragment: '_setPendingAdmin',
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "_setProposalThreshold",
+    functionFragment: '_setProposalThreshold',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "_setVotingDelay",
+    functionFragment: '_setVotingDelay',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "_setVotingPeriod",
+    functionFragment: '_setVotingPeriod',
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'admin', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "cancel",
+    functionFragment: 'cancel',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "castVote",
+    functionFragment: 'castVote',
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "castVoteBySig",
+    functionFragment: 'castVoteBySig',
     values: [BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "castVoteWithReason",
+    functionFragment: 'castVoteWithReason',
     values: [BigNumberish, BigNumberish, string]
   ): string;
-  encodeFunctionData(functionFragment: "comp", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'comp', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "execute",
+    functionFragment: 'execute',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getActions",
+    functionFragment: 'getActions',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getReceipt",
+    functionFragment: 'getReceipt',
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "implementation",
+    functionFragment: 'implementation',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "initialProposalId",
+    functionFragment: 'initialProposalId',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
+    functionFragment: 'initialize',
     values: [string, string, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "latestProposalIds",
+    functionFragment: 'latestProposalIds',
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'name', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "pendingAdmin",
+    functionFragment: 'pendingAdmin',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "proposalCount",
+    functionFragment: 'proposalCount',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "proposalMaxOperations",
+    functionFragment: 'proposalMaxOperations',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "proposalThreshold",
+    functionFragment: 'proposalThreshold',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "proposals",
+    functionFragment: 'proposals',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "propose",
+    functionFragment: 'propose',
     values: [string[], BigNumberish[], string[], BytesLike[], string]
   ): string;
-  encodeFunctionData(functionFragment: "queue", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: 'queue', values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "quorumVotes",
+    functionFragment: 'quorumVotes',
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "state", values: [BigNumberish]): string;
-  encodeFunctionData(functionFragment: "timelock", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'state', values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: 'timelock', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "votingDelay",
+    functionFragment: 'votingDelay',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "votingPeriod",
+    functionFragment: 'votingPeriod',
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "BALLOT_TYPEHASH",
+    functionFragment: 'BALLOT_TYPEHASH',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "DOMAIN_TYPEHASH",
+    functionFragment: 'DOMAIN_TYPEHASH',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MAX_PROPOSAL_THRESHOLD",
+    functionFragment: 'MAX_PROPOSAL_THRESHOLD',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MAX_VOTING_DELAY",
+    functionFragment: 'MAX_VOTING_DELAY',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MAX_VOTING_PERIOD",
+    functionFragment: 'MAX_VOTING_PERIOD',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MIN_PROPOSAL_THRESHOLD",
+    functionFragment: 'MIN_PROPOSAL_THRESHOLD',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MIN_VOTING_DELAY",
+    functionFragment: 'MIN_VOTING_DELAY',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MIN_VOTING_PERIOD",
+    functionFragment: 'MIN_VOTING_PERIOD',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "_acceptAdmin",
+    functionFragment: '_acceptAdmin',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "_initiate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: '_initiate', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "_setPendingAdmin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "_setProposalThreshold",
+    functionFragment: '_setPendingAdmin',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "_setVotingDelay",
+    functionFragment: '_setProposalThreshold',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "_setVotingPeriod",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "castVote", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "castVoteBySig",
+    functionFragment: '_setVotingDelay',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "castVoteWithReason",
+    functionFragment: '_setVotingPeriod',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "comp", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getActions", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getReceipt", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'admin', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'cancel', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'castVote', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "implementation",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "initialProposalId",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "latestProposalIds",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "pendingAdmin",
+    functionFragment: 'castVoteBySig',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "proposalCount",
+    functionFragment: 'castVoteWithReason',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'comp', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'execute', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getActions', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getReceipt', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'implementation',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "proposalMaxOperations",
+    functionFragment: 'initialProposalId',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'latestProposalIds',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'pendingAdmin',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "proposalThreshold",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "proposals", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "propose", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "queue", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "quorumVotes",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "state", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "timelock", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "votingDelay",
+    functionFragment: 'proposalCount',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "votingPeriod",
+    functionFragment: 'proposalMaxOperations',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'proposalThreshold',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'proposals', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'propose', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'queue', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'quorumVotes',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'state', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'timelock', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'votingDelay',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'votingPeriod',
     data: BytesLike
   ): Result;
 
   events: {
-    "NewAdmin(address,address)": EventFragment;
-    "NewImplementation(address,address)": EventFragment;
-    "NewPendingAdmin(address,address)": EventFragment;
-    "ProposalCanceled(uint256)": EventFragment;
-    "ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)": EventFragment;
-    "ProposalExecuted(uint256)": EventFragment;
-    "ProposalQueued(uint256,uint256)": EventFragment;
-    "ProposalThresholdSet(uint256,uint256)": EventFragment;
-    "VoteCast(address,uint256,uint8,uint256,string)": EventFragment;
-    "VotingDelaySet(uint256,uint256)": EventFragment;
-    "VotingPeriodSet(uint256,uint256)": EventFragment;
+    'NewAdmin(address,address)': EventFragment;
+    'NewImplementation(address,address)': EventFragment;
+    'NewPendingAdmin(address,address)': EventFragment;
+    'ProposalCanceled(uint256)': EventFragment;
+    'ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)': EventFragment;
+    'ProposalExecuted(uint256)': EventFragment;
+    'ProposalQueued(uint256,uint256)': EventFragment;
+    'ProposalThresholdSet(uint256,uint256)': EventFragment;
+    'VoteCast(address,uint256,uint8,uint256,string)': EventFragment;
+    'VotingDelaySet(uint256,uint256)': EventFragment;
+    'VotingPeriodSet(uint256,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "NewAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewImplementation"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewPendingAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalCanceled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalExecuted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalQueued"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalThresholdSet"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VoteCast"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingDelaySet"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingPeriodSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'NewAdmin'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'NewImplementation'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'NewPendingAdmin'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCanceled'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCreated'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalExecuted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalQueued'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalThresholdSet'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VoteCast'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VotingDelaySet'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VotingPeriodSet'): EventFragment;
 }
 
 export class GovernorBravoImmutable extends Contract {
@@ -393,41 +393,41 @@ export class GovernorBravoImmutable extends Contract {
   functions: {
     BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
-    "BALLOT_TYPEHASH()"(overrides?: CallOverrides): Promise<[string]>;
+    'BALLOT_TYPEHASH()'(overrides?: CallOverrides): Promise<[string]>;
 
     DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
-    "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<[string]>;
+    'DOMAIN_TYPEHASH()'(overrides?: CallOverrides): Promise<[string]>;
 
     MAX_PROPOSAL_THRESHOLD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "MAX_PROPOSAL_THRESHOLD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'MAX_PROPOSAL_THRESHOLD()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     MAX_VOTING_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "MAX_VOTING_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'MAX_VOTING_DELAY()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     MAX_VOTING_PERIOD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "MAX_VOTING_PERIOD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'MAX_VOTING_PERIOD()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     MIN_PROPOSAL_THRESHOLD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "MIN_PROPOSAL_THRESHOLD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'MIN_PROPOSAL_THRESHOLD()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     MIN_VOTING_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "MIN_VOTING_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'MIN_VOTING_DELAY()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     MIN_VOTING_PERIOD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "MIN_VOTING_PERIOD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'MIN_VOTING_PERIOD()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     _acceptAdmin(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "_acceptAdmin()"(
+    '_acceptAdmin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -435,7 +435,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "_initiate()"(
+    '_initiate()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -444,7 +444,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "_setPendingAdmin(address)"(
+    '_setPendingAdmin(address)'(
       newPendingAdmin: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -454,7 +454,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "_setProposalThreshold(uint256)"(
+    '_setProposalThreshold(uint256)'(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -464,7 +464,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "_setVotingDelay(uint256)"(
+    '_setVotingDelay(uint256)'(
       newVotingDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -474,21 +474,21 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "_setVotingPeriod(uint256)"(
+    '_setVotingPeriod(uint256)'(
       newVotingPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     admin(overrides?: CallOverrides): Promise<[string]>;
 
-    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+    'admin()'(overrides?: CallOverrides): Promise<[string]>;
 
     cancel(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -499,7 +499,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "castVote(uint256,uint8)"(
+    'castVote(uint256,uint8)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -514,7 +514,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       v: BigNumberish,
@@ -530,7 +530,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "castVoteWithReason(uint256,uint8,string)"(
+    'castVoteWithReason(uint256,uint8,string)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
@@ -539,14 +539,14 @@ export class GovernorBravoImmutable extends Contract {
 
     comp(overrides?: CallOverrides): Promise<[string]>;
 
-    "comp()"(overrides?: CallOverrides): Promise<[string]>;
+    'comp()'(overrides?: CallOverrides): Promise<[string]>;
 
     execute(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -563,7 +563,7 @@ export class GovernorBravoImmutable extends Contract {
       }
     >;
 
-    "getActions(uint256)"(
+    'getActions(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -589,7 +589,7 @@ export class GovernorBravoImmutable extends Contract {
       ]
     >;
 
-    "getReceipt(uint256,address)"(
+    'getReceipt(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -605,11 +605,11 @@ export class GovernorBravoImmutable extends Contract {
 
     implementation(overrides?: CallOverrides): Promise<[string]>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<[string]>;
+    'implementation()'(overrides?: CallOverrides): Promise<[string]>;
 
     initialProposalId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "initialProposalId()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'initialProposalId()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     initialize(
       timelock_: string,
@@ -620,7 +620,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,uint256,uint256,uint256)"(
+    'initialize(address,address,uint256,uint256,uint256)'(
       timelock_: string,
       comp_: string,
       votingPeriod_: BigNumberish,
@@ -634,30 +634,30 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "latestProposalIds(address)"(
+    'latestProposalIds(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    "name()"(overrides?: CallOverrides): Promise<[string]>;
+    'name()'(overrides?: CallOverrides): Promise<[string]>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<[string]>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<[string]>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<[string]>;
 
     proposalCount(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "proposalCount()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'proposalCount()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     proposalMaxOperations(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "proposalMaxOperations()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'proposalMaxOperations()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     proposalThreshold(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "proposalThreshold()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'proposalThreshold()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     proposals(
       arg0: BigNumberish,
@@ -688,7 +688,7 @@ export class GovernorBravoImmutable extends Contract {
       }
     >;
 
-    "proposals(uint256)"(
+    'proposals(uint256)'(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -726,7 +726,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "propose(address[],uint256[],string[],bytes[],string)"(
+    'propose(address[],uint256[],string[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       signatures: string[],
@@ -740,75 +740,75 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     quorumVotes(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "quorumVotes()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'quorumVotes()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     state(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[number]>;
 
-    "state(uint256)"(
+    'state(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[number]>;
 
     timelock(overrides?: CallOverrides): Promise<[string]>;
 
-    "timelock()"(overrides?: CallOverrides): Promise<[string]>;
+    'timelock()'(overrides?: CallOverrides): Promise<[string]>;
 
     votingDelay(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "votingDelay()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'votingDelay()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     votingPeriod(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "votingPeriod()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'votingPeriod()'(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-  "BALLOT_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+  'BALLOT_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
   DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-  "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+  'DOMAIN_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
   MAX_PROPOSAL_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "MAX_PROPOSAL_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'MAX_PROPOSAL_THRESHOLD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   MAX_VOTING_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "MAX_VOTING_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'MAX_VOTING_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   MAX_VOTING_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "MAX_VOTING_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'MAX_VOTING_PERIOD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   MIN_PROPOSAL_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "MIN_PROPOSAL_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'MIN_PROPOSAL_THRESHOLD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   MIN_VOTING_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "MIN_VOTING_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'MIN_VOTING_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   MIN_VOTING_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "MIN_VOTING_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'MIN_VOTING_PERIOD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   _acceptAdmin(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "_acceptAdmin()"(
+  '_acceptAdmin()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -816,7 +816,7 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "_initiate()"(
+  '_initiate()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -825,7 +825,7 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "_setPendingAdmin(address)"(
+  '_setPendingAdmin(address)'(
     newPendingAdmin: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -835,7 +835,7 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "_setProposalThreshold(uint256)"(
+  '_setProposalThreshold(uint256)'(
     newProposalThreshold: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -845,7 +845,7 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "_setVotingDelay(uint256)"(
+  '_setVotingDelay(uint256)'(
     newVotingDelay: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -855,21 +855,21 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "_setVotingPeriod(uint256)"(
+  '_setVotingPeriod(uint256)'(
     newVotingPeriod: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   admin(overrides?: CallOverrides): Promise<string>;
 
-  "admin()"(overrides?: CallOverrides): Promise<string>;
+  'admin()'(overrides?: CallOverrides): Promise<string>;
 
   cancel(
     proposalId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "cancel(uint256)"(
+  'cancel(uint256)'(
     proposalId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -880,7 +880,7 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "castVote(uint256,uint8)"(
+  'castVote(uint256,uint8)'(
     proposalId: BigNumberish,
     support: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -895,7 +895,7 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+  'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
     proposalId: BigNumberish,
     support: BigNumberish,
     v: BigNumberish,
@@ -911,7 +911,7 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "castVoteWithReason(uint256,uint8,string)"(
+  'castVoteWithReason(uint256,uint8,string)'(
     proposalId: BigNumberish,
     support: BigNumberish,
     reason: string,
@@ -920,14 +920,14 @@ export class GovernorBravoImmutable extends Contract {
 
   comp(overrides?: CallOverrides): Promise<string>;
 
-  "comp()"(overrides?: CallOverrides): Promise<string>;
+  'comp()'(overrides?: CallOverrides): Promise<string>;
 
   execute(
     proposalId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "execute(uint256)"(
+  'execute(uint256)'(
     proposalId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -944,7 +944,7 @@ export class GovernorBravoImmutable extends Contract {
     }
   >;
 
-  "getActions(uint256)"(
+  'getActions(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
@@ -968,7 +968,7 @@ export class GovernorBravoImmutable extends Contract {
     }
   >;
 
-  "getReceipt(uint256,address)"(
+  'getReceipt(uint256,address)'(
     proposalId: BigNumberish,
     voter: string,
     overrides?: CallOverrides
@@ -982,11 +982,11 @@ export class GovernorBravoImmutable extends Contract {
 
   implementation(overrides?: CallOverrides): Promise<string>;
 
-  "implementation()"(overrides?: CallOverrides): Promise<string>;
+  'implementation()'(overrides?: CallOverrides): Promise<string>;
 
   initialProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "initialProposalId()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'initialProposalId()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   initialize(
     timelock_: string,
@@ -997,7 +997,7 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,uint256,uint256,uint256)"(
+  'initialize(address,address,uint256,uint256,uint256)'(
     timelock_: string,
     comp_: string,
     votingPeriod_: BigNumberish,
@@ -1011,30 +1011,30 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "latestProposalIds(address)"(
+  'latestProposalIds(address)'(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  "name()"(overrides?: CallOverrides): Promise<string>;
+  'name()'(overrides?: CallOverrides): Promise<string>;
 
   pendingAdmin(overrides?: CallOverrides): Promise<string>;
 
-  "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
+  'pendingAdmin()'(overrides?: CallOverrides): Promise<string>;
 
   proposalCount(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "proposalCount()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'proposalCount()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   proposalMaxOperations(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "proposalMaxOperations()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'proposalMaxOperations()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'proposalThreshold()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   proposals(
     arg0: BigNumberish,
@@ -1065,7 +1065,7 @@ export class GovernorBravoImmutable extends Contract {
     }
   >;
 
-  "proposals(uint256)"(
+  'proposals(uint256)'(
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
@@ -1103,7 +1103,7 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "propose(address[],uint256[],string[],bytes[],string)"(
+  'propose(address[],uint256[],string[],bytes[],string)'(
     targets: string[],
     values: BigNumberish[],
     signatures: string[],
@@ -1117,81 +1117,81 @@ export class GovernorBravoImmutable extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "queue(uint256)"(
+  'queue(uint256)'(
     proposalId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   quorumVotes(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'quorumVotes()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
-  "state(uint256)"(
+  'state(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<number>;
 
   timelock(overrides?: CallOverrides): Promise<string>;
 
-  "timelock()"(overrides?: CallOverrides): Promise<string>;
+  'timelock()'(overrides?: CallOverrides): Promise<string>;
 
   votingDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "votingDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'votingDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   votingPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "votingPeriod()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'votingPeriod()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
     BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-    "BALLOT_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+    'BALLOT_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
     DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-    "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+    'DOMAIN_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
     MAX_PROPOSAL_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MAX_PROPOSAL_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MAX_PROPOSAL_THRESHOLD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAX_VOTING_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MAX_VOTING_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MAX_VOTING_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAX_VOTING_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MAX_VOTING_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MAX_VOTING_PERIOD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MIN_PROPOSAL_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MIN_PROPOSAL_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MIN_PROPOSAL_THRESHOLD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MIN_VOTING_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MIN_VOTING_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MIN_VOTING_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MIN_VOTING_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MIN_VOTING_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MIN_VOTING_PERIOD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     _acceptAdmin(overrides?: CallOverrides): Promise<void>;
 
-    "_acceptAdmin()"(overrides?: CallOverrides): Promise<void>;
+    '_acceptAdmin()'(overrides?: CallOverrides): Promise<void>;
 
     _initiate(overrides?: CallOverrides): Promise<void>;
 
-    "_initiate()"(overrides?: CallOverrides): Promise<void>;
+    '_initiate()'(overrides?: CallOverrides): Promise<void>;
 
     _setPendingAdmin(
       newPendingAdmin: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "_setPendingAdmin(address)"(
+    '_setPendingAdmin(address)'(
       newPendingAdmin: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1201,7 +1201,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "_setProposalThreshold(uint256)"(
+    '_setProposalThreshold(uint256)'(
       newProposalThreshold: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1211,7 +1211,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "_setVotingDelay(uint256)"(
+    '_setVotingDelay(uint256)'(
       newVotingDelay: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1221,18 +1221,18 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "_setVotingPeriod(uint256)"(
+    '_setVotingPeriod(uint256)'(
       newVotingPeriod: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     admin(overrides?: CallOverrides): Promise<string>;
 
-    "admin()"(overrides?: CallOverrides): Promise<string>;
+    'admin()'(overrides?: CallOverrides): Promise<string>;
 
     cancel(proposalId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1243,7 +1243,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "castVote(uint256,uint8)"(
+    'castVote(uint256,uint8)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       overrides?: CallOverrides
@@ -1258,7 +1258,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       v: BigNumberish,
@@ -1274,7 +1274,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "castVoteWithReason(uint256,uint8,string)"(
+    'castVoteWithReason(uint256,uint8,string)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
@@ -1283,11 +1283,11 @@ export class GovernorBravoImmutable extends Contract {
 
     comp(overrides?: CallOverrides): Promise<string>;
 
-    "comp()"(overrides?: CallOverrides): Promise<string>;
+    'comp()'(overrides?: CallOverrides): Promise<string>;
 
     execute(proposalId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1304,7 +1304,7 @@ export class GovernorBravoImmutable extends Contract {
       }
     >;
 
-    "getActions(uint256)"(
+    'getActions(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -1328,7 +1328,7 @@ export class GovernorBravoImmutable extends Contract {
       }
     >;
 
-    "getReceipt(uint256,address)"(
+    'getReceipt(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -1342,11 +1342,11 @@ export class GovernorBravoImmutable extends Contract {
 
     implementation(overrides?: CallOverrides): Promise<string>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<string>;
+    'implementation()'(overrides?: CallOverrides): Promise<string>;
 
     initialProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "initialProposalId()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'initialProposalId()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
       timelock_: string,
@@ -1357,7 +1357,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,uint256,uint256,uint256)"(
+    'initialize(address,address,uint256,uint256,uint256)'(
       timelock_: string,
       comp_: string,
       votingPeriod_: BigNumberish,
@@ -1371,30 +1371,30 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "latestProposalIds(address)"(
+    'latestProposalIds(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    "name()"(overrides?: CallOverrides): Promise<string>;
+    'name()'(overrides?: CallOverrides): Promise<string>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<string>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<string>;
 
     proposalCount(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "proposalCount()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'proposalCount()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposalMaxOperations(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "proposalMaxOperations()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'proposalMaxOperations()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'proposalThreshold()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposals(
       arg0: BigNumberish,
@@ -1425,7 +1425,7 @@ export class GovernorBravoImmutable extends Contract {
       }
     >;
 
-    "proposals(uint256)"(
+    'proposals(uint256)'(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -1463,7 +1463,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "propose(address[],uint256[],string[],bytes[],string)"(
+    'propose(address[],uint256[],string[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       signatures: string[],
@@ -1474,33 +1474,33 @@ export class GovernorBravoImmutable extends Contract {
 
     queue(proposalId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     quorumVotes(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'quorumVotes()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
-    "state(uint256)"(
+    'state(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<number>;
 
     timelock(overrides?: CallOverrides): Promise<string>;
 
-    "timelock()"(overrides?: CallOverrides): Promise<string>;
+    'timelock()'(overrides?: CallOverrides): Promise<string>;
 
     votingDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "votingDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'votingDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     votingPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "votingPeriod()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'votingPeriod()'(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -1624,41 +1624,41 @@ export class GovernorBravoImmutable extends Contract {
   estimateGas: {
     BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "BALLOT_TYPEHASH()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'BALLOT_TYPEHASH()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'DOMAIN_TYPEHASH()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAX_PROPOSAL_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MAX_PROPOSAL_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MAX_PROPOSAL_THRESHOLD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAX_VOTING_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MAX_VOTING_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MAX_VOTING_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAX_VOTING_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MAX_VOTING_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MAX_VOTING_PERIOD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MIN_PROPOSAL_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MIN_PROPOSAL_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MIN_PROPOSAL_THRESHOLD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MIN_VOTING_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MIN_VOTING_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MIN_VOTING_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MIN_VOTING_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MIN_VOTING_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MIN_VOTING_PERIOD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     _acceptAdmin(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "_acceptAdmin()"(
+    '_acceptAdmin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1666,7 +1666,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "_initiate()"(
+    '_initiate()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1675,7 +1675,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "_setPendingAdmin(address)"(
+    '_setPendingAdmin(address)'(
       newPendingAdmin: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1685,7 +1685,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "_setProposalThreshold(uint256)"(
+    '_setProposalThreshold(uint256)'(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1695,7 +1695,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "_setVotingDelay(uint256)"(
+    '_setVotingDelay(uint256)'(
       newVotingDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1705,21 +1705,21 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "_setVotingPeriod(uint256)"(
+    '_setVotingPeriod(uint256)'(
       newVotingPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     admin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'admin()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     cancel(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1730,7 +1730,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "castVote(uint256,uint8)"(
+    'castVote(uint256,uint8)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1745,7 +1745,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       v: BigNumberish,
@@ -1761,7 +1761,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "castVoteWithReason(uint256,uint8,string)"(
+    'castVoteWithReason(uint256,uint8,string)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
@@ -1770,14 +1770,14 @@ export class GovernorBravoImmutable extends Contract {
 
     comp(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "comp()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'comp()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     execute(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1787,7 +1787,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getActions(uint256)"(
+    'getActions(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1798,7 +1798,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getReceipt(uint256,address)"(
+    'getReceipt(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -1806,11 +1806,11 @@ export class GovernorBravoImmutable extends Contract {
 
     implementation(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'implementation()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "initialProposalId()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'initialProposalId()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
       timelock_: string,
@@ -1821,7 +1821,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,address,uint256,uint256,uint256)"(
+    'initialize(address,address,uint256,uint256,uint256)'(
       timelock_: string,
       comp_: string,
       votingPeriod_: BigNumberish,
@@ -1835,37 +1835,37 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "latestProposalIds(address)"(
+    'latestProposalIds(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'name()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposalCount(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "proposalCount()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'proposalCount()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposalMaxOperations(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "proposalMaxOperations()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'proposalMaxOperations()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'proposalThreshold()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposals(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "proposals(uint256)"(
+    'proposals(uint256)'(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1879,7 +1879,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "propose(address[],uint256[],string[],bytes[],string)"(
+    'propose(address[],uint256[],string[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       signatures: string[],
@@ -1893,48 +1893,48 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     quorumVotes(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'quorumVotes()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     state(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "state(uint256)"(
+    'state(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     timelock(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "timelock()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'timelock()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     votingDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "votingDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'votingDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     votingPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "votingPeriod()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'votingPeriod()'(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
     BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "BALLOT_TYPEHASH()"(
+    'BALLOT_TYPEHASH()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "DOMAIN_TYPEHASH()"(
+    'DOMAIN_TYPEHASH()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1942,19 +1942,19 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "MAX_PROPOSAL_THRESHOLD()"(
+    'MAX_PROPOSAL_THRESHOLD()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     MAX_VOTING_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "MAX_VOTING_DELAY()"(
+    'MAX_VOTING_DELAY()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     MAX_VOTING_PERIOD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "MAX_VOTING_PERIOD()"(
+    'MAX_VOTING_PERIOD()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1962,19 +1962,19 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "MIN_PROPOSAL_THRESHOLD()"(
+    'MIN_PROPOSAL_THRESHOLD()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     MIN_VOTING_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "MIN_VOTING_DELAY()"(
+    'MIN_VOTING_DELAY()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     MIN_VOTING_PERIOD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "MIN_VOTING_PERIOD()"(
+    'MIN_VOTING_PERIOD()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1982,7 +1982,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "_acceptAdmin()"(
+    '_acceptAdmin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1990,7 +1990,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "_initiate()"(
+    '_initiate()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1999,7 +1999,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "_setPendingAdmin(address)"(
+    '_setPendingAdmin(address)'(
       newPendingAdmin: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2009,7 +2009,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "_setProposalThreshold(uint256)"(
+    '_setProposalThreshold(uint256)'(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2019,7 +2019,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "_setVotingDelay(uint256)"(
+    '_setVotingDelay(uint256)'(
       newVotingDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2029,21 +2029,21 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "_setVotingPeriod(uint256)"(
+    '_setVotingPeriod(uint256)'(
       newVotingPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'admin()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     cancel(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2054,7 +2054,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "castVote(uint256,uint8)"(
+    'castVote(uint256,uint8)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -2069,7 +2069,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       v: BigNumberish,
@@ -2085,7 +2085,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "castVoteWithReason(uint256,uint8,string)"(
+    'castVoteWithReason(uint256,uint8,string)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
@@ -2094,14 +2094,14 @@ export class GovernorBravoImmutable extends Contract {
 
     comp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "comp()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'comp()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     execute(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2111,7 +2111,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getActions(uint256)"(
+    'getActions(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -2122,7 +2122,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getReceipt(uint256,address)"(
+    'getReceipt(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -2130,13 +2130,13 @@ export class GovernorBravoImmutable extends Contract {
 
     implementation(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "implementation()"(
+    'implementation()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     initialProposalId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "initialProposalId()"(
+    'initialProposalId()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2149,7 +2149,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,uint256,uint256,uint256)"(
+    'initialize(address,address,uint256,uint256,uint256)'(
       timelock_: string,
       comp_: string,
       votingPeriod_: BigNumberish,
@@ -2163,34 +2163,34 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "latestProposalIds(address)"(
+    'latestProposalIds(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'name()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     proposalCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "proposalCount()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'proposalCount()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     proposalMaxOperations(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "proposalMaxOperations()"(
+    'proposalMaxOperations()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     proposalThreshold(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "proposalThreshold()"(
+    'proposalThreshold()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2199,7 +2199,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "proposals(uint256)"(
+    'proposals(uint256)'(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -2213,7 +2213,7 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "propose(address[],uint256[],string[],bytes[],string)"(
+    'propose(address[],uint256[],string[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       signatures: string[],
@@ -2227,35 +2227,35 @@ export class GovernorBravoImmutable extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     quorumVotes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "quorumVotes()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'quorumVotes()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     state(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "state(uint256)"(
+    'state(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     timelock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "timelock()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'timelock()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     votingDelay(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "votingDelay()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'votingDelay()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     votingPeriod(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "votingPeriod()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'votingPeriod()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

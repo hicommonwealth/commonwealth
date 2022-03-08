@@ -23,7 +23,14 @@ const ItemListsMapper: m.Component<
     vnode.state.cardImageActiveById = cardItems[0].card.id;
   },
   view: (vnode) => {
-    const { cardItems, tabHoverColorClick, textType, bgColor, margin, variant } = vnode.attrs;
+    const {
+      cardItems,
+      tabHoverColorClick,
+      textType,
+      bgColor,
+      margin,
+      variant,
+    } = vnode.attrs;
     const { buttonHoverActiveById, cardImageActiveById } = vnode.state;
 
     const handleClickItem = (cardItem: ICardListItem) => {
@@ -57,7 +64,7 @@ const ItemListsMapper: m.Component<
         imageAlt: card.imgAlt,
         tabHoverColorClick,
         textType,
-        variant
+        variant,
       });
     });
 

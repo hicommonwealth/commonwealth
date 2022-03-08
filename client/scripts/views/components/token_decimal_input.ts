@@ -4,16 +4,19 @@ import m from 'mithril';
 import { Switch, Input } from 'construct-ui';
 import { weiToTokens, tokensToWei } from 'helpers';
 
-const TokenDecimalInput: m.Component<{
-  decimals: number,
-  defaultValueInWei: string,
-  onInputChange: (valueInWei: string) => void,
-}, {
-  displayValue: string,
-  valueInWei: string,
-  isInputInWei: boolean,
-  switchCaption: string,
-}> = {
+const TokenDecimalInput: m.Component<
+  {
+    decimals: number;
+    defaultValueInWei: string;
+    onInputChange: (valueInWei: string) => void;
+  },
+  {
+    displayValue: string;
+    valueInWei: string;
+    isInputInWei: boolean;
+    switchCaption: string;
+  }
+> = {
   oninit: (vnode) => {
     const { defaultValueInWei } = vnode.attrs;
     vnode.state.valueInWei = defaultValueInWei || '0';
@@ -33,9 +36,13 @@ const TokenDecimalInput: m.Component<{
           // restrict it to numerical input
           const wholeNumberTest = /^[1-9]\d*$/;
           const decimalTest = /^\d+\.?\d*$/;
-          if (v.target.value === '' || v.target.value === '0' || (
-            vnode.state.isInputInWei ? wholeNumberTest : decimalTest
-          ).test(v.target.value)) {
+          if (
+            v.target.value === '' ||
+            v.target.value === '0' ||
+            (vnode.state.isInputInWei ? wholeNumberTest : decimalTest).test(
+              v.target.value
+            )
+          ) {
             const inputNumber = v.target.value;
             vnode.state.displayValue = inputNumber;
             try {
@@ -60,18 +67,24 @@ const TokenDecimalInput: m.Component<{
             if (vnode.state.isInputInWei) {
               vnode.state.switchCaption = 'Using base token value';
               // token -> wei
-              vnode.state.displayValue = tokensToWei(vnode.state.displayValue, decimals);
+              vnode.state.displayValue = tokensToWei(
+                vnode.state.displayValue,
+                decimals
+              );
             } else {
               vnode.state.switchCaption = `Using ${decimals} decimal precision`;
               // wei -> token
-              vnode.state.displayValue = weiToTokens(vnode.state.displayValue, decimals);
+              vnode.state.displayValue = weiToTokens(
+                vnode.state.displayValue,
+                decimals
+              );
             }
           },
         }),
         m('.switch-caption', vnode.state.switchCaption),
-      ])
+      ]),
     ]);
-  }
+  },
 };
 
 export default TokenDecimalInput;

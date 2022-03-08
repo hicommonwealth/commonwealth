@@ -13,30 +13,30 @@ import {
   ContractTransaction,
   PayableOverrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface InitializableUpgradeabilityProxyInterface
   extends ethers.utils.Interface {
   functions: {
-    "initialize(address,bytes)": FunctionFragment;
+    'initialize(address,bytes)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "initialize",
+    functionFragment: 'initialize',
     values: [string, BytesLike]
   ): string;
 
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
 
   events: {
-    "Upgraded(address)": EventFragment;
+    'Upgraded(address)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Upgraded'): EventFragment;
 }
 
 export class InitializableUpgradeabilityProxy extends Contract {
@@ -89,7 +89,7 @@ export class InitializableUpgradeabilityProxy extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,bytes)"(
+    'initialize(address,bytes)'(
       _logic: string,
       _data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -102,7 +102,7 @@ export class InitializableUpgradeabilityProxy extends Contract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,bytes)"(
+  'initialize(address,bytes)'(
     _logic: string,
     _data: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -115,7 +115,7 @@ export class InitializableUpgradeabilityProxy extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,bytes)"(
+    'initialize(address,bytes)'(
       _logic: string,
       _data: BytesLike,
       overrides?: CallOverrides
@@ -135,7 +135,7 @@ export class InitializableUpgradeabilityProxy extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,bytes)"(
+    'initialize(address,bytes)'(
       _logic: string,
       _data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -149,7 +149,7 @@ export class InitializableUpgradeabilityProxy extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,bytes)"(
+    'initialize(address,bytes)'(
       _logic: string,
       _data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }

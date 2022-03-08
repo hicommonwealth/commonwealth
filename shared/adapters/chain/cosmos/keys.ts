@@ -8,7 +8,7 @@ export const validationTokenToSignDoc = (
   token: string,
   fee?: StdFee,
   memo?: string,
-  msgs?: AminoMsg[],
+  msgs?: AminoMsg[]
 ): StdSignDoc => {
   const jsonTx: AminoMsg = {
     type: 'cosmos-sdk/TextProposal',
@@ -17,7 +17,7 @@ export const validationTokenToSignDoc = (
       description: '',
       // proposer: address,
       // initial_deposit: [{ denom: 'stake', amount: '0' }]
-    }
+    },
   };
   fee = fee || { gas: '1', amount: [{ denom: 'astr', amount: '0' }] };
   memo = memo || '';

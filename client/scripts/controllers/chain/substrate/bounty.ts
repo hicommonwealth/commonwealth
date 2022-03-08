@@ -1,10 +1,20 @@
 import { ApiPromise } from '@polkadot/api';
 
 import { formatCoin } from 'adapters/currency';
-import { ISubstrateBounty, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
-  Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
-  VotingType, VotingUnit, ChainEntity, ChainEvent,
+  ISubstrateBounty,
+  SubstrateCoin,
+} from 'adapters/chain/substrate/types';
+import {
+  Proposal,
+  ProposalStatus,
+  ProposalEndTime,
+  ITXModalData,
+  BinaryVote,
+  VotingType,
+  VotingUnit,
+  ChainEntity,
+  ChainEvent,
 } from 'models';
 import { ProposalType } from 'types';
 import { SubstrateTypes } from '@commonwealth/chain-events';
@@ -28,7 +38,12 @@ const backportEventToAdapter = (
   };
 };
 
-export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
+export class SubstrateBounty extends Proposal<
+  ApiPromise,
+  SubstrateCoin,
+  ISubstrateBounty,
+  null
+> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
@@ -64,41 +79,79 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   private _unlockAt;
   private _beneficiary: string;
 
-  public get title() { return this._title || `Bounty ${this.shortIdentifier}`; }
-  public get isActive() { return this._isActive; }
-  public get isApproved() { return this._isApproved; }
-  public get isCuratorProposed() { return this._isCuratorProposed; }
-  public get isFunded() { return this._isFunded; }
-  public get isPendingPayout() { return this._isPendingPayout; }
-  public get isProposed() { return this._isProposed; }
-  public get curator() { return this._curator; }
-  public get updateDue() { return this._updateDue; }
-  public get unlockAt() { return this._unlockAt; }
-  public get beneficiary() { return this._beneficiary; }
+  public get title() {
+    return this._title || `Bounty ${this.shortIdentifier}`;
+  }
+  public get isActive() {
+    return this._isActive;
+  }
+  public get isApproved() {
+    return this._isApproved;
+  }
+  public get isCuratorProposed() {
+    return this._isCuratorProposed;
+  }
+  public get isFunded() {
+    return this._isFunded;
+  }
+  public get isPendingPayout() {
+    return this._isPendingPayout;
+  }
+  public get isProposed() {
+    return this._isProposed;
+  }
+  public get curator() {
+    return this._curator;
+  }
+  public get updateDue() {
+    return this._updateDue;
+  }
+  public get unlockAt() {
+    return this._unlockAt;
+  }
+  public get beneficiary() {
+    return this._beneficiary;
+  }
 
   private readonly _description: string;
-  public get description() { return this._description; }
+  public get description() {
+    return this._description;
+  }
 
   private readonly _author: SubstrateAccount;
-  public get author() { return this._author; }
+  public get author() {
+    return this._author;
+  }
 
   private _awarded: boolean = false;
-  get awarded() { return this._awarded; }
+  get awarded() {
+    return this._awarded;
+  }
 
   private _active: boolean = false;
-  get active() { return this._active; }
+  get active() {
+    return this._active;
+  }
 
   public readonly _value: SubstrateCoin;
-  public get value() { return this._value; }
+  public get value() {
+    return this._value;
+  }
 
   public readonly _bond: SubstrateCoin;
-  public get bond() { return this._bond; }
+  public get bond() {
+    return this._bond;
+  }
 
   public _fee: SubstrateCoin;
-  public get fee() { return this._fee; }
+  public get fee() {
+    return this._fee;
+  }
 
   public _curatorDeposit: SubstrateCoin;
-  public get curatorDeposit() { return this._curatorDeposit; }
+  public get curatorDeposit() {
+    return this._curatorDeposit;
+  }
 
   public get votingType() {
     return VotingType.None;
@@ -124,7 +177,7 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     return ProposalStatus.None;
   }
 
-  get endTime() : ProposalEndTime {
+  get endTime(): ProposalEndTime {
     return { kind: 'unavailable' };
   }
 
@@ -145,7 +198,8 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   public get blockExplorerLinkLabel() {
     const chainInfo = this._Chain.app.chain?.meta?.chain;
     const blockExplorerIds = chainInfo?.blockExplorerIds;
-    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    if (blockExplorerIds && blockExplorerIds['subscan'])
+      return 'View in Subscan';
     return undefined;
   }
 
@@ -162,15 +216,18 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Treasury: SubstrateBountyTreasury,
-    entity: ChainEntity,
+    entity: ChainEntity
   ) {
-    super(ProposalType.SubstrateBountyProposal, backportEventToAdapter( // TODO: check if this is the right backport string
-      ChainInfo,
-      entity.chainEvents
-        .find(
+    super(
+      ProposalType.SubstrateBountyProposal,
+      backportEventToAdapter(
+        // TODO: check if this is the right backport string
+        ChainInfo,
+        entity.chainEvents.find(
           (e) => e.data.kind === SubstrateTypes.EventKind.TreasuryBountyProposed
         ).data as SubstrateTypes.ITreasuryBountyProposed
-    ));
+      )
+    );
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Treasury = Treasury;

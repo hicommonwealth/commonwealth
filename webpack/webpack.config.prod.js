@@ -16,29 +16,34 @@ module.exports = merge(common, {
     publicPath: '/build/',
     path: path.join(__dirname, '../build'),
     filename: 'js/[name].[hash:8].js',
-    chunkFilename: 'js/[name].[chunkhash:8].chunk.js'
+    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production'),
-      CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com')
+      CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com'),
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'bundle.[chunkhash:8].css'
+      filename: 'bundle.[chunkhash:8].css',
     }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',
       generateStatsFile: true,
-      statsOptions: { source: false }
-    })
+      statsOptions: { source: false },
+    }),
   ],
   module: {
     rules: [
       {
         test: /\.s?css/i,
-        use : [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader']
-      }
-    ]
-  }
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader',
+          'sass-loader',
+        ],
+      },
+    ],
+  },
 });

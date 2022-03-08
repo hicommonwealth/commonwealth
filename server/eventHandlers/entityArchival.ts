@@ -55,7 +55,9 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(
+      addPrefix(__filename, [event.network, event.chain])
+    );
 
     // if chain is stored in the event then that will override the class property
     // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
@@ -93,13 +95,9 @@ export default class extends IEventHandler {
         default: { completed },
       });
       if (created) {
-        log.info(
-          `Created db entity, ${type.toString()}: ${type_id}.`
-        );
+        log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
       } else {
-        log.info(
-          `Found duplicate db entity,  ${type.toString()}: ${type_id}.`
-        );
+        log.info(`Found duplicate db entity,  ${type.toString()}: ${type_id}.`);
       }
 
       if (dbEvent.entity_id !== dbEntity.id) {
@@ -107,9 +105,7 @@ export default class extends IEventHandler {
         await dbEvent.save();
         // await this._wssSend(dbEntity, dbEvent);
       } else {
-        log.info(
-          `Db Event is already linked to entity! Doing nothing.`
-        );
+        log.info(`Db Event is already linked to entity! Doing nothing.`);
       }
 
       // TODO: create thread?
@@ -129,9 +125,7 @@ export default class extends IEventHandler {
         },
       });
       if (!dbEntity) {
-        log.error(
-          `no relevant db entity found for ${type}: ${type_id}`
-        );
+        log.error(`no relevant db entity found for ${type}: ${type_id}`);
         return;
       }
       log.info(`Updated db entity, ${type}: ${type_id}.`);

@@ -5,7 +5,12 @@ import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const bulkReactions = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const bulkReactions = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { thread_id, proposal_id, comment_id } = req.query;
   let reactions = [];
   try {
@@ -14,9 +19,9 @@ const bulkReactions = async (models: DB, req: Request, res: Response, next: Next
         where: {
           thread_id: thread_id || null,
           proposal_id: proposal_id || null,
-          comment_id: comment_id || null
+          comment_id: comment_id || null,
         },
-        include: [ models.Address ],
+        include: [models.Address],
         order: [['created_at', 'DESC']],
       });
     }
@@ -24,7 +29,13 @@ const bulkReactions = async (models: DB, req: Request, res: Response, next: Next
     return next(new Error(err));
   }
 
-  return res.json({ status: 'Success', result: uniqBy(reactions.map((c) => c.toJSON()), 'id') });
+  return res.json({
+    status: 'Success',
+    result: uniqBy(
+      reactions.map((c) => c.toJSON()),
+      'id'
+    ),
+  });
 };
 
 export default bulkReactions;

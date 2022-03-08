@@ -16,130 +16,157 @@ const StatsTable: m.Component<{ data }, {}> = {
     const { data } = vnode.attrs;
 
     const style = 'color: #999;'; // light text style
-    return m(Table, {
-      class: 'StatsTable',
-      style: 'margin: 30px 0 50px;',
-    }, [
-      m('tr', [
-        m('th', ''),
-        m('th', { colspan: 2 }, 'New Addresses'),
-        m('th', { colspan: 2 }, 'New Comments'),
-        m('th', { colspan: 2 }, 'New Threads'),
-        m('th', 'Active Addresses'),
-        // m('th', 'Most Active'),
-      ]),
-      _.orderBy(Object.entries(data), (o) => o[0]).reverse().map(([date, row]: [any, any]) => m('tr', [
-        m('td', date),
-        m('td', row.comments || '0'),
-        m('td', { style }, row.totalComments && `${row.totalComments}`),
-        m('td', row.roles || '0'),
-        m('td', { style }, row.totalRoles && `${row.totalRoles}`),
-        m('td', row.threads || '0'),
-        m('td', { style }, row.totalThreads && `${row.totalThreads}`),
-        m('td', row.activeAccounts),
-        // m('td', row.topTopic),
-      ])),
-    ]);
-  }
+    return m(
+      Table,
+      {
+        class: 'StatsTable',
+        style: 'margin: 30px 0 50px;',
+      },
+      [
+        m('tr', [
+          m('th', ''),
+          m('th', { colspan: 2 }, 'New Addresses'),
+          m('th', { colspan: 2 }, 'New Comments'),
+          m('th', { colspan: 2 }, 'New Threads'),
+          m('th', 'Active Addresses'),
+          // m('th', 'Most Active'),
+        ]),
+        _.orderBy(Object.entries(data), (o) => o[0])
+          .reverse()
+          .map(([date, row]: [any, any]) =>
+            m('tr', [
+              m('td', date),
+              m('td', row.comments || '0'),
+              m('td', { style }, row.totalComments && `${row.totalComments}`),
+              m('td', row.roles || '0'),
+              m('td', { style }, row.totalRoles && `${row.totalRoles}`),
+              m('td', row.threads || '0'),
+              m('td', { style }, row.totalThreads && `${row.totalThreads}`),
+              m('td', row.activeAccounts),
+              // m('td', row.topTopic),
+            ])
+          ),
+      ]
+    );
+  },
 };
 
-const StatsPage: m.Component<{}, { requested: boolean, error: string, data }> = {
-  view: (vnode) => {
-    if (!vnode.state.requested && app.user && app.activeChainId()) {
-      vnode.state.requested = true;
+const StatsPage: m.Component<{}, { requested: boolean; error: string; data }> =
+  {
+    view: (vnode) => {
+      if (!vnode.state.requested && app.user && app.activeChainId()) {
+        vnode.state.requested = true;
 
-      $.get(`${app.serverUrl()}/communityStats`, {
-        chain: app.activeChainId(),
-        jwt: app.user?.jwt,
-      }).then(({ status, result }) => {
-        // vnode.state.data = result;
-        if (status !== 'Success') {
-          vnode.state.error = 'Error loading stats';
-        } else {
-          const data = {};
-          const totalComments = +result.totalComments[0].new_items;
-          const totalRoles = +result.totalRoles[0].new_items;
-          const totalThreads = +result.totalThreads[0].new_items;
-
-          let acc1 = totalComments, acc2 = totalRoles, acc3 = totalThreads;
-          result.comments.forEach(({ date, new_items }) => {
-            if (data[date]) {
-              data[date].comments = new_items;
-              data[date].totalComments = acc1;
+        $.get(`${app.serverUrl()}/communityStats`, {
+          chain: app.activeChainId(),
+          jwt: app.user?.jwt,
+        })
+          .then(({ status, result }) => {
+            // vnode.state.data = result;
+            if (status !== 'Success') {
+              vnode.state.error = 'Error loading stats';
             } else {
-              data[date] = { comments: new_items, totalComments: acc1 };
+              const data = {};
+              const totalComments = +result.totalComments[0].new_items;
+              const totalRoles = +result.totalRoles[0].new_items;
+              const totalThreads = +result.totalThreads[0].new_items;
+
+              let acc1 = totalComments,
+                acc2 = totalRoles,
+                acc3 = totalThreads;
+              result.comments.forEach(({ date, new_items }) => {
+                if (data[date]) {
+                  data[date].comments = new_items;
+                  data[date].totalComments = acc1;
+                } else {
+                  data[date] = { comments: new_items, totalComments: acc1 };
+                }
+                acc1 -= new_items;
+              });
+              result.roles.forEach(({ date, new_items }) => {
+                if (data[date]) {
+                  data[date].roles = new_items;
+                  data[date].totalRoles = acc2;
+                } else {
+                  data[date] = { roles: new_items, totalRoles: acc2 };
+                }
+                acc2 -= new_items;
+              });
+              result.threads.forEach(({ date, new_items }) => {
+                if (data[date]) {
+                  data[date].threads = new_items;
+                  data[date].totalThreads = acc3;
+                } else {
+                  data[date] = { threads: new_items, totalThreads: acc3 };
+                }
+                acc3 -= new_items;
+              });
+              (result.activeAccounts || []).forEach(({ date, new_items }) => {
+                if (data[date]) {
+                  data[date].activeAccounts = new_items;
+                } else {
+                  data[date] = { activeAccounts: new_items };
+                }
+              });
+
+              vnode.state.data = data;
             }
-            acc1 -= new_items;
-          });
-          result.roles.forEach(({ date, new_items }) => {
-            if (data[date]) {
-              data[date].roles = new_items;
-              data[date].totalRoles = acc2;
+            m.redraw();
+          })
+          .catch((error: any) => {
+            if (error.responseJSON?.error) {
+              vnode.state.error = error.responseJSON.error;
+            } else if (error.responseText) {
+              vnode.state.error = error.responseText;
             } else {
-              data[date] = { roles: new_items, totalRoles: acc2 };
+              vnode.state.error = 'Error loading analytics';
             }
-            acc2 -= new_items;
+            m.redraw();
           });
-          result.threads.forEach(({ date, new_items }) => {
-            if (data[date]) {
-              data[date].threads = new_items;
-              data[date].totalThreads = acc3;
-            } else {
-              data[date] = { threads: new_items, totalThreads: acc3 };
-            }
-            acc3 -= new_items;
-          });
-          (result.activeAccounts || []).forEach(({ date, new_items }) => {
-            if (data[date]) {
-              data[date].activeAccounts = new_items;
-            } else {
-              data[date] = { activeAccounts: new_items };
-            }
-          });
+      }
 
-          vnode.state.data = data;
-        }
-        m.redraw();
-      }).catch((error: any) => {
-        if (error.responseJSON?.error) {
-          vnode.state.error = error.responseJSON.error;
-        } else if (error.responseText) {
-          vnode.state.error = error.responseText;
-        } else {
-          vnode.state.error = 'Error loading analytics';
-        }
-        m.redraw();
-      });
-    }
+      if (!vnode.state.requested || (!vnode.state.error && !vnode.state.data))
+        return m(PageLoading, {
+          message: 'Loading analytics',
+          title: [
+            'Analytics',
+            m(Tag, {
+              size: 'xs',
+              label: 'Beta',
+              style: 'position: relative; top: -2px; margin-left: 6px',
+            }),
+          ],
+        });
 
-    if (!vnode.state.requested || (!vnode.state.error && !vnode.state.data)) return m(PageLoading, {
-      message: 'Loading analytics',
-      title: [
-        'Analytics',
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-      ],
-    });
+      if (vnode.state.error)
+        return m(ErrorPage, {
+          message: vnode.state.error,
+          title: [
+            'Analytics',
+            m(Tag, {
+              size: 'xs',
+              label: 'Beta',
+              style: 'position: relative; top: -2px; margin-left: 6px',
+            }),
+          ],
+        });
 
-    if (vnode.state.error) return m(ErrorPage, {
-      message: vnode.state.error,
-      title: [
-        'Analytics',
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-      ],
-    });
-
-    return m(Sublayout, {
-      class: 'StatsPage',
-      title: [
-        'Analytics',
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-      ],
-    }, [
-      m('.stats-data', [
-        m(StatsTable, { data: vnode.state.data }),
-      ])
-    ]);
-  }
-};
+      return m(
+        Sublayout,
+        {
+          class: 'StatsPage',
+          title: [
+            'Analytics',
+            m(Tag, {
+              size: 'xs',
+              label: 'Beta',
+              style: 'position: relative; top: -2px; margin-left: 6px',
+            }),
+          ],
+        },
+        [m('.stats-data', [m(StatsTable, { data: vnode.state.data })])]
+      );
+    },
+  };
 
 export default StatsPage;

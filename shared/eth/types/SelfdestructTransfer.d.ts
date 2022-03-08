@@ -13,24 +13,24 @@ import {
   ContractTransaction,
   PayableOverrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface SelfdestructTransferInterface extends ethers.utils.Interface {
   functions: {
-    "destroyAndTransfer(address)": FunctionFragment;
+    'destroyAndTransfer(address)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "destroyAndTransfer",
+    functionFragment: 'destroyAndTransfer',
     values: [string]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "destroyAndTransfer",
+    functionFragment: 'destroyAndTransfer',
     data: BytesLike
   ): Result;
 
@@ -86,7 +86,7 @@ export class SelfdestructTransfer extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "destroyAndTransfer(address)"(
+    'destroyAndTransfer(address)'(
       to: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -97,7 +97,7 @@ export class SelfdestructTransfer extends Contract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "destroyAndTransfer(address)"(
+  'destroyAndTransfer(address)'(
     to: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -105,7 +105,7 @@ export class SelfdestructTransfer extends Contract {
   callStatic: {
     destroyAndTransfer(to: string, overrides?: CallOverrides): Promise<void>;
 
-    "destroyAndTransfer(address)"(
+    'destroyAndTransfer(address)'(
       to: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -119,7 +119,7 @@ export class SelfdestructTransfer extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "destroyAndTransfer(address)"(
+    'destroyAndTransfer(address)'(
       to: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -131,7 +131,7 @@ export class SelfdestructTransfer extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "destroyAndTransfer(address)"(
+    'destroyAndTransfer(address)'(
       to: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

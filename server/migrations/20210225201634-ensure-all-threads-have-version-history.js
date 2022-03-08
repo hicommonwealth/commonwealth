@@ -9,10 +9,13 @@ module.exports = {
       if (!thread.version_history || !thread.version_history.length) {
         const firstVersionObj = {
           timestamp: thread.created_at,
-          body: decodeURIComponent(thread.body)
+          body: decodeURIComponent(thread.body),
         };
         try {
-          const escapedStr = JSON.stringify(firstVersionObj).replace(/'/g, "''");
+          const escapedStr = JSON.stringify(firstVersionObj).replace(
+            /'/g,
+            "''"
+          );
           return `UPDATE "OffchainThreads" SET version_history=ARRAY['${escapedStr}'] WHERE id='${thread.id}'`;
         } catch (e) {
           console.log(e);
@@ -20,14 +23,16 @@ module.exports = {
       }
     });
 
-    Promise.all(insertHistoryQueries.map((insertQuery) => {
-      if (insertQuery) {
-        return queryInterface.sequelize.query(insertQuery);
-      }
-    }));
+    Promise.all(
+      insertHistoryQueries.map((insertQuery) => {
+        if (insertQuery) {
+          return queryInterface.sequelize.query(insertQuery);
+        }
+      })
+    );
   },
 
   down: (queryInterface, Sequelize) => {
     return new Promise((resolve, reject) => resolve());
-  }
+  },
 };

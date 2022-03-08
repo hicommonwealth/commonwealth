@@ -34,7 +34,9 @@ export default class extends IEventHandler {
   }
 
   public async handle(event: CWEvent, dbEvent) {
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(
+      addPrefix(__filename, [event.network, event.chain])
+    );
     const chain = event.chain || this._chain;
 
     const fields = SUPPORTED_KIND_FIELDS[event.data.kind];
@@ -73,7 +75,7 @@ export default class extends IEventHandler {
         chain,
         address,
         verification_token,
-        verification_token_expires
+        verification_token_expires,
       });
       await this._models.OffchainProfile.create({
         address_id: addressInstance.id,

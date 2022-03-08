@@ -13,124 +13,124 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface IERC777Interface extends ethers.utils.Interface {
   functions: {
-    "authorizeOperator(address)": FunctionFragment;
-    "balanceOf(address)": FunctionFragment;
-    "burn(uint256,bytes)": FunctionFragment;
-    "defaultOperators()": FunctionFragment;
-    "granularity()": FunctionFragment;
-    "isOperatorFor(address,address)": FunctionFragment;
-    "name()": FunctionFragment;
-    "operatorBurn(address,uint256,bytes,bytes)": FunctionFragment;
-    "operatorSend(address,address,uint256,bytes,bytes)": FunctionFragment;
-    "revokeOperator(address)": FunctionFragment;
-    "send(address,uint256,bytes)": FunctionFragment;
-    "symbol()": FunctionFragment;
-    "totalSupply()": FunctionFragment;
+    'authorizeOperator(address)': FunctionFragment;
+    'balanceOf(address)': FunctionFragment;
+    'burn(uint256,bytes)': FunctionFragment;
+    'defaultOperators()': FunctionFragment;
+    'granularity()': FunctionFragment;
+    'isOperatorFor(address,address)': FunctionFragment;
+    'name()': FunctionFragment;
+    'operatorBurn(address,uint256,bytes,bytes)': FunctionFragment;
+    'operatorSend(address,address,uint256,bytes,bytes)': FunctionFragment;
+    'revokeOperator(address)': FunctionFragment;
+    'send(address,uint256,bytes)': FunctionFragment;
+    'symbol()': FunctionFragment;
+    'totalSupply()': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "authorizeOperator",
+    functionFragment: 'authorizeOperator',
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(functionFragment: 'balanceOf', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "burn",
+    functionFragment: 'burn',
     values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "defaultOperators",
+    functionFragment: 'defaultOperators',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "granularity",
+    functionFragment: 'granularity',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "isOperatorFor",
+    functionFragment: 'isOperatorFor',
     values: [string, string]
   ): string;
-  encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'name', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "operatorBurn",
+    functionFragment: 'operatorBurn',
     values: [string, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "operatorSend",
+    functionFragment: 'operatorSend',
     values: [string, string, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeOperator",
+    functionFragment: 'revokeOperator',
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "send",
+    functionFragment: 'send',
     values: [string, BigNumberish, BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'symbol', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "totalSupply",
+    functionFragment: 'totalSupply',
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "authorizeOperator",
+    functionFragment: 'authorizeOperator',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'burn', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "defaultOperators",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "granularity",
+    functionFragment: 'defaultOperators',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isOperatorFor",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "operatorBurn",
+    functionFragment: 'granularity',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "operatorSend",
+    functionFragment: 'isOperatorFor',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'operatorBurn',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "revokeOperator",
+    functionFragment: 'operatorSend',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "send", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "totalSupply",
+    functionFragment: 'revokeOperator',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'send', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'symbol', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'totalSupply',
     data: BytesLike
   ): Result;
 
   events: {
-    "AuthorizedOperator(address,address)": EventFragment;
-    "Burned(address,address,uint256,bytes,bytes)": EventFragment;
-    "Minted(address,address,uint256,bytes,bytes)": EventFragment;
-    "RevokedOperator(address,address)": EventFragment;
-    "Sent(address,address,address,uint256,bytes,bytes)": EventFragment;
+    'AuthorizedOperator(address,address)': EventFragment;
+    'Burned(address,address,uint256,bytes,bytes)': EventFragment;
+    'Minted(address,address,uint256,bytes,bytes)': EventFragment;
+    'RevokedOperator(address,address)': EventFragment;
+    'Sent(address,address,address,uint256,bytes,bytes)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "AuthorizedOperator"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Burned"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Minted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RevokedOperator"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Sent"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'AuthorizedOperator'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Burned'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Minted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'RevokedOperator'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Sent'): EventFragment;
 }
 
 export class IERC777 extends Contract {
@@ -182,14 +182,14 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "authorizeOperator(address)"(
+    'authorizeOperator(address)'(
       operator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -200,7 +200,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "burn(uint256,bytes)"(
+    'burn(uint256,bytes)'(
       amount: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -208,11 +208,11 @@ export class IERC777 extends Contract {
 
     defaultOperators(overrides?: CallOverrides): Promise<[string[]]>;
 
-    "defaultOperators()"(overrides?: CallOverrides): Promise<[string[]]>;
+    'defaultOperators()'(overrides?: CallOverrides): Promise<[string[]]>;
 
     granularity(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "granularity()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'granularity()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     isOperatorFor(
       operator: string,
@@ -220,7 +220,7 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "isOperatorFor(address,address)"(
+    'isOperatorFor(address,address)'(
       operator: string,
       tokenHolder: string,
       overrides?: CallOverrides
@@ -228,7 +228,7 @@ export class IERC777 extends Contract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    "name()"(overrides?: CallOverrides): Promise<[string]>;
+    'name()'(overrides?: CallOverrides): Promise<[string]>;
 
     operatorBurn(
       account: string,
@@ -238,7 +238,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "operatorBurn(address,uint256,bytes,bytes)"(
+    'operatorBurn(address,uint256,bytes,bytes)'(
       account: string,
       amount: BigNumberish,
       data: BytesLike,
@@ -255,7 +255,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "operatorSend(address,address,uint256,bytes,bytes)"(
+    'operatorSend(address,address,uint256,bytes,bytes)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -269,7 +269,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "revokeOperator(address)"(
+    'revokeOperator(address)'(
       operator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -281,7 +281,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "send(address,uint256,bytes)"(
+    'send(address,uint256,bytes)'(
       recipient: string,
       amount: BigNumberish,
       data: BytesLike,
@@ -290,11 +290,11 @@ export class IERC777 extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<[string]>;
+    'symbol()'(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   authorizeOperator(
@@ -302,14 +302,14 @@ export class IERC777 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "authorizeOperator(address)"(
+  'authorizeOperator(address)'(
     operator: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "balanceOf(address)"(
+  'balanceOf(address)'(
     owner: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -320,7 +320,7 @@ export class IERC777 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "burn(uint256,bytes)"(
+  'burn(uint256,bytes)'(
     amount: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -328,11 +328,11 @@ export class IERC777 extends Contract {
 
   defaultOperators(overrides?: CallOverrides): Promise<string[]>;
 
-  "defaultOperators()"(overrides?: CallOverrides): Promise<string[]>;
+  'defaultOperators()'(overrides?: CallOverrides): Promise<string[]>;
 
   granularity(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "granularity()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'granularity()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   isOperatorFor(
     operator: string,
@@ -340,7 +340,7 @@ export class IERC777 extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isOperatorFor(address,address)"(
+  'isOperatorFor(address,address)'(
     operator: string,
     tokenHolder: string,
     overrides?: CallOverrides
@@ -348,7 +348,7 @@ export class IERC777 extends Contract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  "name()"(overrides?: CallOverrides): Promise<string>;
+  'name()'(overrides?: CallOverrides): Promise<string>;
 
   operatorBurn(
     account: string,
@@ -358,7 +358,7 @@ export class IERC777 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "operatorBurn(address,uint256,bytes,bytes)"(
+  'operatorBurn(address,uint256,bytes,bytes)'(
     account: string,
     amount: BigNumberish,
     data: BytesLike,
@@ -375,7 +375,7 @@ export class IERC777 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "operatorSend(address,address,uint256,bytes,bytes)"(
+  'operatorSend(address,address,uint256,bytes,bytes)'(
     sender: string,
     recipient: string,
     amount: BigNumberish,
@@ -389,7 +389,7 @@ export class IERC777 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "revokeOperator(address)"(
+  'revokeOperator(address)'(
     operator: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -401,7 +401,7 @@ export class IERC777 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "send(address,uint256,bytes)"(
+  'send(address,uint256,bytes)'(
     recipient: string,
     amount: BigNumberish,
     data: BytesLike,
@@ -410,11 +410,11 @@ export class IERC777 extends Contract {
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  "symbol()"(overrides?: CallOverrides): Promise<string>;
+  'symbol()'(overrides?: CallOverrides): Promise<string>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
     authorizeOperator(
@@ -422,14 +422,14 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "authorizeOperator(address)"(
+    'authorizeOperator(address)'(
       operator: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -440,7 +440,7 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "burn(uint256,bytes)"(
+    'burn(uint256,bytes)'(
       amount: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
@@ -448,11 +448,11 @@ export class IERC777 extends Contract {
 
     defaultOperators(overrides?: CallOverrides): Promise<string[]>;
 
-    "defaultOperators()"(overrides?: CallOverrides): Promise<string[]>;
+    'defaultOperators()'(overrides?: CallOverrides): Promise<string[]>;
 
     granularity(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "granularity()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'granularity()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     isOperatorFor(
       operator: string,
@@ -460,7 +460,7 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isOperatorFor(address,address)"(
+    'isOperatorFor(address,address)'(
       operator: string,
       tokenHolder: string,
       overrides?: CallOverrides
@@ -468,7 +468,7 @@ export class IERC777 extends Contract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    "name()"(overrides?: CallOverrides): Promise<string>;
+    'name()'(overrides?: CallOverrides): Promise<string>;
 
     operatorBurn(
       account: string,
@@ -478,7 +478,7 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "operatorBurn(address,uint256,bytes,bytes)"(
+    'operatorBurn(address,uint256,bytes,bytes)'(
       account: string,
       amount: BigNumberish,
       data: BytesLike,
@@ -495,7 +495,7 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "operatorSend(address,address,uint256,bytes,bytes)"(
+    'operatorSend(address,address,uint256,bytes,bytes)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -506,7 +506,7 @@ export class IERC777 extends Contract {
 
     revokeOperator(operator: string, overrides?: CallOverrides): Promise<void>;
 
-    "revokeOperator(address)"(
+    'revokeOperator(address)'(
       operator: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -518,7 +518,7 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "send(address,uint256,bytes)"(
+    'send(address,uint256,bytes)'(
       recipient: string,
       amount: BigNumberish,
       data: BytesLike,
@@ -527,11 +527,11 @@ export class IERC777 extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<string>;
+    'symbol()'(overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -611,14 +611,14 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "authorizeOperator(address)"(
+    'authorizeOperator(address)'(
       operator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -629,7 +629,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "burn(uint256,bytes)"(
+    'burn(uint256,bytes)'(
       amount: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -637,11 +637,11 @@ export class IERC777 extends Contract {
 
     defaultOperators(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "defaultOperators()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'defaultOperators()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     granularity(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "granularity()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'granularity()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     isOperatorFor(
       operator: string,
@@ -649,7 +649,7 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isOperatorFor(address,address)"(
+    'isOperatorFor(address,address)'(
       operator: string,
       tokenHolder: string,
       overrides?: CallOverrides
@@ -657,7 +657,7 @@ export class IERC777 extends Contract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'name()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     operatorBurn(
       account: string,
@@ -667,7 +667,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "operatorBurn(address,uint256,bytes,bytes)"(
+    'operatorBurn(address,uint256,bytes,bytes)'(
       account: string,
       amount: BigNumberish,
       data: BytesLike,
@@ -684,7 +684,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "operatorSend(address,address,uint256,bytes,bytes)"(
+    'operatorSend(address,address,uint256,bytes,bytes)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -698,7 +698,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "revokeOperator(address)"(
+    'revokeOperator(address)'(
       operator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -710,7 +710,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "send(address,uint256,bytes)"(
+    'send(address,uint256,bytes)'(
       recipient: string,
       amount: BigNumberish,
       data: BytesLike,
@@ -719,11 +719,11 @@ export class IERC777 extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'symbol()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -732,7 +732,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "authorizeOperator(address)"(
+    'authorizeOperator(address)'(
       operator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -742,7 +742,7 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -753,7 +753,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "burn(uint256,bytes)"(
+    'burn(uint256,bytes)'(
       amount: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -761,13 +761,13 @@ export class IERC777 extends Contract {
 
     defaultOperators(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "defaultOperators()"(
+    'defaultOperators()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     granularity(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "granularity()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'granularity()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isOperatorFor(
       operator: string,
@@ -775,7 +775,7 @@ export class IERC777 extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isOperatorFor(address,address)"(
+    'isOperatorFor(address,address)'(
       operator: string,
       tokenHolder: string,
       overrides?: CallOverrides
@@ -783,7 +783,7 @@ export class IERC777 extends Contract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'name()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     operatorBurn(
       account: string,
@@ -793,7 +793,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "operatorBurn(address,uint256,bytes,bytes)"(
+    'operatorBurn(address,uint256,bytes,bytes)'(
       account: string,
       amount: BigNumberish,
       data: BytesLike,
@@ -810,7 +810,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "operatorSend(address,address,uint256,bytes,bytes)"(
+    'operatorSend(address,address,uint256,bytes,bytes)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -824,7 +824,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "revokeOperator(address)"(
+    'revokeOperator(address)'(
       operator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -836,7 +836,7 @@ export class IERC777 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "send(address,uint256,bytes)"(
+    'send(address,uint256,bytes)'(
       recipient: string,
       amount: BigNumberish,
       data: BytesLike,
@@ -845,10 +845,10 @@ export class IERC777 extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'symbol()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

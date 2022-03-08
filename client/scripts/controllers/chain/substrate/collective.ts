@@ -16,20 +16,34 @@ class SubstrateCollective extends ProposalModule<
   SubstrateCollectiveProposal
 > {
   private _members: SubstrateAccount[];
-  public get members() { return this._members; }
+  public get members() {
+    return this._members;
+  }
   public isMember(account: SubstrateAccount): boolean {
-    return this._members.find((m) => m.address === account.address) !== undefined;
+    return (
+      this._members.find((m) => m.address === account.address) !== undefined
+    );
   }
 
-  constructor(app: IApp, public readonly moduleName: 'council' | 'technicalCommittee') {
-    super(app, (e) => new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, e));
+  constructor(
+    app: IApp,
+    public readonly moduleName: 'council' | 'technicalCommittee'
+  ) {
+    super(
+      app,
+      (e) =>
+        new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, e)
+    );
   }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
   // TODO: we may want to track membership here as well as in elections
-  public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public async init(
+    ChainInfo: SubstrateChain,
+    Accounts: SubstrateAccounts
+  ): Promise<void> {
     this._disabled = !ChainInfo.api.query[this.moduleName];
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
@@ -37,7 +51,9 @@ class SubstrateCollective extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.CollectiveProposal);
+    const entities = this.app.chain.chainEntities.store.getByType(
+      SubstrateTypes.EntityKind.CollectiveProposal
+    );
     entities.forEach((e) => {
       const event = e.chainEvents[0];
       if (event && (event.data as any).collectiveName === this.moduleName) {
@@ -47,7 +63,8 @@ class SubstrateCollective extends ProposalModule<
 
     // register new chain-event handlers
     this.app.chain.chainEntities.registerEntityHandler(
-      SubstrateTypes.EntityKind.CollectiveProposal, (entity, event) => {
+      SubstrateTypes.EntityKind.CollectiveProposal,
+      (entity, event) => {
         if ((event.data as any).collectiveName === this.moduleName) {
           this.updateProposal(entity, event);
         }
@@ -58,43 +75,94 @@ class SubstrateCollective extends ProposalModule<
     await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
       chainToEventNetwork(this.app.chain.meta.chain),
-      () => this._Chain.fetcher.fetchCollectiveProposals(this.moduleName, this.app.chain.block.height)
+      () =>
+        this._Chain.fetcher.fetchCollectiveProposals(
+          this.moduleName,
+          this.app.chain.block.height
+        )
     );
 
-    const members = await ChainInfo.api.query[this.moduleName].members() as Vec<AccountId>;
-    this._members = members.toArray().map((v) => this._Accounts.fromAddress(v.toString()));
+    const members = (await ChainInfo.api.query[
+      this.moduleName
+    ].members()) as Vec<AccountId>;
+    this._members = members
+      .toArray()
+      .map((v) => this._Accounts.fromAddress(v.toString()));
 
     this._initialized = true;
     this._initializing = false;
   }
 
-  public createEmergencyCancellation(author: SubstrateAccount, threshold: number, referendumId: number) {
-    const func = this._Chain.getTxMethod('democracy', 'emergencyCancel', [ referendumId ]);
+  public createEmergencyCancellation(
+    author: SubstrateAccount,
+    threshold: number,
+    referendumId: number
+  ) {
+    const func = this._Chain.getTxMethod('democracy', 'emergencyCancel', [
+      referendumId,
+    ]);
     return this.createTx(author, threshold, func, func.encodedLength);
   }
   public vetoNextExternal(author: SubstrateAccount, hash: string) {
-    const func = this._Chain.getTxMethod('democracy', 'vetoExternal', [ hash ]);
+    const func = this._Chain.getTxMethod('democracy', 'vetoExternal', [hash]);
     return this.createTx(author, 1, func, func.encodedLength);
   }
-  public createTreasuryApprovalMotion(author: SubstrateAccount, threshold: number, treasuryIdx: number) {
-    const func = this._Chain.getTxMethod('treasury', 'approveProposal', [ treasuryIdx ]);
+  public createTreasuryApprovalMotion(
+    author: SubstrateAccount,
+    threshold: number,
+    treasuryIdx: number
+  ) {
+    const func = this._Chain.getTxMethod('treasury', 'approveProposal', [
+      treasuryIdx,
+    ]);
     return this.createTx(author, threshold, func, func.encodedLength);
   }
-  public createTreasuryRejectionMotion(author: SubstrateAccount, threshold: number, treasuryIdx: number) {
-    const func = this._Chain.getTxMethod('treasury', 'rejectProposal', [ treasuryIdx ]);
+  public createTreasuryRejectionMotion(
+    author: SubstrateAccount,
+    threshold: number,
+    treasuryIdx: number
+  ) {
+    const func = this._Chain.getTxMethod('treasury', 'rejectProposal', [
+      treasuryIdx,
+    ]);
     return this.createTx(author, threshold, func, func.encodedLength);
   }
-  public createExternalProposal(author: SubstrateAccount, threshold: number, action: Call, length: number) {
-    const func = this._Chain.getTxMethod('democracy', 'externalPropose', [ action.hash ]);
+  public createExternalProposal(
+    author: SubstrateAccount,
+    threshold: number,
+    action: Call,
+    length: number
+  ) {
+    const func = this._Chain.getTxMethod('democracy', 'externalPropose', [
+      action.hash,
+    ]);
     return this.createTx(author, threshold, func, length);
   }
-  public createExternalProposalMajority(author: SubstrateAccount, threshold: number, action: Call, length) {
-    const func = this._Chain.getTxMethod('democracy', 'externalProposeMajority', [ action.hash ]);
+  public createExternalProposalMajority(
+    author: SubstrateAccount,
+    threshold: number,
+    action: Call,
+    length
+  ) {
+    const func = this._Chain.getTxMethod(
+      'democracy',
+      'externalProposeMajority',
+      [action.hash]
+    );
     return this.createTx(author, threshold, func, length);
   }
-  public createExternalProposalDefault(author: SubstrateAccount, threshold: number, action: Call, length) {
+  public createExternalProposalDefault(
+    author: SubstrateAccount,
+    threshold: number,
+    action: Call,
+    length
+  ) {
     // only on kusama
-    const func = this._Chain.getTxMethod('democracy', 'externalProposeDefault', [ action.hash ]);
+    const func = this._Chain.getTxMethod(
+      'democracy',
+      'externalProposeDefault',
+      [action.hash]
+    );
     return this.createTx(author, threshold, func, length);
   }
   public createFastTrack(
@@ -107,13 +175,12 @@ class SubstrateCollective extends ProposalModule<
     // only on kusama
     // TODO: we must check if Instant is allowed and if
     // votingPeriod is valid wrt FastTrackVotingPeriod
-    const func = (this._Chain.getTxMethod('democracy', 'fastTrack', [ hash, votingPeriod, delay ]));
-    return this.createTx(
-      author,
-      threshold,
-      func,
-      func.encodedLength,
-    );
+    const func = this._Chain.getTxMethod('democracy', 'fastTrack', [
+      hash,
+      votingPeriod,
+      delay,
+    ]);
+    return this.createTx(author, threshold, func, func.encodedLength);
   }
 
   public createTx(
@@ -121,19 +188,21 @@ class SubstrateCollective extends ProposalModule<
     threshold: number,
     action: Call,
     length?: number,
-    fromTechnicalCommittee?: boolean,
+    fromTechnicalCommittee?: boolean
   ) {
     // TODO: check council status
     const title = this._Chain.methodToTitle(action);
 
     // handle differing versions of substrate API
     const txFunc = fromTechnicalCommittee
-      ? ((api: ApiPromise) => api.tx.technicalCommittee.propose.meta.args.length === 3
-        ? api.tx.technicalCommittee.propose(threshold, action, length)
-        : (api.tx.technicalCommittee.propose as any)(threshold, action))
-      : ((api: ApiPromise) => api.tx.council.propose.meta.args.length === 3
-        ? api.tx.council.propose(threshold, action, length)
-        : (api.tx.council.propose as any)(threshold, action, null));
+      ? (api: ApiPromise) =>
+          api.tx.technicalCommittee.propose.meta.args.length === 3
+            ? api.tx.technicalCommittee.propose(threshold, action, length)
+            : (api.tx.technicalCommittee.propose as any)(threshold, action)
+      : (api: ApiPromise) =>
+          api.tx.council.propose.meta.args.length === 3
+            ? api.tx.council.propose(threshold, action, length)
+            : (api.tx.council.propose as any)(threshold, action, null);
     return this._Chain.createTXModalData(
       author,
       txFunc,
@@ -147,7 +216,10 @@ export class SubstrateCouncil extends SubstrateCollective {
   constructor(app: IApp) {
     super(app, 'council');
   }
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public init(
+    ChainInfo: SubstrateChain,
+    Accounts: SubstrateAccounts
+  ): Promise<void> {
     return super.init(ChainInfo, Accounts);
   }
 }
@@ -156,7 +228,10 @@ export class SubstrateTechnicalCommittee extends SubstrateCollective {
   constructor(app: IApp) {
     super(app, 'technicalCommittee');
   }
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public init(
+    ChainInfo: SubstrateChain,
+    Accounts: SubstrateAccounts
+  ): Promise<void> {
     return super.init(ChainInfo, Accounts);
   }
 }

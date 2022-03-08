@@ -25,8 +25,8 @@ export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
 export { default as RoleInfo } from './RoleInfo';
 export { default as RolePermission } from './RolePermission';
-export { default as SearchQuery } from './SearchQuery'
-export { default as SearchResult } from './SearchResult'
+export { default as SearchQuery } from './SearchQuery';
+export { default as SearchResult } from './SearchResult';
 export { default as SocialAccount } from './SocialAccount';
 export { default as StorageModule } from './StorageModule';
 export { default as ChainEventType } from './ChainEventType';

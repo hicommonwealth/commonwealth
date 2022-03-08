@@ -14,327 +14,327 @@ import {
   Overrides,
   PayableOverrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface FeiDAOInterface extends ethers.utils.Interface {
   functions: {
-    "BACKUP_GOVERNOR()": FunctionFragment;
-    "BALLOT_TYPEHASH()": FunctionFragment;
-    "COUNTING_MODE()": FunctionFragment;
-    "ROLLBACK_DEADLINE()": FunctionFragment;
-    "__acceptAdmin()": FunctionFragment;
-    "__executeRollback()": FunctionFragment;
-    "__rollback(uint256)": FunctionFragment;
-    "cancel(uint256)": FunctionFragment;
-    "castVote(uint256,uint8)": FunctionFragment;
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)": FunctionFragment;
-    "castVoteWithReason(uint256,uint8,string)": FunctionFragment;
-    "execute(address[],uint256[],bytes[],bytes32)": FunctionFragment;
-    "getActions(uint256)": FunctionFragment;
-    "getReceipt(uint256,address)": FunctionFragment;
-    "getVotes(address,uint256)": FunctionFragment;
-    "hasVoted(uint256,address)": FunctionFragment;
-    "hashProposal(address[],uint256[],bytes[],bytes32)": FunctionFragment;
-    "name()": FunctionFragment;
-    "proposalDeadline(uint256)": FunctionFragment;
-    "proposalEta(uint256)": FunctionFragment;
-    "proposalSnapshot(uint256)": FunctionFragment;
-    "proposalThreshold()": FunctionFragment;
-    "proposals(uint256)": FunctionFragment;
-    "propose(address[],uint256[],bytes[],string)": FunctionFragment;
-    "queue(address[],uint256[],bytes[],bytes32)": FunctionFragment;
-    "quorum(uint256)": FunctionFragment;
-    "quorumVotes()": FunctionFragment;
-    "setProposalThreshold(uint256)": FunctionFragment;
-    "setQuorum(uint256)": FunctionFragment;
-    "setVotingDelay(uint256)": FunctionFragment;
-    "setVotingPeriod(uint256)": FunctionFragment;
-    "state(uint256)": FunctionFragment;
-    "supportsInterface(bytes4)": FunctionFragment;
-    "timelock()": FunctionFragment;
-    "token()": FunctionFragment;
-    "updateTimelock(address)": FunctionFragment;
-    "version()": FunctionFragment;
-    "votingDelay()": FunctionFragment;
-    "votingPeriod()": FunctionFragment;
+    'BACKUP_GOVERNOR()': FunctionFragment;
+    'BALLOT_TYPEHASH()': FunctionFragment;
+    'COUNTING_MODE()': FunctionFragment;
+    'ROLLBACK_DEADLINE()': FunctionFragment;
+    '__acceptAdmin()': FunctionFragment;
+    '__executeRollback()': FunctionFragment;
+    '__rollback(uint256)': FunctionFragment;
+    'cancel(uint256)': FunctionFragment;
+    'castVote(uint256,uint8)': FunctionFragment;
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)': FunctionFragment;
+    'castVoteWithReason(uint256,uint8,string)': FunctionFragment;
+    'execute(address[],uint256[],bytes[],bytes32)': FunctionFragment;
+    'getActions(uint256)': FunctionFragment;
+    'getReceipt(uint256,address)': FunctionFragment;
+    'getVotes(address,uint256)': FunctionFragment;
+    'hasVoted(uint256,address)': FunctionFragment;
+    'hashProposal(address[],uint256[],bytes[],bytes32)': FunctionFragment;
+    'name()': FunctionFragment;
+    'proposalDeadline(uint256)': FunctionFragment;
+    'proposalEta(uint256)': FunctionFragment;
+    'proposalSnapshot(uint256)': FunctionFragment;
+    'proposalThreshold()': FunctionFragment;
+    'proposals(uint256)': FunctionFragment;
+    'propose(address[],uint256[],bytes[],string)': FunctionFragment;
+    'queue(address[],uint256[],bytes[],bytes32)': FunctionFragment;
+    'quorum(uint256)': FunctionFragment;
+    'quorumVotes()': FunctionFragment;
+    'setProposalThreshold(uint256)': FunctionFragment;
+    'setQuorum(uint256)': FunctionFragment;
+    'setVotingDelay(uint256)': FunctionFragment;
+    'setVotingPeriod(uint256)': FunctionFragment;
+    'state(uint256)': FunctionFragment;
+    'supportsInterface(bytes4)': FunctionFragment;
+    'timelock()': FunctionFragment;
+    'token()': FunctionFragment;
+    'updateTimelock(address)': FunctionFragment;
+    'version()': FunctionFragment;
+    'votingDelay()': FunctionFragment;
+    'votingPeriod()': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "BACKUP_GOVERNOR",
+    functionFragment: 'BACKUP_GOVERNOR',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "BALLOT_TYPEHASH",
+    functionFragment: 'BALLOT_TYPEHASH',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "COUNTING_MODE",
+    functionFragment: 'COUNTING_MODE',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "ROLLBACK_DEADLINE",
+    functionFragment: 'ROLLBACK_DEADLINE',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "__acceptAdmin",
+    functionFragment: '__acceptAdmin',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "__executeRollback",
+    functionFragment: '__executeRollback',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "__rollback",
+    functionFragment: '__rollback',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "cancel",
+    functionFragment: 'cancel',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "castVote",
+    functionFragment: 'castVote',
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "castVoteBySig",
+    functionFragment: 'castVoteBySig',
     values: [BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "castVoteWithReason",
+    functionFragment: 'castVoteWithReason',
     values: [BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "execute",
+    functionFragment: 'execute',
     values: [string[], BigNumberish[], BytesLike[], BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "getActions",
+    functionFragment: 'getActions',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getReceipt",
+    functionFragment: 'getReceipt',
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "getVotes",
+    functionFragment: 'getVotes',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "hasVoted",
+    functionFragment: 'hasVoted',
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "hashProposal",
+    functionFragment: 'hashProposal',
     values: [string[], BigNumberish[], BytesLike[], BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'name', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "proposalDeadline",
+    functionFragment: 'proposalDeadline',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "proposalEta",
+    functionFragment: 'proposalEta',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "proposalSnapshot",
+    functionFragment: 'proposalSnapshot',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "proposalThreshold",
+    functionFragment: 'proposalThreshold',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "proposals",
+    functionFragment: 'proposals',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "propose",
+    functionFragment: 'propose',
     values: [string[], BigNumberish[], BytesLike[], string]
   ): string;
   encodeFunctionData(
-    functionFragment: "queue",
+    functionFragment: 'queue',
     values: [string[], BigNumberish[], BytesLike[], BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "quorum",
+    functionFragment: 'quorum',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "quorumVotes",
+    functionFragment: 'quorumVotes',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setProposalThreshold",
+    functionFragment: 'setProposalThreshold',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setQuorum",
+    functionFragment: 'setQuorum',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setVotingDelay",
+    functionFragment: 'setVotingDelay',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setVotingPeriod",
+    functionFragment: 'setVotingPeriod',
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "state", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: 'state', values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "supportsInterface",
+    functionFragment: 'supportsInterface',
     values: [BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "timelock", values?: undefined): string;
-  encodeFunctionData(functionFragment: "token", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'timelock', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'token', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "updateTimelock",
+    functionFragment: 'updateTimelock',
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "version", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'version', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "votingDelay",
+    functionFragment: 'votingDelay',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "votingPeriod",
+    functionFragment: 'votingPeriod',
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "BACKUP_GOVERNOR",
+    functionFragment: 'BACKUP_GOVERNOR',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "BALLOT_TYPEHASH",
+    functionFragment: 'BALLOT_TYPEHASH',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "COUNTING_MODE",
+    functionFragment: 'COUNTING_MODE',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "ROLLBACK_DEADLINE",
+    functionFragment: 'ROLLBACK_DEADLINE',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "__acceptAdmin",
+    functionFragment: '__acceptAdmin',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "__executeRollback",
+    functionFragment: '__executeRollback',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "__rollback", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "castVote", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: '__rollback', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'cancel', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'castVote', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "castVoteBySig",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "castVoteWithReason",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getActions", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getReceipt", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getVotes", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "hasVoted", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "hashProposal",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "proposalDeadline",
+    functionFragment: 'castVoteBySig',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "proposalEta",
+    functionFragment: 'castVoteWithReason',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'execute', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getActions', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getReceipt', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getVotes', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'hasVoted', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'hashProposal',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'proposalDeadline',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "proposalSnapshot",
+    functionFragment: 'proposalEta',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "proposalThreshold",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "proposals", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "propose", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "queue", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "quorum", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "quorumVotes",
+    functionFragment: 'proposalSnapshot',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setProposalThreshold",
+    functionFragment: 'proposalThreshold',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setQuorum", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'proposals', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'propose', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'queue', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'quorum', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setVotingDelay",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setVotingPeriod",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "state", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "supportsInterface",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "timelock", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "updateTimelock",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "votingDelay",
+    functionFragment: 'quorumVotes',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "votingPeriod",
+    functionFragment: 'setProposalThreshold',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'setQuorum', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'setVotingDelay',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'setVotingPeriod',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'state', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'supportsInterface',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'timelock', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'token', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'updateTimelock',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'version', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'votingDelay',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'votingPeriod',
     data: BytesLike
   ): Result;
 
   events: {
-    "ProposalCanceled(uint256)": EventFragment;
-    "ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)": EventFragment;
-    "ProposalExecuted(uint256)": EventFragment;
-    "ProposalQueued(uint256,uint256)": EventFragment;
-    "ProposalThresholdUpdated(uint256,uint256)": EventFragment;
-    "QuorumUpdated(uint256,uint256)": EventFragment;
-    "Rollback()": EventFragment;
-    "RollbackQueued(uint256)": EventFragment;
-    "TimelockChange(address,address)": EventFragment;
-    "VoteCast(address,uint256,uint8,uint256,string)": EventFragment;
-    "VotingDelayUpdated(uint256,uint256)": EventFragment;
-    "VotingPeriodUpdated(uint256,uint256)": EventFragment;
+    'ProposalCanceled(uint256)': EventFragment;
+    'ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)': EventFragment;
+    'ProposalExecuted(uint256)': EventFragment;
+    'ProposalQueued(uint256,uint256)': EventFragment;
+    'ProposalThresholdUpdated(uint256,uint256)': EventFragment;
+    'QuorumUpdated(uint256,uint256)': EventFragment;
+    'Rollback()': EventFragment;
+    'RollbackQueued(uint256)': EventFragment;
+    'TimelockChange(address,address)': EventFragment;
+    'VoteCast(address,uint256,uint8,uint256,string)': EventFragment;
+    'VotingDelayUpdated(uint256,uint256)': EventFragment;
+    'VotingPeriodUpdated(uint256,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "ProposalCanceled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalExecuted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalQueued"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalThresholdUpdated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "QuorumUpdated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Rollback"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RollbackQueued"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TimelockChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VoteCast"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingDelayUpdated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingPeriodUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCanceled'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCreated'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalExecuted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalQueued'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalThresholdUpdated'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'QuorumUpdated'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Rollback'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'RollbackQueued'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'TimelockChange'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VoteCast'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VotingDelayUpdated'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VotingPeriodUpdated'): EventFragment;
 }
 
 export class FeiDAO extends Contract {
@@ -383,25 +383,25 @@ export class FeiDAO extends Contract {
   functions: {
     BACKUP_GOVERNOR(overrides?: CallOverrides): Promise<[string]>;
 
-    "BACKUP_GOVERNOR()"(overrides?: CallOverrides): Promise<[string]>;
+    'BACKUP_GOVERNOR()'(overrides?: CallOverrides): Promise<[string]>;
 
     BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
-    "BALLOT_TYPEHASH()"(overrides?: CallOverrides): Promise<[string]>;
+    'BALLOT_TYPEHASH()'(overrides?: CallOverrides): Promise<[string]>;
 
     COUNTING_MODE(overrides?: CallOverrides): Promise<[string]>;
 
-    "COUNTING_MODE()"(overrides?: CallOverrides): Promise<[string]>;
+    'COUNTING_MODE()'(overrides?: CallOverrides): Promise<[string]>;
 
     ROLLBACK_DEADLINE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "ROLLBACK_DEADLINE()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'ROLLBACK_DEADLINE()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     __acceptAdmin(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "__acceptAdmin()"(
+    '__acceptAdmin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -409,7 +409,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "__executeRollback()"(
+    '__executeRollback()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -418,7 +418,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "__rollback(uint256)"(
+    '__rollback(uint256)'(
       eta: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -428,7 +428,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -439,7 +439,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "castVote(uint256,uint8)"(
+    'castVote(uint256,uint8)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -454,7 +454,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       v: BigNumberish,
@@ -470,14 +470,14 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "castVoteWithReason(uint256,uint8,string)"(
+    'castVoteWithReason(uint256,uint8,string)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "execute(address[],uint256[],bytes[],bytes32)"(
+    'execute(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -485,7 +485,7 @@ export class FeiDAO extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -502,7 +502,7 @@ export class FeiDAO extends Contract {
       }
     >;
 
-    "getActions(uint256)"(
+    'getActions(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -528,7 +528,7 @@ export class FeiDAO extends Contract {
       ]
     >;
 
-    "getReceipt(uint256,address)"(
+    'getReceipt(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -548,7 +548,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getVotes(address,uint256)"(
+    'getVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -560,7 +560,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "hasVoted(uint256,address)"(
+    'hasVoted(uint256,address)'(
       proposalId: BigNumberish,
       account: string,
       overrides?: CallOverrides
@@ -574,7 +574,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "hashProposal(address[],uint256[],bytes[],bytes32)"(
+    'hashProposal(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -584,14 +584,14 @@ export class FeiDAO extends Contract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    "name()"(overrides?: CallOverrides): Promise<[string]>;
+    'name()'(overrides?: CallOverrides): Promise<[string]>;
 
     proposalDeadline(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "proposalDeadline(uint256)"(
+    'proposalDeadline(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -601,7 +601,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "proposalEta(uint256)"(
+    'proposalEta(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -611,14 +611,14 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "proposalSnapshot(uint256)"(
+    'proposalSnapshot(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     proposalThreshold(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "proposalThreshold()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'proposalThreshold()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     proposals(
       proposalId: BigNumberish,
@@ -649,7 +649,7 @@ export class FeiDAO extends Contract {
       }
     >;
 
-    "proposals(uint256)"(
+    'proposals(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -678,7 +678,7 @@ export class FeiDAO extends Contract {
       }
     >;
 
-    "propose(address[],uint256[],bytes[],string)"(
+    'propose(address[],uint256[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -686,7 +686,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "propose(address[],uint256[],string[],bytes[],string)"(
+    'propose(address[],uint256[],string[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       signatures: string[],
@@ -695,7 +695,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "queue(address[],uint256[],bytes[],bytes32)"(
+    'queue(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -703,28 +703,28 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     quorum(arg0: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "quorum(uint256)"(
+    'quorum(uint256)'(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     quorumVotes(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "quorumVotes()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'quorumVotes()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     setProposalThreshold(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setProposalThreshold(uint256)"(
+    'setProposalThreshold(uint256)'(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -734,7 +734,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setQuorum(uint256)"(
+    'setQuorum(uint256)'(
       newQuorum: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -744,7 +744,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setVotingDelay(uint256)"(
+    'setVotingDelay(uint256)'(
       newVotingDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -754,7 +754,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setVotingPeriod(uint256)"(
+    'setVotingPeriod(uint256)'(
       newVotingPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -764,7 +764,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<[number]>;
 
-    "state(uint256)"(
+    'state(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[number]>;
@@ -774,63 +774,63 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     timelock(overrides?: CallOverrides): Promise<[string]>;
 
-    "timelock()"(overrides?: CallOverrides): Promise<[string]>;
+    'timelock()'(overrides?: CallOverrides): Promise<[string]>;
 
     token(overrides?: CallOverrides): Promise<[string]>;
 
-    "token()"(overrides?: CallOverrides): Promise<[string]>;
+    'token()'(overrides?: CallOverrides): Promise<[string]>;
 
     updateTimelock(
       newTimelock: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "updateTimelock(address)"(
+    'updateTimelock(address)'(
       newTimelock: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     version(overrides?: CallOverrides): Promise<[string]>;
 
-    "version()"(overrides?: CallOverrides): Promise<[string]>;
+    'version()'(overrides?: CallOverrides): Promise<[string]>;
 
     votingDelay(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "votingDelay()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'votingDelay()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     votingPeriod(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "votingPeriod()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'votingPeriod()'(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   BACKUP_GOVERNOR(overrides?: CallOverrides): Promise<string>;
 
-  "BACKUP_GOVERNOR()"(overrides?: CallOverrides): Promise<string>;
+  'BACKUP_GOVERNOR()'(overrides?: CallOverrides): Promise<string>;
 
   BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-  "BALLOT_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+  'BALLOT_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
   COUNTING_MODE(overrides?: CallOverrides): Promise<string>;
 
-  "COUNTING_MODE()"(overrides?: CallOverrides): Promise<string>;
+  'COUNTING_MODE()'(overrides?: CallOverrides): Promise<string>;
 
   ROLLBACK_DEADLINE(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "ROLLBACK_DEADLINE()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'ROLLBACK_DEADLINE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   __acceptAdmin(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "__acceptAdmin()"(
+  '__acceptAdmin()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -838,7 +838,7 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "__executeRollback()"(
+  '__executeRollback()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -847,7 +847,7 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "__rollback(uint256)"(
+  '__rollback(uint256)'(
     eta: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -857,7 +857,7 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "cancel(uint256)"(
+  'cancel(uint256)'(
     proposalId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -868,7 +868,7 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "castVote(uint256,uint8)"(
+  'castVote(uint256,uint8)'(
     proposalId: BigNumberish,
     support: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -883,7 +883,7 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+  'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
     proposalId: BigNumberish,
     support: BigNumberish,
     v: BigNumberish,
@@ -899,14 +899,14 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "castVoteWithReason(uint256,uint8,string)"(
+  'castVoteWithReason(uint256,uint8,string)'(
     proposalId: BigNumberish,
     support: BigNumberish,
     reason: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "execute(address[],uint256[],bytes[],bytes32)"(
+  'execute(address[],uint256[],bytes[],bytes32)'(
     targets: string[],
     values: BigNumberish[],
     calldatas: BytesLike[],
@@ -914,7 +914,7 @@ export class FeiDAO extends Contract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "execute(uint256)"(
+  'execute(uint256)'(
     proposalId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -931,7 +931,7 @@ export class FeiDAO extends Contract {
     }
   >;
 
-  "getActions(uint256)"(
+  'getActions(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
@@ -955,7 +955,7 @@ export class FeiDAO extends Contract {
     }
   >;
 
-  "getReceipt(uint256,address)"(
+  'getReceipt(uint256,address)'(
     proposalId: BigNumberish,
     voter: string,
     overrides?: CallOverrides
@@ -973,7 +973,7 @@ export class FeiDAO extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getVotes(address,uint256)"(
+  'getVotes(address,uint256)'(
     account: string,
     blockNumber: BigNumberish,
     overrides?: CallOverrides
@@ -985,7 +985,7 @@ export class FeiDAO extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "hasVoted(uint256,address)"(
+  'hasVoted(uint256,address)'(
     proposalId: BigNumberish,
     account: string,
     overrides?: CallOverrides
@@ -999,7 +999,7 @@ export class FeiDAO extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "hashProposal(address[],uint256[],bytes[],bytes32)"(
+  'hashProposal(address[],uint256[],bytes[],bytes32)'(
     targets: string[],
     values: BigNumberish[],
     calldatas: BytesLike[],
@@ -1009,14 +1009,14 @@ export class FeiDAO extends Contract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  "name()"(overrides?: CallOverrides): Promise<string>;
+  'name()'(overrides?: CallOverrides): Promise<string>;
 
   proposalDeadline(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "proposalDeadline(uint256)"(
+  'proposalDeadline(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -1026,7 +1026,7 @@ export class FeiDAO extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "proposalEta(uint256)"(
+  'proposalEta(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -1036,14 +1036,14 @@ export class FeiDAO extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "proposalSnapshot(uint256)"(
+  'proposalSnapshot(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'proposalThreshold()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   proposals(
     proposalId: BigNumberish,
@@ -1074,7 +1074,7 @@ export class FeiDAO extends Contract {
     }
   >;
 
-  "proposals(uint256)"(
+  'proposals(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
@@ -1103,7 +1103,7 @@ export class FeiDAO extends Contract {
     }
   >;
 
-  "propose(address[],uint256[],bytes[],string)"(
+  'propose(address[],uint256[],bytes[],string)'(
     targets: string[],
     values: BigNumberish[],
     calldatas: BytesLike[],
@@ -1111,7 +1111,7 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "propose(address[],uint256[],string[],bytes[],string)"(
+  'propose(address[],uint256[],string[],bytes[],string)'(
     targets: string[],
     values: BigNumberish[],
     signatures: string[],
@@ -1120,7 +1120,7 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "queue(address[],uint256[],bytes[],bytes32)"(
+  'queue(address[],uint256[],bytes[],bytes32)'(
     targets: string[],
     values: BigNumberish[],
     calldatas: BytesLike[],
@@ -1128,28 +1128,28 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "queue(uint256)"(
+  'queue(uint256)'(
     proposalId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   quorum(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "quorum(uint256)"(
+  'quorum(uint256)'(
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   quorumVotes(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'quorumVotes()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   setProposalThreshold(
     newProposalThreshold: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setProposalThreshold(uint256)"(
+  'setProposalThreshold(uint256)'(
     newProposalThreshold: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1159,7 +1159,7 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setQuorum(uint256)"(
+  'setQuorum(uint256)'(
     newQuorum: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1169,7 +1169,7 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setVotingDelay(uint256)"(
+  'setVotingDelay(uint256)'(
     newVotingDelay: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1179,14 +1179,14 @@ export class FeiDAO extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setVotingPeriod(uint256)"(
+  'setVotingPeriod(uint256)'(
     newVotingPeriod: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
-  "state(uint256)"(
+  'state(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<number>;
@@ -1196,76 +1196,76 @@ export class FeiDAO extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "supportsInterface(bytes4)"(
+  'supportsInterface(bytes4)'(
     interfaceId: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   timelock(overrides?: CallOverrides): Promise<string>;
 
-  "timelock()"(overrides?: CallOverrides): Promise<string>;
+  'timelock()'(overrides?: CallOverrides): Promise<string>;
 
   token(overrides?: CallOverrides): Promise<string>;
 
-  "token()"(overrides?: CallOverrides): Promise<string>;
+  'token()'(overrides?: CallOverrides): Promise<string>;
 
   updateTimelock(
     newTimelock: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "updateTimelock(address)"(
+  'updateTimelock(address)'(
     newTimelock: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   version(overrides?: CallOverrides): Promise<string>;
 
-  "version()"(overrides?: CallOverrides): Promise<string>;
+  'version()'(overrides?: CallOverrides): Promise<string>;
 
   votingDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "votingDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'votingDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   votingPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "votingPeriod()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'votingPeriod()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
     BACKUP_GOVERNOR(overrides?: CallOverrides): Promise<string>;
 
-    "BACKUP_GOVERNOR()"(overrides?: CallOverrides): Promise<string>;
+    'BACKUP_GOVERNOR()'(overrides?: CallOverrides): Promise<string>;
 
     BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-    "BALLOT_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+    'BALLOT_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
     COUNTING_MODE(overrides?: CallOverrides): Promise<string>;
 
-    "COUNTING_MODE()"(overrides?: CallOverrides): Promise<string>;
+    'COUNTING_MODE()'(overrides?: CallOverrides): Promise<string>;
 
     ROLLBACK_DEADLINE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "ROLLBACK_DEADLINE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'ROLLBACK_DEADLINE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     __acceptAdmin(overrides?: CallOverrides): Promise<void>;
 
-    "__acceptAdmin()"(overrides?: CallOverrides): Promise<void>;
+    '__acceptAdmin()'(overrides?: CallOverrides): Promise<void>;
 
     __executeRollback(overrides?: CallOverrides): Promise<void>;
 
-    "__executeRollback()"(overrides?: CallOverrides): Promise<void>;
+    '__executeRollback()'(overrides?: CallOverrides): Promise<void>;
 
     __rollback(eta: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "__rollback(uint256)"(
+    '__rollback(uint256)'(
       eta: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     cancel(proposalId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1276,7 +1276,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "castVote(uint256,uint8)"(
+    'castVote(uint256,uint8)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       overrides?: CallOverrides
@@ -1291,7 +1291,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       v: BigNumberish,
@@ -1307,14 +1307,14 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "castVoteWithReason(uint256,uint8,string)"(
+    'castVoteWithReason(uint256,uint8,string)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "execute(address[],uint256[],bytes[],bytes32)"(
+    'execute(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -1322,7 +1322,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1339,7 +1339,7 @@ export class FeiDAO extends Contract {
       }
     >;
 
-    "getActions(uint256)"(
+    'getActions(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -1363,7 +1363,7 @@ export class FeiDAO extends Contract {
       }
     >;
 
-    "getReceipt(uint256,address)"(
+    'getReceipt(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -1381,7 +1381,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getVotes(address,uint256)"(
+    'getVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -1393,7 +1393,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "hasVoted(uint256,address)"(
+    'hasVoted(uint256,address)'(
       proposalId: BigNumberish,
       account: string,
       overrides?: CallOverrides
@@ -1407,7 +1407,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "hashProposal(address[],uint256[],bytes[],bytes32)"(
+    'hashProposal(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -1417,14 +1417,14 @@ export class FeiDAO extends Contract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    "name()"(overrides?: CallOverrides): Promise<string>;
+    'name()'(overrides?: CallOverrides): Promise<string>;
 
     proposalDeadline(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "proposalDeadline(uint256)"(
+    'proposalDeadline(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1434,7 +1434,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "proposalEta(uint256)"(
+    'proposalEta(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1444,14 +1444,14 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "proposalSnapshot(uint256)"(
+    'proposalSnapshot(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'proposalThreshold()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposals(
       proposalId: BigNumberish,
@@ -1482,7 +1482,7 @@ export class FeiDAO extends Contract {
       }
     >;
 
-    "proposals(uint256)"(
+    'proposals(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -1511,7 +1511,7 @@ export class FeiDAO extends Contract {
       }
     >;
 
-    "propose(address[],uint256[],bytes[],string)"(
+    'propose(address[],uint256[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -1519,7 +1519,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "propose(address[],uint256[],string[],bytes[],string)"(
+    'propose(address[],uint256[],string[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       signatures: string[],
@@ -1528,7 +1528,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "queue(address[],uint256[],bytes[],bytes32)"(
+    'queue(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -1536,28 +1536,28 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     quorum(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "quorum(uint256)"(
+    'quorum(uint256)'(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     quorumVotes(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'quorumVotes()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     setProposalThreshold(
       newProposalThreshold: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setProposalThreshold(uint256)"(
+    'setProposalThreshold(uint256)'(
       newProposalThreshold: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1567,7 +1567,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setQuorum(uint256)"(
+    'setQuorum(uint256)'(
       newQuorum: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1577,7 +1577,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setVotingDelay(uint256)"(
+    'setVotingDelay(uint256)'(
       newVotingDelay: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1587,14 +1587,14 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setVotingPeriod(uint256)"(
+    'setVotingPeriod(uint256)'(
       newVotingPeriod: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
-    "state(uint256)"(
+    'state(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<number>;
@@ -1604,40 +1604,40 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     timelock(overrides?: CallOverrides): Promise<string>;
 
-    "timelock()"(overrides?: CallOverrides): Promise<string>;
+    'timelock()'(overrides?: CallOverrides): Promise<string>;
 
     token(overrides?: CallOverrides): Promise<string>;
 
-    "token()"(overrides?: CallOverrides): Promise<string>;
+    'token()'(overrides?: CallOverrides): Promise<string>;
 
     updateTimelock(
       newTimelock: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "updateTimelock(address)"(
+    'updateTimelock(address)'(
       newTimelock: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     version(overrides?: CallOverrides): Promise<string>;
 
-    "version()"(overrides?: CallOverrides): Promise<string>;
+    'version()'(overrides?: CallOverrides): Promise<string>;
 
     votingDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "votingDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'votingDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     votingPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "votingPeriod()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'votingPeriod()'(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -1759,25 +1759,25 @@ export class FeiDAO extends Contract {
   estimateGas: {
     BACKUP_GOVERNOR(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "BACKUP_GOVERNOR()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'BACKUP_GOVERNOR()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "BALLOT_TYPEHASH()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'BALLOT_TYPEHASH()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     COUNTING_MODE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "COUNTING_MODE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'COUNTING_MODE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     ROLLBACK_DEADLINE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "ROLLBACK_DEADLINE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'ROLLBACK_DEADLINE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     __acceptAdmin(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "__acceptAdmin()"(
+    '__acceptAdmin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1785,7 +1785,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "__executeRollback()"(
+    '__executeRollback()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1794,7 +1794,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "__rollback(uint256)"(
+    '__rollback(uint256)'(
       eta: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1804,7 +1804,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1815,7 +1815,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "castVote(uint256,uint8)"(
+    'castVote(uint256,uint8)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1830,7 +1830,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       v: BigNumberish,
@@ -1846,14 +1846,14 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "castVoteWithReason(uint256,uint8,string)"(
+    'castVoteWithReason(uint256,uint8,string)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "execute(address[],uint256[],bytes[],bytes32)"(
+    'execute(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -1861,7 +1861,7 @@ export class FeiDAO extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1871,7 +1871,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getActions(uint256)"(
+    'getActions(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1882,7 +1882,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getReceipt(uint256,address)"(
+    'getReceipt(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -1894,7 +1894,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getVotes(address,uint256)"(
+    'getVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -1906,7 +1906,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "hasVoted(uint256,address)"(
+    'hasVoted(uint256,address)'(
       proposalId: BigNumberish,
       account: string,
       overrides?: CallOverrides
@@ -1920,7 +1920,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "hashProposal(address[],uint256[],bytes[],bytes32)"(
+    'hashProposal(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -1930,14 +1930,14 @@ export class FeiDAO extends Contract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'name()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposalDeadline(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "proposalDeadline(uint256)"(
+    'proposalDeadline(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1947,7 +1947,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "proposalEta(uint256)"(
+    'proposalEta(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1957,26 +1957,26 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "proposalSnapshot(uint256)"(
+    'proposalSnapshot(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'proposalThreshold()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposals(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "proposals(uint256)"(
+    'proposals(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "propose(address[],uint256[],bytes[],string)"(
+    'propose(address[],uint256[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -1984,7 +1984,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "propose(address[],uint256[],string[],bytes[],string)"(
+    'propose(address[],uint256[],string[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       signatures: string[],
@@ -1993,7 +1993,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "queue(address[],uint256[],bytes[],bytes32)"(
+    'queue(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -2001,28 +2001,28 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     quorum(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "quorum(uint256)"(
+    'quorum(uint256)'(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     quorumVotes(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'quorumVotes()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     setProposalThreshold(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setProposalThreshold(uint256)"(
+    'setProposalThreshold(uint256)'(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -2032,7 +2032,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setQuorum(uint256)"(
+    'setQuorum(uint256)'(
       newQuorum: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -2042,7 +2042,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setVotingDelay(uint256)"(
+    'setVotingDelay(uint256)'(
       newVotingDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -2052,7 +2052,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setVotingPeriod(uint256)"(
+    'setVotingPeriod(uint256)'(
       newVotingPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -2062,7 +2062,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "state(uint256)"(
+    'state(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -2072,62 +2072,62 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     timelock(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "timelock()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'timelock()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     token(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "token()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'token()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     updateTimelock(
       newTimelock: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "updateTimelock(address)"(
+    'updateTimelock(address)'(
       newTimelock: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     version(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "version()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'version()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     votingDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "votingDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'votingDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     votingPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "votingPeriod()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'votingPeriod()'(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
     BACKUP_GOVERNOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "BACKUP_GOVERNOR()"(
+    'BACKUP_GOVERNOR()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     BALLOT_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "BALLOT_TYPEHASH()"(
+    'BALLOT_TYPEHASH()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     COUNTING_MODE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "COUNTING_MODE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'COUNTING_MODE()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     ROLLBACK_DEADLINE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "ROLLBACK_DEADLINE()"(
+    'ROLLBACK_DEADLINE()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2135,7 +2135,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "__acceptAdmin()"(
+    '__acceptAdmin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -2143,7 +2143,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "__executeRollback()"(
+    '__executeRollback()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -2152,7 +2152,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "__rollback(uint256)"(
+    '__rollback(uint256)'(
       eta: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2162,7 +2162,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2173,7 +2173,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "castVote(uint256,uint8)"(
+    'castVote(uint256,uint8)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -2188,7 +2188,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)"(
+    'castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       v: BigNumberish,
@@ -2204,14 +2204,14 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "castVoteWithReason(uint256,uint8,string)"(
+    'castVoteWithReason(uint256,uint8,string)'(
       proposalId: BigNumberish,
       support: BigNumberish,
       reason: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "execute(address[],uint256[],bytes[],bytes32)"(
+    'execute(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -2219,7 +2219,7 @@ export class FeiDAO extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2229,7 +2229,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getActions(uint256)"(
+    'getActions(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -2240,7 +2240,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getReceipt(uint256,address)"(
+    'getReceipt(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -2252,7 +2252,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getVotes(address,uint256)"(
+    'getVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -2264,7 +2264,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "hasVoted(uint256,address)"(
+    'hasVoted(uint256,address)'(
       proposalId: BigNumberish,
       account: string,
       overrides?: CallOverrides
@@ -2278,7 +2278,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "hashProposal(address[],uint256[],bytes[],bytes32)"(
+    'hashProposal(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -2288,14 +2288,14 @@ export class FeiDAO extends Contract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'name()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     proposalDeadline(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "proposalDeadline(uint256)"(
+    'proposalDeadline(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -2305,7 +2305,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "proposalEta(uint256)"(
+    'proposalEta(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -2315,14 +2315,14 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "proposalSnapshot(uint256)"(
+    'proposalSnapshot(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     proposalThreshold(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "proposalThreshold()"(
+    'proposalThreshold()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2331,12 +2331,12 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "proposals(uint256)"(
+    'proposals(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "propose(address[],uint256[],bytes[],string)"(
+    'propose(address[],uint256[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -2344,7 +2344,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "propose(address[],uint256[],string[],bytes[],string)"(
+    'propose(address[],uint256[],string[],bytes[],string)'(
       targets: string[],
       values: BigNumberish[],
       signatures: string[],
@@ -2353,7 +2353,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "queue(address[],uint256[],bytes[],bytes32)"(
+    'queue(address[],uint256[],bytes[],bytes32)'(
       targets: string[],
       values: BigNumberish[],
       calldatas: BytesLike[],
@@ -2361,7 +2361,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2371,21 +2371,21 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "quorum(uint256)"(
+    'quorum(uint256)'(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     quorumVotes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "quorumVotes()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'quorumVotes()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setProposalThreshold(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setProposalThreshold(uint256)"(
+    'setProposalThreshold(uint256)'(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2395,7 +2395,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setQuorum(uint256)"(
+    'setQuorum(uint256)'(
       newQuorum: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2405,7 +2405,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setVotingDelay(uint256)"(
+    'setVotingDelay(uint256)'(
       newVotingDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2415,7 +2415,7 @@ export class FeiDAO extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setVotingPeriod(uint256)"(
+    'setVotingPeriod(uint256)'(
       newVotingPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -2425,7 +2425,7 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "state(uint256)"(
+    'state(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -2435,39 +2435,39 @@ export class FeiDAO extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     timelock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "timelock()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'timelock()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "token()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'token()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     updateTimelock(
       newTimelock: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "updateTimelock(address)"(
+    'updateTimelock(address)'(
       newTimelock: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "version()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'version()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     votingDelay(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "votingDelay()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'votingDelay()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     votingPeriod(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "votingPeriod()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'votingPeriod()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

@@ -12,57 +12,57 @@ import {
   Contract,
   ContractTransaction,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface GovernanceStrategyInterface extends ethers.utils.Interface {
   functions: {
-    "AAVE()": FunctionFragment;
-    "STK_AAVE()": FunctionFragment;
-    "getPropositionPowerAt(address,uint256)": FunctionFragment;
-    "getTotalPropositionSupplyAt(uint256)": FunctionFragment;
-    "getTotalVotingSupplyAt(uint256)": FunctionFragment;
-    "getVotingPowerAt(address,uint256)": FunctionFragment;
+    'AAVE()': FunctionFragment;
+    'STK_AAVE()': FunctionFragment;
+    'getPropositionPowerAt(address,uint256)': FunctionFragment;
+    'getTotalPropositionSupplyAt(uint256)': FunctionFragment;
+    'getTotalVotingSupplyAt(uint256)': FunctionFragment;
+    'getVotingPowerAt(address,uint256)': FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "AAVE", values?: undefined): string;
-  encodeFunctionData(functionFragment: "STK_AAVE", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'AAVE', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'STK_AAVE', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getPropositionPowerAt",
+    functionFragment: 'getPropositionPowerAt',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getTotalPropositionSupplyAt",
+    functionFragment: 'getTotalPropositionSupplyAt',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getTotalVotingSupplyAt",
+    functionFragment: 'getTotalVotingSupplyAt',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getVotingPowerAt",
+    functionFragment: 'getVotingPowerAt',
     values: [string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: "AAVE", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "STK_AAVE", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'AAVE', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'STK_AAVE', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getPropositionPowerAt",
+    functionFragment: 'getPropositionPowerAt',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getTotalPropositionSupplyAt",
+    functionFragment: 'getTotalPropositionSupplyAt',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getTotalVotingSupplyAt",
+    functionFragment: 'getTotalVotingSupplyAt',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getVotingPowerAt",
+    functionFragment: 'getVotingPowerAt',
     data: BytesLike
   ): Result;
 
@@ -115,11 +115,11 @@ export class GovernanceStrategy extends Contract {
   functions: {
     AAVE(overrides?: CallOverrides): Promise<[string]>;
 
-    "AAVE()"(overrides?: CallOverrides): Promise<[string]>;
+    'AAVE()'(overrides?: CallOverrides): Promise<[string]>;
 
     STK_AAVE(overrides?: CallOverrides): Promise<[string]>;
 
-    "STK_AAVE()"(overrides?: CallOverrides): Promise<[string]>;
+    'STK_AAVE()'(overrides?: CallOverrides): Promise<[string]>;
 
     getPropositionPowerAt(
       user: string,
@@ -127,7 +127,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getPropositionPowerAt(address,uint256)"(
+    'getPropositionPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -138,7 +138,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getTotalPropositionSupplyAt(uint256)"(
+    'getTotalPropositionSupplyAt(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -148,7 +148,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getTotalVotingSupplyAt(uint256)"(
+    'getTotalVotingSupplyAt(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -159,7 +159,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getVotingPowerAt(address,uint256)"(
+    'getVotingPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -168,11 +168,11 @@ export class GovernanceStrategy extends Contract {
 
   AAVE(overrides?: CallOverrides): Promise<string>;
 
-  "AAVE()"(overrides?: CallOverrides): Promise<string>;
+  'AAVE()'(overrides?: CallOverrides): Promise<string>;
 
   STK_AAVE(overrides?: CallOverrides): Promise<string>;
 
-  "STK_AAVE()"(overrides?: CallOverrides): Promise<string>;
+  'STK_AAVE()'(overrides?: CallOverrides): Promise<string>;
 
   getPropositionPowerAt(
     user: string,
@@ -180,7 +180,7 @@ export class GovernanceStrategy extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getPropositionPowerAt(address,uint256)"(
+  'getPropositionPowerAt(address,uint256)'(
     user: string,
     blockNumber: BigNumberish,
     overrides?: CallOverrides
@@ -191,7 +191,7 @@ export class GovernanceStrategy extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getTotalPropositionSupplyAt(uint256)"(
+  'getTotalPropositionSupplyAt(uint256)'(
     blockNumber: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -201,7 +201,7 @@ export class GovernanceStrategy extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getTotalVotingSupplyAt(uint256)"(
+  'getTotalVotingSupplyAt(uint256)'(
     blockNumber: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -212,7 +212,7 @@ export class GovernanceStrategy extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getVotingPowerAt(address,uint256)"(
+  'getVotingPowerAt(address,uint256)'(
     user: string,
     blockNumber: BigNumberish,
     overrides?: CallOverrides
@@ -221,11 +221,11 @@ export class GovernanceStrategy extends Contract {
   callStatic: {
     AAVE(overrides?: CallOverrides): Promise<string>;
 
-    "AAVE()"(overrides?: CallOverrides): Promise<string>;
+    'AAVE()'(overrides?: CallOverrides): Promise<string>;
 
     STK_AAVE(overrides?: CallOverrides): Promise<string>;
 
-    "STK_AAVE()"(overrides?: CallOverrides): Promise<string>;
+    'STK_AAVE()'(overrides?: CallOverrides): Promise<string>;
 
     getPropositionPowerAt(
       user: string,
@@ -233,7 +233,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPropositionPowerAt(address,uint256)"(
+    'getPropositionPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -244,7 +244,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getTotalPropositionSupplyAt(uint256)"(
+    'getTotalPropositionSupplyAt(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -254,7 +254,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getTotalVotingSupplyAt(uint256)"(
+    'getTotalVotingSupplyAt(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -265,7 +265,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getVotingPowerAt(address,uint256)"(
+    'getVotingPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -277,11 +277,11 @@ export class GovernanceStrategy extends Contract {
   estimateGas: {
     AAVE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "AAVE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'AAVE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     STK_AAVE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "STK_AAVE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'STK_AAVE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getPropositionPowerAt(
       user: string,
@@ -289,7 +289,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPropositionPowerAt(address,uint256)"(
+    'getPropositionPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -300,7 +300,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getTotalPropositionSupplyAt(uint256)"(
+    'getTotalPropositionSupplyAt(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -310,7 +310,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getTotalVotingSupplyAt(uint256)"(
+    'getTotalVotingSupplyAt(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -321,7 +321,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getVotingPowerAt(address,uint256)"(
+    'getVotingPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -331,11 +331,11 @@ export class GovernanceStrategy extends Contract {
   populateTransaction: {
     AAVE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "AAVE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'AAVE()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     STK_AAVE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "STK_AAVE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'STK_AAVE()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getPropositionPowerAt(
       user: string,
@@ -343,7 +343,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getPropositionPowerAt(address,uint256)"(
+    'getPropositionPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -354,7 +354,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getTotalPropositionSupplyAt(uint256)"(
+    'getTotalPropositionSupplyAt(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -364,7 +364,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getTotalVotingSupplyAt(uint256)"(
+    'getTotalVotingSupplyAt(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -375,7 +375,7 @@ export class GovernanceStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getVotingPowerAt(address,uint256)"(
+    'getVotingPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides

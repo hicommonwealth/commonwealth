@@ -7,16 +7,20 @@ import NewProposalForm from './new_proposal_form';
 
 const NewSnapshotProposalPage: m.Component<{ snapshotId: string }> = {
   view: (vnode) => {
-    return m(Sublayout, {
-      class: 'NewProposalPage',
-      title: 'New Snapshot Proposal',
-      showNewProposalButton: true,
-    }, [
-      m('.forum-container', [
-        m(NewProposalForm, { snapshotId: vnode.attrs.snapshotId }),
-      ])
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        class: 'NewProposalPage',
+        title: 'New Snapshot Proposal',
+        showNewProposalButton: true,
+      },
+      [
+        m('.forum-container', [
+          m(NewProposalForm, { snapshotId: vnode.attrs.snapshotId }),
+        ]),
+      ]
+    );
+  },
 };
 
 export default NewSnapshotProposalPage;

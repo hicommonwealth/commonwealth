@@ -4,7 +4,12 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.createTable('TaggedThreads', {
-        id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
+        id: {
+          type: Sequelize.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+          allowNull: false,
+        },
         tag_id: { type: Sequelize.INTEGER, allowNull: false },
         thread_id: { type: Sequelize.INTEGER, allowNull: false },
         created_at: { type: Sequelize.DATE, allowNull: false },
@@ -17,7 +22,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t },
+        { transaction: t }
       );
       await queryInterface.addColumn(
         'OffchainTags',
@@ -26,7 +31,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t },
+        { transaction: t }
       );
     });
   },
@@ -41,7 +46,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t },
+        { transaction: t }
       );
       await queryInterface.removeColumn(
         'OffchainTags',
@@ -50,7 +55,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: false,
         },
-        { transaction: t },
+        { transaction: t }
       );
     });
   },

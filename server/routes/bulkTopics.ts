@@ -5,9 +5,14 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export const Errors = { };
+export const Errors = {};
 
-const bulkTopics = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const bulkTopics = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 

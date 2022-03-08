@@ -15,7 +15,7 @@ export type OffchainVoteAttributes = {
 
   // associations
   thread?: OffchainThreadAttributes | OffchainThreadAttributes['id'];
-}
+};
 
 export type OffchainVoteInstance = ModelInstance<OffchainVoteAttributes>;
 
@@ -23,10 +23,11 @@ export type OffchainVoteModelStatic = ModelStatic<OffchainVoteInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: typeof DataTypes
 ): OffchainVoteModelStatic => {
   const OffchainVote = <OffchainVoteModelStatic>sequelize.define(
-    'OffchainVote', {
+    'OffchainVote',
+    {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
       option: { type: dataTypes.STRING, allowNull: false },
@@ -35,14 +36,13 @@ export default (
       chain: { type: Sequelize.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
-    }, {
+    },
+    {
       tableName: 'OffchainVotes',
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [
-        { fields: ['thread_id'] },
-      ],
+      indexes: [{ fields: ['thread_id'] }],
     }
   );
 

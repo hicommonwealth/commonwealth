@@ -3,7 +3,10 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.sequelize.query(`UPDATE "Chains" SET snapshot = '{}' WHERE length(snapshot[1])=0;`, { transaction: t });
+      await queryInterface.sequelize.query(
+        `UPDATE "Chains" SET snapshot = '{}' WHERE length(snapshot[1])=0;`,
+        { transaction: t }
+      );
     });
     /**
      * Add altering commands here.
@@ -20,5 +23,5 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-  }
+  },
 };

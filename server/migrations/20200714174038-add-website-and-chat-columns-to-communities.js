@@ -153,5 +153,5 @@ module.exports = {
         { transaction: t }
       );
     });
-  }
+  },
 };

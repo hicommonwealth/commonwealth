@@ -10,7 +10,8 @@ module.exports = async function (deployer, network, accounts) {
   const summoner = accounts[0];
   const applicants = accounts.slice(5);
 
-  await deployer.deploy(MolochV1,
+  await deployer.deploy(
+    MolochV1,
     summoner,
     token.address, // approvedTokens:
     60, // _periodDuration:
@@ -19,7 +20,7 @@ module.exports = async function (deployer, network, accounts) {
     1, // _abortWindow:
     '3', // _proposalDeposit:
     3, // _diluationBound:
-    '3', // _processingReward:
+    '3' // _processingReward:
     // { gas: 25000 }
     // eslint-disable-next-line function-paren-newline
   );

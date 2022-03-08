@@ -2,14 +2,17 @@ import { BrokerConfig } from 'rascal';
 import { assert } from 'chai';
 import { CWEvent } from '@commonwealth/chain-events';
 import { RabbitMqHandler } from '../../../server/eventHandlers/rabbitMQ';
-import  RabbitMQConfig  from '../../../server/util/rabbitmq/RabbitMQConfig';
+import RabbitMQConfig from '../../../server/util/rabbitmq/RabbitMQConfig';
 
 describe.skip('RabbitMQ producer integration tests', () => {
-  let controller
+  let controller;
 
   beforeEach('Initialize RabbitMQ Controller', () => {
-    controller = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
-  })
+    controller = new RabbitMqHandler(
+      <BrokerConfig>RabbitMQConfig,
+      'ChainEventsHandlersPublication'
+    );
+  });
 
   it('should initialize a RabbitMQ producer with the default config', async function () {
     await controller.init();
@@ -18,8 +21,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
 
   it('should publish a CWEvent to a queue', async function () {
     await controller.init();
-    const sub = await controller.startSubscription(
-    async (event: CWEvent) => {
+    const sub = await controller.startSubscription(async (event: CWEvent) => {
       assert.equal(event.blockNumber, 10);
       assert.deepEqual(event.data, {} as any);
       assert.equal(event.chain, 'polkadot');
@@ -38,8 +40,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
 
   xit('should prevent excluded events from being published', async function () {
     await controller.init();
-    const sub = await controller.startSubscription(
-      async (event: CWEvent) => {
+    const sub = await controller.startSubscription(async (event: CWEvent) => {
       assert.equal(event.blockNumber, 10);
       assert.equal(event.data, {} as any);
       assert.equal(event.chain, 'polkadot');

@@ -11,7 +11,7 @@ module.exports = {
         {
           type: Sequelize.BOOLEAN,
           defaultValue: false,
-          allowNull: false
+          allowNull: false,
         },
         { transaction }
       );
@@ -32,5 +32,5 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn('Chains', 'has_chain_events_listener');
-  }
+  },
 };

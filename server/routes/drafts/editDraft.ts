@@ -10,10 +10,15 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NoId: 'Must supply draft ID.',
   NotOwner: 'User does not have permission to edit this thread.',
-  NotFound: 'Draft not found.'
+  NotFound: 'Draft not found.',
 };
 
-const editDraft = async (models, req: Request, res: Response, next: NextFunction) => {
+const editDraft = async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -25,7 +30,10 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
   const { id, title, body, topic } = req.body;
 
   const attachFiles = async () => {
-    if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
+    if (
+      req.body['attachments[]'] &&
+      typeof req.body['attachments[]'] === 'string'
+    ) {
       await models.OffchainAttachment.create({
         attachable: 'draft',
         attachment_id: id,
@@ -33,26 +41,29 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
         description: 'image',
       });
     } else if (req.body['attachments[]']) {
-      await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
-        attachable: 'draft',
-        attachment_id: id,
-        url,
-        description: 'image',
-      })));
+      await Promise.all(
+        req.body['attachments[]'].map((url) =>
+          models.OffchainAttachment.create({
+            attachable: 'draft',
+            attachment_id: id,
+            url,
+            description: 'image',
+          })
+        )
+      );
     }
   };
 
   try {
-    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const draft = await models.DiscussionDraft.findOne({
       where: {
         id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [
-        models.Address,
-        models.OffchainAttachment
-      ]
+      include: [models.Address, models.OffchainAttachment],
     });
     if (!draft) return next(new Error(Errors.NotFound));
     if (body) draft.body = body;

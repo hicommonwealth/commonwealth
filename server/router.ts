@@ -83,8 +83,8 @@ import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
 import getThreads from './routes/getThreads';
-import searchDiscussions from './routes/searchDiscussions'
-import searchComments from './routes/searchComments'
+import searchDiscussions from './routes/searchDiscussions';
+import searchComments from './routes/searchComments';
 import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
@@ -220,7 +220,10 @@ function setupRouter(
   // offchain community admin routes
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
-  router.get('/getSupportedEthChains', getSupportedEthChains.bind(this, models));
+  router.get(
+    '/getSupportedEthChains',
+    getSupportedEthChains.bind(this, models)
+  );
   router.post(
     '/createChain',
     passport.authenticate('jwt', { session: false }),
@@ -495,10 +498,10 @@ function setupRouter(
   );
 
   router.delete(
-      '/discordAccount',
-      passport.authenticate('jwt', { session: false }),
-      deleteSocialAccount.bind(this, models, 'discord')
-  )
+    '/discordAccount',
+    passport.authenticate('jwt', { session: false }),
+    deleteSocialAccount.bind(this, models, 'discord')
+  );
 
   // offchain viewCount
   router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
@@ -598,11 +601,17 @@ function setupRouter(
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
 
   router.get('/auth/github', startOAuthLogin.bind(this, models, 'github'));
-  router.get('/auth/github/callback', startOAuthLogin.bind(this, models, 'github'));
+  router.get(
+    '/auth/github/callback',
+    startOAuthLogin.bind(this, models, 'github')
+  );
   router.get('/finishOAuthLogin', finishOAuthLogin.bind(this, models));
 
   router.get('/auth/discord', startOAuthLogin.bind(this, models, 'discord'));
-  router.get('/auth/discord/callback', startOAuthLogin.bind(this, models, 'discord'));
+  router.get(
+    '/auth/discord/callback',
+    startOAuthLogin.bind(this, models, 'discord')
+  );
 
   router.post(
     '/auth/magic',

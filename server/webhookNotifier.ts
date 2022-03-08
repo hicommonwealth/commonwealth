@@ -6,7 +6,11 @@ import { Label as ChainEventLabel, CWEvent } from '@commonwealth/chain-events';
 import { NotificationCategories } from '../shared/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
 import { getForumNotificationCopy } from '../shared/notificationFormatter';
-import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
+import {
+  SERVER_URL,
+  SLACK_FEEDBACK_WEBHOOK,
+  DEFAULT_COMMONWEALTH_LOGO,
+} from './config';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -21,8 +25,10 @@ export interface WebhookContent {
   chainEventType?: any;
 }
 
-const REGEX_IMAGE = /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;
-const REGEX_EMOJI = /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g;
+const REGEX_IMAGE =
+  /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;
+const REGEX_EMOJI =
+  /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g;
 
 const getFilteredContent = (content, address) => {
   if (content.chainEvent && content.chainEventType) {
@@ -36,25 +42,36 @@ const getFilteredContent = (content, address) => {
     const event = ChainEventLabel(content.chainEventType.chain, evt);
     const title = `${capitalize(content.chainEventType.chain)}`;
     const chainEventLink = `${SERVER_URL}/${content.chainEventType.chain}`;
-    const fulltext = `${event.heading} on ${capitalize(content.chainEventType?.chain)} at block`
-      + ` ${content.chainEvent?.block_number} \n${event.label}`;
+    const fulltext =
+      `${event.heading} on ${capitalize(
+        content.chainEventType?.chain
+      )} at block` + ` ${content.chainEvent?.block_number} \n${event.label}`;
     return { title, fulltext, chainEventLink };
   } else {
     const community = `${content.chain || content.community}`;
     const actor = `${address?.name || content.user}`;
-    const action = ((content.notificationCategory === NotificationCategories.NewComment) ? 'commented on'
-      : (content.notificationCategory === NotificationCategories.NewMention) ? 'mentioned you in the thread'
-        : (content.notificationCategory === NotificationCategories.NewCollaboration) ? 'invited you to collaborate on'
-          : (content.notificationCategory === NotificationCategories.NewThread) ? 'created a new thread'
-            : '');
+    const action =
+      content.notificationCategory === NotificationCategories.NewComment
+        ? 'commented on'
+        : content.notificationCategory === NotificationCategories.NewMention
+        ? 'mentioned you in the thread'
+        : content.notificationCategory ===
+          NotificationCategories.NewCollaboration
+        ? 'invited you to collaborate on'
+        : content.notificationCategory === NotificationCategories.NewThread
+        ? 'created a new thread'
+        : '';
     const actedOn = decodeURIComponent(content.title);
     const actedOnLink = content.url;
 
-    const notificationTitlePrefix = content.notificationCategory === NotificationCategories.NewComment
-      ? 'Comment on: '
-      : content.notificationCategory === NotificationCategories.NewThread ? 'New thread: '
-        : content.notificationCategory === NotificationCategories.NewReaction ? 'Reaction on: '
-          : 'Activity on: ';
+    const notificationTitlePrefix =
+      content.notificationCategory === NotificationCategories.NewComment
+        ? 'Comment on: '
+        : content.notificationCategory === NotificationCategories.NewThread
+        ? 'New thread: '
+        : content.notificationCategory === NotificationCategories.NewReaction
+        ? 'Reaction on: '
+        : 'Activity on: ';
 
     // url decoded
     const bodytext = decodeURIComponent(content.body);
@@ -81,22 +98,34 @@ const getFilteredContent = (content, address) => {
       }
     })();
 
-    return { community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, notificationPreviewImageUrl };
+    return {
+      community,
+      actor,
+      action,
+      actedOn,
+      actedOnLink,
+      notificationTitlePrefix,
+      notificationExcerpt,
+      notificationPreviewImageUrl,
+    };
   }
 };
 
 const send = async (models, content: WebhookContent) => {
   let address;
   try {
-    address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
+    address = await models.Address.findOne({
+      where: { address: content.user, chain: content.author_chain },
+    });
   } catch (err) {
     // pass nothing if no matching address is found
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
-  const chainOrCommObj = (content.chain) ? { chain_id: content.chain } : null;
-  const notificationCategory = (content.chainEvent)
-    ? content.chainEvent.chain_event_type_id : content.notificationCategory;
+  const chainOrCommObj = content.chain ? { chain_id: content.chain } : null;
+  const notificationCategory = content.chainEvent
+    ? content.chainEvent.chain_event_type_id
+    : content.notificationCategory;
   // grab all webhooks for specific community
   const chainOrCommWebhooks = await models.Webhook.findAll({
     where: {
@@ -108,22 +137,35 @@ const send = async (models, content: WebhookContent) => {
   });
   const chainOrCommwebhookUrls = [];
   chainOrCommWebhooks.forEach((wh) => {
-    if (validURL(wh.url)){
+    if (validURL(wh.url)) {
       chainOrCommwebhookUrls.push(wh.url);
     }
   });
 
   const {
-    community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, notificationPreviewImageUrl, // forum events
-    title, chainEventLink, fulltext // chain events
+    community,
+    actor,
+    action,
+    actedOn,
+    actedOnLink,
+    notificationTitlePrefix,
+    notificationExcerpt,
+    notificationPreviewImageUrl, // forum events
+    title,
+    chainEventLink,
+    fulltext, // chain events
   } = getFilteredContent(content, address);
   const isChainEvent = !!chainEventLink;
 
   let actorAvatarUrl = null;
-  const actorAccountLink = address ? `${SERVER_URL}/${address.chain}/account/${address.address}` : null;
+  const actorAccountLink = address
+    ? `${SERVER_URL}/${address.chain}/account/${address.address}`
+    : null;
 
   if (address?.id) {
-    const actorProfile = await models.OffchainProfile.findOne({ where: { address_id: address.id } });
+    const actorProfile = await models.OffchainProfile.findOne({
+      where: { address_id: address.id },
+    });
     if (actorProfile?.data) {
       actorAvatarUrl = JSON.parse(actorProfile.data).avatarUrl;
     }
@@ -145,11 +187,14 @@ const send = async (models, content: WebhookContent) => {
   if (!previewImageUrl) {
     if (content.chain) {
       // if the chain has a logo, show it as preview image
-      const chain = await models.Chain.findOne({ where: { id: content.chain } });
+      const chain = await models.Chain.findOne({
+        where: { id: content.chain },
+      });
       if (chain) {
         if (chain.icon_url) {
-          previewImageUrl = (chain.icon_url.match(`^(http|https)://`)) ? chain.icon_url :
-            `https://commonwealth.im${chain.icon_url}`;
+          previewImageUrl = chain.icon_url.match(`^(http|https)://`)
+            ? chain.icon_url
+            : `https://commonwealth.im${chain.icon_url}`;
         }
         // can't handle the prefix of `previeImageUrl` with SERVER_URL
         // because social platforms can't access to localhost:8080.
@@ -165,146 +210,179 @@ const send = async (models, content: WebhookContent) => {
     previewAltText = previewAltText || 'Commonwealth';
   }
 
-  await Promise.all(chainOrCommwebhookUrls
-    .filter((url) => !!url)
-    .map(async (url) => {
-      let webhookData;
-      if (url.indexOf('slack.com') !== -1) {
-        // slack webhook format (stringified JSON)
-        webhookData = JSON.stringify({
-          blocks: [
-            {
-              type: 'context',
-              elements: actorAvatarUrl?.length ? [
-                {
-                  type: 'image',
-                  image_url: actorAvatarUrl,
-                  alt_text: 'Actor:'
-                },
-                {
-                  type: 'mrkdwn',
-                  text: `<${actorAccountLink}|${actor}>`,
-                }
-              ] : [
-                {
-                  type: 'plain_text',
-                  text: actor,
-                }
-              ]
-            },
-            {
-              type: 'section',
-              text: isChainEvent ? {
-                type: 'mrkdwn',
-                text: (process.env.NODE_ENV !== 'production' ? '[dev] ' : '') + fulltext
-              } : {
-                type: 'mrkdwn',
-                text: `*${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''}${notificationTitlePrefix}* <${actedOnLink}|${actedOn}> \n> ${notificationExcerpt.split('\n').join('\n> ')}`
+  await Promise.all(
+    chainOrCommwebhookUrls
+      .filter((url) => !!url)
+      .map(async (url) => {
+        let webhookData;
+        if (url.indexOf('slack.com') !== -1) {
+          // slack webhook format (stringified JSON)
+          webhookData = JSON.stringify({
+            blocks: [
+              {
+                type: 'context',
+                elements: actorAvatarUrl?.length
+                  ? [
+                      {
+                        type: 'image',
+                        image_url: actorAvatarUrl,
+                        alt_text: 'Actor:',
+                      },
+                      {
+                        type: 'mrkdwn',
+                        text: `<${actorAccountLink}|${actor}>`,
+                      },
+                    ]
+                  : [
+                      {
+                        type: 'plain_text',
+                        text: actor,
+                      },
+                    ],
               },
-              accessory: {
-                type: 'image',
-                image_url: previewImageUrl,
-                alt_text: previewAltText
+              {
+                type: 'section',
+                text: isChainEvent
+                  ? {
+                      type: 'mrkdwn',
+                      text:
+                        (process.env.NODE_ENV !== 'production'
+                          ? '[dev] '
+                          : '') + fulltext,
+                    }
+                  : {
+                      type: 'mrkdwn',
+                      text: `*${
+                        process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+                      }${notificationTitlePrefix}* <${actedOnLink}|${actedOn}> \n> ${notificationExcerpt
+                        .split('\n')
+                        .join('\n> ')}`,
+                    },
+                accessory: {
+                  type: 'image',
+                  image_url: previewImageUrl,
+                  alt_text: previewAltText,
+                },
+              },
+            ],
+          });
+        } else if (url.indexOf('discord.com') !== -1) {
+          // discord webhook format (raw json, for application/json)
+          webhookData = isChainEvent
+            ? {
+                username: 'Commonwealth',
+                avatar_url: DEFAULT_COMMONWEALTH_LOGO,
+                embeds: [
+                  {
+                    author: {
+                      name: 'New chain event',
+                      url: chainEventLink,
+                      icon_url: previewImageUrl,
+                    },
+                    title,
+                    url: chainEventLink,
+                    description: fulltext,
+                    color: 15258703,
+                    thumbnail: {
+                      url: previewImageUrl,
+                    },
+                  },
+                ],
               }
-            }
-          ],
-        });
-      } else if (url.indexOf('discord.com') !== -1) {
-        // discord webhook format (raw json, for application/json)
-        webhookData = isChainEvent ? {
-          username: 'Commonwealth',
-          avatar_url: DEFAULT_COMMONWEALTH_LOGO,
-          embeds: [{
-            author: {
-              name: 'New chain event',
-              url: chainEventLink,
-              icon_url: previewImageUrl
-            },
-            title,
-            url: chainEventLink,
-            description: fulltext,
-            color: 15258703,
-            thumbnail: {
-              'url': previewImageUrl
-            },
-          }]
-        } : {
-          username: 'Commonwealth',
-          avatar_url: DEFAULT_COMMONWEALTH_LOGO,
-          embeds: [{
-            author: {
-              name: actor,
-              url: actorAccountLink,
-              icon_url: actorAvatarUrl
-            },
-            title: notificationTitlePrefix + actedOn,
-            url: actedOnLink,
-            description: notificationExcerpt.replace(REGEX_EMOJI, ''), // discord webhook description doesn't accept emoji
-            color: 15258703,
-            thumbnail: {
-              'url': previewImageUrl
-            },
-          }]
-        };
-      } else if (url.indexOf('matrix') !== -1) {
-        // TODO: matrix format and URL pattern matcher unimplemented
-        // return {
-        //   'text': `${getFiltered(content, address).join('\n')}`,
-        //   'format': 'plain',
-        //   'displayName': 'Commonwealth',
-        //   'avatarUrl': 'http://commonwealthLogoGoesHere'
-        // };
-      } else if ((url.indexOf('telegram') !== -1) && process.env.TELEGRAM_BOT_TOKEN) {
-        let getChatUsername = url.split('/@');
-        getChatUsername = `@${  getChatUsername[1]}`;
+            : {
+                username: 'Commonwealth',
+                avatar_url: DEFAULT_COMMONWEALTH_LOGO,
+                embeds: [
+                  {
+                    author: {
+                      name: actor,
+                      url: actorAccountLink,
+                      icon_url: actorAvatarUrl,
+                    },
+                    title: notificationTitlePrefix + actedOn,
+                    url: actedOnLink,
+                    description: notificationExcerpt.replace(REGEX_EMOJI, ''), // discord webhook description doesn't accept emoji
+                    color: 15258703,
+                    thumbnail: {
+                      url: previewImageUrl,
+                    },
+                  },
+                ],
+              };
+        } else if (url.indexOf('matrix') !== -1) {
+          // TODO: matrix format and URL pattern matcher unimplemented
+          // return {
+          //   'text': `${getFiltered(content, address).join('\n')}`,
+          //   'format': 'plain',
+          //   'displayName': 'Commonwealth',
+          //   'avatarUrl': 'http://commonwealthLogoGoesHere'
+          // };
+        } else if (
+          url.indexOf('telegram') !== -1 &&
+          process.env.TELEGRAM_BOT_TOKEN
+        ) {
+          let getChatUsername = url.split('/@');
+          getChatUsername = `@${getChatUsername[1]}`;
 
-        const botToken = process.env.TELEGRAM_BOT_TOKEN;
-        const getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
-        url = `${getUpdatesUrl  }/sendMessage`;
+          const botToken = process.env.TELEGRAM_BOT_TOKEN;
+          const getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
+          url = `${getUpdatesUrl}/sendMessage`;
 
-        webhookData = isChainEvent ? {
-          chat_id: getChatUsername,
-          text: `<a href="${chainEventLink}"><b>${title}</b></a>\n\n${fulltext}`,
-          parse_mode: 'HTML',
-          reply_markup: {
-            'resize_keyboard': true,
-            'inline_keyboard': [
-              [
-                { 'text': 'Read more on commonwealth', 'url': chainEventLink }
-              ]
-            ]
-          }
-        } : {
-          chat_id: getChatUsername,
-          text: `<b>Author:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${notificationTitlePrefix + actedOn}</b></a> \r\n\n${notificationExcerpt.replace(REGEX_EMOJI, '')}`,
-          parse_mode: 'HTML',
-          reply_markup: {
-            'resize_keyboard': true,
-            'inline_keyboard': [
-              [
-                { 'text': 'Read more on commonwealth', 'url': actedOnLink }
-              ]
-            ]
-          }
-        };
-      } else {
-        // TODO: other formats unimplemented
-      }
-
-      if (!webhookData) {
-        console.error('webhook not supported');
-        return;
-      }
-      try {
-        if (process.env.NODE_ENV === 'production' || (SLACK_FEEDBACK_WEBHOOK && url === SLACK_FEEDBACK_WEBHOOK)) {
-          await request.post(url).send(webhookData);
+          webhookData = isChainEvent
+            ? {
+                chat_id: getChatUsername,
+                text: `<a href="${chainEventLink}"><b>${title}</b></a>\n\n${fulltext}`,
+                parse_mode: 'HTML',
+                reply_markup: {
+                  resize_keyboard: true,
+                  inline_keyboard: [
+                    [
+                      {
+                        text: 'Read more on commonwealth',
+                        url: chainEventLink,
+                      },
+                    ],
+                  ],
+                },
+              }
+            : {
+                chat_id: getChatUsername,
+                text: `<b>Author:</b> <a href="${actorAccountLink}">${actor}</a>\n<a href="${actedOnLink}"><b>${
+                  notificationTitlePrefix + actedOn
+                }</b></a> \r\n\n${notificationExcerpt.replace(
+                  REGEX_EMOJI,
+                  ''
+                )}`,
+                parse_mode: 'HTML',
+                reply_markup: {
+                  resize_keyboard: true,
+                  inline_keyboard: [
+                    [{ text: 'Read more on commonwealth', url: actedOnLink }],
+                  ],
+                },
+              };
         } else {
-          console.log('Suppressed webhook notification to', url);
+          // TODO: other formats unimplemented
         }
-      } catch (err) {
-        console.error(err);
-      }
-    }));
+
+        if (!webhookData) {
+          console.error('webhook not supported');
+          return;
+        }
+        try {
+          if (
+            process.env.NODE_ENV === 'production' ||
+            (SLACK_FEEDBACK_WEBHOOK && url === SLACK_FEEDBACK_WEBHOOK)
+          ) {
+            await request.post(url).send(webhookData);
+          } else {
+            console.log('Suppressed webhook notification to', url);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      })
+  );
 };
 
 export default send;

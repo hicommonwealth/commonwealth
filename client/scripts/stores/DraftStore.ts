@@ -3,7 +3,8 @@ import { DiscussionDraft } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
 class DraftStore extends IdStore<DiscussionDraft> {
-  private _draftsByCommunity: { [identifier: string]: Array<DiscussionDraft> } = {};
+  private _draftsByCommunity: { [identifier: string]: Array<DiscussionDraft> } =
+    {};
 
   public add(draft: DiscussionDraft) {
     super.add(draft);

@@ -19,7 +19,8 @@ describe('API Tests', () => {
 
   describe('address tests', () => {
     it('should call the /api/status route', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .get('/api/status')
         .set('Accept', 'application/json');
       expect(res.body).to.not.be.null;
@@ -29,7 +30,8 @@ describe('API Tests', () => {
       const keypair = wallet.generate();
       const address = `0x${keypair.getAddress().toString('hex')}`;
       const chain = 'ethereum';
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/createAddress')
         .set('Accept', 'application/json')
         .send({ address, chain });
@@ -44,16 +46,22 @@ describe('API Tests', () => {
     it('should verify an address', async () => {
       const { keypair, address } = modelUtils.generateEthAddress();
       const chain = 'ethereum';
-      let res = await chai.request(app)
+      let res = await chai
+        .request(app)
         .post('/api/createAddress')
         .set('Accept', 'application/json')
         .send({ address, chain });
       const token = res.body.result.verification_token;
-      const chain_id = 1;   // use ETH mainnet for testing
+      const chain_id = 1; // use ETH mainnet for testing
       const data = constructTypedMessage(chain_id, token);
       const privateKey = Buffer.from(keypair.getPrivateKey(), 'hex');
-      const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
-      res = await chai.request(app)
+      const signature = signTypedData({
+        privateKey,
+        data,
+        version: SignTypedDataVersion.V4,
+      });
+      res = await chai
+        .request(app)
         .post('/api/verifyAddress')
         .set('Accept', 'application/json')
         .send({ address, chain, signature });

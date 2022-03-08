@@ -17,7 +17,12 @@ export const Errors = {
 
 const ValidRoles = ['admin', 'moderator', 'member'];
 
-const upgradeMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const upgradeMember = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const { address, new_role } = req.body;
@@ -25,7 +30,9 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
   if (!new_role) return next(new Error(Errors.InvalidRole));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const requesterAddresses = await req.user.getAddresses();
-  const requesterAddressIds = requesterAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const requesterAddressIds = requesterAddresses
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
   const requesterAdminRoles = await models.Role.findAll({
     where: {
       chain_id: chain.id,
@@ -34,19 +41,22 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
     },
   });
 
-  if (requesterAdminRoles.length < 1 && !req.user.isAdmin) return next(new Error(Errors.MustBeAdmin));
+  if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
+    return next(new Error(Errors.MustBeAdmin));
 
   const memberAddress = await models.Address.findOne({
     where: {
       address,
     },
-    include: [{
-      model: models.Role,
-      required: true,
-      where: {
-        chain_id: chain.id,
-      }
-    }]
+    include: [
+      {
+        model: models.Role,
+        required: true,
+        where: {
+          chain_id: chain.id,
+        },
+      },
+    ],
   });
   const roles = memberAddress?.Roles;
   if (!memberAddress || !roles) return next(new Error(Errors.NoMember));
@@ -63,8 +73,8 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
   });
   const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.address_id);
   const isLastAdmin = allCommunityAdmin.length < 2;
-  const adminSelfDemoting = requesterAdminAddressIds.includes(memberAddress.id)
-    && new_role !== 'admin';
+  const adminSelfDemoting =
+    requesterAdminAddressIds.includes(memberAddress.id) && new_role !== 'admin';
   if (isLastAdmin && adminSelfDemoting) {
     return next(new Error(Errors.MustHaveAdmin));
   }

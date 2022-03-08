@@ -21,46 +21,62 @@ export type OffchainTopicAttributes = {
   // associations
   chain?: ChainAttributes;
   threads?: OffchainThreadAttributes[] | OffchainTopicAttributes['id'][];
-}
+};
 
 export type OffchainTopicInstance = ModelInstance<OffchainTopicAttributes> & {
   // no mixins used
   // TODO: do we need to implement the "as" stuff here?
-}
+};
 
 export type OffchainTopicModelStatic = ModelStatic<OffchainTopicInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: typeof DataTypes
 ): OffchainTopicModelStatic => {
-  const OffchainTopic = <OffchainTopicModelStatic>sequelize.define('OffchainTopic', {
-    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    name: { type: dataTypes.STRING, allowNull: false },
-    description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
-    telegram: { type: dataTypes.STRING, allowNull: true },
-    chain_id: { type: dataTypes.STRING, allowNull: false },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
-    deleted_at: { type: dataTypes.DATE, allowNull: true },
-    token_threshold: { type: dataTypes.INTEGER, allowNull: true },
-    featured_in_sidebar: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
-    featured_in_new_post: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
-    default_offchain_template: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
-  }, {
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-    deletedAt: 'deleted_at',
-    tableName: 'OffchainTopics',
-    underscored: true,
-    paranoid: true,
-    defaultScope: {
-      attributes: {
-        exclude: [ 'created_at', 'updated_at', 'deleted_at' ],
-      }
+  const OffchainTopic = <OffchainTopicModelStatic>sequelize.define(
+    'OffchainTopic',
+    {
+      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+      name: { type: dataTypes.STRING, allowNull: false },
+      description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
+      telegram: { type: dataTypes.STRING, allowNull: true },
+      chain_id: { type: dataTypes.STRING, allowNull: false },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
+      deleted_at: { type: dataTypes.DATE, allowNull: true },
+      token_threshold: { type: dataTypes.INTEGER, allowNull: true },
+      featured_in_sidebar: {
+        type: dataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
+      featured_in_new_post: {
+        type: dataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
+      default_offchain_template: {
+        type: dataTypes.TEXT,
+        allowNull: false,
+        defaultValue: '',
+      },
     },
-  });
+    {
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+      deletedAt: 'deleted_at',
+      tableName: 'OffchainTopics',
+      underscored: true,
+      paranoid: true,
+      defaultScope: {
+        attributes: {
+          exclude: ['created_at', 'updated_at', 'deleted_at'],
+        },
+      },
+    }
+  );
 
   OffchainTopic.associate = (models) => {
     models.OffchainTopic.belongsTo(models.Chain, {

@@ -8,19 +8,26 @@ import EthereumAccounts from './accounts';
 export default class EthereumAccount extends Account<EthereumCoin> {
   public get balance(): Promise<EthereumCoin> {
     if (!this._Chain) return; // TODO
-    return this._Chain.api.eth.getBalance(this.address).then(
-      (v) => new EthereumCoin('ETH', new BN(v), false)
-    );
+    return this._Chain.api.eth
+      .getBalance(this.address)
+      .then((v) => new EthereumCoin('ETH', new BN(v), false));
   }
 
   protected _initialized: Promise<boolean>;
-  get initialized(): Promise<boolean> { return this._initialized; }
+  get initialized(): Promise<boolean> {
+    return this._initialized;
+  }
 
   private _Chain: EthereumChain;
   private _Accounts: EthereumAccounts;
 
   // CONSTRUCTORS
-  constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
+  constructor(
+    app: IApp,
+    ChainInfo: EthereumChain,
+    Accounts: EthereumAccounts,
+    address: string
+  ) {
     super(app, app.chain.meta.chain, address);
     if (!app.isModuleReady) {
       // defer chain initialization

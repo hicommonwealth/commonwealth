@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Contract, Signer } from 'ethers';
+import { Provider } from '@ethersproject/providers';
 
-import type { IERC777Sender } from "../IERC777Sender";
+import type { IERC777Sender } from '../IERC777Sender';
 
 export class IERC777Sender__factory {
   static connect(
@@ -21,40 +21,40 @@ const _abi = [
     constant: false,
     inputs: [
       {
-        internalType: "address",
-        name: "operator",
-        type: "address",
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
       },
       {
-        internalType: "address",
-        name: "from",
-        type: "address",
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
       },
       {
-        internalType: "address",
-        name: "to",
-        type: "address",
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
       },
       {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
       },
       {
-        internalType: "bytes",
-        name: "userData",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'userData',
+        type: 'bytes',
       },
       {
-        internalType: "bytes",
-        name: "operatorData",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'operatorData',
+        type: 'bytes',
       },
     ],
-    name: "tokensToSend",
+    name: 'tokensToSend',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ];

@@ -29,11 +29,11 @@ module.exports = {
     // options below to some value.
     //
     development: {
-      host: "127.0.0.1",     // Localhost (default: none)
-      port: 9545,            // Standard Ethereum port (default: none)
-      network_id: "*",       // Any network (default: none)
+      host: '127.0.0.1', // Localhost (default: none)
+      port: 9545, // Standard Ethereum port (default: none)
+      network_id: '*', // Any network (default: none)
       gas: 8000000,
-      gasPrice: 2000,  // 20 gwei (in wei) (default: 100 gwei)
+      gasPrice: 2000, // 20 gwei (in wei) (default: 100 gwei)
     },
 
     // Another network with more advanced options...
@@ -64,6 +64,6 @@ module.exports = {
       //  },
       //  evmVersion: "byzantium"
       // }
-    }
-  }
+    },
+  },
 };

@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Contract, Signer } from 'ethers';
+import { Provider } from '@ethersproject/providers';
 
-import type { Ownable } from "../Ownable";
+import type { Ownable } from '../Ownable';
 
 export class Ownable__factory {
   static connect(
@@ -20,80 +20,80 @@ const _abi = [
   {
     inputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "constructor",
+    stateMutability: 'nonpayable',
+    type: 'constructor',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        internalType: "address",
-        name: "previousOwner",
-        type: "address",
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
       },
       {
         indexed: true,
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
       },
     ],
-    name: "OwnershipTransferred",
-    type: "event",
+    name: 'OwnershipTransferred',
+    type: 'event',
   },
   {
     constant: true,
     inputs: [],
-    name: "isOwner",
+    name: 'isOwner',
     outputs: [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool",
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "owner",
+    name: 'owner',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [],
-    name: "renounceOwnership",
+    name: 'renounceOwnership',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [
       {
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
       },
     ],
-    name: "transferOwnership",
+    name: 'transferOwnership',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ];

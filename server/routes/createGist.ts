@@ -14,7 +14,12 @@ export const hashTwo = (left: string, right: string) => {
   );
 };
 
-const createGist = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const createGist = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
@@ -30,7 +35,9 @@ const createGist = async (models: DB, req: Request, res: Response, next: NextFun
   if (!req.body.description) {
     return res.status(400).json({ error: 'No description provided' });
   }
-  const socialAccount = await models.SocialAccount.findOne({ where: { provider: 'github', provider_userid: req.user.id } });
+  const socialAccount = await models.SocialAccount.findOne({
+    where: { provider: 'github', provider_userid: req.user.id },
+  });
   if (!socialAccount) {
     return next(new Error('No linked Github account'));
   }
@@ -41,7 +48,11 @@ const createGist = async (models: DB, req: Request, res: Response, next: NextFun
   const gistData = {
     public: true,
     description: 'Edgeware Identity Attestation',
-    files: { proof: { content: `Attesting to my edgeware account: II ${totalHash} II` } },
+    files: {
+      proof: {
+        content: `Attesting to my edgeware account: II ${totalHash} II`,
+      },
+    },
   };
 
   const githubAccessToken = socialAccount.access_token;

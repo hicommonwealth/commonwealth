@@ -10,12 +10,17 @@ export const Errors = {
   NoKey: 'Missing field: lookupKey',
 };
 
-export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (req.query && req.query.lookupKey) {
     const existingAuth = await models.HedgehogAuthentication.findOne({
       where: {
-        lookupKey: req.query.lookupKey
-      }
+        lookupKey: req.query.lookupKey,
+      },
     });
 
     if (existingAuth) {

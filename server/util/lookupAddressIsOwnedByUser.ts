@@ -3,7 +3,10 @@
 
 import { Request } from 'express';
 
-const lookupAddressIsOwnedByUser = async (models, req: Request): Promise<[any, string | null]> => {
+const lookupAddressIsOwnedByUser = async (
+  models,
+  req: Request
+): Promise<[any, string | null]> => {
   if (!req.user) {
     return [null, 'Not logged in'];
   }
@@ -12,11 +15,13 @@ const lookupAddressIsOwnedByUser = async (models, req: Request): Promise<[any, s
     return [null, 'Invalid public key/chain'];
   }
 
-  const author = await models.Address.findOne({ where: {
-    chain: req.body.author_chain,
-    address: req.body.address,
-    user_id: req.user.id,
-  } });
+  const author = await models.Address.findOne({
+    where: {
+      chain: req.body.author_chain,
+      address: req.body.address,
+      user_id: req.user.id,
+    },
+  });
   if (!author || !author.verified || author.user_id !== req.user.id) {
     return [null, 'Invalid public key/chain'];
   }

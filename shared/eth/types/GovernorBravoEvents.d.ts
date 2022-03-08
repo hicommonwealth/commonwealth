@@ -11,40 +11,40 @@ import {
   PopulatedTransaction,
   Contract,
   ContractTransaction,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface GovernorBravoEventsInterface extends ethers.utils.Interface {
   functions: {};
 
   events: {
-    "NewAdmin(address,address)": EventFragment;
-    "NewImplementation(address,address)": EventFragment;
-    "NewPendingAdmin(address,address)": EventFragment;
-    "ProposalCanceled(uint256)": EventFragment;
-    "ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)": EventFragment;
-    "ProposalExecuted(uint256)": EventFragment;
-    "ProposalQueued(uint256,uint256)": EventFragment;
-    "ProposalThresholdSet(uint256,uint256)": EventFragment;
-    "VoteCast(address,uint256,uint8,uint256,string)": EventFragment;
-    "VotingDelaySet(uint256,uint256)": EventFragment;
-    "VotingPeriodSet(uint256,uint256)": EventFragment;
+    'NewAdmin(address,address)': EventFragment;
+    'NewImplementation(address,address)': EventFragment;
+    'NewPendingAdmin(address,address)': EventFragment;
+    'ProposalCanceled(uint256)': EventFragment;
+    'ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)': EventFragment;
+    'ProposalExecuted(uint256)': EventFragment;
+    'ProposalQueued(uint256,uint256)': EventFragment;
+    'ProposalThresholdSet(uint256,uint256)': EventFragment;
+    'VoteCast(address,uint256,uint8,uint256,string)': EventFragment;
+    'VotingDelaySet(uint256,uint256)': EventFragment;
+    'VotingPeriodSet(uint256,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "NewAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewImplementation"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewPendingAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalCanceled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalExecuted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalQueued"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalThresholdSet"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VoteCast"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingDelaySet"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingPeriodSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'NewAdmin'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'NewImplementation'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'NewPendingAdmin'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCanceled'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCreated'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalExecuted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalQueued'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalThresholdSet'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VoteCast'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VotingDelaySet'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VotingPeriodSet'): EventFragment;
 }
 
 export class GovernorBravoEvents extends Contract {

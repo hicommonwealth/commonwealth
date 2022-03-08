@@ -8,16 +8,16 @@ module.exports = {
         allowNull: false,
         references: {
           model: 'OffchainThreads',
-          key: 'id'
-        }
+          key: 'id',
+        },
       },
       address_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'Addresses',
-          key: 'id'
-        }
+          key: 'id',
+        },
       },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -26,5 +26,5 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('Collaborations');
-  }
+  },
 };

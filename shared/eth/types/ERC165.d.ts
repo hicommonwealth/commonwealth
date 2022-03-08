@@ -12,24 +12,24 @@ import {
   Contract,
   ContractTransaction,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface ERC165Interface extends ethers.utils.Interface {
   functions: {
-    "supportsInterface(bytes4)": FunctionFragment;
+    'supportsInterface(bytes4)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "supportsInterface",
+    functionFragment: 'supportsInterface',
     values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "supportsInterface",
+    functionFragment: 'supportsInterface',
     data: BytesLike
   ): Result;
 
@@ -85,7 +85,7 @@ export class ERC165 extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
@@ -96,7 +96,7 @@ export class ERC165 extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "supportsInterface(bytes4)"(
+  'supportsInterface(bytes4)'(
     interfaceId: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
@@ -107,7 +107,7 @@ export class ERC165 extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -121,7 +121,7 @@ export class ERC165 extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -133,7 +133,7 @@ export class ERC165 extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

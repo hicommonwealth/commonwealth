@@ -8,26 +8,39 @@ export type HedgehogAuthenticationAttributes = {
   lookupKey: string;
   created_at?: Date;
   updated_at?: Date;
-}
+};
 
-export type HedgehogAuthenticationInstance = ModelInstance<HedgehogAuthenticationAttributes>;
+export type HedgehogAuthenticationInstance =
+  ModelInstance<HedgehogAuthenticationAttributes>;
 
-export type HedgehogAuthenticationModelStatic = ModelStatic<HedgehogAuthenticationInstance>;
+export type HedgehogAuthenticationModelStatic =
+  ModelStatic<HedgehogAuthenticationInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: typeof DataTypes
 ): HedgehogAuthenticationModelStatic => {
-  const HedgehogAuthentication = <HedgehogAuthenticationModelStatic>sequelize.define('HedgehogAuthentication', {
-    iv:         { type: dataTypes.STRING, allowNull: false },
-    cipherText: { type: dataTypes.STRING, allowNull: false },
-    lookupKey:  { type: dataTypes.STRING, allowNull: false, unique: true, primaryKey: true },
-  }, {
-    tableName: 'HedgehogAuthentications',
-    underscored: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-  });
+  const HedgehogAuthentication = <HedgehogAuthenticationModelStatic>(
+    sequelize.define(
+      'HedgehogAuthentication',
+      {
+        iv: { type: dataTypes.STRING, allowNull: false },
+        cipherText: { type: dataTypes.STRING, allowNull: false },
+        lookupKey: {
+          type: dataTypes.STRING,
+          allowNull: false,
+          unique: true,
+          primaryKey: true,
+        },
+      },
+      {
+        tableName: 'HedgehogAuthentications',
+        underscored: true,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+      }
+    )
+  );
 
   return HedgehogAuthentication;
 };

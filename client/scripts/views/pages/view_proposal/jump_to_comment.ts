@@ -1,10 +1,15 @@
 import $ from 'jquery';
 
 // highlight the header/body of a parent thread, or the body of a comment
-const jumpHighlightComment = (commentId, shouldScroll = true, animationDelayTime = 2000) => {
-  const $div = (commentId === 'parent' || commentId === 'body')
-    ? $('html, body').find('.ProposalHeader')
-    : $('html, body').find(`.comment-${commentId}`);
+const jumpHighlightComment = (
+  commentId,
+  shouldScroll = true,
+  animationDelayTime = 2000
+) => {
+  const $div =
+    commentId === 'parent' || commentId === 'body'
+      ? $('html, body').find('.ProposalHeader')
+      : $('html, body').find(`.comment-${commentId}`);
   if ($div.length === 0) return; // if the passed comment was invalid, abort
   const divTop = $div.position().top;
   const scrollTime = 500; // time to scroll

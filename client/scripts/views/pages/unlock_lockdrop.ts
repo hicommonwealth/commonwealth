@@ -41,14 +41,17 @@ const getWeb3 = (network, remoteUrl) => {
 const unlock = async (lockContractAddress, userAddress, web3) => {
   console.log(`Unlocking lock contract: ${lockContractAddress}`);
   // Create send transaction to unlock from the lock contract
-  web3.eth.sendTransaction({
-    from: userAddress,
-    to: lockContractAddress,
-    gas: 100000,
-  }, (err, result) => {
-    if (err) console.error(err);
-    else console.log(result);
-  });
+  web3.eth.sendTransaction(
+    {
+      from: userAddress,
+      to: lockContractAddress,
+      gas: 100000,
+    },
+    (err, result) => {
+      if (err) console.error(err);
+      else console.log(result);
+    }
+  );
 };
 
 const getLocks = async (lockdropContract, address) => {
@@ -57,12 +60,18 @@ const getLocks = async (lockdropContract, address) => {
     toBlock: 'latest',
     filter: {
       owner: address,
-    }
+    },
   });
 };
 
-const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) => {
-  console.log(`Fetching locks for account ${userAddress} for contract ${lockdropContractAddress}`);
+const getLocksForAddress = async (
+  userAddress,
+  lockdropContractAddress,
+  web3
+) => {
+  console.log(
+    `Fetching locks for account ${userAddress} for contract ${lockdropContractAddress}`
+  );
   const json = await $.getJSON('/static/contracts/edgeware/Lockdrop.json');
   const contract = new web3.eth.Contract(json.abi, lockdropContractAddress);
   const lockEvents = await getLocks(contract, userAddress);
@@ -86,7 +95,11 @@ const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) =>
 const fetchUnlocks = async (network = 'mainnet', remoteUrl = undefined) => {
   const web3 = getWeb3(network, remoteUrl);
   if (window['Web3'] || window['web3']) {
-    const results = await getLocksForAddress(state.user, state.contractAddress, web3);
+    const results = await getLocksForAddress(
+      state.user,
+      state.contractAddress,
+      web3
+    );
     state.locks = results;
     return results;
   } else {
@@ -106,7 +119,8 @@ const ContractOption = ({ contract, checked }) => {
       oninput: async (e) => {
         if (e.target.checked) {
           state.contract = contract;
-          state.contractAddress = state.contract === 'LockdropV1' ? LockdropV1 : LockdropV2;
+          state.contractAddress =
+            state.contract === 'LockdropV1' ? LockdropV1 : LockdropV2;
           state.locks = [];
         }
         m.redraw();
@@ -122,7 +136,15 @@ const ContractOption = ({ contract, checked }) => {
 
 const LockContractComponent = {
   view: (vnode) => {
-    const { owner, eth, lockContractAddr, unlockTime, unlockTimeMinutes, term, edgewareAddr } = vnode.attrs.data;
+    const {
+      owner,
+      eth,
+      lockContractAddr,
+      unlockTime,
+      unlockTimeMinutes,
+      term,
+      edgewareAddr,
+    } = vnode.attrs.data;
     const etherscanNet = 'https://etherscan.io/';
     return m('.LockContractComponent', [
       m('h3', [
@@ -133,23 +155,31 @@ const LockContractComponent = {
       ]),
       m('p', [
         'Owner Address: ',
-        m('a', {
-          href: `${etherscanNet}address/${owner}`,
-          target: '_blank',
-        }, owner),
+        m(
+          'a',
+          {
+            href: `${etherscanNet}address/${owner}`,
+            target: '_blank',
+          },
+          owner
+        ),
       ]),
       m('p', [
         'Lockdrop User Contract Address: ',
-        m('a', {
-          href: `${etherscanNet}address/${lockContractAddr}`,
-          target: '_blank',
-        }, lockContractAddr),
+        m(
+          'a',
+          {
+            href: `${etherscanNet}address/${lockContractAddr}`,
+            target: '_blank',
+          },
+          lockContractAddr
+        ),
       ]),
       m('p', `EDG Public Keys: ${edgewareAddr}`),
       m('p', [
         'Unlocks In: ',
         Math.round(Number(unlockTime || unlockTimeMinutes)),
-        ' minutes'
+        ' minutes',
       ]),
       m(Button, {
         intent: 'primary',
@@ -175,11 +205,11 @@ const LockContractComponent = {
           }
           m.redraw();
         },
-        label: 'Unlock'
+        label: 'Unlock',
       }),
       vnode.state.error && m('.error-message', vnode.state.error),
     ]);
-  }
+  },
 };
 
 const UnlockPage = {
@@ -188,7 +218,11 @@ const UnlockPage = {
     state.web3 = getWeb3('mainnet', undefined);
 
     // if an injected web3 provider e.g. Metamask is found, enable it
-    if (state.web3 && state.web3.currentProvider && state.web3.currentProvider.enable) {
+    if (
+      state.web3 &&
+      state.web3.currentProvider &&
+      state.web3.currentProvider.enable
+    ) {
       await state.web3.currentProvider.enable();
       if (state.web3.currentProvider.selectedAddress) {
         state.user = state.web3.currentProvider.selectedAddress;
@@ -199,84 +233,92 @@ const UnlockPage = {
     }
   },
   view: (vnode) => {
-    return m(Sublayout, {
-      class: 'UnlockPage',
-    }, [
-      m('.container', [
-        m('.content', [
-          m('h3', 'Unlock with Metamask'),
-          m('.form-field', [
-            m('.form-left', [
-              m('.caption', [
-                'Select lockdrop contract'
-              ]),
-              m(Input, {
-                id: 'LOCKDROP_CONTRACT_ADDRESS',
-                type: 'text',
-                fluid: true,
-                value: state.contract === 'LockdropV1' ? LockdropV1 : LockdropV2,
-                readonly: 'readonly',
-                disabled: true,
-              }),
-              m('.network-selector', [
-                ContractOption({ contract: 'LockdropV1', checked: true }),
-                ContractOption({ contract: 'LockdropV2', checked: false })
+    return m(
+      Sublayout,
+      {
+        class: 'UnlockPage',
+      },
+      [
+        m('.container', [
+          m('.content', [
+            m('h3', 'Unlock with Metamask'),
+            m('.form-field', [
+              m('.form-left', [
+                m('.caption', ['Select lockdrop contract']),
+                m(Input, {
+                  id: 'LOCKDROP_CONTRACT_ADDRESS',
+                  type: 'text',
+                  fluid: true,
+                  value:
+                    state.contract === 'LockdropV1' ? LockdropV1 : LockdropV2,
+                  readonly: 'readonly',
+                  disabled: true,
+                }),
+                m('.network-selector', [
+                  ContractOption({ contract: 'LockdropV1', checked: true }),
+                  ContractOption({ contract: 'LockdropV2', checked: false }),
+                ]),
               ]),
             ]),
-          ]),
-          m('.form-field', [
-            m('.form-left', [
-              m('.caption', [
-                'Enter the address you locked from'
-              ]),
-              m(Input, {
-                id: 'LOCKDROP_USER_ADDRESS',
-                type: 'text',
-                fluid: true,
-                placeholder: 'Enter an ETH address: 0x1234...',
-                value: state.user,
-                oninput: (e) => {
-                  state.locks = [];
-                  state.user = e.target.value;
-                },
-              }),
-            ])
-          ]),
-          m('.form-field', [
-            m('.form-left', [
-              m('.lock-user-contracts', (state.locks.length > 0)
-                ? state.locks.map((data) => m(LockContractComponent, { data }))
-                : m(Button, {
-                  intent: 'primary',
-                  rounded: true,
-                  onclick: async () => {
-                    vnode.state.error = null;
-                    if (!state.user) {
-                      vnode.state.error = 'Enter the address you locked from';
-                      m.redraw();
-                      return;
-                    }
-                    try {
-                      vnode.state.error = 'Please unlock Metamask (a web wallet is now required for unlocking)';
-                      m.redraw();
-                      const results : any[] = await fetchUnlocks();
-                      if (results.length === 0) {
-                        vnode.state.error = 'No locks from this address';
-                      }
-                    } catch (e) {
-                      vnode.state.error = e.toString();
-                    }
-                    m.redraw();
+            m('.form-field', [
+              m('.form-left', [
+                m('.caption', ['Enter the address you locked from']),
+                m(Input, {
+                  id: 'LOCKDROP_USER_ADDRESS',
+                  type: 'text',
+                  fluid: true,
+                  placeholder: 'Enter an ETH address: 0x1234...',
+                  value: state.user,
+                  oninput: (e) => {
+                    state.locks = [];
+                    state.user = e.target.value;
                   },
-                  label: 'Get locks'
-                })),
-              vnode.state.error && m('.error-message', vnode.state.error),
+                }),
+              ]),
+            ]),
+            m('.form-field', [
+              m('.form-left', [
+                m(
+                  '.lock-user-contracts',
+                  state.locks.length > 0
+                    ? state.locks.map((data) =>
+                        m(LockContractComponent, { data })
+                      )
+                    : m(Button, {
+                        intent: 'primary',
+                        rounded: true,
+                        onclick: async () => {
+                          vnode.state.error = null;
+                          if (!state.user) {
+                            vnode.state.error =
+                              'Enter the address you locked from';
+                            m.redraw();
+                            return;
+                          }
+                          try {
+                            vnode.state.error =
+                              'Please unlock Metamask (a web wallet is now required for unlocking)';
+                            m.redraw();
+                            const results: any[] = await fetchUnlocks();
+                            if (results.length === 0) {
+                              vnode.state.error = 'No locks from this address';
+                            }
+                          } catch (e) {
+                            vnode.state.error = e.toString();
+                          }
+                          m.redraw();
+                        },
+                        label: 'Get locks',
+                      })
+                ),
+                vnode.state.error && m('.error-message', vnode.state.error),
+              ]),
             ]),
           ]),
         ]),
-      ]),
-    ]);
-  }
+      ]
+    );
+  },
 };
 
 export default UnlockPage;

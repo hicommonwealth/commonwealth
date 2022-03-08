@@ -8,7 +8,7 @@ export const Errors = {
   InvalidThread: 'Invalid thread',
 };
 
-type ViewOffchainVotesReq = { thread_id: string, chain: string };
+type ViewOffchainVotesReq = { thread_id: string; chain: string };
 type ViewOffchainVotesResp = OffchainVoteAttributes[];
 
 const viewOffchainVotes = async (
@@ -37,7 +37,10 @@ const viewOffchainVotes = async (
     const votes = await models.OffchainVote.findAll({
       where: { thread_id: req.query.thread_id, chain: chain.id },
     });
-    return success(res, votes.map((v) => v.toJSON()));
+    return success(
+      res,
+      votes.map((v) => v.toJSON())
+    );
   } catch (err) {
     throw new ServerError(err);
   }

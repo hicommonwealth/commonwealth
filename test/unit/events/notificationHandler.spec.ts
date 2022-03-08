@@ -68,13 +68,13 @@ describe('Event Handler Tests', () => {
     aliceId = await setupUserAndEventSubscriptions(
       'alice@gmail.com',
       '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
-      'edgeware',
+      'edgeware'
     );
 
     bobId = await setupUserAndEventSubscriptions(
       'bob@gmail.com',
       '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
-      'edgeware',
+      'edgeware'
     );
   });
 
@@ -89,7 +89,7 @@ describe('Event Handler Tests', () => {
         endBlock: 100,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
-      }
+      },
     };
 
     const dbEvent = await setupDbEvent(event);
@@ -103,19 +103,25 @@ describe('Event Handler Tests', () => {
       where: {
         chain_event_id: dbEvent.id,
       },
-      include: [{
-        model: models['NotificationsRead'],
-        include: [{
-          model: models['Subscription'],
-          where: {
-            subscriber_id: [aliceId, bobId]
-          }
-        }]
-      }]
-    })
+      include: [
+        {
+          model: models['NotificationsRead'],
+          include: [
+            {
+              model: models['Subscription'],
+              where: {
+                subscriber_id: [aliceId, bobId],
+              },
+            },
+          ],
+        },
+      ],
+    });
 
-    const userIds = notifications.map((n) => n.NotificationsRead.Subscription.subscriber_id);
-    assert.sameMembers(userIds, [ aliceId, bobId ]);
+    const userIds = notifications.map(
+      (n) => n.NotificationsRead.Subscription.subscriber_id
+    );
+    assert.sameMembers(userIds, [aliceId, bobId]);
   });
 
   it('should only include specified users if includeAddresses present', async () => {
@@ -128,7 +134,7 @@ describe('Event Handler Tests', () => {
         kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
         amount: '10000',
-      }
+      },
     };
 
     const dbEvent = await setupDbEvent(event);
@@ -142,20 +148,26 @@ describe('Event Handler Tests', () => {
       where: {
         chain_event_id: dbEvent.id,
       },
-      include: [{
-        model: models['NotificationsRead'],
-        include: [{
-          model: models['Subscription'],
-          where: {
-            subscriber_id: [aliceId, bobId]
-          }
-        }]
-      }]
+      include: [
+        {
+          model: models['NotificationsRead'],
+          include: [
+            {
+              model: models['Subscription'],
+              where: {
+                subscriber_id: [aliceId, bobId],
+              },
+            },
+          ],
+        },
+      ],
     });
 
     // should only notify bob
-    const userIds = notifications.map((n) => n.NotificationsRead.Subscription.subscriber_id);
-    assert.sameMembers(userIds, [ bobId ]);
+    const userIds = notifications.map(
+      (n) => n.NotificationsRead.Subscription.subscriber_id
+    );
+    assert.sameMembers(userIds, [bobId]);
   });
 
   it('should only exclude specified users if excludeAddresses present', async () => {
@@ -170,7 +182,7 @@ describe('Event Handler Tests', () => {
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
         endBlock: 101,
-      }
+      },
     };
 
     const dbEvent = await setupDbEvent(event);
@@ -185,20 +197,26 @@ describe('Event Handler Tests', () => {
       where: {
         chain_event_id: dbEvent.id,
       },
-      include: [{
-        model: models['NotificationsRead'],
-        include: [{
-          model: models['Subscription'],
-          where: {
-            subscriber_id: [aliceId, bobId]
-          }
-        }]
-      }]
+      include: [
+        {
+          model: models['NotificationsRead'],
+          include: [
+            {
+              model: models['Subscription'],
+              where: {
+                subscriber_id: [aliceId, bobId],
+              },
+            },
+          ],
+        },
+      ],
     });
 
     // should only notify alice, excluding bob
-    const userIds = notifications.map((n) => n.NotificationsRead.Subscription.subscriber_id);
-    assert.sameMembers(userIds, [ aliceId ]);
+    const userIds = notifications.map(
+      (n) => n.NotificationsRead.Subscription.subscriber_id
+    );
+    assert.sameMembers(userIds, [aliceId]);
   });
 
   it('should not emit notifications with unknown db event', async () => {
@@ -212,7 +230,7 @@ describe('Event Handler Tests', () => {
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
         endBlock: 101,
-      }
+      },
     };
 
     const eventHandler = new NotificationHandler(models);
@@ -238,11 +256,13 @@ describe('Event Handler Tests', () => {
         endBlock: 100,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
-      }
+      },
     };
 
     const dbEvent = await setupDbEvent(event);
-    const eventHandler = new NotificationHandler(models, null, [ SubstrateTypes.EventKind.DemocracyStarted ]);
+    const eventHandler = new NotificationHandler(models, null, [
+      SubstrateTypes.EventKind.DemocracyStarted,
+    ]);
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);

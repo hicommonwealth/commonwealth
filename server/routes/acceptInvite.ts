@@ -14,14 +14,19 @@ export const Errors = {
   CodeUpdateFailure: 'Failed to update invite code',
 };
 
-const acceptInvite = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const acceptInvite = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { inviteCode, address, reject } = req.body;
 
   const code = await models.InviteCode.findOne({
     where: {
       id: inviteCode,
       used: false,
-    }
+    },
   });
   if (!code) return next(new Error(Errors.NoInviteCodeFound(inviteCode)));
 
@@ -35,7 +40,7 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
   const addressObj = await models.Address.findOne({
     where: {
       address,
-    }
+    },
   });
   if (!addressObj) return next(new Error(Errors.NoAddressFound(address)));
 
@@ -49,7 +54,7 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
   }
 
   const chain = await models.Chain.findOne({
-    where: { id: code.chain_id }
+    where: { id: code.chain_id },
   });
   if (!chain) {
     return next(new Error(Errors.NoCommunityFound(code.chain_id)));
@@ -77,7 +82,11 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
 
   return res.json({
     status: 'Success',
-    result: { updatedCode: updatedCode.toJSON(), role: role.toJSON(), subscription: subscription.toJSON() }
+    result: {
+      updatedCode: updatedCode.toJSON(),
+      role: role.toJSON(),
+      subscription: subscription.toJSON(),
+    },
   });
 };
 

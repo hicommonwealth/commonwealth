@@ -12,24 +12,24 @@ import {
   Contract,
   ContractTransaction,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface IVotingStrategyInterface extends ethers.utils.Interface {
   functions: {
-    "getVotingPowerAt(address,uint256)": FunctionFragment;
+    'getVotingPowerAt(address,uint256)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getVotingPowerAt",
+    functionFragment: 'getVotingPowerAt',
     values: [string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getVotingPowerAt",
+    functionFragment: 'getVotingPowerAt',
     data: BytesLike
   ): Result;
 
@@ -86,7 +86,7 @@ export class IVotingStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getVotingPowerAt(address,uint256)"(
+    'getVotingPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -99,7 +99,7 @@ export class IVotingStrategy extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getVotingPowerAt(address,uint256)"(
+  'getVotingPowerAt(address,uint256)'(
     user: string,
     blockNumber: BigNumberish,
     overrides?: CallOverrides
@@ -112,7 +112,7 @@ export class IVotingStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getVotingPowerAt(address,uint256)"(
+    'getVotingPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -128,7 +128,7 @@ export class IVotingStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getVotingPowerAt(address,uint256)"(
+    'getVotingPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -142,7 +142,7 @@ export class IVotingStrategy extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getVotingPowerAt(address,uint256)"(
+    'getVotingPowerAt(address,uint256)'(
       user: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides

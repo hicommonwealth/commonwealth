@@ -60,5 +60,5 @@ module.exports = {
     //   permission: 'admin',
     //   offchain_community_id: 'internal',
     // }]);
-  }
+  },
 };

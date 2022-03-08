@@ -43,11 +43,11 @@ export type OffchainThreadAttributes = {
   ChainEntity?: ChainEntityAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
-}
+};
 
 export type OffchainThreadInstance = ModelInstance<OffchainThreadAttributes> & {
   // no mixins used
-}
+};
 
 export type OffchainThreadModelStatic = ModelStatic<OffchainThreadInstance>;
 
@@ -97,7 +97,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
-      last_commented_on: { type: dataTypes.DATE, allowNull: true }
+      last_commented_on: { type: dataTypes.DATE, allowNull: true },
     },
     {
       timestamps: true,

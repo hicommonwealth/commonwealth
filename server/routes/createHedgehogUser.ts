@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { successResponse } from '../util/apiHelpers';
 import { factory, formatFilename } from '../../shared/logging';
-import { redirectWithLoginError, redirectWithLoginSuccess } from './finishEmailLogin';
+import {
+  redirectWithLoginError,
+  redirectWithLoginSuccess,
+} from './finishEmailLogin';
 import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -12,7 +15,12 @@ export const Errors = {
   MissingField: 'Missing one of the required fields: username, walletAddress',
 };
 
-export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const body = req.body;
 
   if (body.username && body.walletAddress) {
@@ -20,7 +28,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     const existingUser = await models.HedgehogUser.findOne({
       where: {
         username,
-      }
+      },
     });
 
     if (existingUser) {
@@ -30,7 +38,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     try {
       const hedgehogObj = await models.HedgehogUser.create({
         username,
-        walletAddress: body.walletAddress
+        walletAddress: body.walletAddress,
       });
 
       return res.json({ status: 'Success', result: hedgehogObj.toJSON() });

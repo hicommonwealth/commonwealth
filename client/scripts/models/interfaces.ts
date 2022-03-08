@@ -27,18 +27,21 @@ export interface IChainModule<C extends Coin, A extends Account<C>> {
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void): ITXModalData;
+    cb?: (success: boolean) => void
+  ): ITXModalData;
 }
 
 // Implemented by a chain's account module. Store for account objects.
-export interface IAccountsModule<C extends Coin, A extends Account<C>> extends StorageModule {
+export interface IAccountsModule<C extends Coin, A extends Account<C>>
+  extends StorageModule {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
   get(address: string, keytype?: string): A;
 }
 
 // Offchain stores and management for discussion features.
-export interface IOffchainAccountsModule<C extends Coin, A extends Account<C>> extends StorageModule {
+export interface IOffchainAccountsModule<C extends Coin, A extends Account<C>>
+  extends StorageModule {
   get(address: string, chain?: string): A;
 }
 
@@ -61,13 +64,13 @@ export interface ITXModalData {
   txType: string;
   txData: {
     // subscribe to transaction events
-    events: EventEmitter,
+    events: EventEmitter;
 
     // get blob of tx data to sign
-    unsignedData: () => Promise<ITXData>,
+    unsignedData: () => Promise<ITXData>;
 
     // perform transaction
-    transact: (...args) => void,
+    transact: (...args) => void;
   };
 
   // callback triggered upon exit

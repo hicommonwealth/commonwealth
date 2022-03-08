@@ -9,7 +9,8 @@ module.exports = {
         { type: Sequelize.BOOLEAN },
         { transaction: t }
       );
-      await queryInterface.sequelize.query(`
+      await queryInterface.sequelize.query(
+        `
         UPDATE "OffchainThreads" 
         SET offchain_voting_enabled = true 
         WHERE offchain_voting_ends_at IS NOT NULL`,
@@ -21,7 +22,7 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn(
       'OffchainThreads',
-      'offchain_voting_enabled',
+      'offchain_voting_enabled'
     );
-  }
+  },
 };

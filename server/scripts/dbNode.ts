@@ -49,7 +49,9 @@ async function handleFatalError(
 ): Promise<void> {
   switch (type) {
     case 'rabbitmq':
-      log.error(`Rascal broker setup failed. Check the Rascal configuration file for errors.\n${error.stack}`);
+      log.error(
+        `Rascal broker setup failed. Check the Rascal configuration file for errors.\n${error.stack}`
+      );
       // TODO: shutdown dyno with heroku api
       process.exit(1);
       break;
@@ -76,7 +78,7 @@ async function handleFatalError(
 }
 
 class Erc20LoggingHandler extends IEventHandler {
-  private logger = {}
+  private logger = {};
   constructor(public tokenNames: string[]) {
     super();
   }
@@ -84,9 +86,13 @@ class Erc20LoggingHandler extends IEventHandler {
     if (this.tokenNames.includes(event.chain)) {
       // if logger for this specific token doesn't exist, create it - decreases computational cost of logging
       if (!this.logger[event.chain])
-        this.logger[event.chain] = factory.getLogger(addPrefix(__filename, ['Erc20', event.chain]));
+        this.logger[event.chain] = factory.getLogger(
+          addPrefix(__filename, ['Erc20', event.chain])
+        );
 
-      this.logger[event.chain].info(`Received event: ${JSON.stringify(event, null, 2)}`);
+      this.logger[event.chain].info(
+        `Received event: ${JSON.stringify(event, null, 2)}`
+      );
     }
     return null;
   }
@@ -108,17 +114,21 @@ async function mainProcess(
     ++runCount;
   }
 
-  const activeChains: string[] = Object.keys(listeners).map((listenerName): string => {
-    if (!listenerName.startsWith('erc20')) return listenerName;
-    else {
-      return listeners[listenerName].options.tokenNames;
+  const activeChains: string[] = Object.keys(listeners).map(
+    (listenerName): string => {
+      if (!listenerName.startsWith('erc20')) return listenerName;
+      else {
+        return listeners[listenerName].options.tokenNames;
+      }
     }
-  });
+  );
   if (activeChains.length > 0)
     log.info(
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      `Starting scheduled process. Active chains: ${JSON.stringify(activeChains.flat())}`
+      `Starting scheduled process. Active chains: ${JSON.stringify(
+        activeChains.flat()
+      )}`
     );
 
   let query =
@@ -227,7 +237,9 @@ async function mainProcess(
 
           // add the rabbitmq handler for this chain
           listeners[tokenKey].eventHandlers['rabbitmq'] = { handler: producer };
-          listeners[tokenKey].eventHandlers['logger'] = { handler: erc20Logger };
+          listeners[tokenKey].eventHandlers['logger'] = {
+            handler: erc20Logger,
+          };
         } catch (error) {
           delete listeners[tokenKey];
           await handleFatalError(error, pool, tokenKey, 'listener-startup');
@@ -299,7 +311,7 @@ async function mainProcess(
           skipCatchup: false,
           verbose: false, // using this will print event before chain is added to it
           enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-          discoverReconnectRange
+          discoverReconnectRange,
         });
       } catch (error) {
         delete listeners[chain.id];
@@ -447,9 +459,12 @@ async function initializer(): Promise<void> {
   // setup sql client pool
   pool = new Pool({
     connectionString: DATABASE_URI,
-    ssl: process.env.NODE_ENV !== 'production' ? false : {
-      rejectUnauthorized: false,
-    },
+    ssl:
+      process.env.NODE_ENV !== 'production'
+        ? false
+        : {
+            rejectUnauthorized: false,
+          },
     max: 3,
   });
 
@@ -458,7 +473,11 @@ async function initializer(): Promise<void> {
   });
 
   // these requests cannot work locally
-  if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING === 'true') {
+  if (
+    (process.env.NODE_ENV === 'production' ||
+      process.env.NODE_ENV === 'staging') &&
+    process.env.USE_SLIDER_SCALING === 'true'
+  ) {
     log.info('Connecting to Heroku API');
     // get all dyno's list
     const res = await fetch(
@@ -532,18 +551,23 @@ async function initializer(): Promise<void> {
       }
     }
   } else {
-    workerNumber = process.env.WORKER_NUMBER ? Number(process.env.WORKER_NUMBER) : 0;
+    workerNumber = process.env.WORKER_NUMBER
+      ? Number(process.env.WORKER_NUMBER)
+      : 0;
     numWorkers = process.env.NUM_WORKERS ? Number(process.env.NUM_WORKERS) : 1;
   }
 
   log.info(`Worker Number: ${workerNumber}\tNumber of Workers: ${numWorkers}`);
 
-  producer = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
+  producer = new RabbitMqHandler(
+    <BrokerConfig>RabbitMQConfig,
+    'ChainEventsHandlersPublication'
+  );
   erc20Logger = new Erc20LoggingHandler([]);
   try {
     await producer.init();
   } catch (e) {
-    handleFatalError(e, pool, null, 'rabbitmq')
+    handleFatalError(e, pool, null, 'rabbitmq');
   }
 }
 

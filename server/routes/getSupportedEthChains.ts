@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
-import { getSupportedEthChainIds, getUrlsForEthChainId } from '../util/supportedEthChains';
+import {
+  getSupportedEthChainIds,
+  getUrlsForEthChainId,
+} from '../util/supportedEthChains';
 
 // TODO: fetch native currency as well as url to support adding chain on metamask
 const getSupportedEthChains = async (
@@ -16,7 +19,10 @@ const getSupportedEthChains = async (
     const chainId = +req.query.chain_id;
     try {
       const supportedChainUrls = await getUrlsForEthChainId(models, chainId);
-      return res.json({ status: 'Success', result: { [chainId]: supportedChainUrls } });
+      return res.json({
+        status: 'Success',
+        result: { [chainId]: supportedChainUrls },
+      });
     } catch (e) {
       return res.json({ status: 'Failure', message: e.message });
     }

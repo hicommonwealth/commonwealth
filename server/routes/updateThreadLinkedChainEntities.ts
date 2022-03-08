@@ -9,7 +9,12 @@ export const Errors = {
   ChainEntityAlreadyHasThread: 'Proposal linked to another thread',
 };
 
-const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const updateThreadLinkedChainEntities = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const { thread_id } = req.body;
@@ -21,13 +26,15 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
   });
   if (!thread) return next(new Error(Errors.NoThread));
   const userOwnedAddressIds = (await req.user.getAddresses())
-    .filter((addr) => !!addr.verified).map((addr) => addr.id);
-  if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
+  if (!userOwnedAddressIds.includes(thread.address_id)) {
+    // is not author
     const roles = await models.Role.findAll({
       where: {
-        address_id: { [Op.in]: userOwnedAddressIds, },
+        address_id: { [Op.in]: userOwnedAddressIds },
         permission: { [Op.in]: ['admin', 'moderator'] },
-      }
+      },
     });
     const role = roles.find((r) => {
       return r.chain_id === thread.chain;
@@ -35,14 +42,20 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
     if (!role) return next(new Error(Errors.NotAdminOrOwner));
   }
 
-  const chain_entity_ids = typeof req.body['chain_entity_id[]'] === 'string' ? [req.body['chain_entity_id[]']]
-    : req.body['chain_entity_id[]'] ? req.body['chain_entity_id[]'].map((id) => +id) : [];
+  const chain_entity_ids =
+    typeof req.body['chain_entity_id[]'] === 'string'
+      ? [req.body['chain_entity_id[]']]
+      : req.body['chain_entity_id[]']
+      ? req.body['chain_entity_id[]'].map((id) => +id)
+      : [];
 
   // remove any chain entities no longer linked to this thread
   const existingChainEntities = await models.ChainEntity.findAll({
-    where: { thread_id }
+    where: { thread_id },
   });
-  const entitiesToClear = existingChainEntities.filter((ce) => chain_entity_ids.indexOf(ce.id) === -1);
+  const entitiesToClear = existingChainEntities.filter(
+    (ce) => chain_entity_ids.indexOf(ce.id) === -1
+  );
   for (let i = 0; i < entitiesToClear.length; i++) {
     entitiesToClear[i].thread_id = null;
     await entitiesToClear[i].save();
@@ -50,11 +63,13 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
 
   // add any chain entities newly linked to this thread
   const existingEntityIds = existingChainEntities.map((ce) => ce.id);
-  const entityIdsToSet = chain_entity_ids.filter((id) => existingEntityIds.indexOf(id) === -1);
+  const entityIdsToSet = chain_entity_ids.filter(
+    (id) => existingEntityIds.indexOf(id) === -1
+  );
   const entitiesToSet = await models.ChainEntity.findAll({
     where: {
-      id: { [Op.in]: entityIdsToSet }
-    }
+      id: { [Op.in]: entityIdsToSet },
+    },
   });
   for (let i = 0; i < entitiesToSet.length; i++) {
     if (entitiesToSet[i].thread_id) {
@@ -65,22 +80,22 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
   }
 
   const finalThread = await models.OffchainThread.findOne({
-    where: { id: thread_id, },
+    where: { id: thread_id },
     include: [
       {
         model: models.Address,
-        as: 'Address'
+        as: 'Address',
       },
       {
         model: models.Address,
         // through: models.Collaboration,
-        as: 'collaborators'
+        as: 'collaborators',
       },
       models.OffchainAttachment,
       {
         model: models.OffchainTopic,
-        as: 'topic'
-      }
+        as: 'topic',
+      },
     ],
   });
 

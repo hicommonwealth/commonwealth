@@ -36,7 +36,11 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
     const api = await ApiPromise.create({ provider, ...sanitizedSpec });
     const version = api.runtimeVersion;
     const props = await api.rpc.system.properties();
-    log.info(`Fetched version: ${version.specName}:${version.specVersion} and properties ${JSON.stringify(props)}`);
+    log.info(
+      `Fetched version: ${version.specName}:${
+        version.specVersion
+      } and properties ${JSON.stringify(props)}`
+    );
     log.info('Disconnecting from chain...');
     await api.disconnect();
     return sanitizedSpec;

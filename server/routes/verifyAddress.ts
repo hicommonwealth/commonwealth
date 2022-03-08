@@ -11,10 +11,18 @@ import { KeyringOptions } from '@polkadot/keyring/types';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
 import { KeypairType } from '@polkadot/util-crypto/types';
 import * as ethUtil from 'ethereumjs-util';
-import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util';
+import {
+  recoverTypedSignature,
+  SignTypedDataVersion,
+} from '@metamask/eth-sig-util';
 
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature } from '@cosmjs/amino';
+import {
+  AminoSignResponse,
+  pubkeyToAddress,
+  serializeSignDoc,
+  decodeSignature,
+} from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
 
@@ -25,7 +33,12 @@ import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/key
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { DynamicTemplate, ChainBase, NotificationCategories, ChainNetwork } from '../../shared/types';
+import {
+  DynamicTemplate,
+  ChainBase,
+  NotificationCategories,
+  ChainNetwork,
+} from '../../shared/types';
 import AddressSwapper from '../util/addressSwapper';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -40,7 +53,7 @@ export const Errors = {
   AddressNF: 'Address not found',
   ExpiredToken: 'Token has expired, please re-register',
   InvalidSignature: 'Invalid signature, please re-register',
-  NoEmail: 'No email to alert'
+  NoEmail: 'No email to alert',
 };
 
 // Address.verifySignature
@@ -49,7 +62,7 @@ const verifySignature = async (
   chain: ChainInstance,
   addressModel: AddressInstance,
   user_id: number,
-  signatureString: string,
+  signatureString: string
 ): Promise<boolean> => {
   if (!chain) {
     log.error('no chain provided to verifySignature');
@@ -63,19 +76,29 @@ const verifySignature = async (
     //
     const address = decodeAddress(addressModel.address);
     const keyringOptions: KeyringOptions = { type: 'sr25519' };
-    if (!addressModel.keytype || (addressModel.keytype === 'sr25519' || addressModel.keytype === 'ed25519')) {
+    if (
+      !addressModel.keytype ||
+      addressModel.keytype === 'sr25519' ||
+      addressModel.keytype === 'ed25519'
+    ) {
       if (addressModel.keytype) {
         keyringOptions.type = addressModel.keytype as KeypairType;
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
-      const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
-      const signatureU8a = signatureString.slice(0, 2) === '0x'
-        ? hexToU8a(signatureString)
-        : hexToU8a(`0x${signatureString}`);
-      isValid = signerKeyring.verify(signedMessageNewline, signatureU8a, address)
-        || signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
+      const signedMessageNewline = stringToU8a(
+        `${addressModel.verification_token}\n`
+      );
+      const signedMessageNoNewline = stringToU8a(
+        addressModel.verification_token
+      );
+      const signatureU8a =
+        signatureString.slice(0, 2) === '0x'
+          ? hexToU8a(signatureString)
+          : hexToU8a(`0x${signatureString}`);
+      isValid =
+        signerKeyring.verify(signedMessageNewline, signatureU8a, address) ||
+        signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
     } else {
       log.error('Invalid keytype.');
       isValid = false;
@@ -103,7 +126,9 @@ const verifySignature = async (
     const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
     try {
       // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
-      const injAddrBuf = ethUtil.Address.fromString(lowercaseAddress.toString()).toBuffer();
+      const injAddrBuf = ethUtil.Address.fromString(
+        lowercaseAddress.toString()
+      ).toBuffer();
       const injAddress = bech32.encode('inj', bech32.toWords(injAddrBuf));
       if (addressModel.address === injAddress) isValid = true;
     } catch (e) {
@@ -115,7 +140,8 @@ const verifySignature = async (
     //
 
     // provided string should be serialized AminoSignResponse object
-    const { signed, signature: stdSignature }: AminoSignResponse = JSON.parse(signatureString);
+    const { signed, signature: stdSignature }: AminoSignResponse =
+      JSON.parse(signatureString);
 
     // we generate an address from the actual public key and verify that it matches,
     // this prevents people from using a different key to sign the message than
@@ -126,12 +152,21 @@ const verifySignature = async (
       log.error('No bech32 prefix found.');
       isValid = false;
     } else {
-      const generatedAddress = pubkeyToAddress(stdSignature.pub_key, bech32Prefix);
-      const generatedAddressWithCosmosPrefix = pubkeyToAddress(stdSignature.pub_key, 'cosmos');
+      const generatedAddress = pubkeyToAddress(
+        stdSignature.pub_key,
+        bech32Prefix
+      );
+      const generatedAddressWithCosmosPrefix = pubkeyToAddress(
+        stdSignature.pub_key,
+        'cosmos'
+      );
 
-      if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
+      if (
+        generatedAddress === addressModel.address ||
+        generatedAddressWithCosmosPrefix === addressModel.address
+      ) {
         // query chain ID from URL
-        const [ node ] = await chain.getChainNodes();
+        const [node] = await chain.getChainNodes();
         const client = await StargateClient.connect(node.url);
         const chainId = await client.getChainId();
         client.disconnect();
@@ -141,27 +176,40 @@ const verifySignature = async (
           addressModel.verification_token.trim(),
           signed.fee,
           signed.memo,
-          <any>signed.msgs,
+          <any>signed.msgs
         );
 
         // ensure correct document was signed
-        if (serializeSignDoc(signed).toString() === serializeSignDoc(generatedSignDoc).toString()) {
+        if (
+          serializeSignDoc(signed).toString() ===
+          serializeSignDoc(generatedSignDoc).toString()
+        ) {
           // ensure valid signature
           const { pubkey, signature } = decodeSignature(stdSignature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
-          const messageHash = new Sha256(serializeSignDoc(generatedSignDoc)).digest();
-          isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
+          const messageHash = new Sha256(
+            serializeSignDoc(generatedSignDoc)
+          ).digest();
+          isValid = await Secp256k1.verifySignature(
+            secpSignature,
+            messageHash,
+            pubkey
+          );
           if (!isValid) {
             log.error('Signature verification failed.');
           }
         } else {
-          log.error(`Sign doc not matched. Generated: ${JSON.stringify(generatedSignDoc)
-            }, found: ${JSON.stringify(signed)
-            }.`);
+          log.error(
+            `Sign doc not matched. Generated: ${JSON.stringify(
+              generatedSignDoc
+            )}, found: ${JSON.stringify(signed)}.`
+          );
           isValid = false;
         }
       } else {
-        log.error(`Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`);
+        log.error(
+          `Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`
+        );
         isValid = false;
       }
     }
@@ -170,19 +218,26 @@ const verifySignature = async (
     // ethereum address handling
     //
     try {
-      const [ node ] = await chain.getChainNodes();
-      const typedMessage = constructTypedMessage(node.eth_chain_id || 1, addressModel.verification_token.trim());
+      const [node] = await chain.getChainNodes();
+      const typedMessage = constructTypedMessage(
+        node.eth_chain_id || 1,
+        addressModel.verification_token.trim()
+      );
       const address = recoverTypedSignature({
         data: typedMessage,
         signature: signatureString.trim(),
-        version: SignTypedDataVersion.V4
+        version: SignTypedDataVersion.V4,
       });
-      isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
+      isValid = addressModel.address.toLowerCase() === address.toLowerCase();
       if (!isValid) {
-        log.info(`Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`);
+        log.info(
+          `Eth verification failed for ${addressModel.address}: does not match recovered address ${address}`
+        );
       }
     } catch (e) {
-      log.info(`Eth verification failed for ${addressModel.address}: ${e.message}`)
+      log.info(
+        `Eth verification failed for ${addressModel.address}: ${e.message}`
+      );
       isValid = false;
     }
   } else if (chain.base === ChainBase.NEAR) {
@@ -195,7 +250,7 @@ const verifySignature = async (
     isValid = nacl.sign.detached.verify(
       Buffer.from(`${addressModel.verification_token}\n`),
       Buffer.from(sigObj, 'base64'),
-      Buffer.from(publicKey, 'base64'),
+      Buffer.from(publicKey, 'base64')
     );
   } else if (chain.base === ChainBase.Solana) {
     //
@@ -209,7 +264,7 @@ const verifySignature = async (
         isValid = nacl.sign.detached.verify(
           Buffer.from(`${addressModel.verification_token}`),
           Buffer.from(signatureString, 'base64'),
-          decodedAddress,
+          decodedAddress
         );
       } else {
         isValid = false;
@@ -256,9 +311,14 @@ const verifySignature = async (
   }
   await addressModel.save();
   return isValid;
-}
+};
 
-const verifyAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const verifyAddress = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   // Verify that a linked address is actually owned by its supposed user.
   if (!req.body.address) {
     return next(new Error(Errors.NoAddress));
@@ -271,33 +331,46 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
   }
 
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
+    where: { id: req.body.chain },
   });
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
 
-  const encodedAddress = chain.base === ChainBase.Substrate
-    ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
-    : req.body.address;
+  const encodedAddress =
+    chain.base === ChainBase.Substrate
+      ? AddressSwapper({
+          address: req.body.address,
+          currentPrefix: chain.ss58_prefix,
+        })
+      : req.body.address;
 
-  const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: encodedAddress }
-  });
+  const existingAddress = await models.Address.scope('withPrivateData').findOne(
+    {
+      where: { chain: req.body.chain, address: encodedAddress },
+    }
+  );
   if (!existingAddress) {
     return next(new Error(Errors.AddressNF));
   } else {
     // first, check whether the token has expired
     const expiration = existingAddress.verification_token_expires;
-    if (expiration && +expiration <= +(new Date())) {
+    if (expiration && +expiration <= +new Date()) {
       return next(new Error(Errors.ExpiredToken));
     }
     // check for validity
-    const isAddressTransfer = !!existingAddress.verified && req.user && existingAddress.user_id !== req.user.id;
+    const isAddressTransfer =
+      !!existingAddress.verified &&
+      req.user &&
+      existingAddress.user_id !== req.user.id;
     const oldId = existingAddress.user_id;
     try {
       const valid = await verifySignature(
-        models, chain, existingAddress, (req.user ? req.user.id : null), req.body.signature
+        models,
+        chain,
+        existingAddress,
+        req.user ? req.user.id : null,
+        req.body.signature
       );
       if (!valid) {
         return next(new Error(Errors.InvalidSignature));
@@ -310,7 +383,9 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
     // has been transferred to someone else
     if (isAddressTransfer) {
       try {
-        const user = await models.User.scope('withPrivateData').findOne({ where: { id: oldId } });
+        const user = await models.User.scope('withPrivateData').findOne({
+          where: { id: oldId },
+        });
         if (!user.email) {
           // users who register thru github don't have emails by default
           throw new Error(Errors.NoEmail);
@@ -325,7 +400,9 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
           },
         };
         await sgMail.send(msg);
-        log.info(`Sent address move email: ${req.body.address} transferred to a new account`);
+        log.info(
+          `Sent address move email: ${req.body.address} transferred to a new account`
+        );
       } catch (e) {
         log.error(`Could not send address move email for: ${req.body.address}`);
       }
@@ -349,7 +426,7 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
           result: {
             user,
             message: 'Logged in',
-          }
+          },
         });
       });
     }

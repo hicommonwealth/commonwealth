@@ -7,10 +7,16 @@ import { DB } from '../database';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  MutuallyExclusive: 'Cannot select mutually exclusive offchain threads and proposals only options',
+  MutuallyExclusive:
+    'Cannot select mutually exclusive offchain threads and proposals only options',
 };
 
-const bulkComments = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const bulkComments = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
@@ -26,11 +32,14 @@ const bulkComments = async (models: DB, req: Request, res: Response, next: NextF
   }
   const comments = await models.OffchainComment.findAll({
     where: whereOptions,
-    include: [ models.Address, models.OffchainAttachment ],
+    include: [models.Address, models.OffchainAttachment],
     order: [['created_at', 'DESC']],
   });
 
-  return res.json({ status: 'Success', result: comments.map((c) => c.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: comments.map((c) => c.toJSON()),
+  });
 };
 
 export default bulkComments;

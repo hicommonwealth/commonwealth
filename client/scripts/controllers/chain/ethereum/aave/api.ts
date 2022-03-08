@@ -6,7 +6,7 @@ import {
   GovernanceStrategy,
   GovernanceStrategy__factory,
   AaveTokenV2,
-  AaveTokenV2__factory
+  AaveTokenV2__factory,
 } from 'eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
@@ -21,16 +21,24 @@ export interface AaveExecutor {
 
 export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
   private _Governance: IAaveGovernanceV2;
-  public get Governance() { return this._Governance; }
+  public get Governance() {
+    return this._Governance;
+  }
 
   private _Strategy: GovernanceStrategy;
-  public get Strategy() { return this._Strategy; }
+  public get Strategy() {
+    return this._Strategy;
+  }
 
   private _Token: AaveTokenV2;
-  public get Token() { return this._Token; }
+  public get Token() {
+    return this._Token;
+  }
 
   private _Executors: AaveExecutor[];
-  public get Executors() { return this._Executors; }
+  public get Executors() {
+    return this._Executors;
+  }
 
   public getExecutor(executorAddress: string): AaveExecutor {
     return this.Executors.find((ex) => ex.address === executorAddress);
@@ -51,13 +59,20 @@ export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
       // which haven't also been unauthorized later
       const isValid = await this.Governance.isExecutorAuthorized(address);
       if (isValid) {
-        const executor = Executor__factory.connect(address, this.Contract.provider);
+        const executor = Executor__factory.connect(
+          address,
+          this.Contract.provider
+        );
         await executor.deployed();
 
         // fetch constants
         const gracePeriod = +(await executor.GRACE_PERIOD());
-        const minimumQuorum = new BN((await executor.MINIMUM_QUORUM()).toString());
-        const voteDifferential = new BN((await executor.VOTE_DIFFERENTIAL()).toString());
+        const minimumQuorum = new BN(
+          (await executor.MINIMUM_QUORUM()).toString()
+        );
+        const voteDifferential = new BN(
+          (await executor.VOTE_DIFFERENTIAL()).toString()
+        );
         const delay = +(await executor.getDelay());
         this._Executors.push({
           contract: executor,
@@ -72,7 +87,10 @@ export default class AaveApi extends ContractApi<IAaveGovernanceV2> {
 
     // fetch strategy from governance
     const strategyAddress = await this.Governance.getGovernanceStrategy();
-    this._Strategy = GovernanceStrategy__factory.connect(strategyAddress, this.Contract.provider);
+    this._Strategy = GovernanceStrategy__factory.connect(
+      strategyAddress,
+      this.Contract.provider
+    );
     await this._Strategy.deployed();
   }
 }

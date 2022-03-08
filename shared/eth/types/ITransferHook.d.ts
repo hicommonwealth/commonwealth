@@ -13,23 +13,23 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface ITransferHookInterface extends ethers.utils.Interface {
   functions: {
-    "onTransfer(address,address,uint256)": FunctionFragment;
+    'onTransfer(address,address,uint256)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "onTransfer",
+    functionFragment: 'onTransfer',
     values: [string, string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: "onTransfer", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'onTransfer', data: BytesLike): Result;
 
   events: {};
 }
@@ -85,7 +85,7 @@ export class ITransferHook extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "onTransfer(address,address,uint256)"(
+    'onTransfer(address,address,uint256)'(
       from: string,
       to: string,
       amount: BigNumberish,
@@ -100,7 +100,7 @@ export class ITransferHook extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "onTransfer(address,address,uint256)"(
+  'onTransfer(address,address,uint256)'(
     from: string,
     to: string,
     amount: BigNumberish,
@@ -115,7 +115,7 @@ export class ITransferHook extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "onTransfer(address,address,uint256)"(
+    'onTransfer(address,address,uint256)'(
       from: string,
       to: string,
       amount: BigNumberish,
@@ -133,7 +133,7 @@ export class ITransferHook extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "onTransfer(address,address,uint256)"(
+    'onTransfer(address,address,uint256)'(
       from: string,
       to: string,
       amount: BigNumberish,
@@ -149,7 +149,7 @@ export class ITransferHook extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "onTransfer(address,address,uint256)"(
+    'onTransfer(address,address,uint256)'(
       from: string,
       to: string,
       amount: BigNumberish,

@@ -11,11 +11,17 @@ export const Errors = {
   MustBeAdmin: 'Must be admin',
   MissingParams: 'Must provide chain ID, name, symbol, network, and node url',
   NodeExists: 'Node already exists',
-  MustSpecifyContract: 'This is a contract, you must specify a contract address',
-  InvalidJSON: 'Substrate spec supplied has invalid JSON'
+  MustSpecifyContract:
+    'This is a contract, you must specify a contract address',
+  InvalidJSON: 'Substrate spec supplied has invalid JSON',
 };
 
-const addChainNode = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const addChainNode = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -23,12 +29,12 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
     return next(new Error(Errors.MustBeAdmin));
   }
   if (
-    !req.body.id?.trim()
-    || !req.body.name?.trim()
-    || !req.body.symbol?.trim()
-    || !req.body.network?.trim()
-    || !req.body.node_url?.trim()
-    || !req.body.base?.trim()
+    !req.body.id?.trim() ||
+    !req.body.name?.trim() ||
+    !req.body.symbol?.trim() ||
+    !req.body.network?.trim() ||
+    !req.body.node_url?.trim() ||
+    !req.body.base?.trim()
   ) {
     return next(new Error(Errors.MissingParams));
   }
@@ -36,24 +42,28 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
   let sanitizedSpec;
   if (req.body.substrate_spec) {
     try {
-      sanitizedSpec = await testSubstrateSpec(req.body.substrate_spec, req.body.node_url);
+      sanitizedSpec = await testSubstrateSpec(
+        req.body.substrate_spec,
+        req.body.node_url
+      );
     } catch (e) {
       return next(new Error('Failed to validate Substrate Spec'));
     }
   }
 
-  let chain = await models.Chain.findOne({ where: {
-    // TODO: should we only check id?
-    [Op.or]: [
-      { id: req.body.id },
-      { name: req.body.name }
-    ]
-  } });
+  let chain = await models.Chain.findOne({
+    where: {
+      // TODO: should we only check id?
+      [Op.or]: [{ id: req.body.id }, { name: req.body.name }],
+    },
+  });
   if (chain) {
-    const existingNode = await models.ChainNode.findOne({ where: {
-      chain: chain.id,
-      url: req.body.node_url,
-    } });
+    const existingNode = await models.ChainNode.findOne({
+      where: {
+        chain: chain.id,
+        url: req.body.node_url,
+      },
+    });
     if (existingNode) {
       return next(new Error(Errors.NodeExists));
     }
@@ -80,7 +90,11 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
     });
   }
 
-  if (chain.type === ChainType.DAO && !req.body.address && req.body.base !== ChainBase.NEAR) {
+  if (
+    chain.type === ChainType.DAO &&
+    !req.body.address &&
+    req.body.base !== ChainBase.NEAR
+  ) {
     return next(new Error(Errors.MustSpecifyContract));
   }
 

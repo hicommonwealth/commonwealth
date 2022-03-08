@@ -13,26 +13,26 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface IERC20PermitInterface extends ethers.utils.Interface {
   functions: {
-    "DOMAIN_SEPARATOR()": FunctionFragment;
-    "nonces(address)": FunctionFragment;
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
+    'DOMAIN_SEPARATOR()': FunctionFragment;
+    'nonces(address)': FunctionFragment;
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "DOMAIN_SEPARATOR",
+    functionFragment: 'DOMAIN_SEPARATOR',
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "nonces", values: [string]): string;
+  encodeFunctionData(functionFragment: 'nonces', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "permit",
+    functionFragment: 'permit',
     values: [
       string,
       string,
@@ -45,11 +45,11 @@ interface IERC20PermitInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "DOMAIN_SEPARATOR",
+    functionFragment: 'DOMAIN_SEPARATOR',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'nonces', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'permit', data: BytesLike): Result;
 
   events: {};
 }
@@ -100,11 +100,11 @@ export class IERC20Permit extends Contract {
   functions: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<[string]>;
+    'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<[string]>;
 
     nonces(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -120,7 +120,7 @@ export class IERC20Permit extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -134,11 +134,11 @@ export class IERC20Permit extends Contract {
 
   DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
-  "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<string>;
+  'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<string>;
 
   nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "nonces(address)"(
+  'nonces(address)'(
     owner: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -154,7 +154,7 @@ export class IERC20Permit extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+  'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
     owner: string,
     spender: string,
     value: BigNumberish,
@@ -168,11 +168,11 @@ export class IERC20Permit extends Contract {
   callStatic: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<string>;
+    'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<string>;
 
     nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -188,7 +188,7 @@ export class IERC20Permit extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -205,11 +205,11 @@ export class IERC20Permit extends Contract {
   estimateGas: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -225,7 +225,7 @@ export class IERC20Permit extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -240,7 +240,7 @@ export class IERC20Permit extends Contract {
   populateTransaction: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "DOMAIN_SEPARATOR()"(
+    'DOMAIN_SEPARATOR()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -249,7 +249,7 @@ export class IERC20Permit extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -265,7 +265,7 @@ export class IERC20Permit extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,

@@ -122,16 +122,14 @@ const PrivacyPage: m.Component<{}> = {
     return m('.PrivacyPage', [
       m(HeaderLandingPage, {
         scrollHeader: false,
-        navs: [
-          { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-        ],
+        navs: [{ text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' }],
       }),
       m('.forum-container', [
         m('h1.page-title', 'Privacy Policy'),
         renderMultilineText(PrivacyPolicy),
       ]),
     ]);
-  }
+  },
 };
 
 export default PrivacyPage;

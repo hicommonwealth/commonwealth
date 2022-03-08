@@ -13,24 +13,24 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface IERC777SenderInterface extends ethers.utils.Interface {
   functions: {
-    "tokensToSend(address,address,address,uint256,bytes,bytes)": FunctionFragment;
+    'tokensToSend(address,address,address,uint256,bytes,bytes)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "tokensToSend",
+    functionFragment: 'tokensToSend',
     values: [string, string, string, BigNumberish, BytesLike, BytesLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "tokensToSend",
+    functionFragment: 'tokensToSend',
     data: BytesLike
   ): Result;
 
@@ -91,7 +91,7 @@ export class IERC777Sender extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "tokensToSend(address,address,address,uint256,bytes,bytes)"(
+    'tokensToSend(address,address,address,uint256,bytes,bytes)'(
       operator: string,
       from: string,
       to: string,
@@ -112,7 +112,7 @@ export class IERC777Sender extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "tokensToSend(address,address,address,uint256,bytes,bytes)"(
+  'tokensToSend(address,address,address,uint256,bytes,bytes)'(
     operator: string,
     from: string,
     to: string,
@@ -133,7 +133,7 @@ export class IERC777Sender extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "tokensToSend(address,address,address,uint256,bytes,bytes)"(
+    'tokensToSend(address,address,address,uint256,bytes,bytes)'(
       operator: string,
       from: string,
       to: string,
@@ -157,7 +157,7 @@ export class IERC777Sender extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "tokensToSend(address,address,address,uint256,bytes,bytes)"(
+    'tokensToSend(address,address,address,uint256,bytes,bytes)'(
       operator: string,
       from: string,
       to: string,
@@ -179,7 +179,7 @@ export class IERC777Sender extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "tokensToSend(address,address,address,uint256,bytes,bytes)"(
+    'tokensToSend(address,address,address,uint256,bytes,bytes)'(
       operator: string,
       from: string,
       to: string,

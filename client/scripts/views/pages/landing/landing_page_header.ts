@@ -14,7 +14,8 @@ interface IState {
 }
 
 // eslint-disable-next-line max-len
-const INITIAL_HEADER_STYLE =  'bg-white static lg:flex lg:flex-row lg:justify-between lg:items-center p-4 lg:mx-auto lg:p-0 lg:px-20 px-10  shadow-lg ';
+const INITIAL_HEADER_STYLE =
+  'bg-white static lg:flex lg:flex-row lg:justify-between lg:items-center p-4 lg:mx-auto lg:p-0 lg:px-20 px-10  shadow-lg ';
 
 const triggerMenu = () => {
   const headerClass = document.getElementById('landing-page');
@@ -102,7 +103,8 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                 m(
                   'a',
                   {
-                    class: ' block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline',
+                    class:
+                      ' block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline',
                     onclick: () => app.modals.create({ modal: LoginModal }),
                   },
                   [
@@ -133,9 +135,9 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                 class: 'inline mr-1.5 close',
                 src: 'static/img/close.svg',
                 alt: 'Close icon',
-              })
+              }),
             ]
-          )
+          ),
         ]
       )
     );

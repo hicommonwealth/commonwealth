@@ -7,7 +7,7 @@ import {
   AccountId,
   RegistrarInfo,
   IdentityJudgement,
-  IdentityFields
+  IdentityFields,
 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { Data } from '@polkadot/types';
@@ -17,9 +17,12 @@ import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateIdentity, { ISubstrateIdentity } from './identity';
 
-class SubstrateIdentityStore extends PersistentStore<ISubstrateIdentity, SubstrateIdentity> { }
+class SubstrateIdentityStore extends PersistentStore<
+  ISubstrateIdentity,
+  SubstrateIdentity
+> {}
 
-export type SuperCodec = [ AccountId, Data ] & Codec;
+export type SuperCodec = [AccountId, Data] & Codec;
 export type IdentityInfoProps = {
   display?: any;
   legal?: any;
@@ -34,36 +37,60 @@ export type IdentityInfoProps = {
 
 class SubstrateIdentities implements StorageModule {
   private _initialized: boolean = false;
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
   private _initializing: boolean = false;
-  public get initializing() { return this._initializing; }
+  public get initializing() {
+    return this._initializing;
+  }
 
   protected _disabled: boolean = false;
-  public get disabled() { return this._disabled; }
-  public disable() { this._disabled = true; }
+  public get disabled() {
+    return this._disabled;
+  }
+  public disable() {
+    this._disabled = true;
+  }
 
   private _store: SubstrateIdentityStore;
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
   private _registrars: Array<RegistrarInfo | null>; // with gaps
-  public get registrars() { return this._registrars; }
+  public get registrars() {
+    return this._registrars;
+  }
 
   private _fieldDeposit: SubstrateCoin;
   private _basicDeposit: SubstrateCoin;
   private _subAcctDeposit: SubstrateCoin;
   private _maxSubAccts: number;
   private _maxAddlFields: number;
-  public get fieldDeposit() { return this._fieldDeposit; }
-  public get basicDeposit() { return this._basicDeposit; }
-  public get subAcctDeposit() { return this._subAcctDeposit; }
-  public get maxSubAccts() { return this._maxSubAccts; }
-  public get maxAddlFields() { return this._maxAddlFields; }
+  public get fieldDeposit() {
+    return this._fieldDeposit;
+  }
+  public get basicDeposit() {
+    return this._basicDeposit;
+  }
+  public get subAcctDeposit() {
+    return this._subAcctDeposit;
+  }
+  public get maxSubAccts() {
+    return this._maxSubAccts;
+  }
+  public get maxAddlFields() {
+    return this._maxAddlFields;
+  }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -94,7 +121,10 @@ class SubstrateIdentities implements StorageModule {
     return this.store.getById(address);
   }
 
-  public async init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public async init(
+    ChainInfo: SubstrateChain,
+    Accounts: SubstrateAccounts
+  ): Promise<void> {
     this._disabled = !ChainInfo.api.query.identity;
     if (this._initializing || this._initialized || this.disabled) return;
     this._initializing = true;
@@ -105,7 +135,12 @@ class SubstrateIdentities implements StorageModule {
       this._app.chain.id,
       'identity',
       (s: ISubstrateIdentity) => {
-        const id = new SubstrateIdentity(ChainInfo, Accounts, this, Accounts.fromAddress(s.address));
+        const id = new SubstrateIdentity(
+          ChainInfo,
+          Accounts,
+          this,
+          Accounts.fromAddress(s.address)
+        );
         id.deserialize(s);
         return id;
       }
@@ -129,7 +164,8 @@ class SubstrateIdentities implements StorageModule {
     // this._maxAddlFields = +api.consts.identity.maxAdditionalFields;
     if (!this._basicDeposit) this._basicDeposit = this._Chain.coins(10, true);
     if (!this._fieldDeposit) this._fieldDeposit = this._Chain.coins(2.5, true);
-    if (!this._subAcctDeposit) this._subAcctDeposit = this._Chain.coins(2, true);
+    if (!this._subAcctDeposit)
+      this._subAcctDeposit = this._Chain.coins(2, true);
     if (!this._maxSubAccts) this._maxSubAccts = 100;
     if (!this._maxAddlFields) this._maxAddlFields = 100;
 
@@ -147,7 +183,9 @@ class SubstrateIdentities implements StorageModule {
     const info = this._Chain.createType('IdentityInfo', data);
 
     // compute the basic required balance for the registration
-    let requiredBalance = this.basicDeposit.add(this.fieldDeposit.muln(info.additional.length));
+    let requiredBalance = this.basicDeposit.add(
+      this.fieldDeposit.muln(info.additional.length)
+    );
 
     // compare with preexisting deposit from old registration, if exists
     const oldId = this.store.getById(who.address);
@@ -167,30 +205,43 @@ class SubstrateIdentities implements StorageModule {
     );
   }
 
-  public setRegistrarFeeTx(who: SubstrateAccount, regIdx: number, fee: SubstrateCoin) {
+  public setRegistrarFeeTx(
+    who: SubstrateAccount,
+    regIdx: number,
+    fee: SubstrateCoin
+  ) {
     return this._Chain.createTXModalData(
       who,
       (api: ApiPromise) => api.tx.identity.setFee(regIdx, fee),
       'setFee',
-      `registrar ${regIdx} updates fee to ${fee.format(true)}`,
+      `registrar ${regIdx} updates fee to ${fee.format(true)}`
     );
   }
 
-  public setRegistrarAccountTx(who: SubstrateAccount, regIdx: number, newAcct: SubstrateAccount) {
+  public setRegistrarAccountTx(
+    who: SubstrateAccount,
+    regIdx: number,
+    newAcct: SubstrateAccount
+  ) {
     return this._Chain.createTXModalData(
       who,
-      (api: ApiPromise) => api.tx.identity.setAccountId(regIdx, newAcct.address),
+      (api: ApiPromise) =>
+        api.tx.identity.setAccountId(regIdx, newAcct.address),
       'setAccountId',
-      `registrar ${regIdx} updates account to ${newAcct.address}`,
+      `registrar ${regIdx} updates account to ${newAcct.address}`
     );
   }
 
-  public setRegistrarFieldsTx(who: SubstrateAccount, regIdx: number, fields: IdentityFields) {
+  public setRegistrarFieldsTx(
+    who: SubstrateAccount,
+    regIdx: number,
+    fields: IdentityFields
+  ) {
     return this._Chain.createTXModalData(
       who,
       (api: ApiPromise) => api.tx.identity.setFields(regIdx, fields),
       'setFee',
-      `registrar ${regIdx} updates fields`,
+      `registrar ${regIdx} updates fields`
     );
   }
 
@@ -202,19 +253,22 @@ class SubstrateIdentities implements StorageModule {
   ) {
     return this._Chain.createTXModalData(
       who,
-      (api: ApiPromise) => api.tx.identity.provideJudgement(
-        regIdx,
-        target.account.address,
-        judgement as any // PalletIdentityJudgment
-      ),
+      (api: ApiPromise) =>
+        api.tx.identity.provideJudgement(
+          regIdx,
+          target.account.address,
+          judgement as any // PalletIdentityJudgment
+        ),
       'providejudgement',
-      `registrar ${regIdx} provides judgement for identity ${target.username}`,
+      `registrar ${regIdx} provides judgement for identity ${target.username}`
     );
   }
 
   // requires RegistrarOrigin or Root!
   public addRegistrarMethod(account: SubstrateAccount): Call {
-    const func = this._Chain.getTxMethod('identity', 'addRegistrar', [ account.address ]);
+    const func = this._Chain.getTxMethod('identity', 'addRegistrar', [
+      account.address,
+    ]);
     return func;
   }
 
@@ -223,7 +277,9 @@ class SubstrateIdentities implements StorageModule {
     if (!target.exists) {
       throw new Error('target identity does not exist');
     }
-    const func = this._Chain.getTxMethod('identity', 'killIdentity', [ target.account.address ]);
+    const func = this._Chain.getTxMethod('identity', 'killIdentity', [
+      target.account.address,
+    ]);
     return func;
   }
 }

@@ -119,14 +119,14 @@ describe('Identity Chain Event Handler Tests', () => {
     const data = {
       bio: 'test bio',
       headline: 'test headline',
-      name: 'test name'
+      name: 'test name',
     };
     res = await modelUtils.updateProfile({
       chain: 'edgeware',
       address,
       data: JSON.stringify(data),
       jwt,
-      skipChainFetch: true
+      skipChainFetch: true,
     });
   });
 
@@ -140,9 +140,9 @@ describe('Identity Chain Event Handler Tests', () => {
         displayName: 'alice',
         judgements: [
           ['bob', SubstrateTypes.IdentityJudgement.KnownGood],
-          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality]
-        ]
-      }
+          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality],
+        ],
+      },
     };
 
     const handler = new IdentityHandler(models, 'edgeware');
@@ -151,7 +151,7 @@ describe('Identity Chain Event Handler Tests', () => {
     assert.equal(profile.identity, 'alice');
     assert.deepEqual(profile.judgements, {
       bob: SubstrateTypes.IdentityJudgement.KnownGood,
-      charlie: SubstrateTypes.IdentityJudgement.LowQuality
+      charlie: SubstrateTypes.IdentityJudgement.LowQuality,
     });
   });
 
@@ -163,8 +163,8 @@ describe('Identity Chain Event Handler Tests', () => {
         kind: SubstrateTypes.EventKind.IdentitySet,
         who: address,
         displayName: 'alice',
-        judgements: []
-      }
+        judgements: [],
+      },
     };
     const judgementEvent: CWEvent<SubstrateTypes.IJudgementGiven> = {
       blockNumber: 10,
@@ -173,8 +173,8 @@ describe('Identity Chain Event Handler Tests', () => {
         kind: SubstrateTypes.EventKind.JudgementGiven,
         who: address,
         registrar: 'dave',
-        judgement: SubstrateTypes.IdentityJudgement.Reasonable
-      }
+        judgement: SubstrateTypes.IdentityJudgement.Reasonable,
+      },
     };
 
     const handler = new IdentityHandler(models, 'edgeware');
@@ -184,7 +184,7 @@ describe('Identity Chain Event Handler Tests', () => {
     assert.equal(profile.address_id, address_id);
     assert.equal(profile.identity, 'alice');
     assert.deepEqual(profile.judgements, {
-      dave: SubstrateTypes.IdentityJudgement.Reasonable
+      dave: SubstrateTypes.IdentityJudgement.Reasonable,
     });
   });
 
@@ -198,9 +198,9 @@ describe('Identity Chain Event Handler Tests', () => {
         displayName: 'alice',
         judgements: [
           ['bob', SubstrateTypes.IdentityJudgement.KnownGood],
-          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality]
-        ]
-      }
+          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality],
+        ],
+      },
     };
     const judgementEvent: CWEvent<SubstrateTypes.IJudgementGiven> = {
       blockNumber: 10,
@@ -209,8 +209,8 @@ describe('Identity Chain Event Handler Tests', () => {
         kind: SubstrateTypes.EventKind.JudgementGiven,
         who: address,
         registrar: 'dave',
-        judgement: SubstrateTypes.IdentityJudgement.Reasonable
-      }
+        judgement: SubstrateTypes.IdentityJudgement.Reasonable,
+      },
     };
 
     const handler = new IdentityHandler(models, 'edgeware');
@@ -219,7 +219,7 @@ describe('Identity Chain Event Handler Tests', () => {
     assert.equal(preJudgementProfile.identity, 'alice');
     assert.deepEqual(preJudgementProfile.judgements, {
       bob: SubstrateTypes.IdentityJudgement.KnownGood,
-      charlie: SubstrateTypes.IdentityJudgement.LowQuality
+      charlie: SubstrateTypes.IdentityJudgement.LowQuality,
     });
 
     await handler.handle(judgementEvent, null);
@@ -229,7 +229,7 @@ describe('Identity Chain Event Handler Tests', () => {
     assert.deepEqual(profile.judgements, {
       bob: SubstrateTypes.IdentityJudgement.KnownGood,
       charlie: SubstrateTypes.IdentityJudgement.LowQuality,
-      dave: SubstrateTypes.IdentityJudgement.Reasonable
+      dave: SubstrateTypes.IdentityJudgement.Reasonable,
     });
   });
 
@@ -243,17 +243,17 @@ describe('Identity Chain Event Handler Tests', () => {
         displayName: 'alice',
         judgements: [
           ['bob', SubstrateTypes.IdentityJudgement.KnownGood],
-          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality]
-        ]
-      }
+          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality],
+        ],
+      },
     };
     const clearEvent: CWEvent<SubstrateTypes.IIdentityCleared> = {
       blockNumber: 10,
       network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentityCleared,
-        who: address
-      }
+        who: address,
+      },
     };
 
     const handler = new IdentityHandler(models, 'edgeware');
@@ -275,17 +275,17 @@ describe('Identity Chain Event Handler Tests', () => {
         displayName: 'alice',
         judgements: [
           ['bob', SubstrateTypes.IdentityJudgement.KnownGood],
-          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality]
-        ]
-      }
+          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality],
+        ],
+      },
     };
     const killedEvent: CWEvent<SubstrateTypes.IIdentityKilled> = {
       blockNumber: 10,
       network: SupportedNetwork.Substrate,
       data: {
         kind: SubstrateTypes.EventKind.IdentityKilled,
-        who: address
-      }
+        who: address,
+      },
     };
 
     const handler = new IdentityHandler(models, 'edgeware');
@@ -307,9 +307,9 @@ describe('Identity Chain Event Handler Tests', () => {
         displayName: 'bob',
         judgements: [
           ['alice', SubstrateTypes.IdentityJudgement.KnownGood],
-          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality]
-        ]
-      }
+          ['charlie', SubstrateTypes.IdentityJudgement.LowQuality],
+        ],
+      },
     };
 
     const handler = new IdentityHandler(models, 'edgeware');
@@ -327,8 +327,8 @@ describe('Identity Chain Event Handler Tests', () => {
         kind: SubstrateTypes.EventKind.JudgementGiven,
         who: address,
         registrar: 'dave',
-        judgement: SubstrateTypes.IdentityJudgement.Reasonable
-      }
+        judgement: SubstrateTypes.IdentityJudgement.Reasonable,
+      },
     };
 
     const handler = new IdentityHandler(models, 'edgeware');
@@ -348,8 +348,8 @@ describe('Identity Chain Event Handler Tests', () => {
         referendumIndex: 0,
         endBlock: 100,
         proposalHash: 'hash',
-        voteThreshold: 'Supermajorityapproval'
-      }
+        voteThreshold: 'Supermajorityapproval',
+      },
     };
     const handler = new IdentityHandler(models, 'edgeware');
     await handler.handle(event, null);

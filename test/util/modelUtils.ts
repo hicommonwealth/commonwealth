@@ -33,10 +33,14 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({ address, chain });
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
-    const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
+    const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
     const data = constructTypedMessage(chain_id, token);
     const privateKey = Buffer.from(keypair.getPrivateKey(), 'hex');
-    const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
+    const signature = signTypedData({
+      privateKey,
+      data,
+      version: SignTypedDataVersion.V4,
+    });
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')
@@ -148,8 +152,7 @@ export interface CommentArgs {
   root_id?: any;
 }
 export const createComment = async (args: CommentArgs) => {
-  const { chain, address, jwt, text, parentCommentId, root_id } =
-    args;
+  const { chain, address, jwt, text, parentCommentId, root_id } = args;
   const res = await chai.request
     .agent(app)
     .post('/api/createComment')

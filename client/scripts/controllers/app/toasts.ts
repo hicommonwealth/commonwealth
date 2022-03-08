@@ -1,6 +1,13 @@
 import $ from 'jquery';
 import m from 'mithril';
-import { Toast, Toaster, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
+import {
+  Toast,
+  Toaster,
+  ToasterPosition,
+  Intent,
+  Icons,
+  Size,
+} from 'construct-ui';
 import { uuidv4 } from 'lib/util';
 import app from 'state';
 

@@ -2,7 +2,11 @@ import moment from 'moment';
 
 import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
-import { NotificationCategories, ProposalType, ChainType } from '../../shared/types';
+import {
+  NotificationCategories,
+  ProposalType,
+  ChainType,
+} from '../../shared/types';
 
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -21,7 +25,8 @@ export const Errors = {
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
-  InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to post',
+  InsufficientTokenBalance:
+    "Users need to hold some of the community's tokens to post",
   BalanceCheckFailed: 'Could not verify user token balance',
 };
 
@@ -45,13 +50,19 @@ const createThread = async (
     if (!title || !title.trim()) {
       return next(new Error(Errors.ForumMissingTitle));
     }
-    if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
+    if (
+      (!body || !body.trim()) &&
+      (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
+    ) {
       return next(new Error(Errors.NoBodyOrAttachments));
     }
     try {
       const quillDoc = JSON.parse(decodeURIComponent(body));
-      if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === ''
-          && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
+      if (
+        quillDoc.ops.length === 1 &&
+        quillDoc.ops[0].insert.trim() === '' &&
+        (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
+      ) {
         return next(new Error(Errors.NoBodyOrAttachments));
       }
     } catch (e) {
@@ -84,12 +95,12 @@ const createThread = async (
 
   // New threads get an empty version history initialized, which is passed
   // the thread's first version, formatted on the frontend with timestamps
-  const firstVersion : any = {
+  const firstVersion: any = {
     timestamp: moment(),
     author: req.body.author,
-    body: decodeURIComponent(req.body.body)
+    body: decodeURIComponent(req.body.body),
   };
-  const version_history : string[] = [ JSON.stringify(firstVersion) ];
+  const version_history: string[] = [JSON.stringify(firstVersion)];
 
   const threadContent = {
     chain: chain.id,
@@ -123,7 +134,9 @@ const createThread = async (
     }
   } else {
     if (chain.topics?.length) {
-      return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
+      return next(
+        Error('Must pass a topic_name string and/or a numeric topic_id')
+      );
     }
   }
 
@@ -137,7 +150,10 @@ const createThread = async (
       },
     });
     if (!req.user.isAdmin && isAdmin.length === 0) {
-      const canReact = await tokenBalanceCache.validateTopicThreshold(topic_id, req.body.address);
+      const canReact = await tokenBalanceCache.validateTopicThreshold(
+        topic_id,
+        req.body.address
+      );
       if (!canReact) {
         return next(new Error(Errors.BalanceCheckFailed));
       }
@@ -152,7 +168,10 @@ const createThread = async (
   }
   // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
   try {
-    if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
+    if (
+      req.body['attachments[]'] &&
+      typeof req.body['attachments[]'] === 'string'
+    ) {
       await models.OffchainAttachment.create({
         attachable: 'thread',
         attachment_id: thread.id,
@@ -160,12 +179,16 @@ const createThread = async (
         description: 'image',
       });
     } else if (req.body['attachments[]']) {
-      await Promise.all(req.body['attachments[]'].map((u) => models.OffchainAttachment.create({
-        attachable: 'thread',
-        attachment_id: thread.id,
-        url: u,
-        description: 'image',
-      })));
+      await Promise.all(
+        req.body['attachments[]'].map((u) =>
+          models.OffchainAttachment.create({
+            attachable: 'thread',
+            attachment_id: thread.id,
+            url: u,
+            description: 'image',
+          })
+        )
+      );
     }
   } catch (err) {
     return next(err);
@@ -212,20 +235,22 @@ const createThread = async (
     where: {
       category_id: NotificationCategories.NewThread,
       object_id: location,
-    }
+    },
   });
-  await Promise.all(subscribers.map((s) => {
-    return models.Subscription.findOrCreate({
-      where: {
-        subscriber_id: s.subscriber_id,
-        category_id: NotificationCategories.NewComment,
-        object_id: `discussion_${finalThread.id}`,
-        offchain_thread_id: finalThread.id,
-        chain_id: finalThread.chain,
-        is_active: true,
-      },
-    });
-  }));
+  await Promise.all(
+    subscribers.map((s) => {
+      return models.Subscription.findOrCreate({
+        where: {
+          subscriber_id: s.subscriber_id,
+          category_id: NotificationCategories.NewComment,
+          object_id: `discussion_${finalThread.id}`,
+          offchain_thread_id: finalThread.id,
+          chain_id: finalThread.chain,
+          is_active: true,
+        },
+      });
+    })
+  );
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(body);
@@ -233,19 +258,21 @@ const createThread = async (
   try {
     const mentions = parseUserMentions(bodyText);
     if (mentions?.length > 0) {
-      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-        try {
-          return models.Address.findOne({
-            where: {
-              chain: mention[0] || null,
-              address: mention[1] || null,
-            },
-            include: [ models.User, models.Role ]
-          });
-        } catch (err) {
-          return next(new Error(err));
-        }
-      }));
+      mentionedAddresses = await Promise.all(
+        mentions.map(async (mention) => {
+          try {
+            return models.Address.findOne({
+              where: {
+                chain: mention[0] || null,
+                address: mention[1] || null,
+              },
+              include: [models.User, models.Role],
+            });
+          } catch (err) {
+            return next(new Error(err));
+          }
+        })
+      );
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
@@ -281,39 +308,42 @@ const createThread = async (
       body: finalThread.body,
     },
     req.wss,
-    excludedAddrs,
+    excludedAddrs
   );
 
   // notify mentioned users, given permissions are in place
-  if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
-    if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+  if (mentionedAddresses?.length > 0)
+    await Promise.all(
+      mentionedAddresses.map(async (mentionedAddress) => {
+        if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-    await models.Subscription.emitNotifications(
-      models,
-      NotificationCategories.NewMention,
-      `user-${mentionedAddress.User.id}`,
-      {
-        created_at: new Date(),
-        root_id: finalThread.id,
-        root_type: ProposalType.OffchainThread,
-        root_title: finalThread.title,
-        comment_text: finalThread.body,
-        chain_id: finalThread.chain,
-        author_address: finalThread.Address.address,
-        author_chain: finalThread.Address.chain,
-      },
-      {
-        user: finalThread.Address.address,
-        url: getProposalUrl('discussion', finalThread),
-        title: req.body.title,
-        bodyUrl: req.body.url,
-        chain: finalThread.chain,
-        body: finalThread.body,
-      },
-      req.wss,
-      [ finalThread.Address.address ],
+        await models.Subscription.emitNotifications(
+          models,
+          NotificationCategories.NewMention,
+          `user-${mentionedAddress.User.id}`,
+          {
+            created_at: new Date(),
+            root_id: finalThread.id,
+            root_type: ProposalType.OffchainThread,
+            root_title: finalThread.title,
+            comment_text: finalThread.body,
+            chain_id: finalThread.chain,
+            author_address: finalThread.Address.address,
+            author_chain: finalThread.Address.chain,
+          },
+          {
+            user: finalThread.Address.address,
+            url: getProposalUrl('discussion', finalThread),
+            title: req.body.title,
+            bodyUrl: req.body.url,
+            chain: finalThread.chain,
+            body: finalThread.body,
+          },
+          req.wss,
+          [finalThread.Address.address]
+        );
+      })
     );
-  }));
 
   // update author.last_active (no await)
   author.last_active = new Date();

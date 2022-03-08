@@ -6,13 +6,23 @@ import { requiresTypeSlug } from 'utils';
 import app from './state';
 import ThreadsController from './controllers/server/threads';
 
-export const pathIsDiscussion = (scope: string | null, path: string): boolean => {
-  return path.startsWith(`/${scope}/discussion`) || path.startsWith('/discussion');
-}
+export const pathIsDiscussion = (
+  scope: string | null,
+  path: string
+): boolean => {
+  return (
+    path.startsWith(`/${scope}/discussion`) || path.startsWith('/discussion')
+  );
+};
 
 // returns a URL path to a proposal based on its type and id, taking into account
 // custom domain prefixes as well.
-export const getProposalUrlPath = (type: ProposalType, id: string, omitActiveId = false, chainId?: string): string => {
+export const getProposalUrlPath = (
+  type: ProposalType,
+  id: string,
+  omitActiveId = false,
+  chainId?: string
+): string => {
   let basePath: string;
   const useTypeSlug = requiresTypeSlug(type);
   if (type === ProposalType.OffchainThread) {
@@ -27,7 +37,7 @@ export const getProposalUrlPath = (type: ProposalType, id: string, omitActiveId 
   } else {
     return `/${chainId || app.activeChainId()}${basePath}`;
   }
-}
+};
 
 export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
   if (c.base === ChainBase.CosmosSDK) return ProposalType.CosmosProposal;
@@ -36,7 +46,7 @@ export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
   if (c.network === ChainNetwork.Compound) return ProposalType.CompoundProposal;
   if (c.network === ChainNetwork.Aave) return ProposalType.AaveProposal;
   throw new Error(`Cannot determine proposal slug from chain ${c.id}.`);
-}
+};
 
 export const proposalSlugToClass = () => {
   const mmap = new Map<

@@ -39,7 +39,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
         endBlock: 100,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
-      }
+      },
     };
 
     const eventHandler = new MigrationHandler(models, 'edgeware');
@@ -53,14 +53,14 @@ describe('Edgeware Migration Event Handler Tests', () => {
       where: {
         chain_event_type_id: 'edgeware-democracy-started',
         block_number: 10,
-      }
+      },
     });
     assert.lengthOf(chainEvents, 1);
     assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
 
     const dbEventType = await dbEvent.getChainEventType();
     const chainEventType = await models['ChainEventType'].findOne({
-      where : { id: 'edgeware-democracy-started' }
+      where: { id: 'edgeware-democracy-started' },
     });
     assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
@@ -73,7 +73,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
         kind: SubstrateTypes.EventKind.PreimageNoted,
         proposalHash: 'hash',
         noter: 'Alice',
-      }
+      },
     };
     const currentEvent: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
@@ -85,9 +85,9 @@ describe('Edgeware Migration Event Handler Tests', () => {
         preimage: {
           method: 'method',
           section: 'section',
-          args: [ 'arg1', 'arg2' ],
-        }
-      }
+          args: ['arg1', 'arg2'],
+        },
+      },
     };
 
     const oldDbEvent = await setupDbEvent(legacyEvent);
@@ -100,14 +100,14 @@ describe('Edgeware Migration Event Handler Tests', () => {
       where: {
         chain_event_type_id: 'edgeware-preimage-noted',
         block_number: 10,
-      }
+      },
     });
     assert.lengthOf(chainEvents, 1);
     assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
 
     const dbEventType = await dbEvent.getChainEventType();
     const chainEventType = await models['ChainEventType'].findOne({
-      where : { id: 'edgeware-preimage-noted' }
+      where: { id: 'edgeware-preimage-noted' },
     });
     assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
@@ -121,7 +121,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
         kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
         amount: '10000',
-      }
+      },
     };
 
     const eventHandler = new MigrationHandler(models, 'edgeware');
@@ -138,13 +138,15 @@ describe('Edgeware Migration Event Handler Tests', () => {
       data: {
         kind: 'democracy-exploded',
         whoops: true,
-      }
+      },
     };
 
     const eventHandler = new MigrationHandler(models, 'edgeware');
 
     // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent<SubstrateTypes.IEventData>);
+    const dbEvent = await eventHandler.handle(
+      event as unknown as CWEvent<SubstrateTypes.IEventData>
+    );
     assert.equal(dbEvent, null);
   });
 });

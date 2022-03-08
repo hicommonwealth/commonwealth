@@ -11,7 +11,10 @@ import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
 
 function encodeEthAddress(address: string): string {
-  return bech32.encode('inj', bech32.toWords(Address.fromString(address).toBuffer()));
+  return bech32.encode(
+    'inj',
+    bech32.toWords(Address.fromString(address).toBuffer())
+  );
 }
 
 class InjectiveWebWalletController implements IWebWallet<string> {
@@ -29,7 +32,7 @@ class InjectiveWebWalletController implements IWebWallet<string> {
   public readonly specificChain = 'injective';
 
   public get available() {
-    return !!(window.ethereum);
+    return !!window.ethereum;
   }
 
   public get provider() {
@@ -49,7 +52,11 @@ class InjectiveWebWalletController implements IWebWallet<string> {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.personal.sign(message, this._ethAccounts[0], '');
+    const signature = await this._web3.eth.personal.sign(
+      message,
+      this._ethAccounts[0],
+      ''
+    );
     return signature;
   }
 
@@ -88,12 +95,17 @@ class InjectiveWebWalletController implements IWebWallet<string> {
   }
 
   public async initAccountsChanged() {
-    await this._web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
-      const encodedAccounts = accounts.map((a) => encodeEthAddress(a));
-      const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === encodedAccounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-    });
+    await this._web3.givenProvider.on(
+      'accountsChanged',
+      async (accounts: string[]) => {
+        const encodedAccounts = accounts.map((a) => encodeEthAddress(a));
+        const updatedAddress = app.user.activeAccounts.find(
+          (addr) => addr.address === encodedAccounts[0]
+        );
+        if (!updatedAddress) return;
+        await setActiveAccount(updatedAddress);
+      }
+    );
     // TODO: chainChanged, disconnect events
   }
 

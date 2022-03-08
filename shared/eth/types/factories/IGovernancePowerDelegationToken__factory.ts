@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Contract, Signer } from 'ethers';
+import { Provider } from '@ethersproject/providers';
 
-import type { IGovernancePowerDelegationToken } from "../IGovernancePowerDelegationToken";
+import type { IGovernancePowerDelegationToken } from '../IGovernancePowerDelegationToken';
 
 export class IGovernancePowerDelegationToken__factory {
   static connect(
@@ -24,30 +24,30 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "user",
-        type: "address",
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
       },
       {
-        internalType: "uint256",
-        name: "blockNumber",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'blockNumber',
+        type: 'uint256',
       },
       {
-        internalType: "enum IGovernancePowerDelegationToken.DelegationType",
-        name: "delegationType",
-        type: "uint8",
+        internalType: 'enum IGovernancePowerDelegationToken.DelegationType',
+        name: 'delegationType',
+        type: 'uint8',
       },
     ],
-    name: "getPowerAtBlock",
+    name: 'getPowerAtBlock',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
 ];

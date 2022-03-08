@@ -128,16 +128,14 @@ const TermsPage: m.Component<{}> = {
     return m('.TermsPage', [
       m(HeaderLandingPage, {
         scrollHeader: false,
-        navs: [
-          { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-        ],
+        navs: [{ text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' }],
       }),
       m('.forum-container', [
         m('h1.page-title', 'Terms of Service'),
         renderMultilineText(TermsOfService),
-      ])
+      ]),
     ]);
-  }
+  },
 };
 
 export default TermsPage;

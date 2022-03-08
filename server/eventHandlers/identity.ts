@@ -21,7 +21,9 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(
+      addPrefix(__filename, [event.network, event.chain])
+    );
 
     const chain = event.chain || this._chain;
 
@@ -67,9 +69,7 @@ export default class extends IEventHandler {
         const { name } = JSON.parse(profile.data);
         logName = name;
       }
-      log.debug(
-        `Discovered name '${profile.identity}' for ${logName}!`
-      );
+      log.debug(`Discovered name '${profile.identity}' for ${logName}!`);
     } else if (event.data.kind === SubstrateTypes.EventKind.JudgementGiven) {
       // if we don't have an identity saved yet for a judgement, do nothing
       // TODO: we can augment the judgement event to include all event data, but seems

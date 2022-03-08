@@ -1,7 +1,12 @@
-import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
+import SubstrateAccounts, {
+  SubstrateAccount,
+} from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
-import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
+import {
+  SubstrateCouncil,
+  SubstrateTechnicalCommittee,
+} from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import ChainEntityController from 'controllers/server/chain_entities';
@@ -35,10 +40,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     return !!this.chain?.timedOut;
   }
 
-  constructor(
-    meta: NodeInfo,
-    app: IApp,
-  ) {
+  constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
     this.chain = new SubstrateChain(this.app);
     this.accounts = new SubstrateAccounts(this.app);
@@ -55,7 +57,10 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
   public async initApi(additionalOptions?) {
     if (this.apiInitialized) return;
-    await this.chain.resetApi(this.meta, additionalOptions || this.meta.chain.substrateSpec);
+    await this.chain.resetApi(
+      this.meta,
+      additionalOptions || this.meta.chain.substrateSpec
+    );
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     await this.identities.init(this.chain, this.accounts);
@@ -71,17 +76,19 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public async deinit(): Promise<void> {
     await super.deinit();
     this.chain.deinitEventLoop();
-    await Promise.all([
-      this.phragmenElections,
-      this.council,
-      this.technicalCommittee,
-      this.democracyProposals,
-      this.democracy,
-      this.treasury,
-      this.bounties,
-      this.tips,
-      this.identities,
-    ].map((m) => m.initialized ? m.deinit() : Promise.resolve()));
+    await Promise.all(
+      [
+        this.phragmenElections,
+        this.council,
+        this.technicalCommittee,
+        this.democracyProposals,
+        this.democracy,
+        this.treasury,
+        this.bounties,
+        this.tips,
+        this.identities,
+      ].map((m) => (m.initialized ? m.deinit() : Promise.resolve()))
+    );
     this.accounts.deinit();
     this.chain.deinitMetadata();
     await this.chain.deinitApi();

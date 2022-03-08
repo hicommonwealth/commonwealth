@@ -14,24 +14,28 @@ describe('Thread queries', () => {
   it('query_thread_through_collabo', async () => {
     const chain = await models.Chain.findOne();
     expect(chain.id).to.not.be.null;
-    const address = (await models.Address.findOrCreate({
-      where: {
-        address: 'JhgYcbJOdWHLVFHJKLPhC12',
-        chain: chain.id,
-        verification_token: 'fgdfgd'
-      },
-    }))[0];
+    const address = (
+      await models.Address.findOrCreate({
+        where: {
+          address: 'JhgYcbJOdWHLVFHJKLPhC12',
+          chain: chain.id,
+          verification_token: 'fgdfgd',
+        },
+      })
+    )[0];
     expect(address.id).to.not.be.null;
     expect(address.id).to.be.greaterThan(0);
-    const thread = (await models.OffchainThread.findOrCreate({
-      where: {
-        chain: chain.id,
-        address_id: address.id,
-        title: 'title',
-        kind: 'kind',
-        stage: 'stage',
-      },
-    }))[0];
+    const thread = (
+      await models.OffchainThread.findOrCreate({
+        where: {
+          chain: chain.id,
+          address_id: address.id,
+          title: 'title',
+          kind: 'kind',
+          stage: 'stage',
+        },
+      })
+    )[0];
     expect(thread.id).to.be.greaterThan(0);
     expect(thread.address_id).to.to.be.greaterThan(0);
     const collaboration = await models.Collaboration.findOrCreate({
@@ -45,7 +49,7 @@ describe('Thread queries', () => {
       include: [
         {
           model: models.Address,
-          as: 'Address'
+          as: 'Address',
         },
         {
           model: models.Address,
@@ -54,10 +58,10 @@ describe('Thread queries', () => {
         },
         {
           model: models.OffchainTopic,
-          as: 'topic'
-        }
+          as: 'topic',
+        },
       ],
-      attributes: { exclude: [ 'version_history' ] },
+      attributes: { exclude: ['version_history'] },
       order: [['created_at', 'DESC']],
     });
     expect(threads).to.not.be.null;

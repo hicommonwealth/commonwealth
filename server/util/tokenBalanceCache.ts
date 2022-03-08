@@ -17,43 +17,59 @@ import { getUrlsForEthChainId } from './supportedEthChains';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-function getKey(chainBase: string, chainId: number, contract: string, address: string) {
+function getKey(
+  chainBase: string,
+  chainId: number,
+  contract: string,
+  address: string
+) {
   return `${chainBase}-${chainId}-${contract}-${address}`;
 }
 
 // map of addresses to balances
 interface CacheT {
   [cacheKey: string]: {
-    balance: BN,
+    balance: BN;
     fetchedAt: moment.Moment;
-  }
+  };
 }
 
 // Uses a tiny class so it's mockable for testing
 export class TokenBalanceProvider {
-  public async getEthTokenBalance(url: string, tokenAddress: string, userAddress: string): Promise<BN> {
+  public async getEthTokenBalance(
+    url: string,
+    tokenAddress: string,
+    userAddress: string
+  ): Promise<BN> {
     const provider = new Web3.providers.WebsocketProvider(url);
-    const api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider));
+    const api = ERC20__factory.connect(
+      tokenAddress,
+      new providers.Web3Provider(provider)
+    );
     await api.deployed();
     const balanceBigNum = await api.balanceOf(userAddress);
     provider.disconnect(1000, 'finished');
     return new BN(balanceBigNum.toString());
   }
 
-  public async getSplTokenBalance(cluster: solw3.Cluster, mint: string, user: string): Promise<BN> {
+  public async getSplTokenBalance(
+    cluster: solw3.Cluster,
+    mint: string,
+    user: string
+  ): Promise<BN> {
     const url = solw3.clusterApiUrl(cluster);
     const connection = new solw3.Connection(url);
     const mintPubKey = new solw3.PublicKey(mint);
     const userPubKey = new solw3.PublicKey(user);
     const { value } = await connection.getParsedTokenAccountsByOwner(
       userPubKey,
-      { mint: mintPubKey },
+      { mint: mintPubKey }
     );
-    const amount: string = value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount;
+    const amount: string =
+      value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount;
     return new BN(amount, 10);
   }
 }
-
 
 export default class TokenBalanceCache extends JobRunner<CacheT> {
   private models: DB;
@@ -61,7 +77,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     models: DB,
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
-    private readonly _balanceProvider = new TokenBalanceProvider(),
+    private readonly _balanceProvider = new TokenBalanceProvider()
   ) {
     super({}, noBalancePruneTimeS);
     this.models = models;
@@ -83,7 +99,10 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     return this.start();
   }
 
-  public async validateTopicThreshold(topicId: number, userAddress: string): Promise<boolean> {
+  public async validateTopicThreshold(
+    topicId: number,
+    userAddress: string
+  ): Promise<boolean> {
     if (!topicId || !userAddress) return true;
     try {
       const topic = await this.models.OffchainTopic.findOne({
@@ -97,9 +116,9 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
               // only support thresholds on token forums
               // TODO: can we support for token-backed DAOs as well?
               type: ChainType.Token,
-            } as WhereOptions<ChainAttributes>
+            } as WhereOptions<ChainAttributes>,
           },
-        ]
+        ],
       });
       if (!topic?.chain) {
         // if associated with an offchain community, or if not token forum, always allow
@@ -107,36 +126,50 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }
       const threshold = topic.token_threshold;
       if (threshold && threshold > 0) {
-        const nodes = await this.models.ChainNode.findAll({ where: { chain: topic.chain.id } });
-        if (!nodes || (topic.chain.base === ChainBase.Ethereum && !nodes[0].eth_chain_id)) {
+        const nodes = await this.models.ChainNode.findAll({
+          where: { chain: topic.chain.id },
+        });
+        if (
+          !nodes ||
+          (topic.chain.base === ChainBase.Ethereum && !nodes[0].eth_chain_id)
+        ) {
           throw new Error('Could not find chain node.');
         }
         const tokenBalance = await this.getBalance(
           topic.chain.base,
           topic.chain.id,
           userAddress,
-          nodes[0].eth_chain_id,
+          nodes[0].eth_chain_id
         );
-        log.info(`Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`);
-        return (new BN(tokenBalance)).gten(threshold);
+        log.info(
+          `Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`
+        );
+        return new BN(tokenBalance).gten(threshold);
       } else {
         return true;
       }
     } catch (err) {
-      log.warn(`Could not validate topic threshold for ${topicId}: ${err.message}`);
+      log.warn(
+        `Could not validate topic threshold for ${topicId}: ${err.message}`
+      );
       return false;
     }
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async getBalance(base: string, contractId: string, address: string, chainId?: number): Promise<BN> {
+  public async getBalance(
+    base: string,
+    contractId: string,
+    address: string,
+    chainId?: number
+  ): Promise<BN> {
     let contractAddress: string;
     // See if token is already in the database as a Chain
     const node = await this.models.ChainNode.findOne({
       where: {
         chain: contractId,
         eth_chain_id: chainId || null,
-      }
+      },
     });
     if (node?.address) {
       contractAddress = node.address;
@@ -148,7 +181,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
         where: {
           id: contractId,
           chain_id: chainId,
-        }
+        },
       });
       if (!tokenMeta?.address) throw new Error('unsupported token');
       contractAddress = tokenMeta.address;
@@ -158,13 +191,15 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
     // check the cache for the token balance
     const cacheKey = getKey(base, chainId, contractAddress, address);
-    const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
-      if (c[cacheKey]) {
-        return c[cacheKey].balance;
-      } else {
-        return undefined;
+    const result = await this.access(
+      async (c: CacheT): Promise<BN | undefined> => {
+        if (c[cacheKey]) {
+          return c[cacheKey].balance;
+        } else {
+          return undefined;
+        }
       }
-    }));
+    );
     if (result !== undefined) return result;
 
     // fetch balance if not found in cache
@@ -177,13 +212,21 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }
       const url = urls.url;
       try {
-        balance = await this._balanceProvider.getEthTokenBalance(url, contractAddress, address);
+        balance = await this._balanceProvider.getEthTokenBalance(
+          url,
+          contractAddress,
+          address
+        );
       } catch (e) {
         throw new Error(`Could not fetch token balance: ${e.message}`);
       }
     } else if (base === ChainBase.Solana) {
       try {
-        balance = await this._balanceProvider.getSplTokenBalance(node.url as solw3.Cluster, contractAddress, address);
+        balance = await this._balanceProvider.getSplTokenBalance(
+          node.url as solw3.Cluster,
+          contractAddress,
+          address
+        );
       } catch (e) {
         throw new Error(`Could not fetch token balance: ${e.message}`);
       }
@@ -192,9 +235,9 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     }
 
     // write fetched balance back to cache
-    await this.access((async (c: CacheT) => {
+    await this.access(async (c: CacheT) => {
       c[cacheKey] = { balance, fetchedAt };
-    }));
+    });
     return balance;
   }
 

@@ -15,7 +15,10 @@ const getTokenForum = async (
 ) => {
   const address = req.query.address;
   if (!address) {
-    return res.json({ status: 'Failure', message: 'Must provide token address' });
+    return res.json({
+      status: 'Failure',
+      message: 'Must provide token address',
+    });
   }
 
   // default to mainnet
@@ -24,7 +27,7 @@ const getTokenForum = async (
     where: {
       address: { [Op.iLike]: address },
       chain_id,
-    }
+    },
   });
   const urls = await getUrlsForEthChainId(models, chain_id);
   let url;
@@ -48,7 +51,10 @@ const getTokenForum = async (
     provider.disconnect(1000, 'finished');
     if (code === '0x') {
       // Account returns 0x, Smart contract returns bytecode
-      return res.json({ status: 'Failure', message: 'Must provide valid contract address' });
+      return res.json({
+        status: 'Failure',
+        message: 'Must provide valid contract address',
+      });
     }
     if (req.query.autocreate) {
       const result = await sequelize.transaction(async (t) => {
@@ -82,11 +88,17 @@ const getTokenForum = async (
       return res.json({ status: 'Success', result });
     } else {
       // only return token data if we do not autocreate
-      return res.json({ status: 'Success', token: token ? token.toJSON() : {} });
+      return res.json({
+        status: 'Success',
+        token: token ? token.toJSON() : {},
+      });
     }
   } catch (e) {
     log.error(e.message);
-    return res.json({ status: 'Failure', message: 'Failed to find or create chain' });
+    return res.json({
+      status: 'Failure',
+      message: 'Failed to find or create chain',
+    });
   }
 };
 

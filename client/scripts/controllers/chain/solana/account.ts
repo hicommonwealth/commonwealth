@@ -12,7 +12,9 @@ export default class SolanaAccount extends Account<SolanaToken> {
   private _Accounts: SolanaAccounts;
 
   private _balance: SolanaToken;
-  public get balance() { return this.updateBalance().then(() => this._balance); }
+  public get balance() {
+    return this.updateBalance().then(() => this._balance);
+  }
 
   public get publicKey() {
     return new solw3.PublicKey(this.address);
@@ -30,7 +32,12 @@ export default class SolanaAccount extends Account<SolanaToken> {
     }
   });
 
-  constructor(app: IApp, ChainInfo: SolanaChain, Accounts: SolanaAccounts, address: string) {
+  constructor(
+    app: IApp,
+    ChainInfo: SolanaChain,
+    Accounts: SolanaAccounts,
+    address: string
+  ) {
     super(app, app.chain.meta.chain, address);
     if (!app.isModuleReady) {
       // defer chain initialization

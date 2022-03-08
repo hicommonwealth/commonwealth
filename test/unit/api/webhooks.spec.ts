@@ -45,7 +45,10 @@ describe('Webhook Tests', () => {
     // get logged in address/user with JWT
     let result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
-    jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+    jwtToken = jwt.sign(
+      { id: result.user_id, email: result.email },
+      JWT_SECRET
+    );
     await modelUtils.updateRole({
       address_id: result.address_id,
       chainOrCommObj: { chain_id: chain },
@@ -57,13 +60,17 @@ describe('Webhook Tests', () => {
     // get logged in not admin address
     result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInNotAdminAddr = result.address;
-    notAdminJWT = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+    notAdminJWT = jwt.sign(
+      { id: result.user_id, email: result.email },
+      JWT_SECRET
+    );
   });
 
   describe('/createWebhook', () => {
     it('should create a webhook for a chain', async () => {
       const webhookUrl = faker.internet.url();
-      const res = await chai.request.agent(app)
+      const res = await chai.request
+        .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
@@ -76,18 +83,24 @@ describe('Webhook Tests', () => {
 
     it('should fail to create a duplicate webhook', async () => {
       const webhookUrl = faker.internet.url();
-      await chai.request.agent(app)
+      await chai.request
+        .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      let webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
+      let webhookUrls = await models['Webhook'].findAll({
+        where: { url: webhookUrl },
+      });
       expect(webhookUrls).to.have.length(1);
-      const errorRes = await chai.request.agent(app)
+      const errorRes = await chai.request
+        .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
       expectErrorOnResponse(500, Errors.NoDuplicates, errorRes);
-      webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
+      webhookUrls = await models['Webhook'].findAll({
+        where: { url: webhookUrl },
+      });
       expect(webhookUrls).to.have.length(1);
     });
 
@@ -95,12 +108,20 @@ describe('Webhook Tests', () => {
     // TODO: therefore our error is 401 rather than a 500 with the "Not logged in" message.
     it('should fail to create a webhook if not a user', async () => {
       const webhookUrl = faker.internet.url();
-      const errorRes = await chai.request.agent(app)
+      const errorRes = await chai.request
+        .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
-        .send({ address: notLoggedInAddr, chain, webhookUrl, jwt: jwt.sign({ id: -1, email: null }, JWT_SECRET) });
+        .send({
+          address: notLoggedInAddr,
+          chain,
+          webhookUrl,
+          jwt: jwt.sign({ id: -1, email: null }, JWT_SECRET),
+        });
       expectErrorOnResponse(401, undefined, errorRes);
-      const webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
+      const webhookUrls = await models['Webhook'].findAll({
+        where: { url: webhookUrl },
+      });
       expect(webhookUrls).to.have.length(0);
     });
   });
@@ -108,48 +129,65 @@ describe('Webhook Tests', () => {
   describe('/deleteWebhook', () => {
     it('should fail to create a webhook if not an admin', async () => {
       const webhookUrl = faker.internet.url();
-      const errorRes = await chai.request.agent(app)
+      const errorRes = await chai.request
+        .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
-        .send({ address: loggedInNotAdminAddr, chain, webhookUrl, auth: true, jwt: notAdminJWT });
+        .send({
+          address: loggedInNotAdminAddr,
+          chain,
+          webhookUrl,
+          auth: true,
+          jwt: notAdminJWT,
+        });
       expectErrorOnResponse(500, Errors.NotAdmin, errorRes);
-      const webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
+      const webhookUrls = await models['Webhook'].findAll({
+        where: { url: webhookUrl },
+      });
       expect(webhookUrls).to.have.length(0);
     });
 
     it('should delete a webhook', async () => {
       const webhookUrl = faker.internet.url();
-      let res = await chai.request.agent(app)
+      let res = await chai.request
+        .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      let webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
+      let webhookUrls = await models['Webhook'].findAll({
+        where: { url: webhookUrl },
+      });
       expect(webhookUrls).to.have.length(1);
-      res = await chai.request.agent(app)
+      res = await chai.request
+        .agent(app)
         .post('/api/deleteWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      webhookUrls = await models['Webhook'].findAll({ where: { url: webhookUrl } });
+      webhookUrls = await models['Webhook'].findAll({
+        where: { url: webhookUrl },
+      });
       expect(webhookUrls).to.have.length(0);
     });
 
     it('should fail to delete a non-existent webhook', async () => {
       const webhookUrl = faker.internet.url();
-      const errorRes = await chai.request.agent(app)
+      const errorRes = await chai.request
+        .agent(app)
         .post('/api/deleteWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
       expectErrorOnResponse(500, Errors.NoWebhookFound, errorRes);
     });
 
-
     it('should fail to delete a webhook from non-admin', async () => {
       const webhookUrl = faker.internet.url();
-      await chai.request.agent(app)
+      await chai.request
+        .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      const errorRes = await chai.request.agent(app)
+      const errorRes = await chai.request
+        .agent(app)
         .post('/api/deleteWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: notAdminJWT });
@@ -159,16 +197,20 @@ describe('Webhook Tests', () => {
 
   describe('/getWebhooks', () => {
     it('should get all webhooks', async () => {
-      const urls = await Promise.all([1, 2, 3, 4, 5].map(async (i) => {
-        const webhookUrl = faker.internet.url();
-        await chai.request.agent(app)
-          .post('/api/createWebhook')
-          .set('Accept', 'application/json')
-          .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-        return webhookUrl;
-      }));
+      const urls = await Promise.all(
+        [1, 2, 3, 4, 5].map(async (i) => {
+          const webhookUrl = faker.internet.url();
+          await chai.request
+            .agent(app)
+            .post('/api/createWebhook')
+            .set('Accept', 'application/json')
+            .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
+          return webhookUrl;
+        })
+      );
       expect(urls).to.have.length(5);
-      const res = await chai.request.agent(app)
+      const res = await chai.request
+        .agent(app)
         .get('/api/getWebhooks')
         .set('Accept', 'application/json')
         .query({ chain, auth: true, jwt: jwtToken });
@@ -176,16 +218,20 @@ describe('Webhook Tests', () => {
     });
 
     it('should fail to get webhooks from non-admin', async () => {
-      const urls = await Promise.all([1, 2, 3, 4, 5].map(async (i) => {
-        const webhookUrl = faker.internet.url();
-        await chai.request.agent(app)
-          .post('/api/createWebhook')
-          .set('Accept', 'application/json')
-          .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-        return webhookUrl;
-      }));
+      const urls = await Promise.all(
+        [1, 2, 3, 4, 5].map(async (i) => {
+          const webhookUrl = faker.internet.url();
+          await chai.request
+            .agent(app)
+            .post('/api/createWebhook')
+            .set('Accept', 'application/json')
+            .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
+          return webhookUrl;
+        })
+      );
       expect(urls).to.have.length(5);
-      const errorRes = await chai.request.agent(app)
+      const errorRes = await chai.request
+        .agent(app)
         .get('/api/getWebhooks')
         .set('Accept', 'application/json')
         .query({ chain, auth: true, jwt: notAdminJWT });
@@ -203,7 +249,7 @@ describe('Webhook Tests', () => {
       let res = await modelUtils.createWebhook({
         chain,
         webhookUrl,
-        jwt: jwtToken
+        jwt: jwtToken,
       });
       res = await modelUtils.createThread({
         chainId: chain,

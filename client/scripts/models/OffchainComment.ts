@@ -37,7 +37,7 @@ class OffchainComment<T extends IUniqueId> {
     community,
     authorChain,
     lastEdited, // moment.Moment
-    deleted
+    deleted,
   }) {
     this.chain = chain;
     this.author = author;

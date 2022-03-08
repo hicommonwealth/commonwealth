@@ -1,27 +1,36 @@
 import { Notification, NotificationSubscription } from 'models';
 import { NotificationCategories } from 'types';
 
-export const batchNotifications = (n: Notification[], prop: string, prop2: string) => {
-  return Object.values(n.reduce((acc, obj) => {
-    const key = obj[prop][prop2];
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(obj);
-    return acc;
-  }, {}));
+export const batchNotifications = (
+  n: Notification[],
+  prop: string,
+  prop2: string
+) => {
+  return Object.values(
+    n.reduce((acc, obj) => {
+      const key = obj[prop][prop2];
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(obj);
+      return acc;
+    }, {})
+  );
 };
 
 export const sortNotifications = (unsortedNotifications: Notification[]) => {
   // The .sort method here is crucial; the sortNotifications fn only works when
   // notifications are sorted in advance by createdAt
-  const n = unsortedNotifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
-  const batched =  batchNotifications(n, 'subscription', 'objectId');
+  const n = unsortedNotifications.sort(
+    (a, b) => b.createdAt.unix() - a.createdAt.unix()
+  );
+  const batched = batchNotifications(n, 'subscription', 'objectId');
   const unbatchChainEvents = [];
   batched.forEach((a: Notification[]) => {
-    if (a[0].chainEvent
+    if (
+      a[0].chainEvent ||
       // unbatch chain-events, comments, and mentions
-      || a[0].subscription.category === NotificationCategories.NewComment
-      || a[0].subscription.category === NotificationCategories.NewMention
-      || a[0].subscription.category === NotificationCategories.NewCollaboration
+      a[0].subscription.category === NotificationCategories.NewComment ||
+      a[0].subscription.category === NotificationCategories.NewMention ||
+      a[0].subscription.category === NotificationCategories.NewCollaboration
     ) {
       a.forEach((n2) => unbatchChainEvents.push([n2]));
     } else if (!a[0].isRead) {
@@ -46,11 +55,16 @@ export const sortNotifications = (unsortedNotifications: Notification[]) => {
   return unbatchChainEvents;
 };
 
-export const sortSubscriptions = (n: NotificationSubscription[], prop: string) => {
-  return Object.values(n.reduce((acc, obj) => {
-    const key = obj[prop];
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(obj);
-    return acc;
-  }, {}));
+export const sortSubscriptions = (
+  n: NotificationSubscription[],
+  prop: string
+) => {
+  return Object.values(
+    n.reduce((acc, obj) => {
+      const key = obj[prop];
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(obj);
+      return acc;
+    }, {})
+  );
 };

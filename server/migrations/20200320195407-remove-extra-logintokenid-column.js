@@ -8,7 +8,7 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     return queryInterface.addColumn('Users', 'login_token_id', {
       type: Sequelize.INTEGER,
-      references: { model: 'LoginTokens', key: 'id' }
+      references: { model: 'LoginTokens', key: 'id' },
     });
-  }
+  },
 };

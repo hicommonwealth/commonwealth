@@ -2,7 +2,7 @@ import app from 'state';
 
 import { ThreadUniqueAddressesCountStore } from 'stores';
 import ThreadUniqueAddressesCount from 'models/ThreadUniqueAddressesCount';
-import { AddressInfo, OffchainThread} from 'models';
+import { AddressInfo, OffchainThread } from 'models';
 import $ from 'jquery';
 
 export const modelFromServer = (threadUniqueAddressesCount) => {
@@ -37,7 +37,8 @@ class ThreadUniqueAddressesCountController {
         'content-type': 'application/json',
       },
       data: JSON.stringify({
-        threads: threads.map(({ id, Address: { address = null } = {}, author }) => ({
+        threads: threads.map(
+          ({ id, Address: { address = null } = {}, author }) => ({
             root_id: `discussion_${id}`,
             author: address || author,
           })

@@ -4,15 +4,22 @@ import { Account, IChainAdapter } from '.';
 
 // Extension of IChainAdapter to support Token functionality
 // See controller/ethereum/tokenAdapter for example usage
-export default abstract class ITokenAdapter extends IChainAdapter<Coin, Account<Coin>> {
+export default abstract class ITokenAdapter extends IChainAdapter<
+  Coin,
+  Account<Coin>
+> {
   public readonly contractAddress: string;
   public contractApi?: unknown; // type-specific by implementation
   public hasToken = false;
   public tokenBalance: BN = new BN(0);
 
-  public abstract activeAddressHasToken(activeAddress?: string): Promise<boolean>;
+  public abstract activeAddressHasToken(
+    activeAddress?: string
+  ): Promise<boolean>;
 
-  public static instanceOf(adapter: IChainAdapter<Coin, Account<Coin>>): adapter is ITokenAdapter {
+  public static instanceOf(
+    adapter: IChainAdapter<Coin, Account<Coin>>
+  ): adapter is ITokenAdapter {
     return !!adapter && 'hasToken' in adapter;
   }
 }

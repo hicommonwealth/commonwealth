@@ -35,14 +35,16 @@ export interface ICosmosTXData extends ITXData {
   gas: number;
 }
 
-export type CosmosApiType = QueryClient
-  & StakingExtension
-  & GovExtension
-  & BankExtension;
+export type CosmosApiType = QueryClient &
+  StakingExtension &
+  GovExtension &
+  BankExtension;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _api: CosmosApiType;
-  public get api() { return this._api; }
+  public get api() {
+    return this._api;
+  }
 
   private _blockSubscription: NodeJS.Timeout;
 
@@ -58,7 +60,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -79,7 +83,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       this._tmClient,
       setupGovExtension,
       setupStakingExtension,
-      setupBankExtension,
+      setupBankExtension
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
@@ -91,14 +95,19 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const { block: prevBlock } = await this._tmClient.block(height - 1);
     const time = moment.unix(block.header.time.valueOf() / 1000);
     // TODO: check if this is correctly seconds or milliseconds
-    this.app.chain.block.duration = block.header.time.valueOf() - prevBlock.header.time.valueOf();
+    this.app.chain.block.duration =
+      block.header.time.valueOf() - prevBlock.header.time.valueOf();
     this.app.chain.block.lastTime = time;
     this.app.chain.block.height = height;
 
-    const { pool: { bondedTokens } } = await this._api.staking.pool();
+    const {
+      pool: { bondedTokens },
+    } = await this._api.staking.pool();
     this._staked = this.coins(new BN(bondedTokens));
 
-    const { params: { bondDenom } } = await this._api.staking.params();
+    const {
+      params: { bondDenom },
+    } = await this._api.staking.params();
     this._denom = bondDenom;
     this.app.chain.networkStatus = ApiStatus.Connected;
     m.redraw();
@@ -108,36 +117,51 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
   }
 
-  public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<readonly Event[]> {
+  public async sendTx(
+    account: CosmosAccount,
+    tx: EncodeObject
+  ): Promise<readonly Event[]> {
     // TODO: error handling
     // TODO: support multiple wallets
     if (this._app.chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
-    const wallet = this.app.wallets.getByName('keplr') as KeplrWebWalletController;
+    const wallet = this.app.wallets.getByName(
+      'keplr'
+    ) as KeplrWebWalletController;
     if (!wallet) throw new Error('Keplr wallet not found');
     if (!wallet.enabled) {
       await wallet.enable();
     }
-    const client = await SigningStargateClient.connectWithSigner(this._app.chain.meta.url, wallet.offlineSigner);
+    const client = await SigningStargateClient.connectWithSigner(
+      this._app.chain.meta.url,
+      wallet.offlineSigner
+    );
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
     const DEFAULT_FEE: StdFee = {
       gas: '180000',
-      amount: [{ amount: (2.5e-8).toFixed(9), denom: this.denom }]
+      amount: [{ amount: (2.5e-8).toFixed(9), denom: this.denom }],
     };
     const DEFAULT_MEMO = '';
 
     // send the transaction using keplr-supported signing client
     try {
-      const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
+      const result = await client.signAndBroadcast(
+        account.address,
+        [tx],
+        DEFAULT_FEE,
+        DEFAULT_MEMO
+      );
       console.log(result);
       if (isBroadcastTxFailure(result)) {
         throw new Error('TX execution failed.');
       } else if (isBroadcastTxSuccess(result)) {
         const txHash = result.transactionHash;
-        const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
+        const txResult = await this._tmClient.tx({
+          hash: Buffer.from(txHash, 'hex'),
+        });
         return txResult.result.events;
       } else {
         throw new Error('Unknown broadcast result');
@@ -153,7 +177,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void,
+    cb?: (success: boolean) => void
   ): ITXModalData {
     throw new Error('unsupported');
   }

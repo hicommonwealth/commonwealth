@@ -22,7 +22,7 @@ export interface IIdentitySubs {
   deposit: SubstrateCoin;
 }
 
-type SubsCodec = [ BalanceOf, Vec<AccountId> ] & Codec;
+type SubsCodec = [BalanceOf, Vec<AccountId>] & Codec;
 
 export enum IdentityQuality {
   Good = 'good',
@@ -42,8 +42,13 @@ export interface ISubstrateIdentity extends IHasId {
 // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L126
 // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L182
 export function getIdentityQuality(judgements: string[]): IdentityQuality {
-  const isGood = judgements.some((j) => j === 'KnownGood' || j === 'known-good'
-                                 || j === 'Reasonable' || j === 'reasonable');
+  const isGood = judgements.some(
+    (j) =>
+      j === 'KnownGood' ||
+      j === 'known-good' ||
+      j === 'Reasonable' ||
+      j === 'reasonable'
+  );
   const isBad = judgements.some((j) => j === 'Erroneous' || j === 'erroneous');
   if (isGood) {
     return IdentityQuality.Good;
@@ -56,29 +61,39 @@ export function getIdentityQuality(judgements: string[]): IdentityQuality {
 
 export default class SubstrateIdentity
   extends Identity<SubstrateCoin>
-  implements ISerializable<ISubstrateIdentity> {
+  implements ISerializable<ISubstrateIdentity>
+{
   // override identity prop
   public readonly account: SubstrateAccount;
 
   private _judgements: RegistrationJudgement[];
   private _info: IdentityInfo;
-  public get info() { return this._info; }
+  public get info() {
+    return this._info;
+  }
 
   private _quality: IdentityQuality;
-  public get quality() { return this._quality; }
+  public get quality() {
+    return this._quality;
+  }
 
   private _deposit: SubstrateCoin;
-  public get deposit() { return this._deposit; }
+  public get deposit() {
+    return this._deposit;
+  }
 
   // set to false if identity was killed or cleared, null if unresolved
   private _exists: boolean;
-  public get exists() { return this._exists; }
+  public get exists() {
+    return this._exists;
+  }
 
   // fetch all sub-accounts
   // all sub-accounts have names, but we don't currently fetch them, because
   // that requires a backward lookup for each. instead we expose a getter.
   public subs(): Promise<IIdentitySubs> {
-    return this._Chain.api.query.identity.subsOf(this.account.address)
+    return this._Chain.api.query.identity
+      .subsOf(this.account.address)
       .then((subResult: SubsCodec) => ({
         deposit: this._Chain.coins(subResult[0]),
         subs: subResult[1].map((v) => this._Accounts.get(v.toString())),
@@ -91,7 +106,9 @@ export default class SubstrateIdentity
 
   // keeps track of changing registration info
   public async update() {
-    const rOpt = await this._Chain.api.query.identity.identityOf(this.account.address);
+    const rOpt = await this._Chain.api.query.identity.identityOf(
+      this.account.address
+    );
     if (rOpt.isSome) {
       const { judgements, deposit, info } = rOpt.unwrap();
       this._judgements = judgements;
@@ -99,9 +116,12 @@ export default class SubstrateIdentity
       this._deposit = this._Chain.coins(deposit);
 
       // update username
-      const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
+      const d2s = (d: Data) =>
+        u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
       this.username = d2s(this._info.display);
-      const quality = getIdentityQuality(this._judgements.map((j) => j[1].toString()));
+      const quality = getIdentityQuality(
+        this._judgements.map((j) => j[1].toString())
+      );
       if (!this._quality || quality !== IdentityQuality.Unknown) {
         this._quality = quality;
       }
@@ -144,7 +164,7 @@ export default class SubstrateIdentity
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Identities: SubstrateIdentities,
-    who: SubstrateAccount,
+    who: SubstrateAccount
   ) {
     // we use the address of the identity's owner as its identifier
     super(who, who.address);
@@ -155,12 +175,13 @@ export default class SubstrateIdentity
   }
 
   public subName(sub: SubstrateAccount): Promise<string> {
-    return this._Chain.api.query.identity.superOf(sub.address)
+    return this._Chain.api.query.identity
+      .superOf(sub.address)
       .then((dataOpt: Option<SuperCodec>) => {
         if (!dataOpt.isSome) {
           throw new Error('provided account is not a sub');
         }
-        const [ superAcct, name ] = dataOpt.unwrap();
+        const [superAcct, name] = dataOpt.unwrap();
         if (superAcct.toString() !== this.account.address) {
           throw new Error('provided account is not your sub');
         }
@@ -172,12 +193,13 @@ export default class SubstrateIdentity
 
   // arg is mapping from sub address to name
   public async setSubsTx(subs: { [address: string]: string }) {
-    const txFunc = (api: ApiPromise) => api.tx.identity.setSubs(Object.entries(subs));
+    const txFunc = (api: ApiPromise) =>
+      api.tx.identity.setSubs(Object.entries(subs));
     return this._Chain.createTXModalData(
       this.account,
       txFunc,
       'setSubs',
-      `${this.username} updated subs`,
+      `${this.username} updated subs`
     );
   }
 
@@ -186,18 +208,19 @@ export default class SubstrateIdentity
       this.account,
       (api: ApiPromise) => api.tx.identity.clearIdentity(),
       'clearIdentity',
-      `${this.account.address} cleared identity`,
+      `${this.account.address} cleared identity`
     );
   }
 
   public async requestJudgementTx(regIdx: number, maxFee: SubstrateCoin) {
     if (!this._judgements) throw new Error('judgements not yet loaded');
-    const txFunc = (api: ApiPromise) => api.tx.identity.requestJudgement(regIdx, maxFee);
+    const txFunc = (api: ApiPromise) =>
+      api.tx.identity.requestJudgement(regIdx, maxFee);
     return this._Chain.createTXModalData(
       this.account,
       txFunc,
       'requestjudgement',
-      `${this.username} requests judgement from registrar ${regIdx}`,
+      `${this.username} requests judgement from registrar ${regIdx}`
     );
   }
 
@@ -207,7 +230,7 @@ export default class SubstrateIdentity
       this.account,
       (api: ApiPromise) => api.tx.identity.cancelRequest(regIdx),
       'cancelRequest',
-      `${this.username} canceled judgement request from registrar ${regIdx}`,
+      `${this.username} canceled judgement request from registrar ${regIdx}`
     );
   }
 }

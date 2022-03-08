@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Signer, Contract, ContractFactory, Overrides } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Signer, Contract, ContractFactory, Overrides } from 'ethers';
+import { Provider, TransactionRequest } from '@ethersproject/providers';
 
-import type { SelfdestructTransfer } from "../SelfdestructTransfer";
+import type { SelfdestructTransfer } from '../SelfdestructTransfer';
 
 export class SelfdestructTransfer__factory extends ContractFactory {
   constructor(signer?: Signer) {
@@ -44,17 +44,17 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address payable",
-        name: "to",
-        type: "address",
+        internalType: 'address payable',
+        name: 'to',
+        type: 'address',
       },
     ],
-    name: "destroyAndTransfer",
+    name: 'destroyAndTransfer',
     outputs: [],
-    stateMutability: "payable",
-    type: "function",
+    stateMutability: 'payable',
+    type: 'function',
   },
 ];
 
 const _bytecode =
-  "0x6080604052348015600f57600080fd5b5060888061001e6000396000f3fe608060405260043610601c5760003560e01c8063785e07b3146021575b600080fd5b604460048036036020811015603557600080fd5b50356001600160a01b03166046565b005b806001600160a01b0316fffea264697066735822122039cd6f3f3e3077a165b99440c924173ee7c36146ecd3a327a12955042d1d25e064736f6c634300060c0033";
+  '0x6080604052348015600f57600080fd5b5060888061001e6000396000f3fe608060405260043610601c5760003560e01c8063785e07b3146021575b600080fd5b604460048036036020811015603557600080fd5b50356001600160a01b03166046565b005b806001600160a01b0316fffea264697066735822122039cd6f3f3e3077a165b99440c924173ee7c36146ecd3a327a12955042d1d25e064736f6c634300060c0033';

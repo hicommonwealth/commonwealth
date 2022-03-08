@@ -14,49 +14,49 @@ import {
   Overrides,
   PayableOverrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface IAaveGovernanceV2Interface extends ethers.utils.Interface {
   functions: {
-    "__abdicate()": FunctionFragment;
-    "authorizeExecutors(address[])": FunctionFragment;
-    "cancel(uint256)": FunctionFragment;
-    "create(address,address[],uint256[],string[],bytes[],bool[],bytes32)": FunctionFragment;
-    "execute(uint256)": FunctionFragment;
-    "getGovernanceStrategy()": FunctionFragment;
-    "getGuardian()": FunctionFragment;
-    "getProposalById(uint256)": FunctionFragment;
-    "getProposalState(uint256)": FunctionFragment;
-    "getProposalsCount()": FunctionFragment;
-    "getVoteOnProposal(uint256,address)": FunctionFragment;
-    "getVotingDelay()": FunctionFragment;
-    "isExecutorAuthorized(address)": FunctionFragment;
-    "queue(uint256)": FunctionFragment;
-    "setGovernanceStrategy(address)": FunctionFragment;
-    "setVotingDelay(uint256)": FunctionFragment;
-    "submitVote(uint256,bool)": FunctionFragment;
-    "submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)": FunctionFragment;
-    "unauthorizeExecutors(address[])": FunctionFragment;
+    '__abdicate()': FunctionFragment;
+    'authorizeExecutors(address[])': FunctionFragment;
+    'cancel(uint256)': FunctionFragment;
+    'create(address,address[],uint256[],string[],bytes[],bool[],bytes32)': FunctionFragment;
+    'execute(uint256)': FunctionFragment;
+    'getGovernanceStrategy()': FunctionFragment;
+    'getGuardian()': FunctionFragment;
+    'getProposalById(uint256)': FunctionFragment;
+    'getProposalState(uint256)': FunctionFragment;
+    'getProposalsCount()': FunctionFragment;
+    'getVoteOnProposal(uint256,address)': FunctionFragment;
+    'getVotingDelay()': FunctionFragment;
+    'isExecutorAuthorized(address)': FunctionFragment;
+    'queue(uint256)': FunctionFragment;
+    'setGovernanceStrategy(address)': FunctionFragment;
+    'setVotingDelay(uint256)': FunctionFragment;
+    'submitVote(uint256,bool)': FunctionFragment;
+    'submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)': FunctionFragment;
+    'unauthorizeExecutors(address[])': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "__abdicate",
+    functionFragment: '__abdicate',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "authorizeExecutors",
+    functionFragment: 'authorizeExecutors',
     values: [string[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "cancel",
+    functionFragment: 'cancel',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "create",
+    functionFragment: 'create',
     values: [
       string,
       string[],
@@ -68,143 +68,143 @@ interface IAaveGovernanceV2Interface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "execute",
+    functionFragment: 'execute',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getGovernanceStrategy",
+    functionFragment: 'getGovernanceStrategy',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getGuardian",
+    functionFragment: 'getGuardian',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getProposalById",
+    functionFragment: 'getProposalById',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getProposalState",
+    functionFragment: 'getProposalState',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getProposalsCount",
+    functionFragment: 'getProposalsCount',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getVoteOnProposal",
+    functionFragment: 'getVoteOnProposal',
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "getVotingDelay",
+    functionFragment: 'getVotingDelay',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "isExecutorAuthorized",
+    functionFragment: 'isExecutorAuthorized',
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "queue", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: 'queue', values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "setGovernanceStrategy",
+    functionFragment: 'setGovernanceStrategy',
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "setVotingDelay",
+    functionFragment: 'setVotingDelay',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "submitVote",
+    functionFragment: 'submitVote',
     values: [BigNumberish, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "submitVoteBySignature",
+    functionFragment: 'submitVoteBySignature',
     values: [BigNumberish, boolean, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "unauthorizeExecutors",
+    functionFragment: 'unauthorizeExecutors',
     values: [string[]]
   ): string;
 
-  decodeFunctionResult(functionFragment: "__abdicate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: '__abdicate', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "authorizeExecutors",
+    functionFragment: 'authorizeExecutors',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "create", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'cancel', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'create', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'execute', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getGovernanceStrategy",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getGuardian",
+    functionFragment: 'getGovernanceStrategy',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getProposalById",
+    functionFragment: 'getGuardian',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getProposalState",
+    functionFragment: 'getProposalById',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getProposalsCount",
+    functionFragment: 'getProposalState',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getVoteOnProposal",
+    functionFragment: 'getProposalsCount',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getVotingDelay",
+    functionFragment: 'getVoteOnProposal',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isExecutorAuthorized",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "queue", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setGovernanceStrategy",
+    functionFragment: 'getVotingDelay',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setVotingDelay",
+    functionFragment: 'isExecutorAuthorized',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "submitVote", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'queue', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "submitVoteBySignature",
+    functionFragment: 'setGovernanceStrategy',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "unauthorizeExecutors",
+    functionFragment: 'setVotingDelay',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'submitVote', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'submitVoteBySignature',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'unauthorizeExecutors',
     data: BytesLike
   ): Result;
 
   events: {
-    "ExecutorAuthorized(address)": EventFragment;
-    "ExecutorUnauthorized(address)": EventFragment;
-    "GovernanceStrategyChanged(address,address)": EventFragment;
-    "ProposalCanceled(uint256)": EventFragment;
-    "ProposalCreated(uint256,address,address,address[],uint256[],string[],bytes[],bool[],uint256,uint256,address,bytes32)": EventFragment;
-    "ProposalExecuted(uint256,address)": EventFragment;
-    "ProposalQueued(uint256,uint256,address)": EventFragment;
-    "VoteEmitted(uint256,address,bool,uint256)": EventFragment;
-    "VotingDelayChanged(uint256,address)": EventFragment;
+    'ExecutorAuthorized(address)': EventFragment;
+    'ExecutorUnauthorized(address)': EventFragment;
+    'GovernanceStrategyChanged(address,address)': EventFragment;
+    'ProposalCanceled(uint256)': EventFragment;
+    'ProposalCreated(uint256,address,address,address[],uint256[],string[],bytes[],bool[],uint256,uint256,address,bytes32)': EventFragment;
+    'ProposalExecuted(uint256,address)': EventFragment;
+    'ProposalQueued(uint256,uint256,address)': EventFragment;
+    'VoteEmitted(uint256,address,bool,uint256)': EventFragment;
+    'VotingDelayChanged(uint256,address)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "ExecutorAuthorized"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ExecutorUnauthorized"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "GovernanceStrategyChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalCanceled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalExecuted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalQueued"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VoteEmitted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingDelayChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ExecutorAuthorized'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ExecutorUnauthorized'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'GovernanceStrategyChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCanceled'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCreated'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalExecuted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalQueued'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VoteEmitted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VotingDelayChanged'): EventFragment;
 }
 
 export class IAaveGovernanceV2 extends Contract {
@@ -255,7 +255,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "__abdicate()"(
+    '__abdicate()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -264,7 +264,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "authorizeExecutors(address[])"(
+    'authorizeExecutors(address[])'(
       executors: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -274,7 +274,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -290,7 +290,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "create(address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+    'create(address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
       executor: string,
       targets: string[],
       values: BigNumberish[],
@@ -306,18 +306,18 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     getGovernanceStrategy(overrides?: CallOverrides): Promise<[string]>;
 
-    "getGovernanceStrategy()"(overrides?: CallOverrides): Promise<[string]>;
+    'getGovernanceStrategy()'(overrides?: CallOverrides): Promise<[string]>;
 
     getGuardian(overrides?: CallOverrides): Promise<[string]>;
 
-    "getGuardian()"(overrides?: CallOverrides): Promise<[string]>;
+    'getGuardian()'(overrides?: CallOverrides): Promise<[string]>;
 
     getProposalById(
       proposalId: BigNumberish,
@@ -364,7 +364,7 @@ export class IAaveGovernanceV2 extends Contract {
       ]
     >;
 
-    "getProposalById(uint256)"(
+    'getProposalById(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -414,14 +414,14 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<[number]>;
 
-    "getProposalState(uint256)"(
+    'getProposalState(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[number]>;
 
     getProposalsCount(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "getProposalsCount()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'getProposalsCount()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getVoteOnProposal(
       proposalId: BigNumberish,
@@ -431,7 +431,7 @@ export class IAaveGovernanceV2 extends Contract {
       [[boolean, BigNumber] & { support: boolean; votingPower: BigNumber }]
     >;
 
-    "getVoteOnProposal(uint256,address)"(
+    'getVoteOnProposal(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -441,14 +441,14 @@ export class IAaveGovernanceV2 extends Contract {
 
     getVotingDelay(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "getVotingDelay()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'getVotingDelay()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     isExecutorAuthorized(
       executor: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "isExecutorAuthorized(address)"(
+    'isExecutorAuthorized(address)'(
       executor: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
@@ -458,7 +458,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -468,7 +468,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setGovernanceStrategy(address)"(
+    'setGovernanceStrategy(address)'(
       governanceStrategy: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -478,7 +478,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setVotingDelay(uint256)"(
+    'setVotingDelay(uint256)'(
       votingDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -489,7 +489,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "submitVote(uint256,bool)"(
+    'submitVote(uint256,bool)'(
       proposalId: BigNumberish,
       support: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -504,7 +504,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)"(
+    'submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: boolean,
       v: BigNumberish,
@@ -518,7 +518,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "unauthorizeExecutors(address[])"(
+    'unauthorizeExecutors(address[])'(
       executors: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -528,7 +528,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "__abdicate()"(
+  '__abdicate()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -537,7 +537,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "authorizeExecutors(address[])"(
+  'authorizeExecutors(address[])'(
     executors: string[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -547,7 +547,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "cancel(uint256)"(
+  'cancel(uint256)'(
     proposalId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -563,7 +563,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "create(address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+  'create(address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
     executor: string,
     targets: string[],
     values: BigNumberish[],
@@ -579,18 +579,18 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "execute(uint256)"(
+  'execute(uint256)'(
     proposalId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   getGovernanceStrategy(overrides?: CallOverrides): Promise<string>;
 
-  "getGovernanceStrategy()"(overrides?: CallOverrides): Promise<string>;
+  'getGovernanceStrategy()'(overrides?: CallOverrides): Promise<string>;
 
   getGuardian(overrides?: CallOverrides): Promise<string>;
 
-  "getGuardian()"(overrides?: CallOverrides): Promise<string>;
+  'getGuardian()'(overrides?: CallOverrides): Promise<string>;
 
   getProposalById(
     proposalId: BigNumberish,
@@ -635,7 +635,7 @@ export class IAaveGovernanceV2 extends Contract {
     }
   >;
 
-  "getProposalById(uint256)"(
+  'getProposalById(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
@@ -683,14 +683,14 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: CallOverrides
   ): Promise<number>;
 
-  "getProposalState(uint256)"(
+  'getProposalState(uint256)'(
     proposalId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<number>;
 
   getProposalsCount(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getProposalsCount()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'getProposalsCount()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   getVoteOnProposal(
     proposalId: BigNumberish,
@@ -700,7 +700,7 @@ export class IAaveGovernanceV2 extends Contract {
     [boolean, BigNumber] & { support: boolean; votingPower: BigNumber }
   >;
 
-  "getVoteOnProposal(uint256,address)"(
+  'getVoteOnProposal(uint256,address)'(
     proposalId: BigNumberish,
     voter: string,
     overrides?: CallOverrides
@@ -710,14 +710,14 @@ export class IAaveGovernanceV2 extends Contract {
 
   getVotingDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getVotingDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'getVotingDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   isExecutorAuthorized(
     executor: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isExecutorAuthorized(address)"(
+  'isExecutorAuthorized(address)'(
     executor: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
@@ -727,7 +727,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "queue(uint256)"(
+  'queue(uint256)'(
     proposalId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -737,7 +737,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setGovernanceStrategy(address)"(
+  'setGovernanceStrategy(address)'(
     governanceStrategy: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -747,7 +747,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setVotingDelay(uint256)"(
+  'setVotingDelay(uint256)'(
     votingDelay: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -758,7 +758,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "submitVote(uint256,bool)"(
+  'submitVote(uint256,bool)'(
     proposalId: BigNumberish,
     support: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -773,7 +773,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)"(
+  'submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)'(
     proposalId: BigNumberish,
     support: boolean,
     v: BigNumberish,
@@ -787,7 +787,7 @@ export class IAaveGovernanceV2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "unauthorizeExecutors(address[])"(
+  'unauthorizeExecutors(address[])'(
     executors: string[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -795,21 +795,21 @@ export class IAaveGovernanceV2 extends Contract {
   callStatic: {
     __abdicate(overrides?: CallOverrides): Promise<void>;
 
-    "__abdicate()"(overrides?: CallOverrides): Promise<void>;
+    '__abdicate()'(overrides?: CallOverrides): Promise<void>;
 
     authorizeExecutors(
       executors: string[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "authorizeExecutors(address[])"(
+    'authorizeExecutors(address[])'(
       executors: string[],
       overrides?: CallOverrides
     ): Promise<void>;
 
     cancel(proposalId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -825,7 +825,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "create(address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+    'create(address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
       executor: string,
       targets: string[],
       values: BigNumberish[],
@@ -838,18 +838,18 @@ export class IAaveGovernanceV2 extends Contract {
 
     execute(proposalId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     getGovernanceStrategy(overrides?: CallOverrides): Promise<string>;
 
-    "getGovernanceStrategy()"(overrides?: CallOverrides): Promise<string>;
+    'getGovernanceStrategy()'(overrides?: CallOverrides): Promise<string>;
 
     getGuardian(overrides?: CallOverrides): Promise<string>;
 
-    "getGuardian()"(overrides?: CallOverrides): Promise<string>;
+    'getGuardian()'(overrides?: CallOverrides): Promise<string>;
 
     getProposalById(
       proposalId: BigNumberish,
@@ -894,7 +894,7 @@ export class IAaveGovernanceV2 extends Contract {
       }
     >;
 
-    "getProposalById(uint256)"(
+    'getProposalById(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -942,14 +942,14 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<number>;
 
-    "getProposalState(uint256)"(
+    'getProposalState(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<number>;
 
     getProposalsCount(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getProposalsCount()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'getProposalsCount()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getVoteOnProposal(
       proposalId: BigNumberish,
@@ -959,7 +959,7 @@ export class IAaveGovernanceV2 extends Contract {
       [boolean, BigNumber] & { support: boolean; votingPower: BigNumber }
     >;
 
-    "getVoteOnProposal(uint256,address)"(
+    'getVoteOnProposal(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -969,21 +969,21 @@ export class IAaveGovernanceV2 extends Contract {
 
     getVotingDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getVotingDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'getVotingDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     isExecutorAuthorized(
       executor: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isExecutorAuthorized(address)"(
+    'isExecutorAuthorized(address)'(
       executor: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     queue(proposalId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -993,7 +993,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setGovernanceStrategy(address)"(
+    'setGovernanceStrategy(address)'(
       governanceStrategy: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1003,7 +1003,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setVotingDelay(uint256)"(
+    'setVotingDelay(uint256)'(
       votingDelay: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1014,7 +1014,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "submitVote(uint256,bool)"(
+    'submitVote(uint256,bool)'(
       proposalId: BigNumberish,
       support: boolean,
       overrides?: CallOverrides
@@ -1029,7 +1029,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)"(
+    'submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: boolean,
       v: BigNumberish,
@@ -1043,7 +1043,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "unauthorizeExecutors(address[])"(
+    'unauthorizeExecutors(address[])'(
       executors: string[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1155,7 +1155,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "__abdicate()"(
+    '__abdicate()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1164,7 +1164,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "authorizeExecutors(address[])"(
+    'authorizeExecutors(address[])'(
       executors: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1174,7 +1174,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1190,7 +1190,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "create(address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+    'create(address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
       executor: string,
       targets: string[],
       values: BigNumberish[],
@@ -1206,25 +1206,25 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     getGovernanceStrategy(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getGovernanceStrategy()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'getGovernanceStrategy()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getGuardian(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getGuardian()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'getGuardian()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getProposalById(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getProposalById(uint256)"(
+    'getProposalById(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1234,14 +1234,14 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getProposalState(uint256)"(
+    'getProposalState(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getProposalsCount(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getProposalsCount()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'getProposalsCount()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getVoteOnProposal(
       proposalId: BigNumberish,
@@ -1249,7 +1249,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getVoteOnProposal(uint256,address)"(
+    'getVoteOnProposal(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -1257,14 +1257,14 @@ export class IAaveGovernanceV2 extends Contract {
 
     getVotingDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getVotingDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'getVotingDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     isExecutorAuthorized(
       executor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isExecutorAuthorized(address)"(
+    'isExecutorAuthorized(address)'(
       executor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1274,7 +1274,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1284,7 +1284,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setGovernanceStrategy(address)"(
+    'setGovernanceStrategy(address)'(
       governanceStrategy: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1294,7 +1294,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setVotingDelay(uint256)"(
+    'setVotingDelay(uint256)'(
       votingDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1305,7 +1305,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "submitVote(uint256,bool)"(
+    'submitVote(uint256,bool)'(
       proposalId: BigNumberish,
       support: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1320,7 +1320,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)"(
+    'submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: boolean,
       v: BigNumberish,
@@ -1334,7 +1334,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "unauthorizeExecutors(address[])"(
+    'unauthorizeExecutors(address[])'(
       executors: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1345,7 +1345,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "__abdicate()"(
+    '__abdicate()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1354,7 +1354,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "authorizeExecutors(address[])"(
+    'authorizeExecutors(address[])'(
       executors: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1364,7 +1364,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "cancel(uint256)"(
+    'cancel(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1380,7 +1380,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "create(address,address[],uint256[],string[],bytes[],bool[],bytes32)"(
+    'create(address,address[],uint256[],string[],bytes[],bool[],bytes32)'(
       executor: string,
       targets: string[],
       values: BigNumberish[],
@@ -1396,7 +1396,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "execute(uint256)"(
+    'execute(uint256)'(
       proposalId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1405,20 +1405,20 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getGovernanceStrategy()"(
+    'getGovernanceStrategy()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getGuardian(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getGuardian()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'getGuardian()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getProposalById(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getProposalById(uint256)"(
+    'getProposalById(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1428,14 +1428,14 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getProposalState(uint256)"(
+    'getProposalState(uint256)'(
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getProposalsCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getProposalsCount()"(
+    'getProposalsCount()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1445,7 +1445,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getVoteOnProposal(uint256,address)"(
+    'getVoteOnProposal(uint256,address)'(
       proposalId: BigNumberish,
       voter: string,
       overrides?: CallOverrides
@@ -1453,7 +1453,7 @@ export class IAaveGovernanceV2 extends Contract {
 
     getVotingDelay(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getVotingDelay()"(
+    'getVotingDelay()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1462,7 +1462,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isExecutorAuthorized(address)"(
+    'isExecutorAuthorized(address)'(
       executor: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1472,7 +1472,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "queue(uint256)"(
+    'queue(uint256)'(
       proposalId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1482,7 +1482,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setGovernanceStrategy(address)"(
+    'setGovernanceStrategy(address)'(
       governanceStrategy: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1492,7 +1492,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setVotingDelay(uint256)"(
+    'setVotingDelay(uint256)'(
       votingDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1503,7 +1503,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "submitVote(uint256,bool)"(
+    'submitVote(uint256,bool)'(
       proposalId: BigNumberish,
       support: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1518,7 +1518,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)"(
+    'submitVoteBySignature(uint256,bool,uint8,bytes32,bytes32)'(
       proposalId: BigNumberish,
       support: boolean,
       v: BigNumberish,
@@ -1532,7 +1532,7 @@ export class IAaveGovernanceV2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "unauthorizeExecutors(address[])"(
+    'unauthorizeExecutors(address[])'(
       executors: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

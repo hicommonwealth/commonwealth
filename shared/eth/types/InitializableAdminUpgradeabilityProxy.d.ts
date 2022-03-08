@@ -14,62 +14,62 @@ import {
   Overrides,
   PayableOverrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface InitializableAdminUpgradeabilityProxyInterface
   extends ethers.utils.Interface {
   functions: {
-    "admin()": FunctionFragment;
-    "changeAdmin(address)": FunctionFragment;
-    "implementation()": FunctionFragment;
-    "initialize(address,address,bytes)": FunctionFragment;
-    "upgradeTo(address)": FunctionFragment;
-    "upgradeToAndCall(address,bytes)": FunctionFragment;
+    'admin()': FunctionFragment;
+    'changeAdmin(address)': FunctionFragment;
+    'implementation()': FunctionFragment;
+    'initialize(address,address,bytes)': FunctionFragment;
+    'upgradeTo(address)': FunctionFragment;
+    'upgradeToAndCall(address,bytes)': FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
-  encodeFunctionData(functionFragment: "changeAdmin", values: [string]): string;
+  encodeFunctionData(functionFragment: 'admin', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'changeAdmin', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "implementation",
+    functionFragment: 'implementation',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
+    functionFragment: 'initialize',
     values: [string, string, BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "upgradeTo", values: [string]): string;
+  encodeFunctionData(functionFragment: 'upgradeTo', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "upgradeToAndCall",
+    functionFragment: 'upgradeToAndCall',
     values: [string, BytesLike]
   ): string;
 
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'admin', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "changeAdmin",
+    functionFragment: 'changeAdmin',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "implementation",
+    functionFragment: 'implementation',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "upgradeTo", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'upgradeTo', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "upgradeToAndCall",
+    functionFragment: 'upgradeToAndCall',
     data: BytesLike
   ): Result;
 
   events: {
-    "AdminChanged(address,address)": EventFragment;
-    "Upgraded(address)": EventFragment;
+    'AdminChanged(address,address)': EventFragment;
+    'Upgraded(address)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "AdminChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'AdminChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Upgraded'): EventFragment;
 }
 
 export class InitializableAdminUpgradeabilityProxy extends Contract {
@@ -120,7 +120,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "admin()"(
+    'admin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -129,7 +129,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "changeAdmin(address)"(
+    'changeAdmin(address)'(
       newAdmin: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -138,18 +138,18 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "implementation()"(
+    'implementation()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,bytes)"(
+    'initialize(address,address,bytes)'(
       _logic: string,
       _admin: string,
       _data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize(address,bytes)"(
+    'initialize(address,bytes)'(
       _logic: string,
       _data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -160,7 +160,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "upgradeTo(address)"(
+    'upgradeTo(address)'(
       newImplementation: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -171,7 +171,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "upgradeToAndCall(address,bytes)"(
+    'upgradeToAndCall(address,bytes)'(
       newImplementation: string,
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -182,7 +182,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "admin()"(
+  'admin()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -191,7 +191,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "changeAdmin(address)"(
+  'changeAdmin(address)'(
     newAdmin: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -200,18 +200,18 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "implementation()"(
+  'implementation()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,bytes)"(
+  'initialize(address,address,bytes)'(
     _logic: string,
     _admin: string,
     _data: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize(address,bytes)"(
+  'initialize(address,bytes)'(
     _logic: string,
     _data: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -222,7 +222,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "upgradeTo(address)"(
+  'upgradeTo(address)'(
     newImplementation: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -233,7 +233,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "upgradeToAndCall(address,bytes)"(
+  'upgradeToAndCall(address,bytes)'(
     newImplementation: string,
     data: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -242,27 +242,27 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
   callStatic: {
     admin(overrides?: CallOverrides): Promise<string>;
 
-    "admin()"(overrides?: CallOverrides): Promise<string>;
+    'admin()'(overrides?: CallOverrides): Promise<string>;
 
     changeAdmin(newAdmin: string, overrides?: CallOverrides): Promise<void>;
 
-    "changeAdmin(address)"(
+    'changeAdmin(address)'(
       newAdmin: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     implementation(overrides?: CallOverrides): Promise<string>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<string>;
+    'implementation()'(overrides?: CallOverrides): Promise<string>;
 
-    "initialize(address,address,bytes)"(
+    'initialize(address,address,bytes)'(
       _logic: string,
       _admin: string,
       _data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,bytes)"(
+    'initialize(address,bytes)'(
       _logic: string,
       _data: BytesLike,
       overrides?: CallOverrides
@@ -273,7 +273,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "upgradeTo(address)"(
+    'upgradeTo(address)'(
       newImplementation: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -284,7 +284,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "upgradeToAndCall(address,bytes)"(
+    'upgradeToAndCall(address,bytes)'(
       newImplementation: string,
       data: BytesLike,
       overrides?: CallOverrides
@@ -310,7 +310,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "admin()"(
+    'admin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -319,7 +319,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "changeAdmin(address)"(
+    'changeAdmin(address)'(
       newAdmin: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -328,18 +328,18 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "implementation()"(
+    'implementation()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,address,bytes)"(
+    'initialize(address,address,bytes)'(
       _logic: string,
       _admin: string,
       _data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize(address,bytes)"(
+    'initialize(address,bytes)'(
       _logic: string,
       _data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -350,7 +350,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "upgradeTo(address)"(
+    'upgradeTo(address)'(
       newImplementation: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -361,7 +361,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "upgradeToAndCall(address,bytes)"(
+    'upgradeToAndCall(address,bytes)'(
       newImplementation: string,
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -373,7 +373,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "admin()"(
+    'admin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -382,7 +382,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "changeAdmin(address)"(
+    'changeAdmin(address)'(
       newAdmin: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -391,18 +391,18 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "implementation()"(
+    'implementation()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,bytes)"(
+    'initialize(address,address,bytes)'(
       _logic: string,
       _admin: string,
       _data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,bytes)"(
+    'initialize(address,bytes)'(
       _logic: string,
       _data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -413,7 +413,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "upgradeTo(address)"(
+    'upgradeTo(address)'(
       newImplementation: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -424,7 +424,7 @@ export class InitializableAdminUpgradeabilityProxy extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "upgradeToAndCall(address,bytes)"(
+    'upgradeToAndCall(address,bytes)'(
       newImplementation: string,
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }

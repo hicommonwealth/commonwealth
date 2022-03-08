@@ -23,7 +23,7 @@ const JoinCommonWealthSection: m.Component<{}, {}> = {
           ]),
           m(
             'div',
-            { class: 'flex mt-10 md:justify-end md:mt-0' },
+            { class: 'flex mt-10 md:justify-end md:mt-0' }
             // m(
             //   'button',
             //   { class: 'btn-gradient pb-3' },

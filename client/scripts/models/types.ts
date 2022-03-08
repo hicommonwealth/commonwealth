@@ -5,7 +5,7 @@ import {
   IThresholdEndTime,
   INotStartedEndTime,
   IQueuedEndTime,
-  IUnavailableEndTime
+  IUnavailableEndTime,
 } from './interfaces';
 import Proposal from './Proposal';
 

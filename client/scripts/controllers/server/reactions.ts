@@ -12,7 +12,7 @@ import {
   OffchainComment,
   OffchainThread,
   Proposal,
-  AbridgedThread
+  AbridgedThread,
 } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -26,19 +26,28 @@ export const modelFromServer = (reaction) => {
     reaction.thread_id,
     reaction.proposal_id,
     reaction.comment_id,
-    reaction.Address.chain,
+    reaction.Address.chain
   );
 };
 
 class ReactionsController {
   private _store: ReactionStore = new ReactionStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
-  public getByPost(post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>) {
+  public getByPost(
+    post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>
+  ) {
     return this._store.getByPost(post);
   }
 
-  public async create(address: string, post: any, reaction: string, chainId: string) {
+  public async create(
+    address: string,
+    post: any,
+    reaction: string,
+    chainId: string
+  ) {
     const options = {
       author_chain: app.user.activeAccount.chain.id,
       chain: chainId,
@@ -49,13 +58,18 @@ class ReactionsController {
     if (post instanceof OffchainThread) {
       options['thread_id'] = (post as OffchainThread).id;
     } else if (post instanceof Proposal) {
-      options['proposal_id'] = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
+      options['proposal_id'] = `${(post as AnyProposal).slug}_${
+        (post as AnyProposal).identifier
+      }`;
     } else if (post instanceof OffchainComment) {
       options['comment_id'] = (post as OffchainComment<any>).id;
     }
     try {
       // TODO: Change to POST /reaction
-      const response = await $.post(`${app.serverUrl()}/createReaction`, options);
+      const response = await $.post(
+        `${app.serverUrl()}/createReaction`,
+        options
+      );
       const { result } = response;
       this._store.add(modelFromServer(result));
     } catch (err) {
@@ -66,10 +80,14 @@ class ReactionsController {
   public async refresh(post: any, chainId: string) {
     const options = { chain: chainId };
     // TODO: ensure identifier vs id use is correct; see also create method
-    if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
+    if (post instanceof OffchainThread)
+      options['thread_id'] = (post as OffchainThread).id;
     else if (post instanceof Proposal) {
-      options['proposal_id'] = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
-    } else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
+      options['proposal_id'] = `${(post as AnyProposal).slug}_${
+        (post as AnyProposal).identifier
+      }`;
+    } else if (post instanceof OffchainComment)
+      options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
       // TODO: Remove any verbs from these route names '/reactions'
@@ -90,9 +108,11 @@ class ReactionsController {
       }
     } catch (err) {
       console.log('Failed to load reactions');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Error loading reactions');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Error loading reactions'
+      );
     }
   }
 
@@ -103,14 +123,16 @@ class ReactionsController {
       $.post(`${app.serverUrl()}/deleteReaction`, {
         jwt: app.user.jwt,
         reaction_id: reaction.id,
-      }).then((result) => {
-        _this.store.remove(reaction);
-        resolve(result);
-      }).catch((e) => {
-        console.error(e);
-        notifyError('Failed to save reaction');
-        reject(e);
-      });
+      })
+        .then((result) => {
+          _this.store.remove(reaction);
+          resolve(result);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError('Failed to save reaction');
+          reject(e);
+        });
     });
   }
 
@@ -144,9 +166,11 @@ class ReactionsController {
       }
     } catch (err) {
       console.log('failed to load bulk reactions');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Error loading reactions');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Error loading reactions'
+      );
     }
   }
 

@@ -9,5 +9,5 @@ module.exports = {
     return queryInterface.addColumn('OffchainThreads', 'category_id', {
       type: Sequelize.INTEGER,
     });
-  }
+  },
 };

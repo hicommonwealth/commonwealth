@@ -26,12 +26,12 @@ const createDraft = async (
   }
 
   const draftContent = {
-        chain: chain.id,
-        address_id: author.id,
-        title,
-        body,
-        topic,
-      };
+    chain: chain.id,
+    address_id: author.id,
+    title,
+    body,
+    topic,
+  };
 
   const draft = await models.DiscussionDraft.create(draftContent);
 

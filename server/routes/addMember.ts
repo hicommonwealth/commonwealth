@@ -14,7 +14,12 @@ export const Errors = {
   AlreadyMember: 'Already a member of this community',
 };
 
-const addMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const addMember = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!chain) return next(new Error(Errors.InvalidCommunity));

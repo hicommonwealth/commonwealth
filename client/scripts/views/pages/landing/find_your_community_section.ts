@@ -19,16 +19,21 @@ const TokenHoldersComponent: m.Component<IState, IState> = {
       'section.LandingPageTokenHolders',
       { class: 'container mx-auto pt-20' },
       [
-        m('h2',
+        m(
+          'h2',
           { class: 'text-3xl font-bold mb-5 text-center' },
-          ' Token holders come together '),
-        m('p',
+          ' Token holders come together '
+        ),
+        m(
+          'p',
           { class: 'text-2xl max-w-screen-sm mx-auto text-center mb-10' },
-          ' Find your community and drive your token forward. '),
+          ' Find your community and drive your token forward. '
+        ),
         // m('div.TokenHoldersButton',
         //   { class: 'text-center' },
         //   m(LandingPageButton, { href: '', text: 'Find your community' })),
-        m('div',
+        m(
+          'div',
           {
             class: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-20',
           },
@@ -42,7 +47,8 @@ const TokenHoldersComponent: m.Component<IState, IState> = {
               m('h3', { class: 'mt-4 text-2xl font-bold mb-1' }, holder.title),
               m('p', { class: 'text-lg' }, holder.text),
             ]);
-          })),
+          })
+        ),
       ]
     );
   },

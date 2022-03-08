@@ -13,64 +13,64 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface GuildBank2Interface extends ethers.utils.Interface {
   functions: {
-    "isOwner()": FunctionFragment;
-    "owner()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
-    "withdraw(address,uint256,uint256,address[])": FunctionFragment;
-    "withdrawToken(address,address,uint256)": FunctionFragment;
+    'isOwner()': FunctionFragment;
+    'owner()': FunctionFragment;
+    'renounceOwnership()': FunctionFragment;
+    'transferOwnership(address)': FunctionFragment;
+    'withdraw(address,uint256,uint256,address[])': FunctionFragment;
+    'withdrawToken(address,address,uint256)': FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "isOwner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'isOwner', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
+    functionFragment: 'renounceOwnership',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "transferOwnership",
+    functionFragment: 'transferOwnership',
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "withdraw",
+    functionFragment: 'withdraw',
     values: [string, BigNumberish, BigNumberish, string[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "withdrawToken",
+    functionFragment: 'withdrawToken',
     values: [string, string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: "isOwner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'isOwner', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
+    functionFragment: 'renounceOwnership',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferOwnership",
+    functionFragment: 'transferOwnership',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "withdrawToken",
+    functionFragment: 'withdrawToken',
     data: BytesLike
   ): Result;
 
   events: {
-    "OwnershipTransferred(address,address)": EventFragment;
-    "Withdrawal(address,address,uint256)": EventFragment;
+    'OwnershipTransferred(address,address)': EventFragment;
+    'Withdrawal(address,address,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Withdrawal"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'OwnershipTransferred'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Withdrawal'): EventFragment;
 }
 
 export class GuildBank2 extends Contract {
@@ -119,17 +119,17 @@ export class GuildBank2 extends Contract {
   functions: {
     isOwner(overrides?: CallOverrides): Promise<[boolean]>;
 
-    "isOwner()"(overrides?: CallOverrides): Promise<[boolean]>;
+    'isOwner()'(overrides?: CallOverrides): Promise<[boolean]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
-    "owner()"(overrides?: CallOverrides): Promise<[string]>;
+    'owner()'(overrides?: CallOverrides): Promise<[string]>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "renounceOwnership()"(
+    'renounceOwnership()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -138,7 +138,7 @@ export class GuildBank2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferOwnership(address)"(
+    'transferOwnership(address)'(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -151,7 +151,7 @@ export class GuildBank2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "withdraw(address,uint256,uint256,address[])"(
+    'withdraw(address,uint256,uint256,address[])'(
       receiver: string,
       shares: BigNumberish,
       totalShares: BigNumberish,
@@ -166,7 +166,7 @@ export class GuildBank2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "withdrawToken(address,address,uint256)"(
+    'withdrawToken(address,address,uint256)'(
       token: string,
       receiver: string,
       amount: BigNumberish,
@@ -176,17 +176,17 @@ export class GuildBank2 extends Contract {
 
   isOwner(overrides?: CallOverrides): Promise<boolean>;
 
-  "isOwner()"(overrides?: CallOverrides): Promise<boolean>;
+  'isOwner()'(overrides?: CallOverrides): Promise<boolean>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
-  "owner()"(overrides?: CallOverrides): Promise<string>;
+  'owner()'(overrides?: CallOverrides): Promise<string>;
 
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "renounceOwnership()"(
+  'renounceOwnership()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -195,7 +195,7 @@ export class GuildBank2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transferOwnership(address)"(
+  'transferOwnership(address)'(
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -208,7 +208,7 @@ export class GuildBank2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "withdraw(address,uint256,uint256,address[])"(
+  'withdraw(address,uint256,uint256,address[])'(
     receiver: string,
     shares: BigNumberish,
     totalShares: BigNumberish,
@@ -223,7 +223,7 @@ export class GuildBank2 extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "withdrawToken(address,address,uint256)"(
+  'withdrawToken(address,address,uint256)'(
     token: string,
     receiver: string,
     amount: BigNumberish,
@@ -233,22 +233,22 @@ export class GuildBank2 extends Contract {
   callStatic: {
     isOwner(overrides?: CallOverrides): Promise<boolean>;
 
-    "isOwner()"(overrides?: CallOverrides): Promise<boolean>;
+    'isOwner()'(overrides?: CallOverrides): Promise<boolean>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
-    "owner()"(overrides?: CallOverrides): Promise<string>;
+    'owner()'(overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    "renounceOwnership()"(overrides?: CallOverrides): Promise<void>;
+    'renounceOwnership()'(overrides?: CallOverrides): Promise<void>;
 
     transferOwnership(
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "transferOwnership(address)"(
+    'transferOwnership(address)'(
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -261,7 +261,7 @@ export class GuildBank2 extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "withdraw(address,uint256,uint256,address[])"(
+    'withdraw(address,uint256,uint256,address[])'(
       receiver: string,
       shares: BigNumberish,
       totalShares: BigNumberish,
@@ -276,7 +276,7 @@ export class GuildBank2 extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "withdrawToken(address,address,uint256)"(
+    'withdrawToken(address,address,uint256)'(
       token: string,
       receiver: string,
       amount: BigNumberish,
@@ -306,17 +306,17 @@ export class GuildBank2 extends Contract {
   estimateGas: {
     isOwner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "isOwner()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'isOwner()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'owner()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "renounceOwnership()"(
+    'renounceOwnership()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -325,7 +325,7 @@ export class GuildBank2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transferOwnership(address)"(
+    'transferOwnership(address)'(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -338,7 +338,7 @@ export class GuildBank2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "withdraw(address,uint256,uint256,address[])"(
+    'withdraw(address,uint256,uint256,address[])'(
       receiver: string,
       shares: BigNumberish,
       totalShares: BigNumberish,
@@ -353,7 +353,7 @@ export class GuildBank2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "withdrawToken(address,address,uint256)"(
+    'withdrawToken(address,address,uint256)'(
       token: string,
       receiver: string,
       amount: BigNumberish,
@@ -364,17 +364,17 @@ export class GuildBank2 extends Contract {
   populateTransaction: {
     isOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "isOwner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'isOwner()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'owner()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "renounceOwnership()"(
+    'renounceOwnership()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -383,7 +383,7 @@ export class GuildBank2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transferOwnership(address)"(
+    'transferOwnership(address)'(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -396,7 +396,7 @@ export class GuildBank2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "withdraw(address,uint256,uint256,address[])"(
+    'withdraw(address,uint256,uint256,address[])'(
       receiver: string,
       shares: BigNumberish,
       totalShares: BigNumberish,
@@ -411,7 +411,7 @@ export class GuildBank2 extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "withdrawToken(address,address,uint256)"(
+    'withdrawToken(address,address,uint256)'(
       token: string,
       receiver: string,
       amount: BigNumberish,

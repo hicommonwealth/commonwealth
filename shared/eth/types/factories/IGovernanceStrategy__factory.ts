@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Contract, Signer } from 'ethers';
+import { Provider } from '@ethersproject/providers';
 
-import type { IGovernanceStrategy } from "../IGovernanceStrategy";
+import type { IGovernanceStrategy } from '../IGovernanceStrategy';
 
 export class IGovernanceStrategy__factory {
   static connect(
@@ -20,87 +20,87 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "user",
-        type: "address",
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
       },
       {
-        internalType: "uint256",
-        name: "blockNumber",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'blockNumber',
+        type: 'uint256',
       },
     ],
-    name: "getPropositionPowerAt",
+    name: 'getPropositionPowerAt',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "blockNumber",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'blockNumber',
+        type: 'uint256',
       },
     ],
-    name: "getTotalPropositionSupplyAt",
+    name: 'getTotalPropositionSupplyAt',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "blockNumber",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'blockNumber',
+        type: 'uint256',
       },
     ],
-    name: "getTotalVotingSupplyAt",
+    name: 'getTotalVotingSupplyAt',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "user",
-        type: "address",
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
       },
       {
-        internalType: "uint256",
-        name: "blockNumber",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'blockNumber',
+        type: 'uint256',
       },
     ],
-    name: "getVotingPowerAt",
+    name: 'getVotingPowerAt',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
 ];

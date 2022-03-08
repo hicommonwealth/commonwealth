@@ -9,7 +9,7 @@ export type LinkedThreadAttributes = {
   linking_thread: number;
   created_at?: Date;
   updated_at?: Date;
-}
+};
 
 export type LinkedThreadInstance = ModelInstance<LinkedThreadAttributes> & {
   getOffchainThread: Sequelize.BelongsToGetAssociationMixin<OffchainThreadInstance>;
@@ -17,7 +17,7 @@ export type LinkedThreadInstance = ModelInstance<LinkedThreadAttributes> & {
     OffchainThreadInstance,
     OffchainThreadInstance['id']
   >;
-}
+};
 
 export type LinkedThreadModelStatic = ModelStatic<LinkedThreadInstance>;
 

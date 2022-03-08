@@ -59,7 +59,7 @@ export type ChainAttributes = {
     | OffchainCommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
-}
+};
 
 export type ChainInstance = ModelInstance<ChainAttributes> & {
   // add mixins as needed
@@ -74,7 +74,7 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
     OffchainTopicInstance,
     OffchainTopicInstance['id']
   >;
-}
+};
 
 export type ChainModelStatic = ModelStatic<ChainInstance>;
 
@@ -143,7 +143,7 @@ export default (
   Chain.associate = (models) => {
     models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' })
+    models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Chain.hasMany(models.OffchainTopic, {
       as: 'topics',
       foreignKey: 'chain_id',

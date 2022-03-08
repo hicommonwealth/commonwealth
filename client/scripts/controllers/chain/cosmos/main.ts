@@ -13,10 +13,7 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public governance: CosmosGovernance;
   public readonly base = ChainBase.CosmosSDK;
 
-  constructor(
-    meta: NodeInfo,
-    app: IApp,
-  ) {
+  constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
     this.chain = new CosmosChain(this.app);
     this.accounts = new CosmosAccounts(this.app);

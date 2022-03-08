@@ -41,9 +41,7 @@ const updateThreadPrivacy = async (
         },
       });
       const role = roles.find((r) => {
-        return (
-          r.chain_id === thread.chain
-        );
+        return r.chain_id === thread.chain;
       });
       if (!role) return next(new Error(Errors.NotAdmin));
     }

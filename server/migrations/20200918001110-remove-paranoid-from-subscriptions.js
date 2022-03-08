@@ -12,13 +12,16 @@ module.exports = {
         'DELETE FROM "Subscriptions" WHERE deleted_at IS NOT NULL',
         { transaction: t }
       );
-      return queryInterface.removeColumn(
-        'Subscriptions', 'deleted_at', { transaction: t }
-      );
+      return queryInterface.removeColumn('Subscriptions', 'deleted_at', {
+        transaction: t,
+      });
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('Subscriptions', 'deleted_at', { type: Sequelize.DATE, allowNull: true });
-  }
+    return queryInterface.addColumn('Subscriptions', 'deleted_at', {
+      type: Sequelize.DATE,
+      allowNull: true,
+    });
+  },
 };

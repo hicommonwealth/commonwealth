@@ -14,117 +14,117 @@ import {
   Overrides,
   PayableOverrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface ICompoundTimelockInterface extends ethers.utils.Interface {
   functions: {
-    "GRACE_PERIOD()": FunctionFragment;
-    "MAXIMUM_DELAY()": FunctionFragment;
-    "MINIMUM_DELAY()": FunctionFragment;
-    "acceptAdmin()": FunctionFragment;
-    "admin()": FunctionFragment;
-    "cancelTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
-    "delay()": FunctionFragment;
-    "executeTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
-    "pendingAdmin()": FunctionFragment;
-    "queueTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
-    "queuedTransactions(bytes32)": FunctionFragment;
-    "setDelay(uint256)": FunctionFragment;
-    "setPendingAdmin(address)": FunctionFragment;
+    'GRACE_PERIOD()': FunctionFragment;
+    'MAXIMUM_DELAY()': FunctionFragment;
+    'MINIMUM_DELAY()': FunctionFragment;
+    'acceptAdmin()': FunctionFragment;
+    'admin()': FunctionFragment;
+    'cancelTransaction(address,uint256,string,bytes,uint256)': FunctionFragment;
+    'delay()': FunctionFragment;
+    'executeTransaction(address,uint256,string,bytes,uint256)': FunctionFragment;
+    'pendingAdmin()': FunctionFragment;
+    'queueTransaction(address,uint256,string,bytes,uint256)': FunctionFragment;
+    'queuedTransactions(bytes32)': FunctionFragment;
+    'setDelay(uint256)': FunctionFragment;
+    'setPendingAdmin(address)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "GRACE_PERIOD",
+    functionFragment: 'GRACE_PERIOD',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MAXIMUM_DELAY",
+    functionFragment: 'MAXIMUM_DELAY',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MINIMUM_DELAY",
+    functionFragment: 'MINIMUM_DELAY',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "acceptAdmin",
+    functionFragment: 'acceptAdmin',
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'admin', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "cancelTransaction",
+    functionFragment: 'cancelTransaction',
     values: [string, BigNumberish, string, BytesLike, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "delay", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'delay', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "executeTransaction",
-    values: [string, BigNumberish, string, BytesLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "pendingAdmin",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "queueTransaction",
+    functionFragment: 'executeTransaction',
     values: [string, BigNumberish, string, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "queuedTransactions",
+    functionFragment: 'pendingAdmin',
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'queueTransaction',
+    values: [string, BigNumberish, string, BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'queuedTransactions',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "setDelay",
+    functionFragment: 'setDelay',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setPendingAdmin",
+    functionFragment: 'setPendingAdmin',
     values: [string]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "GRACE_PERIOD",
+    functionFragment: 'GRACE_PERIOD',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MAXIMUM_DELAY",
+    functionFragment: 'MAXIMUM_DELAY',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MINIMUM_DELAY",
+    functionFragment: 'MINIMUM_DELAY',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "acceptAdmin",
+    functionFragment: 'acceptAdmin',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'admin', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "cancelTransaction",
+    functionFragment: 'cancelTransaction',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "delay", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'delay', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "executeTransaction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "pendingAdmin",
+    functionFragment: 'executeTransaction',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "queueTransaction",
+    functionFragment: 'pendingAdmin',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "queuedTransactions",
+    functionFragment: 'queueTransaction',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setDelay", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setPendingAdmin",
+    functionFragment: 'queuedTransactions',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'setDelay', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'setPendingAdmin',
     data: BytesLike
   ): Result;
 
@@ -177,27 +177,27 @@ export class ICompoundTimelock extends Contract {
   functions: {
     GRACE_PERIOD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'GRACE_PERIOD()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     MAXIMUM_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'MAXIMUM_DELAY()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     MINIMUM_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'MINIMUM_DELAY()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     acceptAdmin(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "acceptAdmin()"(
+    'acceptAdmin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     admin(overrides?: CallOverrides): Promise<[string]>;
 
-    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+    'admin()'(overrides?: CallOverrides): Promise<[string]>;
 
     cancelTransaction(
       target: string,
@@ -208,7 +208,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
+    'cancelTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -219,7 +219,7 @@ export class ICompoundTimelock extends Contract {
 
     delay(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "delay()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'delay()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     executeTransaction(
       target: string,
@@ -230,7 +230,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "executeTransaction(address,uint256,string,bytes,uint256)"(
+    'executeTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -241,7 +241,7 @@ export class ICompoundTimelock extends Contract {
 
     pendingAdmin(overrides?: CallOverrides): Promise<[string]>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<[string]>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<[string]>;
 
     queueTransaction(
       target: string,
@@ -252,7 +252,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "queueTransaction(address,uint256,string,bytes,uint256)"(
+    'queueTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -266,7 +266,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "queuedTransactions(bytes32)"(
+    'queuedTransactions(bytes32)'(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
@@ -276,7 +276,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setDelay(uint256)"(
+    'setDelay(uint256)'(
       arg0: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -286,7 +286,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setPendingAdmin(address)"(
+    'setPendingAdmin(address)'(
       arg0: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -294,27 +294,27 @@ export class ICompoundTimelock extends Contract {
 
   GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'GRACE_PERIOD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'MAXIMUM_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'MINIMUM_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   acceptAdmin(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "acceptAdmin()"(
+  'acceptAdmin()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   admin(overrides?: CallOverrides): Promise<string>;
 
-  "admin()"(overrides?: CallOverrides): Promise<string>;
+  'admin()'(overrides?: CallOverrides): Promise<string>;
 
   cancelTransaction(
     target: string,
@@ -325,7 +325,7 @@ export class ICompoundTimelock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "cancelTransaction(address,uint256,string,bytes,uint256)"(
+  'cancelTransaction(address,uint256,string,bytes,uint256)'(
     target: string,
     value: BigNumberish,
     signature: string,
@@ -336,7 +336,7 @@ export class ICompoundTimelock extends Contract {
 
   delay(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'delay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   executeTransaction(
     target: string,
@@ -347,7 +347,7 @@ export class ICompoundTimelock extends Contract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "executeTransaction(address,uint256,string,bytes,uint256)"(
+  'executeTransaction(address,uint256,string,bytes,uint256)'(
     target: string,
     value: BigNumberish,
     signature: string,
@@ -358,7 +358,7 @@ export class ICompoundTimelock extends Contract {
 
   pendingAdmin(overrides?: CallOverrides): Promise<string>;
 
-  "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
+  'pendingAdmin()'(overrides?: CallOverrides): Promise<string>;
 
   queueTransaction(
     target: string,
@@ -369,7 +369,7 @@ export class ICompoundTimelock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "queueTransaction(address,uint256,string,bytes,uint256)"(
+  'queueTransaction(address,uint256,string,bytes,uint256)'(
     target: string,
     value: BigNumberish,
     signature: string,
@@ -383,7 +383,7 @@ export class ICompoundTimelock extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "queuedTransactions(bytes32)"(
+  'queuedTransactions(bytes32)'(
     arg0: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
@@ -393,7 +393,7 @@ export class ICompoundTimelock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setDelay(uint256)"(
+  'setDelay(uint256)'(
     arg0: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -403,7 +403,7 @@ export class ICompoundTimelock extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setPendingAdmin(address)"(
+  'setPendingAdmin(address)'(
     arg0: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -411,23 +411,23 @@ export class ICompoundTimelock extends Contract {
   callStatic: {
     GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'GRACE_PERIOD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MAXIMUM_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MINIMUM_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     acceptAdmin(overrides?: CallOverrides): Promise<void>;
 
-    "acceptAdmin()"(overrides?: CallOverrides): Promise<void>;
+    'acceptAdmin()'(overrides?: CallOverrides): Promise<void>;
 
     admin(overrides?: CallOverrides): Promise<string>;
 
-    "admin()"(overrides?: CallOverrides): Promise<string>;
+    'admin()'(overrides?: CallOverrides): Promise<string>;
 
     cancelTransaction(
       target: string,
@@ -438,7 +438,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
+    'cancelTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -449,7 +449,7 @@ export class ICompoundTimelock extends Contract {
 
     delay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'delay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     executeTransaction(
       target: string,
@@ -460,7 +460,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "executeTransaction(address,uint256,string,bytes,uint256)"(
+    'executeTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -471,7 +471,7 @@ export class ICompoundTimelock extends Contract {
 
     pendingAdmin(overrides?: CallOverrides): Promise<string>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<string>;
 
     queueTransaction(
       target: string,
@@ -482,7 +482,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "queueTransaction(address,uint256,string,bytes,uint256)"(
+    'queueTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -496,21 +496,21 @@ export class ICompoundTimelock extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "queuedTransactions(bytes32)"(
+    'queuedTransactions(bytes32)'(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     setDelay(arg0: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    "setDelay(uint256)"(
+    'setDelay(uint256)'(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setPendingAdmin(arg0: string, overrides?: CallOverrides): Promise<void>;
 
-    "setPendingAdmin(address)"(
+    'setPendingAdmin(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -521,27 +521,27 @@ export class ICompoundTimelock extends Contract {
   estimateGas: {
     GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'GRACE_PERIOD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MAXIMUM_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MINIMUM_DELAY()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     acceptAdmin(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "acceptAdmin()"(
+    'acceptAdmin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     admin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'admin()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     cancelTransaction(
       target: string,
@@ -552,7 +552,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
+    'cancelTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -563,7 +563,7 @@ export class ICompoundTimelock extends Contract {
 
     delay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'delay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     executeTransaction(
       target: string,
@@ -574,7 +574,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "executeTransaction(address,uint256,string,bytes,uint256)"(
+    'executeTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -585,7 +585,7 @@ export class ICompoundTimelock extends Contract {
 
     pendingAdmin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     queueTransaction(
       target: string,
@@ -596,7 +596,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "queueTransaction(address,uint256,string,bytes,uint256)"(
+    'queueTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -610,7 +610,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "queuedTransactions(bytes32)"(
+    'queuedTransactions(bytes32)'(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -620,7 +620,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setDelay(uint256)"(
+    'setDelay(uint256)'(
       arg0: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -630,7 +630,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setPendingAdmin(address)"(
+    'setPendingAdmin(address)'(
       arg0: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -639,27 +639,27 @@ export class ICompoundTimelock extends Contract {
   populateTransaction: {
     GRACE_PERIOD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'GRACE_PERIOD()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     MAXIMUM_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'MAXIMUM_DELAY()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     MINIMUM_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'MINIMUM_DELAY()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     acceptAdmin(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "acceptAdmin()"(
+    'acceptAdmin()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'admin()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     cancelTransaction(
       target: string,
@@ -670,7 +670,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
+    'cancelTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -681,7 +681,7 @@ export class ICompoundTimelock extends Contract {
 
     delay(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "delay()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'delay()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     executeTransaction(
       target: string,
@@ -692,7 +692,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "executeTransaction(address,uint256,string,bytes,uint256)"(
+    'executeTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -703,7 +703,7 @@ export class ICompoundTimelock extends Contract {
 
     pendingAdmin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     queueTransaction(
       target: string,
@@ -714,7 +714,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "queueTransaction(address,uint256,string,bytes,uint256)"(
+    'queueTransaction(address,uint256,string,bytes,uint256)'(
       target: string,
       value: BigNumberish,
       signature: string,
@@ -728,7 +728,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "queuedTransactions(bytes32)"(
+    'queuedTransactions(bytes32)'(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -738,7 +738,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setDelay(uint256)"(
+    'setDelay(uint256)'(
       arg0: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -748,7 +748,7 @@ export class ICompoundTimelock extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setPendingAdmin(address)"(
+    'setPendingAdmin(address)'(
       arg0: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

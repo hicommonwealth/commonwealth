@@ -6,6 +6,10 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('Addresses', 'selected', { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false, });
-  }
+    return queryInterface.addColumn('Addresses', 'selected', {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    });
+  },
 };

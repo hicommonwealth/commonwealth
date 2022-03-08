@@ -17,17 +17,21 @@ export default class Token extends Solana implements ITokenAdapter {
     // query balance
     const mintPubKey = new solw3.PublicKey(this.contractAddress);
     try {
-      const { value } = await this.chain.connection.getParsedTokenAccountsByOwner(
-        account.publicKey,
-        { mint: mintPubKey },
-      );
-      const amount: string = value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount;
+      const { value } =
+        await this.chain.connection.getParsedTokenAccountsByOwner(
+          account.publicKey,
+          { mint: mintPubKey }
+        );
+      const amount: string =
+        value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount;
       const balance = new BN(amount, 10);
       this.hasToken = balance && !balance.isZero();
       if (balance) this.tokenBalance = balance;
       return this.hasToken;
     } catch (e) {
-      console.error(`Failed to query token balance for mint ${this.contractAddress}: ${e.message}`);
+      console.error(
+        `Failed to query token balance for mint ${this.contractAddress}: ${e.message}`
+      );
       return false;
     }
   }

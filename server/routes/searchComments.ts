@@ -8,7 +8,7 @@ const Errors = {
   UnexpectedError: 'Unexpected error',
   QueryMissing: 'Must enter query to begin searching',
   QueryTooShort: 'Query must be at least 4 characters',
-  NoCommunity: 'Title search must be community scoped'
+  NoCommunity: 'Title search must be community scoped',
 };
 
 const searchComments = async (
@@ -37,11 +37,12 @@ const searchComments = async (
     bind = { chain: chain.id };
   }
 
-  const sort = req.query.sort === 'Newest'
-    ? 'ORDER BY "OffchainComments".created_at DESC'
-    : req.query.sort === 'Oldest'
-    ? 'ORDER BY "OffchainComments".created_at ASC'
-    : 'ORDER BY rank DESC'
+  const sort =
+    req.query.sort === 'Newest'
+      ? 'ORDER BY "OffchainComments".created_at DESC'
+      : req.query.sort === 'Oldest'
+      ? 'ORDER BY "OffchainComments".created_at ASC'
+      : 'ORDER BY rank DESC';
 
   bind['searchTerm'] = req.query.search;
   bind['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend

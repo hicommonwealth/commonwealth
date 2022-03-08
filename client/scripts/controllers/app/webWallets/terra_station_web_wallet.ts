@@ -6,7 +6,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _accounts: string[] = [];
   private _enabling: boolean = false;
-  private _extension = new Extension()
+  private _extension = new Extension();
 
   public readonly name = 'terrastation';
   public readonly label = 'TerraStation';
@@ -59,12 +59,12 @@ class TerraStationWebWalletController implements IWebWallet<string> {
       console.log(payload);
     });
     const msgs: Msg[] = [
-      new MsgStoreCode(this._accounts[0], account.validationToken)
+      new MsgStoreCode(this._accounts[0], account.validationToken),
     ];
     try {
       this._extension.sign({
         fee: new StdFee(0, '0ust'),
-        msgs
+        msgs,
       });
     } catch (error) {
       console.log(error);
@@ -83,10 +83,10 @@ class TerraStationWebWalletController implements IWebWallet<string> {
       signature: {
         pub_key: {
           type: 'tendermint/PubKeySecp256k1',
-          value: result.public_key
+          value: result.public_key,
         },
-        signature: result.signature
-      }
+        signature: result.signature,
+      },
     };
     return account.validate(JSON.stringify(signature));
   }

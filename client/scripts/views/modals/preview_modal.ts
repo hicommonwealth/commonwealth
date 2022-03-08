@@ -14,7 +14,8 @@ const PreviewModal: m.Component<{ title: string; doc: string }> = {
         m('h3', title ? `Preview: ${title}` : 'Preview'),
         m(CompactModalExitButton),
       ]),
-      m('.compact-modal-body',
+      m(
+        '.compact-modal-body',
         (() => {
           try {
             const doc = JSON.parse(vnode.attrs.doc);

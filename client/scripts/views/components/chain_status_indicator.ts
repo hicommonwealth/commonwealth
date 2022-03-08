@@ -20,19 +20,25 @@ const ChainStatusIndicator: m.Component<{
       [ApiStatus.Connected, 'Online'],
     ]);
 
-    const title = !app.chain ? '' : app.chain.networkStatus !== ApiStatus.Connected
+    const title = !app.chain
+      ? ''
+      : app.chain.networkStatus !== ApiStatus.Connected
       ? apiStatusToLabel.get(app.chain.networkStatus)
       : app.chain?.block?.height
-        ? 'Connected'
-        : 'Loading...';
+      ? 'Connected'
+      : 'Loading...';
 
     return m('.ChainStatusIndicator', [
-      m('.status', {
-        class: app.chain ? apiStatusToClass.get(app.chain.networkStatus) : '',
-        title,
-      }, hideLabel ? '' : title)
+      m(
+        '.status',
+        {
+          class: app.chain ? apiStatusToClass.get(app.chain.networkStatus) : '',
+          title,
+        },
+        hideLabel ? '' : title
+      ),
     ]);
-  }
+  },
 };
 
 export default ChainStatusIndicator;

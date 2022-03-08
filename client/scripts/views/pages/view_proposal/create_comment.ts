@@ -6,7 +6,13 @@ import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, OffchainComment, AnyProposal, Account, ITokenAdapter } from 'models';
+import {
+  OffchainThread,
+  OffchainComment,
+  AnyProposal,
+  Account,
+  ITokenAdapter,
+} from 'models';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -19,44 +25,52 @@ import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
 
-const CreateComment: m.Component<{
-  callback: CallableFunction,
-  cancellable?: boolean,
-  getSetGlobalEditingStatus: CallableFunction,
-  proposalPageState: IProposalPageState,
-  parentComment?: OffchainComment<any>,
-  rootProposal: AnyProposal | OffchainThread,
-  tabindex?: number,
-}, {
-  quillEditorState: any,
-  uploadsInProgress,
-  error,
-  saving: boolean,
-  sendingComment,
-}> = {
+const CreateComment: m.Component<
+  {
+    callback: CallableFunction;
+    cancellable?: boolean;
+    getSetGlobalEditingStatus: CallableFunction;
+    proposalPageState: IProposalPageState;
+    parentComment?: OffchainComment<any>;
+    rootProposal: AnyProposal | OffchainThread;
+    tabindex?: number;
+  },
+  {
+    quillEditorState: any;
+    uploadsInProgress;
+    error;
+    saving: boolean;
+    sendingComment;
+  }
+> = {
   view: (vnode) => {
     const {
       callback,
       cancellable,
       getSetGlobalEditingStatus,
       proposalPageState,
-      rootProposal
+      rootProposal,
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
-    let disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
-      || vnode.state.quillEditorState?.editor?.editor?.isBlank();
+    let disabled =
+      getSetGlobalEditingStatus(GlobalStatus.Get) ||
+      vnode.state.quillEditorState?.editor?.editor?.isBlank();
 
     const author = app.user.activeAccount;
-    const parentType = (parentComment || proposalPageState.parentCommentId)
-      ? CommentParent.Comment
-      : CommentParent.Proposal;
+    const parentType =
+      parentComment || proposalPageState.parentCommentId
+        ? CommentParent.Comment
+        : CommentParent.Proposal;
     if (!parentComment) parentComment = null;
     if (vnode.state.uploadsInProgress === undefined) {
       vnode.state.uploadsInProgress = 0;
     }
 
     const submitComment = async (e?) => {
-      if (!vnode.state.quillEditorState || !vnode.state.quillEditorState.editor) {
+      if (
+        !vnode.state.quillEditorState ||
+        !vnode.state.quillEditorState.editor
+      ) {
         if (e) e.preventDefault();
         vnode.state.error = 'Editor not initialized, please try again';
         return;
@@ -69,7 +83,9 @@ const CreateComment: m.Component<{
 
       const { quillEditorState } = vnode.state;
 
-      const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
+      const mentionsEle = document.getElementsByClassName(
+        'ql-mention-list-container'
+      )[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
       const commentText = quillEditorState.markdownMode
@@ -85,8 +101,14 @@ const CreateComment: m.Component<{
       quillEditorState.editor.enable(false);
       const chainId = app.activeChainId();
       try {
-        const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-          chainId, commentText, proposalPageState.parentCommentId, attachments);
+        const res = await app.comments.create(
+          author.address,
+          rootProposal.uniqueIdentifier,
+          chainId,
+          commentText,
+          proposalPageState.parentCommentId,
+          attachments
+        );
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
@@ -113,23 +135,25 @@ const CreateComment: m.Component<{
       vnode.state.saving = false;
       mixpanel.track('Proposal Funnel', {
         'Step No': 2,
-        'Step': 'Create Comment',
-        'Proposal Name': `${(rootProposal).slug}: ${(rootProposal).identifier}`,
-        'Scope': app.activeChainId(),
+        Step: 'Create Comment',
+        'Proposal Name': `${rootProposal.slug}: ${rootProposal.identifier}`,
+        Scope: app.activeChainId(),
       });
       mixpanel.people.increment('Comment');
       mixpanel.people.set({
-        'Last Comment Created': new Date().toISOString()
+        'Last Comment Created': new Date().toISOString(),
       });
 
       proposalPageState.replying = false;
       proposalPageState.parentCommentId = null;
     };
 
-    const activeTopicName = rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
+    const activeTopicName =
+      rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
 
-    const isAdmin = app.user.isSiteAdmin
-      || app.user.isAdminOfEntity({ chain: app.activeChainId() });
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({ chain: app.activeChainId() });
 
     let parentScopedClass = 'new-thread-child';
     let parentAuthor: Account<any>;
@@ -139,11 +163,12 @@ const CreateComment: m.Component<{
     }
 
     const { error, sendingComment, uploadsInProgress } = vnode.state;
-    disabled = getSetGlobalEditingStatus(GlobalStatus.Get)
-      || vnode.state.quillEditorState?.editor?.editor?.isBlank()
-      || sendingComment
-      || uploadsInProgress
-      || !app.user.activeAccount;
+    disabled =
+      getSetGlobalEditingStatus(GlobalStatus.Get) ||
+      vnode.state.quillEditorState?.editor?.editor?.isBlank() ||
+      sendingComment ||
+      uploadsInProgress ||
+      !app.user.activeAccount;
 
     // token balance check if needed
     let tokenPostingThreshold: BN | null = null;
@@ -153,116 +178,155 @@ const CreateComment: m.Component<{
         activeTopicName,
         app.activeChainId()
       )?.tokenThreshold;
-      disabled = disabled
-        || !app.isAdapterReady
-        || (!isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
+      disabled =
+        disabled ||
+        !app.isAdapterReady ||
+        (!isAdmin &&
+          tokenPostingThreshold &&
+          tokenPostingThreshold.gt(tokenBalance));
     }
 
-    const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
-    return m('.CreateComment', {
-      class: parentScopedClass
-    }, [
-      m('.create-comment-avatar', [
-        m(User, { user: author, popover: true, avatarOnly: true, avatarSize: 40 }),
-      ]),
-      m('.create-comment-body', [
-        m('.reply-header', [
-          m('h3', parentType === CommentParent.Comment
-            ? ['Replying to ', m(User, { user: parentAuthor, popover: true, hideAvatar: true })]
-            : 'Reply')
+    const decimals = app.chain?.meta.chain?.decimals
+      ? app.chain.meta.chain.decimals
+      : 18;
+    return m(
+      '.CreateComment',
+      {
+        class: parentScopedClass,
+      },
+      [
+        m('.create-comment-avatar', [
+          m(User, {
+            user: author,
+            popover: true,
+            avatarOnly: true,
+            avatarSize: 40,
+          }),
         ]),
-        m(User, { user: author, popover: true, hideAvatar: true }),
-        (rootProposal instanceof OffchainThread && rootProposal.readOnly)
-          ? m(Callout, {
-            intent: 'primary',
-            content: 'Commenting is disabled because this post has been locked.',
-          })
-          : [
-            app.user.activeAccount?.profile && !app.user.activeAccount.profile.name && m(Callout, {
-              class: 'no-profile-callout',
-              intent: 'primary',
-              content: [
-                'You haven\'t set a display name yet. ',
-                m('a', {
-                  href: `/${app.activeChainId()}/account/${app.user.activeAccount.address}`
-                    + `?base=${app.user.activeAccount.chain}`,
-                  onclick: (e) => {
-                    e.preventDefault();
-                    app.modals.create({
-                      modal: EditProfileModal,
-                      data: {
-                        account: app.user.activeAccount,
-                        refreshCallback: () => m.redraw(),
-                      },
-                    });
-                  }
-                }, 'Set a display name'),
-              ],
-            }),
-            m(QuillEditor, {
-              contentsDoc: '',
-              oncreateBind: (state) => {
-                vnode.state.quillEditorState = state;
-              },
-              editorNamespace: `${document.location.pathname}-commenting`,
-              onkeyboardSubmit: () => {
-                submitComment();
-                m.redraw(); // ensure button is disabled
-              },
-              imageUploader: true,
-              tabindex: vnode.attrs.tabindex,
-            }),
-            m('.token-requirement', [
-              tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
+        m('.create-comment-body', [
+          m('.reply-header', [
+            m(
+              'h3',
+              parentType === CommentParent.Comment
                 ? [
-                  `Commenting in "${activeTopicName}" requires `,
-                  `${weiToTokens(tokenPostingThreshold.toString(), decimals)} `,
-                  `${app.chain.meta.chain.symbol}. `,
-                    ITokenAdapter.instanceOf(app.chain)
-                    && app.chain.tokenBalance
-                    && app.user.activeAccount
-                    && `You have ${
-                      weiToTokens(app.chain.tokenBalance.toString(), decimals)
-                    } ${app.chain.meta.chain.symbol}.`
-                ]
-                : null
-            ]),
-            m('.form-bottom', {
-              onmouseover: () => m.redraw(), // keeps Quill's isBlank up to date
-            }, [
-              m('.form-buttons', [
-                m(Button, {
-                  intent: 'primary',
-                  type: 'submit',
-                  compact: true,
-                  disabled,
-                  rounded: true,
-                  onclick: submitComment,
-                  label: (uploadsInProgress > 0)
-                    ? 'Uploading...'
-                    : 'Submit'
-                }),
-                cancellable
-                  && m(Button, {
-                    intent: 'none',
-                    type: 'cancel',
-                    compact: true,
-                    rounded: true,
-                    onclick: (e) => {
-                      e.preventDefault();
-                      proposalPageState.replying = false;
-                      proposalPageState.parentCommentId = null;
-                    },
-                    label: 'Cancel'
+                    'Replying to ',
+                    m(User, {
+                      user: parentAuthor,
+                      popover: true,
+                      hideAvatar: true,
+                    }),
+                  ]
+                : 'Reply'
+            ),
+          ]),
+          m(User, { user: author, popover: true, hideAvatar: true }),
+          rootProposal instanceof OffchainThread && rootProposal.readOnly
+            ? m(Callout, {
+                intent: 'primary',
+                content:
+                  'Commenting is disabled because this post has been locked.',
+              })
+            : [
+                app.user.activeAccount?.profile &&
+                  !app.user.activeAccount.profile.name &&
+                  m(Callout, {
+                    class: 'no-profile-callout',
+                    intent: 'primary',
+                    content: [
+                      "You haven't set a display name yet. ",
+                      m(
+                        'a',
+                        {
+                          href:
+                            `/${app.activeChainId()}/account/${
+                              app.user.activeAccount.address
+                            }` + `?base=${app.user.activeAccount.chain}`,
+                          onclick: (e) => {
+                            e.preventDefault();
+                            app.modals.create({
+                              modal: EditProfileModal,
+                              data: {
+                                account: app.user.activeAccount,
+                                refreshCallback: () => m.redraw(),
+                              },
+                            });
+                          },
+                        },
+                        'Set a display name'
+                      ),
+                    ],
                   }),
-              ]),
-              error
-              && m('.new-comment-error', error),
-            ]),
-          ]
-      ])
-    ]);
-  }
+                m(QuillEditor, {
+                  contentsDoc: '',
+                  oncreateBind: (state) => {
+                    vnode.state.quillEditorState = state;
+                  },
+                  editorNamespace: `${document.location.pathname}-commenting`,
+                  onkeyboardSubmit: () => {
+                    submitComment();
+                    m.redraw(); // ensure button is disabled
+                  },
+                  imageUploader: true,
+                  tabindex: vnode.attrs.tabindex,
+                }),
+                m('.token-requirement', [
+                  tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0))
+                    ? [
+                        `Commenting in "${activeTopicName}" requires `,
+                        `${weiToTokens(
+                          tokenPostingThreshold.toString(),
+                          decimals
+                        )} `,
+                        `${app.chain.meta.chain.symbol}. `,
+                        ITokenAdapter.instanceOf(app.chain) &&
+                          app.chain.tokenBalance &&
+                          app.user.activeAccount &&
+                          `You have ${weiToTokens(
+                            app.chain.tokenBalance.toString(),
+                            decimals
+                          )} ${app.chain.meta.chain.symbol}.`,
+                      ]
+                    : null,
+                ]),
+                m(
+                  '.form-bottom',
+                  {
+                    onmouseover: () => m.redraw(), // keeps Quill's isBlank up to date
+                  },
+                  [
+                    m('.form-buttons', [
+                      m(Button, {
+                        intent: 'primary',
+                        type: 'submit',
+                        compact: true,
+                        disabled,
+                        rounded: true,
+                        onclick: submitComment,
+                        label:
+                          uploadsInProgress > 0 ? 'Uploading...' : 'Submit',
+                      }),
+                      cancellable &&
+                        m(Button, {
+                          intent: 'none',
+                          type: 'cancel',
+                          compact: true,
+                          rounded: true,
+                          onclick: (e) => {
+                            e.preventDefault();
+                            proposalPageState.replying = false;
+                            proposalPageState.parentCommentId = null;
+                          },
+                          label: 'Cancel',
+                        }),
+                    ]),
+                    error && m('.new-comment-error', error),
+                  ]
+                ),
+              ],
+        ]),
+      ]
+    );
+  },
 };
 
 export default CreateComment;

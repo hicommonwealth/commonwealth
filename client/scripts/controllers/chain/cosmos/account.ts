@@ -18,15 +18,24 @@ export default class CosmosAccount extends Account<CosmosToken> {
 
   // TODO: add delegations, validations
   private _balance: CosmosToken;
-  public get balance() { return this.updateBalance().then(() => this._balance); }
+  public get balance() {
+    return this.updateBalance().then(() => this._balance);
+  }
 
-  constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
+  constructor(
+    app: IApp,
+    ChainInfo: CosmosChain,
+    Accounts: CosmosAccounts,
+    address: string
+  ) {
     super(app, app.chain.meta.chain, address);
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {
-        if (app.chain.chain instanceof CosmosChain) this._Chain = app.chain.chain;
-        else console.error('Did not successfully initialize account with chain');
+        if (app.chain.chain instanceof CosmosChain)
+          this._Chain = app.chain.chain;
+        else
+          console.error('Did not successfully initialize account with chain');
       });
     } else {
       this._Chain = ChainInfo;
@@ -37,7 +46,10 @@ export default class CosmosAccount extends Account<CosmosToken> {
 
   public updateBalance = _.throttle(async () => {
     try {
-      const bal = await this._Chain.api.bank.balance(this.address, this._Chain.denom);
+      const bal = await this._Chain.api.bank.balance(
+        this.address,
+        this._Chain.denom
+      );
       this._balance = this._Chain.coins(new BN(bal.amount));
     } catch (e) {
       // if coins is null, they have a zero balance
@@ -52,8 +64,8 @@ export default class CosmosAccount extends Account<CosmosToken> {
       value: {
         fromAddress: this.address,
         toAddress: recipient.address,
-        amount: [ { denom: amount.denom, amount: amount.toString() } ],
-      }
+        amount: [{ denom: amount.denom, amount: amount.toString() }],
+      },
     };
     await this._Chain.sendTx(this, msg);
   }
@@ -65,7 +77,7 @@ export default class CosmosAccount extends Account<CosmosToken> {
         delegatorAddress: this.address,
         validatorAddress,
         amount: amount.toCoinObject(),
-      }
+      },
     };
     await this._Chain.sendTx(this, msg);
   }
@@ -77,7 +89,7 @@ export default class CosmosAccount extends Account<CosmosToken> {
         delegatorAddress: this.address,
         validatorAddress,
         amount: amount.toCoinObject(),
-      }
+      },
     };
     await this._Chain.sendTx(this, msg);
   }
@@ -88,7 +100,7 @@ export default class CosmosAccount extends Account<CosmosToken> {
       value: {
         delegatorAddress: this.address,
         validatorAddress,
-      }
+      },
     };
     await this._Chain.sendTx(this, msg);
   }

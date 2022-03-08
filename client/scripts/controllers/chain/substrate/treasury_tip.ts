@@ -1,9 +1,19 @@
 import { ApiPromise } from '@polkadot/api';
 import BN from 'bn.js';
-import { ISubstrateTreasuryTip, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
-  Proposal, ProposalStatus, ProposalEndTime, ITXModalData,
-  VotingType, VotingUnit, ChainEntity, ChainEvent, DepositVote,
+  ISubstrateTreasuryTip,
+  SubstrateCoin,
+} from 'adapters/chain/substrate/types';
+import {
+  Proposal,
+  ProposalStatus,
+  ProposalEndTime,
+  ITXModalData,
+  VotingType,
+  VotingUnit,
+  ChainEntity,
+  ChainEvent,
+  DepositVote,
 } from 'models';
 import { SubstrateTypes } from '@commonwealth/chain-events';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
@@ -29,7 +39,10 @@ const backportEventToAdapter = (
 };
 
 export class SubstrateTreasuryTip extends Proposal<
-  ApiPromise, SubstrateCoin, ISubstrateTreasuryTip, DepositVote<SubstrateCoin>
+  ApiPromise,
+  SubstrateCoin,
+  ISubstrateTreasuryTip,
+  DepositVote<SubstrateCoin>
 > {
   public get shortIdentifier() {
     // TODO: better identifier? Maybe based on user?
@@ -38,23 +51,44 @@ export class SubstrateTreasuryTip extends Proposal<
 
   private _title: string;
   public get title() {
-    return this._title || `${this.support.inDollars} ${this.support.denom} to ${this.data.who.slice(0, 8)}…`;
+    return (
+      this._title ||
+      `${this.support.inDollars} ${this.support.denom} to ${this.data.who.slice(
+        0,
+        8
+      )}…`
+    );
   }
 
   private readonly _description: string;
-  public get description() { return this._description; }
+  public get description() {
+    return this._description;
+  }
 
   private readonly _author: SubstrateAccount;
-  public get author() { return this._author; }
+  public get author() {
+    return this._author;
+  }
 
   private _retracted = false;
-  public get retracted() { return this._retracted; }
+  public get retracted() {
+    return this._retracted;
+  }
 
   private _slashed = false;
-  public get slashed() { return this._slashed; }
+  public get slashed() {
+    return this._slashed;
+  }
 
-  public get isClosing() { return !!this.data.closing; }
-  public get isClosable() { return this.data.closing &&  this.data.closing <= this._Tips.app.chain.block.height; }
+  public get isClosing() {
+    return !!this.data.closing;
+  }
+  public get isClosable() {
+    return (
+      this.data.closing &&
+      this.data.closing <= this._Tips.app.chain.block.height
+    );
+  }
 
   // TODO: are these voting types correct?
   public readonly votingType = VotingType.SimpleYesApprovalVoting;
@@ -70,8 +104,12 @@ export class SubstrateTreasuryTip extends Proposal<
     const n = deposits.length;
     let median = 0;
     if (n > 0) {
-      median = (n % 2) ? deposits[Math.floor(n / 2)]
-        : (deposits[Math.floor((n + 1) / 2)] + deposits[Math.floor((n - 1) / 2)]) / 2;
+      median =
+        n % 2
+          ? deposits[Math.floor(n / 2)]
+          : (deposits[Math.floor((n + 1) / 2)] +
+              deposits[Math.floor((n - 1) / 2)]) /
+            2;
     }
     return this._Chain.coins(median, true);
   }
@@ -83,12 +121,15 @@ export class SubstrateTreasuryTip extends Proposal<
     return ProposalStatus.None;
   }
 
-  get endTime() : ProposalEndTime {
+  get endTime(): ProposalEndTime {
     if (this._data.closing) {
       return { kind: 'fixed_block', blocknum: this._data.closing };
     } else {
       // threshold for moving to "closing" is majority of Tippers elect to tip
-      return { kind: 'threshold', threshold: Math.floor((this._Tips.members.length + 1) / 2) };
+      return {
+        kind: 'threshold',
+        threshold: Math.floor((this._Tips.members.length + 1) / 2),
+      };
     }
   }
 
@@ -109,7 +150,8 @@ export class SubstrateTreasuryTip extends Proposal<
   public get blockExplorerLinkLabel() {
     const chainInfo = this._Chain.app.chain?.meta?.chain;
     const blockExplorerIds = chainInfo?.blockExplorerIds;
-    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    if (blockExplorerIds && blockExplorerIds['subscan'])
+      return 'View in Subscan';
     return undefined;
   }
 
@@ -126,15 +168,17 @@ export class SubstrateTreasuryTip extends Proposal<
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Tips: SubstrateTreasuryTips,
-    entity: ChainEntity,
+    entity: ChainEntity
   ) {
-    super(ProposalType.SubstrateTreasuryTip, backportEventToAdapter(
-      ChainInfo,
-      entity.chainEvents
-        .find(
+    super(
+      ProposalType.SubstrateTreasuryTip,
+      backportEventToAdapter(
+        ChainInfo,
+        entity.chainEvents.find(
           (e) => e.data.kind === SubstrateTypes.EventKind.NewTip
         ).data as SubstrateTypes.INewTip
-    ));
+      )
+    );
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Tips = Tips;
@@ -148,11 +192,13 @@ export class SubstrateTreasuryTip extends Proposal<
     if (!this.completed) {
       const slug = chainEntityTypeToProposalSlug(entity.type);
       const uniqueId = `${slug}_${entity.typeId}`;
-      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
-        if (response.status === 'Success' && response.result?.length) {
-          this._title = response.result;
-        }
-      });
+      this._Chain.app.chain.chainEntities
+        ._fetchTitle(entity.chain, uniqueId)
+        .then((response) => {
+          if (response.status === 'Success' && response.result?.length) {
+            this._title = response.result;
+          }
+        });
     }
     this._initialized = true;
     this._Tips.store.add(this);
@@ -211,7 +257,7 @@ export class SubstrateTreasuryTip extends Proposal<
       vote.account as SubstrateAccount,
       (api: ApiPromise) => api.tx.tips.tip(this.data.hash, vote.deposit.asBN),
       'tip',
-      this.title,
+      this.title
       // (success) => {
       //   if (success) {
       //     this.addOrUpdateVote(vote);
@@ -221,14 +267,17 @@ export class SubstrateTreasuryTip extends Proposal<
   }
 
   public closeTx(who: SubstrateAccount): ITXModalData {
-    if (!this.data.closing || this.data.closing > this._Tips.app.chain.block.height) {
+    if (
+      !this.data.closing ||
+      this.data.closing > this._Tips.app.chain.block.height
+    ) {
       throw new Error('Tip not ready for closing.');
     }
     return this._Chain.createTXModalData(
       who,
       (api: ApiPromise) => api.tx.tips.closeTip(this.data.hash),
       'closeTip',
-      this.title,
+      this.title
       // (success) => success && this.complete(),
     );
   }
@@ -241,7 +290,7 @@ export class SubstrateTreasuryTip extends Proposal<
       who,
       (api: ApiPromise) => api.tx.tips.retractTip(this.data.hash),
       'retractTip',
-      this.title,
+      this.title
       // (success) => {
       //   if (success) {
       //     this._retracted = true;

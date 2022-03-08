@@ -29,5 +29,5 @@ module.exports = {
         { transaction: t }
       );
     });
-  }
+  },
 };

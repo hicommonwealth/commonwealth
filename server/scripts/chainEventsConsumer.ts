@@ -14,19 +14,23 @@ import { factory, formatFilename } from '../../shared/logging';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import models from '../database';
 
-
 const log = factory.getLogger(formatFilename(__filename));
 
-const setupChainEventListeners = async (wss: WebSocket.Server):
-  Promise<{ eventsSubscriber: SubscriberSessionAsPromised, identitySubscriber: SubscriberSessionAsPromised}> => {
-
-  let consumer: RabbitMQController
+const setupChainEventListeners = async (
+  wss: WebSocket.Server
+): Promise<{
+  eventsSubscriber: SubscriberSessionAsPromised;
+  identitySubscriber: SubscriberSessionAsPromised;
+}> => {
+  let consumer: RabbitMQController;
   try {
     consumer = new RabbitMQController(<BrokerConfig>RabbitMQConfig);
     await consumer.init();
   } catch (e) {
-    log.error("Rascal consumer setup failed. Please check the Rascal configuration");
-    throw e
+    log.error(
+      'Rascal consumer setup failed. Please check the Rascal configuration'
+    );
+    throw e;
   }
 
   // writes events into the db as ChainEvents rows
@@ -82,7 +86,9 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
         log.error(
-          `${handler.name} handler failed to process the following event: ${JSON.stringify(
+          `${
+            handler.name
+          } handler failed to process the following event: ${JSON.stringify(
             event,
             null,
             2
@@ -98,7 +104,9 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
           prevResult = await handler.handle(event, prevResult);
         } catch (err) {
           log.error(
-            `${handler.name} handler failed to process the following event: ${JSON.stringify(
+            `${
+              handler.name
+            } handler failed to process the following event: ${JSON.stringify(
               event,
               null,
               2
@@ -120,7 +128,8 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
     }
   }
 
-  let eventsSubscriber: SubscriberSessionAsPromised, identitySubscriber: SubscriberSessionAsPromised;
+  let eventsSubscriber: SubscriberSessionAsPromised,
+    identitySubscriber: SubscriberSessionAsPromised;
 
   try {
     eventsSubscriber = await consumer.startSubscription(
@@ -141,7 +150,6 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
     log.info('Failure in SubstrateIdentityEventsSubscription');
     throw e;
   }
-
 
   log.info('Consumer started');
   return { eventsSubscriber, identitySubscriber };

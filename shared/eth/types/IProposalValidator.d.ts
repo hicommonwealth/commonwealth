@@ -12,132 +12,132 @@ import {
   Contract,
   ContractTransaction,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface IProposalValidatorInterface extends ethers.utils.Interface {
   functions: {
-    "MINIMUM_QUORUM()": FunctionFragment;
-    "ONE_HUNDRED_WITH_PRECISION()": FunctionFragment;
-    "PROPOSITION_THRESHOLD()": FunctionFragment;
-    "VOTE_DIFFERENTIAL()": FunctionFragment;
-    "VOTING_DURATION()": FunctionFragment;
-    "getMinimumPropositionPowerNeeded(address,uint256)": FunctionFragment;
-    "getMinimumVotingPowerNeeded(uint256)": FunctionFragment;
-    "isProposalPassed(address,uint256)": FunctionFragment;
-    "isPropositionPowerEnough(address,address,uint256)": FunctionFragment;
-    "isQuorumValid(address,uint256)": FunctionFragment;
-    "isVoteDifferentialValid(address,uint256)": FunctionFragment;
-    "validateCreatorOfProposal(address,address,uint256)": FunctionFragment;
-    "validateProposalCancellation(address,address,uint256)": FunctionFragment;
+    'MINIMUM_QUORUM()': FunctionFragment;
+    'ONE_HUNDRED_WITH_PRECISION()': FunctionFragment;
+    'PROPOSITION_THRESHOLD()': FunctionFragment;
+    'VOTE_DIFFERENTIAL()': FunctionFragment;
+    'VOTING_DURATION()': FunctionFragment;
+    'getMinimumPropositionPowerNeeded(address,uint256)': FunctionFragment;
+    'getMinimumVotingPowerNeeded(uint256)': FunctionFragment;
+    'isProposalPassed(address,uint256)': FunctionFragment;
+    'isPropositionPowerEnough(address,address,uint256)': FunctionFragment;
+    'isQuorumValid(address,uint256)': FunctionFragment;
+    'isVoteDifferentialValid(address,uint256)': FunctionFragment;
+    'validateCreatorOfProposal(address,address,uint256)': FunctionFragment;
+    'validateProposalCancellation(address,address,uint256)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "MINIMUM_QUORUM",
+    functionFragment: 'MINIMUM_QUORUM',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "ONE_HUNDRED_WITH_PRECISION",
+    functionFragment: 'ONE_HUNDRED_WITH_PRECISION',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "PROPOSITION_THRESHOLD",
+    functionFragment: 'PROPOSITION_THRESHOLD',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "VOTE_DIFFERENTIAL",
+    functionFragment: 'VOTE_DIFFERENTIAL',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "VOTING_DURATION",
+    functionFragment: 'VOTING_DURATION',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getMinimumPropositionPowerNeeded",
+    functionFragment: 'getMinimumPropositionPowerNeeded',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getMinimumVotingPowerNeeded",
+    functionFragment: 'getMinimumVotingPowerNeeded',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "isProposalPassed",
+    functionFragment: 'isProposalPassed',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "isPropositionPowerEnough",
+    functionFragment: 'isPropositionPowerEnough',
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "isQuorumValid",
+    functionFragment: 'isQuorumValid',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "isVoteDifferentialValid",
+    functionFragment: 'isVoteDifferentialValid',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "validateCreatorOfProposal",
+    functionFragment: 'validateCreatorOfProposal',
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "validateProposalCancellation",
+    functionFragment: 'validateProposalCancellation',
     values: [string, string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "MINIMUM_QUORUM",
+    functionFragment: 'MINIMUM_QUORUM',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "ONE_HUNDRED_WITH_PRECISION",
+    functionFragment: 'ONE_HUNDRED_WITH_PRECISION',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "PROPOSITION_THRESHOLD",
+    functionFragment: 'PROPOSITION_THRESHOLD',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "VOTE_DIFFERENTIAL",
+    functionFragment: 'VOTE_DIFFERENTIAL',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "VOTING_DURATION",
+    functionFragment: 'VOTING_DURATION',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getMinimumPropositionPowerNeeded",
+    functionFragment: 'getMinimumPropositionPowerNeeded',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getMinimumVotingPowerNeeded",
+    functionFragment: 'getMinimumVotingPowerNeeded',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isProposalPassed",
+    functionFragment: 'isProposalPassed',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isPropositionPowerEnough",
+    functionFragment: 'isPropositionPowerEnough',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isQuorumValid",
+    functionFragment: 'isQuorumValid',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isVoteDifferentialValid",
+    functionFragment: 'isVoteDifferentialValid',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "validateCreatorOfProposal",
+    functionFragment: 'validateCreatorOfProposal',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "validateProposalCancellation",
+    functionFragment: 'validateProposalCancellation',
     data: BytesLike
   ): Result;
 
@@ -190,25 +190,25 @@ export class IProposalValidator extends Contract {
   functions: {
     MINIMUM_QUORUM(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "MINIMUM_QUORUM()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'MINIMUM_QUORUM()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     ONE_HUNDRED_WITH_PRECISION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "ONE_HUNDRED_WITH_PRECISION()"(
+    'ONE_HUNDRED_WITH_PRECISION()'(
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     PROPOSITION_THRESHOLD(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "PROPOSITION_THRESHOLD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'PROPOSITION_THRESHOLD()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     VOTE_DIFFERENTIAL(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "VOTE_DIFFERENTIAL()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'VOTE_DIFFERENTIAL()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     VOTING_DURATION(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "VOTING_DURATION()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'VOTING_DURATION()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getMinimumPropositionPowerNeeded(
       governance: string,
@@ -216,7 +216,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getMinimumPropositionPowerNeeded(address,uint256)"(
+    'getMinimumPropositionPowerNeeded(address,uint256)'(
       governance: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -227,7 +227,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getMinimumVotingPowerNeeded(uint256)"(
+    'getMinimumVotingPowerNeeded(uint256)'(
       votingSupply: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -238,7 +238,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "isProposalPassed(address,uint256)"(
+    'isProposalPassed(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -251,7 +251,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "isPropositionPowerEnough(address,address,uint256)"(
+    'isPropositionPowerEnough(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -264,7 +264,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "isQuorumValid(address,uint256)"(
+    'isQuorumValid(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -276,7 +276,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "isVoteDifferentialValid(address,uint256)"(
+    'isVoteDifferentialValid(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -289,7 +289,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "validateCreatorOfProposal(address,address,uint256)"(
+    'validateCreatorOfProposal(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -303,7 +303,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "validateProposalCancellation(address,address,uint256)"(
+    'validateProposalCancellation(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -313,23 +313,23 @@ export class IProposalValidator extends Contract {
 
   MINIMUM_QUORUM(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "MINIMUM_QUORUM()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'MINIMUM_QUORUM()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   ONE_HUNDRED_WITH_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "ONE_HUNDRED_WITH_PRECISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'ONE_HUNDRED_WITH_PRECISION()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   PROPOSITION_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "PROPOSITION_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'PROPOSITION_THRESHOLD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   VOTE_DIFFERENTIAL(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "VOTE_DIFFERENTIAL()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'VOTE_DIFFERENTIAL()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   VOTING_DURATION(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "VOTING_DURATION()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'VOTING_DURATION()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   getMinimumPropositionPowerNeeded(
     governance: string,
@@ -337,7 +337,7 @@ export class IProposalValidator extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getMinimumPropositionPowerNeeded(address,uint256)"(
+  'getMinimumPropositionPowerNeeded(address,uint256)'(
     governance: string,
     blockNumber: BigNumberish,
     overrides?: CallOverrides
@@ -348,7 +348,7 @@ export class IProposalValidator extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getMinimumVotingPowerNeeded(uint256)"(
+  'getMinimumVotingPowerNeeded(uint256)'(
     votingSupply: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -359,7 +359,7 @@ export class IProposalValidator extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isProposalPassed(address,uint256)"(
+  'isProposalPassed(address,uint256)'(
     governance: string,
     proposalId: BigNumberish,
     overrides?: CallOverrides
@@ -372,7 +372,7 @@ export class IProposalValidator extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isPropositionPowerEnough(address,address,uint256)"(
+  'isPropositionPowerEnough(address,address,uint256)'(
     governance: string,
     user: string,
     blockNumber: BigNumberish,
@@ -385,7 +385,7 @@ export class IProposalValidator extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isQuorumValid(address,uint256)"(
+  'isQuorumValid(address,uint256)'(
     governance: string,
     proposalId: BigNumberish,
     overrides?: CallOverrides
@@ -397,7 +397,7 @@ export class IProposalValidator extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isVoteDifferentialValid(address,uint256)"(
+  'isVoteDifferentialValid(address,uint256)'(
     governance: string,
     proposalId: BigNumberish,
     overrides?: CallOverrides
@@ -410,7 +410,7 @@ export class IProposalValidator extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "validateCreatorOfProposal(address,address,uint256)"(
+  'validateCreatorOfProposal(address,address,uint256)'(
     governance: string,
     user: string,
     blockNumber: BigNumberish,
@@ -424,7 +424,7 @@ export class IProposalValidator extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "validateProposalCancellation(address,address,uint256)"(
+  'validateProposalCancellation(address,address,uint256)'(
     governance: string,
     user: string,
     blockNumber: BigNumberish,
@@ -434,25 +434,25 @@ export class IProposalValidator extends Contract {
   callStatic: {
     MINIMUM_QUORUM(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MINIMUM_QUORUM()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MINIMUM_QUORUM()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     ONE_HUNDRED_WITH_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "ONE_HUNDRED_WITH_PRECISION()"(
+    'ONE_HUNDRED_WITH_PRECISION()'(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     PROPOSITION_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "PROPOSITION_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'PROPOSITION_THRESHOLD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     VOTE_DIFFERENTIAL(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "VOTE_DIFFERENTIAL()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'VOTE_DIFFERENTIAL()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     VOTING_DURATION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "VOTING_DURATION()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'VOTING_DURATION()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getMinimumPropositionPowerNeeded(
       governance: string,
@@ -460,7 +460,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getMinimumPropositionPowerNeeded(address,uint256)"(
+    'getMinimumPropositionPowerNeeded(address,uint256)'(
       governance: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -471,7 +471,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getMinimumVotingPowerNeeded(uint256)"(
+    'getMinimumVotingPowerNeeded(uint256)'(
       votingSupply: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -482,7 +482,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isProposalPassed(address,uint256)"(
+    'isProposalPassed(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -495,7 +495,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isPropositionPowerEnough(address,address,uint256)"(
+    'isPropositionPowerEnough(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -508,7 +508,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isQuorumValid(address,uint256)"(
+    'isQuorumValid(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -520,7 +520,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isVoteDifferentialValid(address,uint256)"(
+    'isVoteDifferentialValid(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -533,7 +533,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "validateCreatorOfProposal(address,address,uint256)"(
+    'validateCreatorOfProposal(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -547,7 +547,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "validateProposalCancellation(address,address,uint256)"(
+    'validateProposalCancellation(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -560,25 +560,25 @@ export class IProposalValidator extends Contract {
   estimateGas: {
     MINIMUM_QUORUM(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "MINIMUM_QUORUM()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'MINIMUM_QUORUM()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     ONE_HUNDRED_WITH_PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "ONE_HUNDRED_WITH_PRECISION()"(
+    'ONE_HUNDRED_WITH_PRECISION()'(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     PROPOSITION_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "PROPOSITION_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'PROPOSITION_THRESHOLD()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     VOTE_DIFFERENTIAL(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "VOTE_DIFFERENTIAL()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'VOTE_DIFFERENTIAL()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     VOTING_DURATION(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "VOTING_DURATION()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'VOTING_DURATION()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getMinimumPropositionPowerNeeded(
       governance: string,
@@ -586,7 +586,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getMinimumPropositionPowerNeeded(address,uint256)"(
+    'getMinimumPropositionPowerNeeded(address,uint256)'(
       governance: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -597,7 +597,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getMinimumVotingPowerNeeded(uint256)"(
+    'getMinimumVotingPowerNeeded(uint256)'(
       votingSupply: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -608,7 +608,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isProposalPassed(address,uint256)"(
+    'isProposalPassed(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -621,7 +621,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isPropositionPowerEnough(address,address,uint256)"(
+    'isPropositionPowerEnough(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -634,7 +634,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isQuorumValid(address,uint256)"(
+    'isQuorumValid(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -646,7 +646,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isVoteDifferentialValid(address,uint256)"(
+    'isVoteDifferentialValid(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -659,7 +659,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "validateCreatorOfProposal(address,address,uint256)"(
+    'validateCreatorOfProposal(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -673,7 +673,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "validateProposalCancellation(address,address,uint256)"(
+    'validateProposalCancellation(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -684,7 +684,7 @@ export class IProposalValidator extends Contract {
   populateTransaction: {
     MINIMUM_QUORUM(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "MINIMUM_QUORUM()"(
+    'MINIMUM_QUORUM()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -692,7 +692,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "ONE_HUNDRED_WITH_PRECISION()"(
+    'ONE_HUNDRED_WITH_PRECISION()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -700,19 +700,19 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "PROPOSITION_THRESHOLD()"(
+    'PROPOSITION_THRESHOLD()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     VOTE_DIFFERENTIAL(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "VOTE_DIFFERENTIAL()"(
+    'VOTE_DIFFERENTIAL()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     VOTING_DURATION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "VOTING_DURATION()"(
+    'VOTING_DURATION()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -722,7 +722,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getMinimumPropositionPowerNeeded(address,uint256)"(
+    'getMinimumPropositionPowerNeeded(address,uint256)'(
       governance: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -733,7 +733,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getMinimumVotingPowerNeeded(uint256)"(
+    'getMinimumVotingPowerNeeded(uint256)'(
       votingSupply: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -744,7 +744,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isProposalPassed(address,uint256)"(
+    'isProposalPassed(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -757,7 +757,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isPropositionPowerEnough(address,address,uint256)"(
+    'isPropositionPowerEnough(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -770,7 +770,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isQuorumValid(address,uint256)"(
+    'isQuorumValid(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -782,7 +782,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isVoteDifferentialValid(address,uint256)"(
+    'isVoteDifferentialValid(address,uint256)'(
       governance: string,
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -795,7 +795,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "validateCreatorOfProposal(address,address,uint256)"(
+    'validateCreatorOfProposal(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,
@@ -809,7 +809,7 @@ export class IProposalValidator extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "validateProposalCancellation(address,address,uint256)"(
+    'validateProposalCancellation(address,address,uint256)'(
       governance: string,
       user: string,
       blockNumber: BigNumberish,

@@ -3,10 +3,7 @@ import JobRunner from './cacheJobRunner';
 type CacheT = { [viewerId: string]: { [objectId: string]: number } };
 
 export default class ViewCountCache extends JobRunner<CacheT> {
-  constructor(
-    private _ttlS: number,
-    _pruningJobTimeS: number,
-  ) {
+  constructor(private _ttlS: number, _pruningJobTimeS: number) {
     super({}, _pruningJobTimeS);
     this.start();
   }
@@ -23,7 +20,10 @@ export default class ViewCountCache extends JobRunner<CacheT> {
 
       // if item doesn't exist or is too old, register a view. otherwise, ignore
       let isNewView: boolean;
-      if (!c[viewerId][objectId] || (c[viewerId][objectId] < oldestPermittedTime)) {
+      if (
+        !c[viewerId][objectId] ||
+        c[viewerId][objectId] < oldestPermittedTime
+      ) {
         c[viewerId][objectId] = now;
         isNewView = true;
       } else {
@@ -35,7 +35,7 @@ export default class ViewCountCache extends JobRunner<CacheT> {
 
   // prunes all expired cache entries based on initialized time-to-live
   protected async _job(c: CacheT): Promise<void> {
-    const oldestPermittedTime = (Date.now() / 1000) - this._ttlS;
+    const oldestPermittedTime = Date.now() / 1000 - this._ttlS;
     for (const viewerId of Object.keys(c)) {
       const views = c[viewerId];
       for (const objectId of Object.keys(views)) {

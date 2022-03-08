@@ -19,17 +19,20 @@ export const formatFilename = (name) => {
 };
 
 export const addPrefix = (filename: string, prefixes?: string[]) => {
-  let finalPrefix = ``
+  let finalPrefix = ``;
   if (!prefixes || prefixes.length === 0) return formatFilename(filename);
   else finalPrefix = `${formatFilename(filename)}`;
 
   for (let i = 0; i < prefixes.length; ++i) {
     if (prefixes[i]) finalPrefix = `${finalPrefix}::${prefixes[i]}`;
   }
-  return finalPrefix
-}
+  return finalPrefix;
+};
 
-export const factory = LFService.createNamedLoggerFactory('Commonwealth', options);
+export const factory = LFService.createNamedLoggerFactory(
+  'Commonwealth',
+  options
+);
 
 const control = getLogControl();
 

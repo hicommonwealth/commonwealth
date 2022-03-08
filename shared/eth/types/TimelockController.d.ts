@@ -14,119 +14,119 @@ import {
   Overrides,
   PayableOverrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface TimelockControllerInterface extends ethers.utils.Interface {
   functions: {
-    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "EXECUTOR_ROLE()": FunctionFragment;
-    "PROPOSER_ROLE()": FunctionFragment;
-    "TIMELOCK_ADMIN_ROLE()": FunctionFragment;
-    "cancel(bytes32)": FunctionFragment;
-    "execute(address,uint256,bytes,bytes32,bytes32)": FunctionFragment;
-    "executeBatch(address[],uint256[],bytes[],bytes32,bytes32)": FunctionFragment;
-    "getMinDelay()": FunctionFragment;
-    "getRoleAdmin(bytes32)": FunctionFragment;
-    "getTimestamp(bytes32)": FunctionFragment;
-    "grantRole(bytes32,address)": FunctionFragment;
-    "hasRole(bytes32,address)": FunctionFragment;
-    "hashOperation(address,uint256,bytes,bytes32,bytes32)": FunctionFragment;
-    "hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)": FunctionFragment;
-    "isOperation(bytes32)": FunctionFragment;
-    "isOperationDone(bytes32)": FunctionFragment;
-    "isOperationPending(bytes32)": FunctionFragment;
-    "isOperationReady(bytes32)": FunctionFragment;
-    "renounceRole(bytes32,address)": FunctionFragment;
-    "revokeRole(bytes32,address)": FunctionFragment;
-    "schedule(address,uint256,bytes,bytes32,bytes32,uint256)": FunctionFragment;
-    "scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)": FunctionFragment;
-    "supportsInterface(bytes4)": FunctionFragment;
-    "updateDelay(uint256)": FunctionFragment;
+    'DEFAULT_ADMIN_ROLE()': FunctionFragment;
+    'EXECUTOR_ROLE()': FunctionFragment;
+    'PROPOSER_ROLE()': FunctionFragment;
+    'TIMELOCK_ADMIN_ROLE()': FunctionFragment;
+    'cancel(bytes32)': FunctionFragment;
+    'execute(address,uint256,bytes,bytes32,bytes32)': FunctionFragment;
+    'executeBatch(address[],uint256[],bytes[],bytes32,bytes32)': FunctionFragment;
+    'getMinDelay()': FunctionFragment;
+    'getRoleAdmin(bytes32)': FunctionFragment;
+    'getTimestamp(bytes32)': FunctionFragment;
+    'grantRole(bytes32,address)': FunctionFragment;
+    'hasRole(bytes32,address)': FunctionFragment;
+    'hashOperation(address,uint256,bytes,bytes32,bytes32)': FunctionFragment;
+    'hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)': FunctionFragment;
+    'isOperation(bytes32)': FunctionFragment;
+    'isOperationDone(bytes32)': FunctionFragment;
+    'isOperationPending(bytes32)': FunctionFragment;
+    'isOperationReady(bytes32)': FunctionFragment;
+    'renounceRole(bytes32,address)': FunctionFragment;
+    'revokeRole(bytes32,address)': FunctionFragment;
+    'schedule(address,uint256,bytes,bytes32,bytes32,uint256)': FunctionFragment;
+    'scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)': FunctionFragment;
+    'supportsInterface(bytes4)': FunctionFragment;
+    'updateDelay(uint256)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
+    functionFragment: 'DEFAULT_ADMIN_ROLE',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "EXECUTOR_ROLE",
+    functionFragment: 'EXECUTOR_ROLE',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "PROPOSER_ROLE",
+    functionFragment: 'PROPOSER_ROLE',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "TIMELOCK_ADMIN_ROLE",
+    functionFragment: 'TIMELOCK_ADMIN_ROLE',
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "cancel", values: [BytesLike]): string;
+  encodeFunctionData(functionFragment: 'cancel', values: [BytesLike]): string;
   encodeFunctionData(
-    functionFragment: "execute",
+    functionFragment: 'execute',
     values: [string, BigNumberish, BytesLike, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "executeBatch",
+    functionFragment: 'executeBatch',
     values: [string[], BigNumberish[], BytesLike[], BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "getMinDelay",
+    functionFragment: 'getMinDelay',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getRoleAdmin",
+    functionFragment: 'getRoleAdmin',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "getTimestamp",
+    functionFragment: 'getTimestamp',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "grantRole",
+    functionFragment: 'grantRole',
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "hasRole",
+    functionFragment: 'hasRole',
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "hashOperation",
+    functionFragment: 'hashOperation',
     values: [string, BigNumberish, BytesLike, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "hashOperationBatch",
+    functionFragment: 'hashOperationBatch',
     values: [string[], BigNumberish[], BytesLike[], BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "isOperation",
+    functionFragment: 'isOperation',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "isOperationDone",
+    functionFragment: 'isOperationDone',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "isOperationPending",
+    functionFragment: 'isOperationPending',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "isOperationReady",
+    functionFragment: 'isOperationReady',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "renounceRole",
+    functionFragment: 'renounceRole',
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeRole",
+    functionFragment: 'revokeRole',
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "schedule",
+    functionFragment: 'schedule',
     values: [
       string,
       BigNumberish,
@@ -137,7 +137,7 @@ interface TimelockControllerInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "scheduleBatch",
+    functionFragment: 'scheduleBatch',
     values: [
       string[],
       BigNumberish[],
@@ -148,110 +148,110 @@ interface TimelockControllerInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "supportsInterface",
+    functionFragment: 'supportsInterface',
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "updateDelay",
+    functionFragment: 'updateDelay',
     values: [BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
+    functionFragment: 'DEFAULT_ADMIN_ROLE',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "EXECUTOR_ROLE",
+    functionFragment: 'EXECUTOR_ROLE',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "PROPOSER_ROLE",
+    functionFragment: 'PROPOSER_ROLE',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "TIMELOCK_ADMIN_ROLE",
+    functionFragment: 'TIMELOCK_ADMIN_ROLE',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'cancel', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'execute', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "executeBatch",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getMinDelay",
+    functionFragment: 'executeBatch',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getRoleAdmin",
+    functionFragment: 'getMinDelay',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getTimestamp",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "hashOperation",
+    functionFragment: 'getRoleAdmin',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "hashOperationBatch",
+    functionFragment: 'getTimestamp',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'grantRole', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'hasRole', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'hashOperation',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isOperation",
+    functionFragment: 'hashOperationBatch',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isOperationDone",
+    functionFragment: 'isOperation',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isOperationPending",
+    functionFragment: 'isOperationDone',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isOperationReady",
+    functionFragment: 'isOperationPending',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "renounceRole",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "schedule", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "scheduleBatch",
+    functionFragment: 'isOperationReady',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "supportsInterface",
+    functionFragment: 'renounceRole',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'revokeRole', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'schedule', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'scheduleBatch',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "updateDelay",
+    functionFragment: 'supportsInterface',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'updateDelay',
     data: BytesLike
   ): Result;
 
   events: {
-    "CallExecuted(bytes32,uint256,address,uint256,bytes)": EventFragment;
-    "CallScheduled(bytes32,uint256,address,uint256,bytes,bytes32,uint256)": EventFragment;
-    "Cancelled(bytes32)": EventFragment;
-    "MinDelayChange(uint256,uint256)": EventFragment;
-    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-    "RoleGranted(bytes32,address,address)": EventFragment;
-    "RoleRevoked(bytes32,address,address)": EventFragment;
+    'CallExecuted(bytes32,uint256,address,uint256,bytes)': EventFragment;
+    'CallScheduled(bytes32,uint256,address,uint256,bytes,bytes32,uint256)': EventFragment;
+    'Cancelled(bytes32)': EventFragment;
+    'MinDelayChange(uint256,uint256)': EventFragment;
+    'RoleAdminChanged(bytes32,bytes32,bytes32)': EventFragment;
+    'RoleGranted(bytes32,address,address)': EventFragment;
+    'RoleRevoked(bytes32,address,address)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "CallExecuted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "CallScheduled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Cancelled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "MinDelayChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'CallExecuted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'CallScheduled'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Cancelled'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'MinDelayChange'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'RoleAdminChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'RoleGranted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'RoleRevoked'): EventFragment;
 }
 
 export class TimelockController extends Contract {
@@ -300,26 +300,26 @@ export class TimelockController extends Contract {
   functions: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    "DEFAULT_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<[string]>;
+    'DEFAULT_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<[string]>;
 
     EXECUTOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    "EXECUTOR_ROLE()"(overrides?: CallOverrides): Promise<[string]>;
+    'EXECUTOR_ROLE()'(overrides?: CallOverrides): Promise<[string]>;
 
     PROPOSER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    "PROPOSER_ROLE()"(overrides?: CallOverrides): Promise<[string]>;
+    'PROPOSER_ROLE()'(overrides?: CallOverrides): Promise<[string]>;
 
     TIMELOCK_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    "TIMELOCK_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<[string]>;
+    'TIMELOCK_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<[string]>;
 
     cancel(
       id: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "cancel(bytes32)"(
+    'cancel(bytes32)'(
       id: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -333,7 +333,7 @@ export class TimelockController extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "execute(address,uint256,bytes,bytes32,bytes32)"(
+    'execute(address,uint256,bytes,bytes32,bytes32)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -351,7 +351,7 @@ export class TimelockController extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "executeBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+    'executeBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -364,13 +364,13 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { duration: BigNumber }>;
 
-    "getMinDelay()"(
+    'getMinDelay()'(
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { duration: BigNumber }>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
 
-    "getRoleAdmin(bytes32)"(
+    'getRoleAdmin(bytes32)'(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<[string]>;
@@ -380,7 +380,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { timestamp: BigNumber }>;
 
-    "getTimestamp(bytes32)"(
+    'getTimestamp(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { timestamp: BigNumber }>;
@@ -391,7 +391,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "grantRole(bytes32,address)"(
+    'grantRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -403,7 +403,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "hasRole(bytes32,address)"(
+    'hasRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -418,7 +418,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[string] & { hash: string }>;
 
-    "hashOperation(address,uint256,bytes,bytes32,bytes32)"(
+    'hashOperation(address,uint256,bytes,bytes32,bytes32)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -436,7 +436,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[string] & { hash: string }>;
 
-    "hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+    'hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -450,7 +450,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean] & { pending: boolean }>;
 
-    "isOperation(bytes32)"(
+    'isOperation(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean] & { pending: boolean }>;
@@ -460,7 +460,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean] & { done: boolean }>;
 
-    "isOperationDone(bytes32)"(
+    'isOperationDone(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean] & { done: boolean }>;
@@ -470,7 +470,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean] & { pending: boolean }>;
 
-    "isOperationPending(bytes32)"(
+    'isOperationPending(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean] & { pending: boolean }>;
@@ -480,7 +480,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean] & { ready: boolean }>;
 
-    "isOperationReady(bytes32)"(
+    'isOperationReady(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean] & { ready: boolean }>;
@@ -491,7 +491,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "renounceRole(bytes32,address)"(
+    'renounceRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -503,7 +503,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "revokeRole(bytes32,address)"(
+    'revokeRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -519,7 +519,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "schedule(address,uint256,bytes,bytes32,bytes32,uint256)"(
+    'schedule(address,uint256,bytes,bytes32,bytes32,uint256)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -539,7 +539,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)"(
+    'scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -554,7 +554,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
@@ -564,7 +564,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "updateDelay(uint256)"(
+    'updateDelay(uint256)'(
       newDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -572,26 +572,26 @@ export class TimelockController extends Contract {
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  "DEFAULT_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<string>;
+  'DEFAULT_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
   EXECUTOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  "EXECUTOR_ROLE()"(overrides?: CallOverrides): Promise<string>;
+  'EXECUTOR_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
   PROPOSER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  "PROPOSER_ROLE()"(overrides?: CallOverrides): Promise<string>;
+  'PROPOSER_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
   TIMELOCK_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  "TIMELOCK_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<string>;
+  'TIMELOCK_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
   cancel(
     id: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "cancel(bytes32)"(
+  'cancel(bytes32)'(
     id: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -605,7 +605,7 @@ export class TimelockController extends Contract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "execute(address,uint256,bytes,bytes32,bytes32)"(
+  'execute(address,uint256,bytes,bytes32,bytes32)'(
     target: string,
     value: BigNumberish,
     data: BytesLike,
@@ -623,7 +623,7 @@ export class TimelockController extends Contract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "executeBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+  'executeBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
     targets: string[],
     values: BigNumberish[],
     datas: BytesLike[],
@@ -634,18 +634,18 @@ export class TimelockController extends Contract {
 
   getMinDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getMinDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'getMinDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
-  "getRoleAdmin(bytes32)"(
+  'getRoleAdmin(bytes32)'(
     role: BytesLike,
     overrides?: CallOverrides
   ): Promise<string>;
 
   getTimestamp(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getTimestamp(bytes32)"(
+  'getTimestamp(bytes32)'(
     id: BytesLike,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -656,7 +656,7 @@ export class TimelockController extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "grantRole(bytes32,address)"(
+  'grantRole(bytes32,address)'(
     role: BytesLike,
     account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -668,7 +668,7 @@ export class TimelockController extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "hasRole(bytes32,address)"(
+  'hasRole(bytes32,address)'(
     role: BytesLike,
     account: string,
     overrides?: CallOverrides
@@ -683,7 +683,7 @@ export class TimelockController extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  "hashOperation(address,uint256,bytes,bytes32,bytes32)"(
+  'hashOperation(address,uint256,bytes,bytes32,bytes32)'(
     target: string,
     value: BigNumberish,
     data: BytesLike,
@@ -701,7 +701,7 @@ export class TimelockController extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  "hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+  'hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
     targets: string[],
     values: BigNumberish[],
     datas: BytesLike[],
@@ -712,14 +712,14 @@ export class TimelockController extends Contract {
 
   isOperation(id: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
-  "isOperation(bytes32)"(
+  'isOperation(bytes32)'(
     id: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   isOperationDone(id: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
-  "isOperationDone(bytes32)"(
+  'isOperationDone(bytes32)'(
     id: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
@@ -729,14 +729,14 @@ export class TimelockController extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isOperationPending(bytes32)"(
+  'isOperationPending(bytes32)'(
     id: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   isOperationReady(id: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
-  "isOperationReady(bytes32)"(
+  'isOperationReady(bytes32)'(
     id: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
@@ -747,7 +747,7 @@ export class TimelockController extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "renounceRole(bytes32,address)"(
+  'renounceRole(bytes32,address)'(
     role: BytesLike,
     account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -759,7 +759,7 @@ export class TimelockController extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "revokeRole(bytes32,address)"(
+  'revokeRole(bytes32,address)'(
     role: BytesLike,
     account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -775,7 +775,7 @@ export class TimelockController extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "schedule(address,uint256,bytes,bytes32,bytes32,uint256)"(
+  'schedule(address,uint256,bytes,bytes32,bytes32,uint256)'(
     target: string,
     value: BigNumberish,
     data: BytesLike,
@@ -795,7 +795,7 @@ export class TimelockController extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)"(
+  'scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)'(
     targets: string[],
     values: BigNumberish[],
     datas: BytesLike[],
@@ -810,7 +810,7 @@ export class TimelockController extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "supportsInterface(bytes4)"(
+  'supportsInterface(bytes4)'(
     interfaceId: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
@@ -820,7 +820,7 @@ export class TimelockController extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "updateDelay(uint256)"(
+  'updateDelay(uint256)'(
     newDelay: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -828,23 +828,23 @@ export class TimelockController extends Contract {
   callStatic: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    "DEFAULT_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<string>;
+    'DEFAULT_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
     EXECUTOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    "EXECUTOR_ROLE()"(overrides?: CallOverrides): Promise<string>;
+    'EXECUTOR_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
     PROPOSER_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    "PROPOSER_ROLE()"(overrides?: CallOverrides): Promise<string>;
+    'PROPOSER_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
     TIMELOCK_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    "TIMELOCK_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<string>;
+    'TIMELOCK_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<string>;
 
     cancel(id: BytesLike, overrides?: CallOverrides): Promise<void>;
 
-    "cancel(bytes32)"(id: BytesLike, overrides?: CallOverrides): Promise<void>;
+    'cancel(bytes32)'(id: BytesLike, overrides?: CallOverrides): Promise<void>;
 
     execute(
       target: string,
@@ -855,7 +855,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "execute(address,uint256,bytes,bytes32,bytes32)"(
+    'execute(address,uint256,bytes,bytes32,bytes32)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -873,7 +873,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "executeBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+    'executeBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -884,18 +884,18 @@ export class TimelockController extends Contract {
 
     getMinDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getMinDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'getMinDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
-    "getRoleAdmin(bytes32)"(
+    'getRoleAdmin(bytes32)'(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
 
     getTimestamp(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getTimestamp(bytes32)"(
+    'getTimestamp(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -906,7 +906,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "grantRole(bytes32,address)"(
+    'grantRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -918,7 +918,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "hasRole(bytes32,address)"(
+    'hasRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -933,7 +933,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "hashOperation(address,uint256,bytes,bytes32,bytes32)"(
+    'hashOperation(address,uint256,bytes,bytes32,bytes32)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -951,7 +951,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+    'hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -962,14 +962,14 @@ export class TimelockController extends Contract {
 
     isOperation(id: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
-    "isOperation(bytes32)"(
+    'isOperation(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     isOperationDone(id: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
-    "isOperationDone(bytes32)"(
+    'isOperationDone(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -979,7 +979,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isOperationPending(bytes32)"(
+    'isOperationPending(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -989,7 +989,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isOperationReady(bytes32)"(
+    'isOperationReady(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -1000,7 +1000,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "renounceRole(bytes32,address)"(
+    'renounceRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -1012,7 +1012,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "revokeRole(bytes32,address)"(
+    'revokeRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -1028,7 +1028,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "schedule(address,uint256,bytes,bytes32,bytes32,uint256)"(
+    'schedule(address,uint256,bytes,bytes32,bytes32,uint256)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -1048,7 +1048,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)"(
+    'scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -1063,7 +1063,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -1073,7 +1073,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "updateDelay(uint256)"(
+    'updateDelay(uint256)'(
       newDelay: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1159,26 +1159,26 @@ export class TimelockController extends Contract {
   estimateGas: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "DEFAULT_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'DEFAULT_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     EXECUTOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "EXECUTOR_ROLE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'EXECUTOR_ROLE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     PROPOSER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "PROPOSER_ROLE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'PROPOSER_ROLE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     TIMELOCK_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "TIMELOCK_ADMIN_ROLE()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'TIMELOCK_ADMIN_ROLE()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     cancel(
       id: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "cancel(bytes32)"(
+    'cancel(bytes32)'(
       id: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1192,7 +1192,7 @@ export class TimelockController extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "execute(address,uint256,bytes,bytes32,bytes32)"(
+    'execute(address,uint256,bytes,bytes32,bytes32)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -1210,7 +1210,7 @@ export class TimelockController extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "executeBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+    'executeBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -1221,21 +1221,21 @@ export class TimelockController extends Contract {
 
     getMinDelay(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getMinDelay()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'getMinDelay()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     getRoleAdmin(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getRoleAdmin(bytes32)"(
+    'getRoleAdmin(bytes32)'(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getTimestamp(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getTimestamp(bytes32)"(
+    'getTimestamp(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1246,7 +1246,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "grantRole(bytes32,address)"(
+    'grantRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1258,7 +1258,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "hasRole(bytes32,address)"(
+    'hasRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -1273,7 +1273,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "hashOperation(address,uint256,bytes,bytes32,bytes32)"(
+    'hashOperation(address,uint256,bytes,bytes32,bytes32)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -1291,7 +1291,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+    'hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -1302,7 +1302,7 @@ export class TimelockController extends Contract {
 
     isOperation(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "isOperation(bytes32)"(
+    'isOperation(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1312,7 +1312,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isOperationDone(bytes32)"(
+    'isOperationDone(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1322,7 +1322,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isOperationPending(bytes32)"(
+    'isOperationPending(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1332,7 +1332,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isOperationReady(bytes32)"(
+    'isOperationReady(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1343,7 +1343,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "renounceRole(bytes32,address)"(
+    'renounceRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1355,7 +1355,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "revokeRole(bytes32,address)"(
+    'revokeRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1371,7 +1371,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "schedule(address,uint256,bytes,bytes32,bytes32,uint256)"(
+    'schedule(address,uint256,bytes,bytes32,bytes32,uint256)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -1391,7 +1391,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)"(
+    'scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -1406,7 +1406,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1416,7 +1416,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "updateDelay(uint256)"(
+    'updateDelay(uint256)'(
       newDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1427,23 +1427,23 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "DEFAULT_ADMIN_ROLE()"(
+    'DEFAULT_ADMIN_ROLE()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     EXECUTOR_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "EXECUTOR_ROLE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'EXECUTOR_ROLE()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     PROPOSER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "PROPOSER_ROLE()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'PROPOSER_ROLE()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     TIMELOCK_ADMIN_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "TIMELOCK_ADMIN_ROLE()"(
+    'TIMELOCK_ADMIN_ROLE()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1452,7 +1452,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "cancel(bytes32)"(
+    'cancel(bytes32)'(
       id: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1466,7 +1466,7 @@ export class TimelockController extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "execute(address,uint256,bytes,bytes32,bytes32)"(
+    'execute(address,uint256,bytes,bytes32,bytes32)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -1484,7 +1484,7 @@ export class TimelockController extends Contract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "executeBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+    'executeBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -1495,14 +1495,14 @@ export class TimelockController extends Contract {
 
     getMinDelay(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "getMinDelay()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'getMinDelay()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getRoleAdmin(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getRoleAdmin(bytes32)"(
+    'getRoleAdmin(bytes32)'(
       role: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1512,7 +1512,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getTimestamp(bytes32)"(
+    'getTimestamp(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1523,7 +1523,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "grantRole(bytes32,address)"(
+    'grantRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1535,7 +1535,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "hasRole(bytes32,address)"(
+    'hasRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: CallOverrides
@@ -1550,7 +1550,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "hashOperation(address,uint256,bytes,bytes32,bytes32)"(
+    'hashOperation(address,uint256,bytes,bytes32,bytes32)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -1568,7 +1568,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)"(
+    'hashOperationBatch(address[],uint256[],bytes[],bytes32,bytes32)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -1582,7 +1582,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isOperation(bytes32)"(
+    'isOperation(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1592,7 +1592,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isOperationDone(bytes32)"(
+    'isOperationDone(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1602,7 +1602,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isOperationPending(bytes32)"(
+    'isOperationPending(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1612,7 +1612,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isOperationReady(bytes32)"(
+    'isOperationReady(bytes32)'(
       id: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1623,7 +1623,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "renounceRole(bytes32,address)"(
+    'renounceRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1635,7 +1635,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "revokeRole(bytes32,address)"(
+    'revokeRole(bytes32,address)'(
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1651,7 +1651,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "schedule(address,uint256,bytes,bytes32,bytes32,uint256)"(
+    'schedule(address,uint256,bytes,bytes32,bytes32,uint256)'(
       target: string,
       value: BigNumberish,
       data: BytesLike,
@@ -1671,7 +1671,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)"(
+    'scheduleBatch(address[],uint256[],bytes[],bytes32,bytes32,uint256)'(
       targets: string[],
       values: BigNumberish[],
       datas: BytesLike[],
@@ -1686,7 +1686,7 @@ export class TimelockController extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "supportsInterface(bytes4)"(
+    'supportsInterface(bytes4)'(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1696,7 +1696,7 @@ export class TimelockController extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "updateDelay(uint256)"(
+    'updateDelay(uint256)'(
       newDelay: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

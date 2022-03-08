@@ -8,17 +8,24 @@ enum UpdateTopicsErrors {
   NoAddr = 'Must provide address',
   NoTopic = 'Must provide topic_name',
   InvalidAddr = 'Invalid address',
-  NoPermission = `You do not have permission to edit post's topics`
+  NoPermission = `You do not have permission to edit post's topics`,
 }
 
-const updateTopics = async (models: DB, req, res: Response, next: NextFunction) => {
+const updateTopics = async (
+  models: DB,
+  req,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) return next(new Error(UpdateTopicsErrors.NoUser));
   if (!req.body.thread_id) return next(new Error(UpdateTopicsErrors.NoThread));
   if (!req.body.address) return next(new Error(UpdateTopicsErrors.NoAddr));
   if (!req.body.topic_name) return next(new Error(UpdateTopicsErrors.NoTopic));
 
   const userAddresses = await req.user.getAddresses();
-  const userAddress = userAddresses.find((a) => !!a.verified && a.address === req.body.address);
+  const userAddress = userAddresses.find(
+    (a) => !!a.verified && a.address === req.body.address
+  );
   if (!userAddress) return next(new Error(UpdateTopicsErrors.InvalidAddr));
 
   const thread = await models.OffchainThread.findOne({
@@ -45,7 +52,7 @@ const updateTopics = async (models: DB, req, res: Response, next: NextFunction) 
     thread.topic_id = req.body.topic_id;
     await thread.save();
     newTopic = await models.OffchainTopic.findOne({
-      where: { id: req.body.topic_id }
+      where: { id: req.body.topic_id },
     });
   } else {
     [newTopic] = await models.OffchainTopic.findOrCreate({

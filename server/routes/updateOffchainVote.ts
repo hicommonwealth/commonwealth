@@ -31,16 +31,22 @@ const updateOffchainVote = async (
   // TODO: check and validate req.signature, instead of checking for author
 
   const thread = await models.OffchainThread.findOne({
-    where: { id: req.body.thread_id, chain: chain.id }
+    where: { id: req.body.thread_id, chain: chain.id },
   });
   if (!thread) return next(new Error(Errors.InvalidThread));
 
-  if (!thread.offchain_voting_ends_at && moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())) {
+  if (
+    !thread.offchain_voting_ends_at &&
+    moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())
+  ) {
     return next(new Error(Errors.PollingClosed));
   }
 
   // check token balance threshold if needed
-  const canVote = await tokenBalanceCache.validateTopicThreshold(thread.topic_id, req.body.address);
+  const canVote = await tokenBalanceCache.validateTopicThreshold(
+    thread.topic_id,
+    req.body.address
+  );
   if (!canVote) {
     return next(new Error(Errors.BalanceCheckFailed));
   }
@@ -55,17 +61,20 @@ const updateOffchainVote = async (
         author_chain: req.body.author_chain,
         chain: req.body.chain,
       },
-      transaction: t
+      transaction: t,
     });
 
     // create new vote
-    vote = await models.OffchainVote.create({
-      thread_id: req.body.thread_id,
-      address: req.body.address,
-      author_chain: req.body.author_chain,
-      chain: req.body.chain,
-      option: req.body.option,
-    }, { transaction: t });
+    vote = await models.OffchainVote.create(
+      {
+        thread_id: req.body.thread_id,
+        address: req.body.address,
+        author_chain: req.body.author_chain,
+        chain: req.body.chain,
+        option: req.body.option,
+      },
+      { transaction: t }
+    );
 
     // update denormalized vote count
     if (destroyed === 0) {

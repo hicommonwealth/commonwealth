@@ -85,7 +85,8 @@ describe('Topic Tests', () => {
     });
 
     it('Should pass /bulkTopics', async () => {
-      const res = await chai.request.agent(app)
+      const res = await chai.request
+        .agent(app)
         .get('/api/bulkTopics')
         .set('Accept', 'application/json')
         .query({
@@ -121,7 +122,7 @@ describe('Topic Tests', () => {
       expect(userAddress).to.not.be.null;
       expect(userJWT).to.not.be.null;
 
-      console.log('creating thread')
+      console.log('creating thread');
       const res3 = await modelUtils.createThread({
         chainId: chain,
         address: adminAddress,
@@ -137,14 +138,15 @@ describe('Topic Tests', () => {
     });
 
     it('Should fail to update thread without a topic name', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateTopics')
         .set('Accept', 'application/json')
         .send({
-          'jwt': adminJWT,
-          'thread_id': thread.id,
-          'address': adminAddress,
-          'topic_name': undefined,
+          jwt: adminJWT,
+          thread_id: thread.id,
+          address: adminAddress,
+          topic_name: undefined,
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.not.be.equal('Success');
@@ -152,14 +154,15 @@ describe('Topic Tests', () => {
     });
 
     it('Should successfully add topic to thread with admin account', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateTopics')
         .set('Accept', 'application/json')
         .send({
-          'jwt': adminJWT,
-          'thread_id': thread.id,
-          'address': adminAddress,
-          'topic_name': topicName,
+          jwt: adminJWT,
+          thread_id: thread.id,
+          address: adminAddress,
+          topic_name: topicName,
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
@@ -168,14 +171,15 @@ describe('Topic Tests', () => {
     });
 
     it('Should fail to add topic to thread with non-admin account', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateTopics')
         .set('Accept', 'application/json')
         .send({
-          'jwt': userJWT,
-          'thread_id': thread.id,
-          'address': userAddress,
-          'topic_name': topicName,
+          jwt: userJWT,
+          thread_id: thread.id,
+          address: userAddress,
+          topic_name: topicName,
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.not.be.equal('Success');

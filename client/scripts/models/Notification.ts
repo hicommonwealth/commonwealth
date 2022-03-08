@@ -32,14 +32,20 @@ class Notification {
     }
   }
 
-  public static fromJSON(json, subscription: NotificationSubscription, chainEventType?: ChainEventType) {
+  public static fromJSON(
+    json,
+    subscription: NotificationSubscription,
+    chainEventType?: ChainEventType
+  ) {
     return new Notification(
       json.id,
       json.notification_data,
       json.is_read,
       json.created_at,
       subscription,
-      json?.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent, chainEventType) : undefined
+      json?.ChainEvent
+        ? ChainEvent.fromJSON(json.ChainEvent, chainEventType)
+        : undefined
     );
   }
 }

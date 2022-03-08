@@ -12,7 +12,9 @@ module.exports = {
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },
       });
-      await queryInterface.addIndex('OffchainAttachments', { fields: ['attachable', 'attachment_id'] });
+      await queryInterface.addIndex('OffchainAttachments', {
+        fields: ['attachable', 'attachment_id'],
+      });
       return new Promise((resolve, reject) => resolve());
     } catch (e) {
       return new Promise((resolve, reject) => reject(e));
@@ -21,5 +23,5 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('OffchainAttachments');
-  }
+  },
 };

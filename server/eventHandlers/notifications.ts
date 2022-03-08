@@ -7,7 +7,10 @@ import {
   CWEvent,
   IChainEventKind,
 } from '@commonwealth/chain-events';
-import {ChainEventNotification, NotificationCategories} from '../../shared/types';
+import {
+  ChainEventNotification,
+  NotificationCategories,
+} from '../../shared/types';
 
 import { addPrefix, factory, formatFilename } from '../../shared/logging';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
@@ -30,7 +33,9 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent, dbEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(
+      addPrefix(__filename, [event.network, event.chain])
+    );
 
     if (!dbEvent) {
       log.trace(`No db event received! Ignoring.`);
@@ -52,8 +57,16 @@ export default class extends IEventHandler {
         this._models,
         NotificationCategories.ChainEvent,
         dbEventType.id,
-        { chainEvent: dbEvent, chainEventType: dbEventType, chain_id: event.chain },
-        { chainEvent: dbEvent, chainEventType: dbEventType, chain: event.chain }, // TODO: add webhook data once specced out
+        {
+          chainEvent: dbEvent,
+          chainEventType: dbEventType,
+          chain_id: event.chain,
+        },
+        {
+          chainEvent: dbEvent,
+          chainEventType: dbEventType,
+          chain: event.chain,
+        }, // TODO: add webhook data once specced out
         this._wss,
         event.excludeAddresses,
         event.includeAddresses
@@ -61,19 +74,34 @@ export default class extends IEventHandler {
 
       // construct notification with all the necessary data from the DB (without having to re-query using joins)
       const formattedEvent: ChainEventNotification = dbNotification.toJSON();
-      formattedEvent.ChainEvent = dbEvent.toJSON()
-      formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON()
+      formattedEvent.ChainEvent = dbEvent.toJSON();
+      formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON();
 
       // publish notification to the appropriate RabbitMQ queue (sends to socket.io servers to send to clients)
-      await this._rabbitMqController.publish(formattedEvent, 'ChainEventsNotificationsPublication')
+      await this._rabbitMqController.publish(
+        formattedEvent,
+        'ChainEventsNotificationsPublication'
+      );
 
       return dbEvent;
     } catch (e) {
       if (e.errors && e.errors.length > 0) {
-        const errors = e.errors.map(x => x.message)
-        log.error(`Failed to generate notification (${e.message}): ${errors}!\nevent: ${JSON.stringify(event)}\ndbEvent: ${JSON.stringify(dbEvent)}\n`);
+        const errors = e.errors.map((x) => x.message);
+        log.error(
+          `Failed to generate notification (${
+            e.message
+          }): ${errors}!\nevent: ${JSON.stringify(
+            event
+          )}\ndbEvent: ${JSON.stringify(dbEvent)}\n`
+        );
       } else {
-        log.error(`Failed to generate notification: ${e.message}\nevent: ${JSON.stringify(event)}\ndbEvent: ${JSON.stringify(dbEvent)}\n`);
+        log.error(
+          `Failed to generate notification: ${
+            e.message
+          }\nevent: ${JSON.stringify(event)}\ndbEvent: ${JSON.stringify(
+            dbEvent
+          )}\n`
+        );
       }
       return dbEvent;
     }

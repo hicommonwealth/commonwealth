@@ -8,7 +8,7 @@ import {
   getSignals,
   setupWeb3Provider,
   getLocksForAddress,
-  getSignalsForAddress
+  getSignalsForAddress,
 } from './getEdgewareLockdropLookup';
 const { toBN } = Web3.utils;
 import { factory, formatFilename } from '../../shared/logging';
@@ -81,7 +81,12 @@ const getEarlyParticipationBonus = (lockTime, lockStart) => {
   }
 };
 
-function getEffectiveValue(ethAmount, term, lockTime = undefined, lockStart = undefined) {
+function getEffectiveValue(
+  ethAmount,
+  term,
+  lockTime = undefined,
+  lockStart = undefined
+) {
   // multiplicative bonus starts at 100 / 100 = 1
   let bonus = toBN(100);
   // get multiplicative bonus if calculating allocation of locks
@@ -125,15 +130,17 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
       fromBlock: 0,
       toBlock: 'latest',
     });
-    lockEvents = [ ...lockEvents, ...events ];
+    lockEvents = [...lockEvents, ...events];
   }
 
   // For truffle tests
   let lockdropStartTime;
   if (typeof lockdropContracts[0].LOCK_START_TIME === 'function') {
-    lockdropStartTime = (await lockdropContracts[0].LOCK_START_TIME());
+    lockdropStartTime = await lockdropContracts[0].LOCK_START_TIME();
   } else {
-    lockdropStartTime = (await lockdropContracts[0].methods.LOCK_START_TIME().call());
+    lockdropStartTime = await lockdropContracts[0].methods
+      .LOCK_START_TIME()
+      .call();
   }
   log.info(`Lock events ${lockEvents.length}`);
   for (let i = 0; i < lockEvents.length; i++) {
@@ -145,12 +152,19 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
     // NOTE: if key was less than length of a correct submission (66 chars), funds are considered lost
     let keys = [data.edgewareAddr];
     if (data.edgewareAddr.length >= 66) {
-      keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map((key) => `0x${key}`);
+      keys = data.edgewareAddr
+        .slice(2)
+        .match(/.{1,64}/g)
+        .map((key) => `0x${key}`);
     }
 
     if (!(data.owner in seen)) {
       seen[data.owner] = true;
-      const detailedEvent = await getLocksForAddress(data.owner, event.address, web3);
+      const detailedEvent = await getLocksForAddress(
+        data.owner,
+        event.address,
+        web3
+      );
       if (data.owner in ethAddrToEvent) {
         if (!ethAddrToEvent[data.owner].includes(detailedEvent)) {
           ethAddrToEvent[data.owner].push(detailedEvent);
@@ -176,7 +190,12 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
       edgAddrToETH[keys[0]] = [data.owner];
     }
 
-    const value = getEffectiveValue(data.eth, data.term, data.time, lockdropStartTime);
+    const value = getEffectiveValue(
+      data.eth,
+      data.term,
+      data.time,
+      lockdropStartTime
+    );
     // Add to totals
     totalETHLocked = totalETHLocked.add(toBN(data.eth));
     totalEffectiveETHLocked = totalEffectiveETHLocked.add(value);
@@ -194,8 +213,12 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
     if (data.isValidator) {
       if (keys[0] in validatingLocks) {
         validatingLocks[keys[0]] = {
-          lockAmt: toBN(data.eth).add(toBN(validatingLocks[keys[0]].lockAmt)).toString(),
-          effectiveValue: toBN(validatingLocks[keys[0]].effectiveValue).add(value).toString(),
+          lockAmt: toBN(data.eth)
+            .add(toBN(validatingLocks[keys[0]].lockAmt))
+            .toString(),
+          effectiveValue: toBN(validatingLocks[keys[0]].effectiveValue)
+            .add(value)
+            .toString(),
           lockAddrs: [data.lockAddr, ...validatingLocks[keys[0]].lockAddrs],
         };
       } else {
@@ -211,7 +234,9 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
     if (keys[0] in locks) {
       locks[keys[0]] = {
         lockAmt: toBN(data.eth).add(toBN(locks[keys[0]].lockAmt)).toString(),
-        effectiveValue: toBN(locks[keys[0]].effectiveValue).add(value).toString(),
+        effectiveValue: toBN(locks[keys[0]].effectiveValue)
+          .add(value)
+          .toString(),
         lockAddrs: [data.lockAddr, ...locks[keys[0]].lockAddrs],
       };
     } else {
@@ -237,7 +262,11 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
   };
 };
 
-const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 8461046) => {
+const calculateEffectiveSignals = async (
+  web3,
+  lockdropContracts,
+  blockNumber = 8461046
+) => {
   let totalETHSignaled = toBN(0);
   let totalEffectiveETHSignaled = toBN(0);
   const signals = {};
@@ -251,7 +280,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
       toBlock: 'latest',
     });
 
-    signalEvents = [ ...signalEvents, ...events ];
+    signalEvents = [...signalEvents, ...events];
   }
   log.info(`Signal events ${signalEvents.length}`);
   const gLocks = {};
@@ -284,10 +313,17 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
       // NOTE: if key was less than length of a correct submission (66 chars), funds are considered lost
       let keys = [data.edgewareAddr];
       if (data.edgewareAddr.length >= 66) {
-        keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map((key) => `0x${key}`);
+        keys = data.edgewareAddr
+          .slice(2)
+          .match(/.{1,64}/g)
+          .map((key) => `0x${key}`);
       }
 
-      const detailedEvent = await getSignalsForAddress(data.contractAddr, event.address, web3);
+      const detailedEvent = await getSignalsForAddress(
+        data.contractAddr,
+        event.address,
+        web3
+      );
       if (data.contractAddr in ethAddrToEvent) {
         if (!ethAddrToEvent[data.contractAddr].includes(detailedEvent)) {
           ethAddrToEvent[data.contractAddr].push(detailedEvent);
@@ -305,7 +341,9 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
       }
 
       // Treat generalized locks as 3 month locks
-      if (generalizedLocks.lockedContractAddresses.includes(data.contractAddr)) {
+      if (
+        generalizedLocks.lockedContractAddresses.includes(data.contractAddr)
+      ) {
         log.info(`Generalized lock: ${balance}, ${data.contractAddr}`);
         value = getEffectiveValue(balance, '0');
         if (keys[0] in gLocks) {
@@ -324,12 +362,13 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
         // Iterate over signals, partition reward into delayed and immediate amounts
         if (keys[0] in signals) {
           signals[keys[0]] = {
-            signalAmt: toBN(balance).add(toBN(signals[keys[0]].signalAmt)).toString(),
-            effectiveValue: toBN(signals[keys[0]]
-              .effectiveValue)
+            signalAmt: toBN(balance)
+              .add(toBN(signals[keys[0]].signalAmt))
+              .toString(),
+            effectiveValue: toBN(signals[keys[0]].effectiveValue)
               .add(value)
               .toString(),
-            signalAddrs: [ ...signals[keys[0]].signalAddrs, data.contractAddr ],
+            signalAddrs: [...signals[keys[0]].signalAddrs, data.contractAddr],
           };
         } else {
           signals[keys[0]] = {
@@ -379,20 +418,29 @@ export const getCountsByBlock = async (web3, contracts) => {
   const roundToBlocks = 600;
 
   const reduceOverBlocks = (blocks, valueGetter) => {
-    return blocks.reduce((acc, value) => {
-      const blockNumber = Math.ceil(value.blockNumber / roundToBlocks) * roundToBlocks;
-      if (acc[acc.length - 1].x === blockNumber) {
-        acc[acc.length - 1].y = acc[acc.length - 1].y + valueGetter(value);
-      } else {
-        acc.push({
-          x: blockNumber,
-          y: acc[acc.length - 1].y + valueGetter(value),
-          origin: value.address,
-          txid: value.txid,
-        });
-      }
-      return acc;
-    }, [{ x: Math.floor(blocks[0].blockNumber / roundToBlocks) * roundToBlocks, y: 0 }]);
+    return blocks.reduce(
+      (acc, value) => {
+        const blockNumber =
+          Math.ceil(value.blockNumber / roundToBlocks) * roundToBlocks;
+        if (acc[acc.length - 1].x === blockNumber) {
+          acc[acc.length - 1].y = acc[acc.length - 1].y + valueGetter(value);
+        } else {
+          acc.push({
+            x: blockNumber,
+            y: acc[acc.length - 1].y + valueGetter(value),
+            origin: value.address,
+            txid: value.txid,
+          });
+        }
+        return acc;
+      },
+      [
+        {
+          x: Math.floor(blocks[0].blockNumber / roundToBlocks) * roundToBlocks,
+          y: 0,
+        },
+      ]
+    );
   };
 
   // TODO: This code assumes there is at least one event of each type
@@ -400,9 +448,9 @@ export const getCountsByBlock = async (web3, contracts) => {
   const participantsByBlock = reduceOverBlocks(allEvents, (value) => 1);
   const lockEventsByBlock = reduceOverBlocks(locks, (value) => 1);
   const signalEventsByBlock = reduceOverBlocks(signals, (value) => 1);
-  const ethLockedByBlock = reduceOverBlocks(locks, (value) => Number(
-    web3.utils.fromWei(web3.utils.toBN(value.returnValues.eth), 'ether')
-  ));
+  const ethLockedByBlock = reduceOverBlocks(locks, (value) =>
+    Number(web3.utils.fromWei(web3.utils.toBN(value.returnValues.eth), 'ether'))
+  );
   const ethSignaledByBlock = [];
   const effectiveETHByBlock = [];
 
@@ -411,12 +459,19 @@ export const getCountsByBlock = async (web3, contracts) => {
   allEvents.forEach((event) => {
     const time = parseInt(event.returnValues.time, 10);
     blocknumToTime[event.blockNumber] = new Date(+web3.utils.toBN(time) * 1000);
-    blocknumToTime[Math.ceil(event.blockNumber / roundToBlocks) * roundToBlocks] =      new Date(+web3.utils.toBN(time) * 1000);
+    blocknumToTime[
+      Math.ceil(event.blockNumber / roundToBlocks) * roundToBlocks
+    ] = new Date(+web3.utils.toBN(time) * 1000);
   });
   const time2 = parseInt(allEvents[0].returnValues.time, 10);
-  blocknumToTime[Math.floor(allEvents[0].blockNumber / roundToBlocks) * roundToBlocks] =    new Date(+web3.utils.toBN(time2) * 1000);
+  blocknumToTime[
+    Math.floor(allEvents[0].blockNumber / roundToBlocks) * roundToBlocks
+  ] = new Date(+web3.utils.toBN(time2) * 1000);
 
-  const lastBlockNum = Math.max.apply(this, allEvents.map((e) => e.blockNumber));
+  const lastBlockNum = Math.max.apply(
+    this,
+    allEvents.map((e) => e.blockNumber)
+  );
   const lastBlock = await web3.eth.getBlock(lastBlockNum);
 
   return {
@@ -427,14 +482,14 @@ export const getCountsByBlock = async (web3, contracts) => {
     ethSignaledByBlock,
     effectiveETHByBlock,
     blocknumToTime,
-    lastBlock
+    lastBlock,
   };
 };
 
 export const fetchStats = async (models: DB, net) => {
   const result = await models.EdgewareLockdropEverything.findAll({
     limit: 1,
-    order: [ [ 'createdAt', 'DESC' ]]
+    order: [['createdAt', 'DESC']],
   });
 
   let results;
@@ -442,11 +497,16 @@ export const fetchStats = async (models: DB, net) => {
     results = JSON.parse(result[0].data);
   } else {
     const network = net || 'mainnet';
-    const json = JSON.parse(fs.readFileSync('static/contracts/edgeware/Lockdrop.json').toString());
+    const json = JSON.parse(
+      fs.readFileSync('static/contracts/edgeware/Lockdrop.json').toString()
+    );
     const web3 = await setupWeb3Provider(network);
-    const contracts = (network === 'mainnet')
-      ? [MAINNET_LOCKDROP_ORIG, MAINNET_LOCKDROP].map((a) => (new web3.eth.Contract(json.abi, a)))
-      : [ROPSTEN_LOCKDROP].map((a) => (new web3.eth.Contract(json.abi, a)));
+    const contracts =
+      network === 'mainnet'
+        ? [MAINNET_LOCKDROP_ORIG, MAINNET_LOCKDROP].map(
+            (a) => new web3.eth.Contract(json.abi, a)
+          )
+        : [ROPSTEN_LOCKDROP].map((a) => new web3.eth.Contract(json.abi, a));
 
     const {
       locks,
@@ -521,7 +581,12 @@ export const fetchStats = async (models: DB, net) => {
   return results;
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const results = await fetchStats(models, req.query.network);
   return res.json({ status: 'Success', results });
 };

@@ -26,9 +26,9 @@ const ProposalListingRow: m.Component<{
           m('.row-header', contentLeft.header),
           m('.row-subheader', contentLeft.subheader),
         ]),
-      ])
+      ]),
     ]);
-  }
+  },
 };
 
 export default ProposalListingRow;

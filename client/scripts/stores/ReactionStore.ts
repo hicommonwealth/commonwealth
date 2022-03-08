@@ -5,22 +5,26 @@ import {
   OffchainThread,
   OffchainComment,
   Proposal,
-  AbridgedThread
+  AbridgedThread,
 } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
 enum PostType {
   discussion = 'discussion',
-  comment = 'comment'
+  comment = 'comment',
 }
 
 class ReactionStore extends IdStore<OffchainReaction<any>> {
-  private _storePost: { [identifier: string]: Array<OffchainReaction<any>> } = {};
+  private _storePost: { [identifier: string]: Array<OffchainReaction<any>> } =
+    {};
 
   public add(reaction: OffchainReaction<any>) {
     // TODO: Remove this once we start enforcing an ordering in stores
     const identifier = this.getPostIdentifier(reaction);
-    const reactionAlreadyInStore = (this._storePost[identifier] || []).filter((rxn) => rxn.id === reaction.id).length > 0;
+    const reactionAlreadyInStore =
+      (this._storePost[identifier] || []).filter(
+        (rxn) => rxn.id === reaction.id
+      ).length > 0;
     if (!reactionAlreadyInStore) {
       super.add(reaction);
       this.getAll().sort(byAscendingCreationDate);
@@ -62,23 +66,37 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
     return this;
   }
 
-  public getByPost(post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>): Array<OffchainReaction<any>> {
+  public getByPost(
+    post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>
+  ): Array<OffchainReaction<any>> {
     const identifier = this.getPostIdentifier(post);
     return this._storePost[identifier] || [];
   }
 
-  public getPostIdentifier(rxnOrPost: OffchainReaction<any> | OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>) {
+  public getPostIdentifier(
+    rxnOrPost:
+      | OffchainReaction<any>
+      | OffchainThread
+      | AbridgedThread
+      | AnyProposal
+      | OffchainComment<any>
+  ) {
     if (rxnOrPost instanceof OffchainReaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;
       return threadId
         ? `discussion-${threadId}`
         : proposalId
-          ? `${proposalId}`
-          : `comment-${commentId}`;
-    } else if (rxnOrPost instanceof OffchainThread || rxnOrPost instanceof AbridgedThread) {
+        ? `${proposalId}`
+        : `comment-${commentId}`;
+    } else if (
+      rxnOrPost instanceof OffchainThread ||
+      rxnOrPost instanceof AbridgedThread
+    ) {
       return `discussion-${rxnOrPost.id}`;
     } else if (rxnOrPost instanceof Proposal) {
-      return `${(rxnOrPost as AnyProposal).slug}_${(rxnOrPost as AnyProposal).identifier}`;
+      return `${(rxnOrPost as AnyProposal).slug}_${
+        (rxnOrPost as AnyProposal).identifier
+      }`;
     } else if (rxnOrPost instanceof OffchainComment) {
       return `comment-${rxnOrPost.id}`;
     }

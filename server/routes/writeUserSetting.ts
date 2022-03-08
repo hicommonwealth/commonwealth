@@ -12,7 +12,12 @@ export const Errors = {
   InvalidSetting: 'Invalid setting',
 };
 
-const writeUserSetting = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const writeUserSetting = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { key, value } = req.body;
 
   if (!req.user) {
@@ -36,7 +41,10 @@ const writeUserSetting = async (models: DB, req: Request, res: Response, next: N
   } else if (key === 'disableRichText' && value === 'false') {
     req.user.disableRichText = false;
     await req.user.save();
-  } else if (key === 'updateEmailInterval' && VALID_DIGEST_INTERVALS.indexOf(value) !== -1) {
+  } else if (
+    key === 'updateEmailInterval' &&
+    VALID_DIGEST_INTERVALS.indexOf(value) !== -1
+  ) {
     req.user.emailNotificationInterval = value;
     await req.user.save();
   } else {

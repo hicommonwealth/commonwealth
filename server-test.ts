@@ -22,7 +22,9 @@ import {
 } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
-import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
+import TokenBalanceCache, {
+  TokenBalanceProvider,
+} from './server/util/tokenBalanceCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 
 require('express-async-errors');
@@ -239,20 +241,20 @@ const resetServer = (debug = false): Promise<void> => {
       });
       await models.NotificationCategory.create({
         name: NotificationCategories.ThreadEdit,
-        description: 'someone edited a thread'
-      })
+        description: 'someone edited a thread',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.CommentEdit,
-        description: 'someoned edited a comment'
-      })
+        description: 'someoned edited a comment',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.NewRoleCreation,
-        description: 'someone created a role'
-      })
+        description: 'someone created a role',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.EntityEvent,
-        description: 'an entity-event as occurred'
-      })
+        description: 'an entity-event as occurred',
+      });
 
       // Admins need to be subscribed to mentions and collaborations
       await models.Subscription.create({

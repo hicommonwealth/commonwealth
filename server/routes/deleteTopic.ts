@@ -12,7 +12,12 @@ export const Errors = {
   DeleteFail: 'Could not delete topic',
 };
 
-const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) => {
+const deleteTopic = async (
+  models: DB,
+  req,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.user) {
@@ -38,11 +43,14 @@ const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) =
     type: QueryTypes.UPDATE,
   });
 
-  topic.destroy().then(() => {
-    res.json({ status: 'Success' });
-  }).catch((e) => {
-    next(new Error(Errors.DeleteFail));
-  });
+  topic
+    .destroy()
+    .then(() => {
+      res.json({ status: 'Success' });
+    })
+    .catch((e) => {
+      next(new Error(Errors.DeleteFail));
+    });
 };
 
 export default deleteTopic;

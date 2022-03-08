@@ -13,86 +13,86 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface MPondInterface extends ethers.utils.Interface {
   functions: {
-    "DELEGATION_TYPEHASH()": FunctionFragment;
-    "DOMAIN_TYPEHASH()": FunctionFragment;
-    "UNDELEGATION_TYPEHASH()": FunctionFragment;
-    "addWhiteListAddress(address)": FunctionFragment;
-    "admin()": FunctionFragment;
-    "allowance(address,address)": FunctionFragment;
-    "approve(address,uint256)": FunctionFragment;
-    "balanceOf(address)": FunctionFragment;
-    "bridgeSupply()": FunctionFragment;
-    "checkpoints(address,uint32)": FunctionFragment;
-    "decimals()": FunctionFragment;
-    "delegate(address,uint96)": FunctionFragment;
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)": FunctionFragment;
-    "delegates(address,address)": FunctionFragment;
-    "enableAllTranfers()": FunctionFragment;
-    "enableAllTransfers()": FunctionFragment;
-    "getCurrentVotes(address)": FunctionFragment;
-    "getPriorVotes(address,uint256)": FunctionFragment;
-    "isWhiteListed(address)": FunctionFragment;
-    "isWhiteListedTransfer(address,address)": FunctionFragment;
-    "name()": FunctionFragment;
-    "nonces(address)": FunctionFragment;
-    "numCheckpoints(address)": FunctionFragment;
-    "symbol()": FunctionFragment;
-    "totalSupply()": FunctionFragment;
-    "transfer(address,uint256)": FunctionFragment;
-    "transferFrom(address,address,uint256)": FunctionFragment;
-    "undelegate(address,uint96)": FunctionFragment;
-    "undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)": FunctionFragment;
+    'DELEGATION_TYPEHASH()': FunctionFragment;
+    'DOMAIN_TYPEHASH()': FunctionFragment;
+    'UNDELEGATION_TYPEHASH()': FunctionFragment;
+    'addWhiteListAddress(address)': FunctionFragment;
+    'admin()': FunctionFragment;
+    'allowance(address,address)': FunctionFragment;
+    'approve(address,uint256)': FunctionFragment;
+    'balanceOf(address)': FunctionFragment;
+    'bridgeSupply()': FunctionFragment;
+    'checkpoints(address,uint32)': FunctionFragment;
+    'decimals()': FunctionFragment;
+    'delegate(address,uint96)': FunctionFragment;
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)': FunctionFragment;
+    'delegates(address,address)': FunctionFragment;
+    'enableAllTranfers()': FunctionFragment;
+    'enableAllTransfers()': FunctionFragment;
+    'getCurrentVotes(address)': FunctionFragment;
+    'getPriorVotes(address,uint256)': FunctionFragment;
+    'isWhiteListed(address)': FunctionFragment;
+    'isWhiteListedTransfer(address,address)': FunctionFragment;
+    'name()': FunctionFragment;
+    'nonces(address)': FunctionFragment;
+    'numCheckpoints(address)': FunctionFragment;
+    'symbol()': FunctionFragment;
+    'totalSupply()': FunctionFragment;
+    'transfer(address,uint256)': FunctionFragment;
+    'transferFrom(address,address,uint256)': FunctionFragment;
+    'undelegate(address,uint96)': FunctionFragment;
+    'undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "DELEGATION_TYPEHASH",
+    functionFragment: 'DELEGATION_TYPEHASH',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "DOMAIN_TYPEHASH",
+    functionFragment: 'DOMAIN_TYPEHASH',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "UNDELEGATION_TYPEHASH",
+    functionFragment: 'UNDELEGATION_TYPEHASH',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "addWhiteListAddress",
+    functionFragment: 'addWhiteListAddress',
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'admin', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "allowance",
+    functionFragment: 'allowance',
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "approve",
+    functionFragment: 'approve',
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(functionFragment: 'balanceOf', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "bridgeSupply",
+    functionFragment: 'bridgeSupply',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "checkpoints",
+    functionFragment: 'checkpoints',
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'decimals', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "delegate",
+    functionFragment: 'delegate',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "delegateBySig",
+    functionFragment: 'delegateBySig',
     values: [
       string,
       BigNumberish,
@@ -104,58 +104,58 @@ interface MPondInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "delegates",
+    functionFragment: 'delegates',
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "enableAllTranfers",
+    functionFragment: 'enableAllTranfers',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "enableAllTransfers",
+    functionFragment: 'enableAllTransfers',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getCurrentVotes",
+    functionFragment: 'getCurrentVotes',
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "getPriorVotes",
+    functionFragment: 'getPriorVotes',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "isWhiteListed",
+    functionFragment: 'isWhiteListed',
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "isWhiteListedTransfer",
+    functionFragment: 'isWhiteListedTransfer',
     values: [string, string]
   ): string;
-  encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nonces", values: [string]): string;
+  encodeFunctionData(functionFragment: 'name', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'nonces', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "numCheckpoints",
+    functionFragment: 'numCheckpoints',
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'symbol', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "totalSupply",
+    functionFragment: 'totalSupply',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "transfer",
+    functionFragment: 'transfer',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferFrom",
+    functionFragment: 'transferFrom',
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "undelegate",
+    functionFragment: 'undelegate',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "undelegateBySig",
+    functionFragment: 'undelegateBySig',
     values: [
       string,
       BigNumberish,
@@ -168,97 +168,97 @@ interface MPondInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "DELEGATION_TYPEHASH",
+    functionFragment: 'DELEGATION_TYPEHASH',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "DOMAIN_TYPEHASH",
+    functionFragment: 'DOMAIN_TYPEHASH',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "UNDELEGATION_TYPEHASH",
+    functionFragment: 'UNDELEGATION_TYPEHASH',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "addWhiteListAddress",
+    functionFragment: 'addWhiteListAddress',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'admin', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'allowance', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "bridgeSupply",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "checkpoints",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "delegate", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "delegateBySig",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "delegates", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "enableAllTranfers",
+    functionFragment: 'bridgeSupply',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "enableAllTransfers",
+    functionFragment: 'checkpoints',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'decimals', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'delegate', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'delegateBySig',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'delegates', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'enableAllTranfers',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getCurrentVotes",
+    functionFragment: 'enableAllTransfers',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getPriorVotes",
+    functionFragment: 'getCurrentVotes',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isWhiteListed",
+    functionFragment: 'getPriorVotes',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isWhiteListedTransfer",
+    functionFragment: 'isWhiteListed',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "numCheckpoints",
+    functionFragment: 'isWhiteListedTransfer',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'nonces', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "totalSupply",
+    functionFragment: 'numCheckpoints',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'symbol', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "transferFrom",
+    functionFragment: 'totalSupply',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "undelegate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'transfer', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "undelegateBySig",
+    functionFragment: 'transferFrom',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: 'undelegate', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: 'undelegateBySig',
     data: BytesLike
   ): Result;
 
   events: {
-    "Approval(address,address,uint256)": EventFragment;
-    "DelegateChanged(address,address,address)": EventFragment;
-    "DelegateVotesChanged(address,uint256,uint256)": EventFragment;
-    "Transfer(address,address,uint256)": EventFragment;
+    'Approval(address,address,uint256)': EventFragment;
+    'DelegateChanged(address,address,address)': EventFragment;
+    'DelegateVotesChanged(address,uint256,uint256)': EventFragment;
+    'Transfer(address,address,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DelegateChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DelegateVotesChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Approval'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'DelegateChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'DelegateVotesChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Transfer'): EventFragment;
 }
 
 export class MPond extends Contract {
@@ -307,29 +307,29 @@ export class MPond extends Contract {
   functions: {
     DELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
-    "DELEGATION_TYPEHASH()"(overrides?: CallOverrides): Promise<[string]>;
+    'DELEGATION_TYPEHASH()'(overrides?: CallOverrides): Promise<[string]>;
 
     DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
-    "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<[string]>;
+    'DOMAIN_TYPEHASH()'(overrides?: CallOverrides): Promise<[string]>;
 
     UNDELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
-    "UNDELEGATION_TYPEHASH()"(overrides?: CallOverrides): Promise<[string]>;
+    'UNDELEGATION_TYPEHASH()'(overrides?: CallOverrides): Promise<[string]>;
 
     addWhiteListAddress(
       _address: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "addWhiteListAddress(address)"(
+    'addWhiteListAddress(address)'(
       _address: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     admin(overrides?: CallOverrides): Promise<[string]>;
 
-    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+    'admin()'(overrides?: CallOverrides): Promise<[string]>;
 
     allowance(
       account: string,
@@ -337,7 +337,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       account: string,
       spender: string,
       overrides?: CallOverrides
@@ -349,7 +349,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       rawAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -357,14 +357,14 @@ export class MPond extends Contract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     bridgeSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "bridgeSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'bridgeSupply()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     checkpoints(
       arg0: string,
@@ -372,7 +372,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<[number, BigNumber] & { fromBlock: number; votes: BigNumber }>;
 
-    "checkpoints(address,uint32)"(
+    'checkpoints(address,uint32)'(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -380,7 +380,7 @@ export class MPond extends Contract {
 
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<[number]>;
+    'decimals()'(overrides?: CallOverrides): Promise<[number]>;
 
     delegate(
       delegatee: string,
@@ -388,7 +388,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "delegate(address,uint96)"(
+    'delegate(address,uint96)'(
       delegatee: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -405,7 +405,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -422,7 +422,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "delegates(address,address)"(
+    'delegates(address,address)'(
       arg0: string,
       arg1: string,
       overrides?: CallOverrides
@@ -430,13 +430,13 @@ export class MPond extends Contract {
 
     enableAllTranfers(overrides?: CallOverrides): Promise<[boolean]>;
 
-    "enableAllTranfers()"(overrides?: CallOverrides): Promise<[boolean]>;
+    'enableAllTranfers()'(overrides?: CallOverrides): Promise<[boolean]>;
 
     enableAllTransfers(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "enableAllTransfers()"(
+    'enableAllTransfers()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -445,7 +445,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getCurrentVotes(address)"(
+    'getCurrentVotes(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -456,7 +456,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getPriorVotes(address,uint256)"(
+    'getPriorVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -464,7 +464,7 @@ export class MPond extends Contract {
 
     isWhiteListed(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
 
-    "isWhiteListed(address)"(
+    'isWhiteListed(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
@@ -475,7 +475,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "isWhiteListedTransfer(address,address)"(
+    'isWhiteListedTransfer(address,address)'(
       _address1: string,
       _address2: string,
       overrides?: CallOverrides
@@ -483,29 +483,29 @@ export class MPond extends Contract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    "name()"(overrides?: CallOverrides): Promise<[string]>;
+    'name()'(overrides?: CallOverrides): Promise<[string]>;
 
     nonces(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<[number]>;
 
-    "numCheckpoints(address)"(
+    'numCheckpoints(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[number]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<[string]>;
+    'symbol()'(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transfer(
       dst: string,
@@ -513,7 +513,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       dst: string,
       rawAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -526,7 +526,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       src: string,
       dst: string,
       rawAmount: BigNumberish,
@@ -539,7 +539,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "undelegate(address,uint96)"(
+    'undelegate(address,uint96)'(
       delegatee: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -556,7 +556,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+    'undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -570,29 +570,29 @@ export class MPond extends Contract {
 
   DELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-  "DELEGATION_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+  'DELEGATION_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
   DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-  "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+  'DOMAIN_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
   UNDELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-  "UNDELEGATION_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+  'UNDELEGATION_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
   addWhiteListAddress(
     _address: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "addWhiteListAddress(address)"(
+  'addWhiteListAddress(address)'(
     _address: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   admin(overrides?: CallOverrides): Promise<string>;
 
-  "admin()"(overrides?: CallOverrides): Promise<string>;
+  'admin()'(overrides?: CallOverrides): Promise<string>;
 
   allowance(
     account: string,
@@ -600,7 +600,7 @@ export class MPond extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "allowance(address,address)"(
+  'allowance(address,address)'(
     account: string,
     spender: string,
     overrides?: CallOverrides
@@ -612,7 +612,7 @@ export class MPond extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "approve(address,uint256)"(
+  'approve(address,uint256)'(
     spender: string,
     rawAmount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -620,14 +620,14 @@ export class MPond extends Contract {
 
   balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "balanceOf(address)"(
+  'balanceOf(address)'(
     account: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   bridgeSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "bridgeSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'bridgeSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   checkpoints(
     arg0: string,
@@ -635,7 +635,7 @@ export class MPond extends Contract {
     overrides?: CallOverrides
   ): Promise<[number, BigNumber] & { fromBlock: number; votes: BigNumber }>;
 
-  "checkpoints(address,uint32)"(
+  'checkpoints(address,uint32)'(
     arg0: string,
     arg1: BigNumberish,
     overrides?: CallOverrides
@@ -643,7 +643,7 @@ export class MPond extends Contract {
 
   decimals(overrides?: CallOverrides): Promise<number>;
 
-  "decimals()"(overrides?: CallOverrides): Promise<number>;
+  'decimals()'(overrides?: CallOverrides): Promise<number>;
 
   delegate(
     delegatee: string,
@@ -651,7 +651,7 @@ export class MPond extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "delegate(address,uint96)"(
+  'delegate(address,uint96)'(
     delegatee: string,
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -668,7 +668,7 @@ export class MPond extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+  'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
     delegatee: string,
     nonce: BigNumberish,
     expiry: BigNumberish,
@@ -685,7 +685,7 @@ export class MPond extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "delegates(address,address)"(
+  'delegates(address,address)'(
     arg0: string,
     arg1: string,
     overrides?: CallOverrides
@@ -693,13 +693,13 @@ export class MPond extends Contract {
 
   enableAllTranfers(overrides?: CallOverrides): Promise<boolean>;
 
-  "enableAllTranfers()"(overrides?: CallOverrides): Promise<boolean>;
+  'enableAllTranfers()'(overrides?: CallOverrides): Promise<boolean>;
 
   enableAllTransfers(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "enableAllTransfers()"(
+  'enableAllTransfers()'(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -708,7 +708,7 @@ export class MPond extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getCurrentVotes(address)"(
+  'getCurrentVotes(address)'(
     account: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -719,7 +719,7 @@ export class MPond extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getPriorVotes(address,uint256)"(
+  'getPriorVotes(address,uint256)'(
     account: string,
     blockNumber: BigNumberish,
     overrides?: CallOverrides
@@ -727,7 +727,7 @@ export class MPond extends Contract {
 
   isWhiteListed(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
-  "isWhiteListed(address)"(
+  'isWhiteListed(address)'(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
@@ -738,7 +738,7 @@ export class MPond extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "isWhiteListedTransfer(address,address)"(
+  'isWhiteListedTransfer(address,address)'(
     _address1: string,
     _address2: string,
     overrides?: CallOverrides
@@ -746,29 +746,29 @@ export class MPond extends Contract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  "name()"(overrides?: CallOverrides): Promise<string>;
+  'name()'(overrides?: CallOverrides): Promise<string>;
 
   nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "nonces(address)"(
+  'nonces(address)'(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<number>;
 
-  "numCheckpoints(address)"(
+  'numCheckpoints(address)'(
     arg0: string,
     overrides?: CallOverrides
   ): Promise<number>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  "symbol()"(overrides?: CallOverrides): Promise<string>;
+  'symbol()'(overrides?: CallOverrides): Promise<string>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   transfer(
     dst: string,
@@ -776,7 +776,7 @@ export class MPond extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transfer(address,uint256)"(
+  'transfer(address,uint256)'(
     dst: string,
     rawAmount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -789,7 +789,7 @@ export class MPond extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transferFrom(address,address,uint256)"(
+  'transferFrom(address,address,uint256)'(
     src: string,
     dst: string,
     rawAmount: BigNumberish,
@@ -802,7 +802,7 @@ export class MPond extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "undelegate(address,uint96)"(
+  'undelegate(address,uint96)'(
     delegatee: string,
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -819,7 +819,7 @@ export class MPond extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+  'undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
     delegatee: string,
     nonce: BigNumberish,
     expiry: BigNumberish,
@@ -833,29 +833,29 @@ export class MPond extends Contract {
   callStatic: {
     DELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-    "DELEGATION_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+    'DELEGATION_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
     DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-    "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+    'DOMAIN_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
     UNDELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
-    "UNDELEGATION_TYPEHASH()"(overrides?: CallOverrides): Promise<string>;
+    'UNDELEGATION_TYPEHASH()'(overrides?: CallOverrides): Promise<string>;
 
     addWhiteListAddress(
       _address: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "addWhiteListAddress(address)"(
+    'addWhiteListAddress(address)'(
       _address: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     admin(overrides?: CallOverrides): Promise<string>;
 
-    "admin()"(overrides?: CallOverrides): Promise<string>;
+    'admin()'(overrides?: CallOverrides): Promise<string>;
 
     allowance(
       account: string,
@@ -863,7 +863,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       account: string,
       spender: string,
       overrides?: CallOverrides
@@ -875,7 +875,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       rawAmount: BigNumberish,
       overrides?: CallOverrides
@@ -883,14 +883,14 @@ export class MPond extends Contract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     bridgeSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "bridgeSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'bridgeSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     checkpoints(
       arg0: string,
@@ -898,7 +898,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<[number, BigNumber] & { fromBlock: number; votes: BigNumber }>;
 
-    "checkpoints(address,uint32)"(
+    'checkpoints(address,uint32)'(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -906,7 +906,7 @@ export class MPond extends Contract {
 
     decimals(overrides?: CallOverrides): Promise<number>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<number>;
+    'decimals()'(overrides?: CallOverrides): Promise<number>;
 
     delegate(
       delegatee: string,
@@ -914,7 +914,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "delegate(address,uint96)"(
+    'delegate(address,uint96)'(
       delegatee: string,
       amount: BigNumberish,
       overrides?: CallOverrides
@@ -931,7 +931,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -948,7 +948,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "delegates(address,address)"(
+    'delegates(address,address)'(
       arg0: string,
       arg1: string,
       overrides?: CallOverrides
@@ -956,18 +956,18 @@ export class MPond extends Contract {
 
     enableAllTranfers(overrides?: CallOverrides): Promise<boolean>;
 
-    "enableAllTranfers()"(overrides?: CallOverrides): Promise<boolean>;
+    'enableAllTranfers()'(overrides?: CallOverrides): Promise<boolean>;
 
     enableAllTransfers(overrides?: CallOverrides): Promise<boolean>;
 
-    "enableAllTransfers()"(overrides?: CallOverrides): Promise<boolean>;
+    'enableAllTransfers()'(overrides?: CallOverrides): Promise<boolean>;
 
     getCurrentVotes(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getCurrentVotes(address)"(
+    'getCurrentVotes(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -978,7 +978,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPriorVotes(address,uint256)"(
+    'getPriorVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -986,7 +986,7 @@ export class MPond extends Contract {
 
     isWhiteListed(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
-    "isWhiteListed(address)"(
+    'isWhiteListed(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -997,7 +997,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "isWhiteListedTransfer(address,address)"(
+    'isWhiteListedTransfer(address,address)'(
       _address1: string,
       _address2: string,
       overrides?: CallOverrides
@@ -1005,29 +1005,29 @@ export class MPond extends Contract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    "name()"(overrides?: CallOverrides): Promise<string>;
+    'name()'(overrides?: CallOverrides): Promise<string>;
 
     nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<number>;
 
-    "numCheckpoints(address)"(
+    'numCheckpoints(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<number>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<string>;
+    'symbol()'(overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
       dst: string,
@@ -1035,7 +1035,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       dst: string,
       rawAmount: BigNumberish,
       overrides?: CallOverrides
@@ -1048,7 +1048,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       src: string,
       dst: string,
       rawAmount: BigNumberish,
@@ -1061,7 +1061,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "undelegate(address,uint96)"(
+    'undelegate(address,uint96)'(
       delegatee: string,
       amount: BigNumberish,
       overrides?: CallOverrides
@@ -1078,7 +1078,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+    'undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -1131,29 +1131,29 @@ export class MPond extends Contract {
   estimateGas: {
     DELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "DELEGATION_TYPEHASH()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'DELEGATION_TYPEHASH()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "DOMAIN_TYPEHASH()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'DOMAIN_TYPEHASH()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     UNDELEGATION_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "UNDELEGATION_TYPEHASH()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'UNDELEGATION_TYPEHASH()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     addWhiteListAddress(
       _address: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "addWhiteListAddress(address)"(
+    'addWhiteListAddress(address)'(
       _address: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     admin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'admin()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
       account: string,
@@ -1161,7 +1161,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       account: string,
       spender: string,
       overrides?: CallOverrides
@@ -1173,7 +1173,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       rawAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1181,14 +1181,14 @@ export class MPond extends Contract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     bridgeSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "bridgeSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'bridgeSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     checkpoints(
       arg0: string,
@@ -1196,7 +1196,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "checkpoints(address,uint32)"(
+    'checkpoints(address,uint32)'(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -1204,7 +1204,7 @@ export class MPond extends Contract {
 
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'decimals()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     delegate(
       delegatee: string,
@@ -1212,7 +1212,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "delegate(address,uint96)"(
+    'delegate(address,uint96)'(
       delegatee: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1229,7 +1229,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -1246,7 +1246,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "delegates(address,address)"(
+    'delegates(address,address)'(
       arg0: string,
       arg1: string,
       overrides?: CallOverrides
@@ -1254,13 +1254,13 @@ export class MPond extends Contract {
 
     enableAllTranfers(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "enableAllTranfers()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'enableAllTranfers()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     enableAllTransfers(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "enableAllTransfers()"(
+    'enableAllTransfers()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1269,7 +1269,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getCurrentVotes(address)"(
+    'getCurrentVotes(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1280,7 +1280,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPriorVotes(address,uint256)"(
+    'getPriorVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -1288,7 +1288,7 @@ export class MPond extends Contract {
 
     isWhiteListed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "isWhiteListed(address)"(
+    'isWhiteListed(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1299,7 +1299,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "isWhiteListedTransfer(address,address)"(
+    'isWhiteListedTransfer(address,address)'(
       _address1: string,
       _address2: string,
       overrides?: CallOverrides
@@ -1307,29 +1307,29 @@ export class MPond extends Contract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'name()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     nonces(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "numCheckpoints(address)"(
+    'numCheckpoints(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'symbol()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
       dst: string,
@@ -1337,7 +1337,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       dst: string,
       rawAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1350,7 +1350,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       src: string,
       dst: string,
       rawAmount: BigNumberish,
@@ -1363,7 +1363,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "undelegate(address,uint96)"(
+    'undelegate(address,uint96)'(
       delegatee: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1380,7 +1380,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+    'undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -1397,13 +1397,13 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "DELEGATION_TYPEHASH()"(
+    'DELEGATION_TYPEHASH()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     DOMAIN_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "DOMAIN_TYPEHASH()"(
+    'DOMAIN_TYPEHASH()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1411,7 +1411,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "UNDELEGATION_TYPEHASH()"(
+    'UNDELEGATION_TYPEHASH()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1420,14 +1420,14 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "addWhiteListAddress(address)"(
+    'addWhiteListAddress(address)'(
       _address: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'admin()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     allowance(
       account: string,
@@ -1435,7 +1435,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       account: string,
       spender: string,
       overrides?: CallOverrides
@@ -1447,7 +1447,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       rawAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1458,14 +1458,14 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     bridgeSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "bridgeSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'bridgeSupply()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     checkpoints(
       arg0: string,
@@ -1473,7 +1473,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "checkpoints(address,uint32)"(
+    'checkpoints(address,uint32)'(
       arg0: string,
       arg1: BigNumberish,
       overrides?: CallOverrides
@@ -1481,7 +1481,7 @@ export class MPond extends Contract {
 
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'decimals()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     delegate(
       delegatee: string,
@@ -1489,7 +1489,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "delegate(address,uint96)"(
+    'delegate(address,uint96)'(
       delegatee: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1506,7 +1506,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -1523,7 +1523,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "delegates(address,address)"(
+    'delegates(address,address)'(
       arg0: string,
       arg1: string,
       overrides?: CallOverrides
@@ -1531,7 +1531,7 @@ export class MPond extends Contract {
 
     enableAllTranfers(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "enableAllTranfers()"(
+    'enableAllTranfers()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1539,7 +1539,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "enableAllTransfers()"(
+    'enableAllTransfers()'(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1548,7 +1548,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getCurrentVotes(address)"(
+    'getCurrentVotes(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1559,7 +1559,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getPriorVotes(address,uint256)"(
+    'getPriorVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -1570,7 +1570,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isWhiteListed(address)"(
+    'isWhiteListed(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1581,7 +1581,7 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "isWhiteListedTransfer(address,address)"(
+    'isWhiteListedTransfer(address,address)'(
       _address1: string,
       _address2: string,
       overrides?: CallOverrides
@@ -1589,14 +1589,14 @@ export class MPond extends Contract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'name()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     nonces(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1606,18 +1606,18 @@ export class MPond extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "numCheckpoints(address)"(
+    'numCheckpoints(address)'(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'symbol()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transfer(
       dst: string,
@@ -1625,7 +1625,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       dst: string,
       rawAmount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1638,7 +1638,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       src: string,
       dst: string,
       rawAmount: BigNumberish,
@@ -1651,7 +1651,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "undelegate(address,uint96)"(
+    'undelegate(address,uint96)'(
       delegatee: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1668,7 +1668,7 @@ export class MPond extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)"(
+    'undelegateBySig(address,uint256,uint256,uint8,bytes32,bytes32,uint96)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,

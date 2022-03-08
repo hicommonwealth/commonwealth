@@ -16,7 +16,7 @@ interface IProfileCommentGroupAttrs {
   account: Account<any>;
 }
 
-const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
+const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
   view: (vnode) => {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
@@ -24,7 +24,11 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
     const { slug, identifier } = proposal;
 
     // hide rows from communities that don't match
-    if (app.isCustomDomain() && (proposal.chain || proposal.community) !== app.customDomainId()) return;
+    if (
+      app.isCustomDomain() &&
+      (proposal.chain || proposal.community) !== app.customDomainId()
+    )
+      return;
 
     return m('.ProfileCommentGroup', [
       m('.summary', [
@@ -33,36 +37,51 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           (proposal.chain || proposal.community) && [
             ' on a ',
             link(
-              'a.link-bold', `/${
-                proposal.chain || proposal.community
-              }${
-                getProposalUrlPath(slug, identifier, true)
-              }`,
-              ((proposal instanceof OffchainThread) ? 'thread' : 'proposal'), {},
+              'a.link-bold',
+              `/${proposal.chain || proposal.community}${getProposalUrlPath(
+                slug,
+                identifier,
+                true
+              )}`,
+              proposal instanceof OffchainThread ? 'thread' : 'proposal',
+              {},
               `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
             ),
             ' in ',
-            link('a.link-bold', `/${proposal.chain || proposal.community}`,
-              ` ${proposal.chain || proposal.community}`),
+            link(
+              'a.link-bold',
+              `/${proposal.chain || proposal.community}`,
+              ` ${proposal.chain || proposal.community}`
+            ),
           ],
         ]),
-        comments[0] && comments[0].createdAt && m('span', comments[0].createdAt.fromNow()),
+        comments[0] &&
+          comments[0].createdAt &&
+          m('span', comments[0].createdAt.fromNow()),
       ]),
       m('.activity', [
-        comments.map((comment) => m('.proposal-comment', [
-          m('.comment-text', (() => {
-            try {
-              const doc = JSON.parse(comment.text);
-              if (!doc.ops) throw new Error();
-              return m(QuillFormattedText, { doc, collapse: true });
-            } catch (e) {
-              return m(MarkdownFormattedText, { doc: comment.text, collapse: true });
-            }
-          })()),
-        ])),
-      ])
+        comments.map((comment) =>
+          m('.proposal-comment', [
+            m(
+              '.comment-text',
+              (() => {
+                try {
+                  const doc = JSON.parse(comment.text);
+                  if (!doc.ops) throw new Error();
+                  return m(QuillFormattedText, { doc, collapse: true });
+                } catch (e) {
+                  return m(MarkdownFormattedText, {
+                    doc: comment.text,
+                    collapse: true,
+                  });
+                }
+              })()
+            ),
+          ])
+        ),
+      ]),
     ]);
-  }
+  },
 };
 
 export default ProfileCommentGroup;

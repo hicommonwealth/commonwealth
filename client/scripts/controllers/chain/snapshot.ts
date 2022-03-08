@@ -7,14 +7,20 @@ import {
 
 class SnapshotController {
   private _space: SnapshotSpace;
-  public get space() { return this._space; }
+  public get space() {
+    return this._space;
+  }
 
   private _proposals: SnapshotProposal[];
-  public get proposals() { return this._proposals; }
+  public get proposals() {
+    return this._proposals;
+  }
 
   private _initializing: boolean = false;
   private _initialized: boolean = false;
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
 
   // private _votes = new Store<SnapshotVote>();
 

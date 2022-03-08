@@ -18,7 +18,9 @@ const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
     return m('.MobileHeader', [
       m('img.mobile-logo', {
         src: 'https://commonwealth.im/static/img/logo.png',
-        onclick: (e) => { m.route.set('/'); }
+        onclick: (e) => {
+          m.route.set('/');
+        },
       }),
       m(SearchBar),
       m('.mobile-header-right', [
@@ -29,18 +31,25 @@ const MobileHeader: m.Component<{}, { sidebarOpen: boolean }> = {
           transitionDuration: 0,
           closeOnContentClick: true,
           closeOnOutsideClick: true,
-          onClosed: () => { vnode.state.sidebarOpen = false; m.redraw(); },
+          onClosed: () => {
+            vnode.state.sidebarOpen = false;
+            m.redraw();
+          },
           trigger: m(Button, {
             class: 'mobile-header-trigger no-border',
             compact: true,
-            label: sidebarOpen ? m(Icon, { name: Icons.X }) : m(CustomHamburgerIcon),
-            onclick: (e) => { vnode.state.sidebarOpen = !sidebarOpen; }
+            label: sidebarOpen
+              ? m(Icon, { name: Icons.X })
+              : m(CustomHamburgerIcon),
+            onclick: (e) => {
+              vnode.state.sidebarOpen = !sidebarOpen;
+            },
           }),
-          content: m(MobileSidebar)
+          content: m(MobileSidebar),
         }),
       ]),
     ]);
-  }
+  },
 };
 
 export default MobileHeader;

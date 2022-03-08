@@ -12,24 +12,24 @@ import {
   Contract,
   ContractTransaction,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface MPondInterfaceInterface extends ethers.utils.Interface {
   functions: {
-    "getPriorVotes(address,uint256)": FunctionFragment;
+    'getPriorVotes(address,uint256)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getPriorVotes",
+    functionFragment: 'getPriorVotes',
     values: [string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getPriorVotes",
+    functionFragment: 'getPriorVotes',
     data: BytesLike
   ): Result;
 
@@ -86,7 +86,7 @@ export class MPondInterface extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getPriorVotes(address,uint256)"(
+    'getPriorVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -99,7 +99,7 @@ export class MPondInterface extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getPriorVotes(address,uint256)"(
+  'getPriorVotes(address,uint256)'(
     account: string,
     blockNumber: BigNumberish,
     overrides?: CallOverrides
@@ -112,7 +112,7 @@ export class MPondInterface extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPriorVotes(address,uint256)"(
+    'getPriorVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -128,7 +128,7 @@ export class MPondInterface extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPriorVotes(address,uint256)"(
+    'getPriorVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -142,7 +142,7 @@ export class MPondInterface extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getPriorVotes(address,uint256)"(
+    'getPriorVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides

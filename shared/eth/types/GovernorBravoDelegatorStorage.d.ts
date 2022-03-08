@@ -12,37 +12,37 @@ import {
   Contract,
   ContractTransaction,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface GovernorBravoDelegatorStorageInterface
   extends ethers.utils.Interface {
   functions: {
-    "admin()": FunctionFragment;
-    "implementation()": FunctionFragment;
-    "pendingAdmin()": FunctionFragment;
+    'admin()': FunctionFragment;
+    'implementation()': FunctionFragment;
+    'pendingAdmin()': FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'admin', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "implementation",
+    functionFragment: 'implementation',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "pendingAdmin",
+    functionFragment: 'pendingAdmin',
     values?: undefined
   ): string;
 
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'admin', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "implementation",
+    functionFragment: 'implementation',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "pendingAdmin",
+    functionFragment: 'pendingAdmin',
     data: BytesLike
   ): Result;
 
@@ -95,41 +95,41 @@ export class GovernorBravoDelegatorStorage extends Contract {
   functions: {
     admin(overrides?: CallOverrides): Promise<[string]>;
 
-    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+    'admin()'(overrides?: CallOverrides): Promise<[string]>;
 
     implementation(overrides?: CallOverrides): Promise<[string]>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<[string]>;
+    'implementation()'(overrides?: CallOverrides): Promise<[string]>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<[string]>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<[string]>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<[string]>;
   };
 
   admin(overrides?: CallOverrides): Promise<string>;
 
-  "admin()"(overrides?: CallOverrides): Promise<string>;
+  'admin()'(overrides?: CallOverrides): Promise<string>;
 
   implementation(overrides?: CallOverrides): Promise<string>;
 
-  "implementation()"(overrides?: CallOverrides): Promise<string>;
+  'implementation()'(overrides?: CallOverrides): Promise<string>;
 
   pendingAdmin(overrides?: CallOverrides): Promise<string>;
 
-  "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
+  'pendingAdmin()'(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     admin(overrides?: CallOverrides): Promise<string>;
 
-    "admin()"(overrides?: CallOverrides): Promise<string>;
+    'admin()'(overrides?: CallOverrides): Promise<string>;
 
     implementation(overrides?: CallOverrides): Promise<string>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<string>;
+    'implementation()'(overrides?: CallOverrides): Promise<string>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<string>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
@@ -137,30 +137,30 @@ export class GovernorBravoDelegatorStorage extends Contract {
   estimateGas: {
     admin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'admin()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     implementation(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'implementation()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
     admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'admin()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     implementation(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "implementation()"(
+    'implementation()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

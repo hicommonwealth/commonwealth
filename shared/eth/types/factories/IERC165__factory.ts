@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Contract, Signer } from 'ethers';
+import { Provider } from '@ethersproject/providers';
 
-import type { IERC165 } from "../IERC165";
+import type { IERC165 } from '../IERC165';
 
 export class IERC165__factory {
   static connect(
@@ -21,21 +21,21 @@ const _abi = [
     constant: true,
     inputs: [
       {
-        internalType: "bytes4",
-        name: "interfaceId",
-        type: "bytes4",
+        internalType: 'bytes4',
+        name: 'interfaceId',
+        type: 'bytes4',
       },
     ],
-    name: "supportsInterface",
+    name: 'supportsInterface',
     outputs: [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool",
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
 ];

@@ -10,9 +10,9 @@ const Listing: m.Component<{
     const { columnHeader, content } = vnode.attrs;
     return m('.Listing', [
       columnHeader && m('.ListingHeader', columnHeader),
-      content
+      content,
     ]);
-  }
+  },
 };
 
 export default Listing;

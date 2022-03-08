@@ -26,19 +26,23 @@ const NewThreadPage: m.Component<{}> = {
     const activeEntity = app.chain;
     if (!activeEntity) return m(PageLoading);
 
-    const hasTopics = !!(app.chain?.meta.topics.length);
+    const hasTopics = !!app.chain?.meta.topics.length;
 
-    return m(Sublayout, {
-      class: 'NewThreadPage',
-      title: 'New Thread',
-    }, [
-      m('.forum-container', [
-        m(NewThreadForm, {
-          isModal: false,
-          hasTopics
-        }),
-      ]),
-    ]);
+    return m(
+      Sublayout,
+      {
+        class: 'NewThreadPage',
+        title: 'New Thread',
+      },
+      [
+        m('.forum-container', [
+          m(NewThreadForm, {
+            isModal: false,
+            hasTopics,
+          }),
+        ]),
+      ]
+    );
   },
 };
 

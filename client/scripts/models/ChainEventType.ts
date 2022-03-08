@@ -14,7 +14,12 @@ class ChainEventType {
   }
 
   public static fromJSON(json) {
-    return new ChainEventType(json.id, json.chain, json.event_network, json.event_name);
+    return new ChainEventType(
+      json.id,
+      json.chain,
+      json.event_network,
+      json.event_name
+    );
   }
 }
 

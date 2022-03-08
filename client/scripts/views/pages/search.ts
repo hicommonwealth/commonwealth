@@ -19,7 +19,7 @@ import { AddressInfo, Profile, SearchQuery } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { ProposalType } from 'types';
 
-import { SearchScope, SearchSort } from 'models/SearchQuery'
+import { SearchScope, SearchSort } from 'models/SearchQuery';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -106,7 +106,12 @@ export const getDiscussionResult = (thread, searchTerm) => {
       iconName: 'feedback',
     }),
     onclick: () => {
-      const path = getProposalUrlPath(ProposalType.OffchainThread, proposalId, false, chainOrComm);
+      const path = getProposalUrlPath(
+        ProposalType.OffchainThread,
+        proposalId,
+        false,
+        chainOrComm
+      );
       m.route.set(path);
     },
     label: m('a.search-results-item', [

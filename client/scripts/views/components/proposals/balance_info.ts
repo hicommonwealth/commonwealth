@@ -5,17 +5,21 @@ import app from 'state';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 interface IState {
-  freeBalance,
-  lockedBalance,
-  balance
+  freeBalance;
+  lockedBalance;
+  balance;
 }
 
 const BalanceInfo = {
   oninit: (vnode: m.Vnode<any, IState>) => {
     app.runWhenReady(async () => {
-      vnode.state.freeBalance = await (vnode.attrs.account as SubstrateAccount).freeBalance;
-      vnode.state.lockedBalance = await (vnode.attrs.account as SubstrateAccount).lockedBalance;
-      vnode.state.balance = await (vnode.attrs.account as SubstrateAccount).balance;
+      vnode.state.freeBalance = await (vnode.attrs.account as SubstrateAccount)
+        .freeBalance;
+      vnode.state.lockedBalance = await (
+        vnode.attrs.account as SubstrateAccount
+      ).lockedBalance;
+      vnode.state.balance = await (vnode.attrs.account as SubstrateAccount)
+        .balance;
       m.redraw();
     });
   },
@@ -27,14 +31,16 @@ const BalanceInfo = {
       ]),
       m('div', [
         'Locked: ',
-        vnode.state.lockedBalance ? formatCoin(vnode.state.lockedBalance) : '--',
+        vnode.state.lockedBalance
+          ? formatCoin(vnode.state.lockedBalance)
+          : '--',
       ]),
       m('div', [
         'Total: ',
         vnode.state.balance ? formatCoin(vnode.state.balance) : '--',
       ]),
     ]);
-  }
+  },
 };
 
 export default BalanceInfo;

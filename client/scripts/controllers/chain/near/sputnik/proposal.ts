@@ -1,7 +1,14 @@
 import { Near as NearApi } from 'near-api-js';
 import BN from 'bn.js';
 import moment from 'moment';
-import { Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXModalData } from 'models';
+import {
+  Proposal,
+  ProposalEndTime,
+  VotingType,
+  VotingUnit,
+  ProposalStatus,
+  ITXModalData,
+} from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
@@ -37,43 +44,63 @@ export default class NearSputnikProposal extends Proposal<
   }
   public get title() {
     // naming taken from https://github.com/AngelBlock/sputnik-dao-2-mockup/blob/dev/src/ProposalPage.jsx#L188
-    if (isChangeConfig(this.data.kind)) return `Change Config: ${this.data.description}`;
-    if (isChangePolicy(this.data.kind)) return `Change Policy: ${this.data.description}`;
-    if (this.data.kind === 'UpgradeSelf') return `UpgradeSelf: ${this.data.description}`;
-    if (this.data.kind === 'UpgradeRemote') return `UpgradeRemote: ${this.data.description}`;
-    if (this.data.kind === 'SetStakingContract') return `SetStakingContract: ${this.data.description}`;
-    if (this.data.kind === 'AddBounty') return `AddBounty: ${this.data.description}`;
-    if (this.data.kind === 'BountyDone') return `BountyDone: ${this.data.description}`;
+    if (isChangeConfig(this.data.kind))
+      return `Change Config: ${this.data.description}`;
+    if (isChangePolicy(this.data.kind))
+      return `Change Policy: ${this.data.description}`;
+    if (this.data.kind === 'UpgradeSelf')
+      return `UpgradeSelf: ${this.data.description}`;
+    if (this.data.kind === 'UpgradeRemote')
+      return `UpgradeRemote: ${this.data.description}`;
+    if (this.data.kind === 'SetStakingContract')
+      return `SetStakingContract: ${this.data.description}`;
+    if (this.data.kind === 'AddBounty')
+      return `AddBounty: ${this.data.description}`;
+    if (this.data.kind === 'BountyDone')
+      return `BountyDone: ${this.data.description}`;
     if (this.data.kind === 'Vote') return `Vote: ${this.data.description}`;
-    if (isAddMemberToRole(this.data.kind) && this.data.kind.AddMemberToRole.role === 'council')
+    if (
+      isAddMemberToRole(this.data.kind) &&
+      this.data.kind.AddMemberToRole.role === 'council'
+    )
       return `Add ${this.data.kind.AddMemberToRole.member_id} to the council`;
-    if (isRemoveMemberFromRole(this.data.kind) && this.data.kind.RemoveMemberFromRole.role === 'council')
+    if (
+      isRemoveMemberFromRole(this.data.kind) &&
+      this.data.kind.RemoveMemberFromRole.role === 'council'
+    )
       return `Remove ${this.data.kind.RemoveMemberFromRole.member_id} from the council`;
     if (isTransfer(this.data.kind) && this.data.kind.Transfer.token_id === '') {
       const amount = this._Chain.coins(this.data.kind.Transfer.amount);
-      return `${'Request for payout Ⓝ'}${
-        amount.inDollars
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-        } to ${this.data.kind.Transfer.receiver_id}`;
+      return `${'Request for payout Ⓝ'}${amount.inDollars
+        .toFixed(2)
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')} to ${
+        this.data.kind.Transfer.receiver_id
+      }`;
     } else if (isTransfer(this.data.kind)) {
       const amount = this._Chain.coins(this.data.kind.Transfer.amount);
-      return `${'Request for payout '}${
-        amount.inDollars
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-        } ${this.data.kind.Transfer.token_id} to ${this.data.kind.Transfer.receiver_id}`;
+      return `${'Request for payout '}${amount.inDollars
+        .toFixed(2)
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ${
+        this.data.kind.Transfer.token_id
+      } to ${this.data.kind.Transfer.receiver_id}`;
     }
     // TODO: support custom decimals
-    if (isFunctionCall(this.data.kind) && this.data.kind.FunctionCall.actions[0].method_name === 'create_token')
+    if (
+      isFunctionCall(this.data.kind) &&
+      this.data.kind.FunctionCall.actions[0].method_name === 'create_token'
+    )
       return 'Create token';
     if (isFunctionCall(this.data.kind)) {
       return `Call ${this.data.kind.FunctionCall.actions[0].method_name} on ${this.data.kind.FunctionCall.receiver_id}`;
     }
     return `Sputnik Proposal ${this.identifier}`;
   }
-  public get description() { return this.data.description; }
-  public get author() { return this._Accounts.get(this.data.proposer); }
+  public get description() {
+    return this.data.description;
+  }
+  public get author() {
+    return this._Accounts.get(this.data.proposer);
+  }
 
   public get votingType() {
     return VotingType.YesNoReject;
@@ -89,9 +116,11 @@ export default class NearSputnikProposal extends Proposal<
     // confirm they have all 3 voting roles
     const permissions = getUserRoles(this._Dao.policy, account.address);
     const permissionTypes = permissions.map((p) => p.split(':')[1]);
-    return permissionTypes.includes('VoteApprove')
-      && permissionTypes.includes('VoteReject')
-      && permissionTypes.includes('VoteRemove');
+    return (
+      permissionTypes.includes('VoteApprove') &&
+      permissionTypes.includes('VoteReject') &&
+      permissionTypes.includes('VoteRemove')
+    );
   }
 
   private _Chain: NearChain;
@@ -115,23 +144,39 @@ export default class NearSputnikProposal extends Proposal<
 
     // init constants from data
     this._votePolicy = getVotePolicy(Dao.policy, data.kind);
-    this._totalSupply = getTotalSupply(Dao.policy, this._votePolicy, Dao.tokenSupply);
+    this._totalSupply = getTotalSupply(
+      Dao.policy,
+      this._votePolicy,
+      Dao.tokenSupply
+    );
 
-    const periodS = +this._Dao.policy.proposal_period.slice(0, this._Dao.policy.proposal_period.length - 9);
-    const submissionTimeS = +this.data.submission_time.slice(0, this.data.submission_time.length - 9);
+    const periodS = +this._Dao.policy.proposal_period.slice(
+      0,
+      this._Dao.policy.proposal_period.length - 9
+    );
+    const submissionTimeS = +this.data.submission_time.slice(
+      0,
+      this.data.submission_time.length - 9
+    );
     this._endTimeS = submissionTimeS + periodS;
     const nowS = moment.now() / 1000;
     if (data.status !== NearSputnikProposalStatus.InProgress) {
       this.complete(this._Dao.store);
     } else if (this._endTimeS < nowS) {
-      console.log(`Marking proposal ${this.identifier} expired, by ${nowS - this._endTimeS} seconds.`);
+      console.log(
+        `Marking proposal ${this.identifier} expired, by ${
+          nowS - this._endTimeS
+        } seconds.`
+      );
       // special case for expiration that hasn't yet been triggered
       data.status = NearSputnikProposalStatus.Expired;
       this.complete(this._Dao.store);
     }
     // TODO: fetch weights for each voter? is this necessary?
     for (const [voter, choice] of Object.entries(data.votes)) {
-      this.addOrUpdateVote(new NearSputnikVote(this._Accounts.get(voter), choice));
+      this.addOrUpdateVote(
+        new NearSputnikVote(this._Accounts.get(voter), choice)
+      );
     }
     this._Dao.store.add(this);
   }
@@ -163,7 +208,8 @@ export default class NearSputnikProposal extends Proposal<
     const PRECISION = 10_000;
     const [yes, no, remove] = this._getVoteCounts();
     const totalVoted = yes.add(no).add(remove);
-    const pctVoted = totalVoted.muln(PRECISION).div(this._totalSupply).toNumber() / PRECISION;
+    const pctVoted =
+      totalVoted.muln(PRECISION).div(this._totalSupply).toNumber() / PRECISION;
     return pctVoted;
   }
 
@@ -179,14 +225,17 @@ export default class NearSputnikProposal extends Proposal<
         // weight threshold: must have enough votes
         threshold = BN.min(
           this._totalSupply,
-          new BN(this._votePolicy.threshold),
+          new BN(this._votePolicy.threshold)
         );
       } else {
         // ratio threshold: must have sufficient proportion
         const [numerator, denominator] = this._votePolicy.threshold;
         threshold = BN.min(
-          this._totalSupply.muln(+numerator).divn(+denominator).addn(1),
-          this._totalSupply,
+          this._totalSupply
+            .muln(+numerator)
+            .divn(+denominator)
+            .addn(1),
+          this._totalSupply
         );
       }
       const [yes, no, remove] = this._getVoteCounts();
@@ -217,7 +266,13 @@ export default class NearSputnikProposal extends Proposal<
       id: this.data.id,
       action: `Vote${vote.choice}`,
     };
-    await this._Chain.redirectTx(contractId, methodName, args, undefined, window.location.href);
+    await this._Chain.redirectTx(
+      contractId,
+      methodName,
+      args,
+      undefined,
+      window.location.href
+    );
   }
 
   public submitVoteTx(vote: NearSputnikVote): ITXModalData {

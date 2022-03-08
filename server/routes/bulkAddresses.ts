@@ -16,12 +16,13 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const bulkAddresses = async (models: DB, req, res, next) => {
   const options = {
-    order: req.query.order ? [[req.query.order]] : [['created_at', 'DESC']]
+    order: req.query.order ? [[req.query.order]] : [['created_at', 'DESC']],
   };
 
   if (req.query.limit) options['limit'] = req.query.limit;
 
-  let chain; let error;
+  let chain;
+  let error;
   if (req.query.chain) {
     [chain, error] = await validateChain(models, req.query);
     if (error) return next(new Error(error));
@@ -35,10 +36,10 @@ const bulkAddresses = async (models: DB, req, res, next) => {
         {
           [Op.and]: [
             { name: { [Op.ne]: null } },
-            { address: { [Op.iLike]: `%${req.query.searchTerm}%` } }
-          ]
-        }
-      ]
+            { address: { [Op.iLike]: `%${req.query.searchTerm}%` } },
+          ],
+        },
+      ],
     };
     options['where'] = options['where']
       ? Object.assign(options['where'], subStr)
@@ -47,7 +48,10 @@ const bulkAddresses = async (models: DB, req, res, next) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const addresses = await models.Address.findAll(options);
-  return res.json({ status: 'Success', result: addresses.map((p) => p.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: addresses.map((p) => p.toJSON()),
+  });
 };
 
 export default bulkAddresses;

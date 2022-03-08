@@ -16,7 +16,12 @@ export class BinaryVote<C extends Coin> implements IVote<C> {
   public readonly choice: boolean;
   public readonly amount: number;
   public readonly weight: number;
-  constructor(account: Account<C>, choice: boolean, amount?: number, weight?: number) {
+  constructor(
+    account: Account<C>,
+    choice: boolean,
+    amount?: number,
+    weight?: number
+  ) {
     this.account = account;
     this.choice = choice;
     this.amount = amount;

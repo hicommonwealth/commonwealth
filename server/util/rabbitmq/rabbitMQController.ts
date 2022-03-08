@@ -11,7 +11,8 @@ export class RabbitMQController {
 
   constructor(private readonly _rabbitMQConfig: Rascal.BrokerConfig) {
     // sets the first vhost config to _rawVhost
-    this._rawVhost = _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];
+    this._rawVhost =
+      _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];
 
     // array of subscribers
     this.subscribers = Object.keys(this._rawVhost.subscriptions);
@@ -21,18 +22,17 @@ export class RabbitMQController {
   }
 
   public async init(): Promise<void> {
-    log.info(
-      `Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`
-    );
+    log.info(`Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`);
 
     this.broker = await Rascal.BrokerAsPromised.create(
       Rascal.withDefaultConfig(this._rabbitMQConfig)
     );
 
-
-
     this.broker.on('error', (err, { vhost, connectionUrl }) => {
-      log.error(`Broker error on vhost: ${vhost} using url: ${connectionUrl}`, err)
+      log.error(
+        `Broker error on vhost: ${vhost} using url: ${connectionUrl}`,
+        err
+      );
     });
     this.broker.on('vhost_initialized', ({ vhost, connectionUrl }) => {
       log.info(
@@ -71,18 +71,21 @@ export class RabbitMQController {
           messageProcessor(content);
           ackOrNack();
         } catch (e) {
-          ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}])
+          ackOrNack(e, [
+            { strategy: 'republish', defer: 2000, attempts: 3 },
+            { strategy: 'nack' },
+          ]);
         }
       });
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       subscription.on('error', (err, messageId, ackOrNack) => {
         log.error(`Publisher error: ${err} ${messageId}`);
-        ackOrNack(err, {strategy: 'nack'})
+        ackOrNack(err, { strategy: 'nack' });
       });
       subscription.on('invalid_content', (err, message, ackOrNack) => {
         log.error(`Invalid content`, err);
-        ackOrNack(err, {strategy: 'nack'})
+        ackOrNack(err, { strategy: 'nack' });
       });
     } catch (err) {
       throw new Error(`Rascal config error: ${err.message}`);

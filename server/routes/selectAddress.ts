@@ -3,7 +3,12 @@ import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
-const selectAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const selectAddress = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.address) return next(new Error('Must provide address'));
   if (!req.body.chain) return next(new Error('Must provide chain'));
@@ -12,7 +17,11 @@ const selectAddress = async (models: DB, req: Request, res: Response, next: Next
   // @ts-ignore
   const addresses = await req.user.getAddresses();
   const newSelectedAddress = addresses.filter((addr) => {
-    return addr.chain === req.body.chain && addr.address === req.body.address && !!addr.verified;
+    return (
+      addr.chain === req.body.chain &&
+      addr.address === req.body.address &&
+      !!addr.verified
+    );
   });
   if (newSelectedAddress.length === 0) {
     return next(new Error('Invalid address'));
@@ -20,7 +29,10 @@ const selectAddress = async (models: DB, req: Request, res: Response, next: Next
 
   // set other addresses to unselected
   const prevSelectedAddresses = addresses.filter((addr) => {
-    return addr.selected && (addr.chain !== req.body.chain || addr.address !== req.body.address);
+    return (
+      addr.selected &&
+      (addr.chain !== req.body.chain || addr.address !== req.body.address)
+    );
   });
   for (const prevSelectedAddress of prevSelectedAddresses) {
     prevSelectedAddress.selected = false;
@@ -31,7 +43,10 @@ const selectAddress = async (models: DB, req: Request, res: Response, next: Next
   newSelectedAddress[0].selected = true;
   await newSelectedAddress[0].save();
 
-  return res.json({ status: 'Success', result: { id: newSelectedAddress[0].id } });
+  return res.json({
+    status: 'Success',
+    result: { id: newSelectedAddress[0].id },
+  });
 };
 
 export default selectAddress;

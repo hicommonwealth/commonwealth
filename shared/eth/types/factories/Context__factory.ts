@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Contract, Signer } from 'ethers';
+import { Provider } from '@ethersproject/providers';
 
-import type { Context } from "../Context";
+import type { Context } from '../Context';
 
 export class Context__factory {
   static connect(
@@ -20,7 +20,7 @@ const _abi = [
   {
     inputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "constructor",
+    stateMutability: 'nonpayable',
+    type: 'constructor',
   },
 ];

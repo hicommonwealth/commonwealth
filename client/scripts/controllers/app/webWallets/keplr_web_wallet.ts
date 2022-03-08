@@ -38,8 +38,12 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public get accounts() {
     return this._accounts || [];
   }
-  public get api() { return window.keplr; }
-  public get offlineSigner() { return this._offlineSigner; }
+  public get api() {
+    return window.keplr;
+  }
+  public get offlineSigner() {
+    return this._offlineSigner;
+  }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
     if (!this._chainId || !window.keplr?.signAmino)
@@ -58,7 +62,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
         preferNoSetFee: true,
         preferNoSetMemo: true,
         disableBalanceCheck: true,
-      }
+      },
     };
 
     const signature = await window.keplr.signAmino(
@@ -93,7 +97,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       try {
         await window.keplr.enable(this._chainId);
       } catch (err) {
-        console.log(`Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`);
+        console.log(
+          `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`
+        );
 
         const bech32Prefix = app.chain.meta.chain.bech32Prefix;
         const info: ChainInfo = {
@@ -104,7 +110,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           // use the RPC url as hack, which will break some querying functionality but not signing.
           rest: app.chain.meta.altWalletUrl || url,
           bip44: {
-              coinType: 118,
+            coinType: 118,
           },
           bech32Config: {
             bech32PrefixAccAddr: `${bech32Prefix}`,

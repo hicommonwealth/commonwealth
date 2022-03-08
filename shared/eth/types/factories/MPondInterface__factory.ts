@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Contract, Signer } from 'ethers';
+import { Provider } from '@ethersproject/providers';
 
-import type { MPondInterface } from "../MPondInterface";
+import type { MPondInterface } from '../MPondInterface';
 
 export class MPondInterface__factory {
   static connect(
@@ -20,25 +20,25 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "account",
-        type: "address",
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
       },
       {
-        internalType: "uint256",
-        name: "blockNumber",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'blockNumber',
+        type: 'uint256',
       },
     ],
-    name: "getPriorVotes",
+    name: 'getPriorVotes',
     outputs: [
       {
-        internalType: "uint96",
-        name: "",
-        type: "uint96",
+        internalType: 'uint96',
+        name: '',
+        type: 'uint96',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
 ];

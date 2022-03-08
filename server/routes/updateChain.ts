@@ -75,11 +75,11 @@ const updateChain = async (
 
   // Handle single string case and undefined case
   if (snapshot !== undefined && typeof snapshot === 'string') {
-    snapshot = [snapshot]
+    snapshot = [snapshot];
   } else if (snapshot === undefined) {
-    snapshot = []
+    snapshot = [];
   }
-  
+
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
@@ -93,7 +93,11 @@ const updateChain = async (
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
   } else if (
-    snapshot.some((snapshot_space) => snapshot_space !== '' && snapshot_space.slice(snapshot_space.length-4) != '.eth')
+    snapshot.some(
+      (snapshot_space) =>
+        snapshot_space !== '' &&
+        snapshot_space.slice(snapshot_space.length - 4) != '.eth'
+    )
   ) {
     return next(new Error(Errors.InvalidSnapshot));
   } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {

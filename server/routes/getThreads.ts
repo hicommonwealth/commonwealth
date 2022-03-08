@@ -18,7 +18,7 @@ const getThreads = async (
     threads = await models.OffchainThread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
-        chain: chain.id
+        chain: chain.id,
       },
       include: [
         {
@@ -56,7 +56,7 @@ const getThreads = async (
     });
   } catch (e) {
     console.log(e);
-    throw new ServerError(error)
+    throw new ServerError(error);
   }
 
   return threads.length

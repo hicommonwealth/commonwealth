@@ -31,7 +31,8 @@ const UserGallery: m.Component<
       addressesCount || (userCount < maxUsers ? 0 : userCount - maxUsers);
 
     return m('.UserGallery', { class: vnode.attrs.class }, [
-      (users).slice(0, Math.min(userCount, maxUsers))
+      users
+        .slice(0, Math.min(userCount, maxUsers))
         .map((user: Account<any> | AddressInfo) => {
           if (user.chain !== app.chain?.id && user.chain !== app.chain?.base) {
             return m(AnonymousUser, {
@@ -41,13 +42,14 @@ const UserGallery: m.Component<
               distinguishingKey: user.address.slice(user.address.length - 3),
             });
           } else {
-          return m(User, {
-            user,
-            avatarOnly: true,
-            popover,
-            avatarSize,
-          });
-        }}),
+            return m(User, {
+              user,
+              avatarOnly: true,
+              popover,
+              avatarSize,
+            });
+          }
+        }),
       overflowUsers > 0 &&
         m(
           '.overflow-users-wrap',

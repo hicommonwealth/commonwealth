@@ -3,7 +3,12 @@ import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
 import { ProposalType } from 'types';
 import { IVote, IUniqueId, ITXModalData } from './interfaces';
-import { VotingType, VotingUnit, ProposalEndTime, ProposalStatus } from './types';
+import {
+  VotingType,
+  VotingUnit,
+  ProposalEndTime,
+  ProposalStatus,
+} from './types';
 import Account from './Account';
 import { ProposalStore } from '../stores';
 import ChainEvent from './ChainEvent';
@@ -13,10 +18,13 @@ abstract class Proposal<
   C extends Coin,
   ConstructorT extends IIdentifiable,
   VoteT extends IVote<C>
-> implements IUniqueId {
+> implements IUniqueId
+{
   // basic info
   protected _data: ConstructorT;
-  public get data(): ConstructorT { return this._data; }
+  public get data(): ConstructorT {
+    return this._data;
+  }
   public readonly identifier: string;
   public readonly slug: ProposalType;
   public abstract get shortIdentifier(): string;
@@ -36,21 +44,27 @@ abstract class Proposal<
   public abstract get votingUnit(): VotingUnit;
   public abstract canVoteFrom(account: Account<C>): boolean;
 
-  protected votes: { [account: string] : VoteT } = {};
+  protected votes: { [account: string]: VoteT } = {};
   public abstract get endTime(): ProposalEndTime;
-  public abstract get isPassing() : ProposalStatus;
+  public abstract get isPassing(): ProposalStatus;
 
   // display
   public abstract get support(): Coin | number;
   public abstract get turnout(): number;
 
   protected _completed = false;
-  get completed() { return this._completed; }
+  get completed() {
+    return this._completed;
+  }
   protected _completedAt: moment.Moment; // TODO: fill this out
-  get completedAt() { return this._completedAt; }
+  get completedAt() {
+    return this._completedAt;
+  }
 
   protected _initialized = false;
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
 
   constructor(slug: ProposalType, data: ConstructorT) {
     this.slug = slug;
@@ -65,7 +79,9 @@ abstract class Proposal<
     store: ProposalStore<Proposal<ApiT, C, ConstructorT, VoteT>>
   ): void {
     if (this._completed) {
-      console.warn(`Warning: state marked as complete multiple times on proposal ${this.identifier}`);
+      console.warn(
+        `Warning: state marked as complete multiple times on proposal ${this.identifier}`
+      );
     }
     this._completed = true;
     this._initialized = true;
@@ -103,7 +119,10 @@ abstract class Proposal<
   public getVoters(): string[] {
     return Object.keys(this.votes);
   }
-  public abstract submitVoteTx(vote: VoteT, ...args): ITXModalData | Promise<ITXModalData>;
+  public abstract submitVoteTx(
+    vote: VoteT,
+    ...args
+  ): ITXModalData | Promise<ITXModalData>;
 }
 
 export default Proposal;

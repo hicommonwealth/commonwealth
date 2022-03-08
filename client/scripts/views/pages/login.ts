@@ -18,12 +18,14 @@ const LoginPage: m.Component<{}> = {
       else m.route.set('/settings');
       return;
     }
-    return m(Sublayout, {
-      class: 'LoginPage',
-    }, [
-      m(Login),
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        class: 'LoginPage',
+      },
+      [m(Login)]
+    );
+  },
 };
 
 export default LoginPage;

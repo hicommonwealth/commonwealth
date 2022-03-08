@@ -102,7 +102,9 @@ import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
-import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
+import NotificationsReadFactory, {
+  NotificationsReadModelStatic,
+} from './models/notifications_read';
 
 export type Models = {
   Address: AddressModelStatic;

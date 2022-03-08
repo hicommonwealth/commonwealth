@@ -123,7 +123,12 @@ export const getDiscussionPreview = (
       return;
     }
 
-    const path = getProposalUrlPath(ProposalType.OffchainThread, proposalId, false, chainOrComm);
+    const path = getProposalUrlPath(
+      ProposalType.OffchainThread,
+      proposalId,
+      false,
+      chainOrComm
+    );
     m.route.set(path);
     closeResultsFn();
   };

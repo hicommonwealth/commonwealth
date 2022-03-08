@@ -6,7 +6,10 @@ import { default as models, sequelize } from '../database';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const handleEventFn = async (handlers: IEventHandler[], event: CWEvent<any>): Promise<void> => {
+const handleEventFn = async (
+  handlers: IEventHandler[],
+  event: CWEvent<any>
+): Promise<void> => {
   let prevResult = null;
   for (const handler of handlers) {
     try {
@@ -51,11 +54,13 @@ async function main(chain: string, eventsPath: string) {
     await sequelize.authenticate();
     const node = await models.ChainNode.findOne({
       where: { chain },
-      include: [{
-        model: models.Chain,
-        where: { active: true },
-        required: true,
-      }],
+      include: [
+        {
+          model: models.Chain,
+          where: { active: true },
+          required: true,
+        },
+      ],
     });
     if (!node) {
       throw new Error(`Chain not found: ${chain}`);

@@ -1,12 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
 
-const domain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const domain = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const hostname = req.headers['x-forwarded-host'] || req.hostname;
 
   // return the community id matching the hostname's custom domain
   try {
-    const chain = await models.Chain.findOne({ where: { custom_domain: hostname } });
+    const chain = await models.Chain.findOne({
+      where: { custom_domain: hostname },
+    });
     if (chain) {
       return res.json({ customDomain: chain.id });
     }

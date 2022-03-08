@@ -34,8 +34,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
           m(
             'p',
             {
-              class:
-                'text-left max-w-screen-md mx-auto text-2xl text-center',
+              class: 'text-left max-w-screen-md mx-auto text-2xl text-center',
             },
             ' Subscribe to chain activity like whale transfers or major votes. Discuss new ideas, crowdfund projects, and access native governance for Layer 1s, tokens, and NFTs alike. '
           ),
@@ -52,47 +51,44 @@ const TokensChainsComponent: m.Component<IState, IState> = {
               'div',
               { class: 'glide__track', 'data-glide-el': 'track' },
               m('ul', { class: 'glide__slides' }, [
-                vnode.attrs.chains.map(
-                  (chain: any, index: number) => {
-                    return m(
-                      'li',
-                      {
-                        id:`card_${index}`,
-                        class: 'glide__slide mt-4 pb-8',
+                vnode.attrs.chains.map((chain: any, index: number) => {
+                  return m(
+                    'li',
+                    {
+                      id: `card_${index}`,
+                      class: 'glide__slide mt-4 pb-8',
 
-                        onclick: (e) => {
-                          e.preventDefault();
-                          m.route.set(`/${chain.id}`);
-                          localStorage['home-scrollY'] = window.scrollY;
-                        },
-
+                      onclick: (e) => {
+                        e.preventDefault();
+                        m.route.set(`/${chain.id}`);
+                        localStorage['home-scrollY'] = window.scrollY;
                       },
-                      m(
-                        'div',
-                        {
-                          class:
-                            'bg-white shadow-xl p-5 xl:p-10 rounded-xl text-center h-56 grow',
-                        },
-                        [
-                          m('img', {
-                            class: 'mx-auto mb-3 w-12 h-auto',
-                            src: chain.img,
-                            alt: '',
-                          }),
-                          m(
-                            'h3',
-                            {
-                              class: 'text-2xl font-extrabold mb-1',
-                              style: 'word-break: break-word'
-                            },
-                            chain.name
-                          ),
-                          m('p', { class: 'text-xl' }, chain.description),
-                        ]
-                      )
-                    );
-                  }
-                ),
+                    },
+                    m(
+                      'div',
+                      {
+                        class:
+                          'bg-white shadow-xl p-5 xl:p-10 rounded-xl text-center h-56 grow',
+                      },
+                      [
+                        m('img', {
+                          class: 'mx-auto mb-3 w-12 h-auto',
+                          src: chain.img,
+                          alt: '',
+                        }),
+                        m(
+                          'h3',
+                          {
+                            class: 'text-2xl font-extrabold mb-1',
+                            style: 'word-break: break-word',
+                          },
+                          chain.name
+                        ),
+                        m('p', { class: 'text-xl' }, chain.description),
+                      ]
+                    )
+                  );
+                }),
               ])
             )
           )

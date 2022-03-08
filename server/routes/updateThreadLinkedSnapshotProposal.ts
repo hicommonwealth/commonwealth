@@ -11,7 +11,12 @@ export const Errors = {
   InvalidSnapshotProposal: 'Invalid snapshot proposal hash',
 };
 
-const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const updateThreadLinkedSnapshotProposal = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!chain?.snapshot) {
@@ -34,13 +39,15 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
 
   if (!thread) return next(new Error(Errors.NoThread));
   const userOwnedAddressIds = (await req.user.getAddresses())
-    .filter((addr) => !!addr.verified).map((addr) => addr.id);
-  if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
+  if (!userOwnedAddressIds.includes(thread.address_id)) {
+    // is not author
     const roles = await models.Role.findAll({
       where: {
-        address_id: { [Op.in]: userOwnedAddressIds, },
+        address_id: { [Op.in]: userOwnedAddressIds },
         permission: { [Op.in]: ['admin', 'moderator'] },
-      }
+      },
     });
     const role = roles.find((r) => {
       return r.chain_id === thread.chain;
@@ -57,22 +64,22 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
   await thread.save();
 
   const finalThread = await models.OffchainThread.findOne({
-    where: { id: thread_id, },
+    where: { id: thread_id },
     include: [
       {
         model: models.Address,
-        as: 'Address'
+        as: 'Address',
       },
       {
         model: models.Address,
         // through: models.Collaboration,
-        as: 'collaborators'
+        as: 'collaborators',
       },
       models.OffchainAttachment,
       {
         model: models.OffchainTopic,
-        as: 'topic'
-      }
+        as: 'topic',
+      },
     ],
   });
 

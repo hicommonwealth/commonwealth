@@ -6,13 +6,19 @@ import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import CosmosAccount from './account';
 
-export default class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccount> {
+export default class CosmosAccounts
+  implements IAccountsModule<CosmosToken, CosmosAccount>
+{
   private _initialized: boolean = false;
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
 
   // STORAGE
   private _store: AccountsStore<CosmosAccount> = new AccountsStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _Chain: CosmosChain;
 
@@ -21,7 +27,9 @@ export default class CosmosAccounts implements IAccountsModule<CosmosToken, Cosm
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;

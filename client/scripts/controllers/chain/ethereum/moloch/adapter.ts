@@ -14,7 +14,10 @@ import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
 
-export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Moloch extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public chain: MolochChain;
   public ethAccounts: EthereumAccounts;
@@ -27,14 +30,21 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain = new MolochChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new MolochMembers(this.app, this.chain, this.ethAccounts);
-    this.governance = new MolochGovernance(this.app, !this.usingServerChainEntities);
+    this.governance = new MolochGovernance(
+      this.app,
+      !this.usingServerChainEntities
+    );
   }
 
   public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    const api = new MolochAPI(Moloch1__factory.connect, this.meta.address, this.chain.api.currentProvider as any);
+    const api = new MolochAPI(
+      Moloch1__factory.connect,
+      this.meta.address,
+      this.chain.api.currentProvider as any
+    );
     await api.init();
     this.chain.molochApi = api;
     await this.accounts.init(api);

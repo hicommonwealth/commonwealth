@@ -10,7 +10,12 @@ export const Errors = {
   NoCommentOrThreadId: 'Must provide a comment or thread ID',
 };
 
-const viewReactions = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const viewReactions = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
@@ -26,14 +31,17 @@ const viewReactions = async (models: DB, req: Request, res: Response, next: Next
   try {
     reactions = await models.OffchainReaction.findAll({
       where: options,
-      include: [ models.Address ],
+      include: [models.Address],
       order: [['created_at', 'DESC']],
     });
   } catch (err) {
     return next(new Error(err));
   }
 
-  return res.json({ status: 'Success', result: reactions.map((c) => c.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: reactions.map((c) => c.toJSON()),
+  });
 };
 
 export default viewReactions;

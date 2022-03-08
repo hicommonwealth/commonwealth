@@ -13,63 +13,63 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface ERC20VotesInterface extends ethers.utils.Interface {
   functions: {
-    "DOMAIN_SEPARATOR()": FunctionFragment;
-    "allowance(address,address)": FunctionFragment;
-    "approve(address,uint256)": FunctionFragment;
-    "balanceOf(address)": FunctionFragment;
-    "checkpoints(address,uint32)": FunctionFragment;
-    "decimals()": FunctionFragment;
-    "decreaseAllowance(address,uint256)": FunctionFragment;
-    "delegate(address)": FunctionFragment;
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "delegates(address)": FunctionFragment;
-    "getPastTotalSupply(uint256)": FunctionFragment;
-    "getPastVotes(address,uint256)": FunctionFragment;
-    "getVotes(address)": FunctionFragment;
-    "increaseAllowance(address,uint256)": FunctionFragment;
-    "name()": FunctionFragment;
-    "nonces(address)": FunctionFragment;
-    "numCheckpoints(address)": FunctionFragment;
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "symbol()": FunctionFragment;
-    "totalSupply()": FunctionFragment;
-    "transfer(address,uint256)": FunctionFragment;
-    "transferFrom(address,address,uint256)": FunctionFragment;
+    'DOMAIN_SEPARATOR()': FunctionFragment;
+    'allowance(address,address)': FunctionFragment;
+    'approve(address,uint256)': FunctionFragment;
+    'balanceOf(address)': FunctionFragment;
+    'checkpoints(address,uint32)': FunctionFragment;
+    'decimals()': FunctionFragment;
+    'decreaseAllowance(address,uint256)': FunctionFragment;
+    'delegate(address)': FunctionFragment;
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment;
+    'delegates(address)': FunctionFragment;
+    'getPastTotalSupply(uint256)': FunctionFragment;
+    'getPastVotes(address,uint256)': FunctionFragment;
+    'getVotes(address)': FunctionFragment;
+    'increaseAllowance(address,uint256)': FunctionFragment;
+    'name()': FunctionFragment;
+    'nonces(address)': FunctionFragment;
+    'numCheckpoints(address)': FunctionFragment;
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment;
+    'symbol()': FunctionFragment;
+    'totalSupply()': FunctionFragment;
+    'transfer(address,uint256)': FunctionFragment;
+    'transferFrom(address,address,uint256)': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "DOMAIN_SEPARATOR",
+    functionFragment: 'DOMAIN_SEPARATOR',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "allowance",
+    functionFragment: 'allowance',
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "approve",
+    functionFragment: 'approve',
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(functionFragment: 'balanceOf', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "checkpoints",
+    functionFragment: 'checkpoints',
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'decimals', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "decreaseAllowance",
+    functionFragment: 'decreaseAllowance',
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "delegate", values: [string]): string;
+  encodeFunctionData(functionFragment: 'delegate', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "delegateBySig",
+    functionFragment: 'delegateBySig',
     values: [
       string,
       BigNumberish,
@@ -79,28 +79,28 @@ interface ERC20VotesInterface extends ethers.utils.Interface {
       BytesLike
     ]
   ): string;
-  encodeFunctionData(functionFragment: "delegates", values: [string]): string;
+  encodeFunctionData(functionFragment: 'delegates', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "getPastTotalSupply",
+    functionFragment: 'getPastTotalSupply',
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getPastVotes",
+    functionFragment: 'getPastVotes',
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "getVotes", values: [string]): string;
+  encodeFunctionData(functionFragment: 'getVotes', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "increaseAllowance",
+    functionFragment: 'increaseAllowance',
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nonces", values: [string]): string;
+  encodeFunctionData(functionFragment: 'name', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'nonces', values: [string]): string;
   encodeFunctionData(
-    functionFragment: "numCheckpoints",
+    functionFragment: 'numCheckpoints',
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "permit",
+    functionFragment: 'permit',
     values: [
       string,
       string,
@@ -111,84 +111,84 @@ interface ERC20VotesInterface extends ethers.utils.Interface {
       BytesLike
     ]
   ): string;
-  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'symbol', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "totalSupply",
+    functionFragment: 'totalSupply',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "transfer",
+    functionFragment: 'transfer',
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferFrom",
+    functionFragment: 'transferFrom',
     values: [string, string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "DOMAIN_SEPARATOR",
+    functionFragment: 'DOMAIN_SEPARATOR',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'allowance', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "checkpoints",
+    functionFragment: 'checkpoints',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'decimals', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "decreaseAllowance",
+    functionFragment: 'decreaseAllowance',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "delegate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'delegate', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "delegateBySig",
+    functionFragment: 'delegateBySig',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "delegates", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'delegates', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getPastTotalSupply",
+    functionFragment: 'getPastTotalSupply',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getPastVotes",
+    functionFragment: 'getPastVotes',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getVotes", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getVotes', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "increaseAllowance",
+    functionFragment: 'increaseAllowance',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'nonces', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "numCheckpoints",
+    functionFragment: 'numCheckpoints',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'permit', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'symbol', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "totalSupply",
+    functionFragment: 'totalSupply',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'transfer', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "transferFrom",
+    functionFragment: 'transferFrom',
     data: BytesLike
   ): Result;
 
   events: {
-    "Approval(address,address,uint256)": EventFragment;
-    "DelegateChanged(address,address,address)": EventFragment;
-    "DelegateVotesChanged(address,uint256,uint256)": EventFragment;
-    "Transfer(address,address,uint256)": EventFragment;
+    'Approval(address,address,uint256)': EventFragment;
+    'DelegateChanged(address,address,address)': EventFragment;
+    'DelegateVotesChanged(address,uint256,uint256)': EventFragment;
+    'Transfer(address,address,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DelegateChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "DelegateVotesChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Approval'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'DelegateChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'DelegateVotesChanged'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Transfer'): EventFragment;
 }
 
 export class ERC20Votes extends Contract {
@@ -237,7 +237,7 @@ export class ERC20Votes extends Contract {
   functions: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<[string]>;
+    'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<[string]>;
 
     allowance(
       owner: string,
@@ -245,7 +245,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       owner: string,
       spender: string,
       overrides?: CallOverrides
@@ -257,7 +257,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -265,7 +265,7 @@ export class ERC20Votes extends Contract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -276,7 +276,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<[[number, BigNumber] & { fromBlock: number; votes: BigNumber }]>;
 
-    "checkpoints(address,uint32)"(
+    'checkpoints(address,uint32)'(
       account: string,
       pos: BigNumberish,
       overrides?: CallOverrides
@@ -284,7 +284,7 @@ export class ERC20Votes extends Contract {
 
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<[number]>;
+    'decimals()'(overrides?: CallOverrides): Promise<[number]>;
 
     decreaseAllowance(
       spender: string,
@@ -292,7 +292,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "decreaseAllowance(address,uint256)"(
+    'decreaseAllowance(address,uint256)'(
       spender: string,
       subtractedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -303,7 +303,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "delegate(address)"(
+    'delegate(address)'(
       delegatee: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -318,7 +318,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -330,7 +330,7 @@ export class ERC20Votes extends Contract {
 
     delegates(account: string, overrides?: CallOverrides): Promise<[string]>;
 
-    "delegates(address)"(
+    'delegates(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<[string]>;
@@ -340,7 +340,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getPastTotalSupply(uint256)"(
+    'getPastTotalSupply(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -351,7 +351,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "getPastVotes(address,uint256)"(
+    'getPastVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -359,7 +359,7 @@ export class ERC20Votes extends Contract {
 
     getVotes(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "getVotes(address)"(
+    'getVotes(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -370,7 +370,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "increaseAllowance(address,uint256)"(
+    'increaseAllowance(address,uint256)'(
       spender: string,
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -378,11 +378,11 @@ export class ERC20Votes extends Contract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    "name()"(overrides?: CallOverrides): Promise<[string]>;
+    'name()'(overrides?: CallOverrides): Promise<[string]>;
 
     nonces(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -392,7 +392,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<[number]>;
 
-    "numCheckpoints(address)"(
+    'numCheckpoints(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<[number]>;
@@ -408,7 +408,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -421,11 +421,11 @@ export class ERC20Votes extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<[string]>;
+    'symbol()'(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transfer(
       recipient: string,
@@ -433,7 +433,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       recipient: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -446,7 +446,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -456,7 +456,7 @@ export class ERC20Votes extends Contract {
 
   DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
-  "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<string>;
+  'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<string>;
 
   allowance(
     owner: string,
@@ -464,7 +464,7 @@ export class ERC20Votes extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "allowance(address,address)"(
+  'allowance(address,address)'(
     owner: string,
     spender: string,
     overrides?: CallOverrides
@@ -476,7 +476,7 @@ export class ERC20Votes extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "approve(address,uint256)"(
+  'approve(address,uint256)'(
     spender: string,
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -484,7 +484,7 @@ export class ERC20Votes extends Contract {
 
   balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "balanceOf(address)"(
+  'balanceOf(address)'(
     account: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -495,7 +495,7 @@ export class ERC20Votes extends Contract {
     overrides?: CallOverrides
   ): Promise<[number, BigNumber] & { fromBlock: number; votes: BigNumber }>;
 
-  "checkpoints(address,uint32)"(
+  'checkpoints(address,uint32)'(
     account: string,
     pos: BigNumberish,
     overrides?: CallOverrides
@@ -503,7 +503,7 @@ export class ERC20Votes extends Contract {
 
   decimals(overrides?: CallOverrides): Promise<number>;
 
-  "decimals()"(overrides?: CallOverrides): Promise<number>;
+  'decimals()'(overrides?: CallOverrides): Promise<number>;
 
   decreaseAllowance(
     spender: string,
@@ -511,7 +511,7 @@ export class ERC20Votes extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "decreaseAllowance(address,uint256)"(
+  'decreaseAllowance(address,uint256)'(
     spender: string,
     subtractedValue: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -522,7 +522,7 @@ export class ERC20Votes extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "delegate(address)"(
+  'delegate(address)'(
     delegatee: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -537,7 +537,7 @@ export class ERC20Votes extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)"(
+  'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)'(
     delegatee: string,
     nonce: BigNumberish,
     expiry: BigNumberish,
@@ -549,7 +549,7 @@ export class ERC20Votes extends Contract {
 
   delegates(account: string, overrides?: CallOverrides): Promise<string>;
 
-  "delegates(address)"(
+  'delegates(address)'(
     account: string,
     overrides?: CallOverrides
   ): Promise<string>;
@@ -559,7 +559,7 @@ export class ERC20Votes extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getPastTotalSupply(uint256)"(
+  'getPastTotalSupply(uint256)'(
     blockNumber: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -570,7 +570,7 @@ export class ERC20Votes extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "getPastVotes(address,uint256)"(
+  'getPastVotes(address,uint256)'(
     account: string,
     blockNumber: BigNumberish,
     overrides?: CallOverrides
@@ -578,7 +578,7 @@ export class ERC20Votes extends Contract {
 
   getVotes(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "getVotes(address)"(
+  'getVotes(address)'(
     account: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -589,7 +589,7 @@ export class ERC20Votes extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "increaseAllowance(address,uint256)"(
+  'increaseAllowance(address,uint256)'(
     spender: string,
     addedValue: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -597,18 +597,18 @@ export class ERC20Votes extends Contract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  "name()"(overrides?: CallOverrides): Promise<string>;
+  'name()'(overrides?: CallOverrides): Promise<string>;
 
   nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  "nonces(address)"(
+  'nonces(address)'(
     owner: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   numCheckpoints(account: string, overrides?: CallOverrides): Promise<number>;
 
-  "numCheckpoints(address)"(
+  'numCheckpoints(address)'(
     account: string,
     overrides?: CallOverrides
   ): Promise<number>;
@@ -624,7 +624,7 @@ export class ERC20Votes extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+  'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
     owner: string,
     spender: string,
     value: BigNumberish,
@@ -637,11 +637,11 @@ export class ERC20Votes extends Contract {
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  "symbol()"(overrides?: CallOverrides): Promise<string>;
+  'symbol()'(overrides?: CallOverrides): Promise<string>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+  'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
   transfer(
     recipient: string,
@@ -649,7 +649,7 @@ export class ERC20Votes extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transfer(address,uint256)"(
+  'transfer(address,uint256)'(
     recipient: string,
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -662,7 +662,7 @@ export class ERC20Votes extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "transferFrom(address,address,uint256)"(
+  'transferFrom(address,address,uint256)'(
     sender: string,
     recipient: string,
     amount: BigNumberish,
@@ -672,7 +672,7 @@ export class ERC20Votes extends Contract {
   callStatic: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<string>;
+    'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<string>;
 
     allowance(
       owner: string,
@@ -680,7 +680,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       owner: string,
       spender: string,
       overrides?: CallOverrides
@@ -692,7 +692,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       amount: BigNumberish,
       overrides?: CallOverrides
@@ -700,7 +700,7 @@ export class ERC20Votes extends Contract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -711,7 +711,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<[number, BigNumber] & { fromBlock: number; votes: BigNumber }>;
 
-    "checkpoints(address,uint32)"(
+    'checkpoints(address,uint32)'(
       account: string,
       pos: BigNumberish,
       overrides?: CallOverrides
@@ -719,7 +719,7 @@ export class ERC20Votes extends Contract {
 
     decimals(overrides?: CallOverrides): Promise<number>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<number>;
+    'decimals()'(overrides?: CallOverrides): Promise<number>;
 
     decreaseAllowance(
       spender: string,
@@ -727,7 +727,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "decreaseAllowance(address,uint256)"(
+    'decreaseAllowance(address,uint256)'(
       spender: string,
       subtractedValue: BigNumberish,
       overrides?: CallOverrides
@@ -735,7 +735,7 @@ export class ERC20Votes extends Contract {
 
     delegate(delegatee: string, overrides?: CallOverrides): Promise<void>;
 
-    "delegate(address)"(
+    'delegate(address)'(
       delegatee: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -750,7 +750,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -762,7 +762,7 @@ export class ERC20Votes extends Contract {
 
     delegates(account: string, overrides?: CallOverrides): Promise<string>;
 
-    "delegates(address)"(
+    'delegates(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<string>;
@@ -772,7 +772,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPastTotalSupply(uint256)"(
+    'getPastTotalSupply(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -783,7 +783,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPastVotes(address,uint256)"(
+    'getPastVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -791,7 +791,7 @@ export class ERC20Votes extends Contract {
 
     getVotes(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getVotes(address)"(
+    'getVotes(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -802,7 +802,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "increaseAllowance(address,uint256)"(
+    'increaseAllowance(address,uint256)'(
       spender: string,
       addedValue: BigNumberish,
       overrides?: CallOverrides
@@ -810,18 +810,18 @@ export class ERC20Votes extends Contract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    "name()"(overrides?: CallOverrides): Promise<string>;
+    'name()'(overrides?: CallOverrides): Promise<string>;
 
     nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     numCheckpoints(account: string, overrides?: CallOverrides): Promise<number>;
 
-    "numCheckpoints(address)"(
+    'numCheckpoints(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<number>;
@@ -837,7 +837,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -850,11 +850,11 @@ export class ERC20Votes extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<string>;
+    'symbol()'(overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
       recipient: string,
@@ -862,7 +862,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       recipient: string,
       amount: BigNumberish,
       overrides?: CallOverrides
@@ -875,7 +875,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -924,7 +924,7 @@ export class ERC20Votes extends Contract {
   estimateGas: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "DOMAIN_SEPARATOR()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'DOMAIN_SEPARATOR()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
       owner: string,
@@ -932,7 +932,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       owner: string,
       spender: string,
       overrides?: CallOverrides
@@ -944,7 +944,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -952,7 +952,7 @@ export class ERC20Votes extends Contract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -963,7 +963,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "checkpoints(address,uint32)"(
+    'checkpoints(address,uint32)'(
       account: string,
       pos: BigNumberish,
       overrides?: CallOverrides
@@ -971,7 +971,7 @@ export class ERC20Votes extends Contract {
 
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'decimals()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     decreaseAllowance(
       spender: string,
@@ -979,7 +979,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "decreaseAllowance(address,uint256)"(
+    'decreaseAllowance(address,uint256)'(
       spender: string,
       subtractedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -990,7 +990,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "delegate(address)"(
+    'delegate(address)'(
       delegatee: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1005,7 +1005,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -1017,7 +1017,7 @@ export class ERC20Votes extends Contract {
 
     delegates(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "delegates(address)"(
+    'delegates(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1027,7 +1027,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPastTotalSupply(uint256)"(
+    'getPastTotalSupply(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1038,7 +1038,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "getPastVotes(address,uint256)"(
+    'getPastVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -1046,7 +1046,7 @@ export class ERC20Votes extends Contract {
 
     getVotes(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "getVotes(address)"(
+    'getVotes(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1057,7 +1057,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "increaseAllowance(address,uint256)"(
+    'increaseAllowance(address,uint256)'(
       spender: string,
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1065,11 +1065,11 @@ export class ERC20Votes extends Contract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "name()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'name()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1079,7 +1079,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "numCheckpoints(address)"(
+    'numCheckpoints(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1095,7 +1095,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -1108,11 +1108,11 @@ export class ERC20Votes extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'symbol()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     transfer(
       recipient: string,
@@ -1120,7 +1120,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       recipient: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1133,7 +1133,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,
@@ -1144,7 +1144,7 @@ export class ERC20Votes extends Contract {
   populateTransaction: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "DOMAIN_SEPARATOR()"(
+    'DOMAIN_SEPARATOR()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1154,7 +1154,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "allowance(address,address)"(
+    'allowance(address,address)'(
       owner: string,
       spender: string,
       overrides?: CallOverrides
@@ -1166,7 +1166,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "approve(address,uint256)"(
+    'approve(address,uint256)'(
       spender: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1177,7 +1177,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "balanceOf(address)"(
+    'balanceOf(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1188,7 +1188,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "checkpoints(address,uint32)"(
+    'checkpoints(address,uint32)'(
       account: string,
       pos: BigNumberish,
       overrides?: CallOverrides
@@ -1196,7 +1196,7 @@ export class ERC20Votes extends Contract {
 
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'decimals()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     decreaseAllowance(
       spender: string,
@@ -1204,7 +1204,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "decreaseAllowance(address,uint256)"(
+    'decreaseAllowance(address,uint256)'(
       spender: string,
       subtractedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1215,7 +1215,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "delegate(address)"(
+    'delegate(address)'(
       delegatee: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1230,7 +1230,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'delegateBySig(address,uint256,uint256,uint8,bytes32,bytes32)'(
       delegatee: string,
       nonce: BigNumberish,
       expiry: BigNumberish,
@@ -1245,7 +1245,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "delegates(address)"(
+    'delegates(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1255,7 +1255,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getPastTotalSupply(uint256)"(
+    'getPastTotalSupply(uint256)'(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1266,7 +1266,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getPastVotes(address,uint256)"(
+    'getPastVotes(address,uint256)'(
       account: string,
       blockNumber: BigNumberish,
       overrides?: CallOverrides
@@ -1277,7 +1277,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getVotes(address)"(
+    'getVotes(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1288,7 +1288,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "increaseAllowance(address,uint256)"(
+    'increaseAllowance(address,uint256)'(
       spender: string,
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1296,14 +1296,14 @@ export class ERC20Votes extends Contract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'name()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     nonces(
       owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "nonces(address)"(
+    'nonces(address)'(
       owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1313,7 +1313,7 @@ export class ERC20Votes extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "numCheckpoints(address)"(
+    'numCheckpoints(address)'(
       account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1329,7 +1329,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)"(
+    'permit(address,address,uint256,uint256,uint8,bytes32,bytes32)'(
       owner: string,
       spender: string,
       value: BigNumberish,
@@ -1342,11 +1342,11 @@ export class ERC20Votes extends Contract {
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "symbol()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'symbol()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "totalSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'totalSupply()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transfer(
       recipient: string,
@@ -1354,7 +1354,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transfer(address,uint256)"(
+    'transfer(address,uint256)'(
       recipient: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1367,7 +1367,7 @@ export class ERC20Votes extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "transferFrom(address,address,uint256)"(
+    'transferFrom(address,address,uint256)'(
       sender: string,
       recipient: string,
       amount: BigNumberish,

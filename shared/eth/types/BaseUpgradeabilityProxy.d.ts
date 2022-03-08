@@ -11,20 +11,20 @@ import {
   PopulatedTransaction,
   Contract,
   ContractTransaction,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface BaseUpgradeabilityProxyInterface extends ethers.utils.Interface {
   functions: {};
 
   events: {
-    "Upgraded(address)": EventFragment;
+    'Upgraded(address)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Upgraded'): EventFragment;
 }
 
 export class BaseUpgradeabilityProxy extends Contract {

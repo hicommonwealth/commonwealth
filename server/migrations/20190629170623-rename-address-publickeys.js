@@ -9,5 +9,5 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     // return queryInterface.renameColumn('Addresses', 'address', 'public_key');
     return new Promise((resolve) => resolve());
-  }
+  },
 };

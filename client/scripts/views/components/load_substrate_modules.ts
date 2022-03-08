@@ -20,7 +20,11 @@ const loadSubstrateModules = (
           message: `Failed to initialize chain modules: ${errors.join(', ')}.`,
           title: [
             name,
-            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+            m(Tag, {
+              size: 'xs',
+              label: 'Beta',
+              style: 'position: relative; top: -2px; margin-left: 6px',
+            }),
           ],
         });
       }
@@ -29,9 +33,13 @@ const loadSubstrateModules = (
         message: `Loading ${name.toLowerCase()}`,
         title: [
           name,
-          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          m(Tag, {
+            size: 'xs',
+            label: 'Beta',
+            style: 'position: relative; top: -2px; margin-left: 6px',
+          }),
         ],
-        showNewProposalButton: true
+        showNewProposalButton: true,
       });
     }
   }

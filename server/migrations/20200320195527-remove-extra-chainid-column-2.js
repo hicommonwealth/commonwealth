@@ -8,7 +8,7 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     return queryInterface.addColumn('Addresses', 'chain_id', {
       type: Sequelize.STRING,
-      references: { model: 'Chains', key: 'id' }
+      references: { model: 'Chains', key: 'id' },
     });
-  }
+  },
 };

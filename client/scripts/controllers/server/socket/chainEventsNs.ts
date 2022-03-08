@@ -1,7 +1,11 @@
-import {ChainEventNotification, WebsocketMessageNames, WebsocketNamespaces} from 'types';
+import {
+  ChainEventNotification,
+  WebsocketMessageNames,
+  WebsocketNamespaces,
+} from 'types';
 import app from 'state';
 import { Notification, NotificationSubscription } from 'models';
-import {io, Socket} from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 export class ChainEventsNamespace {
   private ceNs: Socket;
@@ -21,7 +25,9 @@ export class ChainEventsNamespace {
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
+      const eventTypes = subs
+        .map((x) => x.ChainEventType?.id)
+        .filter((x) => !!x);
       console.log('Adding Websocket subscriptions for:', eventTypes);
       this.ceNs.emit(WebsocketMessageNames.NewSubscriptions, eventTypes);
     } else {
@@ -31,7 +37,9 @@ export class ChainEventsNamespace {
 
   public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
+      const eventTypes = subs
+        .map((x) => x.ChainEventType?.id)
+        .filter((x) => !!x);
       console.log('Deleting Websocket subscriptions for:', eventTypes);
       this.ceNs.emit(
         WebsocketMessageNames.DeleteSubscriptions,
@@ -44,11 +52,12 @@ export class ChainEventsNamespace {
 
   private onChainEvent(notification: ChainEventNotification) {
     const subscription = app.user.notifications.subscriptions.find(
-      (sub) => sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
+      (sub) =>
+        sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
     );
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally
-      console.log("Local subscription not found. Re-sync subscriptions!");
+      console.log('Local subscription not found. Re-sync subscriptions!');
       return;
     }
     const notificationObj = Notification.fromJSON(notification, subscription);

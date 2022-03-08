@@ -13,73 +13,73 @@ import {
   ContractTransaction,
   Overrides,
   CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+} from 'ethers';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi';
+import { TypedEventFilter, TypedEvent, TypedListener } from './commons';
 
 interface GovernorBravoDelegatorInterface extends ethers.utils.Interface {
   functions: {
-    "_setImplementation(address)": FunctionFragment;
-    "admin()": FunctionFragment;
-    "implementation()": FunctionFragment;
-    "pendingAdmin()": FunctionFragment;
+    '_setImplementation(address)': FunctionFragment;
+    'admin()': FunctionFragment;
+    'implementation()': FunctionFragment;
+    'pendingAdmin()': FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "_setImplementation",
+    functionFragment: '_setImplementation',
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'admin', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "implementation",
+    functionFragment: 'implementation',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "pendingAdmin",
+    functionFragment: 'pendingAdmin',
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "_setImplementation",
+    functionFragment: '_setImplementation',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'admin', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "implementation",
+    functionFragment: 'implementation',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "pendingAdmin",
+    functionFragment: 'pendingAdmin',
     data: BytesLike
   ): Result;
 
   events: {
-    "NewAdmin(address,address)": EventFragment;
-    "NewImplementation(address,address)": EventFragment;
-    "NewPendingAdmin(address,address)": EventFragment;
-    "ProposalCanceled(uint256)": EventFragment;
-    "ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)": EventFragment;
-    "ProposalExecuted(uint256)": EventFragment;
-    "ProposalQueued(uint256,uint256)": EventFragment;
-    "ProposalThresholdSet(uint256,uint256)": EventFragment;
-    "VoteCast(address,uint256,uint8,uint256,string)": EventFragment;
-    "VotingDelaySet(uint256,uint256)": EventFragment;
-    "VotingPeriodSet(uint256,uint256)": EventFragment;
+    'NewAdmin(address,address)': EventFragment;
+    'NewImplementation(address,address)': EventFragment;
+    'NewPendingAdmin(address,address)': EventFragment;
+    'ProposalCanceled(uint256)': EventFragment;
+    'ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)': EventFragment;
+    'ProposalExecuted(uint256)': EventFragment;
+    'ProposalQueued(uint256,uint256)': EventFragment;
+    'ProposalThresholdSet(uint256,uint256)': EventFragment;
+    'VoteCast(address,uint256,uint8,uint256,string)': EventFragment;
+    'VotingDelaySet(uint256,uint256)': EventFragment;
+    'VotingPeriodSet(uint256,uint256)': EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "NewAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewImplementation"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewPendingAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalCanceled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalExecuted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalQueued"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProposalThresholdSet"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VoteCast"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingDelaySet"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "VotingPeriodSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'NewAdmin'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'NewImplementation'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'NewPendingAdmin'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCanceled'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalCreated'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalExecuted'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalQueued'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'ProposalThresholdSet'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VoteCast'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VotingDelaySet'): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'VotingPeriodSet'): EventFragment;
 }
 
 export class GovernorBravoDelegator extends Contract {
@@ -131,22 +131,22 @@ export class GovernorBravoDelegator extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "_setImplementation(address)"(
+    '_setImplementation(address)'(
       implementation_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     admin(overrides?: CallOverrides): Promise<[string]>;
 
-    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+    'admin()'(overrides?: CallOverrides): Promise<[string]>;
 
     implementation(overrides?: CallOverrides): Promise<[string]>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<[string]>;
+    'implementation()'(overrides?: CallOverrides): Promise<[string]>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<[string]>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<[string]>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<[string]>;
   };
 
   _setImplementation(
@@ -154,22 +154,22 @@ export class GovernorBravoDelegator extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "_setImplementation(address)"(
+  '_setImplementation(address)'(
     implementation_: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   admin(overrides?: CallOverrides): Promise<string>;
 
-  "admin()"(overrides?: CallOverrides): Promise<string>;
+  'admin()'(overrides?: CallOverrides): Promise<string>;
 
   implementation(overrides?: CallOverrides): Promise<string>;
 
-  "implementation()"(overrides?: CallOverrides): Promise<string>;
+  'implementation()'(overrides?: CallOverrides): Promise<string>;
 
   pendingAdmin(overrides?: CallOverrides): Promise<string>;
 
-  "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
+  'pendingAdmin()'(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     _setImplementation(
@@ -177,22 +177,22 @@ export class GovernorBravoDelegator extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "_setImplementation(address)"(
+    '_setImplementation(address)'(
       implementation_: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     admin(overrides?: CallOverrides): Promise<string>;
 
-    "admin()"(overrides?: CallOverrides): Promise<string>;
+    'admin()'(overrides?: CallOverrides): Promise<string>;
 
     implementation(overrides?: CallOverrides): Promise<string>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<string>;
+    'implementation()'(overrides?: CallOverrides): Promise<string>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<string>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -319,22 +319,22 @@ export class GovernorBravoDelegator extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "_setImplementation(address)"(
+    '_setImplementation(address)'(
       implementation_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     admin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'admin()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     implementation(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "implementation()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'implementation()'(overrides?: CallOverrides): Promise<BigNumber>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<BigNumber>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -343,23 +343,23 @@ export class GovernorBravoDelegator extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "_setImplementation(address)"(
+    '_setImplementation(address)'(
       implementation_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'admin()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     implementation(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "implementation()"(
+    'implementation()'(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     pendingAdmin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    'pendingAdmin()'(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

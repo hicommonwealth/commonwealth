@@ -11,7 +11,11 @@ export default class AaveChain extends EthereumChain {
   public aaveApi: AaveApi;
 
   public coins(n: number, inDollars?: boolean) {
-    return new EthereumCoin(this.app?.chain?.meta.chain.symbol || '???', n, inDollars);
+    return new EthereumCoin(
+      this.app?.chain?.meta.chain.symbol || '???',
+      n,
+      inDollars
+    );
   }
 
   public async init(selectedNode: NodeInfo) {
@@ -42,7 +46,10 @@ export default class AaveChain extends EthereumChain {
   public async getDelegate(delegator: string, type: 'voting' | 'proposition') {
     const token = this.aaveApi?.Token;
     if (!token) throw new Error('No token contract found');
-    const delegate = await token.getDelegateeByType(delegator, type === 'voting' ? 0 : 1);
+    const delegate = await token.getDelegateeByType(
+      delegator,
+      type === 'voting' ? 0 : 1
+    );
     return delegate;
   }
 }

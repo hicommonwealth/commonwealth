@@ -13,7 +13,7 @@ interface IAttrs {
   imageSrc: string;
   imageAlt: string;
   textType?: string;
-  variant?: string
+  variant?: string;
 }
 
 const ListedCardWithImage: m.Component<IAttrs, {}> = {
@@ -32,7 +32,9 @@ const ListedCardWithImage: m.Component<IAttrs, {}> = {
             'button',
             {
               class: `rounded-2xl p-5 text-left w-full focus:outline-none transition transition-all duration-500 ${
-                vnode.attrs.isTabHoverActive ? `${vnode.attrs.tabHoverColorClick}` : ''
+                vnode.attrs.isTabHoverActive
+                  ? `${vnode.attrs.tabHoverColorClick}`
+                  : ''
               }  ${vnode.attrs.variant}`,
               onclick: vnode.attrs.handleClick,
               id: vnode.attrs.buttonId,

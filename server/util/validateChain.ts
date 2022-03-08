@@ -9,7 +9,10 @@ export const ChainCommunityErrors = {
 };
 
 // sequelize 5.0 does not accept undefined key in where clause
-const validateChain = async (models: DB, params): Promise<[ChainInstance, string]> => {
+const validateChain = async (
+  models: DB,
+  params
+): Promise<[ChainInstance, string]> => {
   if (!params.chain) return [null, ChainCommunityErrors.ChainDNE];
   const chain = await models.Chain.findOne({
     where: {

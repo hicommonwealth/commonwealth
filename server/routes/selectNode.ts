@@ -11,7 +11,12 @@ export const Errors = {
   NodeNF: 'Node not found',
 };
 
-const selectNode = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const selectNode = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -22,7 +27,9 @@ const selectNode = async (models: DB, req: Request, res: Response, next: NextFun
     return next(new Error(Errors.NoChain));
   }
 
-  const node = await models.ChainNode.findOne({ where: { chain: req.body.chain, url: req.body.url } });
+  const node = await models.ChainNode.findOne({
+    where: { chain: req.body.chain, url: req.body.url },
+  });
   if (!node) {
     return next(new Error(Errors.NodeNF));
   }

@@ -29,7 +29,7 @@ const ResizableTextarea = {
       if (oninput) oninput(e);
     };
     return m('textarea.ResizableTextarea', attrs, children);
-  }
+  },
 };
 
 export default ResizableTextarea;

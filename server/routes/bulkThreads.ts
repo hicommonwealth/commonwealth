@@ -20,7 +20,7 @@ const bulkThreads = async (
   const { cutoff_date, topic_id, stage } = req.query;
 
   const bind = { chain: chain.id };
-  console.log(bind)
+  console.log(bind);
 
   let topicOptions = '';
   if (topic_id) {
@@ -214,7 +214,9 @@ const bulkThreads = async (
       bind,
       type: QueryTypes.SELECT,
     });
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+  const numVotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'voting'
+  ).length;
 
   return res.json({
     status: 'Success',
