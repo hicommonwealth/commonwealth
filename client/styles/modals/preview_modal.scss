@@ -1,18 +1,14 @@
 @import 'client/styles/shared';
 
 .PreviewModal {
-    .compact-modal-body {
+    .QuillFormattedText {
         width: 640px;
-        padding-top: 31px;
+        max-height: 64vh;
+        overflow-y: auto;
+        margin: 25px 0;
         @include xs-max {
             width: initial;
         }
-    }
-    .compact-modal-attachments {
-        margin-top: 10px;
-        margin-bottom: 30px;
-        padding: 0 25px;
-        @include attachments;
     }
     .empty-preview {
         text-align: center;

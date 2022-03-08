@@ -7,15 +7,13 @@ import { Button } from 'construct-ui';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 import { ThreadSelector } from 'views/components/thread_selector';
 
-const LinkedThreadModal: m.Component<
-  {
-    linkingThread: OffchainThread;
-    onclose: () => null;
-  },
-  {}
-> = {
+const LinkedThreadModal: m.Component<{
+  linkingThread: OffchainThread;
+  linkedThreads: OffchainThread[];
+  onclose: () => null;
+}> = {
   view: (vnode) => {
-    const { linkingThread, onclose } = vnode.attrs;
+    const { linkingThread, linkedThreads, onclose } = vnode.attrs;
     return m('.LinkedThreadModal', [
       m('.compact-modal-title', [
         m('h3', 'Link to Existing Threads'),
@@ -24,6 +22,7 @@ const LinkedThreadModal: m.Component<
       m('.compact-modal-body', [
         m(ThreadSelector, {
           linkingThread,
+          linkedThreads,
         }),
         m(Button, {
           label: 'Close',

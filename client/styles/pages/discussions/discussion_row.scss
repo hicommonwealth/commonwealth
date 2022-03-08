@@ -1,132 +1,110 @@
 @import 'client/styles/shared';
 
 .DiscussionRow {
-    .row-left {
-        .ReactionButton {
-            background: $background-color-white;
-        }
-        .row-header {
-            a {
-                line-height: 1.2;
-            }
-        }
-        .row-subheader {
-            position: relative;
-            top: -2px;
-            > * {
-                display: inline-block !important;
-            }
-            // Styling specific to DiscussionRow subheader content
-            .discussion-locked {
-                .cui-tag.cui-xs .cui-icon svg {
-                    margin-right: 0;
-                }
-                &::after {
-                    content: ' ';
-                }
-            }
-            .discussion-row-linked-poll,
-            .discussion-row-linked-chain-entity,
-            .discussion-row-stage-btn {
-                font-size: 13px;
-                padding: 0 7px;
-                min-height: 19px;
-                height: initial;
-                pointer-events: none;
-                user-select: none;
-                position: relative;
-                top: -2px;
-                margin: -2px 0;
-                margin-right: 6px;
-                border: none;
-                line-height: 1.5;
-                opacity: 0.94;
-            }
-            a.proposal-topic {
-                display: inline-block;
-                color: $text-color-light;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 100%;
-            }
-            .mobile-comment-count {
-                display: none !important;
-                color: $text-color-light;
-                white-space: nowrap;
-                @include xs-max {
-                    display: inline !important;
-                }
-                .cui-icon svg {
-                    position: relative;
-                    top: -1px;
-                    stroke: $text-color-light;
-                    opacity: 0.84;
-                    margin-right: 4px;
-                    height: 14px;
-                    width: 14px;
-                    min-height: 14px;
-                    min-height: 14px;
-                }
-            }
-            .discussion-link {
-                color: $text-color-light;
-            }
-            .proposal-collaborators {
-                color: $text-color-light;
-                position: relative;
-                font-size: 17px;
-            }
-            > .User {
-                display: inline-flex;
-                > .role-icon {
-                    position: relative;
-                    top: -1px;
-                }
-            }
-            > .User > a {
-                display: block;
-                text-decoration: none;
-                color: $text-color-light;
-                &:hover {
-                    color: darken($text-color-light, 8%);
-                    text-decoration: underline;
-                }
-                > a.user-display-name {
-                    color: $primary-bg-color;
-                }
-            }
-            .m-l-20 {
-                color: $text-color-light;
-                @media(min-width: 800px){
-                    margin-left: 10px;
-                }
-            }
-        }
+  .row-left {
+    .ReactionButton {
+      background: $background-color-white;
     }
-    .row-right {
-        .discussion-row-right-meta {
-            margin-left: 8px;
-            margin-right: 4px;
-            .offchain-voting {
-                position: relative;
-                top: -5px;
-                margin-top: 5px;
-                // styling
-                font-size: 16px;
-                height: 40px;
-                padding: 12px;
-                width: 100px;
-                border: 1px solid $border-color;
-                border-radius: 6px;
-            }
-        }
-        .discussion-row-menu {
-            width: 28px;
-            position: relative;
-            svg {
-                position: relative;
-                top: 1px;
-            }
-        }
+    .row-header {
+      a {
+        line-height: 1.2;
+      }
     }
+    .row-subheader {
+      position: relative;
+      top: -2px;
+      // Styling specific to DiscussionRow subheader content
+      .discussion-locked {
+        .cui-tag.cui-xs .cui-icon svg {
+          margin-right: 0;
+        }
+        &::after {
+          content: ' ';
+        }
+      }
+      .discussion-row-linked-poll,
+      .discussion-row-linked-chain-entity,
+      .discussion-row-stage-btn {
+        font-size: 13px;
+        padding: 0 7px;
+        min-height: 19px;
+        height: initial;
+        pointer-events: none;
+        user-select: none;
+        position: relative;
+        top: -2px;
+        margin: -2px 0;
+        margin-right: 6px;
+        border: none;
+        line-height: 1.5;
+        opacity: 0.94;
+      }
+      a.proposal-topic {
+        display: inline-block;
+        color: $text-color-light;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+      }
+      .discussion-link {
+        color: $text-color-light;
+      }
+      .proposal-collaborators {
+        color: $text-color-light;
+        position: relative;
+        font-size: 17px;
+      }
+      > .User {
+        display: inline-flex;
+        > .role-icon {
+          position: relative;
+          top: -1px;
+        }
+      }
+      > .User > a {
+        display: block;
+        text-decoration: none;
+        color: $text-color-light;
+        &:hover {
+          color: darken($text-color-light, 8%);
+          text-decoration: underline;
+        }
+        > a.user-display-name {
+          color: $primary-bg-color;
+        }
+      }
+      .m-l-20 {
+        color: $text-color-light;
+        @media (min-width: 800px) {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+  .row-right {
+    .discussion-row-right-meta {
+      margin-left: 8px;
+      margin-right: 4px;
+      .offchain-voting {
+        position: relative;
+        top: -5px;
+        margin-top: 5px;
+        // styling
+        font-size: 16px;
+        height: 40px;
+        padding: 12px;
+        width: 100px;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+      }
+    }
+    .discussion-row-menu {
+      width: 28px;
+      position: relative;
+      svg {
+        position: relative;
+        top: 1px;
+      }
+    }
+  }
 }
