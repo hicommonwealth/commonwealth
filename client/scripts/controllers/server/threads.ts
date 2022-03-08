@@ -350,6 +350,7 @@ class ThreadsController {
       $.post(`${app.serverUrl()}/deleteThread`, {
         jwt: app.user.jwt,
         thread_id: proposal.id,
+        chain_id: app.activeChainId(),
       })
         .then((result) => {
           // Deleted posts are removed from all stores containing them

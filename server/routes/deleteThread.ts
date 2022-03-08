@@ -18,7 +18,7 @@ const deleteThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { thread_id } = req.body;
+  const { thread_id, chain_id } = req.body;
   if (!req.user) {
     return next(new Error(DeleteThreadErrors.NoUser));
   }
@@ -47,12 +47,7 @@ const deleteThread = async (
         chainMod: true,
       };
 
-      const isAdminOrMod = validateRoles(
-        models,
-        req,
-        allowed_roles,
-        thread.chain
-      );
+      const isAdminOrMod = validateRoles(models, req, allowed_roles, chain_id);
 
       if (!isAdminOrMod) {
         return next(new Error(DeleteThreadErrors.NoPermission));
