@@ -9,12 +9,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      // id: {
-      //   type: Sequelize.INTEGER
-      // },
       IpfsHash: {
         type: Sequelize.STRING
-      }
+      },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
     });
   },
   down: async (queryInterface, Sequelize) => {
