@@ -25,7 +25,13 @@ export default (
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-  });
+    defaultScope: {
+      attributes: {
+        exclude: [ 'created_at', 'updated_at'],
+      }
+    },
+  },
+  );
   IpfsPins.associate = (models) => {
     models.IpfsPins.hasMany(models.Notification, {foreignKey: 'category_id'});
     models.IpfsPins.hasMany(models.Subscription, {foreignKey: 'category_id'})
