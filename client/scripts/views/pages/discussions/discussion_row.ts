@@ -27,7 +27,7 @@ import {
   OffchainThreadStage,
   AddressInfo,
 } from 'models';
-import ReactionButton, { ReactionType } from 'views/components/reaction_button';
+import { ReactionButton, ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { ListingRow } from 'views/components/listing_row';
