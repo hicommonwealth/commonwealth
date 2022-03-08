@@ -1,11 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from '../../shared/logging';
 import { DB, sequelize } from '../database';
-import { Errors } from "./verifyAddress";
+import ipfs from '../util/ipfs';
 
+const pinIPFS = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const ipfsHash = await ipfs(req.user.id, req.body);
+    return res.json({ status: 'Success', IPFSHash: ipfsHash });
+  } catch (e) {
+    return res.json({ status: 'Failure', message: e.message });
+  }
+};
 
-const pinIPFS = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-        return res.json('Test request') ;
-}
-
-export default pinIPFS
+export default pinIPFS;

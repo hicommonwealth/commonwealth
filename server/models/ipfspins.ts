@@ -4,7 +4,7 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type IpfsPinsAttributes = {
   id: number;
-  IpfsHash: string;
+  ipfs_hash: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -19,10 +19,11 @@ export default (
 ): IpfsPinsModelStatic => {
   const IpfsPins = <IpfsPinsModelStatic>sequelize.define('IpfsPins', {
     id: { type: dataTypes.INTEGER, primaryKey: true },
-    IpfsHash: { type: dataTypes.STRING, allowNull: false },
+    ipfs_hash: { type: dataTypes.STRING, allowNull: false },
   }, {
     tableName: 'IpfsPins',
     timestamps: true,
+    underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     defaultScope: {

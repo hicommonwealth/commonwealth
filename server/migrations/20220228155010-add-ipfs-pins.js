@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      IpfsHash: {
+      ipfs_hash: {
         type: Sequelize.STRING
       },
       created_at: { type: Sequelize.DATE, allowNull: false },
