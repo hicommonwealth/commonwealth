@@ -47,7 +47,7 @@ import {
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-import TopicEditor from 'views/components/topic_editor';
+import { TopicEditor } from 'views/components/topic_editor';
 import StageEditor from 'views/components/stage_editor';
 import PollEditor from 'views/components/poll_editor';
 import {
