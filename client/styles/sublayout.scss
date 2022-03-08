@@ -151,6 +151,17 @@
     }
   }
 
+  // TODO: Graham 22.03.04 Necessity & presence of right sidebar
+  // should be assessed site-wide. This is merely a hot fix for
+  // comment threading.
+  &.ViewProposalPage {
+    .sublayout-right-col {
+      @include xs-max {
+        display: none;
+      }
+    }
+  }
+
   .hide-sidebar & {
     .sublayout-main-col {
       margin: 0 auto;

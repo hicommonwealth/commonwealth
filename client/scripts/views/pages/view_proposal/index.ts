@@ -792,7 +792,7 @@ const ProposalComments: m.Component<
           return m(
             `.threading-level-${threadLevel}`,
             {
-              style: `margin-left: calc(36px * ${threadLevel})`,
+              style: `margin-left: 32px`,
             },
             [
               m(ProposalComment, {
