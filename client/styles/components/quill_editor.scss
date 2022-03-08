@@ -134,6 +134,12 @@
     white-space: nowrap;
     overflow-x: auto;
     min-height: 39px;
+    @include xs-max {
+      display: flex;
+      flex-wrap: wrap;
+      min-height: 78px;
+      overflow-x: hidden;
+    }
   }
   .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
     // border-color: #B37DBA;
@@ -161,11 +167,6 @@
       text-decoration: underline;
     }
   }
-  @include xs-max {
-    .ql-toolbar .ql-formats:last-child {
-      padding-right: 80px;
-    }
-  }
 
   // 5. toolbar markdown mode
   &.markdown-mode {
@@ -186,6 +187,9 @@
     display: flex;
     right: 100px;
     top: 6px;
+    @include xs-max {
+      top: 40px;
+    }
     user-select: none;
     .cui-tag {
       cursor: pointer;
@@ -198,6 +202,9 @@
     display: flex;
     right: 10px;
     top: 6px;
+    @include xs-max {
+      top: 40px;
+    }
     user-select: none;
     .preview-button {
       display: flex;
