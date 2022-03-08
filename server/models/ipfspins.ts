@@ -22,7 +22,7 @@ export default (
     IpfsHash: { type: dataTypes.STRING, allowNull: false },
   }, {
     tableName: 'IpfsPins',
-    underscored: true,
+    timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     defaultScope: {
