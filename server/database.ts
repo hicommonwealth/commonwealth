@@ -103,6 +103,8 @@ import WaitlistRegistrationFactory, {
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
 import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
+import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfspins';
+
 
 export type Models = {
   Address: AddressModelStatic;
@@ -122,6 +124,7 @@ export type Models = {
   HedgehogAuthentication: HedgehogAuthenticationModelStatic;
   HedgehogUser: HedgehogUserModelStatic;
   IdentityCache: IdentityCacheStatic;
+  IpfsPins: IpfsPinsModelStatic;
   InviteCode: InviteCodeModelStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
@@ -203,6 +206,7 @@ const models: Models = {
   HedgehogAuthentication: HedgehogAuthenticationFactory(sequelize, DataTypes),
   HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
+  IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
