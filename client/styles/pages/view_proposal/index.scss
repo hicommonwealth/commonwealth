@@ -1,9 +1,10 @@
 @import 'client/styles/shared';
 
 $discussion-outer-padding: 60px;
-$discussion-meta-padding: 12px;      // padding between comment meta & comment content
-$discussion-reaction-padding: 18px;  // padding between comment content & comment reaction
-$discussion-comment-padding: 28px;   // padding between comment content & avatar
+$discussion-meta-padding: 12px; // padding between comment meta & comment content
+$discussion-reaction-padding: 18px; // padding between comment content & comment reaction
+$discussion-comment-padding: 28px; // padding between comment content & avatar
+$discussion-comment-padding-mobile: 16px;
 
 $discussion-meta-font-size: 1rem;
 $discussion-meta-color: $text-color-light;
@@ -11,545 +12,564 @@ $discussion-meta-color: $text-color-light;
 $discussion-title-font-size: 1.45rem;
 
 @mixin supports-jump-highlight() {
-    &.highlighted {
-        border-radius: 20px;
-        background-color: $background-color-new-comment;
-        .thread-connector {
-            background: #00C0A9;
-        }
+  &.highlighted {
+    border-radius: 20px;
+    background-color: $background-color-new-comment;
+    .thread-connector {
+      background: #00c0a9;
     }
-    &.highlighted.highlightAnimationComplete {
-        background-color: transparent;
-        transition: background-color 1s ease-in-out;
-        .thread-connector {
-            background: $background-color-light;
-            transition: background 1s ease-in-out;
-        }
+  }
+  &.highlighted.highlightAnimationComplete {
+    background-color: transparent;
+    transition: background-color 1s ease-in-out;
+    .thread-connector {
+      background: $background-color-light;
+      transition: background 1s ease-in-out;
     }
+  }
 }
 
 .ViewProposalPage {
-    .ProposalHeader {
-        .proposal-content {
-            position: relative;
+  .ProposalHeader {
+    .proposal-content {
+      position: relative;
+    }
+  }
+  .ProposalHeader,
+  .ProposalComment {
+    @include supports-jump-highlight();
+  }
+  .ProposalHeader,
+  .ProposalComment {
+    margin-top: 36px;
+    padding: 4px 0;
+    @include xs-max {
+      margin-top: 30px;
+    }
+  }
+  .ProposalComments.no-active-account {
+    padding-bottom: $discussion-outer-padding;
+  }
+  .proposal-body-bottom,
+  .comment-body-bottom {
+    display: flex;
+    justify-content: space-between;
+    .comment-response-row,
+    .proposal-response-row {
+      width: 100%;
+      display: flex;
+      max-width: 300px;
+      align-items: center;
+      .InlineReplyButton,
+      .ProposalBodyReaction {
+        border: 1px solid $text-color-medium;
+        margin-right: 7%;
+        padding: 6px;
+        cursor: pointer;
+        border-radius: 20px;
+        width: 70px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 10%;
+        padding: 6px;
+        cursor: pointer;
+        &:hover {
+          .cui-icon,
+          .reply-count,
+          .reactions-count {
+            color: #4723ad;
+          }
         }
-    }
-    .ProposalHeader,
-    .ProposalComment {
-        @include supports-jump-highlight();
-    }
-    .ProposalHeader,
-    .ProposalComment {
-        margin-top: 36px;
-        padding: 4px 0;
-        @include xs-max {
-            margin-top: 30px;
+        .active {
+          .cui-icon,
+          .reply-count,
+          .reactions-count {
+            color: #4723ad !important;
+          }
         }
+        .cui-icon,
+        .reply-count,
+        .reactions-count {
+          color: $text-color-medium;
+          font-weight: 500;
+        }
+        .cui-icon {
+          margin-right: 8px;
+        }
+        .reply-count,
+        .reactions-count {
+          position: relative;
+          top: 2px;
+        }
+      }
     }
-    .ProposalComments.no-active-account {
-        padding-bottom: $discussion-outer-padding;
+    .proposal-body-button-group,
+    .comment-body-bottom-right,
+    .comment-edit-buttons {
+      margin-top: 18px;
+      .cancel-editing {
+        margin-right: 15px;
+      }
     }
-    .proposal-body-bottom, .comment-body-bottom {
+  }
+  .threading-level-1 {
+    .new-comment-child {
+      margin-left: 108px !important;
+      @include xs-max {
+        margin-left: 0 !important;
+        width: 100%;
+      }
+    }
+  }
+  .threading-level-2 {
+    .InlineReplyButton {
+      display: none !important;
+    }
+  }
+  h3 {
+    font-size: 23px;
+    line-height: 28px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  //
+  // header
+  //
+  .ProposalHeader {
+    position: relative;
+    &.proposal-snapshot {
+      .snapshot-proposal-top {
+        display: flex;
+        border-bottom: 1px solid $background-color-light;
+      }
+      .proposal-content {
+        padding: 25px 0;
+      }
+    }
+    .proposal-top {
+      display: flex;
+      padding-bottom: 20px;
+      border-bottom: 1px solid $background-color-light;
+    }
+    .proposal-top-left {
+      flex: 1;
+      .cui-input {
+        width: 70%;
+        padding-bottom: 10px;
+      }
+      .proposal-body-meta {
+        margin-bottom: 12px;
+      }
+      .proposal-meta-top {
         display: flex;
         justify-content: space-between;
-        .comment-response-row,
-        .proposal-response-row {
-            width: 100%;
-            display: flex;
-            max-width: 300px;
-            align-items: center;
-            .InlineReplyButton,
-            .ProposalBodyReaction {
-                border: 1px solid $text-color-medium;
-                margin-right: 7%;
-                padding: 6px;
-                cursor: pointer;
-                border-radius: 20px;
-                width: 70px;
-                height: 30px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-right: 10%;
-                padding: 6px;
-                cursor: pointer;
-                &:hover {
-                    .cui-icon, .reply-count, .reactions-count {
-                        color: #4723AD;
-                    }
-                }
-                .active {
-                    .cui-icon, .reply-count, .reactions-count {
-                        color: #4723AD !important;
-                    }
-                }
-                .cui-icon, .reply-count, .reactions-count {
-                    color: $text-color-medium;
-                    font-weight: 500;
-                }
-                .cui-icon {
-                    margin-right: 8px;
-                }
-                .reply-count, .reactions-count {
-                    position: relative;
-                    top: 2px;
-                }
-            }
+        margin-bottom: 12px;
+        height: 35px;
+        button {
+          margin-left: 17px;
+          border-radius: 8px;
+          height: 39px;
+          font-size: 18px;
+          text-transform: uppercase;
         }
-        .proposal-body-button-group, .comment-body-bottom-right,
-        .comment-edit-buttons {
-            margin-top: 18px;
-            .cancel-editing {
-                margin-right: 15px;
-            }
+        .proposal-meta-top-left {
+          display: flex;
+          align-items: center;
         }
+        .proposal-meta-top-right {
+          display: flex;
+          .ExecuteButton,
+          .QueueButton {
+            button {
+              color: white;
+              background: linear-gradient(
+                268.96deg,
+                #00db8c 2.02%,
+                #1bdebb 94.68%
+              );
+            }
+          }
+          .CancelButton {
+            button {
+              color: #ff002e;
+              border: 1px solid #ff002e;
+              background: #ffffff;
+            }
+          }
+        }
+        .ProposalHeaderOnchainId {
+          font-size: 18px;
+          color: black;
+        }
+      }
     }
-    .threading-level-1 {
-        .new-comment-child {
-            margin-left: 108px !important;
-        }
+    .proposal-content {
+      display: flex;
+      padding-top: 40px;
     }
-    .threading-level-2 {
-        .InlineReplyButton {
-            display: none !important;
-        }
+    .proposal-content-left {
     }
-    h3 {
-        font-size: 23px;
-        line-height: 28px;
-        font-weight: 500;
-        margin-bottom: 8px;
-    }
-
-    //
-    // header
-    //
-    .ProposalHeader {
-        position: relative;
-        &.proposal-snapshot {
-            .snapshot-proposal-top {
-                display: flex;
-                border-bottom: 1px solid $background-color-light;
-            }
-            .proposal-content {
-                padding: 25px 0;
-            }
-        }
-        .proposal-top {
-            display: flex;
-            padding-bottom: 20px;
-            border-bottom: 1px solid $background-color-light;
-        }
-        .proposal-top-left {
-            flex: 1;
-            .cui-input {
-                width: 70%;
-                padding-bottom: 10px;
-            }
-            .proposal-body-meta {
-                margin-bottom: 12px;
-            }
-            .proposal-meta-top {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 12px;
-                height: 35px;
-                button {
-                    margin-left: 17px;
-                    border-radius: 8px;
-                    height: 39px;
-                    font-size: 18px;
-                    text-transform: uppercase;
-                }
-                .proposal-meta-top-left {
-                    display: flex;
-                    align-items: center;
-                }
-                .proposal-meta-top-right {
-                    display: flex;
-                    .ExecuteButton, .QueueButton {
-                        button {
-                            color: white;
-                            background: linear-gradient(268.96deg, #00DB8C 2.02%, #1BDEBB 94.68%);
-                        }
-                    }
-                    .CancelButton {
-                        button {
-                            color: #FF002E;
-                            border: 1px solid #FF002E;
-                            background: #FFFFFF;
-                        }
-    
-                    }
-                }
-                .ProposalHeaderOnchainId {
-                    font-size: 18px;
-                    color: black;
-                }
-            }
-        }
-        .proposal-content {
-            display: flex;
-            padding-top: 40px;
-        }
-        .proposal-content-left {
-
-        }
-        .proposal-content-right {
-            flex: 1;
-            overflow-x: auto;
-            margin-left: $discussion-comment-padding;
-            @include xs-max {
-                margin-right: 10px;
-            }
-            .proposal-content-meta {
-                padding-bottom: $discussion-meta-padding;
-                font-size: $discussion-meta-font-size;
-            }
-        }
-        .social-right {
-            margin-right: 10px;
-        }
-        .proposal-title {
-            margin-bottom: 6px;
-            .ProposalHeaderTitle {
-                display: inline;
-                font-size: $discussion-title-font-size;
-                font-weight: 600;
-                flex: 1;
-                line-height: 1.1;
-                .cui-tag {
-                    font-weight: 400;
-                    margin-left: 12px;
-                    position: relative;
-                    top: -2px;
-                    .cui-icon {
-                        margin-right: 3px;
-                    }
-                }
-            }
-        }
-        .ProposalHeaderExternalLink,
-        .ProposalHeaderBlockExplorerLink,
-        .ProposalHeaderVotingInterfaceLink,
-        .ProposalHeaderThreadLink {
-            display: inline-block;
-            margin-right: 12px;
-            margin-top: 12px;
-            font-weight: 600;
-            a:link,
-            a:visited {
-                display: block;
-                padding: 12px 18px 6px;
-                border-radius: 99px;
-                background: $background-color-light;
-                color: $text-color-primary;
-                text-decoration: none !important;
-            }
-            svg {
-                stroke: $text-color-primary;
-                position: relative;
-                top: -1px;
-                margin-left: 5px;
-                $size: 14px;
-                height: $size;
-                width: $size;
-                min-height: $size;
-                min-width: $size;
-            }
-            a:hover {
-                background: darken($background-color-light, 1%);
-            }
-        }
-    }
-
-    //
-    // body
-    //
-    .ProposalComment {
-        position: relative;
-        display: flex;
-        .comment-body {
-            flex: 1;
-            overflow-x: auto;
-            padding-left: $discussion-comment-padding;
-        }
-        .comment-body-top {
-            padding-bottom: $discussion-meta-padding;
-            font-size: $discussion-meta-font-size;
-        }
-        .comment-body-bottom {
-            padding: 4px 0 2px;
-        }
-        .comment-body-content {
-            @include xs-max {
-                margin-right: 10px;
-            }
-        }
-    }
-
-    .ProposalHeader .proposal-content {
-        .ProposalBodyReaction, .InlineReplyButton {
-            margin-top: $discussion-reaction-padding;
-        }
-    }
-
-    .ProposalComments {
-        .threading-level {
-            margin-left: 54px;
-        }
-        .comment-child {
-            margin-left: 36px;
-        }
-        .new-comment-child {
-            margin-left: 72px;
-        }
-        .ProposalBodyReaction, .InlineReplyButton {
-            margin-top: $discussion-reaction-padding;
-        }
-    }
-
-    // proposal-meta
-    .ProposalHeaderStage,
-    .ProposalHeaderTopics,
-    .ProposalHeaderOnchainId,
-    .ProposalHeaderOnchainStatus,
-    .ProposalBodyAuthor,
-    .ProposalBodyCreated,
-    .ProposalBodyLastEnded,
-    .ProposalBodyDelete,
-    .ProposalBodyEdit,
-    .ProposalBodyDelete,
-    .ProposalBodyCancelEdit,
-    .ProposalBodySaveEdit,
-    .ViewCountBlock,
-    .ProposalHeaderExternalLink {
+    .proposal-content-right {
+      flex: 1;
+      overflow-x: auto;
+      margin-left: $discussion-comment-padding;
+      @include xs-max {
+        margin-left: $discussion-comment-padding-mobile;
+      }
+      .proposal-content-meta {
+        padding-bottom: $discussion-meta-padding;
         font-size: $discussion-meta-font-size;
-        display: inline-block;
-        color: $discussion-meta-color;
-        margin-right: 17px;
-        > a:link,
-        > a:visited,
-        a.proposal-collaborators,
-        > .User a.user-display-name {
-            color: $discussion-meta-color;
-            text-decoration: none;
-            &:hover {
-                text-decoration: underline;
-            }
-        }
+      }
     }
-
-    .CommentSocialHeader,
-    .ProposalSocialHeader {
-        font-size: $discussion-meta-font-size;
-        display: inline-block;
-        color: $discussion-meta-color;
-        margin-left: 10px;
-        > a:link,
-        > a:visited,
-        a.proposal-collaborators,
-        > .User a.user-display-name {
-            color: $discussion-meta-color;
-            text-decoration: none;
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-        svg {
-            stroke: $text-color-light;
-        }
-        svg:hover {
-            stroke: $text-color-medium;
-        }
+    .social-right {
+      margin-right: 10px;
     }
-
-    .ProposalTitleEditor {
-        .ProposalTitleSaveEdit {
-            font-size: $discussion-meta-font-size;
-            color: $discussion-meta-color;
+    .proposal-title {
+      margin-bottom: 6px;
+      .ProposalHeaderTitle {
+        display: inline;
+        font-size: $discussion-title-font-size;
+        font-weight: 600;
+        flex: 1;
+        line-height: 1.1;
+        .cui-tag {
+          font-weight: 400;
+          margin-left: 12px;
+          position: relative;
+          top: -2px;
+          .cui-icon {
+            margin-right: 3px;
+          }
         }
-        .cui-input {
-            margin-right: 10px;
-        }
-        .proposal-title-buttons {
-            display: inline-flex;
-            position: relative;
-            bottom: 5px;
-            .ProposalTitleCancelEdit {
-                margin-left: 5px;
-            }
-        }
+      }
     }
-    .ProposalHeaderStage {
-        &.primary {
-            color: tint($primary-bg-color, 10%);
-        }
-        &.positive {
-            color: tint($positive-bg-color, 10%);
-        }
-        &.negative {
-            color: tint($negative-bg-color, 10%);
-        }
-    }
-    .proposal-collaborators-popover {
-        color: $text-color-black;
-        .cui-popover-content {
-            padding-top: 22px;
-            .User {
-                display: block;
-            }
-        }
-    }
-
-    .ProposalSidebarLinkedViewer {
-        border-radius: 10px;
-        border: 1px solid tint($border-color-lightest, 26%);
-        padding: 22px 18px 21px;
-        margin-bottom: 24px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        .placeholder-copy {
-            margin-bottom: 10px;
-            font-weight: 500;
-        }   
-    }
-    
-    .ConnectProposalButtonWrapper {
-        margin-top: 10px;
-    }
-
-    .ProposalHeaderOffchainPoll,
-    .ProposalSidebarPollEditorModule,
-    .ProposalLinkedThreadsEditorModule {
-        border-radius: 10px;
-        border: 1px solid tint($border-color-lightest, 26%);
-        padding: 22px 18px 21px;
-        margin-bottom: 24px;
-    }
-    .ProposalLinkedThreadsEditorModule {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        a.linked-thread {
-            color: #9a9da4;
-        }
-        .cui-list-item {
-            &:first-child {
-                padding-top: 0 !important;
-            }
-            &:hover {
-                background: none;
-            }
-        }
-        .linked-threads-title {
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-    }
-    .ProposalSidebarPollEditorModule {
-        .placeholder-copy {
-            line-height: 1.2;
-            color: shade($text-color-light, 10%);
-            margin: 2px 0 12px;
-        }
-        .proposal-chain-entities {
-            margin-bottom: 12px;
-        }
-    }
-    .ProposalHeaderOffchainPoll {
-        .offchain-poll-header {
-            line-height: 1.2;
-            font-weight: 600;
-        }
-        .offchain-poll-options {
-            margin: 16px 0;
-            .offchain-poll-option {
-                display: flex;
-                .offchain-poll-option-left {
-                    margin: 6px 0;
-                    line-height: 1.1;
-                    flex: 1;
-                }
-            }
-        }
-        .offchain-poll-caption {
-            font-size: 16px;
-            color: $text-color-light;
-            margin-bottom: 24px;
-        }
-        .offchain-poll-invalid,
-        .offchain-poll-no-voters {
-            font-size: 16px;
-            color: $text-color-light;
-        }
-        .offchain-poll-voters {
-            margin-top: 10px;
-            .vote-synopsis {
-                margin-top: 10px;
-                .option-with-votes {
-                    margin: 10px 0;
-                    .poll-bar {
-                        height: 5px;
-                        border-radius: 5px;
-                        background-color: $primary-bg-color;
-                    }
-                    .option-results-label {
-                        display: flex;
-                    }
-                    a {
-                        margin-top: 10px;
-                        display: inline-block;
-                    }
-                }
-            }
-        }
-    }
-
-    .QuillEditor {
-        margin-top: 8px;
-    }
-    .ProposalBodyCancelEdit,
-    .ProposalBodySaveEdit {
-        margin-right: 12px;
-        margin-top: 14px;
-    }
-    .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
-        stroke: $text-color-light;
-        &:hover {
-            stroke: $text-color-medium;
-        }
-    }
-    .ProposalBodyReaction {
-        display: inline-block;
-    }
-    .InlineReplyButton {
-        display: flex;
-    }
-    .ProposalBodyText.proposal-body-placeholder {
-        &, .User .user-display-name {
-            color: $text-color-light;
-        }
-    }
-
-    .comments-error {
-        @include error-text();
-        margin: 30px 0;
-    }
-
-    .proposal-content,
-    .ProposalComment {
-        position: relative;
-    }
-    .thread-connector {
-        position: absolute;
-        top: 48px;
-        bottom: -40px;
+    .ProposalHeaderExternalLink,
+    .ProposalHeaderBlockExplorerLink,
+    .ProposalHeaderVotingInterfaceLink,
+    .ProposalHeaderThreadLink {
+      display: inline-block;
+      margin-right: 12px;
+      margin-top: 12px;
+      font-weight: 600;
+      a:link,
+      a:visited {
+        display: block;
+        padding: 12px 18px 6px;
+        border-radius: 99px;
         background: $background-color-light;
-        left: 19px;
-        width: 2px;
-        z-index: -1;
+        color: $text-color-primary;
+        text-decoration: none !important;
+      }
+      svg {
+        stroke: $text-color-primary;
+        position: relative;
+        top: -1px;
+        margin-left: 5px;
+        $size: 14px;
+        height: $size;
+        width: $size;
+        min-height: $size;
+        min-width: $size;
+      }
+      a:hover {
+        background: darken($background-color-light, 1%);
+      }
     }
-}
+  }
 
+  //
+  // body
+  //
+  .ProposalComment {
+    position: relative;
+    display: flex;
+    .comment-body {
+      flex: 1;
+      overflow-x: auto;
+      padding-left: $discussion-comment-padding;
+      @include xs-max {
+        padding-left: $discussion-comment-padding-mobile;
+      }
+    }
+    .comment-body-top {
+      padding-bottom: $discussion-meta-padding;
+      font-size: $discussion-meta-font-size;
+    }
+    .comment-body-bottom {
+      padding: 4px 0 2px;
+    }
+    .comment-body-content {
+      @include xs-max {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .ProposalHeader .proposal-content {
+    .ProposalBodyReaction,
+    .InlineReplyButton {
+      margin-top: $discussion-reaction-padding;
+    }
+  }
+
+  .ProposalComments {
+    .new-comment-child {
+      margin-left: 72px;
+      @include xs-max {
+        margin-left: 0 !important;
+        width: 100%;
+      }
+    }
+    .ProposalBodyReaction,
+    .InlineReplyButton {
+      margin-top: $discussion-reaction-padding;
+    }
+  }
+
+  // proposal-meta
+  .ProposalHeaderStage,
+  .ProposalHeaderTopics,
+  .ProposalHeaderOnchainId,
+  .ProposalHeaderOnchainStatus,
+  .ProposalBodyAuthor,
+  .ProposalBodyCreated,
+  .ProposalBodyLastEnded,
+  .ProposalBodyDelete,
+  .ProposalBodyEdit,
+  .ProposalBodyDelete,
+  .ProposalBodyCancelEdit,
+  .ProposalBodySaveEdit,
+  .ViewCountBlock,
+  .ProposalHeaderExternalLink {
+    font-size: $discussion-meta-font-size;
+    display: inline-block;
+    color: $discussion-meta-color;
+    margin-right: 17px;
+    > a:link,
+    > a:visited,
+    a.proposal-collaborators,
+    > .User a.user-display-name {
+      color: $discussion-meta-color;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .CommentSocialHeader,
+  .ProposalSocialHeader {
+    font-size: $discussion-meta-font-size;
+    display: inline-block;
+    color: $discussion-meta-color;
+    margin-left: 10px;
+    > a:link,
+    > a:visited,
+    a.proposal-collaborators,
+    > .User a.user-display-name {
+      color: $discussion-meta-color;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    svg {
+      stroke: $text-color-light;
+    }
+    svg:hover {
+      stroke: $text-color-medium;
+    }
+  }
+
+  .ProposalTitleEditor {
+    .ProposalTitleSaveEdit {
+      font-size: $discussion-meta-font-size;
+      color: $discussion-meta-color;
+    }
+    .cui-input {
+      margin-right: 10px;
+    }
+    .proposal-title-buttons {
+      display: inline-flex;
+      position: relative;
+      bottom: 5px;
+      .ProposalTitleCancelEdit {
+        margin-left: 5px;
+      }
+    }
+  }
+  .ProposalHeaderStage {
+    &.primary {
+      color: tint($primary-bg-color, 10%);
+    }
+    &.positive {
+      color: tint($positive-bg-color, 10%);
+    }
+    &.negative {
+      color: tint($negative-bg-color, 10%);
+    }
+  }
+  .proposal-collaborators-popover {
+    color: $text-color-black;
+    .cui-popover-content {
+      padding-top: 22px;
+      .User {
+        display: block;
+      }
+    }
+  }
+
+  .ProposalSidebarLinkedViewer {
+    border-radius: 10px;
+    border: 1px solid tint($border-color-lightest, 26%);
+    padding: 22px 18px 21px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .placeholder-copy {
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+  }
+
+  .ConnectProposalButtonWrapper {
+    margin-top: 10px;
+  }
+
+  .ProposalHeaderOffchainPoll,
+  .ProposalSidebarPollEditorModule,
+  .ProposalLinkedThreadsEditorModule {
+    border-radius: 10px;
+    border: 1px solid tint($border-color-lightest, 26%);
+    padding: 22px 18px 21px;
+    margin-bottom: 24px;
+  }
+  .ProposalLinkedThreadsEditorModule {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    a.linked-thread {
+      color: #9a9da4;
+    }
+    .cui-list-item {
+      &:first-child {
+        padding-top: 0 !important;
+      }
+      &:hover {
+        background: none;
+      }
+    }
+    .linked-threads-title {
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+  }
+  .ProposalSidebarPollEditorModule {
+    .placeholder-copy {
+      line-height: 1.2;
+      color: shade($text-color-light, 10%);
+      margin: 2px 0 12px;
+    }
+    .proposal-chain-entities {
+      margin-bottom: 12px;
+    }
+  }
+  .ProposalHeaderOffchainPoll {
+    .offchain-poll-header {
+      line-height: 1.2;
+      font-weight: 600;
+    }
+    .offchain-poll-options {
+      margin: 16px 0;
+      .offchain-poll-option {
+        display: flex;
+        .offchain-poll-option-left {
+          margin: 6px 0;
+          line-height: 1.1;
+          flex: 1;
+        }
+      }
+    }
+    .offchain-poll-caption {
+      font-size: 16px;
+      color: $text-color-light;
+      margin-bottom: 24px;
+    }
+    .offchain-poll-invalid,
+    .offchain-poll-no-voters {
+      font-size: 16px;
+      color: $text-color-light;
+    }
+    .offchain-poll-voters {
+      margin-top: 10px;
+      .vote-synopsis {
+        margin-top: 10px;
+        .option-with-votes {
+          margin: 10px 0;
+          .poll-bar {
+            height: 5px;
+            border-radius: 5px;
+            background-color: $primary-bg-color;
+          }
+          .option-results-label {
+            display: flex;
+          }
+          a {
+            margin-top: 10px;
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
+
+  .QuillEditor {
+    margin-top: 8px;
+  }
+  .ProposalBodyCancelEdit,
+  .ProposalBodySaveEdit {
+    margin-right: 12px;
+    margin-top: 14px;
+  }
+  .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
+    stroke: $text-color-light;
+    &:hover {
+      stroke: $text-color-medium;
+    }
+  }
+  .ProposalBodyReaction {
+    display: inline-block;
+  }
+  .InlineReplyButton {
+    display: flex;
+  }
+  .ProposalBodyText.proposal-body-placeholder {
+    &,
+    .User .user-display-name {
+      color: $text-color-light;
+    }
+  }
+
+  .comments-error {
+    @include error-text();
+    margin: 30px 0;
+  }
+
+  .proposal-content,
+  .ProposalComment {
+    position: relative;
+  }
+  .thread-connector {
+    position: absolute;
+    top: 48px;
+    bottom: -40px;
+    background: $background-color-light;
+    left: 19px;
+    width: 2px;
+    z-index: -1;
+  }
+}

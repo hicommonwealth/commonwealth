@@ -673,14 +673,8 @@ const instantiateEditor = (
       toolbar: hasFormats
         ? ([[{ header: 1 }, { header: 2 }]] as any).concat([
             ['bold', 'italic', 'strike'],
-            ['code-block', 'blockquote'],
-            [
-              { list: 'ordered' },
-              { list: 'bullet' },
-              { list: 'check' },
-              'link',
-              'preview',
-            ],
+            ['link', 'code-block', 'blockquote'],
+            [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
           ])
         : false,
       imageDropAndPaste: {
