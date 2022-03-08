@@ -9,7 +9,7 @@ import app from 'state';
 import { ITokenAdapter } from 'models';
 import { handleEmailInvites } from 'views/components/header/invites_menu';
 import Sidebar from 'views/components/sidebar';
-import MobileHeader from 'views/mobile/mobile_header';
+import { MobileHeader } from 'views/mobile/mobile_header';
 import { FooterLandingPage } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './components/sublayout_header_left';
@@ -159,7 +159,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     return (
       <div class="layout-container">
         <div class={`Sublayout ${vnode.attrs.class}`}>
-          {m(MobileHeader)}
+          <MobileHeader />
           <div
             class={`sublayout-header ${isUndefined(title) ? 'no-title' : ''}`}
           >
