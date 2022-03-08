@@ -174,7 +174,6 @@ export const ProposalLinkedThreadsEditorModule: m.Component<
         });
       return null;
     }
-    console.log(vnode.state.linkedThreads);
     if (allowLinking || proposal.linkedThreads.length) {
       return m('.ProposalLinkedThreadsEditorModule', [
         !!vnode.state.linkedThreads?.length &&

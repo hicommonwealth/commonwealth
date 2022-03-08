@@ -47,7 +47,8 @@
       display: inline-flex;
       flex-direction: column;
       align-self: center;
-      max-width: 100%;
+      width: 100%;
+      overflow: hidden;
 
       .row-header,
       .row-header a {
@@ -60,10 +61,6 @@
       .row-subheader {
         margin-top: 5px;
         display: flex;
-
-        > * {
-          display: inline;
-        }
       }
 
       .row-subheader + .row-subheader {
@@ -79,7 +76,6 @@
       .row-subheader > a,
       .row-subheader > .User > a,
       .row-subheader > .created-at > a,
-      .row-subheader > .mobile-comment-count,
       > span {
         color: $text-color-light;
         font-size: $text-size-item-meta;
@@ -138,7 +134,9 @@
   @include xs-max {
     display: block;
 
-    .row-right {
+    .row-right,
+    .activity-icons,
+    .last-active {
       display: none;
     }
   }
