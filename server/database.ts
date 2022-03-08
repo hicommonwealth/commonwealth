@@ -177,7 +177,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
         },
   pool: {
     max: 10,
-    min: 5,
+    min: 0,
     acquire: 40000,
     idle: 40000,
   },
