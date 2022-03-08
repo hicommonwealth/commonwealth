@@ -4,6 +4,7 @@ $discussion-outer-padding: 60px;
 $discussion-meta-padding: 12px; // padding between comment meta & comment content
 $discussion-reaction-padding: 18px; // padding between comment content & comment reaction
 $discussion-comment-padding: 28px; // padding between comment content & avatar
+$discussion-comment-padding-mobile: 16px;
 
 $discussion-meta-font-size: 1rem;
 $discussion-meta-color: $text-color-light;
@@ -216,7 +217,7 @@ $discussion-title-font-size: 1.45rem;
       overflow-x: auto;
       margin-left: $discussion-comment-padding;
       @include xs-max {
-        margin-right: 10px;
+        margin-left: $discussion-comment-padding-mobile;
       }
       .proposal-content-meta {
         padding-bottom: $discussion-meta-padding;
@@ -289,6 +290,9 @@ $discussion-title-font-size: 1.45rem;
       flex: 1;
       overflow-x: auto;
       padding-left: $discussion-comment-padding;
+      @include xs-max {
+        padding-left: $discussion-comment-padding-mobile;
+      }
     }
     .comment-body-top {
       padding-bottom: $discussion-meta-padding;
