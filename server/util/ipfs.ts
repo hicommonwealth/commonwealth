@@ -4,7 +4,7 @@ const FormData = require('form-data');
 import models from '../database';
 require('dotenv').config();
 
-const ipfs = async (userID,jsonfile) => {
+const ipfs = async (userID, addressID, jsonfile) => {
   const data = new FormData();
   data.append('file', JSON.stringify(jsonfile), 'userIDblob');
   const headers = {
@@ -19,6 +19,7 @@ const ipfs = async (userID,jsonfile) => {
       try {
         await models.IpfsPins.create({
           id: userID,
+          address_id: addressID,
           ipfs_hash: response.data.IpfsHash,
         });
       } catch (e) {

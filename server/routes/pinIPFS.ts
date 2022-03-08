@@ -9,7 +9,7 @@ const pinIPFS = async (
   next: NextFunction
 ) => {
   try {
-    const ipfsHash = await ipfs(req.user.id, req.body);
+    const ipfsHash = await ipfs(req.user.id, req.body.result.id, req.body);
     return res.json({ status: 'Success', IPFSHash: ipfsHash });
   } catch (e) {
     return res.json({ status: 'Failure', message: e.message });
