@@ -16,7 +16,10 @@ import {
 import { pluralize } from 'helpers';
 import app from 'state';
 import { AddressInfo, Profile, SearchQuery } from 'models';
-import { SearchScope, SearchSort } from 'models/SearchQuery';
+import { getProposalUrlPath } from 'identifiers';
+import { ProposalType } from 'types';
+
+import { SearchScope, SearchSort } from 'models/SearchQuery'
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -25,7 +28,7 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { ContentType } from 'controllers/server/search';
 import { CommunityLabel } from '../components/sidebar/community_selector';
-import PageNotFound from './404';
+import { PageNotFound } from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
@@ -103,7 +106,8 @@ export const getDiscussionResult = (thread, searchTerm) => {
       iconName: 'feedback',
     }),
     onclick: () => {
-      m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
+      const path = getProposalUrlPath(ProposalType.OffchainThread, proposalId, false, chainOrComm);
+      m.route.set(path);
     },
     label: m('a.search-results-item', [
       m('.search-results-thread-header disabled', [
@@ -159,11 +163,9 @@ export const getCommentResult = (comment, searchTerm) => {
       iconName: 'feedback',
     }),
     onclick: (e) => {
-      m.route.set(
-        `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${
-          proposalId.split('_')[1]
-        }`
-      );
+      const [slug, id] = proposalId.split('_');
+      const path = getProposalUrlPath(slug, id, false, chainOrComm);
+      m.route.set(path);
     },
     label: m('a.search-results-item', [
       m('.search-results-thread-header disabled', [
@@ -348,7 +350,7 @@ const SearchPage: m.Component<
         title: ['Search ', capitalize(scope) || 'Commonwealth'],
         showNewProposalButton: true,
         alwaysShowTitle: true,
-        centerGrid: true,
+        hasCenterGrid: true,
       },
       m(Tabs, tabs),
       m('.search-results-wrapper', [

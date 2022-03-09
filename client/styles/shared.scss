@@ -16,19 +16,21 @@ $layout-padding-xs: 20px;
 //
 // base fonts
 
-$fonts: Calibre, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-$monospace-fonts: SF Mono, Menlo, Monaco, "Lucida Sans Typewriter", "Courier New", Courier, monospace;
+$fonts: Calibre, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+  'Segoe UI Symbol';
+$monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
+  'Courier New', Courier, monospace;
 
 //
 // base colors
 
-$base-bg-color:     #ffffff;
-$primary-bg-color:  #4f6dbd; // also used for text
+$base-bg-color: #ffffff;
+$primary-bg-color: #4f6dbd; // also used for text
 $positive-bg-color: #41a360; // also used for text
 $negative-bg-color: #d4302f; // also used for text
-$disable-grey: #DDDDDD;
+$disable-grey: #dddddd;
 
-$layout-color: #F6F6F6;
+$layout-color: #f6f6f6;
 
 $intermediate-icon-color: #ffa200;
 $positive-icon-color: #7ed320;
@@ -37,17 +39,16 @@ $failure-icon-color: #db322d;
 $last-seen-notification-color: #ea7a60;
 
 $text-color-white: #fff;
-$text-color-lightest: #b5b7b9;          // light text on white background
-$text-color-lighter: #a3a4a7;           // light text on white background
-$text-color-light: #9a9da4;             // light text on light background
-$text-color-medium: #777;               // medium text on any background
-$text-color-medium-dark: #555;          // light off-black text on any background
-$text-color-darker: #333;               // off-black text on any background
-$text-color-black: #222;                // black text on any background
+$text-color-lightest: #b5b7b9; // light text on white background
+$text-color-lighter: #a3a4a7; // light text on white background
+$text-color-light: #9a9da4; // light text on light background
+$text-color-medium: #777; // medium text on any background
+$text-color-medium-dark: #555; // light off-black text on any background
+$text-color-darker: #333; // off-black text on any background
+$text-color-black: #222; // black text on any background
 
 $text-color-primary-light: tint($primary-bg-color, 75%);
 $text-color-primary: $primary-bg-color;
-
 
 //
 // background colors
@@ -56,7 +57,7 @@ $background-color-white: #ffffff;
 $background-color-black-hover: tint(#484744, 30%);
 $background-color-white-hover: tint($primary-bg-color, 96.5%);
 $background-color-black: #262523;
-$background-color-white-hover-0: tint(#FAFAFA, 10%);
+$background-color-white-hover-0: tint(#fafafa, 10%);
 $background-color-light: desaturate(tint($primary-bg-color, 90%), 12%);
 $background-color-light-hover: desaturate(tint($primary-bg-color, 86.5%), 12%);
 $background-color-medium-light: desaturate(tint($primary-bg-color, 75%), 25%);
@@ -71,7 +72,7 @@ $background-color-dark-monochrome: #36393f;
 $background-color-darker-accent: shade($primary-bg-color, 4%);
 $background-color-darker-monochrome: #2f3136;
 
-$background-color-unread: #ffffe0;      // notifications color
+$background-color-unread: #ffffe0; // notifications color
 $background-color-selection-on-dark: #ffdd00;
 $background-color-new-comment: #fffba1;
 
@@ -81,7 +82,6 @@ $background-color-new-comment: #fffba1;
 $border-color: #c5cdd1;
 $border-color-light: #e0e4f1;
 $border-color-lightest: #e0e4f1;
-$border-color-focus: mix($border-color, $primary-bg-color, 50%);
 $border-color-off-white: #eee;
 
 //
@@ -98,179 +98,282 @@ $listing-right-flex: 1;
 $text-size-mobile-header: 22px;
 
 @mixin listing-row-base {
-    display: flex;
-    padding: 15px 20px 9px;
-    margin: 0 -20px;
-    cursor: pointer;
-    &:hover {
-        background: $background-color-white-hover;
-    }
-}
+  cursor: pointer;
+  display: flex;
+  margin: 0 -20px;
+  padding: 15px 20px 9px;
 
-@mixin formfield-base {
-    display: block;
-    width: 100%;
-    border: 1px solid $border-color;
-    border-radius: 4px;
-    outline: none;
-    box-shadow: none;
-    &:focus {
-        border-color: $border-color-focus;
-    }
-}
-
-@mixin formfield-text {
-    @include formfield-base;
-    padding: 10px;
-    &::placeholder {
-        color: $text-color-light;
-    }
-    &:focus::placeholder {
-        color: $text-color-light;
-    }
+  &:hover {
+    background: $background-color-white-hover;
+  }
 }
 
 @mixin error-text {
-    font-weight: 500;
-    color: $negative-bg-color;
+  color: $negative-bg-color;
+  font-weight: 500;
 }
+
 @mixin success-text {
-    font-weight: 500;
-    color: $positive-bg-color;
+  color: $positive-bg-color;
+  font-weight: 500;
 }
 
 @mixin attachments {
-    p {
-        font-weight: 500;
-        color: $text-color-light;
+  p {
+    color: $text-color-light;
+    font-weight: 500;
+  }
+
+  a.attachment-item {
+    background: $background-color-light;
+    display: inline-block;
+    margin-right: 10px;
+    max-height: 100px;
+    max-width: 100px;
+    text-align: center;
+    text-decoration: none;
+
+    &:hover {
+      background: $background-color-light-hover;
     }
-    a.attachment-item {
-        display: inline-block;
-        max-width: 100px;
-        max-height: 100px;
-        background: $background-color-light;
-        margin-right: 10px;
-        text-align: center;
-        text-decoration: none;
-        &:hover {
-            background: $background-color-light-hover;
-        }
-        img {
-            width: 50%;
-            margin: 10px 0 4px;
-        }
+
+    img {
+      margin: 10px 0 4px;
+      width: 50%;
     }
+  }
 }
 
 @mixin gov-explainer {
-    .stats-box {
-        margin-top: 20px;
-        margin-bottom: 20px;
-        padding: 24px 20px 20px;
-        border-radius: 10px;
-        background-color: #f8f8f8;
-        display: flex;
-        .stats-box-left {
-            font-size: 28px;
-            margin-right: 16px;
-        }
-        .stats-box-right {
-            line-height: 1.25;
-            p {
-                margin: 4px 0 0;
-            }
-        }
+  .stats-box {
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    display: flex;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    padding: 24px 20px 20px;
 
-        .stats-box-stat {
-            display: inline-block;
-            margin: 6px 0 0;
-            color: #888;
-            &::after {
-                content: ' ';
-                margin: 0 12px;
-            }
-        }
-        .stats-box-action {
-            display: inline-block;
-            margin: 6px 0 0;
-            color: #888;
-            &::after {
-                content: ' ';
-                margin: 0 12px;
-            }
-        }
-    }
-    @include sm-max {
-        .stats-box-left {
-            display: none;
-        }
+    .stats-box-left {
+      font-size: 28px;
+      margin-right: 16px;
     }
 
-    h3 {
-        margin-bottom: 0;
-        clear: both;
-    }
-    .clear + h3 {
-        margin-top: 40px;
+    .stats-box-right {
+      line-height: 1.25;
+
+      p {
+        margin: 4px 0 0;
+      }
     }
 
-    .no-proposals {
-        margin-top: 10px;
-        color: $text-color-light;
+    .stats-box-stat {
+      color: #888;
+      display: inline-block;
+      margin: 6px 0 0;
+
+      &::after {
+        content: ' ';
+        margin: 0 12px;
+      }
     }
+
+    .stats-box-action {
+      color: #888;
+      display: inline-block;
+      margin: 6px 0 0;
+
+      &::after {
+        content: ' ';
+        margin: 0 12px;
+      }
+    }
+  }
+
+  @include sm-max {
+    .stats-box-left {
+      display: none;
+    }
+  }
+
+  h3 {
+    clear: both;
+    margin-bottom: 0;
+  }
+
+  .clear + h3 {
+    margin-top: 40px;
+  }
+
+  .no-proposals {
+    color: $text-color-light;
+    margin-top: 10px;
+  }
 }
 
 @mixin card {
-    position: relative;
-    float: left;
-    height: 220px;
-    width: calc(50% - 24px);
-    max-width: 320px;
-    @include xs-max {
-        width: 100%;
-        max-width: none;
-        margin-right: 0px;
-    }
-    @include xl-min {
-        width: calc(33% - 24px);
-    }
-    // padding
-    padding: 24px 24px 22px;
-    border-radius: 15px;
-    border: 1px solid $border-color-off-white;
-    box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
-    margin-right: 24px;
-    margin-bottom: 22px;
-    cursor: pointer;
-    &:hover {
-        box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
-    }
-    // text
-    overflow-wrap: break-word;
+  border-radius: 15px;
+  border: 1px solid $border-color-off-white;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.07);
+  cursor: pointer;
+  float: left;
+  height: 220px;
+  margin-bottom: 22px;
+  margin-right: 24px;
+  max-width: 320px;
+  overflow-wrap: break-word;
+  padding: 24px 24px 22px;
+  position: relative;
+  width: calc(50% - 24px);
+
+  @include xs-max {
+    margin-right: 0px;
+    max-width: none;
+    width: 100%;
+  }
+
+  @include xl-min {
+    width: calc(33% - 24px);
+  }
+
+  &:hover {
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+  }
 }
 
 @mixin gradientTabs() {
-    .cui-tabs-item {
-        padding: 13px 15px 7px;
-        margin: 0 !important;
-        color: $text-color-light;
-    }
-    .cui-tabs-item:hover {
-        color: #666666;
-        border-width: 2px;
-        border-color: #DDDDDD;
-        border-style: solid;
-        border-top: 0;
-        border-left: 0;
-        border-right: 0;
-    }
-    .cui-tabs-item.cui-active {
-        color: $text-color-black;
-        border-width: 2px;
-        border-style: solid;
-        border-top: 0;
-        border-left: 0;
-        border-right: 0;
-        border-image: linear-gradient(to right, #6086d1, #b37dba) 1;
-    }
+  .cui-tabs-item {
+    color: $text-color-light;
+    margin: 0 !important;
+    padding: 13px 15px 7px;
+  }
+
+  .cui-tabs-item:hover {
+    // these styles can't be alphabetized or else they'll apply incorrectly
+    color: #666666;
+    border-width: 2px;
+    border-color: #dddddd;
+    border-style: solid;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .cui-tabs-item.cui-active {
+    // these styles can't be alphabetized or else they'll apply incorrectly
+    color: $text-color-black;
+    border-width: 2px;
+    border-style: solid;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-image: linear-gradient(to right, #6086d1, #b37dba) 1;
+  }
+}
+
+// Gabe 3/4/22
+// newer styles that will probably be replaced somewhat by v2
+
+$black: #000000;
+$dark-gray: #333333;
+$midi-gray: #666666;
+$lite-gray: #999999;
+$disable-gray: #dddddd;
+$background-gray: #f4f4f4;
+$white: #ffffff;
+
+$dark-purp: #4723ad;
+$midi-purp: #9075dc;
+$lite-purp: #c7b9ef;
+$xlite-purp: #f7f4ff;
+
+$purp-blue: #6300ff;
+$purp-blue-lite: #f3ebff;
+
+$hype-red: #ff002e;
+$pinky: #ffafbe;
+$flesh-pink: #ffebee;
+
+$dark-green: #008676;
+$carib-green: #00c0a9;
+$foam-green: #b4f1ea;
+$mint-green: #f3fff9;
+
+$cream-yellow: #fffba1;
+
+$elevation-1-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+$elevation-2-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+$elevation-3-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+$elevation-4-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+$elevation-5-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
+
+title {
+  font-family: $fonts;
+  font-size: 72px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+@mixin header {
+  font-family: $fonts;
+  font-style: normal;
+  font-weight: 500;
+}
+
+h1 {
+  @include header;
+  font-size: 48px;
+}
+
+h2 {
+  @include header;
+  font-size: 32px;
+}
+
+h3 {
+  @include header;
+  font-size: 24px;
+}
+
+@mixin body {
+  font-family: $fonts;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@mixin body-paragraph {
+  @include body;
+  p {
+    margin-bottom: 10px;
+  }
+}
+
+@mixin link {
+  @include body;
+  font-weight: 500;
+  color: #140994;
+}
+
+@mixin button-label {
+  @include body;
+  font-weight: 600;
+}
+
+@mixin form-label {
+  @include body;
+  font-size: 14px;
+  line-height: 16.8px;
+  color: #666666;
+}
+
+@mixin rainbow-gradient-horizontal {
+  background: linear-gradient(90deg, #91bfff, #91ffa0, #fbff91, #ff9191);
+}
+
+@mixin rainbow-gradient-diagonal {
+  background: linear-gradient(45deg, #91bfff, #91ffa0, #fbff91, #ff9191);
+}
+
+@mixin shadow-gradient {
+  background: linear-gradient(270deg, #17161e, #07060d);
 }

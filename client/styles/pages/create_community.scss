@@ -1,115 +1,86 @@
 @import 'client/styles/shared';
+@import 'client/styles/shared';
 
-.CreateCommunityPage {
-    width: 100%;
-    @include sm-max {
-        width: initial;
+.CreateCommunityIndex {
+  width: 100%;
+
+  h3 {
+    margin: 16px auto;
+    text-align: center;
+  }
+
+  .CreateCommunityForm {
+    margin: 32px auto auto;
+    width: 480px;
+
+    .InputRow {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        @include form-label;
+        margin-bottom: 4px;
+      }
+
+      textarea {
+        resize: none;
+      }
     }
 
-    .community-creation-form {
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-    }
+    .AvatarUploadRow,
+    .IDRow,
+    .SelectRow,
+    .ToggleRow {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
 
-    .create-community-wrapper {
+      label {
+        @include form-label;
+        margin-bottom: 4px;
+      }
+
+      .toggle-and-label {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        h3 {
-            margin-top: 11px;
-        }
-
-        .CommunityMetadataManagementTable {
-            td {
-                padding: 11px 20px;
-            }
-            .cui-button {
-                display: block;
-                width: 40%;
-                min-width: 150px;
-                margin: 26px auto;
-            }
-            .cui-tabs {
-                margin-top: 0 !important;
-            }
-        }
-
-        .cui-table.metadata-management-table {
-            td {
-                line-height: 1.1;
-                padding: 5px 0 5px 28px !important;
-                border-bottom: none !important;
-            }
-            tr:first-child td {
-                padding-top: 18px !important;
-            }
-        }
-        .cui-tabs {
-            margin-top: 2px !important;
-            border-bottom-color: $background-color-light;
-            > :first-child {
-                margin-left: 15px !important;
-            }
-        }
-
-        .AvatarUpload {
-            width: 92px;
-            height: 92px;
-            color: red;
-            margin: auto 0;
-        }
-
-        .error-column {
-            @include error-text
-        }
-
-        .InputPropertyRow {
-            width: 100%;
-            .title-column {
-                width: 150px;
-            }
-            textarea {
-                resize: vertical !important;
-                min-height: 25px !important;
-                width: 100% !important;
-                height: auto !important;
-            }
-        }
-        .TogglePropertyRow {
-            td:first-child {
-                padding-top: 7px !important;
-            }
-            td {
-                padding-top: 14px !important;
-                padding-bottom: 4px !important;
-            }
-            .cui-switch {
-                display: inline-block;
-                margin-right: 5px;
-                position: relative;
-                top: -2px;
-            }
-            .switch-caption {
-                display: inline-block;
-                color: $text-color-light;
-                font-size: 94%;
-                position: relative;
-                top: 1px;
-            }
-        }
-        .SelectPropertyRow {
-            td:first-child {
-                padding-top: 7px !important;
-            }
-            td {
-                padding-top: 14px !important;
-                padding-bottom: 4px !important;
-            }
-        }
+        flex-direction: row;
+      }
     }
-}
-.CompactModalExitButton {
-    color: $text-color-medium;
+
+    .AvatarUpload {
+      color: red;
+      height: 92px;
+      margin: auto 0;
+      width: 92px;
+    }
+
+    .id {
+      background-color: #fffff3;
+      border-radius: 4px;
+      height: 42px;
+      padding: 8px 15px;
+
+      &.placeholder {
+        color: #cccccc;
+        font-style: italic;
+      }
+    }
+
+    .button-margin-bottom {
+      margin-bottom: 20px;
+    }
+
+    .validation-container {
+      @include form-label;
+      height: 20px;
+
+      .error {
+        color: $hype-red;
+        margin-top: 8px;
+      }
+
+      .status {
+        margin-top: 8px;
+      }
+    }
+  }
 }

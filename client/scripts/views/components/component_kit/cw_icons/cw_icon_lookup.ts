@@ -8,6 +8,7 @@ export const iconLookup = {
   'external-link': Icons.CWExternalLink,
   feedback: Icons.CWFeedback,
   github: Icons.CWGithub,
+  pin: Icons.CWPin,
   search: Icons.CWSearch,
   telegram: Icons.CWTelegram,
   website: Icons.CWWebsite,
