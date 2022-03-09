@@ -4,7 +4,7 @@ import _ from 'lodash';
 import m from 'mithril';
 
 import app from 'state';
-import DiscussionRow from 'views/pages/discussions/discussion_row';
+import { DiscussionRow } from 'views/pages/discussions/discussion_row';
 
 interface IPinnedListingAttrs {
   proposals: any;
@@ -12,7 +12,7 @@ interface IPinnedListingAttrs {
 
 interface IPinnedListingState {
   expanded: boolean;
-  visitMarkerPlaced: boolean ;
+  visitMarkerPlaced: boolean;
 }
 
 export const getLastUpdate = (proposal) => {
@@ -41,9 +41,12 @@ const PinnedListing: m.Component<IPinnedListingAttrs, IPinnedListingState> = {
       return;
     }
     return m('.WeeklyDiscussionListing', [
-      m(threadGroup, proposals.map((proposal) => {
-        return m(DiscussionRow, { proposal });
-      }))
+      m(
+        threadGroup,
+        proposals.map((proposal) => {
+          return m(DiscussionRow, { proposal });
+        })
+      ),
     ]);
   },
 };

@@ -46,7 +46,7 @@ export class ListingRow implements m.ClassComponent<ListingRowAttrs> {
           <div class="row-header">{contentLeft.header}</div>
           <div class="row-subheader">{contentLeft.subheader}</div>
         </div>
-        <div class="content-right">
+        <div class="content-right-container">
           {contentRight.map((el) => (
             <div>{el}</div>
           ))}

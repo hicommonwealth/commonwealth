@@ -79,13 +79,13 @@
     }
   }
 
-  .content-right {
+  .content-right-container {
     align-items: center;
     display: flex;
   }
 
   @include xs-max {
-    .content-right,
+    .content-right-container,
     .activity-icons,
     .last-active {
       display: none;
