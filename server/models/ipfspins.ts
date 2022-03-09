@@ -38,9 +38,5 @@ export default (
       },
     }
   );
-  IpfsPins.associate = (models) => {
-    models.IpfsPins.hasMany(models.Notification, { foreignKey: 'category_id' });
-    models.IpfsPins.hasMany(models.Subscription, { foreignKey: 'category_id' });
-  };
   return IpfsPins;
 };
