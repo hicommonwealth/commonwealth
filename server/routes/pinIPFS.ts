@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
 import pinIpfsBlob from '../util/pinIpfsBlob';
-import isValidJSON from '../util/isValidJSON';
+import isValidJSON from '../util/isValidJson';
 import { AppError } from '../util/errors';
 export const Errors = {
   NotLoggedIn: 'Not logged in',
