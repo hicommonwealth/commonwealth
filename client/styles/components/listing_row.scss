@@ -13,10 +13,6 @@
     background: $background-color-white-hover;
   }
 
-  .reaction {
-    margin-right: 24px;
-  }
-
   .pinned {
     align-items: center;
     border-radius: 12px;
@@ -32,56 +28,45 @@
     }
   }
 
+  .reaction {
+    margin-right: 24px;
+  }
+
   .title-container {
     align-self: center;
     display: flex;
     flex-direction: column;
     width: 100%;
 
-    .row-header a {
-      color: $text-color-black;
-      font-size: 19px;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .row-subheader {
-      display: flex;
-    }
-
-    // .row-subheader + .row-subheader {
-    //   margin-top: 1px;
-    // }
-
-    // .row-subheader > .created-at {
-    //   max-height: 17px;
-    //   overflow: hidden;
-    //   text-overflow: ellipsis;
-    // }
-
-    .row-subheader > a,
-    .row-subheader > .User > a,
-    .row-subheader > .created-at > a,
-    > span {
-      color: $text-color-light;
-      font-size: 17px;
-      max-height: 17px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-
-      &:hover {
-        color: darken($text-color-light, 8%);
+    .row-header {
+      a {
+        color: $text-color-black;
+        font-size: 19px;
+        text-decoration: none;
+        font-weight: 600;
       }
     }
 
-    .external-discussion-link {
-      word-break: break-all;
+    .row-subheader {
+      color: $text-color-light;
+      display: flex;
+
+      a {
+        color: $text-color-light;
+        font-size: 17px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover {
+          color: darken($text-color-light, 8%);
+        }
+      }
     }
   }
 
   .content-right-container {
-    align-items: center;
     display: flex;
+    flex-direction: row;
   }
 
   @include xs-max {

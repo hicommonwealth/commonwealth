@@ -199,12 +199,10 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
 
     return (
       <ListingRow
-        contentLeft={{
-          reaction,
-          header: rowHeader,
-          subheader: rowSubheader,
-          pinned,
-        }}
+        reaction={reaction}
+        header={rowHeader}
+        subheader={rowSubheader}
+        pinned={pinned}
         contentRight={rowMetadata}
         key={proposal.id}
         onclick={(e) => {
