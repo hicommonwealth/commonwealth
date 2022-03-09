@@ -21,7 +21,7 @@ export default (
   const IpfsPins = <IpfsPinsModelStatic>sequelize.define(
     'IpfsPins',
     {
-      id: { type: dataTypes.INTEGER, primaryKey: true },
+      id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       ipfs_hash: { type: dataTypes.STRING, allowNull: false },
     },
