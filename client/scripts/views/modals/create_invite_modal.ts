@@ -28,7 +28,7 @@ import { SearchScope } from 'models/SearchQuery';
 import { UserBlock } from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
-export interface SearchParams {
+interface SearchParams {
   communityScope?: string;
   chainScope?: string;
   resultSize?: number;
@@ -87,7 +87,7 @@ const getBalancedContentListing = (
   return results;
 };
 
-export const getMemberPreview = (
+const getMemberPreview = (
   addr,
   enterAddressFn,
   closeResultsFn,
@@ -170,7 +170,7 @@ const concludeSearch = (
   m.redraw();
 };
 
-export const searchMentionableAddresses = async (
+const searchMentionableAddresses = async (
   searchTerm: string,
   params: SearchParams,
   order?: string[]
@@ -210,11 +210,7 @@ const sortResults = (a, b) => {
 // community-scoped. It then "concludesSearch," and either assigns the results to
 // app.searchAddressCache or sends them to getResultsPreview, which creates the relevant
 // preview rows
-export const search = async (
-  searchTerm: string,
-  params: SearchParams,
-  state
-) => {
+const search = async (searchTerm: string, params: SearchParams, state) => {
   const { communityScope, chainScope } = params;
   const resultSize = SEARCH_PREVIEW_SIZE;
   if (app.searchAddressCache[searchTerm]?.loaded) {

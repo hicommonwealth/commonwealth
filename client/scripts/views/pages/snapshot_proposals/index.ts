@@ -1,6 +1,5 @@
 import 'pages/discussions/index.scss';
 
-import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
@@ -12,7 +11,6 @@ import Listing from 'views/pages/listing';
 
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import ProposalRow from './proposal_row';
-import { CommunityOptionsPopover } from '../discussions';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -23,38 +21,50 @@ enum SnapshotProposalFilter {
   Ended = 'Ended',
 }
 
-const SnapshotProposalStagesBar: m.Component<{
-  selected: SnapshotProposalFilter,
-  onChangeFilter: (value: SnapshotProposalFilter) => void
-}, {}> = {
+const SnapshotProposalStagesBar: m.Component<
+  {
+    selected: SnapshotProposalFilter;
+    onChangeFilter: (value: SnapshotProposalFilter) => void;
+  },
+  {}
+> = {
   view: (vnode) => {
     return m('.DiscussionFilterBar', [
-      Object.values(SnapshotProposalFilter)
-        .map((option: SnapshotProposalFilter) => m(Button, {
-          rounded: true,
-          compact: true,
-          size: 'sm',
-          disabled: option === SnapshotProposalFilter.Core || option === SnapshotProposalFilter.Community,
-          class: `discussions-stage ${vnode.attrs.selected === option ? 'active' : ''}`,
-          onclick: (e) => {
-            e.preventDefault();
-            vnode.attrs.onChangeFilter(option);
-          },
-          label: option
-        }))
+      Object.values(SnapshotProposalFilter).map(
+        (option: SnapshotProposalFilter) =>
+          m(Button, {
+            rounded: true,
+            compact: true,
+            size: 'sm',
+            disabled:
+              option === SnapshotProposalFilter.Core ||
+              option === SnapshotProposalFilter.Community,
+            class: `discussions-stage ${
+              vnode.attrs.selected === option ? 'active' : ''
+            }`,
+            onclick: (e) => {
+              e.preventDefault();
+              vnode.attrs.onChangeFilter(option);
+            },
+            label: option,
+          })
+      ),
     ]);
-  }
+  },
 };
 
-const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string }, {
-  lookback?: { [community: string]: moment.Moment} ;
-  postsDepleted: { [community: string]: boolean };
-  topicInitialized: { [community: string]: boolean };
-  lastSubpage: string;
-  lastVisitedUpdated?: boolean;
-  onscroll: any;
-  selectedFilter: SnapshotProposalFilter;
-}> = {
+const SnapshotProposalsPage: m.Component<
+  { topic?: string; snapshotId: string },
+  {
+    lookback?: { [community: string]: moment.Moment };
+    postsDepleted: { [community: string]: boolean };
+    topicInitialized: { [community: string]: boolean };
+    lastSubpage: string;
+    lastVisitedUpdated?: boolean;
+    onscroll: any;
+    selectedFilter: SnapshotProposalFilter;
+  }
+> = {
   oninit: (vnode) => {
     vnode.state.selectedFilter = SnapshotProposalFilter.Active;
   },
@@ -67,17 +77,22 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
         m.redraw();
       });
 
-      return m(Sublayout, {
-        class: 'DiscussionsPage',
-        title: 'Proposals',
-        description: '',
-        showNewProposalButton: true,
-      }, [
-        m(Spinner, { active: true, fill: true, size: 'lg' })
-      ]);
+      return m(
+        Sublayout,
+        {
+          class: 'DiscussionsPage',
+          title: 'Proposals',
+          description: '',
+          showNewProposalButton: true,
+        },
+        [m(Spinner, { active: true, fill: true, size: 'lg' })]
+      );
     }
 
-    const checkProposalByFilter = (proposal: SnapshotProposal, option: SnapshotProposalFilter) => {
+    const checkProposalByFilter = (
+      proposal: SnapshotProposal,
+      option: SnapshotProposalFilter
+    ) => {
       switch (option) {
         case SnapshotProposalFilter.Core:
         case SnapshotProposalFilter.Community:
@@ -93,34 +108,49 @@ const SnapshotProposalsPage: m.Component<{ topic?: string, snapshotId: string },
     };
 
     const proposals = app.snapshot.proposals.filter(
-      (proposal: SnapshotProposal) => checkProposalByFilter(proposal, selectedFilter)
+      (proposal: SnapshotProposal) =>
+        checkProposalByFilter(proposal, selectedFilter)
     );
 
     const onChangeFilter = (value: SnapshotProposalFilter) => {
       vnode.state.selectedFilter = value;
     };
 
-
-    return m(Sublayout, {
-      class: 'DiscussionsPage',
-      title: 'Proposals',     
-      description: '',
-      showNewProposalButton: true,
-    }, [
-      (app.chain) && [
-        m('.discussions-main', [
-          m(SnapshotProposalStagesBar, { selected: selectedFilter, onChangeFilter }),
-          m(Listing, {
-            content: [
-              m('.discussion-group-wrap', proposals.length > 0
-                ? proposals.map((proposal) => m(ProposalRow, { snapshotId, proposal }))
-                : m('.no-proposals', `No ${vnode.state.selectedFilter} proposals found.`))
-            ]
-          })
-        ])
+    return m(
+      Sublayout,
+      {
+        class: 'DiscussionsPage',
+        title: 'Proposals',
+        description: '',
+        showNewProposalButton: true,
+      },
+      [
+        app.chain && [
+          m('.discussions-main', [
+            m(SnapshotProposalStagesBar, {
+              selected: selectedFilter,
+              onChangeFilter,
+            }),
+            m(Listing, {
+              content: [
+                m(
+                  '.discussion-group-wrap',
+                  proposals.length > 0
+                    ? proposals.map((proposal) =>
+                        m(ProposalRow, { snapshotId, proposal })
+                      )
+                    : m(
+                        '.no-proposals',
+                        `No ${vnode.state.selectedFilter} proposals found.`
+                      )
+                ),
+              ],
+            }),
+          ]),
+        ],
       ]
-    ]);
-  }
+    );
+  },
 };
 
 export default SnapshotProposalsPage;

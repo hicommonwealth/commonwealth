@@ -11,61 +11,67 @@ const ConfirmModal = {
     const confirmText = vnode.attrs.prompt || 'Are you sure?';
     const primaryButton = vnode.attrs.primaryButton || 'Yes';
     const secondaryButton = vnode.attrs.secondaryButton || 'Cancel';
-    return m('.ConfirmModal', {
-      onclick: (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    return m(
+      '.ConfirmModal',
+      {
+        onclick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        },
+        onmousedown: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        },
       },
-      onmousedown: (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }, [
-      m('.compact-modal-body', [
-        m('h3', confirmText),
-      ]),
-      m('.compact-modal-actions', [
-        m(Button, {
-          intent: 'primary',
-          rounded: true,
-          onclick: (e) => {
-            e.preventDefault();
-            $(e.target).trigger('modalcomplete');
-            setTimeout(() => {
+      [
+        m('.compact-modal-body', [m('h3', confirmText)]),
+        m('.compact-modal-actions', [
+          m(Button, {
+            intent: 'primary',
+            rounded: true,
+            onclick: (e) => {
+              e.preventDefault();
+              $(e.target).trigger('modalcomplete');
+              setTimeout(() => {
+                $(e.target).trigger('modalexit');
+              }, 0);
+            },
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
+            },
+            label: primaryButton,
+          }),
+          m(Button, {
+            intent: 'none',
+            rounded: true,
+            onclick: (e) => {
+              e.preventDefault();
               $(e.target).trigger('modalexit');
-            }, 0);
-          },
-          oncreate: (vvnode) => {
-            $(vvnode.dom).focus();
-          },
-          label: primaryButton,
-        }),
-        m(Button, {
-          intent: 'none',
-          rounded: true,
-          onclick: (e) => {
-            e.preventDefault();
-            $(e.target).trigger('modalexit');
-          },
-          label: secondaryButton,
-        }),
-      ]),
-    ]);
-  }
+            },
+            label: secondaryButton,
+          }),
+        ]),
+      ]
+    );
+  },
 };
 
-export const confirmationModalWithText = (prompt: string, primaryButton?: string, secondaryButton?: string) => {
-  return async () : Promise<boolean> => {
+export const confirmationModalWithText = (
+  prompt: string,
+  primaryButton?: string,
+  secondaryButton?: string
+) => {
+  return async (): Promise<boolean> => {
     let confirmed = false;
     return new Promise((resolve) => {
       app.modals.create({
         modal: ConfirmModal,
         data: { prompt, primaryButton, secondaryButton },
-        completeCallback: () => { confirmed = true; },
-        exitCallback: () => resolve(confirmed)
+        completeCallback: () => {
+          confirmed = true;
+        },
+        exitCallback: () => resolve(confirmed),
       });
     });
   };
 };
-
-export default ConfirmModal;

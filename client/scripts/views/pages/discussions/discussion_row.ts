@@ -1,7 +1,6 @@
 import 'pages/discussions/discussion_row.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
 import { Button, Icon, Icons, Tag } from 'construct-ui';

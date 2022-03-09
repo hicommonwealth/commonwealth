@@ -1147,7 +1147,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
         m.redraw();
       })
-      .catch((err) => {
+      .catch(() => {
         m.redraw();
       });
   }

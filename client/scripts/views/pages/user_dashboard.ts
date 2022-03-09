@@ -3,16 +3,7 @@ import 'pages/user_dashboard.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import {
-  TabItem,
-  Tabs,
-  Tag,
-  Col,
-  Grid,
-  Icon,
-  Icons,
-  Spinner,
-} from 'construct-ui';
+import { TabItem, Tabs, Icon, Icons, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { DashboardActivityNotification } from 'models';
@@ -32,7 +23,7 @@ const notificationsRemaining = (contentLength, count) => {
   return contentLength >= 10 && count < contentLength;
 };
 
-export enum DashboardViews {
+enum DashboardViews {
   FY = 'For You',
   Global = 'Global',
   Chain = 'Chain',
