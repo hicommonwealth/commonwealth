@@ -2,7 +2,6 @@
 import 'pages/web3login.scss';
 
 import m from 'mithril';
-import { Spinner, Button } from 'construct-ui';
 import app from 'state';
 
 import { link } from 'helpers';
@@ -17,25 +16,38 @@ const Web3LoginPage: m.Component<{}> = {
     const targetCommunity = m.route.param('targetCommunity');
 
     // oops! = address linking interrupted
-    const loginCopy = loggingInWithAddress ? 'Login interrupted' : (joiningCommunity || joiningChain)
-      ? 'Oops! An error occurred' : app.isLoggedIn() ? 'Oops! An error occurred' : 'Login interrupted';
+    const loginCopy = loggingInWithAddress
+      ? 'Login interrupted'
+      : joiningCommunity || joiningChain
+      ? 'Oops! An error occurred'
+      : app.isLoggedIn()
+      ? 'Oops! An error occurred'
+      : 'Login interrupted';
 
-    return m(Sublayout, {
-      class: 'Web3LoginPage',
-    }, [
-      m('.web3login-options', [
-        m('h3', loginCopy),
-        m(LoginWithWalletDropdown, {
-          label: 'Try again',
-          joiningChain,
-          loggingInWithAddress,
-        }),
-        m.route.param('prev')
-          ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
-          : link('a.web3login-go-home', (app.isCustomDomain() ? '/' : `/${app.activeChainId()}`), 'Go home'),
-      ]),
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        class: 'Web3LoginPage',
+      },
+      [
+        m('.web3login-options', [
+          m('h3', loginCopy),
+          m(LoginWithWalletDropdown, {
+            label: 'Try again',
+            joiningChain,
+            loggingInWithAddress,
+          }),
+          m.route.param('prev')
+            ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
+            : link(
+                'a.web3login-go-home',
+                app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,
+                'Go home'
+              ),
+        ]),
+      ]
+    );
+  },
 };
 
 export default Web3LoginPage;

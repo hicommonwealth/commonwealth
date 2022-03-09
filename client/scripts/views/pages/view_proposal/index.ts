@@ -1174,7 +1174,7 @@ const ViewProposalPage: m.Component<
           c.chain === activeAccount?.chain.id
         );
       }).length > 0;
-    const isAdmin =
+    const isAdminOrMod =
       app.user.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
@@ -1305,11 +1305,11 @@ const ViewProposalPage: m.Component<
     const showLinkedSnapshotOptions =
       (proposal as OffchainThread).snapshotProposal?.length > 0 ||
       isAuthor ||
-      isAdmin;
+      isAdminOrMod;
     const showLinkedThreadOptions =
       (proposal as OffchainThread).linkedThreads?.length > 0 ||
       isAuthor ||
-      isAdmin;
+      isAdminOrMod;
 
     return m(
       Sublayout,
@@ -1337,13 +1337,13 @@ const ViewProposalPage: m.Component<
               openStageEditor: () => {
                 vnode.state.stageEditorIsOpen = true;
               },
-              showAddProposalButton: isAuthor || isAdmin,
+              showAddProposalButton: isAuthor || isAdminOrMod,
             }),
           showLinkedThreadOptions &&
             proposal instanceof OffchainThread &&
             m(ProposalLinkedThreadsEditorModule, {
               proposalId: proposal.id,
-              allowLinking: isAuthor || isAdmin,
+              allowLinking: isAuthor || isAdminOrMod,
             }),
         ],
       },
@@ -1356,7 +1356,7 @@ const ViewProposalPage: m.Component<
           proposalPageState: vnode.state,
           isAuthor,
           isEditor,
-          isAdmin: isAdminOnly,
+          isAdmin: isAdminOrMod,
           stageEditorIsOpen: vnode.state.stageEditorIsOpen,
           pollEditorIsOpen: vnode.state.pollEditorIsOpen,
           closeStageEditor: () => {
@@ -1385,7 +1385,7 @@ const ViewProposalPage: m.Component<
           getSetGlobalEditingStatus,
           proposalPageState: vnode.state,
           recentlySubmitted: vnode.state.recentlySubmitted,
-          isAdmin,
+          isAdmin: isAdminOrMod,
         }),
         !vnode.state.editing &&
           !vnode.state.parentCommentId &&

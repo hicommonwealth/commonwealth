@@ -277,7 +277,7 @@ const checkForModifications = async (state, modalMsg) => {
   return confirmed;
 };
 
-export const loadDraft = async (dom, state, draft) => {
+const loadDraft = async (dom, state, draft) => {
   const titleInput = $(dom).find(
     "div.new-thread-form-body input[name='new-thread-title']"
   );

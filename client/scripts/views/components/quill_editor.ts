@@ -7,7 +7,6 @@ import moment from 'moment';
 import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
-import Image from 'quill/formats/image';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
 import QuillMention from 'quill-mention';
