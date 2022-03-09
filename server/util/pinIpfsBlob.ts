@@ -11,7 +11,7 @@ export const Errors = {
   KeysError: 'Pinata Keys do not exist',
 };
 
-const ipfs = async (userID: number, addressID: number, jsonfile: string) => {
+const pinIpfsBlob = async (userID: number, addressID: number, jsonfile: string) => {
   const data = new FormData();
   data.append('file', JSON.stringify(jsonfile), 'userIDblob');
   if (process.env.PINATA_API_KEY && process.env.PINATA_SECRET_API_KEY) {
@@ -46,4 +46,4 @@ const ipfs = async (userID: number, addressID: number, jsonfile: string) => {
   }
 };
 
-export default ipfs;
+export default pinIpfsBlob;

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
-import ipfs from '../util/pinIpfsBlob';
+import pinIpfsBlob from '../util/pinIpfsBlob';
 import isValidJSON from '../util/isValidJSON';
 import { AppError } from '../util/errors';
 export const Errors = {
@@ -21,7 +21,7 @@ const pinIPFS = async (
   if (!req.body.blob) return next(new AppError(Errors.NoBlobPresent));
   if (!isValidJSON(req.body.blob)) return next(new AppError(Errors.InvalidJson));
   try {
-    const ipfsHash = await ipfs(
+    const ipfsHash = await pinIpfsBlob(
       req.user.id,
       req.body.address_id,
       req.body.blob
