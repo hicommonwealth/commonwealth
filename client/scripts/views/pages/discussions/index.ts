@@ -1,15 +1,8 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import 'pages/discussions/index.scss';
-import 'components/dropdown_icon.scss';
-
 import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment';
-import app from 'state';
-import { navigateToSubpage } from 'app';
-
 import {
   Spinner,
   Button,
@@ -19,6 +12,12 @@ import {
   MenuItem,
   MenuDivider,
 } from 'construct-ui';
+
+import 'pages/discussions/index.scss';
+import 'components/dropdown_icon.scss';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
 import {
   pluralize,
   offchainThreadStageToLabel,
@@ -31,8 +30,8 @@ import {
   OffchainThread,
   ITokenAdapter,
 } from 'models';
-
 import { updateLastVisited } from 'controllers/app/login';
+import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import EmptyListingPlaceholder from 'views/components/empty_topic_placeholder';
@@ -42,9 +41,7 @@ import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicThresholdsModal from 'views/modals/edit_topic_thresholds_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
-
-import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
-import PinnedListing from './pinned_listing';
+import { PinnedListing } from './pinned_listing';
 import { DiscussionRow } from './discussion_row';
 import { SummaryListing } from './summary_listing';
 
