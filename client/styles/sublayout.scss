@@ -358,8 +358,12 @@
   .token-banner-terms {
     background-color: $layout-color;
     margin-left: $sidebar-width;
-    padding: 5px 0 5px 0;
+    padding: 5px 30px;
     text-align: center;
+
+    @include sm-max {
+      margin-left: 0;
+    }
 
     .close-button {
       cursor: pointer;
