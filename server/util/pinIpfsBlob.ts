@@ -23,7 +23,6 @@ const ipfs = async (userID, addressID, jsonfile) => {
           ipfs_hash: response.data.IpfsHash,
         });
       } catch (e) {
-        console.log(e);
         return new Error('Could not insert the hash');
       }
       return response.data.IpfsHash;

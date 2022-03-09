@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB, sequelize } from '../database';
-import ipfs from '../util/ipfs';
+import ipfs from '../util/pinIpfsBlob';
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   InvalidAddress: 'Invalid address',
