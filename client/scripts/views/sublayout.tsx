@@ -113,7 +113,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           <div class="token-banner-terms">
             <span>Please read the </span>
             <a href={terms}>terms and conditions</a>
-            <span> before interacting with this community.</span>
+            <span> before interacting with this community. </span>
             <span
               class="close-button"
               onclick={() => {
