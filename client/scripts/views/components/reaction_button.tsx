@@ -29,12 +29,9 @@ export enum ReactionType {
   Dislike = 'dislike',
 }
 
-type ReactionButtonState = {
+type ReactorAttrs = {
   dislikes: number;
-  hasReacted: boolean;
   likes: number;
-  loading: boolean;
-  reactionCounts: ReactionCount<any>;
   reactors: any;
 };
 
@@ -46,29 +43,26 @@ type ReactionButtonAttrs = {
   type: ReactionType;
 };
 
-const getDisplayedReactorsForPopup = (
-  vnode: m.Vnode<ReactionButtonAttrs & ReactionButtonState>
-) => {
-  const { reactors = [], likes = 0, dislikes = 0 } = vnode.attrs;
+const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
+  const { reactors = [], likes = 0, dislikes = 0 } = reactorAttrs;
 
   const slicedReactors = reactors
     .slice(0, MAX_VISIBLE_REACTING_ACCOUNTS)
-    .map((rxn_) => {
+    .map((rxn) => {
       const {
         Address: { address, chain },
-      } = rxn_;
+      } = rxn;
+
       return m(User, {
         user: new AddressInfo(null, address, chain, null),
         linkify: true,
       });
     });
 
-  if (reactors && slicedReactors.length < likes + dislikes) {
+  if (slicedReactors.length < likes + dislikes) {
     const diff = likes + dislikes - slicedReactors.length;
 
-    slicedReactors.push(
-      m('.reacting-user .truncated-reacting-users', `and ${diff} more`)
-    );
+    slicedReactors.push(<div>{`and ${diff} more`}</div>);
   }
 
   return slicedReactors;
@@ -164,15 +158,17 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
 
     const rxnButton = (
       <div
-        class="ProposalBodyReaction"
         onmouseenter={async () => {
           this.reactors = await fetchReactionsByPost(post);
         }}
         onclick={async (e) => {
           const { reactors, reactionCounts } = this;
+
           e.preventDefault();
           e.stopPropagation();
+
           if (disabled) return;
+
           if (!app.isLoggedIn()) {
             app.modals.create({
               modal: LoginModal,
@@ -257,27 +253,35 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
             (type === ReactionType.Dislike ? ' dislike' : '')
           }`}
         >
-          {type === ReactionType.Dislike && large ? (
-            <div class="reactions-icon">▾</div>
-          ) : (
+          {type === ReactionType.Dislike && (
             <div>
-              <Icon
-                class="reactions-icon"
-                name={Icons.THUMBS_DOWN}
-                size={Size.XL}
-              />
-              <div class="upvote-count">{this.dislikes}</div>
+              <div>
+                {large ? (
+                  <div class="reactions-icon">▾</div>
+                ) : (
+                  <Icon
+                    class="reactions-icon"
+                    name={Icons.THUMBS_DOWN}
+                    size={Size.XL}
+                  />
+                )}
+              </div>
+              <div>{this.dislikes}</div>
             </div>
           )}
-          {type === ReactionType.Like && large ? (
-            <div class="reactions-icon">▾</div>
-          ) : (
+          {type === ReactionType.Like && (
             <div>
-              <Icon
-                class="reactions-icon"
-                name={Icons.THUMBS_UP}
-                size={Size.XL}
-              />
+              <div>
+                {large ? (
+                  <div class="reactions-icon">▾</div>
+                ) : (
+                  <Icon
+                    class="reactions-icon"
+                    name={Icons.THUMBS_UP}
+                    size={Size.XL}
+                  />
+                )}
+              </div>
               <div class="reactions-count">{this.likes}</div>
             </div>
           )}
@@ -287,11 +291,14 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
 
     return tooltip && (this.likes || this.dislikes) ? (
       <Popover
-        class="ReactionButtonTooltip"
         interactionType="hover"
         content={
-          <div class="reaction-button-tooltip">
-            {getDisplayedReactorsForPopup(vnode)}
+          <div class="reaction-button-tooltip-contents">
+            {getDisplayedReactorsForPopup({
+              likes: this.likes,
+              dislikes: this.dislikes,
+              reactors: this.reactors,
+            })}
           </div>
         }
         trigger={rxnButton}

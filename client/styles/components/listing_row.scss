@@ -1,140 +1,91 @@
 @import 'client/styles/shared';
 
 .ListingRow {
-  @include listing-row-base;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  padding: 16px;
 
-  .row-left {
-    line-height: 1.1;
-    flex: $listing-left-flex;
-    display: flex;
-    flex-direction: row;
+  &:hover {
+    background: $background-color-white-hover;
+  }
+
+  .reaction {
+    margin-right: 24px;
+  }
+
+  .pinned {
     align-items: center;
-    position: relative;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    display: flex;
+    height: 48px;
+    justify-content: center;
+    margin-right: 24px;
+    width: 48px;
 
-    .reaction {
-      margin-right: 22px;
-      position: relative;
-      top: -4px;
-      @include xs-max {
-        margin-right: 20px;
-      }
-    }
-
-    .pinned {
-      flex-shrink: 0;
-      position: relative;
-      top: -4px;
-      margin-right: 22px;
-
-      @include xs-max {
-        margin-right: 20px;
-      }
-
-      height: 43px;
-      width: 45px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding-top: 15px;
-      text-align: center;
-
-      svg {
-        fill: currentColor;
-        margin: auto;
-      }
-    }
-
-    .title-container {
-      display: inline-flex;
-      flex-direction: column;
-      align-self: center;
-      width: 100%;
-      overflow: hidden;
-
-      .row-header,
-      .row-header a {
-        color: $text-color-black;
-        font-size: $text-size-item-header;
-        text-decoration: none;
-        font-weight: 600;
-      }
-
-      .row-subheader {
-        margin-top: 5px;
-        display: flex;
-      }
-
-      .row-subheader + .row-subheader {
-        margin-top: 1px;
-      }
-
-      .row-subheader > .created-at {
-        max-height: 17px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .row-subheader > a,
-      .row-subheader > .User > a,
-      .row-subheader > .created-at > a,
-      > span {
-        color: $text-color-light;
-        font-size: $text-size-item-meta;
-        max-height: 17px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
-        &:hover {
-          color: darken($text-color-light, 8%);
-        }
-      }
-
-      .external-discussion-link {
-        word-break: break-all;
-      }
+    svg {
+      fill: currentColor;
     }
   }
 
-  .row-right {
+  .title-container {
+    align-self: center;
     display: flex;
-    flex: $listing-right-flex;
-    align-items: center;
-    padding-left: 10px;
+    flex-direction: column;
+    width: 100%;
 
-    .cui-grid {
-      width: 100%;
+    .row-header a {
+      color: $text-color-black;
+      font-size: 19px;
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-      > div {
-        display: flex;
-        justify-content: flex-end;
+    .row-subheader {
+      display: flex;
+    }
 
-        > .UserGallery,
-        > * > .UserGallery {
-          margin-right: 10px;
-          text-align: right;
-          white-space: nowrap;
+    // .row-subheader + .row-subheader {
+    //   margin-top: 1px;
+    // }
 
-          > .User,
-          > .overflow-users-wrap {
-            margin-right: -10px;
-          }
+    // .row-subheader > .created-at {
+    //   max-height: 17px;
+    //   overflow: hidden;
+    //   text-overflow: ellipsis;
+    // }
 
-          .overflow-users {
-            font-size: 13.5px;
-          }
-        }
+    .row-subheader > a,
+    .row-subheader > .User > a,
+    .row-subheader > .created-at > a,
+    > span {
+      color: $text-color-light;
+      font-size: 17px;
+      max-height: 17px;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
-        .ReactionButton {
-          width: min-content;
-          height: min-content;
-        }
+      &:hover {
+        color: darken($text-color-light, 8%);
       }
     }
+
+    .external-discussion-link {
+      word-break: break-all;
+    }
+  }
+
+  .content-right {
+    align-items: center;
+    display: flex;
   }
 
   @include xs-max {
-    display: block;
-
-    .row-right,
+    .content-right,
     .activity-icons,
     .last-active {
       display: none;

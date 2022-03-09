@@ -54,15 +54,21 @@ const DiscussionRow: m.Component<
   { expanded: boolean }
 > = {
   view: (vnode) => {
-    const { proposal, onSelect } = vnode.attrs;
+    const { proposal } = vnode.attrs;
+
     if (!proposal) return;
+
     const propType: OffchainThreadKind = proposal.kind;
+
     const pinned = proposal.pinned;
+
     const discussionLink = getProposalUrlPath(
       proposal.slug,
       `${proposal.identifier}-${slugify(proposal.title)}`
     );
+
     const rowHeader: any = link('a', discussionLink, proposal.title);
+
     const rowSubheader = [
       proposal.readOnly && [
         m('.discussion-locked', [
@@ -216,7 +222,6 @@ const DiscussionRow: m.Component<
     });
 
     return m(ListingRow, {
-      class: 'DiscussionRow',
       contentLeft: {
         reaction,
         header: rowHeader,
@@ -224,7 +229,6 @@ const DiscussionRow: m.Component<
         pinned,
       },
       contentRight: rowMetadata,
-      rightColSpacing: app.isLoggedIn() ? [10, 2] : [12],
       key: proposal.id,
       onclick: (e) => {
         if (vnode.attrs.onSelect) {

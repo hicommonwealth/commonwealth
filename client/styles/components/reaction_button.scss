@@ -56,7 +56,6 @@
     .reactions-icon {
       font-size: 85%;
       margin-bottom: 4px;
-      margin: 0;
       padding: 0;
       position: relative;
       top: 1px;
@@ -81,8 +80,11 @@
   }
 }
 
-.cui-popover.cui-tooltip.ReactionButtonTooltip {
-  .cui-popover-content .reaction-button-tooltip {
-    padding: 7px 8px 2px;
-  }
+.cui-popover-content {
+  padding: 8px;
+}
+
+.reaction-button-tooltip-contents {
+  display: flex;
+  flex-direction: column;
 }
