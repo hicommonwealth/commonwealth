@@ -55,13 +55,12 @@ import User from 'views/components/widgets/user';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import ErrorPage from 'views/pages/error';
-import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
 import { NearSputnikProposalKind } from 'client/scripts/controllers/chain/near/sputnik/types';
-import TopicSelector from '../../components/topic_selector';
+import { TopicSelector } from 'views/components/topic_selector';
 
 enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
