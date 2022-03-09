@@ -149,6 +149,7 @@ export const ProposalLinkedThreadsEditorModule: m.Component<
   view: (vnode) => {
     const { allowLinking, proposalId } = vnode.attrs;
     const proposal = app.threads.getById(proposalId);
+    if (!proposal) return;
     if (!vnode.state.linkedThreads) {
       vnode.state.linkedThreads = [];
     }
