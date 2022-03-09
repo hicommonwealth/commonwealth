@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { DB, sequelize } from '../database';
+import { DB } from '../database';
 import ipfs from '../util/pinIpfsBlob';
+import isValidJSON from '../util/isValidJSON';
+import { AppError } from '../util/errors';
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   InvalidAddress: 'Invalid address',
   NoBlobPresent: 'No JSON blob was input',
+  InvalidJson: 'Input is not a valid JSON string',
 };
 
 const pinIPFS = async (
@@ -13,9 +16,10 @@ const pinIPFS = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
-  if (!req.body.blob) return next(new Error(Errors.NoBlobPresent));
+  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
+  if (!req.body.address_id) return next(new AppError(Errors.InvalidAddress));
+  if (!req.body.blob) return next(new AppError(Errors.NoBlobPresent));
+  if (!isValidJSON(req.body.blob)) return next(new AppError(Errors.InvalidJson));
   try {
     const ipfsHash = await ipfs(
       req.user.id,
