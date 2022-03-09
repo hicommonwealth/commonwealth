@@ -53,7 +53,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
       `${proposal.identifier}-${slugify(proposal.title)}`
     );
 
-    const rowHeader: any = link('a', discussionLink, proposal.title);
+    const rowHeader = link('a', discussionLink, proposal.title);
 
     const rowSubheader = [
       proposal.readOnly && (
@@ -120,13 +120,6 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             label={offchainThreadStageToLabel(proposal.stage)}
           />
         ),
-      proposal instanceof OffchainThread &&
-        (proposal.stage !== OffchainThreadStage.Discussion ||
-          proposal.chainEntities?.length > 0 ||
-          proposal.offchainVotingEndsAt ||
-          proposal.offchainVotingNumVotes ||
-          proposal.readOnly) &&
-        ' ', // en space
       propType === OffchainThreadKind.Link &&
         proposal.url &&
         externalLink(
@@ -157,7 +150,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
         proposal.collaborators &&
         proposal.collaborators.length > 0 && (
           <span class="proposal-collaborators">
-            {proposal.collaborators.length}
+            +{proposal.collaborators.length}
           </span>
         ),
       <div class="last-active created-at">
@@ -167,8 +160,12 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
           `Last active ${formatLastUpdated(getLastUpdated(proposal))}`
         )}
       </div>,
-      <div class="activity-icons">{isHot(proposal) && m('span', '🔥')}</div>,
-    ] as any;
+      isHot(proposal) && (
+        <div class="activity-icons">
+          <span>🔥</span>
+        </div>
+      ),
+    ];
 
     const rowMetadata = [
       <div class="discussion-row-right-meta">
