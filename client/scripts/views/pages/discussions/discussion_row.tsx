@@ -30,7 +30,7 @@ import { isNotUndefined } from 'helpers/typeGuards';
 import { ReactionButton, ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import DiscussionRowMenu from './discussion_row_menu';
+import { DiscussionRowMenu } from './discussion_row_menu';
 import { getLastUpdated, isHot } from './helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
@@ -169,7 +169,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
       </div>,
       app.isLoggedIn() && (
         <div class="discussion-row-menu">
-          {m(DiscussionRowMenu, { proposal })}
+          <DiscussionRowMenu proposal={proposal} />
         </div>
       ),
     ];
