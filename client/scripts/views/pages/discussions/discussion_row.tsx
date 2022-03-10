@@ -26,12 +26,13 @@ import {
   OffchainThreadStage,
   AddressInfo,
 } from 'models';
+import { isNotUndefined } from 'helpers/typeGuards';
 import { ReactionButton, ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import { ListingRow } from 'views/components/listing_row';
 import DiscussionRowMenu from './discussion_row_menu';
 import { getLastUpdated, isHot } from './helpers';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type DiscussionRowAttrs = {
   onSelect?: any;
@@ -42,18 +43,10 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
   view(vnode) {
     const { proposal } = vnode.attrs;
 
-    if (!proposal) return;
-
-    const propType: OffchainThreadKind = proposal.kind;
-
-    const pinned = proposal.pinned;
-
     const discussionLink = getProposalUrlPath(
       proposal.slug,
       `${proposal.identifier}-${slugify(proposal.title)}`
     );
-
-    const rowHeader = link('a', discussionLink, proposal.title);
 
     const rowSubheader = [
       proposal.readOnly && (
@@ -61,9 +54,8 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
           <Tag size="xs" label={<Icon name={Icons.LOCK} size="xs" />} />
         </div>
       ),
-      proposal instanceof OffchainThread && proposal.offchainVotingEnabled && (
+      proposal.offchainVotingEnabled && (
         <Button
-          class="discussion-row-linked-poll"
           label="Poll"
           contentRight={pluralize(proposal.offchainVotingNumVotes, 'vote')}
           intent="warning"
@@ -80,7 +72,6 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             if (!chainEntityTypeToProposalShortName(ce.type)) return;
             return (
               <Button
-                class="discussion-row-linked-chain-entity"
                 label={[
                   chainEntityTypeToProposalShortName(ce.type),
                   Number.isNaN(parseInt(ce.typeId, 10)) ? '' : ` #${ce.typeId}`,
@@ -93,34 +84,31 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
           }),
       proposal.snapshotProposal && (
         <Button
-          class="discussion-row-linked-chain-entity"
           label={['Snap ', `${proposal.snapshotProposal.slice(0, 4)}…`]}
           intent="primary"
           size="xs"
           compact={true}
         />
       ),
-      proposal instanceof OffchainThread &&
-        proposal.stage !== OffchainThreadStage.Discussion && (
-          <Button
-            class="discussion-row-stage-btn"
-            intent={
-              proposal.stage === OffchainThreadStage.ProposalInReview
-                ? 'positive'
-                : proposal.stage === OffchainThreadStage.Voting
-                ? 'positive'
-                : proposal.stage === OffchainThreadStage.Passed
-                ? 'positive'
-                : proposal.stage === OffchainThreadStage.Failed
-                ? 'negative'
-                : 'positive'
-            }
-            size="xs"
-            compact={true}
-            label={offchainThreadStageToLabel(proposal.stage)}
-          />
-        ),
-      propType === OffchainThreadKind.Link &&
+      proposal.stage !== OffchainThreadStage.Discussion && (
+        <Button
+          intent={
+            proposal.stage === OffchainThreadStage.ProposalInReview
+              ? 'positive'
+              : proposal.stage === OffchainThreadStage.Voting
+              ? 'positive'
+              : proposal.stage === OffchainThreadStage.Passed
+              ? 'positive'
+              : proposal.stage === OffchainThreadStage.Failed
+              ? 'negative'
+              : 'positive'
+          }
+          size="xs"
+          compact={true}
+          label={offchainThreadStageToLabel(proposal.stage)}
+        />
+      ),
+      proposal.kind === OffchainThreadKind.Link &&
         proposal.url &&
         externalLink(
           'a.external-discussion-link',
@@ -141,18 +129,16 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
           null
         ),
         linkify: true,
-        popover: true,
+        popover: false,
         hideAvatar: true,
         showAddressWithDisplayName: true,
         hideIdentityIcon: true,
       }),
-      proposal instanceof OffchainThread &&
-        proposal.collaborators &&
-        proposal.collaborators.length > 0 && (
-          <span class="proposal-collaborators">
-            +{proposal.collaborators.length}
-          </span>
-        ),
+      proposal.collaborators && proposal.collaborators.length > 0 && (
+        <span class="proposal-collaborators">
+          +{proposal.collaborators.length}
+        </span>
+      ),
       <div class="last-active created-at">
         {link(
           'a',
@@ -197,14 +183,23 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
       />
     );
 
+    const getContentLeft = () => {
+      if (proposal.pinned) {
+        return (
+          <div class="pinned">
+            <CWIcon iconName="pin" iconSize="small" />
+          </div>
+        );
+      } else if (!proposal.pinned && isNotUndefined(reaction)) {
+        return <div class="reaction">{reaction}</div>;
+      } else {
+        return null;
+      }
+    };
+
     return (
-      <ListingRow
-        reaction={reaction}
-        header={rowHeader}
-        subheader={rowSubheader}
-        pinned={pinned}
-        contentRight={rowMetadata}
-        key={proposal.id}
+      <div
+        class="DiscussionRow"
         onclick={(e) => {
           if (vnode.attrs.onSelect) {
             return vnode.attrs.onSelect();
@@ -221,7 +216,19 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
 
           m.route.set(discussionLink);
         }}
-      />
+        key={proposal.id}
+      >
+        {getContentLeft()}
+        <div class="title-container">
+          <div class="row-header">{proposal.title}</div>
+          <div class="row-subheader">{rowSubheader}</div>
+        </div>
+        <div class="content-right-container">
+          {rowMetadata.map((el) => (
+            <div>{el}</div>
+          ))}
+        </div>
+      </div>
     );
   }
 }

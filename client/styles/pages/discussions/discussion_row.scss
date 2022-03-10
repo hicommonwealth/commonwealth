@@ -1,129 +1,76 @@
 @import 'client/styles/shared';
 
 .DiscussionRow {
-  .row-left {
-    .ReactionButton {
-      background: $background-color-white;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  padding: 16px;
+
+  &:hover {
+    background: $background-color-white-hover;
+  }
+
+  .pinned {
+    align-items: center;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    display: flex;
+    height: 48px;
+    justify-content: center;
+    margin-right: 24px;
+    width: 48px;
+
+    svg {
+      fill: currentColor;
     }
+  }
+
+  .reaction {
+    margin-right: 24px;
+  }
+
+  .title-container {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 
     .row-header {
-      a {
-        line-height: 1.2;
-      }
+      color: $text-color-black;
+      font-size: 19px;
+      font-weight: 600;
     }
 
     .row-subheader {
-      position: relative;
-      top: -2px;
+      color: $text-color-light;
+      display: flex;
 
-      // Styling specific to DiscussionRow subheader content
-      .discussion-locked {
-        .cui-tag.cui-xs .cui-icon svg {
-          margin-right: 0;
-        }
-
-        &::after {
-          content: ' ';
-        }
-      }
-
-      .discussion-row-linked-poll,
-      .discussion-row-linked-chain-entity,
-      .discussion-row-stage-btn {
-        font-size: 13px;
-        padding: 0 7px;
-        min-height: 19px;
-        height: initial;
-        pointer-events: none;
-        user-select: none;
-        position: relative;
-        top: -2px;
-        margin: -2px 0;
-        margin-right: 6px;
-        border: none;
-        line-height: 1.5;
-        opacity: 0.94;
-      }
-
-      a.proposal-topic {
-        display: inline-block;
+      a {
         color: $text-color-light;
+        font-size: 17px;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 100%;
-      }
-
-      .discussion-link {
-        color: $text-color-light;
-      }
-
-      .proposal-collaborators {
-        color: $text-color-light;
-        position: relative;
-        font-size: 17px;
-      }
-
-      > .User {
-        display: inline-flex;
-
-        > .role-icon {
-          position: relative;
-          top: -1px;
-        }
-      }
-
-      > .User > a {
-        display: block;
-        text-decoration: none;
-        color: $text-color-light;
 
         &:hover {
           color: darken($text-color-light, 8%);
-          text-decoration: underline;
-        }
-
-        > a.user-display-name {
-          color: $primary-bg-color;
-        }
-      }
-
-      .m-l-20 {
-        color: $text-color-light;
-
-        @media (min-width: 800px) {
-          margin-left: 10px;
         }
       }
     }
   }
 
-  .row-right {
-    .discussion-row-right-meta {
-      margin-left: 8px;
-      margin-right: 4px;
+  .content-right-container {
+    display: flex;
+    flex-direction: row;
+  }
 
-      .offchain-voting {
-        position: relative;
-        top: -5px;
-        margin-top: 5px;
-        // styling
-        font-size: 16px;
-        height: 40px;
-        padding: 12px;
-        width: 100px;
-        border: 1px solid $border-color;
-        border-radius: 6px;
-      }
-    }
-
-    .discussion-row-menu {
-      width: 28px;
-      position: relative;
-
-      svg {
-        position: relative;
-        top: 1px;
-      }
+  @include xs-max {
+    .content-right-container,
+    .activity-icons,
+    .last-active {
+      display: none;
     }
   }
 }
