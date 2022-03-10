@@ -36,6 +36,7 @@
     align-self: center;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     width: 100%;
 
     .row-header {
@@ -47,16 +48,26 @@
     .row-subheader {
       color: $text-color-light;
       display: flex;
+      width: 100%;
 
       a {
         color: $text-color-light;
         font-size: 17px;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
 
         &:hover {
           color: darken($text-color-light, 8%);
         }
+      }
+
+      button {
+        pointer-events: none;
+      }
+
+      > * {
+        margin: 0 8px 0 0;
       }
     }
   }

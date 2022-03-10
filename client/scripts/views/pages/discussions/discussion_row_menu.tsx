@@ -87,16 +87,14 @@ export class TopicEditorMenuItem
     const { openTopicEditor } = vnode.attrs;
 
     return (
-      <div class="TopicEditorMenuItem">
-        <MenuItem
-          fluid={true}
-          label="Edit topic"
-          onclick={(e) => {
-            e.preventDefault();
-            openTopicEditor();
-          }}
-        />
-      </div>
+      <MenuItem
+        fluid={true}
+        label="Edit topic"
+        onclick={(e) => {
+          e.preventDefault();
+          openTopicEditor();
+        }}
+      />
     );
   }
 }
@@ -143,16 +141,14 @@ class StageEditorMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
     if (!stagesEnabled) return;
 
     return (
-      <div class="StageEditorMenuItem">
-        <MenuItem
-          fluid={true}
-          label="Edit stage"
-          onclick={(e) => {
-            e.preventDefault();
-            openStageEditor();
-          }}
-        />
-      </div>
+      <MenuItem
+        fluid={true}
+        label="Edit stage"
+        onclick={(e) => {
+          e.preventDefault();
+          openStageEditor();
+        }}
+      />
     );
   }
 }
@@ -202,7 +198,6 @@ export class DiscussionRowMenu
             hasAdminPermissions && <MenuDivider />,
             hasAdminPermissions && (
               <MenuItem
-                class="pin-thread-toggle"
                 onclick={(e) => {
                   e.preventDefault();
                   app.threads.pin({ proposal }).then(() => m.redraw());
@@ -212,7 +207,6 @@ export class DiscussionRowMenu
             ),
             hasAdminPermissions && (
               <MenuItem
-                class="read-only-toggle"
                 onclick={(e) => {
                   e.preventDefault();
                   app.threads

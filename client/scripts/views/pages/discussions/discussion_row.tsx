@@ -26,7 +26,6 @@ import {
   OffchainThreadStage,
   AddressInfo,
 } from 'models';
-import { isNotUndefined } from 'helpers/typeGuards';
 import { ReactionButton, ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
@@ -48,139 +47,113 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
       `${proposal.identifier}-${slugify(proposal.title)}`
     );
 
-    const rowSubheader = [
-      proposal.readOnly && (
-        <div class="discussion-locked">
-          <Tag size="xs" label={<Icon name={Icons.LOCK} size="xs" />} />
-        </div>
-      ),
-      proposal.offchainVotingEnabled && (
-        <Button
-          label="Poll"
-          contentRight={pluralize(proposal.offchainVotingNumVotes, 'vote')}
-          intent="warning"
-          size="xs"
-          compact={true}
-        />
-      ),
-      proposal.chainEntities?.length > 0 &&
-        proposal.chainEntities
-          .sort((a, b) => {
-            return +a.typeId - +b.typeId;
-          })
-          .map((ce) => {
-            if (!chainEntityTypeToProposalShortName(ce.type)) return;
-            return (
-              <Button
-                label={[
-                  chainEntityTypeToProposalShortName(ce.type),
-                  Number.isNaN(parseInt(ce.typeId, 10)) ? '' : ` #${ce.typeId}`,
-                ]}
-                intent="primary"
-                size="xs"
-                compact={true}
-              />
-            );
-          }),
-      proposal.snapshotProposal && (
-        <Button
-          label={['Snap ', `${proposal.snapshotProposal.slice(0, 4)}…`]}
-          intent="primary"
-          size="xs"
-          compact={true}
-        />
-      ),
-      proposal.stage !== OffchainThreadStage.Discussion && (
-        <Button
-          intent={
-            proposal.stage === OffchainThreadStage.ProposalInReview
-              ? 'positive'
-              : proposal.stage === OffchainThreadStage.Voting
-              ? 'positive'
-              : proposal.stage === OffchainThreadStage.Passed
-              ? 'positive'
-              : proposal.stage === OffchainThreadStage.Failed
-              ? 'negative'
-              : 'positive'
-          }
-          size="xs"
-          compact={true}
-          label={offchainThreadStageToLabel(proposal.stage)}
-        />
-      ),
-      proposal.kind === OffchainThreadKind.Link &&
-        proposal.url &&
-        externalLink(
-          'a.external-discussion-link',
-          proposal.url,
-          `Link: ${extractDomain(proposal.url)}`
-        ),
-      proposal.topic &&
-        link(
-          'a.proposal-topic',
-          `/${app.activeChainId()}/discussions/${proposal.topic.name}`,
-          <span class="proposal-topic-name">{proposal.topic.name}</span>
-        ),
-      m(User, {
-        user: new AddressInfo(
-          null,
-          proposal.author,
-          proposal.authorChain,
-          null
-        ),
-        linkify: true,
-        popover: false,
-        hideAvatar: true,
-        showAddressWithDisplayName: true,
-        hideIdentityIcon: true,
-      }),
-      proposal.collaborators && proposal.collaborators.length > 0 && (
-        <span class="proposal-collaborators">
-          +{proposal.collaborators.length}
-        </span>
-      ),
-      <div class="last-active created-at">
-        {link(
-          'a',
-          discussionLink,
-          `Last active ${formatLastUpdated(getLastUpdated(proposal))}`
+    const rowSubheader = (
+      <div class="row-subheader">
+        {proposal.readOnly && (
+          <div class="discussion-locked">
+            <Tag size="xs" label={<Icon name={Icons.LOCK} size="xs" />} />
+          </div>
         )}
-      </div>,
-      isHot(proposal) && (
-        <div class="activity-icons">
-          <span>🔥</span>
-        </div>
-      ),
-    ];
-
-    const rowMetadata = [
-      <div class="discussion-row-right-meta">
-        {m(UserGallery, {
-          avatarSize: 36,
-          popover: true,
-          maxUsers: 2,
-          addressesCount:
-            app.threadUniqueAddressesCount.getAddressesCountRootId(
-              `${proposal.slug}_${proposal.id}`
-            ),
-          users:
-            app.threadUniqueAddressesCount.getUniqueAddressesByRootId(proposal),
+        {proposal.offchainVotingEnabled && (
+          <Button
+            label="Poll"
+            contentRight={pluralize(proposal.offchainVotingNumVotes, 'vote')}
+            intent="warning"
+            size="xs"
+            compact={true}
+          />
+        )}
+        {proposal.chainEntities?.length > 0 &&
+          proposal.chainEntities
+            .sort((a, b) => {
+              return +a.typeId - +b.typeId;
+            })
+            .map((ce) => {
+              if (!chainEntityTypeToProposalShortName(ce.type)) return;
+              return (
+                <Button
+                  label={[
+                    chainEntityTypeToProposalShortName(ce.type),
+                    Number.isNaN(parseInt(ce.typeId, 10))
+                      ? ''
+                      : ` #${ce.typeId}`,
+                  ]}
+                  intent="primary"
+                  size="xs"
+                  compact={true}
+                />
+              );
+            })}
+        {proposal.snapshotProposal && (
+          <Button
+            label={['Snap ', `${proposal.snapshotProposal.slice(0, 4)}…`]}
+            intent="primary"
+            size="xs"
+            compact={true}
+          />
+        )}
+        {proposal.stage !== OffchainThreadStage.Discussion && (
+          <Button
+            intent={
+              proposal.stage === OffchainThreadStage.ProposalInReview
+                ? 'positive'
+                : proposal.stage === OffchainThreadStage.Voting
+                ? 'positive'
+                : proposal.stage === OffchainThreadStage.Passed
+                ? 'positive'
+                : proposal.stage === OffchainThreadStage.Failed
+                ? 'negative'
+                : 'positive'
+            }
+            size="xs"
+            compact={true}
+            label={offchainThreadStageToLabel(proposal.stage)}
+          />
+        )}
+        {proposal.kind === OffchainThreadKind.Link &&
+          proposal.url &&
+          externalLink(
+            'a.external-discussion-link',
+            proposal.url,
+            `Link: ${extractDomain(proposal.url)}`
+          )}
+        {proposal.topic &&
+          link(
+            'a.proposal-topic',
+            `/${app.activeChainId()}/discussions/${proposal.topic.name}`,
+            <span class="proposal-topic-name">{proposal.topic.name}</span>
+          )}
+        {m(User, {
+          user: new AddressInfo(
+            null,
+            proposal.author,
+            proposal.authorChain,
+            null
+          ),
+          linkify: true,
+          popover: false,
+          hideAvatar: true,
+          showAddressWithDisplayName: true,
+          hideIdentityIcon: true,
         })}
-      </div>,
-      app.isLoggedIn() && (
-        <div class="discussion-row-menu">
-          <DiscussionRowMenu proposal={proposal} />
+        {proposal.collaborators && proposal.collaborators.length > 0 && (
+          <span class="proposal-collaborators">
+            +{proposal.collaborators.length}
+          </span>
+        )}
+        <div class="last-active created-at">
+          {link(
+            'a',
+            discussionLink,
+            `Last active ${formatLastUpdated(getLastUpdated(proposal))}`
+          )}
         </div>
-      ),
-    ];
-
-    const reaction = (
-      <ReactionButton
-        post={proposal}
-        type={ReactionType.Like}
-        tooltip={true}
-        large={true}
-      />
+        {isHot(proposal) && (
+          <div class="activity-icons">
+            <span>🔥</span>
+          </div>
+        )}
+      </div>
     );
 
     const getContentLeft = () => {
@@ -190,8 +163,17 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             <CWIcon iconName="pin" iconSize="small" />
           </div>
         );
-      } else if (!proposal.pinned && isNotUndefined(reaction)) {
-        return <div class="reaction">{reaction}</div>;
+      } else if (!proposal.pinned) {
+        return (
+          <div class="reaction">
+            <ReactionButton
+              post={proposal}
+              type={ReactionType.Like}
+              tooltip={true}
+              large={true}
+            />
+          </div>
+        );
       } else {
         return null;
       }
@@ -204,16 +186,11 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
           if (vnode.attrs.onSelect) {
             return vnode.attrs.onSelect();
           }
-
           if ($(e.target).hasClass('cui-tag')) return;
-
           if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-
           e.preventDefault();
-
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
             window.scrollY;
-
           m.route.set(discussionLink);
         }}
         key={proposal.id}
@@ -221,12 +198,23 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
         {getContentLeft()}
         <div class="title-container">
           <div class="row-header">{proposal.title}</div>
-          <div class="row-subheader">{rowSubheader}</div>
+          {rowSubheader}
         </div>
         <div class="content-right-container">
-          {rowMetadata.map((el) => (
-            <div>{el}</div>
-          ))}
+          {m(UserGallery, {
+            avatarSize: 36,
+            popover: true,
+            maxUsers: 2,
+            addressesCount:
+              app.threadUniqueAddressesCount.getAddressesCountRootId(
+                `${proposal.slug}_${proposal.id}`
+              ),
+            users:
+              app.threadUniqueAddressesCount.getUniqueAddressesByRootId(
+                proposal
+              ),
+          })}
+          {app.isLoggedIn() && <DiscussionRowMenu proposal={proposal} />}
         </div>
       </div>
     );
