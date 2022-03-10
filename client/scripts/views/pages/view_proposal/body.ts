@@ -28,7 +28,6 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
-import { ReactionButton, ReactionType } from 'views/components/reaction_button';
 import {
   MenuItem,
   Button,
@@ -48,6 +47,9 @@ import {
 import { ChainType } from '../../../../../shared/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
+import ThreadReactionButton, {
+  ReactionType,
+} from '../../components/thread_reaction_button';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -872,7 +874,7 @@ export const ProposalBodyReaction: m.Component<{
     const { item } = vnode.attrs;
     if (!item) return;
 
-    return m(ReactionButton, {
+    return m(ThreadReactionButton, {
       post: item,
       type: ReactionType.Like,
       tooltip: true,

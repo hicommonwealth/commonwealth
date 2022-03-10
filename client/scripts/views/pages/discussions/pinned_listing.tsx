@@ -28,16 +28,12 @@ export class PinnedListing implements m.ClassComponent<IPinnedListingAttrs> {
     const { proposals } = vnode.attrs;
     const sortedProposals = proposals.sort(orderDiscussionsbyDate);
 
-    if (sortedProposals.length === 0) {
-      return;
-    }
-
-    return (
+    return sortedProposals.length > 0 ? (
       <div>
         {sortedProposals.map((proposal) => {
           return <DiscussionRow proposal={proposal} />;
         })}
       </div>
-    );
+    ) : null;
   }
 }

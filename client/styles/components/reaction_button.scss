@@ -1,87 +1,26 @@
 @import 'client/styles/shared';
 
 .ReactionButton {
+  align-items: center;
+  border-radius: 12px;
+  border: 1px solid #ddd;
   display: flex;
-  user-select: none;
+  flex-direction: column;
+  height: 48px;
+  justify-content: center;
+  margin-right: 24px;
+  width: 48px;
 
-  .cui-icon,
-  .reply-count,
-  .reactions-count {
-    color: black;
-    font-weight: 500;
-  }
-
-  .cui-icon {
-    margin-right: 8px;
-  }
-
-  .reply-count,
-  .reactions-count {
-    position: relative;
-    top: 2px;
-  }
-
-  // border
   &.disabled {
-    background: initial !important;
-    border-color: $border-color-lightest !important;
-    color: $text-color-light !important;
+    border-color: $border-color-lightest;
+    color: $text-color-light;
+    pointer-events: none;
   }
 
-  &.large {
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    color: $text-color-medium;
-    display: block;
-    max-height: 43px !important;
-    max-width: 45px !important;
-    min-height: 43px !important;
-    min-width: 45px !important;
-    padding: 0;
-    text-align: center;
-
-    &.active {
-      border-color: $primary-bg-color;
-      color: $primary-bg-color;
-
-      span {
-        color: inherit;
-      }
-    }
-
-    .cui-icon {
-      margin-right: none;
-    }
-
-    .reactions-icon {
-      font-size: 85%;
-      margin-bottom: 4px;
-      padding: 0;
-      position: relative;
-      top: 1px;
-    }
-
-    &.like .reactions-icon {
-      -webkit-transform: rotate(180deg);
-      -moz-transform: rotate(180deg);
-      -o-transform: rotate(180deg);
-      -ms-transform: rotate(180deg);
-      transform: rotate(180deg);
-    }
-
-    .reactions-count {
-      color: $text-color-medium;
-      font-weight: 500;
-      min-width: 26px;
-      padding: 0;
-      text-align: center;
-      top: 0;
-    }
+  svg {
+    fill: currentColor;
+    margin: 8px auto 4px;
   }
-}
-
-.cui-popover-content {
-  padding: 8px;
 }
 
 .reaction-button-tooltip-contents {

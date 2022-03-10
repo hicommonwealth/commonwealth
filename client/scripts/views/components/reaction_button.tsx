@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Icon, Icons, Popover, Size } from 'construct-ui';
+import { Popover } from 'construct-ui';
 import BN from 'bn.js';
 import $ from 'jquery';
 
@@ -21,30 +21,21 @@ import User from 'views/components/widgets/user';
 import ReactionCount from 'models/ReactionCount';
 import SelectAddressModal from '../modals/select_address_modal';
 import LoginModal from '../modals/login_modal';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
-export enum ReactionType {
-  Like = 'like',
-  Dislike = 'dislike',
-}
-
 type ReactorAttrs = {
-  dislikes: number;
   likes: number;
   reactors: any;
 };
 
 type ReactionButtonAttrs = {
-  displayAsLink?: boolean;
-  large?: boolean;
   post: OffchainThread | AnyProposal | OffchainComment<any>;
-  tooltip?: boolean;
-  type: ReactionType;
 };
 
 const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
-  const { reactors = [], likes = 0, dislikes = 0 } = reactorAttrs;
+  const { reactors = [], likes = 0 } = reactorAttrs;
 
   const slicedReactors = reactors
     .slice(0, MAX_VISIBLE_REACTING_ACCOUNTS)
@@ -59,8 +50,8 @@ const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       });
     });
 
-  if (slicedReactors.length < likes + dislikes) {
-    const diff = likes + dislikes - slicedReactors.length;
+  if (slicedReactors.length < likes) {
+    const diff = likes - slicedReactors.length;
 
     slicedReactors.push(<div>{`and ${diff} more`}</div>);
   }
@@ -93,23 +84,16 @@ const fetchReactionsByPost = async (
 };
 
 export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
-  private dislikes: number;
-  private hasReacted: boolean;
   private likes: number;
   private loading: boolean;
   private reactionCounts: ReactionCount<any>;
   private reactors: any;
 
   view(vnode) {
-    const { post, type, displayAsLink, tooltip, large } = vnode.attrs;
-
+    const { post } = vnode.attrs;
     this.reactionCounts = app.reactionCounts.getByPost(post);
-
-    const { likes = 0, dislikes = 0, hasReacted } = this.reactionCounts || {};
-
+    const { likes = 0, hasReacted } = this.reactionCounts || {};
     this.likes = likes;
-
-    this.dislikes = dislikes;
 
     let disabled = this.loading;
 
@@ -150,12 +134,6 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
 
     const activeAddress = app.user.activeAccount?.address;
 
-    this.hasReacted = hasReacted;
-
-    let hasReactedType;
-
-    if (hasReacted) hasReactedType = ReactionType.Like;
-
     const rxnButton = (
       <div
         onmouseenter={async () => {
@@ -183,10 +161,7 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
             const chainId = app.activeChainId();
             if (hasReacted) {
               const reaction = (await fetchReactionsByPost(post)).find((r) => {
-                return (
-                  r.reaction === hasReactedType &&
-                  r.Address.address === activeAddress
-                );
+                return r.Address.address === activeAddress;
               });
               this.loading = true;
               app.reactionCounts
@@ -199,27 +174,13 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
                   this.reactors = reactors.filter(
                     ({ Address }) => Address.address !== userAddress
                   );
-                  if (
-                    (hasReactedType === ReactionType.Like &&
-                      type === ReactionType.Dislike) ||
-                    (hasReactedType === ReactionType.Dislike &&
-                      type === ReactionType.Like)
-                  ) {
-                    app.reactions
-                      .create(userAddress, post, type, chainId)
-                      .then(() => {
-                        this.loading = false;
-                        m.redraw();
-                      });
-                  } else {
-                    this.loading = false;
-                    m.redraw();
-                  }
+                  this.loading = false;
+                  m.redraw();
                 });
             } else {
               this.loading = true;
               app.reactionCounts
-                .create(userAddress, post, type, chainId)
+                .create(userAddress, post, 'like', chainId)
                 .then(() => {
                   this.loading = false;
                   this.reactors = [
@@ -244,59 +205,20 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
           }
         }}
       >
-        <div
-          class={`ReactionButton ${
-            (disabled ? 'disabled' : type === hasReactedType ? 'active' : '') +
-            (displayAsLink ? ' as-link' : '') +
-            (large ? ' large' : '') +
-            (type === ReactionType.Like ? ' like' : '') +
-            (type === ReactionType.Dislike ? ' dislike' : '')
-          }`}
-        >
-          {type === ReactionType.Dislike && (
-            <div>
-              <div>
-                {large ? (
-                  <div class="reactions-icon">▾</div>
-                ) : (
-                  <Icon
-                    class="reactions-icon"
-                    name={Icons.THUMBS_DOWN}
-                    size={Size.XL}
-                  />
-                )}
-              </div>
-              <div>{this.dislikes}</div>
-            </div>
-          )}
-          {type === ReactionType.Like && (
-            <div>
-              <div>
-                {large ? (
-                  <div class="reactions-icon">▾</div>
-                ) : (
-                  <Icon
-                    class="reactions-icon"
-                    name={Icons.THUMBS_UP}
-                    size={Size.XL}
-                  />
-                )}
-              </div>
-              <div class="reactions-count">{this.likes}</div>
-            </div>
-          )}
+        <div class={`ReactionButton ${disabled ? 'disabled' : ''}`}>
+          <CWIcon iconName="arrow1" iconSize="small" />
+          <div class="reactions-count">{this.likes}</div>
         </div>
       </div>
     );
 
-    return tooltip && (this.likes || this.dislikes) ? (
+    return this.likes > 0 ? (
       <Popover
         interactionType="hover"
         content={
           <div class="reaction-button-tooltip-contents">
             {getDisplayedReactorsForPopup({
               likes: this.likes,
-              dislikes: this.dislikes,
               reactors: this.reactors,
             })}
           </div>
