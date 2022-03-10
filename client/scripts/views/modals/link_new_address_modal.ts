@@ -591,23 +591,8 @@ const LinkNewAddressModal: m.Component<
                         }
                       )
                     ]
-                : app.chain.networkStatus !== ApiStatus.Connected && app.chain.base === ChainBase.Substrate
-                  ? [ ]
-                  : [ webWallet?.accounts.map(
-                    (addressOrAccount) => m(LinkAccountItem, {
-                      account: typeof addressOrAccount === 'string'
-                        ? { address: addressOrAccount }
-                        : addressOrAccount,
-                      base: app.chain.base,
-                      targetCommunity,
-                      accountVerifiedCallback,
-                      errorCallback: (error) => { notifyError(error); },
-                      linkNewAddressModalVnode: vnode,
-                      webWallet,
-                    })
-                  )]
-                  : app.chain.networkStatus !== ApiStatus.Connected &&
-                    app.chain.base === ChainBase.Substrate
+                : app.chain.networkStatus !== ApiStatus.Connected &&
+                  app.chain.base === ChainBase.Substrate
                   ? []
                   : [
                       webWallet?.accounts.map((addressOrAccount) =>
