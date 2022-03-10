@@ -11,7 +11,7 @@ import {
   Icons,
   Tooltip,
 } from 'construct-ui';
-import { selectNode, initChain, navigateToSubpage } from 'app';
+import { selectNode, initChain } from 'app';
 import app from 'state';
 import { link } from 'helpers';
 import { ChainInfo, NodeInfo } from 'models';

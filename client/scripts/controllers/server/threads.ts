@@ -21,6 +21,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { LinkedThreadAttributes } from 'server/models/linked_thread';
 
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
@@ -134,6 +135,13 @@ export const modelFromServer = (thread) => {
     decodedBody = body;
   }
 
+  const linkedThreads = (linked_threads || []).map(
+    (lT: LinkedThreadAttributes) => ({
+      linkedThread: lT.linked_thread,
+      linkingThread: lT.linking_thread,
+    })
+  );
+
   return new OffchainThread({
     id,
     author: thread.Address.address,
@@ -160,10 +168,8 @@ export const modelFromServer = (thread) => {
     offchainVotingOptions: offchain_voting_options,
     offchainVotingEndsAt: offchain_voting_ends_at,
     offchainVotingNumVotes: offchain_voting_votes,
-    lastCommentedOn: last_commented_on
-      ? moment(last_commented_on)
-      : null,
-    linkedThreads: linked_threads,
+    lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
+    linkedThreads,
   });
 };
 
@@ -344,6 +350,7 @@ class ThreadsController {
       $.post(`${app.serverUrl()}/deleteThread`, {
         jwt: app.user.jwt,
         thread_id: proposal.id,
+        chain_id: app.activeChainId(),
       })
         .then((result) => {
           // Deleted posts are removed from all stores containing them
@@ -554,13 +561,13 @@ class ThreadsController {
   }
 
   public async addLinkedThread(
-    linking_thread_id: number,
-    linked_thread_id: number,
+    linkingThreadId: number,
+    linkedThreadId: number
   ) {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
-      linking_thread_id,
-      linked_thread_id,
+      linking_thread_id: linkingThreadId,
+      linked_thread_id: linkedThreadId,
       address: app.user.activeAccount.address,
       author_chain: app.user.activeAccount.chain.id,
       jwt: app.user.jwt,
@@ -572,13 +579,13 @@ class ThreadsController {
   }
 
   public async removeLinkedThread(
-    linking_thread_id: number,
-    linked_thread_id: number,
+    linkingThreadId: number,
+    linkedThreadId: number
   ) {
     const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
       chain: app.activeChainId(),
-      linking_thread_id,
-      linked_thread_id,
+      linking_thread_id: linkingThreadId,
+      linked_thread_id: linkedThreadId,
       address: app.user.activeAccount.address,
       author_chain: app.user.activeAccount.chain.id,
       remove_link: true,
@@ -605,7 +612,9 @@ class ThreadsController {
     return response.result;
   }
 
-  public async fetchThreadsFromId(ids: Array<number | string>): Promise<OffchainThread[]> {
+  public async fetchThreadsFromId(
+    ids: Array<number | string>
+  ): Promise<OffchainThread[]> {
     const params = {
       chain: app.activeChainId(),
       ids,

@@ -3,15 +3,9 @@ import $ from 'jquery';
 import _ from 'lodash';
 import Web3 from 'web3';
 
-export const MAINNET_LOCKDROP_ORIG = '0x1b75B90e60070d37CfA9d87AFfD124bB345bf70a';
 export const MAINNET_LOCKDROP = '0xFEC6F679e32D45E22736aD09dFdF6E3368704e31';
 export const ROPSTEN_LOCKDROP = '0x111ee804560787E0bFC1898ed79DAe24F2457a04';
-const MAINNET_START_BLOCK = 7870000; // original mainnet lockdrop opened on block 7870425
-const MAX_BLOCKS_PER_MAINNET_QUERY = 15000;
 const { toBN } = Web3.utils;
-
-let cachedLocks;
-let cachedSignals;
 
 export const isHex = (inputString) => {
   const re = /^(0x)?[0-9A-Fa-f]+$/g;
@@ -37,15 +31,16 @@ export const formatNumberRound = (num) => {
 };
 
 export const getLockStorage = async (lockAddress, web3) => {
-  return Promise.all([0, 1].map((v) => {
-    return web3.eth.getStorageAt(lockAddress, v);
-  }))
-    .then((vals) => {
-      return {
-        owner: vals[0],
-        unlockTime: web3.utils.hexToNumber(vals[1]),
-      };
-    });
+  return Promise.all(
+    [0, 1].map((v) => {
+      return web3.eth.getStorageAt(lockAddress, v);
+    })
+  ).then((vals) => {
+    return {
+      owner: vals[0],
+      unlockTime: web3.utils.hexToNumber(vals[1]),
+    };
+  });
 };
 
 export const getCurrentTimestamp = async (web3) => {
@@ -57,8 +52,10 @@ export const getCurrentTimestamp = async (web3) => {
  * Setup web3 provider using InjectedWeb3's injected providers
  */
 export function setupWeb3Provider(network, url = null) {
-  const providerUrl = url || `https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr`;
-  const provider = (window['web3'])
+  const providerUrl =
+    url ||
+    `https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr`;
+  const provider = window['web3']
     ? window['web3']
     : new Web3.providers.HttpProvider(providerUrl);
 
@@ -67,7 +64,9 @@ export function setupWeb3Provider(network, url = null) {
 
 export const getParticipationSummary = async (network) => {
   const web3 = setupWeb3Provider(network);
-  const ldResults = await $.get(`${app.serverUrl()}/edgewareLockdropStats`, { network });
+  const ldResults = await $.get(`${app.serverUrl()}/edgewareLockdropStats`, {
+    network,
+  });
   const {
     locks,
     validatingLocks,
@@ -98,13 +97,17 @@ export const getParticipationSummary = async (network) => {
   const lastBlockTime = lastBlock.timestamp;
   // Calculate some metrics with the lock and signal data
   const totalETH = toBN(totalETHLocked).add(toBN(totalETHSignaled));
-  const totalEffectiveETH = toBN(totalEffectiveETHLocked).add(toBN(totalEffectiveETHSignaled));
+  const totalEffectiveETH = toBN(totalEffectiveETHLocked).add(
+    toBN(totalEffectiveETHSignaled)
+  );
   const avgLock = toBN(totalETHLocked).div(toBN(numLocks));
   const avgSignal = toBN(totalETHSignaled).div(toBN(numSignals));
   // Convert most return types to numbers
   Object.keys(locks).forEach((l) => {
     const newLockAmt = Number(web3.utils.fromWei(locks[l].lockAmt, 'ether'));
-    const newEffeVal = Number(web3.utils.fromWei(locks[l].effectiveValue, 'ether'));
+    const newEffeVal = Number(
+      web3.utils.fromWei(locks[l].effectiveValue, 'ether')
+    );
     locks[l] = {
       ...locks[l],
       lockAmt: newLockAmt,
@@ -112,8 +115,12 @@ export const getParticipationSummary = async (network) => {
     };
   });
   Object.keys(validatingLocks).forEach((l) => {
-    const newLockAmt = Number(web3.utils.fromWei(validatingLocks[l].lockAmt, 'ether'));
-    const newEffeVal = Number(web3.utils.fromWei(validatingLocks[l].effectiveValue, 'ether'));
+    const newLockAmt = Number(
+      web3.utils.fromWei(validatingLocks[l].lockAmt, 'ether')
+    );
+    const newEffeVal = Number(
+      web3.utils.fromWei(validatingLocks[l].effectiveValue, 'ether')
+    );
     validatingLocks[l] = {
       ...validatingLocks[l],
       lockAmt: newLockAmt,
@@ -121,8 +128,12 @@ export const getParticipationSummary = async (network) => {
     };
   });
   Object.keys(signals).forEach((s) => {
-    const newSignalAmt = Number(web3.utils.fromWei(signals[s].signalAmt, 'ether'));
-    const newEffeVal = Number(web3.utils.fromWei(signals[s].effectiveValue, 'ether'));
+    const newSignalAmt = Number(
+      web3.utils.fromWei(signals[s].signalAmt, 'ether')
+    );
+    const newEffeVal = Number(
+      web3.utils.fromWei(signals[s].effectiveValue, 'ether')
+    );
     signals[s] = {
       ...signals[s],
       signalAmt: newSignalAmt,
@@ -137,9 +148,13 @@ export const getParticipationSummary = async (network) => {
     totalETHLocked3mo: Number(web3.utils.fromWei(totalETHLocked3mo, 'ether')),
     totalETHLocked6mo: Number(web3.utils.fromWei(totalETHLocked6mo, 'ether')),
     totalETHLocked12mo: Number(web3.utils.fromWei(totalETHLocked12mo, 'ether')),
-    totalEffectiveETHLocked: Number(web3.utils.fromWei(totalEffectiveETHLocked, 'ether')),
+    totalEffectiveETHLocked: Number(
+      web3.utils.fromWei(totalEffectiveETHLocked, 'ether')
+    ),
     totalETHSignaled: Number(web3.utils.fromWei(totalETHSignaled, 'ether')),
-    totalEffectiveETHSignaled: Number(web3.utils.fromWei(totalEffectiveETHSignaled, 'ether')),
+    totalEffectiveETHSignaled: Number(
+      web3.utils.fromWei(totalEffectiveETHSignaled, 'ether')
+    ),
     totalETH: Number(web3.utils.fromWei(totalETH, 'ether')),
     totalEffectiveETH: Number(web3.utils.fromWei(totalEffectiveETH, 'ether')),
     numLocks,
