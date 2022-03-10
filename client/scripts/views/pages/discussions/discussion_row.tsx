@@ -156,29 +156,6 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
       </div>
     );
 
-    const getContentLeft = () => {
-      if (proposal.pinned) {
-        return (
-          <div class="pinned">
-            <CWIcon iconName="pin" iconSize="small" />
-          </div>
-        );
-      } else if (!proposal.pinned) {
-        return (
-          <div class="reaction">
-            <ReactionButton
-              post={proposal}
-              type={ReactionType.Like}
-              tooltip={true}
-              large={true}
-            />
-          </div>
-        );
-      } else {
-        return null;
-      }
-    };
-
     return (
       <div
         class="DiscussionRow"
@@ -195,7 +172,20 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
         }}
         key={proposal.id}
       >
-        {getContentLeft()}
+        {proposal.pinned ? (
+          <div class="pinned">
+            <CWIcon iconName="pin" iconSize="small" />
+          </div>
+        ) : (
+          <div class="reaction">
+            <ReactionButton
+              post={proposal}
+              type={ReactionType.Like}
+              tooltip={true}
+              large={true}
+            />
+          </div>
+        )}
         <div class="title-container">
           <div class="row-header">{proposal.title}</div>
           {rowSubheader}
