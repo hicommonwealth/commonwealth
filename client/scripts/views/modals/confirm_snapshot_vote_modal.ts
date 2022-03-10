@@ -10,6 +10,7 @@ import {
   SnapshotProposal,
   SnapshotSpace,
   getVersion,
+  castVote,
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -18,6 +19,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import { ChainBase } from 'types';
 import { formatNumberShort } from 'adapters/currency';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { Web3Provider } from '@ethersproject/providers';
 
 enum NewVoteErrors {
   SomethingWentWrong = 'Something went wrong!',
@@ -101,53 +103,18 @@ const ConfirmSnapshotVoteModal: m.Component<
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.saving = true;
-              const version = await getVersion();
-              const msg: any = {
-                address: author.address,
-                msg: JSON.stringify({
-                  version,
-                  timestamp: (Date.now() / 1e3).toFixed(),
-                  space: space.id,
-                  type: 'vote',
-                  payload: {
-                    proposal: id,
-                    choice: selectedChoice + 1,
-                    metadata: {},
-                  },
-                }),
+              const votePayload = {
+                space: space.id,
+                proposal: id,
+                type: 'single-choice',
+                choice: selectedChoice + 1,
+                metadata: JSON.stringify({}),
               };
-
               try {
-                const wallet = await app.wallets.locateWallet(
-                  author.address,
-                  ChainBase.Ethereum
-                );
-                if (
-                  !(
-                    wallet instanceof MetamaskWebWalletController ||
-                    wallet instanceof WalletConnectWebWalletController
-                  )
-                ) {
-                  throw new Error('Invalid wallet.');
-                }
-                msg.sig = await wallet.signMessage(msg.msg);
-
-                const result = await $.post(
-                  `${app.serverUrl()}/snapshotAPI/sendMessage`,
-                  { ...msg }
-                );
-                if (result.status === 'Failure') {
-                  const errorMessage =
-                    result && result.message.error_description
-                      ? `${result.message.error_description}`
-                      : NewVoteErrors.SomethingWentWrong;
-                  notifyError(errorMessage);
-                } else if (result.status === 'Success') {
-                  $(e.target).trigger('modalexit');
-                  navigateToSubpage(`/snapshot/${space.id}`);
-                }
-              } catch (err) {
-                const errorMessage = err.message;
+                castVote(author.address, votePayload);
+              } catch (e) {
+                console.log(e);
+                const errorMessage = e.message;
                 notifyError(errorMessage);
               }
 

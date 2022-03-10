@@ -1,19 +1,24 @@
 import gql from 'graphql-tag';
+import snapshot from '@snapshot-labs/snapshot.js';
+import { Web3Provider } from '@ethersproject/providers';
+
+const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
+const client = new snapshot.Client712(hub);
 
 let apolloClient = null;
 async function getApolloClient() {
   if (apolloClient) return apolloClient;
 
-  const {
-    ApolloClient,
-    createHttpLink,
-    InMemoryCache
-  } = await import('@apollo/client/core');
+  const { ApolloClient, createHttpLink, InMemoryCache } = await import(
+    '@apollo/client/core'
+  );
 
   // HTTP connection to the API
   const httpLink = createHttpLink({
     // You should use an absolute URL here
-    uri: `${process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'}/graphql`
+    uri: `${
+      process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'
+    }/graphql`,
   });
 
   // Create the apollo client
@@ -22,17 +27,15 @@ async function getApolloClient() {
     cache: new InMemoryCache(),
     defaultOptions: {
       query: {
-        fetchPolicy: 'no-cache'
-      }
-    }
+        fetchPolicy: 'no-cache',
+      },
+    },
   });
   return apolloClient;
 }
 
 export const SPACE_QUERY = gql`
-  query Space(
-    $space: String
-  ) {
+  query Space($space: String) {
     space(id: $space) {
       id
       name
@@ -91,16 +94,12 @@ export const PROPOSALS_QUERY = gql`
 `;
 
 export const PROPOSAL_VOTES_QUERY = gql`
-  query Votes(
-    $proposalHash: String!
-  ) {
-    votes (
+  query Votes($proposalHash: String!) {
+    votes(
       first: 10000
       skip: 0
-      where: {
-        proposal: $proposalHash
-      }
-      orderBy: "created",
+      where: { proposal: $proposalHash }
+      orderBy: "created"
       orderDirection: desc
     ) {
       id
@@ -119,9 +118,9 @@ export interface SnapshotSpace {
   private: boolean;
   network: string;
   filters: {
-    minScore: number,
-    onlyMembers: boolean,
-  }
+    minScore: number;
+    onlyMembers: boolean;
+  };
   strategies: Array<{
     name: string;
     params: any;
@@ -138,7 +137,7 @@ export interface SnapshotProposal {
   start: number;
   end: number;
   title: string;
-  body: string
+  body: string;
   snapshot: string;
   choices: string[];
   state: string;
@@ -168,7 +167,7 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
     query: SPACE_QUERY,
     variables: {
       space,
-    }
+    },
   });
   return spaceObj.data.space;
 }
@@ -183,20 +182,34 @@ export async function getProposals(space: string): Promise<SnapshotProposal[]> {
       // TODO: pagination in UI
       first: 1000,
       skip: 0,
-    }
+    },
   });
   return proposalsObj.data.proposals;
 }
 
-export async function getVotes(proposalHash: string): Promise<SnapshotProposalVote[]> {
+export async function getVotes(
+  proposalHash: string
+): Promise<SnapshotProposalVote[]> {
   const client = await getApolloClient();
   const response = await client.query({
     query: PROPOSAL_VOTES_QUERY,
     variables: {
-      proposalHash
-    }
+      proposalHash,
+    },
   });
   return response.data.votes;
+}
+
+export async function castVote(address: string, payload: any) {
+  const web3 = new Web3Provider((window as any).ethereum);
+  const receipt = await client.vote(web3 as any, address, payload);
+}
+
+export async function createProposal(address: string, payload: any) {
+  const web3 = new Web3Provider((window as any).ethereum);
+
+  const receipt = await client.proposal(web3 as any, address, payload);
+  return receipt;
 }
 
 export async function getSpaceBlockNumber(network: string): Promise<number> {
@@ -210,14 +223,17 @@ export async function getScore(space: SnapshotSpace, address: string) {
     space.id,
     space.strategies,
     space.network,
-    [address],
+    [address]
     // Snapshot.utils.getProvider(space.network),
   );
 }
 
 /* Single Choice Voting */
 
-export async function getResults(space: SnapshotSpace, proposal: SnapshotProposal) {
+export async function getResults(
+  space: SnapshotSpace,
+  proposal: SnapshotProposal
+) {
   const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
   try {
     let votes = await getVotes(proposal.id);
@@ -231,10 +247,11 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
         strategies,
         space.network,
         votes.map((vote) => vote.voter),
-        parseInt(proposal.snapshot, 10),
+        parseInt(proposal.snapshot, 10)
         // provider,
       );
-      votes = votes.map((vote: any) => {
+      votes = votes
+        .map((vote: any) => {
           vote.scores = strategies.map(
             (strategy, i) => scores[i][vote.voter] || 0
           );
@@ -242,15 +259,19 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
           return vote;
         })
         .sort((a, b) => b.balance - a.balance)
-        .filter(vote => vote.balance > 0);
+        .filter((vote) => vote.balance > 0);
     }
 
     /* Get results */
-    const votingClass = new Snapshot.utils.voting[proposal.type](proposal, votes, strategies);
+    const votingClass = new Snapshot.utils.voting[proposal.type](
+      proposal,
+      votes,
+      strategies
+    );
     const results = {
       resultsByVoteBalance: votingClass.resultsByVoteBalance(),
       resultsByStrategyScore: votingClass.resultsByStrategyScore(),
-      sumOfResultsBalance: votingClass.sumOfResultsBalance()
+      sumOfResultsBalance: votingClass.sumOfResultsBalance(),
     };
 
     return { votes, results };
@@ -260,33 +281,45 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
   }
 }
 
-export async function getPower(space: SnapshotSpace, address: string, snapshot: string) {
+export async function getPower(
+  space: SnapshotSpace,
+  address: string,
+  snapshot: string
+) {
   const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
-  const blockNumber = await Snapshot.utils.getBlockNumber(Snapshot.utils.getProvider(space.network));
-  const blockTag = +snapshot > blockNumber ? 'latest' : +snapshot;
-  const scores: Array<{ [who: string]: number }> = await Snapshot.utils.getScores(
-    space.id,
-    space.strategies,
-    space.network,
-    [address],
-    blockTag,
-    // Snapshot.utils.getProvider(space.network),
+  const blockNumber = await Snapshot.utils.getBlockNumber(
+    Snapshot.utils.getProvider(space.network)
   );
-  const summedScores = scores.map((score) => Object.values(score).reduce((a, b) => a + b, 0));
+  const blockTag = +snapshot > blockNumber ? 'latest' : +snapshot;
+  const scores: Array<{ [who: string]: number }> =
+    await Snapshot.utils.getScores(
+      space.id,
+      space.strategies,
+      space.network,
+      [address],
+      blockTag
+      // Snapshot.utils.getProvider(space.network),
+    );
+  const summedScores = scores.map((score) =>
+    Object.values(score).reduce((a, b) => a + b, 0)
+  );
   return {
     scores: summedScores,
-    totalScore: summedScores.reduce((a, b) => a + b, 0)
+    totalScore: summedScores.reduce((a, b) => a + b, 0),
   };
 }
 
-export async function loadMultipleSpacesData(snapshot_spaces:string[]) {
-  const spaces_data: Array<{space: SnapshotSpace, proposals: SnapshotProposal[]}> = [];
+export async function loadMultipleSpacesData(snapshot_spaces: string[]) {
+  const spaces_data: Array<{
+    space: SnapshotSpace;
+    proposals: SnapshotProposal[];
+  }> = [];
 
   for (const spaceId of snapshot_spaces) {
     try {
       const proposals = await getProposals(spaceId);
       const space = await getSpace(spaceId);
-      spaces_data.push({space, proposals});
+      spaces_data.push({ space, proposals });
     } catch (e) {
       console.error(`Failed to initialize snapshot: ${spaceId}.`);
     }
