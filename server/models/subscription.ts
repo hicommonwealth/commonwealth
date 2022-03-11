@@ -135,22 +135,6 @@ export default (
       }
     };
 
-    // currently excludes override includes, but we may want to provide the option for both
-    if (excludeAddresses && excludeAddresses.length > 0) {
-      const ids = await fetchUsersFromAddresses(excludeAddresses);
-      if (ids && ids.length > 0) {
-        findOptions.subscriber_id = { [Op.notIn]: ids };
-      }
-    } else if (includeAddresses && includeAddresses.length > 0) {
-      const ids = await fetchUsersFromAddresses(includeAddresses);
-      if (ids && ids.length > 0) {
-        findOptions.subscriber_id = { [Op.in]: ids };
-      }
-    }
-
-    // get all relevant subscriptions
-    const subscribers = await models.Subscription.findAll({ where: findOptions });
-
     // get notification if it already exists
     let notification: NotificationInstance;
     notification = await models.Notification.findOne(isChainEventData ? {
@@ -184,6 +168,50 @@ export default (
       return null;
     }
 
+    let nReads;
+    // currently excludes override includes, but we may want to provide the option for both
+    if (excludeAddresses && excludeAddresses.length > 0) {
+      const ids = await fetchUsersFromAddresses(excludeAddresses);
+      if (ids && ids.length > 0) {
+        findOptions.subscriber_id = { [Op.notIn]: ids };
+        nReads = await sequelize.query(`
+                  INSERT INTO "NotificationsRead"
+                  SELECT ? as notification_id, id as subscription_id, False as is_read
+                  FROM ("Subscriptions")
+                  WHERE subscriber_id NOT IN (?)
+                    AND category_id = ?
+                    AND object_id = ?
+                    and is_active = true;
+              `, {raw: true, type: 'RAW', replacements: [notification.id, ids, category_id, object_id]}
+        );
+      }
+    } else if (includeAddresses && includeAddresses.length > 0) {
+      const ids = await fetchUsersFromAddresses(includeAddresses);
+      if (ids && ids.length > 0) {
+        findOptions.subscriber_id = { [Op.in]: ids };
+        nReads = await sequelize.query(`
+                  INSERT INTO "NotificationsRead"
+                  SELECT ? as notification_id, id as subscription_id, False as is_read
+                  FROM ("Subscriptions")
+                  WHERE subscriber_id IN (?)
+                    AND category_id = ?
+                    AND object_id = ?
+                    and is_active = true;
+              `, {raw: true, type: 'RAW', replacements: [notification.id, ids, category_id, object_id]}
+        );
+      }
+    } else {
+      nReads = await sequelize.query(`
+                INSERT INTO "NotificationsRead"
+                SELECT ? as notification_id, id as subscription_id, false as is_read
+                FROM "Subscriptions"
+                WHERE category_id = ?
+                  AND object_id = ?
+                  and is_active = true;
+            `, {raw: true, type: 'RAW', replacements: [notification.id, category_id, object_id]}
+      );
+    }
+
     let msg;
     try {
       msg = await createImmediateNotificationEmailObject(notification_data, category_id, models);
@@ -192,27 +220,23 @@ export default (
       console.trace(e);
     }
 
-    // create NotificationsRead instances
-    const nReads = await Promise.all(subscribers.map(async (subscription) => {
-      // create NotificationsRead instance
-      const nRead = await models.NotificationsRead.create({
-        notification_id: notification.id,
-        subscription_id: subscription.id,
-        is_read: false
-      });
+    const subscribers = await models.Subscription.findAll({ where: findOptions });
 
-      if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
-        msg.dynamic_template_data.notification.path = `${
-          SERVER_URL
-        }/${
-          (<IChainEventNotificationData>notification_data).chainEventType.chain
-        }/notifications?id=${
-          notification.id
-        }`;
-      }
-      if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
-      return nRead;
-    }));
+    // send notification emails
+    await Promise.all(
+      subscribers.map(async (subscription) => {
+        if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
+          msg.dynamic_template_data.notification.path = `${
+              SERVER_URL
+          }/${
+              (<IChainEventNotificationData>notification_data).chainEventType.chain
+          }/notifications?id=${
+              notification.id
+          }`;
+        }
+        if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
+      })
+    );
 
     const erc20Tokens = (await models.Chain.findAll({
       where: {

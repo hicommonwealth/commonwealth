@@ -48,27 +48,34 @@ const dispatchHooks = async (models: DB, req: Request, finalThread: OffchainThre
   } catch (err) {
     throw new ServerError(err);
   }
+
   // auto-subscribe NewThread subscribers to NewComment as well
   // findOrCreate because redundant creation if author is also subscribed to NewThreads
   const location = finalThread.chain;
-  const subscribers = await models.Subscription.findAll({
-    where: {
-      category_id: NotificationCategories.NewThread,
-      object_id: location,
-    }
-  });
-  await Promise.all(subscribers.map((s) => {
-    return models.Subscription.findOrCreate({
-      where: {
-        subscriber_id: s.subscriber_id,
-        category_id: NotificationCategories.NewComment,
-        object_id: `discussion_${finalThread.id}`,
-        offchain_thread_id: finalThread.id,
-        chain_id: finalThread.chain,
-        is_active: true,
-      },
-    });
-  }));
+  try {
+    await sequelize.query(`
+      WITH irrelevant_subs AS (
+        SELECT id
+        FROM "Subscriptions"
+        WHERE subscriber_id IN (
+          SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
+        ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND chain_id = ? AND is_active = true
+      )
+      INSERT INTO "Subscriptions"
+      SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as chain_id, true as is_active
+      FROM "Subscriptions"
+      WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
+      );
+    `, {raw: true, type: 'RAW', replacements: [
+        NotificationCategories.NewThread, location,
+        NotificationCategories.NewComment, `discussion_${finalThread.id}`, finalThread.id, finalThread.chain,
+        NotificationCategories.NewComment, `discussion_${finalThread.id}`, finalThread.id, finalThread.chain,
+        NotificationCategories.NewThread, location
+      ]}
+    );
+  } catch (e) {
+    console.log(e);
+  }
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(req.body.body);
