@@ -16,6 +16,7 @@ import {
   AnyProposal,
   AddressInfo,
   ITokenAdapter,
+  ChainInfo,
 } from 'models';
 import User from 'views/components/widgets/user';
 import ReactionCount from 'models/ReactionCount';
@@ -30,8 +31,10 @@ type ReactorAttrs = {
   reactors: any;
 };
 
+type Post = OffchainThread | AnyProposal | OffchainComment<any>;
+
 type ReactionButtonAttrs = {
-  post: OffchainThread | AnyProposal | OffchainComment<any>;
+  post: Post;
 };
 
 const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
@@ -59,9 +62,7 @@ const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
   return slicedReactors;
 };
 
-const fetchReactionsByPost = async (
-  post: OffchainThread | AnyProposal | OffchainComment<any>
-) => {
+const fetchReactionsByPost = async (post: Post) => {
   let thread_id, proposal_id, comment_id;
 
   if (post instanceof OffchainThread) {
@@ -81,6 +82,73 @@ const fetchReactionsByPost = async (
   });
 
   return result;
+};
+
+const onReactionClick = (
+  e: MouseEvent,
+  hasReacted: boolean,
+  dislike: (userAddress: string) => void,
+  like: (chain: ChainInfo, chainId: string, userAddress: string) => void,
+  post: Post
+) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (!app.isLoggedIn()) {
+    app.modals.create({
+      modal: LoginModal,
+    });
+  } else if (!app.user.activeAccount) {
+    app.modals.create({
+      modal: SelectAddressModal,
+    });
+  } else {
+    const { address: userAddress, chain } = app.user.activeAccount;
+
+    // if it's a community use the app.user.activeAccount.chain.id instead of author chain
+    const chainId = app.activeChainId();
+
+    if (hasReacted) {
+      dislike(userAddress);
+    } else {
+      like(chain, chainId, userAddress);
+    }
+
+    mixpanel.track('Create Reaction ', {
+      'Step No': 1,
+      Step: 'Create Reaction',
+      'Post Name': `${post.slug}: ${post.identifier}`,
+      Scope: app.activeChainId(),
+    });
+    mixpanel.people.increment('Reaction');
+    mixpanel.people.set({
+      'Last Reaction Created': new Date().toISOString(),
+    });
+  }
+};
+
+const gettokenPostingThreshold = (post: Post) => {
+  let tokenPostingThreshold: BN;
+
+  if (post instanceof OffchainThread && post.topic && app.topics) {
+    tokenPostingThreshold = app.topics.getByName(
+      (post as OffchainThread).topic.name,
+      app.activeChainId()
+    )?.tokenThreshold;
+  } else if (post instanceof OffchainComment) {
+    // post.rootProposal has typescript typedef number but in practice seems to be a string
+    const parentThread = app.threads.getById(
+      parseInt(post.rootProposal.toString().split('_')[1], 10)
+    );
+    tokenPostingThreshold = app.topics.getByName(
+      parentThread.topic.name,
+      app.activeChainId()
+    )?.tokenThreshold;
+  } else {
+    tokenPostingThreshold = new BN(0);
+  }
+
+  return tokenPostingThreshold;
 };
 
 export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
@@ -105,25 +173,7 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
         app.user.isSiteAdmin ||
         app.user.isAdminOfEntity({ chain: app.activeChainId() });
 
-      let tokenPostingThreshold: BN;
-
-      if (post instanceof OffchainThread && post.topic && app.topics) {
-        tokenPostingThreshold = app.topics.getByName(
-          (post as OffchainThread).topic.name,
-          app.activeChainId()
-        )?.tokenThreshold;
-      } else if (post instanceof OffchainComment) {
-        // post.rootProposal has typescript typedef number but in practice seems to be a string
-        const parentThread = app.threads.getById(
-          parseInt(post.rootProposal.toString().split('_')[1], 10)
-        );
-        tokenPostingThreshold = app.topics.getByName(
-          parentThread.topic.name,
-          app.activeChainId()
-        )?.tokenThreshold;
-      } else {
-        tokenPostingThreshold = new BN(0);
-      }
+      const tokenPostingThreshold = gettokenPostingThreshold(post);
 
       disabled =
         this.loading ||
@@ -134,76 +184,48 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
 
     const activeAddress = app.user.activeAccount?.address;
 
-    const rxnButton = (
+    const dislike = async (userAddress: string) => {
+      const reaction = (await fetchReactionsByPost(post)).find((r) => {
+        return r.Address.address === activeAddress;
+      });
+      this.loading = true;
+      app.reactionCounts
+        .delete(reaction, {
+          ...this.reactionCounts,
+          likes: likes - 1,
+          hasReacted: false,
+        })
+        .then(() => {
+          this.reactors = this.reactors.filter(
+            ({ Address }) => Address.address !== userAddress
+          );
+          this.loading = false;
+          m.redraw();
+        });
+    };
+
+    const like = (chain: ChainInfo, chainId: string, userAddress: string) => {
+      this.loading = true;
+      app.reactionCounts.create(userAddress, post, 'like', chainId).then(() => {
+        this.loading = false;
+        this.reactors = [
+          ...this.reactors,
+          {
+            Address: { address: userAddress, chain },
+          },
+        ];
+        m.redraw();
+      });
+    };
+
+    const reactionButton = (
       <div
         onmouseenter={async () => {
           this.reactors = await fetchReactionsByPost(post);
         }}
-        onclick={async (e) => {
-          const { reactors, reactionCounts } = this;
-
-          e.preventDefault();
-          e.stopPropagation();
-
-          if (disabled) return;
-
-          if (!app.isLoggedIn()) {
-            app.modals.create({
-              modal: LoginModal,
-            });
-          } else if (!app.user.activeAccount) {
-            app.modals.create({
-              modal: SelectAddressModal,
-            });
-          } else {
-            const { address: userAddress, chain } = app.user.activeAccount;
-            // if it's a community use the app.user.activeAccount.chain.id instead of author chain
-            const chainId = app.activeChainId();
-            if (hasReacted) {
-              const reaction = (await fetchReactionsByPost(post)).find((r) => {
-                return r.Address.address === activeAddress;
-              });
-              this.loading = true;
-              app.reactionCounts
-                .delete(reaction, {
-                  ...reactionCounts,
-                  likes: likes - 1,
-                  hasReacted: false,
-                })
-                .then(() => {
-                  this.reactors = reactors.filter(
-                    ({ Address }) => Address.address !== userAddress
-                  );
-                  this.loading = false;
-                  m.redraw();
-                });
-            } else {
-              this.loading = true;
-              app.reactionCounts
-                .create(userAddress, post, 'like', chainId)
-                .then(() => {
-                  this.loading = false;
-                  this.reactors = [
-                    ...reactors,
-                    {
-                      Address: { address: userAddress, chain },
-                    },
-                  ];
-                  m.redraw();
-                });
-            }
-            mixpanel.track('Create Reaction ', {
-              'Step No': 1,
-              Step: 'Create Reaction',
-              'Post Name': `${post.slug}: ${post.identifier}`,
-              Scope: app.activeChainId(),
-            });
-            mixpanel.people.increment('Reaction');
-            mixpanel.people.set({
-              'Last Reaction Created': new Date().toISOString(),
-            });
-          }
-        }}
+        onclick={async (e) =>
+          onReactionClick(e, hasReacted, dislike, like, post)
+        }
         class={`ReactionButton${disabled ? ' disabled' : ''}${
           hasReacted ? ' hasReacted' : ''
         }`}
@@ -224,11 +246,11 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
             })}
           </div>
         }
-        trigger={rxnButton}
+        trigger={reactionButton}
         hoverOpenDelay={100}
       />
     ) : (
-      rxnButton
+      reactionButton
     );
   }
 }
