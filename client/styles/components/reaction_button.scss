@@ -4,12 +4,19 @@
   align-items: center;
   border-radius: 12px;
   border: 1px solid #ddd;
+  color: $text-color-medium;
   display: flex;
   flex-direction: column;
+  font-weight: 500;
   height: 48px;
   justify-content: center;
   margin-right: 24px;
-  width: 48px;
+  min-width: 48px;
+
+  &.hasReacted {
+    border-color: $primary-bg-color;
+    color: $primary-bg-color;
+  }
 
   &.disabled {
     border-color: $border-color-lightest;

@@ -204,11 +204,12 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
             });
           }
         }}
+        class={`ReactionButton${disabled ? ' disabled' : ''}${
+          hasReacted ? ' hasReacted' : ''
+        }`}
       >
-        <div class={`ReactionButton ${disabled ? 'disabled' : ''}`}>
-          <CWIcon iconName="arrow1" iconSize="small" />
-          <div class="reactions-count">{this.likes}</div>
-        </div>
+        <CWIcon iconName="arrow1" iconSize="small" />
+        <div class="reactions-count">{this.likes}</div>
       </div>
     );
 
