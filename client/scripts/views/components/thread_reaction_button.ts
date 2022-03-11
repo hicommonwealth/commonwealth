@@ -108,8 +108,6 @@ const ThreadReactionButton: m.Component<
     vnode.state.likes = likes;
     vnode.state.dislikes = dislikes;
 
-    console.log('thread', vnode.state.reactionCounts);
-
     let disabled = vnode.state.loading;
 
     // token balance check if needed
