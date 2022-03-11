@@ -213,24 +213,6 @@ const createThread = async (
   // auto-subscribe NewThread subscribers to NewComment as well
   // findOrCreate because redundant creation if author is also subscribed to NewThreads
   const location = finalThread.chain;
-  // const subscribers = await models.Subscription.findAll({
-  //   where: {
-  //     category_id: NotificationCategories.NewThread,
-  //     object_id: location,
-  //   }
-  // });
-  // await Promise.all(subscribers.map((s) => {
-  //   return models.Subscription.findOrCreate({
-  //     where: {
-  //       subscriber_id: s.subscriber_id,
-  //       category_id: NotificationCategories.NewComment,
-  //       object_id: `discussion_${finalThread.id}`,
-  //       offchain_thread_id: finalThread.id,
-  //       chain_id: finalThread.chain,
-  //       is_active: true,
-  //     },
-  //   });
-  // }));
 
   try {
     await sequelize.query(`
