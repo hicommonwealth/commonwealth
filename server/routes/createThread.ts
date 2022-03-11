@@ -1,6 +1,5 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import BN from 'bn.js';
 import { NotificationCategories, ProposalType, ChainType } from '../../shared/types';
 
 import validateChain from '../util/validateChain';
