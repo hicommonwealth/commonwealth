@@ -209,12 +209,16 @@ export interface VersionHistory {
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
   private _listingStore = new FilterScopedThreadStore();
+  private _summaryStore = new ProposalStore<OffchainThread>();
 
   public get store() {
     return this._store;
   }
   public get listingStore() {
     return this._listingStore;
+  }
+  public get summaryStore() {
+    return this._summaryStore;
   }
 
   private _initialized = false;
@@ -642,6 +646,7 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads } = response.result;
+    console.log(threads[0]);
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -789,6 +794,7 @@ class ThreadsController {
     }
     this.numVotingThreads = numVotingThreads;
     this._initialized = true;
+    console.log('initialed:', this.listingStore.getAll().length)
   }
 
   public deinit() {
