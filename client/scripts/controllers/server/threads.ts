@@ -209,12 +209,16 @@ export interface VersionHistory {
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
   private _listingStore = new FilterScopedThreadStore();
+  private _summaryStore = new ProposalStore<OffchainThread>();
 
   public get store() {
     return this._store;
   }
   public get listingStore() {
     return this._listingStore;
+  }
+  public get summaryStore() {
+    return this._summaryStore;
   }
 
   private _initialized = false;

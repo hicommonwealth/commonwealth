@@ -51,7 +51,7 @@ import { SummaryListing } from './summary_listing';
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
 const getLastUpdate = (proposal: OffchainThread): number => {
-  const lastComment = app.comments.lastCommented(proposal)?.unix() || 0;
+  const lastComment = proposal.lastCommentedOn?.unix() || 0;
   const createdAt = proposal.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
@@ -479,7 +479,7 @@ const DiscussionsPage: m.Component<
       }
       vnode.state.summaryViewInitialized = true;
     }
-    let { summaryView, recentThreads, lastSubpage } = vnode.state;
+    const { summaryView, recentThreads, lastSubpage } = vnode.state;
     const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
     const onSummaryView = summaryView && !topicSelected;
 
@@ -742,7 +742,6 @@ const DiscussionsPage: m.Component<
       vnode.state.postsDepleted[subpage] === true;
     const postsDepleted =
       allThreads.length > 0 && vnode.state.postsDepleted[subpage];
-
 
     return m(
       Sublayout,
