@@ -152,18 +152,17 @@ const gettokenPostingThreshold = (post: Post) => {
 };
 
 export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
-  private likes: number;
   private loading: boolean;
-  private reactionCounts: ReactionCount<any>;
   private reactors: any;
+
+  oninit() {
+    this.loading = false;
+  }
 
   view(vnode) {
     const { post } = vnode.attrs;
-    this.reactionCounts = app.reactionCounts.getByPost(post);
-    const { likes = 0, hasReacted } = this.reactionCounts || {};
-    this.likes = likes;
-
-    let disabled = this.loading;
+    const reactionCounts = app.reactionCounts.getByPost(post);
+    const { likes = 0, hasReacted } = reactionCounts || {};
 
     // token balance check if needed
     if (ITokenAdapter.instanceOf(app.chain)) {
@@ -175,11 +174,10 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
 
       const tokenPostingThreshold = gettokenPostingThreshold(post);
 
-      disabled =
-        this.loading ||
-        (!isAdmin &&
-          tokenPostingThreshold &&
-          tokenPostingThreshold.gt(tokenBalance));
+      this.loading =
+        !isAdmin &&
+        tokenPostingThreshold &&
+        tokenPostingThreshold.gt(tokenBalance);
     }
 
     const activeAddress = app.user.activeAccount?.address;
@@ -191,7 +189,7 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
       this.loading = true;
       app.reactionCounts
         .delete(reaction, {
-          ...this.reactionCounts,
+          ...reactionCounts,
           likes: likes - 1,
           hasReacted: false,
         })
@@ -226,22 +224,22 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
         onclick={async (e) =>
           onReactionClick(e, hasReacted, dislike, like, post)
         }
-        class={`ReactionButton${disabled ? ' disabled' : ''}${
+        class={`ReactionButton${this.loading ? ' disabled' : ''}${
           hasReacted ? ' hasReacted' : ''
         }`}
       >
         <CWIcon iconName="arrow1" iconSize="small" />
-        <div class="reactions-count">{this.likes}</div>
+        <div class="reactions-count">{likes}</div>
       </div>
     );
 
-    return this.likes > 0 ? (
+    return likes > 0 ? (
       <Popover
         interactionType="hover"
         content={
           <div class="reaction-button-tooltip-contents">
             {getDisplayedReactorsForPopup({
-              likes: this.likes,
+              likes,
               reactors: this.reactors,
             })}
           </div>
