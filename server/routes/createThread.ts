@@ -9,7 +9,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
-import { DB } from '../database';
+import {DB, sequelize} from '../database';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -127,6 +127,8 @@ const createThread = async (
     }
   }
 
+  const topStartTime = Date.now();
+
   if (chain && chain.type === ChainType.Token) {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
@@ -205,27 +207,57 @@ const createThread = async (
   } catch (err) {
     return next(new Error(err));
   }
+
+  const stEmitNotifications = Date.now();
+
   // auto-subscribe NewThread subscribers to NewComment as well
   // findOrCreate because redundant creation if author is also subscribed to NewThreads
   const location = finalThread.chain;
-  const subscribers = await models.Subscription.findAll({
-    where: {
-      category_id: NotificationCategories.NewThread,
-      object_id: location,
-    }
-  });
-  await Promise.all(subscribers.map((s) => {
-    return models.Subscription.findOrCreate({
-      where: {
-        subscriber_id: s.subscriber_id,
-        category_id: NotificationCategories.NewComment,
-        object_id: `discussion_${finalThread.id}`,
-        offchain_thread_id: finalThread.id,
-        chain_id: finalThread.chain,
-        is_active: true,
-      },
-    });
-  }));
+  // const subscribers = await models.Subscription.findAll({
+  //   where: {
+  //     category_id: NotificationCategories.NewThread,
+  //     object_id: location,
+  //   }
+  // });
+  // await Promise.all(subscribers.map((s) => {
+  //   return models.Subscription.findOrCreate({
+  //     where: {
+  //       subscriber_id: s.subscriber_id,
+  //       category_id: NotificationCategories.NewComment,
+  //       object_id: `discussion_${finalThread.id}`,
+  //       offchain_thread_id: finalThread.id,
+  //       chain_id: finalThread.chain,
+  //       is_active: true,
+  //     },
+  //   });
+  // }));
+
+  try {
+    await sequelize.query(`
+      WITH irrelevant_subs AS (
+        SELECT id
+        FROM "Subscriptions"
+        WHERE subscriber_id IN (
+          SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
+        ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND chain_id = ? AND is_active = true
+      )
+      INSERT INTO "Subscriptions"
+      SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as chain_id, true as is_active
+      FROM "Subscriptions"
+      WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
+      );
+    `, {raw: true, type: 'RAW', replacements: [
+        NotificationCategories.NewThread, location,
+        NotificationCategories.NewComment, `discussion_${finalThread.id}`, finalThread.id, finalThread.chain,
+        NotificationCategories.NewComment, `discussion_${finalThread.id}`, finalThread.id, finalThread.chain,
+        NotificationCategories.NewThread, location
+      ]}
+    );
+  } catch (e) {
+    console.log(e);
+  }
+
+
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(body);
@@ -255,6 +287,8 @@ const createThread = async (
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(finalThread.Address.address);
+  const etEmitNotifications = Date.now();
+
 
   // dispatch notifications to subscribers of the given chain
   await models.Subscription.emitNotifications(
@@ -325,6 +359,9 @@ const createThread = async (
     object_id: finalThread.id,
     view_count: 0,
   });
+
+  log.info(`>>>>>>>>>>>>>>>>>> Top part: ${stEmitNotifications-topStartTime}\t` +
+      `Emit: ${etEmitNotifications-stEmitNotifications}\tBottom: ${Date.now() - etEmitNotifications}`);
 
   return res.json({ status: 'Success', result: finalThread.toJSON() });
 };
