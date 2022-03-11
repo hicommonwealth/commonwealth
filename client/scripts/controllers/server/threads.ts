@@ -646,7 +646,6 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads } = response.result;
-    console.log(threads[0]);
     for (const thread of threads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
@@ -794,7 +793,6 @@ class ThreadsController {
     }
     this.numVotingThreads = numVotingThreads;
     this._initialized = true;
-    console.log('initialed:', this.listingStore.getAll().length)
   }
 
   public deinit() {
