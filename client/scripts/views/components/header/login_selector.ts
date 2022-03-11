@@ -310,7 +310,7 @@ const LoginSelector: m.Component<
       if (addressChainInfo?.base !== activeBase) return false;
 
       // ensure doesn't already exist
-      const addressExists = !!samebaseAddresses.find((prev) =>
+      const addressExists = !!app.user.addresses.find((prev) =>
         activeBase === ChainBase.Substrate
           ? AddressSwapper({
             address: prev.address, currentPrefix: 42
