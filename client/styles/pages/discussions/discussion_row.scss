@@ -42,9 +42,22 @@
     }
 
     .row-subheader {
+      align-items: baseline;
       color: $text-color-light;
       display: flex;
       width: 100%;
+
+      .discussion-locked {
+        height: 100%;
+
+        .cui-tag {
+          margin: 0;
+
+          svg {
+            margin: auto;
+          }
+        }
+      }
 
       a {
         color: $text-color-light;
