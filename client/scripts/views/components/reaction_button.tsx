@@ -19,7 +19,6 @@ import {
   ChainInfo,
 } from 'models';
 import User from 'views/components/widgets/user';
-import ReactionCount from 'models/ReactionCount';
 import SelectAddressModal from '../modals/select_address_modal';
 import LoginModal from '../modals/login_modal';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
