@@ -1,0 +1,27 @@
+.topic-items {
+  max-width: 296px;
+
+  .cui-button-label {
+    // resets the dumb construct overrides
+    position: unset;
+    top: unset;
+
+    .topic-item {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      .cui-icon {
+        margin-right: 8px;
+      }
+
+      .topic-item-name {
+        margin-right: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}

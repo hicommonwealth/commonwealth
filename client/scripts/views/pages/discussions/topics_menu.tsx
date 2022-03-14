@@ -10,7 +10,7 @@ import {
   MenuDivider,
 } from 'construct-ui';
 
-import 'pages/discussions/discussion_filter_bar.scss';
+import 'pages/discussions/topics_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -63,7 +63,7 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
         transitionDuration={0}
         closeOnContentClick={true}
         content={
-          <div class="discussions-topic-items">
+          <div class="topic-items">
             <MenuItem
               active={m.route.get() === `/${app.activeChainId()}` || !topic}
               iconLeft={
@@ -112,9 +112,9 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
                         );
                       }}
                       label={
-                        <div class="topic-menu-item">
+                        <div class="topic-item">
                           {active && <Icon name={Icons.CHECK} />}
-                          <div class="topic-menu-item-name">{name}</div>
+                          <div class="topic-item-name">{name}</div>
                           {app.user?.isAdminOfEntity({
                             chain: app.activeChainId(),
                           }) && (

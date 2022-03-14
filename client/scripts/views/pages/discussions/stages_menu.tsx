@@ -9,7 +9,7 @@ import {
   MenuDivider,
 } from 'construct-ui';
 
-import 'pages/discussions/discussion_filter_bar.scss';
+import 'pages/discussions/stages_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -48,7 +48,7 @@ export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
         transitionDuration={0}
         closeOnContentClick={true}
         content={
-          <div class="discussions-stage-items">
+          <div class="stage-items">
             <MenuItem
               onclick={(e) => {
                 e.preventDefault();
