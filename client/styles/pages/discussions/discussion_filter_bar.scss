@@ -2,21 +2,21 @@
 
 .DiscussionFilterBar {
   > .cui-button {
+    color: $text-color-black;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 1 !important;
+    margin: 0 11px 6px 0;
     max-width: 200px;
     overflow: hidden;
+    padding: 0 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin: 0 11px 6px 0;
-    color: $text-color-black;
-    padding: 0 12px;
-    display: inline-block;
-    cursor: pointer;
-    line-height: 1 !important;
 
     &.cui-sm {
       height: 26px;
-      min-height: 26px;
       line-height: 1 !important;
+      min-height: 26px;
     }
 
     &.active {
@@ -33,18 +33,18 @@
     }
 
     .cui-icon {
+      margin-left: -6px;
       position: relative;
       top: 3px;
-      margin-left: -6px;
     }
 
     .cui-icon svg {
       $size: 13px;
+      height: $size;
+      margin-right: -4px;
       min-height: $size;
       min-width: $size;
-      height: $size;
       width: $size;
-      margin-right: -4px;
     }
   }
 
@@ -64,8 +64,8 @@
 .discussions-topic-items,
 .discussions-stage-items {
   max-height: 70vh;
-  overflow-y: scroll;
   max-width: 300px;
+  overflow-y: scroll;
 
   .topic-menu-item {
     display: flex;
@@ -78,10 +78,10 @@
     .topic-menu-item-name {
       flex: 7;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
       position: relative;
+      text-overflow: ellipsis;
       top: 1px;
+      white-space: nowrap;
     }
 
     .cui-button {
@@ -92,15 +92,15 @@
 }
 
 .discussions-stage-count {
-  display: inline-block;
-  height: 19px;
-  font-size: 15px;
-  position: relative;
-  left: 2px;
-  padding: 3px 5px 0;
-  border-radius: 9999px;
   background: $primary-bg-color;
+  border-radius: 9999px;
   color: #fff;
+  display: inline-block;
+  font-size: 15px;
   font-weight: 500;
+  height: 19px;
+  left: 2px;
   margin: -2px 0 -2px 2px;
+  padding: 3px 5px 0;
+  position: relative;
 }
