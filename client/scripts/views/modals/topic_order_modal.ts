@@ -1,47 +1,41 @@
 import 'components/topic_selector.scss';
+import dragula from 'dragula';
 
-import m from 'mithril';
-import { ListItem, Button, List } from 'construct-ui';
-import { OffchainTopic } from 'models';
-import app from 'client/scripts/state';
+import m, { VnodeDOM } from 'mithril';
+import { ListItem, Button, List, Icon, Icons } from 'construct-ui';
+import app from 'state';
 
-const TopicOrderModal: m.Component = {
-  view: (vnode) => {
-    const featuredTopics = app.chain.meta.chain.topics.filter((topic) => topic.featuredInSidebar);
-    const itemRender = (topic) => {
-      return m(ListItem, {
-        class: featuredTopics.includes(topic)
-          ? 'featured-topic'
-          : 'other-topic',
-        label: [m('span.topic-name', topic.name)],
+const TopicOrderModal: m.Component<null, { featuredTopics }> = {
+  oncreate: (vnode: VnodeDOM<{}, { featuredTopics }>) => {
+    dragula([document.querySelector('.featured-topic-list')])
+      .on('drop', async (el, target, source, sibling) => {
+        console.log({
+          el,
+          target,
+          source,
+          sibling
+        });
+        const siblingTopic = vnode.state.featuredTopics
+          .find((t) => t.name === sibling.innerText);
       });
-    };
-
-    const itemPredicate = (query: string, item: OffchainTopic) => {
-      return item.name.toLowerCase().includes(query.toLowerCase());
-    };
-
-    const sortTopics = (topics_: OffchainTopic[]) => {
-      return topics_
-        .filter((topic) => featuredTopics.includes(topic))
-        .sort((a, b) => (a.name > b.name ? 1 : -1))
-        .concat(
-          topics_
-            .filter((topic) => !featuredTopics.includes(topic))
-            .sort((a, b) => (a.name > b.name ? 1 : -1))
-        );
-    };
+  },
+  view: (vnode: VnodeDOM<null, { featuredTopics }>) => {
+    vnode.state.featuredTopics = app.chain.meta.chain.topics.filter((topic) => topic.featuredInSidebar);
+    const { featuredTopics } = vnode.state;
 
     return m('.TopicOrderModal', [
-      m('.header', 'Reorder Topic'),
+      m('.header', 'Reorder Topics'),
       m('.compact-modal-body', [
         m(List, {
-          class: 'TopicSelector',
-          filterable: false,
-          itemPredicate,
-          itemRender,
-          items: sortTopics(featuredTopics),
-        }),
+          class: 'featured-topic-list',
+        },
+          featuredTopics
+            .sort((a, b) => (a.name > b.name ? 1 : -1))
+            .map((t) => m(ListItem, {
+              label: [m('span.topic-name', t.name)],
+              contentRight: m(Icon, { name: Icons.ALIGN_JUSTIFY }),
+            }))
+        ),
         m(Button, {
           intent: 'primary',
           type: 'submit',
