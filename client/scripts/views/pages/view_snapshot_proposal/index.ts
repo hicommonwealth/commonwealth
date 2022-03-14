@@ -21,6 +21,7 @@ import {
   SnapshotProposal,
   SnapshotProposalVote,
   getResults,
+  getPower,
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
@@ -100,7 +101,12 @@ const ProposalContent: m.Component<
             m('.vote-row', [
               m('.user-column', [
                 m(User, {
-                  user: new AddressInfo(null, vote.voter, app.activeChainId(), null),
+                  user: new AddressInfo(
+                    null,
+                    vote.voter,
+                    app.activeChainId(),
+                    null
+                  ),
                   linkify: true,
                   popover: true,
                 }),
@@ -187,6 +193,7 @@ const VoteAction: m.Component<
   {
     votingModalOpen: boolean;
     chosenOption: string;
+    validatedAgainstStrategies: boolean;
   }
 > = {
   view: (vnode) => {
@@ -199,6 +206,15 @@ const VoteAction: m.Component<
       vnode.state.votingModalOpen = false;
       m.redraw();
     };
+
+    getPower(
+      vnode.attrs.space,
+      app.user?.activeAccount?.address,
+      vnode.attrs.proposal.snapshot
+    ).then((vals) => {
+      console.log('Vals', vals);
+      vnode.state.validatedAgainstStrategies = vals.totalScore > 0; // TODO: need to incorporate handling for when a minscore is required to vote
+    });
 
     const vote = async (selectedChoice: number) => {
       try {
@@ -239,7 +255,9 @@ const VoteAction: m.Component<
       }),
       m(Button, {
         label: 'Vote',
-        disabled: hasVoted !== undefined || !vnode.state.chosenOption,
+        disabled:
+          (hasVoted !== undefined || !vnode.state.chosenOption) &&
+          !vnode.state.validatedAgainstStrategies,
         onclick: () => vote(proposal.choices.indexOf(vnode.state.chosenOption)),
       }),
     ]);
@@ -262,7 +280,7 @@ const ViewProposalPage: m.Component<
     totalScore: number;
     scores: number[];
     activeTab: string;
-    threads: Array<{id: string, title: string}> | null;
+    threads: Array<{ id: string; title: string }> | null;
   }
 > = {
   oninit: (vnode) => {
@@ -282,6 +300,9 @@ const ViewProposalPage: m.Component<
       vnode.state.space = space;
       vnode.state.symbol = space.symbol;
 
+      console.log('space', space);
+      console.log('prop: ', vnode.state.proposal);
+
       await getResults(space, vnode.state.proposal).then((res) => {
         vnode.state.votes = res.votes;
         vnode.state.totals = res.results;
@@ -290,11 +311,11 @@ const ViewProposalPage: m.Component<
 
       try {
         app.threads
-        .fetchThreadIdsForSnapshot({ snapshot: vnode.state.proposal.id })
-        .then((res) => {
-          vnode.state.threads = res;
-          m.redraw();
-        });
+          .fetchThreadIdsForSnapshot({ snapshot: vnode.state.proposal.id })
+          .then((res) => {
+            vnode.state.threads = res;
+            m.redraw();
+          });
       } catch (e) {
         console.error(`Failed to fetch threads: ${e}`);
       }
@@ -444,11 +465,11 @@ const ViewProposalPage: m.Component<
                   threads !== null &&
                     m('.linked-discussion', [
                       m('.heading-2', 'Linked Discussions'),
-                      threads.map((thread) => 
+                      threads.map((thread) =>
                         m(ProposalHeaderSnapshotThreadLink, {
-                          thread
-                        }),
-                      )
+                          thread,
+                        })
+                      ),
                     ]),
                 ]),
                 isActive &&

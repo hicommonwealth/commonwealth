@@ -11,6 +11,7 @@ import {
   SnapshotSpace,
   getVersion,
   castVote,
+  getPower,
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -38,6 +39,7 @@ const ConfirmSnapshotVoteModal: m.Component<
   {
     error: any;
     saving: boolean;
+    validAgainstStrategies: boolean;
   }
 > = {
   view: (vnode) => {
@@ -51,6 +53,7 @@ const ConfirmSnapshotVoteModal: m.Component<
       scores,
       snapshot,
     } = vnode.attrs;
+
     return m('.ConfirmSnapshotVoteModal', [
       m('.compact-modal-title', [
         m('h3', 'Confirm vote'),

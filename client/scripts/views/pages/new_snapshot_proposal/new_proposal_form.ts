@@ -141,10 +141,17 @@ const newThread = async (
 
   try {
     const res = await createProposal(author.address, proposalPayload);
-    console.log('res', res);
+    await app.user.notifications.refresh();
+    await app.snapshot.refreshProposals();
   } catch (e) {
     console.log(e);
+    throw new Error(e.error);
   }
+
+  const wallet = await app.wallets.locateWallet(
+    author.address,
+    ChainBase.Ethereum
+  );
 
   /*  try {
     const wallet = await app.wallets.locateWallet(
@@ -322,7 +329,8 @@ const NewProposalForm: m.Component<
       (!vnode.state.space.filters?.onlyMembers ||
         (vnode.state.space.filters?.onlyMembers && isMember)) &&
       (vnode.state.space.filters?.minScore === 0 ||
-        (vnode.state.space.filters?.minScore > 0 && vnode.state.userScore) ||
+        (vnode.state.space.filters?.minScore > 0 &&
+          vnode.state.userScore > vnode.state.space.filters?.minScore) ||
         isMember);
 
     const today = new Date();

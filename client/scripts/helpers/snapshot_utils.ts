@@ -1,7 +1,6 @@
 import gql from 'graphql-tag';
 import snapshot from '@snapshot-labs/snapshot.js';
 import { Web3Provider } from '@ethersproject/providers';
-
 const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
 const client = new snapshot.Client712(hub);
 
@@ -213,13 +212,11 @@ export async function createProposal(address: string, payload: any) {
 }
 
 export async function getSpaceBlockNumber(network: string): Promise<number> {
-  const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
-  return Snapshot.utils.getBlockNumber(Snapshot.utils.getProvider(network));
+  return snapshot.utils.getBlockNumber(snapshot.utils.getProvider(network));
 }
 
 export async function getScore(space: SnapshotSpace, address: string) {
-  const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
-  return Snapshot.utils.getScores(
+  return snapshot.utils.getScores(
     space.id,
     space.strategies,
     space.network,
@@ -234,36 +231,37 @@ export async function getResults(
   space: SnapshotSpace,
   proposal: SnapshotProposal
 ) {
-  const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
   try {
     let votes = await getVotes(proposal.id);
-
-    // const voters = votes.map(vote => vote.voter);
-    // const provider = Snapshot.utils.getProvider(space.network);
     const strategies = proposal.strategies ?? space.strategies;
+
     if (proposal.state !== 'pending') {
-      const scores = await Snapshot.utils.getScores(
-        space.id,
-        strategies,
-        space.network,
-        votes.map((vote) => vote.voter),
-        parseInt(proposal.snapshot, 10)
-        // provider,
-      );
-      votes = votes
-        .map((vote: any) => {
-          vote.scores = strategies.map(
-            (strategy, i) => scores[i][vote.voter] || 0
-          );
-          vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
-          return vote;
-        })
-        .sort((a, b) => b.balance - a.balance)
-        .filter((vote) => vote.balance > 0);
+      try {
+        const scores = await snapshot.utils.getScores(
+          space.id,
+          strategies,
+          space.network,
+          votes.map((vote) => vote.voter),
+          parseInt(proposal.snapshot, 10)
+          // provider,
+        );
+        votes = votes
+          .map((vote: any) => {
+            vote.scores = strategies.map(
+              (strategy, i) => scores[i][vote.voter] || 0
+            );
+            vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
+            return vote;
+          })
+          .sort((a, b) => b.balance - a.balance)
+          .filter((vote) => vote.balance > 0);
+      } catch (e) {
+        console.log(e);
+      }
     }
 
     /* Get results */
-    const votingClass = new Snapshot.utils.voting[proposal.type](
+    const votingClass = new snapshot.utils.voting[proposal.type](
       proposal,
       votes,
       strategies
@@ -284,15 +282,14 @@ export async function getResults(
 export async function getPower(
   space: SnapshotSpace,
   address: string,
-  snapshot: string
+  snapshotVal: string
 ) {
-  const { default: Snapshot } = await import('@snapshot-labs/snapshot.js');
-  const blockNumber = await Snapshot.utils.getBlockNumber(
-    Snapshot.utils.getProvider(space.network)
+  const blockNumber = await snapshot.utils.getBlockNumber(
+    snapshot.utils.getProvider(space.network)
   );
-  const blockTag = +snapshot > blockNumber ? 'latest' : +snapshot;
+  const blockTag = +snapshotVal > blockNumber ? 'latest' : +snapshotVal;
   const scores: Array<{ [who: string]: number }> =
-    await Snapshot.utils.getScores(
+    await snapshot.utils.getScores(
       space.id,
       space.strategies,
       space.network,
