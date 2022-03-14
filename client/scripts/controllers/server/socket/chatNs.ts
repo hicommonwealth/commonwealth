@@ -102,7 +102,10 @@ export class ChatNamespace {
         raw_channels.forEach(c => {
             channels[c.id] = { unread: this.channels[c.id] || 0, ...c }
         });
+        // channels is the new channels, this.channels is the old channels
+        // new_channel_ids are the ids in channels which are not in this.channels
         const new_channel_ids = Object.keys(channels).filter(x => !Object.keys(this.channels).includes(x));
+        // removed_channel_ids are the ids in this.channels which are not in channels
         const removed_channel_ids = Object.keys(this.channels).filter(x => !Object.keys(channels).includes(x));
         this.disconnectFromChannels(removed_channel_ids.map(id => this.channels[id]).map(ChatNamespace.channelToRoomId))
         this.connectToChannels(new_channel_ids.map(id => channels[id]).map(ChatNamespace.channelToRoomId))
@@ -110,6 +113,10 @@ export class ChatNamespace {
     }
 
     private onMessage(msg) {
+        // Ignore message if it is already in ChatMessages, last 5 msgs
+        if(this.channels[msg.chat_channel_id].ChatMessages.slice(-5).includes(msg)) {
+            return
+        }
         this.channels[msg.chat_channel_id].ChatMessages.push(msg)
         this.channels[msg.chat_channel_id].unread++
     }
@@ -123,7 +130,7 @@ export class ChatNamespace {
     }
 
     public async createChatChannel(name, chain_id, category) {
-        // check for admin?
+        // this call will fail unless its an admin
         try {
             const res = await $.post(`${app.serverUrl()}/createChatChannel`, {
                 jwt: app.user.jwt,
