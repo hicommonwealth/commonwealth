@@ -278,19 +278,17 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       if (topic) {
         topicId = app.topics.getByName(topic, app.activeChainId())?.id;
         if (!topicId) {
-          return m(
-            Sublayout,
-            {
-              class: 'DiscussionsPage',
-              title: 'Discussions',
-              showNewProposalButton: true,
-            },
-            [
-              m(EmptyListingPlaceholder, {
+          return (
+            <Sublayout
+              class="DiscussionsPage"
+              title="Discussions"
+              showNewProposalButton={true}
+            >
+              {m(EmptyListingPlaceholder, {
                 communityName: app.activeChainId(),
                 topicName: topic,
-              }),
-            ]
+              })}
+            </Sublayout>
           );
         }
       }
@@ -377,65 +375,56 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       this.postsDepleted[subpage] === true;
     const postsDepleted = allThreads.length > 0 && this.postsDepleted[subpage];
 
-    return m(
-      Sublayout,
-      {
-        class: 'DiscussionsPage',
-        title: ['Discussions'],
-        description: topicDescription,
-        showNewProposalButton: true,
-      },
-      [
-        app.chain && [
-          m('.discussions-main', [
-            !isEmpty &&
-              m(DiscussionFilterBar, {
-                topic: topicName,
-                stage,
-                parentState: this,
-                disabled: isLoading || stillFetching,
-              }),
-            m('.listing-wrap', [
-              onSummaryView
+    return (
+      <Sublayout
+        class="DiscussionsPage"
+        title="Discussions"
+        description={topicDescription}
+        showNewProposalButton={true}
+      >
+        {app.chain && (
+          <div class="discussions-main">
+            {!isEmpty && (
+              <DiscussionFilterBar
+                topic={topicName}
+                stage={stage}
+                parentState={this}
+                disabled={isLoading || stillFetching}
+              />
+            )}
+            <div class="listing-wrap">
+              {onSummaryView
                 ? isLoading
                   ? m(LoadingRow)
                   : m(Listing, {
                       content: [
-                        // ...pinnedListing,
-                        m(SummaryListing, { recentThreads }),
+                        <SummaryListing recentThreads={recentThreads} />,
                       ],
                     })
-                : [
-                    isLoading
-                      ? m(LoadingRow)
-                      : isEmpty
-                      ? m(EmptyListingPlaceholder, {
-                          stageName: stage,
-                          communityName,
-                          topicName,
-                        })
-                      : m(Listing, { content: sortedListing }),
-                    postsDepleted
-                      ? m('.infinite-scroll-reached-end', [
-                          `Showing ${allThreads.length} of ${pluralize(
-                            allThreads.length,
-                            'thread'
-                          )}`,
-                          topic ? ` under the topic '${topic}'` : '',
-                        ])
-                      : isEmpty
-                      ? null
-                      : m('.infinite-scroll-spinner-wrap', [
-                          m(Spinner, {
-                            active: !this.postsDepleted[subpage],
-                            size: 'lg',
-                          }),
-                        ]),
-                  ],
-            ]),
-          ]),
-        ],
-      ]
+                : isLoading
+                ? m(LoadingRow)
+                : isEmpty
+                ? m(EmptyListingPlaceholder, {
+                    stageName: stage,
+                    communityName,
+                    topicName,
+                  })
+                : m(Listing, { content: sortedListing })}
+              {postsDepleted ? (
+                <div class="infinite-scroll-reached-end">
+                  Showing {allThreads.length} of{' '}
+                  {pluralize(allThreads.length, 'thread')}
+                  {topic ? ` under the topic '${topic}'` : ''}
+                </div>
+              ) : isEmpty ? null : (
+                <div class="infinite-scroll-spinner-wrap">
+                  <Spinner active={!this.postsDepleted[subpage]} size="lg" />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </Sublayout>
     );
   }
 }
