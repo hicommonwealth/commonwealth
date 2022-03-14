@@ -24,7 +24,7 @@ export class DiscussionFilterBar
   implements m.ClassComponent<DiscussionFilterBarAttrs>
 {
   view(vnode) {
-    const { topic, stage, disabled } = vnode.attrs;
+    const { topic, stage, disabled, parentState } = vnode.attrs;
 
     const communityInfo = app.chain?.meta?.chain;
 
@@ -83,8 +83,7 @@ export class DiscussionFilterBar
 
     const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
 
-    const summaryViewEnabled =
-      vnode.attrs.parentState.summaryView && !topicSelected;
+    const summaryViewEnabled = parentState.summaryView && !topicSelected;
 
     return (
       <div class="DiscussionFilterBar">
@@ -93,7 +92,7 @@ export class DiscussionFilterBar
             disabled={disabled}
             featuredTopics={featuredTopics}
             otherTopics={otherTopics}
-            parentState={vnode.attrs.parentState}
+            parentState={parentState}
             selectedTopic={selectedTopic}
             topic={topic}
           />
@@ -101,7 +100,7 @@ export class DiscussionFilterBar
         {stagesEnabled && (
           <StagesMenu
             disabled={disabled}
-            parentState={vnode.attrs.parentState}
+            parentState={parentState}
             selectedState={selectedStage}
             stage={stage}
             stages={stages}
@@ -112,31 +111,27 @@ export class DiscussionFilterBar
             <Button
               rounded={true}
               compact={true}
-              class={`summary-toggle ${
-                summaryViewEnabled ? 'active' : 'inactive'
-              }`}
+              class={`${summaryViewEnabled ? 'active' : ''}`}
               label="Summary"
               size="sm"
               disabled={disabled}
               onclick={async (e) => {
                 e.preventDefault();
                 localStorage.setItem('discussion-summary-toggle', 'true');
-                vnode.attrs.parentState.summaryView = true;
+                parentState.summaryView = true;
                 navigateToSubpage('/');
               }}
             />
             <Button
               rounded={true}
               compact={true}
-              class={`latest-toggle ${
-                summaryViewEnabled ? 'inactive' : 'active'
-              }`}
+              class={`${summaryViewEnabled ? 'active' : ''}`}
               label="Latest"
               size="sm"
               disabled={disabled}
               onclick={async (e) => {
                 e.preventDefault();
-                vnode.attrs.parentState.summaryView = false;
+                parentState.summaryView = false;
                 localStorage.setItem('discussion-summary-toggle', 'false');
               }}
             />
