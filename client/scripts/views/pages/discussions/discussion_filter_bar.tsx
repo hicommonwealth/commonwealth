@@ -10,7 +10,7 @@ import {
   MenuDivider,
 } from 'construct-ui';
 
-import 'pages/discussions/index.scss';
+import 'pages/discussions/discussion_filter_bar.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -39,6 +39,7 @@ export class DiscussionFilterBar
     const { stagesEnabled, customStages } = communityInfo;
 
     const featuredTopicIds = communityInfo.featuredTopics;
+
     const topics = app.topics
       .getByCommunity(app.activeChainId())
       .map(
@@ -63,14 +64,17 @@ export class DiscussionFilterBar
           };
         }
       );
+
     const featuredTopics = topics
       .filter((t) => t.featured_order !== -1)
       .sort((a, b) => Number(a.featured_order) - Number(b.featured_order));
+
     const otherTopics = topics
       .filter((t) => t.featured_order === -1)
       .sort((a, b) => a.name.localeCompare(b.name));
 
     const selectedTopic = topics.find((t) => topic && topic === t.name);
+
     const stages = !customStages
       ? [
           OffchainThreadStage.Discussion,
@@ -87,13 +91,12 @@ export class DiscussionFilterBar
     const summaryViewEnabled =
       vnode.attrs.parentState.summaryView && !topicSelected;
 
-    return m('.DiscussionFilterBar', [
+    return m('DiscussionFilterBar', [
       topics.length > 0 &&
         m(PopoverMenu, {
           trigger: m(Button, {
             rounded: true,
             compact: true,
-            class: 'topic-filter',
             label: selectedTopic ? `Topic: ${topic}` : 'All Topics',
             iconRight: Icons.CHEVRON_DOWN,
             size: 'sm',
@@ -103,7 +106,6 @@ export class DiscussionFilterBar
           hasArrow: false,
           transitionDuration: 0,
           closeOnContentClick: true,
-          class: 'TopicsFilterPopover',
           content: m('.discussions-topic-items', [
             m(MenuItem, {
               active: m.route.get() === `/${app.activeChainId()}` || !topic,
