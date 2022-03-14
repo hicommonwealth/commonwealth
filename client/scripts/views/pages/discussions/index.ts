@@ -47,6 +47,7 @@ import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import PinnedListing from './pinned_listing';
 import DiscussionRow from './discussion_row';
 import { SummaryListing } from './summary_listing';
+import TopicOrderModal from '../../modals/topic_order_modal';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -113,7 +114,17 @@ export const CommunityOptionsPopover: m.Component<{}> = {
               app.modals.create({ modal: EditTopicThresholdsModal });
             },
           }),
-        (isAdmin) &&
+        isAdmin &&
+          m(MenuItem, {
+            label: 'Order featured topics',
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.create({
+                modal: TopicOrderModal,
+              })
+            }
+          }),
+        isAdmin &&
           m(MenuItem, {
             label: 'Invite members',
             onclick: (e) => {

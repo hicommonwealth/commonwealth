@@ -5,8 +5,8 @@ import { ListItem, Button, List } from 'construct-ui';
 import { OffchainTopic } from 'models';
 import app from 'client/scripts/state';
 
-const TopicOrderModal: m.Component<{ chain }, {}> = {
-  view: (vnode: m.VnodeDOM<{ chain }, {}>) => {
+const TopicOrderModal: m.Component = {
+  view: (vnode) => {
     const featuredTopics = app.chain.meta.chain.topics.filter((topic) => topic.featuredInSidebar);
     const itemRender = (topic) => {
       return m(ListItem, {
