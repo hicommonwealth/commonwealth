@@ -1,20 +1,19 @@
 @import 'shared';
-@import 'shared';
-@import 'mixins/responsive';
 
 .SummaryListing {
   display: flex;
   flex-direction: column;
 
   .SummaryRow {
-    display: flex;
-    padding: 15px 0;
     border-top: 1px solid $disable-gray;
+    display: flex;
     max-width: 100%;
+    padding: 15px 0;
 
     .recent-thread-cell {
       display: flex;
       flex-direction: column;
+
       .thread-summary {
         display: flex;
         justify-content: space-between;
@@ -23,17 +22,21 @@
         &:last-child {
           margin-bottom: 0;
         }
+
         a.thread-title {
-          flex: 4;
           color: $purp-blue;
+          flex: 4;
+
           &:hover {
             text-decoration: none;
           }
         }
+
         .last-updated {
           flex: 1;
-          text-align: left;
           min-width: max-content;
+          text-align: left;
+
           span {
             color: $lite-gray;
           }
@@ -43,20 +46,21 @@
     .topic-header,
     .topic-cell {
       h3 {
+        cursor: pointer;
         font-size: 24px;
         font-weight: 500;
-        cursor: pointer;
       }
     }
   }
 
   h4 {
     color: $midi-gray;
-    font-size: 18px;
-    margin-bottom: 10px;
     display: flex;
+    font-size: 18px;
     font-weight: 500;
+    margin-bottom: 10px;
   }
+
   .row-wrap {
     display: flex;
     flex-direction: column;
@@ -66,12 +70,15 @@
   .topic-cell {
     flex: 385;
   }
+
   .recent-thread-header,
   .recent-thread-cell {
     flex: 430;
+
     .thread-title {
       flex: 335;
     }
+
     .last-updated {
       flex: 95;
       width: auto;
@@ -104,10 +111,12 @@
       flex: 225;
       margin-right: 25px;
     }
+
     .recent-thread-header,
     .recent-thread-cell {
       flex: 225;
     }
+
     .thread-summary {
       display: flex;
       flex-direction: column;
@@ -117,13 +126,16 @@
   @include sm-max {
     .SummaryRow {
       flex-direction: column;
+
       .topic-header,
       .recent-thread-header {
         margin-bottom: 7px;
       }
+
       .topic-cell {
         margin-bottom: 15px;
       }
+
       .last-updated {
         display: flex;
         justify-content: space-between;
