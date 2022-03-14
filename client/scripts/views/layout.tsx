@@ -65,12 +65,12 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
         >
           <Sublayout
             errorLayout={
-              <div>
+              <>
                 <p style="color: #222">
                   Application error: ${app.loadingError}
                 </p>
                 <p style="color: #222">Please try again later</p>
-              </div>
+              </>
             }
           />
           <AppModals />,

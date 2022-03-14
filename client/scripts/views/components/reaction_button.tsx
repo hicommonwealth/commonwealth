@@ -55,7 +55,7 @@ const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
   if (slicedReactors.length < likes) {
     const diff = likes - slicedReactors.length;
 
-    slicedReactors.push(<div>{`and ${diff} more`}</div>);
+    slicedReactors.push(<>{`and ${diff} more`}</>);
   }
 
   return slicedReactors;

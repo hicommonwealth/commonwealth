@@ -29,11 +29,11 @@ export class PinnedListing implements m.ClassComponent<IPinnedListingAttrs> {
     const sortedProposals = proposals.sort(orderDiscussionsbyDate);
 
     return sortedProposals.length > 0 ? (
-      <div>
+      <>
         {sortedProposals.map((proposal) => {
           return <DiscussionRow proposal={proposal} />;
         })}
-      </div>
+      </>
     ) : null;
   }
 }
