@@ -50,7 +50,7 @@ class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {
     return (
       <div class="SummaryRow">
         {isMobile ? (
-          <div>
+          <>
             <h4 class="topic-header">Topic</h4>
             <div class="topic-cell">
               <h3
@@ -71,9 +71,9 @@ class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {
             <div class="recent-thread-cell">
               {getThreadCells(sortedThreads)}
             </div>
-          </div>
+          </>
         ) : (
-          <div>
+          <>
             <div class="topic-cell">
               <h3
                 onclick={(e) => {
@@ -92,7 +92,7 @@ class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {
             <div class="recent-thread-cell">
               {getThreadCells(sortedThreads)}
             </div>
-          </div>
+          </>
         )}
       </div>
     );
