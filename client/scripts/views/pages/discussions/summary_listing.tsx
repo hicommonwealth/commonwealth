@@ -17,11 +17,12 @@ const getThreadCells = (sortedThreads: OffchainThread[]) => {
       thread.slug,
       `${thread.identifier}-${slugify(thread.title)}`
     );
+
     return (
       <div class="thread-summary">
         {link('a.thread-title', discussionLink, thread.title)}
         <div class="last-updated">
-          <span>{formatLastUpdated(getLastUpdated(thread))}</span>
+          {formatLastUpdated(getLastUpdated(thread))}
           {isHot(thread) && <span>🔥</span>}
         </div>
       </div>
@@ -49,51 +50,22 @@ class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {
 
     return (
       <div class="SummaryRow">
-        {isMobile ? (
-          <>
-            <h4 class="topic-header">Topic</h4>
-            <div class="topic-cell">
-              <h3
-                onclick={(e) => {
-                  e.preventDefault();
-                  m.route.set(
-                    `/${app.activeChainId()}/discussions/${encodeURI(
-                      topic.name
-                    )}`
-                  );
-                }}
-              >
-                {topic.name}
-              </h3>
-              <p>{topic.description}</p>
-            </div>
-            <h4 class="recent-thread-header">Recent threads</h4>
-            <div class="recent-thread-cell">
-              {getThreadCells(sortedThreads)}
-            </div>
-          </>
-        ) : (
-          <>
-            <div class="topic-cell">
-              <h3
-                onclick={(e) => {
-                  e.preventDefault();
-                  m.route.set(
-                    `/${app.activeChainId()}/discussions/${encodeURI(
-                      topic.name
-                    )}`
-                  );
-                }}
-              >
-                {topic.name}
-              </h3>
-              <p>{topic.description}</p>
-            </div>
-            <div class="recent-thread-cell">
-              {getThreadCells(sortedThreads)}
-            </div>
-          </>
-        )}
+        {isMobile && <h4 class="topic-header">Topic</h4>}
+        <div class="topic-cell">
+          <h3
+            onclick={(e) => {
+              e.preventDefault();
+              m.route.set(
+                `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
+              );
+            }}
+          >
+            {topic.name}
+          </h3>
+          <p>{topic.description}</p>
+        </div>
+        {isMobile && <h4 class="recent-thread-header">Recent threads</h4>}
+        <div class="recent-thread-cell">{getThreadCells(sortedThreads)}</div>
       </div>
     );
   }
