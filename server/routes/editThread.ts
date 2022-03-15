@@ -20,6 +20,7 @@ export const Errors = {
   NoBodyOrAttachment: 'Must provide body or attachment',
   IncorrectOwner: 'Not owned by this user',
   InvalidLink: 'Invalid thread URL',
+  CollaborationsInsertError: 'Could not insert the thread to Collaborations: ',
 };
 
 const editThread = async (
@@ -77,7 +78,8 @@ const editThread = async (
   const userOwnedAddressIds = userOwnedAddresses
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const collaboration = await models.Role.findOne({
+
+  const moderator = await models.Role.findOne({
     where: {
       chain_id: chain.id,
       address_id: { [Op.in]: userOwnedAddressIds },
@@ -93,7 +95,7 @@ const editThread = async (
     },
   });
 
-  if (collaboration || admin) {
+  if (admin || moderator) {
     thread = await models.OffchainThread.findOne({
       where: {
         id: thread_id,
@@ -150,6 +152,14 @@ const editThread = async (
 
     await thread.save();
     await attachFiles();
+    try {
+      await models.Collaboration.create({
+        offchain_thread_id: thread_id,
+        address_id: thread.address_id,
+      });
+    } catch (e) {
+      log.error(Errors.CollaborationsInsertError, e.message);
+    }
 
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
