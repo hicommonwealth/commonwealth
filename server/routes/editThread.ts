@@ -152,13 +152,25 @@ const editThread = async (
 
     await thread.save();
     await attachFiles();
-    try {
-      await models.Collaboration.create({
+
+    const collaboration = await models.Collaboration.findOne({
+      where: {
         offchain_thread_id: thread_id,
         address_id: thread.address_id,
-      });
-    } catch (e) {
-      log.error(Errors.CollaborationsInsertError, e.message);
+      },
+    });
+
+    console.log(collaboration);
+
+    if (!collaboration){
+      try {
+        await models.Collaboration.create({
+          offchain_thread_id: thread_id,
+          address_id: thread.address_id,
+        });
+      } catch (e) {
+        log.error(Errors.CollaborationsInsertError, e.message);
+      }
     }
 
     const finalThread = await models.OffchainThread.findOne({
