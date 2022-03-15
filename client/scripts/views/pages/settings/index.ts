@@ -7,7 +7,7 @@ import app from 'state';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { notifyInfo } from 'controllers/app/notifications';
 
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 
 import EmailWell from './email_well';
@@ -25,18 +25,22 @@ const SettingsPage: m.Component<{}> = {
     }
     if (!app.loginStatusLoaded()) return m(PageLoading);
 
-    return m(Sublayout, {
-      class: 'SettingsPage',
-      title: 'Account Settings',
-    }, [
-      m('br'),
-      m(EmailWell, { github: true }),
-      m('br'),
-      m(LinkedAddressesWell),
-      m('br'),
-      m(SettingsWell),
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        class: 'SettingsPage',
+        title: 'Account Settings',
+      },
+      [
+        m('br'),
+        m(EmailWell, { github: true }),
+        m('br'),
+        m(LinkedAddressesWell),
+        m('br'),
+        m(SettingsWell),
+      ]
+    );
+  },
 };
 
 export default SettingsPage;
