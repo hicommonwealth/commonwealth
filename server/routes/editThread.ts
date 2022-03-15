@@ -56,10 +56,11 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
   let thread;
   const userOwnedAddresses = await req.user.getAddresses();
   const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
-  const collaboration = await models.Collaboration.findOne({
+  const collaboration = await await models.Role.findOne({
     where: {
-      offchain_thread_id: thread_id,
-      address_id: { [Op.in]: userOwnedAddressIds }
+      chain_id: chain.id,
+      address_id: { [Op.in]: userOwnedAddressIds },
+      permission: 'moderator'
     }
   });
 
