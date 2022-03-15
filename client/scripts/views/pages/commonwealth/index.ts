@@ -45,7 +45,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
             m(
               'div.SeeDocsButton',
               { class: 'text-center hidden lg:block xl:block mb-20' },
-              m(LandingPageButton, { href: '', text: 'See docs' })
+              m(LandingPageButton, { href: 'https://docs.commonwealth.im/commonwealth/', text: 'See docs' })
             )
           ),
         ])
@@ -258,7 +258,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           },
           { text: 'Terms', redirectTo: '/terms' },
           { text: 'Privacy', redirectTo: '/privacy' },
-          { text: 'Discord', externalLink: 'https://discord.gg/t9XscHdZrG' },
+          { text: 'Discord', externalLink: 'https://discord.gg/vYcfQ758' },
           { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
           {
             text: 'Twitter',
