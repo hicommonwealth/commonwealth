@@ -53,19 +53,18 @@ const dispatchHooks = async (models: DB, req: Request, finalThread: OffchainThre
   const location = finalThread.chain;
   try {
     await sequelize.query(`
-      WITH irrelevant_subs AS (
-        SELECT id
-        FROM "Subscriptions"
-        WHERE subscriber_id IN (
-          SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
-        ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND chain_id = ? AND is_active = true
-      )
-      INSERT INTO "Subscriptions"
-      SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as chain_id, true as is_active
+    WITH irrelevant_subs AS (
+      SELECT id
       FROM "Subscriptions"
-      WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
-      );
-    `, {raw: true, type: 'RAW', replacements: [
+      WHERE subscriber_id IN (
+        SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
+      ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND chain_id = ? AND is_active = true
+    )
+    INSERT INTO "Subscriptions"(subscriber_id, category_id, object_id, offchain_thread_id, chain_id, is_active, created_at, updated_at)
+    SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
+    FROM "Subscriptions"
+    WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
+  `,  {raw: true, type: 'RAW', replacements: [
         NotificationCategories.NewThread, location,
         NotificationCategories.NewComment, `discussion_${finalThread.id}`, finalThread.id, finalThread.chain,
         NotificationCategories.NewComment, `discussion_${finalThread.id}`, finalThread.id, finalThread.chain,
