@@ -5,7 +5,7 @@ import m, { VnodeDOM } from 'mithril';
 import { ListItem, Button, List, Icon, Icons } from 'construct-ui';
 import app from 'state';
 
-const TopicOrderModal: m.Component<null, { featuredTopics }> = {
+const OrderTopicModal: m.Component<null, { featuredTopics }> = {
   oncreate: (vnode: VnodeDOM<{}, { featuredTopics }>) => {
     dragula([document.querySelector('.featured-topic-list')])
       .on('drop', async (el, target, source, sibling) => {
@@ -15,15 +15,18 @@ const TopicOrderModal: m.Component<null, { featuredTopics }> = {
           source,
           sibling
         });
+        const movedTopic = vnode.state.featuredTopics
+          .find((t) => t.name === el.innerText);
         const siblingTopic = vnode.state.featuredTopics
           .find((t) => t.name === sibling.innerText);
+        app.topics.edit(movedTopic, siblingTopic.order - 1);
       });
   },
   view: (vnode: VnodeDOM<null, { featuredTopics }>) => {
     vnode.state.featuredTopics = app.chain.meta.chain.topics.filter((topic) => topic.featuredInSidebar);
     const { featuredTopics } = vnode.state;
 
-    return m('.TopicOrderModal', [
+    return m('.OrderTopicModal', [
       m('.header', 'Reorder Topics'),
       m('.compact-modal-body', [
         m(List, {
@@ -52,4 +55,4 @@ const TopicOrderModal: m.Component<null, { featuredTopics }> = {
   }
 };
 
-export default TopicOrderModal;
+export default OrderTopicModal;

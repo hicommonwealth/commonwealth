@@ -73,16 +73,7 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     await topic.save();
 
     if (featured_order) {
-      const activeEntity = await models.Chain.findOne({ where: { id: chain.id } });
-      let { featured_topics } = activeEntity;
-      if (featured_order === 'true' && !featured_topics.includes(`${id}`)) {
-        featured_topics.push(`${id}`);
-      } else if (featured_order === 'false' && featured_topics.includes(`${id}`)) {
-        const idx = featured_topics.indexOf(`${id}`);
-        featured_topics = featured_topics.slice(0, idx).concat(featured_topics.slice(idx + 1));
-      }
-      activeEntity.featured_topics = featured_topics;
-      await activeEntity.save();
+      // TODO: May require a specialized /updateTopicOrder route
     }
 
     return res.json({ status: 'Success', result: topic.toJSON() });

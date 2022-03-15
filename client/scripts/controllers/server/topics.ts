@@ -16,7 +16,7 @@ class TopicsController {
   public getByName(name, communityId) { return this._store.getByName(name, communityId); }
   public addToStore(topic: OffchainTopic) { return this._store.add(topic); }
 
-  public async edit(topic: OffchainTopic, featured_order?: boolean) {
+  public async edit(topic: OffchainTopic, featuredOrder?: boolean) {
     try {
       // TODO: Change to PUT /topic
       const response = await $.post(`${app.serverUrl()}/editTopic`, {
@@ -28,7 +28,7 @@ class TopicsController {
         'featured_in_sidebar': topic.featuredInSidebar,
         'featured_in_new_post': topic.featuredInNewPost,
         'default_offchain_template': topic.defaultOffchainTemplate,
-        'featured_order': featured_order,
+        'featured_order': featuredOrder,
         'address': app.user.activeAccount.address,
         'jwt': app.user.jwt,
       });
