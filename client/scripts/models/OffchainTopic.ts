@@ -8,6 +8,7 @@ class OffchainTopic {
   public readonly chainId: string;
   public readonly featuredInSidebar?: boolean;
   public readonly featuredInNewPost?: boolean;
+  public readonly order?: number;
   public readonly defaultOffchainTemplate?: string;
 
   private _tokenThreshold?: BN;
@@ -22,6 +23,7 @@ class OffchainTopic {
     chain_id,
     featured_in_sidebar,
     featured_in_new_post,
+    order,
     default_offchain_template,
     token_threshold,
   }: {
@@ -32,6 +34,7 @@ class OffchainTopic {
       chain_id?: string,
       featured_in_sidebar?: boolean,
       featured_in_new_post?: boolean,
+      order?: number,
       default_offchain_template?: string,
       token_threshold?: BN | string | number,
   }) {
@@ -42,6 +45,7 @@ class OffchainTopic {
     this.chainId = chain_id;
     this.featuredInSidebar = featured_in_sidebar;
     this.featuredInNewPost = featured_in_new_post;
+    this.order = order;
     this.defaultOffchainTemplate = default_offchain_template;
     if (token_threshold !== undefined) {
       this._tokenThreshold = new BN(token_threshold);

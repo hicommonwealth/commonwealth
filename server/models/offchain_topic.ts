@@ -8,6 +8,7 @@ export type OffchainTopicAttributes = {
   name: string;
   featured_in_sidebar: boolean;
   featured_in_new_post: boolean;
+  order?: number;
   id?: number;
   chain_id: string;
   description?: string;
@@ -46,6 +47,7 @@ export default (
     token_threshold: { type: dataTypes.INTEGER, allowNull: true },
     featured_in_sidebar: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
     featured_in_new_post: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
+    order: { type: dataTypes.INTEGER, allowNull: true },
     default_offchain_template: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
   }, {
     timestamps: true,
