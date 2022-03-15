@@ -160,8 +160,6 @@ const editThread = async (
       },
     });
 
-    console.log(collaboration);
-
     if (!collaboration){
       try {
         await models.Collaboration.create({
