@@ -68,6 +68,12 @@ const addEditors = async (models: DB, req: Request, res: Response, next: NextFun
         .find((role) => role.chain_id === chain.id);
       if (!isMember) throw new Error(Errors.InvalidEditor);
 
+      await models.Collaboration.findOrCreate({
+        where: {
+          offchain_thread_id: thread.id,
+          address_id: collaborator.id
+        }
+      });
       // auto-subscribe collaborator to comments & reactions
       // findOrCreate to avoid duplicate subscriptions being created e.g. for
       // same-account collaborators
