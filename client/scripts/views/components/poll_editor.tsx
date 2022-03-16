@@ -153,7 +153,7 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
                   compact={true}
                   iconRight={Icons.CHEVRON_DOWN}
                   label={this.customDuration || 'Infinite'}
-                  style="min-width: 300px"
+                  style="min-width: 200px"
                 />
               }
             />
