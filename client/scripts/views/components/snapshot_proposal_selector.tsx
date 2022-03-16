@@ -21,7 +21,7 @@ type SnapshotProposalSelectorAttrs = {
 export class SnapshotProposalSelector
   implements m.ClassComponent<SnapshotProposalSelectorAttrs>
 {
-  private all_proposals: SnapshotProposal[];
+  private allProposals: SnapshotProposal[];
   private initialized: boolean;
   private snapshotProposalsLoaded: boolean;
 
@@ -31,12 +31,12 @@ export class SnapshotProposalSelector
     if (!app.chain || !app.activeChainId()) return;
 
     if (!this.initialized) {
-      this.all_proposals = [];
+      this.allProposals = [];
       this.initialized = true;
 
       loadMultipleSpacesData(app.chain.meta.chain.snapshot).then((data) => {
         for (const { proposals } of data) {
-          this.all_proposals = [...this.all_proposals, ...proposals];
+          this.allProposals = [...this.allProposals, ...proposals];
         }
 
         this.snapshotProposalsLoaded = true;
@@ -49,7 +49,7 @@ export class SnapshotProposalSelector
         {this.snapshotProposalsLoaded ? (
           <QueryList
             checkmark={true}
-            items={this.all_proposals.sort((a, b) => {
+            items={this.allProposals.sort((a, b) => {
               return b.created - a.created;
             })}
             inputAttrs={{
@@ -62,9 +62,9 @@ export class SnapshotProposalSelector
               return (
                 <ListItem
                   label={
-                    <div class="chain-entity-info">
-                      <span>{sn.title}</span>
-                      <span>Hash: ${sn.id}</span>
+                    <div class="chain-entity">
+                      <div class="chain-entity-text">{sn.title}</div>
+                      <div class="chain-entity-subtext">Hash: ${sn.id}</div>
                     </div>
                   }
                   selected={selected}
@@ -85,7 +85,7 @@ export class SnapshotProposalSelector
           />
         ) : (
           <div class="loading-container">
-            <div class="loading-container-text">
+            <div class="loading-text">
               {this.snapshotProposalsLoaded
                 ? 'TODO: how to begin?'
                 : 'Loading snapshot proposals...'}

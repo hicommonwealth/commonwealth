@@ -63,18 +63,18 @@ export class ChainEntitiesSelector
                 <ListItem
                   disabled={ce.threadId && ce.threadId !== thread.id}
                   label={
-                    <div class="chain-entity-info">
-                      <span>
+                    <div class="chain-entity">
+                      <div class="chain-entity-text">
                         {chainEntityTypeToProposalName(ce.type) +
                           (ce.typeId.startsWith('0x')
                             ? ` ${ce.typeId.slice(0, 6)}...`
                             : ` #${ce.typeId}`)}
-                      </span>
-                      <span>
+                      </div>
+                      <div class="chain-entity-subtext">
                         {ce.threadTitle !== 'undefined'
                           ? decodeURIComponent(ce.threadTitle)
-                          : ''}
-                      </span>
+                          : 'No thread title'}
+                      </div>
                     </div>
                   }
                   selected={selected}
@@ -119,7 +119,7 @@ export class ChainEntitiesSelector
           />
         ) : (
           <div class="laoding-container">
-            <div class="loading-container-text">
+            <div class="loading-text">
               {this.chainEntitiesLoaded
                 ? 'Select "In Voting" to begin.'
                 : 'Loading on-chain proposals...'}

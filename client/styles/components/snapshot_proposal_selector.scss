@@ -3,7 +3,7 @@
 .SnapshotProposalSelector {
   border-radius: 5px;
   border: 1px solid #ddd;
-  height: 176px;
+  height: 208px;
   margin-bottom: 16px;
   overflow-y: scroll;
   width: 552px;
@@ -23,9 +23,10 @@
 
   .cui-list {
     border-radius: 5px;
-    height: 152px;
+    height: 208px;
 
     .cui-list-item {
+      height: 56px;
       padding: 8px 16px !important;
     }
   }
@@ -34,8 +35,21 @@
     left: 0;
   }
 
-  .chain-entity-info {
+  .chain-entity {
+    display: flex;
+    flex-direction: column;
     font-size: 14px;
+    min-width: 0; // this ensures the title ellipsis will work
+
+    .chain-entity-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chain-entity-subtext {
+      color: $text-color-medium;
+    }
   }
 
   .loading-container {
@@ -45,7 +59,7 @@
     justify-content: center;
     width: 100%;
 
-    .loading-container-text {
+    .loading-text {
       color: $text-color-medium-dark;
     }
   }

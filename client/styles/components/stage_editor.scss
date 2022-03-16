@@ -1,32 +1,18 @@
 @import 'client/styles/shared';
 
 .StageEditorDialog {
-  h4 {
-    font-size: 17px;
-    font-weight: 600;
-    margin: 10px 7px;
-  }
+  .cui-dialog-body {
+    padding: 16px 24px;
 
-  p {
-    margin: 0 8px;
-    margin-top: 16px;
-  }
+    .stage-options {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      margin: 0 0 8px;
 
-  p.secondary {
-    color: $text-color-medium;
-    margin-top: 16px;
-    margin: 0;
-  }
-
-  .stage-options {
-    margin-bottom: 30px;
-    margin-top: 12px;
-  }
-
-  .cui-button.cui-sm {
-    height: initial;
-    margin: 0 6px;
-    max-height: initial;
-    padding: 4px 15px 3px;
+      button {
+        margin: 0 8px 8px 0;
+      }
+    }
   }
 }
