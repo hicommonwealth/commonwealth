@@ -26,6 +26,26 @@ type PollEditorAttrs = {
   thread: OffchainThread;
 };
 
+const getPollDurationCopy = (
+  customDuration: string,
+  customDurationEnabled: boolean
+) => {
+  if (customDurationEnabled && customDuration === 'Infinite') {
+    return 'This poll will never expire.';
+  } else if (customDurationEnabled && customDuration !== 'Infinite') {
+    return `If started now, this poll will stay open until ${moment()
+      .add(customDuration.split(' ')[0], 'days')
+      .local()
+      .format('lll')}.`;
+  } else if (!customDurationEnabled) {
+    return `By default, offchain polls run for at least 5 days, ending on the 1st
+        and 15th of each month. If started now, this poll would stay open until
+        ${getNextOffchainPollEndingTime(moment())
+          .local()
+          .format('lll')}. Override?`;
+  }
+};
+
 export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
   private choices: string[];
   private customDuration: string;
@@ -104,23 +124,7 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
             />
           </div>,
           <div class="poll-duration-copy">
-            {customDurationEnabled
-              ? customDuration === 'Infinite'
-                ? 'This poll will never expire.'
-                : [
-                    'If started now, this poll will stay open until ',
-                    moment()
-                      .add(customDuration.split(' ')[0], 'days')
-                      .local()
-                      .format('lll'),
-                    '.',
-                  ]
-              : [
-                  'By default, offchain polls run for at least 5 days, ending on the 1st and 15th of each month. ',
-                  'If started now, this poll would stay open until ',
-                  getNextOffchainPollEndingTime(moment()).local().format('lll'),
-                  '. Override?',
-                ]}
+            {getPollDurationCopy(customDuration, customDurationEnabled)}
           </div>,
           <div class="poll-editor-duration">
             <Switch
