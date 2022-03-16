@@ -1,0 +1,52 @@
+@import 'client/styles/shared';
+
+.SnapshotProposalSelector {
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  height: 176px;
+  margin-bottom: 16px;
+  overflow-y: scroll;
+  width: 552px;
+
+  .cui-control-group {
+    margin-bottom: 0;
+  }
+
+  .cui-input input {
+    border-bottom-color: $border-color-light;
+    border-left: none;
+    border-radius: 0;
+    border-right: none;
+    border-top: none;
+    height: 40px;
+  }
+
+  .cui-list {
+    border-radius: 5px;
+    height: 152px;
+
+    .cui-list-item {
+      padding: 8px 16px !important;
+    }
+  }
+
+  .cui-query-list-checkmark .cui-list-item-content-left {
+    left: 0;
+  }
+
+  .chain-entity-info {
+    font-size: 14px;
+  }
+
+  .loading-container {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    width: 100%;
+
+    .loading-container-text {
+      color: $text-color-medium-dark;
+    }
+  }
+}
