@@ -1,11 +1,11 @@
 import { ChainBase } from 'types';
 import { Account, IWebWallet } from 'models';
-import { Extension, Msg, MsgStoreCode, StdFee } from '@terra-money/terra.js';
+import { Extension, Msg, MsgStoreCode, Fee } from '@terra-money/terra.js';
 
 class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _accounts: string[] = [];
-  private _enabling: boolean = false;
+  private _enabling = false;
   private _extension = new Extension()
 
   public readonly name = 'terrastation';
@@ -44,10 +44,10 @@ class TerraStationWebWalletController implements IWebWallet<string> {
           this._accounts.push(accountAddr);
           console.log('enabled and added');
         }
-        this._enabled = this._accounts.length !== 0;
+        this._enabled = !!accountAddr;
+        this._enabling = false;
       });
       this._extension.connect();
-      this._enabling = false;
     } catch (error) {
       console.error(`Failed to enabled Terra Station ${error.message}`);
       this._enabling = false;
@@ -55,27 +55,25 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
-    this._extension.on('onSign', (payload) => {
-      console.log(payload);
-    });
-    const msgs: Msg[] = [
-      new MsgStoreCode(this._accounts[0], account.validationToken)
-    ];
-    try {
-      this._extension.sign({
-        fee: new StdFee(0, '0ust'),
-        msgs
-      });
-    } catch (error) {
-      console.log(error);
-    }
-
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
+        console.log(payload);
         if (payload.result?.signature) resolve(payload.result);
         else reject();
       });
+
+      const msgs: Msg[] = [
+        new MsgStoreCode(this._accounts[0], account.validationToken)
+      ];
+      try {
+        this._extension.sign({
+          fee: new Fee(0, '0ust'),
+          msgs
+        });
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     const signature = {
