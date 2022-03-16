@@ -2,55 +2,55 @@
 
 .PollEditorDialog {
   .cui-dialog-body {
-    padding: 36px 28px 32px;
-  }
-
-  .cui-switch {
-    color: $text-color-black;
-    margin-bottom: 20px;
-  }
-
-  h4 {
-    margin: 12px 0 14px;
-  }
-
-  h4.disabled {
-    color: $text-color-light;
-  }
-
-  .poll-editor-choices-question {
-    margin-bottom: 16px;
-  }
-
-  .poll-editor-choices {
-    .poll-editor-choice-buttons {
-      margin: 4px 0;
-    }
-
-    .poll-editor-choice {
-      margin-bottom: 4px;
-    }
-
-    .cui-input,
-    .cui-button {
-      margin-bottom: 8px;
-    }
-  }
-
-  .poll-duration-copy {
-    color: $text-color-medium;
-    margin: 22px 0 10px;
-  }
-
-  .poll-editor-duration {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
+    padding: 24px;
 
     .cui-switch {
+      color: $text-color-black;
+      margin-bottom: 16px;
+    }
+
+    h4 {
+      margin: 8px 0;
+    }
+
+    h4.disabled {
+      color: $text-color-light;
+    }
+
+    .poll-editor-choices-question {
+      margin-bottom: 16px;
+    }
+
+    .poll-editor-choices {
+      .poll-editor-choice-buttons {
+        margin: 4px 0;
+      }
+
+      .poll-editor-choice {
+        margin-bottom: 4px;
+      }
+
+      .cui-input,
+      .cui-button {
+        margin-bottom: 8px;
+      }
+    }
+
+    .poll-duration-copy {
       color: $text-color-medium;
-      margin-bottom: 0;
-      min-width: max-content;
+      margin: 16px 0px;
+    }
+
+    .poll-editor-duration {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+
+      .cui-switch {
+        color: $text-color-medium;
+        margin-bottom: 0;
+        min-width: max-content;
+      }
     }
   }
 }

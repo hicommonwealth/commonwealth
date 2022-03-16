@@ -54,7 +54,7 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
   private pollingEnabled: boolean;
 
   view(vnode) {
-    const { thread } = vnode.attrs;
+    const { onChangeHandler, thread } = vnode.attrs;
     const { pollingEnabled, customDurationEnabled, customDuration } = this;
 
     // reset choices when initializing
@@ -163,7 +163,7 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
         isOpen={true}
         inline={false}
         onClose={() => {
-          vnode.attrs.onChangeHandler();
+          onChangeHandler();
         }}
         title="Create poll"
         transitionDuration={200}
@@ -173,7 +173,7 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
               label="Cancel"
               rounded={true}
               onclick={() => {
-                vnode.attrs.onChangeHandler();
+                onChangeHandler();
               }}
             />
             ,
@@ -202,9 +202,9 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
                   } catch (e) {
                     console.error(e);
                   }
-                  vnode.attrs.onChangeHandler();
+                  onChangeHandler();
                 } else {
-                  vnode.attrs.onChangeHandler();
+                  onChangeHandler();
                 }
               }}
             />
