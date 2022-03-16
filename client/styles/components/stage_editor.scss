@@ -1,78 +1,84 @@
 @import 'client/styles/shared';
 
-.StageEditor {
-}
-
 .StageEditorDialog {
-    h4 {
-        margin: 10px 7px;
-        font-size: 17px;
-        font-weight: 600;
-    }
-    p {
-        margin: 0 8px;
-        margin-top: 16px;
-    }
-    p.secondary {
-        margin: 0;
-        margin-top: 16px;
-        color: $text-color-medium;
-    }
-    .stage-options {
-        margin-top: 12px;
-        margin-bottom: 30px;
-    }
-    .cui-button.cui-sm {
-        padding: 4px 15px 3px;
-        height: initial;
-        max-height: initial;
-        margin: 0 6px;
-    }
+  h4 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 10px 7px;
+  }
+
+  p {
+    margin: 0 8px;
+    margin-top: 16px;
+  }
+
+  p.secondary {
+    color: $text-color-medium;
+    margin-top: 16px;
+    margin: 0;
+  }
+
+  .stage-options {
+    margin-bottom: 30px;
+    margin-top: 12px;
+  }
+
+  .cui-button.cui-sm {
+    height: initial;
+    margin: 0 6px;
+    max-height: initial;
+    padding: 4px 15px 3px;
+  }
 }
 
 .ChainEntitiesSelector {
-    padding: 0;
-    border: 1px solid #ddd;
-    margin: 10px 8px 20px;
-    border-radius: 5px;
-    .cui-control-group {
-        margin-bottom: 0;
-    }
-    .cui-input input {
-        border-top: none;
-        border-right: none;
-        border-left: none;
-        border-bottom-color: $border-color-light;
-        height: 44px;
-        border-radius: 0;
-    }
-    .cui-list {
-        min-height: 150px;
-        max-height: 150px;
-        border-radius: 5px;
-        .cui-active {
-            background: initial;
-        }
-        .cui-list-item {
-            .chain-entity-info {
-                .chain-entity-top {
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin: 10px 8px 20px;
+  padding: 0;
 
-                }
-                .chain-entity-bottom {
-                    font-size: 88%;
-                }
-            }
+  .cui-control-group {
+    margin-bottom: 0;
+  }
+
+  .cui-input input {
+    border-bottom-color: $border-color-light;
+    border-left: none;
+    border-radius: 0;
+    border-right: none;
+    border-top: none;
+    height: 44px;
+  }
+
+  .cui-list {
+    border-radius: 5px;
+    max-height: 150px;
+    min-height: 150px;
+
+    .cui-active {
+      background: initial;
+    }
+
+    .cui-list-item {
+      .chain-entity-info {
+        .chain-entity-bottom {
+          font-size: 88%;
         }
+      }
     }
-    .cui-query-list-checkmark .cui-list-item-content-left {
-        left: 0;
-    }
-    .chain-entities-selector-placeholder {
-        padding: 112px 0;
-        text-align: center;
-    }
-    .chain-entities-selector-placeholder-text {
-        height: 30px;
-        color: $text-color-medium-dark;
-    }
+  }
+
+  .cui-query-list-checkmark .cui-list-item-content-left {
+    left: 0;
+  }
+
+  .chain-entities-selector-placeholder {
+    padding: 112px 0;
+    text-align: center;
+  }
+
+  .chain-entities-selector-placeholder-text {
+    color: $text-color-medium-dark;
+    height: 30px;
+  }
 }
