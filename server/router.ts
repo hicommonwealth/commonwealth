@@ -5,10 +5,6 @@ import type { Express } from 'express';
 import domain from './routes/domain';
 import status from './routes/status';
 import createGist from './routes/createGist';
-
-import edgewareLockdropEvents from './routes/edgeware_lockdrop_events';
-import edgewareLockdropBalances from './routes/edgeware_lockdrop_balances';
-
 import createAddress from './routes/createAddress';
 import linkExistingAddressToChain from './routes/linkExistingAddressToChain';
 import verifyAddress from './routes/verifyAddress';
@@ -105,9 +101,6 @@ import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
 import setTopicThreshold from './routes/setTopicThreshold';
-
-import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
-import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
@@ -582,17 +575,6 @@ function setupRouter(
   // send feedback button
   router.post('/sendFeedback', sendFeedback.bind(this, models));
 
-  // stats
-  // edgeware
-  router.get(
-    '/stats/edgeware/lockdrop/events',
-    edgewareLockdropEvents.bind(this, models)
-  );
-  router.get(
-    '/stats/edgeware/lockdrop/balances',
-    edgewareLockdropBalances.bind(this, models)
-  );
-
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
@@ -614,15 +596,6 @@ function setupRouter(
 
   // logout
   router.get('/logout', logout.bind(this, models));
-
-  router.get(
-    '/edgewareLockdropLookup',
-    edgewareLockdropLookup.bind(this, models)
-  );
-  router.get(
-    '/edgewareLockdropStats',
-    edgewareLockdropStats.bind(this, models)
-  );
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
