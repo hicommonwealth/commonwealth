@@ -154,7 +154,7 @@
 
 .SearchBar {
   margin: -1px 4%;
-  padding: 0 1px;
+  padding: 0;
   flex: 6;
   position: relative;
   .cui-input {
@@ -206,8 +206,7 @@
     }
     input {
       height: 31px;
-      padding: 20px 15px 15px;
-      padding-right: 38px;
+      padding: 4px 16px;
       position: relative;
       background: #efefef;
       border: none;
@@ -337,6 +336,7 @@
             border-radius: 10px;
             text-transform: capitalize;
             margin-right: 3px;
+            padding: 4px 8px;
 
             &.search-history-primary-tag {
               border: 1px solid #6300ff;

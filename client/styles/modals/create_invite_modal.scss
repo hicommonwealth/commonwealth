@@ -12,6 +12,11 @@
     }
     .address-input-group {
       max-width: calc(66.7% - 5px);
+
+      .cui-input input {
+        height: 40px;
+        padding: 4px 8px;
+      }
     }
     h4 {
       margin-top: 0;
@@ -24,6 +29,12 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+    }
+  }
+  .invite-email-form {
+    .cui-input input {
+      height: 40px;
+      padding: 4px 8px;
     }
   }
   form + form {
@@ -72,6 +83,10 @@
 
   .CreateInviteLink {
     margin-top: 30px;
+    .cui-input input {
+      height: 40px;
+      padding: 4px 8px;
+    }
     .invite-link-title {
       font-size: 24px;
       font-weight: 500;
