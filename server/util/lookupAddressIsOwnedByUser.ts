@@ -1,14 +1,21 @@
 // Helper function to look up an (address, author_chain) pair of parameters,
 // and check that it's owned by the current user. Only for POST requests.
 
-import { Request } from 'express';
+import { DB } from '../database';
+import { AddressInstance } from '../models/address';
+import { UserInstance } from '../models/user';
 
-const lookupAddressIsOwnedByUser = async (models, req: Request): Promise<[any, string | null]> => {
-  if (!req.user) {
+type AddressChainReq = { body?: { author_chain: string, address: string }, user?: UserInstance };
+
+const lookupAddressIsOwnedByUser = async (
+  models: DB,
+  req: AddressChainReq
+): Promise<[AddressInstance | null, string | null]> => {
+  if (!req.user?.id) {
     return [null, 'Not logged in'];
   }
 
-  if (!req.body.author_chain || !req.body.address) {
+  if (!req.body?.author_chain || !req.body?.address) {
     return [null, 'Invalid public key/chain'];
   }
 
