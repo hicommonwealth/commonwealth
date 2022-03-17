@@ -1,4 +1,4 @@
-@import "client/styles/shared";
+@import 'client/styles/shared';
 
 @mixin profile-listing {
   h3 {
@@ -36,11 +36,10 @@
 @mixin comment-level {
   margin-top: 24px;
   padding-bottom: 18px;
-  border-bottom: 1px solid #DDDDDD;
+  border-bottom: 1px solid #dddddd;
   .proposal-title {
     color: black !important;
     font-weight: 600;
-    line-height: 1.2;
   }
   .summary {
     color: $text-color-light;
@@ -100,7 +99,7 @@
       border-bottom: none;
       position: sticky;
       top: 83px;
-      @include sm-max{
+      @include sm-max {
         top: 57px;
       }
       background-color: white;
@@ -114,7 +113,7 @@
 
       .count {
         display: inline;
-        background-color: #EEEEEE;
+        background-color: #eeeeee;
         padding: 6px 10px 2px 10px;
         border-radius: 9999px;
         font-size: 14px;
@@ -238,9 +237,9 @@
       margin: 6px 16px 6px 0;
       border-radius: 8px;
       padding: 5px 15px 5px 15px;
-      background: #FFFFFF;
-      border: 1px solid #4723AD;
-      color: #4723AD;
+      background: #ffffff;
+      border: 1px solid #4723ad;
+      color: #4723ad;
       font-weight: 500;
       font-size: 18px;
       text-transform: uppercase;
@@ -334,9 +333,9 @@
         margin-right: 16px;
         border-radius: 8px;
         padding: 5px 15px 5px 15px;
-        background: #FFFFFF;
-        border: 1px solid #4723AD;
-        color: #4723AD;
+        background: #ffffff;
+        border: 1px solid #4723ad;
+        color: #4723ad;
         font-weight: 500;
         font-size: 18px;
         text-transform: uppercase;
@@ -400,7 +399,6 @@
       color: $text-color-white;
       background: $text-color-medium;
       position: relative;
-      line-height: 1.1;
       padding-left: 4px;
       font-size: 95%;
     }

@@ -5,11 +5,6 @@
     .ReactionButton {
       background: $background-color-white;
     }
-    .row-header {
-      a {
-        line-height: 1.2;
-      }
-    }
     .row-subheader {
       position: relative;
       top: -2px;
@@ -36,7 +31,6 @@
         margin: -2px 0;
         margin-right: 6px;
         border: none;
-        line-height: 1.5;
         opacity: 0.94;
       }
       a.proposal-topic {

@@ -130,7 +130,6 @@ $discussion-title-font-size: 1.45rem;
   }
   h3 {
     font-size: 23px;
-    line-height: 28px;
     font-weight: 500;
     margin-bottom: 8px;
   }
@@ -234,7 +233,6 @@ $discussion-title-font-size: 1.45rem;
         font-size: $discussion-title-font-size;
         font-weight: 600;
         flex: 1;
-        line-height: 1.1;
         .cui-tag {
           font-weight: 400;
           margin-left: 12px;
@@ -470,7 +468,6 @@ $discussion-title-font-size: 1.45rem;
   }
   .ProposalSidebarPollEditorModule {
     .placeholder-copy {
-      line-height: 1.2;
       color: shade($text-color-light, 10%);
       margin: 2px 0 12px;
     }
@@ -480,7 +477,6 @@ $discussion-title-font-size: 1.45rem;
   }
   .ProposalHeaderOffchainPoll {
     .offchain-poll-header {
-      line-height: 1.2;
       font-weight: 600;
     }
     .offchain-poll-options {
@@ -489,7 +485,6 @@ $discussion-title-font-size: 1.45rem;
         display: flex;
         .offchain-poll-option-left {
           margin: 6px 0;
-          line-height: 1.1;
           flex: 1;
         }
       }

@@ -4,7 +4,6 @@
   @include listing-row-base;
 
   .row-left {
-    line-height: 1.1;
     flex: $listing-left-flex;
     display: flex;
     flex-direction: row;

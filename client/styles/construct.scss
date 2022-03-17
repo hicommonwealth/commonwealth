@@ -17,15 +17,12 @@ $cui-font-weight-bold: 500;
 $cui-font-weight-heavy: 500; // this is only used in overrides
 $cui-font-weight: $cui-font-weight-normal;
 
-$cui-line-height: 1.5;
-
 $cui-paragraph-margin-bottom: 1rem;
 
 $cui-headings-margin-bottom: $cui-spacer;
 
 $cui-headings-font-family: inherit;
 $cui-headings-font-weight: 400;
-$cui-headings-line-height: 1.2;
 
 $cui-font-size: floor($cui-base-size * 1.4);
 $cui-font-size-xs: floor($cui-base-size * 1.1);
@@ -162,18 +159,6 @@ body {
   font-size: inherit;
 }
 
-.cui-button .cui-button-sublabel,
-.cui-button .cui-button-label {
-  position: relative;
-  top: 3px;
-  overflow: visible;
-}
-
-.cui-button.cui-xl .cui-button-sublabel,
-.cui-button.cui-xl .cui-button-label {
-  top: 4px;
-}
-
 .cui-button.cui-sm,
 .cui-button-group.cui-sm .cui-button,
 .cui-menu.cui-sm .cui-button {
@@ -181,7 +166,6 @@ body {
   font-size: 16px;
   height: 26px;
   min-height: 26px;
-  line-height: 26px;
 }
 
 .cui-tooltip .cui-popover-content {
@@ -261,12 +245,6 @@ body {
   padding: 13px 13px 6.5px !important;
 }
 
-// cui toast
-.cui-toast .cui-toast-message {
-  position: relative;
-  top: 3px;
-}
-
 // cui tabs
 .cui-tabs .cui-tabs-item {
   padding-top: 13px !important;
@@ -281,7 +259,6 @@ body {
 // cui control padding
 .cui-control {
   min-height: 1.5em;
-  line-height: 1.5em;
 }
 
 // button link fixes
@@ -360,7 +337,6 @@ button,
 
 // adjust callout padding, colors, spacing
 .cui-callout {
-  line-height: 1.2;
   padding: 1.3em 1.2em 1em;
 
   @each $size in $cui-sizes {
@@ -407,7 +383,6 @@ button,
 // adjust select height
 .cui-select select {
   height: 41px;
-  padding-top: 5px;
 }
 
 // adjust card padding
@@ -440,7 +415,6 @@ button,
 
 // reduce tag padding
 .cui-tag {
-  line-height: 1.2;
   @include cui-tag-sizing(
     $cui-base-height * 0.5,
     $cui-base-padding,

@@ -159,8 +159,6 @@ $text-size-mobile-header: 22px;
     }
 
     .stats-box-right {
-      line-height: 1.25;
-
       p {
         margin: 4px 0 0;
       }
@@ -362,7 +360,6 @@ h3 {
 @mixin form-label {
   @include body;
   font-size: 14px;
-  line-height: 16.8px;
   color: #666666;
 }
 

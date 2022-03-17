@@ -43,7 +43,6 @@
   .compact-modal-title {
     background: $primary-bg-color;
     color: $text-color-white;
-    line-height: 1.2;
     padding: 23px 27px 15px;
 
     h1,
@@ -62,7 +61,6 @@
   }
 
   .compact-modal-body {
-    line-height: 1.2;
     padding: 22px 28px 0;
 
     &:last-child {
