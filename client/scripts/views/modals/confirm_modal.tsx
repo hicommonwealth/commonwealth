@@ -1,57 +1,63 @@
-import 'modals/confirm_modal.scss';
+/* @jsx m */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
 import $ from 'jquery';
-import app from 'state';
 import { Button } from 'construct-ui';
+
+import 'modals/confirm_modal.scss';
+
+import app from 'state';
 
 const ConfirmModal = {
   confirmExit: async () => true,
-  view: (vnode) => {
+  view(vnode) {
     const confirmText = vnode.attrs.prompt || 'Are you sure?';
     const primaryButton = vnode.attrs.primaryButton || 'Yes';
     const secondaryButton = vnode.attrs.secondaryButton || 'Cancel';
-    return m(
-      '.ConfirmModal',
-      {
-        onclick: (e) => {
+
+    return (
+      <div
+        class="ConfirmModal"
+        onclick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-        },
-        onmousedown: (e) => {
+        }}
+        onmousedown={(e) => {
           e.preventDefault();
           e.stopPropagation();
-        },
-      },
-      [
-        m('.compact-modal-body', [m('h3', confirmText)]),
-        m('.compact-modal-actions', [
-          m(Button, {
-            intent: 'primary',
-            rounded: true,
-            onclick: (e) => {
+        }}
+      >
+        <div class="compact-modal-body">
+          <h3>{confirmText}</h3>
+        </div>
+        <div class="compact-modal-actions">
+          <Button
+            intent="primary"
+            rounded={true}
+            onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               setTimeout(() => {
                 $(e.target).trigger('modalexit');
               }, 0);
-            },
-            oncreate: (vvnode) => {
+            }}
+            oncreate={(vvnode) => {
               $(vvnode.dom).focus();
-            },
-            label: primaryButton,
-          }),
-          m(Button, {
-            intent: 'none',
-            rounded: true,
-            onclick: (e) => {
+            }}
+            label={primaryButton}
+          />
+          <Button
+            intent="none"
+            rounded={true}
+            onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');
-            },
-            label: secondaryButton,
-          }),
-        ]),
-      ]
+            }}
+            label={secondaryButton}
+          />
+        </div>
+      </div>
     );
   },
 };
