@@ -150,18 +150,12 @@ function setupRouter(
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
 
-  router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));
   router.post(
     '/editSubstrateSpec',
     passport.authenticate('jwt', { session: false }),
     editSubstrateSpec.bind(this, models)
   );
 
-  router.post(
-    '/createGist',
-    passport.authenticate('jwt', { session: false }),
-    createGist.bind(this, models)
-  );
   router.post('/createAddress', createAddress.bind(this, models));
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   router.post(
@@ -402,11 +396,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createInvite.bind(this, models)
   );
-  router.get(
-    '/getInvites',
-    passport.authenticate('jwt', { session: false }),
-    getInvites.bind(this, models)
-  );
   router.post(
     '/acceptInvite',
     passport.authenticate('jwt', { session: false }),
@@ -488,9 +477,9 @@ function setupRouter(
   );
 
   router.delete(
-      '/discordAccount',
-      passport.authenticate('jwt', { session: false }),
-      deleteSocialAccount.bind(this, models, 'discord')
+    '/discordAccount',
+    passport.authenticate('jwt', { session: false }),
+    deleteSocialAccount.bind(this, models, 'discord')
   )
 
   // offchain viewCount
