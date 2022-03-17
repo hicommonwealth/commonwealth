@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { DB } from '../database';
 import pinIpfsBlob from '../util/pinIpfsBlob';
 import isValidJSON from '../util/isValidJson';
@@ -17,9 +18,17 @@ const pinIPFS = async (
   next: NextFunction
 ) => {
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-  if (!req.body.address_id) return next(new AppError(Errors.InvalidAddress));
   if (!req.body.blob) return next(new AppError(Errors.NoBlobPresent));
   if (!isValidJSON(req.body.blob)) return next(new AppError(Errors.InvalidJson));
+  const userOwnedAddresses = await req.user.getAddresses();
+  const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const validAddress = await models.Address.findOne({
+    where: {
+      id: { [Op.in]: userOwnedAddressIds },
+      user_id: req.user.id,
+    }
+  });
+  if (!validAddress) return next(new AppError(Errors.InvalidAddress));
   try {
     const ipfsHash = await pinIpfsBlob(
       req.user.id,
