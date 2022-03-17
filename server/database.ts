@@ -31,15 +31,6 @@ import ContractItemFactory, {
 import DiscussionDraftFactory, {
   DiscussionDraftModelStatic,
 } from './models/discussion_draft';
-import EdgewareLockdropBalanceFactory, {
-  EdgewareLockdropBalanceModelStatic,
-} from './models/edgeware_lockdrop_balance';
-import EdgewareLockdropEventFactory, {
-  EdgewareLockdropEventModelStatic,
-} from './models/edgeware_lockdrop_event';
-import EdgewareLockdropEverythingFactory, {
-  EdgewareLockdropEverythingModelStatic,
-} from './models/edgeware_lockdrop_everything';
 import HedgehogAuthenticationFactory, {
   HedgehogAuthenticationModelStatic,
 } from './models/hedgehog_authentication';
@@ -116,9 +107,6 @@ export type Models = {
   ContractCategory: ContractCategoryModelStatic;
   ContractItem: ContractItemModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
-  EdgewareLockdropBalance: EdgewareLockdropBalanceModelStatic;
-  EdgewareLockdropEvent: EdgewareLockdropEventModelStatic;
-  EdgewareLockdropEverything: EdgewareLockdropEverythingModelStatic;
   HedgehogAuthentication: HedgehogAuthenticationModelStatic;
   HedgehogUser: HedgehogUserModelStatic;
   IdentityCache: IdentityCacheStatic;
@@ -194,12 +182,6 @@ const models: Models = {
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
   ContractItem: ContractItemFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
-  EdgewareLockdropBalance: EdgewareLockdropBalanceFactory(sequelize, DataTypes),
-  EdgewareLockdropEvent: EdgewareLockdropEventFactory(sequelize, DataTypes),
-  EdgewareLockdropEverything: EdgewareLockdropEverythingFactory(
-    sequelize,
-    DataTypes
-  ),
   HedgehogAuthentication: HedgehogAuthenticationFactory(sequelize, DataTypes),
   HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),

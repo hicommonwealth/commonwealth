@@ -123,41 +123,6 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
   },
 };
 
-const LockdropToolsCard: m.Component = {
-  view: () => {
-    return m(
-      CWCard,
-      {
-        elevation: 'elevation-2',
-        interactive: true,
-        className: 'chain-card',
-      },
-      [
-        m('.lockdrop-card-body', [
-          m('h3', 'Edgeware Lockdrop Tools'),
-          m(CWButton, {
-            onclick: (e) => {
-              e.preventDefault();
-              localStorage['home-scrollY'] = window.scrollY;
-              m.route.set('/edgeware/stats');
-            },
-            label: 'Lockdrop stats',
-          }),
-          m('.spacer', []),
-          m(CWButton, {
-            onclick: (e) => {
-              e.preventDefault();
-              localStorage['home-scrollY'] = window.scrollY;
-              m.route.set('/edgeware/unlock');
-            },
-            label: 'Unlock ETH',
-          }),
-        ]),
-      ]
-    );
-  },
-};
-
 const NewCommunityCard: m.Component = {
   view: () => {
     return m(
@@ -245,7 +210,7 @@ const HomepageCommunityCards: m.Component = {
             m('h4', 'Testnets & Alpha Networks'),
           betaChainsAndCommunities,
         ]),
-        m('.other-list', [m(NewCommunityCard), m(LockdropToolsCard)]),
+        m('.other-list', [m(NewCommunityCard)]),
       ]
     );
   },
