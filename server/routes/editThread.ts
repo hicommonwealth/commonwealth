@@ -154,7 +154,8 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
         chain_id: finalThread.chain,
-        author_address: finalThread.Address.address
+        author_address: finalThread.Address.address,
+        author_chain: finalThread.Address.chain,
       },
       // don't send webhook notifications for edits
       null,

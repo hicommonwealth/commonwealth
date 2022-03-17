@@ -1,11 +1,12 @@
 import moment from 'moment';
-import { Request, Response, NextFunction } from 'express';
-import BN from 'bn.js';
+import { NextFunction } from 'express';
 
 import { sequelize, DB } from '../database';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import TokenBalanceCache from '../util/tokenBalanceCache';
+import { TypedRequestBody, TypedResponse, success } from '../types';
+import { OffchainVoteAttributes, OffchainVoteInstance } from '../models/offchain_vote';
 
 export const Errors = {
   InvalidThread: 'Invalid thread',
@@ -14,11 +15,21 @@ export const Errors = {
   BalanceCheckFailed: 'Could not verify user token balance',
 };
 
+type UpdateOffchainVoteReq = {
+  thread_id: number,
+  chain: string,
+  address: string,
+  author_chain: string,
+  option: string,
+};
+
+type UpdateOffchainVoteResp = OffchainVoteAttributes;
+
 const updateOffchainVote = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<UpdateOffchainVoteReq>,
+  res: TypedResponse<UpdateOffchainVoteResp>,
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
@@ -45,7 +56,7 @@ const updateOffchainVote = async (
     return next(new Error(Errors.BalanceCheckFailed));
   }
 
-  let vote;
+  let vote: OffchainVoteInstance;
   await sequelize.transaction(async (t) => {
     // delete existing votes
     const destroyed = await models.OffchainVote.destroy({
@@ -74,7 +85,7 @@ const updateOffchainVote = async (
     }
   });
 
-  return res.json({ status: 'Success', result: vote.toJSON() });
+  return success(res, vote.toJSON());
 };
 
 export default updateOffchainVote;

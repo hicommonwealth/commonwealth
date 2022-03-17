@@ -555,7 +555,7 @@ const DiscussionsPage: m.Component<
     const lastVisited = moment(allLastVisited[id]).utc();
 
     let sortedListing = [];
-    let pinnedListing = [];
+    const pinnedListing = [];
     // fetch unique addresses count for pinned threads
     if (!app.threadUniqueAddressesCount.getInitializedPinned()) {
       app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
