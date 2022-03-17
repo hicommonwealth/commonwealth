@@ -48,6 +48,9 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Typography</h1>
+        <div style="font-family: Silka;">poop</div>
+        <div style="font-family: neue-haas-unica;">poop</div>
         <h1>Colors</h1>
         <div class="color-gallery">
           {displayColors({
