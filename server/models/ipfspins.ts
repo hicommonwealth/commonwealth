@@ -33,5 +33,8 @@ export default (
       updatedAt: 'updated_at',
     }
   );
+  IpfsPins.associate = (models) => {
+    models.IpfsPins.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
+  };
   return IpfsPins;
 };
