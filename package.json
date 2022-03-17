@@ -52,7 +52,6 @@
   "keywords": [],
   "dependencies": {
     "@apollo/client": "^3.3.18",
-    "@audius/hedgehog": "^1.0.5",
     "@babel/core": "^7.2.2",
     "@babel/plugin-proposal-async-generator-functions": "^7.2.0",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
