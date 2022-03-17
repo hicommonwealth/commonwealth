@@ -174,6 +174,11 @@ function setupRouter(
 
   // chains
   router.post(
+    '/createChain',
+    passport.authenticate('jwt', { session: false }),
+    createChain.bind(this, models)
+  );
+  router.post(
     '/addChainNode',
     passport.authenticate('jwt', { session: false }),
     addChainNode.bind(this, models)
@@ -194,22 +199,15 @@ function setupRouter(
     updateChain.bind(this, models)
   );
 
-  // offchain communities
   router.post(
     '/starCommunity',
     passport.authenticate('jwt', { session: false }),
     starCommunity.bind(this, models)
   );
 
-  // offchain community admin routes
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get('/getSupportedEthChains', getSupportedEthChains.bind(this, models));
-  router.post(
-    '/createChain',
-    passport.authenticate('jwt', { session: false }),
-    createChain.bind(this, models)
-  );
 
   // offchain threads
   router.post(
