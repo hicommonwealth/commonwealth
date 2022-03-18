@@ -2,7 +2,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import { initAppState } from 'app';
 import { updateActiveAddresses } from 'controllers/app/login';
 import ErrorPage from './error';
