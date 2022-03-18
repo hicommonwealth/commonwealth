@@ -4,7 +4,7 @@
 // import app from 'state';
 
 // import Sublayout from 'views/sublayout';
-// import PageLoading from 'views/pages/loading';
+// import { PageLoading } from 'views/pages/loading';
 
 // const BackersPage: m.Component<{}> = {
 //   view: (vnode) => {

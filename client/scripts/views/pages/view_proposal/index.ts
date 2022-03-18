@@ -60,7 +60,7 @@ import ProposalVotingActions, {
   QueueButton,
 } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';

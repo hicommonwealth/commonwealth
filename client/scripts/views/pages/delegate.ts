@@ -5,7 +5,7 @@ import app from 'state';
 import { ChainNetwork } from 'types';
 
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
