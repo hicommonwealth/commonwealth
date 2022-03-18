@@ -15,7 +15,7 @@ import { NodeInfo, OffchainThread } from 'models';
 import { updateLastVisited } from 'controllers/app/login';
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import EmptyListingPlaceholder from 'views/components/empty_topic_placeholder';
 import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
