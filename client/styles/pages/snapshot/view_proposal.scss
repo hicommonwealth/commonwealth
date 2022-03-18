@@ -58,20 +58,20 @@
           color: white;
           font-weight: 500;
           border-radius: 9999px;
-          padding: 8px 12px 3px;
+          padding: 4px 8px;
         }
       }
 
       .votes-container {
-        border: 2px solid #EEEEEE;
+        border: 2px solid #eeeeee;
         border-radius: 10px;
-        background-color: #F8F8F8;
+        background-color: #f8f8f8;
         margin-top: 18px;
 
         .t-head {
           display: flex;
           justify-content: space-between;
-          border-bottom: 2px solid #EEEEEE;
+          border-bottom: 2px solid #eeeeee;
           color: #666666;
           font-weight: 500;
           padding: 18px 18px 14px;
@@ -106,8 +106,8 @@
           text-transform: uppercase;
           width: 100%;
           padding: 18px 0 14px 0;
-          color: #4723AD;
-          border-top: 1px solid #DDDDDD;
+          color: #4723ad;
+          border-top: 1px solid #dddddd;
         }
       }
     }
@@ -117,13 +117,13 @@
 
       .proposal-info-box,
       .VoteAction {
-        border: 1px solid #DDDDDD;
+        border: 1px solid #dddddd;
         border-radius: 8px;
         padding: 20px 0;
         margin-top: 24px;
-        box-shadow: 0px 2px 6px 0px #0000001A;
+        box-shadow: 0px 2px 6px 0px #0000001a;
 
-        &>* {
+        & > * {
           @include padding-x-20;
         }
 
@@ -141,7 +141,6 @@
         font-weight: 500;
       }
 
-
       .external-link-icon {
         margin-left: 0.25rem;
       }
@@ -155,7 +154,7 @@
           margin-right: 24px;
           flex-shrink: 0;
 
-          &>* {
+          & > * {
             margin-bottom: 10px;
           }
         }
@@ -171,7 +170,7 @@
             text-transform: capitalize;
           }
 
-          &>* {
+          & > * {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -181,7 +180,7 @@
       }
 
       .linked-discussion {
-        border-top: 1px solid #EEEEEE;
+        border-top: 1px solid #eeeeee;
         padding-top: 16px;
       }
 
@@ -232,17 +231,17 @@
         width: 100%;
         height: 6px;
         border-radius: 5px;
-        background-color: #DDDDDD;
+        background-color: #dddddd;
       }
 
       .result-progress::-webkit-progress-value {
         border-radius: 5px;
-        background-color: #00C0A9;
+        background-color: #00c0a9;
       }
 
       .snapshot-link {
         font-weight: 500;
-        color: #4723AD;
+        color: #4723ad;
         display: flex;
       }
 

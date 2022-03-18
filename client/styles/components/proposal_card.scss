@@ -5,16 +5,12 @@
   padding: 0;
   height: initial;
   .proposal-card-top {
-    position: relative;
-    padding: 24px 24px 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px;
     min-height: 260px;
     width: 100%;
-  }
-  .proposal-card-metadata {
-    min-height: 112px;
-    max-height: 112px;
-    margin-bottom: 21px;
-    overflow: hidden;
   }
   .proposal-injected {
     margin-bottom: 4px;
@@ -40,7 +36,7 @@
   .proposal-title {
     font-size: 18px;
     font-weight: 500;
-    margin: 9px 0 6px;
+    margin: 8px 0;
   }
   .proposal-amount,
   .proposal-comments {
@@ -79,10 +75,7 @@
     }
   }
   .proposal-status {
-    position: absolute;
-    bottom: 14px;
     font-weight: 500;
-    margin-bottom: 4px;
     color: $text-color-black;
     &.pass {
       color: $positive-bg-color;
