@@ -254,19 +254,20 @@ export class DiscussionRowMenu
             }}
           />
         )}
-        {this.stageEditorIsOpen &&
-          m(StageEditor, {
-            thread: vnode.attrs.proposal,
-            popoverMenu: true,
-            onChangeHandler: (stage: OffchainThreadStage) => {
+        {this.stageEditorIsOpen && (
+          <StageEditor
+            thread={vnode.attrs.proposal}
+            popoverMenu={true}
+            onChangeHandler={(stage: OffchainThreadStage) => {
               proposal.stage = stage;
               m.redraw();
-            },
-            openStateHandler: (v) => {
+            }}
+            openStateHandler={(v) => {
               this.stageEditorIsOpen = v;
               m.redraw();
-            },
-          })}
+            }}
+          />
+        )}
       </div>
     );
   }
