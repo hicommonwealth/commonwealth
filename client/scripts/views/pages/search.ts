@@ -17,7 +17,7 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import { ContentType } from 'controllers/server/search';
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import { PageNotFound } from './404';
