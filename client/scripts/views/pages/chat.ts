@@ -14,7 +14,7 @@
 // import Sublayout from 'views/sublayout';
 // import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 // import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-// import PageLoading from 'views/pages/loading';
+// import { PageLoading } from 'views/pages/loading';
 //
 // // how often outgoing typing indicators get sent
 // const TYPING_INDICATOR_OUTGOING_FREQUENCY = 1000;

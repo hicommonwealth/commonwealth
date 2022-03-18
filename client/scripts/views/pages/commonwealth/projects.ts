@@ -9,7 +9,7 @@ import { AddressInfo } from 'models';
 
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 
 interface CWProjectStub {
   title: string;

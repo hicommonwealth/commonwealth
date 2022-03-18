@@ -18,7 +18,7 @@ import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase } from 'types';
 import Sublayout from 'views/sublayout';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 
 interface IState {

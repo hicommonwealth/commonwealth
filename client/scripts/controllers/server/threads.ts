@@ -15,14 +15,16 @@ import {
   OffchainTopic,
   Profile,
   ChainEntity,
+  NotificationSubscription,
 } from 'models';
+import { NotificationCategories } from 'types';
+
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { LinkedThreadAttributes } from 'server/models/linked_thread';
-
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
@@ -288,6 +290,21 @@ class ThreadsController {
       this._listingStore.add(result, storeOptions);
       const activeEntity = app.chain;
       updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
+
+      // synthesize new subscription rather than hitting backend
+      const subscriptionJSON = {
+        id: null,
+        category_id: NotificationCategories.NewComment,
+        object_id: `discussion_${result.id}`,
+        is_active: true,
+        created_at: Date.now(),
+        immediate_email: false,
+        chain_id: result.chain,
+        offchain_thread_id: result.id,
+      };
+      app.user.notifications.subscriptions.push(
+        NotificationSubscription.fromJSON(subscriptionJSON)
+      );
       return result;
     } catch (err) {
       console.log('Failed to create thread');

@@ -12,7 +12,7 @@ import app from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { DropdownFormField } from '../components/forms';
 import Sublayout from '../sublayout';
-import PageLoading from './loading';
+import { PageLoading } from './loading';
 import { PageNotFound } from './404';
 
 interface ISpecSettingsState {
