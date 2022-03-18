@@ -8,9 +8,6 @@ import { ListItem, Select, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 import { pluralize } from 'helpers';
 import app from 'state';
 import { AddressInfo, Profile, SearchQuery } from 'models';
-import { getProposalUrlPath } from 'identifiers';
-import { ProposalType } from 'types';
-
 import { SearchScope, SearchSort } from 'models/SearchQuery';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
@@ -19,10 +16,10 @@ import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ContentType } from 'controllers/server/search';
-import { CommunityLabel } from '../components/sidebar/community_selector';
 import { PageNotFound } from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
+import { CommunityLabel } from '../components/community_label';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -65,14 +62,17 @@ const getCommunityResult = (community) => {
       : community.contentType === ContentType.Chain
       ? { chain: community }
       : null;
+
   params['size'] = 36;
-  const onSelect = (e) => {
+
+  const onSelect = () => {
     if (params.token) {
       m.route.set(params.token.address ? `/${params.token.address}` : '/');
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
     }
   };
+
   return m(ListItem, {
     label: m('a.search-results-item.community-result', [
       m(CommunityLabel, params),
@@ -80,7 +80,7 @@ const getCommunityResult = (community) => {
     onclick: onSelect,
     onkeyup: (e) => {
       if (e.key === 'Enter') {
-        onSelect(e);
+        onSelect();
       }
     },
   });
@@ -98,13 +98,7 @@ const getDiscussionResult = (thread, searchTerm) => {
       iconName: 'feedback',
     }),
     onclick: () => {
-      const path = getProposalUrlPath(
-        ProposalType.OffchainThread,
-        proposalId,
-        false,
-        chainOrComm
-      );
-      m.route.set(path);
+      m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
     },
     label: m('a.search-results-item', [
       m('.search-results-thread-header disabled', [
@@ -160,9 +154,11 @@ const getCommentResult = (comment, searchTerm) => {
       iconName: 'feedback',
     }),
     onclick: (e) => {
-      const [slug, id] = proposalId.split('_');
-      const path = getProposalUrlPath(slug, id, false, chainOrComm);
-      m.route.set(path);
+      m.route.set(
+        `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${
+          proposalId.split('_')[1]
+        }`
+      );
     },
     label: m('a.search-results-item', [
       m('.search-results-thread-header disabled', [
@@ -347,7 +343,7 @@ const SearchPage: m.Component<
         title: ['Search ', capitalize(scope) || 'Commonwealth'],
         showNewProposalButton: true,
         alwaysShowTitle: true,
-        hasCenterGrid: true,
+        centerGrid: true,
       },
       m(Tabs, tabs),
       m('.search-results-wrapper', [

@@ -133,17 +133,7 @@
         padding: 12px 0 6px;
         font-size: 18px;
         overflow: hidden;
-        .TokenLabel {
-          display: flex;
-          justify-content: left;
-          align-items: center;
-          .token-label-left {
-            padding-right: 12px;
-          }
-          .token-label-right {
-            font-weight: 500;
-          }
-        }
+
         .search-results-thread-title {
           font-weight: 500;
           margin-bottom: 4px;

@@ -8,7 +8,7 @@ import 'sublayout.scss';
 import app from 'state';
 import { ITokenAdapter } from 'models';
 import { handleEmailInvites } from 'views/components/header/invites_menu';
-import Sidebar from 'views/components/sidebar';
+import { Sidebar } from 'views/components/sidebar';
 import { MobileHeader } from 'views/mobile/mobile_header';
 import { FooterLandingPage } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
@@ -185,7 +185,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 : 'sublayout-sidebar-col'
             }
           >
-            {m(Sidebar, { useQuickSwitcher })}
+            <Sidebar useQuickSwitcher={useQuickSwitcher} />
           </div>
           <div
             class={!sidebarOpen ? 'sublayout-body' : 'sublayout-body-sidebar'}

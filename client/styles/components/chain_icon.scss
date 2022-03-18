@@ -1,84 +1,53 @@
 @import 'client/styles/shared';
 
 .ChainIcon {
-  align-items: center;
-  display: flex;
-
   .chain-icon {
-    display: flex;
     border-radius: 9999px;
+    display: flex;
   }
 
   .chain-icon.no-image {
-    border-radius: 9999px;
-    background: $background-color-darker-monochrome;
-    display: flex;
     align-items: center;
+    background: $background-color-darker-monochrome;
+    border-radius: 9999px;
+    display: flex;
     justify-content: center;
 
     span {
       color: $text-color-white;
-      text-align: center;
-      font-weight: 500;
       font-size: 16px;
-      position: relative;
-      top: 0.19em;
-    }
-  }
-
-  &.onclick img.chain-icon {
-    cursor: pointer;
-  }
-}
-
-.CommunityIcon {
-  img.community-icon {
-    display: flex;
-    border-radius: 9999px;
-    background: $background-color-darker-monochrome;
-  }
-
-  .community-icon.no-image {
-    border-radius: 9999px;
-    background: $background-color-darker-monochrome;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    span {
-      color: $text-color-white;
-      text-align: center;
       font-weight: 500;
       position: relative;
+      text-align: center;
       top: 0.19em;
     }
   }
 
-  &.onclick .community-icon {
+  &.onclick .chain-icon {
     cursor: pointer;
   }
 }
 
 .TokenIcon {
-  img.token-icon {
-    display: flex;
-    border-radius: 9999px;
+  .token-icon {
     background: $background-color-darker-monochrome;
+    border-radius: 9999px;
+    display: flex;
   }
 
   .token-icon.no-image {
-    border-radius: 9999px;
-    background: $background-color-darker-monochrome;
-    display: flex;
     align-items: center;
+    background: $background-color-darker-monochrome;
+    border-radius: 9999px;
+    display: flex;
     justify-content: center;
 
     span {
       color: $text-color-white;
-      text-align: center;
-      font-weight: 500;
       font-size: 16px;
+      font-weight: 500;
       position: relative;
+      text-align: center;
       top: 0.19em;
     }
   }

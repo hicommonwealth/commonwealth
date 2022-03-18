@@ -132,17 +132,6 @@
               border-radius: 5px;
             }
           }
-          .TokenLabel {
-            display: flex;
-            justify-content: left;
-            align-items: center;
-            .token-label-left {
-              padding-right: 12px;
-            }
-            .token-label-right {
-              font-weight: 500;
-            }
-          }
         }
         .search-results-item:hover {
           cursor: pointer;
@@ -245,17 +234,7 @@
         padding: 6px 0;
         font-size: 18px;
         overflow: hidden;
-        .TokenLabel {
-          display: flex;
-          justify-content: left;
-          align-items: center;
-          .token-label-left {
-            padding-right: 12px;
-          }
-          .token-label-right {
-            font-weight: 500;
-          }
-        }
+
         .search-results-thread-title {
           font-weight: 500;
           margin-bottom: 4px;

@@ -3,6 +3,7 @@ import 'components/header/login_selector.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
+import _ from 'underscore';
 import mixpanel from 'mixpanel-browser';
 
 import {
@@ -19,13 +20,11 @@ import {
 import app from 'state';
 import { navigateToSubpage, initAppState } from 'app';
 import { ChainBase } from 'types';
-import { AddressInfo, ChainInfo, ITokenAdapter } from 'models';
+import { AddressInfo, ITokenAdapter } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 
 import { notifySuccess } from 'controllers/app/notifications';
 
-import { ChainIcon } from 'views/components/chain_icon';
-import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import User, { UserBlock } from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import LoginModal from 'views/modals/login_modal';
@@ -52,62 +51,6 @@ export const CHAINBASE_SHORT = {
   [ChainBase.NEAR]: 'NEAR',
   [ChainBase.Substrate]: 'Substrate',
   [ChainBase.Solana]: 'Solana',
-};
-
-const CommunityLabel: m.Component<{
-  chain?: ChainInfo;
-  showStatus?: boolean;
-  link?: boolean;
-}> = {
-  view: (vnode) => {
-    const { chain, showStatus, link } = vnode.attrs;
-    const size = 22;
-
-    if (chain)
-      return m('.CommunityLabel', [
-        m('.community-label-left', [
-          m(ChainIcon, {
-            chain,
-            size,
-            onclick: link ? () => m.route.set(`/${chain.id}`) : null,
-          }),
-        ]),
-        m('.community-label-right', [
-          m('.community-name-row', [
-            m('span.community-name', chain.name),
-            showStatus === true && m(ChainStatusIndicator, { hideLabel: true }),
-          ]),
-        ]),
-      ]);
-
-    return m('.CommunityLabel', [m('.site-brand', 'Commonwealth')]);
-  },
-};
-
-export const CurrentCommunityLabel: m.Component<{}> = {
-  view: (vnode) => {
-    const nodes = app.config.nodes.getAll();
-    const activeNode = app.chain?.meta;
-    const selectedNodes = nodes.filter(
-      (n) =>
-        activeNode &&
-        n.url === activeNode.url &&
-        n.chain &&
-        activeNode.chain &&
-        n.chain.id === activeNode.chain.id
-    );
-    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-
-    if (selectedNode) {
-      return m(CommunityLabel, {
-        chain: selectedNode.chain,
-        showStatus: true,
-        link: true,
-      });
-    } else {
-      return m(CommunityLabel, { showStatus: true, link: true });
-    }
-  },
 };
 
 export const LoginSelectorMenuLeft: m.Component<{

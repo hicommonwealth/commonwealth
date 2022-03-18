@@ -15,10 +15,7 @@ import {
   Size,
   Tag,
 } from 'construct-ui';
-
 import app from 'state';
-import { getProposalUrlPath } from 'identifiers';
-import { ProposalType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
@@ -26,9 +23,9 @@ import { ContentType } from 'controllers/server/search';
 import moment from 'moment';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
-import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
 import { ChainIcon } from './chain_icon';
+import { CommunityLabel } from './community_label';
 
 const getMemberPreview = (
   addr,
@@ -82,8 +79,10 @@ const getCommunityPreview = (
       : community.contentType === ContentType.Chain
       ? { chain: community }
       : null;
+
   params['size'] = 36;
-  const onSelect = (e) => {
+
+  const onSelect = () => {
     if (params.token) {
       m.route.set(params.token.address ? `/${params.token.address}` : '/');
     } else {
@@ -91,6 +90,7 @@ const getCommunityPreview = (
     }
     closeResultsFn();
   };
+
   return m(ListItem, {
     tabIndex,
     label: m('a.search-results-item.community-result', [
@@ -99,7 +99,7 @@ const getCommunityPreview = (
     onclick: onSelect,
     onkeyup: (e) => {
       if (e.key === 'Enter') {
-        onSelect(e);
+        onSelect();
       }
     },
     onmouseover: () => setUsingFilterMenuFn(true),
@@ -121,14 +121,7 @@ const getDiscussionPreview = (
       notifyError('Discussion not found.');
       return;
     }
-
-    const path = getProposalUrlPath(
-      ProposalType.OffchainThread,
-      proposalId,
-      false,
-      chainOrComm
-    );
-    m.route.set(path);
+    m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
     closeResultsFn();
   };
   return m(ListItem, {
@@ -194,10 +187,11 @@ const getCommentPreview = (
       notifyError('Discussion not found.');
       return;
     }
-
-    const [slug, id] = proposalId.split('_');
-    const path = getProposalUrlPath(slug, id, false, chainOrComm);
-    m.route.set(path);
+    m.route.set(
+      `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${
+        proposalId.split('_')[1]
+      }`
+    );
     closeResultsFn();
   };
   return m(ListItem, {
