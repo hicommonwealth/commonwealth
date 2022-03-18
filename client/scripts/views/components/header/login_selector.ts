@@ -311,7 +311,7 @@ const LoginSelector: m.Component<
 
       // ensure doesn't already exist
       const addressExists = !!app.user.addresses.find((prev) =>
-        activeBase === ChainBase.Substrate
+        activeBase === ChainBase.Substrate && app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
           ? AddressSwapper({
             address: prev.address, currentPrefix: 42
           }) === AddressSwapper({
