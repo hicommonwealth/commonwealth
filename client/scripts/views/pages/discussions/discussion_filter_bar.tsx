@@ -125,7 +125,7 @@ export class DiscussionFilterBar
             <Button
               rounded={true}
               compact={true}
-              class={`${summaryViewEnabled ? 'active' : ''}`}
+              class={`${!summaryViewEnabled ? 'active' : ''}`}
               label="Latest"
               size="sm"
               disabled={disabled}
