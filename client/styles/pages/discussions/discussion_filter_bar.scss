@@ -6,10 +6,13 @@
     cursor: pointer;
     margin: 0 8px 16px 0;
     max-width: 192px;
-    overflow: hidden;
     padding: 0 8px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     &.active {
       border-color: $text-color-black;
