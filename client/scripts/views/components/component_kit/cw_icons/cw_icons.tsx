@@ -333,3 +333,23 @@ export const CWArrow1: m.Component<IconAttrs> = {
     );
   },
 };
+
+export const CWX: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path d="M6.454 5.747c.195-.195.6-.107.904.196l18.699 18.7c.303.303.391.708.196.903l-.707.707c-.195.195-.6.107-.904-.196L5.943 7.357c-.303-.303-.391-.708-.196-.903l.707-.707z"></path>
+        <path d="M26.253 6.454c.195.195.107.6-.196.904l-18.7 18.699c-.303.303-.708.391-.903.196l-.707-.707c-.195-.195-.107-.6.196-.904l18.7-18.699c.303-.303.708-.391.903-.196l.707.707z"></path>
+      </svg>
+    );
+  },
+};

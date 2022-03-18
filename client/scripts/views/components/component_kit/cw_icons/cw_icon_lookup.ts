@@ -14,6 +14,7 @@ export const iconLookup = {
   telegram: Icons.CWTelegram,
   website: Icons.CWWebsite,
   views: Icons.CWViews,
+  x: Icons.CWX,
 };
 
 export type IconName = keyof typeof iconLookup;

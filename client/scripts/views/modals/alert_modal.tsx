@@ -1,54 +1,60 @@
-import 'modals/alert_modal.scss';
+/* @jsx m */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
 import $ from 'jquery';
-import app from 'state';
 import { Button } from 'construct-ui';
+
+import 'modals/alert_modal.scss';
+
+import app from 'state';
 
 const AlertModal = {
   confirmExit: async () => true,
-  view: (vnode) => {
+  view(vnode) {
     const alertText = vnode.attrs.text;
     const primaryButton = vnode.attrs.primaryButton || 'Continue';
-    return m(
-      '.AlertModal',
-      {
-        onclick: (e) => {
+
+    return (
+      <div
+        class="ConfirmModal"
+        onclick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-        },
-        onmousedown: (e) => {
+        }}
+        onmousedown={(e) => {
           e.preventDefault();
           e.stopPropagation();
-        },
-      },
-      [
-        m('.compact-modal-body', [m('h3', alertText)]),
-        m('.compact-modal-actions', [
-          m(Button, {
-            intent: 'primary',
-            rounded: true,
-            onclick: (e) => {
+        }}
+      >
+        <div class="compact-modal-body">
+          <h3>{alertText}</h3>
+        </div>
+        <div class="compact-modal-actions">
+          <Button
+            intent="primary"
+            rounded={true}
+            onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               setTimeout(() => {
                 $(e.target).trigger('modalexit');
               }, 0);
-            },
-            oncreate: (vvnode) => {
+            }}
+            oncreate={(vvnode) => {
               $(vvnode.dom).focus();
-            },
-            label: primaryButton,
-          }),
-        ]),
-      ]
+            }}
+            label={primaryButton}
+          />
+        </div>
+      </div>
     );
   },
 };
 
 export const alertModalWithText = (text: string, primaryButton?: string) => {
   return async (): Promise<boolean> => {
-    return new Promise((resolve) => {
+    return new Promise(() => {
       app.modals.create({
         modal: AlertModal,
         data: { text, primaryButton },
