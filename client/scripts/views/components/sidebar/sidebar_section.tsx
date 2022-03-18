@@ -159,7 +159,7 @@ export class SidebarSection implements m.ClassComponent<SidebarSectionAttrs> {
   private hoverColor: string;
 
   oninit(vnode) {
-    this.toggled = vnode.attrs.defaultToggle;
+    this.toggled = vnode.attrs.hasDefaultToggle;
     this.hoverColor = 'none';
   }
 
