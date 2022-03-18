@@ -18,16 +18,12 @@ import { AppModals } from './app_modals';
 
 type LoadingLayoutAttrs = { hideSidebar?: boolean };
 
-export class LoadingLayout implements m.ClassComponent<LoadingLayoutAttrs> {
+class LoadingLayout implements m.ClassComponent<LoadingLayoutAttrs> {
   view(vnode) {
     const { hideSidebar } = vnode.attrs;
 
     return (
-      <div
-        class={`Layout mithril-app ${
-          app.isCustomDomain() ? 'custom-domain' : ''
-        }`}
-      >
+      <div class={`Layout ${app.isCustomDomain() ? 'custom-domain' : ''}`}>
         <Sublayout isLoadingLayout={true} hideSidebar={hideSidebar} />
         <AppModals />
         <AppToasts />
@@ -48,7 +44,6 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
 
   view(vnode) {
     const { scope, deferChain, hideSidebar } = vnode.attrs;
-
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
 
@@ -58,11 +53,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
 
     if (app.loadingError) {
       return (
-        <div
-          class={`Layout mithril-app ${
-            app.isCustomDomain() ? 'custom-domain' : ''
-          }`}
-        >
+        <div class={`Layout ${app.isCustomDomain() ? 'custom-domain' : ''}`}>
           <Sublayout
             errorLayout={
               <div>
@@ -88,11 +79,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return (
-        <div
-          class={`Layout mithril-app ${
-            app.isCustomDomain() ? 'custom-domain' : ''
-          }`}
-        >
+        <div class={`Layout ${app.isCustomDomain() ? 'custom-domain' : ''}`}>
           <PageNotFound />
           <AppModals />
           <AppToasts />
@@ -134,7 +121,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
     }
     return (
       <div
-        class={`Layout mithril-app ${hideSidebar ? 'hide-sidebar' : ''} ${
+        class={`Layout ${hideSidebar ? 'hide-sidebar' : ''} ${
           app.isCustomDomain() ? 'custom-domain' : ''
         }`}
       >

@@ -6,7 +6,6 @@ import { EmptyState, Icons, Spinner } from 'construct-ui';
 import 'sublayout.scss';
 
 import app from 'state';
-import { ITokenAdapter } from 'models';
 import { handleEmailInvites } from 'views/components/header/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
 import { MobileHeader } from 'views/mobile/mobile_header';
@@ -14,11 +13,9 @@ import { FooterLandingPage } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './components/sublayout_header_left';
 import { SublayoutHeaderRight } from './components/sublayout_header_right';
-import {
-  isNonEmptyString,
-  isNotUndefined,
-  isUndefined,
-} from '../helpers/typeGuards';
+import { isNotUndefined, isUndefined } from '../helpers/typeGuards';
+import { TokenHero } from './token_hero';
+import { TokenTerms } from './token_terms';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
@@ -86,49 +83,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const sidebarOpen = app.chain !== null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
-    const heroContent = () => {
-      if (isNotUndefined(hero)) {
-        return <div class="sublayout-hero">{hero}</div>;
-      } else if (
-        app.isLoggedIn() &&
-        ITokenAdapter.instanceOf(app.chain) &&
-        !app.user.activeAccount
-      ) {
-        return (
-          <div class="sublayout-hero token-banner">
-            <div class="token-banner-content">
-              Link an address that holds {chain.symbol} to participate in
-              governance.
-            </div>
-          </div>
-        );
-      } else {
-        return null;
-      }
-    };
-
-    const termsContent = () => {
-      if (isNonEmptyString(terms) && tosStatus !== 'off') {
-        return (
-          <div class="token-banner-terms">
-            <span>Please read the </span>
-            <a href={terms}>terms and conditions</a>
-            <span> before interacting with this community. </span>
-            <span
-              class="close-button"
-              onclick={() => {
-                localStorage.setItem(`${app.activeChainId()}-tos`, 'off');
-              }}
-            >
-              X
-            </span>
-          </div>
-        );
-      } else {
-        return null;
-      }
-    };
-
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
@@ -176,8 +130,8 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               />
             </div>
           </div>
-          {heroContent()}
-          {termsContent()}
+          <TokenHero chain={chain} hero={hero} />
+          <TokenTerms terms={terms} tosStatus={tosStatus} />
           <div
             class={
               useQuickSwitcher

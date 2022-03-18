@@ -14,7 +14,7 @@ body {
 
 html {
   font-family: $fonts;
-  font-size: 18px;
+  font-size: 16px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   background: $background-color-white;
@@ -23,11 +23,6 @@ html {
 
 body {
   overscroll-behavior-y: none;
-}
-
-.mithril-app {
-  height: 100%;
-  width: 100%;
 }
 
 // global css
@@ -83,85 +78,14 @@ pre {
   clear: both;
 }
 
-.container {
-  position: relative;
-  max-width: $layout-max-width;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 20px;
-  @include xs-max {
-    padding: 0 1rem;
-  }
-}
-
-.forum-container {
-  padding: 20px 0;
-}
-
-.MobileHeader {
-  display: none;
-}
-
 .LoadingLayout {
   @include md-min {
     .cui-spinner.cui-spinner-fill {
+      height: calc(100vh - 120px) !important;
+      left: $quick-switcher-width / 2;
       position: absolute;
       top: 82px;
-      left: $quick-switcher-width / 2;
       width: calc(100vw - $quick-switcher-width) !important;
-      height: calc(100vh - 120px) !important;
     }
-  }
-}
-
-.layout-container {
-  padding-left: $quick-switcher-width;
-
-  .custom-domain & {
-    padding-left: 0;
-  }
-
-  .hide-sidebar & {
-    padding-left: 0;
-  }
-
-  @include xs-max {
-    padding-left: 0;
-  }
-}
-
-@include sm-max {
-  $mobile-header-height: 60px; // see also sidebar/index.scss
-
-  .MobileHeader {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 99;
-    user-select: none;
-    padding: 10px;
-  }
-
-  .Sidebar {
-    display: none;
-    position: fixed;
-    top: $mobile-header-height;
-    left: 0;
-    width: 100%;
-    padding: 20px 0;
-    z-index: 99;
-
-    &.open {
-      display: block;
-    }
-  }
-
-  .layout-container {
-    padding-top: $mobile-header-height;
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
   }
 }

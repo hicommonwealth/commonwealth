@@ -43,6 +43,47 @@
   }
 }
 
+.layout-container {
+  padding-left: $quick-switcher-width;
+
+  .custom-domain & {
+    padding-left: 0;
+  }
+
+  .hide-sidebar & {
+    padding-left: 0;
+  }
+
+  @include xs-max {
+    padding-left: 0;
+  }
+}
+
+@include sm-max {
+  $mobile-header-height: 60px; // see also sidebar/index.scss
+
+  .Sidebar {
+    display: none;
+    position: fixed;
+    top: $mobile-header-height;
+    left: 0;
+    width: 100%;
+    padding: 20px 0;
+    z-index: 99;
+
+    &.open {
+      display: block;
+    }
+  }
+
+  .layout-container {
+    padding-top: $mobile-header-height;
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 .Sublayout {
   display: block;
 
@@ -344,30 +385,6 @@
 
     @include sm-max {
       margin-left: 0px;
-    }
-  }
-
-  .token-banner {
-    background: $background-color-white-hover;
-    color: $text-color-darker;
-    padding: 8px 0 2px;
-    text-align: center;
-  }
-
-  .token-banner-terms {
-    background-color: $layout-color;
-    margin-left: $sidebar-width;
-    padding: 5px 30px;
-    text-align: center;
-
-    @include sm-max {
-      margin-left: 0;
-    }
-
-    .close-button {
-      cursor: pointer;
-      position: absolute;
-      right: 1rem;
     }
   }
 }
