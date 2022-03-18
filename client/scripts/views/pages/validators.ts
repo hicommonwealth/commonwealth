@@ -12,7 +12,7 @@ import Substrate from 'controllers/chain/substrate/main';
 
 import Sublayout from 'views/sublayout';
 import User from 'views/components/widgets/user';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 
 const Validator: m.Component<{ info }> = {

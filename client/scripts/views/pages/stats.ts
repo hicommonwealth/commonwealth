@@ -6,7 +6,7 @@ import { Table, Tag } from 'construct-ui';
 
 import app from 'state';
 
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import Sublayout from 'views/sublayout';
 

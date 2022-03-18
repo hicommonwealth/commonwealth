@@ -10,7 +10,7 @@ import { NotificationCategories } from 'types';
 import { OffchainThread, OffchainTopic, OffchainThreadStage } from 'models';
 
 import TopicEditor from 'views/components/topic_editor';
-import StageEditor from 'views/components/stage_editor';
+import { StageEditor } from 'views/components/stage_editor';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
