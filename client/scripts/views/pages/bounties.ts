@@ -13,7 +13,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { AddressInfo } from 'models';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import ProposalCard from 'views/components/proposal_card';
 import User from 'views/components/widgets/user';
 

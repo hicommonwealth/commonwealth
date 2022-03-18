@@ -14,7 +14,7 @@ import { OffchainThread, OffchainComment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
 import { PageNotFound } from 'views/pages/404';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
 import {
