@@ -1,77 +1,89 @@
 @import 'client/styles/shared';
 
 .ChainIcon {
-    .chain-icon {
-        display: flex;
-        border-radius: 9999px;
+  align-items: center;
+  display: flex;
+
+  .chain-icon {
+    display: flex;
+    border-radius: 9999px;
+  }
+
+  .chain-icon.no-image {
+    border-radius: 9999px;
+    background: $background-color-darker-monochrome;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      color: $text-color-white;
+      text-align: center;
+      font-weight: 500;
+      font-size: 16px;
+      position: relative;
+      top: 0.19em;
     }
-    .chain-icon.no-image {
-        border-radius: 9999px;
-        background: $background-color-darker-monochrome;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        span {
-            color: $text-color-white;
-            text-align: center;
-            font-weight: 500;
-            font-size: 16px;
-            position: relative;
-            top: 0.19em;
-        }
-    }
-    &.onclick img.chain-icon {
-        cursor: pointer;
-    }
+  }
+
+  &.onclick img.chain-icon {
+    cursor: pointer;
+  }
 }
 
 .CommunityIcon {
-    img.community-icon {
-        display: flex;
-        border-radius: 9999px;
-        background: $background-color-darker-monochrome;
+  img.community-icon {
+    display: flex;
+    border-radius: 9999px;
+    background: $background-color-darker-monochrome;
+  }
+
+  .community-icon.no-image {
+    border-radius: 9999px;
+    background: $background-color-darker-monochrome;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      color: $text-color-white;
+      text-align: center;
+      font-weight: 500;
+      position: relative;
+      top: 0.19em;
     }
-    .community-icon.no-image {
-        border-radius: 9999px;
-        background: $background-color-darker-monochrome;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        span {
-            color: $text-color-white;
-            text-align: center;
-            font-weight: 500;
-            position: relative;
-            top: 0.19em;
-        }
-    }
-    &.onclick .community-icon {
-        cursor: pointer;
-    }
+  }
+
+  &.onclick .community-icon {
+    cursor: pointer;
+  }
 }
 
 .TokenIcon {
-    img.token-icon {
-        display: flex;
-        border-radius: 9999px;
-        background: $background-color-darker-monochrome;
+  img.token-icon {
+    display: flex;
+    border-radius: 9999px;
+    background: $background-color-darker-monochrome;
+  }
+
+  .token-icon.no-image {
+    border-radius: 9999px;
+    background: $background-color-darker-monochrome;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      color: $text-color-white;
+      text-align: center;
+      font-weight: 500;
+      font-size: 16px;
+      position: relative;
+      top: 0.19em;
     }
-    .token-icon.no-image {
-        border-radius: 9999px;
-        background: $background-color-darker-monochrome;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        span {
-            color: $text-color-white;
-            text-align: center;
-            font-weight: 500;
-            font-size: 16px;
-            position: relative;
-            top: 0.19em;
-        }
-    }
-    &.onclick .token-icon {
-        cursor: pointer;
-    }
+  }
+
+  &.onclick .token-icon {
+    cursor: pointer;
+  }
 }

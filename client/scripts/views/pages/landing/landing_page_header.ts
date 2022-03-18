@@ -14,7 +14,8 @@ interface IState {
 }
 
 // eslint-disable-next-line max-len
-const INITIAL_HEADER_STYLE =  'bg-white static lg:flex lg:flex-row lg:justify-between lg:items-center p-4 lg:mx-auto lg:p-0 lg:px-20 px-10  shadow-lg ';
+const INITIAL_HEADER_STYLE =
+  'bg-white static lg:flex lg:flex-row lg:justify-between lg:items-center p-4 lg:mx-auto lg:p-0 lg:px-20 px-10  shadow-lg ';
 
 const triggerMenu = () => {
   const headerClass = document.getElementById('landing-page');
@@ -102,12 +103,15 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                 m(
                   'a',
                   {
-                    class: ' block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline',
+                    class:
+                      ' block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline',
+                    style: 'padding: 8px 16px',
                     onclick: () => app.modals.create({ modal: LoginModal }),
                   },
                   [
                     m('img', {
                       class: 'inline mr-1.5',
+                      style: 'padding: 0',
                       src: 'static/img/user.svg',
                       alt: 'Login',
                     }),
@@ -133,9 +137,9 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                 class: 'inline mr-1.5 close',
                 src: 'static/img/close.svg',
                 alt: 'Close icon',
-              })
+              }),
             ]
-          )
+          ),
         ]
       )
     );

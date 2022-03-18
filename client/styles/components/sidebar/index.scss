@@ -632,8 +632,6 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  padding-bottom: 10px;
-  padding-top: 10px;
   user-select: none;
 
   .SidebarTitle {
@@ -642,13 +640,10 @@
     font-size: 20px;
     font-weight: 600;
     justify-content: space-between;
-    margin-bottom: 1px;
-    margin-left: 20px;
-    margin-top: 10px;
+    padding: 8px 0 8px 16px;
 
     .toggle-icon {
-      margin-right: 10px;
-      margin-top: -6px;
+      margin: -6px 8px 0 0;
     }
   }
 }
@@ -660,8 +655,7 @@
 
   .SectionGroupTitle {
     display: flex;
-    padding-left: 5px;
-    padding-top: 6px;
+    padding: 4px 0;
 
     .section-title-text-standard {
       margin-bottom: 1px;
