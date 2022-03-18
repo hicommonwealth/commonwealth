@@ -11,7 +11,7 @@ import { ChainBase } from 'types';
 import Substrate from 'controllers/chain/substrate/main';
 
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Listing from 'views/pages/listing';

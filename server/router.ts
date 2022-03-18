@@ -4,11 +4,6 @@ import type { Express } from 'express';
 
 import domain from './routes/domain';
 import status from './routes/status';
-import createGist from './routes/createGist';
-
-import edgewareLockdropEvents from './routes/edgeware_lockdrop_events';
-import edgewareLockdropBalances from './routes/edgeware_lockdrop_balances';
-
 import createAddress from './routes/createAddress';
 import linkExistingAddressToChain from './routes/linkExistingAddressToChain';
 import verifyAddress from './routes/verifyAddress';
@@ -51,7 +46,6 @@ import clearNotifications from './routes/clearNotifications';
 import bulkMembers from './routes/bulkMembers';
 import bulkAddresses from './routes/bulkAddresses';
 import createInvite from './routes/createInvite';
-import getInvites from './routes/getInvites';
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
@@ -105,9 +99,6 @@ import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
 import setTopicThreshold from './routes/setTopicThreshold';
-
-import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
-import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
@@ -122,7 +113,6 @@ import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import getSupportedEthChains from './routes/getSupportedEthChains';
-import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
 import updateAddress from './routes/updateAddress';
@@ -159,18 +149,12 @@ function setupRouter(
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
 
-  router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));
   router.post(
     '/editSubstrateSpec',
     passport.authenticate('jwt', { session: false }),
     editSubstrateSpec.bind(this, models)
   );
 
-  router.post(
-    '/createGist',
-    passport.authenticate('jwt', { session: false }),
-    createGist.bind(this, models)
-  );
   router.post('/createAddress', createAddress.bind(this, models));
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   router.post(
@@ -192,6 +176,11 @@ function setupRouter(
 
   // chains
   router.post(
+    '/createChain',
+    passport.authenticate('jwt', { session: false }),
+    createChain.bind(this, models)
+  );
+  router.post(
     '/addChainNode',
     passport.authenticate('jwt', { session: false }),
     addChainNode.bind(this, models)
@@ -212,22 +201,15 @@ function setupRouter(
     updateChain.bind(this, models)
   );
 
-  // offchain communities
   router.post(
     '/starCommunity',
     passport.authenticate('jwt', { session: false }),
     starCommunity.bind(this, models)
   );
 
-  // offchain community admin routes
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get('/getSupportedEthChains', getSupportedEthChains.bind(this, models));
-  router.post(
-    '/createChain',
-    passport.authenticate('jwt', { session: false }),
-    createChain.bind(this, models)
-  );
 
   // offchain threads
   router.post(
@@ -411,11 +393,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createInvite.bind(this, models)
   );
-  router.get(
-    '/getInvites',
-    passport.authenticate('jwt', { session: false }),
-    getInvites.bind(this, models)
-  );
   router.post(
     '/acceptInvite',
     passport.authenticate('jwt', { session: false }),
@@ -497,9 +474,9 @@ function setupRouter(
   );
 
   router.delete(
-      '/discordAccount',
-      passport.authenticate('jwt', { session: false }),
-      deleteSocialAccount.bind(this, models, 'discord')
+    '/discordAccount',
+    passport.authenticate('jwt', { session: false }),
+    deleteSocialAccount.bind(this, models, 'discord')
   )
 
   // offchain viewCount
@@ -584,17 +561,6 @@ function setupRouter(
   // send feedback button
   router.post('/sendFeedback', sendFeedback.bind(this, models));
 
-  // stats
-  // edgeware
-  router.get(
-    '/stats/edgeware/lockdrop/events',
-    edgewareLockdropEvents.bind(this, models)
-  );
-  router.get(
-    '/stats/edgeware/lockdrop/balances',
-    edgewareLockdropBalances.bind(this, models)
-  );
-
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
@@ -623,15 +589,6 @@ function setupRouter(
 
   // logout
   router.get('/logout', logout.bind(this, models));
-
-  router.get(
-    '/edgewareLockdropLookup',
-    edgewareLockdropLookup.bind(this, models)
-  );
-  router.get(
-    '/edgewareLockdropStats',
-    edgewareLockdropStats.bind(this, models)
-  );
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));

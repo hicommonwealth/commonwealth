@@ -1,15 +1,9 @@
 @import 'client/styles/shared';
 
 .ConfirmModal {
-    max-width: 440px;
-    .compact-modal-actions {
-        padding-bottom: 22px;
-    }
-    h3 {
-        margin: 4px 0 12px;
-        line-height: 1.1;
-    }
-    button {
-        margin-right: 8px;
-    }
+  max-width: 440px;
+
+  button {
+    margin-right: 8px;
+  }
 }

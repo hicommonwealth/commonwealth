@@ -188,13 +188,9 @@ const newThread = async (
     throw new Error(e);
   }
 
-  const activeEntity = app.chain;
-  updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
-
-  await app.user.notifications.refresh();
-
   navigateToSubpage(`/discussion/${result.id}`);
 
+  const activeEntity = app.chain;
   if (result.topic) {
     try {
       const topicNames = Array.isArray(activeEntity?.meta?.topics)
