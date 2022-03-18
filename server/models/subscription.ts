@@ -17,6 +17,7 @@ import { OffchainCommentAttributes } from './offchain_comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
 import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
+import { NotificationInstance } from './notification';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -52,7 +53,16 @@ extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 }
 
-export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; };
+export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: (
+  models: DB,
+  category_id: string,
+  object_id: string,
+  notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData,
+  webhook_data?: Partial<WebhookContent>,
+  wss?: WebSocket.Server,
+  excludeAddresses?: string[],
+  includeAddresses?: string[],
+) => Promise<NotificationInstance> };
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -93,7 +103,7 @@ export default (
     wss?: WebSocket.Server,
     excludeAddresses?: string[],
     includeAddresses?: string[],
-  ) => {
+  ): Promise<NotificationInstance> => {
     // get subscribers to send notifications to
     const findOptions: any = {
       [Op.and]: [
@@ -144,7 +154,7 @@ export default (
     const subscribers = await models.Subscription.findAll({ where: findOptions });
 
     // get notification if it already exists
-    let notification;
+    let notification: NotificationInstance;
     notification = await models.Notification.findOne(isChainEventData ? {
       where: {
         chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id
@@ -165,14 +175,9 @@ export default (
       } : {
         notification_data: JSON.stringify(notification_data),
         category_id,
-        chain_id: (<IPostNotificationData>notification_data).chain_id || (<ICommunityNotificationData>notification_data).chain
+        chain_id: (<IPostNotificationData>notification_data).chain_id
+          || (<ICommunityNotificationData>notification_data).chain
       })
-    }
-
-    // create notifications (data should always exist, but we check anyway)
-    if (!notification_data) {
-      log.info('Subscription is missing notification data, will not trigger send emails or webhooks');
-      return [];
     }
 
     let msg;

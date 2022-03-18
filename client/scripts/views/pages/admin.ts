@@ -19,7 +19,7 @@ import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { DropdownFormField } from 'views/components/forms';
 import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 
 interface IChainManagerAttrs {
   success?: string;
