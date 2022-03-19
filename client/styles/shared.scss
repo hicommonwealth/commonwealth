@@ -268,6 +268,49 @@ $text-size-mobile-header: 22px;
   }
 }
 
+@mixin narrowBrowserHeader {
+  .sublayout-header-right {
+    > .cui-button > .cui-button-label > .User {
+      .user-display-name {
+        display: none;
+      }
+
+      .user-avatar {
+        margin: 0px;
+        margin-right: 0px;
+        position: relative;
+        top: 2px;
+      }
+    }
+
+    .NewProposalButton {
+      .cui-button {
+        padding: 0 10px;
+
+        .cui-button-label {
+          top: 2px;
+        }
+      }
+    }
+  }
+
+  .role-icon {
+    display: none;
+  }
+
+  .LoginSelectorMenu .user-display-name {
+    display: inline;
+  }
+
+  .cui-button-label .cui-icon-user {
+    margin-right: 0;
+  }
+
+  .hiringBtn {
+    display: none;
+  }
+}
+
 // Gabe 3/4/22
 // newer styles that will probably be replaced somewhat by v2
 
