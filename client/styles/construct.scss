@@ -126,6 +126,11 @@ button,
     background: $background-color-white;
     box-shadow: none;
   }
+
+  &:hover {
+    background: $background-color-white;
+  }
+
   // adjust rounded button styles
   &.cui-rounded {
     border-color: $grey200;
@@ -269,6 +274,10 @@ button,
       );
     }
   }
+}
+
+.cui-icon {
+  color: $text-color-black;
 }
 
 // reduce menu padding
