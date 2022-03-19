@@ -43,29 +43,11 @@
   }
 }
 
-.layout-container {
-  padding-left: $quick-switcher-width;
-
-  .custom-domain & {
-    padding-left: 0;
-  }
-
-  .hide-sidebar & {
-    padding-left: 0;
-  }
-
-  @include xs-max {
-    padding-left: 0;
-  }
-}
-
 @include sm-max {
-  $mobile-header-height: 60px; // see also sidebar/index.scss
-
   .Sidebar {
     display: none;
     position: fixed;
-    top: $mobile-header-height;
+    top: 60px;
     left: 0;
     width: 100%;
     padding: 20px 0;
@@ -74,13 +56,6 @@
     &.open {
       display: block;
     }
-  }
-
-  .layout-container {
-    padding-top: $mobile-header-height;
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
   }
 }
 

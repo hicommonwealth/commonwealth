@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { EmptyState, Icons, Spinner } from 'construct-ui';
 
 import 'sublayout.scss';
 
@@ -22,11 +21,8 @@ type SublayoutAttrs = {
   hasCenterGrid?: boolean;
   class?: string;
   description?: string; // displayed at the top of the layout
-  errorLayout?: m.Vnode<any, any>[];
   hero?: any;
   hideSearch?: boolean;
-  hideSidebar?: boolean;
-  isLoadingLayout?: boolean;
   rightContent?: any;
   showCouncilMenu?: boolean;
   showNewProposalButton?: boolean;
@@ -59,18 +55,13 @@ const footercontents = [
 ];
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
-  private modalAutoTriggered: boolean; // what's going on here?
-
   view(vnode) {
     const {
       alwaysShowTitle,
       description, // ?
-      errorLayout,
       hasCenterGrid,
       hero,
       hideSearch,
-      hideSidebar, // ?
-      isLoadingLayout,
       rightContent,
       showCouncilMenu, // ?
       showNewProposalButton,
@@ -87,78 +78,49 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 
-    if (isLoadingLayout) {
-      return (
-        <div class="layout-container">
-          <div class="LoadingLayout">
-            <Spinner active={true} fill={true} size="xl" />
-          </div>
-        </div>
-      );
-    }
-
-    if (isNotUndefined(errorLayout)) {
-      return (
-        <div class="layout-container">
-          <EmptyState
-            fill={true}
-            icon={Icons.ALERT_TRIANGLE}
-            content={errorLayout}
-            style="color: #546e7b;"
-          />
-        </div>
-      );
-    }
-
     return (
-      <div class="layout-container">
-        <div class={`Sublayout ${vnode.attrs.class}`}>
-          <MobileHeader />
-          <div
-            class={`sublayout-header ${isUndefined(title) ? 'no-title' : ''}`}
-          >
-            <div class="sublayout-header-inner">
-              <SublayoutHeaderLeft
-                alwaysShowTitle={alwaysShowTitle}
-                chain={chain}
-                title={title}
-              />
-              {!isLoadingLayout && !hideSearch && m(SearchBar)}
-              <SublayoutHeaderRight
-                chain={chain}
-                showNewProposalButton={showNewProposalButton}
-              />
-            </div>
+      <div class={`Sublayout ${vnode.attrs.class}`}>
+        <MobileHeader />
+        <div class={`sublayout-header ${isUndefined(title) ? 'no-title' : ''}`}>
+          <div class="sublayout-header-inner">
+            <SublayoutHeaderLeft
+              alwaysShowTitle={alwaysShowTitle}
+              chain={chain}
+              title={title}
+            />
+            {!hideSearch && m(SearchBar)}
+            <SublayoutHeaderRight
+              chain={chain}
+              showNewProposalButton={showNewProposalButton}
+            />
           </div>
-          <TokenHero chain={chain} hero={hero} />
-          <TokenTerms terms={terms} tosStatus={tosStatus} />
-          <div
-            class={
-              useQuickSwitcher
-                ? 'sublayout-quickswitcheronly-col'
-                : 'sublayout-sidebar-col'
-            }
-          >
-            <Sidebar useQuickSwitcher={useQuickSwitcher} />
-          </div>
-          <div
-            class={!sidebarOpen ? 'sublayout-body' : 'sublayout-body-sidebar'}
-          >
-            <div class={`sublayout-grid ${hasCenterGrid ? 'flex-center' : ''}`}>
-              <div
-                class={`sublayout-main-col ${
-                  isUndefined(rightContent) ? 'no-right-content' : ''
-                }`}
-              >
-                {vnode.children}
-              </div>
-              {isNotUndefined(rightContent) && (
-                <div class="sublayout-right-col">{rightContent}</div>
-              )}
-            </div>
-          </div>
-          {!app.isCustomDomain() && <FooterLandingPage list={footercontents} />}
         </div>
+        <TokenHero chain={chain} hero={hero} />
+        <TokenTerms terms={terms} tosStatus={tosStatus} />
+        <div
+          class={
+            useQuickSwitcher
+              ? 'sublayout-quickswitcheronly-col'
+              : 'sublayout-sidebar-col'
+          }
+        >
+          <Sidebar useQuickSwitcher={useQuickSwitcher} />
+        </div>
+        <div class={!sidebarOpen ? 'sublayout-body' : 'sublayout-body-sidebar'}>
+          <div class={`sublayout-grid ${hasCenterGrid ? 'flex-center' : ''}`}>
+            <div
+              class={`sublayout-main-col ${
+                isUndefined(rightContent) ? 'no-right-content' : ''
+              }`}
+            >
+              {vnode.children}
+            </div>
+            {isNotUndefined(rightContent) && (
+              <div class="sublayout-right-col">{rightContent}</div>
+            )}
+          </div>
+        </div>
+        {!app.isCustomDomain() && <FooterLandingPage list={footercontents} />}
       </div>
     );
   }

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import '../styles/normalize.css';
-import '../styles/tailwind_reset.css';
+import '../styles/normalize.css'; // reset
+import '../styles/tailwind_reset.css'; // for the landing page
 import '../styles/shared.scss';
 import 'construct.scss';
 import 'lity/dist/lity.min.css';
