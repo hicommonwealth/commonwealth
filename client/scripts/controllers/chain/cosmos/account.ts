@@ -3,13 +3,7 @@ import BN from 'bn.js';
 import { IApp } from 'state';
 import CosmosChain from 'controllers/chain/cosmos/chain';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { Account, ITXModalData } from 'models';
-import {
-  MsgSendEncodeObject,
-  MsgDelegateEncodeObject,
-  MsgUndelegateEncodeObject,
-  MsgWithdrawDelegatorRewardEncodeObject,
-} from '@cosmjs/stargate';
+import { Account } from 'models';
 import CosmosAccounts from './accounts';
 
 export default class CosmosAccount extends Account<CosmosToken> {
@@ -45,51 +39,4 @@ export default class CosmosAccount extends Account<CosmosToken> {
       this._balance = this._Chain.coins(0);
     }
   });
-
-  public async sendTx(recipient: CosmosAccount, amount: CosmosToken) {
-    const msg: MsgSendEncodeObject = {
-      typeUrl: '/cosmos.bank.v1beta1.MsgSend',
-      value: {
-        fromAddress: this.address,
-        toAddress: recipient.address,
-        amount: [ { denom: amount.denom, amount: amount.toString() } ],
-      }
-    };
-    await this._Chain.sendTx(this, msg);
-  }
-
-  public async delegateTx(validatorAddress: string, amount: CosmosToken) {
-    const msg: MsgDelegateEncodeObject = {
-      typeUrl: '/cosmos.staking.v1beta1.MsgDelegate',
-      value: {
-        delegatorAddress: this.address,
-        validatorAddress,
-        amount: amount.toCoinObject(),
-      }
-    };
-    await this._Chain.sendTx(this, msg);
-  }
-
-  public async undelegateTx(validatorAddress: string, amount: CosmosToken) {
-    const msg: MsgUndelegateEncodeObject = {
-      typeUrl: '/cosmos.staking.v1beta1.MsgUndelegate',
-      value: {
-        delegatorAddress: this.address,
-        validatorAddress,
-        amount: amount.toCoinObject(),
-      }
-    };
-    await this._Chain.sendTx(this, msg);
-  }
-
-  public async withdrawDelegationRewardTx(validatorAddress: string) {
-    const msg: MsgWithdrawDelegatorRewardEncodeObject = {
-      typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
-      value: {
-        delegatorAddress: this.address,
-        validatorAddress,
-      }
-    };
-    await this._Chain.sendTx(this, msg);
-  }
 }
