@@ -139,7 +139,9 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
           ) : (
             <div class="no-carat" />
           )}
-          <div class={titleTextClass}>{title}</div>
+          <div title={title} class={`title-text ${titleTextClass}`}>
+            {title}
+          </div>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
         </div>
         {containsChildren && toggled && (
@@ -220,7 +222,7 @@ export class SidebarSection implements m.ClassComponent<SidebarSectionAttrs> {
         <div class="SidebarTitle" onclick={(e) => clickHandler(e)}>
           <div class="title-text">{title}</div>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
-          <div class="toggle-icon">{carat}</div>
+          {carat}
         </div>
         {this.toggled && (
           <div class="section-groups">

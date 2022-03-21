@@ -4,6 +4,8 @@
   background-color: $layout-color;
   border-right-color: $disable-grey;
   border-right-width: 1px;
+  display: flex;
+  flex-direction: column;
   min-width: $sidebar-width;
 
   &::-webkit-scrollbar {

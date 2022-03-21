@@ -26,7 +26,10 @@
     top: 0;
     width: $quick-switcher-width;
 
+    // Gabe 3/21/22 - dumb construct overrides
     .cui-button {
+      line-height: 32px;
+      min-height: 32px;
       height: 32px;
       width: 32px;
     }

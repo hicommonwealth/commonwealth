@@ -6,29 +6,16 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  padding-bottom: 10px;
-  padding-top: 10px;
-  user-select: none;
 
   .SidebarTitle {
     align-items: center;
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
-    margin-left: 20px;
+    padding: 8px 8px 8px 16px;
 
     .title-text {
       font-size: 20px;
       font-weight: 600;
-      margin-bottom: 1px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .toggle-icon {
-      margin-right: 10px;
-      margin-top: -6px;
     }
 
     .right-icon {
@@ -38,34 +25,36 @@
       }
     }
   }
+
+  .section-groups {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .SectionGroup {
   font-weight: 400;
   font-size: 17px;
-  padding-left: 0px;
 
   .SectionGroupTitle {
-    padding-left: 5px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    height: 30px;
+    height: 32px;
     display: flex;
     align-items: center;
+    min-width: 0;
 
-    [class^='section-title-text'] {
-      margin-left: 3px;
-      margin-right: 10px;
-      padding-top: 3px;
-      display: inline-block;
+    .title-text {
+      overflow: hidden;
+      padding-right: 8px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .section-title-text-active {
+    &.section-title-text-active {
       font-weight: 500;
       color: #3a0095;
     }
 
-    .section-title-text-stale {
+    &.section-title-text-stale {
       color: #999999;
     }
 
