@@ -3,15 +3,7 @@ import 'pages/search.scss';
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
-import {
-  Button,
-  ListItem,
-  Select,
-  Spinner,
-  TabItem,
-  Tabs,
-  Tag,
-} from 'construct-ui';
+import { ListItem, Select, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
 
 import { pluralize } from 'helpers';
 import app from 'state';
@@ -19,13 +11,13 @@ import { AddressInfo, Profile, SearchQuery } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { ProposalType } from 'types';
 
-import { SearchScope, SearchSort } from 'models/SearchQuery'
+import { SearchScope, SearchSort } from 'models/SearchQuery';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import { ContentType } from 'controllers/server/search';
 import { CommunityLabel } from '../components/sidebar/community_selector';
 import { PageNotFound } from './404';
@@ -34,7 +26,7 @@ import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
-export const getMemberResult = (addr, searchTerm) => {
+const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
 
@@ -66,7 +58,7 @@ export const getMemberResult = (addr, searchTerm) => {
   });
 };
 
-export const getCommunityResult = (community) => {
+const getCommunityResult = (community) => {
   const params =
     community.contentType === ContentType.Token
       ? { token: community }
@@ -94,7 +86,7 @@ export const getCommunityResult = (community) => {
   });
 };
 
-export const getDiscussionResult = (thread, searchTerm) => {
+const getDiscussionResult = (thread, searchTerm) => {
   const proposalId = thread.proposalid;
   const chainOrComm = thread.chain || thread.offchain_community;
 
@@ -106,7 +98,12 @@ export const getDiscussionResult = (thread, searchTerm) => {
       iconName: 'feedback',
     }),
     onclick: () => {
-      const path = getProposalUrlPath(ProposalType.OffchainThread, proposalId, false, chainOrComm);
+      const path = getProposalUrlPath(
+        ProposalType.OffchainThread,
+        proposalId,
+        false,
+        chainOrComm
+      );
       m.route.set(path);
     },
     label: m('a.search-results-item', [
@@ -151,7 +148,7 @@ export const getDiscussionResult = (thread, searchTerm) => {
   });
 };
 
-export const getCommentResult = (comment, searchTerm) => {
+const getCommentResult = (comment, searchTerm) => {
   const proposalId = comment.proposalid;
   const chainOrComm = comment.chain || comment.offchain_community;
 

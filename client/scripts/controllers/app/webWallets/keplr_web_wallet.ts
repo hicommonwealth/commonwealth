@@ -133,11 +133,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
             coinMinimalDenom: `u${app.chain.meta.chain.symbol.toLowerCase()}`,
             coinDecimals: app.chain.meta.chain.decimals || 6,
           },
-          gasPriceStep: {
-            low: 0,
-            average: 0,
-            high: 0.025,
-          },
+          gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
           features: ['stargate'],
         };
         await window.keplr.experimentalSuggestChain(info);

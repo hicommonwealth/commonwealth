@@ -572,5 +572,3 @@ export const createTXModal = async (
     return modalP;
   }
 };
-
-export default TXSigningModal;

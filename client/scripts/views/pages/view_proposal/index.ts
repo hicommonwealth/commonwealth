@@ -48,8 +48,8 @@ import {
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TopicEditor from 'views/components/topic_editor';
-import StageEditor from 'views/components/stage_editor';
-import PollEditor from 'views/components/poll_editor';
+import { StageEditor } from 'views/components/stage_editor';
+import { PollEditor } from 'views/components/poll_editor';
 import {
   TopicEditorMenuItem,
   ThreadSubscriptionMenuItem,
@@ -60,7 +60,7 @@ import ProposalVotingActions, {
   QueueButton,
 } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
@@ -792,7 +792,7 @@ const ProposalComments: m.Component<
           return m(
             `.threading-level-${threadLevel}`,
             {
-              style: `margin-left: calc(36px * ${threadLevel})`,
+              style: `margin-left: 32px`,
             },
             [
               m(ProposalComment, {
@@ -1174,7 +1174,7 @@ const ViewProposalPage: m.Component<
           c.chain === activeAccount?.chain.id
         );
       }).length > 0;
-    const isAdmin =
+    const isAdminOrMod =
       app.user.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
@@ -1305,11 +1305,11 @@ const ViewProposalPage: m.Component<
     const showLinkedSnapshotOptions =
       (proposal as OffchainThread).snapshotProposal?.length > 0 ||
       isAuthor ||
-      isAdmin;
+      isAdminOrMod;
     const showLinkedThreadOptions =
       (proposal as OffchainThread).linkedThreads?.length > 0 ||
       isAuthor ||
-      isAdmin;
+      isAdminOrMod;
 
     return m(
       Sublayout,
@@ -1337,13 +1337,13 @@ const ViewProposalPage: m.Component<
               openStageEditor: () => {
                 vnode.state.stageEditorIsOpen = true;
               },
-              showAddProposalButton: isAuthor || isAdmin,
+              showAddProposalButton: isAuthor || isAdminOrMod,
             }),
           showLinkedThreadOptions &&
             proposal instanceof OffchainThread &&
             m(ProposalLinkedThreadsEditorModule, {
               proposalId: proposal.id,
-              allowLinking: isAuthor || isAdmin,
+              allowLinking: isAuthor || isAdminOrMod,
             }),
         ],
       },
@@ -1356,7 +1356,7 @@ const ViewProposalPage: m.Component<
           proposalPageState: vnode.state,
           isAuthor,
           isEditor,
-          isAdmin: isAdminOnly,
+          isAdmin: isAdminOrMod,
           stageEditorIsOpen: vnode.state.stageEditorIsOpen,
           pollEditorIsOpen: vnode.state.pollEditorIsOpen,
           closeStageEditor: () => {
@@ -1385,7 +1385,7 @@ const ViewProposalPage: m.Component<
           getSetGlobalEditingStatus,
           proposalPageState: vnode.state,
           recentlySubmitted: vnode.state.recentlySubmitted,
-          isAdmin,
+          isAdmin: isAdminOrMod,
         }),
         !vnode.state.editing &&
           !vnode.state.parentCommentId &&

@@ -1,7 +1,6 @@
 import 'pages/discussions/discussion_row.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
 import { Button, Icon, Icons, Tag } from 'construct-ui';
@@ -176,7 +175,7 @@ const DiscussionRow: m.Component<
         ],
       ' ', // em space
       m(
-        '.created-at',
+        '.last-active.created-at',
         link(
           'a',
           discussionLink,
@@ -187,11 +186,6 @@ const DiscussionRow: m.Component<
       m('.activity-icons', [
         ' ', // en space
         isHot(proposal) && m('span', '🔥'),
-      ]),
-      m('.mobile-comment-count', [
-        ' ', // em space
-        m(Icon, { name: Icons.MESSAGE_SQUARE }),
-        app.comments.nComments(proposal),
       ]),
     ] as any;
 

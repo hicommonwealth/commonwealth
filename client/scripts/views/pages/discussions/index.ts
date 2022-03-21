@@ -34,7 +34,7 @@ import {
 
 import { updateLastVisited } from 'controllers/app/login';
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import EmptyListingPlaceholder from 'views/components/empty_topic_placeholder';
 import LoadingRow from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
@@ -51,7 +51,7 @@ import { SummaryListing } from './summary_listing';
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
 const getLastUpdate = (proposal: OffchainThread): number => {
-  const lastComment = app.comments.lastCommented(proposal)?.unix() || 0;
+  const lastComment = proposal.lastCommentedOn?.unix() || 0;
   const createdAt = proposal.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
@@ -64,7 +64,8 @@ const getLastSeenDivider = (hasText = true) => {
   );
 };
 
-const onFeaturedDiscussionPage = (p, topic) => decodeURI(p).endsWith(`/discussions/${topic}`);
+const onFeaturedDiscussionPage = (p, topic) =>
+  decodeURI(p).endsWith(`/discussions/${topic}`);
 
 export const CommunityOptionsPopover: m.Component<{}> = {
   view: (vnode) => {
@@ -80,14 +81,12 @@ export const CommunityOptionsPopover: m.Component<{}> = {
     if (!isAdmin && !isMod) return;
 
     // add extra width to compensate for an icon that isn't centered inside its boundaries
-    const DropdownIcon = m('.dropdown-wrapper',
-    [
+    const DropdownIcon = m('.dropdown-wrapper', [
       m(Icon, {
         name: Icons.CHEVRON_DOWN,
       }),
-      m('.dropdown-spacer', {})
+      m('.dropdown-spacer', {}),
     ]);
-
 
     return m(PopoverMenu, {
       class: 'community-options-popover',
@@ -105,7 +104,8 @@ export const CommunityOptionsPopover: m.Component<{}> = {
               app.modals.create({ modal: NewTopicModal });
             },
           }),
-        isAdmin && ITokenAdapter.instanceOf(app.chain) &&
+        isAdmin &&
+          ITokenAdapter.instanceOf(app.chain) &&
           m(MenuItem, {
             label: 'Edit topic thresholds',
             onclick: (e) => {
@@ -113,7 +113,7 @@ export const CommunityOptionsPopover: m.Component<{}> = {
               app.modals.create({ modal: EditTopicThresholdsModal });
             },
           }),
-        (isAdmin) &&
+        isAdmin &&
           m(MenuItem, {
             label: 'Invite members',
             onclick: (e) => {
@@ -127,7 +127,11 @@ export const CommunityOptionsPopover: m.Component<{}> = {
           }),
         isAdmin &&
           m(MenuItem, {
-            label: link('a', `${(app.isCustomDomain() ? '' : `/${app.activeChainId()}`)}/manage`, 'Manage community'),
+            label: link(
+              'a',
+              `${app.isCustomDomain() ? '' : `/${app.activeChainId()}`}/manage`,
+              'Manage community'
+            ),
           }),
         (isAdmin || isMod) &&
           app.activeChainId() &&
@@ -197,7 +201,8 @@ const DiscussionFilterBar: m.Component<
     const selectedStage = stages.find((s) => s === (stage as any));
 
     const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
-    const summaryViewEnabled = vnode.attrs.parentState.summaryView && !topicSelected;
+    const summaryViewEnabled =
+      vnode.attrs.parentState.summaryView && !topicSelected;
 
     return m('.DiscussionFilterBar', [
       topics.length > 0 &&
@@ -454,7 +459,10 @@ const DiscussionsPage: m.Component<
       returningFromThread &&
       localStorage[`${app.activeChainId()}-lookback-${subpage}`]
         ? moment.unix(
-            parseInt(localStorage[`${app.activeChainId()}-lookback-${subpage}`], 10)
+            parseInt(
+              localStorage[`${app.activeChainId()}-lookback-${subpage}`],
+              10
+            )
           )
         : moment.isMoment(vnode.state.lookback[subpage])
         ? vnode.state.lookback[subpage]
@@ -479,11 +487,15 @@ const DiscussionsPage: m.Component<
       }
       vnode.state.summaryViewInitialized = true;
     }
-    let { summaryView, recentThreads, lastSubpage } = vnode.state;
+    const { summaryView, recentThreads, lastSubpage } = vnode.state;
     const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
     const onSummaryView = summaryView && !topicSelected;
 
-    if (onSummaryView && !vnode.state.activityFetched && !vnode.state.loadingRecentThreads) {
+    if (
+      onSummaryView &&
+      !vnode.state.activityFetched &&
+      !vnode.state.loadingRecentThreads
+    ) {
       vnode.state.loadingRecentThreads = true;
       app.recentActivity
         .getRecentTopicActivity({
@@ -526,9 +538,7 @@ const DiscussionsPage: m.Component<
       );
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
 
-    const communityName = selectedNode
-      ? selectedNode.chain.name
-      : '';
+    const communityName = selectedNode ? selectedNode.chain.name : '';
 
     const allLastVisited =
       typeof app.user.lastVisited === 'string'
@@ -536,27 +546,25 @@ const DiscussionsPage: m.Component<
         : app.user.lastVisited;
     if (!vnode.state.lastVisitedUpdated) {
       vnode.state.lastVisitedUpdated = true;
-      updateLastVisited((activeEntity.meta as NodeInfo).chain
-      );
+      updateLastVisited((activeEntity.meta as NodeInfo).chain);
     }
 
     // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
     // for easy comparison with weekly indexes' msecAgo
-    const id = (activeEntity.meta as NodeInfo).chain.id
+    const id = (activeEntity.meta as NodeInfo).chain.id;
     const lastVisited = moment(allLastVisited[id]).utc();
 
     let sortedListing = [];
-    let pinnedListing = [];
+    const pinnedListing = [];
     // fetch unique addresses count for pinned threads
     if (!app.threadUniqueAddressesCount.getInitializedPinned()) {
-      app.threadUniqueAddressesCount
-        .fetchThreadsUniqueAddresses({
-          threads: app.threads.listingStore
-            .getByCommunityTopicAndStage(app.activeChainId(), topic, stage)
-            .filter((t) => t.pinned),
-          chainId: app.activeChainId(),
-          pinned: true,
-        });
+      app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
+        threads: app.threads.listingStore
+          .getByCommunityTopicAndStage(app.activeChainId(), topic, stage)
+          .filter((t) => t.pinned),
+        chainId: app.activeChainId(),
+        pinned: true,
+      });
     }
 
     const allThreads = app.threads.listingStore
@@ -743,19 +751,16 @@ const DiscussionsPage: m.Component<
     const postsDepleted =
       allThreads.length > 0 && vnode.state.postsDepleted[subpage];
 
-
     return m(
       Sublayout,
       {
         class: 'DiscussionsPage',
-        title: [
-          'Discussions',
-        ],
+        title: ['Discussions'],
         description: topicDescription,
         showNewProposalButton: true,
       },
       [
-        (app.chain) && [
+        app.chain && [
           m('.discussions-main', [
             !isEmpty &&
               m(DiscussionFilterBar, {
@@ -771,7 +776,8 @@ const DiscussionsPage: m.Component<
                   : m(Listing, {
                       content: [
                         // ...pinnedListing,
-                        m(SummaryListing, { recentThreads })],
+                        m(SummaryListing, { recentThreads }),
+                      ],
                     })
                 : [
                     isLoading

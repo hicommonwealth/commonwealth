@@ -45,7 +45,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
             m(
               'div.SeeDocsButton',
               { class: 'text-center hidden lg:block xl:block mb-20' },
-              m(LandingPageButton, { href: '', text: 'See docs' })
+              m(LandingPageButton, { href: 'https://docs.commonwealth.im/commonwealth/', text: 'See docs' })
             )
           ),
         ])

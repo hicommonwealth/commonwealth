@@ -99,7 +99,7 @@ class RecentActivityController {
         console.error('OffchainThread missing address');
       }
       try {
-        app.threads.store.add(modeledThread);
+        app.threads.summaryStore.add(modeledThread);
       } catch (e) {
         console.error(e.message);
       }

@@ -1,6 +1,5 @@
 import 'pages/discussions/index.scss';
 
-import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
@@ -12,7 +11,6 @@ import Listing from 'views/pages/listing';
 
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import ProposalRow from './proposal_row';
-import { CommunityOptionsPopover } from '../discussions';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
