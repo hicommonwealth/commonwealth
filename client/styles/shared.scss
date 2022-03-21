@@ -85,28 +85,9 @@ $border-color-lightest: #e0e4f1;
 $border-color-off-white: #eee;
 
 //
-// forum listing components
-
-$text-size-item-header: 19px;
-$text-size-item-meta: 17px;
-$listing-left-flex: 6;
-$listing-right-flex: 1;
-
-//
 // mobile specs
 
 $text-size-mobile-header: 22px;
-
-@mixin listing-row-base {
-  cursor: pointer;
-  display: flex;
-  margin: 0 -20px;
-  padding: 15px 20px 9px;
-
-  &:hover {
-    background: $background-color-white-hover;
-  }
-}
 
 @mixin error-text {
   color: $negative-bg-color;

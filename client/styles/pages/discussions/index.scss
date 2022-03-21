@@ -5,104 +5,27 @@
     position: relative;
     flex: 1;
     margin: 0px auto;
+    padding: 36px 0 36px;
+
     @include sm-max {
       padding-top: 24px;
     }
+
     &.empty-list {
       height: calc(100vh - 200px);
     }
   }
+
   @include xs-max {
     .discussions-main {
       padding: 12px 0;
     }
   }
 
-  .DiscussionFilterBar {
-    > .cui-button {
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin: 0 11px 6px 0;
-      color: $text-color-black;
-      padding: 0 12px;
-      cursor: pointer;
-      &.cui-sm {
-        height: 26px;
-        min-height: 26px;
-      }
-      &.active {
-        border-color: $text-color-black;
-      }
-      .cui-popover-content {
-        position: relative;
-        top: 1px;
-        .cui-menu-item {
-          font-weight: initial !important;
-        }
-      }
-      .cui-icon svg {
-        $size: 13px;
-        min-height: $size;
-        min-width: $size;
-        height: $size;
-        width: $size;
-        margin-right: -4px;
-      }
-    }
-    margin-bottom: 20px;
-    font-size: 17px;
-    .cui-button-group {
-      flex-wrap: wrap;
-    }
-    @include xs-max {
-      margin-bottom: 10px;
-    }
-  }
-  .discussions-topic-items,
-  .discussions-stage-items {
-    max-height: 70vh;
-    overflow-y: scroll;
-    max-width: 300px;
-    .topic-menu-item {
-      display: flex;
-      .cui-icon {
-        flex: 1;
-        margin-right: 0;
-      }
-      .topic-menu-item-name {
-        flex: 7;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        position: relative;
-        top: 1px;
-      }
-      .cui-button {
-        position: relative;
-        top: -3px;
-      }
-    }
-  }
-
-  .discussions-stage-count {
-    display: inline-block;
-    height: 19px;
-    font-size: 15px;
-    position: relative;
-    left: 2px;
-    padding: 3px 5px 0;
-    border-radius: 9999px;
-    background: $primary-bg-color;
-    color: #fff;
-    font-weight: 500;
-    margin: -2px 0 -2px 2px;
-  }
-
   // content
   .PinnedDivider {
     margin: 6px 0 8px;
+
     hr {
       height: 1px;
       border: none;

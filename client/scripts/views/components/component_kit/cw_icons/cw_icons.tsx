@@ -315,6 +315,25 @@ export const CWPin: m.Component<IconAttrs> = {
   },
 };
 
+export const CWArrow1: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="28"
+        height="26"
+        fill="none"
+        viewBox="0 0 28 26"
+        onclick={onclick}
+      >
+        <path d="M13.27 1.172a.843.843 0 011.46 0l13.156 22.81a.845.845 0 01-.731 1.268H.845a.845.845 0 01-.73-1.267l13.154-22.81z"></path>
+      </svg>
+    );
+  },
+};
+
 export const CWX: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;

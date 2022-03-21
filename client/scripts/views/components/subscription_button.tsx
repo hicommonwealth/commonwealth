@@ -1,5 +1,6 @@
 /* @jsx m */
 
+import { isNotUndefined } from 'helpers/typeGuards';
 import m from 'mithril';
 
 import app from 'state';
@@ -20,7 +21,7 @@ export class SubscriptionButton implements m.ClassComponent {
       <CWButton
         onclick={(e) => {
           e.preventDefault();
-          if (communitySubscription) {
+          if (isNotUndefined(communitySubscription)) {
             subscriptions.deleteSubscription(communitySubscription).then(() => {
               m.redraw();
             });
@@ -32,8 +33,14 @@ export class SubscriptionButton implements m.ClassComponent {
               });
           }
         }}
-        label={communitySubscription ? 'Notifications on' : 'Notifications off'}
-        buttonType={communitySubscription ? 'primary' : 'secondary'}
+        label={
+          isNotUndefined(communitySubscription)
+            ? 'Notifications on'
+            : 'Notifications off'
+        }
+        buttonType={
+          isNotUndefined(communitySubscription) ? 'primary' : 'secondary'
+        }
       />
     );
   }

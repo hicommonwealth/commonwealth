@@ -55,12 +55,12 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
             fill={true}
             icon={Icons.ALERT_TRIANGLE}
             content={
-              <div>
+              <>
                 <p style="color: #222">
                   Application error: ${app.loadingError}
                 </p>
                 <p style="color: #222">Please try again later</p>
-              </div>
+              </>
             }
             style="color: #546e7b;"
           />
