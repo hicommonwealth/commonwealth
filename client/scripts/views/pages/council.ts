@@ -173,7 +173,6 @@ const CouncilPage: m.Component<{}> = {
           }),
         ],
         showNewProposalButton: true,
-        showCouncilMenu: true,
       },
       [
         // stats

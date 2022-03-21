@@ -24,17 +24,11 @@ class SidebarQuickSwitcherItem
 
     return (
       <div class="SidebarQuickSwitcherItem" key={`chain-${item.id}`}>
-        <div
-          class={`quick-switcher-option ${
-            item.id === app?.chain?.meta?.chain?.id
-          }`}
-        >
-          <ChainIcon
-            size={size}
-            chain={item}
-            onclick={link ? () => m.route.set(`/${item.id}`) : null}
-          />
-        </div>
+        <ChainIcon
+          size={size}
+          chain={item}
+          onclick={link ? () => m.route.set(`/${item.id}`) : null}
+        />
       </div>
     );
   }
@@ -61,13 +55,12 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
       return true;
     });
 
-    const size = 36;
+    const size = 32;
 
     return (
       <div class="SidebarQuickSwitcher">
         <div class="community-nav-bar">
           <Button
-            class="sidebar-home-link"
             rounded={true}
             label={<Icon name={Icons.HOME} />}
             onclick={(e) => {
@@ -78,7 +71,6 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
           <CommunitySelector />
           {app.isLoggedIn() && (
             <Button
-              class="create-community"
               rounded={true}
               label={<Icon name={Icons.PLUS} />}
               onclick={(e) => {

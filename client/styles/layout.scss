@@ -1,22 +1,6 @@
 @import 'client/styles/shared';
 
 .Layout {
-  padding-left: $quick-switcher-width;
-
-  &.custom-domain {
-    padding-left: 0;
-  }
-
-  &.hide-sidebar {
-    padding-left: 0;
-  }
-
-  @include sm-max {
-    padding: 60px 0 0 0;
-    width: 100%;
-  }
-
-  @include xs-max {
-    padding-left: 0;
-  }
+  height: 100%;
+  width: 100%;
 }

@@ -1,21 +1,10 @@
 @import 'client/styles/shared';
 
 .Sidebar {
-  -ms-overflow-style: none; /* IE and Edge */
   background-color: $layout-color;
   border-right-color: $disable-grey;
   border-right-width: 1px;
-  left: $quick-switcher-width;
-  max-height: 100%;
-  max-width: $sidebar-width;
-  min-height: 100vh;
   min-width: $sidebar-width;
-  overflow-y: scroll;
-  padding-bottom: 36px;
-  position: fixed;
-  scrollbar-width: none; /* Firefox */
-  top: $layout-padding + 47;
-  z-index: 2;
 
   &::-webkit-scrollbar {
     /* Chrome */

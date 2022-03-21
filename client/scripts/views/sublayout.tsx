@@ -15,16 +15,14 @@ import { SublayoutHeaderRight } from './components/sublayout_header_right';
 import { isNotUndefined, isUndefined } from '../helpers/typeGuards';
 import { TokenHero } from './token_hero';
 import { TokenTerms } from './token_terms';
+import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
-  hasCenterGrid?: boolean;
   class?: string;
-  description?: string; // displayed at the top of the layout
   hero?: any;
   hideSearch?: boolean;
   rightContent?: any;
-  showCouncilMenu?: boolean;
   showNewProposalButton?: boolean;
   title?: any; // displayed at the top of the layout
   useQuickSwitcher?: boolean; // show quick switcher only, without the rest of the sidebar
@@ -58,12 +56,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   view(vnode) {
     const {
       alwaysShowTitle,
-      description, // ?
-      hasCenterGrid,
       hero,
       hideSearch,
       rightContent,
-      showCouncilMenu, // ?
       showNewProposalButton,
       title,
       useQuickSwitcher,
@@ -80,47 +75,36 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
 
     return (
       <div class={`Sublayout ${vnode.attrs.class}`}>
-        <MobileHeader />
-        <div class={`sublayout-header ${isUndefined(title) ? 'no-title' : ''}`}>
-          <div class="sublayout-header-inner">
-            <SublayoutHeaderLeft
-              alwaysShowTitle={alwaysShowTitle}
-              chain={chain}
-              title={title}
-            />
-            {!hideSearch && m(SearchBar)}
-            <SublayoutHeaderRight
-              chain={chain}
-              showNewProposalButton={showNewProposalButton}
-            />
-          </div>
-        </div>
-        <TokenHero chain={chain} hero={hero} />
-        <TokenTerms terms={terms} tosStatus={tosStatus} />
-        <div
-          class={
-            useQuickSwitcher
-              ? 'sublayout-quickswitcheronly-col'
-              : 'sublayout-sidebar-col'
-          }
-        >
-          <Sidebar useQuickSwitcher={useQuickSwitcher} />
-        </div>
-        <div class={!sidebarOpen ? 'sublayout-body' : 'sublayout-body-sidebar'}>
-          <div class={`sublayout-grid ${hasCenterGrid ? 'flex-center' : ''}`}>
-            <div
-              class={`sublayout-main-col ${
-                isUndefined(rightContent) ? 'no-right-content' : ''
-              }`}
-            >
-              {vnode.children}
+        <SidebarQuickSwitcher />
+        <div class="header-and-body-container">
+          <MobileHeader />
+          <div
+            class={`sublayout-header ${isUndefined(title) ? 'no-title' : ''}`}
+          >
+            <div class="sublayout-header-inner">
+              <SublayoutHeaderLeft
+                alwaysShowTitle={alwaysShowTitle}
+                chain={chain}
+                title={title}
+              />
+              {!hideSearch && m(SearchBar)}
+              <SublayoutHeaderRight
+                chain={chain}
+                showNewProposalButton={showNewProposalButton}
+              />
             </div>
-            {isNotUndefined(rightContent) && (
-              <div class="sublayout-right-col">{rightContent}</div>
-            )}
           </div>
+          <div class="sidebar-and-body-container">
+            <Sidebar />
+            <div class="body">
+              <TokenHero chain={chain} hero={hero} />
+              <TokenTerms terms={terms} tosStatus={tosStatus} />
+              {vnode.children}
+              {isNotUndefined(rightContent) && <div>{rightContent}</div>}
+            </div>
+          </div>
+          {!app.isCustomDomain() && <FooterLandingPage list={footercontents} />}
         </div>
-        {!app.isCustomDomain() && <FooterLandingPage list={footercontents} />}
       </div>
     );
   }
