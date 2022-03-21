@@ -316,7 +316,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
         }
         const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
         const getPct = (n: BN) => {
-          return (n.muln(10_000).div(voteTotal).toNumber() / 100).toFixed(2);
+          return !voteTotal?.isZero() ? (n.muln(10_000).div(voteTotal).toNumber() / 100).toFixed(2) : '0.00';
         }
         return m('.VotingResults', [
           m('.results-column', [
