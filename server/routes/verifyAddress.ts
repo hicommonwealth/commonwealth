@@ -2,9 +2,9 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { StargateClient } from '@cosmjs/stargate';
-import Web3 from 'web3';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
+import * as secp256k1 from 'secp256k1';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringOptions } from '@polkadot/keyring/types';
@@ -13,7 +13,7 @@ import { KeypairType } from '@polkadot/util-crypto/types';
 import * as ethUtil from 'ethereumjs-util';
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util';
 
-import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
+import { Secp256k1, Secp256k1Signature, sha256 } from '@cosmjs/crypto';
 import { AminoSignResponse, pubkeyToAddress, serializeSignDoc, decodeSignature } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
@@ -109,6 +109,24 @@ const verifySignature = async (
     } catch (e) {
       isValid = false;
     }
+  } else if (chain.base === ChainBase.CosmosSDK && chain.network === ChainNetwork.Terra) {
+    try {
+      const { public_key, signature, recid }: {
+        public_key: string, signature: string, recid: number
+      } = JSON.parse(signatureString);
+
+      // terra station signBytes will sign a hash of the provided data -- we need to recreate this
+      const msgBuffer = Buffer.from(addressModel.verification_token.trim(), 'hex');
+      const msgHash = sha256(msgBuffer);
+
+      // verify the recovered address is the same as the one provided by the wallet
+      const signatureBuf = Buffer.from(signature, 'base64');
+      const recoveredKeyBuf = secp256k1.ecdsaRecover(signatureBuf, recid, msgHash);
+      const recoveredKey = Buffer.from(recoveredKeyBuf).toString('base64');
+      if (recoveredKey === public_key) isValid = true;
+    } catch (e) {
+      isValid = false;
+    }
   } else if (chain.base === ChainBase.CosmosSDK) {
     //
     // cosmos-sdk address handling
@@ -149,7 +167,7 @@ const verifySignature = async (
           // ensure valid signature
           const { pubkey, signature } = decodeSignature(stdSignature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
-          const messageHash = new Sha256(serializeSignDoc(generatedSignDoc)).digest();
+          const messageHash = sha256(serializeSignDoc(generatedSignDoc));
           isValid = await Secp256k1.verifySignature(secpSignature, messageHash, pubkey);
           if (!isValid) {
             log.error('Signature verification failed.');

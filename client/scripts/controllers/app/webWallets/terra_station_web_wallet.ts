@@ -39,6 +39,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
 
     try {
       this._extension.once('onConnect', (accountAddr) => {
+        console.log(this._extension);
         if (accountAddr && !this._accounts.includes(accountAddr)) {
           console.log(accountAddr);
           this._accounts.push(accountAddr);
@@ -56,38 +57,23 @@ class TerraStationWebWalletController implements IWebWallet<string> {
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
     // timeout?
-    const result = await new Promise<any>((resolve, reject) => {
+    const result = await new Promise<{ public_key: string, signature: string, recid: number }>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
-        console.log(payload);
-        if (payload.result?.signatures) resolve(payload.result);
+        if (payload.result?.signature) resolve(payload.result);
         else reject();
       });
 
-      const msgs: Msg[] = [
-        new MsgStoreCode(this._accounts[0], account.validationToken)
-      ];
-      this._extension.info()
       try {
-        this._extension.sign({
-          fee: new Fee(0, '0ust'),
-          msgs
+        this._extension.signBytes({
+          purgeQueue: true,
+          bytes: Buffer.from(account.validationToken.trim(), 'hex'),
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
+        // TODO: handling?
       }
     });
-
-    const signature = {
-      signed: result.body,
-      signature: {
-        pub_key: {
-          type: 'tendermint/PubKeySecp256k1',
-          value: result.public_key
-        },
-        signature: result.signatures[0]
-      }
-    };
-    return account.validate(JSON.stringify(signature));
+    return account.validate(JSON.stringify(result));
   }
 }
 
