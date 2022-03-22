@@ -1,8 +1,13 @@
 @import 'client/styles/shared';
 
 .cui-control-group {
-  margin: 0;
+  flex: 1;
+  margin: 0 48px;
   position: relative;
+}
+
+.cui-control-group .SearchBar {
+  flex: 1;
 }
 
 .SearchBar {
@@ -14,7 +19,6 @@
     display: flex;
     font-size: 14px;
     height: 100%;
-    width: 400px;
 
     svg .SearchIcon {
       z-index: 2;

@@ -1,23 +1,20 @@
 .Sublayout.Homepage {
-    .sublayout-sidebar-col {
-        padding-right: 0;
-        max-width: 0px;
-    }
-    .sublayout-main-col {
-        padding: 36px;
-        min-width: 100%;
-        max-width: calc(100% - 72px); // horizontal padding * 2
-    }
-    .sublayout-header-right {
-        flex: 3;
-    }
-    .sublayout-header-left {
-        flex: 2;
-    }
-    .sublayout-header {
-        padding: 24px;
-    }
-    .SearchBar {
-        flex: 8;
-    }
+  .sublayout-sidebar-col {
+    padding-right: 0;
+    max-width: 0px;
+  }
+  .sublayout-main-col {
+    padding: 36px;
+    min-width: 100%;
+    max-width: calc(100% - 72px); // horizontal padding * 2
+  }
+  .sublayout-header-right {
+    flex: 3;
+  }
+  .sublayout-header-left {
+    flex: 2;
+  }
+  .sublayout-header {
+    padding: 24px;
+  }
 }

@@ -156,7 +156,6 @@ const getDiscussionPreview = (
           <div class="search-results-thread-title">
             {decodeURIComponent(thread.title)}
           </div>
-          ,
           <div class="search-results-thread-subtitle">
             <span class="created-at">
               {moment(thread.created_at).fromNow()}
@@ -192,7 +191,6 @@ const getDiscussionPreview = (
               }
             })()}
           </div>
-          ,
         </a>
       }
     />
