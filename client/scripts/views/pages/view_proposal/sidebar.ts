@@ -17,7 +17,7 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
-import LinkedThreadModal from '../../modals/linked_thread_modal';
+import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
 
 export const ProposalSidebarLinkedChainEntity: m.Component<{

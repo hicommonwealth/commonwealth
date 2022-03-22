@@ -47,9 +47,9 @@ import {
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-import TopicEditor from 'views/components/topic_editor';
-import StageEditor from 'views/components/stage_editor';
-import PollEditor from 'views/components/poll_editor';
+import { TopicEditor } from 'views/components/topic_editor';
+import { StageEditor } from 'views/components/stage_editor';
+import { PollEditor } from 'views/components/poll_editor';
 import {
   TopicEditorMenuItem,
   ThreadSubscriptionMenuItem,
@@ -60,7 +60,7 @@ import ProposalVotingActions, {
   QueueButton,
 } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
