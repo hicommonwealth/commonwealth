@@ -435,7 +435,12 @@ const ViewProposalPage: m.Component<
                       m('p', 'Voting System'),
                       m('p', 'Start Date'),
                       m('p', 'End Date'),
-                      m('p', 'Strategies'),
+                      m(
+                        'p',
+                        proposal.strategies.length > 1
+                          ? 'Strategies'
+                          : 'Strategy'
+                      ),
                       m('p', 'Snapshot'),
                     ]),
                     m('.values', [
@@ -470,7 +475,26 @@ const ViewProposalPage: m.Component<
                       ),
                       m('p', moment(+proposal.start * 1000).format('lll')),
                       m('p', moment(+proposal.end * 1000).format('lll')),
-                      m('p', moment(+proposal.end * 1000).format('lll')),
+                      m(
+                        'a',
+                        {
+                          class: 'snapshot-link',
+                          href: `https://snapshot.org/#/${app.snapshot.space.id}/proposal/${proposal.id}`,
+                          target: '_blank',
+                        },
+                        [
+                          m(
+                            '.truncate',
+                            proposal.strategies.length > 1
+                              ? proposal.strategies.length + ' Strategies'
+                              : proposal.strategies[0].name
+                          ),
+                          m(Icon, {
+                            name: Icons.EXTERNAL_LINK,
+                            class: 'external-link-icon',
+                          }),
+                        ]
+                      ),
                       m(
                         'a',
                         {
