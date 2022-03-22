@@ -24,9 +24,9 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
   if (!req.body.id) {
     return next(new Error(Errors.NeedChainId));
   }
-  // if (!['george@commonwealth.im', 'zak@commonwealth.im', 'jake@commonwealth.im'].includes(req.user.email)) {
-  //   return next(new Error(Errors.NotAcceptableAdmin));
-  // }
+  if (!['george@commonwealth.im', 'zak@commonwealth.im', 'jake@commonwealth.im'].includes(req.user.email)) {
+    return next(new Error(Errors.NotAcceptableAdmin));
+  }
 
   await models.sequelize.transaction(async (t) => {
     const chain = await models.Chain.findOne({
