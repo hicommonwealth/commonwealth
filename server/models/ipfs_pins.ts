@@ -6,8 +6,8 @@ export type IpfsPinsAttributes = {
   id: number;
   address_id: number;
   ipfs_hash: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 };
 
 export type IpfsPinsInstance = ModelInstance<IpfsPinsAttributes>;
