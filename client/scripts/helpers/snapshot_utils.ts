@@ -235,7 +235,6 @@ export async function getResults(
   space: SnapshotSpace,
   proposal: SnapshotProposal
 ) {
-  console.log(space, proposal);
   try {
     let votes = await getVotes(proposal.id);
     const strategies = proposal.strategies ?? space.strategies;
