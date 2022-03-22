@@ -137,8 +137,6 @@ const newThread = async (
     metadata: JSON.stringify({}),
   };
 
-  console.log(proposalPayload);
-
   try {
     const res = await createProposal(author.address, proposalPayload);
     await app.user.notifications.refresh();
