@@ -1,0 +1,19 @@
+@import 'client/styles/shared';
+
+.stage-items {
+  max-width: 296px;
+
+  .discussions-stage-count {
+    background: $primary-bg-color;
+    border-radius: 9999px;
+    color: #fff;
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 500;
+    height: 19px;
+    left: 2px;
+    margin: -2px 0 -2px 2px;
+    padding: 3px 5px 0;
+    position: relative;
+  }
+}
