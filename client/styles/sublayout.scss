@@ -10,7 +10,6 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow-y: auto;
     width: 100%;
   }
 
@@ -18,6 +17,7 @@
     display: flex;
     flex-direction: row;
     height: 100%;
+    overflow: hidden;
     width: 100%;
   }
 
@@ -27,6 +27,11 @@
     height: 100%;
     overflow-y: auto;
     width: 100%;
+
+    .inner-body {
+      display: flex;
+      flex-direction: row;
+    }
   }
 
   &.Homepage {
@@ -152,10 +157,6 @@
   }
 
   .sublayout-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-
     @include sm-max {
       display: none;
     }
@@ -259,8 +260,6 @@
           }
 
           .cui-icon {
-            position: relative;
-
             &.cui-icon-chevron-down {
               top: 1px;
             }

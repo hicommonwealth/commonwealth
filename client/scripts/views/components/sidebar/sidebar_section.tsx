@@ -156,7 +156,9 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
   }
 }
 
-export class SidebarSection implements m.ClassComponent<SidebarSectionAttrs> {
+export class SidebarSectionGroup
+  implements m.ClassComponent<SidebarSectionAttrs>
+{
   private toggled: boolean;
   private hoverColor: string;
 
@@ -214,18 +216,21 @@ export class SidebarSection implements m.ClassComponent<SidebarSectionAttrs> {
 
     return (
       <div
-        class="SidebarSection"
+        class="SidebarSectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
         onmouseleave={() => mouseLeaveHandler()}
         style={`background-color: ${hoverColor}`}
       >
-        <div class="SidebarTitle" onclick={(e) => clickHandler(e)}>
+        <div
+          class="section-group-title-container"
+          onclick={(e) => clickHandler(e)}
+        >
           <div class="title-text">{title}</div>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
           {carat}
         </div>
         {this.toggled && (
-          <div class="section-groups">
+          <div class="sections-container">
             {displayData.map((sectionGroup) => (
               <SectionGroup {...sectionGroup} />
             ))}

@@ -1,22 +1,26 @@
 @import 'client/styles/shared';
 
-.SidebarSection {
+.SidebarSectionGroup {
   border-bottom-color: $disable-grey;
   border-bottom-width: 1px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
 
-  .SidebarTitle {
+  .section-group-title-container {
     align-items: center;
     display: flex;
     justify-content: space-between;
     padding: 8px 8px 8px 16px;
 
     .title-text {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
     }
+
+    // .cui-icon {
+    //   position: unset;
+    // }
 
     .right-icon {
       .cui-icon-plus-circle {
@@ -26,16 +30,13 @@
     }
   }
 
-  .section-groups {
+  .sections-container {
     display: flex;
     flex-direction: column;
   }
 }
 
 .SectionGroup {
-  font-weight: 400;
-  font-size: 17px;
-
   .SectionGroupTitle {
     height: 32px;
     display: flex;
@@ -47,6 +48,8 @@
       padding-right: 8px;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-weight: 400;
+      font-size: 14px;
     }
 
     &.section-title-text-active {

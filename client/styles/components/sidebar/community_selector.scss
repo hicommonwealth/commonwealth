@@ -1,13 +1,5 @@
 @import 'client/styles/shared';
 
-.CommunitySelector {
-  .cui-button {
-    height: 38px;
-    width: 38px;
-    padding: 0;
-  }
-}
-
 .CommunitySelectList {
   transform: none !important; // override any scrolling effects
   left: $quick-switcher-width !important;

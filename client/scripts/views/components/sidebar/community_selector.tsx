@@ -129,14 +129,14 @@ export class CommunitySelector
           </a>
         )}
         {app.isLoggedIn() && (
-          <div>
+          <>
             <h4>Your communities</h4>
             {joinedCommunities.map(renderCommunity)}
             {joinedCommunities.length === 0 && (
               <div class="community-placeholder">None</div>
             )}
             <h4>Other communities</h4>
-          </div>
+          </>
         )}
         {unjoinedCommunities.map(renderCommunity)}
         {!showHomeButtonAtTop && renderCommunity('home')}
@@ -155,10 +155,9 @@ export class CommunitySelector
                 }
               />
             }
-            inline={true}
             class="CommunitySelectList"
             content={
-              <div>
+              <>
                 {app.isLoggedIn() && (
                   <div>
                     <h4>Your communities</h4>
@@ -171,7 +170,7 @@ export class CommunitySelector
                 )}
                 {unjoinedCommunities.map(renderCommunity)}
                 {renderCommunity('home')}
-              </div>
+              </>
             }
           />
         </div>

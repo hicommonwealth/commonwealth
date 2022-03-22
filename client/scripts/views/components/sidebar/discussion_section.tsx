@@ -6,7 +6,7 @@ import 'components/sidebar/index.scss';
 
 import { navigateToSubpage } from 'app';
 import app from 'state';
-import { SidebarSection } from './sidebar_section';
+import { SidebarSectionGroup } from './sidebar_section';
 import {
   MobileSidebarSectionAttrs,
   SectionGroupAttrs,
@@ -205,6 +205,6 @@ export class DiscussionSection
       toggleDisabled: vnode.attrs.mobile,
     };
 
-    return <SidebarSection {...sidebarSectionData} />;
+    return <SidebarSectionGroup {...sidebarSectionData} />;
   }
 }

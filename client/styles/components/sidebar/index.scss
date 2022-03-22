@@ -6,12 +6,9 @@
   border-right-width: 1px;
   display: flex;
   flex-direction: column;
+  height: 100%;
   min-width: $sidebar-width;
-
-  &::-webkit-scrollbar {
-    /* Chrome */
-    display: none;
-  }
+  overflow-y: auto;
 
   &.custom-domain {
     left: 0;

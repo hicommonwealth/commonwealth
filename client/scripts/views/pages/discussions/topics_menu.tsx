@@ -51,7 +51,7 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
         trigger={
           <Button
             rounded={true}
-            compac={true}
+            compact={true}
             label={selectedTopic ? `Topic: ${topic}` : 'All Topics'}
             iconRight={Icons.CHEVRON_DOWN}
             size="sm"
@@ -121,8 +121,8 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
                             <Button
                               size="xs"
                               label="Edit"
+                              class="edit-button"
                               compact={true}
-                              rounded={true}
                               onclick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();

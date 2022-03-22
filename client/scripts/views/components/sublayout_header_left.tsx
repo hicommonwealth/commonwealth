@@ -51,7 +51,7 @@ export class SublayoutHeaderLeft
                 <span class="breadcrumb">{m.trust('/')}</span>
               )}
               {title}
-              {m(CommunityOptionsPopover)}
+              <CommunityOptionsPopover />
             </h4>
           </div>
         );

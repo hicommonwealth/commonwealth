@@ -1,26 +1,47 @@
-.topic-items {
-  max-width: 296px;
+.cui-menu {
+  padding: 0;
 
-  .cui-button-label {
-    // resets the dumb construct overrides
-    position: unset;
-    top: unset;
+  .topic-items {
+    max-width: 296px;
 
-    .topic-item {
-      align-items: center;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+    .cui-menu-divider {
+      margin: 0;
+    }
 
-      .cui-icon {
-        margin-right: 8px;
-      }
+    .cui-button {
+      height: 32px;
+      min-height: 32px;
+      line-height: 32px;
 
-      .topic-item-name {
-        margin-right: 8px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+      .cui-button-label {
+        // resets the dumb construct overrides
+        position: unset;
+        top: unset;
+
+        .topic-item {
+          align-items: center;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+
+          .cui-icon {
+            margin-right: 8px;
+          }
+
+          .edit-button {
+            font-size: 14px;
+            height: 24px;
+            min-height: 24px;
+            line-height: 24px;
+          }
+
+          .topic-item-name {
+            margin-right: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
       }
     }
   }

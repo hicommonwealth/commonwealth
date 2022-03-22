@@ -224,7 +224,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
           if (getLastUpdate(firstThread) > lastVisited.unix()) {
             sortedListing.push(getLastSeenDivider(false));
           } else {
-            sortedListing.push(m('.PinnedDivider', m('hr')));
+            sortedListing.push(m('PinnedDivider', m('hr')));
           }
         }
       }

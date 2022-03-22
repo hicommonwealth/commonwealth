@@ -74,7 +74,11 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     }
 
     return (
-      <div class={`Sublayout ${vnode.attrs.class}`}>
+      <div
+        class={`Sublayout ${
+          isNotUndefined(vnode.attrs.class) ? vnode.attrs.class : ''
+        }`}
+      >
         <SidebarQuickSwitcher />
         <div class="header-and-body-container">
           <MobileHeader />
@@ -99,11 +103,15 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             <div class="body">
               <TokenHero chain={chain} hero={hero} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
-              {vnode.children}
-              {isNotUndefined(rightContent) && <div>{rightContent}</div>}
+              <div class="inner-body">
+                {vnode.children}
+                {isNotUndefined(rightContent) && <div>{rightContent}</div>}
+              </div>
+              {!app.isCustomDomain() && (
+                <FooterLandingPage list={footercontents} />
+              )}
             </div>
           </div>
-          {!app.isCustomDomain() && <FooterLandingPage list={footercontents} />}
         </div>
       </div>
     );
