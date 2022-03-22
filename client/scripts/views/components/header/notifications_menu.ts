@@ -112,7 +112,7 @@ const NotificationsMenu: m.Component<
         compact: true,
       }),
       position: 'bottom-end',
-      inline: true,
+      // inline: true,
       closeOnContentClick: true,
       closeOnOutsideClick: true,
       menuAttrs: {

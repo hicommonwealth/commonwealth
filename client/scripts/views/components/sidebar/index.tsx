@@ -11,9 +11,7 @@ import { GovernanceSection } from './governance_section';
 import { ChainStatusModule } from './chain_status_module';
 import { ExternalLinksModule } from './external_links_module';
 
-type SidebarAttrs = { useQuickSwitcher?: boolean };
-
-export class Sidebar implements m.ClassComponent<SidebarAttrs> {
+export class Sidebar implements m.ClassComponent {
   view() {
     const isCustom = app.isCustomDomain();
 

@@ -8,11 +8,11 @@ import app from 'state';
 import { handleEmailInvites } from 'views/components/header/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
 import { MobileHeader } from 'views/mobile/mobile_header';
-import { FooterLandingPage } from 'views/pages/landing/landing_page_footer';
+import { LandingPageFooter } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
-import { SublayoutHeaderLeft } from './components/sublayout_header_left';
-import { SublayoutHeaderRight } from './components/sublayout_header_right';
-import { isNotUndefined, isUndefined } from '../helpers/typeGuards';
+import { SublayoutHeaderLeft } from './sublayout_header_left';
+import { SublayoutHeaderRight } from './sublayout_header_right';
+import { isNotUndefined } from '../helpers/typeGuards';
 import { TokenHero } from './token_hero';
 import { TokenTerms } from './token_terms';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
@@ -25,7 +25,6 @@ type SublayoutAttrs = {
   rightContent?: any;
   showNewProposalButton?: boolean;
   title?: any; // displayed at the top of the layout
-  useQuickSwitcher?: boolean; // show quick switcher only, without the rest of the sidebar
 };
 
 const footercontents = [
@@ -61,12 +60,10 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       rightContent,
       showNewProposalButton,
       title,
-      useQuickSwitcher,
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
     const terms = app.chain ? chain.terms : null;
-    const sidebarOpen = app.chain !== null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
     if (m.route.param('triggerInvite') === 't') {
@@ -82,21 +79,17 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
         <SidebarQuickSwitcher />
         <div class="header-and-body-container">
           <MobileHeader />
-          <div
-            class={`sublayout-header ${isUndefined(title) ? 'no-title' : ''}`}
-          >
-            <div class="sublayout-header-inner">
-              <SublayoutHeaderLeft
-                alwaysShowTitle={alwaysShowTitle}
-                chain={chain}
-                title={title}
-              />
-              {!hideSearch && m(SearchBar)}
-              <SublayoutHeaderRight
-                chain={chain}
-                showNewProposalButton={showNewProposalButton}
-              />
-            </div>
+          <div class="header-container">
+            <SublayoutHeaderLeft
+              alwaysShowTitle={alwaysShowTitle}
+              chain={chain}
+              title={title}
+            />
+            {!hideSearch && m(SearchBar)}
+            <SublayoutHeaderRight
+              chain={chain}
+              showNewProposalButton={showNewProposalButton}
+            />
           </div>
           <div class="sidebar-and-body-container">
             <Sidebar />
@@ -108,7 +101,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 {isNotUndefined(rightContent) && <div>{rightContent}</div>}
               </div>
               {!app.isCustomDomain() && (
-                <FooterLandingPage list={footercontents} />
+                <LandingPageFooter list={footercontents} />
               )}
             </div>
           </div>

@@ -11,6 +11,16 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
+
+    .header-container {
+      align-items: center;
+      border-bottom: 1px solid $disable-grey;
+      display: flex;
+      flex-direction: row;
+      height: 88px;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
   }
 
   .sidebar-and-body-container {
@@ -31,6 +41,7 @@
     .inner-body {
       display: flex;
       flex-direction: row;
+      height: 100%;
     }
   }
 
@@ -61,75 +72,6 @@
     }
   }
 
-  .sublayout-grid {
-    display: flex;
-    margin: 0 auto;
-    max-width: $layout-max-width;
-    min-height: calc(100vh - 150px);
-    padding: 0 $layout-padding;
-    position: relative;
-
-    @include xs-max {
-      padding: 0 $layout-padding-xs;
-    }
-  }
-  .sublayout-sidebar-col {
-    flex: 1;
-    max-width: $sidebar-width;
-    padding-right: 48px;
-  }
-
-  @include sm-max {
-    .sublayout-sidebar-col {
-      display: none;
-    }
-  }
-
-  .hide-sidebar & {
-    .sublayout-sidebar-col {
-      display: none;
-    }
-  }
-
-  .sublayout-main-col {
-    flex: 3;
-    max-width: calc(100% - #{$sidebar-width});
-    padding-right: 20px;
-    padding: 0;
-
-    &.no-right-content {
-      padding: 32px 0;
-      max-width: 100%;
-      width: 100%;
-    }
-
-    @include sm-max {
-      max-width: 100%;
-      padding: 0;
-    }
-
-    @include xs-max {
-      min-width: calc(100vw - 80px);
-    }
-  }
-
-  .sublayout-right-col {
-    flex: 1.75;
-    max-width: calc(#{$sidebar-width} + 32px);
-    padding: 36px 0 36px 36px;
-
-    @include xl-min {
-      max-width: calc(#{$sidebar-width} + 48px);
-      padding: 36px 20px 36px 32px;
-    }
-
-    @include xs-max {
-      min-width: calc(#{$sidebar-width} + 20px);
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-  }
-
   // TODO: Graham 22.03.04 Necessity & presence of right sidebar
   // should be assessed site-wide. This is merely a hot fix for
   // comment threading.
@@ -138,184 +80,6 @@
       @include xs-max {
         display: none;
       }
-    }
-  }
-
-  .hide-sidebar & {
-    .sublayout-main-col {
-      margin: 0 auto;
-      padding: 0;
-      width: 100%;
-    }
-  }
-
-  @include md-max {
-    .sublayout-main-col {
-      padding: 0;
-      width: calc(100% - #{$sidebar-width});
-    }
-  }
-
-  .sublayout-header {
-    @include sm-max {
-      display: none;
-    }
-
-    background-color: white;
-    border-bottom: 1px solid $disable-grey;
-    padding-right: 20px;
-    padding: 24px 0 22px;
-
-    @include md-max {
-      @include narrowBrowserHeader();
-      padding-right: 0;
-
-      // .sublayout-header-heading {
-      //     display: none !important;
-      // }
-    }
-
-    @include lg-max {
-      @include narrowBrowserHeader();
-    }
-
-    .hide-sidebar & {
-      padding-right: 0;
-    }
-
-    .sublayout-header-inner {
-      display: flex;
-      margin: 0 auto;
-      max-width: $layout-max-width;
-      padding: 0 $layout-padding;
-
-      .SearchBar {
-        flex: 8;
-      }
-
-      .hide-sidebar & {
-        margin: 0 auto;
-      }
-
-      .hiringBtn {
-        color: #4a4a4a;
-        font-weight: 500;
-        height: 36px;
-        margin: 0 7px;
-        min-width: fit-content;
-      }
-    }
-
-    .sublayout-header-left {
-      align-items: center;
-      display: flex;
-      flex: 2;
-      margin-top: 0 !important;
-      white-space: nowrap;
-
-      .inner-heading-container {
-        align-items: center;
-        display: flex;
-        flex-direction: row;
-
-        > .ChainIcon {
-          height: 22px;
-          margin-right: 10px;
-          width: 22px;
-        }
-
-        > .CommunityIcon {
-          display: inline-block;
-          margin-right: 14px;
-          position: relative;
-
-          .no-image {
-            position: relative;
-          }
-        }
-
-        .CommunitySelector,
-        .sublayout-header-heading {
-          align-items: baseline;
-          display: flex;
-        }
-
-        h4.sublayout-header-heading {
-          font-size: 1.15rem;
-          font-weight: 600;
-          margin: 7px 0 0 0;
-          white-space: nowrap;
-
-          a {
-            color: $text-color-black;
-          }
-
-          .breadcrumb {
-            color: $text-color-lightest;
-            margin: 0 8px;
-          }
-
-          .cui-tag {
-            margin: -1px 0;
-          }
-
-          .cui-icon {
-            &.cui-icon-chevron-down {
-              top: 1px;
-            }
-
-            &::before {
-              content: ' ';
-              width: 5px;
-            }
-          }
-
-          .sublayout-header-heading-wrapper {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-        }
-      }
-
-      h3 {
-        font-size: 1.15rem;
-        font-weight: 600;
-        margin: 8px 0 0;
-      }
-    }
-
-    .sublayout-header-right {
-      align-items: center;
-      display: flex;
-      flex-direction: row-reverse;
-      flex: 3;
-      text-align: right;
-
-      > .cui-button,
-      > .LoginSelector {
-        margin-left: 7px;
-      }
-    }
-  }
-
-  .sublayout-body {
-    min-height: calc(100vh - 140px);
-    padding-bottom: 80px;
-    padding: 1px 0; // prevent margins from flowing outside the container
-    position: relative;
-  }
-
-  .sublayout-body-sidebar {
-    margin-left: $sidebar-width;
-    min-height: calc(100vh - 140px);
-    padding-bottom: 80px;
-    padding: 1px 0; // prevent margins from flowing outside the container
-    position: relative;
-
-    @include sm-max {
-      margin-left: 0px;
     }
   }
 }

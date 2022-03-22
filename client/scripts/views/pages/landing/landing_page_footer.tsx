@@ -4,40 +4,28 @@ import m from 'mithril';
 
 import 'pages/landing/landing_page_footer.scss';
 
-import app from 'state';
-
 type IState = {
   list: { text: string; redirectTo?: string; externalLink?: string }[];
 };
 
-export class FooterLandingPage implements m.ClassComponent<IState> {
+export class LandingPageFooter implements m.ClassComponent<IState> {
   view(vnode) {
     const redirectClick = (route) => {
       m.route.set(route);
     };
 
-    let footerClass = 'FooterLandingPage';
-
-    if (app.chain !== null) {
-      footerClass = 'FooterLandingPage.sidebar';
-    }
-
     return (
-      <footer class={`${footerClass} bg-footer bg-cover py-10`}>
-        <div class="mt-8 container mx-auto md:flex md:flex-row md:justify-between md:items-start">
-          <img class="w-60" src="/static/img/logo.svg" alt="Commonwealth" />
-          <nav class="mt-10 md:mt-0 w-64">
-            <ul
-              class={`flex flex-wrap flex-col ${
-                vnode.attrs.list.length > 6 ? 'h-32' : 'h-24'
-              }`}
-            >
+      <footer class="LandingPageFooter">
+        <div class="">
+          <img class="" src="/static/img/logo.svg" alt="Commonwealth" />
+          <nav class="">
+            <ul class="">
               {vnode.attrs.list.map((item) => {
                 return (
-                  <li class="FooterNavsLinks mb-2">
+                  <li class="">
                     {item.redirectTo ? (
                       <a
-                        class="text-gray-500"
+                        class=""
                         onclick={(e) => {
                           e.preventDefault();
                           redirectClick(item.redirectTo);
@@ -46,11 +34,7 @@ export class FooterLandingPage implements m.ClassComponent<IState> {
                         {item.text}
                       </a>
                     ) : (
-                      <a
-                        class="text-gray-500"
-                        href={item.externalLink}
-                        target="_blank"
-                      >
+                      <a class="" href={item.externalLink} target="_blank">
                         {item.text}
                       </a>
                     )}

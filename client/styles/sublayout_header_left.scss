@@ -1,0 +1,27 @@
+@import 'client/styles/shared';
+
+.SublayoutHeaderLeft {
+  display: flex;
+  flex-direction: row;
+
+  .ChainIcon {
+    margin-right: 8px;
+  }
+
+  h4 {
+    margin-right: 4px;
+
+    a {
+      color: $text-color-black;
+    }
+  }
+
+  .slash {
+    color: $text-color-lightest;
+    margin: 0 8px;
+  }
+
+  .cui-icon {
+    top: 3px;
+  }
+}

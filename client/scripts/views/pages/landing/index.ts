@@ -7,7 +7,7 @@ import app, { LoginState } from 'state';
 
 import { ChainInfo } from 'client/scripts/models';
 import HeaderLandingPage from './landing_page_header';
-import { FooterLandingPage } from './landing_page_footer';
+import { LandingPageFooter } from './landing_page_footer';
 import JoinCommonWealthSection from './landing_page_pre_footer';
 import TokensCommunityComponent from './tokens_community_hero';
 import TokensCreatorComponent from './creators_card_section';
@@ -299,7 +299,7 @@ const LandingPage: m.Component<{}, IState> = {
           ],
         }),
         m(JoinCommonWealthSection),
-        m(FooterLandingPage, {
+        m(LandingPageFooter, {
           list: [
             // { text:  'Use Cases' },
             // { text:  'Crowdfunding' },

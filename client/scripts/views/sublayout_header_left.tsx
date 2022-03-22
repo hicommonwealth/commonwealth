@@ -2,14 +2,14 @@
 
 import m from 'mithril';
 
-import 'sublayout.scss';
+import 'sublayout_header_left.scss';
 
 import app from 'state';
 import { link } from 'helpers';
 import { ChainIcon } from 'views/components/chain_icon';
 import { isNotNil, isNotUndefined, isUndefined } from 'helpers/typeGuards';
 import { ChainInfo } from 'client/scripts/models';
-import { CommunityOptionsPopover } from './community_options_popover';
+import { CommunityOptionsPopover } from './components/community_options_popover';
 
 type SublayoutHeaderLeftAttrs = {
   alwaysShowTitle?: boolean;
@@ -30,42 +30,36 @@ export class SublayoutHeaderLeft
 
     const headerLeftContent = () => {
       if (hasDefaultHeader) {
-        return <h3>Commonwealth</h3>;
+        return <h4>Commonwealth</h4>;
       } else if (isNotNil(chain)) {
         return (
-          <div class="inner-heading-container">
-            <div class="ChainIcon">
-              {link(
-                'a',
-                !app.isCustomDomain() ? `/${app.activeChainId()}` : '/',
-                <ChainIcon size={22} chain={chain} />
-              )}
-            </div>
-            <h4 class="sublayout-header-heading">
+          <>
+            {link(
+              'a',
+              !app.isCustomDomain() ? `/${app.activeChainId()}` : '/',
+              <ChainIcon size={22} chain={chain} />
+            )}
+            <h4>
               {link(
                 'a',
                 app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,
                 chain.name
               )}
               {isNotUndefined(title) && (
-                <span class="breadcrumb">{m.trust('/')}</span>
+                <span class="slash">{m.trust('/')}</span>
               )}
               {title}
-              <CommunityOptionsPopover />
             </h4>
-          </div>
+            <CommunityOptionsPopover />
+          </>
         );
       } else if (alwaysShowTitle) {
-        return (
-          <h4 class="sublayout-header-heading no-chain-or-community">
-            {title}
-          </h4>
-        );
+        return <h4>{title}</h4>;
       } else {
         return null;
       }
     };
 
-    return <div class="sublayout-header-left">{headerLeftContent()}</div>;
+    return <div class="SublayoutHeaderLeft">{headerLeftContent()}</div>;
   }
 }
