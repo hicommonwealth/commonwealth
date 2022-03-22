@@ -2,7 +2,7 @@
 import axios from 'axios';
 const FormData = require('form-data');
 import models from '../database';
-import { AppError ,ServerError} from './errors';
+import { ServerError } from './errors';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -10,9 +10,15 @@ require('dotenv').config();
 
 export const Errors = {
   KeysError: 'Pinata Keys do not exist',
+  DBInsertError: 'Could not insert the hash into the DB: ',
+  PinningError: 'Pinata pinning has failed: ',
 };
 
-const pinIpfsBlob = async (userID: number, addressID: number, jsonfile: string) => {
+const pinIpfsBlob = async (
+  userID: number,
+  addressID: number,
+  jsonfile: string
+) => {
   const data = new FormData();
   data.append('file', JSON.stringify(jsonfile), 'userIDblob');
   if (process.env.PINATA_API_KEY && process.env.PINATA_SECRET_API_KEY) {
@@ -36,11 +42,13 @@ const pinIpfsBlob = async (userID: number, addressID: number, jsonfile: string) 
         });
       } catch (e) {
         log.error('Could not insert the hash into the DB: ', e.message);
+        throw new ServerError(Errors.DBInsertError);
       }
 
       return pinataResponse.data.IpfsHash;
     } catch (e) {
       log.error('Pinata pinning has failed', e.message);
+      throw new ServerError(Errors.PinningError);
     }
   } else {
     throw new ServerError(Errors.KeysError);
