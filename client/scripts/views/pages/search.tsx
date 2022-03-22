@@ -358,35 +358,20 @@ class SearchPage implements m.Component<SearchPageAttrs> {
       </div>
     );
 
+    const getCaptionScope = () => {
+      if (scope) {
+        return `in ${capitalize(scope)}.`;
+      } else if (app.isCustomDomain()) {
+        return '';
+      } else {
+        return 'across all communities.';
+      }
+    };
+
     const getSearchResultsCaption = () => {
-      return [
-        resultCount,
-        " matching '",
-        this.searchQuery.searchTerm,
-        "'",
-        scope
-          ? ` in ${capitalize(scope)}.`
-          : app.isCustomDomain()
-          ? ''
-          : ' across all communities.',
-        scope &&
-          !app.isCustomDomain() && [
-            ' ',
-            <a
-              href="#"
-              class="search-all-communities"
-              onclick={() => {
-                searchQuery.chainScope = undefined;
-                m.route.set(`/search?${searchQuery.toUrlParams()}`);
-                setTimeout(() => {
-                  this.refreshResults = true;
-                }, 0);
-              }}
-            >
-              Search all communities?
-            </a>,
-          ],
-      ];
+      return `${resultCount} matching '${
+        this.searchQuery.searchTerm
+      }' ${getCaptionScope()}`;
     };
 
     return (
@@ -395,27 +380,43 @@ class SearchPage implements m.Component<SearchPageAttrs> {
         title={['Search ', capitalize(scope) || 'Commonwealth']}
         showNewProposalButton={true}
         alwaysShowTitle={true}
-        centerGrid={true}
       >
-        <Tabs tabs={tabs} />,
-        <div class="search-results-wrapper">
-          {!app.search.getByQuery(searchQuery)?.loaded ? (
-            <div class="search-loading">
-              <Spinner active={true} fill={true} size="xl" />,
-            </div>
-          ) : this.errorText ? (
-            <div class="search-error">
-              <div class="error-text">{this.errorText}</div>
-            </div>
-          ) : (
-            <div class="search-results">
-              <div class="search-results-caption">
-                {getSearchResultsCaption()}
+        <div class="container">
+          <Tabs>{tabs}</Tabs>
+          <div class="search-results-wrapper">
+            {!app.search.getByQuery(searchQuery)?.loaded ? (
+              <div class="search-loading">
+                <Spinner active={true} fill={true} size="xl" />,
               </div>
-              {resultCount === '0' ? null : filterBar}
-              <div class="search-results-list">{tabScopedListing}</div>
-            </div>
-          )}
+            ) : this.errorText ? (
+              <div class="search-error">
+                <div class="error-text">{this.errorText}</div>
+              </div>
+            ) : (
+              <div class="search-results">
+                <div class="search-results-caption">
+                  {getSearchResultsCaption()}
+                  {scope && !app.isCustomDomain() && (
+                    <a
+                      href="#"
+                      class="search-all-communities"
+                      onclick={() => {
+                        searchQuery.chainScope = undefined;
+                        m.route.set(`/search?${searchQuery.toUrlParams()}`);
+                        setTimeout(() => {
+                          this.refreshResults = true;
+                        }, 0);
+                      }}
+                    >
+                      {` Search all communities?`}
+                    </a>
+                  )}
+                </div>
+                {resultCount === '0' ? null : filterBar}
+                <div class="search-results-list">{tabScopedListing}</div>
+              </div>
+            )}
+          </div>
         </div>
       </Sublayout>
     );

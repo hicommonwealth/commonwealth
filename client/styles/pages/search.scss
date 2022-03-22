@@ -1,6 +1,11 @@
 @import 'client/styles/shared';
 
 .SearchPage {
+  .container {
+    display: flex;
+    flex-direction: column;
+  }
+
   .sublayout-main-col {
     padding: 0 5%;
   }
