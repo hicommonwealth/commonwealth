@@ -51,7 +51,7 @@ class MobileAccountMenu implements m.ClassComponent {
     return (
       <Menu class="MobileAccountMenu">
         {app.isLoggedIn() ? (
-          <div>
+          <>
             {app.activeChainId() &&
               m(LoginSelectorMenuLeft, {
                 activeAddressesWithRole,
@@ -60,7 +60,7 @@ class MobileAccountMenu implements m.ClassComponent {
               })}
             {app.activeChainId() && <MenuDivider />}
             {m(LoginSelectorMenuRight, { mobile: true })}
-          </div>
+          </>
         ) : (
           <MenuItem
             label="Login"

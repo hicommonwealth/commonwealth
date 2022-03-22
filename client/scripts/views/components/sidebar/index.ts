@@ -11,11 +11,11 @@ import {
   Icons,
   Tooltip,
 } from 'construct-ui';
-import { selectNode, initChain, navigateToSubpage } from 'app';
+import { selectNode, initChain } from 'app';
 import app from 'state';
 import { link } from 'helpers';
 import { ChainInfo, NodeInfo } from 'models';
-import SubscriptionButton from 'views/components/subscription_button';
+import { SubscriptionButton } from 'views/components/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import { ChainIcon } from 'views/components/chain_icon';
 import CommunitySelector from 'views/components/sidebar/community_selector';

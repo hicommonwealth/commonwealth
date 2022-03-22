@@ -3,7 +3,6 @@ import 'components/header/login_selector.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import _ from 'underscore';
 import mixpanel from 'mixpanel-browser';
 
 import {

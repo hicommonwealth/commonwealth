@@ -1,9 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 import { ChainBase } from '../../shared/types';
+import { ChainAttributes } from '../models/chain';
+import { TypedRequestBody, TypedResponse, success } from '../types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -24,10 +26,18 @@ export const Errors = {
   InvalidTerms: 'Terms of Service must begin with https://',
 };
 
+type UpdateChainReq = ChainAttributes & {
+  id: string;
+  'featured_topics[]'?: string[];
+  'snapshot[]'?: string[];
+};
+
+type UpdateChainResp = ChainAttributes;
+
 const updateChain = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<UpdateChainReq>,
+  res: TypedResponse<UpdateChainResp>,
   next: NextFunction
 ) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
@@ -79,7 +89,7 @@ const updateChain = async (
   } else if (snapshot === undefined) {
     snapshot = []
   }
-  
+
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
@@ -93,7 +103,8 @@ const updateChain = async (
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
   } else if (
-    snapshot.some((snapshot_space) => snapshot_space !== '' && snapshot_space.slice(snapshot_space.length-4) != '.eth')
+    snapshot.some((snapshot_space) => snapshot_space !== '' &&
+      snapshot_space.slice(snapshot_space.length - 4) !== '.eth')
   ) {
     return next(new Error(Errors.InvalidSnapshot));
   } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {
@@ -129,7 +140,7 @@ const updateChain = async (
 
   await chain.save();
 
-  return res.json({ status: 'Success', result: chain.toJSON() });
+  return success(res, chain.toJSON());
 };
 
 export default updateChain;

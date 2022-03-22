@@ -8,22 +8,20 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import AddressInputTypeahead from 'views/components/addresses/address_input_typeahead';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import { notifyError } from 'controllers/app/notifications';
 
 import app from 'state';
 
-export const ApproveBountyModal: m.Component<{ bountyId: number }, { approvals: number }> = {
+export const ApproveBountyModal: m.Component<
+  { bountyId: number },
+  { approvals: number }
+> = {
   view: (vnode) => {
     const { bountyId } = vnode.attrs;
 
     return m('.ApproveBountyModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Approve bounty'),
-      ]),
+      m('.compact-modal-title', [m('h3', 'Approve bounty')]),
       m('.compact-modal-body', [
-        m('p', [
-          'Create a council motion to approve this bounty?',
-        ]),
+        m('p', ['Create a council motion to approve this bounty?']),
         m('p', [
           'You must select a valid number of approvals, or the motion will fail.',
         ]),
@@ -45,7 +43,9 @@ export const ApproveBountyModal: m.Component<{ bountyId: number }, { approvals: 
             if (isNaN(vnode.state.approvals)) return;
             await createTXModal(
               (app.chain as Substrate).bounties.createBountyApprovalMotionTx(
-                app.user?.activeAccount as SubstrateAccount, bountyId, vnode.state.approvals
+                app.user?.activeAccount as SubstrateAccount,
+                bountyId,
+                vnode.state.approvals
               )
             );
 
@@ -62,27 +62,26 @@ export const ApproveBountyModal: m.Component<{ bountyId: number }, { approvals: 
         }),
       ]),
     ]);
-  }
+  },
 };
 
-export const ProposeCuratorModal: m.Component<{ bountyId: number }, {
-  approvals: number,
-  curator: string,
-  fee: number,
-}> = {
+export const ProposeCuratorModal: m.Component<
+  { bountyId: number },
+  {
+    approvals: number;
+    curator: string;
+    fee: number;
+  }
+> = {
   view: (vnode) => {
     const { bountyId } = vnode.attrs;
     const { curator, fee, approvals } = vnode.state;
     const feeCoins = app.chain.chain.coins(fee, true);
 
     return m('.ProposeCuratorModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Propose curator'),
-      ]),
+      m('.compact-modal-title', [m('h3', 'Propose curator')]),
       m('.compact-modal-body', [
-        m('p', [
-          'Propose a curator and fee to manage this bounty.',
-        ]),
+        m('p', ['Propose a curator and fee to manage this bounty.']),
         m('p', [
           'The fee should be a portion of the bounty, that will go to the curator once the bounty is completed.',
         ]),
@@ -123,7 +122,11 @@ export const ProposeCuratorModal: m.Component<{ bountyId: number }, {
             if (isNaN(vnode.state.approvals)) return;
             await createTXModal(
               (app.chain as Substrate).bounties.proposeCuratorTx(
-                app.user?.activeAccount as SubstrateAccount, bountyId, curator, feeCoins, approvals
+                app.user?.activeAccount as SubstrateAccount,
+                bountyId,
+                curator,
+                feeCoins,
+                approvals
               )
             );
 
@@ -131,28 +134,31 @@ export const ProposeCuratorModal: m.Component<{ bountyId: number }, {
             $(e.target).trigger('modalcomplete');
             setTimeout(async () => {
               $(e.target).trigger('modalexit');
-              await alertModalWithText('Curator proposed! Next, the motion must be approved & the curator must accept.')();
+              await alertModalWithText(
+                'Curator proposed! Next, the motion must be approved & the curator must accept.'
+              )();
             }, 0);
           },
           label: 'Go to send transaction',
         }),
       ]),
     ]);
-  }
+  },
 };
 
-export const AwardBountyModal: m.Component<{ bountyId: number }, { approvals: number, recipient: string }> = {
+export const AwardBountyModal: m.Component<
+  { bountyId: number },
+  { approvals: number; recipient: string }
+> = {
   view: (vnode) => {
     const { bountyId } = vnode.attrs;
     const { recipient } = vnode.state;
 
     return m('.AwardBountyModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Approve bounty'),
-      ]),
+      m('.compact-modal-title', [m('h3', 'Approve bounty')]),
       m('.compact-modal-body', [
         m('p', [
-          'Award this bounty to the recipient. This action will take effect after a delay.'
+          'Award this bounty to the recipient. This action will take effect after a delay.',
         ]),
         m(AddressInputTypeahead, {
           options: {
@@ -172,7 +178,9 @@ export const AwardBountyModal: m.Component<{ bountyId: number }, { approvals: nu
             e.preventDefault();
             await createTXModal(
               (app.chain as Substrate).bounties.awardBountyTx(
-                app.user?.activeAccount as SubstrateAccount, bountyId, recipient
+                app.user?.activeAccount as SubstrateAccount,
+                bountyId,
+                recipient
               )
             );
 
@@ -189,18 +197,19 @@ export const AwardBountyModal: m.Component<{ bountyId: number }, { approvals: nu
         }),
       ]),
     ]);
-  }
+  },
 };
 
-export const ExtendExpiryModal: m.Component<{ bountyId: number }, { approvals: number, remark: string }> = {
+export const ExtendExpiryModal: m.Component<
+  { bountyId: number },
+  { approvals: number; remark: string }
+> = {
   view: (vnode) => {
     const { bountyId } = vnode.attrs;
     const { remark } = vnode.state;
 
     return m('.ExtendExpiryModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Approve bounty'),
-      ]),
+      m('.compact-modal-title', [m('h3', 'Approve bounty')]),
       m('.compact-modal-body', [
         m('p', [
           'Extend this bounty? You should include a remark summarizing progress so far.',
@@ -221,7 +230,9 @@ export const ExtendExpiryModal: m.Component<{ bountyId: number }, { approvals: n
             e.preventDefault();
             await createTXModal(
               (app.chain as Substrate).bounties.extendBountyExpiryTx(
-                app.user?.activeAccount as SubstrateAccount, bountyId, remark
+                app.user?.activeAccount as SubstrateAccount,
+                bountyId,
+                remark
               )
             );
 
@@ -235,5 +246,5 @@ export const ExtendExpiryModal: m.Component<{ bountyId: number }, { approvals: n
         }),
       ]),
     ]);
-  }
+  },
 };
