@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { DB } from '../database';
 import pinIpfsBlob from '../util/pinIpfsBlob';
-import isValidJSON from '../util/isValidJson';
 import { AppError } from '../util/errors';
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -11,7 +10,16 @@ export const Errors = {
   InvalidJson: 'Input is not a valid JSON string',
 };
 
-const pinIPFS = async (
+const isValidJSON = (input: string) => {
+  try {
+    JSON.parse(input);
+  } catch (e) {
+    return false;
+  }
+  return true;
+};
+
+const ipfsPin = async (
   models: DB,
   req: Request,
   res: Response,
@@ -41,4 +49,4 @@ const pinIPFS = async (
   }
 };
 
-export default pinIPFS;
+export default ipfsPin;

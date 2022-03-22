@@ -2,7 +2,8 @@
 import axios from 'axios';
 const FormData = require('form-data');
 import models from '../database';
-import { AppError } from './errors';
+import { AppError ,ServerError} from './errors';
+
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 require('dotenv').config();
@@ -42,7 +43,7 @@ const pinIpfsBlob = async (userID: number, addressID: number, jsonfile: string) 
       log.error('Pinata pinning has failed', e.message);
     }
   } else {
-    throw new AppError(Errors.KeysError);
+    throw new ServerError(Errors.KeysError);
   }
 };
 
