@@ -15,8 +15,8 @@ export type ButtonAttrs = {
   onclick: (e?: MouseEvent) => void;
 } & ButtonStyleAttrs;
 
-export const CWButton: m.Component<ButtonAttrs> = {
-  view: (vnode) => {
+export class CWButton implements m.ClassComponent<ButtonAttrs> {
+  view(vnode) {
     const {
       buttonType = 'primary',
       className,
@@ -37,5 +37,5 @@ export const CWButton: m.Component<ButtonAttrs> = {
         <span>{label}</span>
       </button>
     );
-  },
-};
+  }
+}

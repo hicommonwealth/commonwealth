@@ -21,7 +21,13 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { ProposalType, ChainBase } from 'types';
-import { chainToProposalSlug, getProposalUrlPath, idToProposal, pathIsDiscussion, proposalSlugToClass } from 'identifiers';
+import {
+  chainToProposalSlug,
+  getProposalUrlPath,
+  idToProposal,
+  pathIsDiscussion,
+  proposalSlugToClass,
+} from 'identifiers';
 import { slugify } from 'utils';
 
 import Substrate from 'controllers/chain/substrate/main';
@@ -41,9 +47,9 @@ import {
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-import TopicEditor from 'views/components/topic_editor';
-import StageEditor from 'views/components/stage_editor';
-import PollEditor from 'views/components/poll_editor';
+import { TopicEditor } from 'views/components/topic_editor';
+import { StageEditor } from 'views/components/stage_editor';
+import { PollEditor } from 'views/components/poll_editor';
 import {
   TopicEditorMenuItem,
   ThreadSubscriptionMenuItem,
@@ -54,8 +60,8 @@ import ProposalVotingActions, {
   QueueButton,
 } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import PageLoading from 'views/pages/loading';
-import PageNotFound from 'views/pages/404';
+import { PageLoading } from 'views/pages/loading';
+import { PageNotFound } from 'views/pages/404';
 
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
@@ -242,7 +248,10 @@ const ProposalHeader: m.Component<
       proposal instanceof OffchainThread
         ? (proposal as OffchainThread).attachments
         : false;
-    const proposalLink = getProposalUrlPath(proposal.slug, `${proposal.identifier}-${slugify(proposal.title)}`);
+    const proposalLink = getProposalUrlPath(
+      proposal.slug,
+      `${proposal.identifier}-${slugify(proposal.title)}`
+    );
     const proposalTitleIsEditable =
       proposal instanceof SubstrateDemocracyProposal ||
       proposal instanceof SubstrateCollectiveProposal ||
@@ -299,7 +308,7 @@ const ProposalHeader: m.Component<
                         closeOnContentClick: true,
                         menuAttrs: { size: 'default' },
                         content: [
-                          (isEditor || isAuthor) &&
+                          (isEditor || isAuthor || isAdmin) &&
                             m(ProposalBodyEditMenuItem, {
                               item: proposal,
                               proposalPageState: vnode.attrs.proposalPageState,
@@ -330,11 +339,17 @@ const ProposalHeader: m.Component<
                             app.chain?.meta.chain.snapshot.length > 0 &&
                             m(MenuItem, {
                               onclick: (e) => {
-                                const snapshotSpaces = app.chain.meta.chain.snapshot;
+                                const snapshotSpaces =
+                                  app.chain.meta.chain.snapshot;
                                 if (snapshotSpaces.length > 1) {
-                                  navigateToSubpage('/multiple-snapshots', {action: 'create-from-thread', proposal: proposal});
+                                  navigateToSubpage('/multiple-snapshots', {
+                                    action: 'create-from-thread',
+                                    proposal,
+                                  });
                                 } else {
-                                  navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+                                  navigateToSubpage(
+                                    `/snapshot/${snapshotSpaces}`
+                                  );
                                 }
                               },
                               label: 'Snapshot proposal from thread',
@@ -777,7 +792,7 @@ const ProposalComments: m.Component<
           return m(
             `.threading-level-${threadLevel}`,
             {
-              style: `margin-left: calc(36px * ${threadLevel})`,
+              style: `margin-left: 32px`,
             },
             [
               m(ProposalComment, {
@@ -854,9 +869,11 @@ const ViewProposalPage: m.Component<
         title: 'Loading...',
       });
     }
-    const type = vnode.attrs.type || (isDiscussion
-      ? ProposalType.OffchainThread
-      : chainToProposalSlug(app.chain.meta.chain));
+    const type =
+      vnode.attrs.type ||
+      (isDiscussion
+        ? ProposalType.OffchainThread
+        : chainToProposalSlug(app.chain.meta.chain));
     const headerTitle = isDiscussion ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string')
       return m(PageNotFound, { title: headerTitle });
@@ -971,7 +988,11 @@ const ViewProposalPage: m.Component<
     if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
       navigateToSubpage(
-        getProposalUrlPath(proposal.slug, `${proposalId}-${slugify(proposal.title)}`, true),
+        getProposalUrlPath(
+          proposal.slug,
+          `${proposalId}-${slugify(proposal.title)}`,
+          true
+        ),
         {},
         { replace: true }
       );
@@ -979,7 +1000,8 @@ const ViewProposalPage: m.Component<
 
     // load comments
     if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
-      (app.comments.refresh(proposal, app.activeChainId()))
+      app.comments
+        .refresh(proposal, app.activeChainId())
         .then(async (result) => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
@@ -1152,7 +1174,7 @@ const ViewProposalPage: m.Component<
           c.chain === activeAccount?.chain.id
         );
       }).length > 0;
-    const isAdmin =
+    const isAdminOrMod =
       app.user.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
@@ -1161,6 +1183,10 @@ const ViewProposalPage: m.Component<
         role: 'moderator',
         chain: app.activeChainId(),
       });
+    const isAdminOnly = app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+    });
 
     if (proposal instanceof SubstrateTreasuryTip) {
       const {
@@ -1276,8 +1302,14 @@ const ViewProposalPage: m.Component<
         ]
       );
     }
-    const showLinkedSnapshotOptions = (proposal as OffchainThread).snapshotProposal?.length > 0 || isAuthor || isAdmin;
-    const showLinkedThreadOptions = (proposal as OffchainThread).linkedThreads?.length > 0 || isAuthor || isAdmin;
+    const showLinkedSnapshotOptions =
+      (proposal as OffchainThread).snapshotProposal?.length > 0 ||
+      isAuthor ||
+      isAdminOrMod;
+    const showLinkedThreadOptions =
+      (proposal as OffchainThread).linkedThreads?.length > 0 ||
+      isAuthor ||
+      isAdminOrMod;
 
     return m(
       Sublayout,
@@ -1286,30 +1318,32 @@ const ViewProposalPage: m.Component<
         showNewProposalButton: true,
         title: headerTitle,
         rightContent: [
-          proposal instanceof OffchainThread
-            && proposal.hasOffchainPoll
-            && m(ProposalHeaderOffchainPoll, { proposal }),
-          proposal instanceof OffchainThread
-            && isAuthor
-            && !proposal.offchainVotingEnabled &&
+          proposal instanceof OffchainThread &&
+            proposal.hasOffchainPoll &&
+            m(ProposalHeaderOffchainPoll, { proposal }),
+          proposal instanceof OffchainThread &&
+            isAuthor &&
+            !proposal.offchainVotingEnabled &&
             m(ProposalSidebarPollEditorModule, {
               proposal,
               openPollEditor: () => {
                 vnode.state.pollEditorIsOpen = true;
               },
             }),
-            showLinkedSnapshotOptions && proposal instanceof OffchainThread &&
+          showLinkedSnapshotOptions &&
+            proposal instanceof OffchainThread &&
             m(ProposalSidebarLinkedViewer, {
               proposal,
               openStageEditor: () => {
                 vnode.state.stageEditorIsOpen = true;
               },
-              showAddProposalButton: (isAuthor || isAdmin)
+              showAddProposalButton: isAuthor || isAdminOrMod,
             }),
-            showLinkedThreadOptions && proposal instanceof OffchainThread &&
+          showLinkedThreadOptions &&
+            proposal instanceof OffchainThread &&
             m(ProposalLinkedThreadsEditorModule, {
-              proposal,
-              allowLinking: isAuthor || isAdmin,
+              proposalId: proposal.id,
+              allowLinking: isAuthor || isAdminOrMod,
             }),
         ],
       },
@@ -1322,7 +1356,7 @@ const ViewProposalPage: m.Component<
           proposalPageState: vnode.state,
           isAuthor,
           isEditor,
-          isAdmin,
+          isAdmin: isAdminOrMod,
           stageEditorIsOpen: vnode.state.stageEditorIsOpen,
           pollEditorIsOpen: vnode.state.pollEditorIsOpen,
           closeStageEditor: () => {
@@ -1351,7 +1385,7 @@ const ViewProposalPage: m.Component<
           getSetGlobalEditingStatus,
           proposalPageState: vnode.state,
           recentlySubmitted: vnode.state.recentlySubmitted,
-          isAdmin,
+          isAdmin: isAdminOrMod,
         }),
         !vnode.state.editing &&
           !vnode.state.parentCommentId &&

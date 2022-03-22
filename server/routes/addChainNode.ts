@@ -1,11 +1,15 @@
 import { Op } from 'sequelize';
-import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from '../../shared/logging';
+import { NextFunction } from 'express';
 import { ChainBase, ChainType } from '../../shared/types';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { DB } from '../database';
+import { TypedRequestBody, TypedResponse, success } from '../types';
+import { ChainAttributes } from '../models/chain';
+import { ChainNodeAttributes } from '../models/chain_node';
 
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
+
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   MustBeAdmin: 'Must be admin',
@@ -15,14 +19,34 @@ export const Errors = {
   InvalidJSON: 'Substrate spec supplied has invalid JSON'
 };
 
-const addChainNode = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+type AddChainNodeReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
+  id: string;
+  node_url: string;
+  substrate_spec: string;
+};
+
+type AddChainNodeResp = ChainNodeAttributes;
+
+const addChainNode = async (
+  models: DB,
+  req: TypedRequestBody<AddChainNodeReq>,
+  res: TypedResponse<AddChainNodeResp>,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
   if (!req.user.isAdmin && req.body?.base !== ChainBase.NEAR) {
     return next(new Error(Errors.MustBeAdmin));
   }
-  if (!req.body.id || !req.body.name || !req.body.symbol || !req.body.network || !req.body.node_url || !req.body.base) {
+  if (
+    !req.body.id?.trim()
+    || !req.body.name?.trim()
+    || !req.body.symbol?.trim()
+    || !req.body.network?.trim()
+    || !req.body.node_url?.trim()
+    || !req.body.base?.trim()
+  ) {
     return next(new Error(Errors.MissingParams));
   }
 
@@ -88,7 +112,7 @@ const addChainNode = async (models: DB, req: Request, res: Response, next: NextF
 
   // TODO: trigger migration job if turning on chain events for Comp/Aave
 
-  return res.json({ status: 'Success', result: node.toJSON() });
+  return success(res, node.toJSON());
 };
 
 export default addChainNode;

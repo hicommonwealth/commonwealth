@@ -141,7 +141,7 @@ export const DiscussionSection: m.Component<{mobile: boolean}, {}> = {
             onclick: (e, toggle: boolean) => {
               e.preventDefault();
               setDiscussionsToggleTree(`children.${topic.name}.toggled_state`, toggle);
-              navigateToSubpage(`/discussions/${topic.name}`);
+              navigateToSubpage(`/discussions/${encodeURI(topic.name)}`);
             },
             display_data: null
           }

@@ -1,21 +1,20 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { SubscriptionAttributes } from './subscription';
 import { NotificationAttributes } from './notification';
 
-export interface NotificationsReadAttributes {
+export type NotificationsReadAttributes = {
 	subscription_id: number;
-	notification_id: string;
+	notification_id: number;
 	is_read: boolean;
 	Subscription?: SubscriptionAttributes;
 	Notification?: NotificationAttributes;
 }
 
-export interface NotificationsReadInstance
-	extends Model<NotificationsReadAttributes>, NotificationsReadAttributes {}
+export type NotificationsReadInstance = ModelInstance<NotificationsReadAttributes>;
 
-export type NotificationsReadModelStatic = ModelStatic<NotificationsReadInstance>
+export type NotificationsReadModelStatic = ModelStatic<NotificationsReadInstance>;
 
 export default (
 	sequelize: Sequelize.Sequelize,

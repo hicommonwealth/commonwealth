@@ -2,12 +2,11 @@
 import 'components/widgets/user.scss';
 
 import m from 'mithril';
-import _, { capitalize } from 'lodash';
+import { capitalize } from 'lodash';
 import { link } from 'helpers';
 import { Tag, Icon, Icons, Popover } from 'construct-ui';
 
 import app from 'state';
-import moment from 'moment';
 import jdenticon from 'jdenticon';
 import { ChainBase } from 'types';
 import { Account, AddressInfo, Profile } from 'models';
@@ -21,33 +20,43 @@ export interface IAddressDisplayOptions {
   maxCharLength?: number;
 }
 
-const User: m.Component<{
-  user: Account<any> | AddressInfo | Profile;
-  avatarSize?: number;
-  avatarOnly?: boolean; // overrides most other properties
-  hideAvatar?: boolean;
-  hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
-  showAddressWithDisplayName?: boolean; // show address inline with the display name
-  addressDisplayOptions?: IAddressDisplayOptions, // display full or truncated address
-  linkify?: boolean;
-  onclick?: any;
-  popover?: boolean;
-  showRole?: boolean;
-}, {
-  identityWidgetLoading: boolean;
-}> = {
+const User: m.Component<
+  {
+    user: Account<any> | AddressInfo | Profile;
+    avatarSize?: number;
+    avatarOnly?: boolean; // overrides most other properties
+    hideAvatar?: boolean;
+    hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
+    showAddressWithDisplayName?: boolean; // show address inline with the display name
+    addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
+    linkify?: boolean;
+    onclick?: any;
+    popover?: boolean;
+    showRole?: boolean;
+  },
+  {
+    identityWidgetLoading: boolean;
+  }
+> = {
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
-      avatarOnly, hideAvatar, hideIdentityIcon, showAddressWithDisplayName,
-      user, linkify, popover, showRole
+      avatarOnly,
+      hideAvatar,
+      hideIdentityIcon,
+      showAddressWithDisplayName,
+      user,
+      linkify,
+      popover,
+      showRole,
     } = vnode.attrs;
-    const { showFullAddress, autoTruncate, maxCharLength } = vnode.attrs.addressDisplayOptions || {};
+    const { showFullAddress, autoTruncate, maxCharLength } =
+      vnode.attrs.addressDisplayOptions || {};
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
 
-    let account : Account<any>;
+    let account: Account<any>;
     let profile: Profile; // profile is used to retrieve the chain and address later
     let role;
     const addrShort = formatAddressShort(
@@ -56,12 +65,17 @@ const User: m.Component<{
       false,
       maxCharLength
     );
-    const friendlyChainName = app.config.chains
-      .getById(typeof user.chain === 'string' ? user.chain : user.chain?.id)?.name;
+    const friendlyChainName = app.config.chains.getById(
+      typeof user.chain === 'string' ? user.chain : user.chain?.id
+    )?.name;
 
     const adminsAndMods = app.chain?.meta.chain.adminsAndMods || [];
 
-    if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !app.cachedIdentityWidget) {
+    if (
+      app.chain?.base === ChainBase.Substrate &&
+      !vnode.state.identityWidgetLoading &&
+      !app.cachedIdentityWidget
+    ) {
       vnode.state.identityWidgetLoading = true;
       import(
         /* webpackMode: "lazy" */
@@ -88,7 +102,9 @@ const User: m.Component<{
         }
       }
       profile = app.profiles.getProfile(chainId, address);
-      role = adminsAndMods.find((r) => r.address === address && r.address_chain === chainId);
+      role = adminsAndMods.find(
+        (r) => r.address === address && r.address_chain === chainId
+      );
     } else if (vnode.attrs.user instanceof Profile) {
       profile = vnode.attrs.user;
       // only load account if it's possible to, using the current chain
@@ -100,162 +116,268 @@ const User: m.Component<{
           account = null;
         }
       }
-      role = adminsAndMods.find((r) => r.address === profile.address && r.address_chain === profile.chain);
+      role = adminsAndMods.find(
+        (r) =>
+          r.address === profile.address && r.address_chain === profile.chain
+      );
     } else {
       account = vnode.attrs.user;
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
-      const chainId = typeof account.chain === 'string' ? account.chain : account.chain.id;
+      const chainId =
+        typeof account.chain === 'string' ? account.chain : account.chain.id;
       profile = account.profile;
-      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain === chainId);
+      role = adminsAndMods.find(
+        (r) => r.address === account.address && r.address_chain === chainId
+      );
     }
     const getRoleTags = (long?) => [
       // 'long' makes role tags show as full length text
-      profile.isCouncillor && !hideIdentityIcon && m('.role-icon.role-icon-councillor', {
-        class: long ? 'long' : ''
-      }, long ? `${friendlyChainName} Councillor` : 'C'),
-      profile.isValidator && !hideIdentityIcon && m('.role-icon.role-icon-validator', {
-        class: long ? 'long' : ''
-      }, long ? `${friendlyChainName} Validator` : 'V'),
+      profile.isCouncillor &&
+        !hideIdentityIcon &&
+        m(
+          '.role-icon.role-icon-councillor',
+          {
+            class: long ? 'long' : '',
+          },
+          long ? `${friendlyChainName} Councillor` : 'C'
+        ),
+      profile.isValidator &&
+        !hideIdentityIcon &&
+        m(
+          '.role-icon.role-icon-validator',
+          {
+            class: long ? 'long' : '',
+          },
+          long ? `${friendlyChainName} Validator` : 'V'
+        ),
       // offchain role in commonwealth forum
-      showRole && role && m(Tag, {
-        class: 'role-tag',
-        label: role.permission,
-        rounded: true,
-        size: 'xs',
-      }),
+      showRole &&
+        role &&
+        m(Tag, {
+          class: 'role-tag',
+          label: role.permission,
+          rounded: true,
+          size: 'xs',
+        }),
     ];
-    const ghostAddress = app.user.addresses.some(({ address, ghostAddress }) => {
-      if (this !== undefined) account.address === address && ghostAddress
-    });
-    const userFinal = avatarOnly
-      ? m('.User.avatar-only', {
-        key: profile?.address || '-',
-      }, [
-        m('.user-avatar-only', { style: `width: ${avatarSize}px; height: ${avatarSize}px;`, }, [
-          !profile ? null
-            : profile.avatarUrl
-              ? profile.getAvatar(avatarSize)
-              : profile.getAvatar(avatarSize - 4)
-        ]),
-      ])
-      : m('.User', {
-        key: profile?.address || '-',
-        class: linkify ? 'linkified' : '',
-      }, [
-        showAvatar && m('.user-avatar', {
-          style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
-        }, profile && profile.getAvatar(avatarSize)),
-        (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
-          // substrate name
-          ? m(app.cachedIdentityWidget, {
-            account,
-            linkify,
-            profile,
-            hideIdentityIcon,
-            addrShort,
-            showAddressWithDisplayName
-          }) : [
-            // non-substrate name
-            linkify
-              ? link('a.user-display-name.username',
-                (profile
-                  ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
-                  : 'javascript:'
-                ), [
-                  !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
-                    profile.displayName,
-                    m('.id-short', formatAddressShort(profile.address, profile.chain)),
-                  ],
-                  getRoleTags(false),
-                ])
-              : m('a.user-display-name.username', [
-                !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
-                  profile.displayName,
-                  m('.id-short', formatAddressShort(profile.address, profile.chain)),
-                ],
-                getRoleTags(false),
-              ]),
-              ghostAddress && m('img', {
-                src: '/static/img/ghost.svg',
-                width: '20px',
-                style: 'display: inline-block',
-              }),
-          ],
-      ]);
-
-    const userPopover = m('.UserPopover', {
-      onclick: (e) => {
-        e.stopPropagation();
+    const ghostAddress = app.user.addresses.some(
+      ({ address, ghostAddress }) => {
+        if (this !== undefined) account.address === address && ghostAddress;
       }
-    }, [
-      m('.user-avatar', [
-        !profile ? null
-          : profile.avatarUrl
+    );
+    const userFinal = avatarOnly
+      ? m(
+          '.User.avatar-only',
+          {
+            key: profile?.address || '-',
+          },
+          [
+            m(
+              '.user-avatar-only',
+              { style: `width: ${avatarSize}px; height: ${avatarSize}px;` },
+              [
+                !profile
+                  ? null
+                  : profile.avatarUrl
+                  ? profile.getAvatar(avatarSize)
+                  : profile.getAvatar(avatarSize - 4),
+              ]
+            ),
+          ]
+        )
+      : m(
+          '.User',
+          {
+            key: profile?.address || '-',
+            class: linkify ? 'linkified' : '',
+          },
+          [
+            showAvatar &&
+              m(
+                '.user-avatar',
+                {
+                  style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
+                },
+                profile && profile.getAvatar(avatarSize)
+              ),
+            app.chain &&
+            app.chain.base === ChainBase.Substrate &&
+            app.cachedIdentityWidget
+              ? // substrate name
+                m(app.cachedIdentityWidget, {
+                  account,
+                  linkify,
+                  profile,
+                  hideIdentityIcon,
+                  addrShort,
+                  showAddressWithDisplayName,
+                })
+              : [
+                  // non-substrate name
+                  linkify
+                    ? link(
+                        'a.user-display-name.username',
+                        profile
+                          ? `/${app.activeChainId() || profile.chain}/account/${
+                              profile.address
+                            }?base=${profile.chain}`
+                          : 'javascript:',
+                        [
+                          !profile
+                            ? addrShort
+                            : !showAddressWithDisplayName
+                            ? profile.displayName
+                            : [
+                                profile.displayName,
+                                m(
+                                  '.id-short',
+                                  formatAddressShort(
+                                    profile.address,
+                                    profile.chain
+                                  )
+                                ),
+                              ],
+                          getRoleTags(false),
+                        ]
+                      )
+                    : m('a.user-display-name.username', [
+                        !profile
+                          ? addrShort
+                          : !showAddressWithDisplayName
+                          ? profile.displayName
+                          : [
+                              profile.displayName,
+                              m(
+                                '.id-short',
+                                formatAddressShort(
+                                  profile.address,
+                                  profile.chain
+                                )
+                              ),
+                            ],
+                        getRoleTags(false),
+                      ]),
+                  ghostAddress &&
+                    m('img', {
+                      src: '/static/img/ghost.svg',
+                      width: '20px',
+                      style: 'display: inline-block',
+                    }),
+                ],
+          ]
+        );
+
+    const userPopover = m(
+      '.UserPopover',
+      {
+        onclick: (e) => {
+          e.stopPropagation();
+        },
+      },
+      [
+        m('.user-avatar', [
+          !profile
+            ? null
+            : profile.avatarUrl
             ? profile.getAvatar(36)
-            : profile.getAvatar(32)
-      ]),
-      m('.user-name', [
-        (app.chain && app.chain.base === ChainBase.Substrate && app.cachedIdentityWidget)
-          ? m(app.cachedIdentityWidget, {
-            account,
-            linkify: true,
-            profile,
-            hideIdentityIcon,
-            addrShort,
-            showAddressWithDisplayName: false
-          }) : link('a.user-display-name',
-            profile
-              ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
-              : 'javascript:',
-            !profile ? addrShort : !showAddressWithDisplayName ? profile.displayName : [
-              profile.displayName,
-              m('.id-short', formatAddressShort(profile.address, profile.chain)),
-            ])
-      ]),
-      profile?.address && m('.user-address', formatAddressShort(profile.address, profile.chain, false, maxCharLength)),
-      friendlyChainName && m('.user-chain', friendlyChainName),
-      getRoleTags(true), // always show roleTags in .UserPopover
-    ]);
+            : profile.getAvatar(32),
+        ]),
+        m('.user-name', [
+          app.chain &&
+          app.chain.base === ChainBase.Substrate &&
+          app.cachedIdentityWidget
+            ? m(app.cachedIdentityWidget, {
+                account,
+                linkify: true,
+                profile,
+                hideIdentityIcon,
+                addrShort,
+                showAddressWithDisplayName: false,
+              })
+            : link(
+                'a.user-display-name',
+                profile
+                  ? `/${app.activeChainId() || profile.chain}/account/${
+                      profile.address
+                    }?base=${profile.chain}`
+                  : 'javascript:',
+                !profile
+                  ? addrShort
+                  : !showAddressWithDisplayName
+                  ? profile.displayName
+                  : [
+                      profile.displayName,
+                      m(
+                        '.id-short',
+                        formatAddressShort(profile.address, profile.chain)
+                      ),
+                    ]
+              ),
+        ]),
+        profile?.address &&
+          m(
+            '.user-address',
+            formatAddressShort(
+              profile.address,
+              profile.chain,
+              false,
+              maxCharLength
+            )
+          ),
+        friendlyChainName && m('.user-chain', friendlyChainName),
+        getRoleTags(true), // always show roleTags in .UserPopover
+      ]
+    );
 
     return popover
       ? m(Popover, {
-        inline: true,
-        interactionType: 'hover',
-        content: userPopover,
-        trigger: userFinal,
-        closeOnContentClick: true,
-        transitionDuration: 0,
-        hoverOpenDelay: 500,
-        key: profile?.address || '-'
-      })
+          inline: true,
+          interactionType: 'hover',
+          content: userPopover,
+          trigger: userFinal,
+          closeOnContentClick: true,
+          transitionDuration: 0,
+          hoverOpenDelay: 500,
+          key: profile?.address || '-',
+        })
       : userFinal;
-  }
+  },
 };
 
 export const UserBlock: m.Component<{
-  user: Account<any> | AddressInfo | Profile,
-  hideIdentityIcon?: boolean,
-  popover?: boolean,
-  showRole?: boolean,
-  showAddressWithDisplayName?: boolean,
-  addressDisplayOptions?: IAddressDisplayOptions,
-  searchTerm?: string,
-  showChainName?: boolean,
-  hideOnchainRole?: boolean,
-  selected?: boolean,
-  compact?: boolean,
-  linkify?: boolean,
-  avatarSize?: number,
+  user: Account<any> | AddressInfo | Profile;
+  hideIdentityIcon?: boolean;
+  popover?: boolean;
+  showRole?: boolean;
+  showAddressWithDisplayName?: boolean;
+  addressDisplayOptions?: IAddressDisplayOptions;
+  searchTerm?: string;
+  showChainName?: boolean;
+  hideOnchainRole?: boolean;
+  selected?: boolean;
+  compact?: boolean;
+  linkify?: boolean;
+  avatarSize?: number;
 }> = {
   view: (vnode) => {
     const {
-      user, hideIdentityIcon, popover, showRole, searchTerm,
-      hideOnchainRole, showAddressWithDisplayName, showChainName,
-      selected, compact, linkify, addressDisplayOptions
+      user,
+      hideIdentityIcon,
+      popover,
+      showRole,
+      searchTerm,
+      hideOnchainRole,
+      showAddressWithDisplayName,
+      showChainName,
+      selected,
+      compact,
+      linkify,
+      addressDisplayOptions,
     } = vnode.attrs;
 
-    const { showFullAddress, autoTruncate, maxCharLength } = vnode.attrs.addressDisplayOptions || {};
+    const { showFullAddress, autoTruncate, maxCharLength } =
+      vnode.attrs.addressDisplayOptions || {};
 
     let profile;
     if (user instanceof AddressInfo) {
@@ -267,20 +389,23 @@ export const UserBlock: m.Component<{
       profile = app.profiles.getProfile(user.chain.id, user.address);
     }
 
-    const highlightSearchTerm = profile?.address
-      && searchTerm
-      && profile.address.toLowerCase().includes(searchTerm);
-    const highlightedAddress = highlightSearchTerm ? (() => {
-      const isNear = profile.address.chain === 'near';
-      const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
-      const queryEnd = queryStart + searchTerm.length;
+    const highlightSearchTerm =
+      profile?.address &&
+      searchTerm &&
+      profile.address.toLowerCase().includes(searchTerm);
+    const highlightedAddress = highlightSearchTerm
+      ? (() => {
+          const isNear = profile.address.chain === 'near';
+          const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
+          const queryEnd = queryStart + searchTerm.length;
 
-      return ([
-        m('span', profile.address.slice(0, queryStart)),
-        m('mark', profile.address.slice(queryStart, queryEnd)),
-        m('span', profile.address.slice(queryEnd, profile.address.length)),
-      ]);
-    })() : null;
+          return [
+            m('span', profile.address.slice(0, queryStart)),
+            m('mark', profile.address.slice(queryStart, queryEnd)),
+            m('span', profile.address.slice(queryEnd, profile.address.length)),
+          ];
+        })()
+      : null;
 
     const children = [
       m('.user-block-left', [
@@ -303,83 +428,130 @@ export const UserBlock: m.Component<{
             showRole,
           }),
         ]),
-        m('.user-block-address', {
-          class: profile?.address ? '' : 'no-address',
-        }, [
-          m('', highlightSearchTerm
-            ? highlightedAddress
-            : showFullAddress ? profile.address : formatAddressShort(profile.address, profile.chain)),
-          profile?.address && showChainName && m('.address-divider', ' · '),
-          showChainName && m('', (typeof user.chain === 'string' ? capitalize(user.chain) : capitalize(user.chain.name))),
-        ]),
+        m(
+          '.user-block-address',
+          {
+            class: profile?.address ? '' : 'no-address',
+          },
+          [
+            m(
+              '',
+              highlightSearchTerm
+                ? highlightedAddress
+                : showFullAddress
+                ? profile.address
+                : formatAddressShort(profile.address, profile.chain)
+            ),
+            profile?.address && showChainName && m('.address-divider', ' · '),
+            showChainName &&
+              m(
+                '',
+                typeof user.chain === 'string'
+                  ? capitalize(user.chain)
+                  : capitalize(user.chain.name)
+              ),
+          ]
+        ),
       ]),
       m('.user-block-right', [
-        m('.user-block-selected', selected ? m(Icon, { name: Icons.CHECK }) : ''),
+        m(
+          '.user-block-selected',
+          selected ? m(Icon, { name: Icons.CHECK }) : ''
+        ),
       ]),
     ];
 
     const userLink = profile
-      ? `/${app.activeChainId() || profile.chain}/account/${profile.address}?base=${profile.chain}`
+      ? `/${app.activeChainId() || profile.chain}/account/${
+          profile.address
+        }?base=${profile.chain}`
       : 'javascript:';
 
     return linkify
       ? link('.UserBlock', userLink, children)
-      : m('.UserBlock', {
-        class: compact ? 'compact' : ''
-      }, children);
-  }
+      : m(
+          '.UserBlock',
+          {
+            class: compact ? 'compact' : '',
+          },
+          children
+        );
+  },
 };
 
-export const AnonymousUser: m.Component<{
-  avatarSize?: number;
-  avatarOnly?: boolean;
-  hideAvatar?: boolean;
-  showAsDeleted?: boolean;
-  distinguishingKey: string; // To distinguish user from other anonymous users
-}, {}> = {
+export const AnonymousUser: m.Component<
+  {
+    avatarSize?: number;
+    avatarOnly?: boolean;
+    hideAvatar?: boolean;
+    showAsDeleted?: boolean;
+    distinguishingKey: string; // To distinguish user from other anonymous users
+  },
+  {}
+> = {
   view: (vnode) => {
-    const { avatarOnly, avatarSize, hideAvatar, distinguishingKey, showAsDeleted } = vnode.attrs;
+    const {
+      avatarOnly,
+      avatarSize,
+      hideAvatar,
+      distinguishingKey,
+      showAsDeleted,
+    } = vnode.attrs;
     const showAvatar = !hideAvatar;
     let profileAvatar;
     if (showAvatar) {
       const pseudoAddress = distinguishingKey;
       profileAvatar = m('svg.Jdenticon', {
-        width: avatarSize - 4,
-        height: avatarSize - 4,
+        style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         'data-address': pseudoAddress,
         oncreate: (vnode_) => {
           jdenticon.update(vnode_.dom as HTMLElement, pseudoAddress);
         },
         onupdate: (vnode_) => {
           jdenticon.update(vnode_.dom as HTMLElement, pseudoAddress);
-        }
-      })
+        },
+      });
     }
 
     return avatarOnly
-      ? m('.User.avatar-only', {
-        key: '-'
-      }, [
-        m('.user-avatar-only', {
-          style: `width: ${avatarSize}px; height: ${avatarSize}px;`
-        }, [
-          profileAvatar
-        ]),
-      ])
-      : m('.User', {
-        key: '-',
-      }, [
-        showAvatar
-        && m('.user-avatar-only', {
-          style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
-        }, [
-          profileAvatar
-        ]),
-        [
-          m('a.user-display-name.username', showAsDeleted ? 'Deleted' : 'Anonymous')
-        ],
-      ]);
-  }
+      ? m(
+          '.User.avatar-only',
+          {
+            key: '-',
+          },
+          [
+            m(
+              '.user-avatar-only',
+              {
+                style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
+              },
+              [profileAvatar]
+            ),
+          ]
+        )
+      : m(
+          '.User',
+          {
+            key: '-',
+          },
+          [
+            showAvatar &&
+              m(
+                '.user-avatar-only',
+                {
+                  style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
+                },
+                [profileAvatar]
+              ),
+            [
+              m(
+                'a.user-display-name.username',
+                showAsDeleted ? 'Deleted' : 'Anonymous'
+              ),
+            ],
+          ]
+        );
+  },
 };
 
 export default User;

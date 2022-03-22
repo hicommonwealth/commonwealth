@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 
-export interface OffchainTopicAttributes {
+export type OffchainTopicAttributes = {
   name: string;
   featured_in_sidebar: boolean;
   featured_in_new_post: boolean;
@@ -23,12 +23,12 @@ export interface OffchainTopicAttributes {
   threads?: OffchainThreadAttributes[] | OffchainTopicAttributes['id'][];
 }
 
-export interface OffchainTopicInstance extends Model<OffchainTopicAttributes>, OffchainTopicAttributes {
+export type OffchainTopicInstance = ModelInstance<OffchainTopicAttributes> & {
   // no mixins used
   // TODO: do we need to implement the "as" stuff here?
 }
 
-export type OffchainTopicModelStatic = ModelStatic<OffchainTopicInstance>
+export type OffchainTopicModelStatic = ModelStatic<OffchainTopicInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

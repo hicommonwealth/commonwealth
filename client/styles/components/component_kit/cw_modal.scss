@@ -1,0 +1,83 @@
+@import 'client/styles/shared';
+
+$modal-padding: 16px;
+
+.Modal {
+  .overlay {
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 101;
+  }
+
+  &:last-child .overlay {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .popup {
+    @include popout();
+
+    background: $text-color-white;
+    border-radius: 3px;
+    max-height: 96%;
+    max-width: 800px;
+    max-width: 92%;
+    min-width: 380px;
+    overflow-y: auto;
+    overflow: hidden;
+    position: relative;
+    z-index: 20;
+  }
+
+  @include xs-max {
+    .popup {
+      max-height: calc(100vh - 20px);
+      min-width: calc(100vw - 20px);
+    }
+  }
+
+  .compact-modal-title {
+    background: $primary-bg-color;
+    color: $text-color-white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: $modal-padding;
+
+    h1,
+    h2,
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin: 0;
+      padding: 0;
+    }
+
+    svg {
+      cursor: pointer;
+      fill: currentColor;
+
+      &:hover {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  .compact-modal-body {
+    padding: $modal-padding;
+
+    &:last-child {
+      padding-bottom: 16px;
+    }
+  }
+
+  .compact-modal-actions {
+    padding: $modal-padding;
+  }
+}

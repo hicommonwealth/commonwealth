@@ -1,12 +1,12 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 
-export interface OffchainCommentAttributes {
+export type OffchainCommentAttributes = {
   root_id: string;
   address_id: number;
   text: string;
@@ -25,12 +25,11 @@ export interface OffchainCommentAttributes {
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
 }
 
-export interface OffchainCommentInstance
-extends Model<OffchainCommentAttributes>, OffchainCommentAttributes {
+export type OffchainCommentInstance = ModelInstance<OffchainCommentAttributes> & {
   // no mixins used
 }
 
-export type OffchainCommentModelStatic =  ModelStatic<OffchainCommentInstance>
+export type OffchainCommentModelStatic =  ModelStatic<OffchainCommentInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

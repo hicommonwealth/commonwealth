@@ -4,6 +4,7 @@ import m from 'mithril';
 import 'components/component_kit/cw_text_input.scss';
 
 import { ComponentType } from './types';
+import { getTextInputClasses } from './helpers';
 
 export enum ValidationStatus {
   Success = 'success',
@@ -14,6 +15,7 @@ type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   defaultValue?: string;
+  disabled?: boolean;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   name: string;
@@ -22,17 +24,21 @@ type TextInputAttrs = {
   tabindex?: number;
 };
 
-type TextInputState = {
-  statusMessage: string;
-  validationStatus: ValidationStatus;
+export type InputStyleAttrs = {
+  disabled?: boolean;
+  validationStatus?: ValidationStatus;
 };
 
-export const CWTextInput: m.Component<TextInputAttrs, TextInputState> = {
-  view: (vnode) => {
+export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
+  private statusMessage?: string = '';
+  private validationStatus?: ValidationStatus = undefined;
+
+  view(vnode) {
     const {
       autocomplete,
       autofocus,
       defaultValue,
+      disabled,
       inputValidationFn,
       label,
       name,
@@ -41,15 +47,17 @@ export const CWTextInput: m.Component<TextInputAttrs, TextInputState> = {
       tabindex,
     } = vnode.attrs;
 
-    const { statusMessage, validationStatus } = vnode.state;
-
     return (
       <div class={ComponentType.TextInput}>
         {label && <label>{label}</label>}
         <input
           autofocus={autofocus}
           autocomplete={autocomplete}
-          class={validationStatus}
+          class={getTextInputClasses({
+            validationStatus: this.validationStatus,
+            disabled,
+          })}
+          disabled={disabled}
           tabindex={tabindex}
           name={name}
           placeholder={placeholder}
@@ -57,23 +65,24 @@ export const CWTextInput: m.Component<TextInputAttrs, TextInputState> = {
           onfocusout={(e) => {
             if (inputValidationFn) {
               if (!e.target.value?.length) {
-                delete vnode.state.validationStatus;
-                delete vnode.state.statusMessage;
+                this.validationStatus = undefined;
+                this.statusMessage = undefined;
                 m.redraw();
               } else {
-                [vnode.state.validationStatus, vnode.state.statusMessage] =
-                  inputValidationFn(e.target.value);
+                [this.validationStatus, this.statusMessage] = inputValidationFn(
+                  e.target.value
+                );
               }
             }
           }}
           defaultValue={defaultValue}
         />
-        {statusMessage && (
-          <div class={`validation-status ${validationStatus}`}>
-            {statusMessage}
+        {this.statusMessage && (
+          <div class={`validation-status ${this.validationStatus}`}>
+            {this.statusMessage}
           </div>
         )}
       </div>
     );
-  },
-};
+  }
+}

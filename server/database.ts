@@ -31,21 +31,6 @@ import ContractItemFactory, {
 import DiscussionDraftFactory, {
   DiscussionDraftModelStatic,
 } from './models/discussion_draft';
-import EdgewareLockdropBalanceFactory, {
-  EdgewareLockdropBalanceModelStatic,
-} from './models/edgeware_lockdrop_balance';
-import EdgewareLockdropEventFactory, {
-  EdgewareLockdropEventModelStatic,
-} from './models/edgeware_lockdrop_event';
-import EdgewareLockdropEverythingFactory, {
-  EdgewareLockdropEverythingModelStatic,
-} from './models/edgeware_lockdrop_everything';
-import HedgehogAuthenticationFactory, {
-  HedgehogAuthenticationModelStatic,
-} from './models/hedgehog_authentication';
-import HedgehogUserFactory, {
-  HedgehogUserModelStatic,
-} from './models/hedgehog_user';
 import IdentityCacheFactory, {
   IdentityCacheStatic,
 } from './models/identity_cache';
@@ -82,6 +67,7 @@ import OffchainViewCountFactory, {
 import OffchainVoteFactory, {
   OffchainVoteModelStatic,
 } from './models/offchain_vote';
+import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
@@ -115,11 +101,6 @@ export type Models = {
   ContractCategory: ContractCategoryModelStatic;
   ContractItem: ContractItemModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
-  EdgewareLockdropBalance: EdgewareLockdropBalanceModelStatic;
-  EdgewareLockdropEvent: EdgewareLockdropEventModelStatic;
-  EdgewareLockdropEverything: EdgewareLockdropEverythingModelStatic;
-  HedgehogAuthentication: HedgehogAuthenticationModelStatic;
-  HedgehogUser: HedgehogUserModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
   LinkedThread: LinkedThreadModelStatic;
@@ -135,6 +116,7 @@ export type Models = {
   OffchainTopic: OffchainTopicModelStatic;
   OffchainViewCount: OffchainViewCountModelStatic;
   OffchainVote: OffchainVoteModelStatic;
+  Profile: ProfileModelStatic;
   Role: RoleModelStatic;
   SocialAccount: SocialAccountModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
@@ -192,14 +174,6 @@ const models: Models = {
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
   ContractItem: ContractItemFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
-  EdgewareLockdropBalance: EdgewareLockdropBalanceFactory(sequelize, DataTypes),
-  EdgewareLockdropEvent: EdgewareLockdropEventFactory(sequelize, DataTypes),
-  EdgewareLockdropEverything: EdgewareLockdropEverythingFactory(
-    sequelize,
-    DataTypes
-  ),
-  HedgehogAuthentication: HedgehogAuthenticationFactory(sequelize, DataTypes),
-  HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
@@ -215,6 +189,7 @@ const models: Models = {
   OffchainTopic: OffchainTopicFactory(sequelize, DataTypes),
   OffchainViewCount: OffchainViewCountFactory(sequelize, DataTypes),
   OffchainVote: OffchainVoteFactory(sequelize, DataTypes),
+  Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),

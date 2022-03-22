@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { parseUserMentions } from '../util/parseUserMentions';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
@@ -29,7 +29,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -62,7 +62,16 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       address_id: { [Op.in]: userOwnedAddressIds }
     }
   });
-  if (collaboration) {
+
+  const admin = await models.Role.findOne({
+    where: {
+      chain_id: chain.id,
+      address_id: { [Op.in]: userOwnedAddressIds },
+      permission: 'admin'
+    }
+  });
+
+  if (collaboration || admin) {
     thread = await models.OffchainThread.findOne({
       where: {
         id: thread_id
@@ -77,6 +86,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
     });
   }
   if (!thread) return next(new Error('No thread with that id found'));
+
   try {
     let latestVersion;
     try {
@@ -115,8 +125,10 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
         return next(new Error(Errors.InvalidLink));
       }
     }
+
     await thread.save();
     await attachFiles();
+
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
       include: [
@@ -142,7 +154,8 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
         chain_id: finalThread.chain,
-        author_address: finalThread.Address.address
+        author_address: finalThread.Address.address,
+        author_chain: finalThread.Address.chain,
       },
       // don't send webhook notifications for edits
       null,

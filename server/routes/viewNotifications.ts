@@ -32,10 +32,15 @@ export default async (
       }
     });
   }
+  if (req.body.chain_filter) {
+    searchParams.push({
+      chain_id: req.body.chain_filter,
+    });
+  }
 
   const notificationParams: any = {
     model: models.NotificationsRead,
-    required: false,
+    required: false, // send subscriptions regardless of whether user has notifications
     include: [
       {
         model: models.Notification,

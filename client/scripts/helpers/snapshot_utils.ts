@@ -144,7 +144,10 @@ export interface SnapshotProposal {
   state: string;
   scores: number[];
   scores_total: number;
-  strategies?: string;
+  strategies?: Array<{
+    name: string;
+    params: any;
+  }>;
 }
 
 export interface SnapshotProposalVote {
@@ -152,7 +155,7 @@ export interface SnapshotProposalVote {
   voter: string;
   created: number;
   choice: number;
-  power: number;
+  balance: number;
 }
 
 export async function getVersion(): Promise<string> {
@@ -221,33 +224,33 @@ export async function getResults(space: SnapshotSpace, proposal: SnapshotProposa
 
     // const voters = votes.map(vote => vote.voter);
     // const provider = Snapshot.utils.getProvider(space.network);
-    const strategies = space.strategies;
-
+    const strategies = proposal.strategies ?? space.strategies;
     if (proposal.state !== 'pending') {
       const scores = await Snapshot.utils.getScores(
         space.id,
         strategies,
         space.network,
-        (votes).map((vote) => vote.voter),
-        proposal.snapshot,
+        votes.map((vote) => vote.voter),
+        parseInt(proposal.snapshot, 10),
         // provider,
       );
-
       votes = votes.map((vote: any) => {
           vote.scores = strategies.map(
             (strategy, i) => scores[i][vote.voter] || 0
           );
-          vote.power = vote.scores.reduce((a, b: any) => a + b, 0);
+          vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
           return vote;
         })
-        .sort((a, b) => b.power - a.power)
-        .filter(vote => vote.power > 0);
+        .sort((a, b) => b.balance - a.balance)
+        .filter(vote => vote.balance > 0);
     }
 
     /* Get results */
+    const votingClass = new Snapshot.utils.voting[proposal.type](proposal, votes, strategies);
     const results = {
-      resultsByVoteBalance: proposal.scores,
-      sumOfResultsBalance: proposal.scores_total,
+      resultsByVoteBalance: votingClass.resultsByVoteBalance(),
+      resultsByStrategyScore: votingClass.resultsByStrategyScore(),
+      sumOfResultsBalance: votingClass.sumOfResultsBalance()
     };
 
     return { votes, results };

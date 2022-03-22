@@ -8,6 +8,9 @@ import {
 import { fromAscii } from '@cosmjs/encoding';
 import { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
 import { Proposal, TextProposal, ProposalStatus, TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import {
+  CommunityPoolSpendProposal, CommunityPoolSpendProposalWithDeposit
+} from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import {
   ICosmosProposal, CosmosToken, ICosmosProposalTally, CosmosProposalState
@@ -92,6 +95,7 @@ class CosmosGovernance extends ProposalModule<
       console.error('Gov minDeposit in wrong denom:', depositParams.minDeposit);
       this._minDeposit = new CosmosToken(this._Chain.denom, 0);
     }
+    console.log(this._minDeposit);
 
     // query existing proposals
     await this._initProposals();
@@ -160,24 +164,43 @@ class CosmosGovernance extends ProposalModule<
     throw new Error('unsupported');
   }
 
-  // TODO: support multiple deposit types
-  // TODO: support multiple proposal types (not just text)
-  public async submitProposalTx(
-    sender: CosmosAccount,
+  public encodeTextProposal(title: string, description: string): Any {
+    const tProp = TextProposal.fromPartial({ title, description });
+    return Any.fromPartial({
+      typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+      value: Uint8Array.from(TextProposal.encode(tProp).finish()),
+    });
+  }
+
+  // TODO: support multiple amount types
+  public encodeCommunitySpend(
     title: string,
     description: string,
+    recipient: string,
+    amount: string,
+  ): Any {
+    const denom = this._minDeposit.denom;
+    const coinAmount = [{ amount, denom }];
+    const spend = CommunityPoolSpendProposal.fromPartial({ title, description, recipient, amount: coinAmount });
+    const prop = CommunityPoolSpendProposal.encode(spend).finish();
+    return Any.fromPartial({
+      typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
+      value: prop,
+    });
+  }
+
+  // TODO: support multiple deposit types
+  public async submitProposalTx(
+    sender: CosmosAccount,
     initialDeposit: CosmosToken,
+    content: Any,
   ): Promise<number> {
-    const tProp = TextProposal.fromPartial({ title, description });
     const msg: MsgSubmitProposalEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
       value: {
         initialDeposit: [ initialDeposit.toCoinObject() ],
         proposer: sender.address,
-        content: Any.fromPartial({
-          typeUrl: '/cosmos.gov.v1beta1.TextProposal',
-          value: Uint8Array.from(TextProposal.encode(tProp).finish()),
-        }),
+        content,
       }
     };
 

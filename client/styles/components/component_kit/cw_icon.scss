@@ -1,0 +1,51 @@
+@import 'client/styles/shared';
+
+svg {
+  flex-shrink: 0;
+  height: 1em;
+  stroke: currentColor;
+  width: 1em;
+
+  &.small {
+    font-size: 14px;
+  }
+
+  &.medium {
+    font-size: 20px;
+  }
+
+  &.large {
+    font-size: 28px;
+  }
+
+  &.disabled {
+    color: $disable-gray;
+  }
+
+  // Gabe 2/28/22 - These styles shouldn't be applied on the icon itself,
+  // better to wait for an icon button component
+
+  // &.primary {
+  //   color: $black;
+  // }
+
+  // &.primary:hover {
+  //   color: $dark-purp;
+
+  //   &.disabled {
+  //     color: $disable-gray;
+  //   }
+  // }
+
+  // &.secondary {
+  //   color: $lite-gray;
+  // }
+
+  // &.secondary:hover {
+  //   color: $black;
+
+  //   &.disabled {
+  //     color: $disable-gray;
+  //   }
+  // }
+}

@@ -6,12 +6,21 @@ import $ from 'jquery';
 
 import app from 'state';
 import { ChainInfo, RoleInfo, RolePermission, Webhook } from 'models';
-import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+
+const sortAdminsAndModsFirst = (a, b) => {
+  if (a.permission === b.permission)
+    return a.Address.address.localeCompare(b.Address.address);
+  if (a.permission === RolePermission.admin) return -1;
+  if (b.permission === RolePermission.admin) return 1;
+  if (a.permission === RolePermission.moderator) return -1;
+  if (b.permission === RolePermission.moderator) return 1;
+  return a.Address.address.localeCompare(b.Address.address);
+};
 
 const deleteChainButton = (chain: ChainInfo) => {
   return m(CWButton, {
@@ -22,13 +31,10 @@ const deleteChainButton = (chain: ChainInfo) => {
         auth: true,
         jwt: app.user.jwt,
       }).then((result) => {
-        console.log("success!")
         if (result.status !== 'Success') return;
         app.config.chains.remove(chain);
-        console.log("deleted from local config");
         notifySuccess('Deleted chain!');
         m.route.set('/');
-        console.log("post route shift")
         // redirect to /
       }, (err) => {
         notifyError('Failed to delete chain!');
@@ -50,7 +56,7 @@ const ManageCommunityPage: m.Component<
     if (!app.activeChainId()) {
       return;
     }
-    const chainOrCommObj = { chain: app.activeChainId() }
+    const chainOrCommObj = { chain: app.activeChainId() };
     const loadRoles = async () => {
       try {
         // TODO: Change to GET /members
@@ -137,37 +143,39 @@ const ManageCommunityPage: m.Component<
       m.redraw();
     };
 
-    return m(Sublayout, {
-      class: 'ManageCommunityPage',
-      title: [
-        'Manage Community',
-      ],
-      showNewProposalButton: true,
-    }, [
-      m('.manage-community-wrapper', [
-        m('.panel-top', [
-          vnode.state.loadingFinished &&
-            m(ChainMetadataManagementTable, {
-              admins,
-              chain: app.config.chains.getById(app.activeChainId()),
-              mods,
-              onRoleUpdate: (oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole),
-            }),
-            app.user.isSiteAdmin && deleteChainButton(app.config.chains.getById(app.activeChainId())),
+    return m(
+      Sublayout,
+      {
+        class: 'ManageCommunityPage',
+        title: ['Manage Community'],
+        showNewProposalButton: true,
+      },
+      [
+        m('.manage-community-wrapper', [
+          m('.panel-top', [
+            vnode.state.loadingFinished &&
+              m(ChainMetadataManagementTable, {
+                admins,
+                chain: app.config.chains.getById(app.activeChainId()),
+                mods,
+                onRoleUpdate: (oldRole, newRole) =>
+                  onRoleUpdate(oldRole, newRole),
+              }),
+          ]),
+          m('.panel-bottom', [
+            vnode.state.loadingFinished &&
+              m(AdminPanelTabs, {
+                defaultTab: 1,
+                onRoleUpgrade: (oldRole, newRole) =>
+                  onRoleUpdate(oldRole, newRole),
+                roleData: vnode.state.roleData,
+                webhooks: vnode.state.webhooks,
+              }),
+          ]),
+          app.user.isSiteAdmin && deleteChainButton(app.config.chains.getById(app.activeChainId())),
         ]),
-        m('.panel-bottom', [
-          vnode.state.loadingFinished &&
-            m(AdminPanelTabs, {
-              defaultTab: 1,
-              onRoleUpgrade: (oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole),
-              roleData: vnode.state.roleData,
-              webhooks: vnode.state.webhooks,
-            }),
-        ]),
-      ]),
-    ]);
+      ]
+    );
   },
 };
 
