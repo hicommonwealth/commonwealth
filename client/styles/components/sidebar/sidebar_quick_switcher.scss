@@ -18,19 +18,19 @@
     border-right: 1px solid $disable-grey;
     display: flex;
     flex-direction: column;
-    height: 176px;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    padding: 16px 8px;
+    height: 160px;
+    justify-content: flex-start;
+    padding: 16px 8px 0;
     position: fixed;
     top: 0;
     width: $quick-switcher-width;
 
     // Gabe 3/21/22 - dumb construct overrides
     .cui-button {
-      line-height: 32px;
-      min-height: 32px;
       height: 32px;
+      line-height: 32px;
+      margin-bottom: 16px;
+      min-height: 32px;
       width: 32px;
     }
 
@@ -50,7 +50,7 @@
     align-items: center;
     display: flex;
     flex-direction: column;
-    margin-top: 176px;
+    margin-top: 160px;
     min-height: 0;
     overflow-y: auto;
     padding: 16px 8px;
