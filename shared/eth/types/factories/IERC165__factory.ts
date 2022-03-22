@@ -18,7 +18,6 @@ export class IERC165__factory {
 
 const _abi = [
   {
-    constant: true,
     inputs: [
       {
         internalType: "bytes4",
@@ -34,7 +33,6 @@ const _abi = [
         type: "bool",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },

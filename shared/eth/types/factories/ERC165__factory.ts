@@ -15,13 +15,6 @@ export class ERC165__factory {
 
 const _abi = [
   {
-    inputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "constructor",
-  },
-  {
-    constant: true,
     inputs: [
       {
         internalType: "bytes4",
@@ -37,7 +30,6 @@ const _abi = [
         type: "bool",
       },
     ],
-    payable: false,
     stateMutability: "view",
     type: "function",
   },

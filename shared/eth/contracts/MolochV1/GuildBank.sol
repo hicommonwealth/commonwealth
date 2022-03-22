@@ -1,8 +1,8 @@
 pragma solidity ^0.5.3;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/ownership/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-old/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-old/ownership/Ownable.sol";
+import "@openzeppelin/contracts-old/math/SafeMath.sol";
 
 contract GuildBank1 is Ownable {
     using SafeMath for uint256;

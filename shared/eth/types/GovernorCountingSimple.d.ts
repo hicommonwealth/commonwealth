@@ -34,9 +34,11 @@ interface GovernorCountingSimpleInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "proposalDeadline(uint256)": FunctionFragment;
     "proposalSnapshot(uint256)": FunctionFragment;
+    "proposalThreshold()": FunctionFragment;
     "proposalVotes(uint256)": FunctionFragment;
     "propose(address[],uint256[],bytes[],string)": FunctionFragment;
     "quorum(uint256)": FunctionFragment;
+    "relay(address,uint256,bytes)": FunctionFragment;
     "state(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "version()": FunctionFragment;
@@ -90,6 +92,10 @@ interface GovernorCountingSimpleInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "proposalThreshold",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "proposalVotes",
     values: [BigNumberish]
   ): string;
@@ -100,6 +106,10 @@ interface GovernorCountingSimpleInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "quorum",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "relay",
+    values: [string, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "state", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -150,11 +160,16 @@ interface GovernorCountingSimpleInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "proposalThreshold",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "proposalVotes",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "propose", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "quorum", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "relay", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "state", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
@@ -359,6 +374,10 @@ export class GovernorCountingSimple extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    proposalThreshold(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "proposalThreshold()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     proposalVotes(
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -406,6 +425,20 @@ export class GovernorCountingSimple extends Contract {
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     state(
       proposalId: BigNumberish,
@@ -572,6 +605,10 @@ export class GovernorCountingSimple extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   proposalVotes(
     proposalId: BigNumberish,
     overrides?: CallOverrides
@@ -619,6 +656,20 @@ export class GovernorCountingSimple extends Contract {
     blockNumber: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  relay(
+    target: string,
+    value: BigNumberish,
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "relay(address,uint256,bytes)"(
+    target: string,
+    value: BigNumberish,
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
@@ -782,6 +833,10 @@ export class GovernorCountingSimple extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     proposalVotes(
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -829,6 +884,20 @@ export class GovernorCountingSimple extends Contract {
       blockNumber: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
@@ -1055,6 +1124,10 @@ export class GovernorCountingSimple extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     proposalVotes(
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -1089,6 +1162,20 @@ export class GovernorCountingSimple extends Contract {
     "quorum(uint256)"(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     state(
@@ -1259,6 +1346,12 @@ export class GovernorCountingSimple extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    proposalThreshold(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "proposalThreshold()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     proposalVotes(
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -1293,6 +1386,20 @@ export class GovernorCountingSimple extends Contract {
     "quorum(uint256)"(
       blockNumber: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     state(

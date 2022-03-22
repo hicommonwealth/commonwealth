@@ -43,6 +43,7 @@ interface GovernorMockInterface extends ethers.utils.Interface {
     "quorum(uint256)": FunctionFragment;
     "quorumDenominator()": FunctionFragment;
     "quorumNumerator()": FunctionFragment;
+    "relay(address,uint256,bytes)": FunctionFragment;
     "state(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "timelock()": FunctionFragment;
@@ -135,6 +136,10 @@ interface GovernorMockInterface extends ethers.utils.Interface {
     functionFragment: "quorumNumerator",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "relay",
+    values: [string, BigNumberish, BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "state", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -217,6 +222,7 @@ interface GovernorMockInterface extends ethers.utils.Interface {
     functionFragment: "quorumNumerator",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "relay", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "state", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
@@ -539,6 +545,20 @@ export class GovernorMock extends Contract {
 
     "quorumNumerator()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     state(
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -834,6 +854,20 @@ export class GovernorMock extends Contract {
 
   "quorumNumerator()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  relay(
+    target: string,
+    value: BigNumberish,
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "relay(address,uint256,bytes)"(
+    target: string,
+    value: BigNumberish,
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
   "state(uint256)"(
@@ -1125,6 +1159,20 @@ export class GovernorMock extends Contract {
     quorumNumerator(overrides?: CallOverrides): Promise<BigNumber>;
 
     "quorumNumerator()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     state(proposalId: BigNumberish, overrides?: CallOverrides): Promise<number>;
 
@@ -1493,6 +1541,20 @@ export class GovernorMock extends Contract {
 
     "quorumNumerator()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     state(
       proposalId: BigNumberish,
       overrides?: CallOverrides
@@ -1783,6 +1845,20 @@ export class GovernorMock extends Contract {
 
     "quorumNumerator()"(
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     state(

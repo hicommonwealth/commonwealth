@@ -36,7 +36,6 @@ interface IGovernorCompatibilityBravoInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "proposalDeadline(uint256)": FunctionFragment;
     "proposalSnapshot(uint256)": FunctionFragment;
-    "proposalThreshold()": FunctionFragment;
     "proposals(uint256)": FunctionFragment;
     "propose(address[],uint256[],bytes[],string)": FunctionFragment;
     "queue(uint256)": FunctionFragment;
@@ -103,10 +102,6 @@ interface IGovernorCompatibilityBravoInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "proposalThreshold",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "proposals",
     values: [BigNumberish]
   ): string;
@@ -168,10 +163,6 @@ interface IGovernorCompatibilityBravoInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "proposalSnapshot",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "proposalThreshold",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "proposals", data: BytesLike): Result;
@@ -440,10 +431,6 @@ export class IGovernorCompatibilityBravo extends Contract {
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
-
-    proposalThreshold(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "proposalThreshold()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     proposals(
       arg0: BigNumberish,
@@ -760,10 +747,6 @@ export class IGovernorCompatibilityBravo extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
-
   proposals(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -1072,10 +1055,6 @@ export class IGovernorCompatibilityBravo extends Contract {
       proposalId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposals(
       arg0: BigNumberish,
@@ -1423,10 +1402,6 @@ export class IGovernorCompatibilityBravo extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    proposalThreshold(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "proposalThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
-
     proposals(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -1666,12 +1641,6 @@ export class IGovernorCompatibilityBravo extends Contract {
 
     "proposalSnapshot(uint256)"(
       proposalId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    proposalThreshold(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "proposalThreshold()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

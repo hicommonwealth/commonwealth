@@ -12,7 +12,6 @@ import {
   Contract,
   ContractTransaction,
   Overrides,
-  PayableOverrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -22,127 +21,95 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface TimelockInterface extends ethers.utils.Interface {
   functions: {
-    "GRACE_PERIOD()": FunctionFragment;
-    "MAXIMUM_DELAY()": FunctionFragment;
-    "MINIMUM_DELAY()": FunctionFragment;
-    "acceptAdmin()": FunctionFragment;
-    "admin()": FunctionFragment;
-    "cancelTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
-    "delay()": FunctionFragment;
-    "executeTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
-    "pendingAdmin()": FunctionFragment;
-    "queueTransaction(address,uint256,string,bytes,uint256)": FunctionFragment;
-    "queuedTransactions(bytes32)": FunctionFragment;
-    "setDelay(uint256)": FunctionFragment;
-    "setPendingAdmin(address)": FunctionFragment;
+    "authorize(address)": FunctionFragment;
+    "authorized(address)": FunctionFragment;
+    "callTimestamps(bytes32)": FunctionFragment;
+    "deauthorize(address)": FunctionFragment;
+    "execute(address[],bytes[])": FunctionFragment;
+    "increaseTime(uint256,bytes32)": FunctionFragment;
+    "isAuthorized(address)": FunctionFragment;
+    "owner()": FunctionFragment;
+    "registerCall(bytes32)": FunctionFragment;
+    "setOwner(address)": FunctionFragment;
+    "setWaitTime(uint256)": FunctionFragment;
+    "stopCall(bytes32)": FunctionFragment;
+    "timeIncreases(bytes32)": FunctionFragment;
+    "waitTime()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "authorize", values: [string]): string;
+  encodeFunctionData(functionFragment: "authorized", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "GRACE_PERIOD",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "MAXIMUM_DELAY",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "MINIMUM_DELAY",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "acceptAdmin",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "admin", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "cancelTransaction",
-    values: [string, BigNumberish, string, BytesLike, BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "delay", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "executeTransaction",
-    values: [string, BigNumberish, string, BytesLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "pendingAdmin",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "queueTransaction",
-    values: [string, BigNumberish, string, BytesLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "queuedTransactions",
+    functionFragment: "callTimestamps",
     values: [BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "deauthorize", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "setDelay",
-    values: [BigNumberish]
+    functionFragment: "execute",
+    values: [string[], BytesLike[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "setPendingAdmin",
+    functionFragment: "increaseTime",
+    values: [BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isAuthorized",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "registerCall",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(functionFragment: "setOwner", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "setWaitTime",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "stopCall", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "timeIncreases",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(functionFragment: "waitTime", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "authorize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "authorized", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "GRACE_PERIOD",
+    functionFragment: "callTimestamps",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MAXIMUM_DELAY",
+    functionFragment: "deauthorize",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "increaseTime",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MINIMUM_DELAY",
+    functionFragment: "isAuthorized",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "acceptAdmin",
+    functionFragment: "registerCall",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "cancelTransaction",
+    functionFragment: "setWaitTime",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "delay", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "stopCall", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "executeTransaction",
+    functionFragment: "timeIncreases",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "pendingAdmin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "queueTransaction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "queuedTransactions",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "setDelay", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setPendingAdmin",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "waitTime", data: BytesLike): Result;
 
-  events: {
-    "CancelTransaction(bytes32,address,uint256,string,bytes,uint256)": EventFragment;
-    "ExecuteTransaction(bytes32,address,uint256,string,bytes,uint256)": EventFragment;
-    "NewAdmin(address)": EventFragment;
-    "NewDelay(uint256)": EventFragment;
-    "NewPendingAdmin(address)": EventFragment;
-    "QueueTransaction(bytes32,address,uint256,string,bytes,uint256)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "CancelTransaction"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ExecuteTransaction"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewDelay"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NewPendingAdmin"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "QueueTransaction"): EventFragment;
+  events: {};
 }
 
 export class Timelock extends Contract {
@@ -189,654 +156,621 @@ export class Timelock extends Contract {
   interface: TimelockInterface;
 
   functions: {
-    GRACE_PERIOD(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    MINIMUM_DELAY(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    acceptAdmin(
+    authorize(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "acceptAdmin()"(
+    "authorize(address)"(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    admin(overrides?: CallOverrides): Promise<[string]>;
+    authorized(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
 
-    "admin()"(overrides?: CallOverrides): Promise<[string]>;
+    "authorized(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
-    cancelTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    callTimestamps(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "callTimestamps(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    deauthorize(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    "deauthorize(address)"(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    delay(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "delay()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    executeTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "executeTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    pendingAdmin(overrides?: CallOverrides): Promise<[string]>;
-
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<[string]>;
-
-    queueTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    execute(
+      targets: string[],
+      calldatas: BytesLike[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "queueTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    "execute(address[],bytes[])"(
+      targets: string[],
+      calldatas: BytesLike[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    queuedTransactions(
+    increaseTime(
+      timeValue: BigNumberish,
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "increaseTime(uint256,bytes32)"(
+      timeValue: BigNumberish,
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    isAuthorized(who: string, overrides?: CallOverrides): Promise<[boolean]>;
+
+    "isAuthorized(address)"(
+      who: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    owner(overrides?: CallOverrides): Promise<[string]>;
+
+    "owner()"(overrides?: CallOverrides): Promise<[string]>;
+
+    registerCall(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "registerCall(bytes32)"(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setOwner(
+      who: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setOwner(address)"(
+      who: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setWaitTime(
+      _waitTime: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "setWaitTime(uint256)"(
+      _waitTime: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    stopCall(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "stopCall(bytes32)"(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    timeIncreases(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    "queuedTransactions(bytes32)"(
+    "timeIncreases(bytes32)"(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    setDelay(
-      delay_: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    waitTime(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "setDelay(uint256)"(
-      delay_: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setPendingAdmin(
-      pendingAdmin_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "setPendingAdmin(address)"(
-      pendingAdmin_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    "waitTime()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
-  GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  acceptAdmin(
+  authorize(
+    who: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "acceptAdmin()"(
+  "authorize(address)"(
+    who: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  admin(overrides?: CallOverrides): Promise<string>;
+  authorized(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
-  "admin()"(overrides?: CallOverrides): Promise<string>;
+  "authorized(address)"(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
-  cancelTransaction(
-    target: string,
-    value: BigNumberish,
-    signature: string,
-    data: BytesLike,
-    eta: BigNumberish,
+  callTimestamps(
+    arg0: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "callTimestamps(bytes32)"(
+    arg0: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  deauthorize(
+    who: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "cancelTransaction(address,uint256,string,bytes,uint256)"(
-    target: string,
-    value: BigNumberish,
-    signature: string,
-    data: BytesLike,
-    eta: BigNumberish,
+  "deauthorize(address)"(
+    who: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  delay(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  executeTransaction(
-    target: string,
-    value: BigNumberish,
-    signature: string,
-    data: BytesLike,
-    eta: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "executeTransaction(address,uint256,string,bytes,uint256)"(
-    target: string,
-    value: BigNumberish,
-    signature: string,
-    data: BytesLike,
-    eta: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  pendingAdmin(overrides?: CallOverrides): Promise<string>;
-
-  "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
-
-  queueTransaction(
-    target: string,
-    value: BigNumberish,
-    signature: string,
-    data: BytesLike,
-    eta: BigNumberish,
+  execute(
+    targets: string[],
+    calldatas: BytesLike[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "queueTransaction(address,uint256,string,bytes,uint256)"(
-    target: string,
-    value: BigNumberish,
-    signature: string,
-    data: BytesLike,
-    eta: BigNumberish,
+  "execute(address[],bytes[])"(
+    targets: string[],
+    calldatas: BytesLike[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  queuedTransactions(
+  increaseTime(
+    timeValue: BigNumberish,
+    callHash: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "increaseTime(uint256,bytes32)"(
+    timeValue: BigNumberish,
+    callHash: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  isAuthorized(who: string, overrides?: CallOverrides): Promise<boolean>;
+
+  "isAuthorized(address)"(
+    who: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  owner(overrides?: CallOverrides): Promise<string>;
+
+  "owner()"(overrides?: CallOverrides): Promise<string>;
+
+  registerCall(
+    callHash: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "registerCall(bytes32)"(
+    callHash: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setOwner(
+    who: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setOwner(address)"(
+    who: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setWaitTime(
+    _waitTime: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "setWaitTime(uint256)"(
+    _waitTime: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  stopCall(
+    callHash: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "stopCall(bytes32)"(
+    callHash: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  timeIncreases(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
+  "timeIncreases(bytes32)"(
     arg0: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  "queuedTransactions(bytes32)"(
-    arg0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
+  waitTime(overrides?: CallOverrides): Promise<BigNumber>;
 
-  setDelay(
-    delay_: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "setDelay(uint256)"(
-    delay_: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setPendingAdmin(
-    pendingAdmin_: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "setPendingAdmin(address)"(
-    pendingAdmin_: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  "waitTime()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
+    authorize(who: string, overrides?: CallOverrides): Promise<void>;
 
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "authorize(address)"(who: string, overrides?: CallOverrides): Promise<void>;
 
-    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
+    authorized(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "authorized(address)"(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
-    MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
+    callTimestamps(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "callTimestamps(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    acceptAdmin(overrides?: CallOverrides): Promise<void>;
+    deauthorize(who: string, overrides?: CallOverrides): Promise<void>;
 
-    "acceptAdmin()"(overrides?: CallOverrides): Promise<void>;
-
-    admin(overrides?: CallOverrides): Promise<string>;
-
-    "admin()"(overrides?: CallOverrides): Promise<string>;
-
-    cancelTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    "deauthorize(address)"(
+      who: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    execute(
+      targets: string[],
+      calldatas: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    delay(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    executeTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    "execute(address[],bytes[])"(
+      targets: string[],
+      calldatas: BytesLike[],
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
 
-    "executeTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    increaseTime(
+      timeValue: BigNumberish,
+      callHash: BytesLike,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
 
-    pendingAdmin(overrides?: CallOverrides): Promise<string>;
-
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<string>;
-
-    queueTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    "increaseTime(uint256,bytes32)"(
+      timeValue: BigNumberish,
+      callHash: BytesLike,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
 
-    "queueTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
+    isAuthorized(who: string, overrides?: CallOverrides): Promise<boolean>;
+
+    "isAuthorized(address)"(
+      who: string,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<boolean>;
 
-    queuedTransactions(
+    owner(overrides?: CallOverrides): Promise<string>;
+
+    "owner()"(overrides?: CallOverrides): Promise<string>;
+
+    registerCall(callHash: BytesLike, overrides?: CallOverrides): Promise<void>;
+
+    "registerCall(bytes32)"(
+      callHash: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setOwner(who: string, overrides?: CallOverrides): Promise<void>;
+
+    "setOwner(address)"(who: string, overrides?: CallOverrides): Promise<void>;
+
+    setWaitTime(
+      _waitTime: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setWaitTime(uint256)"(
+      _waitTime: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    stopCall(callHash: BytesLike, overrides?: CallOverrides): Promise<void>;
+
+    "stopCall(bytes32)"(
+      callHash: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    timeIncreases(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
+    "timeIncreases(bytes32)"(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "queuedTransactions(bytes32)"(
-      arg0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
+    waitTime(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setDelay(delay_: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    "setDelay(uint256)"(
-      delay_: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setPendingAdmin(
-      pendingAdmin_: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setPendingAdmin(address)"(
-      pendingAdmin_: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    "waitTime()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
-  filters: {
-    CancelTransaction(
-      txHash: BytesLike | null,
-      target: string | null,
-      value: null,
-      signature: null,
-      data: null,
-      eta: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, string, string, BigNumber],
-      {
-        txHash: string;
-        target: string;
-        value: BigNumber;
-        signature: string;
-        data: string;
-        eta: BigNumber;
-      }
-    >;
-
-    ExecuteTransaction(
-      txHash: BytesLike | null,
-      target: string | null,
-      value: null,
-      signature: null,
-      data: null,
-      eta: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, string, string, BigNumber],
-      {
-        txHash: string;
-        target: string;
-        value: BigNumber;
-        signature: string;
-        data: string;
-        eta: BigNumber;
-      }
-    >;
-
-    NewAdmin(
-      newAdmin: string | null
-    ): TypedEventFilter<[string], { newAdmin: string }>;
-
-    NewDelay(
-      newDelay: BigNumberish | null
-    ): TypedEventFilter<[BigNumber], { newDelay: BigNumber }>;
-
-    NewPendingAdmin(
-      newPendingAdmin: string | null
-    ): TypedEventFilter<[string], { newPendingAdmin: string }>;
-
-    QueueTransaction(
-      txHash: BytesLike | null,
-      target: string | null,
-      value: null,
-      signature: null,
-      data: null,
-      eta: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, string, string, BigNumber],
-      {
-        txHash: string;
-        target: string;
-        value: BigNumber;
-        signature: string;
-        data: string;
-        eta: BigNumber;
-      }
-    >;
-  };
+  filters: {};
 
   estimateGas: {
-    GRACE_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    MINIMUM_DELAY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    acceptAdmin(
+    authorize(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "acceptAdmin()"(
+    "authorize(address)"(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    admin(overrides?: CallOverrides): Promise<BigNumber>;
+    authorized(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    "admin()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    cancelTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    "authorized(address)"(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    delay(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "delay()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    executeTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "executeTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    pendingAdmin(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    queueTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "queueTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    queuedTransactions(
+    callTimestamps(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "queuedTransactions(bytes32)"(
+    "callTimestamps(bytes32)"(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    setDelay(
-      delay_: BigNumberish,
+    deauthorize(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setDelay(uint256)"(
-      delay_: BigNumberish,
+    "deauthorize(address)"(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setPendingAdmin(
-      pendingAdmin_: string,
+    execute(
+      targets: string[],
+      calldatas: BytesLike[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setPendingAdmin(address)"(
-      pendingAdmin_: string,
+    "execute(address[],bytes[])"(
+      targets: string[],
+      calldatas: BytesLike[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    increaseTime(
+      timeValue: BigNumberish,
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "increaseTime(uint256,bytes32)"(
+      timeValue: BigNumberish,
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    isAuthorized(who: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "isAuthorized(address)"(
+      who: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    registerCall(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "registerCall(bytes32)"(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setOwner(
+      who: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setOwner(address)"(
+      who: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setWaitTime(
+      _waitTime: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "setWaitTime(uint256)"(
+      _waitTime: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    stopCall(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "stopCall(bytes32)"(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    timeIncreases(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "timeIncreases(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    waitTime(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "waitTime()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    GRACE_PERIOD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "GRACE_PERIOD()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    MAXIMUM_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "MAXIMUM_DELAY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    MINIMUM_DELAY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "MINIMUM_DELAY()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    acceptAdmin(
+    authorize(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "acceptAdmin()"(
+    "authorize(address)"(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    admin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "admin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    cancelTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    authorized(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "cancelTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    "authorized(address)"(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    delay(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "delay()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    executeTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "executeTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    pendingAdmin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "pendingAdmin()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    queueTransaction(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "queueTransaction(address,uint256,string,bytes,uint256)"(
-      target: string,
-      value: BigNumberish,
-      signature: string,
-      data: BytesLike,
-      eta: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    queuedTransactions(
+    callTimestamps(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "queuedTransactions(bytes32)"(
+    "callTimestamps(bytes32)"(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    setDelay(
-      delay_: BigNumberish,
+    deauthorize(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setDelay(uint256)"(
-      delay_: BigNumberish,
+    "deauthorize(address)"(
+      who: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setPendingAdmin(
-      pendingAdmin_: string,
+    execute(
+      targets: string[],
+      calldatas: BytesLike[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setPendingAdmin(address)"(
-      pendingAdmin_: string,
+    "execute(address[],bytes[])"(
+      targets: string[],
+      calldatas: BytesLike[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    increaseTime(
+      timeValue: BigNumberish,
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "increaseTime(uint256,bytes32)"(
+      timeValue: BigNumberish,
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    isAuthorized(
+      who: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "isAuthorized(address)"(
+      who: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    registerCall(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "registerCall(bytes32)"(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setOwner(
+      who: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setOwner(address)"(
+      who: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setWaitTime(
+      _waitTime: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "setWaitTime(uint256)"(
+      _waitTime: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    stopCall(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "stopCall(bytes32)"(
+      callHash: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    timeIncreases(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "timeIncreases(bytes32)"(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    waitTime(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "waitTime()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

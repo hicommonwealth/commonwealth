@@ -49,6 +49,7 @@ interface FeiDAOInterface extends ethers.utils.Interface {
     "queue(address[],uint256[],bytes[],bytes32)": FunctionFragment;
     "quorum(uint256)": FunctionFragment;
     "quorumVotes()": FunctionFragment;
+    "relay(address,uint256,bytes)": FunctionFragment;
     "setProposalThreshold(uint256)": FunctionFragment;
     "setQuorum(uint256)": FunctionFragment;
     "setVotingDelay(uint256)": FunctionFragment;
@@ -169,6 +170,10 @@ interface FeiDAOInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "relay",
+    values: [string, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setProposalThreshold",
     values: [BigNumberish]
   ): string;
@@ -274,6 +279,7 @@ interface FeiDAOInterface extends ethers.utils.Interface {
     functionFragment: "quorumVotes",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "relay", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setProposalThreshold",
     data: BytesLike
@@ -719,6 +725,20 @@ export class FeiDAO extends Contract {
 
     "quorumVotes()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setProposalThreshold(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1144,6 +1164,20 @@ export class FeiDAO extends Contract {
 
   "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  relay(
+    target: string,
+    value: BigNumberish,
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "relay(address,uint256,bytes)"(
+    target: string,
+    value: BigNumberish,
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setProposalThreshold(
     newProposalThreshold: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1551,6 +1585,20 @@ export class FeiDAO extends Contract {
     quorumVotes(overrides?: CallOverrides): Promise<BigNumber>;
 
     "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     setProposalThreshold(
       newProposalThreshold: BigNumberish,
@@ -2017,6 +2065,20 @@ export class FeiDAO extends Contract {
 
     "quorumVotes()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setProposalThreshold(
       newProposalThreshold: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -2379,6 +2441,20 @@ export class FeiDAO extends Contract {
     quorumVotes(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "quorumVotes()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    relay(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "relay(address,uint256,bytes)"(
+      target: string,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     setProposalThreshold(
       newProposalThreshold: BigNumberish,

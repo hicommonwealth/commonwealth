@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.4;
 
-import '@openzeppelin/contracts-governance/governance/compatibility/GovernorCompatibilityBravo.sol';
-import '@openzeppelin/contracts-governance/governance/extensions/GovernorTimelockCompound.sol';
-import '@openzeppelin/contracts-governance/governance/extensions/GovernorVotesComp.sol';
-import '@openzeppelin/contracts-governance/token/ERC20/extensions/ERC20VotesComp.sol';
+import '@openzeppelin/contracts/governance/compatibility/GovernorCompatibilityBravo.sol';
+import '@openzeppelin/contracts/governance/extensions/GovernorTimelockCompound.sol';
+import '@openzeppelin/contracts/governance/extensions/GovernorVotesComp.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/ERC20VotesComp.sol';
 
 // Forked functionality from https://github.com/unlock-protocol/unlock/blob/master/smart-contracts/contracts/UnlockProtocolGovernor.sol
 

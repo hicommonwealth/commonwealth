@@ -2,10 +2,11 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-governance/governance/extensions/GovernorTimelockControl.sol";
-import "@openzeppelin/contracts-governance/governance/extensions/GovernorCountingSimple.sol";
-import "@openzeppelin/contracts-governance/governance/extensions/GovernorVotesQuorumFraction.sol";
-import "@openzeppelin/contracts-governance/governance/extensions/GovernorProposalThreshold.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorProposalThreshold.sol";
 
 contract GovernorMock is GovernorTimelockControl, GovernorProposalThreshold, GovernorVotesQuorumFraction, GovernorCountingSimple {
     uint256 immutable _votingDelay;
