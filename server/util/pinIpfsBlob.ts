@@ -34,7 +34,7 @@ const pinIpfsBlob = async (userID: number, addressID: number, jsonfile: string) 
           ipfs_hash: pinataResponse.data.IpfsHash,
         });
       } catch (e) {
-        log.error('Could not insert the hash: ', e.message);
+        log.error('Could not insert the hash into the DB: ', e.message);
       }
 
       return pinataResponse.data.IpfsHash;
