@@ -4,6 +4,8 @@ import m from 'mithril';
 
 import 'pages/landing/landing_page_footer.scss';
 
+import app from 'state';
+
 type IState = {
   list: { text: string; redirectTo?: string; externalLink?: string }[];
 };
@@ -14,18 +16,28 @@ export class LandingPageFooter implements m.ClassComponent<IState> {
       m.route.set(route);
     };
 
+    let footerClass = 'FooterLandingPage';
+
+    if (app.chain !== null) {
+      footerClass = 'FooterLandingPage.sidebar';
+    }
+
     return (
-      <footer class="LandingPageFooter">
-        <div class="">
-          <img class="" src="/static/img/logo.svg" alt="Commonwealth" />
-          <nav class="">
-            <ul class="">
+      <footer class={`${footerClass} bg-footer bg-cover py-10`}>
+        <div class="mt-8 container mx-auto md:flex md:flex-row md:justify-between md:items-start">
+          <img class="w-60" src="/static/img/logo.svg" alt="Commonwealth" />
+          <nav class="mt-10 md:mt-0 w-64">
+            <ul
+              class={`flex flex-wrap flex-col ${
+                vnode.attrs.list.length > 6 ? 'h-32' : 'h-24'
+              }`}
+            >
               {vnode.attrs.list.map((item) => {
                 return (
-                  <li class="">
+                  <li class="FooterNavsLinks mb-2">
                     {item.redirectTo ? (
                       <a
-                        class=""
+                        class="text-gray-500"
                         onclick={(e) => {
                           e.preventDefault();
                           redirectClick(item.redirectTo);
@@ -34,7 +46,11 @@ export class LandingPageFooter implements m.ClassComponent<IState> {
                         {item.text}
                       </a>
                     ) : (
-                      <a class="" href={item.externalLink} target="_blank">
+                      <a
+                        class="text-gray-500"
+                        href={item.externalLink}
+                        target="_blank"
+                      >
                         {item.text}
                       </a>
                     )}

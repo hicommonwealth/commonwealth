@@ -29,19 +29,18 @@
     height: 100%;
     overflow: hidden;
     width: 100%;
-  }
 
-  .body {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
-    width: 100%;
-
-    .inner-body {
+    .body {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       height: 100%;
+      overflow-y: auto;
+      width: 100%;
+
+      .inner-body {
+        display: flex;
+        flex: 1;
+      }
     }
   }
 

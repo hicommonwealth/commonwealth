@@ -416,7 +416,6 @@ const LoginSelector: m.Component<
         transitionDuration: 0,
         hoverCloseDelay: 0,
         position: 'top-end',
-        inline: true,
         trigger: m(Button, {
           class: 'login-selector-right',
           intent: 'none',

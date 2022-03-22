@@ -96,7 +96,12 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             <div class="body">
               <TokenHero chain={chain} hero={hero} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
-              <div class="inner-body">
+              <div
+                class="inner-body"
+                style={
+                  isNotUndefined(rightContent) ? 'flex-direction: row;' : ''
+                }
+              >
                 {vnode.children}
                 {isNotUndefined(rightContent) && <div>{rightContent}</div>}
               </div>

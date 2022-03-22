@@ -167,6 +167,7 @@
 
 .cui-control-group {
   margin: 0;
+  position: relative;
   width: 400px;
 }
 
@@ -227,7 +228,7 @@
     }
 
     input {
-      height: 31px;
+      height: 40px;
       padding: 4px 16px;
       position: relative;
       background: #efefef;
