@@ -4,23 +4,16 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
-import { navigateToSubpage } from 'app';
 
 import {
   SnapshotProposal,
   SnapshotSpace,
-  getVersion,
   castVote,
-  getPower,
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 
-import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { ChainBase } from 'types';
 import { formatNumberShort } from 'adapters/currency';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
-import { Web3Provider } from '@ethersproject/providers';
 
 enum NewVoteErrors {
   SomethingWentWrong = 'Something went wrong!',
