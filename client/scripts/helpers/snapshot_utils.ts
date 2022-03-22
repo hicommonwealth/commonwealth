@@ -88,6 +88,10 @@ export const PROPOSALS_QUERY = gql`
       scores_total
       author
       created
+      strategies {
+        name
+        params
+      }
     }
   }
 `;
@@ -281,17 +285,18 @@ export async function getResults(
 
 export async function getPower(
   space: SnapshotSpace,
-  address: string,
-  snapshotVal: string
+  proposal: SnapshotProposal,
+  address: string
 ) {
   const blockNumber = await snapshot.utils.getBlockNumber(
     snapshot.utils.getProvider(space.network)
   );
-  const blockTag = +snapshotVal > blockNumber ? 'latest' : +snapshotVal;
+  const blockTag =
+    +proposal.snapshot > blockNumber ? 'latest' : +proposal.snapshot;
   const scores: Array<{ [who: string]: number }> =
     await snapshot.utils.getScores(
       space.id,
-      space.strategies,
+      proposal.strategies,
       space.network,
       [address],
       blockTag

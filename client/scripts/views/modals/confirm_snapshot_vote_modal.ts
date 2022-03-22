@@ -114,7 +114,10 @@ const ConfirmSnapshotVoteModal: m.Component<
                 metadata: JSON.stringify({}),
               };
               try {
-                castVote(author.address, votePayload);
+                castVote(author.address, votePayload).then(() => {
+                  $(e.target).trigger('modalexit');
+                  m.redraw();
+                });
               } catch (e) {
                 console.log(e);
                 const errorMessage = e.message;

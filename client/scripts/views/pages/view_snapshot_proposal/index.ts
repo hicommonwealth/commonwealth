@@ -30,6 +30,11 @@ import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 
+const enum VotingError {
+  NOT_VALIDATED = 'Insufficient Voting Power',
+  ALREADY_VOTED = 'Already Submitted Vote',
+}
+
 const ProposalContent: m.Component<
   {
     proposal: SnapshotProposal;
@@ -185,7 +190,6 @@ const VoteAction: m.Component<
     space: SnapshotSpace;
     proposal: SnapshotProposal;
     id: string;
-    totalScore: number;
     scores: number[];
     choices: string[];
     votes: SnapshotProposalVote[];
@@ -194,8 +198,14 @@ const VoteAction: m.Component<
     votingModalOpen: boolean;
     chosenOption: string;
     validatedAgainstStrategies: boolean;
+    fetchedPower: boolean;
+    totalScore: number;
   }
 > = {
+  oninit: (vnode) => {
+    vnode.state.fetchedPower = false;
+    vnode.state.validatedAgainstStrategies = true;
+  },
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const hasVoted = vnode.attrs.votes.find((vote) => {
@@ -207,14 +217,18 @@ const VoteAction: m.Component<
       m.redraw();
     };
 
-    getPower(
-      vnode.attrs.space,
-      app.user?.activeAccount?.address,
-      vnode.attrs.proposal.snapshot
-    ).then((vals) => {
-      console.log('Vals', vals);
-      vnode.state.validatedAgainstStrategies = vals.totalScore > 0; // TODO: need to incorporate handling for when a minscore is required to vote
-    });
+    if (!vnode.state.fetchedPower) {
+      getPower(
+        vnode.attrs.space,
+        vnode.attrs.proposal,
+        app.user?.activeAccount?.address
+      ).then((vals) => {
+        vnode.state.validatedAgainstStrategies = vals.totalScore > 0;
+        vnode.state.totalScore = vals.totalScore;
+        m.redraw();
+      });
+      vnode.state.fetchedPower = true;
+    }
 
     const vote = async (selectedChoice: number) => {
       try {
@@ -225,7 +239,7 @@ const VoteAction: m.Component<
             proposal: vnode.attrs.proposal,
             id: vnode.attrs.id,
             selectedChoice,
-            totalScore: vnode.attrs.totalScore,
+            totalScore: vnode.state.totalScore,
             scores: vnode.attrs.scores,
             snapshot: vnode.attrs.proposal.snapshot,
             state: vnode.state,
@@ -240,6 +254,12 @@ const VoteAction: m.Component<
 
     if (!vnode.attrs.proposal.choices?.length) return;
 
+    const voteText = !vnode.state.validatedAgainstStrategies
+      ? VotingError.NOT_VALIDATED
+      : hasVoted
+      ? VotingError.ALREADY_VOTED
+      : '';
+
     return m('.VoteAction', [
       m('.title', 'Cast your vote'),
       m(RadioGroup, {
@@ -253,13 +273,21 @@ const VoteAction: m.Component<
           ).value;
         },
       }),
-      m(Button, {
-        label: 'Vote',
-        disabled:
-          (hasVoted !== undefined || !vnode.state.chosenOption) &&
-          !vnode.state.validatedAgainstStrategies,
-        onclick: () => vote(proposal.choices.indexOf(vnode.state.chosenOption)),
-      }),
+      m('.vote-button-group', [
+        m(Button, {
+          label: 'Vote',
+          disabled:
+            !vnode.state.fetchedPower ||
+            hasVoted !== undefined ||
+            !vnode.state.chosenOption ||
+            !vnode.state.validatedAgainstStrategies,
+          onclick: () => {
+            vote(proposal.choices.indexOf(vnode.state.chosenOption));
+            m.redraw();
+          },
+        }),
+        m('.vote-message', voteText),
+      ]),
     ]);
   },
 };
@@ -286,7 +314,6 @@ const ViewProposalPage: m.Component<
   oninit: (vnode) => {
     vnode.state.activeTab = 'Proposals';
     vnode.state.votes = [];
-    vnode.state.totalScore = 0;
     vnode.state.scores = [];
     vnode.state.proposal = null;
     vnode.state.threads = null;
@@ -299,9 +326,6 @@ const ViewProposalPage: m.Component<
       const space = app.snapshot.space;
       vnode.state.space = space;
       vnode.state.symbol = space.symbol;
-
-      console.log('space', space);
-      console.log('prop: ', vnode.state.proposal);
 
       await getResults(space, vnode.state.proposal).then((res) => {
         vnode.state.votes = res.votes;
@@ -411,6 +435,7 @@ const ViewProposalPage: m.Component<
                       m('p', 'Voting System'),
                       m('p', 'Start Date'),
                       m('p', 'End Date'),
+                      m('p', 'Strategies'),
                       m('p', 'Snapshot'),
                     ]),
                     m('.values', [
@@ -445,6 +470,7 @@ const ViewProposalPage: m.Component<
                       ),
                       m('p', moment(+proposal.start * 1000).format('lll')),
                       m('p', moment(+proposal.end * 1000).format('lll')),
+                      m('p', moment(+proposal.end * 1000).format('lll')),
                       m(
                         'a',
                         {
@@ -478,7 +504,6 @@ const ViewProposalPage: m.Component<
                     space: vnode.state.space,
                     proposal: vnode.state.proposal,
                     id: vnode.attrs.identifier,
-                    totalScore: vnode.state.totalScore,
                     scores: vnode.state.scores,
                     choices: vnode.state.proposal.choices,
                     votes: vnode.state.votes,
