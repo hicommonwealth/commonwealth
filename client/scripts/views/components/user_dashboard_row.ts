@@ -299,8 +299,7 @@ const ActivityContent: m.Component<{
             },
             [communityName]
           ),
-          m('span.comment-counts', [' ']),
-          m('span.comment-counts', [formatTimestamp(moment(created_at))]),
+          m('span.comment-counts', [` (${formatTimestamp(moment(created_at))})`]),
         ]),
         m('.comment-body-concat', [getCommentPreview(comment_text)]),
       ]);
@@ -322,8 +321,7 @@ const ActivityContent: m.Component<{
             },
             [communityName]
           ),
-          m('span.comment-counts', [' ']),
-          m('span.comment-counts', [formatTimestamp(moment(created_at))]),
+          m('span.comment-counts', [` (${formatTimestamp(moment(created_at))})`]),
         ]),
       ]);
     }
