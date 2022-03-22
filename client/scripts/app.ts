@@ -12,6 +12,7 @@ import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
+import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';

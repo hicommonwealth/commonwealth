@@ -2,6 +2,7 @@ import * as Icons from './cw_icons';
 
 export const iconLookup = {
   account: Icons.CWAccount,
+  arrow1: Icons.CWArrow1,
   create: Icons.CWCreate,
   discord: Icons.CWDiscord,
   element: Icons.CWElement,
