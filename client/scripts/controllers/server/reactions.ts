@@ -114,42 +114,6 @@ class ReactionsController {
     });
   }
 
-  public async refreshAll(chainId: string, reset = false) {
-    try {
-      // TODO: Change to GET /reactions
-      const response = await $.get(`${app.serverUrl()}/bulkReactions`, {
-        chain: chainId,
-      });
-      if (response.status !== 'Success') {
-        throw new Error(`got unsuccessful status: ${response.status}`);
-      }
-      if (reset) {
-        this._store.clear();
-      }
-      for (const reaction of response.result) {
-        // TODO: Reactions should always have a linked Address
-        if (!reaction.Address) {
-          console.error('Reaction missing linked address');
-        }
-        // TODO: check `response` against store and update store iff `response` is newer
-        const existing = this._store.getById(reaction.id);
-        if (existing) {
-          this._store.remove(existing);
-        }
-        try {
-          this._store.add(modelFromServer(reaction));
-        } catch (e) {
-          // console.error(e.message);
-        }
-      }
-    } catch (err) {
-      console.log('failed to load bulk reactions');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Error loading reactions');
-    }
-  }
-
   public initialize(initialReactions, reset = true) {
     if (reset) {
       this._store.clear();
