@@ -39,16 +39,16 @@ export function createChatNamespace(io: Server, models: DB) {
         socket.on(WebsocketMessageNames.ChatMessage, (_message) => {
             const { message, address, chat_channel_id, now, socket_room } = _message
             const now_date = moment(now).toDate()
-            models.ChatMessage.create({ address, message, chat_channel_id, created_at: now_date, updated_at: now_date })
-                .then((res) => {
-                    const { id, created_at } = res
-                    ChatNs
-                      .to(`${socket_room}`)
-                      .emit(WebsocketMessageNames.ChatMessage, { id, address, message, chat_channel_id, created_at });
-                })
-                .catch((e) => {
-                    socket.emit('Error', e)
-                })
+            // models.ChatMessage.create({ address, message, chat_channel_id, created_at: now_date, updated_at: now_date })
+            //     .then((res) => {
+            //         const { id, created_at } = res
+            //         ChatNs
+            //           .to(`${socket_room}`)
+            //           .emit(WebsocketMessageNames.ChatMessage, { id, address, message, chat_channel_id, created_at });
+            //     })
+            //     .catch((e) => {
+            //         socket.emit('Error', e)
+            //     })
         })
     })
 
