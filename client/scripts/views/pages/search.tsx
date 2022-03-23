@@ -381,7 +381,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
         showNewProposalButton={true}
         alwaysShowTitle={true}
       >
-        <div class="container">
+        <div class="search-page-container">
           <Tabs>{tabs}</Tabs>
           <div class="search-results-wrapper">
             {!app.search.getByQuery(searchQuery)?.loaded ? (

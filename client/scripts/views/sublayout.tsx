@@ -99,11 +99,13 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               <div
                 class="inner-body"
                 style={
-                  isNotUndefined(rightContent) ? 'flex-direction: row;' : ''
+                  isNotUndefined(rightContent)
+                    ? 'display: flex; flex-direction: row;'
+                    : ''
                 }
               >
                 {vnode.children}
-                {isNotUndefined(rightContent) && <div>{rightContent}</div>}
+                {isNotUndefined(rightContent) && rightContent}
               </div>
               {!app.isCustomDomain() && (
                 <LandingPageFooter list={footercontents} />

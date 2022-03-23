@@ -4,7 +4,7 @@
   flex-direction: row;
   justify-content: flex-end;
 
-  > * :not(:last-child) {
+  > :not(:first-child) {
     margin-left: 8px;
   }
 }

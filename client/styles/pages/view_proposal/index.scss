@@ -30,6 +30,13 @@ $discussion-title-font-size: 1.45rem;
 }
 
 .ViewProposalPage {
+  .view-proposal-page-container {
+    display: flex;
+    flex-direction: column;
+    margin-right: 24px;
+    padding: 24px 0 24px 24px;
+    width: 736px;
+  }
   .ProposalHeader {
     .proposal-content {
       position: relative;
@@ -41,8 +48,6 @@ $discussion-title-font-size: 1.45rem;
   }
   .ProposalHeader,
   .ProposalComment {
-    margin-top: 36px;
-    padding: 4px 0;
     @include xs-max {
       margin-top: 30px;
     }
@@ -207,7 +212,7 @@ $discussion-title-font-size: 1.45rem;
     }
     .proposal-content {
       display: flex;
-      padding-top: 40px;
+      padding-top: 24px;
     }
     .proposal-content-left {
     }
@@ -215,6 +220,7 @@ $discussion-title-font-size: 1.45rem;
       flex: 1;
       overflow-x: auto;
       margin-left: $discussion-comment-padding;
+      margin-bottom: 40px;
       @include xs-max {
         margin-left: $discussion-comment-padding-mobile;
       }
@@ -436,6 +442,12 @@ $discussion-title-font-size: 1.45rem;
 
   .ConnectProposalButtonWrapper {
     margin-top: 10px;
+  }
+
+  .right-content-container {
+    display: flex;
+    flex-direction: column;
+    padding: 24px 24px 24px 0;
   }
 
   .ProposalHeaderOffchainPoll,

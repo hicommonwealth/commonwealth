@@ -212,8 +212,7 @@
   max-width: 2400px;
 
   .join-button-wrapper {
-    position: absolute;
-    margin-top: 180px;
+    // margin-top: 180px;
 
     @include mobile-max {
       font-size: 12px;

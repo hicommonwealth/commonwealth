@@ -38,7 +38,6 @@
       width: 100%;
 
       .inner-body {
-        display: flex;
         flex: 1;
       }
     }
@@ -75,7 +74,7 @@
   // should be assessed site-wide. This is merely a hot fix for
   // comment threading.
   &.ViewProposalPage {
-    .sublayout-right-col {
+    .right-content-container {
       @include xs-max {
         display: none;
       }
