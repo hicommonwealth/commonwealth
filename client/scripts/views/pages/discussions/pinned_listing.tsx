@@ -12,7 +12,7 @@ type IPinnedListingAttrs = {
 
 export const getLastUpdate = (proposal) => {
   const lastComment = Number(app.comments.lastCommented(proposal));
-  const createdAt = Number(proposal.createdAt.utc());
+  const createdAt = Number(proposal.createdAt.utc()) / 1000;
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
 };

@@ -215,7 +215,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
 
     if (unpinnedThreads.length > 0) {
       let visitMarkerPlaced = false;
-      this.lookback[subpage] = moment(
+      this.lookback[subpage] = moment.unix(
         getLastUpdate(unpinnedThreads[unpinnedThreads.length - 1])
       );
 
