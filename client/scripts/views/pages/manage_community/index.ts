@@ -176,7 +176,10 @@ const ManageCommunityPage: m.Component<
                 webhooks: vnode.state.webhooks,
               }),
           ]),
-          app.user.isSiteAdmin && deleteChainButton(app.config.chains.getById(app.activeChainId())),
+          app.user.isSiteAdmin
+            && m(deleteChainButton, {
+              chain: app.config.chains.getById(app.activeChainId())
+            }),
         ]),
       ]
     );
