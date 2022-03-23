@@ -116,6 +116,7 @@ import { getStatsDInstance } from './util/metrics';
 import updateAddress from './routes/updateAddress';
 import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
+import ipfsPin from './routes/ipfsPin';
 
 function setupRouter(
   app: Express,
@@ -146,7 +147,11 @@ function setupRouter(
   );
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
-
+  router.post(
+    '/ipfsPin',
+    passport.authenticate('jwt', { session: false }),
+    ipfsPin.bind(this, models)
+  );
   router.post(
     '/editSubstrateSpec',
     passport.authenticate('jwt', { session: false }),

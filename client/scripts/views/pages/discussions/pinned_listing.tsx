@@ -10,9 +10,9 @@ type IPinnedListingAttrs = {
   proposals: OffchainThread[];
 };
 
-export const getLastUpdate = (proposal) => {
-  const lastComment = Number(app.comments.lastCommented(proposal));
-  const createdAt = Number(proposal.createdAt.utc());
+export const getLastUpdate = (proposal: OffchainThread) => {
+  const lastComment = proposal.lastCommentedOn?.unix() || 0;
+  const createdAt = proposal.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
 };
