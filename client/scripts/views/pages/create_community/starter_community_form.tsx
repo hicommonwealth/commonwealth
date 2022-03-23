@@ -110,12 +110,14 @@ export class StarterCommunityForm implements m.ClassComponent {
                 break;
               }
             }
+            const { iconUrl } = this.state.form;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 jwt: app.user.jwt,
                 address: '',
                 type: ChainType.Offchain,
                 network: baseToNetwork(this.state.form.base),
+                icon_url: iconUrl,
                 ...this.state.form,
                 ...additionalArgs,
               });
