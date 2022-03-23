@@ -22,25 +22,29 @@ const sortAdminsAndModsFirst = (a, b) => {
   return a.Address.address.localeCompare(b.Address.address);
 };
 
-const deleteChainButton = (chain: ChainInfo) => {
-  return m(CWButton, {
-    label: 'DELETE CHAIN',
-    onclick: (e) => {
-      $.post(`${app.serverUrl()}/deleteChain`, {
-        id: chain.id,
-        auth: true,
-        jwt: app.user.jwt,
-      }).then((result) => {
-        if (result.status !== 'Success') return;
-        app.config.chains.remove(chain);
-        notifySuccess('Deleted chain!');
-        m.route.set('/');
-        // redirect to /
-      }, (err) => {
-        notifyError('Failed to delete chain!');
-      });
-    }
-  });
+const deleteChainButton: m.Component<{chain: ChainInfo}> = {
+  view: (vnode) => {
+    const { chain } = vnode.attrs;
+    return m(CWButton, {
+      buttonType: 'primary',
+      label: 'DELETE CHAIN',
+      onclick: async (e) => {
+        $.post(`${app.serverUrl()}/deleteChain`, {
+          id: chain.id,
+          auth: true,
+          jwt: app.user.jwt,
+        }).then((result) => {
+          if (result.status !== 'Success') return;
+          app.config.chains.remove(chain);
+          notifySuccess('Deleted chain!');
+          m.route.set('/');
+          // redirect to /
+        }, (err) => {
+          notifyError('Failed to delete chain!');
+        });
+      },
+    });
+  }
 }
 
 const ManageCommunityPage: m.Component<
