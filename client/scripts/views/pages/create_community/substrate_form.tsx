@@ -110,7 +110,7 @@ export class SubstrateForm implements m.ClassComponent {
           buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
-            const { name, nodeUrl, iconUrl, substrateSpec } = this.state.form;
+            const { name, nodeUrl, icon_url, substrateSpec } = this.state.form;
             try {
               JSON.parse(substrateSpec);
             } catch (err) {
@@ -120,7 +120,7 @@ export class SubstrateForm implements m.ClassComponent {
             this.state.saving = true;
             $.post(`${app.serverUrl()}/addChainNode`, {
               base: ChainBase.Substrate,
-              icon_url: iconUrl,
+              icon_url,
               id: slugify(name),
               jwt: app.user.jwt,
               network: slugify(name),

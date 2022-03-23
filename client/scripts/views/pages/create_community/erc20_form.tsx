@@ -81,9 +81,9 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             this.state.form.id = res.token.id && slugify(res.token.id);
             this.state.form.symbol = res.token.symbol || '';
             this.state.form.decimals = +res.token.decimals || 18;
-            this.state.form.iconUrl = res.token.icon_url || '';
-            if (this.state.form.iconUrl.startsWith('/')) {
-              this.state.form.iconUrl = `https://commonwealth.im${this.state.form.iconUrl}`;
+            this.state.form.icon_url = res.token.icon_url || '';
+            if (this.state.form.icon_url.startsWith('/')) {
+              this.state.form.icon_url = `https://commonwealth.im${this.state.form.icon_url}`;
             }
             this.state.form.description = res.token.description || '';
             this.state.form.website = res.token.website || '';
@@ -117,7 +117,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
               this.state.form.decimals = 18;
               this.state.status = 'Verified token but could not load metadata.';
             }
-            this.state.form.iconUrl = '';
+            this.state.form.icon_url = '';
             this.state.form.description = '';
             this.state.form.website = '';
             this.state.form.discord = '';

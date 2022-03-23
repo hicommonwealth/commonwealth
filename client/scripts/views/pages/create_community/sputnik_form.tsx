@@ -61,7 +61,7 @@ export class SputnikForm implements m.ClassComponent {
           buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
-            const { iconUrl, name } = this.state.form;
+            const { icon_url, name } = this.state.form;
 
             this.state.saving = true;
 
@@ -77,7 +77,7 @@ export class SputnikForm implements m.ClassComponent {
 
             const addChainNodeArgs = {
               base: ChainBase.NEAR,
-              icon_url: iconUrl,
+              icon_url,
               id,
               jwt: app.user.jwt,
               name: id,
