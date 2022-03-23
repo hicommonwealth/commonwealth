@@ -741,51 +741,6 @@ class ThreadsController {
     return !(threads.length < DEFAULT_PAGE_SIZE);
   }
 
-  public refreshAll(chainId: string, reset = false) {
-    // TODO: Change to GET /threads
-    return $.get(`${app.serverUrl()}/bulkThreads`, {
-      chain: chainId,
-    }).then(
-      (response) => {
-        if (response.status !== 'Success') {
-          throw new Error(`Unsuccessful refresh status: ${response.status}`);
-        }
-        if (reset) {
-          this._store.clear();
-        }
-        // Threads that are posted in an offchain community are still linked to a chain / author address,
-        // so when we want just chain threads, then we have to filter away those that have a community
-        const { threads, numVotingThreads } = response.result;
-        for (const thread of threads) {
-          // TODO: OffchainThreads should always have a linked Address
-          if (!thread.Address) {
-            console.error('OffchainThread missing address');
-          }
-          // TODO: check `response` against store and update store iff `response` is newer
-          const existing = this._store.getByIdentifier(thread.id);
-          if (existing) {
-            this._store.remove(existing);
-          }
-          try {
-            this._store.add(modelFromServer(thread));
-          } catch (e) {
-            console.error(e.message);
-          }
-        }
-        this.numVotingThreads = numVotingThreads;
-        this._initialized = true;
-      },
-      (err) => {
-        console.log('failed to load offchain discussions');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Error loading offchain discussions'
-        );
-      }
-    );
-  }
-
   public initialize(initialThreads: any[] = [], numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
