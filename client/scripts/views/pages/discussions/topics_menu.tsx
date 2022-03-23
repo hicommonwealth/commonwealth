@@ -113,8 +113,12 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
                       }}
                       label={
                         <div class="topic-item">
-                          {active && <Icon name={Icons.CHECK} />}
-                          <div class="topic-item-name">{name}</div>
+                          <div class="icon-and-item-name-container">
+                            {active && <Icon name={Icons.CHECK} />}
+                            <div class="topic-item-name" title={name}>
+                              {name}
+                            </div>
+                          </div>
                           {app.user?.isAdminOfEntity({
                             chain: app.activeChainId(),
                           }) && (

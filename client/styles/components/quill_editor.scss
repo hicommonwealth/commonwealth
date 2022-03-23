@@ -186,6 +186,7 @@
     display: flex;
     right: 100px;
     top: 6px;
+    margin-right: 8px;
     @include xs-max {
       top: 40px;
     }

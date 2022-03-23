@@ -174,7 +174,7 @@ const CouncilPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.council-container', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),
@@ -254,7 +254,7 @@ const CouncilPage: m.Component<{}> = {
           .filter(([account]) => !councillors.includes(account))
           .map(([account]) => m(Councillor, { account })),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

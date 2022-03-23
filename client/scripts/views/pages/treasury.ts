@@ -174,7 +174,7 @@ const TreasuryPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.treasury-container', [
         onSubstrate && m(SubstrateProposalStats),
         m('.clear'),
         m(Listing, {
@@ -187,7 +187,7 @@ const TreasuryPage: m.Component<{}> = {
           columnHeader: 'Inactive Treasury Proposals',
         }),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

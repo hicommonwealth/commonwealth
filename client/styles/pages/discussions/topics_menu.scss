@@ -24,8 +24,22 @@
           flex-direction: row;
           justify-content: space-between;
 
-          .cui-icon {
-            margin-right: 8px;
+          .icon-and-item-name-container {
+            align-items: center;
+            display: flex;
+            flex-direction: row;
+            min-width: 0;
+
+            .cui-icon {
+              margin-right: 8px;
+            }
+
+            .topic-item-name {
+              margin-right: 8px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
           }
 
           .edit-button {
@@ -33,13 +47,6 @@
             height: 24px;
             min-height: 24px;
             line-height: 24px;
-          }
-
-          .topic-item-name {
-            margin-right: 8px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
           }
         }
       }

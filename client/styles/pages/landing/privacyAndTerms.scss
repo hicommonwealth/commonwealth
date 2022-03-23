@@ -1,8 +1,19 @@
-.PrivacyPage, .TermsPage {
-    .forum-container {
-        padding: 10vh 20vw;
-    }
-    p {
-        margin: 7px 0;
-    }
+.PrivacyPage,
+.TermsPage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+
+  .forum-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    width: 736px;
+  }
+
+  p {
+    margin: 8px 0;
+  }
 }
