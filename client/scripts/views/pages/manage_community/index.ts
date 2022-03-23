@@ -5,10 +5,12 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { RoleInfo, RolePermission, Webhook } from 'models';
+import { ChainInfo, RoleInfo, RolePermission, Webhook } from 'models';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
@@ -19,6 +21,31 @@ const sortAdminsAndModsFirst = (a, b) => {
   if (b.permission === RolePermission.moderator) return 1;
   return a.Address.address.localeCompare(b.Address.address);
 };
+
+const deleteChainButton: m.Component<{chain: ChainInfo}> = {
+  view: (vnode) => {
+    const { chain } = vnode.attrs;
+    return m(CWButton, {
+      buttonType: 'primary',
+      label: 'DELETE CHAIN',
+      onclick: async (e) => {
+        $.post(`${app.serverUrl()}/deleteChain`, {
+          id: chain.id,
+          auth: true,
+          jwt: app.user.jwt,
+        }).then((result) => {
+          if (result.status !== 'Success') return;
+          app.config.chains.remove(chain);
+          notifySuccess('Deleted chain!');
+          m.route.set('/');
+          // redirect to /
+        }, (err) => {
+          notifyError('Failed to delete chain!');
+        });
+      },
+    });
+  }
+}
 
 const ManageCommunityPage: m.Component<
   {},
@@ -149,6 +176,10 @@ const ManageCommunityPage: m.Component<
                 webhooks: vnode.state.webhooks,
               }),
           ]),
+          app.user.isSiteAdmin
+            && m(deleteChainButton, {
+              chain: app.config.chains.getById(app.activeChainId())
+            }),
         ]),
       ]
     );
