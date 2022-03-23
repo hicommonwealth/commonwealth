@@ -290,6 +290,7 @@ $discussion-title-font-size: 1.45rem;
   .ProposalComment {
     position: relative;
     display: flex;
+    margin-bottom: 40px;
     .comment-body {
       flex: 1;
       overflow-x: auto;

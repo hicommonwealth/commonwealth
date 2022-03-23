@@ -83,6 +83,9 @@
 }
 
 .ProfilePage {
+  .profile-container {
+    padding: 24px;
+  }
   padding-bottom: 50px;
   .error-message {
     @include error-text();

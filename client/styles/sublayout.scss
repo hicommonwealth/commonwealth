@@ -43,33 +43,6 @@
     }
   }
 
-  &.Homepage {
-    .sublayout-main-col {
-      min-height: calc(100vh - 140px);
-      padding-bottom: 80px;
-      position: relative;
-
-      &.no-right-content {
-        max-width: 100%;
-        padding: 0;
-        width: 100%;
-      }
-
-      display: flex;
-    }
-
-    .sublayout-grid {
-      max-width: 100%;
-      min-height: calc(100vh - 150px);
-      padding: 0 0;
-      position: relative;
-
-      @include xs-max {
-        padding: 0 0;
-      }
-    }
-  }
-
   // TODO: Graham 22.03.04 Necessity & presence of right sidebar
   // should be assessed site-wide. This is merely a hot fix for
   // comment threading.

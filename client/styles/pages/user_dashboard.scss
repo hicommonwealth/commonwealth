@@ -1,28 +1,11 @@
 @import 'client/styles/shared';
-.Sublayout.UserDashboard {
-  .sublayout-sidebar-col {
-    padding-right: 0;
-    max-width: 0px;
-  }
-  .sublayout-main-col {
-    padding: 36px;
-    min-width: 100%;
-    max-width: calc(100% - 72px); // horizontal padding * 2
-  }
-  .sublayout-header-right,
-  .sublayout-header-left {
-    flex: 2;
-  }
-  .sublayout-header {
-    padding: 24px;
-  }
-}
 
 .UserDashboard {
   .dashboard-wrapper {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    padding: 24px;
   }
 
   .dashboard-header {
@@ -41,9 +24,6 @@
       margin-top: 10px;
     }
     margin-bottom: 10px;
-  }
-  .sublayout-main-col {
-    max-width: 100%;
   }
   .title {
     font-size: 32px;

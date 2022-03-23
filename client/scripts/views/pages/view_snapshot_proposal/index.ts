@@ -100,7 +100,12 @@ const ProposalContent: m.Component<
             m('.vote-row', [
               m('.user-column', [
                 m(User, {
-                  user: new AddressInfo(null, vote.voter, app.activeChainId(), null),
+                  user: new AddressInfo(
+                    null,
+                    vote.voter,
+                    app.activeChainId(),
+                    null
+                  ),
                   linkify: true,
                   popover: true,
                 }),
@@ -262,7 +267,7 @@ const ViewProposalPage: m.Component<
     totalScore: number;
     scores: number[];
     activeTab: string;
-    threads: Array<{id: string, title: string}> | null;
+    threads: Array<{ id: string; title: string }> | null;
   }
 > = {
   oninit: (vnode) => {
@@ -290,11 +295,11 @@ const ViewProposalPage: m.Component<
 
       try {
         app.threads
-        .fetchThreadIdsForSnapshot({ snapshot: vnode.state.proposal.id })
-        .then((res) => {
-          vnode.state.threads = res;
-          m.redraw();
-        });
+          .fetchThreadIdsForSnapshot({ snapshot: vnode.state.proposal.id })
+          .then((res) => {
+            vnode.state.threads = res;
+            m.redraw();
+          });
       } catch (e) {
         console.error(`Failed to fetch threads: ${e}`);
       }
@@ -337,7 +342,7 @@ const ViewProposalPage: m.Component<
       },
       !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
         ? m(Spinner, { fill: true, active: true, size: 'xl' })
-        : [
+        : m('.view-proposal-container', [
             // eslint-disable-next-line no-restricted-globals
             m('.back-button', { onclick: () => m.route.set(scope) }, [
               m('img', {
@@ -444,11 +449,11 @@ const ViewProposalPage: m.Component<
                   threads !== null &&
                     m('.linked-discussion', [
                       m('.heading-2', 'Linked Discussions'),
-                      threads.map((thread) => 
+                      threads.map((thread) =>
                         m(ProposalHeaderSnapshotThreadLink, {
-                          thread
-                        }),
-                      )
+                          thread,
+                        })
+                      ),
                     ]),
                 ]),
                 isActive &&
@@ -473,7 +478,7 @@ const ViewProposalPage: m.Component<
                 ]),
               ]),
             ]),
-          ]
+          ])
     );
   },
 };

@@ -250,27 +250,12 @@ $text-size-mobile-header: 22px;
 }
 
 @mixin narrowBrowserHeader {
-  .sublayout-header-right {
-    > .cui-button > .cui-button-label > .User {
-      .user-display-name {
-        display: none;
-      }
+  .NewProposalButton {
+    .cui-button {
+      padding: 0 10px;
 
-      .user-avatar {
-        margin: 0px;
-        margin-right: 0px;
-        position: relative;
+      .cui-button-label {
         top: 2px;
-      }
-    }
-
-    .NewProposalButton {
-      .cui-button {
-        padding: 0 10px;
-
-        .cui-button-label {
-          top: 2px;
-        }
       }
     }
   }
@@ -285,10 +270,6 @@ $text-size-mobile-header: 22px;
 
   .cui-button-label .cui-icon-user {
     margin-right: 0;
-  }
-
-  .hiringBtn {
-    display: none;
   }
 }
 

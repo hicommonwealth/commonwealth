@@ -21,7 +21,7 @@ export class PageLoading implements m.ClassComponent<PageLoadingAttrs> {
         showNewProposalButton={showNewProposalButton}
         hideSearch={true}
       >
-        <Spinner fill={true} message={message} size="xl" style="flex: 1;" />
+        <Spinner fill={true} message={message} size="xl" />
       </Sublayout>
     );
   }

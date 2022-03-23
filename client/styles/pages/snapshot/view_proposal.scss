@@ -12,10 +12,15 @@
 }
 
 .SnapshotViewProposalPage {
+  .view-proposal-container {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+  }
   .proposal-body {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
-    overflow: hidden;
 
     .proposal-content {
       max-width: 100%;
@@ -253,7 +258,6 @@
   }
 
   .back-button {
-    margin-top: 40px;
     color: #999999;
     display: flex;
     align-items: flex-start;
