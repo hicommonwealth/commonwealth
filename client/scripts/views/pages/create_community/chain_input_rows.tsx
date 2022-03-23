@@ -18,7 +18,7 @@ export const initChainForm = (): ChainFormDefaultFields => {
     discord: '',
     element: '',
     github: '',
-    iconUrl: '',
+    icon_url: '',
     telegram: '',
     uploadInProgress: false,
     website: '',
@@ -51,7 +51,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
           files.forEach((f) => {
             if (!f.uploadURL) return;
             const url = f.uploadURL.replace(/\?.*/, '');
-            state.iconUrl = url;
+            state.icon_url = url;
           });
           state.uploadInProgress = false;
           m.redraw();
@@ -61,10 +61,10 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <InputRow
       title="Icon URL"
       disabled={disabled}
-      defaultValue={state.iconUrl}
+      defaultValue={state.icon_url}
       placeholder="https://"
       onChangeHandler={(v) => {
-        state.iconUrl = v;
+        state.icon_url = v;
       }}
     />,
     <InputRow

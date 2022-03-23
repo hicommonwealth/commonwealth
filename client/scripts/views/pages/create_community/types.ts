@@ -9,7 +9,7 @@ export type ChainFormDefaultFields = {
   discord: string;
   element: string;
   github: string;
-  iconUrl: string;
+  icon_url: string;
   telegram: string;
   uploadInProgress: boolean;
   website: string;
