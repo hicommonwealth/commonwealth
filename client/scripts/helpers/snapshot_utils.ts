@@ -241,28 +241,36 @@ export async function getResults(
     const strategies = proposal.strategies ?? space.strategies;
 
     if (proposal.state !== 'pending') {
-      try {
-        const scores = await snapshot.utils.getScores(
-          space.id,
-          strategies,
-          space.network,
-          votes.map((vote) => vote.voter),
-          parseInt(proposal.snapshot, 10)
-          // provider,
-        );
-        votes = votes
-          .map((vote: any) => {
-            vote.scores = strategies.map(
-              (strategy, i) => scores[i][vote.voter] || 0
-            );
-            vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
-            return vote;
-          })
-          .sort((a, b) => b.balance - a.balance)
-          .filter((vote) => vote.balance > 0);
-      } catch (e) {
-        console.log(e);
-        notifyError('Snapshot.js API failed to return the results.');
+      let attempts = 0;
+      while (attempts <= 3) {
+        try {
+          const scores = await snapshot.utils.getScores(
+            space.id,
+            strategies,
+            space.network,
+            votes.map((vote) => vote.voter),
+            parseInt(proposal.snapshot, 10)
+            // provider,
+          );
+          votes = votes
+            .map((vote: any) => {
+              vote.scores = strategies.map(
+                (strategy, i) => scores[i][vote.voter] || 0
+              );
+              vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
+              return vote;
+            })
+            .sort((a, b) => b.balance - a.balance)
+            .filter((vote) => vote.balance > 0);
+          break;
+        } catch (e) {
+          if (attempts == 3) {
+            console.log(e);
+            notifyError('Snapshot.js API failed to return the results.');
+          }
+        } finally {
+          attempts += 1;
+        }
       }
     }
 
