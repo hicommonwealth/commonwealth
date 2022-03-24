@@ -71,14 +71,16 @@ export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
                   localStorage.setItem('discussion-summary-toggle', 'false');
                   navigateToSubpage(`/?stage=${targetStage}`);
                 }}
-                label={[
-                  `${offchainThreadStageToLabel(targetStage)}`,
-                  targetStage === OffchainThreadStage.Voting && (
-                    <div class="discussions-stage-count">
-                      {app.threads.numVotingThreads}
-                    </div>
-                  ),
-                ]}
+                label={
+                  <div class="stages-item">
+                    {offchainThreadStageToLabel(targetStage)}
+                    {targetStage === OffchainThreadStage.Voting && (
+                      <div class="discussions-stage-count">
+                        {app.threads.numVotingThreads}
+                      </div>
+                    )}
+                  </div>
+                }
               />
             ))}
           </div>

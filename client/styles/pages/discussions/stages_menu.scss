@@ -10,27 +10,30 @@
       margin: 0;
     }
 
-    .cui-button {
-      height: 32px;
-      min-height: 32px;
-      line-height: 32px;
+    .stages-item {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
 
-      .cui-icon {
-        margin-right: 8px;
+      .cui-button {
+        height: 32px;
+        min-height: 32px;
+        line-height: 32px;
+
+        .cui-icon {
+          margin-right: 8px;
+        }
       }
 
       .discussions-stage-count {
         background: $primary-bg-color;
-        border-radius: 9999px;
+        border-radius: 50%;
         color: #fff;
-        display: inline-block;
         font-size: 15px;
         font-weight: 500;
-        height: 19px;
-        left: 2px;
-        margin: -2px 0 -2px 2px;
-        padding: 3px 5px 0;
-        position: relative;
+        line-height: 16px;
+        padding: 4px 6px 5px;
       }
     }
   }
