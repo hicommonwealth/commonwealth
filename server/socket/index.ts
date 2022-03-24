@@ -15,7 +15,6 @@ import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 import { JWT_SECRET, REDIS_URL } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import {createChatNamespace} from "./chatNs";
-import {DB} from "../database";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -41,7 +40,7 @@ export const authenticate = (
   }
 };
 
-export function setupWebSocketServer(httpServer: http.Server, models: DB) {
+export function setupWebSocketServer(httpServer: http.Server) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
   const io = new Server(httpServer, {
@@ -86,7 +85,7 @@ export function setupWebSocketServer(httpServer: http.Server, models: DB) {
     .finally(() => {
       // create the chain-events namespace
       const ceNamespace = createCeNamespace(io);
-      const chatNamespace = createChatNamespace(io, models);
+      const chatNamespace = createChatNamespace(io);
 
       try {
         const rabbitController = new RabbitMQController(

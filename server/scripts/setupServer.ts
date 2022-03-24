@@ -12,7 +12,7 @@ const setupServer = (app: Express, models: DB) => {
   const port = process.env.PORT || DEFAULT_PORT;
   app.set('port', port);
   const server = http.createServer(app);
-  setupWebSocketServer(server, null);
+  setupWebSocketServer(server);
 
   const onError = (error) => {
     if (error.syscall !== 'listen') {

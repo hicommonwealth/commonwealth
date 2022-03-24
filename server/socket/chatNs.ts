@@ -7,11 +7,10 @@ import {
     WebsocketNamespaces,
 } from '../../shared/types';
 import {authenticate} from './index';
-import {DB} from '../database';
 
 const log = factory.getLogger(addPrefix(__filename));
 
-export function createChatNamespace(io: Server, models: DB) {
+export function createChatNamespace(io: Server) {
     const ChatNs = io.of(`/${WebsocketNamespaces.Chat}`);
     io.use(authenticate)
 
