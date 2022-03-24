@@ -7,6 +7,7 @@ import {
     WebsocketNamespaces,
 } from '../../shared/types';
 import {authenticate} from './index';
+import fs from "fs";
 
 const log = factory.getLogger(addPrefix(__filename));
 
@@ -50,11 +51,18 @@ export function createChatNamespace(io: Server, pool) {
             //         socket.emit('Error', e)
             //     })
             const client = await pool.connect();
-            const res = await client.query(`INSERT INTO "ChatMessages" (address, message, chat_channel_id, created_at, updated_at)
-                                            VALUES (${address}, ${message}, ${chat_channel_id}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`);
-            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>", res);
-            ChatNs.to(`${socket_room}`).emit(WebsocketMessageNames.ChatMessage, {
-                id: res.id, address: res.address, message: res.message, chat_channel_id: res.chat_channel_id, created_at: res.created_at })
+            // fs.appendFileSync("tim_log.txt", `${address}\n`);
+
+            try {
+                const res = await client.query(`INSERT INTO commonwealth.public."ChatMessages" (address, message, chat_channel_id, created_at, updated_at)
+                                            VALUES ('0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE', 'hello', 209, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`);
+                // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>", res);
+                // log.info(`>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${res}`);
+                // ChatNs.to(`${socket_room}`).emit(WebsocketMessageNames.ChatMessage, {
+                //     id: res.id, address: res.address, message: res.message, chat_channel_id: res.chat_channel_id, created_at: res.created_at })
+            } catch (e) {
+                // fs.appendFileSync("tim_log.txt", `${e}\n`);
+            }
         })
     })
 
