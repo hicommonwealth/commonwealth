@@ -322,7 +322,7 @@ export async function getPower(
 }
 
 export async function loadMultipleSpacesData(snapshot_spaces: string[]) {
-  const spaces_data: Array<{
+  const spacesData: Array<{
     space: SnapshotSpace;
     proposals: SnapshotProposal[];
   }> = [];
@@ -331,11 +331,11 @@ export async function loadMultipleSpacesData(snapshot_spaces: string[]) {
     try {
       const proposals = await getProposals(spaceId);
       const space = await getSpace(spaceId);
-      spaces_data.push({ space, proposals });
+      spacesData.push({ space, proposals });
     } catch (e) {
       console.error(`Failed to initialize snapshot: ${spaceId}.`);
     }
   }
 
-  return spaces_data;
+  return spacesData;
 }
