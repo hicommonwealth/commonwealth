@@ -130,18 +130,18 @@
       }
 
       .card-description {
-        margin: 0;
-        max-height: 3.75em;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        word-wrap: normal;
-        width: 150px;
-        color: #999999;
-        font-weight: normal;
-        font-size: 16px;
-        -webkit-hyphens: auto;
         -ms-hyphens: auto;
+        -webkit-box-orient: vertical;
+        -webkit-hyphens: auto;
+        -webkit-line-clamp: 3;
+        color: #999999;
+        display: -webkit-box;
+        font-size: 16px;
+        font-weight: normal;
         hyphens: auto;
+        margin: 0;
+        overflow: hidden;
+        width: 150px;
 
         @include mobile-max {
           font-size: 14px;
