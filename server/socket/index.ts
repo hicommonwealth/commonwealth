@@ -12,9 +12,10 @@ import { createClient } from 'redis';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import { JWT_SECRET, REDIS_URL } from '../config';
+import { DATABASE_URI, JWT_SECRET, REDIS_URL } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import {createChatNamespace} from "./chatNs";
+import { Pool } from 'pg';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -83,9 +84,11 @@ export function setupWebSocketServer(httpServer: http.Server) {
       io.adapter(<any>createAdapter(pubClient, subClient));
     })
     .finally(() => {
+      const pool = new Pool({ connectionString: DATABASE_URI })
+
       // create the chain-events namespace
       const ceNamespace = createCeNamespace(io);
-      const chatNamespace = createChatNamespace(io);
+      const chatNamespace = createChatNamespace(io, pool);
 
       try {
         const rabbitController = new RabbitMQController(

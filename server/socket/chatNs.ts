@@ -10,7 +10,7 @@ import {authenticate} from './index';
 
 const log = factory.getLogger(addPrefix(__filename));
 
-export function createChatNamespace(io: Server) {
+export function createChatNamespace(io: Server, pool) {
     const ChatNs = io.of(`/${WebsocketNamespaces.Chat}`);
     io.use(authenticate)
 
@@ -35,9 +35,10 @@ export function createChatNamespace(io: Server) {
             }
         })
 
-        socket.on(WebsocketMessageNames.ChatMessage, (_message) => {
+        socket.on(WebsocketMessageNames.ChatMessage, async (_message) => {
             const { message, address, chat_channel_id, now, socket_room } = _message
             const now_date = moment(now).toDate()
+            // TODO: could not await the models be causing the high number of connections?
             // models.ChatMessage.create({ address, message, chat_channel_id, created_at: now_date, updated_at: now_date })
             //     .then((res) => {
             //         const { id, created_at } = res
@@ -48,6 +49,12 @@ export function createChatNamespace(io: Server) {
             //     .catch((e) => {
             //         socket.emit('Error', e)
             //     })
+            const client = await pool.connect();
+            const res = await client.query(`INSERT INTO "ChatMessages" (address, message, chat_channel_id, created_at, updated_at)
+                                            VALUES (${address}, ${message}, ${chat_channel_id}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`);
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>", res);
+            ChatNs.to(`${socket_room}`).emit(WebsocketMessageNames.ChatMessage, {
+                id: res.id, address: res.address, message: res.message, chat_channel_id: res.chat_channel_id, created_at: res.created_at })
         })
     })
 
