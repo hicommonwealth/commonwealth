@@ -21,13 +21,11 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    width: 100%;
 
     .proposal-content {
-      max-width: 100%;
-
-      @media (min-width: 1024px) {
-        width: 60%;
-      }
+      width: 100%;
+      margin-right: 40px;
 
       .snapshot-proposal-title {
         margin-top: 24px;
@@ -118,7 +116,9 @@
     }
 
     .proposal-info {
-      max-width: 100%;
+      .proposal-info-box {
+        width: 336px;
+      }
 
       .proposal-info-box,
       .VoteAction {
@@ -135,10 +135,6 @@
         button {
           margin: 0 20px;
         }
-      }
-
-      @media (min-width: 1024px) {
-        width: 30%;
       }
 
       .title {
