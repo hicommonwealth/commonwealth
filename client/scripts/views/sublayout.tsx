@@ -9,7 +9,7 @@ import app from 'state';
 import { ITokenAdapter } from 'models';
 import { handleEmailInvites } from 'views/components/header/invites_menu';
 import Sidebar from 'views/components/sidebar';
-import MobileHeader from 'views/mobile/mobile_header';
+import { MobileHeader } from 'views/mobile/mobile_header';
 import { FooterLandingPage } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './components/sublayout_header_left';
@@ -48,7 +48,7 @@ const footercontents = [
   { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
   {
     text: 'Discord',
-    externalLink: 'https://discord.gg/vYcfQ758',
+    externalLink: 'https://discord.gg/t9XscHdZrG',
   },
   {
     text: 'Telegram',
@@ -113,7 +113,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           <div class="token-banner-terms">
             <span>Please read the </span>
             <a href={terms}>terms and conditions</a>
-            <span> before interacting with this community.</span>
+            <span> before interacting with this community. </span>
             <span
               class="close-button"
               onclick={() => {
@@ -159,7 +159,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     return (
       <div class="layout-container">
         <div class={`Sublayout ${vnode.attrs.class}`}>
-          {m(MobileHeader)}
+          <MobileHeader />
           <div
             class={`sublayout-header ${isUndefined(title) ? 'no-title' : ''}`}
           >

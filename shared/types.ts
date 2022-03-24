@@ -135,7 +135,7 @@ export interface InviteCodeAttributes {
 
 export interface IPostNotificationData {
   created_at: any;
-  root_id: string;
+  root_id: number | string;
   root_title: string;
   root_type: string;
   comment_id?: number;

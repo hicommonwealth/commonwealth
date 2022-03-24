@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
-import { Button, List, ListItem, Spinner } from 'construct-ui';
+import { Button, List, ListItem } from 'construct-ui';
 
 import app from 'state';
 
@@ -17,9 +17,8 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
-import LinkedThreadModal from '../../modals/linked_thread_modal';
+import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
-import Sublayout from '../../sublayout';
 
 export const ProposalSidebarLinkedChainEntity: m.Component<{
   proposal: OffchainThread;
@@ -150,6 +149,7 @@ export const ProposalLinkedThreadsEditorModule: m.Component<
   view: (vnode) => {
     const { allowLinking, proposalId } = vnode.attrs;
     const proposal = app.threads.getById(proposalId);
+    if (!proposal) return;
     if (!vnode.state.linkedThreads) {
       vnode.state.linkedThreads = [];
     }
@@ -175,7 +175,6 @@ export const ProposalLinkedThreadsEditorModule: m.Component<
         });
       return null;
     }
-    console.log(vnode.state.linkedThreads);
     if (allowLinking || proposal.linkedThreads.length) {
       return m('.ProposalLinkedThreadsEditorModule', [
         !!vnode.state.linkedThreads?.length &&

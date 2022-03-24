@@ -3,13 +3,12 @@ import 'pages/proposals.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Button, Grid, Col, List, Tag } from 'construct-ui';
-import moment from 'moment';
+import { Button, Tag } from 'construct-ui';
 import BN from 'bn.js';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainNetwork } from 'types';
 import { ProposalModule } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
@@ -19,13 +18,11 @@ import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
-import LoadingRow from 'views/components/loading_row';
+import { PageLoading } from 'views/pages/loading';
 import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 
-import NewProposalPage from 'views/pages/new_proposal/index';
 import { PageNotFound } from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';

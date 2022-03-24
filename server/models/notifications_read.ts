@@ -6,7 +6,7 @@ import { NotificationAttributes } from './notification';
 
 export type NotificationsReadAttributes = {
 	subscription_id: number;
-	notification_id: string;
+	notification_id: number;
 	is_read: boolean;
 	Subscription?: SubscriptionAttributes;
 	Notification?: NotificationAttributes;

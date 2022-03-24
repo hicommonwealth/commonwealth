@@ -3,7 +3,6 @@ import 'pages/search.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import _, { capitalize } from 'lodash';
 import {
   ControlGroup,
   Icon,
@@ -16,6 +15,7 @@ import {
   Size,
   Tag,
 } from 'construct-ui';
+
 import app from 'state';
 import { getProposalUrlPath } from 'identifiers';
 import { ProposalType } from 'types';
@@ -29,9 +29,8 @@ import QuillFormattedText from './quill_formatted_text';
 import { CommunityLabel } from './sidebar/community_selector';
 import User, { UserBlock } from './widgets/user';
 import { ChainIcon } from './chain_icon';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
-export const getMemberPreview = (
+const getMemberPreview = (
   addr,
   closeResultsFn,
   searchTerm,
@@ -71,7 +70,7 @@ export const getMemberPreview = (
   });
 };
 
-export const getCommunityPreview = (
+const getCommunityPreview = (
   community,
   closeResultsFn,
   tabIndex,
@@ -108,7 +107,7 @@ export const getCommunityPreview = (
   });
 };
 
-export const getDiscussionPreview = (
+const getDiscussionPreview = (
   thread,
   closeResultsFn,
   searchTerm,
@@ -123,7 +122,12 @@ export const getDiscussionPreview = (
       return;
     }
 
-    const path = getProposalUrlPath(ProposalType.OffchainThread, proposalId, false, chainOrComm);
+    const path = getProposalUrlPath(
+      ProposalType.OffchainThread,
+      proposalId,
+      false,
+      chainOrComm
+    );
     m.route.set(path);
     closeResultsFn();
   };
@@ -176,7 +180,7 @@ export const getDiscussionPreview = (
   });
 };
 
-export const getCommentPreview = (
+const getCommentPreview = (
   comment,
   closeResultsFn,
   searchTerm,
@@ -411,7 +415,7 @@ export const search = async (searchQuery: SearchQuery, state) => {
   m.redraw();
 };
 
-export const executeSearch = (query: SearchQuery) => {
+const executeSearch = (query: SearchQuery) => {
   if (!query.searchTerm || !query.searchTerm.toString().trim()) {
     notifyError('Enter a valid search term');
     return;
@@ -696,5 +700,3 @@ export const SearchBar: m.Component<
     );
   },
 };
-
-export default SearchBar;

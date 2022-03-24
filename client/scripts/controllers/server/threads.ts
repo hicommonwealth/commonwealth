@@ -15,14 +15,16 @@ import {
   OffchainTopic,
   Profile,
   ChainEntity,
+  NotificationSubscription,
 } from 'models';
+import { NotificationCategories } from 'types';
+
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { LinkedThreadAttributes } from 'server/models/linked_thread';
-
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
@@ -209,12 +211,16 @@ export interface VersionHistory {
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
   private _listingStore = new FilterScopedThreadStore();
+  private _summaryStore = new ProposalStore<OffchainThread>();
 
   public get store() {
     return this._store;
   }
   public get listingStore() {
     return this._listingStore;
+  }
+  public get summaryStore() {
+    return this._summaryStore;
   }
 
   private _initialized = false;
@@ -284,6 +290,21 @@ class ThreadsController {
       this._listingStore.add(result, storeOptions);
       const activeEntity = app.chain;
       updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
+
+      // synthesize new subscription rather than hitting backend
+      const subscriptionJSON = {
+        id: null,
+        category_id: NotificationCategories.NewComment,
+        object_id: `discussion_${result.id}`,
+        is_active: true,
+        created_at: Date.now(),
+        immediate_email: false,
+        chain_id: result.chain,
+        offchain_thread_id: result.id,
+      };
+      app.user.notifications.subscriptions.push(
+        NotificationSubscription.fromJSON(subscriptionJSON)
+      );
       return result;
     } catch (err) {
       console.log('Failed to create thread');
@@ -350,6 +371,7 @@ class ThreadsController {
       $.post(`${app.serverUrl()}/deleteThread`, {
         jwt: app.user.jwt,
         thread_id: proposal.id,
+        chain_id: app.activeChainId(),
       })
         .then((result) => {
           // Deleted posts are removed from all stores containing them
@@ -717,51 +739,6 @@ class ThreadsController {
     // it should continue calling the loadNextPage fn on scroll, or else notify the user that all
     // relevant listing threads have been exhausted.
     return !(threads.length < DEFAULT_PAGE_SIZE);
-  }
-
-  public refreshAll(chainId: string, reset = false) {
-    // TODO: Change to GET /threads
-    return $.get(`${app.serverUrl()}/bulkThreads`, {
-      chain: chainId,
-    }).then(
-      (response) => {
-        if (response.status !== 'Success') {
-          throw new Error(`Unsuccessful refresh status: ${response.status}`);
-        }
-        if (reset) {
-          this._store.clear();
-        }
-        // Threads that are posted in an offchain community are still linked to a chain / author address,
-        // so when we want just chain threads, then we have to filter away those that have a community
-        const { threads, numVotingThreads } = response.result;
-        for (const thread of threads) {
-          // TODO: OffchainThreads should always have a linked Address
-          if (!thread.Address) {
-            console.error('OffchainThread missing address');
-          }
-          // TODO: check `response` against store and update store iff `response` is newer
-          const existing = this._store.getByIdentifier(thread.id);
-          if (existing) {
-            this._store.remove(existing);
-          }
-          try {
-            this._store.add(modelFromServer(thread));
-          } catch (e) {
-            console.error(e.message);
-          }
-        }
-        this.numVotingThreads = numVotingThreads;
-        this._initialized = true;
-      },
-      (err) => {
-        console.log('failed to load offchain discussions');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Error loading offchain discussions'
-        );
-      }
-    );
   }
 
   public initialize(initialThreads: any[] = [], numVotingThreads, reset) {
