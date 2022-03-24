@@ -65,7 +65,7 @@ export default class WebWalletController {
       new TerraStationWebWalletController(),
       new InjectiveWebWalletController(),
       new PhantomWebWalletController(),
-      new RoninWebWalletController(),
+      // new RoninWebWalletController(),
     ];
   }
 }
