@@ -14,6 +14,7 @@
     align-items: center;
     justify-content: center;
     padding: 0;
+
     .label {
       margin-top: 5px;
       font-size: 12px;
@@ -42,8 +43,6 @@
     }
 
     .card-header {
-      padding-top: 10px;
-
       .chain-icon {
         width: 100px;
         height: 100px;
@@ -63,6 +62,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+
         span {
           color: $text-color-white;
           text-align: center;
@@ -71,25 +71,31 @@
           position: relative;
           top: 0.19em;
         }
+
         @include mobile-max {
           width: 40px;
           height: 40px;
         }
       }
     }
+
     .card-body {
-      width: 200px;
+      align-items: center;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      height: 200px;
+      justify-content: space-between;
+      width: 200px;
+      margin-top: auto;
+      min-width: 0;
+
       @include mobile-max {
         width: 100px;
       }
+
       .community-name {
         font-size: 30px;
         font-weight: 600;
-        margin-top: 22px;
-        margin-bottom: 8px;
         text-align: center;
         width: 190px;
         max-height: 2.5em;
@@ -106,19 +112,23 @@
           margin-top: 10px;
           margin-bottom: 1px;
         }
+
         .cui-icon {
           position: relative;
           top: -2px;
+
           &::before {
             content: ' ';
             width: 4px;
           }
         }
       }
+
       .chain-new {
         margin: -4px 0;
         margin-right: -8px;
       }
+
       .card-description {
         margin: 0;
         max-height: 3.75em;
@@ -132,16 +142,19 @@
         -webkit-hyphens: auto;
         -ms-hyphens: auto;
         hyphens: auto;
+
         @include mobile-max {
           font-size: 14px;
           width: 110px;
           text-align: center;
         }
       }
+
       .recent-activity {
         margin-top: 12px;
         color: $text-color-light;
         height: 24px;
+
         .recent-threads {
           margin-bottom: 4px;
         }
@@ -152,6 +165,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+
       h3 {
         flex: 1;
         font-size: 25px;
@@ -167,6 +181,7 @@
         width: 180px;
         margin-top: 20px;
         margin-bottom: 30px;
+
         @include mobile-max {
           font-size: 20px;
           font-weight: 600;
@@ -174,17 +189,21 @@
           margin-bottom: 10px;
         }
       }
+
       .spacer {
         height: 30px;
+
         @include mobile-max {
           height: 10px;
         }
       }
+
       p.action {
         text-align: center;
         width: 180px;
         font-size: 18px;
         margin-bottom: 30px;
+
         @include mobile-max {
           font-size: 14px;
           width: 110px;
@@ -219,12 +238,15 @@
       margin-top: 120px;
     }
   }
+
   .ChainIcon {
     margin-bottom: 10px;
   }
+
   .CommunityIcon {
     margin-bottom: 10px;
   }
+
   .communities-number {
     color: #333333;
     margin-left: 10px;
@@ -232,6 +254,7 @@
     font-weight: 500;
     margin-bottom: 10px;
   }
+
   h4 {
     margin-left: 10px;
   }
