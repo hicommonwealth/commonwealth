@@ -6,12 +6,23 @@
   @include sm-max {
     display: flex;
     left: 0;
-    padding: 10px;
+    padding: 8px 16px;
     position: fixed;
+    height: 88px;
     top: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     width: 100%;
     z-index: 99;
+    flex-direction: row;
+    align-items: center;
+
+    .mobile-popover-trigger {
+      border: none;
+      box-shadow: none;
+    }
   }
 
   * {
@@ -38,6 +49,12 @@
     &.logged-in.no-community {
       max-width: calc(100% - 142px);
     }
+  }
+
+  .mobile-header-right {
+    display: flex;
+    height: 100%;
+    align-items: center;
   }
 
   // TODO: split this up so CSS classes aren't duplicated
@@ -67,38 +84,14 @@
       display: inline-block;
     }
 
-    > .cui-button,
-    > .MobileNewProposalButton,
-    > .community-label,
-    > .LoginSelector {
-      margin-left: 5px;
-    }
-
     > .cui-button {
-      &.no-border {
-        border: none;
-      }
-
       .cui-button-label {
-        display: inline-block;
-        position: relative;
-        top: 1px;
+        display: flex;
 
         .CustomHamburgerIcon {
           position: relative;
           right: 1.5px;
         }
-      }
-    }
-
-    .mobile-header-trigger {
-      box-sizing: content-box;
-      width: 26px;
-
-      .cui-icon-x > svg {
-        height: 26px;
-        stroke: black;
-        width: 26px;
       }
     }
 
@@ -111,21 +104,15 @@
     }
 
     @include sm-max {
+      .cui-icon {
+        margin: auto;
+      }
+
       .MobileNewProposalButton .cui-button {
         padding: 0 10px;
 
         .cui-button-label {
           top: 2px;
-        }
-      }
-
-      .cui-button.mobile-header-trigger {
-        padding-left: 12px;
-        padding-right: 12px;
-
-        .cui-icon {
-          margin-left: -2px;
-          margin-right: -2px;
         }
       }
 
@@ -184,7 +171,7 @@
 
 .MobileHeaderPopoverMenu {
   position: absolute;
-  top: 61px !important;
+  top: 64px !important;
   transform: none !important;
   will-change: initial !important;
 

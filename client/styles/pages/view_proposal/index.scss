@@ -46,7 +46,6 @@ $discussion-title-font-size: 1.45rem;
   .ProposalComment {
     @include supports-jump-highlight();
   }
-  .ProposalHeader,
   .ProposalComment {
     @include xs-max {
       margin-top: 30px;
@@ -496,6 +495,8 @@ $discussion-title-font-size: 1.45rem;
       margin: 16px 0;
       .offchain-poll-option {
         display: flex;
+        flex-direction: row;
+        align-items: center;
         .offchain-poll-option-left {
           margin: 6px 0;
           flex: 1;

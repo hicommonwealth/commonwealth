@@ -6,7 +6,7 @@ import { Button, PopoverMenu, Icon, Icons } from 'construct-ui';
 import 'mobile/mobile_header.scss';
 
 import app from 'state';
-import NotificationsMenu from 'views/components/header/notifications_menu';
+import { NotificationsMenu } from 'views/components/header/notifications_menu';
 import { SearchBar } from 'views/components/search_bar';
 import { MobileSidebar } from './mobile_sidebar';
 import { CustomHamburgerIcon } from './mobile_icons';
@@ -45,7 +45,7 @@ export class MobileHeader implements m.ClassComponent {
             }}
             trigger={
               <Button
-                class="mobile-header-trigger no-border"
+                class="mobile-popover-trigger"
                 compact={true}
                 label={
                   this.sidebarOpen
