@@ -100,13 +100,7 @@
       flex-direction: row !important;
       margin-bottom: 12px;
       border-bottom: none;
-      position: sticky;
-      top: 83px;
-      @include sm-max {
-        top: 57px;
-      }
       background-color: white;
-      z-index: 50;
     }
     a.tab-entry {
       padding: 12px 0 0 0;

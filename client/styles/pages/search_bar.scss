@@ -180,8 +180,6 @@
       }
 
       &.search-history-item {
-        padding-top: 10px !important;
-
         .cui-list-item-content-left {
           display: flex;
           flex-direction: row;
@@ -189,8 +187,6 @@
           align-content: space-around;
 
           p {
-            padding-top: 5px;
-
             &.search-history-tag-seperator {
               color: $text-color-light;
               margin: 0 5px 0 2px;
