@@ -1,6 +1,8 @@
 (global as any).window = { location: { href: '/' } };
 
 import { Request, Response, NextFunction } from 'express';
+import * as jwt from 'jsonwebtoken';
+
 import { StargateClient } from '@cosmjs/stargate';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
@@ -27,20 +29,23 @@ import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 import { DynamicTemplate, ChainBase, NotificationCategories, ChainNetwork } from '../../shared/types';
 import AddressSwapper from '../util/addressSwapper';
+import { AppError, ServerError } from '../util/errors';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NoAddress: 'Must provide address',
   NoChain: 'Must provide chain',
   InvalidChain: 'Invalid chain',
-  NoSignature: 'Must provide signature',
   AddressNF: 'Address not found',
   ExpiredToken: 'Token has expired, please re-register',
   InvalidSignature: 'Invalid signature, please re-register',
-  NoEmail: 'No email to alert'
+  NoEmail: 'No email to alert',
+  InvalidArguments: 'Invalid arguments',
+  CouldNotVerifySignature: 'Failed to verify signature',
+  BadSecret: 'Invalid jwt secret',
+  BadToken: 'Invalid login token',
 };
 
 // Address.verifySignature
@@ -276,18 +281,71 @@ const verifySignature = async (
   return isValid;
 }
 
-const verifyAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  // Verify that a linked address is actually owned by its supposed user.
-  if (!req.body.address) {
-    return next(new Error(Errors.NoAddress));
-  }
-  if (!req.body.chain) {
-    return next(new Error(Errors.NoChain));
-  }
-  if (!req.body.signature) {
-    return next(new Error(Errors.NoSignature));
+const processAddress = async (
+  models: DB,
+  chain: ChainInstance,
+  address: string,
+  signature?: string,
+  user?: Express.User
+): Promise<void> => {
+  const existingAddress = await models.Address.scope('withPrivateData').findOne({
+    where: { chain: chain.id, address }
+  });
+  if (!existingAddress) {
+    throw new AppError(Errors.AddressNF);
   }
 
+  // first, check whether the token has expired
+  // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
+  const expiration = existingAddress.verification_token_expires;
+  if (expiration && +expiration <= +(new Date())) {
+    throw new AppError(Errors.ExpiredToken);
+  }
+  // check for validity
+  const isAddressTransfer = !!existingAddress.verified && user && existingAddress.user_id !== user.id;
+  const oldId = existingAddress.user_id;
+  try {
+    const valid = await verifySignature(
+      models, chain, existingAddress, (user ? user.id : null), signature
+    );
+    if (!valid) {
+      throw new AppError(Errors.InvalidSignature);
+    }
+  } catch (e) {
+    log.warn(`Failed to verify signature for ${address}: ${e.message}`);
+    throw new AppError(Errors.CouldNotVerifySignature);
+  }
+
+  // if someone else already verified it, send an email letting them know ownership
+  // has been transferred to someone else
+  if (isAddressTransfer) {
+    try {
+      const oldUser = await models.User.scope('withPrivateData').findOne({ where: { id: oldId } });
+      if (!oldUser) {
+        // users who register thru github don't have emails by default
+        throw new Error(Errors.NoEmail);
+      }
+      const msg = {
+        to: user.email,
+        from: 'Commonwealth <no-reply@commonwealth.im>',
+        templateId: DynamicTemplate.VerifyAddress,
+        dynamic_template_data: {
+          address,
+          chain: chain.name,
+        },
+      };
+      await sgMail.send(msg);
+      log.info(`Sent address move email: ${address} transferred to a new account`);
+    } catch (e) {
+      log.error(`Could not send address move email for: ${address}`);
+    }
+  }
+};
+
+const verifyAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+  if (!req.body.chain) {
+    throw new AppError(Errors.NoChain);
+  }
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
   });
@@ -295,82 +353,37 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
     return next(new Error(Errors.InvalidChain));
   }
 
-  const encodedAddress = chain.base === ChainBase.Substrate
+  if (!req.body.address || !req.body.signature) {
+    throw new AppError(Errors.InvalidArguments);
+  }
+
+  const address = chain.base === ChainBase.Substrate
     ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
     : req.body.address;
+  await processAddress(models, chain, address, req.body.signature, req.user);
 
-  const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.chain, address: encodedAddress }
-  });
-  if (!existingAddress) {
-    return next(new Error(Errors.AddressNF));
+  if (req.user) {
+    // if user was already logged in, we're done
+    return res.json({ status: 'Success', result: { address, message: 'Verified signature' } });
   } else {
-    // first, check whether the token has expired
-    const expiration = existingAddress.verification_token_expires;
-    if (expiration && +expiration <= +(new Date())) {
-      return next(new Error(Errors.ExpiredToken));
-    }
-    // check for validity
-    const isAddressTransfer = !!existingAddress.verified && req.user && existingAddress.user_id !== req.user.id;
-    const oldId = existingAddress.user_id;
-    try {
-      const valid = await verifySignature(
-        models, chain, existingAddress, (req.user ? req.user.id : null), req.body.signature
-      );
-      if (!valid) {
-        return next(new Error(Errors.InvalidSignature));
-      }
-    } catch (e) {
-      return next(e);
-    }
-
-    // if someone else already verified it, send an email letting them know ownership
-    // has been transferred to someone else
-    if (isAddressTransfer) {
-      try {
-        const user = await models.User.scope('withPrivateData').findOne({ where: { id: oldId } });
-        if (!user.email) {
-          // users who register thru github don't have emails by default
-          throw new Error(Errors.NoEmail);
+    // if user isn't logged in, log them in now
+    const newAddress = await models.Address.findOne({
+      where: { chain: req.body.chain, address },
+    });
+    const user = await models.User.scope('withPrivateData').findOne({
+      where: { id: newAddress.user_id },
+    });
+    req.login(user, (err) => {
+      if (err) return next(err);
+      return res.json({
+        status: 'Success',
+        result: {
+          user,
+          address,
+          message: 'Logged in',
         }
-        const msg = {
-          to: user.email,
-          from: 'Commonwealth <no-reply@commonwealth.im>',
-          templateId: DynamicTemplate.VerifyAddress,
-          dynamic_template_data: {
-            address: req.body.address,
-            chain: chain.name,
-          },
-        };
-        await sgMail.send(msg);
-        log.info(`Sent address move email: ${req.body.address} transferred to a new account`);
-      } catch (e) {
-        log.error(`Could not send address move email for: ${req.body.address}`);
-      }
-    }
-
-    if (req.user) {
-      // if user was already logged in, we're done
-      return res.json({ status: 'Success', result: 'Verified signature' });
-    } else {
-      // if user isn't logged in, log them in now
-      const newAddress = await models.Address.findOne({
-        where: { chain: req.body.chain, address: encodedAddress },
       });
-      const user = await models.User.scope('withPrivateData').findOne({
-        where: { id: newAddress.user_id },
-      });
-      req.login(user, (err) => {
-        if (err) return next(err);
-        return res.json({
-          status: 'Success',
-          result: {
-            user,
-            message: 'Logged in',
-          }
-        });
-      });
-    }
+    });
   }
 };
 

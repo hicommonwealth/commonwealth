@@ -72,6 +72,9 @@ import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
 } from './models/social_account';
+import SsoTokenFactory, {
+  SsoTokenModelStatic,
+} from './models/sso_token';
 import StarredCommunityFactory, {
   StarredCommunityModelStatic,
 } from './models/starred_community';
@@ -88,6 +91,7 @@ import WaitlistRegistrationFactory, {
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
 import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
+import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -103,6 +107,7 @@ export type Models = {
   DiscussionDraft: DiscussionDraftModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
+  IpfsPins: IpfsPinsModelStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
@@ -119,6 +124,7 @@ export type Models = {
   Profile: ProfileModelStatic;
   Role: RoleModelStatic;
   SocialAccount: SocialAccountModelStatic;
+  SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
   Subscription: SubscriptionModelStatic;
   Token: TokenModelStatic;
@@ -142,7 +148,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
     process.env.NODE_ENV === 'test'
       ? false
       : (msg) => {
-          log.trace(msg);
+          log.info(msg);
         },
   dialectOptions:
     process.env.NODE_ENV !== 'production'
@@ -176,6 +182,7 @@ const models: Models = {
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
+  IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
@@ -192,6 +199,7 @@ const models: Models = {
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
+  SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),

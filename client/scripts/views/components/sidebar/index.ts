@@ -192,6 +192,7 @@ export const ChainStatusModule: m.Component<{}, { initializing: boolean }> = {
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.initializing = true;
+              console.log('initializing');
               await initChain();
               vnode.state.initializing = false;
               m.redraw();

@@ -18,7 +18,7 @@ import {
 
 import app from 'state';
 import { navigateToSubpage, initAppState } from 'app';
-import { ChainBase } from 'types';
+import { ChainBase, ChainNetwork } from 'types';
 import { AddressInfo, ChainInfo, ITokenAdapter } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 
@@ -282,12 +282,8 @@ const LoginSelector: m.Component<
         return app.user.getRoleInCommunity({
           account,
           chain: app.activeChainId(),
-        });
-      }
-    );
-    const isAdmin = app.user.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
+        }
+      );
     });
 
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
@@ -299,40 +295,40 @@ const LoginSelector: m.Component<
       vnode.state.profileLoadComplete = true;
     }
 
-    const joiningChainInfo = app.chain?.meta.chain;
-    const joiningChain = joiningChainInfo?.id;
-
-    let samebaseAddresses: AddressInfo[];
+    const activeChainInfo = app.chain?.meta.chain;
+    const activeChainId = activeChainInfo?.id;
 
     // add all addresses if joining a community
-    const joiningBase = joiningChainInfo?.base;
-    if (!joiningBase) {
-      samebaseAddresses = app.user.addresses;
-    } else {
-      samebaseAddresses = [];
-      for (const addressInfo of app.user.addresses) {
-        // add all items on same base as joining chain
-        const addressBase = app.config.chains.getById(addressInfo.chain)?.base;
-        if (addressBase === joiningBase) {
-          // ensure doesn't already exist
-          const addressExists = !!samebaseAddresses.find((prev) =>
-            joiningBase === ChainBase.Substrate
-              ? AddressSwapper({
-                  address: prev.address,
-                  currentPrefix: 42,
-                }) ===
-                AddressSwapper({
-                  address: addressInfo.address,
-                  currentPrefix: 42,
-                })
-              : prev.address === addressInfo.address
-          );
-          if (!addressExists) {
-            samebaseAddresses.push(addressInfo);
-          }
-        }
+    const activeBase = activeChainInfo?.base;
+    const NON_INTEROP_NETWORKS = [ ChainNetwork.AxieInfinity ];
+    const samebaseAddresses = app.user.addresses.filter((a) => {
+      // if no active chain, add all addresses
+      if (!activeBase) return true;
+
+      // add all items on same base as active chain
+      const addressChainInfo = app.config.chains.getById(a.chain);
+      if (addressChainInfo?.base !== activeBase) return false;
+
+      // ensure doesn't already exist
+      const addressExists = !!app.user.addresses.find((prev) =>
+        activeBase === ChainBase.Substrate && app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
+          ? AddressSwapper({
+            address: prev.address, currentPrefix: 42
+          }) === AddressSwapper({
+            address: a.address, currentPrefix: 42
+          })
+          : prev.address === a.address
+      );
+      if (addressExists) return false;
+
+      // filter additionally by chain network if in list of non-interop, unless we are on that chain
+      // TODO: make this related to wallet.specificChain
+      if (NON_INTEROP_NETWORKS.includes(addressChainInfo?.network)
+        && activeChainInfo?.network !== addressChainInfo?.network) {
+        return false;
       }
-    }
+      return true;
+    });
 
     const activeCommunityMeta = app.chain?.meta?.chain;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
@@ -350,7 +346,7 @@ const LoginSelector: m.Component<
 
               if (originAddressInfo) {
                 try {
-                  const targetChain = joiningChain || originAddressInfo.chain;
+                  const targetChain = activeChainId || originAddressInfo.chain;
 
                   const address = originAddressInfo.address;
 
@@ -387,15 +383,14 @@ const LoginSelector: m.Component<
                       account.setValidationToken(verification_token);
                     }
                     if (
-                      joiningChain &&
+                      activeChainId &&
                       !app.user.getRoleInCommunity({
-                        account,
-                        chain: joiningChain,
+                        account, chain: activeChainId
                       })
                     ) {
                       await app.user.createRole({
                         address: addressInfo,
-                        chain: joiningChain,
+                        chain: activeChainId,
                       });
                     }
 

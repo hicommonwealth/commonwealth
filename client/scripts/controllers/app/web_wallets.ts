@@ -9,6 +9,7 @@ import NearWebWalletController from './webWallets/near_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import InjectiveWebWalletController from './webWallets/injective_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
+import RoninWebWalletController from './webWallets/ronin_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
@@ -16,13 +17,18 @@ export default class WebWalletController {
     return this._wallets;
   }
 
-  // TODO filter out wallets that are specific to a chain (and the current page isn't that chain)
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
+    // handle case like injective, axie, where we require a specific wallet
+    const specificChain = app.chain?.meta?.chain?.id;
+    if (app.chain?.meta?.chain?.id) {
+      const specificWallet = this._wallets.find((w) => w.specificChain === specificChain);
+      if (specificWallet) return [ specificWallet ];
+    }
+
+    // handle general case of wallet by chain base
     return this._wallets.filter((w) => w.available
-      && (!chain || w.chain === chain)
-      // if a specific chain is specified on a wallet AND a current chain is defined (aka not on home page) then load
-      // the wallet if the current chain is the same as the specific chain
-      && ((w.specificChain && app.chain?.meta?.chain.id) ? w.specificChain === app.chain.meta.chain.id : true));
+      && !w.specificChain // omit chain-specific wallets unless on correct chain
+      && (!chain || w.chain === chain));
   }
 
   public getByName(name: string): IWebWallet<any> | undefined {
@@ -59,6 +65,7 @@ export default class WebWalletController {
       new TerraStationWebWalletController(),
       new InjectiveWebWalletController(),
       new PhantomWebWalletController(),
+      // new RoninWebWalletController(),
     ];
   }
 }
