@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .PrivacyPage,
 .TermsPage {
   align-items: center;
@@ -13,6 +15,10 @@
     flex-direction: column;
     padding: 24px;
     width: 736px;
+
+    @include sm-max {
+      width: unset;
+    }
   }
 
   p {
