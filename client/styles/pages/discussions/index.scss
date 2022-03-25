@@ -2,21 +2,11 @@
 
 .DiscussionsPage {
   .discussions-main {
-    padding: 36px;
+    padding: 24px;
     width: 100%;
-
-    @include sm-max {
-      padding-top: 24px;
-    }
 
     &.empty-list {
       height: calc(100vh - 200px);
-    }
-  }
-
-  @include xs-max {
-    .discussions-main {
-      padding: 12px 0;
     }
   }
 
