@@ -125,7 +125,7 @@ export class CommunitySelector
               src="https://commonwealth.im/static/img/logo.png"
               style="height:18px;width:18px;background:black;border-radius:50%;"
             />
-            <span>Home</span>,
+            <span>Home</span>
           </a>
         )}
         {app.isLoggedIn() && (
@@ -159,14 +159,14 @@ export class CommunitySelector
             content={
               <>
                 {app.isLoggedIn() && (
-                  <div>
+                  <>
                     <h4>Your communities</h4>
                     {joinedCommunities.map(renderCommunity)}
                     {joinedCommunities.length === 0 && (
                       <div class="community-placeholder">None</div>
                     )}
                     <h4>Other communities</h4>
-                  </div>
+                  </>
                 )}
                 {unjoinedCommunities.map(renderCommunity)}
                 {renderCommunity('home')}

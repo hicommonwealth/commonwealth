@@ -5,8 +5,6 @@
   left: $quick-switcher-width !important;
 
   @include sm-max {
-    // left: 0 !important;
-    // top: 60px !important;
     overflow-y: scroll;
   }
 
@@ -19,11 +17,6 @@
     max-height: 100vh;
     overflow-y: auto;
     text-align: left;
-    // @include xs-max {
-    //     margin: 0 10px;
-    //     width: calc(100vw - 20px);
-    //     max-height: calc(100vh - 70px);
-    // }
   }
 
   .cui-menu {
@@ -31,21 +24,13 @@
     border: none;
     max-width: 360px;
     width: 360px;
-    padding: 24px 4px 8px;
-    // @include xs-max {
-    //     max-width: 100%;
-    //     width: 100%;
-    // }
+    padding: 8px;
 
     h4 {
-      margin: 20px 24px 10px;
+      margin: 16px 24px;
       color: $text-color-light;
       font-weight: 400;
       font-size: 16px;
-    }
-
-    h4:first-child {
-      margin-top: 0;
     }
 
     .community-placeholder {
@@ -56,10 +41,10 @@
   }
 
   .cui-list-item {
-    padding: 4px 10px;
-    margin: 0 14px;
+    padding: 4px 8px;
+    margin: 0 8px;
     border-radius: 4px;
-    min-height: 35px;
+    height: 32px;
     border: none;
     user-select: none;
 
@@ -82,26 +67,29 @@
       overflow: hidden;
       text-overflow: ellipsis;
 
-      .User {
-        position: relative;
-        top: 4px;
-        margin-left: 4px;
-      }
+      .community-star-toggle {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
-      .star-icon {
-        display: inline-block;
-        position: relative;
-        top: -1px;
-        margin-left: 10px;
+        .User {
+          margin-right: 8px;
+        }
+
+        .star-icon {
+          display: flex;
+          height: 100%;
+          flex-direction: column;
+          justify-content: center;
+        }
       }
     }
   }
 
   .cui-list-item.select-list-back-home {
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-top: 16px;
     font-size: 16px;
-    padding-top: 9px;
+    padding: 8px;
   }
 
   // stars

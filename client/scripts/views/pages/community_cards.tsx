@@ -62,7 +62,7 @@ class ChainCard implements m.ClassComponent<ChainCardAttrs> {
           <div class="community-name" lang="en">
             {chainInfo.name}
           </div>
-          <div class="card-description" lang="en">
+          <div class="card-description" title={prettyDescription} lang="en">
             {prettyDescription}
           </div>
           <div class="join-button-wrapper">
@@ -116,7 +116,7 @@ class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
           <div class="community-name" lang="en">
             {community.name}
           </div>
-          <div class="card-description" lang="en">
+          <div class="card-description" title={prettyDescription} lang="en">
             {prettyDescription}
           </div>
           <div class="join-button-wrapper">
