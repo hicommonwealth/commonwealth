@@ -30,7 +30,7 @@ export class MobileHeader implements m.ClassComponent {
             m.route.set('/');
           }}
         />
-        {m(SearchBar)}
+        <SearchBar />
         <div class="mobile-header-right">
           {app.isLoggedIn() && <NotificationsMenu small={false} />}
           {app.isLoggedIn() && <InvitesMenu />}

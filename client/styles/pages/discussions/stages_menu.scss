@@ -10,16 +10,17 @@
       margin: 0;
     }
 
-    .stages-item {
-      align-items: center;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+    .cui-button {
+      font-size: 14px;
+      height: 32px;
+      min-height: 32px;
+      line-height: 32px;
 
-      .cui-button {
-        height: 32px;
-        min-height: 32px;
-        line-height: 32px;
+      .stages-item {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
 
         .cui-icon {
           margin-right: 8px;

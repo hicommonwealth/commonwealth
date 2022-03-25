@@ -24,4 +24,8 @@
   .cui-icon {
     top: 3px;
   }
+
+  @include sm-max {
+    display: none;
+  }
 }

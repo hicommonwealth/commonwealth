@@ -167,7 +167,7 @@
 
   .address-block-right {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
 
     .address {
       color: #666666;
@@ -345,7 +345,7 @@
   .address-block-left {
     @include md-max {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
 
       .address {
         color: #666666;
