@@ -179,17 +179,16 @@ class HomepageCommunityCards implements m.ClassComponent {
     );
 
     return (
-      <div class="HomepageCommunityCards" style="margin-top: 40px">
-        <div class="communities-list">
-          <div class="communities-number">{totalCommunitiesString}</div>
-          {sortedChainsAndCommunities}
-          <div class="clear" />
+      <div class="HomepageCommunityCards">
+        <div class="communities-header">{totalCommunitiesString}</div>
+        <div class="communities-list">{sortedChainsAndCommunities}</div>
+        <div class="communities-header">
           {betaChainsAndCommunities.length > 0 && (
             <h4>Testnets & Alpha Networks</h4>
           )}
-          {betaChainsAndCommunities}
         </div>
-        <div class="other-list">
+        <div class="communities-list">
+          {betaChainsAndCommunities}
           <CWCard
             elevation="elevation-2"
             interactive={true}

@@ -26,6 +26,14 @@
   }
 
   .search-results-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    .search-results {
+      display: flex;
+      flex-direction: column;
+    }
+
     .search-results-caption {
       margin: 20px 0;
       text-align: center;
@@ -164,33 +172,6 @@
           cursor: pointer;
         }
       }
-    }
-  }
-}
-
-@media only screen and (max-width: 800px) {
-  .search-results-list {
-    left: -55px !important;
-    width: 97vw !important;
-  }
-
-  .search-filter-button-bar {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
-    padding-right: 0 !important;
-  }
-
-  .search-history-tag-seperator {
-    display: none;
-  }
-
-  .cui-list-item-content-left {
-    overflow: scroll;
-
-    .cui-tag {
-      margin-left: 3px;
-      font-size: 16px;
     }
   }
 }
