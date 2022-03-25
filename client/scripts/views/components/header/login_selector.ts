@@ -300,7 +300,7 @@ const LoginSelector: m.Component<
 
     // add all addresses if joining a community
     const activeBase = activeChainInfo?.base;
-    const NON_INTEROP_NETWORKS = [ ChainNetwork.AxieInfinity ];
+    const NON_INTEROP_NETWORKS = [ ChainNetwork.AxieInfinity, ChainNetwork.Terra ];
     const samebaseAddresses = app.user.addresses.filter((a) => {
       // if no active chain, add all addresses
       if (!activeBase) return true;
@@ -322,7 +322,7 @@ const LoginSelector: m.Component<
       if (addressExists) return false;
 
       // filter additionally by chain network if in list of non-interop, unless we are on that chain
-      // TODO: make this related to wallet.specificChain
+      // TODO: make this related to wallet.specificNetwork
       if (NON_INTEROP_NETWORKS.includes(addressChainInfo?.network)
         && activeChainInfo?.network !== addressChainInfo?.network) {
         return false;

@@ -1,4 +1,4 @@
-import { ChainBase } from 'types';
+import { ChainBase, ChainNetwork } from 'types';
 import Account from './Account';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
@@ -14,7 +14,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   chain: ChainBase;
 
   // optional parameter used to specify the exact chain that a wallet is associated with (if any)
-  specificChain?: string;
+  specificNetwork?: ChainNetwork;
 }
 
 export default IWebWallet;

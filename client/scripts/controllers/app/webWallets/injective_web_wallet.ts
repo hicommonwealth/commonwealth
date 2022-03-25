@@ -4,7 +4,7 @@ declare let window: any;
 
 import Web3 from 'web3';
 import { provider } from 'web3-core';
-import { ChainBase } from 'types';
+import { ChainBase, ChainNetwork } from 'types';
 import { Account, IWebWallet } from 'models';
 import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
@@ -17,7 +17,7 @@ function encodeEthAddress(address: string): string {
 class InjectiveWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
-  private _enabling: boolean = false;
+  private _enabling = false;
   private _accounts: string[] = [];
   private _ethAccounts: string[];
   private _provider: provider;
@@ -26,7 +26,7 @@ class InjectiveWebWalletController implements IWebWallet<string> {
   public readonly name = 'inj-metamask';
   public readonly label = 'Metamask (Injective)';
   public readonly chain = ChainBase.CosmosSDK;
-  public readonly specificChain = 'injective';
+  public readonly specificNetwork = ChainNetwork.Injective;
 
   public get available() {
     return !!(window.ethereum);

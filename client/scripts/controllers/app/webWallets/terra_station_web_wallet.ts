@@ -1,6 +1,6 @@
-import { ChainBase } from 'types';
+import { ChainBase, ChainNetwork } from 'types';
 import { Account, IWebWallet } from 'models';
-import { Extension, Msg, MsgStoreCode, Fee, LCDClient } from '@terra-money/terra.js';
+import { Extension } from '@terra-money/terra.js';
 
 class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -11,7 +11,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   public readonly name = 'terrastation';
   public readonly label = 'TerraStation';
   public readonly chain = ChainBase.CosmosSDK;
-  public readonly specificChain = 'terra';
+  public readonly specificNetwork = ChainNetwork.Terra;
 
   public get available() {
     return this._extension.isAvailable;
