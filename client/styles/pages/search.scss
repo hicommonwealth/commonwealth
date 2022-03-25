@@ -6,8 +6,11 @@
     flex-direction: column;
     height: 100%;
     margin: 0 auto;
-    width: 100%;
     width: 904px;
+
+    @include sm-max {
+      width: 100%;
+    }
   }
 
   .search-page-input {
@@ -82,7 +85,6 @@
         }
 
         .search-results-item {
-          display: block;
           padding: 20px;
           color: $text-color-black;
           text-decoration: none;
@@ -119,6 +121,9 @@
           /* Thread results */
           .search-results-thread-title {
             font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
 
           .search-results-thread-subtitle {

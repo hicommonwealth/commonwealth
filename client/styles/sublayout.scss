@@ -19,7 +19,12 @@
       flex-direction: row;
       height: 88px;
       justify-content: space-between;
+      min-height: 88px;
       padding: 0 24px;
+
+      @include sm-max {
+        display: none;
+      }
     }
   }
 
@@ -29,6 +34,10 @@
     height: 100%;
     overflow: hidden;
     width: 100%;
+
+    @include sm-max {
+      margin-top: 88px;
+    }
 
     .body {
       display: flex;

@@ -2,6 +2,7 @@
 
 .NewThreadForm {
   display: flex;
+
   &.is-modal {
     max-width: 680px;
   }
@@ -42,6 +43,7 @@
 
   .new-thread-form-body {
     max-width: 100%;
+    padding: 16px;
     .new-snapshot-proposal-form {
       display: flex;
       .add-vote-choice {
@@ -68,7 +70,7 @@
     max-width: calc(100% - 205px);
     @include xs-max {
       max-width: 100%;
-      margin-right: 28px;
+      padding: 16px;
     }
   }
   .new-thread-form-body {
@@ -173,7 +175,7 @@
       max-height: none;
       .cui-list-item {
         display: block;
-        padding: 21px 12px 12px !important;
+        padding: 21px 0 12px !important;
         border-bottom-color: $border-color-lightest;
         max-height: 140px;
         overflow: hidden;
@@ -220,10 +222,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
     .draft-badge {
       display: inline-block;
-      margin-right: 12px;
-      width: calc(100% - 6px);
       color: $negative-bg-color;
       border: 1px solid $negative-bg-color;
       border-radius: 9999px;
