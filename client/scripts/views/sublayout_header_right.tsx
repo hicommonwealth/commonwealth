@@ -10,7 +10,7 @@ import NewProposalButton, {
 } from 'views/components/new_proposal_button';
 import { ChainInfo } from 'client/scripts/models';
 import { NotificationsMenu } from 'views/components/header/notifications_menu';
-import InvitesMenu from 'views/components/header/invites_menu';
+import { InvitesMenu } from 'views/components/header/invites_menu';
 import LoginSelector from 'views/components/header/login_selector';
 import { CWGradientButton } from './components/component_kit/cw_gradient_button';
 
@@ -47,8 +47,9 @@ export class SublayoutHeaderRight
           (narrowBrowserWidth
             ? m(MobileNewProposalButton)
             : m(NewProposalButton, { fluid: false, threadOnly: !chain }))}
-        {app.isLoggedIn() && m(NotificationsMenu)}
-        {app.isLoggedIn() && m(InvitesMenu)}
+        {app.isLoggedIn() && <NotificationsMenu />}
+        {/* {app.isLoggedIn() && <InvitesMenu />} */}
+        <InvitesMenu />
         {m(LoginSelector)}
       </div>
     );

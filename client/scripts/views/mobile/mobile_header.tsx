@@ -10,7 +10,7 @@ import { NotificationsMenu } from 'views/components/header/notifications_menu';
 import { SearchBar } from 'views/components/search_bar';
 import { MobileSidebar } from './mobile_sidebar';
 import { CustomHamburgerIcon } from './mobile_icons';
-import InvitesMenu from '../components/header/invites_menu';
+import { InvitesMenu } from '../components/header/invites_menu';
 
 export class MobileHeader implements m.ClassComponent {
   private sidebarOpen: boolean;
@@ -32,8 +32,8 @@ export class MobileHeader implements m.ClassComponent {
         />
         {m(SearchBar)}
         <div class="mobile-header-right">
-          {app.isLoggedIn() && m(NotificationsMenu, { small: false })}
-          {app.isLoggedIn() && m(InvitesMenu)}
+          {app.isLoggedIn() && <NotificationsMenu small={false} />}
+          {app.isLoggedIn() && <InvitesMenu />}
           <PopoverMenu
             class="MobileHeaderPopoverMenu"
             transitionDuration={0}
@@ -48,9 +48,11 @@ export class MobileHeader implements m.ClassComponent {
                 class="mobile-popover-trigger"
                 compact={true}
                 label={
-                  this.sidebarOpen
-                    ? m(Icon, { name: Icons.X })
-                    : m(CustomHamburgerIcon)
+                  this.sidebarOpen ? (
+                    <Icon name={Icons.X} />
+                  ) : (
+                    m(CustomHamburgerIcon)
+                  )
                 }
                 onclick={() => {
                   this.sidebarOpen = !this.sidebarOpen;

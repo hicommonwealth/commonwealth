@@ -27,7 +27,7 @@ import { notifySuccess } from 'controllers/app/notifications';
 
 import User, { UserBlock } from 'views/components/widgets/user';
 import EditProfileModal from 'views/modals/edit_profile_modal';
-import LoginModal from 'views/modals/login_modal';
+import { LoginModal } from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import AddressSwapper from 'views/components/addresses/address_swapper';

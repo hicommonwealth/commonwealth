@@ -21,7 +21,7 @@ import {
   LoginSelectorMenuRight,
 } from 'views/components/header/login_selector';
 import { getNewProposalMenu } from 'views/components/new_proposal_button';
-import LoginModal from '../modals/login_modal';
+import { LoginModal } from '../modals/login_modal';
 import { ExternalLinksModule } from '../components/sidebar/external_links_module';
 import { CommunitySelector } from '../components/sidebar/community_selector';
 

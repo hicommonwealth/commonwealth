@@ -110,7 +110,7 @@ export class NotificationsMenu
         trigger={
           <Button
             class="toggle"
-            style="padding: 8px 16px;"
+            style="padding: 8px;"
             intent={unreadNotificationsCount > 0 ? 'primary' : undefined}
             label={
               <>

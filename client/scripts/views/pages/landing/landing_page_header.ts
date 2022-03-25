@@ -1,7 +1,7 @@
 import m from 'mithril';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
-import LoginModal from 'views/modals/login_modal';
+import { LoginModal } from 'views/modals/login_modal';
 
 interface IAttrs {
   navs: { text: string; redirectTo: string }[];
