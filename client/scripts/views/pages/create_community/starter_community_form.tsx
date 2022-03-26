@@ -110,13 +110,36 @@ export class StarterCommunityForm implements m.ClassComponent {
                 break;
               }
             }
+            const {
+              id,
+              name,
+              symbol,
+              iconUrl,
+              description,
+              website,
+              discord,
+              telegram,
+              github,
+              element,
+              base,
+             } = this.state.form;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 jwt: app.user.jwt,
                 address: '',
                 type: ChainType.Offchain,
                 network: baseToNetwork(this.state.form.base),
-                ...this.state.form,
+                icon_url: iconUrl,
+                id,
+                name,
+                symbol,
+                base,
+                description,
+                discord,
+                element,
+                github,
+                telegram,
+                website,
                 ...additionalArgs,
               });
               await initAppState(false);
