@@ -50,10 +50,10 @@ export const DISCORD_OAUTH_CALLBACK = process.env.DISCORD_OAUTH_CALLBACK
         : 'http://localhost:8080') + '/api/auth/discord/callback';
 export const DISCORD_OAUTH_SCOPES = process.env.DISCORD_OAUTH_SCOPES?.split(" ")
 
-export const DATABASE_URI =
-      (!process.env.DATABASE_URL || process.env.NODE_ENV === 'development') ?
-      'postgresql://commonwealth:edgeware@localhost/commonwealth' :
-      process.env.DATABASE_URL;
+export const DATABASE_URI = process.env.HEROKU_POSTGRESQL_TEAL_URL
+      // (!process.env.DATABASE_URL || process.env.NODE_ENV === 'development') ?
+      // 'postgresql://commonwealth:edgeware@localhost/commonwealth' :
+      // process.env.DATABASE_URL;
 
 export const RABBITMQ_URI = (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') ?
   'amqp://guest:guest@localhost:5672' : process.env.CLOUDAMQP_URL;
