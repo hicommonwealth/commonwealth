@@ -83,7 +83,6 @@ const finishSsoLogin = async (
   let jwtPayload: AxieInfinityJwt;
   try {
     const decoded = jwt.verify(tokenString, AXIE_SHARED_SECRET, { issuer: 'AxieInfinity' });
-    console.log(decoded);
     if (isAxieInfinityJwt(decoded)) {
       jwtPayload = decoded;
     } else {
@@ -143,7 +142,7 @@ const finishSsoLogin = async (
 
     // perform login on existing account
     if (jwtPayload.iat <= token.issued_at) {
-      console.log('Replay attack detected.');
+      log.error('Replay attack detected.');
       throw new AppError(Errors.ReplayAttack);
     }
     token.issued_at = jwtPayload.iat;
@@ -179,9 +178,9 @@ const finishSsoLogin = async (
         log.error(`Could not send address move email for: ${existingAddress}`);
       }
 
-      const newProfiles = await reqUser.getProfiles();
+      const newProfile = await models.Profile.findOne({ where: { user_id: reqUser.id } });
       existingAddress.user_id = reqUser.id;
-      existingAddress.profile_id = newProfiles[0].id;
+      existingAddress.profile_id = newProfile.id;
       await existingAddress.save();
 
       const newAddress = await models.Address.findOne({ where: { id: existingAddress.id }});
@@ -214,7 +213,7 @@ const finishSsoLogin = async (
         profile = user.Profiles[0];
       } else {
         user = reqUser;
-        profile = await user.getProfiles()[0];
+        profile = await models.Profile.findOne({ where: { user_id: user.id } });
       }
 
       // create new address

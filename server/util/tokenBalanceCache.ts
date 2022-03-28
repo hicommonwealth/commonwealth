@@ -39,21 +39,19 @@ export class TokenBalanceProvider {
       if (!COVALENT_API_KEY) {
         throw new Error('failed to query axie balance');
       }
-      const balanceQueryResultString = await axios.post(url, { }, {
+      const balanceQueryResult = await axios.get(url, {
         headers: {
           'Content-Type': 'application/json',
         },
         auth: {
           username: COVALENT_API_KEY,
-          password: '',
+          password: undefined,
         }
       });
-      const balanceQueryResult = JSON.parse(balanceQueryResultString.data);
-      console.log(balanceQueryResult);
-      if (balanceQueryResult.error) {
-        throw new Error(balanceQueryResult.error_message)
+      if (balanceQueryResult.status !== 200 || balanceQueryResult.data?.data?.error) {
+        throw new Error(balanceQueryResult.data?.data?.error || balanceQueryResult.statusText);
       }
-      const axieItem = balanceQueryResult.data.items.find((item) => item.contract_ticker_symbol === 'RON');
+      const axieItem = balanceQueryResult.data.data.items.find((item) => item.contract_ticker_symbol === 'RON');
       return new BN(axieItem.balance, 10);
     } catch (e) {
       log.info(`Failed to query axie balance: ${e.message}`);
