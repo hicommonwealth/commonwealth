@@ -21,7 +21,6 @@ export default class Token extends Ethereum implements ITokenAdapter {
       address: account.address,
       author_chain: account.chain.id,
     });
-    console.log(balanceResp);
     if (balanceResp.result) {
       const balance = new BN(balanceResp.result, 10);
       this.hasToken = balance && !balance.isZero();
