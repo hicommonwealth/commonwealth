@@ -28,3 +28,25 @@
     }
   }
 }
+
+.Table {
+  .delegate-avatar-section {
+    display: flex;
+
+    .avatar-name {
+      margin-top: 3px;
+      margin-left: 10px;
+    }
+  }
+
+  td {
+    font-weight: 400;
+    font-size: 18px;
+  }
+
+  .Button {
+    height: 30px;
+    margin-top: 5px;
+    margin-bottom: 9px;
+  }
+}

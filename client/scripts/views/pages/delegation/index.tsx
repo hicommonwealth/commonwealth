@@ -13,6 +13,7 @@ import {
   CWTable,
   TableEntryType,
 } from '../../components/component_kit/cw_table';
+import User from '../../components/widgets/user';
 
 type DelegationPageAttrs = { topic?: string };
 
@@ -30,6 +31,133 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
   private delegate: Account<any> | AddressInfo | Profile;
   private delegates: Array<DelegateInfo>;
   view(vnode) {
+    // ----------------- MOCK DATA -------------- //
+    const dummyTableData = {
+      columns: [
+        { colTitle: 'Rank', colWidth: '7%', collapse: false },
+        { colTitle: 'Delegate', colWidth: '25%', collapse: false },
+        {
+          colTitle: 'Vote Weight',
+          colWidth: '15%',
+          align: 'right',
+          collapse: false,
+        },
+        {
+          colTitle: 'Total Votes',
+          colWidth: '15%',
+          align: 'right',
+          collapse: true,
+        },
+        {
+          colTitle: 'Proposals',
+          colWidth: '15%',
+          align: 'right',
+          collapse: true,
+        },
+        { colTitle: '', align: 'right', collapse: false },
+      ],
+      data: [
+        [
+          {
+            value: 1,
+            type: TableEntryType.String,
+          },
+          {
+            value: (
+              <div class="delegate-avatar-section">
+                {m(User, {
+                  user: app.user.activeAccount,
+                  avatarSize: 25,
+                  popover: true,
+                  avatarOnly: true,
+                })}
+                <div class="avatar-name">{'Alex Young'}</div>
+              </div>
+            ),
+            type: TableEntryType.Component,
+          },
+          { value: '12.9%', type: TableEntryType.String, align: 'right' },
+          { value: '330 M', type: TableEntryType.String, align: 'right' },
+          { value: '11', type: TableEntryType.String, align: 'right' },
+          {
+            value: 'Delegate',
+            type: TableEntryType.Button,
+            buttonDetails: {
+              onclick: () => console.log('clicked!'),
+              buttonType: 'secondary',
+            },
+            align: 'right',
+          },
+        ],
+        [
+          {
+            value: 2,
+            type: TableEntryType.String,
+          },
+          {
+            value: (
+              <div class="delegate-avatar-section">
+                {m(User, {
+                  user: app.user.activeAccount,
+                  avatarSize: 25,
+                  popover: true,
+                  avatarOnly: true,
+                })}
+                <div class="avatar-name">{'Other Dude'}</div>
+              </div>
+            ),
+            type: TableEntryType.Component,
+          },
+          { value: '11.9%', type: TableEntryType.String, align: 'right' },
+          { value: '310 M', type: TableEntryType.String, align: 'right' },
+          { value: '23', type: TableEntryType.String, align: 'right' },
+          {
+            value: 'Delegate',
+            type: TableEntryType.Button,
+            buttonDetails: {
+              onclick: () => console.log('clicked!'),
+              buttonType: 'secondary',
+            },
+            align: 'right',
+          },
+        ],
+        [
+          {
+            value: 3,
+            type: TableEntryType.String,
+          },
+          {
+            value: (
+              <div class="delegate-avatar-section">
+                {m(User, {
+                  user: app.user.activeAccount,
+                  avatarSize: 25,
+                  popover: true,
+                  avatarOnly: true,
+                })}
+                <div class="avatar-name">{'Zak Hap'}</div>
+              </div>
+            ),
+            type: TableEntryType.Component,
+          },
+          { value: '3.9%', type: TableEntryType.String, align: 'right' },
+          { value: '37 M', type: TableEntryType.String, align: 'right' },
+          { value: '220', type: TableEntryType.String, align: 'right' },
+          {
+            value: 'Delegate',
+            type: TableEntryType.Button,
+            buttonDetails: {
+              onclick: () => console.log('clicked!'),
+              buttonType: 'secondary',
+            },
+            align: 'right',
+          },
+        ],
+      ],
+    };
+
+    // ----------------- END MOCK DATA -------------- //
+
     if (!this.delegate) {
       this.delegate = app.user.activeAccount; // TODO: Replace this with an actual fetch of the user's selected delegate. Include handling for if none exists
       m.redraw();
@@ -94,11 +222,8 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
             placeholder="Search Delegates"
           />
           <CWTable
-            columns={[
-              { colTitle: 'Rank', colWidth: '5px' },
-              { colTitle: 'Delegate', colWidth: '25px' },
-            ]}
-            data={[{ value: 1, type: TableEntryType.String }]}
+            columns={dummyTableData.columns}
+            data={dummyTableData.data}
           />
         </div>
       </Sublayout>
