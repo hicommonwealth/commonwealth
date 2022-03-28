@@ -1,5 +1,4 @@
 /* @jsx m */
-
 import m from 'mithril';
 import 'components/component_kit/cw_table.scss';
 import { CWButton } from './cw_button';
@@ -11,7 +10,7 @@ export enum TableEntryType {
   Component = 'other',
 }
 
-type TableEntry = {
+export type TableEntry = {
   value: any;
   type: TableEntryType;
   align?: string;
