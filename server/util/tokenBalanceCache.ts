@@ -33,6 +33,34 @@ interface CacheT {
 
 // Uses a tiny class so it's mockable for testing
 export class TokenBalanceProvider {
+  public async getRoninTokenBalance(address: string, chainId: number) {
+    const url = `https://api.covalenthq.com/v1/${chainId}/address/${address}/balances_v2/`;
+    try {
+      if (!COVALENT_API_KEY) {
+        throw new Error('failed to query axie balance');
+      }
+      const balanceQueryResultString = await axios.post(url, { }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        auth: {
+          username: COVALENT_API_KEY,
+          password: '',
+        }
+      });
+      const balanceQueryResult = JSON.parse(balanceQueryResultString.data);
+      console.log(balanceQueryResult);
+      if (balanceQueryResult.error) {
+        throw new Error(balanceQueryResult.error_message)
+      }
+      const axieItem = balanceQueryResult.data.items.find((item) => item.contract_ticker_symbol === 'RON');
+      return new BN(axieItem.balance, 10);
+    } catch (e) {
+      log.info(`Failed to query axie balance: ${e.message}`);
+      throw new Error('failed to query axie balance');
+    }
+  }
+
   public async getEthTokenBalance(url: string, tokenAddress: string, userAddress: string): Promise<BN> {
     const provider = new Web3.providers.WebsocketProvider(url);
     const api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
@@ -153,30 +181,10 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     // TODO: add cosmos and other chains
     if (chain.network === ChainNetwork.AxieInfinity) {
       // special case for axie query using covalent
-      const url = `https://api.covalenthq.com/v1/${node.eth_chain_id}/address/${address}/balances_v2/`;
       try {
-        if (!COVALENT_API_KEY) {
-          throw new Error('failed to query axie balance');
-        }
-        const balanceQueryResultString = await axios.post(url, { }, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          auth: {
-            username: COVALENT_API_KEY,
-            password: '',
-          }
-        });
-        const balanceQueryResult = JSON.parse(balanceQueryResultString.data);
-        console.log(balanceQueryResult);
-        if (balanceQueryResult.error) {
-          throw new Error(balanceQueryResult.error_message)
-        }
-        const axieItem = balanceQueryResult.data.items.find((item) => item.contract_ticker_symbol === 'RON');
-        balance = new BN(axieItem.balance);
+        balance = await this._balanceProvider.getRoninTokenBalance(address, node.eth_chain_id);
       } catch (e) {
-        log.info(`Failed to query axie balance: ${e.message}`);
-        throw new Error('failed to query axie balance');
+        throw new Error(`Could not fetch token balance: ${e.message}`);
       }
     } else if (chain.base === ChainBase.Ethereum) {
       if (!contractAddress) {
