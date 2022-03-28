@@ -115,8 +115,10 @@ export const CommunityOptionsPopover: m.Component<{}> = {
             },
           }),
         isAdmin &&
+          app.chain.meta.chain.topics.filter((topic) => topic.featuredInSidebar)
+            .length > 0 &&
           m(MenuItem, {
-            label: 'Order featured topics',
+            label: 'Order sidebar topics',
             onclick: (e) => {
               e.preventDefault();
               app.modals.create({
@@ -170,7 +172,7 @@ const DiscussionFilterBar: m.Component<
 
     const featuredTopics = topics
       .filter((t) => t.featuredInSidebar)
-      .sort((a, b) => a.order - b.order);
+      .sort((a, b) => b.order - a.order);
     const otherTopics = topics
       .filter((t) => !t.featuredInSidebar)
       .sort((a, b) => a.name.localeCompare(b.name));

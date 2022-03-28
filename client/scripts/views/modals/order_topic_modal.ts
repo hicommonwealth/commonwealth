@@ -5,8 +5,31 @@ import m, { VnodeDOM } from 'mithril';
 import { ListItem, Button, List, Icon, Icons } from 'construct-ui';
 import app from 'state';
 
-const OrderTopicModal: m.Component<null, { featuredTopics }> = {
-  oncreate: (vnode: VnodeDOM<null, { featuredTopics }>) => {
+const OrderTopicModal: m.Component<
+  null,
+  { featuredTopics; featuredTopicOrder }
+> = {
+  oninit: (vnode: VnodeDOM<null, { featuredTopics; featuredTopicOrder }>) => {
+    vnode.state.featuredTopics = app.chain.meta.chain.topics.filter(
+      (topic) => topic.featuredInSidebar
+    );
+    console.log(vnode.state.featuredTopics);
+    if (!vnode.state.featuredTopics[0].order) {
+      vnode.state.featuredTopics
+        .sort((a, b) => b.name - a.name)
+        .forEach((topic, idx) => {
+          topic.order = idx + 1;
+        });
+    }
+    vnode.state.featuredTopics.sort((a, b) => b.order - a.order || b - a);
+
+    vnode.state.featuredTopicOrder = {};
+    vnode.state.featuredTopics.forEach((topic) => {
+      vnode.state.featuredTopicOrder[topic.order] = topic;
+    });
+    console.log(vnode.state.featuredTopicOrder);
+  },
+  oncreate: (vnode: VnodeDOM<null, { featuredTopics; featuredTopicOrder }>) => {
     dragula([document.querySelector('.featured-topic-list')]).on(
       'drop',
       async (el, target, source, sibling) => {
@@ -22,14 +45,10 @@ const OrderTopicModal: m.Component<null, { featuredTopics }> = {
         const siblingTopic = vnode.state.featuredTopics.find(
           (t) => t.name === sibling.innerText
         );
-        app.topics.edit(movedTopic, siblingTopic.order - 1);
       }
     );
   },
-  view: (vnode: VnodeDOM<null, { featuredTopics }>) => {
-    vnode.state.featuredTopics = app.chain.meta.chain.topics.filter(
-      (topic) => topic.featuredInSidebar
-    );
+  view: (vnode: VnodeDOM<null, { featuredTopics; featuredTopicOrder }>) => {
     const { featuredTopics } = vnode.state;
 
     return m('.OrderTopicModal', [
@@ -40,14 +59,12 @@ const OrderTopicModal: m.Component<null, { featuredTopics }> = {
           {
             class: 'featured-topic-list',
           },
-          featuredTopics
-            .sort((a, b) => (a.name > b.name ? 1 : -1))
-            .map((t) =>
-              m(ListItem, {
-                label: [m('span.topic-name', t.name)],
-                contentRight: m(Icon, { name: Icons.ALIGN_JUSTIFY }),
-              })
-            )
+          featuredTopics.map((t) =>
+            m(ListItem, {
+              label: [m('span.topic-name', t.name)],
+              contentRight: m(Icon, { name: Icons.ALIGN_JUSTIFY }),
+            })
+          )
         ),
         m(Button, {
           intent: 'primary',
@@ -55,10 +72,9 @@ const OrderTopicModal: m.Component<null, { featuredTopics }> = {
           rounded: true,
           onclick: async (e) => {
             e.preventDefault();
-            $(vnode.dom).trigger('modalforceexit');
-            m.redraw();
+            $(e.target).trigger('modalexit');
           },
-          label: 'Close',
+          label: 'Save',
         }),
       ]),
     ]);
