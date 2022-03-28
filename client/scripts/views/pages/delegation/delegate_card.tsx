@@ -63,6 +63,7 @@ class DelegateCard implements m.ClassComponent<DelegateCardAttrs> {
                   user: vnode.attrs.delegate,
                   avatarOnly: true,
                   avatarSize: 40,
+                  popover: true,
                 })}
               <div class="profile-section">
                 <div class="profile-name">
@@ -113,7 +114,7 @@ class DelegateCard implements m.ClassComponent<DelegateCardAttrs> {
                   dataFetched={this.fetchedDelegateInfo}
                 />
                 <StatSection
-                  title="Proposals"
+                  title="Proposal Votes"
                   displayValue={this.delegateInfo.proposals.toString()}
                   persist={false}
                   dataFetched={this.fetchedDelegateInfo}
