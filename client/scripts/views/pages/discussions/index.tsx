@@ -28,6 +28,7 @@ import {
   orderDiscussionsbyLastComment,
 } from './helpers';
 import { DiscussionFilterBar } from './discussion_filter_bar';
+import { RecentListing } from './recent_listing';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -375,6 +376,9 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       this.postsDepleted[subpage] === true;
     const postsDepleted = allThreads.length > 0 && this.postsDepleted[subpage];
 
+    const showSummaryListing = !isLoading && onSummaryView;
+    const showRecentListing = !isLoading && !onSummaryView;
+
     return (
       <Sublayout
         class="DiscussionsPage"
@@ -393,23 +397,9 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
               />
             )}
             <div class="listing-wrap">
-              {onSummaryView
-                ? isLoading
-                  ? m(LoadingRow)
-                  : m(Listing, {
-                      content: [
-                        <SummaryListing recentThreads={recentThreads} />,
-                      ],
-                    })
-                : isLoading
-                ? m(LoadingRow)
-                : isEmpty
-                ? m(EmptyListingPlaceholder, {
-                    stageName: stage,
-                    communityName,
-                    topicName,
-                  })
-                : m(Listing, { content: sortedListing })}
+              {isLoading && m(LoadingRow)}
+              {showSummaryListing && m(SummaryListing, { recentThreads })}
+              {showRecentListing && m(RecentListing, { recentThreads })}
               {postsDepleted ? (
                 <div class="infinite-scroll-reached-end">
                   Showing {allThreads.length} of{' '}
