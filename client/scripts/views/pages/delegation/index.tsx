@@ -161,7 +161,7 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
       this.delegates = [];
 
       // TODO: remove this duplicate data that was used for testing
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 5; i++) {
         this.delegates = this.delegates.concat(dummyData);
       }
 
