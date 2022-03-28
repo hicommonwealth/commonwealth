@@ -136,10 +136,8 @@ export class UserDashboard implements m.ClassComponent {
       }
     }, 400);
 
-    $(window).on('scroll', this.onscroll);
-
     return (
-      <Sublayout>
+      <Sublayout onscroll={this.onscroll}>
         <div class="UserDashboard">
           <div class="dashboard-header">
             <div class="title">

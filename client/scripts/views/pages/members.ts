@@ -161,9 +161,6 @@ const MembersPage: m.Component<
       }, 100);
     }
 
-    // Infinite Scroll
-    $(window).off('scroll');
-
     vnode.state.onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
@@ -191,8 +188,6 @@ const MembersPage: m.Component<
       }
     }, 400);
 
-    $(window).on('scroll', vnode.state.onscroll);
-
     const {
       membersLoaded,
       numProfilesLoaded,
@@ -214,6 +209,7 @@ const MembersPage: m.Component<
           }),
         ],
         showNewProposalButton: true,
+        onscroll: vnode.state.onscroll,
       },
       m('.members-container', [
         [

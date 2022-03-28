@@ -25,6 +25,7 @@ type SublayoutAttrs = {
   rightContent?: any;
   showNewProposalButton?: boolean;
   title?: any; // displayed at the top of the layout
+  onscroll?: any; // lazy loading for page content
 };
 
 const footercontents = [
@@ -60,6 +61,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       rightContent,
       showNewProposalButton,
       title,
+      onscroll,
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
@@ -93,7 +95,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           </div>
           <div class="sidebar-and-body-container">
             <Sidebar />
-            <div class="body">
+            <div class="body" onscroll={onscroll}>
               <TokenHero chain={chain} hero={hero} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
               <div

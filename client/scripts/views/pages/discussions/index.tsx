@@ -272,8 +272,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
     const newSubpage = subpage !== lastSubpage;
 
     if (newSubpage) {
-      $(window).off('scroll');
-
       let topicId;
       if (topic) {
         topicId = app.topics.getByName(topic, app.activeChainId())?.id;
@@ -307,6 +305,19 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
         stage,
       };
 
+      this.onscroll = _.debounce(async () => {
+        console.log('scrawling');
+        if (this.postsDepleted[subpage]) return;
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollPos > scrollHeight - 400) {
+          options.cutoffDate = this.lookback[subpage];
+          const morePostsRemaining = await app.threads.loadNextPage(options);
+          if (!morePostsRemaining) this.postsDepleted[subpage] = true;
+          m.redraw();
+        }
+      }, 400);
+
       if (!this.topicInitialized[subpage]) {
         // Fetch first page of posts
         app.threads.loadNextPage(options).then((morePostsRemaining) => {
@@ -320,31 +331,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       ) {
         this.postsDepleted[subpage] = true;
       }
-
-      // Initialize infiniteScroll
-      this.onscroll = _.debounce(async () => {
-        if (this.postsDepleted[subpage]) return;
-        const scrollHeight = $(document).height();
-        const scrollPos = $(window).height() + $(window).scrollTop();
-        if (scrollPos > scrollHeight - 400) {
-          options.cutoffDate = this.lookback[subpage];
-          const morePostsRemaining = await app.threads.loadNextPage(options);
-          if (!morePostsRemaining) this.postsDepleted[subpage] = true;
-          m.redraw();
-        }
-      }, 400);
-
-      // Trigger a scroll event after this render cycle
-      // NOTE: If the window is resized to increase its height, we may
-      // get stuck in a state where the user cannot scroll and thus
-      // new posts can never be loaded.
-      setTimeout(() => {
-        if ($('.DiscussionsPage').height() < $(document).height()) {
-          $(window).trigger('scroll');
-        }
-      }, 0);
-
-      $(window).on('scroll', this.onscroll);
 
       this.lastSubpage = subpage;
     }
@@ -381,6 +367,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
         title="Discussions"
         description={topicDescription}
         showNewProposalButton={true}
+        onscroll={this.onscroll}
       >
         {app.chain && (
           <div class="discussions-main">
