@@ -12,6 +12,7 @@
   .MarkdownFormattedText {
     margin-top: 6px;
     &.collapsed {
+      white-space: unset;
       margin-bottom: -6px;
       &.suppress-fadeout {
         margin-bottom: 0;
@@ -86,7 +87,6 @@
   .profile-container {
     padding: 24px;
   }
-  padding-bottom: 50px;
   .error-message {
     @include error-text();
     margin-top: 20px;
