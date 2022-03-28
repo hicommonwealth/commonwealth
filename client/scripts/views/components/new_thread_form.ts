@@ -685,12 +685,7 @@ export const NewThreadForm: m.Component<
                         localStorage.getItem(
                           `${app.activeChainId()}-active-topic`
                         ),
-                      topics: app.topics.getByCommunity(app.activeChainId()),
-                      featuredTopics: app.topics
-                        .getByCommunity(app.activeChainId())
-                        .filter((ele) =>
-                          activeEntityInfo.featuredTopics.includes(`${ele.id}`)
-                        ),
+                      topics: app.chain.meta.chain.topics,
                       updateFormData: updateTopicState,
                       tabindex: 1,
                     }),
@@ -828,23 +823,14 @@ export const NewThreadForm: m.Component<
                               ),
                         topics:
                           app.topics &&
-                          app.topics
-                            .getByCommunity(app.activeChainId())
-                            .filter((t) => {
-                              return (
-                                isAdmin ||
-                                t.tokenThreshold.isZero() ||
-                                (ITokenAdapter.instanceOf(app.chain) &&
-                                  t.tokenThreshold.lte(app.chain.tokenBalance))
-                              );
-                            }),
-                        featuredTopics: app.topics
-                          .getByCommunity(app.activeChainId())
-                          .filter((ele) =>
-                            activeEntityInfo.featuredTopics.includes(
-                              `${ele.id}`
-                            )
-                          ),
+                          app.chain.meta.chain.topics.filter((t) => {
+                            return (
+                              isAdmin ||
+                              t.tokenThreshold.isZero() ||
+                              (ITokenAdapter.instanceOf(app.chain) &&
+                                t.tokenThreshold.lte(app.chain.tokenBalance))
+                            );
+                          }),
                         updateFormData: updateTopicState,
                         tabindex: 1,
                       }),

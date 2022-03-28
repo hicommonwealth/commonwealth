@@ -7,7 +7,6 @@ import { OffchainTopic } from 'models';
 const TopicSelector: m.Component<
   {
     defaultTopic?: OffchainTopic | string | boolean;
-    featuredTopics: OffchainTopic[];
     tabindex?: number;
     topics: OffchainTopic[];
     updateFormData: Function;
@@ -17,8 +16,7 @@ const TopicSelector: m.Component<
   }
 > = {
   view: (vnode) => {
-    const { defaultTopic, featuredTopics, tabindex, topics, updateFormData } =
-      vnode.attrs;
+    const { defaultTopic, tabindex, topics, updateFormData } = vnode.attrs;
     let selectedTopic;
     if (defaultTopic === false) {
       selectedTopic = undefined;
@@ -27,6 +25,10 @@ const TopicSelector: m.Component<
     } else if (defaultTopic && defaultTopic instanceof OffchainTopic) {
       selectedTopic = defaultTopic;
     }
+
+    const featuredTopics = topics
+      .filter((topic) => topic.featuredInSidebar)
+      .sort((a, b) => b.order - a.order);
 
     const itemRender = (topic) => {
       return m(ListItem, {
