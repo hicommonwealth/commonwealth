@@ -19,7 +19,7 @@ module.exports = {
         id: 'axie-infinity',
         symbol: 'RON',
         name: 'Axie Infinity',
-        type: 'offchain',
+        type: 'token',
         network: 'axie-infinity',
         base: 'ethereum',
         active: true,
