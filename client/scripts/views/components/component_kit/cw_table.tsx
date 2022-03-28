@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import 'components/component_kit/cw_table.scss';
-import { Table } from 'construct-ui';
 import { CWButton } from './cw_button';
 import { ButtonType } from './types';
 
@@ -12,6 +11,17 @@ export enum TableEntryType {
   Component = 'other',
 }
 
+type TableEntry = {
+  value: any;
+  type: TableEntryType;
+  align?: string;
+  className?: string;
+  buttonDetails?: {
+    buttonType: ButtonType;
+    onclick?: any;
+  };
+};
+
 export type TableAttrs = {
   columns: Array<{
     colTitle: string;
@@ -19,22 +29,20 @@ export type TableAttrs = {
     colWidth?: string;
     align?: string;
   }>;
-  data: Array<
-    Array<{
-      value: any;
-      type: TableEntryType;
-      align?: string;
-      className?: string;
-      buttonDetails?: {
-        onclick?: any;
-        buttonType: ButtonType;
-      };
-    }>
-  >;
+  data: Array<Array<TableEntry>>;
 };
 export class CWTable implements m.ClassComponent<TableAttrs> {
+  private dataMatches: boolean;
+  oninit(vnode) {
+    this.dataMatches = true;
+  }
   view(vnode) {
-    return (
+    for (const data of vnode.attrs.data) {
+      if (data.length != vnode.attrs.columns.length) {
+        this.dataMatches = false; // Enforce data matches expected columns
+      }
+    }
+    return this.dataMatches ? (
       <table class="Table">
         <tr>
           {vnode.attrs.columns.map(
@@ -114,6 +122,8 @@ export class CWTable implements m.ClassComponent<TableAttrs> {
           );
         })}
       </table>
+    ) : (
+      <div></div>
     );
   }
 }
