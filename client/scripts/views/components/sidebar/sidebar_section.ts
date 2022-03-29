@@ -3,12 +3,12 @@ import m from 'mithril';
 
 export interface SubSectionProps {
   title: string;
-  is_visible: boolean;
-  is_active: boolean; // Is this the current page
-  is_updated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
+  isVisible: boolean;
+  isActive: boolean; // Is this the current page
+  isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
   onclick: Function;
   onhover?: Function;
-  row_icon?: boolean;
+  rowIcon?: boolean;
 }
 
 export interface SectionGroupProps {
@@ -16,8 +16,8 @@ export interface SectionGroupProps {
   contains_children: boolean;
   default_toggle: boolean;
   is_visible: boolean; // Is this section shown as an option
-  is_active: boolean; // Is this the current page
-  is_updated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
+  isActive: boolean; // Is this the current page
+  isUpdated: boolean; // Does this page have updates (relevant for chat, less so for other sections)
   onclick: Function;
   onhover?: Function;
   display_data: SubSectionProps[] | null;
@@ -25,8 +25,8 @@ export interface SectionGroupProps {
 
 export interface SidebarSectionProps {
   title: string;
-  default_toggle: boolean;
-  is_active: boolean;
+  defaultToggle: boolean;
+  isActive: boolean;
   onclick: Function;
   onhover?: Function;
   display_data: SectionGroupProps[];
@@ -35,13 +35,13 @@ export interface SidebarSectionProps {
 
 const SubSection: m.Component<SubSectionProps, { background_color: string }> = {
   oninit: (vnode) => {
-    vnode.state.background_color = vnode.attrs.is_active ? '#EDE7FF' : 'none';
+    vnode.state.background_color = vnode.attrs.isActive ? '#EDE7FF' : 'none';
   },
   view: (vnode) => {
-    const { title, is_visible, is_active, onclick, row_icon, is_updated } =
+    const { title, isVisible, isActive, onclick, rowIcon, isUpdated } =
       vnode.attrs;
     const { background_color } = vnode.state;
-    if (!is_visible) {
+    if (!isVisible) {
       return;
     }
 
@@ -49,19 +49,19 @@ const SubSection: m.Component<SubSectionProps, { background_color: string }> = {
       onclick(e);
     };
 
-    let title_text_class = '.title-standard';
-    if (is_active) {
-      title_text_class = '.title-active';
-    } else if (!is_updated) {
-      title_text_class = '.title-stale';
+    let titleTextClass = '.title-standard';
+    if (isActive) {
+      titleTextClass = '.title-active';
+    } else if (!isUpdated) {
+      titleTextClass = '.title-stale';
     }
 
-    const mouse_enter_handler = (e) => {
+    const mouseEnterHandler = (e) => {
       vnode.state.background_color = '#EDE7FF';
     };
 
-    const mouse_leave_handler = (e) => {
-      vnode.state.background_color = is_active ? '#EDE7FF' : 'none';
+    const mouseLeaveHandler = (e) => {
+      vnode.state.background_color = isActive ? '#EDE7FF' : 'none';
     };
 
     return m(
@@ -70,11 +70,11 @@ const SubSection: m.Component<SubSectionProps, { background_color: string }> = {
         onclick: (e) => click_handler(e),
         style: `background-color: ${background_color}`,
         onmouseenter: (e) => mouse_enter_handler(e),
-        onmouseleave: (e) => mouse_leave_handler(e),
+        onmouseleave: (e) => mouseLeaveHandler(e),
       },
       [
-        row_icon && m(title_text_class, [m(Icon, { name: Icons.HASH })]),
-        m(title_text_class, title),
+        rowIcon && m(titleTextClass, [m(Icon, { name: Icons.HASH })]),
+        m(titleTextClass, title),
       ]
     );
   },
@@ -90,11 +90,11 @@ const SectionGroup: m.Component<
   view: (vnode) => {
     const {
       title,
-      contains_children,
-      display_data,
+      containsChildren,
+      displayData,
       is_visible,
-      is_updated,
-      is_active,
+      isUpdated,
+      isActive,
       onclick,
       onhover,
     } = vnode.attrs;
@@ -105,7 +105,7 @@ const SectionGroup: m.Component<
     }
 
     const click_handler = (e) => {
-      if (contains_children) {
+      if (containsChildren) {
         vnode.state.toggled = !toggled;
       }
       onclick(e, vnode.state.toggled);
@@ -119,15 +119,15 @@ const SectionGroup: m.Component<
           name: Icons.CHEVRON_RIGHT,
         });
 
-    let title_text_class = '.section-title-text-standard';
-    if (is_active && !contains_children) {
-      title_text_class = '.section-title-text-active';
-    } else if (!is_updated) {
-      title_text_class = '.section-title-text-stale';
+    let titleTextClass = '.section-title-text-standard';
+    if (isActive && !containsChildren) {
+      titleTextClass = '.section-title-text-active';
+    } else if (!isUpdated) {
+      titleTextClass = '.section-title-text-stale';
     }
 
     let background_color = 'none';
-    if (is_active && !contains_children) {
+    if (isActive && !containsChildren) {
       background_color = '#EDE7FF';
     }
 
@@ -138,16 +138,16 @@ const SectionGroup: m.Component<
       }
     };
 
-    const mouse_leave_handler = (e) => {
-      background_color = is_active && !contains_children ? '#EDE7FF' : 'none';
+    const mouseLeaveHandler = (e) => {
+      background_color = isActive && !containsChildren ? '#EDE7FF' : 'none';
       vnode.state.hover_on = false;
     };
 
     return m(
       '.SectionGroup',
       {
-        onmouseenter: (e) => mouse_enter_handler(e),
-        onmouseleave: (e) => mouse_leave_handler(e),
+        onmouseenter: mouseEnterHandler,
+        onmouseleave: (mouseLeaveHandler,
       },
       [
         m(
@@ -159,14 +159,14 @@ const SectionGroup: m.Component<
             }`,
           },
           [
-            contains_children ? m('.carat', carat) : m('.no-carat'),
-            m(title_text_class, title),
+            containsChildren ? m('.carat', carat) : m('.no-carat'),
+            m(titleTextClass, title),
           ]
         ),
-        contains_children &&
+        containsChildren &&
           toggled &&
           m('.subsections', [
-            display_data.map((subsection) => m(SubSection, { ...subsection })),
+            displayData.map((subsection) => m(SubSection, { ...subsection })),
           ]),
       ]
     );
@@ -178,7 +178,7 @@ const SidebarSection: m.Component<
   { toggled: boolean; hover_color: string }
 > = {
   oninit: (vnode) => {
-    vnode.state.toggled = vnode.attrs.default_toggle;
+    vnode.state.toggled = vnode.attrs.defaultToggle;
     vnode.state.hover_color = 'none';
   },
   view: (vnode) => {
@@ -196,13 +196,13 @@ const SidebarSection: m.Component<
       onclick(e, vnode.state.toggled);
     };
 
-    const mouse_enter_handler = (e) => {
+    const mouseEnterHandler = (e) => {
       if (!toggled) {
         vnode.state.hover_color = '#EDE7FF';
       }
     };
 
-    const mouse_leave_handler = (e) => {
+    const mouseLeaveHandler = (e) => {
       vnode.state.hover_color = 'none';
     };
 
@@ -217,8 +217,8 @@ const SidebarSection: m.Component<
     return m(
       '.SidebarSection',
       {
-        onmouseenter: (e) => mouse_enter_handler(e),
-        onmouseleave: (e) => mouse_leave_handler(e),
+        onmouseenter: (e) => mouseEnterHandler(e),
+        onmouseleave: (e) => mouseLeaveHandler(e),
         style: `background-color: ${hover_color}`,
       },
       [

@@ -26,13 +26,13 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 // Toggle Tree Definition (3 layers of depth, could add more if desired)
 export interface ToggleTree {
-  toggled_state: boolean;
+  toggledState: boolean;
   children: {
     [child: string]: {
-      toggled_state: boolean;
+      toggledState: boolean;
       children: {
         [child: string]: {
-          toggled_state: boolean;
+          toggledState: boolean;
         };
       };
     };
@@ -46,13 +46,13 @@ function comparisonCustomizer(value1, value2) {
 }
 // Check that our current cached tree is structurally correct
 export function verifyCachedToggleTree(
-  tree_name: string,
-  toggle_tree: ToggleTree
+  treeName: string,
+  toggleTree: ToggleTree
 ) {
-  const cached_tree = JSON.parse(
-    localStorage[`${app.activeChainId()}-${tree_name}-toggle-tree`]
+  const cachedTree = JSON.parse(
+    localStorage[`${app.activeChainId()}-${treeName}-toggle-tree`]
   );
-  return _.isEqualWith(cached_tree, toggle_tree, comparisonCustomizer);
+  return _.isEqualWith(cachedTree, toggleTree, comparisonCustomizer);
 }
 
 const SidebarQuickSwitcherItem: m.Component<{ item; size }> = {

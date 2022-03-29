@@ -238,7 +238,7 @@ class TopicsController {
       'order[]': orderedIds,
       jwt: app.user.jwt,
     });
-    console.log(response.result);
+
     response.result.forEach((t) => {
       // TODO Graham 3/29/22: Add 'update' method to TopicStore,
       // consolidate methods
