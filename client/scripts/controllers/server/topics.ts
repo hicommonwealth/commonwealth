@@ -67,7 +67,7 @@ class TopicsController {
     try {
       const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
         topic_id: topic.id,
-        token_threshold: token_threshold,
+        token_threshold,
         jwt: app.user.jwt,
       });
       if (response.status === 'Success') {
@@ -87,7 +87,7 @@ class TopicsController {
 
   public async update(threadId: number, topicName: string, topicId?: number) {
     try {
-      const response = await $.post(`${app.serverUrl()}/updateTopics`, {
+      const response = await $.post(`${app.serverUrl()}/updateTopic`, {
         jwt: app.user.jwt,
         thread_id: threadId,
         topic_id: topicId,
@@ -123,9 +123,9 @@ class TopicsController {
       // TODO: Change to POST /topic
       const response = await $.post(`${app.serverUrl()}/createTopic`, {
         chain: app.activeChainId(),
-        name: name,
-        description: description,
-        telegram: telegram,
+        name,
+        description,
+        telegram,
         featured_in_sidebar: featuredInSidebar,
         featured_in_new_post: featuredInNewPost,
         default_offchain_template: defaultOffchainTemplate,
@@ -210,7 +210,7 @@ class TopicsController {
     this._initialized = true;
   }
 
-  public getTopicListing = (topic, activeTopic) => {
+  public getTopicListing = (topic: OffchainTopic, activeTopic: string) => {
     // Iff a topic is already in the TopicStore, e.g. due to app.topics.edit, it will be excluded from
     // addition to the TopicStore, since said store will be more up-to-date
     const existing = this.getByIdentifier(topic.id);
@@ -218,6 +218,22 @@ class TopicsController {
     const { id, name, description, telegram } = existing || topic;
     const selected = name === activeTopic;
     return { id, name, description, telegram, selected };
+  };
+
+  public updateFeaturedOrder = async (featuredTopics: OffchainTopic[]) => {
+    const reorderedTopics = featuredTopics.filter((t) => {
+      const newPosition = +t.order;
+      const previousPosition = +this.getByIdentifier(t.id).order;
+      return newPosition !== previousPosition;
+    });
+    console.log({ reorderedTopics });
+    const orderedIds = reorderedTopics.map((t) => t.id);
+    const response = await $.get(`${app.serverUrl()}/orderTopics`, {
+      chain: app.activeChainId(),
+      'order[]': orderedIds,
+      jwt: app.user.jwt,
+    });
+    console.log(response.result);
   };
 }
 
