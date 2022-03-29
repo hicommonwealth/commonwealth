@@ -11,10 +11,8 @@ const storeNewTopicOrder = (
   HTMLContainer: HTMLElement,
   state: { topics: OffchainTopic[] }
 ) => {
-  const { topics } = state;
-  console.log(HTMLContainer);
   const getTopicOrderFromEle = (htmlEle: HTMLElement): OffchainTopic => {
-    const topic = topics.find((t) => t.name === htmlEle.innerText);
+    const topic = state.topics.find((t) => t.name === htmlEle.innerText);
     return topic;
   };
 
@@ -39,7 +37,7 @@ const OrderTopicsModalodal: m.Component<null, { topics: OffchainTopic[] }> = {
           topic.order = idx + 1;
         });
     } else {
-      vnode.state.topics.sort((a, b) => b.order - a.order);
+      vnode.state.topics.sort((a, b) => a.order - b.order);
     }
   },
   oncreate: (vnode: VnodeDOM<null, { topics: OffchainTopic[] }>) => {
@@ -52,6 +50,7 @@ const OrderTopicsModalodal: m.Component<null, { topics: OffchainTopic[] }> = {
   },
   view: (vnode: VnodeDOM<null, { topics: OffchainTopic[] }>) => {
     const { topics } = vnode.state;
+    console.log(topics);
 
     return m('.OrderTopicsModalodal', [
       m('h2.header', 'Reorder Topics'),

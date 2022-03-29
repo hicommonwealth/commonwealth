@@ -221,6 +221,7 @@ class TopicsController {
   };
 
   public updateFeaturedOrder = async (featuredTopics: OffchainTopic[]) => {
+    // Only topics which have had their order altered are passed to the backend
     const reorderedTopics = featuredTopics.filter((t) => {
       const newPosition = +t.order;
       const previousPosition = +this.getByIdentifier(t.id).order;
@@ -228,13 +229,23 @@ class TopicsController {
       return newPosition !== previousPosition;
     });
     console.log({ reorderedTopics });
-    const orderedIds = reorderedTopics.map((t) => t.id);
-    const response = await $.get(`${app.serverUrl()}/orderTopics`, {
+    const orderedIds = reorderedTopics
+      .sort((a, b) => a.order - b.order)
+      .map((t) => t.id);
+    console.log({ orderedIds });
+    const response = await $.post(`${app.serverUrl()}/orderTopics`, {
       chain: app.activeChainId(),
       'order[]': orderedIds,
       jwt: app.user.jwt,
     });
     console.log(response.result);
+    response.result.forEach((t) => {
+      // TODO Graham 3/29/22: Add 'update' method to TopicStore,
+      // consolidate methods
+      const modeledTopic = new OffchainTopic(t);
+      this.store.remove(modeledTopic);
+      this.store.add(modeledTopic);
+    });
   };
 }
 

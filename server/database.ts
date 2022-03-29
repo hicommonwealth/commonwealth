@@ -102,7 +102,9 @@ import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
-import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
+import NotificationsReadFactory, {
+  NotificationsReadModelStatic,
+} from './models/notifications_read';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -162,7 +164,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
     process.env.NODE_ENV === 'test'
       ? false
       : (msg) => {
-          log.trace(msg);
+          log.info(msg);
         },
   dialectOptions:
     process.env.NODE_ENV !== 'production'
