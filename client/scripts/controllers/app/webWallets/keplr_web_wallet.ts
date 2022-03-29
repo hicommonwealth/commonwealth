@@ -1,7 +1,14 @@
 import app from 'state';
 
-import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
-import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
+import {
+  SigningStargateClient,
+  StargateClient,
+  StdFee,
+  isBroadcastTxSuccess,
+  isBroadcastTxFailure,
+} from '@cosmjs/stargate';
+import { OfflineDirectSigner, AccountData, EncodeObject } from '@cosmjs/proto-signing';
+import { Event } from '@cosmjs/tendermint-rpc';
 
 import { ChainBase } from 'types';
 import { Account, IWebWallet } from 'models';
@@ -20,7 +27,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _enabling = false;
   private _chainId: string;
   private _offlineSigner: OfflineDirectSigner;
-  private _client: SigningStargateClient;
 
   public readonly name = 'keplr';
   public readonly label = 'Keplr';
@@ -40,6 +46,34 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
   public get api() { return window.keplr; }
   public get offlineSigner() { return this._offlineSigner; }
+
+  public async sendTx(address: string, tx: EncodeObject): Promise<string> {
+    if (!this.enabled) {
+      await this.enable();
+    }
+    const client = await SigningStargateClient.connectWithSigner(app.chain.meta.url, this.offlineSigner);
+
+    // these parameters will be overridden by the wallet
+    // TODO: can it be simulated?
+    const DEFAULT_FEE: StdFee = {
+      gas: '180000',
+      amount: [{ amount: (2.5e-8).toFixed(9), denom: app.chain.chain.denom }]
+    };
+    const DEFAULT_MEMO = '';
+
+    // send the transaction using keplr-supported signing client
+    try {
+      const result = await client.signAndBroadcast(address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
+      if (isBroadcastTxFailure(result)) {
+        throw new Error('TX execution failed.');
+      } else if (isBroadcastTxSuccess(result)) {
+        return result.transactionHash;
+      }
+    } catch (err) {
+      console.log(err.message);
+      throw err;
+    }
+  }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
     if (!this._chainId || !window.keplr?.signAmino)

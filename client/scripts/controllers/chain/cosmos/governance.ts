@@ -95,7 +95,6 @@ class CosmosGovernance extends ProposalModule<
       console.error('Gov minDeposit in wrong denom:', depositParams.minDeposit);
       this._minDeposit = new CosmosToken(this._Chain.denom, 0);
     }
-    console.log(this._minDeposit);
 
     // query existing proposals
     await this._initProposals();
@@ -139,7 +138,6 @@ class CosmosGovernance extends ProposalModule<
       // TODO: only fetch next page of proposals on scroll
       let nextKey = pagination.nextKey;
       while (nextKey.length > 0) {
-        console.log(nextKey);
         const { proposals: addlProposals, pagination: nextPage } =
           await this._Chain.api.gov.proposals(0, '', '', nextKey);
         proposals.push(...addlProposals);
@@ -206,7 +204,6 @@ class CosmosGovernance extends ProposalModule<
 
     // fetch completed proposal from returned events
     const events = await this._Chain.sendTx(sender, msg);
-    console.log(events);
     const submitEvent = events.find((e) => e.type === 'submit_proposal');
     const idAttribute = submitEvent.attributes.find(({ key }) => fromAscii(key) === 'proposal_id');
     const id = +fromAscii(idAttribute.value);

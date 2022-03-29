@@ -1,6 +1,6 @@
 import { ChainBase, ChainNetwork } from 'types';
 import { Account, IWebWallet } from 'models';
-import { Extension } from '@terra-money/terra.js';
+import { Extension, CreateTxOptions } from '@terra-money/terra.js';
 
 class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -38,42 +38,35 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     this._enabling = true;
 
     try {
-      this._extension.once('onConnect', (accountAddr) => {
-        console.log(this._extension);
-        if (accountAddr && !this._accounts.includes(accountAddr)) {
-          console.log(accountAddr);
-          this._accounts.push(accountAddr);
-          console.log('enabled and added');
-        }
-        this._enabled = !!accountAddr;
-        this._enabling = false;
-      });
-      this._extension.connect();
+      const res: any = await this._extension.request('connect');
+      const accountAddr: string = res.payload.address;
+      if (accountAddr && !this._accounts.includes(accountAddr)) {
+        this._accounts.push(accountAddr);
+      }
+      this._enabled = !!accountAddr;
+      this._enabling = false;
     } catch (error) {
       console.error(`Failed to enabled Terra Station ${error.message}`);
       this._enabling = false;
     }
   }
 
+  public async sendTx(options: CreateTxOptions) {
+    const res: any = await this._extension.request('post', JSON.parse(JSON.stringify(options)));
+    console.log(res);
+    return res.payload.transactionHash;
+  }
+
   public async validateWithAccount(account: Account<any>): Promise<void> {
     // timeout?
-    const result = await new Promise<{ public_key: string, signature: string, recid: number }>((resolve, reject) => {
-      this._extension.on('onSign', (payload) => {
-        if (payload.result?.signature) resolve(payload.result);
-        else reject();
-      });
-
-      try {
-        this._extension.signBytes({
-          purgeQueue: true,
-          bytes: Buffer.from(account.validationToken.trim(), 'hex'),
-        });
-      } catch (error) {
-        console.error(error);
-        // TODO: handling?
-      }
-    });
-    return account.validate(JSON.stringify(result));
+    const bytes = Buffer.from(account.validationToken.trim(), 'hex').toString('base64');
+    const res: any = await this._extension.request('sign', { bytes, purgeQueue: true });
+    if (res?.payload?.result?.signature) {
+      return account.validate(JSON.stringify(res.payload.result));
+    } else {
+      console.error('Failed to validate: ', res);
+      throw new Error('Failed to validate terra account');
+    }
   }
 }
 

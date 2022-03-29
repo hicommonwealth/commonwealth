@@ -6,11 +6,9 @@ import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import BN from 'bn.js';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+import { Msg, CreateTxOptions } from '@terra-money/terra.js';
 
 import {
-  StdFee,
-  isBroadcastTxSuccess,
-  isBroadcastTxFailure,
   QueryClient,
   StakingExtension,
   setupStakingExtension,
@@ -18,7 +16,6 @@ import {
   setupGovExtension,
   BankExtension,
   setupBankExtension,
-  SigningStargateClient,
 } from '@cosmjs/stargate';
 import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
 import { EncodeObject } from '@cosmjs/proto-signing';
@@ -108,42 +105,26 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     this.app.chain.networkStatus = ApiStatus.Disconnected;
   }
 
-  public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<readonly Event[]> {
+  public async sendTx(account: CosmosAccount, tx: EncodeObject | Msg): Promise<readonly Event[]> {
     // TODO: error handling
-    // TODO: support multiple wallets
-    if (this._app.chain.network === ChainNetwork.Terra) {
-      throw new Error('Tx not yet supported on Terra');
-    }
-    const wallet = this.app.wallets.getByName('keplr') as KeplrWebWalletController;
-    if (!wallet) throw new Error('Keplr wallet not found');
-    if (!wallet.enabled) {
-      await wallet.enable();
-    }
-    const client = await SigningStargateClient.connectWithSigner(this._app.chain.meta.url, wallet.offlineSigner);
-
-    // these parameters will be overridden by the wallet
-    // TODO: can it be simulated?
-    const DEFAULT_FEE: StdFee = {
-      gas: '180000',
-      amount: [{ amount: (2.5e-8).toFixed(9), denom: this.denom }]
-    };
-    const DEFAULT_MEMO = '';
-
-    // send the transaction using keplr-supported signing client
     try {
-      const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
-      console.log(result);
-      if (isBroadcastTxFailure(result)) {
-        throw new Error('TX execution failed.');
-      } else if (isBroadcastTxSuccess(result)) {
-        const txHash = result.transactionHash;
-        const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
-        return txResult.result.events;
+      let hash: string;
+      if (this._app.chain.network === ChainNetwork.Terra) {
+        const wallet = this.app.wallets.getByName('terrastation') as TerraStationWebWalletController;
+        if (!wallet) throw new Error('Terra Station wallet not found');
+        const terraOptions: CreateTxOptions = {
+          msgs: [ tx as Msg ],
+        }
+        hash = await wallet.sendTx(terraOptions);
       } else {
-        throw new Error('Unknown broadcast result');
+        const wallet = this.app.wallets.getByName('keplr') as KeplrWebWalletController;
+        if (!wallet) throw new Error('Keplr wallet not found');
+        hash = await wallet.sendTx(account.address, tx as EncodeObject);
       }
+      const txResult = await this._tmClient.tx({ hash: Buffer.from(hash, 'hex') });
+      return txResult.result.events;
     } catch (err) {
-      console.log(err.message);
+      console.error(err.message);
       throw err;
     }
   }
