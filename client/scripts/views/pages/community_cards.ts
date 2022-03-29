@@ -8,6 +8,7 @@ import { ChainInfo, NodeInfo } from 'models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCard } from '../components/component_kit/cw_card';
 import Sublayout from '../sublayout';
+import { ButtonGroup } from 'construct-ui';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -203,7 +204,41 @@ const HomepageCommunityCards: m.Component = {
       },
       [
         m('.communities-list', [
-          m('.communities-number', totalCommunitiesString),
+          m('.header-section', [
+            m('.communities-number', totalCommunitiesString),
+            m('.filter-buttons', [
+              m(CWButton, {
+                label: 'DeFi',
+                buttonType: 'secondary',
+                onclick: () => console.log('clicked'),
+              }),
+              m(CWButton, {
+                label: 'DAO',
+                buttonType: 'secondary',
+                onclick: () => console.log('clicked'),
+              }),
+              m(CWButton, {
+                label: 'ERC20',
+                buttonType: 'secondary',
+                onclick: () => console.log('clicked'),
+              }),
+              m(CWButton, {
+                label: 'Cosmos',
+                buttonType: 'secondary',
+                onclick: () => console.log('clicked'),
+              }),
+              m(CWButton, {
+                label: 'Substrate',
+                buttonType: 'secondary',
+                onclick: () => console.log('clicked'),
+              }),
+              m(CWButton, {
+                label: 'Ethereum',
+                buttonType: 'secondary',
+                onclick: () => console.log('clicked'),
+              }),
+            ]),
+          ]),
           sortedChainsAndCommunities,
           m('.clear'),
           betaChainsAndCommunities.length > 0 &&
