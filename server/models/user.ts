@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { CreateOptions, DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
@@ -10,7 +10,7 @@ import { DB } from '../database';
 
 export type EmailNotificationInterval = 'daily' | 'never';
 
-export interface UserAttributes {
+export type UserAttributes = {
   email: string;
   id?: number;
   emailVerified?: boolean;
@@ -32,7 +32,7 @@ export interface UserAttributes {
 }
 
 // eslint-disable-next-line no-use-before-define
-export interface UserInstance extends Model<UserAttributes>, UserCreationAttributes {
+export type UserInstance = ModelInstance<UserAttributes> & {
   getSelectedNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
   setSelectedNode: Sequelize.BelongsToSetAssociationMixin<ChainNodeInstance, ChainNodeInstance['id']>;
 
@@ -46,7 +46,7 @@ export interface UserInstance extends Model<UserAttributes>, UserCreationAttribu
   setSocialAccounts: Sequelize.HasManySetAssociationsMixin<SocialAccountInstance, SocialAccountInstance['id']>;
 }
 
-export interface UserCreationAttributes extends UserAttributes {
+export type UserCreationAttributes = UserAttributes & {
   createWithProfile?: (
     models: DB,
     attrs: UserAttributes,

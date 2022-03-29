@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes, Op } from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../database';
@@ -15,7 +15,7 @@ const bulkThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
   const { cutoff_date, topic_id, stage } = req.query;
 

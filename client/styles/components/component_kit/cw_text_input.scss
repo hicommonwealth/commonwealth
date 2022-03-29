@@ -1,4 +1,4 @@
-@import 'client/styles/facelift';
+@import 'client/styles/shared';
 
 $text-input-border: 2px solid;
 
@@ -39,6 +39,13 @@ $text-input-border: 2px solid;
     &.failure {
       border: $text-input-border $pinky;
       background-color: $flesh-pink;
+    }
+
+    &.disabled {
+      background-color: $background-gray;
+      border: none;
+      box-shadow: none;
+      cursor: not-allowed;
     }
   }
 

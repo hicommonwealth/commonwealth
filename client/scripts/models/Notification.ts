@@ -7,10 +7,10 @@ class Notification {
   public readonly id: number;
   public readonly data: string;
   public readonly createdAt: moment.Moment;
-  public readonly subscription: NotificationSubscription;
+  public readonly subscription?: NotificationSubscription;
   public readonly chainEvent?: ChainEvent;
+  private _isRead?: boolean;
 
-  private _isRead: boolean;
   public get isRead(): boolean {
     return this._isRead;
   }
@@ -39,7 +39,7 @@ class Notification {
       json.is_read,
       json.created_at,
       subscription,
-      json.Notification?.ChainEvent ? ChainEvent.fromJSON(json.Notification.ChainEvent, chainEventType) : undefined
+      json?.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent, chainEventType) : undefined
     );
   }
 }

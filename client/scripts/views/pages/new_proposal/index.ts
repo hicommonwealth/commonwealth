@@ -6,14 +6,18 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import { ProposalType } from 'types';
-import { proposalSlugToClass, proposalSlugToFriendlyName, chainToProposalSlug } from 'identifiers';
+import {
+  proposalSlugToClass,
+  proposalSlugToFriendlyName,
+  chainToProposalSlug,
+} from 'identifiers';
 import { ProposalModule } from 'models';
 import NewProposalForm from 'views/pages/new_proposal/new_proposal_form';
-import PageNotFound from '../404';
+import { PageNotFound } from '../404';
 
-const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
+const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
   view: (vnode) => {
     vnode.state.typeEnum = vnode.attrs.type;
     vnode.state.titlePre = 'New';
@@ -45,50 +49,69 @@ const NewProposalPage: m.Component<{ type }, { typeEnum, titlePre }> = {
     }
 
     // check if module is still initializing
-    const c = proposalSlugToClass().get(vnode.state.typeEnum) as ProposalModule<any, any, any>;
+    const c = proposalSlugToClass().get(vnode.state.typeEnum) as ProposalModule<
+      any,
+      any,
+      any
+    >;
     if (!c.ready) {
-      app.chain.loadModules([ c ]);
+      app.chain.loadModules([c]);
       return m(PageLoading, { narrow: true, showNewProposalButton: true });
     }
 
-    return m(Sublayout, {
-      class: 'NewProposalPage',
-      title: `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`,
-      showNewProposalButton: true,
-    }, [
-      m('.forum-container', [
-        m('h3', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
-        m(NewProposalForm, {
-          typeEnum: vnode.state.typeEnum,
-          onChangeSlugEnum: (value) => {
-            if (value !== 'proposal') {
-              vnode.state.titlePre = 'Note';
-            } else {
-              vnode.state.titlePre = 'New';
-            }
-            vnode.state.typeEnum = `democracy${value}`;
-            m.redraw();
-          },
-          callback: (proposal) => {
-            if (proposal && vnode.state.typeEnum !== ProposalType.PhragmenCandidacy) {
-              mixpanel.track('Create Thread', {
-                'Step No': 3,
-                'Step' : 'Transaction Signed',
-                'Thread Type': 'Proposal',
-                'ProposalID': typeof proposal === 'object' ? proposal.slug : proposal,
-                'Scope': app.activeChainId(),
-                'user' : app.user.activeAccount.address,
-              });
-              mixpanel.people.increment('Thread');
-              mixpanel.people.set({
-                'Last Thread Created': new Date().toISOString()
-              });
-            }
-          }
-        }),
-      ])
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        class: 'NewProposalPage',
+        title: `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(
+          vnode.state.typeEnum
+        )}`,
+        showNewProposalButton: true,
+      },
+      [
+        m('.forum-container', [
+          m(
+            'h3',
+            `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(
+              vnode.state.typeEnum
+            )}`
+          ),
+          m(NewProposalForm, {
+            typeEnum: vnode.state.typeEnum,
+            onChangeSlugEnum: (value) => {
+              if (value !== 'proposal') {
+                vnode.state.titlePre = 'Note';
+              } else {
+                vnode.state.titlePre = 'New';
+              }
+              vnode.state.typeEnum = `democracy${value}`;
+              m.redraw();
+            },
+            callback: (proposal) => {
+              if (
+                proposal &&
+                vnode.state.typeEnum !== ProposalType.PhragmenCandidacy
+              ) {
+                mixpanel.track('Create Thread', {
+                  'Step No': 3,
+                  Step: 'Transaction Signed',
+                  'Thread Type': 'Proposal',
+                  ProposalID:
+                    typeof proposal === 'object' ? proposal.slug : proposal,
+                  Scope: app.activeChainId(),
+                  user: app.user.activeAccount.address,
+                });
+                mixpanel.people.increment('Thread');
+                mixpanel.people.set({
+                  'Last Thread Created': new Date().toISOString(),
+                });
+              }
+            },
+          }),
+        ]),
+      ]
+    );
+  },
 };
 
 export default NewProposalPage;

@@ -1,6 +1,6 @@
 /* eslint-disable dot-notation */
 import Sequelize from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 const { Op } = Sequelize;
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
@@ -23,7 +23,7 @@ const bulkAddresses = async (models: DB, req, res, next) => {
 
   let chain; let error;
   if (req.query.chain) {
-    [chain, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+    [chain, error] = await validateChain(models, req.query);
     if (error) return next(new Error(error));
     options['where'] = { chain: req.query.chain };
   }

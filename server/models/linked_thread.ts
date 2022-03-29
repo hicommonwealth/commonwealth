@@ -1,9 +1,9 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { OffchainThreadInstance } from './offchain_thread';
 
-export interface LinkedThreadAttributes {
+export type LinkedThreadAttributes = {
   id?: number;
   linked_thread: number;
   linking_thread: number;
@@ -11,9 +11,7 @@ export interface LinkedThreadAttributes {
   updated_at?: Date;
 }
 
-export interface LinkedThreadInstance
-  extends Model<LinkedThreadAttributes>,
-    LinkedThreadAttributes {
+export type LinkedThreadInstance = ModelInstance<LinkedThreadAttributes> & {
   getOffchainThread: Sequelize.BelongsToGetAssociationMixin<OffchainThreadInstance>;
   setOffchainThread: Sequelize.BelongsToSetAssociationMixin<
     OffchainThreadInstance,

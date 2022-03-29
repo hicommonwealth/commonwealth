@@ -144,29 +144,6 @@ class TopicsController {
     }
   }
 
-  public async refreshAll(chainId, reset = false) {
-    try {
-      // TODO: Change to GET /topics
-      const response = await $.get(`${app.serverUrl()}/bulkTopics`, {
-        chain: chainId || app.activeChainId(),
-      });
-      if (response.status !== 'Success') {
-        throw new Error(`Unsuccessful refresh status: ${response.status}`);
-      }
-      if (reset) {
-        this._store.clear();
-      }
-      const topics = (app.chain) ? response.result.filter((topic) => !topic.communityId) : response.result;
-      topics.forEach((t) => this._store.add(new OffchainTopic(t)));
-      this._initialized = true;
-    } catch (err) {
-      console.log('Failed to load offchain topics');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Error loading offchain topics');
-    }
-  }
-
   public initialize(initialTopics, reset = true) {
     if (reset) {
       this._store.clear();
