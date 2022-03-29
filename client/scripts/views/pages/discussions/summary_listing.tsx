@@ -6,7 +6,7 @@ import 'pages/discussions/summary_listing.scss';
 
 import app from 'state';
 import { OffchainThread, OffchainTopic } from 'models';
-import { formatLastUpdated, link } from 'helpers';
+import { formatLastUpdated, formatTimestampAsDate, link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { getLastUpdated, isHot } from './helpers';
@@ -22,7 +22,7 @@ const getThreadCells = (sortedThreads: OffchainThread[]) => {
       <div class="thread-summary">
         {link('a.thread-title', discussionLink, thread.title)}
         <div class="last-updated">
-          {formatLastUpdated(getLastUpdated(thread))}
+          {formatTimestampAsDate(getLastUpdated(thread))}
           {isHot(thread) && <span>🔥</span>}
         </div>
       </div>
