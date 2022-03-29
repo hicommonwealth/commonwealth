@@ -90,7 +90,7 @@
     "@polkadot/util-crypto": "7.4.1",
     "@popperjs/core": "^2.0.6",
     "@sendgrid/mail": "^6.5.0",
-    "@snapshot-labs/snapshot.js": "^0.3.55",
+    "@snapshot-labs/snapshot.js": "^0.3.4",
     "@socket.io/admin-ui": "^0.2.0",
     "@socket.io/postgres-adapter": "^0.1.1",
     "@socket.io/redis-adapter": "^7.1.0",
