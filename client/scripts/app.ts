@@ -747,7 +747,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             '/snapshot/:snapshotId/:identifier': importRoute(
               'views/pages/view_snapshot_proposal',
-              { scoped: true }
+              { scoped: true, deferChain: true }
             ),
             '/new/snapshot/:snapshotId': importRoute(
               'views/pages/new_snapshot_proposal',
@@ -1006,7 +1006,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             '/:scope/snapshot/:snapshotId/:identifier': importRoute(
               'views/pages/view_snapshot_proposal',
-              { scoped: true }
+              { scoped: true, deferChain: true }
             ),
             '/:scope/new/snapshot/:snapshotId': importRoute(
               'views/pages/new_snapshot_proposal',

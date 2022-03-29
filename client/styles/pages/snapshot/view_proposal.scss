@@ -135,6 +135,16 @@
         button {
           margin: 0 20px;
         }
+        .vote-button-group {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          margin-left: -20px;
+          .vote-message {
+            margin-top: 5px;
+            color: #303f9f;
+          }
+        }
       }
 
       .title {
