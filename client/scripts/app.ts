@@ -284,7 +284,7 @@ export async function selectNode(
       )
     ).default;
     newChain = new Aave(n, app);
-  } else if (n.chain.network === ChainNetwork.ERC20) {
+  } else if (n.chain.network === ChainNetwork.ERC20 || n.chain.network === ChainNetwork.AxieInfinity) {
     const ERC20 = (
       await import(
         //   /* webpackMode: "lazy" */
