@@ -1,0 +1,34 @@
+@import 'client/styles/shared';
+
+.TokenTerms {
+  align-items: center;
+  background-color: $layout-color;
+  display: flex;
+  flex-direction: row;
+  height: 32px;
+  justify-content: center;
+  margin-left: $sidebar-width;
+
+  .terms-text {
+    display: flex;
+  }
+
+  a {
+    margin: 0 4px;
+  }
+
+  @include sm-max {
+    margin-left: 0;
+  }
+
+  svg {
+    cursor: pointer;
+    fill: currentColor;
+    position: relative;
+    top: 2px;
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}

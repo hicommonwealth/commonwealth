@@ -1,75 +1,41 @@
 @import 'client/styles/shared';
 
 .ReactionButton {
-    user-select: none;
-    display: flex;
-    .cui-icon, .reply-count, .reactions-count {
-        color: black;
-        font-weight: 500;
-    }
-    .cui-icon {
-        margin-right: 8px;
-    }
-    .reply-count, .reactions-count {
-        position: relative;
-        top: 2px;
-    }
-    // border
-    &.disabled {
-        background: initial !important;
-        color: $text-color-light !important;
-        border-color: $border-color-lightest !important;
-    }
-    &.large {
-        display: block;
-        min-height: 43px !important;
-        min-width: 45px !important;
-        max-height: 43px !important;
-        max-width: 45px !important;
-        text-align: center;
-        color: $text-color-medium;
-        border: 1px solid #ddd;
-        display: block;
-        border-radius: 12px;
-        padding: 0;
-        &.active {
-            color: $primary-bg-color;
-            border-color: $primary-bg-color;
-            span {
-                color: inherit;
-            }
-        }
-        .cui-icon {
-            margin-right: none;
-        }
-        .reactions-icon {
-            position: relative;
-            top: 1px;
-            font-size: 85%;
-            padding: 0;
-            margin: 0;
-            margin-bottom: 4px;
-        }
-        &.like .reactions-icon {
-            -webkit-transform: rotate(180deg);
-            -moz-transform: rotate(180deg);
-            -o-transform: rotate(180deg);
-            -ms-transform: rotate(180deg);
-            transform: rotate(180deg);
-        }
-        .reactions-count {
-            top: 0;
-            padding: 0;
-            min-width: 26px;
-            text-align: center;
-            color: $text-color-medium;
-            font-weight: 500;
-        }
-    }
+  align-items: center;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  color: $text-color-medium;
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  height: 48px;
+  justify-content: center;
+  margin-right: 24px;
+  min-width: 48px;
+
+  &.hasReacted {
+    border-color: $primary-bg-color;
+    color: $primary-bg-color;
+  }
+
+  &.disabled {
+    border-color: $border-color-lightest;
+    color: $text-color-light;
+    pointer-events: none;
+  }
+
+  svg {
+    fill: currentColor;
+    margin: 4px auto 2px;
+  }
+
+  .reactions-count {
+    font-size: 14px;
+    margin: 2px auto 4px;
+  }
 }
 
-.cui-popover.cui-tooltip.ReactionButtonTooltip {
-    .cui-popover-content .reaction-button-tooltip {
-        padding: 7px 8px 2px;
-    }
+.reaction-button-tooltip-contents {
+  display: flex;
+  flex-direction: column;
 }

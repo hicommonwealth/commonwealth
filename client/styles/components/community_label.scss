@@ -1,0 +1,25 @@
+@import 'client/styles/shared';
+
+.CommunityLabel {
+  align-items: center;
+  display: flex;
+  justify-content: left;
+
+  .community-label-name {
+    @include header;
+
+    align-items: center;
+    color: $text-color-black;
+    display: flex;
+    justify-content: left;
+    margin: 0 8px;
+  }
+
+  .visible-sm {
+    display: none;
+
+    @include sm-max {
+      display: block;
+    }
+  }
+}

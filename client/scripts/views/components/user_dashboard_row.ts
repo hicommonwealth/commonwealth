@@ -8,6 +8,7 @@ import {
   Label as ChainEventLabel,
   // CompoundEvents
 } from '@commonwealth/chain-events';
+import moment from 'moment';
 
 import app from 'state';
 import { NotificationCategories } from 'types';
@@ -20,6 +21,7 @@ import {
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
+import { formatTimestamp } from 'helpers/index';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { getProposalUrlPath } from '../../identifiers';
@@ -297,6 +299,9 @@ const ActivityContent: m.Component<{
             },
             [communityName]
           ),
+          m('span.comment-counts', [
+            ` (${formatTimestamp(moment(created_at))})`,
+          ]),
         ]),
         m('.comment-body-concat', [getCommentPreview(comment_text)]),
       ]);
@@ -318,6 +323,9 @@ const ActivityContent: m.Component<{
             },
             [communityName]
           ),
+          m('span.comment-counts', [
+            ` (${formatTimestamp(moment(created_at))})`,
+          ]),
         ]),
       ]);
     }

@@ -12,15 +12,13 @@
   font-weight: 600;
   height: 40px;
   justify-content: center;
-  min-width: 70px;
+  min-width: fit-content;
   padding: 1px;
   background-image: linear-gradient(white, white),
     linear-gradient(var(--angle), #91bfff, #91ffa0, #fbff91, #ff9191);
 
   span {
-    padding-top: 6px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin: 4px 8px;
   }
 
   &.primary {

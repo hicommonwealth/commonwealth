@@ -17,7 +17,7 @@ import Sublayout from 'views/sublayout';
 import User from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 
@@ -173,9 +173,8 @@ const CouncilPage: m.Component<{}> = {
           }),
         ],
         showNewProposalButton: true,
-        showCouncilMenu: true,
       },
-      [
+      m('.council-container', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),
@@ -255,7 +254,7 @@ const CouncilPage: m.Component<{}> = {
           .filter(([account]) => !councillors.includes(account))
           .map(([account]) => m(Councillor, { account })),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

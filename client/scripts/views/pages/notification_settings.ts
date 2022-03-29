@@ -34,7 +34,7 @@ import {
 
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import PageError from 'views/pages/error';
 
 const NOTIFICATION_TABLE_PRE_COPY = 'Off-chain discussion events';

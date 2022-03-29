@@ -54,14 +54,13 @@ import {
 import User from 'views/components/widgets/user';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import TopicSelector from 'views/components/topic_selector';
 import ErrorPage from 'views/pages/error';
-import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
 import { NearSputnikProposalKind } from 'client/scripts/controllers/chain/near/sputnik/types';
+import { TopicSelector } from 'views/components/topic_selector';
 
 enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
@@ -919,17 +918,28 @@ const NewProposalForm = {
           ],
           hasDepositChooser && [
             m(FormGroup, [
-              m(FormLabel, `Deposit (${app.chain.currency})`),
+              m(
+                FormLabel,
+                `Deposit (${
+                  app.chain.base === ChainBase.Substrate
+                    ? app.chain.currency
+                    : (app.chain as Cosmos).governance.minDeposit.denom
+                })`
+              ),
               m(Input, {
                 name: 'deposit',
                 placeholder: `Min: ${
-                  (app.chain as Substrate).democracyProposals.minimumDeposit
-                    .inDollars
+                  app.chain.base === ChainBase.Substrate
+                    ? (app.chain as Substrate).democracyProposals.minimumDeposit
+                        .inDollars
+                    : +(app.chain as Cosmos).governance.minDeposit
                 }`,
                 oncreate: (vvnode) =>
                   $(vvnode.dom).val(
-                    (app.chain as Substrate).democracyProposals.minimumDeposit
-                      .inDollars
+                    app.chain.base === ChainBase.Substrate
+                      ? (app.chain as Substrate).democracyProposals
+                          .minimumDeposit.inDollars
+                      : +(app.chain as Cosmos).governance.minDeposit
                   ),
                 oninput: (e) => {
                   const result = (e.target as any).value;

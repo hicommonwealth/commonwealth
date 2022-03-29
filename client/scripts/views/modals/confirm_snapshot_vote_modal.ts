@@ -4,18 +4,14 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
-import { navigateToSubpage } from 'app';
 
 import {
   SnapshotProposal,
   SnapshotSpace,
-  getVersion,
+  castVote,
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 
-import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { ChainBase } from 'types';
 import { formatNumberShort } from 'adapters/currency';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 
@@ -36,6 +32,7 @@ const ConfirmSnapshotVoteModal: m.Component<
   {
     error: any;
     saving: boolean;
+    validAgainstStrategies: boolean;
   }
 > = {
   view: (vnode) => {
@@ -49,6 +46,7 @@ const ConfirmSnapshotVoteModal: m.Component<
       scores,
       snapshot,
     } = vnode.attrs;
+
     return m('.ConfirmSnapshotVoteModal', [
       m('.compact-modal-title', [
         m('h3', 'Confirm vote'),
@@ -101,53 +99,21 @@ const ConfirmSnapshotVoteModal: m.Component<
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.saving = true;
-              const version = await getVersion();
-              const msg: any = {
-                address: author.address,
-                msg: JSON.stringify({
-                  version,
-                  timestamp: (Date.now() / 1e3).toFixed(),
-                  space: space.id,
-                  type: 'vote',
-                  payload: {
-                    proposal: id,
-                    choice: selectedChoice + 1,
-                    metadata: {},
-                  },
-                }),
+              const votePayload = {
+                space: space.id,
+                proposal: id,
+                type: 'single-choice',
+                choice: selectedChoice + 1,
+                metadata: JSON.stringify({}),
               };
-
               try {
-                const wallet = await app.wallets.locateWallet(
-                  author.address,
-                  ChainBase.Ethereum
-                );
-                if (
-                  !(
-                    wallet instanceof MetamaskWebWalletController ||
-                    wallet instanceof WalletConnectWebWalletController
-                  )
-                ) {
-                  throw new Error('Invalid wallet.');
-                }
-                msg.sig = await wallet.signMessage(msg.msg);
-
-                const result = await $.post(
-                  `${app.serverUrl()}/snapshotAPI/sendMessage`,
-                  { ...msg }
-                );
-                if (result.status === 'Failure') {
-                  const errorMessage =
-                    result && result.message.error_description
-                      ? `${result.message.error_description}`
-                      : NewVoteErrors.SomethingWentWrong;
-                  notifyError(errorMessage);
-                } else if (result.status === 'Success') {
+                castVote(author.address, votePayload).then(() => {
                   $(e.target).trigger('modalexit');
-                  navigateToSubpage(`/snapshot/${space.id}`);
-                }
-              } catch (err) {
-                const errorMessage = err.message;
+                  m.redraw();
+                });
+              } catch (e) {
+                console.log(e);
+                const errorMessage = e.message;
                 notifyError(errorMessage);
               }
 

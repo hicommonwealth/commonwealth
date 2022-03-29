@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import '../styles/normalize.css';
-import '../styles/tailwind_reset.css';
+import '../styles/normalize.css'; // reset
+import '../styles/tailwind_reset.css'; // for the landing page
 import '../styles/shared.scss';
 import 'construct.scss';
 import 'lity/dist/lity.min.css';
@@ -12,6 +12,7 @@ import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
+import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
@@ -27,7 +28,7 @@ import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import LoginModal from 'views/modals/login_modal';
+import { LoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
 
@@ -746,7 +747,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             '/snapshot/:snapshotId/:identifier': importRoute(
               'views/pages/view_snapshot_proposal',
-              { scoped: true }
+              { scoped: true, deferChain: true }
             ),
             '/new/snapshot/:snapshotId': importRoute(
               'views/pages/new_snapshot_proposal',
@@ -1005,7 +1006,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             '/:scope/snapshot/:snapshotId/:identifier': importRoute(
               'views/pages/view_snapshot_proposal',
-              { scoped: true }
+              { scoped: true, deferChain: true }
             ),
             '/:scope/new/snapshot/:snapshotId': importRoute(
               'views/pages/new_snapshot_proposal',

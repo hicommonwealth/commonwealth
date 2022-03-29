@@ -1,9 +1,13 @@
 @import 'client/styles/shared';
 
 .ProposalsPage {
-    @include gov-explainer;
-    .active-proposals, .inactive-proposals {
-        display: flex;
-        flex-wrap: wrap;
-    }
+  .proposals-container {
+    padding: 24px;
+  }
+  @include gov-explainer;
+  .active-proposals,
+  .inactive-proposals {
+    display: flex;
+    flex-wrap: wrap;
+  }
 }

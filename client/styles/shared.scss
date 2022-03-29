@@ -7,8 +7,8 @@
 //
 // layout parameters
 
-$sidebar-width: 220px;
-$quick-switcher-width: 64px;
+$sidebar-width: 232px;
+$quick-switcher-width: 56px;
 $layout-max-width: 1280px;
 $layout-padding: 36px;
 $layout-padding-xs: 20px;
@@ -16,8 +16,8 @@ $layout-padding-xs: 20px;
 //
 // base fonts
 
-$fonts: Calibre, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-  'Segoe UI Symbol';
+$fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
+  'Segoe UI Emoji', 'Segoe UI Symbol';
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
   'Courier New', Courier, monospace;
 
@@ -85,28 +85,9 @@ $border-color-lightest: #e0e4f1;
 $border-color-off-white: #eee;
 
 //
-// forum listing components
-
-$text-size-item-header: 19px;
-$text-size-item-meta: 17px;
-$listing-left-flex: 6;
-$listing-right-flex: 1;
-
-//
 // mobile specs
 
 $text-size-mobile-header: 22px;
-
-@mixin listing-row-base {
-  cursor: pointer;
-  display: flex;
-  margin: 0 -20px;
-  padding: 15px 20px 9px;
-
-  &:hover {
-    background: $background-color-white-hover;
-  }
-}
 
 @mixin error-text {
   color: $negative-bg-color;
@@ -150,7 +131,6 @@ $text-size-mobile-header: 22px;
     border-radius: 10px;
     display: flex;
     margin-bottom: 20px;
-    margin-top: 20px;
     padding: 24px 20px 20px;
 
     .stats-box-left {
@@ -159,8 +139,6 @@ $text-size-mobile-header: 22px;
     }
 
     .stats-box-right {
-      line-height: 1.25;
-
       p {
         margin: 4px 0 0;
       }
@@ -270,6 +248,30 @@ $text-size-mobile-header: 22px;
   }
 }
 
+@mixin narrowBrowserHeader {
+  .NewProposalButton {
+    .cui-button {
+      padding: 0 10px;
+
+      .cui-button-label {
+        top: 2px;
+      }
+    }
+  }
+
+  .role-icon {
+    display: none;
+  }
+
+  .LoginSelectorMenu .user-display-name {
+    display: inline;
+  }
+
+  .cui-button-label .cui-icon-user {
+    margin-right: 0;
+  }
+}
+
 // Gabe 3/4/22
 // newer styles that will probably be replaced somewhat by v2
 
@@ -362,7 +364,6 @@ h3 {
 @mixin form-label {
   @include body;
   font-size: 14px;
-  line-height: 16.8px;
   color: #666666;
 }
 

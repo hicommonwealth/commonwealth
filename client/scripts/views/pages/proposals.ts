@@ -18,7 +18,7 @@ import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
@@ -402,7 +402,7 @@ const ProposalsPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.proposals-container', [
         onSubstrate && m(SubstrateProposalStats),
         onCompound && m(CompoundProposalStats),
         m('.clear'),
@@ -416,7 +416,7 @@ const ProposalsPage: m.Component<{}> = {
           columnHeader: 'Inactive',
         }),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

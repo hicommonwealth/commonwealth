@@ -1,17 +1,24 @@
 @import 'client/styles/shared';
 
 .CouncilPage {
-    padding-bottom: 60px;
-    @include gov-explainer;
+  .council-container {
+    padding: 24px;
+  }
+  padding-bottom: 60px;
+  @include gov-explainer;
 
-    .Councillor {
-        @include card;
-        height: initial;
-        .User {
-            font-weight: 600;
-        }
-        .councillor-status {
-            color: $text-color-light;
-        }
+  h3 {
+    margin-bottom: 16px;
+  }
+
+  .Councillor {
+    @include card;
+    height: initial;
+    .User {
+      font-weight: 600;
     }
+    .councillor-status {
+      color: $text-color-light;
+    }
+  }
 }

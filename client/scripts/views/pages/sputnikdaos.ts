@@ -6,7 +6,7 @@ import { Tag, Table } from 'construct-ui';
 
 import app from 'state';
 
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import SputnikDaoRow from 'views/components/sputnik_dao_row';
 import Sublayout from 'views/sublayout';
 import Near from 'controllers/chain/near/main';
@@ -98,7 +98,7 @@ const SputnikDAOsPage: m.Component<
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.sputnik-daos-container', [
         m('.title', 'Sputnik DAOs'),
         m(Table, [
           m('tr', [
@@ -147,7 +147,7 @@ const SputnikDAOsPage: m.Component<
             });
           }),
         ]),
-      ]
+      ])
     );
   },
 };

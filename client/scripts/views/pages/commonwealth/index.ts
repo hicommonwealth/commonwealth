@@ -3,7 +3,7 @@ import m from 'mithril';
 
 import GeometricPatternSection from './geometric_pattern_section';
 import HeaderLandingPage from '../landing/landing_page_header';
-import { FooterLandingPage } from '../landing/landing_page_footer';
+import { LandingPageFooter } from '../landing/landing_page_footer';
 import LandingPageButton from '../landing/landing_page_button';
 
 const WhyCommonWealthView: m.Component<{}, {}> = {
@@ -45,7 +45,10 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
             m(
               'div.SeeDocsButton',
               { class: 'text-center hidden lg:block xl:block mb-20' },
-              m(LandingPageButton, { href: '', text: 'See docs' })
+              m(LandingPageButton, {
+                href: 'https://docs.commonwealth.im/commonwealth/',
+                text: 'See docs',
+              })
             )
           ),
         ])
@@ -249,7 +252,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           })
         ),
       ]),
-      m(FooterLandingPage, {
+      m(LandingPageFooter, {
         list: [
           { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
           {
@@ -258,7 +261,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           },
           { text: 'Terms', redirectTo: '/terms' },
           { text: 'Privacy', redirectTo: '/privacy' },
-          { text: 'Discord', externalLink: 'https://discord.gg/t9XscHdZrG' },
+          { text: 'Discord', externalLink: 'https://discord.gg/vYcfQ758' },
           { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
           {
             text: 'Twitter',
