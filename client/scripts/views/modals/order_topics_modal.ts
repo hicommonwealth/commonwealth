@@ -93,11 +93,4 @@ const OrderTopicsModal: m.Component<null, { topics: OffchainTopic[] }> = {
   },
 };
 
-// inject confirmExit property
-OrderTopicsModal['confirmExit'] = confirmationModalWithText(
-  'Exit now?',
-  'Yes',
-  'No'
-);
-
 export default OrderTopicsModal;
