@@ -1,5 +1,6 @@
 import { NextFunction } from 'express';
 import Web3 from 'web3';
+import crypto from 'crypto';
 import * as solw3 from '@solana/web3.js';
 import { Cluster } from '@solana/web3.js';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
@@ -14,6 +15,8 @@ import { getUrlsForEthChainId } from '../util/supportedEthChains';
 
 import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -260,6 +263,57 @@ const createChain = async (
     eth_chain_id,
     token_name,
     alt_wallet_url: altWalletUrl,
+  });
+
+  const userOwnedAddresses = await req.user.getAddresses();
+  const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const validAddress = await models.Address.scope('withPrivateData').findOne({
+    where: {
+      id: { [Op.in]: userOwnedAddressIds },
+      user_id: req.user.id,
+    }
+  });
+  let verificationToken = validAddress.verification_token;
+  let verificationTokenExpires = validAddress.verification_token_expires;
+  const isOriginalTokenValid = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
+
+  if (!isOriginalTokenValid) {
+    const chains = await models.Chain.findAll({
+      where: { base: chain.base }
+    });
+
+    verificationToken = crypto.randomBytes(18).toString('hex');
+    verificationTokenExpires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
+
+    await models.Address.update({
+      verification_token: verificationToken,
+      verification_token_expires: verificationTokenExpires
+    }, {
+      where: {
+        user_id: validAddress.user_id,
+        address: req.body.address,
+        chain: { [Op.in]: chains.map((ch) => ch.id) }
+      }
+    });
+  }
+
+  const newAddress = await models.Address.create({
+    user_id: validAddress.user_id,
+    profile_id: validAddress.profile_id,
+    address: validAddress.address,
+    chain: chain.name,
+    verification_token: validAddress.verification_token,
+    verification_token_expires: validAddress.verification_token_expires,
+    verified: validAddress.verified,
+    keytype: validAddress.keytype,
+    name: validAddress.name,
+    last_active: new Date(),
+  });
+
+  await models.Role.create({
+    address_id: newAddress.id,
+    chain_id: chain.name,
+    permission: 'admin',
   });
 
   return success(res, { chain: chain.toJSON(), node: node.toJSON() });
