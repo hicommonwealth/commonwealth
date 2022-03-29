@@ -28,7 +28,6 @@ import {
   orderDiscussionsbyLastComment,
 } from './helpers';
 import { DiscussionFilterBar } from './discussion_filter_bar';
-import OrderTopicsModal from '../../modals/order_topics_modal';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 

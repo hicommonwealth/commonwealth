@@ -10,6 +10,7 @@ import { ITokenAdapter } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicThresholdsModal from 'views/modals/edit_topic_thresholds_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
+import OrderTopicsModal from '../modals/order_topics_modal';
 
 export class CommunityOptionsPopover implements m.ClassComponent {
   view() {
@@ -55,16 +56,17 @@ export class CommunityOptionsPopover implements m.ClassComponent {
           isAdmin &&
             app.chain.meta.chain.topics.filter(
               (topic) => topic.featuredInSidebar
-            ).length > 0 &&
-            m(MenuItem, {
-              label: 'Order sidebar topics',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: OrderTopicsModalodal,
-                });
-              },
-            }),
+            ).length > 0 && (
+              <MenuItem
+                label="Order sidebar topics"
+                onclick={(e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: OrderTopicsModal,
+                  });
+                }}
+              />
+            ),
           isAdmin && (
             <MenuItem
               label="Invite members"

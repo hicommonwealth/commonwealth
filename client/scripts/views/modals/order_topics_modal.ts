@@ -22,7 +22,7 @@ const storeNewTopicOrder = (
   });
 };
 
-const OrderTopicsModalodal: m.Component<null, { topics: OffchainTopic[] }> = {
+const OrderTopicsModal: m.Component<null, { topics: OffchainTopic[] }> = {
   oninit: (vnode: VnodeDOM<null, { topics: OffchainTopic[] }>) => {
     vnode.state.topics = app.chain.meta.chain.topics.filter(
       (topic) => topic.featuredInSidebar
@@ -50,10 +50,9 @@ const OrderTopicsModalodal: m.Component<null, { topics: OffchainTopic[] }> = {
   },
   view: (vnode: VnodeDOM<null, { topics: OffchainTopic[] }>) => {
     const { topics } = vnode.state;
-    console.log(topics);
 
-    return m('.OrderTopicsModalodal', [
-      m('h2.header', 'Reorder Topics'),
+    return m('.OrderTopicsModal', [
+      m('h3.compact-modal-title', 'Reorder Topics'),
       m('.compact-modal-body', [
         m(
           List,
@@ -87,4 +86,4 @@ const OrderTopicsModalodal: m.Component<null, { topics: OffchainTopic[] }> = {
   },
 };
 
-export default OrderTopicsModalodal;
+export default OrderTopicsModal;
