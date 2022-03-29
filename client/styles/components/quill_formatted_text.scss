@@ -292,6 +292,7 @@
 
 .QuillFormattedText {
   position: relative;
+  line-height: normal;
   @include formatted-text();
   @include collapsible();
   @include hidden-formatting();
