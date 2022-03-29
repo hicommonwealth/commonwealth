@@ -22,7 +22,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public readonly chain = ChainBase.Ethereum;
 
   public get available() {
-    return !!(window.ethereum);
+    return !!window.ethereum;
   }
 
   public get provider() {
@@ -42,22 +42,30 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.sign(message, this.accounts[0]);
+    const signature = await this._web3.eth.sign(
+      this._web3.utils.sha3(message),
+      this.accounts[0]
+    );
     return signature;
   }
 
   public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(app.chain.meta.ethChainId || 1, message);
+    const msgParams = constructTypedMessage(
+      app.chain.meta.ethChainId || 1,
+      message
+    );
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
       params: [this._accounts[0], JSON.stringify(msgParams)],
-    })
+    });
     return signature;
   }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
     // Sign with the method on eth_webwallet, because we don't have access to the private key
-    const webWalletSignature = await this.signLoginToken(account.validationToken);
+    const webWalletSignature = await this.signLoginToken(
+      account.validationToken
+    );
     return account.validate(webWalletSignature);
   }
 
@@ -75,7 +83,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       this._web3 = new Web3((window as any).ethereum);
       // TODO: does this come after?
       await this._web3.givenProvider.request({
-        method: 'eth_requestAccounts'
+        method: 'eth_requestAccounts',
       });
       const chainIdHex = `0x${chainId.toString(16)}`;
       try {
@@ -87,19 +95,22 @@ class MetamaskWebWalletController implements IWebWallet<string> {
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
           const wsRpcUrl = new URL(app.chain.meta.url);
-          const rpcUrl = app.chain.meta.altWalletUrl || `https://${wsRpcUrl.host}`;
+          const rpcUrl =
+            app.chain.meta.altWalletUrl || `https://${wsRpcUrl.host}`;
 
           // TODO: we should cache this data!
           const chains = await $.getJSON('https://chainid.network/chains.json');
           const baseChain = chains.find((c) => c.chainId === chainId);
           await this._web3.givenProvider.request({
             method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: chainIdHex,
-              chainName: baseChain.name,
-              nativeCurrency: baseChain.nativeCurrency,
-              rpcUrls: [rpcUrl]
-            }]
+            params: [
+              {
+                chainId: chainIdHex,
+                chainName: baseChain.name,
+                nativeCurrency: baseChain.nativeCurrency,
+                rpcUrls: [rpcUrl],
+              },
+            ],
           });
         } else {
           throw switchError;
@@ -128,11 +139,16 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async initAccountsChanged() {
-    await this._web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
-      const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-    });
+    await this._web3.givenProvider.on(
+      'accountsChanged',
+      async (accounts: string[]) => {
+        const updatedAddress = app.user.activeAccounts.find(
+          (addr) => addr.address === accounts[0]
+        );
+        if (!updatedAddress) return;
+        await setActiveAccount(updatedAddress);
+      }
+    );
     // TODO: chainChanged, disconnect events
   }
 
