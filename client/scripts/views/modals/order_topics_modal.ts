@@ -77,7 +77,7 @@ const OrderTopicsModalodal: m.Component<null, { topics: OffchainTopic[] }> = {
             try {
               app.topics.updateFeaturedOrder(topics);
               $(e.target).trigger('modalexit');
-            } catch (e) {
+            } catch (err) {
               notifyError('Failed to update order');
             }
           },

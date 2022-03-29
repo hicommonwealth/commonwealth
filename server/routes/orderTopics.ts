@@ -19,21 +19,23 @@ const OrderTopics = async (
   next: NextFunction
 ) => {
   if (!req.user) return next(new Error(OrderTopicsErrors.NoUser));
-  if (!req.body.order) return next(new Error(OrderTopicsErrors.NoIds));
-  if (!req.body.chain) return next(new Error(OrderTopicsErrors.NoChain));
 
-  const { order, chain } = req.body;
+  const { chain } = req.body;
+  if (!chain) return next(new Error(OrderTopicsErrors.NoChain));
 
   const isAdminOrMod = validateRoles(models, req, 'moderator', chain);
   if (!isAdminOrMod) return next(new Error(OrderTopicsErrors.NoPermission));
 
+  const newTopicOrder = req.body['order[]'];
+  if (!newTopicOrder) return next(new Error(OrderTopicsErrors.NoIds));
+
   // todo proper array handling
   const topics = [];
-  for (let i = 0; i < req.body.order.length; i++) {
+  for (let i = 0; i < newTopicOrder.length; i++) {
     const topic = await models.OffchainTopic.findOne({
-      where: { id: order[i] },
+      where: { id: newTopicOrder[i] },
     });
-    topic.order = i;
+    topic.order = i + 1;
     topics.push(topic);
     await topic.save();
   }

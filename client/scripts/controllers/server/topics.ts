@@ -224,6 +224,7 @@ class TopicsController {
     const reorderedTopics = featuredTopics.filter((t) => {
       const newPosition = +t.order;
       const previousPosition = +this.getByIdentifier(t.id).order;
+      console.log({ newPosition, previousPosition });
       return newPosition !== previousPosition;
     });
     console.log({ reorderedTopics });
