@@ -7,14 +7,15 @@ import {
 } from 'models';
 import { fromAscii } from '@cosmjs/encoding';
 import { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
+import { Event } from '@cosmjs/tendermint-rpc';
+import { MsgSubmitProposal } from '@terra-money/terra.js';
 import { Proposal, TextProposal, ProposalStatus, TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import {
-  CommunityPoolSpendProposal, CommunityPoolSpendProposalWithDeposit
-} from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
+import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import {
   ICosmosProposal, CosmosToken, ICosmosProposalTally, CosmosProposalState
 } from 'controllers/chain/cosmos/types';
+import { ChainNetwork } from 'types';
 import CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain, { CosmosApiType } from './chain';
@@ -157,58 +158,109 @@ class CosmosGovernance extends ProposalModule<
   }
 
   public createTx(
-    sender: CosmosAccount, title: string, description: string, initialDeposit: CosmosToken, memo: string = ''
+    sender: CosmosAccount, title: string, description: string, initialDeposit: CosmosToken, memo: string
   ): ITXModalData {
     throw new Error('unsupported');
   }
 
-  public encodeTextProposal(title: string, description: string): Any {
-    const tProp = TextProposal.fromPartial({ title, description });
-    return Any.fromPartial({
-      typeUrl: '/cosmos.gov.v1beta1.TextProposal',
-      value: Uint8Array.from(TextProposal.encode(tProp).finish()),
-    });
-  }
-
-  // TODO: support multiple amount types
-  public encodeCommunitySpend(
-    title: string,
-    description: string,
-    recipient: string,
-    amount: string,
-  ): Any {
-    const denom = this._minDeposit.denom;
-    const coinAmount = [{ amount, denom }];
-    const spend = CommunityPoolSpendProposal.fromPartial({ title, description, recipient, amount: coinAmount });
-    const prop = CommunityPoolSpendProposal.encode(spend).finish();
-    return Any.fromPartial({
-      typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-      value: prop,
-    });
-  }
-
-  // TODO: support multiple deposit types
-  public async submitProposalTx(
-    sender: CosmosAccount,
-    initialDeposit: CosmosToken,
-    content: Any,
-  ): Promise<number> {
-    const msg: MsgSubmitProposalEncodeObject = {
-      typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
-      value: {
-        initialDeposit: [ initialDeposit.toCoinObject() ],
-        proposer: sender.address,
-        content,
-      }
-    };
-
-    // fetch completed proposal from returned events
-    const events = await this._Chain.sendTx(sender, msg);
+  private async initSentProposal(events: readonly Event[]): Promise<number> {
     const submitEvent = events.find((e) => e.type === 'submit_proposal');
     const idAttribute = submitEvent.attributes.find(({ key }) => fromAscii(key) === 'proposal_id');
     const id = +fromAscii(idAttribute.value);
     await this._initProposals(id);
     return id;
+  }
+
+  public async submitTextProposal(
+    sender: CosmosAccount,
+    initialDeposit: CosmosToken,
+    title: string,
+    description: string,
+  ): Promise<number> {
+    let events: readonly Event[];
+    if (this._Chain.app.chain.network === ChainNetwork.Terra) {
+      const prop = MsgSubmitProposal.fromAmino({
+        type: 'gov/MsgSubmitProposal',
+        value: {
+          proposer: sender.address,
+          initial_deposit: [ initialDeposit.toCoinObject() ],
+          content: {
+            type: 'gov/TextProposal',
+            value: {
+              title,
+              description,
+            }
+          }
+        }
+      });
+      events = await this._Chain.sendTx(sender, prop);
+    } else {
+      const tProp = TextProposal.fromPartial({ title, description });
+      const content = Any.fromPartial({
+        typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+        value: Uint8Array.from(TextProposal.encode(tProp).finish()),
+      });
+      const msg: MsgSubmitProposalEncodeObject = {
+        typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
+        value: {
+          initialDeposit: [ initialDeposit.toCoinObject() ],
+          proposer: sender.address,
+          content,
+        }
+      };
+      events = await this._Chain.sendTx(sender, msg);
+    }
+    return this.initSentProposal(events);
+  }
+
+  // TODO: support multiple amount types
+  public async submitCommunitySpend(
+    sender: CosmosAccount,
+    initialDeposit: CosmosToken,
+    title: string,
+    description: string,
+    recipient: string,
+    amount: string,
+  ): Promise<number> {
+    const denom = this._minDeposit.denom;
+    const coinAmount = [{ amount, denom }];
+    let events: readonly Event[];
+    if (this._Chain.app.chain.network === ChainNetwork.Terra) {
+      const prop = MsgSubmitProposal.fromAmino({
+        type: 'gov/MsgSubmitProposal',
+        value: {
+          proposer: sender.address,
+          initial_deposit: [ initialDeposit.toCoinObject() ],
+          content: {
+            type: 'distribution/CommunityPoolSpendProposal',
+            value: {
+              title,
+              description,
+              recipient,
+              amount: coinAmount,
+            }
+          }
+        }
+      });
+      events = await this._Chain.sendTx(sender, prop);
+    } else {
+      const spend = CommunityPoolSpendProposal.fromPartial({ title, description, recipient, amount: coinAmount });
+      const prop = CommunityPoolSpendProposal.encode(spend).finish();
+      const content = Any.fromPartial({
+        typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
+        value: prop,
+      });
+      const msg: MsgSubmitProposalEncodeObject = {
+        typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
+        value: {
+          initialDeposit: [ initialDeposit.toCoinObject() ],
+          proposer: sender.address,
+          content,
+        }
+      };
+      events = await this._Chain.sendTx(sender, msg);
+    }
+    return this.initSentProposal(events);
   }
 }
 

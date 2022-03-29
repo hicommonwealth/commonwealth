@@ -52,7 +52,9 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   }
 
   public async sendTx(options: CreateTxOptions) {
-    const res: any = await this._extension.request('post', JSON.parse(JSON.stringify(options)));
+    const postPayload = JSON.parse(JSON.stringify(options));
+    console.log(postPayload);
+    const res: any = await this._extension.request('post', postPayload);
     console.log(res);
     return res.payload.transactionHash;
   }

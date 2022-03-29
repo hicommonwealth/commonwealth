@@ -468,10 +468,13 @@ const NewProposalForm = {
               false
             )
           : (app.chain as Cosmos).governance.minDeposit;
+        let f: () => Promise<number>;
         if (
           vnode.state.cosmosProposalType === SupportedCosmosProposalTypes.Text
         ) {
-          prop = (app.chain as Cosmos).governance.encodeTextProposal(
+          f = () => (app.chain as Cosmos).governance.submitTextProposal(
+            author as CosmosAccount,
+            deposit,
             title,
             description
           );
@@ -479,7 +482,9 @@ const NewProposalForm = {
           vnode.state.cosmosProposalType ===
           SupportedCosmosProposalTypes.CommunitySpend
         ) {
-          prop = (app.chain as Cosmos).governance.encodeCommunitySpend(
+          f = () => (app.chain as Cosmos).governance.submitCommunitySpend(
+            author as CosmosAccount,
+            deposit,
             title,
             description,
             vnode.state.recipient,
@@ -489,9 +494,7 @@ const NewProposalForm = {
           throw new Error('Unknown Cosmos proposal type.');
         }
         // TODO: add disabled / loading
-        (app.chain as Cosmos).governance
-          .submitProposalTx(author as CosmosAccount, deposit, prop)
-          .then((result) => {
+        f().then((result) => {
             done(result);
             navigateToSubpage(`/proposal/${result}`);
           })
