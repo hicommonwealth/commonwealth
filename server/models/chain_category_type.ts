@@ -25,9 +25,5 @@ export default (
     underscored: true,
   });
 
-  // ChainCategoryType.associate = (models) => {
-  //   models.ChainCategoryType.belongsToMany(models.ChainCategory, {}); // TODO: is this right?
-  // };
-
   return ChainCategoryType;
 };
