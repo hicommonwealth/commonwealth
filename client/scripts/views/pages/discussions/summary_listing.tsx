@@ -50,7 +50,6 @@ class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {
 
     return (
       <div class="SummaryRow">
-        {isMobile && <h4 class="topic-header">Topic</h4>}
         <div class="topic-cell">
           <h3
             onclick={(e) => {
