@@ -1,6 +1,6 @@
 import m, { RouteOptions } from 'mithril';
 import { ICardListItem } from 'models/interfaces';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
 import app from 'state';
@@ -228,6 +228,11 @@ export function formatTimestamp(timestamp) {
     .replace(' hour', 'h')
     .replace(' months', 'mo')
     .replace(' month', 'mo')}`;
+}
+
+export function formatTimestampAsDate(timestamp: moment.Moment) {
+  if (timestamp.isBefore(moment().startOf('year'))) return timestamp.format('MMM D YYYY')
+  else return timestamp.format('MMM D');
 }
 
 // duplicated in adapters/currency.ts
