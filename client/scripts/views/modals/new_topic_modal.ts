@@ -20,7 +20,7 @@ import {
   CWTextInput,
   ValidationStatus,
 } from 'views/components/component_kit/cw_text_input';
-import { ChainNetwork } from 'shared/types';
+import { ChainNetwork } from '../../../../shared/types';
 
 interface INewTopicModalForm {
   id: number;

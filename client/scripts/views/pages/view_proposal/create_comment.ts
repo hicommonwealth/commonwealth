@@ -16,7 +16,7 @@ import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';
 import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { ChainNetwork } from 'shared/types';
+import { ChainNetwork } from '../../../../../shared/types';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
