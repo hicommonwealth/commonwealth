@@ -36,7 +36,8 @@ export class DiscussionFilterBar
 
     const featuredTopics = topics
       .filter((t) => t.featuredInSidebar)
-      .sort((a, b) => b.order - a.order);
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => a.order - b.order);
     const otherTopics = topics
       .filter((t) => !t.featuredInSidebar)
       .sort((a, b) => a.name.localeCompare(b.name));

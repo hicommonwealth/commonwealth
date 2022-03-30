@@ -80,6 +80,7 @@ export class DiscussionSection
 
     const topics = app.chain.meta.chain.topics
       .filter((t) => t.featuredInSidebar)
+      .sort((a, b) => a.name.localeCompare(b.name))
       .sort((a, b) => a.order - b.order);
 
     const discussionsLabel = ['vesuvius', 'olympus'].includes(
