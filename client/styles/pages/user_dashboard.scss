@@ -29,7 +29,7 @@
 
   .title {
     align-items: center;
-    color: black;
+    color: $black;
     display: flex;
     font-size: 30px;
     font-weight: 500;
@@ -57,7 +57,7 @@
       padding: 13px 0 0 0;
 
       &.cui-active {
-        color: black;
+        color: $black;
       }
     }
   }

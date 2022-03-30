@@ -8,7 +8,7 @@
   cursor: pointer;
   border-bottom: 1px solid $border-color-lightest;
   text-decoration: none !important;
-  color: black !important;
+  color: $black !important;
   &:hover {
     background: $background-color-white-hover;
   }

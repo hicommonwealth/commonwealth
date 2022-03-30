@@ -48,7 +48,7 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        <h1>Colors</h1>
+        {/* <h1>Colors</h1>
         <div class="color-gallery">
           {displayColors({
             Black: '#000000',
@@ -72,7 +72,7 @@ export class ComponentShowcase implements m.ClassComponent {
             MintGreen: '#F3FFF9',
             CreamYellow: '#FFFBA1',
           })}
-        </div>
+        </div> */}
         <h1>Gradients</h1>
         <div class="color-gallery">
           {displayGradients([

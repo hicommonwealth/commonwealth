@@ -187,7 +187,7 @@ $discussion-title-font-size: 1.45rem;
           .ExecuteButton,
           .QueueButton {
             button {
-              color: white;
+              color: $white;
               background: linear-gradient(
                 268.96deg,
                 #00db8c 2.02%,
@@ -199,13 +199,13 @@ $discussion-title-font-size: 1.45rem;
             button {
               color: #ff002e;
               border: 1px solid #ff002e;
-              background: #ffffff;
+              background: $white;
             }
           }
         }
         .ProposalHeaderOnchainId {
           font-size: 18px;
-          color: black;
+          color: $black;
         }
       }
     }

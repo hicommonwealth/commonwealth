@@ -29,7 +29,7 @@
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   }
   // only content styles here. layout styles are in layout.scss
-  background: $background-color-white;
+  background: $white;
   border-bottom: 1px solid $border-color-lightest;
 
   img.mobile-logo {
@@ -60,7 +60,7 @@
   .mobile-header-center,
   .mobile-header-right {
     .CommunitySelector .cui-button {
-      background: $background-color-white;
+      background: $white;
       border-radius: 4px !important;
       border: 1px solid #c5cdd1 !important;
       overflow: hidden;

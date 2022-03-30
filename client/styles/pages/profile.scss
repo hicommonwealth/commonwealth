@@ -39,7 +39,7 @@
   padding-bottom: 18px;
   border-bottom: 1px solid #dddddd;
   .proposal-title {
-    color: black !important;
+    color: $black !important;
     font-weight: 600;
   }
   .summary {
@@ -53,7 +53,7 @@
   }
   .link-bold {
     font-weight: 500;
-    color: #000000;
+    color: $black;
   }
   .link-normal {
     color: inherit;
@@ -70,7 +70,7 @@
       padding-top: 2px;
       font-size: inherit;
       .username {
-        color: black !important;
+        color: $black !important;
       }
     }
   }
@@ -100,7 +100,7 @@
       flex-direction: row !important;
       margin-bottom: 12px;
       border-bottom: none;
-      background-color: white;
+      background-color: $white;
     }
     a.tab-entry {
       padding: 12px 0 0 0;
@@ -234,7 +234,7 @@
       margin: 6px 16px 6px 0;
       border-radius: 8px;
       padding: 5px 15px 5px 15px;
-      background: #ffffff;
+      background: $white;
       border: 1px solid #4723ad;
       color: #4723ad;
       font-weight: 500;
@@ -330,7 +330,7 @@
         margin-right: 16px;
         border-radius: 8px;
         padding: 5px 15px 5px 15px;
-        background: #ffffff;
+        background: $white;
         border: 1px solid #4723ad;
         color: #4723ad;
         font-weight: 500;
@@ -393,7 +393,7 @@
     .verification-icon.unverified {
       position: relative;
       top: 0;
-      color: $text-color-white;
+      color: $white;
       background: $text-color-medium;
       position: relative;
       padding-left: 4px;
@@ -453,7 +453,7 @@
     margin: 32px 0;
   }
   a.btn {
-    background-color: white !important;
+    background-color: $white !important;
     border: 1px solid $primary-bg-color !important;
     background-image: none !important;
     color: $primary-bg-color;

@@ -30,14 +30,14 @@
         }
         .cui-button[type='submit'] {
           // background: linear-gradient(50.49deg, #91BFFF -6.12%, #91FFA0 30.17%, #FBFF91 62.49%, #FF9191 102.75%);
-          // color: black;
+          // color: $black;
           background: $primary-bg-color;
-          color: white;
+          color: $white;
           border: none;
           margin-left: 20px;
         }
         .cui-button[type='cancel'] {
-          background: #ffffff;
+          background: $white;
           border: 2px solid #dddddd;
           color: #999999;
         }
@@ -59,7 +59,7 @@
     margin: 14px 0 18px;
     .ql-toolbar,
     .ql-editor {
-      background: $background-color-white;
+      background: $white;
     }
     .ql-editor {
       min-height: 100px;

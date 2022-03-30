@@ -17,7 +17,7 @@ html {
   font-size: 16px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  background: $background-color-white;
+  background: $white;
 }
 
 // global css
@@ -64,7 +64,7 @@ pre {
 }
 
 ::selection {
-  color: $text-color-white;
+  color: $white;
   background: $background-color-dark-accent;
 }
 

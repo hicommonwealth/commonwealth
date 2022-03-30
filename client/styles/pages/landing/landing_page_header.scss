@@ -76,7 +76,7 @@ li.LandingPageHeaderLoginButton.ml-10.pt-2 {
   a.btn-primary.pb-3.text-white {
     padding-top: 14px;
     padding-bottom: 9px;
-    color: $text-color-white;
+    color: $white;
     text-decoration: none;
     cursor: pointer;
     &:hover {
@@ -90,7 +90,7 @@ li.LandingPageHeaderLoginButton.ml-10.pt-2 {
 }
 li.LandingPageMenuButton.ml-10.pt-2 {
   white-space: nowrap;
-  background: white;
+  background: $white;
 }
 
 .HeaderLandingPage {

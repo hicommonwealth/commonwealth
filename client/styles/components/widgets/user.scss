@@ -5,7 +5,7 @@
   display: inline-block;
   margin: -3px 0;
   margin-right: 8px;
-  background: $text-color-white;
+  background: $white;
   border-radius: 9999px;
   overflow: hidden;
   .avatar-image {
@@ -18,7 +18,7 @@
   border-radius: 9999px;
   overflow: hidden;
   margin: 0;
-  background: $text-color-white;
+  background: $white;
   box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.1);
   svg {
     margin: 2px;
@@ -34,7 +34,7 @@
 @mixin roleIcon {
   background: $background-color-dark-accent;
   border-radius: 50%;
-  color: $text-color-white;
+  color: $white;
   display: inline-block;
   font-weight: 500;
   padding: 2px 5px 2px;

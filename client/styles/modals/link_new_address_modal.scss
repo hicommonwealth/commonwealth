@@ -7,7 +7,7 @@
     margin: 0 auto;
     padding: 20px 40px 18px;
     background: $primary-bg-color;
-    color: $background-color-white;
+    color: $white;
     h3 {
       margin: 0;
       font-size: 17px;
@@ -125,7 +125,7 @@
       height: 190px;
       border-radius: 3px;
       border: 1px solid $border-color-lightest;
-      background: $background-color-white;
+      background: $white;
       box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
       &.mobile-disabled {
         opacity: 0.6;
@@ -228,8 +228,8 @@
       top: -2px;
       margin-right: 6px;
       .cui-spinner-icon {
-        border-top-color: #fff !important;
-        border-right-color: #fff !important;
+        border-top-color: $white !important;
+        border-right-color: $white !important;
       }
     }
   }

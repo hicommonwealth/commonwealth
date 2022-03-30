@@ -20,7 +20,6 @@ $fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
   'Courier New', Courier, monospace;
 
-$base-bg-color: #ffffff;
 $primary-bg-color: #4f6dbd; // also used for text
 $positive-bg-color: #41a360; // also used for text
 $negative-bg-color: #d4302f; // also used for text
@@ -30,7 +29,6 @@ $intermediate-icon-color: #ffa200;
 $positive-icon-color: #7ed320;
 $failure-icon-color: #db322d;
 $last-seen-notification-color: #ea7a60;
-$text-color-white: #fff;
 $text-color-lightest: #b5b7b9; // light text on white background
 $text-color-lighter: #a3a4a7; // light text on white background
 $text-color-light: #9a9da4; // light text on light background
@@ -40,11 +38,12 @@ $text-color-darker: #333; // off-black text on any background
 $text-color-black: #222; // black text on any background
 $text-color-primary-light: tint($primary-bg-color, 75%);
 $text-color-primary: $primary-bg-color;
-$background-color-white: #ffffff;
-$background-color-black-hover: tint(#484744, 30%);
+
 $background-color-white-hover: tint($primary-bg-color, 96.5%);
-$background-color-black: #262523;
 $background-color-white-hover-0: tint(#fafafa, 10%);
+
+$background-color-black-hover: tint(#484744, 30%);
+$background-color-black: #262523;
 $background-color-light: desaturate(tint($primary-bg-color, 90%), 12%);
 $background-color-light-hover: desaturate(tint($primary-bg-color, 86.5%), 12%);
 $background-color-medium-light: desaturate(tint($primary-bg-color, 75%), 25%);
@@ -62,13 +61,11 @@ $border-color: #c5cdd1;
 $border-color-light: #e0e4f1;
 $border-color-lightest: #e0e4f1;
 $border-color-off-white: #eee;
-$black: #000000;
 $dark-gray: #333333;
 $midi-gray: #666666;
 $lite-gray: #999999;
 $disable-gray: #dddddd;
 $background-gray: #f4f4f4;
-$white: #ffffff;
 $dark-purp: #4723ad;
 $midi-purp: #9075dc;
 $lite-purp: #c7b9ef;

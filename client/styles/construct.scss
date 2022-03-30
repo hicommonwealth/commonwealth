@@ -32,7 +32,6 @@ $cui-base-height: floor($cui-base-size * 2.8);
 // component colors
 //
 
-$cui-base-bg-color: $base-bg-color;
 $cui-primary-bg-color: $primary-bg-color;
 $cui-positive-bg-color: $positive-bg-color;
 $cui-negative-bg-color: $negative-bg-color;
@@ -118,17 +117,17 @@ button,
 
 // button color fixes
 .cui-button {
-  background: $background-color-white;
+  background: $white;
   transition: none;
 
   &:active,
   &.cui-active {
-    background: $background-color-white;
+    background: $white;
     box-shadow: none;
   }
 
   &:hover {
-    background: $background-color-white;
+    background: $white;
   }
 
   // adjust rounded button styles
@@ -175,7 +174,7 @@ button,
 .cui-button.cui-primary,
 .cui-button-group.cui-primary .cui-button {
   a {
-    color: $text-color-white;
+    color: $white;
   }
 }
 

@@ -1,3 +1,5 @@
+@import 'shared.scss';
+
 $border-color-tint-percentage: 70%;
 $telegram-color: #2480cc;
 $element-color: #0cbd8b;
@@ -15,7 +17,7 @@ $default-color: #222222;
 
   .cui-link:hover {
     background: #6966ff;
-    color: white;
+    color: $white;
   }
 
   .telegram-link {

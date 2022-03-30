@@ -7,7 +7,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: $white;
   border: 1px solid $background-color-light;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
   > .User,
@@ -235,7 +235,7 @@
     &.dz-image-preview {
       height: 100%;
       width: 100%;
-      background: white;
+      background: $white;
       .dz-details {
         @include prefix(
           (
@@ -406,7 +406,7 @@
       background: $color;
       background: linear-gradient(to bottom, $color, darken($color, 5%));
       padding: 0.5em 1.2em;
-      color: $text-color-white;
+      color: $white;
 
       // The triangle pointing up
       &:after {
