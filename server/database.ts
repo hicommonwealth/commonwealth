@@ -31,21 +31,6 @@ import ContractItemFactory, {
 import DiscussionDraftFactory, {
   DiscussionDraftModelStatic,
 } from './models/discussion_draft';
-import EdgewareLockdropBalanceFactory, {
-  EdgewareLockdropBalanceModelStatic,
-} from './models/edgeware_lockdrop_balance';
-import EdgewareLockdropEventFactory, {
-  EdgewareLockdropEventModelStatic,
-} from './models/edgeware_lockdrop_event';
-import EdgewareLockdropEverythingFactory, {
-  EdgewareLockdropEverythingModelStatic,
-} from './models/edgeware_lockdrop_everything';
-import HedgehogAuthenticationFactory, {
-  HedgehogAuthenticationModelStatic,
-} from './models/hedgehog_authentication';
-import HedgehogUserFactory, {
-  HedgehogUserModelStatic,
-} from './models/hedgehog_user';
 import IdentityCacheFactory, {
   IdentityCacheStatic,
 } from './models/identity_cache';
@@ -103,6 +88,7 @@ import WaitlistRegistrationFactory, {
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
 import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
+import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -116,13 +102,9 @@ export type Models = {
   ContractCategory: ContractCategoryModelStatic;
   ContractItem: ContractItemModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
-  EdgewareLockdropBalance: EdgewareLockdropBalanceModelStatic;
-  EdgewareLockdropEvent: EdgewareLockdropEventModelStatic;
-  EdgewareLockdropEverything: EdgewareLockdropEverythingModelStatic;
-  HedgehogAuthentication: HedgehogAuthenticationModelStatic;
-  HedgehogUser: HedgehogUserModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
+  IpfsPins: IpfsPinsModelStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
@@ -194,16 +176,9 @@ const models: Models = {
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
   ContractItem: ContractItemFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
-  EdgewareLockdropBalance: EdgewareLockdropBalanceFactory(sequelize, DataTypes),
-  EdgewareLockdropEvent: EdgewareLockdropEventFactory(sequelize, DataTypes),
-  EdgewareLockdropEverything: EdgewareLockdropEverythingFactory(
-    sequelize,
-    DataTypes
-  ),
-  HedgehogAuthentication: HedgehogAuthenticationFactory(sequelize, DataTypes),
-  HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
+  IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),

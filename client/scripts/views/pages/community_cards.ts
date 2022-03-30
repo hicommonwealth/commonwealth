@@ -1,28 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import 'pages/landing/community_cards.scss';
 import m from 'mithril';
-import { Tag } from 'construct-ui';
+import numeral from 'numeral';
 
 import app from 'state';
 import { ChainInfo, NodeInfo } from 'models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCard } from '../components/component_kit/cw_card';
 import Sublayout from '../sublayout';
-
-var numeral = require('numeral');
-
-const getNewTag = (labelCount = null) => {
-  const label = labelCount === null ? 'New' : `${labelCount} new`;
-  return m('span.chain-new', [
-    m(Tag, {
-      label,
-      size: 'xs',
-      rounded: true,
-      intent: 'primary',
-      style: 'margin-top: -3px; margin-left: 10px;',
-    }),
-  ]);
-};
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -32,15 +17,10 @@ const buildCommunityString = (numCommunities: number) => {
   return `${numberString} Communities`;
 };
 
-export const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
+const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
   view: (vnode) => {
     const { chain, nodeList } = vnode.attrs;
-    const { unseenPosts } = app.user;
     const chainInfo = app.config.chains.getById(chain);
-    const visitedChain = !!unseenPosts[chain];
-    const updatedThreads = unseenPosts[chain]?.activePosts || 0;
-    const monthlyThreadCount =
-      app.recentActivity.getCommunityThreadCount(chain);
 
     const redirectFunction = (e) => {
       e.preventDefault();
@@ -95,12 +75,6 @@ export const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
 const CommunityCard: m.Component<{ community: ChainInfo }> = {
   view: (vnode) => {
     const { community } = vnode.attrs;
-    const { unseenPosts } = app.user;
-    const visitedCommunity = !!unseenPosts[community.id];
-    const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
-    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
-      community.id
-    );
 
     const redirectFunction = (e) => {
       e.preventDefault();
@@ -149,43 +123,8 @@ const CommunityCard: m.Component<{ community: ChainInfo }> = {
   },
 };
 
-const LockdropToolsCard: m.Component = {
-  view: (vnode) => {
-    return m(
-      CWCard,
-      {
-        elevation: 'elevation-2',
-        interactive: true,
-        className: 'chain-card',
-      },
-      [
-        m('.lockdrop-card-body', [
-          m('h3', 'Edgeware Lockdrop Tools'),
-          m(CWButton, {
-            onclick: (e) => {
-              e.preventDefault();
-              localStorage['home-scrollY'] = window.scrollY;
-              m.route.set('/edgeware/stats');
-            },
-            label: 'Lockdrop stats',
-          }),
-          m('.spacer', []),
-          m(CWButton, {
-            onclick: (e) => {
-              e.preventDefault();
-              localStorage['home-scrollY'] = window.scrollY;
-              m.route.set('/edgeware/unlock');
-            },
-            label: 'Unlock ETH',
-          }),
-        ]),
-      ]
-    );
-  },
-};
-
 const NewCommunityCard: m.Component = {
-  view: (vnode) => {
+  view: () => {
     return m(
       CWCard,
       {
@@ -213,7 +152,7 @@ const NewCommunityCard: m.Component = {
 };
 
 const HomepageCommunityCards: m.Component = {
-  view: (vnode) => {
+  view: () => {
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
       if (chains[n.chain.id]) {
@@ -271,20 +210,22 @@ const HomepageCommunityCards: m.Component = {
             m('h4', 'Testnets & Alpha Networks'),
           betaChainsAndCommunities,
         ]),
-        m('.other-list', [m(NewCommunityCard), m(LockdropToolsCard)]),
+        m('.other-list', [m(NewCommunityCard)]),
       ]
     );
   },
 };
 
 const CommunityCardPage: m.Component = {
-  view: (vnode) => {
-    return m(Sublayout, {
-      class: 'Homepage',
-    }, [
-      m(HomepageCommunityCards),
-    ]);
-  }
-}
+  view: () => {
+    return m(
+      Sublayout,
+      {
+        class: 'Homepage',
+      },
+      [m(HomepageCommunityCards)]
+    );
+  },
+};
 
 export default CommunityCardPage;
