@@ -46,14 +46,6 @@ $discussion-title-font-size: 1.45rem;
   .ProposalComment {
     @include supports-jump-highlight();
   }
-  .ProposalComment {
-    @include xs-max {
-      margin-top: 30px;
-    }
-  }
-  .ProposalComments.no-active-account {
-    padding-bottom: $discussion-outer-padding;
-  }
   .proposal-body-bottom,
   .comment-body-bottom {
     display: flex;
@@ -154,7 +146,7 @@ $discussion-title-font-size: 1.45rem;
     }
     .proposal-top {
       display: flex;
-      padding-bottom: 20px;
+      padding-bottom: 16px;
       border-bottom: 1px solid $background-color-light;
     }
     .proposal-top-left {
@@ -290,6 +282,8 @@ $discussion-title-font-size: 1.45rem;
     position: relative;
     display: flex;
     margin-bottom: 40px;
+    padding-top: 16px;
+
     .comment-body {
       flex: 1;
       overflow-x: auto;
@@ -299,7 +293,6 @@ $discussion-title-font-size: 1.45rem;
       }
     }
     .comment-body-top {
-      padding-bottom: $discussion-meta-padding;
       font-size: $discussion-meta-font-size;
     }
     .comment-body-bottom {
