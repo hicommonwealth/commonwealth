@@ -39,7 +39,12 @@
   font-size: 12px;
   font-weight: 500;
   margin-left: 8px;
-  padding: 2px 5px 2px;
+  padding: 0px 2px 2px;
+  line-height: 1;
+  width: 14px;
+  height: 14px;
+  position: relative;
+  top: -2px;
 
   &.green {
     background: $positive-bg-color;
