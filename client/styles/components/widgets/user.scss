@@ -36,7 +36,9 @@
   border-radius: 50%;
   color: $text-color-white;
   display: inline-block;
+  font-size: 12px;
   font-weight: 500;
+  margin-left: 8px;
   padding: 2px 5px 2px;
 
   &.green {
@@ -100,9 +102,6 @@
   // role icons and identity icons
   span.identity-icon {
     @include roleIcon();
-  }
-  .user-display-name .identity-icon {
-    margin-left: 7px !important;
   }
   .role-icon {
     @include roleIcon();
