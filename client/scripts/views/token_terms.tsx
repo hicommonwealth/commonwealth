@@ -20,11 +20,12 @@ export class TokenTerms implements m.ClassComponent<TermsAttrs> {
     if (isNonEmptyString(terms) && tosStatus !== 'off') {
       return (
         <div class="TokenTerms">
-          <div class="terms-text">
-            Please read the
-            <a href={terms}> terms and conditions </a>
-            before interacting with this community.
-          </div>
+          <a href={terms}>
+            <div class="terms-text">
+              Please read the terms and conditions before interacting with this
+              community.
+            </div>
+          </a>
           <CWIcon
             iconName="x"
             iconSize="small"

@@ -5,27 +5,26 @@
   background-color: $layout-color;
   display: flex;
   flex-direction: row;
-  height: 32px;
+  min-height: 32px;
   justify-content: center;
-  margin-left: $sidebar-width;
-
-  .terms-text {
-    display: flex;
-  }
+  padding-left: 16px;
 
   a {
-    margin: 0 4px;
-  }
+    margin: 0 auto;
 
-  @include sm-max {
-    margin-left: 0;
+    .terms-text {
+      display: flex;
+      font-size: 12px;
+      height: 100%;
+      text-align: center;
+      word-wrap: break-word;
+    }
   }
 
   svg {
     cursor: pointer;
     fill: currentColor;
-    position: relative;
-    top: 2px;
+    margin: 0 16px;
 
     &:hover {
       opacity: 0.6;
