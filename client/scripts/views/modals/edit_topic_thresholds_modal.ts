@@ -6,10 +6,10 @@ import app from 'state';
 import { Button, Form } from 'construct-ui';
 
 import { OffchainTopic } from 'models';
+import { ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import TokenDecimalInput from 'views/components/token_decimal_input';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
-import { ChainNetwork } from '../../../../shared/types';
 
 interface INewTopicModalForm {
   id: number;

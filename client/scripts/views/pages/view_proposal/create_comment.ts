@@ -7,6 +7,7 @@ import { Button, Callout } from 'construct-ui';
 import app from 'state';
 
 import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
+import { ChainNetwork } from 'types';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -16,7 +17,6 @@ import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';
 import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { ChainNetwork } from '../../../../../shared/types';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
