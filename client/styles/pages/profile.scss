@@ -49,7 +49,7 @@
     justify-content: space-between;
   }
   .summary > .User > .username {
-    color: $primary-bg-color !important;
+    color: $primary-500 !important;
   }
   .link-bold {
     font-weight: 500;
@@ -118,7 +118,7 @@
       }
     }
     a.tab-entry.active {
-      color: $text-color-darker;
+      color: $neutral-900;
     }
   }
   @include sm-max {
@@ -156,7 +156,7 @@
   .header {
     font-size: 24px;
     font-weight: 600;
-    color: $text-color-darker;
+    color: $neutral-900;
     margin-top: 32px;
     margin-bottom: 6px;
   }
@@ -302,7 +302,7 @@
       font-size: 24px;
       font-weight: 600;
       .username {
-        color: $text-color-darker;
+        color: $neutral-900;
       }
     }
     .role-tag {
@@ -378,7 +378,7 @@
       position: relative;
       top: 2px;
       display: inline-block;
-      background: $primary-bg-color;
+      background: $primary-500;
       width: 16px;
       height: 16px;
       border-radius: 8px;
@@ -454,9 +454,9 @@
   }
   a.btn {
     background-color: $white !important;
-    border: 1px solid $primary-bg-color !important;
+    border: 1px solid $primary-500 !important;
     background-image: none !important;
-    color: $primary-bg-color;
+    color: $primary-500;
     border-radius: 4px;
   }
   .infinite-scroll {

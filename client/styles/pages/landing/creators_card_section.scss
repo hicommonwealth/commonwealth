@@ -1,12 +1,12 @@
-@import "client/styles/shared";
+@import 'client/styles/shared';
 
 .TokensCreatorsUseCaseButton.text-center.hidden.mb-20 {
   a.btn-outline.text-xl.rounded-lg.pb-2.pt-3.px-3 {
-    color: $text-color-black;
+    color: $neutral-800;
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      opacity: 0.6
+      opacity: 0.6;
     }
   }
 }

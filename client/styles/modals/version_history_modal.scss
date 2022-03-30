@@ -1,51 +1,52 @@
 @import 'client/styles/shared';
 
 .VersionHistoryModal {
-    .compact-modal-body {
-        width: 640px;
-        @include xs-max {
-            width: initial;
-        }
-        .versions {
-            display: flex;
-            flex-direction: column;
-            .version {
-                padding-bottom: 20px;
-                border-bottom: 1px solid $border-color-light;
-                margin-bottom: 20px;
-                display: flex;
-                justify-content: space-between;
-                .panel-left {
-                    display: flex;
-                    flex-direction: column;
-                    flex: 2;
-                    padding-right: 25px;
-                    .timestamp {
-                        color: $text-color-light;
-                        padding-top: 5px;
-                    }
-                }
-                .panel-right {
-                    display: flex;
-                    flex: 5;
-                }
-                .QuillFormattedText, .MarkdownFormattedText {
-                    flex: 5;
-                    color: $text-color-darker;
-                    .deleted {
-                        background: $background-color-light-negative !important;
-                        color: $negative-bg-color !important;
-                    }
-                    .added {
-                        background: $background-color-light-positive !important;
-                        color: $positive-bg-color !important;
-                    }
-                }
-            }
-            .version:last-child {
-                border-bottom: none !important;
-                margin-bottom: 0 !important;
-            }
-        }
+  .compact-modal-body {
+    width: 640px;
+    @include xs-max {
+      width: initial;
     }
+    .versions {
+      display: flex;
+      flex-direction: column;
+      .version {
+        padding-bottom: 20px;
+        border-bottom: 1px solid $border-color-light;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        .panel-left {
+          display: flex;
+          flex-direction: column;
+          flex: 2;
+          padding-right: 25px;
+          .timestamp {
+            color: $text-color-light;
+            padding-top: 5px;
+          }
+        }
+        .panel-right {
+          display: flex;
+          flex: 5;
+        }
+        .QuillFormattedText,
+        .MarkdownFormattedText {
+          flex: 5;
+          color: $neutral-900;
+          .deleted {
+            background: $rorange-100 !important;
+            color: $negative-bg-color !important;
+          }
+          .added {
+            background: $green-100 !important;
+            color: $positive-bg-color !important;
+          }
+        }
+      }
+      .version:last-child {
+        border-bottom: none !important;
+        margin-bottom: 0 !important;
+      }
+    }
+  }
 }

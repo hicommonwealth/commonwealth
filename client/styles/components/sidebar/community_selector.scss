@@ -20,7 +20,7 @@
   }
 
   .cui-menu {
-    background: $background-color-white-hover;
+    background: $primary-400;
     border: none;
     max-width: 360px;
     width: 360px;
@@ -49,12 +49,12 @@
     user-select: none;
 
     &.cui-selected {
-      background: $background-color-light-hover;
-      color: $text-color-black;
+      background: $primary-200;
+      color: $neutral-800;
     }
 
     &:hover {
-      background: $background-color-light-hover;
+      background: $primary-200;
     }
 
     .CommunityIcon {

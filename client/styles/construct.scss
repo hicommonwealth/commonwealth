@@ -15,28 +15,10 @@ $cui-font-weight: $cui-font-weight-normal;
 $cui-font-size: floor($cui-base-size * 1.4);
 
 //
-// text colors
-//
-
-$cui-body-color: $text-color-black;
-$cui-hover-color: tint($blue-grey50, 25%);
-$cui-base-text-color: lighten($grey800, 3%);
-
-//
 // component styling
 //
 
 $cui-base-height: floor($cui-base-size * 2.8);
-
-//
-// component colors
-//
-
-$cui-primary-bg-color: $primary-bg-color;
-$cui-positive-bg-color: $positive-bg-color;
-$cui-negative-bg-color: $negative-bg-color;
-$cui-base-border-color: #c5cdd1;
-$cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
 
 @import 'construct-ui/src/utils/focus-manager/index.scss';
 @import 'construct-ui/src/components/index.scss';
@@ -58,11 +40,11 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
 }
 
 .cui-popover-content {
-  border-color: $cui-popover-arrow-border-color;
+  border-color: $primary-50;
 }
 
 .cui-menu .cui-menu-divider {
-  border-color: lighten($cui-popover-arrow-border-color, 2%);
+  border-color: $primary-50;
 }
 
 .cui-button {
@@ -132,40 +114,40 @@ button,
 
   // adjust rounded button styles
   &.cui-rounded {
-    border-color: $grey200;
+    border-color: $neutral-100;
 
     &:hover {
-      border-color: $grey700;
+      border-color: $neutral-600;
     }
 
     &:active,
     &.cui-active {
-      border-color: $grey700;
+      border-color: $neutral-600;
     }
   }
 
   // adjust sublabel colors to grey from blue grey
   .cui-button-sublabel {
-    color: $grey400;
+    color: $neutral-400;
   }
 
   &.cui-basic .cui-button-sublabel,
   &.cui-outlined .cui-button-sublabel {
-    color: $grey400;
+    color: $neutral-400;
   }
 
   // adjust basic button styles
   &.cui-basic,
   .cui-button-group.cui-basic & {
     &:hover {
-      background: $background-color-white-hover;
-      color: $cui-base-text-color;
+      background: $primary-400;
+      color: $neutral-600;
     }
 
     &:active,
     &.cui-active {
-      background: $background-color-light;
-      color: $cui-base-text-color;
+      background: $primary-300;
+      color: $neutral-600;
     }
   }
 }
@@ -187,12 +169,12 @@ button,
 }
 
 .cui-callout.cui-primary {
-  border-color: $text-color-primary-light;
+  border-color: $primary-100;
 }
 
 .cui-callout a {
   font-weight: 500;
-  color: $text-color-primary;
+  color: $primary-500;
 }
 
 // adjust input padding
@@ -223,11 +205,7 @@ button,
     min-width: $icon-size;
   }
 
-  @include cui-tag-style(
-    $cui-base-text-color,
-    $cui-hover-color,
-    tint($blue-grey100, 10%)
-  );
+  @include cui-tag-style($neutral-600, $primary-50, tint($blue-grey100, 10%));
 
   @each $size in $cui-sizes {
     &.cui-#{$size},
@@ -276,7 +254,7 @@ button,
 }
 
 .cui-icon {
-  color: $text-color-black;
+  color: $neutral-800;
 }
 
 // reduce menu padding
@@ -290,14 +268,14 @@ button,
   }
 
   > .cui-button.cui-basic {
-    color: $text-color-black;
+    color: $neutral-800;
 
     .cui-icon svg {
-      stroke: $text-color-black;
+      stroke: $neutral-800;
     }
 
     a {
-      color: $text-color-black;
+      color: $neutral-800;
     }
   }
 
@@ -337,13 +315,13 @@ button,
 // make spinner visually minimal
 .cui-spinner .cui-spinner-icon {
   border-color: transparent;
-  border-top-color: $text-color-darker !important;
-  border-right-color: $text-color-darker !important;
+  border-top-color: $neutral-900 !important;
+  border-right-color: $neutral-900 !important;
 }
 
 .cui-spinner-message {
   margin-top: 0.8em;
-  color: $text-color-darker;
+  color: $neutral-900;
 }
 
 // make spinner slower

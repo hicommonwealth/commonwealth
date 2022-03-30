@@ -47,9 +47,9 @@
   .SwitchAddress {
     display: block;
     padding: 13px 10px 7px;
-    border: 1px solid $background-color-light;
+    border: 1px solid $primary-300;
     &:hover {
-      background: $background-color-white-hover;
+      background: $primary-400;
       cursor: pointer;
     }
     .UserBlock span.balance {
@@ -62,15 +62,9 @@
     }
   }
   .SwitchAddress.selected {
-    background-color: darken(
-      $color: $background-color-white-hover,
-      $amount: 5%
-    );
+    background-color: darken($color: $primary-400, $amount: 5%);
     &:hover {
-      background-color: darken(
-        $color: $background-color-white-hover,
-        $amount: 5%
-      );
+      background-color: darken($color: $primary-400, $amount: 5%);
     }
   }
   .SwitchAddress.mobile {
@@ -87,8 +81,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     @include sm-min {
-      border-right: 1px
-        darken($color: $background-color-white-hover, $amount: 5%) solid;
+      border-right: 1px darken($color: $primary-400, $amount: 5%) solid;
       flex-direction: column;
       flex-wrap: nowrap;
       width: 200px;
@@ -105,20 +98,15 @@
       @include sm-min {
         margin: 0;
         padding: 18px 21px 13px;
-        border-bottom: 1px
-          darken($color: $background-color-white-hover, $amount: 5%) solid;
+        border-bottom: 1px darken($color: $primary-400, $amount: 5%) solid;
       }
       &.selected {
         border-bottom: 3px $positive-bg-color solid;
         @include sm-min {
           border-left: 8px $positive-bg-color solid;
-          border-bottom: 1px
-            darken($color: $background-color-white-hover, $amount: 5%) solid;
+          border-bottom: 1px darken($color: $primary-400, $amount: 5%) solid;
           padding-left: 13px;
-          background-color: darken(
-            $color: $background-color-white-hover,
-            $amount: 3%
-          );
+          background-color: darken($color: $primary-400, $amount: 3%);
         }
       }
     }

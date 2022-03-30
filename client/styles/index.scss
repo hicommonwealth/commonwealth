@@ -35,7 +35,7 @@ strong {
 }
 
 a {
-  color: $primary-bg-color;
+  color: $primary-500;
   text-decoration: none;
   &:hover {
     text-decoration: underline;
@@ -43,14 +43,14 @@ a {
 }
 
 a:visited {
-  color: lighten($primary-bg-color, 5%);
+  color: lighten($primary-500, 5%);
 }
 
 code,
 pre {
   font-family: $monospace-fonts;
   font-size: 13.5px;
-  background: $background-color-white-hover;
+  background: $primary-400;
   border-radius: 4px;
 }
 

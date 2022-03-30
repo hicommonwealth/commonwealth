@@ -20,7 +20,6 @@ $fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
   'Courier New', Courier, monospace;
 
-$primary-bg-color: #4f6dbd; // also used for text
 $positive-bg-color: #41a360; // also used for text
 $negative-bg-color: #d4302f; // also used for text
 $disable-grey: #dddddd;
@@ -34,25 +33,13 @@ $text-color-lighter: #a3a4a7; // light text on white background
 $text-color-light: #9a9da4; // light text on light background
 $text-color-medium: #777; // medium text on any background
 $text-color-medium-dark: #555; // light off-black text on any background
-$text-color-darker: #333; // off-black text on any background
-$text-color-black: #222; // black text on any background
-$text-color-primary-light: tint($primary-bg-color, 75%);
-$text-color-primary: $primary-bg-color;
-
-$background-color-white-hover: tint($primary-bg-color, 96.5%);
-$background-color-white-hover-0: tint(#fafafa, 10%);
-
 $background-color-black-hover: tint(#484744, 30%);
 $background-color-black: #262523;
-$background-color-light: desaturate(tint($primary-bg-color, 90%), 12%);
-$background-color-light-hover: desaturate(tint($primary-bg-color, 86.5%), 12%);
-$background-color-medium-light: desaturate(tint($primary-bg-color, 75%), 25%);
-$background-color-light-positive: #cce8cc;
-$background-color-light-negative: #e8cccc;
-$background-color-medium-accent: tint($primary-bg-color, 50%);
-$background-color-dark-accent: $primary-bg-color;
+$background-color-medium-light: desaturate(tint($primary-500, 75%), 25%);
+$background-color-medium-accent: tint($primary-500, 50%);
+$background-color-dark-accent: $primary-500;
 $background-color-dark-monochrome: #36393f;
-$background-color-darker-accent: shade($primary-bg-color, 4%);
+$background-color-darker-accent: shade($primary-500, 4%);
 $background-color-darker-monochrome: #2f3136;
 $background-color-unread: #ffffe0; // notifications color
 $background-color-selection-on-dark: #ffdd00;
@@ -103,7 +90,7 @@ $text-size-mobile-header: 22px;
   }
 
   a.attachment-item {
-    background: $background-color-light;
+    background: $primary-300;
     display: inline-block;
     margin-right: 10px;
     max-height: 100px;
@@ -112,7 +99,7 @@ $text-size-mobile-header: 22px;
     text-decoration: none;
 
     &:hover {
-      background: $background-color-light-hover;
+      background: $primary-200;
     }
 
     img {
@@ -235,7 +222,7 @@ $text-size-mobile-header: 22px;
 
   .cui-tabs-item.cui-active {
     // these styles can't be alphabetized or else they'll apply incorrectly
-    color: $text-color-black;
+    color: $neutral-800;
     border-width: 2px;
     border-style: solid;
     border-top: 0;

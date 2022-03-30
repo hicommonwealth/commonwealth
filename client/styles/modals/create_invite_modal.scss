@@ -128,7 +128,7 @@
         outline: #cfcbff auto 2px;
       }
       .search-results-item {
-        color: $text-color-black;
+        color: $neutral-800;
         text-decoration: none;
         padding: 12px 0 6px;
         font-size: 18px;
@@ -182,7 +182,7 @@
         }
         span {
           width: 50%;
-          color: $primary-bg-color;
+          color: $primary-500;
           text-align: right;
         }
       }

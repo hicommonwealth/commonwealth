@@ -9,7 +9,7 @@
   border-radius: 9999px;
   overflow: hidden;
   .avatar-image {
-    background: $background-color-light;
+    background: $primary-300;
     background-size: cover;
   }
 }
@@ -26,7 +26,7 @@
   .avatar-image {
     width: 100% !important;
     height: 100% !important;
-    background: $background-color-light;
+    background: $primary-300;
     background-size: cover;
   }
 }
@@ -86,7 +86,7 @@
     font-size: 75%;
     font-weight: 500;
     margin-left: 4px;
-    background: $background-color-light;
+    background: $primary-300;
     border-radius: 99px;
     padding: 4px 8px;
     text-decoration: none !important;
@@ -134,7 +134,7 @@
     clear: both;
     a {
       text-decoration: none !important;
-      color: $text-color-black !important;
+      color: $neutral-800 !important;
     }
     a:hover {
       text-decoration: underline !important;

@@ -36,8 +36,8 @@
     border-radius: 12px;
     padding: 0;
     &.active {
-      color: $primary-bg-color;
-      border-color: $primary-bg-color;
+      color: $primary-500;
+      border-color: $primary-500;
       span {
         color: inherit;
       }

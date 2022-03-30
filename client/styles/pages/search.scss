@@ -79,7 +79,7 @@
         padding: 5px 5px 5px 10px;
 
         &:hover {
-          background-color: $background-color-white-hover;
+          background-color: $primary-400;
         }
 
         .cui-list-item-content-left {
@@ -94,7 +94,7 @@
 
         .search-results-item {
           padding: 20px;
-          color: $text-color-black;
+          color: $neutral-800;
           text-decoration: none;
           width: 100%;
           overflow: hidden;
@@ -113,7 +113,7 @@
             color: $text-color-light;
 
             mark {
-              background: $background-color-light;
+              background: $primary-300;
               border-radius: 5px;
               color: $black !important;
             }
@@ -160,7 +160,7 @@
           .search-results-thread-body,
           .search-results-comment {
             mark {
-              background: $background-color-light;
+              background: $primary-300;
               padding: 5px 2px 0;
               margin: 0 3px;
               border-radius: 5px;

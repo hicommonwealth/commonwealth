@@ -8,7 +8,7 @@
   justify-content: center;
   align-items: center;
   background-color: $white;
-  border: 1px solid $background-color-light;
+  border: 1px solid $primary-300;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
   > .User,
   .ChainIcon,
@@ -203,7 +203,7 @@
 
   &.dz-drag-hover {
     border-style: solid;
-    border: 2px solid $primary-bg-color;
+    border: 2px solid $primary-500;
     border-radius: 5px;
     margin: -8px -2px;
   }
@@ -226,7 +226,7 @@
         width: 100%;
         border-radius: $image-border-radius;
         background: $text-color-light;
-        background: linear-gradient(to bottom, $background-color-light, #ddd);
+        background: linear-gradient(to bottom, $primary-300, #ddd);
       }
       .dz-details {
         opacity: 1;

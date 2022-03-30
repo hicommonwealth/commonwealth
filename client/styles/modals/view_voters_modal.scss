@@ -14,7 +14,7 @@
 //     padding: 12px 16px 11px;
 //     margin-bottom: 20px;
 //     border-radius: 4px;
-//     background: $text-color-darker;
+//     background: $neutral-900;
 //     color: $white;
 //     font-family: $monospace-fonts;
 //     font-size: 13px;
@@ -33,7 +33,7 @@
 
 // .VoterRow {
 //   display: flex;
-//   border: 1px solid $background-color-light;
+//   border: 1px solid $primary-300;
 //   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
 //   background: $white;
 //   border-radius: 3px;
@@ -44,7 +44,7 @@
 
 //   // link styling
 //   text-decoration: none;
-//   color: $text-color-black;
+//   color: $neutral-800;
 //   @include hoverFloat;
 
 //   .proposal-pre {

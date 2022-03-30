@@ -23,7 +23,7 @@ $discussion-title-font-size: 1.45rem;
     background-color: transparent;
     transition: background-color 1s ease-in-out;
     .thread-connector {
-      background: $background-color-light;
+      background: $primary-300;
       transition: background 1s ease-in-out;
     }
   }
@@ -146,7 +146,7 @@ $discussion-title-font-size: 1.45rem;
     &.proposal-snapshot {
       .snapshot-proposal-top {
         display: flex;
-        border-bottom: 1px solid $background-color-light;
+        border-bottom: 1px solid $primary-300;
       }
       .proposal-content {
         padding: 25px 0;
@@ -155,7 +155,7 @@ $discussion-title-font-size: 1.45rem;
     .proposal-top {
       display: flex;
       padding-bottom: 20px;
-      border-bottom: 1px solid $background-color-light;
+      border-bottom: 1px solid $primary-300;
     }
     .proposal-top-left {
       flex: 1;
@@ -262,12 +262,12 @@ $discussion-title-font-size: 1.45rem;
         display: block;
         padding: 8px 16px;
         border-radius: 99px;
-        background: $background-color-light;
-        color: $text-color-primary;
+        background: $primary-300;
+        color: $primary-500;
         text-decoration: none !important;
       }
       svg {
-        stroke: $text-color-primary;
+        stroke: $primary-500;
         position: relative;
         top: -1px;
         margin-left: 5px;
@@ -278,7 +278,7 @@ $discussion-title-font-size: 1.45rem;
         min-width: $size;
       }
       a:hover {
-        background: darken($background-color-light, 1%);
+        background: darken($primary-300, 1%);
       }
     }
   }
@@ -407,7 +407,7 @@ $discussion-title-font-size: 1.45rem;
   }
   .ProposalHeaderStage {
     &.primary {
-      color: tint($primary-bg-color, 10%);
+      color: tint($primary-500, 10%);
     }
     &.positive {
       color: tint($positive-bg-color, 10%);
@@ -417,7 +417,7 @@ $discussion-title-font-size: 1.45rem;
     }
   }
   .proposal-collaborators-popover {
-    color: $text-color-black;
+    color: $neutral-800;
     .cui-popover-content {
       padding-top: 22px;
       .User {
@@ -522,7 +522,7 @@ $discussion-title-font-size: 1.45rem;
           .poll-bar {
             height: 5px;
             border-radius: 5px;
-            background-color: $primary-bg-color;
+            background-color: $primary-500;
           }
           .option-results-label {
             display: flex;
@@ -576,7 +576,7 @@ $discussion-title-font-size: 1.45rem;
     position: absolute;
     top: 48px;
     bottom: -40px;
-    background: $background-color-light;
+    background: $primary-300;
     left: 19px;
     width: 2px;
     z-index: -1;

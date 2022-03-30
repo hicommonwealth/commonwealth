@@ -5,7 +5,7 @@
     padding: 24px;
 
     .cui-switch {
-      color: $text-color-black;
+      color: $neutral-800;
       margin-bottom: 16px;
     }
 
@@ -65,7 +65,7 @@
       padding: 4px 8px;
 
       &:hover {
-        background-color: $background-color-white-hover;
+        background-color: $primary-400;
       }
     }
   }

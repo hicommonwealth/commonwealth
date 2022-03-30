@@ -14,8 +14,8 @@
   min-width: 48px;
 
   &.hasReacted {
-    border-color: $primary-bg-color;
-    color: $primary-bg-color;
+    border-color: $primary-500;
+    color: $primary-500;
   }
 
   &.disabled {

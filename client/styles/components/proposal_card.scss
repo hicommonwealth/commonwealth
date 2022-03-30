@@ -30,8 +30,8 @@
     font-weight: 500;
   }
   .cui-tag.proposal-became-tag {
-    background: tint($primary-bg-color, 40%);
-    border-color: tint($primary-bg-color, 40%);
+    background: tint($primary-500, 40%);
+    border-color: tint($primary-500, 40%);
   }
   .proposal-title {
     font-size: 18px;
@@ -53,7 +53,7 @@
     font-weight: 500;
     //
     padding: 8px 16px;
-    background: $background-color-light;
+    background: $primary-300;
     border-radius: 6px;
     font-size: 92%;
     margin-top: 11px;
@@ -61,13 +61,13 @@
     bottom: 60px;
     margin-right: 32px;
     &:hover {
-      background: $background-color-light-hover;
+      background: $primary-200;
     }
     a:hover {
       text-decoration: none;
     }
     .cui-icon svg {
-      stroke: $text-color-primary;
+      stroke: $primary-500;
       position: relative;
       top: -1px;
       left: -2px;
@@ -76,7 +76,7 @@
   }
   .proposal-status {
     font-weight: 500;
-    color: $text-color-black;
+    color: $neutral-800;
     &.pass {
       color: $positive-bg-color;
     }

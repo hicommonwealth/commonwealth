@@ -10,7 +10,7 @@
   padding: 16px;
 
   &:hover {
-    background: $background-color-white-hover;
+    background: $primary-400;
   }
 
   .pinned {
@@ -36,7 +36,7 @@
     width: 100%;
 
     .row-header {
-      color: $text-color-black;
+      color: $neutral-800;
       font-size: 16px;
       font-weight: 600;
       margin-bottom: 4px;
