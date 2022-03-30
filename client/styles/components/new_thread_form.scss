@@ -79,7 +79,7 @@
     .cui-tabs {
       margin-bottom: 8px;
       padding-right: 28px;
-      border-bottom: 1px solid $border-color-lightest;
+      border-bottom: 1px solid $neutral-50;
       .cui-tabs-item {
         padding: 11px 0 7px !important;
         margin-left: 1px !important;
@@ -168,14 +168,14 @@
     display: flex;
     flex-direction: column;
     flex: 3;
-    border-left: 1px solid $border-color-lightest;
+    border-left: 1px solid $neutral-50;
     padding-bottom: 10px;
     .cui-list {
       max-height: none;
       .cui-list-item {
         display: block;
         padding: 21px 0 12px !important;
-        border-bottom-color: $border-color-lightest;
+        border-bottom-color: $neutral-50;
         max-height: 140px;
         overflow: hidden;
         .discussion-draft-title-wrap {

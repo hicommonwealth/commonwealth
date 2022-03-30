@@ -20,41 +20,6 @@ $fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
   'Courier New', Courier, monospace;
 
-$background-color-black-hover: tint(#484744, 30%);
-$background-color-black: #262523;
-$background-color-medium-light: desaturate(tint($primary-500, 75%), 25%);
-$background-color-medium-accent: tint($primary-500, 50%);
-$background-color-dark-accent: $primary-500;
-$background-color-dark-monochrome: #36393f;
-$background-color-darker-accent: shade($primary-500, 4%);
-$background-color-darker-monochrome: #2f3136;
-$background-color-unread: #ffffe0; // notifications color
-$background-color-selection-on-dark: #ffdd00;
-$background-color-new-comment: #fffba1;
-$border-color: #c5cdd1;
-$border-color-light: #e0e4f1;
-$border-color-lightest: #e0e4f1;
-$border-color-off-white: #eee;
-$dark-gray: #333333;
-$midi-gray: #666666;
-$lite-gray: #999999;
-$disable-gray: #dddddd;
-$background-gray: #f4f4f4;
-$dark-purp: #4723ad;
-$midi-purp: #9075dc;
-$lite-purp: #c7b9ef;
-$xlite-purp: #f7f4ff;
-$purp-blue: #6300ff;
-$purp-blue-lite: #f3ebff;
-$hype-red: #ff002e;
-$pinky: #ffafbe;
-$flesh-pink: #ffebee;
-$dark-green: #008676;
-$carib-green: #00c0a9;
-$foam-green: #b4f1ea;
-$mint-green: #f3fff9;
-$cream-yellow: #fffba1;
-
 //
 // mobile specs
 
@@ -161,7 +126,7 @@ $text-size-mobile-header: 22px;
 
 @mixin card {
   border-radius: 15px;
-  border: 1px solid $border-color-off-white;
+  border: 1px solid $neutral-25;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.07);
   cursor: pointer;
   float: left;

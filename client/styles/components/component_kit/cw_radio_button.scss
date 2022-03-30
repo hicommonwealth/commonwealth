@@ -33,7 +33,7 @@
         margin-right: 5px;
         width: 16px;
         height: 16px;
-        border: 1px solid $lite-gray;
+        border: 1px solid $neutral-500;
         background: $white;
       }
 
@@ -42,7 +42,7 @@
         display: block;
         width: 10px;
         height: 10px;
-        background: $purp-blue;
+        background: $purple-400;
         position: absolute;
         border-radius: 50%;
         top: 3px;
@@ -53,14 +53,14 @@
     }
 
     &:hover + span:before {
-      border: 1px solid $purp-blue;
-      background: $purp-blue-lite;
+      border: 1px solid $purple-400;
+      background: $purple-400-lite;
     }
 
     &:hover + span:after {
       opacity: 1;
       transform: scale(1, 1);
-      background: $purp-blue;
+      background: $purple-400;
       top: 6px;
       left: 6px;
       width: 4px;
@@ -69,13 +69,13 @@
 
     &:checked + span:before {
       background: $white;
-      border: 1px solid $purp-blue;
+      border: 1px solid $purple-400;
     }
 
     &:checked + span:after {
       opacity: 1;
       transform: scale(1, 1);
-      background: $purp-blue;
+      background: $purple-400;
       width: 10px;
       height: 10px;
       top: 3px;

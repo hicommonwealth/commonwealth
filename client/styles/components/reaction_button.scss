@@ -19,7 +19,7 @@
   }
 
   &.disabled {
-    border-color: $border-color-lightest;
+    border-color: $neutral-50;
     color: $neutral-500;
     pointer-events: none;
   }

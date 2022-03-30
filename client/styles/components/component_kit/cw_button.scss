@@ -9,35 +9,35 @@
 
   &.primary {
     color: $white;
-    background-color: $midi-purp;
+    background-color: $purple-300;
 
     &:hover {
-      background-color: $dark-purp;
+      background-color: $purple-500;
       box-shadow: 0px 2px 6px 0px #0000001a;
     }
 
     &.disabled {
-      background-color: $disable-gray;
+      background-color: $neutral-100;
       box-shadow: none;
       cursor: default;
     }
   }
 
   &.secondary {
-    color: $lite-gray;
+    color: $neutral-500;
     background-color: $white;
-    border: 1px solid $lite-gray;
+    border: 1px solid $neutral-500;
 
     &:hover {
-      color: $midi-gray;
-      background-color: $background-gray;
+      color: $neutral-600;
+      background-color: $neutral-50;
       box-shadow: 0px 2px 6px 0px #0000001a;
     }
 
     &.disabled {
-      color: $disable-gray;
+      color: $neutral-100;
       background-color: $white;
-      border: 1px solid $disable-gray;
+      border: 1px solid $neutral-100;
       box-shadow: none;
       cursor: default;
     }

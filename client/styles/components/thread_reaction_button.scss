@@ -21,7 +21,7 @@
   &.disabled {
     background: initial !important;
     color: $neutral-500 !important;
-    border-color: $border-color-lightest !important;
+    border-color: $neutral-50 !important;
   }
   &.large {
     display: block;

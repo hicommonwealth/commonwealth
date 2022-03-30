@@ -4,7 +4,7 @@
   position: relative;
   height: calc(100vh - 100px);
   background: $white;
-  border: 1px solid $border-color-off-white;
+  border: 1px solid $neutral-25;
 
   .chat-messages,
   .chat-composer-unavailable {
@@ -15,7 +15,7 @@
     top: 0;
     width: 100%;
     height: calc(100vh - 100px);
-    border-bottom: 1px solid $border-color-off-white;
+    border-bottom: 1px solid $neutral-25;
     overflow-y: scroll;
     .chat-message-placeholder {
       margin: 16px 0;
@@ -49,7 +49,7 @@
   .chat-composer {
     position: absolute;
     bottom: 0;
-    border-top: 1px solid $border-color-off-white;
+    border-top: 1px solid $neutral-25;
     width: 100%;
     padding: 0;
     margin: 0;

@@ -354,12 +354,8 @@
       border-radius: 8px;
       overflow: hidden;
       .dz-upload {
-        background: $background-color-dark-accent;
-        background: linear-gradient(
-          to bottom,
-          $background-color-dark-accent,
-          $background-color-darker-accent
-        );
+        background: $primary-600;
+        background: linear-gradient(to bottom, $primary-600, $primary-800);
         position: absolute;
         top: 0;
         left: 0;

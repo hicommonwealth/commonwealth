@@ -4,7 +4,7 @@ pre.CodeBlock {
   padding: 12px 16px 11px;
   margin-bottom: 20px;
   border-radius: 4px;
-  background: $background-color-dark-monochrome;
+  background: $neutral-800;
   color: $white;
   font-family: $monospace-fonts;
   font-size: 13px;
@@ -17,6 +17,6 @@ pre.CodeBlock {
     opacity: 0.9;
   }
   &::selection {
-    background: $background-color-selection-on-dark;
+    background: $yellow-300;
   }
 }

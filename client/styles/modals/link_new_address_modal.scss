@@ -101,7 +101,7 @@
     margin: 0 20px;
     margin-bottom: 28px;
     text-align: left;
-    border: 1px solid $border-color-lightest;
+    border: 1px solid $neutral-50;
     font-size: 14px;
     .link-address-combined-warning-icon {
       margin-right: 6px;
@@ -124,7 +124,7 @@
       width: 230px;
       height: 190px;
       border-radius: 3px;
-      border: 1px solid $border-color-lightest;
+      border: 1px solid $neutral-50;
       background: $white;
       box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
       &.mobile-disabled {
@@ -236,7 +236,7 @@
   .account-item {
     cursor: pointer;
     padding: 16px 18px 9px;
-    border: 1px solid $border-color-lightest;
+    border: 1px solid $neutral-50;
     border-bottom: none;
     text-align: left;
     display: flex;
@@ -267,7 +267,7 @@
       border-top-left-radius: 6px;
     }
     &:last-child {
-      border-bottom: 1px solid $border-color-lightest;
+      border-bottom: 1px solid $neutral-50;
       border-bottom-right-radius: 6px;
       border-bottom-left-radius: 6px;
     }
@@ -326,7 +326,7 @@
   .new-account-userblock {
     width: 180px;
     margin: 0 auto 30px;
-    border: 1px solid $border-color-light;
+    border: 1px solid $neutral-100;
     border-radius: 4px;
     padding: 15px 20px 11px;
   }

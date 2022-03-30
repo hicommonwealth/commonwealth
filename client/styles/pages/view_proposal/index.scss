@@ -14,7 +14,7 @@ $discussion-title-font-size: 1.45rem;
 @mixin supports-jump-highlight() {
   &.highlighted {
     border-radius: 20px;
-    background-color: $background-color-new-comment;
+    background-color: $yellow-200;
     .thread-connector {
       background: #00c0a9;
     }
@@ -421,7 +421,7 @@ $discussion-title-font-size: 1.45rem;
 
   .ProposalSidebarLinkedViewer {
     border-radius: 10px;
-    border: 1px solid tint($border-color-lightest, 26%);
+    border: 1px solid tint($neutral-50, 26%);
     padding: 22px 18px 21px;
     margin-bottom: 24px;
     display: flex;
@@ -448,7 +448,7 @@ $discussion-title-font-size: 1.45rem;
   .ProposalSidebarPollEditorModule,
   .ProposalLinkedThreadsEditorModule {
     border-radius: 10px;
-    border: 1px solid tint($border-color-lightest, 26%);
+    border: 1px solid tint($neutral-50, 26%);
     padding: 22px 18px 21px;
     margin-bottom: 24px;
   }

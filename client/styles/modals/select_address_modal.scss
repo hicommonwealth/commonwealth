@@ -11,7 +11,7 @@
 
   .select-address-placeholder {
     padding: 30px 30px 24px;
-    border: 1px solid $border-color-light;
+    border: 1px solid $neutral-100;
     border-radius: 15px;
     margin-bottom: 12px;
     p:first-child {
@@ -26,12 +26,12 @@
   }
 
   .select-address-options {
-    border-bottom: 1px solid $border-color-lightest;
+    border-bottom: 1px solid $neutral-50;
     margin-bottom: 10px;
   }
   .select-address-option {
     position: relative;
-    border: 1px solid $border-color-lightest;
+    border: 1px solid $neutral-50;
     border-bottom: none;
     cursor: pointer;
     &:hover {

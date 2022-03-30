@@ -10,17 +10,17 @@
   min-width: fit-content;
 
   span {
-    color: $dark-purp;
+    color: $purple-500;
     margin-right: 15px;
   }
 
   &.button {
     padding: 4px 8px;
-    border: 1px solid $lite-purp;
+    border: 1px solid $purple-200;
     border-radius: 10px;
 
     svg {
-      color: $dark-purp;
+      color: $purple-500;
     }
   }
 
@@ -29,15 +29,15 @@
     border-radius: 4px;
 
     svg {
-      color: $dark-purp;
+      color: $purple-500;
     }
   }
 
   &:hover {
-    background-color: $lite-purp;
+    background-color: $purple-200;
 
     svg {
-      color: $dark-purp;
+      color: $purple-500;
     }
   }
 }

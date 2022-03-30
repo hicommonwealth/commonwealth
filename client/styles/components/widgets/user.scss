@@ -32,7 +32,7 @@
 }
 
 @mixin roleIcon {
-  background: $background-color-dark-accent;
+  background: $primary-600;
   border-radius: 50%;
   color: $white;
   display: inline-block;
@@ -55,7 +55,7 @@
   }
 
   &.gray {
-    background: $background-color-medium-accent;
+    background: $primary-400;
   }
 
   &.long {

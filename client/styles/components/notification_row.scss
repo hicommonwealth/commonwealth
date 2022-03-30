@@ -6,14 +6,14 @@
   padding: 17px 22px;
   margin: 0;
   cursor: pointer;
-  border-bottom: 1px solid $border-color-lightest;
+  border-bottom: 1px solid $neutral-50;
   text-decoration: none !important;
   color: $black !important;
   &:hover {
     background: $primary-400;
   }
   &.unread {
-    background: $background-color-unread;
+    background: $yellow-100;
   }
   > .User {
     width: min-content;
@@ -74,13 +74,13 @@
       top: -1px;
       .cui-spinner-icon {
         border-color: transparent;
-        border-top-color: $background-color-dark-accent !important;
-        border-right-color: $background-color-dark-accent !important;
+        border-top-color: $primary-600 !important;
+        border-right-color: $primary-600 !important;
       }
     }
   }
   .comment-body-mark-as-read:hover {
-    color: $background-color-dark-accent;
+    color: $primary-600;
   }
 }
 

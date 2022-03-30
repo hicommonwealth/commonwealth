@@ -19,7 +19,7 @@ svg {
   }
 
   &.disabled {
-    color: $disable-gray;
+    color: $neutral-100;
   }
 
   // Gabe 2/28/22 - These styles shouldn't be applied on the icon itself,
@@ -30,22 +30,22 @@ svg {
   // }
 
   // &.primary:hover {
-  //   color: $dark-purp;
+  //   color: $purple-500;
 
   //   &.disabled {
-  //     color: $disable-gray;
+  //     color: $neutral-100;
   //   }
   // }
 
   // &.secondary {
-  //   color: $lite-gray;
+  //   color: $neutral-500;
   // }
 
   // &.secondary:hover {
   //   color: $black;
 
   //   &.disabled {
-  //     color: $disable-gray;
+  //     color: $neutral-100;
   //   }
   // }
 }
