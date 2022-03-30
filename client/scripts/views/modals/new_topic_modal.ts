@@ -20,6 +20,7 @@ import {
   CWTextInput,
   ValidationStatus,
 } from 'views/components/component_kit/cw_text_input';
+import { ChainNetwork } from 'shared/types';
 
 interface INewTopicModalForm {
   id: number;
@@ -86,7 +87,7 @@ const NewTopicModal: m.Component<
 
     const decimals = app.chain?.meta.chain?.decimals
       ? app.chain.meta.chain.decimals
-      : 18;
+      : (app.chain.network === ChainNetwork.ERC721) ? 0 : 18;
 
     return m('.NewTopicModal', [
       m('.compact-modal-title', [
@@ -219,7 +220,7 @@ const NewTopicModal: m.Component<
                   app.activeChainId()
                     ? tokensToWei(
                         vnode.state.form.tokenThreshold || '0',
-                        app.chain?.meta.chain.decimals || 18
+                        decimals
                       )
                     : '0',
                   defaultOffchainTemplate
