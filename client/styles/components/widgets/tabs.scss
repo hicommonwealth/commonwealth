@@ -16,7 +16,7 @@
   a.tab-entry.active {
     color: $neutral-800;
     border-bottom: 3px solid $background-color-dark-accent;
-    padding-bottom: 6px;
+    padding-bottom: 8px;
   }
   @include xs-max {
     .tab-bar {

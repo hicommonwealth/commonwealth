@@ -33,7 +33,7 @@ $discussion-title-font-size: 1.45rem;
   .view-proposal-page-container {
     display: flex;
     flex-direction: column;
-    margin-right: 24px;
+    margin-right: 32px;
     padding: 24px 0 24px 24px;
     width: 736px;
   }
@@ -45,14 +45,6 @@ $discussion-title-font-size: 1.45rem;
   .ProposalHeader,
   .ProposalComment {
     @include supports-jump-highlight();
-  }
-  .ProposalComment {
-    @include xs-max {
-      margin-top: 30px;
-    }
-  }
-  .ProposalComments.no-active-account {
-    padding-bottom: $discussion-outer-padding;
   }
   .proposal-body-bottom,
   .comment-body-bottom {
@@ -154,7 +146,7 @@ $discussion-title-font-size: 1.45rem;
     }
     .proposal-top {
       display: flex;
-      padding-bottom: 20px;
+      padding-bottom: 16px;
       border-bottom: 1px solid $primary-300;
     }
     .proposal-top-left {
@@ -290,6 +282,8 @@ $discussion-title-font-size: 1.45rem;
     position: relative;
     display: flex;
     margin-bottom: 40px;
+    padding-top: 16px;
+
     .comment-body {
       flex: 1;
       overflow-x: auto;
@@ -299,7 +293,6 @@ $discussion-title-font-size: 1.45rem;
       }
     }
     .comment-body-top {
-      padding-bottom: $discussion-meta-padding;
       font-size: $discussion-meta-font-size;
     }
     .comment-body-bottom {
@@ -448,6 +441,7 @@ $discussion-title-font-size: 1.45rem;
     display: flex;
     flex-direction: column;
     padding: 24px 24px 24px 0;
+    width: 296px;
   }
 
   .ProposalHeaderOffchainPoll,
@@ -526,6 +520,7 @@ $discussion-title-font-size: 1.45rem;
           }
           .option-results-label {
             display: flex;
+            margin-bottom: 4px;
           }
           a {
             margin-top: 10px;

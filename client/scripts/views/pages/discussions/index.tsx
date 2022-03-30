@@ -231,6 +231,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
 
       const allThreadsSeen = () =>
         firstThread && getLastUpdate(firstThread) < lastVisited.unix();
+
       const noThreadsSeen = () =>
         lastThread && getLastUpdate(lastThread) > lastVisited.unix();
 
@@ -242,27 +243,26 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
           )
         );
       } else {
-        let count = 0;
         unpinnedThreads.forEach((proposal) => {
           if (
             !visitMarkerPlaced &&
             getLastUpdate(proposal) < lastVisited.unix()
           ) {
             const sortedListingCopy = sortedListing;
+
             sortedListing = [
               m('.discussion-group-wrap', sortedListingCopy),
               getLastSeenDivider(),
               m('.discussion-group-wrap', [m(DiscussionRow, { proposal })]),
             ];
+
             visitMarkerPlaced = true;
-            count += 1;
           } else {
             if (visitMarkerPlaced) {
               sortedListing[2].children.push(m(DiscussionRow, { proposal }));
             } else {
               sortedListing.push(m(DiscussionRow, { proposal }));
             }
-            count += 1;
           }
         });
       }
