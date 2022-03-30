@@ -98,7 +98,7 @@ const SputnikDAOsPage: m.Component<
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.sputnik-daos-container', [
         m('.title', 'Sputnik DAOs'),
         m(Table, [
           m('tr', [
@@ -147,7 +147,7 @@ const SputnikDAOsPage: m.Component<
             });
           }),
         ]),
-      ]
+      ])
     );
   },
 };

@@ -37,8 +37,9 @@
 
     .row-header {
       color: $text-color-black;
-      font-size: 19px;
+      font-size: 16px;
       font-weight: 600;
+      margin-bottom: 4px;
     }
 
     .row-subheader {
@@ -61,7 +62,7 @@
 
       a {
         color: $text-color-light;
-        font-size: 17px;
+        font-size: 15px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -71,8 +72,15 @@
         }
       }
 
-      button {
+      .cui-button {
+        height: 24px;
+        max-height: 24px;
         pointer-events: none;
+        min-height: 24px;
+
+        .cui-button-label {
+          font-size: 14px;
+        }
       }
 
       > * {

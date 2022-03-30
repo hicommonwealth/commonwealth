@@ -10,8 +10,7 @@
  */
 
 html {
-  font-family: Calibre, sans-serif; /* 1 */
-  line-height: 1.5; /* 2 */
+  font-family: sans-serif; /* 1 */
 }
 
 /**
@@ -133,7 +132,6 @@ optgroup,
 select,
 textarea {
   padding: 0;
-  line-height: inherit;
   color: inherit;
 }
 
@@ -185,89 +183,6 @@ video {
   height: auto;
 }
 
-@font-face {
-  font-family: Calibre;
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: 100;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: 300;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: 500;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: 900;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: 900;
-  font-style: normal;
-}
-
-@font-face {
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: normal;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: bold;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: bold;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: 600;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Calibre;
-  font-weight: 100;
-  font-style: italic;
-}
-
 .container {
   width: 100%;
   padding-right: 1rem;
@@ -312,7 +227,6 @@ video {
   border-radius: 0.25rem;
   padding: 0.75rem;
   padding-bottom: 0.5rem;
-  line-height: 1;
   transition-property: background-color, border-color, color, fill, stroke,
     opacity, box-shadow, transform;
   transition-duration: 300ms;
@@ -331,7 +245,6 @@ video {
   border-radius: 0.25rem;
   padding: 0.75rem;
   padding-bottom: 0.5rem;
-  line-height: 1;
   transition-property: background-color, border-color, color, fill, stroke,
     opacity, box-shadow, transform;
   transition-duration: 300ms;
@@ -354,7 +267,6 @@ video {
   padding-left: 1.25rem;
   padding-right: 1.25rem;
   padding-bottom: 0.5rem;
-  line-height: 1;
   transition-property: background-color, border-color, color, fill, stroke,
     opacity, box-shadow, transform;
   transition-duration: 300ms;
@@ -618,15 +530,12 @@ section.LandingPageTokenHolders {
 }
 
 .leading-10 {
-  line-height: 2.5rem;
 }
 
 .leading-none {
-  line-height: 1;
 }
 
 .leading-tight {
-  line-height: 1.25;
 }
 
 .mx-3 {

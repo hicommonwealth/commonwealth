@@ -1,12 +1,13 @@
 @import 'client/styles/shared';
 
 .ExternalLink {
+  align-items: center;
+  cursor: pointer;
   display: flex;
   flex-direction: row;
-  align-items: baseline;
-  max-width: fit-content;
+  height: 40px;
   font-weight: 500;
-  cursor: pointer;
+  min-width: fit-content;
 
   span {
     color: $dark-purp;
@@ -14,7 +15,7 @@
   }
 
   &.button {
-    padding: 6px 24px 2px;
+    padding: 4px 8px;
     border: 1px solid $lite-purp;
     border-radius: 10px;
 
@@ -24,7 +25,7 @@
   }
 
   &.inline {
-    padding: 3px 6px 0;
+    padding: 4px 8px;
     border-radius: 4px;
 
     svg {

@@ -1,0 +1,10 @@
+@import 'client/styles/shared';
+
+.TokenHero {
+  align-items: center;
+  background: $background-color-white-hover;
+  color: $text-color-darker;
+  display: flex;
+  justify-content: center;
+  height: 32px;
+}
