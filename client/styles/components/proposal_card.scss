@@ -78,10 +78,10 @@
     font-weight: 500;
     color: $neutral-800;
     &.pass {
-      color: $positive-bg-color;
+      color: $green-500;
     }
     &.fail {
-      color: $negative-bg-color;
+      color: $rorange-500;
     }
   }
 }

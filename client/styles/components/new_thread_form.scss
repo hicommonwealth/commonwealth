@@ -181,7 +181,7 @@
         .discussion-draft-title-wrap {
           display: flex;
           .cui-icon-edit {
-            color: $negative-bg-color;
+            color: $rorange-500;
             margin: 0 8px 8px 0;
           }
         }
@@ -210,7 +210,7 @@
             text-decoration: none;
             &:hover {
               opacity: 1;
-              color: $negative-bg-color;
+              color: $rorange-500;
             }
           }
         }
@@ -224,8 +224,8 @@
 
     .draft-badge {
       display: inline-block;
-      color: $negative-bg-color;
-      border: 1px solid $negative-bg-color;
+      color: $rorange-500;
+      border: 1px solid $rorange-500;
       border-radius: 9999px;
       text-align: center;
     }

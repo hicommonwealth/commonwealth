@@ -101,9 +101,9 @@
         border-bottom: 1px darken($color: $primary-400, $amount: 5%) solid;
       }
       &.selected {
-        border-bottom: 3px $positive-bg-color solid;
+        border-bottom: 3px $green-500 solid;
         @include sm-min {
-          border-left: 8px $positive-bg-color solid;
+          border-left: 8px $green-500 solid;
           border-bottom: 1px darken($color: $primary-400, $amount: 5%) solid;
           padding-left: 13px;
           background-color: darken($color: $primary-400, $amount: 3%);

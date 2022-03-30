@@ -36,10 +36,10 @@
     margin-bottom: 4px;
     color: $text-color-light;
     &.pass {
-      color: $positive-bg-color;
+      color: $green-500;
     }
     &.fail {
-      color: $negative-bg-color;
+      color: $rorange-500;
     }
   }
 }

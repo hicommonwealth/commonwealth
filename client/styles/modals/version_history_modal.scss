@@ -35,11 +35,11 @@
           color: $neutral-900;
           .deleted {
             background: $rorange-100 !important;
-            color: $negative-bg-color !important;
+            color: $rorange-500 !important;
           }
           .added {
             background: $green-100 !important;
-            color: $positive-bg-color !important;
+            color: $green-500 !important;
           }
         }
       }

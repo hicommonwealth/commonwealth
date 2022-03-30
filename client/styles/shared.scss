@@ -20,8 +20,6 @@ $fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
   'Courier New', Courier, monospace;
 
-$positive-bg-color: #41a360; // also used for text
-$negative-bg-color: #d4302f; // also used for text
 $disable-grey: #dddddd;
 $layout-color: #f6f6f6;
 $intermediate-icon-color: #ffa200;
@@ -74,12 +72,12 @@ $cream-yellow: #fffba1;
 $text-size-mobile-header: 22px;
 
 @mixin error-text {
-  color: $negative-bg-color;
+  color: $rorange-500;
   font-weight: 500;
 }
 
 @mixin success-text {
-  color: $positive-bg-color;
+  color: $green-500;
   font-weight: 500;
 }
 

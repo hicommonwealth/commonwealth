@@ -88,10 +88,10 @@
       word-break: break-word;
     }
     .txbox-content.txbox-success {
-      color: $positive-bg-color;
+      color: $green-500;
     }
     .txbox-content.txbox-fail {
-      color: $negative-bg-color;
+      color: $rorange-500;
     }
   }
 }

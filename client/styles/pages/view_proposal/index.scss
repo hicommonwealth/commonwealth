@@ -403,10 +403,10 @@ $discussion-title-font-size: 1.45rem;
       color: tint($primary-500, 10%);
     }
     &.positive {
-      color: tint($positive-bg-color, 10%);
+      color: tint($green-500, 10%);
     }
     &.negative {
-      color: tint($negative-bg-color, 10%);
+      color: tint($rorange-500, 10%);
     }
   }
   .proposal-collaborators-popover {
