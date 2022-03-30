@@ -23,6 +23,32 @@ const TokenDecimalInput: m.Component<{
   },
   view: (vnode) => {
     const { onInputChange, decimals } = vnode.attrs;
+    const token_settings_elements = [
+      m('.switch-caption', vnode.state.switchCaption)
+    ]
+
+    if(decimals > 0) {
+      token_settings_elements.push(
+        m(Switch, {
+          title: '',
+          defaultValue: vnode.state.isInputInWei,
+          onchange: () => {
+            vnode.state.isInputInWei = !vnode.state.isInputInWei;
+            if (vnode.state.isInputInWei) {
+              vnode.state.switchCaption = 'Using base token value';
+              // token -> wei
+              vnode.state.displayValue = tokensToWei(vnode.state.displayValue, decimals);
+            } else {
+              vnode.state.switchCaption = `Using ${decimals} decimal precision`;
+              // wei -> token
+              vnode.state.displayValue = weiToTokens(vnode.state.displayValue, decimals);
+            }
+          },
+        }),
+        m('.switch-caption', vnode.state.switchCaption),
+      )
+    }
+
     return m('.TokenDecimalInput', [
       m(Input, {
         title: '',
@@ -51,25 +77,7 @@ const TokenDecimalInput: m.Component<{
           }
         },
       }),
-      m('.token-settings', [
-        m(Switch, {
-          title: '',
-          defaultValue: vnode.state.isInputInWei,
-          onchange: () => {
-            vnode.state.isInputInWei = !vnode.state.isInputInWei;
-            if (vnode.state.isInputInWei) {
-              vnode.state.switchCaption = 'Using base token value';
-              // token -> wei
-              vnode.state.displayValue = tokensToWei(vnode.state.displayValue, decimals);
-            } else {
-              vnode.state.switchCaption = `Using ${decimals} decimal precision`;
-              // wei -> token
-              vnode.state.displayValue = weiToTokens(vnode.state.displayValue, decimals);
-            }
-          },
-        }),
-        m('.switch-caption', vnode.state.switchCaption),
-      ])
+      m('.token-settings', token_settings_elements)
     ]);
   }
 };
