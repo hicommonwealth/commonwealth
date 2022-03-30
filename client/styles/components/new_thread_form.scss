@@ -2,9 +2,11 @@
 
 .NewThreadForm {
   display: flex;
+  padding: 16px;
 
   &.is-modal {
     max-width: 680px;
+    padding: 0 0 16px 0;
   }
   &.is-modal.has-drafts {
     max-width: 810px;
@@ -73,10 +75,8 @@
     }
   }
   .new-thread-form-body {
-    padding-bottom: 24px;
     flex: 9;
     .cui-tabs {
-      margin-top: 6px;
       margin-bottom: 8px;
       padding-right: 28px;
       border-bottom: 1px solid $border-color-lightest;
