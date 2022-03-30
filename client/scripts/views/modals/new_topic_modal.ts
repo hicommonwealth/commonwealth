@@ -217,12 +217,7 @@ const NewTopicModal: m.Component<
                   null,
                   form.featuredInSidebar,
                   form.featuredInNewPost,
-                  app.activeChainId()
-                    ? tokensToWei(
-                        vnode.state.form.tokenThreshold || '0',
-                        decimals
-                      )
-                    : '0',
+                  vnode.state.form.tokenThreshold || '0',
                   defaultOffchainTemplate
                 )
                 .then(() => {
