@@ -27,7 +27,7 @@ export const getLastUpdate = (proposal: OffchainThread): number => {
 
 export const getLastSeenDivider = (hasText = true) => {
   return m(
-    '.LastSeenDivider',
+    'LastSeenDivider',
     hasText ? [m('hr'), m('span', 'Last visit'), m('hr')] : [m('hr')]
   );
 };

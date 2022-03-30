@@ -49,6 +49,9 @@
 
     .chain-entity-subtext {
       color: $text-color-medium;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
