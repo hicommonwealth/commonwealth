@@ -1,218 +1,206 @@
 @import 'client/styles/shared';
 
 @mixin bareAvatar {
-    position: relative;
-    display: inline-block;
-    margin: -3px 0;
-    margin-right: 8px;
-    line-height: 0; // ensure icon doesn't get misaligned when base font size changes
-    background: $text-color-white;
-    border-radius: 9999px;
-    overflow: hidden;
-    .avatar-image {
-        background: $background-color-light;
-        background-size: cover;
-    }
+  position: relative;
+  display: inline-block;
+  margin: -3px 0;
+  margin-right: 8px;
+  background: $text-color-white;
+  border-radius: 9999px;
+  overflow: hidden;
+  .avatar-image {
+    background: $background-color-light;
+    background-size: cover;
+  }
 }
 
 @mixin circledAvatar {
-    border-radius: 9999px;
-    overflow: hidden;
-    margin: 0;
-    background: $text-color-white;
-    box-shadow: 0 0 0 1px rgba(128,128,128,0.1);
-    svg {
-        margin: 2px;
-    }
-    .avatar-image {
-        width: 100% !important;
-        height: 100% !important;
-        background: $background-color-light;
-        background-size: cover;
-    }
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0;
+  background: $text-color-white;
+  box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.1);
+  svg {
+    margin: 2px;
+  }
+  .avatar-image {
+    width: 100% !important;
+    height: 100% !important;
+    background: $background-color-light;
+    background-size: cover;
+  }
 }
 
 @mixin roleIcon {
-    display: inline-block;
-    position: relative;
-    top: -2px;
-    width: 14px;
-    height: 14px;
-    padding-top: 4px;
-    margin: 0;
-    margin-left: 4px; // tuned for correct spacing next to inline text and/or identity icons
-    margin-right: 1px;
-    border-radius: 9999px;
-    // text styling
-    text-align: center;
-    line-height: 1;
-    font-size: 10px;
-    font-weight: 500;
-    background: $background-color-dark-accent;
-    color: $text-color-white;
-    &.green {
-        background: $positive-bg-color;
-    }
-    &.red {
-        background: $negative-bg-color;
-    }
-    &.gray {
-        background: $background-color-medium-accent;
-    }
-    &.long {
-        width: initial;
-        font-weight: 400;
-        padding: 4px 7px 0px;
-        height: initial;
-        font-size: 15px;
-        margin-top: 4px;
-    }
+  background: $background-color-dark-accent;
+  border-radius: 50%;
+  color: $text-color-white;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 8px;
+  padding: 0px 2px 2px;
+  line-height: 1;
+  width: 14px;
+  height: 14px;
+  position: relative;
+  top: -2px;
+
+  &.green {
+    background: $positive-bg-color;
+  }
+
+  &.red {
+    background: $negative-bg-color;
+  }
+
+  &.gray {
+    background: $background-color-medium-accent;
+  }
+
+  &.long {
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 400;
+    height: 24px;
+    margin-top: 4px;
+  }
 }
 
 .User {
+  display: inline-block;
+  white-space: nowrap;
+  > a {
+    // reset link styles
+    &,
+    &:link,
+    &:visited {
+      color: inherit;
+    }
+  }
+  .user-avatar {
+    @include bareAvatar();
+  }
+  .user-avatar-only {
+    @include circledAvatar();
+  }
+  a.user-display-name {
+    cursor: inherit;
+    text-decoration: initial;
+  }
+  .id-short {
     display: inline-block;
-    white-space: nowrap;
-    > a {
-        // reset link styles
-        &, &:link, &:visited {
-            color: inherit;
-        }
-    }
-    .user-avatar {
-        @include bareAvatar();
-    }
-    .user-avatar-only {
-        @include circledAvatar();
-    }
-    a.user-display-name {
-        cursor: inherit;
-        text-decoration: initial;
-    }
-    .id-short {
-        display: inline-block;
-        font-size: 75%;
-        font-weight: 500;
-        position: relative;
-        top: -1px;
-        margin-left: 4px;
-        background: $background-color-light;
-        border-radius: 99px;
-        padding: 4px 6px 0;
-        line-height: 0.9;
-        text-decoration: none !important;
-    }
-    &.linkified a.user-display-name {
-        cursor: pointer;
-    }
-    &.linkified a.user-display-name:hover {
-        text-decoration: underline;
-    }
-    // role icons and identity icons
-    span.identity-icon {
-        @include roleIcon();
-    }
-    .user-display-name .identity-icon {
-        margin-left: 7px !important;
-    }
-    .role-icon {
-        @include roleIcon();
-    }
-    .role-tag {
-        font-size: 14px;
-        line-height: 0.7;
-        padding: 6px 6px 1px;
-        position: relative;
-        top: -2px;
-        margin-left: 6px;
-    }
+    font-size: 75%;
+    font-weight: 500;
+    margin-left: 4px;
+    background: $background-color-light;
+    border-radius: 99px;
+    padding: 4px 8px;
+    text-decoration: none !important;
+  }
+  &.linkified a.user-display-name {
+    cursor: pointer;
+  }
+  &.linkified a.user-display-name:hover {
+    text-decoration: underline;
+  }
+  // role icons and identity icons
+  span.identity-icon {
+    @include roleIcon();
+  }
+  .role-icon {
+    @include roleIcon();
+  }
+  .role-tag {
+    font-size: 14px;
+    margin-left: 6px;
+    padding: 4px 8px;
+  }
 }
 
 .UserPopover {
-    text-align: center !important;
-    line-height: 1.3 !important;
+  text-align: center !important;
 
-    .user-avatar,
-    .user-name {
-        display: block !important;
-        text-align: center !important;
-        margin: 0 auto !important;
-        font-weight: 500 !important;
+  .user-avatar,
+  .user-name {
+    display: block !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    font-weight: 500 !important;
+  }
+  .user-avatar {
+    @include circledAvatar();
+    width: 36px !important;
+    height: 36px !important;
+    margin: 0 auto 12px !important;
+  }
+  .user-name {
+    clear: both;
+    a {
+      text-decoration: none !important;
+      color: $text-color-black !important;
     }
-    .user-avatar {
-        @include circledAvatar();
-        width: 36px !important;
-        height: 36px !important;
-        margin: 0 auto 12px !important;
+    a:hover {
+      text-decoration: underline !important;
     }
-    .user-name {
-        clear: both;
-        a {
-            text-decoration: none !important;
-            color: $text-color-black !important;
-        }
-        a:hover {
-            text-decoration: underline !important;
-        }
-        span.identity-icon {
-            @include roleIcon();
-        }
+    span.identity-icon {
+      @include roleIcon();
     }
-    .user-address, .user-chain {
-        color: $text-color-light !important;
-    }
-    .role-tag {
-        margin-top: 10px !important;
-    }
-    .role-icon {
-        @include roleIcon();
-        top: 3px !important;
-    }
+  }
+  .user-address,
+  .user-chain {
+    color: $text-color-light !important;
+  }
+  .role-tag {
+    margin-top: 10px !important;
+  }
+  .role-icon {
+    @include roleIcon();
+    top: 3px !important;
+  }
 }
 
 .UserBlock {
+  display: flex;
+  .user-block-left {
+    padding-right: 13px;
+    position: relative;
+  }
+  .user-block-center {
+    flex: 1;
+    .user-block-name,
+    .user-block-address {
+      text-align: left;
+    }
+    .user-block-address {
+      font-size: 0.85em;
+      opacity: 0.6;
+      margin-top: -2px;
+    }
+  }
+  .user-block-right {
     display: flex;
-    line-height: 17px;
+    align-items: center;
+    justify-content: right;
+    width: 60px;
+    .user-block-selected {
+      flex: 1;
+      text-align: right;
+      position: relative;
+      top: -2px;
+    }
+  }
+  &.compact {
     .user-block-left {
-        padding-right: 13px;
-        position: relative;
+      top: 2px;
     }
     .user-block-center {
-        flex: 1;
-        line-height: 19px;
-        .user-block-name,
-        .user-block-address {
-            text-align: left;
-        }
-        .user-block-address {
-            font-size: 0.85em;
-            opacity: 0.6;
-            margin-top: -2px;
-        }
+      .user-block-name {
+        font-size: 0.94em;
+      }
+      .user-block-address {
+        font-size: 0.8em;
+      }
     }
-    .user-block-right {
-        display: flex;
-        align-items: center;
-        justify-content: right;
-        width: 60px;
-        .user-block-selected {
-            flex: 1;
-            text-align: right;
-            position: relative;
-            top: -2px;
-        }
-    }
-    &.compact {
-        .user-block-left {
-            top: 2px;
-        }
-        .user-block-center {
-            line-height: 1em;
-            .user-block-name {
-                font-size: 0.94em;
-            }
-            .user-block-address {
-                font-size: 0.8em;
-            }
-        }
-    }
+  }
 }

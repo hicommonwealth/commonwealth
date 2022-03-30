@@ -2,23 +2,11 @@
 
 .DiscussionsPage {
   .discussions-main {
-    position: relative;
-    flex: 1;
-    margin: 0px auto;
-    padding: 36px 0 36px;
-
-    @include sm-max {
-      padding-top: 24px;
-    }
+    padding: 24px;
+    width: 100%;
 
     &.empty-list {
       height: calc(100vh - 200px);
-    }
-  }
-
-  @include xs-max {
-    .discussions-main {
-      padding: 12px 0;
     }
   }
 
@@ -27,9 +15,9 @@
     margin: 6px 0 8px;
 
     hr {
-      height: 1px;
-      border: none;
       border-bottom: 1px solid $border-color-off-white;
+      border: none;
+      height: 1px;
       margin-left: 4px;
       margin-right: 4px;
       width: -webkit-fill-available;
@@ -38,24 +26,24 @@
 
   .LastSeenDivider {
     display: flex;
-    padding: 0 0 3px;
     margin: 6px 0 8px;
+    padding: 0 0 3px;
 
     span {
       color: $last-seen-notification-color;
       font-size: 0.94rem;
       font-weight: 500;
-      width: max-content;
-      text-align: center;
-      padding: 0 10px;
       margin: -6px 0;
+      padding: 0 10px;
+      text-align: center;
       white-space: nowrap;
+      width: max-content;
     }
 
     hr {
-      height: 1px;
-      border: none;
       border-bottom: 1px solid lighten($last-seen-notification-color, 11%);
+      border: none;
+      height: 1px;
       width: -webkit-fill-available;
     }
   }
@@ -69,11 +57,11 @@
 
   .topic-loading-spinner-wrap,
   .infinite-scroll-spinner-wrap {
-    height: 70px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
     align-items: center;
+    display: flex;
+    height: 70px;
+    justify-content: center;
+    width: 100%;
   }
 
   .topic-loading-spinner-wrap {

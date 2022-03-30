@@ -141,7 +141,7 @@ const TipsPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.tips-container', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),
@@ -183,7 +183,7 @@ const TipsPage: m.Component<{}> = {
           columnHeader: 'Inactive Tips',
         }),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

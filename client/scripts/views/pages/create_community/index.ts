@@ -8,7 +8,6 @@ const CreateCommunity: m.Component = {
       Sublayout,
       {
         title: 'Create Community',
-        useQuickSwitcher: true,
       },
       [m(CreateCommunityIndex)]
     );

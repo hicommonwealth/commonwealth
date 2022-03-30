@@ -1,27 +1,30 @@
 @import 'client/styles/shared';
 
 .TipsPage {
-    padding-bottom: 60px;
-    @include gov-explainer;
+  .tips-container {
+    padding: 24px;
+  }
 
-    .proposal-title {
-        min-height: 70px;
-    }
+  @include gov-explainer;
 
-    .TipDetail {
-        .group {
-            margin-bottom: 12px;
+  .proposal-title {
+    min-height: 70px;
+  }
 
-            .t-row {
-                padding-top: 5px;
-                display: flex;
+  .TipDetail {
+    .group {
+      margin-bottom: 12px;
 
-                .reason {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-            }
+      .t-row {
+        padding-top: 5px;
+        display: flex;
+
+        .reason {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
+      }
     }
+  }
 }
