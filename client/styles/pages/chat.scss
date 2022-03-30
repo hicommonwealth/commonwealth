@@ -19,7 +19,7 @@
     overflow-y: scroll;
     .chat-message-placeholder {
       margin: 16px 0;
-      color: $text-color-light;
+      color: $neutral-500;
     }
     .chat-message-group {
       margin: 18px 0;
@@ -29,7 +29,7 @@
     }
     .chat-message-group-timestamp {
       float: right;
-      color: $text-color-light;
+      color: $neutral-500;
     }
     .chat-message-text {
       margin: 2px 0;
@@ -37,12 +37,12 @@
     .User {
       margin-bottom: 2px;
       a {
-        color: $text-color-light;
+        color: $neutral-500;
         text-decoration: none;
       }
     }
     .chat-messages-typing {
-      color: $text-color-light;
+      color: $neutral-500;
       margin: 8px 0;
     }
   }
@@ -66,6 +66,6 @@
   .chat-composer-unavailable {
     position: absolute;
     bottom: 0;
-    color: $text-color-light;
+    color: $neutral-500;
   }
 }

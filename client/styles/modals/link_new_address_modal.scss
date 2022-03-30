@@ -52,14 +52,14 @@
     margin: 15px 0;
   }
   .mobile-error-message {
-    color: $text-color-medium;
+    color: $neutral-500;
     margin: 26px 40px;
     p {
       margin: 8px 0;
     }
   }
   a.back-text {
-    color: $text-color-medium;
+    color: $neutral-500;
     text-decoration: none;
     margin-top: 20px;
     &:hover {
@@ -87,7 +87,7 @@
   .link-address-precopy {
     display: block;
     font-size: 15px;
-    color: $text-color-medium;
+    color: $neutral-500;
     margin: 26px auto 4px;
     max-width: 480px;
     @include xs-max {
@@ -160,20 +160,20 @@
     }
     .link-address-title {
       padding: 9px 15px;
-      color: $text-color-medium;
+      color: $neutral-500;
     }
     .link-address-description {
       font-size: 13px;
       margin: 16px 20px 10px;
-      color: $text-color-medium;
+      color: $neutral-500;
     }
     .link-address-link {
       font-size: 13px;
       margin: 10px 20px 16px;
-      color: $text-color-medium;
+      color: $neutral-500;
     }
     .link-address-link a {
-      color: $text-color-medium;
+      color: $neutral-500;
       text-decoration: none;
       &:hover {
         text-decoration: underline;
@@ -211,14 +211,14 @@
   }
   .accounts-list-unavailable {
     text-align: center;
-    color: $text-color-light;
+    color: $neutral-500;
     margin: 100px 20px;
   }
   .accounts-caption {
   }
   .accounts-caption p.small-text {
     font-size: 15px;
-    color: $text-color-light;
+    color: $neutral-500;
   }
   .account-adder,
   .account-adder-placeholder {
@@ -244,7 +244,7 @@
       width: 56px;
     }
     .account-item-address {
-      color: $text-color-light;
+      color: $neutral-500;
     }
     .account-item-left {
       flex: 1;

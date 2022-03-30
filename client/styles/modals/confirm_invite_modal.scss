@@ -19,7 +19,7 @@
   .invite-actions-or {
     display: inline;
     margin: 0 12px;
-    color: $text-color-light;
+    color: $neutral-500;
   }
   button.submit,
   button.reject {
@@ -55,7 +55,7 @@
     .UserBlock span.balance {
       display: block;
       float: right;
-      color: $text-color-light;
+      color: $neutral-500;
     }
     .UserBlock .address-divider {
       display: none;

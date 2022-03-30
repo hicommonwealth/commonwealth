@@ -7,7 +7,7 @@ $discussion-comment-padding: 28px; // padding between comment content & avatar
 $discussion-comment-padding-mobile: 16px;
 
 $discussion-meta-font-size: 1rem;
-$discussion-meta-color: $text-color-light;
+$discussion-meta-color: $neutral-500;
 
 $discussion-title-font-size: 1.45rem;
 
@@ -58,7 +58,7 @@ $discussion-title-font-size: 1.45rem;
       align-items: center;
       .InlineReplyButton,
       .ProposalBodyReaction {
-        border: 1px solid $text-color-medium;
+        border: 1px solid $neutral-500;
         margin-right: 7%;
         padding: 6px;
         cursor: pointer;
@@ -88,7 +88,7 @@ $discussion-title-font-size: 1.45rem;
         .cui-icon,
         .reply-count,
         .reactions-count {
-          color: $text-color-medium;
+          color: $neutral-500;
           font-weight: 500;
         }
         .cui-icon {
@@ -374,10 +374,10 @@ $discussion-title-font-size: 1.45rem;
       }
     }
     svg {
-      stroke: $text-color-light;
+      stroke: $neutral-500;
     }
     svg:hover {
-      stroke: $text-color-medium;
+      stroke: $neutral-500;
     }
   }
 
@@ -474,7 +474,7 @@ $discussion-title-font-size: 1.45rem;
   }
   .ProposalSidebarPollEditorModule {
     .placeholder-copy {
-      color: shade($text-color-light, 10%);
+      color: shade($neutral-500, 10%);
       margin: 2px 0 12px;
     }
     .proposal-chain-entities {
@@ -499,13 +499,13 @@ $discussion-title-font-size: 1.45rem;
     }
     .offchain-poll-caption {
       font-size: 14px;
-      color: $text-color-light;
+      color: $neutral-500;
       margin-bottom: 24px;
     }
     .offchain-poll-invalid,
     .offchain-poll-no-voters {
       font-size: 16px;
-      color: $text-color-light;
+      color: $neutral-500;
     }
     .offchain-poll-voters {
       margin-top: 10px;
@@ -540,9 +540,9 @@ $discussion-title-font-size: 1.45rem;
     margin-top: 14px;
   }
   .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
-    stroke: $text-color-light;
+    stroke: $neutral-500;
     &:hover {
-      stroke: $text-color-medium;
+      stroke: $neutral-500;
     }
   }
   .ProposalBodyReaction {
@@ -554,7 +554,7 @@ $discussion-title-font-size: 1.45rem;
   .ProposalBodyText.proposal-body-placeholder {
     &,
     .User .user-display-name {
-      color: $text-color-light;
+      color: $neutral-500;
     }
   }
 

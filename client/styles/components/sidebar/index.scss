@@ -1,8 +1,8 @@
 @import 'client/styles/shared';
 
 .Sidebar {
-  background-color: $layout-color;
-  border-right-color: $disable-grey;
+  background-color: $neutral-100;
+  border-right-color: $neutral-50;
   border-right-width: 1px;
   display: flex;
   flex-direction: column;
@@ -15,7 +15,7 @@
   }
 
   .section-header {
-    color: $text-color-light;
+    color: $neutral-500;
     font-size: 18px;
     margin-bottom: 6px;
     margin-top: 20px;

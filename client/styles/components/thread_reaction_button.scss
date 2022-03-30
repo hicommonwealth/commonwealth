@@ -20,7 +20,7 @@
   // border
   &.disabled {
     background: initial !important;
-    color: $text-color-light !important;
+    color: $neutral-500 !important;
     border-color: $border-color-lightest !important;
   }
   &.large {
@@ -30,7 +30,7 @@
     max-height: 43px !important;
     max-width: 45px !important;
     text-align: center;
-    color: $text-color-medium;
+    color: $neutral-500;
     border: 1px solid #ddd;
     display: block;
     border-radius: 12px;
@@ -65,7 +65,7 @@
       padding: 0;
       min-width: 26px;
       text-align: center;
-      color: $text-color-medium;
+      color: $neutral-500;
       font-weight: 500;
     }
   }

@@ -134,7 +134,7 @@
         font-weight: 500;
         font-size: 14px;
         letter-spacing: 0.3px;
-        color: $text-color-medium-dark;
+        color: $neutral-600;
         margin-top: 15px;
         top: 2px;
 
@@ -188,14 +188,14 @@
 
           p {
             &.search-history-tag-seperator {
-              color: $text-color-light;
+              color: $neutral-500;
               margin: 0 5px 0 2px;
             }
           }
 
           .cui-icon {
             margin: 0 5px;
-            color: $text-color-lightest;
+            color: $neutral-400;
           }
 
           .cui-tag {
@@ -231,7 +231,7 @@
         font-size: 18px;
         text-align: center;
         justify-content: center;
-        color: $text-color-lighter;
+        color: $neutral-300;
 
         &:hover {
           background: $white !important;
@@ -272,7 +272,7 @@
         &.disabled {
           pointer-events: none;
           background: #bebebe;
-          color: $text-color-light;
+          color: $neutral-500;
         }
       }
 

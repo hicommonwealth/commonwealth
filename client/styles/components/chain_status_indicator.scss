@@ -19,19 +19,19 @@
     }
 
     &.connecting:before {
-      background: $intermediate-icon-color;
+      background: $rorange-200;
     }
 
     &.connected:before {
-      background: $positive-icon-color;
+      background: $green-600;
     }
 
     &.disconnected:before {
-      background: $failure-icon-color;
+      background: $rorange-600;
     }
 
     &.error:before {
-      background: $failure-icon-color;
+      background: $rorange-600;
     }
   }
 }

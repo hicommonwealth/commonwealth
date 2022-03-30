@@ -22,7 +22,7 @@
     align-items: center;
     height: 100%;
     width: 100%;
-    color: $text-color-light;
+    color: $neutral-500;
     z-index: 1;
     &.hidden {
       display: none;
@@ -41,7 +41,7 @@
     font-size: 14px;
     cursor: pointer;
     &:hover {
-      color: $text-color-medium;
+      color: $neutral-500;
     }
     > svg {
       margin: -3px 0;
@@ -225,7 +225,7 @@
         height: 100%;
         width: 100%;
         border-radius: $image-border-radius;
-        background: $text-color-light;
+        background: $neutral-500;
         background: linear-gradient(to bottom, $primary-300, #ddd);
       }
       .dz-details {

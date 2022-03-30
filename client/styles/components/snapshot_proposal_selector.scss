@@ -48,7 +48,7 @@
     }
 
     .chain-entity-subtext {
-      color: $text-color-medium;
+      color: $neutral-500;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -63,7 +63,7 @@
     width: 100%;
 
     .loading-text {
-      color: $text-color-medium-dark;
+      color: $neutral-600;
     }
   }
 }

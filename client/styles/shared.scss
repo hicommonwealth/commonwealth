@@ -20,17 +20,6 @@ $fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
   'Courier New', Courier, monospace;
 
-$disable-grey: #dddddd;
-$layout-color: #f6f6f6;
-$intermediate-icon-color: #ffa200;
-$positive-icon-color: #7ed320;
-$failure-icon-color: #db322d;
-$last-seen-notification-color: #ea7a60;
-$text-color-lightest: #b5b7b9; // light text on white background
-$text-color-lighter: #a3a4a7; // light text on white background
-$text-color-light: #9a9da4; // light text on light background
-$text-color-medium: #777; // medium text on any background
-$text-color-medium-dark: #555; // light off-black text on any background
 $background-color-black-hover: tint(#484744, 30%);
 $background-color-black: #262523;
 $background-color-medium-light: desaturate(tint($primary-500, 75%), 25%);
@@ -83,7 +72,7 @@ $text-size-mobile-header: 22px;
 
 @mixin attachments {
   p {
-    color: $text-color-light;
+    color: $neutral-500;
     font-weight: 500;
   }
 
@@ -165,7 +154,7 @@ $text-size-mobile-header: 22px;
   }
 
   .no-proposals {
-    color: $text-color-light;
+    color: $neutral-500;
     margin-top: 10px;
   }
 }
@@ -202,7 +191,7 @@ $text-size-mobile-header: 22px;
 
 @mixin gradientTabs() {
   .cui-tabs-item {
-    color: $text-color-light;
+    color: $neutral-500;
     margin: 0 !important;
     padding: 13px 15px 7px;
   }

@@ -37,7 +37,7 @@
     .search-results-caption {
       margin: 20px 0;
       text-align: center;
-      color: $text-color-light;
+      color: $neutral-500;
 
       .search-results-clear {
         margin-left: 10px;
@@ -110,7 +110,7 @@
             font-size: 18px;
             margin-top: 2px;
             opacity: 1;
-            color: $text-color-light;
+            color: $neutral-500;
 
             mark {
               background: $primary-300;
@@ -120,7 +120,7 @@
           }
 
           .search-results-thread-header {
-            color: $text-color-light;
+            color: $neutral-500;
             text-transform: uppercase;
             font-size: 13px;
             margin-bottom: 2px;
@@ -139,22 +139,22 @@
 
             .created-at {
               font-weight: 400;
-              color: $text-color-light;
+              color: $neutral-500;
             }
 
             .User {
               margin-left: 14px;
               font-weight: 400;
-              color: $text-color-light;
+              color: $neutral-500;
             }
           }
 
           .search-results-thread-body {
-            color: $text-color-light;
+            color: $neutral-500;
           }
 
           .search-results-comment {
-            color: $text-color-light;
+            color: $neutral-500;
           }
 
           .search-results-thread-body,

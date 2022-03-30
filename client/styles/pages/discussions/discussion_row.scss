@@ -44,7 +44,7 @@
 
     .row-subheader {
       align-items: baseline;
-      color: $text-color-light;
+      color: $neutral-500;
       display: flex;
       width: 100%;
 
@@ -61,14 +61,14 @@
       }
 
       a {
-        color: $text-color-light;
+        color: $neutral-500;
         font-size: 15px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
 
         &:hover {
-          color: darken($text-color-light, 8%);
+          color: darken($neutral-500, 8%);
         }
       }
 

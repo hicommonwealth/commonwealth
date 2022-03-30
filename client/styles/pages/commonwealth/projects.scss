@@ -16,7 +16,7 @@
     margin-bottom: 2px;
   }
   .project-description {
-    color: $text-color-medium;
+    color: $neutral-500;
     margin-bottom: 5px;
   }
   .project-metadata {
@@ -26,11 +26,11 @@
       display: inline-block;
     }
     .project-metadata-beneficiary {
-      color: $text-color-medium;
+      color: $neutral-500;
       margin-right: 18px;
     }
     .project-metadata-created {
-      color: $text-color-medium;
+      color: $neutral-500;
     }
   }
   .project-metrics {
@@ -64,7 +64,7 @@
       display: flex;
       padding-top: 12px;
       padding-bottom: 12px;
-      color: $text-color-medium;
+      color: $neutral-500;
       .project-progress-text-left {
         flex: 1;
       }

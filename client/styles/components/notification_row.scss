@@ -47,7 +47,7 @@
   }
   .comment-body-excerpt {
     margin: 7px 0 8px;
-    color: $text-color-medium;
+    color: $neutral-500;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -63,11 +63,11 @@
   }
   .comment-body-created {
     display: inline;
-    color: $text-color-medium;
+    color: $neutral-500;
   }
   .comment-body-mark-as-read {
     display: inline;
-    color: $text-color-medium;
+    color: $neutral-500;
     margin-left: 8px;
     .cui-spinner {
       position: relative;

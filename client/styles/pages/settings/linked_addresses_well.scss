@@ -9,7 +9,7 @@
     margin: 10px 0;
   }
   .address-listing-explanation {
-    color: $text-color-light;
+    color: $neutral-500;
     font-size: 14px;
     margin-bottom: 18px;
   }
@@ -50,12 +50,12 @@
       }
     }
     .address {
-      color: $text-color-light;
+      color: $neutral-500;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .account-balance {
-      color: $text-color-light;
+      color: $neutral-500;
       font-weight: 400;
       margin-left: 10px;
     }

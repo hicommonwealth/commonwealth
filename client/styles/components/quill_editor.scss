@@ -98,12 +98,12 @@
     }
     li[data-list='checked'] > .ql-ui::before {
       content: '\f14a';
-      color: $text-color-medium;
+      color: $neutral-500;
       font-size: 93%;
     }
     li[data-list='unchecked'] > .ql-ui::before {
       content: '\f096';
-      color: $text-color-lightest;
+      color: $neutral-400;
     }
   }
 
@@ -313,12 +313,12 @@
       }
       .ql-mention-addr {
         float: right;
-        color: $text-color-light;
+        color: $neutral-500;
         font-size: 90%;
       }
       .ql-mention-la {
         display: block;
-        color: $text-color-light;
+        color: $neutral-500;
         font-size: 90%;
         white-space: nowrap;
         margin-bottom: 2px;

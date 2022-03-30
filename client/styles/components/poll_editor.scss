@@ -14,7 +14,7 @@
     }
 
     h4.disabled {
-      color: $text-color-light;
+      color: $neutral-500;
     }
 
     .poll-editor-choices-question {
@@ -37,7 +37,7 @@
     }
 
     .poll-duration-copy {
-      color: $text-color-medium;
+      color: $neutral-500;
       margin: 16px 0px;
     }
 
@@ -47,7 +47,7 @@
       justify-content: space-between;
 
       .cui-switch {
-        color: $text-color-medium;
+        color: $neutral-500;
         margin-bottom: 0;
         min-width: max-content;
       }
