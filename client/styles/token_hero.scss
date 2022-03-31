@@ -5,6 +5,7 @@
   background: $background-color-white-hover;
   color: $text-color-darker;
   display: flex;
+  font-size: 12px;
   justify-content: center;
-  height: 32px;
+  min-height: 32px;
 }
