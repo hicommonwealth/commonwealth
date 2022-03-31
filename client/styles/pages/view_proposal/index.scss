@@ -270,7 +270,7 @@ $discussion-title-font-size: 1.45rem;
         min-width: $size;
       }
       a:hover {
-        background: darken($primary-300, 1%);
+        background: $primary-300;
       }
     }
   }
@@ -400,13 +400,13 @@ $discussion-title-font-size: 1.45rem;
   }
   .ProposalHeaderStage {
     &.primary {
-      color: tint($primary-500, 10%);
+      color: $primary-500;
     }
     &.positive {
-      color: tint($green-500, 10%);
+      color: $green-500;
     }
     &.negative {
-      color: tint($rorange-500, 10%);
+      color: $rorange-500;
     }
   }
   .proposal-collaborators-popover {
@@ -421,7 +421,7 @@ $discussion-title-font-size: 1.45rem;
 
   .ProposalSidebarLinkedViewer {
     border-radius: 10px;
-    border: 1px solid tint($neutral-50, 26%);
+    border: 1px solid $neutral-50;
     padding: 22px 18px 21px;
     margin-bottom: 24px;
     display: flex;
@@ -448,7 +448,7 @@ $discussion-title-font-size: 1.45rem;
   .ProposalSidebarPollEditorModule,
   .ProposalLinkedThreadsEditorModule {
     border-radius: 10px;
-    border: 1px solid tint($neutral-50, 26%);
+    border: 1px solid $neutral-50;
     padding: 22px 18px 21px;
     margin-bottom: 24px;
   }
@@ -474,7 +474,7 @@ $discussion-title-font-size: 1.45rem;
   }
   .ProposalSidebarPollEditorModule {
     .placeholder-copy {
-      color: shade($neutral-500, 10%);
+      color: $neutral-600;
       margin: 2px 0 12px;
     }
     .proposal-chain-entities {
