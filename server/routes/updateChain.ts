@@ -131,8 +131,9 @@ const updateChain = async (
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   if (snapshot) chain.snapshot = snapshot;
-  console.log(default_summary_view);
-  // TODO
+
+  // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
+  // is left un-updated? Is there a better approach?
   chain.default_summary_view = default_summary_view || false;
 
   // Under our current security policy, custom domains must be set by trusted
