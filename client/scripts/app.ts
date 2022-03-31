@@ -79,6 +79,7 @@ export async function initAppState(
           (json) => NotificationCategory.fromJSON(json)
         );
         app.config.invites = data.invites;
+        app.config.chainCategories = data.chainCategories;
 
         // add recentActivity
         const { recentThreads } = data;

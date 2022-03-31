@@ -241,12 +241,14 @@
     align-items: flex-start;
     justify-content: space-between;
     margin-right: 160px;
+    min-width: 1050px;
     @include mobile-max {
       margin-right: 100px;
     }
 
     @include lg-max {
       flex-direction: column;
+      min-width: 0px;
     }
 
     .filter-buttons {

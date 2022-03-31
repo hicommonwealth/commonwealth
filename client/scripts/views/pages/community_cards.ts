@@ -4,11 +4,10 @@ import m from 'mithril';
 import numeral from 'numeral';
 
 import app from 'state';
-import { ChainInfo, NodeInfo } from 'models';
+import { NodeInfo } from 'models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCard } from '../components/component_kit/cw_card';
 import Sublayout from '../sublayout';
-import { ButtonGroup } from 'construct-ui';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -73,57 +72,6 @@ const ChainCard: m.Component<{ chain: string; nodeList: NodeInfo[] }> = {
   },
 };
 
-const CommunityCard: m.Component<{ community: ChainInfo }> = {
-  view: (vnode) => {
-    const { community } = vnode.attrs;
-
-    const redirectFunction = (e) => {
-      e.preventDefault();
-      localStorage['home-scrollY'] = window.scrollY;
-      m.route.set(`/${community.id}`);
-    };
-
-    let pretty_description = '';
-    if (community.description) {
-      pretty_description =
-        community.description[community.description.length - 1] === '.'
-          ? community.description
-          : `${community.description}.`;
-    }
-
-    return m(
-      CWCard,
-      {
-        elevation: 'elevation-2',
-        interactive: true,
-        className: 'chain-card',
-        onclick: redirectFunction,
-      },
-      [
-        m('.card-header', [
-          community.iconUrl
-            ? m('img.chain-icon', {
-                src: community.iconUrl,
-              })
-            : m('.chain-icon.no-image'),
-        ]),
-        m('.card-body', [
-          m('.community-name', { lang: 'en' }, community.name),
-          m('.card-description', { lang: 'en' }, pretty_description),
-          m('.join-button-wrapper', [
-            m(CWButton, {
-              buttonType: 'secondary',
-              disabled: false,
-              label: 'See More',
-              onclick: redirectFunction,
-            }),
-          ]),
-        ]),
-      ]
-    );
-  },
-};
-
 const NewCommunityCard: m.Component = {
   view: () => {
     return m(
@@ -152,8 +100,38 @@ const NewCommunityCard: m.Component = {
   },
 };
 
-const HomepageCommunityCards: m.Component = {
-  view: () => {
+// Corresponds to 'ChainCategoryTypes' id numbering (which currently only includes DeFi and DAO)
+const filterMap = {
+  DeFi: 1,
+  DAO: 2,
+  ERC20: 3,
+  Cosmos: 4,
+  Substrate: 5,
+  Ethereum: 6,
+};
+
+const HomepageCommunityCards: m.Component<
+  {},
+  {
+    filters: Array<boolean>;
+    categoryMap: { [chain: string]: number[] };
+  }
+> = {
+  oninit: (vnode) => {
+    vnode.state.filters = [false, false, false, false, false, false];
+    const categories = app.config.chainCategories;
+    let categoryMap = {};
+    // Build the category map
+    for (const data of categories) {
+      if (categoryMap[data.chain_id]) {
+        categoryMap[data.chain_id].push(data.category_type_id);
+      } else {
+        categoryMap[data.chain_id] = [data.category_type_id];
+      }
+    }
+    vnode.state.categoryMap = categoryMap;
+  },
+  view: (vnode) => {
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
       if (chains[n.chain.id]) {
@@ -165,8 +143,31 @@ const HomepageCommunityCards: m.Component = {
 
     const myChains: any = Object.entries(chains);
 
-    const sortChainsAndCommunities = (list) =>
-      list
+    const sortChains = (list, filters) => {
+      let filteredList = list;
+      // Filter via on-page filters
+      if (filters.includes(true)) {
+        let appliedFilters = [];
+        for (let i = 0; i < filters.length; i++) {
+          if (filters[i]) {
+            appliedFilters.push(i + 1);
+          }
+        }
+
+        filteredList = filteredList.filter((data) => {
+          for (const filter of appliedFilters) {
+            if (
+              !vnode.state.categoryMap[data[0]] ||
+              !vnode.state.categoryMap[data[0]].includes(filter)
+            ) {
+              return false;
+            }
+          }
+          return true;
+        });
+      }
+      // Filter by recent thread activity
+      const res = filteredList
         .sort((a, b) => {
           const threadCountA = app.recentActivity.getCommunityThreadCount(
             Array.isArray(a) ? a[0] : a.id
@@ -180,21 +181,23 @@ const HomepageCommunityCards: m.Component = {
           if (Array.isArray(entity)) {
             const [chain, nodeList]: [string, any] = entity as any;
             return m(ChainCard, { chain, nodeList });
-          } else if (entity.id) {
-            return m(CommunityCard, { community: entity });
           }
           return null;
         });
+      return res;
+    };
 
-    const sortedChainsAndCommunities = sortChainsAndCommunities(
-      myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
+    const sortedChains = sortChains(
+      myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage),
+      vnode.state.filters
     );
-    const betaChainsAndCommunities = sortChainsAndCommunities(
-      myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
+    const betaChains = sortChains(
+      myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage),
+      vnode.state.filters
     );
 
-    const totalCommunitiesString = buildCommunityString(
-      sortedChainsAndCommunities.length + betaChainsAndCommunities.length
+    const totalChainsString = buildCommunityString(
+      sortedChains.length + betaChains.length
     );
 
     return m(
@@ -203,47 +206,76 @@ const HomepageCommunityCards: m.Component = {
         style: 'margin-top: 40px',
       },
       [
-        m('.communities-list', [
-          m('.header-section', [
-            m('.communities-number', totalCommunitiesString),
-            m('.filter-buttons', [
-              m(CWButton, {
-                label: 'DeFi',
-                buttonType: 'secondary',
-                onclick: () => console.log('clicked'),
-              }),
-              m(CWButton, {
-                label: 'DAO',
-                buttonType: 'secondary',
-                onclick: () => console.log('clicked'),
-              }),
-              m(CWButton, {
-                label: 'ERC20',
-                buttonType: 'secondary',
-                onclick: () => console.log('clicked'),
-              }),
-              m(CWButton, {
-                label: 'Cosmos',
-                buttonType: 'secondary',
-                onclick: () => console.log('clicked'),
-              }),
-              m(CWButton, {
-                label: 'Substrate',
-                buttonType: 'secondary',
-                onclick: () => console.log('clicked'),
-              }),
-              m(CWButton, {
-                label: 'Ethereum',
-                buttonType: 'secondary',
-                onclick: () => console.log('clicked'),
-              }),
-            ]),
+        m('.header-section', [
+          m('.communities-number', totalChainsString),
+          m('.filter-buttons', [
+            m(CWButton, {
+              label: 'DeFi',
+              buttonType: vnode.state.filters[filterMap['DeFi'] - 1]
+                ? 'primary'
+                : 'secondary',
+              onclick: () => {
+                vnode.state.filters[filterMap['DeFi'] - 1] =
+                  !vnode.state.filters[filterMap['DeFi'] - 1];
+              },
+            }),
+            m(CWButton, {
+              label: 'DAO',
+              buttonType: vnode.state.filters[filterMap['DAO'] - 1]
+                ? 'primary'
+                : 'secondary',
+              onclick: () => {
+                vnode.state.filters[filterMap['DAO'] - 1] =
+                  !vnode.state.filters[filterMap['DAO'] - 1];
+              },
+            }),
+            m(CWButton, {
+              label: 'ERC20',
+              buttonType: vnode.state.filters[filterMap['ERC20'] - 1]
+                ? 'primary'
+                : 'secondary',
+              onclick: () => {
+                vnode.state.filters[filterMap['ERC20'] - 1] =
+                  !vnode.state.filters[filterMap['ERC20'] - 1];
+              },
+            }),
+            m(CWButton, {
+              label: 'Cosmos',
+              buttonType: vnode.state.filters[filterMap['Cosmos'] - 1]
+                ? 'primary'
+                : 'secondary',
+              onclick: () => {
+                vnode.state.filters[filterMap['Cosmos'] - 1] =
+                  !vnode.state.filters[filterMap['Cosmos'] - 1];
+              },
+            }),
+            m(CWButton, {
+              label: 'Substrate',
+              buttonType: vnode.state.filters[filterMap['Substrate'] - 1]
+                ? 'primary'
+                : 'secondary',
+              onclick: () => {
+                vnode.state.filters[filterMap['Substrate'] - 1] =
+                  !vnode.state.filters[filterMap['Substrate'] - 1];
+              },
+            }),
+            m(CWButton, {
+              label: 'Ethereum',
+              buttonType: vnode.state.filters[filterMap['Ethereum'] - 1]
+                ? 'primary'
+                : 'secondary',
+              onclick: () => {
+                vnode.state.filters[filterMap['Ethereum'] - 1] =
+                  !vnode.state.filters[filterMap['Ethereum'] - 1];
+              },
+            }),
           ]),
-          sortedChainsAndCommunities,
+        ]),
+        m('.communities-list', [
+          sortedChains,
           m('.clear'),
-          betaChainsAndCommunities.length > 0 &&
-            m('h4', 'Testnets & Alpha Networks'),
-          betaChainsAndCommunities,
+          betaChains.length > 0 && m('h4', 'Testnets & Alpha Networks'),
+          betaChains,
         ]),
         m('.other-list', [m(NewCommunityCard)]),
       ]
