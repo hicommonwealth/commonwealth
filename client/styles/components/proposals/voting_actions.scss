@@ -75,9 +75,9 @@
   }
   .yes-button {
     button {
-      background: #ebfffd;
-      border: 2px solid #c5eee9;
-      color: #009785;
+      background: $green-50;
+      border: 2px solid $green-100;
+      color: $green-500;
       text-transform: capitalize;
       font-size: 24px;
       margin-right: 10px;
@@ -85,9 +85,9 @@
   }
   .no-button {
     button {
-      background: #fff1f4 !important;
-      border: 2px solid #ffd4dc !important;
-      color: #c60024;
+      background: $pink-50 !important;
+      border: 2px solid $pink-100 !important;
+      color: $rorange-500;
       text-transform: capitalize;
       font-size: 24px;
     }

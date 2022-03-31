@@ -47,20 +47,20 @@
     }
 
     .AvatarUpload {
-      color: red;
+      color: $rorange-500;
       height: 92px;
       margin: auto 0;
       width: 92px;
     }
 
     .id {
-      background-color: #fffff3;
+      background-color: $yellow-50;
       border-radius: 4px;
       height: 42px;
       padding: 8px 15px;
 
       &.placeholder {
-        color: #cccccc;
+        color: $neutral-200;
         font-style: italic;
       }
     }

@@ -16,7 +16,7 @@ $discussion-title-font-size: 1.45rem;
     border-radius: 20px;
     background-color: $yellow-200;
     .thread-connector {
-      background: #00c0a9;
+      background: $green-500;
     }
   }
   &.highlighted.highlightAnimationComplete {
@@ -75,14 +75,14 @@ $discussion-title-font-size: 1.45rem;
           .cui-icon,
           .reply-count,
           .reactions-count {
-            color: #4723ad;
+            color: $purple-400;
           }
         }
         .active {
           .cui-icon,
           .reply-count,
           .reactions-count {
-            color: #4723ad !important;
+            color: $purple-400 !important;
           }
         }
         .cui-icon,
@@ -189,8 +189,8 @@ $discussion-title-font-size: 1.45rem;
           }
           .CancelButton {
             button {
-              color: #ff002e;
-              border: 1px solid #ff002e;
+              color: $rorange-500;
+              border: 1px solid $rorange-500;
               background: $white;
             }
           }
@@ -457,7 +457,7 @@ $discussion-title-font-size: 1.45rem;
     flex-direction: column;
     align-items: center;
     a.linked-thread {
-      color: #9a9da4;
+      color: $neutral-500;
     }
     .cui-list-item {
       &:first-child {

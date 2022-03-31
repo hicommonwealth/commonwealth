@@ -50,7 +50,7 @@
     @include gradientTabs();
 
     .cui-tabs-item {
-      color: #ddd;
+      color: $neutral-100;
       font-size: 24px;
       font-weight: 500;
       margin: 0 34px 0 0 !important;
@@ -95,7 +95,7 @@
 
   .link {
     border-radius: 10px;
-    color: #4723ad;
+    color: $purple-400;
     cursor: pointer;
     float: right;
     font-weight: 500;
@@ -107,12 +107,12 @@
       margin-top: -3px;
 
       svg {
-        stroke: #4723ad;
+        stroke: $purple-400;
       }
     }
 
     &:hover {
-      background-color: #f7f4ff;
+      background-color: $purple-50;
       text-decoration: none;
     }
   }

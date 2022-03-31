@@ -37,7 +37,7 @@
 @mixin comment-level {
   margin-top: 24px;
   padding-bottom: 18px;
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid $neutral-100;
   .proposal-title {
     color: $black !important;
     font-weight: 600;
@@ -110,7 +110,7 @@
 
       .count {
         display: inline;
-        background-color: #eeeeee;
+        background-color: $neutral-100;
         padding: 1px 8px 3px;
         border-radius: 9999px;
         font-size: 14px;
@@ -169,7 +169,7 @@
     align-items: center;
 
     .address {
-      color: #666666;
+      color: $neutral-600;
       margin-right: 8px;
     }
   }
@@ -234,8 +234,8 @@
       border-radius: 8px;
       padding: 5px 15px 5px 15px;
       background: $white;
-      border: 1px solid #4723ad;
-      color: #4723ad;
+      border: 1px solid $purple-400;
+      color: $purple-400;
       font-weight: 500;
       font-size: 18px;
       text-transform: uppercase;
@@ -330,8 +330,8 @@
         border-radius: 8px;
         padding: 5px 15px 5px 15px;
         background: $white;
-        border: 1px solid #4723ad;
-        color: #4723ad;
+        border: 1px solid $purple-400;
+        color: $purple-400;
         font-weight: 500;
         font-size: 18px;
         text-transform: uppercase;
@@ -347,7 +347,7 @@
       align-items: center;
 
       .address {
-        color: #666666;
+        color: $neutral-600;
         margin-right: 8px;
       }
     }

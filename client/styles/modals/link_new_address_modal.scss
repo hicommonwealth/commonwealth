@@ -289,7 +289,7 @@
     .account-item {
       cursor: pointer;
       padding: 10px 15px;
-      border: 1px solid #ccc;
+      border: 1px solid $neutral-300;
       border-bottom: none;
       &:hover {
         background: $primary-400;
@@ -299,7 +299,7 @@
         border-top-left-radius: 6px;
       }
       &:last-child {
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid $neutral-300;
         border-bottom-right-radius: 6px;
         border-bottom-left-radius: 6px;
       }

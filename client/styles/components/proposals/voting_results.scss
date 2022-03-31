@@ -10,7 +10,7 @@
   .VoteRow {
     display: flex;
     &:hover {
-      background: #f9fafd;
+      background: $neutral-50;
     }
     .row-left {
       flex: 1;
@@ -44,24 +44,24 @@
     .results-subheader {
       display: flex;
       justify-content: space-between;
-      color: #666666;
+      color: $neutral-600;
       font-size: 18px;
       font-weight: 500;
-      border-bottom: 1px solid #dddddd;
+      border-bottom: 1px solid $neutral-100;
       margin-bottom: 20px;
     }
     &.yes-votes {
-      border: 2px solid #c5eee9;
+      border: 2px solid $green-100;
       .results-header {
         font-size: 24px;
-        color: #009785;
+        color: $green-500;
       }
     }
     &.no-votes {
-      border: 2px solid #ffd5dc;
+      border: 2px solid $pink-100;
       .results-header {
         font-size: 24px;
-        color: #c60024;
+        color: $rorange-500;
       }
     }
   }

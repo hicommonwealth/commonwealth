@@ -61,7 +61,7 @@ $text-size-mobile-header: 22px;
 
 @mixin gov-explainer {
   .stats-box {
-    background-color: #f8f8f8;
+    background-color: $neutral-50;
     border-radius: 10px;
     display: flex;
     margin-bottom: 20px;
@@ -79,7 +79,7 @@ $text-size-mobile-header: 22px;
     }
 
     .stats-box-stat {
-      color: #888;
+      color: $neutral-500;
       display: inline-block;
       margin: 6px 0 0;
 
@@ -90,7 +90,7 @@ $text-size-mobile-header: 22px;
     }
 
     .stats-box-action {
-      color: #888;
+      color: $neutral-500;
       display: inline-block;
       margin: 6px 0 0;
 
@@ -161,9 +161,9 @@ $text-size-mobile-header: 22px;
 
   .cui-tabs-item:hover {
     // these styles can't be alphabetized or else they'll apply incorrectly
-    color: #666666;
+    color: $neutral-600;
     border-width: 2px;
-    border-color: #dddddd;
+    border-color: $neutral-25;
     border-style: solid;
     border-top: 0;
     border-left: 0;
@@ -257,7 +257,7 @@ h3 {
 @mixin link {
   @include body;
   font-weight: 500;
-  color: #140994;
+  color: $primary-700;
 }
 
 @mixin button-label {
@@ -268,7 +268,7 @@ h3 {
 @mixin form-label {
   @include body;
   font-size: 14px;
-  color: #666666;
+  color: $neutral-600;
 }
 
 @mixin rainbow-gradient-horizontal {

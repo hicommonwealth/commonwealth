@@ -4,7 +4,6 @@ $neutral-200-tint-percentage: 70%;
 $telegram-color: #2480cc;
 $element-color: #0cbd8b;
 $discord-color: #677bc4;
-$default-color: #222222;
 
 .ExternalLinksModule {
   display: flex;
@@ -16,7 +15,7 @@ $default-color: #222222;
   }
 
   .cui-link:hover {
-    background: #6966ff;
+    background: $purple-400;
     color: $white;
   }
 
@@ -39,12 +38,12 @@ $default-color: #222222;
   }
 
   .website-link {
-    color: $default-color;
+    color: $neutral-800;
     cursor: pointer;
   }
 
   .github-link {
-    color: $default-color;
+    color: $neutral-800;
     cursor: pointer;
     fill: currentColor;
   }

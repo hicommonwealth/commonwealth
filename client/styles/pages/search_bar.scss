@@ -69,7 +69,7 @@
       height: 40px;
       padding: 4px 16px;
       position: relative;
-      background: #efefef;
+      background: $neutral-100;
       border: none;
       outline: 0;
     }
@@ -101,7 +101,7 @@
       top: 0 !important;
 
       &:focus {
-        outline: #cfcbff auto 2px;
+        outline: $purple-100 auto 2px;
       }
 
       .search-results-item {
@@ -125,7 +125,7 @@
         }
 
         mark {
-          background-color: #cfcbff;
+          background-color: $purple-100;
         }
       }
 
@@ -205,8 +205,8 @@
             padding: 4px 8px;
 
             &.search-history-primary-tag {
-              border: 1px solid #6300ff;
-              color: #4a00bc;
+              border: 1px solid $purple-400;
+              color: $purple-500;
             }
           }
 
@@ -251,17 +251,17 @@
         padding: 15px 15px !important;
         font-size: 18px !important;
         border-radius: 10px !important;
-        border: 1px solid white;
-        background: #f4f4f4;
+        border: 1px solid $white;
+        background: $neutral-50;
 
         &.cui-active {
-          background: #f2edff;
-          border: 1px solid #6300ff;
+          background: $purple-50;
+          border: 1px solid $purple-400;
         }
 
         &.cui-active:hover {
-          background: #e8e1fd;
-          border: 1px solid #4a00bc;
+          background: $purple-100;
+          border: 1px solid $purple-500;
         }
 
         .cui-button-label {
@@ -271,13 +271,13 @@
 
         &.disabled {
           pointer-events: none;
-          background: #bebebe;
+          background: $neutral-400;
           color: $neutral-500;
         }
       }
 
       .cui-button:hover {
-        background: #e7e7e7;
+        background: $neutral-50;
       }
 
       .cui-spinner {

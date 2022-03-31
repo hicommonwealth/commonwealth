@@ -130,7 +130,7 @@
         -webkit-box-orient: vertical;
         -webkit-hyphens: auto;
         -webkit-line-clamp: 3;
-        color: #999999;
+        color: $neutral-500;
         display: -webkit-box;
         font-size: 16px;
         font-weight: normal;
@@ -224,7 +224,7 @@
   padding: 24px;
 
   .communities-header {
-    color: #333333;
+    color: $neutral-800;
     font-size: 25px;
     font-weight: 500;
     margin-bottom: 24px;

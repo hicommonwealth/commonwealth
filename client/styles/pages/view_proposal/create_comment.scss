@@ -35,8 +35,8 @@
         }
         .cui-button[type='cancel'] {
           background: $white;
-          border: 2px solid #dddddd;
-          color: #999999;
+          border: 2px solid $neutral-100;
+          color: $neutral-500;
         }
       }
       .new-comment-error {

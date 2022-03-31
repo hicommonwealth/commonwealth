@@ -48,7 +48,7 @@
     .new-snapshot-proposal-form {
       display: flex;
       .add-vote-choice {
-        color: #4f6dbd;
+        color: $primary-400;
         font-weight: 500;
         margin: 10px 0 20px;
         display: flex;
@@ -57,7 +57,7 @@
           padding-top: 1px;
         }
         .cui-icon {
-          color: #4f6dbd;
+          color: $primary-400;
           margin-left: 12px;
         }
       }

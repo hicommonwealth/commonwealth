@@ -97,7 +97,7 @@
     stroke: $primary-200;
   }
 
-  $star-color: #ecbc00;
+  $star-color: $yellow-400;
 
   .community-star-toggle .cui-icon:hover svg {
     stroke: $star-color !important;

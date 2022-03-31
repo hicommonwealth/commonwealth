@@ -226,7 +226,7 @@
         width: 100%;
         border-radius: $image-border-radius;
         background: $neutral-500;
-        background: linear-gradient(to bottom, $primary-300, #ddd);
+        background: linear-gradient(to bottom, $primary-300, $neutral-100);
       }
       .dz-details {
         opacity: 1;

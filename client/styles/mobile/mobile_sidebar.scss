@@ -40,7 +40,7 @@
     overflow-x: hidden;
 
     h4 {
-      color: #aaaaaa;
+      color: $neutral-400;
       font-size: 16px;
       font-weight: 400;
     }
@@ -67,7 +67,7 @@
     .cui-icon svg {
       display: inline-flex;
       height: 28px;
-      stroke: rgb(102, 102, 102) !important;
+      stroke: $neutral-600 !important;
       width: 28px;
     }
   }

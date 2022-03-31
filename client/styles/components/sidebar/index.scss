@@ -53,7 +53,7 @@
   background-image: url('/static/img/powered-by.svg');
   background-position: center;
   background-repeat: no-repeat;
-  border-color: #f9f9f9;
+  border-color: $neutral-50;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
@@ -87,7 +87,7 @@
     z-index: 100;
 
     h4 {
-      color: #666666;
+      color: $neutral-600;
       font-weight: 400;
     }
 
@@ -96,7 +96,7 @@
     }
 
     .cui-icon-x {
-      color: #666666;
+      color: $neutral-600;
       left: calc(100% - 35px);
       position: absolute;
       top: 15px;
@@ -112,11 +112,11 @@
         margin-left: 5px;
 
         &.danger {
-          background-color: #ff002f;
+          background-color: $rorange-500;
         }
 
         &.danger:hover {
-          background-color: #cc0025;
+          background-color: $rorange-600;
         }
       }
     }

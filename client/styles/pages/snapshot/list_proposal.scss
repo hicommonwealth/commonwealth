@@ -26,13 +26,13 @@
 
     .submitted-by {
       display: inline;
-      color: #666666;
+      color: $neutral-600;
       margin-right: 16px;
     }
 
     .author-address {
       display: inline;
-      background-color: #f7f4ff;
+      background-color: $neutral-50;
       padding: 4px 16px;
       border-radius: 9999px;
     }
@@ -42,7 +42,7 @@
         margin-top: 14px;
       }
 
-      background-color: #999999;
+      background-color: $neutral-500;
       border-radius: 9999px;
       max-width: max-content;
       padding: 4px 8px;
@@ -57,15 +57,15 @@
       }
 
       align-items: center;
-      background-color: #f4f4f4;
+      background-color: $neutral-50;
       border-radius: 9999px;
       max-width: max-content;
       display: flex;
-      color: #666666;
+      color: $neutral-600;
       padding: 4px 16px;
 
       .active-text {
-        background-color: #00c0a9;
+        background-color: $green-500;
         border-radius: 9999px;
         font-weight: 500;
         color: $white;
