@@ -29,8 +29,7 @@ export default (
       },
       category_type_id: {
         type: dataTypes.INTEGER,
-        allowNull: false,
-        references: { model: 'ChainCategoryTypes', key: 'id' },
+        allowNull: false
       },
     },
     {
@@ -41,7 +40,8 @@ export default (
   );
 
   ChainCategory.associate = (models) => {
-    models.ChainCategory.hasOne(models.ChainCategoryType); // TODO: is this right?
+    models.ChainCategory.belongsTo(models.Chain)
+    models.ChainCategory.hasOne(models.ChainCategoryType);
   };
 
   return ChainCategory;
