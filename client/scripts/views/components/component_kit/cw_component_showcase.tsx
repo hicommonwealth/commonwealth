@@ -89,7 +89,7 @@ export class ComponentShowcase implements m.ClassComponent {
           </div>
           <div class="icon-row">
             Medium
-            <CWIcon iconName="views" />
+            <CWIcon iconName="flag" />
           </div>
           <div class="icon-row">
             Large
