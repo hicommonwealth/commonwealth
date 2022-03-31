@@ -4,8 +4,7 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 60px);
-  padding: 3%;
+  padding: 24px;
   width: 100vw;
 
   * {
@@ -13,6 +12,9 @@
   }
 
   .cui-tabs {
+    margin-bottom: 16px;
+    width: 100%;
+
     @include gradientTabs();
 
     .cui-tabs-item.cui-active {
@@ -27,20 +29,11 @@
         1 !important;
     }
 
-    margin-bottom: 20px;
-
     .cui-tabs-item {
       font-size: $text-size-mobile-header;
       padding: 13px 4% 7px;
       width: initial;
     }
-  }
-
-  > .cui-menu {
-    overflow-y: scroll;
-    max-width: 600px;
-    // 10px to accomodate scrollbar
-    width: calc(94% - 10px);
   }
 
   .CommunitySelectList {
@@ -58,6 +51,8 @@
   }
 
   .CurrentCommunityMenu {
+    width: 100%;
+
     .cui-menu-divider {
       margin: 12px 0 18px;
     }

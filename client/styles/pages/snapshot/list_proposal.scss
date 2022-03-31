@@ -17,7 +17,7 @@
   .other-details {
     margin-top: 14px;
 
-    @media (min-width:600px) {
+    @media (min-width: 600px) {
       display: flex;
     }
 
@@ -32,45 +32,45 @@
 
     .author-address {
       display: inline;
-      background-color: #F7F4FF;
-      padding: 8px 14px 4px;
+      background-color: #f7f4ff;
+      padding: 4px 16px;
       border-radius: 9999px;
     }
 
     .closed-proposal {
-      @media(max-width: 600px) {
+      @media (max-width: 600px) {
         margin-top: 14px;
       }
 
       background-color: #999999;
       border-radius: 9999px;
       max-width: max-content;
-      padding: 8px 14px 4px;
+      padding: 4px 8px;
       color: white;
       font-weight: 500;
       text-transform: capitalize;
     }
 
     .active-proposal {
-      @media(max-width: 600px) {
+      @media (max-width: 600px) {
         margin-top: 14px;
       }
 
-      background-color: #F4F4F4;
+      align-items: center;
+      background-color: #f4f4f4;
       border-radius: 9999px;
       max-width: max-content;
       display: flex;
       color: #666666;
-
-      &>* {
-        padding: 8px 14px 4px;
-      }
+      padding: 4px 16px;
 
       .active-text {
-        background-color: #00C0A9;
+        background-color: #00c0a9;
         border-radius: 9999px;
         font-weight: 500;
         color: white;
+        padding: 4px 8px;
+        margin-left: 8px;
       }
     }
   }

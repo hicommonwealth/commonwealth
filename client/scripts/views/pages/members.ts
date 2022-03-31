@@ -161,8 +161,6 @@ const MembersPage: m.Component<
       }, 100);
     }
 
-    // Infinite Scroll
-    $(window).off('scroll');
     vnode.state.onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
@@ -189,7 +187,6 @@ const MembersPage: m.Component<
         }
       }
     }, 400);
-    $(window).on('scroll', vnode.state.onscroll);
 
     const {
       membersLoaded,
@@ -212,52 +209,55 @@ const MembersPage: m.Component<
           }),
         ],
         showNewProposalButton: true,
+        onscroll: vnode.state.onscroll,
       },
-      [
-        m(
-          '.title',
-          totalMembersCount ? `Members (${totalMembersCount})` : 'Members'
-        ),
-        m(Table, [
-          m('tr', [m('th', 'Member'), m('th.align-right', 'Posts / Month')]),
-          profilesLoaded.map((profileInfo) => {
-            const { address, chain } = profileInfo.profile;
-            return m('tr', [
-              m('td.members-item-info', [
-                m(
-                  'a',
-                  {
-                    href: `/${app.activeChainId()}/account/${address}?base=${chain}`,
-                    onclick: (e) => {
-                      e.preventDefault();
-                      localStorage[`${app.activeChainId()}-members-scrollY`] =
-                        window.scrollY;
-                      localStorage[
-                        `${app.activeChainId()}-members-numProfilesLoaded`
-                      ] = numProfilesLoaded;
-                      navigateToSubpage(`/account/${address}?base=${chain}`);
+      m('.members-container', [
+        [
+          m(
+            '.title',
+            totalMembersCount ? `Members (${totalMembersCount})` : 'Members'
+          ),
+          m(Table, [
+            m('tr', [m('th', 'Member'), m('th.align-right', 'Posts / Month')]),
+            profilesLoaded.map((profileInfo) => {
+              const { address, chain } = profileInfo.profile;
+              return m('tr', [
+                m('td.members-item-info', [
+                  m(
+                    'a',
+                    {
+                      href: `/${app.activeChainId()}/account/${address}?base=${chain}`,
+                      onclick: (e) => {
+                        e.preventDefault();
+                        localStorage[`${app.activeChainId()}-members-scrollY`] =
+                          window.scrollY;
+                        localStorage[
+                          `${app.activeChainId()}-members-numProfilesLoaded`
+                        ] = numProfilesLoaded;
+                        navigateToSubpage(`/account/${address}?base=${chain}`);
+                      },
                     },
-                  },
-                  [m(User, { user: profileInfo.profile, showRole: true })]
-                ),
-              ]),
-              m('td.align-right', profileInfo.postCount),
-            ]);
-          }),
-        ]),
-        m('.infinite-scroll-wrapper', [
-          profilesFinishedLoading
-            ? m('.infinite-scroll-reached-end', [
-                `Showing all ${membersLoaded.length} community members`,
-              ])
-            : m('.infinite-scroll-spinner-wrap', [
-                m(Spinner, {
-                  active: true,
-                  size: 'lg',
-                }),
-              ]),
-        ]),
-      ]
+                    [m(User, { user: profileInfo.profile, showRole: true })]
+                  ),
+                ]),
+                m('td.align-right', profileInfo.postCount),
+              ]);
+            }),
+          ]),
+          m('.infinite-scroll-wrapper', [
+            profilesFinishedLoading
+              ? m('.infinite-scroll-reached-end', [
+                  `Showing all ${membersLoaded.length} community members`,
+                ])
+              : m('.infinite-scroll-spinner-wrap', [
+                  m(Spinner, {
+                    active: true,
+                    size: 'lg',
+                  }),
+                ]),
+          ]),
+        ],
+      ])
     );
   },
 };

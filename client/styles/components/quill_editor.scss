@@ -29,7 +29,6 @@
   // 1. editor typography modifications
   .ql-editor {
     font-size: 1rem;
-    line-height: 1.3;
     padding: 20px 22px 28px;
     max-height: 360px;
     a {
@@ -187,13 +186,13 @@
     display: flex;
     right: 100px;
     top: 6px;
+    margin-right: 8px;
     @include xs-max {
       top: 40px;
     }
     user-select: none;
     .cui-tag {
       cursor: pointer;
-      margin-top: 3px;
       margin-right: 0;
     }
   }
@@ -211,12 +210,11 @@
     }
     .cui-tag {
       cursor: pointer;
-      margin-top: 3px;
       margin-right: 0;
     }
     svg {
-      margin-right: 5px;
-      top: -1px;
+      margin-right: 4px;
+      top: 3px;
       position: relative;
     }
   }
@@ -248,9 +246,6 @@
     /* For safety - reset parent styles, that can break glyph codes*/
     font-variant: normal;
     text-transform: none;
-
-    /* fix buttons height, for twitter bootstrap */
-    line-height: 1em;
 
     /* Animation center compensation - margins should be symmetric */
     /* remove if not needed */
@@ -320,7 +315,6 @@
         float: right;
         color: $text-color-light;
         font-size: 90%;
-        line-height: 1.6;
       }
       .ql-mention-la {
         display: block;
@@ -359,5 +353,4 @@
 .quill-editor-tooltip {
   position: relative;
   top: 3px;
-  line-height: 1;
 }

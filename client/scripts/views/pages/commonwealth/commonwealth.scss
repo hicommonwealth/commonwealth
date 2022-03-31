@@ -1,11 +1,9 @@
-@import "client/styles/shared";
+@import 'client/styles/shared';
 
 p.Gradient-purple-text {
-  font-family: Calibre;
   font-style: normal;
   font-weight: 600;
   font-size: 24px;
-  line-height: 29px;
 
   background-size: 100%;
   background: linear-gradient(

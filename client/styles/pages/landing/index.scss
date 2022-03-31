@@ -1,67 +1,65 @@
 @import 'client/styles/shared';
 
 .Homepage {
-    .hero-unit {
-        margin: 0 auto;
-        background: $background-color-white-hover;
-        border-bottom: 1px solid $border-color-off-white;
-        margin-bottom: 48px;
-        .layout-container {
-            padding: 28px 30px 30px;
-            max-width: 820px;
-            margin: 0 auto;
-            display: flex;
-        }
-        .hero-unit-left {
-            padding-right: 40px;
-        }
-        .hero-unit-right {
-            padding-top: 4px;
-        }
+  .hero-unit {
+    margin: 0 auto;
+    background: $background-color-white-hover;
+    border-bottom: 1px solid $border-color-off-white;
+    margin-bottom: 48px;
+    .layout-container {
+      padding: 28px 30px 30px;
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+    }
+    .hero-unit-left {
+      padding-right: 40px;
+    }
+    .hero-unit-right {
+      padding-top: 4px;
+    }
 
-        .hero-image {
-        }
-        .hero-image-inner {
-            border-radius: 9999px;
-            height: 160px;
-            width: 160px;
-            background: #f3f3f3;
-            text-align: center;
-            padding-top: 29px;
-            img {
-                margin: 0 auto;
-                position: relative;
-                left: -1px;
-                width: 108px;
-                height: 108px;
-            }
-        }
-        h2 {
-            margin: 18px 0 13px 0;
-            line-height: 1.1;
-        }
-        p {
-            margin: 6px 0;
-        }
-        @include sm-max {
-            .layout-container {
-                display: block;
-                text-align: center;
-            }
-            .hero-unit-left {
-                padding-right: 0;
-            }
-            .hero-unit-right {
-                padding-top: 12px;
-            }
-            .hero-image-inner {
-                margin: 0 auto;
-            }
-        }
+    .hero-image {
     }
-    p.lead-copy {
-        font-size: 19px;
-        margin: 0 0 34px;
-        line-height: 1.1;
+    .hero-image-inner {
+      border-radius: 9999px;
+      height: 160px;
+      width: 160px;
+      background: #f3f3f3;
+      text-align: center;
+      padding-top: 29px;
+      img {
+        margin: 0 auto;
+        position: relative;
+        left: -1px;
+        width: 108px;
+        height: 108px;
+      }
     }
+    h2 {
+      margin: 18px 0 13px 0;
+    }
+    p {
+      margin: 6px 0;
+    }
+    @include sm-max {
+      .layout-container {
+        display: block;
+        text-align: center;
+      }
+      .hero-unit-left {
+        padding-right: 0;
+      }
+      .hero-unit-right {
+        padding-top: 12px;
+      }
+      .hero-image-inner {
+        margin: 0 auto;
+      }
+    }
+  }
+  p.lead-copy {
+    font-size: 19px;
+    margin: 0 0 34px;
+  }
 }

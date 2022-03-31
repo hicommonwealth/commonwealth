@@ -15,22 +15,19 @@
       align-items: center;
       justify-content: center;
       padding: 0;
+
       .label {
         margin-top: 5px;
         font-size: 12px;
         width: 50px;
-        line-height: 1.25em;
         max-height: 1.25em;
       }
     }
   }
   &.chain-card {
-    box-sizing: border-box;
-    float: left;
     width: 240px;
     max-width: 240px;
-    margin-right: 30px;
-    margin-bottom: 30px;
+    margin: 0 24px 24px 0;
     align-items: center;
     height: 370px;
     justify-content: flex-start;
@@ -38,12 +35,9 @@
     @include mobile-max {
       width: 135px;
       height: 220px;
-      margin-right: 20px;
     }
 
     .card-header {
-      padding-top: 10px;
-
       .chain-icon {
         width: 100px;
         height: 100px;
@@ -77,22 +71,26 @@
         }
       }
     }
+
     .card-body {
-      width: 200px;
+      align-items: center;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      height: 200px;
+      justify-content: space-between;
+      width: 200px;
+      margin-top: auto;
+      min-width: 0;
+
       @include mobile-max {
         width: 100px;
       }
+
       .community-name {
         font-size: 30px;
         font-weight: 600;
-        margin-top: 22px;
-        margin-bottom: 8px;
         text-align: center;
         width: 190px;
-        line-height: 1.25em;
         max-height: 2.5em;
         -webkit-hyphens: auto;
         -ms-hyphens: auto;
@@ -107,43 +105,49 @@
           margin-top: 10px;
           margin-bottom: 1px;
         }
+
         .cui-icon {
           position: relative;
           top: -2px;
+
           &::before {
             content: ' ';
             width: 4px;
           }
         }
       }
+
       .chain-new {
         margin: -4px 0;
         margin-right: -8px;
       }
+
       .card-description {
-        margin: 0;
-        line-height: 1.25em;
-        max-height: 3.75em;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        word-wrap: normal;
-        width: 150px;
-        color: #999999;
-        font-weight: normal;
-        font-size: 16px;
-        -webkit-hyphens: auto;
         -ms-hyphens: auto;
+        -webkit-box-orient: vertical;
+        -webkit-hyphens: auto;
+        -webkit-line-clamp: 3;
+        color: #999999;
+        display: -webkit-box;
+        font-size: 16px;
+        font-weight: normal;
         hyphens: auto;
+        margin: 0;
+        overflow: hidden;
+        width: 150px;
+
         @include mobile-max {
           font-size: 14px;
           width: 110px;
           text-align: center;
         }
       }
+
       .recent-activity {
         margin-top: 12px;
         color: $text-color-light;
         height: 24px;
+
         .recent-threads {
           margin-bottom: 4px;
         }
@@ -154,11 +158,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+
       h3 {
         flex: 1;
         font-size: 25px;
         font-weight: 600;
-        line-height: 1.1;
         text-align: center;
         white-space: initial;
         word-wrap: break-word;
@@ -170,6 +174,7 @@
         width: 180px;
         margin-top: 20px;
         margin-bottom: 30px;
+
         @include mobile-max {
           font-size: 20px;
           font-weight: 600;
@@ -177,12 +182,15 @@
           margin-bottom: 10px;
         }
       }
+
       .spacer {
         height: 30px;
+
         @include mobile-max {
           height: 10px;
         }
       }
+
       p.action {
         text-align: center;
         width: 180px;
@@ -214,14 +222,6 @@
   flex-direction: column;
   max-width: 2400px;
 
-  .join-button-wrapper {
-    position: absolute;
-    margin-top: 180px;
-
-    @include mobile-max {
-      margin-top: 120px;
-    }
-  }
   .ChainIcon {
     margin-bottom: 10px;
   }
@@ -237,31 +237,81 @@
   }
   .header-section {
     display: flex;
-    margin-bottom: 10px;
     align-items: flex-start;
     justify-content: space-between;
-    margin-right: 160px;
+    margin-right: 30px;
+    margin-left: 60px;
     min-width: 1050px;
+    margin-bottom: 24px;
     @include mobile-max {
-      margin-right: 100px;
+      align-items: center;
+      margin-right: 60px;
     }
 
     @include lg-max {
       flex-direction: column;
       min-width: 0px;
+      margin-left: 100px;
     }
 
     .filter-buttons {
       margin-top: 0px;
-    }
-    .Button {
-      height: 25px;
-      padding-top: 3px;
-      margin-left: 7px;
-      min-width: 50px;
-      margin-bottom: 8px;
+      @include mobile-max {
+        justify-content: center;
+        display: flex;
+      }
+
+      .filter-button {
+        height: 25px;
+        padding-top: 1px;
+        margin-left: 7px;
+        min-width: 50px;
+        margin-bottom: 8px;
+      }
     }
   }
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+
+  .communities-header {
+    color: #333333;
+    font-size: 25px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    @include lg-max {
+      margin-bottom: 15px;
+    }
+  }
+
+  .communities-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 240px);
+    grid-gap: 24px;
+    justify-content: center;
+    align-content: flex-start;
+
+    @include mobile-max {
+      grid-template-columns: repeat(auto-fit, 135px);
+    }
+  }
+
+  .join-button-wrapper {
+    @include mobile-max {
+      font-size: 12px;
+    }
+  }
+
+  .ChainIcon {
+    margin-bottom: 10px;
+  }
+
+  .CommunityIcon {
+    margin-bottom: 10px;
+  }
+
   h4 {
     margin-left: 10px;
   }
