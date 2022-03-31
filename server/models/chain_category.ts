@@ -40,9 +40,5 @@ export default (
     }
   );
 
-  ChainCategory.associate = (models) => {
-    models.ChainCategory.hasOne(models.ChainCategoryType); // TODO: is this right?
-  };
-
   return ChainCategory;
 };
