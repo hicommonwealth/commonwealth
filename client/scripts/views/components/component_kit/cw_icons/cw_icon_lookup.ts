@@ -1,15 +1,16 @@
 import * as Icons from './cw_icons';
 
 export const iconLookup = {
-  account: Icons.CWAccount,
-  arrow1: Icons.CWArrow1,
-  create: Icons.CWCreate,
+  add: Icons.CWAdd,
   discord: Icons.CWDiscord,
   element: Icons.CWElement,
-  'external-link': Icons.CWExternalLink,
+  externalLink: Icons.CWExternalLink,
   feedback: Icons.CWFeedback,
   github: Icons.CWGithub,
+  heartEmpty: Icons.CWHeartEmpty,
+  heartFilled: Icons.CWHeartFilled,
   pin: Icons.CWPin,
+  profile: Icons.CWProfile,
   search: Icons.CWSearch,
   telegram: Icons.CWTelegram,
   website: Icons.CWWebsite,

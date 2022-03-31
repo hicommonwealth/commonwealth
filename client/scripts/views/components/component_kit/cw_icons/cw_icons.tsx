@@ -8,55 +8,62 @@ import 'components/component_kit/cw_icon.scss';
 import { IconAttrs } from './cw_icon';
 import { getIconClasses } from '../helpers';
 
-export const CWViews: m.Component<IconAttrs> = {
+export const CWAdd: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
         class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="15"
+        width="32"
+        height="32"
         fill="none"
-        viewBox="0 0 20 15"
+        viewBox="0 0 32 32"
         onclick={onclick}
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="1.5"
-          d="M18.727 7.5S14.76 14 9.864 14C4.968 14 1 7.5 1 7.5S4.968 1 9.864 1c4.895 0 8.863 6.5 8.863 6.5z"
-        ></path>
-        <circle
-          cx="9.863"
-          cy="7.5"
-          r="2.955"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="1.5"
-        ></circle>
+        <path d="M2 16c0-.276.348-.5.778-.5h26.444c.43 0 .778.224.778.5v1c0 .276-.348.5-.778.5H2.778c-.43 0-.778-.224-.778-.5v-1z"></path>
+        <path d="M16.5 2.5c.276 0 .5.348.5.778v26.444c0 .43-.224.778-.5.778h-1c-.276 0-.5-.348-.5-.778V3.278c0-.43.224-.778.5-.778h1z"></path>
       </svg>
     );
   },
 };
 
-export const CWCreate: m.Component<IconAttrs> = {
+export const CWDiscord: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
         class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
-        width="21"
-        height="21"
+        width="32"
+        height="32"
         fill="none"
-        viewBox="0 0 21 21"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path d="M26.182 8.864s-2.918-2.285-6.364-2.546l-.31.622c3.114.763 4.543 1.854 6.037 3.196C22.97 8.822 20.43 7.591 16 7.591c-4.43 0-6.97 1.23-9.545 2.545 1.494-1.342 3.194-2.555 6.037-3.196l-.31-.622c-3.615.34-6.364 2.546-6.364 2.546S2.56 13.589 2 22.864c3.284 3.788 8.273 3.818 8.273 3.818l1.043-1.39a12.748 12.748 0 01-5.498-3.701c2.06 1.559 5.17 3.182 10.182 3.182 5.011 0 8.121-1.623 10.182-3.182a12.74 12.74 0 01-5.498 3.701l1.043 1.39s4.99-.03 8.273-3.818c-.56-9.275-3.818-14-3.818-14zM11.864 20.318c-1.231 0-2.228-1.139-2.228-2.545 0-1.407.997-2.546 2.228-2.546 1.23 0 2.227 1.14 2.227 2.546s-.997 2.545-2.227 2.545zm8.272 0c-1.23 0-2.227-1.139-2.227-2.545 0-1.407.997-2.546 2.227-2.546 1.231 0 2.228 1.14 2.228 2.546s-.997 2.545-2.228 2.545z"></path>
+      </svg>
+    );
+  },
+};
+
+export const CWElement: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
         onclick={onclick}
       >
         <path
-          stroke-linecap="round"
-          stroke-width="1.5"
-          d="M10.455 2.4v16.993M1.957 10.896H18.95"
+          fillRule="evenodd"
+          d="M12.08 4.18c0-.928.753-1.68 1.68-1.68 6.186 0 11.2 5.014 11.2 11.2a1.68 1.68 0 01-3.36 0 7.84 7.84 0 00-7.84-7.84 1.68 1.68 0 01-1.68-1.68zM19.92 28.82a1.68 1.68 0 01-1.68 1.68c-6.186 0-11.2-5.014-11.2-11.2a1.68 1.68 0 013.36 0 7.84 7.84 0 007.84 7.84c.927 0 1.68.752 1.68 1.68zM3.68 20.42A1.68 1.68 0 012 18.74c0-6.186 5.014-11.2 11.2-11.2a1.68 1.68 0 010 3.36 7.84 7.84 0 00-7.84 7.84 1.68 1.68 0 01-1.68 1.68zM28.32 12.58c.928 0 1.68.752 1.68 1.68 0 6.185-5.014 11.2-11.2 11.2a1.68 1.68 0 110-3.36 7.84 7.84 0 007.84-7.84c0-.928.752-1.68 1.68-1.68z"
+          clipRule="evenodd"
         ></path>
       </svg>
     );
@@ -70,16 +77,16 @@ export const CWExternalLink: m.Component<IconAttrs> = {
       <svg
         class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
+        width="32"
+        height="32"
         fill="none"
-        viewBox="0 0 16 16"
+        viewBox="0 0 32 32"
         onclick={onclick}
       >
         <path
-          stroke-miterlimit="16"
-          stroke-width="1.5"
-          d="M15 8V1H8m7 9.5V13a2 2 0 01-2 2H3a2 2 0 01-2-2V3a2 2 0 012-2h2.5M8 8l6.5-6.5"
+          fillRule="evenodd"
+          d="M5 4.5a1 1 0 00-1 1v22a1 1 0 001 1h22a1 1 0 001-1v-6.357a1 1 0 112 0V27.5a3 3 0 01-3 3H5a3 3 0 01-3-3v-22a3 3 0 013-3h6.357a1 1 0 110 2H5zm10-1a1 1 0 011-1h13a1 1 0 011 1v13a1 1 0 11-2 0V5.914L16.707 17.207a1 1 0 01-1.414-1.414L26.586 4.5H16a1 1 0 01-1-1z"
+          clipRule="evenodd"
         ></path>
       </svg>
     );
@@ -93,46 +100,129 @@ export const CWFeedback: m.Component<IconAttrs> = {
       <svg
         class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
-        width="19"
-        height="20"
+        width="32"
+        height="32"
         fill="none"
-        viewBox="0 0 19 20"
+        viewBox="0 0 32 32"
         onclick={onclick}
       >
         <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="1.5"
-          d="M1.709 17.71a.75.75 0 001.297.513l3.043-3.246h9.47c.648 0 1.26-.275 1.702-.747.44-.47.68-1.098.68-1.744V3.779c0-.645-.24-1.274-.68-1.744a2.332 2.332 0 00-1.702-.747H4.091c-.648 0-1.259.275-1.701.747a2.552 2.552 0 00-.681 1.744V17.71z"
+          fillRule="evenodd"
+          d="M2 6.187c0-.38.313-.687.699-.687H29.3c.386 0 .699.308.699.687v20.625c0 .605-.74.915-1.183.495l-4.028-3.808H2.7A.693.693 0 012 22.812V6.187zM8 16.5a2 2 0 100-4 2 2 0 000 4zm10-2a2 2 0 11-4 0 2 2 0 014 0zm6 2a2 2 0 100-4 2 2 0 000 4z"
+          clipRule="evenodd"
         ></path>
       </svg>
     );
   },
 };
 
-export const CWAccount: m.Component<IconAttrs> = {
+export const CWGithub: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
         class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
-        width="21"
-        height="22"
+        width="33"
+        height="32"
         fill="none"
-        viewBox="0 0 21 22"
+        viewBox="0 0 33 32"
         onclick={onclick}
       >
         <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="1.5"
-          d="M18.264 20.281v-5.04a4.268 4.268 0 00-4.269-4.268H6.833a4.268 4.268 0 00-4.269 4.269v5.04"
+          fillRule="evenodd"
+          d="M16.067 2.5a13.878 13.878 0 00-9.115 3.417 14.431 14.431 0 00-4.77 8.639 14.61 14.61 0 001.852 9.735 14.11 14.11 0 007.59 6.185c.7.132.958-.308.958-.696v-2.44c-3.925.872-4.753-1.93-4.753-1.93a3.79 3.79 0 00-1.562-2.098c-1.277-.88.095-.88.095-.88.446.062.873.227 1.247.484.373.256.685.597.91.996.19.353.448.665.757.916a2.935 2.935 0 003.332.273 3.096 3.096 0 01.862-1.92c-3.088-.344-6.366-1.578-6.366-7.076a5.618 5.618 0 011.45-3.85 5.266 5.266 0 01.137-3.799s1.182-.387 3.865 1.472a13.05 13.05 0 017.04 0c2.682-1.86 3.864-1.472 3.864-1.472a5.257 5.257 0 01.12 3.798 5.61 5.61 0 011.442 3.85c0 5.517-3.287 6.724-6.419 7.05.334.346.592.76.757 1.216.166.456.234.942.2 1.427v3.939c0 .476.251.828.967.687a14.118 14.118 0 007.484-6.208 14.612 14.612 0 001.806-9.673 14.433 14.433 0 00-4.723-8.585A13.882 13.882 0 0016.068 2.5z"
+          clipRule="evenodd"
         ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWHeartEmpty: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
         <path
-          stroke-linejoin="round"
-          stroke-width="1.5"
-          d="M14.667 5.97a4.252 4.252 0 11-8.505 0 4.252 4.252 0 018.505 0z"
+          fillRule="evenodd"
+          d="M17.204 27.821a2.121 2.121 0 01-2.462.003c-1.655-1.177-4.483-3.34-6.921-5.852-1.219-1.255-2.39-2.649-3.269-4.095C3.688 16.454 3 14.804 3 13.08 3 8.92 6.315 5.5 10.528 5.5c2.002 0 3.714.804 4.863 1.524.207.13.402.26.583.39.181-.13.376-.26.584-.39 1.148-.72 2.86-1.524 4.862-1.524A7.58 7.58 0 0129 13.08c0 1.732-.703 3.389-1.577 4.812-.89 1.45-2.076 2.846-3.306 4.102-2.46 2.514-5.3 4.676-6.913 5.827zM16.093 10.05c.544-.52 2.723-2.428 5.327-2.428a5.459 5.459 0 015.459 5.459c0 4.702-7.772 10.775-10.908 13.016-3.21-2.283-10.85-8.314-10.85-13.016 0-3.015 2.392-5.459 5.407-5.459 2.604 0 4.783 1.909 5.327 2.428.06.057.1.098.12.117.018-.02.058-.06.118-.117z"
+          clipRule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWHeartFilled: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path
+          fillRule="evenodd"
+          d="M14.742 27.824a2.121 2.121 0 002.462-.003c1.612-1.151 4.453-3.313 6.913-5.827 1.23-1.256 2.415-2.653 3.306-4.102C28.297 16.47 29 14.812 29 13.08a7.58 7.58 0 00-7.58-7.58c-2.002 0-3.714.804-4.863 1.524-.207.13-.402.26-.583.39a12.42 12.42 0 00-.583-.39c-1.149-.72-2.86-1.524-4.863-1.524C6.315 5.5 3 8.92 3 13.08c0 1.724.688 3.374 1.552 4.797.878 1.447 2.05 2.84 3.269 4.095 2.438 2.511 5.266 4.675 6.921 5.852z"
+          clipRule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWPin: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="33"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path d="M7 18a.5.5 0 01.5-.5h17a.5.5 0 01.5.5v1a.5.5 0 01-.5.5h-17A.5.5 0 017 19v-1z"></path>
+        <path d="M16.5 7.5c.276 0 .5.275.5.615v20.902c0 .615-.724 1.483-1 1.483s-1-.868-1-1.483V8.115c0-.34.224-.615.5-.615h1zM9 3c0-.276.174-.5.389-.5H22.61c.215 0 .389.224.389.5v1c0 .276-.174.5-.389.5H9.39C9.174 4.5 9 4.276 9 4V3z"></path>
+        <path d="M10.556 2.5h10.888L23 19.5H9l1.556-17z"></path>
+      </svg>
+    );
+  },
+};
+
+export const CWProfile: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path
+          fillRule="evenodd"
+          d="M19.114 17.873A8.002 8.002 0 0016.004 2.5a8 8 0 00-3.107 15.374C7.37 19.23 3.233 24.114 3.01 30c-.01.276.214.501.49.501h25.018a.486.486 0 00.49-.5c-.222-5.889-4.364-10.774-9.894-12.127z"
+          clipRule="evenodd"
         ></path>
       </svg>
     );
@@ -146,74 +236,17 @@ export const CWSearch: m.Component<IconAttrs> = {
       <svg
         class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
-        width="28"
-        height="28"
+        width="32"
+        height="32"
         fill="none"
-        viewBox="0 0 28 28"
+        viewBox="0 0 32 32"
         onclick={onclick}
       >
         <path
-          stroke-linecap="round"
-          stroke-width="1.5"
-          d="M18.071 18.071c-3.905 3.905-10.237 3.905-14.142 0C.024 14.166.024 7.834 3.929 3.93 7.834.024 14.166.024 18.07 3.929c3.905 3.905 3.905 10.237 0 14.142z"
+          fillRule="evenodd"
+          d="M25.605 15.366c0 5.93-4.808 10.737-10.738 10.737S4.13 21.296 4.13 15.366 8.937 4.628 14.867 4.628s10.738 4.808 10.738 10.738zm-2.548 9.756a12.686 12.686 0 01-8.19 2.981C7.832 28.103 2.13 22.4 2.13 15.366c0-7.035 5.702-12.738 12.737-12.738s12.738 5.703 12.738 12.738c0 3.118-1.121 5.975-2.982 8.19l5.47 5.469c.096.096-.002.35-.218.565l-.783.784c-.216.216-.47.313-.566.217l-5.47-5.47z"
+          clipRule="evenodd"
         ></path>
-        <path stroke-linecap="square" stroke-width="1.5" d="M19 19l7 7"></path>
-      </svg>
-    );
-  },
-};
-
-export const CWDiscord: m.Component<IconAttrs> = {
-  view: (vnode) => {
-    const { className, disabled, iconSize, onclick } = vnode.attrs;
-    return (
-      <svg
-        class={getIconClasses({ disabled, iconSize, className })}
-        xmlns="http://www.w3.org/2000/svg"
-        width="29"
-        height="28"
-        fill="none"
-        viewBox="0 0 29 28"
-        onclick={onclick}
-      >
-        <g clip-path="url(#clip0_729_15084)">
-          <path d="M25.556 5.908s-3.093-2.42-6.743-2.697l-.33.659c3.3.808 4.815 1.964 6.398 3.387-2.728-1.393-5.421-2.698-10.114-2.698-4.694 0-7.386 1.305-10.115 2.698C6.235 5.834 8.037 4.549 11.05 3.87l-.33-.66c-3.83.362-6.742 2.698-6.742 2.698S.524 10.916-.068 20.743c3.48 4.014 8.766 4.046 8.766 4.046l1.106-1.473c-1.878-.652-3.995-1.817-5.826-3.921 2.183 1.652 5.478 3.371 10.789 3.371 5.31 0 8.605-1.72 10.789-3.371-1.83 2.104-3.948 3.269-5.826 3.921l1.106 1.473s5.286-.032 8.766-4.046c-.593-9.827-4.046-14.835-4.046-14.835zM10.384 18.046c-1.305 0-2.36-1.207-2.36-2.697s1.056-2.698 2.36-2.698c1.304 0 2.36 1.207 2.36 2.698 0 1.49-1.056 2.697-2.36 2.697zm8.766 0c-1.304 0-2.36-1.207-2.36-2.697s1.056-2.698 2.36-2.698c1.304 0 2.36 1.207 2.36 2.698 0 1.49-1.056 2.697-2.36 2.697z"></path>
-        </g>
-        <defs>
-          <clipPath id="clip0_729_15084">
-            <path d="M0 0H28V28H0z" transform="translate(.768)"></path>
-          </clipPath>
-        </defs>
-      </svg>
-    );
-  },
-};
-
-export const CWElement: m.Component<IconAttrs> = {
-  view: (vnode) => {
-    const { className, disabled, iconSize, onclick } = vnode.attrs;
-    return (
-      <svg
-        class={getIconClasses({ disabled, iconSize, className })}
-        xmlns="http://www.w3.org/2000/svg"
-        width="29"
-        height="28"
-        fill="none"
-        viewBox="0 0 29 28"
-        onclick={onclick}
-      >
-        <g
-          fill-rule="evenodd"
-          clip-path="url(#clip0_729_15085)"
-          clip-rule="evenodd"
-        >
-          <path d="M10.848 1.68c0-.928.752-1.68 1.68-1.68 6.185 0 11.2 5.015 11.2 11.2a1.68 1.68 0 01-3.36 0 7.84 7.84 0 00-7.84-7.84 1.68 1.68 0 01-1.68-1.68zM18.687 26.32a1.68 1.68 0 01-1.68 1.68c-6.186 0-11.2-5.014-11.2-11.2a1.68 1.68 0 013.36 0 7.84 7.84 0 007.84 7.84c.927 0 1.68.752 1.68 1.68zM2.448 17.92a1.68 1.68 0 01-1.68-1.68c0-6.185 5.014-11.2 11.2-11.2a1.68 1.68 0 010 3.36 7.84 7.84 0 00-7.84 7.84 1.68 1.68 0 01-1.68 1.68zM27.089 10.08c.928 0 1.68.752 1.68 1.68 0 6.186-5.015 11.2-11.2 11.2a1.68 1.68 0 110-3.36 7.84 7.84 0 007.84-7.84c0-.928.752-1.68 1.68-1.68z"></path>
-        </g>
-        <defs>
-          <clipPath id="clip0_729_15085">
-            <path d="M0 0H28V28H0z" transform="translate(.768)"></path>
-          </clipPath>
-        </defs>
       </svg>
     );
   },
@@ -226,16 +259,40 @@ export const CWTelegram: m.Component<IconAttrs> = {
       <svg
         class={getIconClasses({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
-        width="29"
-        height="28"
+        width="32"
+        height="32"
         fill="none"
-        viewBox="0 0 29 28"
+        viewBox="0 0 32 32"
         onclick={onclick}
       >
         <path
-          fill-rule="evenodd"
-          d="M23.02 24.253l4.206-20.231a.673.673 0 00-.9-.765L2.887 12.298a.673.673 0 00.007 1.26l5.71 2.13 2.21 7.11a.672.672 0 001.069.32l3.183-2.594a.95.95 0 011.157-.033l5.742 4.169a.673.673 0 001.054-.407zm-12.56-9.699L21.62 7.68c.201-.123.408.148.235.308l-9.21 8.562a1.91 1.91 0 00-.592 1.143l-.314 2.325c-.042.31-.478.341-.564.04l-1.206-4.24c-.138-.483.063-1 .49-1.264z"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          d="M25.232 28.084l4.752-22.857a.76.76 0 00-1.019-.864L2.487 14.578c-.653.251-.648 1.177.008 1.422l6.451 2.408 2.498 8.031a.76.76 0 001.206.363l3.596-2.931a1.072 1.072 0 011.308-.037l6.487 4.71a.76.76 0 001.19-.46zm-14.19-10.958L23.65 9.36c.227-.139.46.168.265.348L13.51 19.381c-.366.34-.601.796-.668 1.29l-.355 2.628c-.047.35-.54.385-.636.046l-1.364-4.79a1.27 1.27 0 01.555-1.429z"
+          clipRule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWViews: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <circle cx="16" cy="16.5" r="6"></circle>
+        <path
+          fillRule="evenodd"
+          d="M24.907 20.42C27.144 19.142 28 17.682 28 16.5s-.856-2.642-3.093-3.92c-2.18-1.246-5.325-2.08-8.907-2.08s-6.727.834-8.907 2.08C4.856 13.858 4 15.318 4 16.5s.856 2.642 3.093 3.92c2.18 1.246 5.325 2.08 8.907 2.08s6.727-.834 8.907-2.08zM16 24.5c7.732 0 14-3.582 14-8s-6.268-8-14-8-14 3.582-14 8 6.268 8 14 8z"
+          clipRule="evenodd"
         ></path>
       </svg>
     );
@@ -259,76 +316,6 @@ export const CWWebsite: m.Component<IconAttrs> = {
         <ellipse cx="15" cy="15" stroke-width="1.5" rx="9" ry="14"></ellipse>
         <ellipse cx="15" cy="15" stroke-width="1.5" rx="3" ry="14"></ellipse>
         <path strokeW-width="1.5" d="M1 15h28M3 8h24M3 22h24"></path>
-      </svg>
-    );
-  },
-};
-
-export const CWGithub: m.Component<IconAttrs> = {
-  view: (vnode) => {
-    const { className, disabled, iconSize, onclick } = vnode.attrs;
-    return (
-      <svg
-        class={getIconClasses({ disabled, iconSize, className })}
-        xmlns="http://www.w3.org/2000/svg"
-        width="33"
-        height="32"
-        fill="none"
-        viewBox="0 0 33 32"
-        onclick={onclick}
-      >
-        <g clipPath="url(#clip0_796_10037)">
-          <path
-            fill-rule="evenodd"
-            d="M16.291 0a16.29 16.29 0 00-5.15 31.75c.81.15 1.11-.35 1.11-.79v-2.77c-4.55.99-5.51-2.19-5.51-2.19a4.31 4.31 0 00-1.81-2.38c-1.48-1 .11-1 .11-1a3.42 3.42 0 012.5 1.68 3.47 3.47 0 004.74 1.35 3.48 3.48 0 011-2.18c-3.58-.39-7.38-1.79-7.38-8.03a6.3 6.3 0 011.68-4.37 5.86 5.86 0 01.16-4.31s1.37-.44 4.48 1.67a15.44 15.44 0 018.16 0c3.11-2.11 4.48-1.67 4.48-1.67a5.85 5.85 0 01.14 4.31 6.29 6.29 0 011.67 4.37c0 6.26-3.81 7.63-7.44 8a3.89 3.89 0 011.11 3v4.47c0 .54.29.94 1.12.78A16.29 16.29 0 0016.291 0z"
-            clip-rule="evenodd"
-          ></path>
-        </g>
-        <defs>
-          <clipPath id="clip0_796_10037">
-            <path d="M0 0H32.58V31.77H0z"></path>
-          </clipPath>
-        </defs>
-      </svg>
-    );
-  },
-};
-
-export const CWPin: m.Component<IconAttrs> = {
-  view: (vnode) => {
-    const { className, disabled, iconSize, onclick } = vnode.attrs;
-    return (
-      <svg
-        class={getIconClasses({ disabled, iconSize, className })}
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="22"
-        fill="none"
-        viewBox="0 0 14 22"
-        onclick={onclick}
-      >
-        <path d="M.25 12.125c0-.207.168-.375.375-.375h12.75c.207 0 .375.168.375.375v.75a.375.375 0 01-.375.375H.625a.375.375 0 01-.375-.375v-.75z"></path>
-        <path d="M7.375 4.25c.207 0 .375.206.375.461v15.677c0 .461-.543 1.112-.75 1.112-.207 0-.75-.65-.75-1.112V4.711c0-.255.168-.461.375-.461h.75zM1.75.875c0-.207.13-.375.292-.375h9.916c.161 0 .292.168.292.375v.75c0 .207-.13.375-.292.375H2.042c-.161 0-.292-.168-.292-.375v-.75z"></path>
-        <path d="M2.917.5h8.166l1.167 12.75H1.75L2.917.5z"></path>
-      </svg>
-    );
-  },
-};
-
-export const CWArrow1: m.Component<IconAttrs> = {
-  view: (vnode) => {
-    const { className, disabled, iconSize, onclick } = vnode.attrs;
-    return (
-      <svg
-        class={getIconClasses({ disabled, iconSize, className })}
-        xmlns="http://www.w3.org/2000/svg"
-        width="28"
-        height="26"
-        fill="none"
-        viewBox="0 0 28 26"
-        onclick={onclick}
-      >
-        <path d="M13.27 1.172a.843.843 0 011.46 0l13.156 22.81a.845.845 0 01-.731 1.268H.845a.845.845 0 01-.73-1.267l13.154-22.81z"></path>
       </svg>
     );
   },

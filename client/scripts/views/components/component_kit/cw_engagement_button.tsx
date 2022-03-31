@@ -40,7 +40,7 @@ export class CWEngagementButton
         onclick={onclick}
         disabled={disabled}
       >
-        <CWIcon disabled={disabled} iconName="create" />
+        <CWIcon disabled={disabled} iconName="add" />
         <span>{label}</span>
       </button>
     );
