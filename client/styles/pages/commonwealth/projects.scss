@@ -1,82 +1,80 @@
 @import 'client/styles/shared';
 
 .ProjectsPage {
-    .cui-card {
-        padding-top: 28px;
-        margin-top: 24px;
-        max-width: none;
-        @include lg-min {
-            max-width: calc(50% - 20px);
-            margin-right: 20px;
-        }
+  .cui-card {
+    padding-top: 28px;
+    margin-top: 24px;
+    max-width: none;
+    @include lg-min {
+      max-width: calc(50% - 20px);
+      margin-right: 20px;
     }
-    h4 {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 2px;
+  }
+  h4 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .project-description {
+    color: $text-color-medium;
+    margin-bottom: 5px;
+  }
+  .project-metadata {
+    margin-bottom: 20px;
+    .project-metadata-created,
+    .project-metadata-beneficiary {
+      display: inline-block;
     }
-    .project-description {
-        color: $text-color-medium;
-        margin-bottom: 5px;
-        line-height: 1.2;
+    .project-metadata-beneficiary {
+      color: $text-color-medium;
+      margin-right: 18px;
     }
-    .project-metadata {
-        margin-bottom: 20px;
-        .project-metadata-created,
-        .project-metadata-beneficiary {
-            display: inline-block;
-        }
-        .project-metadata-beneficiary {
-            color: $text-color-medium;
-            margin-right: 18px;
-        }
-        .project-metadata-created {
-            color: $text-color-medium;
-        }
+    .project-metadata-created {
+      color: $text-color-medium;
     }
-    .project-metrics {
-        display: flex;
-        .project-metric {
-            flex: 1;
-            padding: 16px 0 10px;
-        }
-        .project-metric-figure {
-            width: 120px;
-            font-size: 24px;
-            line-height: 1;
-        }
-        .project-metric-title {
-        }
+  }
+  .project-metrics {
+    display: flex;
+    .project-metric {
+      flex: 1;
+      padding: 16px 0 10px;
     }
-    .project-progress {
-        padding: 4px 0 8px;
-        $progress-bar-height: 11px;
-        .project-progress-bar {
-            width: 100%;
-            height: $progress-bar-height;
-            border-radius: 9999px;
-            background-color: $background-color-medium-light;
-        }
-        .project-progress-bar-fill {
-            height: $progress-bar-height;
-            border-radius: 9999px;
-            background-color: $positive-bg-color;
-        }
-        .project-progress-text {
-            display: flex;
-            padding-top: 12px;
-            padding-bottom: 12px;
-            color: $text-color-medium;
-            .project-progress-text-left {
-                flex: 1;
-            }
-            .project-progress-text-right {
-                text-align: right;
-            }
-        }
+    .project-metric-figure {
+      width: 120px;
+      font-size: 24px;
     }
-    .contribute-button,
-    .more-info-button {
-        margin-bottom: 8px;
+    .project-metric-title {
     }
+  }
+  .project-progress {
+    padding: 4px 0 8px;
+    $progress-bar-height: 11px;
+    .project-progress-bar {
+      width: 100%;
+      height: $progress-bar-height;
+      border-radius: 9999px;
+      background-color: $background-color-medium-light;
+    }
+    .project-progress-bar-fill {
+      height: $progress-bar-height;
+      border-radius: 9999px;
+      background-color: $positive-bg-color;
+    }
+    .project-progress-text {
+      display: flex;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      color: $text-color-medium;
+      .project-progress-text-left {
+        flex: 1;
+      }
+      .project-progress-text-right {
+        text-align: right;
+      }
+    }
+  }
+  .contribute-button,
+  .more-info-button {
+    margin-bottom: 8px;
+  }
 }

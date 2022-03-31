@@ -1,61 +1,72 @@
 @import 'client/styles/shared';
 
 .PollEditorDialog {
-    .cui-dialog-body {
-        padding: 36px 28px 32px;
-    }
+  .cui-dialog-body {
+    padding: 24px;
+
     .cui-switch {
-        color: $text-color-black;
-        margin-bottom: 20px;
+      color: $text-color-black;
+      margin-bottom: 16px;
     }
+
     h4 {
-        margin: 12px 0 14px;
+      margin: 8px 0;
     }
+
     h4.disabled {
-        color: $text-color-light;
+      color: $text-color-light;
     }
+
     .poll-editor-choices-question {
-        margin-bottom: 16px;
+      margin-bottom: 16px;
     }
+
     .poll-editor-choices {
-        .poll-editor-choice-buttons {
-            margin: 4px 0;
-        }
-        .poll-editor-choice {
-            margin-bottom: 4px;
-        }
-        .cui-input,
-        .cui-button {
-            margin-bottom: 8px;
-        }
+      .poll-editor-choice-buttons {
+        margin: 4px 0;
+      }
+
+      .poll-editor-choice {
+        margin-bottom: 4px;
+      }
+
+      .cui-input,
+      .cui-button {
+        margin-bottom: 8px;
+      }
     }
 
     .poll-duration-copy {
-        margin: 22px 0 10px;
-        color: $text-color-medium;
+      color: $text-color-medium;
+      margin: 16px 0px;
     }
+
     .poll-editor-duration {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        .cui-switch {
-            color: $text-color-medium;
-            min-width: max-content;
-            margin-bottom: 0;
-        }
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+
+      .cui-switch {
+        color: $text-color-medium;
+        margin-bottom: 0;
+        min-width: max-content;
+      }
     }
+  }
 }
 
 .custom-duration-items {
-    .cui-popover-content {
-        width: 175px;
-        padding: 15px 10px;
-        .duration-item {
-            cursor: pointer;
-            padding: 0 4px 1px 10px;
-            &:hover {
-                background-color: $background-color-white-hover;
-            }
-        }
+  .cui-popover-content {
+    padding: 8px;
+    width: 104px;
+
+    .duration-item {
+      cursor: pointer;
+      padding: 4px 8px;
+
+      &:hover {
+        background-color: $background-color-white-hover;
+      }
     }
+  }
 }

@@ -1,78 +1,18 @@
 @import 'client/styles/shared';
 
-.StageEditor {
-}
-
 .StageEditorDialog {
-    h4 {
-        margin: 10px 7px;
-        font-size: 17px;
-        font-weight: 600;
-    }
-    p {
-        margin: 0 8px;
-        margin-top: 16px;
-    }
-    p.secondary {
-        margin: 0;
-        margin-top: 16px;
-        color: $text-color-medium;
-    }
+  .cui-dialog-body {
+    padding: 16px 24px;
+
     .stage-options {
-        margin-top: 12px;
-        margin-bottom: 30px;
-    }
-    .cui-button.cui-sm {
-        padding: 4px 15px 3px;
-        height: initial;
-        max-height: initial;
-        margin: 0 6px;
-    }
-}
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      margin: 0 0 8px;
 
-.ChainEntitiesSelector {
-    padding: 0;
-    border: 1px solid #ddd;
-    margin: 10px 8px 20px;
-    border-radius: 5px;
-    .cui-control-group {
-        margin-bottom: 0;
+      button {
+        margin: 0 8px 8px 0;
+      }
     }
-    .cui-input input {
-        border-top: none;
-        border-right: none;
-        border-left: none;
-        border-bottom-color: $border-color-light;
-        height: 44px;
-        border-radius: 0;
-    }
-    .cui-list {
-        min-height: 150px;
-        max-height: 150px;
-        border-radius: 5px;
-        .cui-active {
-            background: initial;
-        }
-        .cui-list-item {
-            .chain-entity-info {
-                .chain-entity-top {
-
-                }
-                .chain-entity-bottom {
-                    font-size: 88%;
-                }
-            }
-        }
-    }
-    .cui-query-list-checkmark .cui-list-item-content-left {
-        left: 0;
-    }
-    .chain-entities-selector-placeholder {
-        padding: 112px 0;
-        text-align: center;
-    }
-    .chain-entities-selector-placeholder-text {
-        height: 30px;
-        color: $text-color-medium-dark;
-    }
+  }
 }

@@ -1,6 +1,9 @@
 @import 'client/styles/shared';
 
 .TreasuryPage {
-    padding-bottom: 60px;
-    @include gov-explainer;
+  .treasury-container {
+    padding: 24px;
+  }
+
+  @include gov-explainer;
 }

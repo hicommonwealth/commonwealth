@@ -11,7 +11,7 @@ import { ChainBase } from 'types';
 import Substrate from 'controllers/chain/substrate/main';
 
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import ProposalCard from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Listing from 'views/pages/listing';
@@ -174,7 +174,7 @@ const TreasuryPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.treasury-container', [
         onSubstrate && m(SubstrateProposalStats),
         m('.clear'),
         m(Listing, {
@@ -187,7 +187,7 @@ const TreasuryPage: m.Component<{}> = {
           columnHeader: 'Inactive Treasury Proposals',
         }),
         m('.clear'),
-      ]
+      ])
     );
   },
 };
