@@ -2,7 +2,6 @@
 
 .VotingResults {
   display: flex;
-  background-color: $primary-300;
   justify-content: space-between;
   margin-top: 25px;
   flex-wrap: wrap;
@@ -26,7 +25,7 @@
   .results-column {
     display: flex;
     flex-direction: column;
-    background-color: $primary-300;
+    background-color: $neutral-100;
     padding: 18px 0 12px;
     flex: 1;
     min-width: 48%;

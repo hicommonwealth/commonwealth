@@ -54,10 +54,12 @@
     }
 
     .id {
+      align-items: center;
       background-color: $yellow-50;
       border-radius: 4px;
-      height: 42px;
-      padding: 8px 15px;
+      display: flex;
+      height: 40px;
+      padding: 8px 16px;
 
       &.placeholder {
         color: $neutral-200;

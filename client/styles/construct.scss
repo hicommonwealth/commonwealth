@@ -139,13 +139,13 @@ button,
   &.cui-basic,
   .cui-button-group.cui-basic & {
     &:hover {
-      background: $primary-400;
+      background: $neutral-200;
       color: $neutral-600;
     }
 
     &:active,
     &.cui-active {
-      background: $primary-300;
+      background: $neutral-300;
       color: $neutral-600;
     }
   }

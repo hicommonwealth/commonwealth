@@ -10,13 +10,13 @@
   padding: 16px;
 
   &:hover {
-    background: $primary-400;
+    background: $neutral-100;
   }
 
   .pinned {
     align-items: center;
     border-radius: 12px;
-    border: 1px solid $neutral-100;
+    border: 1px solid $neutral-300;
     display: flex;
     height: 48px;
     justify-content: center;

@@ -23,7 +23,7 @@ $discussion-title-font-size: 1.45rem;
     background-color: transparent;
     transition: background-color 1s ease-in-out;
     .thread-connector {
-      background: $primary-300;
+      background: $neutral-200;
       transition: background 1s ease-in-out;
     }
   }
@@ -138,7 +138,7 @@ $discussion-title-font-size: 1.45rem;
     &.proposal-snapshot {
       .snapshot-proposal-top {
         display: flex;
-        border-bottom: 1px solid $primary-300;
+        border-bottom: 1px solid $neutral-200;
       }
       .proposal-content {
         padding: 25px 0;
@@ -147,7 +147,7 @@ $discussion-title-font-size: 1.45rem;
     .proposal-top {
       display: flex;
       padding-bottom: 16px;
-      border-bottom: 1px solid $primary-300;
+      border-bottom: 1px solid $neutral-200;
     }
     .proposal-top-left {
       flex: 1;
@@ -254,8 +254,8 @@ $discussion-title-font-size: 1.45rem;
         display: block;
         padding: 8px 16px;
         border-radius: 99px;
-        background: $primary-300;
-        color: $primary-500;
+        background: $neutral-200;
+        color: $neutral-500;
         text-decoration: none !important;
       }
       svg {
@@ -270,7 +270,7 @@ $discussion-title-font-size: 1.45rem;
         min-width: $size;
       }
       a:hover {
-        background: $primary-300;
+        background: $neutral-300;
       }
     }
   }
@@ -571,7 +571,7 @@ $discussion-title-font-size: 1.45rem;
     position: absolute;
     top: 48px;
     bottom: -40px;
-    background: $primary-300;
+    background: $neutral-200;
     left: 19px;
     width: 2px;
     z-index: -1;

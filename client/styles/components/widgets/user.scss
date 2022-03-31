@@ -9,7 +9,7 @@
   border-radius: 9999px;
   overflow: hidden;
   .avatar-image {
-    background: $primary-300;
+    background: $neutral-200;
     background-size: cover;
   }
 }
@@ -26,7 +26,7 @@
   .avatar-image {
     width: 100% !important;
     height: 100% !important;
-    background: $primary-300;
+    background: $neutral-200;
     background-size: cover;
   }
 }
@@ -93,7 +93,7 @@
     font-size: 75%;
     font-weight: 500;
     margin-left: 4px;
-    background: $primary-300;
+    background: $neutral-200;
     border-radius: 99px;
     padding: 4px 8px;
     text-decoration: none !important;

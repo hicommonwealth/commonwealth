@@ -15,12 +15,12 @@
   animation-iteration-count: infinite;
   animation-name: placeHolderShimmer;
   animation-timing-function: linear;
-  background: $primary-300;
+  background: $neutral-100;
   background: linear-gradient(
     to right,
-    $primary-400 8%,
-    $primary-300 18%,
-    $primary-200 33%
+    $neutral-400 8%,
+    $neutral-300 18%,
+    $neutral-200 33%
   );
   background-size: 800px 104px;
   background-repeat: repeat;
@@ -49,7 +49,7 @@
   .metadata-block,
   .content-block {
     display: inline-block;
-    background: $primary-300;
+    background: $neutral-300;
     height: 15px;
     min-width: 100px;
     @include placeholder-shimmer;
