@@ -225,14 +225,11 @@ class TopicsController {
     const reorderedTopics = featuredTopics.filter((t) => {
       const newPosition = +t.order;
       const previousPosition = +this.getByIdentifier(t.id).order;
-      console.log({ newPosition, previousPosition });
       return newPosition !== previousPosition;
     });
-    console.log({ reorderedTopics });
     const orderedIds = reorderedTopics
       .sort((a, b) => a.order - b.order)
       .map((t) => t.id);
-    console.log({ orderedIds });
     const response = await $.post(`${app.serverUrl()}/orderTopics`, {
       chain: app.activeChainId(),
       'order[]': orderedIds,
