@@ -10,6 +10,7 @@ import { ChainInfo, NodeInfo } from 'models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCard } from '../components/component_kit/cw_card';
 import Sublayout from '../sublayout';
+import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -90,15 +91,39 @@ const filterMap = {
 
 class HomepageCommunityCards implements m.ClassComponent {
   private filters: Array<boolean>;
+  private chainCategories: Array<string>;
+  private chainNetworks: Array<string>;
+  private chainBases: Array<string>;
+  private filterMap: { [val: string]: boolean };
   private categoryMap: { [chain: string]: number[] };
   oninit() {
     this.filters = [false, false, false, false, false, false];
+    this.filterMap = {};
+    this.chainCategories = Object.keys(ChainCategoryType);
+    this.chainBases = Object.keys(ChainBase);
+    this.chainNetworks = Object.keys(ChainNetwork).filter(
+      (val) => val === 'ERC20'
+    ); // We only are allowing ERC20 for now
+
+    for (const cat of this.chainCategories) {
+      this.filterMap[cat] = false;
+    }
+    for (const base of this.chainBases) {
+      this.filterMap[base] = false;
+    }
+    for (const network of this.chainNetworks) {
+      this.filterMap[network] = false;
+    }
+
+    // Handle mapping provided by ChainCategories table
+
     const categories = app.config.chainCategories;
+    const categoryTypes = app.config.chainCategoryTypes;
+    console.log(categoryTypes);
     let categoryMap = {};
-    // Build the category map
     for (const data of categories) {
       if (categoryMap[data.chain_id]) {
-        categoryMap[data.chain_id].push(data.category_type_id);
+        categoryMap[data.chain_id].push(data);
       } else {
         categoryMap[data.chain_id] = [data.category_type_id];
       }
@@ -119,7 +144,15 @@ class HomepageCommunityCards implements m.ClassComponent {
 
     const sortChains = (list, filters) => {
       let filteredList = list;
+
       // Filter via on-page filters
+      // 1. filter via chainCategory, 2 filter via chainNetwork, 3 filter via chainBase. All using the filterMap
+
+      if (Object.values(this.filterMap).includes(true)) {
+        // Filter for ChainCategory
+
+        console.log(this.filterMap);
+      }
       if (filters.includes(true)) {
         let appliedFilters = [];
         for (let i = 0; i < filters.length; i++) {
@@ -179,76 +212,42 @@ class HomepageCommunityCards implements m.ClassComponent {
         <div class="header-section">
           <div class="communities-header">{totalCommunitiesString}</div>
           <div class="filter-buttons">
-            <CWButton
-              label="DeFi"
-              className="filter-button"
-              buttonType={
-                this.filters[filterMap['DeFi'] - 1] ? 'primary' : 'secondary'
-              }
-              onclick={() => {
-                this.filters[filterMap['DeFi'] - 1] =
-                  !this.filters[filterMap['DeFi'] - 1];
-              }}
-            />
-            <CWButton
-              label="DAO"
-              className="filter-button"
-              buttonType={
-                this.filters[filterMap['DAO'] - 1] ? 'primary' : 'secondary'
-              }
-              onclick={() => {
-                this.filters[filterMap['DAO'] - 1] =
-                  !this.filters[filterMap['DAO'] - 1];
-              }}
-            />
-            <CWButton
-              label="ERC20"
-              className="filter-button"
-              buttonType={
-                this.filters[filterMap['ERC20'] - 1] ? 'primary' : 'secondary'
-              }
-              onclick={() => {
-                this.filters[filterMap['ERC20'] - 1] =
-                  !this.filters[filterMap['ERC20'] - 1];
-              }}
-            />
-            <CWButton
-              label="Cosmos"
-              className="filter-button"
-              buttonType={
-                this.filters[filterMap['Cosmos'] - 1] ? 'primary' : 'secondary'
-              }
-              onclick={() => {
-                this.filters[filterMap['Cosmos'] - 1] =
-                  !this.filters[filterMap['Cosmos'] - 1];
-              }}
-            />
-            <CWButton
-              label="Substrate"
-              className="filter-button"
-              buttonType={
-                this.filters[filterMap['Substrate'] - 1]
-                  ? 'primary'
-                  : 'secondary'
-              }
-              onclick={() => {
-                this.filters[filterMap['Substrate'] - 1] =
-                  !this.filters[filterMap['Substrate'] - 1];
-              }}
-            />
-            <CWButton
-              label="Ethereum"
-              className="filter-button"
-              buttonType={
-                this.filters[filterMap['Ethereum'] - 1]
-                  ? 'primary'
-                  : 'secondary'
-              }
-              onclick={() => {
-                this.filters[filterMap['Ethereum'] - 1] =
-                  !this.filters[filterMap['Ethereum'] - 1];
-              }}
-            />
+            {this.chainCategories.map((cat) => {
+              return (
+                <CWButton
+                  label={cat}
+                  className="filter-button"
+                  buttonType={this.filterMap[cat] ? 'primary' : 'secondary'}
+                  onclick={() => {
+                    this.filterMap[cat] = !this.filterMap[cat];
+                  }}
+                />
+              );
+            })}
+            {this.chainNetworks.map((network) => {
+              return (
+                <CWButton
+                  label={network}
+                  className="filter-button"
+                  buttonType={this.filterMap[network] ? 'primary' : 'secondary'}
+                  onclick={() => {
+                    this.filterMap[network] = !this.filterMap[network];
+                  }}
+                />
+              );
+            })}
+            {this.chainBases.map((base) => {
+              return (
+                <CWButton
+                  label={base}
+                  className="filter-button"
+                  buttonType={this.filterMap[base] ? 'primary' : 'secondary'}
+                  onclick={() => {
+                    this.filterMap[base] = !this.filterMap[base];
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
 

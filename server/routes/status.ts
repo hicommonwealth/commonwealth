@@ -23,6 +23,7 @@ const status = async (
       contractCategories,
       notificationCategories,
       chainCategories,
+      chainCategoryTypes,
     ] = await Promise.all([
       models.Chain.findAll({
         where: { active: true },
@@ -44,6 +45,7 @@ const status = async (
       models.ContractCategory.findAll(),
       models.NotificationCategory.findAll(),
       models.ChainCategory.findAll(),
+      models.ChainCategoryType.findAll(),
     ]);
 
     const thirtyDaysAgo = new Date(
@@ -77,6 +79,7 @@ const status = async (
         contractCategories,
         notificationCategories,
         chainCategories,
+        chainCategoryTypes,
         recentThreads: threadCount,
         loggedIn: false,
       });
@@ -200,6 +203,7 @@ const status = async (
       contractCategories,
       notificationCategories,
       chainCategories,
+      chainCategoryTypes,
       recentThreads: threadCount,
       roles,
       invites,

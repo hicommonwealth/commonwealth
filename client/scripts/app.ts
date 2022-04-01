@@ -80,6 +80,7 @@ export async function initAppState(
         );
         app.config.invites = data.invites;
         app.config.chainCategories = data.chainCategories;
+        app.config.chainCategoryTypes = data.chainCategoryTypes;
 
         // add recentActivity
         const { recentThreads } = data;

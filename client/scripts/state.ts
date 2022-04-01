@@ -19,6 +19,7 @@ import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
 import { ChainCategoryAttributes } from 'server/models/chain_category';
+import { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -74,6 +75,7 @@ export interface IApp {
     defaultChain: string;
     invites: InviteCodeAttributes[];
     chainCategories?: ChainCategoryAttributes[];
+    chainCategoryTypes?: ChainCategoryTypeAttributes[];
   };
   loginStatusLoaded(): boolean;
   isLoggedIn(): boolean;
