@@ -1301,6 +1301,7 @@ const ViewProposalPage: m.Component<
     }
     const showLinkedSnapshotOptions =
       (proposal as OffchainThread).snapshotProposal?.length > 0 ||
+      (proposal as OffchainThread).chainEntities?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
     const showLinkedThreadOptions =
