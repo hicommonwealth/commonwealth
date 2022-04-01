@@ -20,9 +20,7 @@ module.exports = {
     await queryInterface.createTable("ChainCategories", {
       id: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
       chain_id: { type: Sequelize.STRING, allowNull: false, references: { model: "Chains", key: "id" }},
-      category_type_id: {
-        type: Sequelize.INTEGER, allowNull: false, references: { model: "ChainCategoryTypes", key: "id" }
-      }
+      category_type_id: { type: Sequelize.INTEGER, allowNull: false }
     }, { transaction: t });
 
     const chainCategories = [

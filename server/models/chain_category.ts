@@ -41,7 +41,7 @@ export default (
 
   ChainCategory.associate = (models) => {
     models.ChainCategory.belongsTo(models.Chain)
-    models.ChainCategory.hasOne(models.ChainCategoryType);
+    models.ChainCategory.belongsTo(models.ChainCategoryType);
   };
 
   return ChainCategory;
