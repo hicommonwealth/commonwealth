@@ -405,7 +405,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
                 </div>
               ) : isEmpty ? null : (
                 <div class="infinite-scroll-spinner-wrap">
-                  <Spinner active={!this.postsDepleted[subpage]} size="lg" />
+                  <Spinner active={!this.postsDepleted[subpage] && !onSummaryView} size="lg" />
                 </div>
               )}
             </div>
