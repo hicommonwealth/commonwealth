@@ -96,6 +96,19 @@ button,
   }
 }
 
+.cui-tabs-item {
+  color: $neutral-400;
+}
+
+.cui-tabs-item.cui-active {
+  color: $neutral-500;
+  border-color: $neutral-500;
+}
+
+.cui-tabs-item:hover {
+  color: $neutral-600;
+}
+
 // button color fixes
 .cui-button {
   background: $white;
@@ -123,30 +136,34 @@ button,
     &.cui-active {
       border-color: $neutral-600;
     }
+
+    &.cui-disabled {
+      border: none;
+    }
   }
 
   // adjust sublabel colors to grey from blue grey
   .cui-button-sublabel {
-    color: $neutral-400;
+    color: $black;
   }
 
   &.cui-basic .cui-button-sublabel,
   &.cui-outlined .cui-button-sublabel {
-    color: $neutral-400;
+    color: $black;
   }
 
   // adjust basic button styles
   &.cui-basic,
   .cui-button-group.cui-basic & {
     &:hover {
-      background: $neutral-200;
-      color: $neutral-600;
+      background: $neutral-100;
+      color: $black;
     }
 
     &:active,
     &.cui-active {
-      background: $neutral-300;
-      color: $neutral-600;
+      background: $neutral-100;
+      color: $black;
     }
   }
 }
@@ -154,9 +171,48 @@ button,
 // set text color on active buttons
 .cui-button.cui-primary,
 .cui-button-group.cui-primary .cui-button {
+  background: $purple-300;
+  border: $purple-300;
+
+  &:hover {
+    background: $purple-400;
+    border: $purple-400;
+  }
+
   a {
     color: $white;
   }
+}
+
+.cui-button.cui-negative,
+.cui-button-group.cui-negative .cui-button {
+  background: $rorange-300;
+  border-color: $rorange-300;
+
+  &:hover {
+    background: $rorange-400;
+    border-color: $rorange-400;
+  }
+
+  a {
+    color: $white;
+  }
+}
+
+.cui-button.cui-warning,
+.cui-button-group.cui-warning .cui-button {
+  background: $rorange-300;
+  border-color: $rorange-300;
+}
+
+.cui-button.cui-positive,
+.cui-button-group.cui-positive .cui-button {
+  background: $green-300;
+  border-color: $green-300;
+}
+
+.cui-radio input:checked ~ .cui-control-indicator:after {
+  background: $purple-300;
 }
 
 // set z-index

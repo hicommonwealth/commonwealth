@@ -81,7 +81,7 @@ $text-size-mobile-header: 22px;
     .stats-box-stat {
       color: $neutral-500;
       display: inline-block;
-      margin: 6px 0 0;
+      margin: 8px 0;
 
       &::after {
         content: ' ';
@@ -178,7 +178,6 @@ $text-size-mobile-header: 22px;
     border-top: 0;
     border-left: 0;
     border-right: 0;
-    border-image: linear-gradient(to right, #6086d1, #b37dba) 1;
   }
 }
 

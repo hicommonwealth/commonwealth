@@ -61,6 +61,14 @@
       color: $neutral-500;
     }
 
+    &.background {
+      background-color: $purple-50;
+    }
+
+    &.no-background {
+      background-color: none;
+    }
+
     .no-carat {
       width: 22px;
     }

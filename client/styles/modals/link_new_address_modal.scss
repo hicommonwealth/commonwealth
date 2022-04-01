@@ -260,7 +260,7 @@
     }
 
     &:hover {
-      background: $primary-400;
+      background: $neutral-200;
     }
     &:first-child {
       border-top-right-radius: 6px;
@@ -276,7 +276,7 @@
     background: $primary-300;
 
     &:hover {
-      background: $primary-200;
+      background: $neutral-200;
     }
   }
 
@@ -292,7 +292,7 @@
       border: 1px solid $neutral-300;
       border-bottom: none;
       &:hover {
-        background: $primary-400;
+        background: $neutral-200;
       }
       &:first-child {
         border-top-right-radius: 6px;

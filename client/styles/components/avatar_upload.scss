@@ -8,7 +8,7 @@
   justify-content: center;
   align-items: center;
   background-color: $white;
-  border: 1px solid $primary-300;
+  border: 1px solid $neutral-300;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
   > .User,
   .ChainIcon,
@@ -34,7 +34,7 @@
     align-items: center;
     height: 24px;
     width: 24px;
-    background-color: lightgray;
+    background-color: $neutral-50;
     clip-path: circle(12px at center);
     -webkit-clip-path: circle(12px at center);
     color: inherit;

@@ -71,7 +71,10 @@ $discussion-title-font-size: 1.45rem;
         margin-right: 10%;
         padding: 6px;
         cursor: pointer;
+
         &:hover {
+          border: 1px solid $purple-400;
+
           .cui-icon,
           .reply-count,
           .reactions-count {
@@ -448,7 +451,7 @@ $discussion-title-font-size: 1.45rem;
   .ProposalSidebarPollEditorModule,
   .ProposalLinkedThreadsEditorModule {
     border-radius: 10px;
-    border: 1px solid $neutral-50;
+    border: 1px solid $neutral-100;
     padding: 22px 18px 21px;
     margin-bottom: 24px;
   }
@@ -456,9 +459,6 @@ $discussion-title-font-size: 1.45rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    a.linked-thread {
-      color: $neutral-500;
-    }
     .cui-list-item {
       &:first-child {
         padding-top: 0 !important;

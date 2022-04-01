@@ -206,7 +206,11 @@
   button.cui-button.cui-fluid {
     width: fit-content;
     border-radius: 6px;
-    background-image: linear-gradient(to bottom left, #6086d1, #b37dba);
+    background-color: $purple-300;
+
+    &:hover {
+      background-color: $purple-400;
+    }
 
     span {
       padding-right: 0px;
@@ -424,7 +428,12 @@
       button.cui-button.cui-fluid {
         width: fit-content;
         border-radius: 6px;
-        background-image: linear-gradient(to bottom left, #6086d1, #b37dba);
+        background-color: $purple-300;
+
+        &:hover {
+          background-color: $purple-400;
+        }
+
         span {
           padding-right: 0px;
         }
