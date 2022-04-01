@@ -27,6 +27,7 @@ export const iconLookup = {
   send: Icons.CWSend,
   share: Icons.CWShare,
   telegram: Icons.CWTelegram,
+  thumbs: Icons.CWThumbs,
   views: Icons.CWViews,
   website: Icons.CWWebsite,
   x: Icons.CWX,

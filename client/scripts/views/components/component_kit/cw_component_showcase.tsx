@@ -13,6 +13,7 @@ import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
+import { iconLookup } from './cw_icons/cw_icon_lookup';
 
 const displayColors = (hexList) => {
   return Object.entries(hexList).map(([k, v]) => {
@@ -31,6 +32,17 @@ const displayGradients = (gradientNames: string[]) => {
       <div class="color-row">
         {gradient}
         <div class={`color ${gradient}`} />
+      </div>
+    );
+  });
+};
+
+const displayIcons = (icons) => {
+  return Object.entries(icons).map(([k, v]) => {
+    return (
+      <div class="icon-container">
+        <div class="icon-name">{k}</div>
+        <CWIcon iconName={k} />
       </div>
     );
   });
@@ -83,13 +95,14 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <h1>Icons</h1>
         <div class="icon-gallery">
+          <div class="all-icons-container">{displayIcons(iconLookup)}</div>
           <div class="icon-row">
             Small
             <CWIcon iconName="views" iconSize="small" />
           </div>
           <div class="icon-row">
             Medium
-            <CWIcon iconName="pencil" />
+            <CWIcon iconName="views" />
           </div>
           <div class="icon-row">
             Large

@@ -667,6 +667,29 @@ export const CWTelegram: m.Component<IconAttrs> = {
   },
 };
 
+export const CWThumbs: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10.692 3.301c.11-1.343-1.736-1.82-2.29-.592l-1.9 4.212a1.99 1.99 0 00-1.033-.287H4a2 2 0 00-2 2v6a2 2 0 002 2h1.47c.7 0 1.316-.36 1.673-.905l1.858.879c.334.158.7.24 1.069.24h2.963a2.5 2.5 0 002.49-2.287l.515-6.024a2 2 0 00-1.992-2.17h-3.608l.254-3.066zM5.469 8.634H4v6h1.47v-6zM23.644 29.14c-.554 1.229-2.4.75-2.29-.592l.253-3.065H18a2 2 0 01-1.993-2.17l.515-6.025A2.5 2.5 0 0119.012 15h2.964c.37 0 .735.082 1.069.24l1.857.879a1.998 1.998 0 011.674-.905h1.47a2 2 0 012 2v6a2 2 0 01-2 2h-1.47a1.99 1.99 0 01-1.032-.287l-1.9 4.212zm2.932-5.925h1.47v-6h-1.47v6z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
 export const CWViews: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
