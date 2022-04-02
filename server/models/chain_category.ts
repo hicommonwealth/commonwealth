@@ -29,7 +29,7 @@ export default (
       },
       category_type_id: {
         type: dataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
     },
     {
@@ -40,8 +40,10 @@ export default (
   );
 
   ChainCategory.associate = (models) => {
-    models.ChainCategory.belongsTo(models.Chain)
-    models.ChainCategory.belongsTo(models.ChainCategoryType);
+    models.ChainCategory.belongsTo(models.Chain);
+    models.ChainCategory.belongsTo(models.ChainCategoryType, {
+      foreignKey: 'category_type_id',
+    });
   };
 
   return ChainCategory;

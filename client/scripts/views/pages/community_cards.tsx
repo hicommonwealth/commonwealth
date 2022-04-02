@@ -90,21 +90,26 @@ const filterMap = {
 };
 
 class HomepageCommunityCards implements m.ClassComponent {
-  private filters: Array<boolean>;
   private chainCategories: Array<string>;
   private chainNetworks: Array<string>;
   private chainBases: Array<string>;
   private filterMap: { [val: string]: boolean };
-  private categoryMap: { [chain: string]: number[] };
+  private chainToCategoriesMap: { [chain: string]: string[] };
+  private myChains: Array<NodeInfo | string | any>;
   oninit() {
-    this.filters = [false, false, false, false, false, false];
+    const chainsAndCategories = app.config.chainCategories;
+    const categoryTypes = app.config.chainCategoryTypes;
+
     this.filterMap = {};
-    this.chainCategories = Object.keys(ChainCategoryType);
+    this.chainCategories = categoryTypes.map(
+      (category) => category.category_name
+    );
     this.chainBases = Object.keys(ChainBase);
     this.chainNetworks = Object.keys(ChainNetwork).filter(
       (val) => val === 'ERC20'
     ); // We only are allowing ERC20 for now
 
+    // Load Filter Map
     for (const cat of this.chainCategories) {
       this.filterMap[cat] = false;
     }
@@ -116,21 +121,25 @@ class HomepageCommunityCards implements m.ClassComponent {
     }
 
     // Handle mapping provided by ChainCategories table
-
-    const categories = app.config.chainCategories;
-    const categoryTypes = app.config.chainCategoryTypes;
-    console.log(categoryTypes);
     let categoryMap = {};
-    for (const data of categories) {
-      if (categoryMap[data.chain_id]) {
-        categoryMap[data.chain_id].push(data);
+    for (const data of categoryTypes) {
+      categoryMap[data.id] = data.category_name;
+    }
+    let chainToCategoriesMap = {};
+    for (const data of chainsAndCategories) {
+      if (chainToCategoriesMap[data.chain_id]) {
+        chainToCategoriesMap[data.chain_id].push(
+          categoryMap[data.category_type_id]
+        );
       } else {
-        categoryMap[data.chain_id] = [data.category_type_id];
+        chainToCategoriesMap[data.chain_id] = [
+          categoryMap[data.category_type_id],
+        ];
       }
     }
-    this.categoryMap = categoryMap;
-  }
-  view() {
+    this.chainToCategoriesMap = chainToCategoriesMap;
+
+    // Load Chains
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
       if (chains[n.chain.id]) {
@@ -139,39 +148,85 @@ class HomepageCommunityCards implements m.ClassComponent {
         chains[n.chain.id] = [n];
       }
     });
+    this.myChains = Object.entries(chains);
+  }
+  view() {
+    const chainBaseFilter = (list, filterMap) => {
+      return list.filter((data) => {
+        const chainBase =
+          Object.keys(ChainBase)[
+            Object.values(ChainBase).indexOf(data[1][0].chain.base)
+          ]; // Converts chain.base into a ChainBase key to match our filterMap keys
 
-    const myChains: any = Object.entries(chains);
+        return filterMap[chainBase];
+      });
+    };
 
-    const sortChains = (list, filters) => {
-      let filteredList = list;
+    const chainNetworkFilter = (list, filterMap) => {
+      return list.filter((data) => {
+        const chainNetwork =
+          Object.keys(ChainNetwork)[
+            Object.values(ChainNetwork).indexOf(data[1][0].chain.network)
+          ]; // Converts chain.base into a ChainBase key to match our filterMap keys
 
-      // Filter via on-page filters
-      // 1. filter via chainCategory, 2 filter via chainNetwork, 3 filter via chainBase. All using the filterMap
+        if (this.chainNetworks.includes(chainNetwork)) {
+          return filterMap[chainNetwork];
+        } else {
+          return false;
+        }
+      });
+    };
 
-      if (Object.values(this.filterMap).includes(true)) {
-        // Filter for ChainCategory
-
-        console.log(this.filterMap);
-      }
-      if (filters.includes(true)) {
-        let appliedFilters = [];
-        for (let i = 0; i < filters.length; i++) {
-          if (filters[i]) {
-            appliedFilters.push(i + 1);
+    const chainCategoryFilter = (list, filterMap) => {
+      return list.filter((data) => {
+        for (const cat of this.chainCategories) {
+          if (
+            this.filterMap[cat] &&
+            (!this.chainToCategoriesMap[data[0]] ||
+              !this.chainToCategoriesMap[data[0]].includes(cat))
+          ) {
+            return false;
           }
         }
+        return true;
+      });
+    };
 
-        filteredList = filteredList.filter((data) => {
-          for (const filter of appliedFilters) {
-            if (
-              !this.categoryMap[data[0]] ||
-              !this.categoryMap[data[0]].includes(filter)
-            ) {
-              return false;
-            }
-          }
-          return true;
-        });
+    const sortChains = (list, filterMap) => {
+      let filteredList = list;
+
+      if (Object.values(filterMap).includes(true)) {
+        // Handle Overlaps
+        if (this.chainBases.filter((val) => filterMap[val]).length > 1) {
+          filteredList = [];
+        }
+        if (this.chainNetworks.filter((val) => filterMap[val]).length > 1) {
+          filteredList = [];
+        }
+
+        // Filter for ChainBase
+        const chainBaseFilterOn =
+          this.chainBases.filter((base) => filterMap[base]).length > 0;
+
+        if (chainBaseFilterOn) {
+          filteredList = chainBaseFilter(filteredList, filterMap);
+        }
+
+        // Filter for ChainNetwork
+        const chainNetworkFilterOn =
+          this.chainNetworks.filter((network) => filterMap[network]).length > 0;
+
+        if (chainNetworkFilterOn) {
+          filteredList = chainNetworkFilter(filteredList, filterMap);
+        }
+
+        // Filter for ChainCategory
+        const chainCategoryFilterOn =
+          this.chainCategories.filter((cat) => filterMap[cat]).length > 0;
+
+        if (chainCategoryFilterOn) {
+          filteredList = chainCategoryFilter(filteredList, filterMap);
+        }
       }
       // Filter by recent thread activity
       const res = filteredList
@@ -184,9 +239,9 @@ class HomepageCommunityCards implements m.ClassComponent {
           );
           return threadCountB - threadCountA;
         })
-        .map((entity) => {
+        .map((entity: Array<NodeInfo | string>) => {
           if (Array.isArray(entity)) {
-            const [chain, nodeList]: [string, any] = entity as any;
+            const [chain, nodeList]: [string, NodeInfo] = entity as any;
             return m(ChainCard, { chain, nodeList });
           }
           return null;
@@ -195,12 +250,14 @@ class HomepageCommunityCards implements m.ClassComponent {
     };
 
     const sortedChains = sortChains(
-      myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage),
-      this.filters
+      this.myChains.filter(
+        (c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage
+      ),
+      this.filterMap
     );
     const betaChains = sortChains(
-      myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage),
-      this.filters
+      this.myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage),
+      this.filterMap
     );
 
     const totalCommunitiesString = buildCommunityString(
@@ -250,7 +307,6 @@ class HomepageCommunityCards implements m.ClassComponent {
             })}
           </div>
         </div>
-
         <div class="communities-list">{sortedChains}</div>
         <div class="communities-header">
           {betaChains.length > 0 && <h4>Testnets & Alpha Networks</h4>}
