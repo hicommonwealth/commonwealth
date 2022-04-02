@@ -6,11 +6,11 @@ import numeral from 'numeral';
 import 'pages/landing/community_cards.scss';
 
 import app from 'state';
-import { ChainInfo, NodeInfo } from 'models';
+import { NodeInfo } from 'models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCard } from '../components/component_kit/cw_card';
 import Sublayout from '../sublayout';
-import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
+import { ChainBase, ChainNetwork } from 'types';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -78,17 +78,6 @@ class ChainCard implements m.ClassComponent<ChainCardAttrs> {
     );
   }
 }
-
-// Corresponds to 'ChainCategoryTypes' id numbering (which currently only includes DeFi and DAO)
-const filterMap = {
-  DeFi: 1,
-  DAO: 2,
-  ERC20: 3,
-  Cosmos: 4,
-  Substrate: 5,
-  Ethereum: 6,
-};
-
 class HomepageCommunityCards implements m.ClassComponent {
   private chainCategories: Array<string>;
   private chainNetworks: Array<string>;
