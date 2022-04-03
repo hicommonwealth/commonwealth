@@ -15,7 +15,7 @@ const getSupportedEthChains = async (
   if (req.query.chain_id) {
     const chainId = +req.query.chain_id;
     try {
-      const supportedChainUrls = await getUrlsForEthChainId(models, chainId);
+      const supportedChainUrls = await getUrlsForEthChainId(models, chainId, false);
       return res.json({ status: 'Success', result: { [chainId]: supportedChainUrls } });
     } catch (e) {
       return res.json({ status: 'Failure', message: e.message });

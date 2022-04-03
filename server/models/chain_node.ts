@@ -12,6 +12,7 @@ export type ChainNodeAttributes = {
   ce_verbose?: boolean;
   eth_chain_id?: number;
   alt_wallet_url?: string;
+  private_url?: string;
 
   // associations
   Chain?: ChainAttributes;
@@ -39,13 +40,24 @@ export default (
       ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
       alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
+      private_url: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'ChainNodes',
       timestamps: false,
       underscored: true,
       indexes: [{ fields: ['chain'] }],
-    }
+      defaultScope: {
+        attributes: {
+          exclude: [
+            'private_url'
+          ],
+        }
+      },
+      scopes: {
+        withPrivateData: {}
+      }
+    },
   );
 
   ChainNode.associate = (models) => {
