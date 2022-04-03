@@ -47,7 +47,14 @@ export default (
       timestamps: false,
       underscored: true,
       indexes: [{ fields: ['chain'] }],
-    }
+      defaultScope: {
+        attributes: {
+          exclude: [
+            'private_url'
+          ],
+        }
+      },
+    },
   );
 
   ChainNode.associate = (models) => {

@@ -33,15 +33,20 @@ export async function getSupportedEthChainIds(models: DB): Promise<{
   return results;
 }
 
-export async function getUrlsForEthChainId(models: DB, chainId: number): Promise<
+export async function getUrlsForEthChainId(models: DB, chainId: number, includePrivateUrl = true): Promise<
   { url: string, alt_wallet_url: string, private_url?: string } | null
 > {
   const chainIds = await getSupportedEthChainIds(models);
   const chain = chainIds[chainId];
-  const nodeInstance = await models.ChainNode.findOne({ where: {
-    eth_chain_id: chainId,
-    url: chain.url,
-    alt_wallet_url: chain.alt_wallet_url,
-  }});
+  if (!includePrivateUrl) {
+    return chain;
+  }
+  const nodeInstance = await models.ChainNode.scope('withPrivateData').findOne({
+    where: {
+      eth_chain_id: chainId,
+      url: chain.url,
+      alt_wallet_url: chain.alt_wallet_url,
+    },
+  });
   return { ...chain, private_url: nodeInstance.private_url };
 }
