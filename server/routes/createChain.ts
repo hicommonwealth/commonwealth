@@ -266,8 +266,10 @@ const createChain = async (
     alt_wallet_url: altWalletUrl,
     private_url: privateUrl,
   });
+  const nodeJSON = node.toJSON();
+  delete nodeJSON.private_url;
 
-  return success(res, { chain: chain.toJSON(), node: node.toJSON() });
+  return success(res, { chain: chain.toJSON(), node: nodeJSON });
 };
 
 export default createChain;
