@@ -72,10 +72,6 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     topic.default_offchain_template = default_offchain_template || '';
     await topic.save();
 
-    if (featured_order) {
-      // TODO: May require a specialized /updateTopicOrder route
-    }
-
     return res.json({ status: 'Success', result: topic.toJSON() });
   } catch (e) {
     return next(e);
