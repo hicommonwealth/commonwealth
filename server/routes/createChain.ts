@@ -100,6 +100,7 @@ const createChain = async (
   let eth_chain_id: number = null;
   let url = req.body.node_url;
   let altWalletUrl = req.body.alt_wallet_url;
+  let privateUrl;
 
   // always generate a chain id
   if (req.body.base === ChainBase.Ethereum) {
@@ -118,10 +119,13 @@ const createChain = async (
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
     const urls = await getUrlsForEthChainId(models, eth_chain_id);
     if (urls) {
-      const { url: ethChainUrl, alt_wallet_url } = urls;
+      const { url: ethChainUrl, alt_wallet_url, private_url } = urls;
       url = ethChainUrl;
       if (alt_wallet_url) {
         altWalletUrl = alt_wallet_url;
+      }
+      if (private_url) {
+        privateUrl = private_url;
       }
     } else {
       // If using overridden URL, then user must be admin -- we do not allow users to submit
@@ -141,7 +145,8 @@ const createChain = async (
       return next(new Error(Errors.ChainAddressExists));
     }
 
-    const provider = new Web3.providers.WebsocketProvider(url);
+    console.log(privateUrl, url);
+    const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
     provider.disconnect(1000, 'finished');
@@ -260,6 +265,7 @@ const createChain = async (
     eth_chain_id,
     token_name,
     alt_wallet_url: altWalletUrl,
+    private_url: privateUrl,
   });
 
   return success(res, { chain: chain.toJSON(), node: node.toJSON() });
