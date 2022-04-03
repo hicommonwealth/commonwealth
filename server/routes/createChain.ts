@@ -145,7 +145,6 @@ const createChain = async (
       return next(new Error(Errors.ChainAddressExists));
     }
 
-    console.log(privateUrl, url);
     const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
