@@ -54,6 +54,9 @@ export default (
           ],
         }
       },
+      scopes: {
+        withPrivateData: {}
+      }
     },
   );
 
