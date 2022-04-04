@@ -175,7 +175,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       if (!urls) {
         throw new Error(`unsupported eth chain id ${chainId}`);
       }
-      const url = urls.url;
+      const url = urls.private_url || urls.url;
       try {
         balance = await this._balanceProvider.getEthTokenBalance(url, contractAddress, address);
       } catch (e) {
