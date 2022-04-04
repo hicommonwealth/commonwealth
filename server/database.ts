@@ -89,7 +89,9 @@ import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
-import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
+import NotificationsReadFactory, {
+  NotificationsReadModelStatic,
+} from './models/notifications_read';
 import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
 
 export type Models = {

@@ -93,7 +93,8 @@ import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
 import createTopic from './routes/createTopic';
-import updateTopics from './routes/updateTopics';
+import updateTopic from './routes/updateTopic';
+import orderTopics from './routes/orderTopics';
 import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
@@ -353,9 +354,14 @@ function setupRouter(
     createTopic.bind(this, models)
   );
   router.post(
-    '/updateTopics',
+    '/updateTopic',
     passport.authenticate('jwt', { session: false }),
-    updateTopics.bind(this, models)
+    updateTopic.bind(this, models)
+  );
+  router.post(
+    '/orderTopics',
+    passport.authenticate('jwt', { session: false }),
+    orderTopics.bind(this, models)
   );
   router.post(
     '/editTopic',
