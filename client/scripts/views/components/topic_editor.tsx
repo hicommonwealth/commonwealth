@@ -20,17 +20,8 @@ class TopicWindow implements m.ClassComponent<TopicWindowAttrs> {
   }
 
   view(vnode) {
-    const activeMeta = app.chain.meta.chain;
-
-    const featuredTopics = activeMeta.featuredTopics.map((t) => {
-      return app.topics
-        .getByCommunity(app.activeChainId())
-        .find((t_) => Number(t) === t_.id);
-    });
-
     return (
       <TopicSelector
-        featuredTopics={featuredTopics}
         defaultTopic={this.activeTopic}
         topics={app.topics.getByCommunity(app.activeChainId())}
         updateFormData={(topicName, topicId?) => {
