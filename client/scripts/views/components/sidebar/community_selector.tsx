@@ -34,11 +34,7 @@ const renderCommunity = (item) => {
             onclick={async (e) => {
               e.preventDefault();
               e.stopPropagation();
-              await app.communities.setStarred(
-                item.id,
-                null,
-                !app.communities.isStarred(item.id, null)
-              );
+              await app.communities.setStarred(item.id);
               m.redraw();
             }}
           >
@@ -84,7 +80,6 @@ const homeButton = (
 export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
   view(vnode) {
     const { isMobile } = vnode.attrs;
-    const activeEntityName = app.chain?.meta.chain.name;
     const allCommunities = app.config.chains
       .getAll()
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -110,82 +105,8 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
     );
     const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
 
-    const renderCommunity = (item) => {
-      const roles: RoleInfo[] = [];
-      if (item instanceof ChainInfo) {
-        roles.push(...app.user.getAllRolesInCommunity({ chain: item.id }));
-      }
-
-      return item instanceof ChainInfo ? (
-        <ListItem
-          class={app.communities.isStarred(item.id) ? 'starred' : ''}
-          label={<CommunityLabel chain={item} />}
-          selected={app.activeChainId() === item.id}
-          onclick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            m.route.set(item.id ? `/${item.id}` : '/');
-          }}
-          contentRight={
-            app.isLoggedIn() &&
-            roles.length > 0 && (
-              <div
-                class="community-star-toggle"
-                onclick={async (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  await app.communities.setStarred(item.id);
-                  m.redraw();
-                }}
-              >
-                {roles.map((role) => {
-                  return m(User, {
-                    avatarSize: 18,
-                    avatarOnly: true,
-                    user: new AddressInfo(
-                      null,
-                      role.address,
-                      role.address_chain,
-                      null
-                    ),
-                  });
-                })}
-                <div class="star-icon">
-                  <Icon name={Icons.STAR} key={item.id} />
-                </div>
-              </div>
-            )
-          }
-        />
-      ) : m.route.get() !== '/' ? (
-        <ListItem
-          class="select-list-back-home"
-          label="« Back home"
-          onclick={() => {
-            m.route.set(item.id ? `/${item.id}` : '/');
-          }}
-        />
-      ) : null;
-    };
-
-    return showListOnly ? (
-      <div class="CommunitySelectList">
-        {showHomeButtonAtTop && (
-          <a
-            class="home-button"
-            href="/"
-            onclick={() => {
-              m.route.set('/');
-            }}
-          >
-            <img
-              class="mobile-logo"
-              src="https://commonwealth.im/static/img/logo.png"
-              style="height:18px;width:18px;background:black;border-radius:50%;"
-            />
-            <span>Home</span>
-          </a>
-        )}
+    const communityList = (
+      <>
         {app.isLoggedIn() && (
           <>
             <h4>Your communities</h4>
