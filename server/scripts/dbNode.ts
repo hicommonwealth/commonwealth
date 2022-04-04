@@ -122,7 +122,7 @@ async function mainProcess(
     );
 
   let query =
-    'SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network", "ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
+    'SELECT "Chains"."id", "substrate_spec", "url", "private_url", "address", "base", "type", "network", "ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
   const allChains = (await pool.query(query)).rows;
 
   // gets the chains specific to this node
@@ -294,7 +294,7 @@ async function mainProcess(
         listeners[chain.id] = await createListener(chain.id, network, {
           address: chain.address,
           archival: false,
-          url: chain.url,
+          url: chain.private_url || chain.url,
           spec: chain.substrate_spec,
           skipCatchup: false,
           verbose: false, // using this will print event before chain is added to it
