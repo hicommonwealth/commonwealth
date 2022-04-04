@@ -10,7 +10,7 @@ import { NodeInfo } from 'models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCard } from '../components/component_kit/cw_card';
 import Sublayout from '../sublayout';
-import { ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -78,6 +78,31 @@ class ChainCard implements m.ClassComponent<ChainCardAttrs> {
     );
   }
 }
+
+export const buildChainToCategoriesMap = (
+  categoryTypes,
+  chainsAndCategories
+) => {
+  // Handle mapping provided by ChainCategories table
+  let categoryMap = {};
+  for (const data of categoryTypes) {
+    categoryMap[data.id] = data.category_name;
+  }
+  let chainToCategoriesMap: { [chain: string]: ChainCategoryType[] } = {};
+  for (const data of chainsAndCategories) {
+    if (chainToCategoriesMap[data.chain_id]) {
+      chainToCategoriesMap[data.chain_id].push(
+        categoryMap[data.category_type_id]
+      );
+    } else {
+      chainToCategoriesMap[data.chain_id] = [
+        categoryMap[data.category_type_id],
+      ];
+    }
+  }
+
+  return chainToCategoriesMap;
+};
 class HomepageCommunityCards implements m.ClassComponent {
   private chainCategories: Array<string>;
   private chainNetworks: Array<string>;
@@ -110,23 +135,10 @@ class HomepageCommunityCards implements m.ClassComponent {
     }
 
     // Handle mapping provided by ChainCategories table
-    let categoryMap = {};
-    for (const data of categoryTypes) {
-      categoryMap[data.id] = data.category_name;
-    }
-    let chainToCategoriesMap = {};
-    for (const data of chainsAndCategories) {
-      if (chainToCategoriesMap[data.chain_id]) {
-        chainToCategoriesMap[data.chain_id].push(
-          categoryMap[data.category_type_id]
-        );
-      } else {
-        chainToCategoriesMap[data.chain_id] = [
-          categoryMap[data.category_type_id],
-        ];
-      }
-    }
-    this.chainToCategoriesMap = chainToCategoriesMap;
+    this.chainToCategoriesMap = buildChainToCategoriesMap(
+      categoryTypes,
+      chainsAndCategories
+    );
 
     // Load Chains
     const chains = {};
