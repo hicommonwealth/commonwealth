@@ -3,7 +3,11 @@
 import m from 'mithril';
 import 'components/component_kit/cw_component_showcase.scss';
 
-import { notifySuccess } from 'controllers/app/notifications';
+import {
+  notifyError,
+  notifyInfo,
+  notifySuccess,
+} from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWGradientButton } from './cw_gradient_button';
 import { CWButtonGroup } from './cw_button_group';
@@ -117,7 +121,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="button-gallery">
           <CWButton
             label="Primary"
-            onclick={() => notifySuccess('Button clicked!')}
+            onclick={() => notifyError('Button clicked!')}
           />
           <CWButton
             label="Disabled"
@@ -127,7 +131,7 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWButton
             label="Secondary"
             buttonType="secondary"
-            onclick={() => notifySuccess('Button clicked!')}
+            onclick={() => notifyInfo('Button clicked!')}
           />
           <CWButton
             label="Secondary"

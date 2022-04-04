@@ -1,3 +1,5 @@
+/* @jsx m */
+
 import m from 'mithril';
 import { Toast, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
 import { uuidv4 } from 'lib/util';
@@ -19,48 +21,56 @@ export class ToastStore {
 
   public createSuccess(message) {
     const key = uuidv4();
-    const toast = m(Toast, {
-      key,
-      message,
-      onDismiss: this.remove.bind(this, key),
-      timeout,
-      icon: Icons.CHECK_CIRCLE,
-      intent: Intent.POSITIVE,
-      size: Size.DEFAULT,
-      position: ToasterPosition.BOTTOM,
-    });
+    const toast = (
+      <Toast
+        key={key}
+        message={message}
+        onDismiss={this.remove.bind(this, key)}
+        timeout={timeout}
+        icon={Icons.CHECK_CIRCLE}
+        intent={Intent.POSITIVE}
+        size={Size.DEFAULT}
+        position={ToasterPosition.BOTTOM}
+      />
+    );
     toast['_message'] = message;
     this._toasts.push(toast);
     m.redraw();
   }
+
   public createError(message) {
     const key = uuidv4();
-    const toast = m(Toast, {
-      key,
-      message,
-      onDismiss: this.remove.bind(this, key),
-      timeout,
-      icon: Icons.ALERT_TRIANGLE,
-      intent: Intent.NEGATIVE,
-      size: Size.DEFAULT,
-      position: ToasterPosition.BOTTOM,
-    });
+    const toast = (
+      <Toast
+        key={key}
+        message={message}
+        onDismiss={this.remove.bind(this, key)}
+        timeout={timeout}
+        icon={Icons.ALERT_TRIANGLE}
+        intent={Intent.NEGATIVE}
+        size={Size.DEFAULT}
+        position={ToasterPosition.BOTTOM}
+      />
+    );
     toast['_message'] = message;
     this._toasts.push(toast);
     m.redraw();
   }
+
   public createInfo(message) {
     const key = uuidv4();
-    const toast = m(Toast, {
-      key,
-      message,
-      onDismiss: this.remove.bind(this, key),
-      timeout,
-      icon: Icons.INFO,
-      intent: Intent.NONE,
-      size: Size.DEFAULT,
-      position: ToasterPosition.BOTTOM,
-    });
+    const toast = (
+      <Toast
+        key={key}
+        message={message}
+        onDismiss={this.remove.bind(this, key)}
+        timeout={timeout}
+        icon={Icons.INFO}
+        intent={Intent.NONE}
+        size={Size.DEFAULT}
+        position={ToasterPosition.BOTTOM}
+      />
+    );
     toast['_message'] = message;
     this._toasts.push(toast);
     m.redraw();
