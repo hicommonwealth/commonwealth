@@ -5,17 +5,12 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import sleep from 'sleep-promise';
-import moment from 'moment';
-import { Errors as TopicErrors } from 'server/routes/editTopic';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
-const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownThread = require('../../util/fixtures/markdownThread');
 
 let adminJWT;
 let adminAddress;
@@ -122,7 +117,6 @@ describe('Topic Tests', () => {
       expect(userAddress).to.not.be.null;
       expect(userJWT).to.not.be.null;
 
-      console.log('creating thread');
       const res3 = await modelUtils.createThread({
         chainId: chain,
         address: adminAddress,

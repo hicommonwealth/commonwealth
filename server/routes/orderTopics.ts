@@ -10,6 +10,7 @@ enum OrderTopicsErrors {
   NoIds = 'Must supply ordered array of topic IDs',
   NoChain = 'Must supply a chain ID',
   NoPermission = `You do not have permission to order topics`,
+  InvalidTopic = 'Passed topics may not all be featured, or may include an invalid ID',
 }
 
 // TODO Graham 3/29/22: Add checks to ensure only featured tags are ordered
@@ -41,7 +42,12 @@ const OrderTopics = async (
     const topics: OffchainTopicInstance[] = await Promise.all(
       newTopicOrder.map((id: string, idx: number) => {
         return (async () => {
-          const topic = await models.OffchainTopic.findOne({ where: { id } });
+          const topic = await models.OffchainTopic.findOne({
+            where: { id, featured_in_sidebar: true },
+          });
+          if (!topic) {
+            throw new Error(OrderTopicsErrors.InvalidTopic);
+          }
           topic.order = idx + 1;
           await topic.save();
           return topic;
