@@ -7,13 +7,3 @@
     cursor: pointer;
   }
 }
-
-.FooterLandingPage {
-  &.sidebar {
-    margin-left: $sidebar-width;
-
-    @include sm-max {
-      margin-left: 0px;
-    }
-  }
-}

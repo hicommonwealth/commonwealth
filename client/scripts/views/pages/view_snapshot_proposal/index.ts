@@ -382,7 +382,7 @@ const ViewProposalPage: m.Component<
       },
       !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
         ? m(Spinner, { fill: true, active: true, size: 'xl' })
-        : [
+        : m('.view-proposal-container', [
             // eslint-disable-next-line no-restricted-globals
             m('.back-button', { onclick: () => m.route.set(scope) }, [
               m('img', {
@@ -543,7 +543,7 @@ const ViewProposalPage: m.Component<
                 ]),
               ]),
             ]),
-          ]
+          ])
     );
   },
 };

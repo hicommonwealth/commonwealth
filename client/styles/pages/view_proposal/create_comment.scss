@@ -3,10 +3,7 @@
 
 .CreateComment {
   display: flex;
-  padding-top: 40px;
-  &.new-thread-child {
-    margin-top: 30px;
-  }
+
   .create-comment-body {
     @include xs-max {
       margin: 0;
@@ -26,7 +23,6 @@
           border-radius: 8px;
           font-weight: 500;
           font-size: 18px;
-          line-height: 22px;
           text-transform: uppercase;
         }
         .cui-button[type='submit'] {

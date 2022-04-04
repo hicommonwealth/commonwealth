@@ -29,7 +29,7 @@ const getTokenForum = async (
   const urls = await getUrlsForEthChainId(models, chain_id);
   let url;
   if (urls) {
-    url = urls.url;
+    url = urls.private_url || urls.url;
   } else {
     url = req.query.url;
     if (!url) {

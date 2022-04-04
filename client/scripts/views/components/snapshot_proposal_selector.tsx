@@ -63,8 +63,12 @@ export class SnapshotProposalSelector
                 <ListItem
                   label={
                     <div class="chain-entity">
-                      <div class="chain-entity-text">{sn.title}</div>
-                      <div class="chain-entity-subtext">Hash: ${sn.id}</div>
+                      <div class="chain-entity-text" title={sn.title}>
+                        {sn.title}
+                      </div>
+                      <div class="chain-entity-subtext" title={sn.id}>
+                        Hash: ${sn.id}
+                      </div>
                     </div>
                   }
                   selected={selected}

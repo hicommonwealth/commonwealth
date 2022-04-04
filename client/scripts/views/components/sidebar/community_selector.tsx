@@ -8,7 +8,7 @@ import 'components/sidebar/community_selector.scss';
 import app from 'state';
 import { AddressInfo, ChainInfo, RoleInfo } from 'models';
 import User from '../widgets/user';
-import { CommunityLabel } from './community_selector';
+import { CommunityLabel } from '../community_label';
 
 type CommunitySelectorAttrs = {
   showTextLabel?: boolean;

@@ -51,7 +51,7 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
         trigger={
           <Button
             rounded={true}
-            compac={true}
+            compact={true}
             label={selectedTopic ? `Topic: ${topic}` : 'All Topics'}
             iconRight={Icons.CHEVRON_DOWN}
             size="sm"
@@ -113,16 +113,20 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
                       }}
                       label={
                         <div class="topic-item">
-                          {active && <Icon name={Icons.CHECK} />}
-                          <div class="topic-item-name">{name}</div>
+                          <div class="icon-and-item-name-container">
+                            {active && <Icon name={Icons.CHECK} />}
+                            <div class="topic-item-name" title={name}>
+                              {name}
+                            </div>
+                          </div>
                           {app.user?.isAdminOfEntity({
                             chain: app.activeChainId(),
                           }) && (
                             <Button
                               size="xs"
                               label="Edit"
+                              class="edit-button"
                               compact={true}
-                              rounded={true}
                               onclick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();

@@ -20,7 +20,7 @@ import {
 } from 'models';
 import User from 'views/components/widgets/user';
 import SelectAddressModal from '../modals/select_address_modal';
-import LoginModal from '../modals/login_modal';
+import { LoginModal } from '../modals/login_modal';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;

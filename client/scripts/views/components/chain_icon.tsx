@@ -79,7 +79,7 @@ export class TokenIcon implements m.ClassComponent<TokenIconAttrs> {
         ) : (
           <div
             class="token-icon.no-image"
-            style={`width: ${size}px; height: ${size}px;`}
+            style={`width: ${size}px;`}
             onclick={onclick}
           >
             <span>{token.name.slice(0, 1)}</span>

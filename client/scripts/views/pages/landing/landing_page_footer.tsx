@@ -10,7 +10,7 @@ type IState = {
   list: { text: string; redirectTo?: string; externalLink?: string }[];
 };
 
-export class FooterLandingPage implements m.ClassComponent<IState> {
+export class LandingPageFooter implements m.ClassComponent<IState> {
   view(vnode) {
     const redirectClick = (route) => {
       m.route.set(route);

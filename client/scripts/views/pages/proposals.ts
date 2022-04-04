@@ -402,7 +402,7 @@ const ProposalsPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.proposals-container', [
         onSubstrate && m(SubstrateProposalStats),
         onCompound && m(CompoundProposalStats),
         m('.clear'),
@@ -416,7 +416,7 @@ const ProposalsPage: m.Component<{}> = {
           columnHeader: 'Inactive',
         }),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

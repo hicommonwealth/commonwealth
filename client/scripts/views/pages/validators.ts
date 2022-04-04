@@ -130,7 +130,7 @@ const ValidatorsPage: m.Component<
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.validators-container', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),
@@ -171,7 +171,7 @@ const ValidatorsPage: m.Component<
           : validators?.sort((a, b) => b.expectedReturn - a.expectedReturn)
         ).map((info) => m(Validator, { info })),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

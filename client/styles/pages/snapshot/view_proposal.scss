@@ -12,17 +12,20 @@
 }
 
 .SnapshotViewProposalPage {
+  .view-proposal-container {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+  }
   .proposal-body {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
-    overflow: hidden;
+    width: 100%;
 
     .proposal-content {
-      max-width: 100%;
-
-      @media (min-width: 1024px) {
-        width: 60%;
-      }
+      width: 100%;
+      margin-right: 40px;
 
       .snapshot-proposal-title {
         margin-top: 24px;
@@ -58,7 +61,7 @@
           color: white;
           font-weight: 500;
           border-radius: 9999px;
-          padding: 8px 12px 3px;
+          padding: 4px 8px;
         }
       }
 
@@ -113,7 +116,9 @@
     }
 
     .proposal-info {
-      max-width: 100%;
+      .proposal-info-box {
+        width: 336px;
+      }
 
       .proposal-info-box,
       .VoteAction {
@@ -140,10 +145,6 @@
             color: #303f9f;
           }
         }
-      }
-
-      @media (min-width: 1024px) {
-        width: 30%;
       }
 
       .title {
@@ -218,6 +219,7 @@
       .result-choice-details {
         display: flex;
         justify-content: space-between;
+        margin-bottom: 4px;
       }
 
       .vote-balance-for-choice {
@@ -263,7 +265,6 @@
   }
 
   .back-button {
-    margin-top: 40px;
     color: #999999;
     display: flex;
     align-items: flex-start;
