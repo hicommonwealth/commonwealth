@@ -85,9 +85,9 @@ const updateChain = async (
 
   // Handle single string case and undefined case
   if (snapshot !== undefined && typeof snapshot === 'string') {
-    snapshot = [snapshot]
+    snapshot = [snapshot];
   } else if (snapshot === undefined) {
-    snapshot = []
+    snapshot = [];
   }
 
   if (website && !urlHasValidHTTPPrefix(website)) {
@@ -103,8 +103,11 @@ const updateChain = async (
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
   } else if (
-    snapshot.some((snapshot_space) => snapshot_space !== '' &&
-      snapshot_space.slice(snapshot_space.length - 4) !== '.eth')
+    snapshot.some(
+      (snapshot_space) =>
+        snapshot_space !== '' &&
+        snapshot_space.slice(snapshot_space.length - 4) !== '.eth'
+    )
   ) {
     return next(new Error(Errors.InvalidSnapshot));
   } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {
@@ -128,8 +131,9 @@ const updateChain = async (
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   if (snapshot) chain.snapshot = snapshot;
-  if (req.body['featured_topics[]'])
-    chain.featured_topics = req.body['featured_topics[]'];
+
+  // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
+  // is left un-updated? Is there a better approach?
   chain.default_summary_view = default_summary_view || false;
 
   // Under our current security policy, custom domains must be set by trusted
