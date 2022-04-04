@@ -4,53 +4,49 @@ import m from 'mithril';
 import { StarredCommunity } from 'models';
 
 class CommunitiesController {
-  public isStarred(chain: string, community: string) {
-    if (!chain && !community) throw new Error('Must provide a community');
-    if (chain && community) throw new Error('Invalid');
+  public isStarred(chain: string) {
+    if (!chain) throw new Error('Must provide a chain community');
     if (!app.isLoggedIn()) return false;
 
-    return app.user.starredCommunities.findIndex((c) => {
-      return chain
-        ? c.chain === chain
-        : c.community === community;
-    }) !== -1;
+    return (
+      app.user.starredCommunities.findIndex((c) => {
+        return c.chain === chain;
+      }) !== -1
+    );
   }
 
-  public async setStarred(chain: string, community: string, status: boolean) {
-    if (!chain && !community) throw new Error('Must provide a community');
-    if (chain && community) throw new Error('Invalid');
+  public async setStarred(chain: string) {
+    if (!chain) throw new Error('Must provide a chain community');
     if (!app.isLoggedIn()) throw new Error('Must be logged in');
+    const isAlreadyStarred = this.isStarred(chain);
 
     return new Promise<void>((resolve, reject) => {
-      const params = chain ? {
+      const params = {
         chain,
-        star: status,
-        auth: true,
-        jwt: app.user.jwt,
-      } : {
-        community,
-        star: status,
+        isAlreadyStarred,
         auth: true,
         jwt: app.user.jwt,
       };
 
-      $.post(`${app.serverUrl()}/starCommunity`, params).then((response) => {
-        if (status) {
-          const json = response.result;
-          app.user.addStarredCommunity(new StarredCommunity(json.chain, json.community, json.user_id));
-        } else {
-          const star = app.user.starredCommunities.find((c) => {
-            return chain
-              ? c.chain === chain
-              : c.community === community;
-          });
-          app.user.removeStarredCommunity(star);
-        }
-        resolve();
-        m.redraw();
-      }).catch((err) => {
-        reject();
-      });
+      $.post(`${app.serverUrl()}/starCommunity`, params)
+        .then((response) => {
+          if (!isAlreadyStarred) {
+            const json = response.result;
+            app.user.addStarredCommunity(
+              new StarredCommunity(json.chain, json.user_id)
+            );
+          } else {
+            const star = app.user.starredCommunities.find((c) => {
+              return c.chain === chain;
+            });
+            app.user.removeStarredCommunity(star);
+          }
+          resolve();
+          m.redraw();
+        })
+        .catch((err) => {
+          reject();
+        });
     });
   }
 }
