@@ -27,7 +27,7 @@ export class CommunitySelector
       .sort((a, b) => a.name.localeCompare(b.name))
       .sort((a) => {
         // sort starred communities at top
-        if (a instanceof ChainInfo && app.communities.isStarred(a.id, null))
+        if (a instanceof ChainInfo && app.communities.isStarred(a.id))
           return -1;
         return 0;
       })
@@ -56,7 +56,7 @@ export class CommunitySelector
 
       return item instanceof ChainInfo ? (
         <ListItem
-          class={app.communities.isStarred(item.id, null) ? 'starred' : ''}
+          class={app.communities.isStarred(item.id) ? 'starred' : ''}
           label={<CommunityLabel chain={item} />}
           selected={app.activeChainId() === item.id}
           onclick={(e) => {
@@ -72,11 +72,7 @@ export class CommunitySelector
                 onclick={async (e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  await app.communities.setStarred(
-                    item.id,
-                    null,
-                    !app.communities.isStarred(item.id, null)
-                  );
+                  await app.communities.setStarred(item.id);
                   m.redraw();
                 }}
               >
