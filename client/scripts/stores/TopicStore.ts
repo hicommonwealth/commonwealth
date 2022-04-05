@@ -4,7 +4,8 @@ import { byAscendingCreationDate } from '../helpers';
 
 // TODO: Differentiate between topics associated with a chain, and topics associated with a community
 class TopicStore extends IdStore<OffchainTopic> {
-  private _topicsByCommunity: { [identifier: string]: Array<OffchainTopic> } = {};
+  private _topicsByCommunity: { [identifier: string]: Array<OffchainTopic> } =
+    {};
 
   public add(topic: OffchainTopic) {
     // TODO: Remove this once we start enforcing an ordering in stores

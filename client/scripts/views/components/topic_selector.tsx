@@ -10,7 +10,6 @@ import { isNotUndefined } from 'helpers/typeGuards';
 
 type TopicSelectorAttrs = {
   defaultTopic?: OffchainTopic | string | boolean;
-  featuredTopics: OffchainTopic[];
   tabindex?: number;
   topics: OffchainTopic[];
   updateFormData: () => void;
@@ -18,8 +17,7 @@ type TopicSelectorAttrs = {
 
 export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
   view(vnode) {
-    const { defaultTopic, featuredTopics, tabindex, topics, updateFormData } =
-      vnode.attrs;
+    const { defaultTopic, tabindex, topics, updateFormData } = vnode.attrs;
 
     let selectedTopic;
 
@@ -30,6 +28,10 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
     } else if (defaultTopic && defaultTopic instanceof OffchainTopic) {
       selectedTopic = defaultTopic;
     }
+
+    const featuredTopics = topics
+      .filter((topic) => topic.featuredInSidebar)
+      .sort((a, b) => b.order - a.order);
 
     const itemRender = (topic) => {
       return (

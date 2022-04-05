@@ -78,13 +78,10 @@ export class DiscussionSection
     const onSputnikDaosPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
 
-    const topics = app.topics
-      .getByCommunity(app.activeChainId())
-      .map(({ id, name, featuredInSidebar }) => {
-        return { id, name, featuredInSidebar };
-      })
+    const topics = app.chain.meta.chain.topics
       .filter((t) => t.featuredInSidebar)
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => a.order - b.order);
 
     const discussionsLabel = ['vesuvius', 'olympus'].includes(
       app.activeChainId()

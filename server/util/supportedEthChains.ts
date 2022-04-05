@@ -9,7 +9,7 @@ export async function getSupportedEthChainIds(models: DB): Promise<{
   [id: number]: { url: string, alt_wallet_url: string }
 }> {
   const supportedChainIds = await models.ChainNode.findAll({
-    attributes: ['url', 'eth_chain_id', 'alt_wallet_url' ],
+    attributes: ['url', 'eth_chain_id', 'alt_wallet_url'],
     group: ['url', 'eth_chain_id', 'alt_wallet_url'],
     where: {
       // get all nodes that have a valid chain id
@@ -33,9 +33,20 @@ export async function getSupportedEthChainIds(models: DB): Promise<{
   return results;
 }
 
-export async function getUrlsForEthChainId(models: DB, chainId: number): Promise<
-  { url: string, alt_wallet_url: string } | null
+export async function getUrlsForEthChainId(models: DB, chainId: number, includePrivateUrl = true): Promise<
+  { url: string, alt_wallet_url: string, private_url?: string } | null
 > {
   const chainIds = await getSupportedEthChainIds(models);
-  return chainIds[chainId] || null;
+  const chain = chainIds[chainId];
+  if (!includePrivateUrl) {
+    return chain;
+  }
+  const nodeInstance = await models.ChainNode.scope('withPrivateData').findOne({
+    where: {
+      eth_chain_id: chainId,
+      url: chain.url,
+      alt_wallet_url: chain.alt_wallet_url,
+    },
+  });
+  return { ...chain, private_url: nodeInstance.private_url };
 }
