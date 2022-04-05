@@ -13,10 +13,8 @@ import { ExternalLinksModule } from './external_links_module';
 
 export class Sidebar implements m.ClassComponent {
   view() {
-    const isCustom = app.isCustomDomain();
-
     return app.chain ? (
-      <div class={`Sidebar${isCustom ? ' custom-domain' : ''}`}>
+      <div class="Sidebar">
         <DiscussionSection />
         <GovernanceSection />
         <ExternalLinksModule />

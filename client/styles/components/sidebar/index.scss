@@ -10,10 +10,6 @@
   min-width: $sidebar-width;
   overflow-y: auto;
 
-  &.custom-domain {
-    left: 0;
-  }
-
   .section-header {
     color: $text-color-light;
     font-size: 18px;

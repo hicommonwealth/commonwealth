@@ -1,10 +1,10 @@
 @import 'client/styles/shared';
 
 .ProposalsPage {
-  .proposals-container {
-    padding: 24px;
-  }
+  padding: 24px;
+
   @include gov-explainer;
+
   .active-proposals,
   .inactive-proposals {
     display: flex;

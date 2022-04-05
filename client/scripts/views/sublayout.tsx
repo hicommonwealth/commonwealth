@@ -12,7 +12,6 @@ import { LandingPageFooter } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './sublayout_header_left';
 import { SublayoutHeaderRight } from './sublayout_header_right';
-import { isNotUndefined } from '../helpers/typeGuards';
 import { TokenHero } from './token_hero';
 import { TokenTerms } from './token_terms';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';

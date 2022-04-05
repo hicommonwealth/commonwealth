@@ -70,10 +70,7 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
 
     return m(
       Sublayout,
-      {
-        class: 'SpecSettingsPage',
-      },
-      [
+      m('.SpecSettingsPage', [
         m(Form, { class: 'SpecSettingsForm' }, [
           m(Grid, [
             m(Col, { class: 'form-col' }, [
@@ -230,7 +227,7 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
             ]),
           ]),
         ]),
-      ]
+      ])
     );
   },
 };

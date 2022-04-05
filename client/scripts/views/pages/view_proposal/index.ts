@@ -1197,7 +1197,6 @@ const ViewProposalPage: m.Component<
       return m(
         Sublayout,
         {
-          class: 'ViewProposalPage',
           showNewProposalButton: true,
           title: headerTitle,
         },

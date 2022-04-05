@@ -119,7 +119,6 @@ const ValidatorsPage: m.Component<
     return m(
       Sublayout,
       {
-        class: 'ValidatorsPage',
         title: [
           'Validators',
           m(Tag, {
@@ -130,7 +129,7 @@ const ValidatorsPage: m.Component<
         ],
         showNewProposalButton: true,
       },
-      m('.validators-container', [
+      m('.ValidatorsPage', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),
