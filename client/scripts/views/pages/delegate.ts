@@ -186,39 +186,40 @@ const DelegateForm: m.Component<Record<string, never>, IDelegateFormState> = {
 
 const DelegatePage: m.Component = {
   view: () => {
-    // if (!app.chain || !app.chain.loaded) {
-    //   // chain load failed
-    //   if (app.chain && app.chain.failed) {
-    //     return m(PageNotFound, {
-    //       title: 'Wrong Ethereum Provider Network!',
-    //       message: 'Change Metamask to point to Ethereum Mainnet',
-    //     });
-    //   }
-    //   // wrong chain loaded
-    //   if (
-    //     app.chain &&
-    //     app.chain.loaded &&
-    //     app.chain.network !== ChainNetwork.Compound &&
-    //     app.chain.network !== ChainNetwork.Aave
-    //   ) {
-    //     return m(PageNotFound, {
-    //       title: 'Delegate Page',
-    //       message: 'Delegate page for Marlin and Aave users only!',
-    //     });
-    //   }
-    //   // chain loading
-    //   return m(PageLoading, {
-    //     message: 'Connecting to chain',
-    //     title: 'Delegate',
-    //   });
-    // }
+    if (!app.chain || !app.chain.loaded) {
+      // chain load failed
+      if (app.chain && app.chain.failed) {
+        return m(PageNotFound, {
+          title: 'Wrong Ethereum Provider Network!',
+          message: 'Change Metamask to point to Ethereum Mainnet',
+        });
+      }
+      // wrong chain loaded
+      if (
+        app.chain &&
+        app.chain.loaded &&
+        app.chain.network !== ChainNetwork.Compound &&
+        app.chain.network !== ChainNetwork.Aave
+      ) {
+        return m(PageNotFound, {
+          title: 'Delegate Page',
+          message: 'Delegate page for Marlin and Aave users only!',
+        });
+      }
+      // chain loading
+      return m(PageLoading, {
+        message: 'Connecting to chain',
+        title: 'Delegate',
+      });
+    }
 
     return m(
       Sublayout,
       {
+        class: 'DelegatePage',
         title: 'Delegate',
       },
-      [m('.DelegatePage', [m(DelegateForm, {})])]
+      [m('.forum-container', [m(DelegateForm, {})])]
     );
   },
 };
