@@ -1,9 +1,17 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
+import { ChainCategoryInstance } from 'server/models/chain_category';
+import { success, TypedRequestBody } from '../types';
 import { DB } from '../database';
+
+type UpdateChainCategoryReq = Omit<ChainCategoryInstance, 'id'> & {
+  create: string;
+  auth: string;
+  jwt: string;
+};
 
 const updateChainCategory = async (
   models: DB,
-  req: Request,
+  req: TypedRequestBody<UpdateChainCategoryReq>,
   res: Response,
   next: NextFunction
 ) => {
@@ -19,7 +27,7 @@ const updateChainCategory = async (
         chain_id: req.body.chain_id,
         category_type_id: req.body.category_type_id,
       });
-      return res.json({ status: 'Success', result: category.toJSON() });
+      return success(res, category.toJSON());
     }
 
     return res.json({ status: 'Success' });
@@ -33,7 +41,7 @@ const updateChainCategory = async (
 
     if (categoryEntry) {
       await categoryEntry.destroy();
-      return res.json({ status: 'Success', result: categoryEntry.toJSON() });
+      return success(res, categoryEntry.toJSON());
     }
     return res.json({ status: 'Success' });
   } else {
