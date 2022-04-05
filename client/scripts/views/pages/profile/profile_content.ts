@@ -74,7 +74,7 @@ const ProfileContent: m.Component<{
               return m(ProfileProposal, { proposal: data });
             } else {
               return m(ProfileCommentGroup, {
-                proposal: data.proposal,
+                proposal: data,
                 comments: [data],
                 account
               });
