@@ -18,7 +18,7 @@ const renderCommunity = (item) => {
 
   return (
     <ListItem
-      class={app.communities.isStarred(item.id, null) ? 'starred' : ''}
+      class={app.communities.isStarred(item.id) ? 'starred' : ''}
       label={<CommunityLabel chain={item} />}
       selected={app.activeChainId() === item.id}
       onclick={(e) => {
@@ -34,11 +34,7 @@ const renderCommunity = (item) => {
             onclick={async (e) => {
               e.preventDefault();
               e.stopPropagation();
-              await app.communities.setStarred(
-                item.id,
-                null,
-                !app.communities.isStarred(item.id, null)
-              );
+              await app.communities.setStarred(item.id);
               m.redraw();
             }}
           >
@@ -84,7 +80,6 @@ const homeButton = (
 export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
   view(vnode) {
     const { isMobile } = vnode.attrs;
-    const activeEntityName = app.chain?.meta.chain.name;
     const allCommunities = app.config.chains
       .getAll()
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -103,10 +98,10 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
       }
     };
     const starredCommunities = allCommunities.filter((c) => {
-      return c instanceof ChainInfo && app.communities.isStarred(c.id, null);
+      return c instanceof ChainInfo && app.communities.isStarred(c.id);
     });
     const joinedCommunities = allCommunities.filter(
-      (c) => isInCommunity(c) && !app.communities.isStarred(c.id, null)
+      (c) => isInCommunity(c) && !app.communities.isStarred(c.id)
     );
     const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
 
