@@ -18,12 +18,11 @@ import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switche
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
-  class?: string;
   hero?: any;
   hideSearch?: boolean;
+  onscroll?: any; // lazy loading for page content
   showNewProposalButton?: boolean;
   title?: any; // displayed at the top of the layout
-  onscroll?: any; // lazy loading for page content
 };
 
 const footercontents = [
@@ -56,9 +55,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       alwaysShowTitle,
       hero,
       hideSearch,
+      onscroll,
       showNewProposalButton,
       title,
-      onscroll,
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;

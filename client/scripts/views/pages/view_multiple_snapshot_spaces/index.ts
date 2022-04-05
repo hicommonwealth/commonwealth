@@ -12,6 +12,7 @@ import 'pages/discussions/discussion_row.scss';
 import 'pages/snapshot/multiple_snapshots.scss';
 import { OffchainThread } from 'client/scripts/models';
 import SnapshotSpaceCard from './space_card';
+import { PageLoading } from '../loading';
 
 export const enum SPACES_HEADER_MESSAGES {
   NEW_PROPOSAL = 'Select a Snapshot Space to Create a Proposal:',
@@ -85,27 +86,17 @@ const MultipleSnapshotsPage: m.Component<
         m.redraw();
       });
 
-      return m(
-        Sublayout,
-        {
-          class: 'DiscussionsPage',
-          title: 'Proposals',
-          description: '',
-          showNewProposalButton: true,
-        },
-        [m(Spinner, { active: true, fill: true, size: 'lg' })]
-      );
+      return m(PageLoading);
     }
 
     return m(
       Sublayout,
       {
-        class: 'DiscussionsPage',
         title: 'Proposals',
         description: '',
         showNewProposalButton: true,
       },
-      [
+      m('.DiscussionsPage', [
         m('.SnapshotSpaceTextHeader', [redirect_options.header_message]),
         app.chain &&
           vnode.state.spaces_metadata && [
@@ -125,7 +116,7 @@ const MultipleSnapshotsPage: m.Component<
               ],
             }),
           ],
-      ]
+      ])
     );
   },
 };

@@ -382,11 +382,10 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     return m(
       Sublayout,
       {
-        class: 'ProfilePage',
         showNewProposalButton: true,
       },
       [
-        m('.profile-container', [
+        m('.ProfilePage', [
           displayBanner &&
             m(ProfileBanner, {
               account,
