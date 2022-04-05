@@ -51,8 +51,8 @@ export class TokenBalanceProvider {
       if (balanceQueryResult.status !== 200 || balanceQueryResult.data?.data?.error) {
         throw new Error(balanceQueryResult.data?.data?.error || balanceQueryResult.statusText);
       }
-      const axieItem = balanceQueryResult.data.data.items.find((item) => item.contract_ticker_symbol === 'RON');
-      return new BN(axieItem.balance, 10);
+      const axieItem = balanceQueryResult.data.data.items.find((item) => item.contract_ticker_symbol === 'AXS');
+      return axieItem?.balance ? new BN(axieItem.balance, 10) : new BN(0);
     } catch (e) {
       log.info(`Failed to query axie balance: ${e.message}`);
       throw new Error('failed to query axie balance');

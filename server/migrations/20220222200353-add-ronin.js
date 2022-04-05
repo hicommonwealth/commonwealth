@@ -17,7 +17,7 @@ module.exports = {
       await queryInterface.bulkDelete('Chains', { id: [chain] }, { transaction: t });
       await queryInterface.bulkInsert('Chains', [{
         id: 'axie-infinity',
-        symbol: 'RON',
+        symbol: 'AXS',
         name: 'Axie Infinity',
         type: 'token',
         network: 'axie-infinity',
