@@ -211,7 +211,7 @@ class OffchainThread implements IUniqueId {
             id: +ce.id,
             chain,
             type: ce.type,
-            typeId: ce.type_id,
+            typeId: ce.type_id || ce.typeId,
             completed: ce.completed,
             author,
           };

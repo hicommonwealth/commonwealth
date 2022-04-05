@@ -1,4 +1,4 @@
-@import "client/styles/shared";
+@import 'client/styles/shared';
 
 .LandingPageHeaderLinks {
   white-space: nowrap;
@@ -140,4 +140,14 @@ header {
   // @media (min-width: 1500px) {
   //   width: 90%;
   // }
+}
+
+@include sm-max {
+  .menuButton {
+    display: none;
+  }
+
+  #landing-page {
+    margin: 0;
+  }
 }

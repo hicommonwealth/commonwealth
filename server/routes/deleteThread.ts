@@ -63,14 +63,6 @@ const deleteThread = async (
       where: { id: thread.topic_id },
       include: [{ model: models.OffchainThread, as: 'threads' }],
     });
-    const featuredTopics = thread.Chain.featured_topics;
-    if (
-      topic &&
-      !featuredTopics.includes(`${topic.id}`) &&
-      topic.threads.length <= 1
-    ) {
-      topic.destroy();
-    }
 
     // find and delete all associated subscriptions
     const subscriptions = await models.Subscription.findAll({

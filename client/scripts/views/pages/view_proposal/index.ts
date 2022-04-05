@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/ban-types */
-import 'pages/view_proposal/index.scss';
-import 'pages/view_proposal/tips.scss';
-
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
@@ -17,6 +12,9 @@ import {
   Size,
 } from 'construct-ui';
 
+import 'pages/view_proposal/index.scss';
+import 'pages/view_proposal/tips.scss';
+
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
@@ -29,7 +27,6 @@ import {
   proposalSlugToClass,
 } from 'identifiers';
 import { slugify } from 'utils';
-
 import Substrate from 'controllers/chain/substrate/main';
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
@@ -137,24 +134,24 @@ interface IPrefetch {
 }
 
 export interface IProposalPageState {
-  editing: boolean;
-  recentlyEdited: boolean;
-  replying: boolean;
-  parentCommentId: number; // if null or undefined, reply is thread-scoped
-  recentlySubmitted: number; // comment ID for CSS highlight transitions
-  highlightedComment: boolean;
-  prefetch: IPrefetch;
   comments;
-  viewCount: number;
+  editing: boolean;
+  highlightedComment: boolean;
+  parentCommentId: number; // if null or undefined, reply is thread-scoped
+  pollEditorIsOpen: boolean;
+  prefetch: IPrefetch;
   proposal: AnyProposal | OffchainThread;
+  recentlyEdited: boolean;
+  recentlySubmitted: number; // comment ID for CSS highlight transitions
+  replying: boolean;
+  stageEditorIsOpen: boolean;
   threadFetched;
   threadFetchFailed;
-  pollEditorIsOpen: boolean;
-  stageEditorIsOpen: boolean;
   tipAmount: number;
+  viewCount: number;
 }
 
-export const scrollToForm = (parentId?: number) => {
+const scrollToForm = (parentId?: number) => {
   setTimeout(() => {
     const $reply = parentId
       ? $(`.comment-${parentId}`).nextAll('.CreateComment')
@@ -564,6 +561,7 @@ const ProposalComment: m.Component<
       isAdmin,
       isLast,
     } = vnode.attrs;
+
     if (!comment) return;
     const parentType = comment.parentComment
       ? CommentParent.Comment
@@ -1317,87 +1315,91 @@ const ViewProposalPage: m.Component<
         class: 'ViewProposalPage',
         showNewProposalButton: true,
         title: headerTitle,
-        rightContent: [
-          proposal instanceof OffchainThread &&
-            proposal.hasOffchainPoll &&
-            m(ProposalHeaderOffchainPoll, { proposal }),
-          proposal instanceof OffchainThread &&
-            isAuthor &&
-            !proposal.offchainVotingEnabled &&
-            m(ProposalSidebarPollEditorModule, {
-              proposal,
-              openPollEditor: () => {
-                vnode.state.pollEditorIsOpen = true;
-              },
-            }),
-          showLinkedSnapshotOptions &&
+        rightContent: m('.right-content-container', [
+          [
             proposal instanceof OffchainThread &&
-            m(ProposalSidebarLinkedViewer, {
-              proposal,
-              openStageEditor: () => {
-                vnode.state.stageEditorIsOpen = true;
-              },
-              showAddProposalButton: isAuthor || isAdminOrMod,
-            }),
-          showLinkedThreadOptions &&
+              proposal.hasOffchainPoll &&
+              m(ProposalHeaderOffchainPoll, { proposal }),
             proposal instanceof OffchainThread &&
-            m(ProposalLinkedThreadsEditorModule, {
-              proposalId: proposal.id,
-              allowLinking: isAuthor || isAdminOrMod,
-            }),
-        ],
+              isAuthor &&
+              !proposal.offchainVotingEnabled &&
+              m(ProposalSidebarPollEditorModule, {
+                proposal,
+                openPollEditor: () => {
+                  vnode.state.pollEditorIsOpen = true;
+                },
+              }),
+            showLinkedSnapshotOptions &&
+              proposal instanceof OffchainThread &&
+              m(ProposalSidebarLinkedViewer, {
+                proposal,
+                openStageEditor: () => {
+                  vnode.state.stageEditorIsOpen = true;
+                },
+                showAddProposalButton: isAuthor || isAdminOrMod,
+              }),
+            showLinkedThreadOptions &&
+              proposal instanceof OffchainThread &&
+              m(ProposalLinkedThreadsEditorModule, {
+                proposalId: proposal.id,
+                allowLinking: isAuthor || isAdminOrMod,
+              }),
+          ],
+        ]),
       },
-      [
-        m(ProposalHeader, {
-          proposal,
-          commentCount,
-          viewCount,
-          getSetGlobalEditingStatus,
-          proposalPageState: vnode.state,
-          isAuthor,
-          isEditor,
-          isAdmin: isAdminOrMod,
-          stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-          pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-          closeStageEditor: () => {
-            vnode.state.stageEditorIsOpen = false;
-            m.redraw();
-          },
-          closePollEditor: () => {
-            vnode.state.pollEditorIsOpen = false;
-            m.redraw();
-          },
-        }),
-        !(proposal instanceof OffchainThread) &&
-          m(LinkedProposalsEmbed, { proposal }),
-        proposal instanceof AaveProposal && [
-          m(AaveViewProposalSummary, { proposal }),
-          m(AaveViewProposalDetail, { proposal }),
-        ],
-        !(proposal instanceof OffchainThread) &&
-          m(ProposalVotingResults, { proposal }),
-        !(proposal instanceof OffchainThread) &&
-          m(ProposalVotingActions, { proposal }),
-        m(ProposalComments, {
-          proposal,
-          comments,
-          createdCommentCallback,
-          getSetGlobalEditingStatus,
-          proposalPageState: vnode.state,
-          recentlySubmitted: vnode.state.recentlySubmitted,
-          isAdmin: isAdminOrMod,
-        }),
-        !vnode.state.editing &&
-          !vnode.state.parentCommentId &&
-          m(CreateComment, {
-            callback: createdCommentCallback,
-            cancellable: true,
+      m('.view-proposal-page-container', [
+        [
+          m(ProposalHeader, {
+            proposal,
+            commentCount,
+            viewCount,
             getSetGlobalEditingStatus,
             proposalPageState: vnode.state,
-            parentComment: null,
-            rootProposal: proposal,
+            isAuthor,
+            isEditor,
+            isAdmin: isAdminOrMod,
+            stageEditorIsOpen: vnode.state.stageEditorIsOpen,
+            pollEditorIsOpen: vnode.state.pollEditorIsOpen,
+            closeStageEditor: () => {
+              vnode.state.stageEditorIsOpen = false;
+              m.redraw();
+            },
+            closePollEditor: () => {
+              vnode.state.pollEditorIsOpen = false;
+              m.redraw();
+            },
           }),
-      ]
+          !(proposal instanceof OffchainThread) &&
+            m(LinkedProposalsEmbed, { proposal }),
+          proposal instanceof AaveProposal && [
+            m(AaveViewProposalSummary, { proposal }),
+            m(AaveViewProposalDetail, { proposal }),
+          ],
+          !(proposal instanceof OffchainThread) &&
+            m(ProposalVotingResults, { proposal }),
+          !(proposal instanceof OffchainThread) &&
+            m(ProposalVotingActions, { proposal }),
+          m(ProposalComments, {
+            proposal,
+            comments,
+            createdCommentCallback,
+            getSetGlobalEditingStatus,
+            proposalPageState: vnode.state,
+            recentlySubmitted: vnode.state.recentlySubmitted,
+            isAdmin: isAdminOrMod,
+          }),
+          !vnode.state.editing &&
+            !vnode.state.parentCommentId &&
+            m(CreateComment, {
+              callback: createdCommentCallback,
+              cancellable: true,
+              getSetGlobalEditingStatus,
+              proposalPageState: vnode.state,
+              parentComment: null,
+              rootProposal: proposal,
+            }),
+        ],
+      ])
     );
   },
 };

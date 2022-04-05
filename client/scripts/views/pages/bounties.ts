@@ -421,7 +421,7 @@ const BountiesPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.bounties-container', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),
@@ -465,7 +465,7 @@ const BountiesPage: m.Component<{}> = {
           columnHeader: 'Inactive Bounties',
         }),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

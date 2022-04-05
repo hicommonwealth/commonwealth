@@ -1,242 +1,265 @@
 @import 'client/styles/shared';
 
 @mixin mobile-max {
-    @media only screen and (max-width: 670px) { @content; }
+  @media only screen and (max-width: 670px) {
+    @content;
+  }
 }
 
 .Button {
-    @include mobile-max {
-        width: 35px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-        .label {
-            margin-top: 5px;
-            font-size: 12px;
-            width: 50px;
-            line-height: 1.25em;
-            max-height: 1.25em;
-        }
+  @include mobile-max {
+    width: 35px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+    .label {
+      margin-top: 5px;
+      font-size: 12px;
+      width: 50px;
+      max-height: 1.25em;
     }
+  }
 }
 
 .Card {
-    &.chain-card {
-        box-sizing: border-box;
-        float: left;
-        width: 240px;
-        max-width: 240px;
-        margin-right: 30px;
-        margin-bottom: 30px;
-        align-items: center;
-        height: 370px;
-        justify-content: flex-start;
+  &.chain-card {
+    width: 240px;
+    max-width: 240px;
+    margin: 0 24px 24px 0;
+    align-items: center;
+    height: 370px;
+    justify-content: flex-start;
+
+    @include mobile-max {
+      width: 135px;
+      height: 220px;
+    }
+
+    .card-header {
+      .chain-icon {
+        width: 100px;
+        height: 100px;
+        display: flex;
+        border-radius: 9999px;
 
         @include mobile-max {
-            width: 135px;
-            height: 220px;
-            margin-right: 20px;
+          width: 40px;
+          height: 40px;
+        }
+      }
+      .chain-icon.no-image {
+        border-radius: 9999px;
+        background: $background-color-darker-monochrome;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        span {
+          color: $text-color-white;
+          text-align: center;
+          font-weight: 500;
+          font-size: 16px;
+          position: relative;
+          top: 0.19em;
         }
 
-        .card-header {
-            padding-top: 10px;
-            
-            .chain-icon {
-                width: 100px;
-                height: 100px;
-                display: flex;
-                border-radius: 9999px;
-
-                @include mobile-max {
-                    width: 40px;
-                    height: 40px;
-                }
-            }
-            .chain-icon.no-image {
-                border-radius: 9999px;
-                background: $background-color-darker-monochrome;
-                width: 100px;
-                height: 100px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                span {
-                    color: $text-color-white;
-                    text-align: center;
-                    font-weight: 500;
-                    font-size: 16px;
-                    position: relative;
-                    top: 0.19em;
-                }
-                @include mobile-max {
-                    width: 40px;
-                    height: 40px;
-                }
-            }
+        @include mobile-max {
+          width: 40px;
+          height: 40px;
         }
-        .card-body {
-            width: 200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            @include mobile-max {
-                width: 100px;
-            }
-            .community-name {
-                font-size: 30px;
-                font-weight: 600;
-                margin-top:22px;
-                margin-bottom: 8px;
-                text-align: center;
-                width: 190px;
-                line-height: 1.25em;
-                max-height: 2.5em;
-                -webkit-hyphens: auto;
-                -ms-hyphens: auto;
-                hyphens: auto;
-                overflow: hidden;
-                text-overflow: ellipsis;
+      }
+    }
 
-                @include mobile-max {
-                    font-size: 20px;
-                    font-weight: 600;
-                    width: 110px;
-                    margin-top:10px;
-                    margin-bottom: 1px;
-                }
-                .cui-icon {
-                    position: relative;
-                    top: -2px;
-                    &::before {
-                        content: ' ';
-                        width: 4px;
-                    }
-                }
-            }
-            .chain-new {
-                margin: -4px 0;
-                margin-right: -8px;
-            }
-            .card-description {
-                margin: 0;
-                line-height: 1.25em;
-                max-height: 3.75em;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                word-wrap: normal;
-                width: 150px;
-                color: #999999;
-                font-weight: normal;
-                font-size: 16px;
-                -webkit-hyphens: auto;
-                -ms-hyphens: auto;
-                hyphens: auto;
-                @include mobile-max {
-                    font-size: 14px;
-                    width: 110px;
-                    text-align: center;
-                }
-            }
-            .recent-activity {
-                margin-top: 12px;
-                color: $text-color-light;
-                height: 24px;
-                .recent-threads {
-                    margin-bottom: 4px;
-                }
-            }
-        }  
-        
-        .new-community-card-body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            h3 {
-                flex: 1;
-                font-size: 25px;
-                font-weight: 600;
-                line-height: 1.1;
-                text-align: center;
-                white-space: initial;
-                word-wrap: break-word;
-                display: -webkit-box; 
-                -webkit-line-clamp: 3; 
-                -webkit-box-orient: vertical;
-                display: inline-block;
-                justify-content: center;
-                width: 180px;
-                margin-top: 20px;
-                margin-bottom: 30px;
-                @include mobile-max {
-                    font-size: 20px;
-                    font-weight: 600;
-                    width: 110px;
-                    margin-bottom: 10px;
-                }
-            }
-            .spacer {
-                height: 30px;
-                @include mobile-max {
-                    height: 10px;
-                }
-            }
-            p.action {
-                text-align: center;
-                width: 180px;
-                font-size: 18px;
-                margin-bottom: 30px;
-                @include mobile-max {
-                    font-size: 14px;
-                    width: 110px;
-                    text-align: center;
-                }
-            }
+    .card-body {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      height: 200px;
+      justify-content: space-between;
+      width: 200px;
+      margin-top: auto;
+      min-width: 0;
 
-            a.learn-more {
-                @include mobile-max {
-                    font-size: 14px;
-                    width: 110px;
-                    text-align: center;
-                }
-            }
+      @include mobile-max {
+        width: 100px;
+      }
 
+      .community-name {
+        font-size: 30px;
+        font-weight: 600;
+        text-align: center;
+        width: 190px;
+        max-height: 2.5em;
+        -webkit-hyphens: auto;
+        -ms-hyphens: auto;
+        hyphens: auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        @include mobile-max {
+          font-size: 20px;
+          font-weight: 600;
+          width: 110px;
+          margin-top: 10px;
+          margin-bottom: 1px;
         }
-    } 
+
+        .cui-icon {
+          position: relative;
+          top: -2px;
+
+          &::before {
+            content: ' ';
+            width: 4px;
+          }
+        }
+      }
+
+      .chain-new {
+        margin: -4px 0;
+        margin-right: -8px;
+      }
+
+      .card-description {
+        -ms-hyphens: auto;
+        -webkit-box-orient: vertical;
+        -webkit-hyphens: auto;
+        -webkit-line-clamp: 3;
+        color: #999999;
+        display: -webkit-box;
+        font-size: 16px;
+        font-weight: normal;
+        hyphens: auto;
+        margin: 0;
+        overflow: hidden;
+        width: 150px;
+
+        @include mobile-max {
+          font-size: 14px;
+          width: 110px;
+          text-align: center;
+        }
+      }
+
+      .recent-activity {
+        margin-top: 12px;
+        color: $text-color-light;
+        height: 24px;
+
+        .recent-threads {
+          margin-bottom: 4px;
+        }
+      }
+    }
+
+    .new-community-card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      h3 {
+        flex: 1;
+        font-size: 25px;
+        font-weight: 600;
+        text-align: center;
+        white-space: initial;
+        word-wrap: break-word;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        display: inline-block;
+        justify-content: center;
+        width: 180px;
+        margin-top: 20px;
+        margin-bottom: 30px;
+
+        @include mobile-max {
+          font-size: 20px;
+          font-weight: 600;
+          width: 110px;
+          margin-bottom: 10px;
+        }
+      }
+
+      .spacer {
+        height: 30px;
+
+        @include mobile-max {
+          height: 10px;
+        }
+      }
+
+      p.action {
+        text-align: center;
+        width: 180px;
+        font-size: 18px;
+        margin-bottom: 30px;
+
+        @include mobile-max {
+          font-size: 14px;
+          width: 110px;
+          text-align: center;
+        }
+      }
+
+      a.learn-more {
+        @include mobile-max {
+          font-size: 14px;
+          width: 110px;
+          text-align: center;
+        }
+      }
+    }
+  }
 }
 
 .HomepageCommunityCards {
-    text-align: left;
-    margin: 0 0;    
-    padding-left: 11%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+
+  .communities-header {
+    color: #333333;
+    font-size: 25px;
+    font-weight: 500;
+    margin-bottom: 24px;
     display: flex;
-    flex-direction: column;
-    max-width: 2400px;
+    flex-direction: row;
+    justify-content: center;
+  }
 
-    .join-button-wrapper {
-        position: absolute;
-        margin-top: 180px;
+  .communities-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 240px);
+    grid-gap: 24px;
+    justify-content: center;
+    align-content: flex-start;
 
-        @include mobile-max {
-            margin-top: 120px;
-        }
+    @include mobile-max {
+      grid-template-columns: repeat(auto-fit, 135px);
     }
-    .ChainIcon {
-        margin-bottom: 10px;
+  }
+
+  .join-button-wrapper {
+    @include mobile-max {
+      font-size: 12px;
     }
-    .CommunityIcon {
-        margin-bottom: 10px;
-    }  
-    .communities-number {
-        color: #333333;
-        margin-left: 10px;
-        font-size: 25px;
-        font-weight: 500;
-        margin-bottom: 10px;
-    }
-    h4 {
-        margin-left: 10px;
-    }
+  }
+
+  .ChainIcon {
+    margin-bottom: 10px;
+  }
+
+  .CommunityIcon {
+    margin-bottom: 10px;
+  }
+
+  h4 {
+    margin-left: 10px;
+  }
 }
-

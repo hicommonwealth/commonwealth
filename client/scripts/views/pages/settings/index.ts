@@ -31,14 +31,13 @@ const SettingsPage: m.Component<{}> = {
         class: 'SettingsPage',
         title: 'Account Settings',
       },
-      [
-        m('br'),
+      m('.account-settings-container', [
         m(EmailWell, { github: true }),
         m('br'),
         m(LinkedAddressesWell),
         m('br'),
         m(SettingsWell),
-      ]
+      ])
     );
   },
 };

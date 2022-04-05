@@ -21,6 +21,7 @@ import {
   SnapshotProposal,
   SnapshotProposalVote,
   getResults,
+  getPower,
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
@@ -28,6 +29,11 @@ import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
+
+const enum VotingError {
+  NOT_VALIDATED = 'Insufficient Voting Power',
+  ALREADY_VOTED = 'Already Submitted Vote',
+}
 
 const ProposalContent: m.Component<
   {
@@ -100,7 +106,12 @@ const ProposalContent: m.Component<
             m('.vote-row', [
               m('.user-column', [
                 m(User, {
-                  user: new AddressInfo(null, vote.voter, app.activeChainId(), null),
+                  user: new AddressInfo(
+                    null,
+                    vote.voter,
+                    app.activeChainId(),
+                    null
+                  ),
                   linkify: true,
                   popover: true,
                 }),
@@ -179,7 +190,6 @@ const VoteAction: m.Component<
     space: SnapshotSpace;
     proposal: SnapshotProposal;
     id: string;
-    totalScore: number;
     scores: number[];
     choices: string[];
     votes: SnapshotProposalVote[];
@@ -187,8 +197,15 @@ const VoteAction: m.Component<
   {
     votingModalOpen: boolean;
     chosenOption: string;
+    validatedAgainstStrategies: boolean;
+    fetchedPower: boolean;
+    totalScore: number;
   }
 > = {
+  oninit: (vnode) => {
+    vnode.state.fetchedPower = false;
+    vnode.state.validatedAgainstStrategies = true;
+  },
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const hasVoted = vnode.attrs.votes.find((vote) => {
@@ -200,6 +217,19 @@ const VoteAction: m.Component<
       m.redraw();
     };
 
+    if (!vnode.state.fetchedPower) {
+      getPower(
+        vnode.attrs.space,
+        vnode.attrs.proposal,
+        app.user?.activeAccount?.address
+      ).then((vals) => {
+        vnode.state.validatedAgainstStrategies = vals.totalScore > 0;
+        vnode.state.totalScore = vals.totalScore;
+        m.redraw();
+      });
+      vnode.state.fetchedPower = true;
+    }
+
     const vote = async (selectedChoice: number) => {
       try {
         app.modals.create({
@@ -209,7 +239,7 @@ const VoteAction: m.Component<
             proposal: vnode.attrs.proposal,
             id: vnode.attrs.id,
             selectedChoice,
-            totalScore: vnode.attrs.totalScore,
+            totalScore: vnode.state.totalScore,
             scores: vnode.attrs.scores,
             snapshot: vnode.attrs.proposal.snapshot,
             state: vnode.state,
@@ -224,6 +254,12 @@ const VoteAction: m.Component<
 
     if (!vnode.attrs.proposal.choices?.length) return;
 
+    const voteText = !vnode.state.validatedAgainstStrategies
+      ? VotingError.NOT_VALIDATED
+      : hasVoted
+      ? VotingError.ALREADY_VOTED
+      : '';
+
     return m('.VoteAction', [
       m('.title', 'Cast your vote'),
       m(RadioGroup, {
@@ -237,11 +273,21 @@ const VoteAction: m.Component<
           ).value;
         },
       }),
-      m(Button, {
-        label: 'Vote',
-        disabled: hasVoted !== undefined || !vnode.state.chosenOption,
-        onclick: () => vote(proposal.choices.indexOf(vnode.state.chosenOption)),
-      }),
+      m('.vote-button-group', [
+        m(Button, {
+          label: 'Vote',
+          disabled:
+            !vnode.state.fetchedPower ||
+            hasVoted !== undefined ||
+            !vnode.state.chosenOption ||
+            !vnode.state.validatedAgainstStrategies,
+          onclick: () => {
+            vote(proposal.choices.indexOf(vnode.state.chosenOption));
+            m.redraw();
+          },
+        }),
+        m('.vote-message', voteText),
+      ]),
     ]);
   },
 };
@@ -262,13 +308,12 @@ const ViewProposalPage: m.Component<
     totalScore: number;
     scores: number[];
     activeTab: string;
-    threads: Array<{id: string, title: string}> | null;
+    threads: Array<{ id: string; title: string }> | null;
   }
 > = {
   oninit: (vnode) => {
     vnode.state.activeTab = 'Proposals';
     vnode.state.votes = [];
-    vnode.state.totalScore = 0;
     vnode.state.scores = [];
     vnode.state.proposal = null;
     vnode.state.threads = null;
@@ -290,11 +335,11 @@ const ViewProposalPage: m.Component<
 
       try {
         app.threads
-        .fetchThreadIdsForSnapshot({ snapshot: vnode.state.proposal.id })
-        .then((res) => {
-          vnode.state.threads = res;
-          m.redraw();
-        });
+          .fetchThreadIdsForSnapshot({ snapshot: vnode.state.proposal.id })
+          .then((res) => {
+            vnode.state.threads = res;
+            m.redraw();
+          });
       } catch (e) {
         console.error(`Failed to fetch threads: ${e}`);
       }
@@ -337,7 +382,7 @@ const ViewProposalPage: m.Component<
       },
       !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
         ? m(Spinner, { fill: true, active: true, size: 'xl' })
-        : [
+        : m('.view-proposal-container', [
             // eslint-disable-next-line no-restricted-globals
             m('.back-button', { onclick: () => m.route.set(scope) }, [
               m('img', {
@@ -390,6 +435,12 @@ const ViewProposalPage: m.Component<
                       m('p', 'Voting System'),
                       m('p', 'Start Date'),
                       m('p', 'End Date'),
+                      m(
+                        'p',
+                        proposal.strategies.length > 1
+                          ? 'Strategies'
+                          : 'Strategy'
+                      ),
                       m('p', 'Snapshot'),
                     ]),
                     m('.values', [
@@ -428,6 +479,26 @@ const ViewProposalPage: m.Component<
                         'a',
                         {
                           class: 'snapshot-link',
+                          href: `https://snapshot.org/#/${app.snapshot.space.id}/proposal/${proposal.id}`,
+                          target: '_blank',
+                        },
+                        [
+                          m(
+                            '.truncate',
+                            proposal.strategies.length > 1
+                              ? proposal.strategies.length + ' Strategies'
+                              : proposal.strategies[0].name
+                          ),
+                          m(Icon, {
+                            name: Icons.EXTERNAL_LINK,
+                            class: 'external-link-icon',
+                          }),
+                        ]
+                      ),
+                      m(
+                        'a',
+                        {
+                          class: 'snapshot-link',
                           href: `https://etherscan.io/block/${proposal.snapshot}`,
                           target: '_blank',
                         },
@@ -444,11 +515,11 @@ const ViewProposalPage: m.Component<
                   threads !== null &&
                     m('.linked-discussion', [
                       m('.heading-2', 'Linked Discussions'),
-                      threads.map((thread) => 
+                      threads.map((thread) =>
                         m(ProposalHeaderSnapshotThreadLink, {
-                          thread
-                        }),
-                      )
+                          thread,
+                        })
+                      ),
                     ]),
                 ]),
                 isActive &&
@@ -457,7 +528,6 @@ const ViewProposalPage: m.Component<
                     space: vnode.state.space,
                     proposal: vnode.state.proposal,
                     id: vnode.attrs.identifier,
-                    totalScore: vnode.state.totalScore,
                     scores: vnode.state.scores,
                     choices: vnode.state.proposal.choices,
                     votes: vnode.state.votes,
@@ -473,7 +543,7 @@ const ViewProposalPage: m.Component<
                 ]),
               ]),
             ]),
-          ]
+          ])
     );
   },
 };

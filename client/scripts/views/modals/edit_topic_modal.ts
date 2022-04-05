@@ -134,7 +134,7 @@ const EditTopicModal: m.Component<
               tabindex: 1,
               defaultValue: vnode.state?.form?.name,
               oninput: (e) => {
-                vnode.state.form.name = (e.target as any).value;
+                vnode.state.form.name = (e.target as HTMLInputElement).value;
               },
             }),
           ]),
@@ -147,7 +147,9 @@ const EditTopicModal: m.Component<
               tabindex: 2,
               defaultValue: vnode.state.form.description,
               oninput: (e) => {
-                vnode.state.form.description = (e.target as any).value;
+                vnode.state.form.description = (
+                  e.target as HTMLInputElement
+                ).value;
               },
             }),
           ]),

@@ -1,0 +1,49 @@
+$border-color-tint-percentage: 70%;
+$telegram-color: #2480cc;
+$element-color: #0cbd8b;
+$discord-color: #677bc4;
+$default-color: #222222;
+
+.ExternalLinksModule {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+
+  :not(:last-child) {
+    margin-right: 16px;
+  }
+
+  .cui-link:hover {
+    background: #6966ff;
+    color: white;
+  }
+
+  .telegram-link {
+    color: $telegram-color;
+    cursor: pointer;
+    fill: currentColor;
+  }
+
+  .element-link {
+    color: $element-color;
+    cursor: pointer;
+    fill: currentColor;
+  }
+
+  .discord-link {
+    color: $discord-color;
+    cursor: pointer;
+    fill: currentColor;
+  }
+
+  .website-link {
+    color: $default-color;
+    cursor: pointer;
+  }
+
+  .github-link {
+    color: $default-color;
+    cursor: pointer;
+    fill: currentColor;
+  }
+}
