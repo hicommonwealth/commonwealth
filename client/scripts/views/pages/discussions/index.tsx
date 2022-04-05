@@ -18,7 +18,6 @@ import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import EmptyListingPlaceholder from 'views/components/empty_topic_placeholder';
 import LoadingRow from 'views/components/loading_row';
-import Listing from 'views/pages/listing';
 import { getLastUpdate, PinnedListing } from './pinned_listing';
 import { DiscussionRow } from './discussion_row';
 import { SummaryListing } from './summary_listing';
@@ -31,6 +30,22 @@ import { DiscussionFilterBar } from './discussion_filter_bar';
 import { RecentListing } from './recent_listing';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
+
+const handleScrollback = () => {
+  const returningFromThread =
+    app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/discussion/');
+  if (
+    returningFromThread &&
+    localStorage[`${app.activeChainId()}-discussions-scrollY`]
+  ) {
+    setTimeout(() => {
+      window.scrollTo(
+        0,
+        Number(localStorage[`${app.activeChainId()}-discussions-scrollY`])
+      );
+    }, 100);
+  }
+};
 
 type DiscussionsPageAttrs = { topic?: string };
 
@@ -48,26 +63,16 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
   private activityFetched: boolean;
 
   oncreate() {
+    console.log('create');
+    console.log(app);
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
       Scope: app.activeChainId(),
     });
 
-    const returningFromThread =
-      app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/discussion/');
-    if (
-      returningFromThread &&
-      localStorage[`${app.activeChainId()}-discussions-scrollY`]
-    ) {
-      setTimeout(() => {
-        window.scrollTo(
-          0,
-          Number(localStorage[`${app.activeChainId()}-discussions-scrollY`])
-        );
-      }, 100);
-    }
+    handleScrollback();
 
+    // TODO Graham 4/5/22: Investigate last seen divider line
     if (app.user.unseenPosts[app.activeChainId()]) {
       app.user.unseenPosts[app.activeChainId()]['activePosts'] = 0;
       app.user.unseenPosts[app.activeChainId()]['threads'] = 0;
@@ -75,6 +80,8 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
   }
 
   oninit(vnode) {
+    console.log('init');
+    console.log(app);
     this.lookback = {};
     this.postsDepleted = {};
     this.topicInitialized = {};
@@ -101,6 +108,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
   }
 
   view(vnode) {
+    console.log('view');
     let { topic } = vnode.attrs;
 
     if (!app.chain) return;
@@ -386,7 +394,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
             <div class="listing-wrap">
               {isLoading && m(LoadingRow)}
               {showSummaryListing && m(SummaryListing, { recentThreads })}
-              {showRecentListing && m(RecentListing, { recentThreads })}
+              {/* {showRecentListing && m(RecentListing, {})} */}
               {postsDepleted ? (
                 <div class="infinite-scroll-reached-end">
                   Showing {allThreads.length} of{' '}

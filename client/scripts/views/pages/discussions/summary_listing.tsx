@@ -10,6 +10,8 @@ import { formatLastUpdated, formatTimestampAsDate, link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { getLastUpdated, isHot } from './helpers';
+import LoadingRow from '../../components/loading_row';
+import Sublayout from '../../sublayout';
 
 const getThreadCells = (sortedThreads: OffchainThread[]) => {
   return sortedThreads.slice(0, 3).map((thread) => {
@@ -69,14 +71,32 @@ class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {
     );
   }
 }
+export class SummaryListing implements m.ClassComponent {
+  private initializing: boolean;
+  private recentThreads: OffchainThread[];
+  private isMobile: boolean;
 
-type SummaryListingAttrs = { recentThreads: OffchainThread[] };
+  oninit() {
+    this.isMobile = window.innerWidth < 767.98;
+    // TODO Graham 4/5/22: Investigate recentActivity controller
+    this.initializing = true;
+    app.recentActivity
+      .getRecentTopicActivity({
+        chainId: app.activeChainId(),
+      })
+      .then((res) => {
+        this.initializing = false;
+        this.recentThreads = res;
+      });
+  }
 
-export class SummaryListing implements m.ClassComponent<SummaryListingAttrs> {
   view(vnode) {
-    const topicScopedThreads = {};
+    if (this.initializing) {
+      return m(LoadingRow);
+    }
 
     const topics = app.topics.getByCommunity(app.activeChainId());
+    const topicScopedThreads = {};
 
     topics.forEach((topic) => {
       topicScopedThreads[topic.id] = vnode.attrs.recentThreads.filter(
@@ -94,28 +114,32 @@ export class SummaryListing implements m.ClassComponent<SummaryListingAttrs> {
       return 0;
     });
 
-    const isMobile = window.innerWidth < 767.98;
-
     return (
-      <div class="SummaryListing">
-        {!isMobile && (
-          <div class="row-header">
-            <h4 class="topic-header">Topic</h4>
-            <h4 class="recent-thread-header">Recent threads</h4>
+      <Sublayout
+        class="DiscussionsPage"
+        title="Discussions"
+        showNewProposalButton={true}
+      >
+        <div class="SummaryListing">
+          {!this.isMobile && (
+            <div class="row-header">
+              <h4 class="topic-header">Topic</h4>
+              <h4 class="recent-thread-header">Recent threads</h4>
+            </div>
+          )}
+          <div class="row-wrap">
+            {sortedTopics.map((topic: OffchainTopic) => {
+              return (
+                <SummaryRow
+                  topic={topic}
+                  monthlyThreads={topicScopedThreads[topic.id]}
+                  this={this.isMobile}
+                />
+              );
+            })}
           </div>
-        )}
-        <div class="row-wrap">
-          {sortedTopics.map((topic: OffchainTopic) => {
-            return (
-              <SummaryRow
-                topic={topic}
-                monthlyThreads={topicScopedThreads[topic.id]}
-                isMobile={isMobile}
-              />
-            );
-          })}
         </div>
-      </div>
+      </Sublayout>
     );
   }
 }

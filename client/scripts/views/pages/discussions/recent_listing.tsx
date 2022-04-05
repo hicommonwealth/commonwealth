@@ -6,64 +6,106 @@ import 'pages/discussions/summary_listing.scss';
 
 import app from 'state';
 import { OffchainThread, OffchainTopic } from 'models';
-import { formatLastUpdated, link } from 'helpers';
-import { getProposalUrlPath } from 'identifiers';
-import { slugify } from 'utils';
-import { getLastUpdated, isHot } from './helpers';
+import { Spinner } from 'construct-ui';
+import { orderDiscussionsbyLastComment } from './helpers';
+import { DiscussionFilterBar } from './discussion_filter_bar';
+import LoadingRow from '../../components/loading_row';
+import Sublayout from '../../sublayout';
 
-export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
+interface DiscussionScrollAttrs {
+  postsDepleted: boolean;
+  subpageName: string;
+  totalThreadCount: number;
+}
+export class DiscussionScroll
+  implements m.ClassComponent<DiscussionScrollAttrs>
+{
   view(vnode) {
-    const topicScopedThreads = {};
-
-    const topics = app.topics.getByCommunity(app.activeChainId());
-
-    topics.forEach((topic) => {
-      topicScopedThreads[topic.id] = vnode.attrs.recentThreads.filter(
-        (thread) => thread.topic?.id === topic?.id
+    const { postsDepleted, subpageName, totalThreadCount } = vnode.attrs;
+    if (postsDepleted) {
+      let postsDepletedCopy = `Showing ${totalThreadCount} of ${pluralize(
+        totalThreadCount,
+        'thread'
+      )}`;
+      if (subpageName)
+        postsDepletedCopy += ` under the subpage '${subpageName}'`;
+      return <div class="infinite-scroll-reached-end">{postsDepletedCopy}</div>;
+    } else if (totalThreadCount !== 0) {
+      return (
+        <div class="infinite-scroll-spinner-wrap">
+          <Spinner active={true} size="lg" />
+        </div>
       );
-    });
+    }
+  }
+}
 
-    const sortedTopics = topics.sort((a, b) => {
-      if (a.name.toLowerCase() < b.name.toLowerCase()) {
-        return -1;
-      }
-      if (a.name.toLowerCase() > b.name.toLowerCase()) {
-        return 1;
-      }
-      return 0;
-    });
+interface RecentListingAttrs {}
+export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
+  private initializing: boolean;
+  private allThreads: OffchainThread[];
+  private postsDepleted: boolean;
+  // TODO: Better variable name
+  private isEmpty: boolean;
+  // TODO: Try to get a proper OffchainTopic/Stage object
+  private topic: string;
+  private stage: string;
 
-    const isMobile = window.innerWidth < 767.98;
+  oninit() {
+    return null;
+  }
 
+  view() {
+    if (this.initializing) {
+      <div class="RecentListing">
+        <DiscussionFilterBar
+          topic={this.topic}
+          stage={this.stage}
+          parentState={this}
+          disabled={true}
+        />
+        {m(LoadingRow)}
+      </div>;
+    }
 
-    const content = isEmpty
-      ? m(EmptyListingPlaceholder, {
-          stageName: stage,
-          communityName,
-          topicName,
-        })
-      : m(Listing, { content: sortedListing })}
+    // TODO: More robust method of topic-determination
+    this.topic = m.route.get().split('/')[2];
+    this.stage = m.route.param('stage');
+
+    // TODO: Handle pinned, lastVisited
+    const allThreads = app.threads.listingStore
+      .getByCommunityTopicAndStage(app.activeChainId(), this.topic, this.stage)
+      .sort(orderDiscussionsbyLastComment);
 
     return (
-      <div class="RecentListing">
-        {!isMobile && (
-          <div class="row-header">
-            <h4 class="topic-header">Topic</h4>
-            <h4 class="recent-thread-header">Recent threads</h4>
-          </div>
-        )}
-        <div class="row-wrap">
-          {sortedTopics.map((topic: OffchainTopic) => {
-            return (
-              <SummaryRow
-                topic={topic}
-                monthlyThreads={topicScopedThreads[topic.id]}
-                isMobile={isMobile}
-              />
-            );
-          })}
+      <Sublayout
+        class="DiscussionsPage"
+        title="Discussions"
+        description={null} // TODO
+        showNewProposalButton={true}
+        // onscroll={this.onscroll}
+      >
+        <div class="RecentListing">
+          <DiscussionFilterBar
+            topic={this.topic}
+            stage={this.stage}
+            parentState={this}
+          />
+          <DiscussionScroll
+            postsDepleted={this.postsDepleted}
+            subpageName={this.topic || this.stage}
+            totalThreadCount={this.allThreads.length}
+          />
         </div>
-      </div>
+      </Sublayout>
     );
   }
 }
+
+// const content = isEmpty
+//   ? m(EmptyListingPlaceholder, {
+//       stageName: stage,
+//       communityName,
+//       topicName,
+//     })
+// : m(Listing, { content: sortedListing })}
