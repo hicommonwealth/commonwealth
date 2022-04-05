@@ -22,7 +22,6 @@ type SublayoutAttrs = {
   class?: string;
   hero?: any;
   hideSearch?: boolean;
-  rightContent?: any;
   showNewProposalButton?: boolean;
   title?: any; // displayed at the top of the layout
   onscroll?: any; // lazy loading for page content
@@ -58,7 +57,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       alwaysShowTitle,
       hero,
       hideSearch,
-      rightContent,
       showNewProposalButton,
       title,
       onscroll,
@@ -73,11 +71,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     }
 
     return (
-      <div
-        class={`Sublayout ${
-          isNotUndefined(vnode.attrs.class) ? vnode.attrs.class : ''
-        }`}
-      >
+      <div class="Sublayout">
         <SidebarQuickSwitcher />
         <div class="header-and-body-container">
           <MobileHeader />
@@ -98,17 +92,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             <div class="body" onscroll={onscroll}>
               <TokenHero chain={chain} hero={hero} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
-              <div
-                class="inner-body"
-                style={
-                  isNotUndefined(rightContent)
-                    ? 'display: flex; flex-direction: row;'
-                    : ''
-                }
-              >
-                {vnode.children}
-                {isNotUndefined(rightContent) && rightContent}
-              </div>
+              {vnode.children}
               {!app.isCustomDomain() && (
                 <LandingPageFooter list={footercontents} />
               )}
