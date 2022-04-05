@@ -1,0 +1,25 @@
+@import 'client/styles/shared';
+
+.OrderTopicsModal {
+  .featured-topic-list {
+    .cui-list-item {
+      cursor: default;
+      pointer-events: none;
+      &:hover {
+        cursor: default;
+        background-color: $white;
+      }
+      &.gu-transit {
+        background-color: $background-color-light;
+      }
+      .cui-icon {
+        padding: 2px;
+        cursor: pointer;
+        pointer-events: all;
+      }
+    }
+  }
+  .cui-button {
+    margin-top: 15px;
+  }
+}
