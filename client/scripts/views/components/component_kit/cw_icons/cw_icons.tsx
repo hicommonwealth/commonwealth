@@ -243,6 +243,29 @@ export const CWChevronRight: m.Component<IconAttrs> = {
   },
 };
 
+export const CWChevronUp: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M6.847 21.758a1 1 0 01-.105-1.41l8.614-10a1 1 0 011.515 0l8.387 9.736a1 1 0 01-1.516 1.306l-7.629-8.858-7.855 9.12a1 1 0 01-1.41.106z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
 export const CWClose: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
@@ -290,6 +313,29 @@ export const CWCloud: m.Component<IconAttrs> = {
         <path
           fill-rule="evenodd"
           d="M6.916 17.725l-.925 1.97a1.135 1.135 0 101.939 0h.001l-.925-1.97a.05.05 0 00-.09 0zM23.858 17.725l-.925 1.97a1.135 1.135 0 101.939 0h.001l-.925-1.97a.05.05 0 00-.09 0zM6.916 26.306l-.925 1.97a1.135 1.135 0 101.939 0h.001l-.925-1.97a.05.05 0 00-.09 0zM11.789 21.433l-.925 1.97a1.135 1.135 0 101.939 0h.001l-.925-1.97a.05.05 0 00-.09 0zM23.858 26.306l-.925 1.97a1.135 1.135 0 101.939 0h.001l-.925-1.97a.05.05 0 00-.09 0zM16.024 17.725l-.925 1.97a1.135 1.135 0 101.939 0h.001l-.925-1.97a.05.05 0 00-.09 0zM16.024 26.306l-.925 1.97a1.135 1.135 0 101.939 0h.001l-.925-1.97a.05.05 0 00-.09 0zM20.26 21.433l-.926 1.97h.001a1.135 1.135 0 101.939 0l-.924-1.97a.05.05 0 00-.09 0z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWCollapse: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M17 29a1 1 0 01-1 1H3a1 1 0 01-1-1V16a1 1 0 112 0v10.586l11.293-11.293a1 1 0 011.414 1.414L5.414 28H16a1 1 0 011 1z"
           clip-rule="evenodd"
         ></path>
       </svg>
@@ -489,6 +535,29 @@ export const CWElement: m.Component<IconAttrs> = {
   },
 };
 
+export const CWExpand: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M15 3a1 1 0 011-1h13a1 1 0 011 1v13a1 1 0 11-2 0V5.414L16.707 16.707a1 1 0 01-1.414-1.414L26.586 4H16a1 1 0 01-1-1z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
 export const CWExternalLink: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
@@ -548,25 +617,10 @@ export const CWFilter: m.Component<IconAttrs> = {
         viewBox="0 0 32 32"
         onclick={onclick}
       >
-        <mask
-          id="path-1-outside-1_402_11947"
-          width="25"
-          height="27"
-          x="4"
-          y="3.5"
-          maskUnits="userSpaceOnUse"
-        >
-          {/* Gabe 3/31/22 - icon will not render without this fill */}
-          <path fill="#fff" d="M4 3.5H29V30.5H4z"></path>
-          <path
-            fill-rule="evenodd"
-            d="M15.195 18.207v6.123l2.61 3.17v-9.295L27 5.5H6l9.195 12.707z"
-            clip-rule="evenodd"
-          ></path>
-        </mask>
         <path
-          d="M15.195 24.33h-2a2 2 0 00.457 1.272l1.543-1.272zm0-6.123h2a2 2 0 00-.38-1.173l-1.62 1.173zm2.61 9.293l-1.543 1.271a2 2 0 003.544-1.27h-2zm0-9.295l-1.62-1.172a2 2 0 00-.38 1.172h2zM27 5.5l1.62 1.173A2 2 0 0027 3.5v2zm-21 0v-2a2 2 0 00-1.62 3.173L6 5.5zm11.195 18.83v-6.123h-4v6.123h4zm2.155 1.899l-2.61-3.17-3.088 2.543 2.61 3.17 3.088-2.543zm-3.544-8.024V27.5h4v-9.295h-4zm3.62 1.173L28.62 6.673l-3.24-2.346-9.194 12.706 3.24 2.345zM27 3.5H6v4h21v-4zM4.38 6.673l9.195 12.706 3.24-2.345L7.62 4.327 4.38 6.673z"
-          mask="url(#path-1-outside-1_402_11947)"
+          fill-rule="evenodd"
+          d="M13.652 25.102a2 2 0 01-.457-1.272v-5.476L4.38 6.173A2 2 0 016 3h21a2 2 0 011.62 3.173l-8.814 12.18V27a2 2 0 01-3.544 1.271l-2.61-3.17zm4.154-7.397L27 5H6l9.195 12.707v6.123l2.61 3.17v-9.295z"
+          clip-rule="evenodd"
         ></path>
       </svg>
     );
@@ -730,6 +784,29 @@ export const CWHamburger: m.Component<IconAttrs> = {
   },
 };
 
+export const CWHash: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="33"
+        height="32"
+        fill="none"
+        viewBox="0 0 33 32"
+        onclick={onclick}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M13.994 7.11a1 1 0 00-1.988-.22L11.55 11H7a1 1 0 100 2h4.327l-.666 6H7a1 1 0 100 2h3.438l-.432 3.89a1 1 0 001.988.22L12.45 21h5.987l-.432 3.89a1 1 0 001.988.22L20.45 21H25a1 1 0 100-2h-4.327l.667-6H25a1 1 0 100-2h-3.438l.432-3.89a1 1 0 00-1.988-.22L19.55 11h-5.987l.432-3.89zM13.339 13l-.666 6h5.987l.667-6H13.34z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
 export const CWHeartEmpty: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
@@ -776,6 +853,29 @@ export const CWHeartFilled: m.Component<IconAttrs> = {
   },
 };
 
+export const CWHelp: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M16 30c7.732 0 14-6.268 14-14S23.732 2 16 2 2 8.268 2 16s6.268 14 14 14zm-3.982-17.702a.466.466 0 00.478.495h.971c.282 0 .503-.235.547-.513a2.75 2.75 0 01.12-.48c.11-.317.278-.606.491-.85.228-.264.506-.467.815-.596.297-.124.614-.176.93-.153a.659.659 0 00.08 0c.292-.014.584.033.86.14.287.11.552.284.779.51.202.215.36.475.465.762.105.288.153.596.141.905.007.426-.072.848-.232 1.236-.194.396-.454.75-.768 1.04l-1.339 1.098c-.436.388-.805.86-1.089 1.392a3.693 3.693 0 00-.339 1.648v.755a.5.5 0 00.5.5h1.107a.5.5 0 00.5-.5v-.638a2.11 2.11 0 01.238-.96c.146-.277.352-.511.599-.681a.583.583 0 00.071-.057l1.02-.969.732-.687c.236-.245.451-.515.643-.804.215-.336.384-.707.5-1.098.11-.427.163-.87.16-1.314a4.584 4.584 0 00-.299-1.755 4.24 4.24 0 00-.932-1.462c-.924-.875-2.12-1.325-3.34-1.255a4.654 4.654 0 00-1.91.392 3.785 3.785 0 00-1.41 1.08c-.354.451-.632.97-.82 1.529-.142.416-.232.85-.269 1.29zm2.665 11.753c.071.193.18.367.317.51.276.246.628.458.982.434l.071-.002c.392.003.773-.15 1.071-.432.142-.142.256-.314.332-.507.077-.192.116-.4.115-.611a1.68 1.68 0 00-.119-.61 1.558 1.558 0 00-.328-.508 1.542 1.542 0 00-1.107-.451 1.297 1.297 0 00-.55.112 1.408 1.408 0 00-.467.339c-.135.145-.24.32-.311.512-.07.192-.105.398-.1.606-.008.207.024.415.095.608z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
 export const CWHome: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
@@ -812,22 +912,12 @@ export const CWInfoEmpty: m.Component<IconAttrs> = {
         viewBox="0 0 32 32"
         onclick={onclick}
       >
-        <path fill="#fff" d="M0 0H32V32H0z"></path>
+        <path d="M17.333 21.61c0 .343-.335.621-.75.621h-.5c-.414 0-.75-.278-.75-.622v-7.05c0-.344.336-.623.75-.623h.5c.415 0 .75.279.75.622v7.051zM15 11.102a1.334 1.334 0 112.667 0 1.334 1.334 0 01-2.667 0z"></path>
         <path
-          fill="#342E37"
           fill-rule="evenodd"
           d="M16 28c6.627 0 12-5.373 12-12S22.627 4 16 4 4 9.373 4 16s5.373 12 12 12zm0 2c7.732 0 14-6.268 14-14S23.732 2 16 2 2 8.268 2 16s6.268 14 14 14z"
           clip-rule="evenodd"
         ></path>
-        <circle cx="16" cy="10" r="2" fill="#342E37"></circle>
-        <rect
-          width="4"
-          height="10"
-          x="14"
-          y="14"
-          fill="#342E37"
-          rx="0.5"
-        ></rect>
       </svg>
     );
   },
@@ -846,13 +936,11 @@ export const CWInfoFilled: m.Component<IconAttrs> = {
         viewBox="0 0 32 32"
         onclick={onclick}
       >
-        <path fill="#fff" d="M0 0H32V32H0z"></path>
         <path
-          fill="#342E37"
-          d="M30 16c0 7.732-6.268 14-14 14S2 23.732 2 16 8.268 2 16 2s14 6.268 14 14z"
+          fill-rule="evenodd"
+          d="M30 16c0 7.732-6.268 14-14 14S2 23.732 2 16 8.268 2 16 2s14 6.268 14 14zm-15-4.898a1.334 1.334 0 112.667 0 1.334 1.334 0 01-2.667 0zm1.583 11.13c.414 0 .75-.28.75-.623v-7.05c0-.344-.336-.623-.75-.623h-.5c-.415 0-.75.279-.75.622v7.051c0 .344.335.622.75.622h.5z"
+          clip-rule="evenodd"
         ></path>
-        <circle cx="16" cy="10" r="2" fill="#fff"></circle>
-        <rect width="4" height="10" x="14" y="14" fill="#fff" rx="0.5"></rect>
       </svg>
     );
   },
@@ -877,6 +965,29 @@ export const CWJar: m.Component<IconAttrs> = {
           clip-rule="evenodd"
         ></path>
         <path d="M19 18.5a3 3 0 11-6 0 3 3 0 016 0zM15.026 24.5a3 3 0 11-6 0 3 3 0 016 0zM22.974 24.5a3 3 0 11-6 0 3 3 0 016 0z"></path>
+      </svg>
+    );
+  },
+};
+
+export const CWLock: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M15.975 5.369a6.37 6.37 0 00-6.37 6.37v1.62h12.789v-1.572a6.418 6.418 0 00-6.419-6.418zm-8.37 6.37v1.62H6.5a.5.5 0 00-.5.5v15.683a.5.5 0 00.5.5h19a.5.5 0 00.5-.5V13.858a.5.5 0 00-.5-.5h-1.106v-1.57c0-4.65-3.77-8.42-8.419-8.42a8.37 8.37 0 00-8.37 8.37zm10.552 6.835c0 .938-.598 1.736-1.434 2.033l.954 3.198a.5.5 0 01-.48.643h-2.394a.5.5 0 01-.48-.643l.955-3.197a2.158 2.158 0 112.879-2.034z"
+          clip-rule="evenodd"
+        ></path>
       </svg>
     );
   },
@@ -1106,6 +1217,29 @@ export const CWShare: m.Component<IconAttrs> = {
         <path
           fill-rule="evenodd"
           d="M29.764 10.918a.482.482 0 000-.836L16.727 2.565a.483.483 0 00-.724.418v6.55a13.26 13.26 0 00-7.641 3.066c-3.565 2.989-6.26 8.376-6.356 17.398a.498.498 0 00.497.503h1c.277 0 .5-.227.503-.503.096-8.624 2.66-13.366 5.641-15.865a11.275 11.275 0 016.356-2.595v6.48c0 .371.402.603.724.418l13.037-7.517z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWShare2: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const { className, disabled, iconSize, onclick } = vnode.attrs;
+    return (
+      <svg
+        class={getIconClasses({ disabled, iconSize, className })}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        onclick={onclick}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M11.53 8.898c.252-.432.396-.932.396-1.466 0-1.62-1.327-2.932-2.963-2.932C7.327 4.5 6 5.812 6 7.432c0 1.619 1.327 2.931 2.963 2.931.546 0 1.058-.146 1.497-.401v.017l9.658 5.517a2.926 2.926 0 000 1.008l-9.67 5.524v.003a2.974 2.974 0 00-1.485-.394C7.327 21.637 6 22.949 6 24.568c0 1.62 1.327 2.932 2.963 2.932 1.636 0 2.963-1.313 2.963-2.931 0-.534-.145-1.035-.397-1.466l9.205-5.259a2.97 2.97 0 002.303 1.088C24.674 18.932 26 17.619 26 16s-1.326-2.931-2.963-2.931c-.93 0-1.76.423-2.303 1.087l-9.205-5.258z"
           clip-rule="evenodd"
         ></path>
       </svg>
