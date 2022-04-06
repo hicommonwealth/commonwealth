@@ -114,7 +114,16 @@ const DashboardExplorePreview: m.Component = {
     );
 
     return m(Col, { span: { md: 3 }, class: 'expore-communities-col' }, [
-      m('.title', 'Explore Communities'),
+      m(
+        '.title',
+        {
+          onclick: () => {
+            m.route.set('/communities');
+            m.redraw();
+          },
+        },
+        'Explore Communities'
+      ),
       m('.communities-list', [
         sortedChainsAndCommunities.length > 3
           ? sortedChainsAndCommunities.slice(0, 3)
