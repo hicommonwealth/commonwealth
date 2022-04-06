@@ -153,9 +153,7 @@ const CreateComment: m.Component<{
         activeTopicName,
         app.activeChainId()
       )?.tokenThreshold;
-      disabled = disabled
-        || !app.isAdapterReady
-        || (!isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
+      disabled = disabled || (!isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
     }
 
     const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
