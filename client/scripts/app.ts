@@ -286,7 +286,7 @@ export async function selectNode(
       )
     ).default;
     newChain = new Aave(n, app);
-  } else if (n.chain.network === ChainNetwork.ERC20) {
+  } else if (n.chain.network === ChainNetwork.ERC20 || n.chain.network === ChainNetwork.AxieInfinity) {
     const ERC20 = (
       await import(
         //   /* webpackMode: "lazy" */
@@ -322,6 +322,13 @@ export async function selectNode(
       )
     ).default;
     newChain = new Commonwealth(n, app);
+  } else if (n.chain.base === ChainBase.Ethereum && n.chain.type === ChainType.Offchain) {
+    const Ethereum = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "ethereum-main" */
+      './controllers/chain/ethereum/main'
+    )).default;
+    newChain = new Ethereum(n, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -649,6 +656,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/finishNearLogin': importRoute('views/pages/finish_near_login', {
               scoped: true,
             }),
+            '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
+              scoped: true,
+            }),
             // Discussions
             '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
             '/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
@@ -765,6 +775,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/backers': redirectRoute(() => '/backers'),
             '/:scope/collectives': redirectRoute(() => '/collectives'),
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
+            '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
             '/:scope/home': redirectRoute(() => '/'),
             '/:scope/discussions': redirectRoute(() => '/'),
             '/:scope': redirectRoute(() => '/'),
@@ -876,6 +887,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/finish_near_login',
               { scoped: true }
             ),
+            '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
+              scoped: false
+            }),
             // Settings
             '/settings': redirectRoute(() => '/edgeware/settings'),
             '/:scope/settings': importRoute('views/pages/settings', {

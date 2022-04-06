@@ -97,6 +97,7 @@ export enum ChainNetwork {
   SolanaTestnet = 'solana-testnet',
   Solana = 'solana',
   SPL = 'spl', // solana token
+  AxieInfinity = 'axie-infinity',
 }
 
 export enum WebsocketMessageNames {
