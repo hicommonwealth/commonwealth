@@ -1,0 +1,39 @@
+@import 'client/styles/shared';
+
+.Footer {
+  background-image: url('/static/img/footer.png');
+  background-size: cover;
+  display: flex;
+  flex-wrap: wrap;
+  height: 240px;
+  justify-content: space-between;
+  min-height: 240px;
+  padding: 48px 24px;
+
+  @include sm-max {
+    padding: 24px;
+  }
+
+  img {
+    height: 40px;
+    margin-bottom: 24px;
+    width: 240px;
+  }
+
+  .footer-links-container {
+    align-items: flex-start;
+    display: flex;
+    flex-flow: column;
+    flex-wrap: wrap;
+    height: 128px;
+    width: 208px;
+
+    .footer-link {
+      color: $text-color-black;
+      cursor: pointer;
+      height: 24px;
+      text-decoration: none;
+      width: 104px;
+    }
+  }
+}
