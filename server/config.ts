@@ -75,3 +75,6 @@ export const MAGIC_DEFAULT_CHAIN = process.env.MAGIC_DEFAULT_CHAIN || 'ethereum'
 
 export const DEFAULT_COMMONWEALTH_LOGO =
   'https://commonwealth.im/static/img/logo.png';
+
+export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
+export const COVALENT_API_KEY = process.env.COVALENT_API_KEY;

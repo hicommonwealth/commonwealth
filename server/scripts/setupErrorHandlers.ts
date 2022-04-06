@@ -29,6 +29,7 @@ const setupErrorHandlers = (app: Express) => {
   // Handle our ServerErrors (500), AppErrors (400), or unknown errors.
   app.use((error, req, res: Response, next) => {
     if (error instanceof ServerError) {
+      console.trace(error);
       rollbar.error(error); // expected server error
       res.status(error.status).send({
         status: error.status,
@@ -42,6 +43,7 @@ const setupErrorHandlers = (app: Express) => {
         error: error.message,
       });
     } else {
+      console.trace(error);
       rollbar.critical(error); // unexpected error
       res.status(500);
       res.json({
