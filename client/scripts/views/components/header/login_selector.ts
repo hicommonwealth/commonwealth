@@ -19,7 +19,7 @@ import {
 
 import app from 'state';
 import { navigateToSubpage, initAppState } from 'app';
-import { ChainBase } from 'types';
+import { ChainBase, ChainNetwork } from 'types';
 import { AddressInfo, ITokenAdapter } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 
