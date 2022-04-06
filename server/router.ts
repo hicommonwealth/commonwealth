@@ -107,6 +107,7 @@ import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
+import updateChainCategory from './routes/updateChainCategory';
 
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
@@ -561,6 +562,13 @@ function setupRouter(
     '/disableImmediateEmails',
     passport.authenticate('jwt', { session: false }),
     disableImmediateEmails.bind(this, models)
+  );
+
+  // chain categories
+  router.post(
+    '/updateChainCategory',
+    passport.authenticate('jwt', { session: false }),
+    updateChainCategory.bind(this, models)
   );
 
   // settings

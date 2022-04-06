@@ -8,6 +8,8 @@ import { factory, formatFilename } from '../shared/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
 import ChainFactory, { ChainModelStatic } from './models/chain';
+import ChainCategoryFactory, { ChainCategoryModelStatic } from './models/chain_category';
+import ChainCategoryTypeFactory, { ChainCategoryTypeModelStatic } from './models/chain_category_type';
 import ChainEntityFactory, {
   ChainEntityModelStatic,
 } from './models/chain_entity';
@@ -95,6 +97,8 @@ import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
 export type Models = {
   Address: AddressModelStatic;
   Chain: ChainModelStatic;
+  ChainCategory: ChainCategoryModelStatic;
+  ChainCategoryType: ChainCategoryTypeModelStatic;
   ChainEntity: ChainEntityModelStatic;
   ChainEvent: ChainEventModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
@@ -169,6 +173,8 @@ export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
+  ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
+  ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
   ChainEntity: ChainEntityFactory(sequelize, DataTypes),
   ChainEvent: ChainEventFactory(sequelize, DataTypes),
   ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
