@@ -8,3 +8,19 @@
     margin-left: 8px;
   }
 }
+
+.cui-popover-content {
+  padding: 0;
+}
+
+.cui-menu {
+  .cui-menu-divider {
+    margin: 0;
+  }
+
+  .cui-button {
+    height: 40px;
+    min-height: 40px;
+    line-height: 40px;
+  }
+}
