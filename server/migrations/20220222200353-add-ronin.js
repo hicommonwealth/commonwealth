@@ -14,6 +14,7 @@ module.exports = {
       await queryInterface.bulkDelete('Addresses', { chain }, { transaction: t });
       await queryInterface.bulkDelete('ChainNodes', { chain }, { transaction: t });
       await queryInterface.bulkDelete('Notifications', { chain_id: chain }, { transaction: t });
+      await queryInterface.bulkDelete('ChainCategories', { chain_id: chain }, {transaction: t});
       await queryInterface.bulkDelete('Chains', { id: [chain] }, { transaction: t });
       await queryInterface.bulkInsert('Chains', [{
         id: 'axie-infinity',
