@@ -251,19 +251,8 @@ class HomepageCommunityCards implements m.ClassComponent {
     };
 
     const sortedChains = sortChains(this.myChains, this.filterMap);
-    //   this.myChains.filter(
-    //     (c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage
-    //   ),
-    //   this.filterMap
-    // );
-    const betaChains = sortChains(
-      this.myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage),
-      this.filterMap
-    );
 
-    const totalCommunitiesString = buildCommunityString(
-      sortedChains.length + betaChains.length
-    );
+    const totalCommunitiesString = buildCommunityString(sortedChains.length);
 
     return (
       <div class="HomepageCommunityCards">
