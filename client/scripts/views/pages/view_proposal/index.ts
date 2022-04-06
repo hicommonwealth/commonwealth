@@ -561,6 +561,7 @@ const ProposalComment: m.Component<
       isAdmin,
       isLast,
     } = vnode.attrs;
+
     if (!comment) return;
     const parentType = comment.parentComment
       ? CommentParent.Comment
