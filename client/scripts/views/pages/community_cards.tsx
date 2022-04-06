@@ -250,12 +250,12 @@ class HomepageCommunityCards implements m.ClassComponent {
       return res;
     };
 
-    const sortedChains = sortChains(
-      this.myChains.filter(
-        (c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage
-      ),
-      this.filterMap
-    );
+    const sortedChains = sortChains(this.myChains, this.filterMap);
+    //   this.myChains.filter(
+    //     (c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage
+    //   ),
+    //   this.filterMap
+    // );
     const betaChains = sortChains(
       this.myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage),
       this.filterMap
@@ -308,12 +308,8 @@ class HomepageCommunityCards implements m.ClassComponent {
             })}
           </div>
         </div>
-        <div class="communities-list">{sortedChains}</div>
-        <div class="communities-header">
-          {betaChains.length > 0 && <h4>Testnets & Alpha Networks</h4>}
-        </div>
         <div class="communities-list">
-          {betaChains}
+          {sortedChains}
           <CWCard
             elevation="elevation-2"
             interactive={true}
