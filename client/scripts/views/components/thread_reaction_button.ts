@@ -18,7 +18,7 @@ import {
 import User from 'views/components/widgets/user';
 import ReactionCount from 'models/ReactionCount';
 import SelectAddressModal from '../modals/select_address_modal';
-import LoginModal from '../modals/login_modal';
+import { LoginModal } from '../modals/login_modal';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 

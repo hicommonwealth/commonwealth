@@ -167,7 +167,7 @@ const ReferendaPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.referenda-container', [
         onSubstrate && m(SubstrateProposalStats),
         m('.clear'),
         m(Listing, {
@@ -180,7 +180,7 @@ const ReferendaPage: m.Component<{}> = {
           columnHeader: 'Inactive Referenda',
         }),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

@@ -77,8 +77,8 @@ import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
 import getThreads from './routes/getThreads';
-import searchDiscussions from './routes/searchDiscussions'
-import searchComments from './routes/searchComments'
+import searchDiscussions from './routes/searchDiscussions';
+import searchComments from './routes/searchComments';
 import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
@@ -93,7 +93,8 @@ import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
 import createTopic from './routes/createTopic';
-import updateTopics from './routes/updateTopics';
+import updateTopic from './routes/updateTopic';
+import orderTopics from './routes/orderTopics';
 import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
@@ -106,6 +107,7 @@ import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
+import updateChainCategory from './routes/updateChainCategory';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
@@ -216,7 +218,10 @@ function setupRouter(
   router.post('/tokenBalance', tokenBalance.bind(this, models, tokenBalanceCache));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
-  router.get('/getSupportedEthChains', getSupportedEthChains.bind(this, models));
+  router.get(
+    '/getSupportedEthChains',
+    getSupportedEthChains.bind(this, models)
+  );
 
   // offchain threads
   router.post(
@@ -353,9 +358,14 @@ function setupRouter(
     createTopic.bind(this, models)
   );
   router.post(
-    '/updateTopics',
+    '/updateTopic',
     passport.authenticate('jwt', { session: false }),
-    updateTopics.bind(this, models)
+    updateTopic.bind(this, models)
+  );
+  router.post(
+    '/orderTopics',
+    passport.authenticate('jwt', { session: false }),
+    orderTopics.bind(this, models)
   );
   router.post(
     '/editTopic',
@@ -484,7 +494,7 @@ function setupRouter(
     '/discordAccount',
     passport.authenticate('jwt', { session: false }),
     deleteSocialAccount.bind(this, models, 'discord')
-  )
+  );
 
   // offchain viewCount
   router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
@@ -558,6 +568,13 @@ function setupRouter(
     disableImmediateEmails.bind(this, models)
   );
 
+  // chain categories
+  router.post(
+    '/updateChainCategory',
+    passport.authenticate('jwt', { session: false }),
+    updateChainCategory.bind(this, models)
+  );
+
   // settings
   router.post(
     '/writeUserSetting',
@@ -573,11 +590,17 @@ function setupRouter(
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
 
   router.get('/auth/github', startOAuthLogin.bind(this, models, 'github'));
-  router.get('/auth/github/callback', startOAuthLogin.bind(this, models, 'github'));
+  router.get(
+    '/auth/github/callback',
+    startOAuthLogin.bind(this, models, 'github')
+  );
   router.get('/finishOAuthLogin', finishOAuthLogin.bind(this, models));
 
   router.get('/auth/discord', startOAuthLogin.bind(this, models, 'discord'));
-  router.get('/auth/discord/callback', startOAuthLogin.bind(this, models, 'discord'));
+  router.get(
+    '/auth/discord/callback',
+    startOAuthLogin.bind(this, models, 'discord')
+  );
 
   router.post(
     '/auth/magic',

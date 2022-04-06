@@ -386,7 +386,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
         showNewProposalButton: true,
       },
       [
-        [
+        m('.profile-container', [
           displayBanner &&
             m(ProfileBanner, {
               account,
@@ -454,7 +454,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
               }),
             ]),
           ]),
-        ],
+        ]),
       ]
     );
   },
