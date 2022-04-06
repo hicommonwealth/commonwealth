@@ -368,14 +368,17 @@ export const ProposalEditorPermissions: m.Component<
 > = {
   view: (vnode) => {
     const { thread } = vnode.attrs;
+    // TODO Graham 4/4/21: We should begin developing boilerplate around fetching toggles, state
     if (!vnode.state.membersFetched) {
       vnode.state.membersFetched = true;
       const chainOrCommObj = { chain: app.activeChainId() };
+      // TODO Graham 4/4/21: This needs pagination, search, or serializing.
+      // The fetch time for large communities is getting unwieldy.
       $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
-        .then((res) => {
-          if (res.status !== 'Success')
+        .then((response) => {
+          if (response.status !== 'Success')
             throw new Error('Could not fetch members');
-          vnode.state.items = res.result.filter((role) => {
+          vnode.state.items = response.result.filter((role) => {
             return role.Address.address !== app.user.activeAccount?.address;
           });
           m.redraw();
@@ -518,7 +521,8 @@ export const ProposalEditorPermissions: m.Component<
           onclick: async () => {
             if (!$.isEmptyObject(vnode.state.addedEditors)) {
               try {
-                const res = await $.post(`${app.serverUrl()}/addEditors`, {
+                // TODO Graham 4/4/22: Break off into proper controller methods
+                const response = await $.post(`${app.serverUrl()}/addEditors`, {
                   address: app.user.activeAccount.address,
                   author_chain: app.user.activeAccount.chain.id,
                   chain: app.activeChainId(),
@@ -526,8 +530,9 @@ export const ProposalEditorPermissions: m.Component<
                   editors: JSON.stringify(vnode.state.addedEditors),
                   jwt: app.user.jwt,
                 });
-                if (res.status === 'Success') {
-                  thread.collaborators = res.result.collaborators;
+                const { status, result } = response;
+                if (status === 'Success') {
+                  thread.collaborators = result.collaborators;
                   notifySuccess('Collaborators added');
                 } else {
                   notifyError('Failed to add collaborators');
@@ -542,16 +547,20 @@ export const ProposalEditorPermissions: m.Component<
             }
             if (!$.isEmptyObject(vnode.state.removedEditors)) {
               try {
-                const res = await $.post(`${app.serverUrl()}/deleteEditors`, {
-                  address: app.user.activeAccount.address,
-                  author_chain: app.user.activeAccount.chain.id,
-                  chain: app.activeChainId(),
-                  thread_id: thread.id,
-                  editors: JSON.stringify(vnode.state.removedEditors),
-                  jwt: app.user.jwt,
-                });
-                if (res.status === 'Success') {
-                  thread.collaborators = res.result.collaborators;
+                const response = await $.post(
+                  `${app.serverUrl()}/deleteEditors`,
+                  {
+                    address: app.user.activeAccount.address,
+                    author_chain: app.user.activeAccount.chain.id,
+                    chain: app.activeChainId(),
+                    thread_id: thread.id,
+                    editors: JSON.stringify(vnode.state.removedEditors),
+                    jwt: app.user.jwt,
+                  }
+                );
+                const { status, result } = response;
+                if (status === 'Success') {
+                  thread.collaborators = result.collaborators;
                   notifySuccess('Collaborators removed');
                 } else {
                   throw new Error('Failed to remove collaborators');
