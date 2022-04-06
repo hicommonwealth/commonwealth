@@ -60,8 +60,9 @@ export class LoginSelectorMenuLeft
             label={m(UserBlock, {
               user: account,
               selected: isSameAccount(account, app.user.activeAccount),
-              showRole: true,
+              showRole: false,
               compact: true,
+              avatarSize: 16,
             })}
           />
         ))}
@@ -395,12 +396,10 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
           app.user.activeAccount && (
             <Cui.Popover
               hasArrow={false}
-              class="login-selector-popover"
               closeOnContentClick={true}
               transitionDuration={0}
               hoverCloseDelay={0}
               position="top-end"
-              inline={true}
               trigger={
                 <Cui.Button
                   label={m(User, {
@@ -419,14 +418,13 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
           )}
         <Cui.Popover
           hasArrow={false}
-          class="login-selector-popover"
           closeOnContentClick={true}
           transitionDuration={0}
           hoverCloseDelay={0}
           position="top-end"
           trigger={
             <Cui.Button
-              class="login-selector-right"
+              class="login-selector-right-button"
               intent="none"
               fluid={true}
               compact={true}

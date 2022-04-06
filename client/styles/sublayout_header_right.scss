@@ -8,3 +8,22 @@
     margin-left: 8px;
   }
 }
+
+// these have to be outside of the main styles
+// because the popovers are portals
+
+.cui-popover-content {
+  padding: 0;
+}
+
+.cui-menu {
+  .cui-menu-divider {
+    margin: 0;
+  }
+
+  .cui-button {
+    height: 40px;
+    min-height: 40px;
+    line-height: 40px;
+  }
+}

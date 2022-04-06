@@ -52,14 +52,15 @@ class MobileAccountMenu implements m.ClassComponent {
       <Menu class="MobileAccountMenu">
         {app.isLoggedIn() ? (
           <>
-            {app.activeChainId() &&
-              m(LoginSelectorMenuLeft, {
-                activeAddressesWithRole,
-                nAccountsWithoutRole,
-                mobile: true,
-              })}
+            {app.activeChainId() && (
+              <LoginSelectorMenuLeft
+                activeAddressesWithRole={activeAddressesWithRole}
+                nAccountsWithoutRole={nAccountsWithoutRole}
+                mobile={true}
+              />
+            )}
             {app.activeChainId() && <MenuDivider />}
-            {m(LoginSelectorMenuRight, { mobile: true })}
+            <LoginSelectorMenuRight mobile={true} />
           </>
         ) : (
           <MenuItem
