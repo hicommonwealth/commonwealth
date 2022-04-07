@@ -22,7 +22,6 @@ const validate = async (token: string, stateId: string, chain: string): Promise<
     console.error(`Post request error: ${e.responseText}`);
     return `Login Error: ${e.responseText}`;
   }
-  console.log(result);
   if (result.status === 'Success') {
     await initAppState();
     const selectedChainMeta = app.config.chains.getById('axie-infinity');
@@ -41,7 +40,6 @@ const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
     // TODO: how to use state id?
     const token = m.route.param('token');
     const stateId = m.route.param('stateId');
-    console.log(token);
     validate(token, stateId, 'axie-infinity').then((res) => {
       if (typeof res === 'string') {
         vnode.state.error = res;
