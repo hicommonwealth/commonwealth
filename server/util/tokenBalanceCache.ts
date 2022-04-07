@@ -70,7 +70,6 @@ export class TokenBalanceProvider {
     ];
     const axsStakingPoolContract = new web3.eth.Contract(axsStakingAbi, axsStakingPoolAddress);
     const stakingPoolBalance = await axsStakingPoolContract.methods.getStakingAmount(address).call();
-    console.log(stakingPoolBalance);
     provider.disconnect();
     return new BN(axsBalanceBigNum.toString()).add(new BN(stakingPoolBalance.toString()));
   }
