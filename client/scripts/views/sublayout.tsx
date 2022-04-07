@@ -8,13 +8,13 @@ import app from 'state';
 import { handleEmailInvites } from 'views/components/header/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
 import { MobileHeader } from 'views/mobile/mobile_header';
-import { LandingPageFooter } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './sublayout_header_left';
 import { SublayoutHeaderRight } from './sublayout_header_right';
 import { TokenHero } from './token_hero';
 import { TokenTerms } from './token_terms';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
+import { Footer } from './footer';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
@@ -91,9 +91,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               <TokenHero chain={chain} hero={hero} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
               {vnode.children}
-              {!app.isCustomDomain() && (
-                <LandingPageFooter list={footercontents} />
-              )}
+              {!app.isCustomDomain() && <Footer list={footercontents} />}
             </div>
           </div>
         </div>
