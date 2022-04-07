@@ -327,12 +327,10 @@ class HomepageCommunityCards implements m.ClassComponent {
 
 const CommunityCardPage: m.Component = {
   view: () => {
-    return m(
-      Sublayout,
-      {
-        class: 'Homepage',
-      },
-      [m(HomepageCommunityCards)]
+    return (
+      <Sublayout>
+        <HomepageCommunityCards />
+      </Sublayout>
     );
   },
 };

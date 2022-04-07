@@ -62,14 +62,13 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
     return m(
       Sublayout,
       {
-        class: 'NewProposalPage',
         title: `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(
           vnode.state.typeEnum
         )}`,
         showNewProposalButton: true,
       },
       [
-        m('.forum-container', [
+        m('.NewProposalPage', [
           m(
             'h3',
             `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(

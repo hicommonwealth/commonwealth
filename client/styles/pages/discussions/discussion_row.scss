@@ -22,10 +22,6 @@
     justify-content: center;
     margin-right: 24px;
     min-width: 48px;
-
-    svg {
-      fill: currentColor;
-    }
   }
 
   .title-container {
@@ -46,6 +42,7 @@
       align-items: baseline;
       color: $text-color-light;
       display: flex;
+      flex-wrap: wrap;
       width: 100%;
 
       .discussion-locked {
@@ -77,6 +74,7 @@
         max-height: 24px;
         pointer-events: none;
         min-height: 24px;
+        min-width: 0;
 
         .cui-button-label {
           font-size: 14px;
@@ -84,7 +82,7 @@
       }
 
       > * {
-        margin: 0 8px 0 0;
+        margin: 0 8px 4px 0;
       }
     }
   }

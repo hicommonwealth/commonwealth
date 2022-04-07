@@ -161,51 +161,39 @@ const FinishNearLogin: m.Component<{}, IState> = {
       return m(PageNotFound);
     }
     if (vnode.state.validationError) {
-      return m(
-        Sublayout,
-        {
-          class: 'FinishNearLogin',
-        },
-        [
-          m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
-          m(
-            'button.formular-button-primary',
-            {
-              onclick: (e) => {
-                e.preventDefault();
-                redirectToNextPage();
-              },
+      return m(Sublayout, [
+        m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
+        m(
+          'button.formular-button-primary',
+          {
+            onclick: (e) => {
+              e.preventDefault();
+              redirectToNextPage();
             },
-            'Return Home'
-          ),
-        ]
-      );
+          },
+          'Return Home'
+        ),
+      ]);
     } else if (vnode.state.validationCompleted) {
-      return m(
-        Sublayout,
-        {
-          class: 'FinishNearLogin',
-        },
-        [
-          m('div', {
-            oncreate: (e) => {
-              if (vnode.state.validatedAccount.profile.name) {
-                redirectToNextPage();
-              } else {
-                app.modals.create({
-                  modal: LinkNewAddressModal,
-                  data: {
-                    alreadyInitializedAccount: vnode.state.validatedAccount,
-                  },
-                  exitCallback: () => {
-                    redirectToNextPage();
-                  },
-                });
-              }
-            },
-          }),
-        ]
-      );
+      return m(Sublayout, [
+        m('div', {
+          oncreate: (e) => {
+            if (vnode.state.validatedAccount.profile.name) {
+              redirectToNextPage();
+            } else {
+              app.modals.create({
+                modal: LinkNewAddressModal,
+                data: {
+                  alreadyInitializedAccount: vnode.state.validatedAccount,
+                },
+                exitCallback: () => {
+                  redirectToNextPage();
+                },
+              });
+            }
+          },
+        }),
+      ]);
     } else if (!vnode.state.validating) {
       // chain loaded and on near -- finish login and call lingering txs
       vnode.state.validating = true;
