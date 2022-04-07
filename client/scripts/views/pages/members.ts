@@ -199,7 +199,6 @@ const MembersPage: m.Component<
     return m(
       Sublayout,
       {
-        class: 'MembersPage',
         title: [
           'Members',
           m(Tag, {
@@ -211,7 +210,7 @@ const MembersPage: m.Component<
         showNewProposalButton: true,
         onscroll: vnode.state.onscroll,
       },
-      m('.members-container', [
+      m('.MembersPage', [
         [
           m(
             '.title',

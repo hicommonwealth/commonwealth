@@ -10,10 +10,6 @@
   min-width: $sidebar-width;
   overflow-y: auto;
 
-  &.custom-domain {
-    left: 0;
-  }
-
   .section-header {
     color: $text-color-light;
     font-size: 18px;
@@ -49,22 +45,19 @@
   }
 }
 
-.PoweredBy {
-  background-image: url('/static/img/powered-by.svg');
+.powered-by {
+  background-image: url(/static/img/powered-by.svg);
   background-position: center;
   background-repeat: no-repeat;
-  border-color: #f9f9f9;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  height: 60.99px;
-  margin-top: 10%;
-  position: absolute;
-  width: 171.43px;
-}
+  height: 104px;
+  width: 100%;
 
-.PoweredBy:hover {
-  background-image: url('/static/img/powered-by-2.svg');
+  &:hover {
+    background-image: url('/static/img/powered-by-2.svg');
+  }
 }
 
 .cui-popover.community-options-popover .cui-menu,
