@@ -27,7 +27,7 @@ export class TokenTerms implements m.ClassComponent<TermsAttrs> {
             </div>
           </a>
           <CWIcon
-            iconName="x"
+            iconName="close"
             iconSize="small"
             onclick={() => {
               localStorage.setItem(`${app.activeChainId()}-tos`, 'off');

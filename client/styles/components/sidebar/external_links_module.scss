@@ -1,4 +1,3 @@
-$border-color-tint-percentage: 70%;
 $telegram-color: #2480cc;
 $element-color: #0cbd8b;
 $discord-color: #677bc4;
@@ -21,19 +20,16 @@ $default-color: #222222;
   .telegram-link {
     color: $telegram-color;
     cursor: pointer;
-    fill: currentColor;
   }
 
   .element-link {
     color: $element-color;
     cursor: pointer;
-    fill: currentColor;
   }
 
   .discord-link {
     color: $discord-color;
     cursor: pointer;
-    fill: currentColor;
   }
 
   .website-link {
@@ -44,6 +40,5 @@ $default-color: #222222;
   .github-link {
     color: $default-color;
     cursor: pointer;
-    fill: currentColor;
   }
 }
