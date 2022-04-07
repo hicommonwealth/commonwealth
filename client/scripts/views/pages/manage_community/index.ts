@@ -5,8 +5,9 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { navigateToSubpage } from 'app';
 import { ChainInfo, RoleInfo, RolePermission, Webhook } from 'models';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
@@ -63,6 +64,16 @@ const ManageCommunityPage: m.Component<
     if (!app.activeChainId()) {
       return;
     }
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+      });
+
+    if (!isAdmin) {
+      navigateToSubpage(``);
+    }
+
     const chainOrCommObj = { chain: app.activeChainId() };
     const loadRoles = async () => {
       try {
@@ -181,7 +192,11 @@ const ManageCommunityPage: m.Component<
           m(deleteChainButton, {
             chain: app.config.chains.getById(app.activeChainId()),
           }),
-      ])
+      ]),
+      app.user.isSiteAdmin &&
+        m(deleteChainButton, {
+          chain: app.config.chains.getById(app.activeChainId()),
+        })
     );
   },
 };

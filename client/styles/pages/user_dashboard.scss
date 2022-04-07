@@ -75,6 +75,9 @@
     align-items: center;
     display: flex;
     flex-direction: column;
+    .title {
+      cursor: pointer;
+    }
   }
 
   .home-card {

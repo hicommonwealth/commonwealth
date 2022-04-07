@@ -121,6 +121,28 @@
       button {
         margin-right: 0;
       }
+
+      .tag-row {
+        margin-top: 0px;
+        display: flex;
+        flex-direction: column;
+
+        label {
+          @include form-label;
+        }
+
+        .tag-group {
+          margin-top: 10px;
+          margin-bottom: 10px;
+        }
+        .filter-button {
+          height: 25px;
+          padding-top: 1px;
+          margin-left: 7px;
+          min-width: 50px;
+          margin-bottom: 8px;
+        }
+      }
     }
   }
 
