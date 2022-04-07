@@ -306,7 +306,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       };
 
       this.onscroll = _.debounce(async () => {
-        console.log('scrawling');
         if (this.postsDepleted[subpage]) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
