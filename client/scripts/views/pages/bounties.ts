@@ -410,7 +410,6 @@ const BountiesPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'BountiesPage',
         title: [
           'Bounties',
           m(Tag, {
@@ -421,7 +420,7 @@ const BountiesPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      m('.bounties-container', [
+      m('.BountiesPage', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),

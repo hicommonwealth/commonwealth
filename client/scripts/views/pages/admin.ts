@@ -541,25 +541,20 @@ const AdminPage: m.Component<{}> = {
 
     return m(
       Sublayout,
-      {
-        class: 'AdminPage',
-      },
-      [
-        m('.forum-container', [
-          m(Tabs, [
-            {
-              name: 'Admin',
-              content: app.chain
-                ? [m(AdminActions), m(SudoForm), m(ChainStats)]
-                : [],
-            },
-            {
-              name: 'Manage Chains and Nodes',
-              content: m(ChainManager),
-            },
-          ]),
+      m('.AdminPage', [
+        m(Tabs, [
+          {
+            name: 'Admin',
+            content: app.chain
+              ? [m(AdminActions), m(SudoForm), m(ChainStats)]
+              : [],
+          },
+          {
+            name: 'Manage Chains and Nodes',
+            content: m(ChainManager),
+          },
         ]),
-      ]
+      ])
     );
   },
 };

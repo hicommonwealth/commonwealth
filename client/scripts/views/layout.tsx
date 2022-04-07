@@ -20,7 +20,7 @@ import { AppModals } from './app_modals';
 class LoadingLayout implements m.ClassComponent {
   view() {
     return (
-      <div class={`Layout${app.isCustomDomain() ? ' custom-domain' : ''}`}>
+      <div class="Layout">
         <Spinner active={true} fill={true} size="xl" />
         <AppModals />
         <AppToasts />
@@ -50,7 +50,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
 
     if (app.loadingError) {
       return (
-        <div class={`Layout${app.isCustomDomain() ? ' custom-domain' : ''}`}>
+        <div class="Layout">
           <EmptyState
             fill={true}
             icon={Icons.ALERT_TRIANGLE}
@@ -79,7 +79,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return (
-        <div class={`Layout${app.isCustomDomain() ? ' custom-domain' : ''}`}>
+        <div class="Layout">
           <PageNotFound />
           <AppModals />
           <AppToasts />
@@ -120,11 +120,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
     return (
-      <div
-        class={`Layout${hideSidebar ? ' hide-sidebar' : ''}${
-          app.isCustomDomain() ? ' custom-domain' : ''
-        }`}
-      >
+      <div class={`Layout${hideSidebar ? ' hide-sidebar' : ''}`}>
         {vnode.children}
         <AppModals />
         <AppToasts />

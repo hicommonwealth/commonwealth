@@ -1,16 +1,14 @@
 @import 'client/styles/shared';
 
 .SearchPage {
-  .search-page-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    margin: 0 auto;
-    width: 904px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 904px;
 
-    @include sm-max {
-      width: 100%;
-    }
+  @include sm-max {
+    width: 100%;
   }
 
   .search-page-input {

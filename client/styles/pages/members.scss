@@ -1,11 +1,11 @@
 @import 'client/styles/shared';
 
 .MembersPage {
-  .members-container {
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
-  }
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+
   .title {
     font-size: 32px;
     padding-left: 12px;
