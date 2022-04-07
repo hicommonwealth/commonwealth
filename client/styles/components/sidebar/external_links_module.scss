@@ -1,7 +1,4 @@
-$telegram-color: #2480cc;
-$element-color: #0cbd8b;
-$discord-color: #677bc4;
-$default-color: #222222;
+@import 'shared.scss';
 
 .ExternalLinksModule {
   display: flex;
@@ -13,32 +10,32 @@ $default-color: #222222;
   }
 
   .cui-link:hover {
-    background: #6966ff;
-    color: white;
+    background: $purple-400;
+    color: $white;
   }
 
   .telegram-link {
-    color: $telegram-color;
+    color: $primary-500;
     cursor: pointer;
   }
 
   .element-link {
-    color: $element-color;
+    color: $green-500;
     cursor: pointer;
   }
 
   .discord-link {
-    color: $discord-color;
+    color: $purple-300;
     cursor: pointer;
   }
 
   .website-link {
-    color: $default-color;
+    color: $neutral-800;
     cursor: pointer;
   }
 
   .github-link {
-    color: $default-color;
+    color: $neutral-800;
     cursor: pointer;
   }
 }

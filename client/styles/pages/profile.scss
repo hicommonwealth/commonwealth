@@ -5,7 +5,7 @@
     margin: 32px 0 30px;
   }
   .no-items {
-    color: $text-color-light;
+    color: $neutral-500;
     margin-bottom: 20px;
   }
   .QuillFormattedText,
@@ -37,23 +37,23 @@
 @mixin comment-level {
   margin-top: 24px;
   padding-bottom: 18px;
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid $neutral-100;
   .proposal-title {
-    color: black !important;
+    color: $black !important;
     font-weight: 600;
   }
   .summary {
-    color: $text-color-light;
+    color: $neutral-500;
     margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
   }
   .summary > .User > .username {
-    color: $primary-bg-color !important;
+    color: $primary-500 !important;
   }
   .link-bold {
     font-weight: 500;
-    color: #000000;
+    color: $black;
   }
   .link-normal {
     color: inherit;
@@ -64,13 +64,13 @@
     }
     .proposal-timestamp,
     .proposal-author {
-      color: $text-color-light;
+      color: $neutral-500;
     }
     .proposal-meta {
       padding-top: 2px;
       font-size: inherit;
       .username {
-        color: black !important;
+        color: $black !important;
       }
     }
   }
@@ -78,7 +78,7 @@
     padding-bottom: 6px;
     .comment-meta,
     .comment-timestamp {
-      color: $text-color-light;
+      color: $neutral-500;
     }
   }
 }
@@ -98,17 +98,17 @@
       flex-direction: row !important;
       margin-bottom: 12px;
       border-bottom: none;
-      background-color: white;
+      background-color: $white;
     }
     a.tab-entry {
       padding: 12px 0 0 0;
       margin-right: 18px;
       margin-bottom: 10px;
-      color: $text-color-medium;
+      color: $neutral-500;
 
       .count {
         display: inline;
-        background-color: #eeeeee;
+        background-color: $neutral-100;
         padding: 1px 8px 3px;
         border-radius: 9999px;
         font-size: 14px;
@@ -116,7 +116,7 @@
       }
     }
     a.tab-entry.active {
-      color: $text-color-darker;
+      color: $neutral-900;
     }
   }
   @include sm-max {
@@ -153,12 +153,12 @@
   .header {
     font-size: 24px;
     font-weight: 600;
-    color: $text-color-darker;
+    color: $neutral-900;
     margin-top: 32px;
     margin-bottom: 6px;
   }
   .no-items {
-    color: $text-color-light;
+    color: $neutral-500;
     margin: 8px 0 20px;
   }
 
@@ -167,7 +167,7 @@
     align-items: center;
 
     .address {
-      color: #666666;
+      color: $neutral-600;
       margin-right: 8px;
     }
   }
@@ -204,7 +204,11 @@
   button.cui-button.cui-fluid {
     width: fit-content;
     border-radius: 6px;
-    background-image: linear-gradient(to bottom left, #6086d1, #b37dba);
+    background-color: $purple-300;
+
+    &:hover {
+      background-color: $purple-400;
+    }
 
     span {
       padding-right: 0px;
@@ -231,9 +235,9 @@
       margin: 6px 16px 6px 0;
       border-radius: 8px;
       padding: 5px 15px 5px 15px;
-      background: #ffffff;
-      border: 1px solid #4723ad;
-      color: #4723ad;
+      background: $white;
+      border: 1px solid $purple-400;
+      color: $purple-400;
       font-weight: 500;
       font-size: 18px;
       text-transform: uppercase;
@@ -260,8 +264,8 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
-  border: 1px solid $border-color-light;
-  box-shadow: 0px 0px 1px 1px $border-color-light;
+  border: 1px solid $neutral-100;
+  box-shadow: 0px 0px 1px 1px $neutral-100;
   margin-top: 24px;
   .banner-text {
     margin-right: 12px;
@@ -299,7 +303,7 @@
       font-size: 24px;
       font-weight: 600;
       .username {
-        color: $text-color-darker;
+        color: $neutral-900;
       }
     }
     .role-tag {
@@ -327,9 +331,9 @@
         margin-right: 16px;
         border-radius: 8px;
         padding: 5px 15px 5px 15px;
-        background: #ffffff;
-        border: 1px solid #4723ad;
-        color: #4723ad;
+        background: $white;
+        border: 1px solid $purple-400;
+        color: $purple-400;
         font-weight: 500;
         font-size: 18px;
         text-transform: uppercase;
@@ -345,7 +349,7 @@
       align-items: center;
 
       .address {
-        color: #666666;
+        color: $neutral-600;
         margin-right: 8px;
       }
     }
@@ -369,13 +373,13 @@
     }
     .no-verification {
       display: inline-block;
-      color: $text-color-medium;
+      color: $neutral-500;
     }
     .verification-icon {
       position: relative;
       top: 2px;
       display: inline-block;
-      background: $primary-bg-color;
+      background: $primary-500;
       width: 16px;
       height: 16px;
       border-radius: 8px;
@@ -390,17 +394,17 @@
     .verification-icon.unverified {
       position: relative;
       top: 0;
-      color: $text-color-white;
-      background: $text-color-medium;
+      color: $white;
+      background: $neutral-500;
       position: relative;
       padding-left: 4px;
       font-size: 95%;
     }
     .verification-icon.none {
-      background: $text-color-medium;
+      background: $neutral-500;
     }
     .verification-icon.unverified {
-      background: $intermediate-icon-color;
+      background: $rorange-200;
     }
   }
   .info-row {
@@ -414,7 +418,7 @@
       }
       a {
         text-decoration: none;
-        color: $text-color-light;
+        color: $neutral-500;
       }
       .space {
         flex: 1;
@@ -422,7 +426,12 @@
       button.cui-button.cui-fluid {
         width: fit-content;
         border-radius: 6px;
-        background-image: linear-gradient(to bottom left, #6086d1, #b37dba);
+        background-color: $purple-300;
+
+        &:hover {
+          background-color: $purple-400;
+        }
+
         span {
           padding-right: 0px;
         }
@@ -435,12 +444,12 @@
   }
   .profile-headline {
     .no-headline {
-      color: $text-color-light;
+      color: $neutral-500;
     }
   }
   .username,
   span.copy-done {
-    color: $text-color-light;
+    color: $neutral-500;
   }
 }
 
@@ -450,10 +459,10 @@
     margin: 32px 0;
   }
   a.btn {
-    background-color: white !important;
-    border: 1px solid $primary-bg-color !important;
+    background-color: $white !important;
+    border: 1px solid $primary-500 !important;
     background-image: none !important;
-    color: $primary-bg-color;
+    color: $primary-500;
     border-radius: 4px;
   }
   .infinite-scroll {
@@ -470,8 +479,8 @@
   .no-content {
     padding: 20px 0 10px 0;
     text-align: center;
-    border-top: 1px solid $border-color-lightest;
-    color: $text-color-light;
+    border-top: 1px solid $neutral-50;
+    color: $neutral-500;
   }
 }
 
@@ -496,6 +505,6 @@
     margin-top: 16px;
   }
   .placeholder {
-    color: $text-color-light;
+    color: $neutral-500;
   }
 }

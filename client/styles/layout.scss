@@ -4,4 +4,12 @@
   height: 100%;
   overflow: hidden;
   width: 100%;
+
+  .loading-error {
+    align-items: center;
+    color: $neutral-800;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }

@@ -7,23 +7,23 @@ $discussion-comment-padding: 28px; // padding between comment content & avatar
 $discussion-comment-padding-mobile: 16px;
 
 $discussion-meta-font-size: 1rem;
-$discussion-meta-color: $text-color-light;
+$discussion-meta-color: $neutral-500;
 
 $discussion-title-font-size: 1.45rem;
 
 @mixin supports-jump-highlight() {
   &.highlighted {
     border-radius: 20px;
-    background-color: $background-color-new-comment;
+    background-color: $yellow-200;
     .thread-connector {
-      background: #00c0a9;
+      background: $green-500;
     }
   }
   &.highlighted.highlightAnimationComplete {
     background-color: transparent;
     transition: background-color 1s ease-in-out;
     .thread-connector {
-      background: $background-color-light;
+      background: $neutral-200;
       transition: background 1s ease-in-out;
     }
   }
@@ -61,7 +61,7 @@ $discussion-title-font-size: 1.45rem;
       align-items: center;
       .InlineReplyButton,
       .ProposalBodyReaction {
-        border: 1px solid $text-color-medium;
+        border: 1px solid $neutral-500;
         margin-right: 7%;
         padding: 6px;
         cursor: pointer;
@@ -74,24 +74,27 @@ $discussion-title-font-size: 1.45rem;
         margin-right: 10%;
         padding: 6px;
         cursor: pointer;
+
         &:hover {
+          border: 1px solid $purple-400;
+
           .cui-icon,
           .reply-count,
           .reactions-count {
-            color: #4723ad;
+            color: $purple-400;
           }
         }
         .active {
           .cui-icon,
           .reply-count,
           .reactions-count {
-            color: #4723ad !important;
+            color: $purple-400 !important;
           }
         }
         .cui-icon,
         .reply-count,
         .reactions-count {
-          color: $text-color-medium;
+          color: $neutral-500;
           font-weight: 500;
         }
         .cui-icon {
@@ -141,7 +144,7 @@ $discussion-title-font-size: 1.45rem;
     &.proposal-snapshot {
       .snapshot-proposal-top {
         display: flex;
-        border-bottom: 1px solid $background-color-light;
+        border-bottom: 1px solid $neutral-200;
       }
       .proposal-content {
         padding: 25px 0;
@@ -150,7 +153,7 @@ $discussion-title-font-size: 1.45rem;
     .proposal-top {
       display: flex;
       padding-bottom: 16px;
-      border-bottom: 1px solid $background-color-light;
+      border-bottom: 1px solid $neutral-200;
     }
     .proposal-top-left {
       flex: 1;
@@ -182,7 +185,7 @@ $discussion-title-font-size: 1.45rem;
           .ExecuteButton,
           .QueueButton {
             button {
-              color: white;
+              color: $white;
               background: linear-gradient(
                 268.96deg,
                 #00db8c 2.02%,
@@ -192,15 +195,15 @@ $discussion-title-font-size: 1.45rem;
           }
           .CancelButton {
             button {
-              color: #ff002e;
-              border: 1px solid #ff002e;
-              background: #ffffff;
+              color: $rorange-500;
+              border: 1px solid $rorange-500;
+              background: $white;
             }
           }
         }
         .ProposalHeaderOnchainId {
           font-size: 18px;
-          color: black;
+          color: $black;
         }
       }
     }
@@ -257,12 +260,12 @@ $discussion-title-font-size: 1.45rem;
         display: block;
         padding: 8px 16px;
         border-radius: 99px;
-        background: $background-color-light;
-        color: $text-color-primary;
+        background: $neutral-200;
+        color: $neutral-500;
         text-decoration: none !important;
       }
       svg {
-        stroke: $text-color-primary;
+        stroke: $primary-500;
         position: relative;
         top: -1px;
         margin-left: 5px;
@@ -273,7 +276,7 @@ $discussion-title-font-size: 1.45rem;
         min-width: $size;
       }
       a:hover {
-        background: darken($background-color-light, 1%);
+        background: $neutral-300;
       }
     }
   }
@@ -377,10 +380,10 @@ $discussion-title-font-size: 1.45rem;
       }
     }
     svg {
-      stroke: $text-color-light;
+      stroke: $neutral-500;
     }
     svg:hover {
-      stroke: $text-color-medium;
+      stroke: $neutral-500;
     }
   }
 
@@ -403,17 +406,17 @@ $discussion-title-font-size: 1.45rem;
   }
   .ProposalHeaderStage {
     &.primary {
-      color: tint($primary-bg-color, 10%);
+      color: $primary-500;
     }
     &.positive {
-      color: tint($positive-bg-color, 10%);
+      color: $green-500;
     }
     &.negative {
-      color: tint($negative-bg-color, 10%);
+      color: $rorange-500;
     }
   }
   .proposal-collaborators-popover {
-    color: $text-color-black;
+    color: $neutral-800;
     .cui-popover-content {
       padding-top: 22px;
       .User {
@@ -424,7 +427,7 @@ $discussion-title-font-size: 1.45rem;
 
   .ProposalSidebarLinkedViewer {
     border-radius: 10px;
-    border: 1px solid tint($border-color-lightest, 26%);
+    border: 1px solid $neutral-50;
     padding: 22px 18px 21px;
     margin-bottom: 24px;
     display: flex;
@@ -455,7 +458,7 @@ $discussion-title-font-size: 1.45rem;
   .ProposalSidebarPollEditorModule,
   .ProposalLinkedThreadsEditorModule {
     border-radius: 10px;
-    border: 1px solid tint($border-color-lightest, 26%);
+    border: 1px solid $neutral-100;
     padding: 22px 18px 21px;
     margin-bottom: 24px;
   }
@@ -463,9 +466,6 @@ $discussion-title-font-size: 1.45rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    a.linked-thread {
-      color: #9a9da4;
-    }
     .cui-list-item {
       &:first-child {
         padding-top: 0 !important;
@@ -481,7 +481,7 @@ $discussion-title-font-size: 1.45rem;
   }
   .ProposalSidebarPollEditorModule {
     .placeholder-copy {
-      color: shade($text-color-light, 10%);
+      color: $neutral-600;
       margin: 2px 0 12px;
     }
     .proposal-chain-entities {
@@ -506,13 +506,13 @@ $discussion-title-font-size: 1.45rem;
     }
     .offchain-poll-caption {
       font-size: 14px;
-      color: $text-color-light;
+      color: $neutral-500;
       margin-bottom: 24px;
     }
     .offchain-poll-invalid,
     .offchain-poll-no-voters {
       font-size: 16px;
-      color: $text-color-light;
+      color: $neutral-500;
     }
     .offchain-poll-voters {
       margin-top: 10px;
@@ -523,7 +523,7 @@ $discussion-title-font-size: 1.45rem;
           .poll-bar {
             height: 5px;
             border-radius: 5px;
-            background-color: $primary-bg-color;
+            background-color: $primary-500;
           }
           .option-results-label {
             display: flex;
@@ -547,9 +547,9 @@ $discussion-title-font-size: 1.45rem;
     margin-top: 14px;
   }
   .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
-    stroke: $text-color-light;
+    stroke: $neutral-500;
     &:hover {
-      stroke: $text-color-medium;
+      stroke: $neutral-500;
     }
   }
   .ProposalBodyReaction {
@@ -561,7 +561,7 @@ $discussion-title-font-size: 1.45rem;
   .ProposalBodyText.proposal-body-placeholder {
     &,
     .User .user-display-name {
-      color: $text-color-light;
+      color: $neutral-500;
     }
   }
 
@@ -578,7 +578,7 @@ $discussion-title-font-size: 1.45rem;
     position: absolute;
     top: 48px;
     bottom: -40px;
-    background: $background-color-light;
+    background: $neutral-200;
     left: 19px;
     width: 2px;
     z-index: -1;
