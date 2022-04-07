@@ -26,8 +26,8 @@ export class Sidebar implements m.ClassComponent {
           )}
           {app.chain && <ChainStatusModule />}
           {app.isCustomDomain() && (
-            <a
-              class="PoweredBy"
+            <div
+              class="powered-by"
               onclick={() => {
                 window.open('https://commonwealth.im/');
               }}
