@@ -9,7 +9,7 @@
     margin: 10px 0;
   }
   .address-listing-explanation {
-    color: $text-color-light;
+    color: $neutral-500;
     font-size: 14px;
     margin-bottom: 18px;
   }
@@ -23,7 +23,7 @@
   margin: 0;
   padding: 6px 10px;
   &.selected {
-    background: $background-color-light;
+    background: $primary-300;
     @include xs-max {
       margin: 0px -22px;
       padding-right: 22px;
@@ -42,7 +42,7 @@
     .username {
       font-weight: 500;
       a {
-        color: $text-color-black;
+        color: $neutral-800;
         text-decoration: none;
       }
       a:hover {
@@ -50,12 +50,12 @@
       }
     }
     .address {
-      color: $text-color-light;
+      color: $neutral-500;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .account-balance {
-      color: $text-color-light;
+      color: $neutral-500;
       font-weight: 400;
       margin-left: 10px;
     }

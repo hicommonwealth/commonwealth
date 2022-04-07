@@ -35,7 +35,7 @@
     .search-results-caption {
       margin: 20px 0;
       text-align: center;
-      color: $text-color-light;
+      color: $neutral-500;
 
       .search-results-clear {
         margin-left: 10px;
@@ -77,7 +77,7 @@
         padding: 5px 5px 5px 10px;
 
         &:hover {
-          background-color: $background-color-white-hover;
+          background-color: $primary-400;
         }
 
         .cui-list-item-content-left {
@@ -92,7 +92,7 @@
 
         .search-results-item {
           padding: 20px;
-          color: $text-color-black;
+          color: $neutral-800;
           text-decoration: none;
           width: 100%;
           overflow: hidden;
@@ -108,17 +108,17 @@
             font-size: 18px;
             margin-top: 2px;
             opacity: 1;
-            color: $text-color-light;
+            color: $neutral-500;
 
             mark {
-              background: $background-color-light;
+              background: $primary-300;
               border-radius: 5px;
-              color: black !important;
+              color: $black !important;
             }
           }
 
           .search-results-thread-header {
-            color: $text-color-light;
+            color: $neutral-500;
             text-transform: uppercase;
             font-size: 13px;
             margin-bottom: 2px;
@@ -137,28 +137,28 @@
 
             .created-at {
               font-weight: 400;
-              color: $text-color-light;
+              color: $neutral-500;
             }
 
             .User {
               margin-left: 14px;
               font-weight: 400;
-              color: $text-color-light;
+              color: $neutral-500;
             }
           }
 
           .search-results-thread-body {
-            color: $text-color-light;
+            color: $neutral-500;
           }
 
           .search-results-comment {
-            color: $text-color-light;
+            color: $neutral-500;
           }
 
           .search-results-thread-body,
           .search-results-comment {
             mark {
-              background: $background-color-light;
+              background: $primary-300;
               padding: 5px 2px 0;
               margin: 0 3px;
               border-radius: 5px;

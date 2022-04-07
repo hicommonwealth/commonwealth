@@ -30,11 +30,9 @@ import {
   OffchainTopic,
   OffchainThreadKind,
   OffchainThreadStage,
-  NodeInfo,
   ITokenAdapter,
 } from 'models';
 
-import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';

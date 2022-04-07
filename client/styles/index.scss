@@ -17,7 +17,7 @@ html {
   font-size: 16px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  background: $background-color-white;
+  background: $white;
 }
 
 // global css
@@ -35,7 +35,7 @@ strong {
 }
 
 a {
-  color: $primary-bg-color;
+  color: $purple-400;
   text-decoration: none;
   &:hover {
     text-decoration: underline;
@@ -43,20 +43,20 @@ a {
 }
 
 a:visited {
-  color: lighten($primary-bg-color, 5%);
+  color: $purple-400;
 }
 
 code,
 pre {
   font-family: $monospace-fonts;
   font-size: 13.5px;
-  background: $background-color-white-hover;
+  background: $neutral-300;
   border-radius: 4px;
 }
 
 code {
   padding: 1px 3px;
-  color: $negative-bg-color;
+  color: $rorange-500;
 }
 
 pre {
@@ -64,8 +64,8 @@ pre {
 }
 
 ::selection {
-  color: $text-color-white;
-  background: $background-color-dark-accent;
+  color: $white;
+  background: $primary-600;
 }
 
 // shared styles
