@@ -12,7 +12,7 @@
   }
 
   th {
-    color: #666666;
+    color: $neutral-600;
     font-weight: 400;
     border: 0;
   }
@@ -27,7 +27,7 @@
 
   .members-item-info {
     a {
-      color: $text-color-black;
+      color: $neutral-800;
       text-decoration: none;
     }
 
@@ -38,7 +38,7 @@
   }
 
   .infinite-scroll-reached-end {
-    color: $text-color-light;
+    color: $neutral-500;
     font-size: 0.94rem;
     margin: 20px 0;
     text-align: center;

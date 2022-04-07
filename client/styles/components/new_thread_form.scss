@@ -48,7 +48,7 @@
     .new-snapshot-proposal-form {
       display: flex;
       .add-vote-choice {
-        color: #4f6dbd;
+        color: $primary-400;
         font-weight: 500;
         margin: 10px 0 20px;
         display: flex;
@@ -57,7 +57,7 @@
           padding-top: 1px;
         }
         .cui-icon {
-          color: #4f6dbd;
+          color: $primary-400;
           margin-left: 12px;
         }
       }
@@ -79,7 +79,7 @@
     .cui-tabs {
       margin-bottom: 8px;
       padding-right: 28px;
-      border-bottom: 1px solid $border-color-lightest;
+      border-bottom: 1px solid $neutral-50;
       .cui-tabs-item {
         padding: 11px 0 7px !important;
         margin-left: 1px !important;
@@ -168,20 +168,20 @@
     display: flex;
     flex-direction: column;
     flex: 3;
-    border-left: 1px solid $border-color-lightest;
+    border-left: 1px solid $neutral-50;
     padding-bottom: 10px;
     .cui-list {
       max-height: none;
       .cui-list-item {
         display: block;
         padding: 21px 0 12px !important;
-        border-bottom-color: $border-color-lightest;
+        border-bottom-color: $neutral-50;
         max-height: 140px;
         overflow: hidden;
         .discussion-draft-title-wrap {
           display: flex;
           .cui-icon-edit {
-            color: $negative-bg-color;
+            color: $rorange-500;
             margin: 0 8px 8px 0;
           }
         }
@@ -210,7 +210,7 @@
             text-decoration: none;
             &:hover {
               opacity: 1;
-              color: $negative-bg-color;
+              color: $rorange-500;
             }
           }
         }
@@ -224,8 +224,8 @@
 
     .draft-badge {
       display: inline-block;
-      color: $negative-bg-color;
-      border: 1px solid $negative-bg-color;
+      color: $rorange-500;
+      border: 1px solid $rorange-500;
       border-radius: 9999px;
       text-align: center;
     }
