@@ -391,7 +391,6 @@ const ProposalsPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'ProposalsPage',
         title: [
           'Proposals',
           m(Tag, {
@@ -402,7 +401,7 @@ const ProposalsPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      m('.proposals-container', [
+      m('.ProposalsPage', [
         onSubstrate && m(SubstrateProposalStats),
         onCompound && m(CompoundProposalStats),
         m('.clear'),

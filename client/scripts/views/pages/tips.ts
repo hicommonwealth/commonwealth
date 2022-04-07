@@ -130,7 +130,6 @@ const TipsPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'TipsPage',
         title: [
           'Tips',
           m(Tag, {
@@ -141,7 +140,7 @@ const TipsPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      m('.tips-container', [
+      m('.TipsPage', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),
