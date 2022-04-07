@@ -5,13 +5,13 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { ChainInfo, RoleInfo, RolePermission, Webhook } from 'models';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { navigateToSubpage } from 'app';
 
 const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
@@ -164,38 +164,39 @@ const ManageCommunityPage: m.Component<
     return m(
       Sublayout,
       {
-        class: 'ManageCommunityPage',
         title: ['Manage Community'],
         showNewProposalButton: true,
       },
-      [
-        m('.manage-community-wrapper', [
-          m('.panel-top', [
-            vnode.state.loadingFinished &&
-              m(ChainMetadataManagementTable, {
-                admins,
-                chain: app.config.chains.getById(app.activeChainId()),
-                mods,
-                onRoleUpdate: (oldRole, newRole) =>
-                  onRoleUpdate(oldRole, newRole),
-              }),
-          ]),
-          m('.panel-bottom', [
-            vnode.state.loadingFinished &&
-              m(AdminPanelTabs, {
-                defaultTab: 1,
-                onRoleUpgrade: (oldRole, newRole) =>
-                  onRoleUpdate(oldRole, newRole),
-                roleData: vnode.state.roleData,
-                webhooks: vnode.state.webhooks,
-              }),
-          ]),
-          app.user.isSiteAdmin &&
-            m(deleteChainButton, {
+      m('.ManageCommunityPage', [
+        m('.panel-top', [
+          vnode.state.loadingFinished &&
+            m(ChainMetadataManagementTable, {
+              admins,
               chain: app.config.chains.getById(app.activeChainId()),
+              mods,
+              onRoleUpdate: (oldRole, newRole) =>
+                onRoleUpdate(oldRole, newRole),
             }),
         ]),
-      ]
+        m('.panel-bottom', [
+          vnode.state.loadingFinished &&
+            m(AdminPanelTabs, {
+              defaultTab: 1,
+              onRoleUpgrade: (oldRole, newRole) =>
+                onRoleUpdate(oldRole, newRole),
+              roleData: vnode.state.roleData,
+              webhooks: vnode.state.webhooks,
+            }),
+        ]),
+        app.user.isSiteAdmin &&
+          m(deleteChainButton, {
+            chain: app.config.chains.getById(app.activeChainId()),
+          }),
+      ]),
+      app.user.isSiteAdmin &&
+        m(deleteChainButton, {
+          chain: app.config.chains.getById(app.activeChainId()),
+        })
     );
   },
 };

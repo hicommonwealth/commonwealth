@@ -4,7 +4,6 @@ import m from 'mithril';
 import { Select, Switch, TextArea } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
-import { Strings } from 'aws-sdk/clients/opsworks';
 
 type InputRowAttrs = {
   defaultValue: string;

@@ -153,7 +153,6 @@ const StatsPage: m.Component<{}, { requested: boolean; error: string; data }> =
       return m(
         Sublayout,
         {
-          class: 'StatsPage',
           title: [
             'Analytics',
             m(Tag, {

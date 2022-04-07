@@ -48,11 +48,10 @@ const CollectivesPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'CollectivesPage',
         title: 'Collectives',
         showNewProposalButton: true,
       },
-      [
+      m('.CollectivesPage', [
         COLLECTIVES.map((collective) => {
           return m(
             Card,
@@ -116,7 +115,7 @@ const CollectivesPage: m.Component<{}> = {
             ]
           );
         }),
-      ]
+      ])
     );
   },
 };

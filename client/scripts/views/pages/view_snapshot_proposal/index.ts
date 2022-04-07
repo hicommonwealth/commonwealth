@@ -375,175 +375,177 @@ const ViewProposalPage: m.Component<
     return m(
       Sublayout,
       {
-        class: `SnapshotViewProposalPage ${
-          activeTab === 'Proposals' ? 'proposal-tab' : 'info-tab'
-        }`,
         title: 'Snapshot Proposal',
       },
       !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
         ? m(Spinner, { fill: true, active: true, size: 'xl' })
-        : m('.view-proposal-container', [
-            // eslint-disable-next-line no-restricted-globals
-            m('.back-button', { onclick: () => m.route.set(scope) }, [
-              m('img', {
-                class: 'back-icon',
-                src: '/static/img/arrow-right-black.svg',
-                alt: 'Go Back',
-              }),
-              m('.back-button-text', 'Back'),
-            ]),
-            m(
-              Tabs,
-              {
-                align: 'left',
-                class: 'snapshot-tabs',
-              },
-              [
-                m(TabItem, {
-                  label: 'Proposals',
-                  active: activeTab === 'Proposals',
-                  onclick: () => {
-                    vnode.state.activeTab = 'Proposals';
-                  },
+        : m(
+            `.SnapshotViewProposalPage ${
+              activeTab === 'Proposals' ? '.proposal-tab' : '.info-tab'
+            }`,
+            [
+              // eslint-disable-next-line no-restricted-globals
+              m('.back-button', { onclick: () => m.route.set(scope) }, [
+                m('img', {
+                  class: 'back-icon',
+                  src: '/static/img/arrow-right-black.svg',
+                  alt: 'Go Back',
                 }),
-                m(TabItem, {
-                  label: 'Info & Results',
-                  active: activeTab === 'Info & Results',
-                  onclick: () => {
-                    vnode.state.activeTab = 'Info & Results';
-                  },
-                }),
-              ]
-            ),
-            m('.proposal-body', [
-              activeTab !== 'Info & Results' && [
-                m('.proposal-content', [
-                  m(ProposalContent, {
-                    proposal,
-                    votes,
-                    symbol: vnode.state.symbol,
+                m('.back-button-text', 'Back'),
+              ]),
+              m(
+                Tabs,
+                {
+                  align: 'left',
+                  class: 'snapshot-tabs',
+                },
+                [
+                  m(TabItem, {
+                    label: 'Proposals',
+                    active: activeTab === 'Proposals',
+                    onclick: () => {
+                      vnode.state.activeTab = 'Proposals';
+                    },
                   }),
-                ]),
-              ],
-              m('.proposal-info', [
-                m('.proposal-info-box', [
-                  m('.title', 'Information'),
-                  m('.info-block', [
-                    m('.labels', [
-                      m('p', 'Author'),
-                      m('p', 'IPFS'),
-                      m('p', 'Voting System'),
-                      m('p', 'Start Date'),
-                      m('p', 'End Date'),
-                      m(
-                        'p',
-                        proposal.strategies.length > 1
-                          ? 'Strategies'
-                          : 'Strategy'
-                      ),
-                      m('p', 'Snapshot'),
-                    ]),
-                    m('.values', [
-                      m(User, {
-                        user: new AddressInfo(
-                          null,
-                          proposal.author,
-                          app.activeChainId(),
-                          null
-                        ),
-                        linkify: true,
-                        popover: true,
-                      }),
-                      m(
-                        'a',
-                        {
-                          class: 'snapshot-link -mt-10',
-                          href: `https://ipfs.fleek.co/ipfs/${proposal.ipfs}`,
-                          target: '_blank',
-                        },
-                        [
-                          m('.truncate', `#${proposal.ipfs}`),
-                          m(Icon, {
-                            name: Icons.EXTERNAL_LINK,
-                            class: 'external-link-icon',
-                          }),
-                        ]
-                      ),
-                      m(
-                        '.snapshot-type',
-                        proposal.type.split('-').join(' ').concat(' voting')
-                      ),
-                      m('p', moment(+proposal.start * 1000).format('lll')),
-                      m('p', moment(+proposal.end * 1000).format('lll')),
-                      m(
-                        'a',
-                        {
-                          class: 'snapshot-link',
-                          href: `https://snapshot.org/#/${app.snapshot.space.id}/proposal/${proposal.id}`,
-                          target: '_blank',
-                        },
-                        [
-                          m(
-                            '.truncate',
-                            proposal.strategies.length > 1
-                              ? proposal.strategies.length + ' Strategies'
-                              : proposal.strategies[0].name
-                          ),
-                          m(Icon, {
-                            name: Icons.EXTERNAL_LINK,
-                            class: 'external-link-icon',
-                          }),
-                        ]
-                      ),
-                      m(
-                        'a',
-                        {
-                          class: 'snapshot-link',
-                          href: `https://etherscan.io/block/${proposal.snapshot}`,
-                          target: '_blank',
-                        },
-                        [
-                          m('.truncate', `#${proposal.snapshot}`),
-                          m(Icon, {
-                            name: Icons.EXTERNAL_LINK,
-                            class: 'external-link-icon',
-                          }),
-                        ]
-                      ),
-                    ]),
+                  m(TabItem, {
+                    label: 'Info & Results',
+                    active: activeTab === 'Info & Results',
+                    onclick: () => {
+                      vnode.state.activeTab = 'Info & Results';
+                    },
+                  }),
+                ]
+              ),
+              m('.proposal-body', [
+                activeTab !== 'Info & Results' && [
+                  m('.proposal-content', [
+                    m(ProposalContent, {
+                      proposal,
+                      votes,
+                      symbol: vnode.state.symbol,
+                    }),
                   ]),
-                  threads !== null &&
-                    m('.linked-discussion', [
-                      m('.heading-2', 'Linked Discussions'),
-                      threads.map((thread) =>
-                        m(ProposalHeaderSnapshotThreadLink, {
-                          thread,
-                        })
-                      ),
+                ],
+                m('.proposal-info', [
+                  m('.proposal-info-box', [
+                    m('.title', 'Information'),
+                    m('.info-block', [
+                      m('.labels', [
+                        m('p', 'Author'),
+                        m('p', 'IPFS'),
+                        m('p', 'Voting System'),
+                        m('p', 'Start Date'),
+                        m('p', 'End Date'),
+                        m(
+                          'p',
+                          proposal.strategies.length > 1
+                            ? 'Strategies'
+                            : 'Strategy'
+                        ),
+                        m('p', 'Snapshot'),
+                      ]),
+                      m('.values', [
+                        m(User, {
+                          user: new AddressInfo(
+                            null,
+                            proposal.author,
+                            app.activeChainId(),
+                            null
+                          ),
+                          linkify: true,
+                          popover: true,
+                        }),
+                        m(
+                          'a',
+                          {
+                            class: 'snapshot-link -mt-10',
+                            href: `https://ipfs.fleek.co/ipfs/${proposal.ipfs}`,
+                            target: '_blank',
+                          },
+                          [
+                            m('.truncate', `#${proposal.ipfs}`),
+                            m(Icon, {
+                              name: Icons.EXTERNAL_LINK,
+                              class: 'external-link-icon',
+                            }),
+                          ]
+                        ),
+                        m(
+                          '.snapshot-type',
+                          proposal.type.split('-').join(' ').concat(' voting')
+                        ),
+                        m('p', moment(+proposal.start * 1000).format('lll')),
+                        m('p', moment(+proposal.end * 1000).format('lll')),
+                        m(
+                          'a',
+                          {
+                            class: 'snapshot-link',
+                            href: `https://snapshot.org/#/${app.snapshot.space.id}/proposal/${proposal.id}`,
+                            target: '_blank',
+                          },
+                          [
+                            m(
+                              '.truncate',
+                              proposal.strategies.length > 1
+                                ? proposal.strategies.length + ' Strategies'
+                                : proposal.strategies[0].name
+                            ),
+                            m(Icon, {
+                              name: Icons.EXTERNAL_LINK,
+                              class: 'external-link-icon',
+                            }),
+                          ]
+                        ),
+                        m(
+                          'a',
+                          {
+                            class: 'snapshot-link',
+                            href: `https://etherscan.io/block/${proposal.snapshot}`,
+                            target: '_blank',
+                          },
+                          [
+                            m('.truncate', `#${proposal.snapshot}`),
+                            m(Icon, {
+                              name: Icons.EXTERNAL_LINK,
+                              class: 'external-link-icon',
+                            }),
+                          ]
+                        ),
+                      ]),
                     ]),
-                ]),
-                isActive &&
-                  author &&
-                  m(VoteAction, {
-                    space: vnode.state.space,
-                    proposal: vnode.state.proposal,
-                    id: vnode.attrs.identifier,
-                    scores: vnode.state.scores,
-                    choices: vnode.state.proposal.choices,
-                    votes: vnode.state.votes,
-                  }),
-                m('.proposal-info-box', [
-                  m('.title', 'Current Results'),
-                  m(VotingResults, {
-                    choices: vnode.state.proposal.choices,
-                    votes: vnode.state.votes,
-                    totals: vnode.state.totals,
-                    symbol: vnode.state.symbol,
-                  }),
+                    threads !== null &&
+                      m('.linked-discussion', [
+                        m('.heading-2', 'Linked Discussions'),
+                        threads.map((thread) =>
+                          m(ProposalHeaderSnapshotThreadLink, {
+                            thread,
+                          })
+                        ),
+                      ]),
+                  ]),
+                  isActive &&
+                    author &&
+                    m(VoteAction, {
+                      space: vnode.state.space,
+                      proposal: vnode.state.proposal,
+                      id: vnode.attrs.identifier,
+                      scores: vnode.state.scores,
+                      choices: vnode.state.proposal.choices,
+                      votes: vnode.state.votes,
+                    }),
+                  m('.proposal-info-box', [
+                    m('.title', 'Current Results'),
+                    m(VotingResults, {
+                      choices: vnode.state.proposal.choices,
+                      votes: vnode.state.votes,
+                      totals: vnode.state.totals,
+                      symbol: vnode.state.symbol,
+                    }),
+                  ]),
                 ]),
               ]),
-            ]),
-          ])
+            ]
+          )
     );
   },
 };
