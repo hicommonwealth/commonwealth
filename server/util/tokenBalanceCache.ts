@@ -1,5 +1,6 @@
 import moment from 'moment';
 import Web3 from 'web3';
+import { StateMutabilityType, AbiType } from 'web3-utils';
 import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 import { providers } from 'ethers';
@@ -13,7 +14,6 @@ import JobRunner from './cacheJobRunner';
 import { ChainAttributes } from '../models/chain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { COVALENT_API_KEY } from '../config';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 import { getUrlsForEthChainId } from './supportedEthChains';
 
@@ -33,30 +33,45 @@ interface CacheT {
 
 // Uses a tiny class so it's mockable for testing
 export class TokenBalanceProvider {
-  public async getRoninTokenBalance(address: string, chainId: number) {
-    const url = `https://api.covalenthq.com/v1/${chainId}/address/${address}/balances_v2/`;
-    try {
-      if (!COVALENT_API_KEY) {
-        throw new Error('failed to query axie balance');
-      }
-      const balanceQueryResult = await axios.get(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        auth: {
-          username: COVALENT_API_KEY,
-          password: undefined,
-        }
-      });
-      if (balanceQueryResult.status !== 200 || balanceQueryResult.data?.data?.error) {
-        throw new Error(balanceQueryResult.data?.data?.error || balanceQueryResult.statusText);
-      }
-      const axieItem = balanceQueryResult.data.data.items.find((item) => item.contract_ticker_symbol === 'AXS');
-      return axieItem?.balance ? new BN(axieItem.balance, 10) : new BN(0);
-    } catch (e) {
-      log.info(`Failed to query axie balance: ${e.message}`);
-      throw new Error('failed to query axie balance');
-    }
+  public async getRoninTokenBalance(address: string) {
+    // TODO: make configurable
+    const rpcUrl = 'https://api.roninchain.com/rpc';
+    const provider = new Web3.providers.HttpProvider(rpcUrl);
+    const web3 = new Web3(provider);
+    const axsAddress = '0x97a9107c1793bc407d6f527b77e7fff4d812bece';
+    const axsStakingPoolAddress = '05b0bb3c1c320b280501b86706c3551995bc8571';
+
+    const axsApi = ERC20__factory.connect(axsAddress, new providers.Web3Provider(provider as any));
+    await axsApi.deployed();
+    const axsBalanceBigNum = await axsApi.balanceOf(address);
+
+    const axsStakingAbi = [
+      {
+        'constant': true,
+        'inputs': [
+          {
+            'internalType': 'address',
+            'name': '_user',
+            'type': 'address'
+          }
+        ],
+        'name': 'getStakingAmount',
+        'outputs': [
+          {
+            'internalType': 'uint256',
+            'name': '',
+            'type': 'uint256'
+          }
+        ],
+        'payable': false,
+        'stateMutability': 'view' as StateMutabilityType,
+        'type': 'function' as AbiType,
+      },
+    ];
+    const axsStakingPoolContract = new web3.eth.Contract(axsStakingAbi, axsStakingPoolAddress);
+    const stakingPoolBalance = await axsStakingPoolContract.methods.getStakingAmount(address).call();
+    provider.disconnect();
+    return new BN(axsBalanceBigNum.toString()).add(new BN(stakingPoolBalance.toString()));
   }
 
   public async getEthTokenBalance(url: string, tokenAddress: string, userAddress: string): Promise<BN> {
@@ -180,7 +195,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     if (chain.network === ChainNetwork.AxieInfinity) {
       // special case for axie query using covalent
       try {
-        balance = await this._balanceProvider.getRoninTokenBalance(address, node.eth_chain_id);
+        balance = await this._balanceProvider.getRoninTokenBalance(address);
       } catch (e) {
         throw new Error(`Could not fetch token balance: ${e.message}`);
       }
