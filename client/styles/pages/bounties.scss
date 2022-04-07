@@ -19,17 +19,17 @@
       margin-top: 4px;
     }
     .b-box {
-      border: 1px solid $border-color-lightest;
+      border: 1px solid $neutral-50;
       border-radius: 8px;
       border-bottom: none;
       margin-bottom: 18px;
       .b-row {
         padding: 0 10px;
         padding-top: 5px;
-        border-bottom: 1px solid $border-color-lightest;
+        border-bottom: 1px solid $neutral-50;
         display: flex;
         &.waiting {
-          color: $text-color-light;
+          color: $neutral-500;
         }
         &:last-child {
           border-radius: 0 0 8px 8px;

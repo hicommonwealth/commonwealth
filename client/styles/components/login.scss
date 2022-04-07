@@ -18,10 +18,10 @@
     text-align: center;
     font-weight: 500;
     &.success {
-      color: $positive-bg-color;
+      color: $green-500;
     }
     &.failure {
-      color: $negative-bg-color;
+      color: $rorange-500;
     }
   }
   .login-magic-prompt {

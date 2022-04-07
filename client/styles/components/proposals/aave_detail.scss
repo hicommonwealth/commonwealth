@@ -51,20 +51,20 @@
   }
   .proposal-injected-status {
     margin-bottom: 4px;
-    color: $text-color-black;
+    color: $neutral-800;
   }
   .b-box {
-    border: 1px solid $border-color-lightest;
+    border: 1px solid $neutral-50;
     border-radius: 8px;
     border-bottom: none;
     margin-bottom: 18px;
     .b-row {
       padding: 0 10px;
       padding-top: 5px;
-      border-bottom: 1px solid $border-color-lightest;
+      border-bottom: 1px solid $neutral-50;
       display: flex;
       &.waiting {
-        color: $text-color-light;
+        color: $neutral-500;
       }
       &:last-child {
         border-radius: 0 0 8px 8px;
@@ -78,7 +78,7 @@
     margin-top: 6px;
   }
   .detail-highlight {
-    color: #4723ad;
+    color: $purple-500;
     padding-right: 8px;
     &.emphasize {
       font-weight: 600;
@@ -97,7 +97,7 @@
   div {
     display: flex;
     justify-content: left;
-    border-bottom: 1px solid #eeeeee;
+    border-bottom: 1px solid $neutral-25;
     align-items: baseline;
   }
   div:last-child {

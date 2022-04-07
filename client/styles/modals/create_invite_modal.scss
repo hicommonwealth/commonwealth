@@ -49,12 +49,12 @@
   .error-message {
     margin: 10px 0;
     font-weight: 500;
-    color: $negative-bg-color;
+    color: $rorange-500;
   }
   .success-message {
     margin: 10px 0;
     font-weight: 500;
-    color: $positive-bg-color;
+    color: $green-500;
   }
   .copy-link-line {
     display: flex;
@@ -76,7 +76,7 @@
   .divider {
     width: calc(100% + 56px);
     height: 1px;
-    background: #ddd;
+    background: $neutral-25;
     margin-top: 20px;
     margin-left: -28px;
   }
@@ -125,10 +125,10 @@
       border-bottom: none;
       padding: 5px 20px !important;
       &:focus {
-        outline: #cfcbff auto 2px;
+        outline: $purple-100 auto 2px;
       }
       .search-results-item {
-        color: $text-color-black;
+        color: $neutral-800;
         text-decoration: none;
         padding: 12px 0 6px;
         font-size: 18px;
@@ -145,7 +145,7 @@
           }
         }
         mark {
-          background-color: #cfcbff;
+          background-color: $pink-50;
         }
       }
       &.disabled,
@@ -155,14 +155,14 @@
         letter-spacing: 0.3px;
         margin-bottom: 3px;
         text-transform: uppercase;
-        color: #aaaaaa;
+        color: $neutral-400;
         margin-top: 18px;
         top: 2px;
         &:first-child {
           margin-top: 0px;
         }
         &:hover {
-          background: white;
+          background: $white;
         }
       }
       &.disabled {
@@ -182,7 +182,7 @@
         }
         span {
           width: 50%;
-          color: $primary-bg-color;
+          color: $primary-500;
           text-align: right;
         }
       }

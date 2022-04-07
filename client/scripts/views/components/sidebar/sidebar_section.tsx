@@ -99,10 +99,10 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
       titleTextClass = 'section-title-text-stale';
     }
 
-    let backgroundColor = 'none';
+    let backgroundColorClass = 'no-background';
 
     if (isActive && !containsChildren) {
-      backgroundColor = '#EDE7FF';
+      backgroundColorClass = 'background';
     }
 
     const mouseEnterHandler = (e) => {
@@ -111,13 +111,14 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
         e.stopPropagation();
       }
       if (!this.toggled) {
-        backgroundColor = '#EDE7FF';
+        backgroundColorClass = 'background';
         this.hoverOn = true;
       }
     };
 
     const mouseLeaveHandler = () => {
-      backgroundColor = isActive && !containsChildren ? '#EDE7FF' : 'none';
+      backgroundColorClass =
+        isActive && !containsChildren ? 'background' : 'no-background';
       this.hoverOn = false;
     };
 
@@ -128,11 +129,10 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
         onmouseleave={() => mouseLeaveHandler()}
       >
         <div
-          class="SectionGroupTitle"
-          onclick={(e) => clickHandler(e)}
-          style={`background-color: ${
-            this.hoverOn ? '#EDE7FF' : backgroundColor
+          class={`SectionGroupTitle ${
+            this.hoverOn ? 'background' : backgroundColorClass
           }`}
+          onclick={(e) => clickHandler(e)}
         >
           {containsChildren ? (
             <div class="carat">{carat}</div>

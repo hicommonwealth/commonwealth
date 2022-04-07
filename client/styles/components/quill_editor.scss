@@ -22,8 +22,8 @@
   position: relative;
   word-break: break-word;
   ::selection {
-    background: $primary-bg-color;
-    color: $text-color-white;
+    background: $primary-500;
+    color: $white;
   }
 
   // 1. editor typography modifications
@@ -35,22 +35,22 @@
       text-decoration: underline;
     }
     img {
-      background-color: $background-color-white-hover;
+      background-color: $primary-400;
     }
     code,
     kbd,
     samp {
       font-family: $monospace-fonts;
       font-size: 0.75rem;
-      background: $background-color-light;
+      background: $primary-300;
       padding: 2px 5px;
       margin: 0 1px;
       border-radius: 3px;
     }
     pre,
     .ql-code-block-container {
-      background: $background-color-light;
-      color: $text-color-black;
+      background: $primary-300;
+      color: $neutral-800;
       font-family: $monospace-fonts;
       font-size: 0.75rem;
       white-space: pre-wrap;
@@ -98,12 +98,12 @@
     }
     li[data-list='checked'] > .ql-ui::before {
       content: '\f14a';
-      color: $text-color-medium;
+      color: $neutral-500;
       font-size: 93%;
     }
     li[data-list='unchecked'] > .ql-ui::before {
       content: '\f096';
-      color: $text-color-lightest;
+      color: $neutral-400;
     }
   }
 
@@ -112,7 +112,7 @@
     // border: 1px solid #B37DBA;
     border-radius: 0 0 3px 3px;
     // construct-ui input styles
-    color: $text-color-darker;
+    color: $neutral-900;
   }
   .ql-bubble .ql-editor {
     padding: 1px 8px 8px 1px;
@@ -266,9 +266,9 @@
 // 7. mentions container
 .ql-mention-list-container {
   background: white;
-  border-top: 1px solid $background-color-light;
-  border-left: 1px solid $background-color-light;
-  border-right: 1px solid $background-color-light;
+  border-top: 1px solid $primary-300;
+  border-left: 1px solid $primary-300;
+  border-right: 1px solid $primary-300;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   z-index: 2;
@@ -279,7 +279,7 @@
     cursor: pointer;
     li {
       padding: 5px 10px;
-      border-bottom: 1px solid $background-color-light;
+      border-bottom: 1px solid $primary-300;
       margin: 0;
       display: flex;
       align-items: center;
@@ -297,7 +297,7 @@
       }
     }
     > .selected {
-      background: $background-color-white-hover;
+      background: $primary-400;
       cursor: pointer;
     }
     .ql-mention-list-item > div > span {
@@ -313,12 +313,12 @@
       }
       .ql-mention-addr {
         float: right;
-        color: $text-color-light;
+        color: $neutral-500;
         font-size: 90%;
       }
       .ql-mention-la {
         display: block;
-        color: $text-color-light;
+        color: $neutral-500;
         font-size: 90%;
         white-space: nowrap;
         margin-bottom: 2px;
@@ -332,7 +332,7 @@
       margin-right: 12px;
       border-radius: 9999px;
       &.missing {
-        background-color: $background-color-light;
+        background-color: $primary-300;
       }
     }
   }

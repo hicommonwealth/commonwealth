@@ -17,21 +17,21 @@
     padding: 0 2px;
   }
   .card-subheader {
-    color: #666666;
+    color: $neutral-600;
     margin-bottom: 5px;
     font-size: 14px;
   }
   .cui-tag {
-    background: #f6f6f6;
+    background: $neutral-25;
     border-radius: 4px;
     height: 30px;
-    color: black;
+    color: $black;
     border-color: transparent;
     font-weight: 500;
   }
   .cui-tag.proposal-became-tag {
-    background: tint($primary-bg-color, 40%);
-    border-color: tint($primary-bg-color, 40%);
+    background: $neutral-200;
+    border-color: $neutral-200;
   }
   .proposal-title {
     font-size: 18px;
@@ -40,11 +40,11 @@
   }
   .proposal-amount,
   .proposal-comments {
-    color: $text-color-light;
+    color: $neutral-500;
   }
   .proposal-action {
     display: inline-block;
-    color: $text-color-light;
+    color: $neutral-500;
     font-weight: 500;
     font-size: 80%;
     text-transform: uppercase;
@@ -53,7 +53,7 @@
     font-weight: 500;
     //
     padding: 8px 16px;
-    background: $background-color-light;
+    background: $neutral-100;
     border-radius: 6px;
     font-size: 92%;
     margin-top: 11px;
@@ -61,13 +61,13 @@
     bottom: 60px;
     margin-right: 32px;
     &:hover {
-      background: $background-color-light-hover;
+      background: $neutral-200;
     }
     a:hover {
       text-decoration: none;
     }
     .cui-icon svg {
-      stroke: $text-color-primary;
+      stroke: $neutral-500;
       position: relative;
       top: -1px;
       left: -2px;
@@ -76,12 +76,12 @@
   }
   .proposal-status {
     font-weight: 500;
-    color: $text-color-black;
+    color: $neutral-800;
     &.pass {
-      color: $positive-bg-color;
+      color: $green-600;
     }
     &.fail {
-      color: $negative-bg-color;
+      color: $rorange-600;
     }
   }
 }
