@@ -30,6 +30,9 @@ $discussion-title-font-size: 1.45rem;
 }
 
 .ViewProposalPage {
+  display: flex;
+  flex-direction: row;
+
   .view-proposal-page-container {
     display: flex;
     flex-direction: column;
@@ -445,6 +448,10 @@ $discussion-title-font-size: 1.45rem;
     flex-direction: column;
     padding: 24px 24px 24px 0;
     width: 296px;
+
+    @include xs-max {
+      display: none;
+    }
   }
 
   .ProposalHeaderOffchainPoll,

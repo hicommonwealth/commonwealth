@@ -45,21 +45,6 @@
       height: 100%;
       overflow-y: auto;
       width: 100%;
-
-      .inner-body {
-        flex: 1;
-      }
-    }
-  }
-
-  // TODO: Graham 22.03.04 Necessity & presence of right sidebar
-  // should be assessed site-wide. This is merely a hot fix for
-  // comment threading.
-  &.ViewProposalPage {
-    .right-content-container {
-      @include xs-max {
-        display: none;
-      }
     }
   }
 }

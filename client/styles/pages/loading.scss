@@ -1,13 +1,7 @@
-@import 'client/styles/shared';
-
-.ErrorPage {
+.LoadingPage {
   align-items: center;
   display: flex;
   height: 100%;
   justify-content: center;
   width: 100%;
-
-  .cui-empty-state {
-    position: unset;
-  }
 }

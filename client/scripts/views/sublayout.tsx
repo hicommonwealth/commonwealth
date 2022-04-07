@@ -12,20 +12,17 @@ import { LandingPageFooter } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './sublayout_header_left';
 import { SublayoutHeaderRight } from './sublayout_header_right';
-import { isNotUndefined } from '../helpers/typeGuards';
 import { TokenHero } from './token_hero';
 import { TokenTerms } from './token_terms';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
-  class?: string;
   hero?: any;
   hideSearch?: boolean;
-  rightContent?: any;
+  onscroll?: any; // lazy loading for page content
   showNewProposalButton?: boolean;
   title?: any; // displayed at the top of the layout
-  onscroll?: any; // lazy loading for page content
 };
 
 const footercontents = [
@@ -58,10 +55,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       alwaysShowTitle,
       hero,
       hideSearch,
-      rightContent,
+      onscroll,
       showNewProposalButton,
       title,
-      onscroll,
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
@@ -73,11 +69,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     }
 
     return (
-      <div
-        class={`Sublayout ${
-          isNotUndefined(vnode.attrs.class) ? vnode.attrs.class : ''
-        }`}
-      >
+      <div class="Sublayout">
         <SidebarQuickSwitcher />
         <div class="header-and-body-container">
           <MobileHeader />
@@ -98,17 +90,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             <div class="body" onscroll={onscroll}>
               <TokenHero chain={chain} hero={hero} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
-              <div
-                class="inner-body"
-                style={
-                  isNotUndefined(rightContent)
-                    ? 'display: flex; flex-direction: row;'
-                    : ''
-                }
-              >
-                {vnode.children}
-                {isNotUndefined(rightContent) && rightContent}
-              </div>
+              {vnode.children}
               {!app.isCustomDomain() && (
                 <LandingPageFooter list={footercontents} />
               )}

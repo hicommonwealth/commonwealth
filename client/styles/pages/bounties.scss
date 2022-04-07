@@ -1,9 +1,9 @@
 @import 'client/styles/shared';
 
 .BountiesPage {
-  .bounties-container {
-    padding: 24px;
-  }
+  flex: 1;
+  padding: 24px;
+  width: 100%;
 
   @include gov-explainer;
 

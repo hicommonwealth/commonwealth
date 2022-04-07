@@ -1,9 +1,7 @@
 @import 'client/styles/shared';
 
 .CouncilPage {
-  .council-container {
-    padding: 24px;
-  }
+  padding: 24px;
 
   @include gov-explainer;
 

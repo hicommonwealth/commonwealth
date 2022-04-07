@@ -1,13 +1,14 @@
 @import 'client/styles/shared';
 
 .DiscussionsPage {
-  .discussions-main {
-    padding: 24px;
-    width: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+  width: 100%;
 
-    &.empty-list {
-      height: calc(100vh - 200px);
-    }
+  &.empty-list {
+    height: calc(100vh - 200px);
   }
 
   // content

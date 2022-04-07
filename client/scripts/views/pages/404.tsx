@@ -21,10 +21,9 @@ export class PageNotFound implements m.ClassComponent<PageNotFoundAttrs> {
     const { message, title } = vnode.attrs;
 
     return (
-      <Sublayout class="PageNotFound" title={title}>
-        <div class="page-not-found-container">
+      <Sublayout title={title}>
+        <div class="PageNotFound">
           <EmptyState
-            class="PageNotFound"
             icon={Icons.HELP_CIRCLE}
             header="Page not found"
             content={
