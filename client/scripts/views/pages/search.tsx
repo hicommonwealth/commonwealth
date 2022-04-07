@@ -38,7 +38,7 @@ const getMemberResult = (addr, searchTerm) => {
   return (
     <ListItem
       allowOnContentClick={true}
-      contentLeft={<CWIcon iconSize="large" iconName="account" />}
+      contentLeft={<CWIcon iconSize="large" iconName="person" />}
       label={
         <a class="search-results-item">
           {m(UserBlock, {
@@ -376,12 +376,11 @@ class SearchPage implements m.Component<SearchPageAttrs> {
 
     return (
       <Sublayout
-        class="SearchPage"
         title={['Search ', capitalize(scope) || 'Commonwealth']}
         showNewProposalButton={true}
         alwaysShowTitle={true}
       >
-        <div class="search-page-container">
+        <div class="SearchPage">
           <Tabs>{tabs}</Tabs>
           <div class="search-results-wrapper">
             {!app.search.getByQuery(searchQuery)?.loaded ? (

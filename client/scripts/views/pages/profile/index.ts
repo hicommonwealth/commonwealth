@@ -107,6 +107,11 @@ interface IProfilePageState {
   loaded: boolean;
   loading: boolean;
   refreshProfile: boolean;
+  tabSelected: number;
+  onscroll: any;
+  allContentCount: number;
+  proposalsContentCount: number;
+  commentsContentCount: number;
 }
 
 const checkCosmosAddress = (address: string): boolean => {
@@ -274,9 +279,14 @@ const loadProfile = async (
   }
 };
 
+const postsRemaining = (contentLength, count) => {
+  return contentLength > 10 && count < contentLength;
+};
+
 const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
+    vnode.state.tabSelected = 0;
     vnode.state.initialized = false;
     vnode.state.loaded = false;
     vnode.state.loading = false;
@@ -341,6 +351,18 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       return m(PageLoading, { showNewProposalButton: true });
     }
 
+    if (!vnode.state.allContentCount) {
+      vnode.state.allContentCount = 10;
+    }
+
+    if (!vnode.state.proposalsContentCount) {
+      vnode.state.proposalsContentCount = 10;
+    }
+
+    if (!vnode.state.commentsContentCount) {
+      vnode.state.commentsContentCount = 10;
+    }
+
     const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } =
       getProfileStatus(account);
 
@@ -355,6 +377,43 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
         m.redraw();
       }
     }
+
+    const onscroll = _.debounce(() => {
+      const tab = vnode.state.tabSelected;
+      if (tab === 0) {
+        if (!postsRemaining(allContent.length, vnode.state.allContentCount))
+          return;
+      } else if (tab === 1) {
+        if (
+          !postsRemaining(proposals.length, vnode.state.proposalsContentCount)
+        )
+          return;
+      } else {
+        if (!postsRemaining(comments.length, vnode.state.commentsContentCount))
+          return;
+      }
+      const scrollHeight = $(document).height();
+      const scrollPos = $(window).height() + $(window).scrollTop();
+      if (scrollPos > scrollHeight - 400) {
+        if (tab === 0) {
+          vnode.state.allContentCount += 20;
+          const thisUrl = m.route.get();
+          if (m.route.get() === thisUrl)
+            window.location.hash = vnode.state.allContentCount.toString();
+        } else if (tab === 1) {
+          vnode.state.proposalsContentCount += 20;
+          const thisUrl = m.route.get();
+          if (m.route.get() === thisUrl)
+            window.location.hash = vnode.state.proposalsContentCount.toString();
+        } else {
+          vnode.state.commentsContentCount += 20;
+          const thisUrl = m.route.get();
+          if (m.route.get() === thisUrl)
+            window.location.hash = vnode.state.commentsContentCount.toString();
+        }
+        m.redraw();
+      }
+    }, 400);
 
     // TODO: search for cosmos proposals, if ChainBase is Cosmos
     const comments = vnode.state.comments.sort(
@@ -382,11 +441,11 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     return m(
       Sublayout,
       {
-        class: 'ProfilePage',
         showNewProposalButton: true,
+        onscroll: onscroll,
       },
       [
-        m('.profile-container', [
+        m('.ProfilePage', [
           displayBanner &&
             m(ProfileBanner, {
               account,
@@ -406,10 +465,14 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
               m(Tabs, [
                 {
                   name: allTabTitle,
+                  onclick: () => {
+                    vnode.state.tabSelected = 0;
+                  },
                   content: m(ProfileContent, {
                     account,
                     type: UserContent.All,
                     content: allContent,
+                    count: vnode.state.allContentCount,
                     // eslint-disable-next-line max-len
                     localStorageScrollYKey: `profile-${
                       vnode.attrs.address
@@ -418,10 +481,14 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                 },
                 {
                   name: threadsTabTitle,
+                  onclick: () => {
+                    vnode.state.tabSelected = 1;
+                  },
                   content: m(ProfileContent, {
                     account,
                     type: UserContent.Threads,
                     content: proposals,
+                    count: vnode.state.proposalsContentCount,
                     // eslint-disable-next-line max-len
                     localStorageScrollYKey: `profile-${
                       vnode.attrs.address
@@ -430,10 +497,14 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                 },
                 {
                   name: commentsTabTitle,
+                  onclick: () => {
+                    vnode.state.tabSelected = 2;
+                  },
                   content: m(ProfileContent, {
                     account,
                     type: UserContent.Comments,
                     content: comments,
+                    count: vnode.state.commentsContentCount,
                     // eslint-disable-next-line max-len
                     localStorageScrollYKey: `profile-${
                       vnode.attrs.address

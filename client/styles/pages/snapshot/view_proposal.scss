@@ -12,11 +12,10 @@
 }
 
 .SnapshotViewProposalPage {
-  .view-proposal-container {
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
-  }
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+
   .proposal-body {
     display: flex;
     flex-direction: row;

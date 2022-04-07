@@ -156,7 +156,6 @@ const ReferendaPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'ReferendaPage',
         title: [
           'Referenda',
           m(Tag, {
@@ -167,7 +166,7 @@ const ReferendaPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      m('.referenda-container', [
+      m('.ReferendaPage', [
         onSubstrate && m(SubstrateProposalStats),
         m('.clear'),
         m(Listing, {
