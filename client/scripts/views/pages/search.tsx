@@ -38,7 +38,7 @@ const getMemberResult = (addr, searchTerm) => {
   return (
     <ListItem
       allowOnContentClick={true}
-      contentLeft={<CWIcon iconSize="large" iconName="account" />}
+      contentLeft={<CWIcon iconSize="large" iconName="person" />}
       label={
         <a class="search-results-item">
           {m(UserBlock, {
