@@ -3,49 +3,22 @@
 svg {
   flex-shrink: 0;
   height: 1em;
-  stroke: currentColor;
+  fill: currentColor;
   width: 1em;
 
   &.small {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   &.medium {
-    font-size: 20px;
+    font-size: 24px;
   }
 
   &.large {
-    font-size: 28px;
+    font-size: 32px;
   }
 
   &.disabled {
     color: $neutral-100;
   }
-
-  // Gabe 2/28/22 - These styles shouldn't be applied on the icon itself,
-  // better to wait for an icon button component
-
-  // &.primary {
-  //   color: $black;
-  // }
-
-  // &.primary:hover {
-  //   color: $purple-500;
-
-  //   &.disabled {
-  //     color: $neutral-100;
-  //   }
-  // }
-
-  // &.secondary {
-  //   color: $neutral-500;
-  // }
-
-  // &.secondary:hover {
-  //   color: $black;
-
-  //   &.disabled {
-  //     color: $neutral-100;
-  //   }
-  // }
 }
