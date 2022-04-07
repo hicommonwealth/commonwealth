@@ -16,7 +16,7 @@
     margin-bottom: 2px;
   }
   .collective-description {
-    color: $text-color-medium;
+    color: $neutral-500;
     margin-bottom: 5px;
   }
   .collective-metadata {
@@ -26,11 +26,11 @@
       display: inline-block;
     }
     .collective-metadata-beneficiary {
-      color: $text-color-medium;
+      color: $neutral-500;
       margin-right: 18px;
     }
     .collective-metadata-members {
-      color: $text-color-medium;
+      color: $neutral-500;
     }
   }
   .collective-metrics {

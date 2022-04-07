@@ -23,7 +23,7 @@ $modal-padding: 16px;
   .popup {
     @include popout();
 
-    background: $text-color-white;
+    background: $white;
     border-radius: 3px;
     max-height: 96%;
     max-width: 800px;
@@ -43,8 +43,8 @@ $modal-padding: 16px;
   }
 
   .compact-modal-title {
-    background: $primary-bg-color;
-    color: $text-color-white;
+    background: $purple-400;
+    color: $white;
     display: flex;
     flex-direction: row;
     justify-content: space-between;

@@ -14,6 +14,7 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 import EditIdentityModal from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
 import EditProfileModal from '../../modals/edit_profile_modal';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 const editIdentityAction = (
   account,
@@ -195,8 +196,8 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         onOwnProfile
           ? [
               editIdentityAction(account, vnode.state.identity, vnode),
-              m(Button, {
-                intent: 'primary',
+              m(CWButton, {
+                buttonType: 'primary',
                 onclick: () => {
                   app.modals.create({
                     modal: EditProfileModal,

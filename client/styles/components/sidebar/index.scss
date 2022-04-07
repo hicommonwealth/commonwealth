@@ -1,8 +1,8 @@
 @import 'client/styles/shared';
 
 .Sidebar {
-  background-color: $layout-color;
-  border-right-color: $disable-grey;
+  background-color: $neutral-100;
+  border-right-color: $neutral-50;
   border-right-width: 1px;
   display: flex;
   flex-direction: column;
@@ -11,7 +11,7 @@
   overflow-y: auto;
 
   .section-header {
-    color: $text-color-light;
+    color: $neutral-500;
     font-size: 18px;
     margin-bottom: 6px;
     margin-top: 20px;
@@ -49,6 +49,7 @@
   background-image: url(/static/img/powered-by.svg);
   background-position: center;
   background-repeat: no-repeat;
+  border-color: $neutral-50;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
@@ -80,7 +81,7 @@
     z-index: 100;
 
     h4 {
-      color: #666666;
+      color: $neutral-600;
       font-weight: 400;
     }
 
@@ -89,7 +90,7 @@
     }
 
     .cui-icon-x {
-      color: #666666;
+      color: $neutral-600;
       left: calc(100% - 35px);
       position: absolute;
       top: 15px;
@@ -105,11 +106,11 @@
         margin-left: 5px;
 
         &.danger {
-          background-color: #ff002f;
+          background-color: $rorange-500;
         }
 
         &.danger:hover {
-          background-color: #cc0025;
+          background-color: $rorange-600;
         }
       }
     }

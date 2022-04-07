@@ -27,16 +27,16 @@
         }
         .cui-button[type='submit'] {
           // background: linear-gradient(50.49deg, #91BFFF -6.12%, #91FFA0 30.17%, #FBFF91 62.49%, #FF9191 102.75%);
-          // color: black;
-          background: $primary-bg-color;
-          color: white;
+          // color: $black;
+          background: $purple-300;
+          color: $white;
           border: none;
           margin-left: 20px;
         }
         .cui-button[type='cancel'] {
-          background: #ffffff;
-          border: 2px solid #dddddd;
-          color: #999999;
+          background: $white;
+          border: 2px solid $neutral-100;
+          color: $neutral-500;
         }
       }
       .new-comment-error {
@@ -56,7 +56,7 @@
     margin: 14px 0 18px;
     .ql-toolbar,
     .ql-editor {
-      background: $background-color-white;
+      background: $white;
     }
     .ql-editor {
       min-height: 100px;
@@ -67,7 +67,7 @@
     margin-top: 20px;
   }
   .token-requirement {
-    color: $text-color-light;
+    color: $neutral-500;
     margin-bottom: 10px;
   }
 }

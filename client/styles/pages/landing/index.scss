@@ -3,8 +3,8 @@
 .Homepage {
   .hero-unit {
     margin: 0 auto;
-    background: $background-color-white-hover;
-    border-bottom: 1px solid $border-color-off-white;
+    background: $primary-400;
+    border-bottom: 1px solid $neutral-25;
     margin-bottom: 48px;
     .layout-container {
       padding: 28px 30px 30px;
@@ -25,7 +25,7 @@
       border-radius: 9999px;
       height: 160px;
       width: 160px;
-      background: #f3f3f3;
+      background: $neutral-50;
       text-align: center;
       padding-top: 29px;
       img {

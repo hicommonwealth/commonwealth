@@ -51,14 +51,14 @@
       }
       .chain-icon.no-image {
         border-radius: 9999px;
-        background: $background-color-darker-monochrome;
+        background: $neutral-800;
         width: 100px;
         height: 100px;
         display: flex;
         align-items: center;
         justify-content: center;
         span {
-          color: $text-color-white;
+          color: $white;
           text-align: center;
           font-weight: 500;
           font-size: 16px;
@@ -127,7 +127,7 @@
         -webkit-box-orient: vertical;
         -webkit-hyphens: auto;
         -webkit-line-clamp: 3;
-        color: #999999;
+        color: $neutral-500;
         display: -webkit-box;
         font-size: 16px;
         font-weight: normal;
@@ -145,7 +145,7 @@
 
       .recent-activity {
         margin-top: 12px;
-        color: $text-color-light;
+        color: $neutral-500;
         height: 24px;
 
         .recent-threads {
@@ -274,7 +274,7 @@
   padding: 24px;
 
   .communities-header {
-    color: #333333;
+    color: $neutral-800;
     font-size: 25px;
     font-weight: 500;
     display: flex;
