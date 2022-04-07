@@ -39,11 +39,11 @@ $cui-base-height: floor($cui-base-size * 2.8);
 }
 
 .cui-popover-content {
-  border-color: $primary-50;
+  border-color: $neutral-200;
 }
 
 .cui-menu .cui-menu-divider {
-  border-color: $primary-50;
+  border-color: $neutral-200;
 }
 
 .cui-button {
@@ -58,6 +58,10 @@ $cui-base-height: floor($cui-base-size * 2.8);
 
 .cui-empty-state .cui-empty-state-header {
   font-weight: $cui-font-weight-bold; // fix weight
+}
+
+.cui-callout.cui-primary {
+  background: $purple-50;
 }
 
 .cui-callout .cui-callout-header {
@@ -184,6 +188,13 @@ button,
   }
 }
 
+.cui-button.cui-primary[disabled],
+.cui-button.cui-primary.cui-disabled {
+  color: $white;
+  background: $purple-100;
+  pointer-events: none;
+}
+
 .cui-button.cui-negative,
 .cui-button-group.cui-negative .cui-button {
   background: $rorange-300;
@@ -201,14 +212,14 @@ button,
 
 .cui-button.cui-warning,
 .cui-button-group.cui-warning .cui-button {
-  background: $rorange-300;
-  border-color: $rorange-300;
+  background: $purple-300;
+  border-color: $purple-300;
 }
 
 .cui-button.cui-positive,
 .cui-button-group.cui-positive .cui-button {
-  background: $green-300;
-  border-color: $green-300;
+  background: $green-500;
+  border-color: $green-500;
 }
 
 .cui-radio input:checked ~ .cui-control-indicator:after {
@@ -224,12 +235,13 @@ button,
 }
 
 .cui-callout.cui-primary {
-  border-color: $primary-100;
+  border-color: $purple-50;
+  color: $neutral-800;
 }
 
 .cui-callout a {
   font-weight: 500;
-  color: $primary-500;
+  color: $purple-400;
 }
 
 // adjust input padding

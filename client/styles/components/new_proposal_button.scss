@@ -28,7 +28,7 @@ button.NewProposalButton {
 .cui-popover.new-proposal-button-popover {
   z-index: 51;
   .cui-menu {
-    border-color: $primary-50; // match cui-popover border color
+    border-color: $neutral-200; // match cui-popover border color
   }
   .cui-menu-divider:last-child {
     display: none !important;
