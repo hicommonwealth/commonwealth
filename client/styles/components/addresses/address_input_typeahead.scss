@@ -1,27 +1,27 @@
 @import 'client/styles/shared';
 
 .AddressInputTypeahead {
-    .User {
-        position: relative;
-        top: -3px;
-        margin-right: 10px;
-    }
-    .lighter {
-        margin-left: 6px;
-        color: $text-color-lighter;
-    }
+  .User {
+    position: relative;
+    top: -3px;
+    margin-right: 10px;
+  }
+  .lighter {
+    margin-left: 6px;
+    color: $neutral-300;
+  }
 }
 
 .AddressInputTypeaheadPopoverPortal {
-    margin-top: 1px;
-    .cui-popover {
+  margin-top: 1px;
+  .cui-popover {
+  }
+  .cui-popover-content {
+    .cui-list {
+      max-height: 200px !important;
+      overscroll-behavior: none;
     }
-    .cui-popover-content {
-        .cui-list {
-            max-height: 200px !important;
-            overscroll-behavior: none;
-        }
-        padding: 10px;
-        padding-right: 0;
-    }
+    padding: 10px;
+    padding-right: 0;
+  }
 }

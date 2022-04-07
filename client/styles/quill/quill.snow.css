@@ -494,7 +494,7 @@
 .ql-snow .ql-tooltip {
   background-color: #fff;
   border: 1px solid #ccc;
-  box-shadow: 0 0 5px #ddd;
+  box-shadow: 0 0 5px $neutral-100;
   color: #444;
   padding: 5px 12px;
   white-space: nowrap;

@@ -1044,108 +1044,106 @@ const NotificationSettingsPage: m.Component<
           }),
         ],
       },
-      [
-        m('.forum-container', [
-          m(EmailIntervalConfiguration),
-          communities &&
-            subscriptions &&
-            m('.CommunityNotifications', [
-              m('.header', [
-                m(SelectList, {
-                  class: 'CommunityNotificationSelectList',
-                  filterable: false,
-                  checkmark: false,
-                  emptyContent: null,
-                  popoverAttrs: {
-                    transitionDuration: 0,
-                  },
-                  itemRender: (community: string) => {
-                    return m(ListItem, {
-                      label: community,
-                      selected: vnode.state.selectedCommunityId === community,
-                    });
-                  },
-                  items: selectableCommunityIds,
-                  trigger: m(Button, {
-                    align: 'left',
-                    compact: true,
-                    rounded: true,
-                    disabled: !app.user.emailVerified,
-                    iconRight: Icons.CHEVRON_DOWN,
-                    label: vnode.state.selectedCommunity
-                      ? vnode.state.selectedCommunityId
-                      : ALL_COMMUNITIES,
-                  }),
-                  onSelect: (community: string) => {
-                    vnode.state.selectedCommunity =
-                      communities.find((c) => c.name === community) ||
-                      chains.find((c) => c.name === community);
-                    vnode.state.selectedCommunityId =
-                      vnode.state.selectedCommunity?.name || ALL_COMMUNITIES;
-                    m.redraw();
-                  },
+      m('.NotificationSettingsPage', [
+        m(EmailIntervalConfiguration),
+        communities &&
+          subscriptions &&
+          m('.CommunityNotifications', [
+            m('.header', [
+              m(SelectList, {
+                class: 'CommunityNotificationSelectList',
+                filterable: false,
+                checkmark: false,
+                emptyContent: null,
+                popoverAttrs: {
+                  transitionDuration: 0,
+                },
+                itemRender: (community: string) => {
+                  return m(ListItem, {
+                    label: community,
+                    selected: vnode.state.selectedCommunityId === community,
+                  });
+                },
+                items: selectableCommunityIds,
+                trigger: m(Button, {
+                  align: 'left',
+                  compact: true,
+                  rounded: true,
+                  disabled: !app.user.emailVerified,
+                  iconRight: Icons.CHEVRON_DOWN,
+                  label: vnode.state.selectedCommunity
+                    ? vnode.state.selectedCommunityId
+                    : ALL_COMMUNITIES,
                 }),
-              ]),
-              m(Table, { class: 'NotificationsTable' }, [
-                // off-chain discussion notifications
-                m('tr', [m('th', NOTIFICATION_TABLE_PRE_COPY), m('th', '')]),
-                selectedCommunityId === ALL_COMMUNITIES && [
-                  m(AllCommunitiesNotifications, {
-                    communities: allCommunityIds,
-                    subscriptions,
-                  }),
-                  m(
-                    'tr.on-chain-events-header',
-                    m('th', { colspan: 2 }, 'Edgeware chain events')
-                  ),
-                  m(EdgewareChainEventNotifications),
-                  m(
-                    'tr.on-chain-events-header',
-                    m('th', { colspan: 2 }, 'Kulupu chain events')
-                  ),
-                  m(KulupuChainEventNotifications),
-                  m(
-                    'tr.on-chain-events-header',
-                    m('th', { colspan: 2 }, 'Kusama chain events')
-                  ),
-                  m(KusamaChainEventNotifications),
-                  m(
-                    'tr.on-chain-events-header',
-                    m('th', { colspan: 2 }, 'Polkadot chain events')
-                  ),
-                  m(PolkadotChainEventNotifications),
-                  m(
-                    'tr.on-chain-events-header',
-                    m('th', { colspan: 2 }, 'dYdX chain events')
-                  ),
-                  m(DydxChainEventNotifications),
-                ],
-                selectedCommunity &&
-                  m(IndividualCommunityNotifications, {
-                    subscriptions,
-                    community: selectedCommunity,
-                  }),
-                // on-chain event notifications
-                selectedCommunity instanceof ChainInfo && [
-                  m(
-                    'tr.on-chain-events-header',
-                    m('th', { colspan: 2 }, CHAIN_NOTIFICATION_TABLE_PRE_COPY)
-                  ),
-                  selectedCommunity.network === ChainNetwork.Edgeware &&
-                    m(EdgewareChainEventNotifications),
-                  selectedCommunity.network === ChainNetwork.Kulupu &&
-                    m(KulupuChainEventNotifications),
-                  selectedCommunity.network === ChainNetwork.Kusama &&
-                    m(KusamaChainEventNotifications),
-                  selectedCommunity.network === ChainNetwork.Polkadot &&
-                    m(PolkadotChainEventNotifications),
-                  selectedCommunity.network === ChainNetwork.Aave &&
-                    m(DydxChainEventNotifications),
-                ],
-              ]),
+                onSelect: (community: string) => {
+                  vnode.state.selectedCommunity =
+                    communities.find((c) => c.name === community) ||
+                    chains.find((c) => c.name === community);
+                  vnode.state.selectedCommunityId =
+                    vnode.state.selectedCommunity?.name || ALL_COMMUNITIES;
+                  m.redraw();
+                },
+              }),
             ]),
-        ]),
-      ]
+            m(Table, { class: 'NotificationsTable' }, [
+              // off-chain discussion notifications
+              m('tr', [m('th', NOTIFICATION_TABLE_PRE_COPY), m('th', '')]),
+              selectedCommunityId === ALL_COMMUNITIES && [
+                m(AllCommunitiesNotifications, {
+                  communities: allCommunityIds,
+                  subscriptions,
+                }),
+                m(
+                  'tr.on-chain-events-header',
+                  m('th', { colspan: 2 }, 'Edgeware chain events')
+                ),
+                m(EdgewareChainEventNotifications),
+                m(
+                  'tr.on-chain-events-header',
+                  m('th', { colspan: 2 }, 'Kulupu chain events')
+                ),
+                m(KulupuChainEventNotifications),
+                m(
+                  'tr.on-chain-events-header',
+                  m('th', { colspan: 2 }, 'Kusama chain events')
+                ),
+                m(KusamaChainEventNotifications),
+                m(
+                  'tr.on-chain-events-header',
+                  m('th', { colspan: 2 }, 'Polkadot chain events')
+                ),
+                m(PolkadotChainEventNotifications),
+                m(
+                  'tr.on-chain-events-header',
+                  m('th', { colspan: 2 }, 'dYdX chain events')
+                ),
+                m(DydxChainEventNotifications),
+              ],
+              selectedCommunity &&
+                m(IndividualCommunityNotifications, {
+                  subscriptions,
+                  community: selectedCommunity,
+                }),
+              // on-chain event notifications
+              selectedCommunity instanceof ChainInfo && [
+                m(
+                  'tr.on-chain-events-header',
+                  m('th', { colspan: 2 }, CHAIN_NOTIFICATION_TABLE_PRE_COPY)
+                ),
+                selectedCommunity.network === ChainNetwork.Edgeware &&
+                  m(EdgewareChainEventNotifications),
+                selectedCommunity.network === ChainNetwork.Kulupu &&
+                  m(KulupuChainEventNotifications),
+                selectedCommunity.network === ChainNetwork.Kusama &&
+                  m(KusamaChainEventNotifications),
+                selectedCommunity.network === ChainNetwork.Polkadot &&
+                  m(PolkadotChainEventNotifications),
+                selectedCommunity.network === ChainNetwork.Aave &&
+                  m(DydxChainEventNotifications),
+              ],
+            ]),
+          ]),
+      ])
     );
   },
 };

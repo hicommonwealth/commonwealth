@@ -724,6 +724,7 @@ class ThreadsController {
     if (topicId) params['topic_id'] = topicId;
     if (stage) params['stage'] = stage;
     const threads = await this.fetchBulkThreads({ topicId, stage, params });
+
     await Promise.all([
       this.fetchReactionsCount(threads),
       app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({

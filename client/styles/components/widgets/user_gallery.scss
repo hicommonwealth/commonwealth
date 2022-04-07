@@ -9,14 +9,14 @@
     margin-right: -16px;
     margin-top: -3px;
     white-space: nowrap;
-    background-color: tint(#88a0de, 12%);
+    background-color: $primary-100;
     .overflow-users {
       position: absolute;
       width: 100%;
       left: 0;
       top: -50%;
       text-align: center;
-      color: white;
+      color: $white;
     }
   }
 }

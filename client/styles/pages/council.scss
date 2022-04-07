@@ -1,9 +1,7 @@
 @import 'client/styles/shared';
 
 .CouncilPage {
-  .council-container {
-    padding: 24px;
-  }
+  padding: 24px;
 
   @include gov-explainer;
 
@@ -18,7 +16,7 @@
       font-weight: 600;
     }
     .councillor-status {
-      color: $text-color-light;
+      color: $neutral-500;
     }
   }
 }

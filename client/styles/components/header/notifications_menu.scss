@@ -10,21 +10,21 @@
     padding: 0;
 
     .cui-button-label {
-      color: $text-color-darker;
+      color: $neutral-900;
       text-align: center;
     }
 
     &:hover {
-      background: #f9fafd;
+      background: $neutral-100;
     }
 
     &:active {
-      background: #eff1f7;
+      background: $neutral-200;
     }
   }
 
   .cui-button:first-child {
-    border-right: 1px solid #d8dee0;
+    border-right: 1px solid $neutral-300;
   }
 }
 
@@ -40,7 +40,7 @@
       .NotificationsMenuHeader {
         @include notificationsButton;
 
-        border-bottom: 1px solid #d8dee0;
+        border-bottom: 1px solid $neutral-300;
         display: flex;
       }
 
@@ -54,7 +54,7 @@
       .NotificationsMenuFooter {
         @include notificationsButton;
 
-        border-top: 1px solid #d8dee0;
+        border-top: 1px solid $neutral-300;
         display: flex;
       }
     }

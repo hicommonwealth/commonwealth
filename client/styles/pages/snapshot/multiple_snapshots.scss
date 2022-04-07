@@ -19,7 +19,7 @@
     display: flex;
   }
   .card-subheader {
-    color: #666666;
+    color: $neutral-600;
     font-size: 14px;
     margin-left: auto;
     margin-top: 12px;
@@ -34,12 +34,12 @@
     bottom: 14px;
     font-weight: 400;
     margin-bottom: 4px;
-    color: $text-color-light;
+    color: $neutral-500;
     &.pass {
-      color: $positive-bg-color;
+      color: $green-500;
     }
     &.fail {
-      color: $negative-bg-color;
+      color: $rorange-500;
     }
   }
 }
@@ -47,6 +47,4 @@
 .SnapshotSpaceTextHeader {
   font-size: 18px;
   font-weight: 500;
-  margin-top: 40px;
-  margin-bottom: -20px;
 }

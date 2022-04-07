@@ -30,11 +30,11 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
 }
 
 const LoginWithWalletDropdown: m.Component<{
-  label,
-  loggingInWithAddress,
-  joiningChain,
-  onSuccess?,
-  prepopulateAddress?,
+  label;
+  loggingInWithAddress;
+  joiningChain;
+  onSuccess?;
+  prepopulateAddress?;
 }> = {
   view: (vnode) => {
     const {
@@ -47,25 +47,34 @@ const LoginWithWalletDropdown: m.Component<{
 
     // prev and next must work whether the modal is on the web3login page, or not...which is why this is so confusing
     const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
-    const next = (m.route.param('prev')
-                  && m.route.param('prev').indexOf('web3login') === -1
-                  && m.route.param('prev') !== '/')
-      ? m.route.param('prev')
-      : joiningChain ? `/${joiningChain}`
-          : m.route.get().indexOf('web3login') === -1 && m.route.get().replace(/\?.*/, '') !== '/' ? m.route.get()
-            : app.chain ? `/${app.chain.meta.chain.id}`
-                : '/?';
+    const next =
+      m.route.param('prev') &&
+      m.route.param('prev').indexOf('web3login') === -1 &&
+      m.route.param('prev') !== '/'
+        ? m.route.param('prev')
+        : joiningChain
+        ? `/${joiningChain}`
+        : m.route.get().indexOf('web3login') === -1 &&
+          m.route.get().replace(/\?.*/, '') !== '/'
+        ? m.route.get()
+        : app.chain
+        ? `/${app.chain.meta.chain.id}`
+        : '/?';
     // only redirect to home as an absolute last resort
 
     const web3loginParams = loggingInWithAddress
-    ? { prev, loggingInWithAddress }
-    : joiningChain
-    ? { prev, joiningChain }
-    : { prev };
+      ? { prev, loggingInWithAddress }
+      : joiningChain
+      ? { prev, joiningChain }
+      : { prev };
 
     const allChains = app.config.chains.getAll();
     const sortedChainBases = [
-      ChainBase.CosmosSDK, ChainBase.Ethereum, ChainBase.NEAR, ChainBase.Substrate, ChainBase.Solana
+      ChainBase.CosmosSDK,
+      ChainBase.Ethereum,
+      ChainBase.NEAR,
+      ChainBase.Substrate,
+      ChainBase.Solana,
     ].filter((base) => allChains.find((chain) => chain.base === base));
 
     const emptyWalletMenuItem = 
@@ -78,49 +87,58 @@ const LoginWithWalletDropdown: m.Component<{
 
     const getMenuItemsForChainBase = (base: ChainBase) => {
       const wallets = app.wallets.availableWallets(base);
-      const createItem = (webWallet?: IWebWallet<any>) => m(MenuItem, {
-        label: m('.chain-login-label', [
-          webWallet && m(WalletIcon, { walletName: webWallet.name, size: 20 }),
-          m('.chain-login-label-name', [ webWallet.label ]),
-        ]),
-        onclick: (e) => {
-          $('.Login').trigger('modalexit');
-          const defaultChainId = webWallet?.specificChain || baseToNetwork(base);
-          if (app.activeChainId()) {
-            navigateToSubpage('/web3login', web3loginParams);
-          } else {
-            m.route.set(`${defaultChainId}/web3login`, web3loginParams);
-          }
-          app.modals.lazyCreate('link_new_address_modal', {
-            loggingInWithAddress,
-            joiningChain,
-            webWallet,
-            prepopulateAddress,
-            successCallback: () => {
-              if (next === '/?') {
-                navigateToSubpage('/');
-              } else {
-                m.route.set(next);
-              }
-              m.redraw();
-              setTimeout(() => {
+      const createItem = (webWallet?: IWebWallet<any>) =>
+        m(MenuItem, {
+          label: m('.chain-login-label', [
+            webWallet &&
+              m(WalletIcon, { walletName: webWallet.name, size: 20 }),
+            m('.chain-login-label-name', [webWallet.label]),
+          ]),
+          onclick: (e) => {
+            $('.Login').trigger('modalexit');
+            const defaultChainId =
+              webWallet?.specificChain || baseToNetwork(base);
+            if (app.activeChainId()) {
+              navigateToSubpage('/web3login', web3loginParams);
+            } else {
+              m.route.set(`${defaultChainId}/web3login`, web3loginParams);
+            }
+            app.modals.lazyCreate('link_new_address_modal', {
+              loggingInWithAddress,
+              joiningChain,
+              webWallet,
+              prepopulateAddress,
+              successCallback: () => {
+                if (next === '/?') {
+                  navigateToSubpage('/');
+                } else {
+                  m.route.set(next);
+                }
                 m.redraw();
-                if (onSuccess) onSuccess();
-              }, 1); // necessary because address linking may be deferred
-            },
-          });
-        }
-      });
+                setTimeout(() => {
+                  m.redraw();
+                  if (onSuccess) onSuccess();
+                }, 1); // necessary because address linking may be deferred
+              },
+            });
+          },
+        });
       return wallets.map((w) => createItem(w));
     };
 
     let chainbase = app.chain?.meta?.chain?.base;
-    if (!chainbase && app.customDomainId() && app.config.chains.getById(app.customDomainId())) {
+    if (
+      !chainbase &&
+      app.customDomainId() &&
+      app.config.chains.getById(app.customDomainId())
+    ) {
       chainbase = app.config.chains.getById(app.customDomainId()).base;
     }
-    const menuItems = chainbase ? [
-        ...getMenuItemsForChainBase(chainbase)
-      ] : _.flatten(sortedChainBases.map((base) => getMenuItemsForChainBase(base)));
+    const menuItems = chainbase
+      ? [...getMenuItemsForChainBase(chainbase)]
+      : _.flatten(
+          sortedChainBases.map((base) => getMenuItemsForChainBase(base))
+        );
 
     if (!menuItems.length) {
       menuItems.push(emptyWalletMenuItem);
@@ -132,10 +150,7 @@ const LoginWithWalletDropdown: m.Component<{
         fluid: true,
         class: 'login-with-web3',
         rounded: true,
-        label: [
-          label,
-          m(Icon, { name: Icons.CHEVRON_DOWN }),
-        ]
+        label: [label, m(Icon, { name: Icons.CHEVRON_DOWN })],
       }),
       addToStack: true,
       closeOnContentClick: true,
@@ -143,7 +158,7 @@ const LoginWithWalletDropdown: m.Component<{
       transitionDuration: 0,
       content: menuItems,
     });
-  }
+  },
 };
 
 export default LoginWithWalletDropdown;
