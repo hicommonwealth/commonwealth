@@ -10,7 +10,7 @@ import { navigateToSubpage } from 'app';
 import { RoleInfo, RolePermission, Webhook } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
-import AdminPanelTabs from './admin_panel_tabs';
+import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { PageLoading } from '../loading';
@@ -145,13 +145,14 @@ class ManageCommunityPage implements m.ClassComponent {
             })}
           </div>
           <div class="panel-bottom">
-            {m(AdminPanelTabs, {
-              defaultTab: 1,
-              onRoleUpgrade: (oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole),
-              roleData: this.roleData,
-              webhooks: this.webhooks,
-            })}
+            <AdminPanelTabs
+              defaultTab={1}
+              onRoleUpgrade={(oldRole, newRole) =>
+                onRoleUpdate(oldRole, newRole)
+              }
+              roleData={this.roleData}
+              webhooks={this.webhooks}
+            />
           </div>
           {app.user.isSiteAdmin && (
             <CWButton
