@@ -1,12 +1,13 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import 'pages/manage_community.scss';
+/* @jsx m */
 
 import m from 'mithril';
 import $ from 'jquery';
 
+import 'pages/manage_community.scss';
+
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ChainInfo, RoleInfo, RolePermission, Webhook } from 'models';
+import { RoleInfo, RolePermission, Webhook } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
@@ -24,44 +25,13 @@ const sortAdminsAndModsFirst = (a, b) => {
   return a.Address.address.localeCompare(b.Address.address);
 };
 
-const deleteChainButton: m.Component<{ chain: ChainInfo }> = {
-  view: (vnode) => {
-    const { chain } = vnode.attrs;
-    return m(CWButton, {
-      buttonType: 'primary',
-      label: 'DELETE CHAIN',
-      onclick: async (e) => {
-        $.post(`${app.serverUrl()}/deleteChain`, {
-          id: chain.id,
-          auth: true,
-          jwt: app.user.jwt,
-        }).then(
-          (result) => {
-            if (result.status !== 'Success') return;
-            app.config.chains.remove(chain);
-            notifySuccess('Deleted chain!');
-            m.route.set('/');
-            // redirect to /
-          },
-          (err) => {
-            notifyError('Failed to delete chain!');
-          }
-        );
-      },
-    });
-  },
-};
+class ManageCommunityPage implements m.ClassComponent {
+  private loadingFinished: boolean;
+  private loadingStarted: boolean;
+  private roleData: RoleInfo[];
+  private webhooks: Webhook[];
 
-const ManageCommunityPage: m.Component<
-  {},
-  {
-    roleData: RoleInfo[];
-    webhooks: Webhook[];
-    loadingFinished: boolean;
-    loadingStarted: boolean;
-  }
-> = {
-  view: (vnode) => {
+  view() {
     if (!app.activeChainId()) {
       return;
     }
@@ -76,6 +46,7 @@ const ManageCommunityPage: m.Component<
     }
 
     const chainOrCommObj = { chain: app.activeChainId() };
+
     const loadRoles = async () => {
       try {
         // TODO: Change to GET /members
@@ -93,27 +64,28 @@ const ManageCommunityPage: m.Component<
         });
         if (webhooks.status !== 'Success')
           throw new Error('Could not fetch community webhooks');
-        vnode.state.webhooks = webhooks.result;
-        vnode.state.roleData = bulkMembers.result;
-        vnode.state.loadingFinished = true;
+        this.webhooks = webhooks.result;
+        this.roleData = bulkMembers.result;
+        this.loadingFinished = true;
         m.redraw();
       } catch (err) {
-        vnode.state.roleData = [];
-        vnode.state.loadingFinished = true;
+        this.roleData = [];
+        this.loadingFinished = true;
         m.redraw();
         console.error(err);
       }
     };
 
-    if (!vnode.state.loadingStarted) {
-      vnode.state.loadingStarted = true;
+    if (!this.loadingStarted) {
+      this.loadingStarted = true;
       loadRoles();
     }
 
     const admins = [];
+
     const mods = [];
-    if (vnode.state.roleData?.length > 0) {
-      vnode.state.roleData.sort(sortAdminsAndModsFirst).forEach((role) => {
+    if (this.roleData?.length > 0) {
+      this.roleData.sort(sortAdminsAndModsFirst).forEach((role) => {
         if (role.permission === RolePermission.admin) admins.push(role);
         else if (role.permission === RolePermission.moderator) mods.push(role);
       });
@@ -126,11 +98,7 @@ const ManageCommunityPage: m.Component<
       const predicate = (r) => {
         return r.id === oldRole.id;
       };
-      vnode.state.roleData.splice(
-        vnode.state.roleData.indexOf(oldRole),
-        1,
-        newRole
-      );
+      this.roleData.splice(this.roleData.indexOf(oldRole), 1, newRole);
       app.user.addRole(newRole);
       app.user.removeRole(predicate);
       const { adminsAndMods } = app.chain.meta.chain;
@@ -162,40 +130,59 @@ const ManageCommunityPage: m.Component<
       m.redraw();
     };
 
-    return !vnode.state.loadingFinished
-      ? m(PageLoading)
-      : m(
-          Sublayout,
-          {
-            title: ['Manage Community'],
-            showNewProposalButton: true,
-          },
-          m('.ManageCommunityPage', [
-            m('.panel-top', [
-              m(ChainMetadataManagementTable, {
-                admins,
-                chain: app.config.chains.getById(app.activeChainId()),
-                mods,
-                onRoleUpdate: (oldRole, newRole) =>
-                  onRoleUpdate(oldRole, newRole),
-              }),
-            ]),
-            m('.panel-bottom', [
-              m(AdminPanelTabs, {
-                defaultTab: 1,
-                onRoleUpgrade: (oldRole, newRole) =>
-                  onRoleUpdate(oldRole, newRole),
-                roleData: vnode.state.roleData,
-                webhooks: vnode.state.webhooks,
-              }),
-            ]),
-            app.user.isSiteAdmin &&
-              m(deleteChainButton, {
-                chain: app.config.chains.getById(app.activeChainId()),
-              }),
-          ])
-        );
-  },
-};
+    return !this.loadingFinished ? (
+      <PageLoading />
+    ) : (
+      <Sublayout title="Manage Community" showNewProposalButton={true}>
+        <div class="ManageCommunityPage">
+          <div class="panel-top">
+            {m(ChainMetadataManagementTable, {
+              admins,
+              chain: app.config.chains.getById(app.activeChainId()),
+              mods,
+              onRoleUpdate: (oldRole, newRole) =>
+                onRoleUpdate(oldRole, newRole),
+            })}
+          </div>
+          <div class="panel-bottom">
+            {m(AdminPanelTabs, {
+              defaultTab: 1,
+              onRoleUpgrade: (oldRole, newRole) =>
+                onRoleUpdate(oldRole, newRole),
+              roleData: this.roleData,
+              webhooks: this.webhooks,
+            })}
+          </div>
+          {app.user.isSiteAdmin && (
+            <CWButton
+              buttonType="primary"
+              label="DELETE CHAIN"
+              onclick={async () => {
+                $.post(`${app.serverUrl()}/deleteChain`, {
+                  id: app.config.chains.getById(app.activeChainId()).id,
+                  auth: true,
+                  jwt: app.user.jwt,
+                }).then(
+                  (result) => {
+                    if (result.status !== 'Success') return;
+                    app.config.chains.remove(
+                      app.config.chains.getById(app.activeChainId())
+                    );
+                    notifySuccess('Deleted chain!');
+                    m.route.set('/');
+                    // redirect to /
+                  },
+                  () => {
+                    notifyError('Failed to delete chain!');
+                  }
+                );
+              }}
+            />
+          )}
+        </div>
+      </Sublayout>
+    );
+  }
+}
 
 export default ManageCommunityPage;

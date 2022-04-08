@@ -10,9 +10,9 @@ import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 
 import { ChainInfo } from 'client/scripts/models';
-import ManageRolesRow from './manage_roles_row';
 import { buildChainToCategoriesMap } from '../community_cards';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { ManageRolesRow } from './manage_roles_row';
 
 interface IChainOrCommMetadataManagementAttrs {
   chain?: ChainInfo;
