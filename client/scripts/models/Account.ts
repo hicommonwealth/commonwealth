@@ -14,6 +14,7 @@ abstract class Account<C extends Coin> {
   public readonly ghost_address: ChainBase;
   public get freeBalance() { return this.balance; }
   public abstract balance: Promise<C>;
+  // TODO: add walletId here
 
   // validation token sent by server
   private _validationToken?: string;

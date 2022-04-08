@@ -1,12 +1,14 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction } from 'express';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 
 import AddressSwapper from '../util/addressSwapper';
 import { DB } from '../database';
+import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ChainBase, WalletId } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { AddressAttributes } from '../models/address';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -16,7 +18,22 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const createAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+type CreateAddressReq = {
+  address: string;
+  chain: string;
+  walletId: WalletId;
+  community?: string;
+  keytype?: string;
+};
+
+type CreateAddressResp = AddressAttributes;
+
+const createAddress = async (
+  models: DB,
+  req: TypedRequestBody<CreateAddressReq>,
+  res: TypedResponse<CreateAddressResp>,
+  next: NextFunction,
+) => {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.
@@ -74,7 +91,7 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
 		existingAddress.last_active = new Date();
 
     // we update addresses with the wallet used to sign in
-    existingAddress.wallet_id = req.body.wallet_id;
+    existingAddress.wallet_id = req.body.walletId;
 
 		const updatedObj = await existingAddress.save();
 
@@ -92,7 +109,7 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
         });
       }
     }
-    return res.json({ status: 'Success', result: updatedObj.toJSON() });
+    return success(res, updatedObj.toJSON());
   } else {
     // address doesn't exist, add it to the database
     try {
@@ -131,7 +148,7 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
         });
       }
 
-      return res.json({ status: 'Success', result: newObj.toJSON() });
+      return success(res, newObj.toJSON());
     } catch (e) {
       return next(e);
     }

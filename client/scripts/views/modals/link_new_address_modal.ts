@@ -595,6 +595,7 @@ const LinkNewAddressModal: m.Component<
                   app.chain.base === ChainBase.Substrate
                   ? []
                   : [
+                      // TODO: include walletId here
                       webWallet?.accounts.map((addressOrAccount) =>
                         m(LinkAccountItem, {
                           account:
