@@ -103,6 +103,7 @@
       display: flex;
 
       svg {
+        fill: none; // temporary while custom icons are replaced
         height: 28px;
         margin-right: 25px;
         stroke-width: 1px;

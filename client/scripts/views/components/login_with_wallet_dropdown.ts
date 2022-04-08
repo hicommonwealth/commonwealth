@@ -77,6 +77,14 @@ const LoginWithWalletDropdown: m.Component<{
       ChainBase.Solana,
     ].filter((base) => allChains.find((chain) => chain.base === base));
 
+    const emptyWalletMenuItem = 
+      m(MenuItem, {
+        label: m('.chain-login-label', [
+          // TODO Graham 4/7/22: Better copy
+          m('.chain-login-label-name', 'No wallets found'),
+        ]),
+      });
+
     const getMenuItemsForChainBase = (base: ChainBase) => {
       const wallets = app.wallets.availableWallets(base);
       const createItem = (webWallet?: IWebWallet<any>) =>
@@ -131,6 +139,10 @@ const LoginWithWalletDropdown: m.Component<{
       : _.flatten(
           sortedChainBases.map((base) => getMenuItemsForChainBase(base))
         );
+
+    if (!menuItems.length) {
+      menuItems.push(emptyWalletMenuItem);
+    }
 
     return m(PopoverMenu, {
       trigger: m(Button, {

@@ -1,6 +1,7 @@
 @import 'client/styles/shared';
 
 .ManageCommunityPage {
+  flex: 1;
   width: 100%;
 
   @include sm-max {
