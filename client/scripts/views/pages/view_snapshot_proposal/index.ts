@@ -29,6 +29,7 @@ import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import { PageLoading } from '../loading';
 
 const enum VotingError {
   NOT_VALIDATED = 'Insufficient Voting Power',
@@ -372,14 +373,14 @@ const ViewProposalPage: m.Component<
       moment(+vnode.state.proposal.start * 1000) <= moment() &&
       moment(+vnode.state.proposal.end * 1000) > moment();
 
-    return m(
-      Sublayout,
-      {
-        title: 'Snapshot Proposal',
-      },
-      !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
-        ? m(Spinner, { fill: true, active: true, size: 'xl' })
-        : m(
+    return !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
+      ? m(PageLoading)
+      : m(
+          Sublayout,
+          {
+            title: 'Snapshot Proposal',
+          },
+          m(
             `.SnapshotViewProposalPage ${
               activeTab === 'Proposals' ? '.proposal-tab' : '.info-tab'
             }`,
@@ -546,7 +547,7 @@ const ViewProposalPage: m.Component<
               ]),
             ]
           )
-    );
+        );
   },
 };
 
