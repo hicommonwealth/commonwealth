@@ -4,7 +4,7 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type WalletAttributes = {
   id?: string;
-  base_id: string;
+  base_id?: string;
 }
 
 export type WalletInstance = ModelInstance<WalletAttributes> & {
@@ -22,7 +22,8 @@ export default (
     'Wallet',
     {
       id: { type: dataTypes.STRING, primaryKey: true },
-      base_id: { type: dataTypes.STRING, allowNull: false }
+      // base_id will be null if a wallet is ONLY to be used via override_wallet
+      base_id: { type: dataTypes.STRING, allowNull: true }
     },
     {
       tableName: 'Wallets',

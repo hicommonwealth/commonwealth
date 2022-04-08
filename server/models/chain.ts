@@ -20,7 +20,6 @@ export type ChainAttributes = {
   name: string;
   symbol: string;
   network: ChainNetwork;
-  base: ChainBase;
   icon_url: string;
   active: boolean;
   type: ChainType;
@@ -102,7 +101,6 @@ export default (
       github: { type: dataTypes.STRING, allowNull: true },
       symbol: { type: dataTypes.STRING, allowNull: false },
       network: { type: dataTypes.STRING, allowNull: false },
-      base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
       ss58_prefix: { type: dataTypes.INTEGER, allowNull: true },
       icon_url: { type: dataTypes.STRING },
       active: { type: dataTypes.BOOLEAN },
