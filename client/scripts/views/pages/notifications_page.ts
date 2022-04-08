@@ -46,7 +46,6 @@ const NotificationsPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'NotificationsPage',
         title: [
           'Notifications ',
           m(Tag, {
@@ -57,7 +56,7 @@ const NotificationsPage: m.Component<{}> = {
         ],
       },
       [
-        m('.forum-container', [
+        m('.NotificationsPage', [
           m(
             ButtonGroup,
             {
