@@ -96,10 +96,13 @@ import NotificationsReadFactory, {
   NotificationsReadModelStatic,
 } from './models/notifications_read';
 import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
+import WalletFactory, { WalletModelStatic } from './models/wallet';
+import ChainBaseFactory, { ChainBaseModelStatic } from './models/chain_base';
 
 export type Models = {
   Address: AddressModelStatic;
   Chain: ChainModelStatic;
+  ChainBase: ChainBaseModelStatic;
   ChainCategory: ChainCategoryModelStatic;
   ChainCategoryType: ChainCategoryTypeModelStatic;
   ChainEntity: ChainEntityModelStatic;
@@ -137,6 +140,7 @@ export type Models = {
   TaggedThread: TaggedThreadModelStatic;
   User: UserModelStatic;
   WaitlistRegistration: WaitlistRegistrationModelStatic;
+  Wallet: WalletModelStatic;
   Webhook: WebhookModelStatic;
 };
 
@@ -177,6 +181,7 @@ export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
+  ChainBase: ChainBaseFactory(sequelize, DataTypes),
   ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
   ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
   ChainEntity: ChainEntityFactory(sequelize, DataTypes),
@@ -214,6 +219,7 @@ const models: Models = {
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
   User: UserModelFactory(sequelize, DataTypes),
   WaitlistRegistration: WaitlistRegistrationFactory(sequelize, DataTypes),
+  Wallet: WalletFactory(sequelize, DataTypes),
   Webhook: WebhookFactory(sequelize, DataTypes),
 };
 

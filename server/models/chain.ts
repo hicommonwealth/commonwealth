@@ -13,6 +13,8 @@ import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
+import { ChainBaseAttributes, ChainBaseInstance } from './chain_base';
+import { WalletAttributes, WalletInstance } from './wallet';
 
 export type ChainAttributes = {
   name: string;
@@ -42,6 +44,8 @@ export type ChainAttributes = {
   terms?: string;
   snapshot?: string[];
   bech32_prefix?: string;
+  base_id: string;
+  override_wallet?: string;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -58,6 +62,8 @@ export type ChainAttributes = {
     | OffchainCommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
+  ChainBase?: ChainBaseAttributes;
+  OverrideWallet?: WalletAttributes;
 };
 
 export type ChainInstance = ModelInstance<ChainAttributes> & {
@@ -73,6 +79,8 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
     OffchainTopicInstance,
     OffchainTopicInstance['id']
   >;
+  getChainBase: Sequelize.BelongsToGetAssociationMixin<ChainBaseInstance>;
+  getOverrideWallet: Sequelize.BelongsToGetAssociationMixin<WalletInstance>;
 };
 
 export type ChainModelStatic = ModelStatic<ChainInstance>;
@@ -126,6 +134,8 @@ export default (
       },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
+      base_id: { type: dataTypes.STRING, allowNull: false },
+      override_wallet: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'Chains',
@@ -148,6 +158,8 @@ export default (
     models.Chain.belongsToMany(models.User, {
       through: models.WaitlistRegistration,
     });
+    models.Chain.belongsTo(models.ChainBase, { foreignKey: 'base_id', targetKey: 'id' });
+    models.Chain.belongsTo(models.Wallet, { foreignKey: 'override_wallet', targetKey: 'id', as: 'OverrideWallet' });
   };
 
   return Chain;

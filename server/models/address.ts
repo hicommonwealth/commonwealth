@@ -1,16 +1,17 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
-import { ChainAttributes, ChainInstance } from './chain';
+import { ChainBaseAttributes, ChainBaseInstance } from './chain_base';
 import { UserAttributes, UserInstance } from './user';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
 import { ProfileInstance } from './profile';
 import { SsoTokenInstance } from './sso_token';
+import { WalletAttributes, WalletInstance } from './wallet';
 
 export type AddressAttributes = {
 	address: string;
-	chain: string;
+	chain_base: string;
 	verification_token: string;
 	id?: number;
 	verification_token_expires?: Date;
@@ -26,8 +27,11 @@ export type AddressAttributes = {
 	is_magic?: boolean;
 	ghost_address?: boolean;
 	profile_id?: number;
+	wallet_id: string;
+
 	// associations
-	Chain?: ChainAttributes;
+	ChainBase?: ChainBaseAttributes;
+	Wallet?: WalletAttributes;
 	User?: UserAttributes;
 	OffchainProfile?: OffchainProfileAttributes;
 	Roles?: RoleAttributes[];
@@ -36,12 +40,13 @@ export type AddressAttributes = {
 // eslint-disable-next-line no-use-before-define
 export type AddressInstance = ModelInstance<AddressAttributes> & {
 	// no mixins used yet
-	getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+	getChainBase: Sequelize.BelongsToGetAssociationMixin<ChainBaseInstance>;
 	getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
 	getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
 	getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
 	getRoles: Sequelize.HasManyGetAssociationsMixin<RoleInstance>;
 	getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
+	getWallet: Sequelize.BelongsToGetAssociationMixin<WalletInstance>;
 }
 
 export type AddressModelStatic = ModelStatic<AddressInstance>;
@@ -53,7 +58,7 @@ export default (
 	const Address: AddressModelStatic = <AddressModelStatic>sequelize.define('Address', {
 		id:                         { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 		address:                    { type: dataTypes.STRING, allowNull: false },
-		chain:                      { type: dataTypes.STRING, allowNull: false },
+		chain_base:                 { type: dataTypes.STRING, allowNull: false },
 		verification_token:         { type: dataTypes.STRING, allowNull: false },
 		verification_token_expires: { type: dataTypes.DATE, allowNull: true },
 		verified:                   { type: dataTypes.DATE, allowNull: true },
@@ -68,6 +73,7 @@ export default (
 		is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		profile_id:    						  { type: dataTypes.INTEGER, allowNull: true },
+		wallet_id:									{ type: dataTypes.STRING, allowNull: true }, // TODO: make non-nullable
 	}, {
 		timestamps: true,
 		createdAt: 'created_at',
@@ -75,7 +81,7 @@ export default (
 		underscored: true,
 		tableName: 'Addresses',
 		indexes: [
-			{ fields: ['address', 'chain'], unique: true },
+			{ fields: ['address', 'chain_base'], unique: true },
 			{ fields: ['user_id'] },
 			{ fields: ['name'] }
 		],
@@ -90,7 +96,7 @@ export default (
 	});
 
 	Address.associate = (models) => {
-		models.Address.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+		models.Address.belongsTo(models.ChainBase, { foreignKey: 'chain_base', targetKey: 'id' });
 		models.Address.belongsTo(models.Profile, { foreignKey: 'profile_id', targetKey: 'id' });
 		models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
 		models.Address.hasOne(models.OffchainProfile);
@@ -101,6 +107,7 @@ export default (
 			as: 'collaboration'
 		});
 		models.Address.hasMany(models.Collaboration);
+		models.Wallet.belongsTo(models.Wallet, { foreignKey: 'wallet_id', targetKey: 'id' });
 	};
 
 	return Address;
