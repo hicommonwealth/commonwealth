@@ -9,21 +9,12 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { RoleInfo, RolePermission, Webhook } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import ChainMetadataManagementTable from './chain_metadata_management_table';
+import { ChainMetadataManagementTable } from './chain_metadata_management_table';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { PageLoading } from '../loading';
-
-const sortAdminsAndModsFirst = (a, b) => {
-  if (a.permission === b.permission)
-    return a.Address.address.localeCompare(b.Address.address);
-  if (a.permission === RolePermission.admin) return -1;
-  if (b.permission === RolePermission.admin) return 1;
-  if (a.permission === RolePermission.moderator) return -1;
-  if (b.permission === RolePermission.moderator) return 1;
-  return a.Address.address.localeCompare(b.Address.address);
-};
+import { sortAdminsAndModsFirst } from './helpers';
 
 class ManageCommunityPage implements m.ClassComponent {
   private loadingFinished: boolean;
@@ -136,13 +127,14 @@ class ManageCommunityPage implements m.ClassComponent {
       <Sublayout title="Manage Community" showNewProposalButton={true}>
         <div class="ManageCommunityPage">
           <div class="panel-top">
-            {m(ChainMetadataManagementTable, {
-              admins,
-              chain: app.config.chains.getById(app.activeChainId()),
-              mods,
-              onRoleUpdate: (oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole),
-            })}
+            <ChainMetadataManagementTable
+              admins={admins}
+              chain={app.config.chains.getById(app.activeChainId())}
+              mods={mods}
+              onRoleUpdate={(oldRole, newRole) =>
+                onRoleUpdate(oldRole, newRole)
+              }
+            />
           </div>
           <div class="panel-bottom">
             <AdminPanelTabs
