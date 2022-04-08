@@ -442,7 +442,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       Sublayout,
       {
         showNewProposalButton: true,
-        onscroll: onscroll,
+        onscroll,
       },
       [
         m('.ProfilePage', [

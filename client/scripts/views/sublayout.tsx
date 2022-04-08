@@ -70,7 +70,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
 
     return (
       <div class="Sublayout">
-        <SidebarQuickSwitcher />
+        {!app.isCustomDomain() && <SidebarQuickSwitcher />}
         <div class="header-and-body-container">
           <MobileHeader />
           <div class="header-container">

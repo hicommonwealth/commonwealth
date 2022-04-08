@@ -31,6 +31,7 @@ $discussion-title-font-size: 1.45rem;
 
 .ViewProposalPage {
   display: flex;
+  flex: 1;
   flex-direction: row;
 
   .view-proposal-page-container {
@@ -162,6 +163,9 @@ $discussion-title-font-size: 1.45rem;
         padding-bottom: 10px;
       }
       .proposal-body-meta {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
         margin-bottom: 12px;
       }
       .proposal-meta-top {

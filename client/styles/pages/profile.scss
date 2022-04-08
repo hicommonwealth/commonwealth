@@ -84,7 +84,9 @@
 }
 
 .ProfilePage {
+  flex: 1;
   padding: 24px;
+
   .error-message {
     @include error-text();
     margin-top: 20px;

@@ -78,6 +78,7 @@ $cui-base-height: floor($cui-base-size * 2.8);
 
 .cui-tabs .cui-tabs-item {
   font-weight: $cui-font-weight-bold; // fix weight
+  padding: 8px;
 }
 
 .cui-card h4 {
@@ -177,6 +178,21 @@ button,
 .cui-button-group.cui-primary .cui-button {
   background: $purple-300;
   border: $purple-300;
+
+  &:hover {
+    background: $purple-400;
+    border: $purple-400;
+  }
+
+  a {
+    color: $white;
+  }
+}
+
+.cui-button.cui-primary.cui-active {
+  background: $purple-300;
+  border: $purple-300;
+  box-shadow: none;
 
   &:hover {
     background: $purple-400;
