@@ -59,7 +59,7 @@ export class AaveProposalCardDetail
           </div>
         </div>
         <div class="aave-voting">
-          <div class="card-subheader">Voting</div>,
+          <div class="card-subheader">Voting</div>
           <div class="aave-turnout">
             <p class="detail-highlight.emphasize">
               {roundVote(proposal.turnout * 100)}%
