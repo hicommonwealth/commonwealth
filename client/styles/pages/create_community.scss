@@ -1,6 +1,8 @@
 @import 'client/styles/shared';
 
 .CreateCommunityIndex {
+  display: flex;
+  flex-direction: column;
   padding: 24px;
   width: 100%;
 
@@ -10,6 +12,8 @@
   }
 
   .CreateCommunityForm {
+    display: flex;
+    flex-direction: column;
     margin: 32px auto auto;
     width: 480px;
 

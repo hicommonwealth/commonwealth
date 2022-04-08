@@ -3,13 +3,13 @@
 import m from 'mithril';
 import $ from 'jquery';
 
-import 'pages/manage_community.scss';
+import 'pages/manage_community/index.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { RoleInfo, RolePermission, Webhook } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { ChainMetadataManagementTable } from './chain_metadata_management_table';
+import { ChainMetadataRows } from './chain_metadata_rows';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -127,7 +127,7 @@ class ManageCommunityPage implements m.ClassComponent {
       <Sublayout title="Manage Community" showNewProposalButton={true}>
         <div class="ManageCommunityPage">
           <div class="panel-top">
-            <ChainMetadataManagementTable
+            <ChainMetadataRows
               admins={admins}
               chain={app.config.chains.getById(app.activeChainId())}
               mods={mods}

@@ -4,6 +4,8 @@ import m from 'mithril';
 import $ from 'jquery';
 import { Icon, Icons } from 'construct-ui';
 
+import 'pages/manage_community/manage_roles.scss';
+
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
@@ -15,14 +17,14 @@ type ManageRoleRowAttrs = {
   roledata?: any;
 };
 
-export class ManageRolesRow implements m.ClassComponent<ManageRoleRowAttrs> {
+export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
   view(vnode) {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
     const chainOrCommObj = { chain: app.activeChainId() };
     const communityMeta = app.chain.meta.chain;
 
     return (
-      <div class="ManageRoleRow">
+      <div class="ManageRoles">
         {vnode.attrs.roledata?.map((role) => {
           const addr = role.Address;
 
@@ -35,7 +37,7 @@ export class ManageRolesRow implements m.ClassComponent<ManageRoleRowAttrs> {
           ).length;
 
           return (
-            <div class="RoleChild">
+            <div class="Role">
               {m(User, {
                 user: new AddressInfo(
                   addr.id,
