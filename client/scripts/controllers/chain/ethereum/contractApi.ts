@@ -7,6 +7,7 @@ import WalletConnectWebWalletController from '../../app/webWallets/walletconnect
 
 export type ContractFactoryT<ContractT> = (address: string, provider: Provider) => ContractT;
 
+// TODO: this should take an Account object and should set the wallet on the server if found + not already set
 export async function attachSigner<CT extends Contract>(
   wallets: WebWalletController,
   sender: string,
