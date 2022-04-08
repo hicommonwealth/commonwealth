@@ -13,6 +13,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 type ManageRoleRowAttrs = {
+  label: string;
   onRoleUpdate?: () => void;
   roledata?: any;
 };
@@ -25,6 +26,7 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
 
     return (
       <div class="ManageRoles">
+        <label>{vnode.attrs.label}</label>
         {vnode.attrs.roledata?.map((role) => {
           const addr = role.Address;
 

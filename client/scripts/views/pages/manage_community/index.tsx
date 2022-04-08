@@ -126,26 +126,18 @@ class ManageCommunityPage implements m.ClassComponent {
     ) : (
       <Sublayout title="Manage Community" showNewProposalButton={true}>
         <div class="ManageCommunityPage">
-          <div class="panel-top">
-            <ChainMetadataRows
-              admins={admins}
-              chain={app.config.chains.getById(app.activeChainId())}
-              mods={mods}
-              onRoleUpdate={(oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole)
-              }
-            />
-          </div>
-          <div class="panel-bottom">
-            <AdminPanelTabs
-              defaultTab={1}
-              onRoleUpgrade={(oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole)
-              }
-              roleData={this.roleData}
-              webhooks={this.webhooks}
-            />
-          </div>
+          <ChainMetadataRows
+            admins={admins}
+            chain={app.config.chains.getById(app.activeChainId())}
+            mods={mods}
+            onRoleUpdate={(oldRole, newRole) => onRoleUpdate(oldRole, newRole)}
+          />
+          <AdminPanelTabs
+            defaultTab={1}
+            onRoleUpgrade={(oldRole, newRole) => onRoleUpdate(oldRole, newRole)}
+            roleData={this.roleData}
+            webhooks={this.webhooks}
+          />
           {app.user.isSiteAdmin && (
             <CWButton
               buttonType="primary"

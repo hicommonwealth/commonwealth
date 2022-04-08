@@ -4,6 +4,8 @@ import $ from 'jquery';
 import m from 'mithril';
 import { Button } from 'construct-ui';
 
+import 'pages/manage_community/chain_metadata_rows.scss';
+
 import app from 'state';
 import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -75,23 +77,25 @@ export class ChainMetadataRows
   view(vnode) {
     return (
       <div class="ChainMetadataRows">
-        {m(AvatarUpload, {
-          avatarScope: AvatarScope.Chain,
-          uploadStartedCallback: () => {
-            this.uploadInProgress = true;
-            m.redraw();
-          },
-          uploadCompleteCallback: (files) => {
-            files.forEach((f) => {
-              if (!f.uploadURL) return;
-              const url = f.uploadURL.replace(/\?.*/, '');
-              this.iconUrl = url;
-              $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
-            });
-            this.uploadInProgress = false;
-            m.redraw();
-          },
-        })}
+        <div class="AvatarUploadRow">
+          {m(AvatarUpload, {
+            avatarScope: AvatarScope.Chain,
+            uploadStartedCallback: () => {
+              this.uploadInProgress = true;
+              m.redraw();
+            },
+            uploadCompleteCallback: (files) => {
+              files.forEach((f) => {
+                if (!f.uploadURL) return;
+                const url = f.uploadURL.replace(/\?.*/, '');
+                this.iconUrl = url;
+                $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
+              });
+              this.uploadInProgress = false;
+              m.redraw();
+            },
+          })}
+        </div>
         <InputRow
           title="Name"
           defaultValue={this.name}
@@ -210,40 +214,36 @@ export class ChainMetadataRows
             this.terms = v;
           }}
         />
-        <div class="tag-row">
-          <label>Community Tags</label>,
-          <div class="tag-group">
-            {Object.keys(this.selectedTags).map((key) => {
-              return (
-                <CWButton
-                  label={key}
-                  className="filter-button"
-                  buttonType={this.selectedTags[key] ? 'primary' : 'secondary'}
-                  onclick={() => {
-                    this.selectedTags[key] = !this.selectedTags[key];
-                  }}
-                />
-              );
-            })}
-          </div>
+        <label>Community Tags</label>
+        <div class="tag-group">
+          {Object.keys(this.selectedTags).map((key) => {
+            return (
+              <CWButton
+                label={key}
+                className="filter-button"
+                buttonType={this.selectedTags[key] ? 'primary' : 'secondary'}
+                onclick={() => {
+                  this.selectedTags[key] = !this.selectedTags[key];
+                }}
+              />
+            );
+          })}
         </div>
-        <label>Admins</label>,
         <ManageRoles
+          label="Admins"
           roledata={vnode.attrs.admins}
           onRoleUpdate={(x, y) => {
             vnode.attrs.onRoleUpdate(x, y);
           }}
         />
         {vnode.attrs.mods.length > 0 && (
-          <>
-            <label>Moderators</label>
-            <ManageRoles
-              roledata={vnode.attrs.mods}
-              onRoleUpdate={(x, y) => {
-                vnode.attrs.onRoleUpdate(x, y);
-              }}
-            />
-          </>
+          <ManageRoles
+            label="Moderators"
+            roledata={vnode.attrs.mods}
+            onRoleUpdate={(x, y) => {
+              vnode.attrs.onRoleUpdate(x, y);
+            }}
+          />
         )}
         <div class="button-wrap">
           <Button

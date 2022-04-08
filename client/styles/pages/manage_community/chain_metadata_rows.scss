@@ -1,4 +1,45 @@
+@import 'client/styles/shared';
+
 .ChainMetadataRows {
   display: flex;
   flex-direction: column;
+  width: 100%;
+
+  .InputRow {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      @include form-label;
+      margin-bottom: 4px;
+    }
+
+    textarea {
+      resize: none;
+    }
+  }
+
+  .AvatarUploadRow,
+  .ToggleRow {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+
+    label {
+      @include form-label;
+      margin-bottom: 4px;
+    }
+
+    .toggle-and-label {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+
+  .AvatarUpload {
+    color: $rorange-500;
+    height: 96px;
+    margin: auto 0;
+    width: 96px;
+  }
 }
