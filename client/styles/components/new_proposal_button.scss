@@ -1,36 +1,7 @@
 @import 'client/styles/shared';
 
-button.NewProposalButton {
-  padding: 0 10px;
-}
-
-.cui-button-group.NewProposalButton > button:first-child {
-  padding: 0 12px 0 12px;
-}
-.cui-button-group.NewProposalButton > button:last-child {
-  padding: 0 10px 0 10px;
-}
-
-.NewProposalButton.MobileNewProposalButton {
-  padding: 0;
-  @include xs-max {
-    .cui-button {
-      padding: 0 13px;
-      .cui-icon {
-        display: block;
-        margin-left: -3px;
-        margin-right: -3px;
-      }
-    }
-  }
-}
-
-.cui-popover.new-proposal-button-popover {
-  z-index: 51;
-  .cui-menu {
-    border-color: $neutral-200; // match cui-popover border color
-  }
-  .cui-menu-divider:last-child {
-    display: none !important;
+.NewProposalButton {
+  .cui-button {
+    padding: 8px;
   }
 }
