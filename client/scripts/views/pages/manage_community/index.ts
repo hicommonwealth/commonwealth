@@ -12,6 +12,7 @@ import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { PageLoading } from '../loading';
 
 const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
@@ -161,43 +162,39 @@ const ManageCommunityPage: m.Component<
       m.redraw();
     };
 
-    return m(
-      Sublayout,
-      {
-        title: ['Manage Community'],
-        showNewProposalButton: true,
-      },
-      m('.ManageCommunityPage', [
-        m('.panel-top', [
-          vnode.state.loadingFinished &&
-            m(ChainMetadataManagementTable, {
-              admins,
-              chain: app.config.chains.getById(app.activeChainId()),
-              mods,
-              onRoleUpdate: (oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole),
-            }),
-        ]),
-        m('.panel-bottom', [
-          vnode.state.loadingFinished &&
-            m(AdminPanelTabs, {
-              defaultTab: 1,
-              onRoleUpgrade: (oldRole, newRole) =>
-                onRoleUpdate(oldRole, newRole),
-              roleData: vnode.state.roleData,
-              webhooks: vnode.state.webhooks,
-            }),
-        ]),
-        app.user.isSiteAdmin &&
-          m(deleteChainButton, {
-            chain: app.config.chains.getById(app.activeChainId()),
-          }),
-      ]),
-      app.user.isSiteAdmin &&
-        m(deleteChainButton, {
-          chain: app.config.chains.getById(app.activeChainId()),
-        })
-    );
+    return !vnode.state.loadingFinished
+      ? m(PageLoading)
+      : m(
+          Sublayout,
+          {
+            title: ['Manage Community'],
+            showNewProposalButton: true,
+          },
+          m('.ManageCommunityPage', [
+            m('.panel-top', [
+              m(ChainMetadataManagementTable, {
+                admins,
+                chain: app.config.chains.getById(app.activeChainId()),
+                mods,
+                onRoleUpdate: (oldRole, newRole) =>
+                  onRoleUpdate(oldRole, newRole),
+              }),
+            ]),
+            m('.panel-bottom', [
+              m(AdminPanelTabs, {
+                defaultTab: 1,
+                onRoleUpgrade: (oldRole, newRole) =>
+                  onRoleUpdate(oldRole, newRole),
+                roleData: vnode.state.roleData,
+                webhooks: vnode.state.webhooks,
+              }),
+            ]),
+            app.user.isSiteAdmin &&
+              m(deleteChainButton, {
+                chain: app.config.chains.getById(app.activeChainId()),
+              }),
+          ])
+        );
   },
 };
 

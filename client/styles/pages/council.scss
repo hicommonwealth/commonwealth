@@ -11,7 +11,9 @@
 
   .Councillor {
     @include card;
+    cursor: default;
     height: initial;
+
     .User {
       font-weight: 600;
     }

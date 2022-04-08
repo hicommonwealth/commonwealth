@@ -7,7 +7,6 @@ import app, { LoginState } from 'state';
 
 import { ChainInfo } from 'client/scripts/models';
 import HeaderLandingPage from './landing_page_header';
-import { LandingPageFooter } from './landing_page_footer';
 import JoinCommonWealthSection from './landing_page_pre_footer';
 import TokensCommunityComponent from './tokens_community_hero';
 import TokensCreatorComponent from './creators_card_section';
@@ -20,6 +19,7 @@ import 'pages/landing/index.scss';
 
 import { handleEmailInvites } from '../../components/header/invites_menu';
 import { UserDashboard } from '../user_dashboard';
+import { Footer } from '../../footer';
 
 export interface Chain {
   img: string;
@@ -299,11 +299,12 @@ const LandingPage: m.Component<{}, IState> = {
           ],
         }),
         m(JoinCommonWealthSection),
-        m(LandingPageFooter, {
+        m(Footer, {
           list: [
             // { text:  'Use Cases' },
             // { text:  'Crowdfunding' },
             // { text:  'Developers' },
+            { text: 'About', redirectTo: '/whyCommonwealth' },
             { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
             {
               text: 'Jobs',
@@ -312,7 +313,6 @@ const LandingPage: m.Component<{}, IState> = {
             { text: 'Terms', redirectTo: '/terms' },
             { text: 'Privacy', redirectTo: '/privacy' },
             { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
-            { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
             { text: 'Discord', externalLink: 'https://discord.gg/t9XscHdZrG' },
             { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
             {
