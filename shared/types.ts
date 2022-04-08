@@ -54,6 +54,19 @@ export enum ChainType {
   Offchain = 'offchain',
 }
 
+export enum WalletId {
+  Magic = 'magic',
+  Polkadot = 'polkadot',
+  Metamask = 'metamask',
+  WalletConnect = 'walletconnect',
+  Keplr = 'keplr',
+  NearWallet = 'near',
+  TerraStation = 'terrastation',
+  InjectiveMetamask = 'inj-metamask',
+  Phantom = 'phantom',
+  Ronin = 'ronin',
+}
+
 export enum ChainCategoryType {
   DeFi = 'DeFi',
   DAO = 'DAO',

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { WalletId } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
@@ -29,7 +30,7 @@ const deleteAddress = async (models: DB, req: Request, res: Response, next: Next
   if (!addressObj || addressObj.user_id !== req.user.id) {
     return next(new Error(Errors.AddressNotFound));
   }
-  if (addressObj.is_magic) {
+  if (addressObj.wallet_id === WalletId.Magic) {
     return next(new Error(Errors.CannotDeleteMagic));
   }
 

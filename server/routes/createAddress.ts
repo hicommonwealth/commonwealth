@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 import AddressSwapper from '../util/addressSwapper';
 import { DB } from '../database';
-import { ChainBase } from '../../shared/types';
+import { ChainBase, WalletId } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 const log = factory.getLogger(formatFilename(__filename));
@@ -12,6 +12,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
+  NeedWallet: 'Must provide valid walletId',
   InvalidChain: 'Invalid chain',
 };
 
@@ -24,6 +25,9 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
   }
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
+  }
+  if (!req.body.walletId || !Object.values(WalletId).includes(req.body.walletId)) {
+    return next(new Error(Errors.NeedWallet));
   }
 
   const chain = await models.Chain.findOne({
@@ -69,6 +73,9 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
 		existingAddress.verification_token_expires = verification_token_expires;
 		existingAddress.last_active = new Date();
 
+    // we update addresses with the wallet used to sign in
+    existingAddress.wallet_id = req.body.wallet_id;
+
 		const updatedObj = await existingAddress.save();
 
     // even if this is the existing address, there is a case to login to community through this address's chain
@@ -111,6 +118,7 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
         verification_token_expires,
         keytype: req.body.keytype,
         last_active,
+        wallet_id: req.body.walletId,
       });
 
       // if req.user.id is undefined, the address is being used to create a new user,

@@ -30,7 +30,7 @@ const ManageRolesRow: m.Component<{ roledata?; onRoleUpdate?: Function }> = {
               addr.address,
               addr.chain,
               null,
-              addr.is_magic
+              addr.wallet_id
             ), // role.Address, // make AddressInfo?
             popover: true,
             linkify: false,

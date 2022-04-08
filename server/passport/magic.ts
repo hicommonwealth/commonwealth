@@ -8,7 +8,7 @@ import { Strategy as MagicStrategy } from 'passport-magic';
 
 import '../types';
 import { sequelize, DB } from '../database';
-import { ChainBase, NotificationCategories } from '../../shared/types';
+import { ChainBase, NotificationCategories, WalletId } from '../../shared/types';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import validateChain from '../util/validateChain';
 import { ProfileAttributes } from '../models/profile';
@@ -46,7 +46,7 @@ export function useMagicAuth(models: DB) {
         },
         include: [{
           model: models.Address,
-          where: { is_magic: true },
+          where: { wallet_id: WalletId.Magic },
           required: false,
         }]
       });
@@ -102,7 +102,7 @@ export function useMagicAuth(models: DB) {
               last_active: new Date(),
               user_id: newUser.id,
               profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
-              is_magic: true,
+              wallet_id: WalletId.Magic,
             }, { transaction: t });
 
             // if they selected a substrate chain, create an additional address on ethereum
@@ -116,7 +116,7 @@ export function useMagicAuth(models: DB) {
               last_active: new Date(),
               user_id: newUser.id,
               profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
-              is_magic: true,
+              wallet_id: WalletId.Magic
             }, { transaction: t });
 
             await models.Role.create({
@@ -134,7 +134,7 @@ export function useMagicAuth(models: DB) {
               last_active: new Date(),
               user_id: newUser.id,
               profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
-              is_magic: true,
+              wallet_id: WalletId.Magic,
             }, { transaction: t });
 
             // if they selected an eth chain, create an additional address on edgeware
@@ -148,7 +148,7 @@ export function useMagicAuth(models: DB) {
               last_active: new Date(),
               user_id: newUser.id,
               profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
-              is_magic: true,
+              wallet_id: WalletId.Magic,
             }, { transaction: t });
 
             await models.Role.create({

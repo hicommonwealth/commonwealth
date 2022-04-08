@@ -309,7 +309,7 @@ const LoginSelector: m.Component<
                           a.address,
                           a.chain,
                           a.keytype,
-                          a.is_magic
+                          a.wallet_id
                         );
                       })
                     );
