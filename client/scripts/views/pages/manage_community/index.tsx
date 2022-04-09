@@ -141,7 +141,7 @@ class ManageCommunityPage implements m.ClassComponent {
           {app.user.isSiteAdmin && (
             <CWButton
               buttonType="primary"
-              label="DELETE CHAIN"
+              label="Delete Chain"
               onclick={async () => {
                 $.post(`${app.serverUrl()}/deleteChain`, {
                   id: app.config.chains.getById(app.activeChainId()).id,

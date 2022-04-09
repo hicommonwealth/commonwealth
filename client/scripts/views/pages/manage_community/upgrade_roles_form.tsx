@@ -7,6 +7,7 @@ import * as Cui from 'construct-ui';
 import app from 'state';
 import { RolePermission } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 type UpgradeRolesFormAttrs = {
   onRoleUpgrade: (oldRole: string, newRole: string) => void;
@@ -47,7 +48,6 @@ export class UpgradeRolesForm
       <div class="UpgradeRolesForm">
         <Cui.RadioGroup
           name="members/mods"
-          class="members-list"
           options={names}
           value={this.user}
           onchange={(e: Event) => {
@@ -64,8 +64,7 @@ export class UpgradeRolesForm
             }}
           />
           <div class="button-container">
-            <Cui.Button
-              class="admin-panel-tab-button"
+            <CWButton
               label="Upgrade Member"
               disabled={!this.role || !this.user}
               onclick={() => {

@@ -4,8 +4,8 @@
   border-radius: 8px;
   font-weight: 600;
   height: 40px;
-  min-width: 70px;
   padding: 4px 16px;
+  width: fit-content;
 
   &.primary {
     color: $white;

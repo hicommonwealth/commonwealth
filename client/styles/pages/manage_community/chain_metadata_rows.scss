@@ -3,6 +3,7 @@
 .ChainMetadataRows {
   display: flex;
   flex-direction: column;
+  margin-bottom: 24px;
   width: 100%;
 
   .InputRow {
@@ -41,5 +42,26 @@
     height: 96px;
     margin: auto 0;
     width: 96px;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+
+    label {
+      @include form-label;
+      margin-bottom: 4px;
+    }
+
+    .tag-group {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      > * {
+        margin-right: 8px;
+      }
+    }
   }
 }

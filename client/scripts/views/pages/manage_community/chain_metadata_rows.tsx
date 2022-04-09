@@ -214,20 +214,21 @@ export class ChainMetadataRows
             this.terms = v;
           }}
         />
-        <label>Community Tags</label>
-        <div class="tag-group">
-          {Object.keys(this.selectedTags).map((key) => {
-            return (
-              <CWButton
-                label={key}
-                className="filter-button"
-                buttonType={this.selectedTags[key] ? 'primary' : 'secondary'}
-                onclick={() => {
-                  this.selectedTags[key] = !this.selectedTags[key];
-                }}
-              />
-            );
-          })}
+        <div class="tag-row">
+          <label>Community Tags</label>
+          <div class="tag-group">
+            {Object.keys(this.selectedTags).map((key) => {
+              return (
+                <CWButton
+                  label={key}
+                  buttonType={this.selectedTags[key] ? 'primary' : 'secondary'}
+                  onclick={() => {
+                    this.selectedTags[key] = !this.selectedTags[key];
+                  }}
+                />
+              );
+            })}
+          </div>
         </div>
         <ManageRoles
           label="Admins"
@@ -245,14 +246,49 @@ export class ChainMetadataRows
             }}
           />
         )}
-        <div class="button-wrap">
-          <Button
-            class="save-changes-button"
-            disabled={this.uploadInProgress}
-            label="Save changes"
-            intent="primary"
-            onclick={async () => {
-              const {
+        <CWButton
+          disabled={this.uploadInProgress}
+          label="Save changes"
+          onclick={async () => {
+            const {
+              name,
+              description,
+              website,
+              discord,
+              element,
+              telegram,
+              github,
+              stagesEnabled,
+              customStages,
+              customDomain,
+              snapshot,
+              terms,
+              iconUrl,
+              defaultSummaryView,
+            } = this;
+            for (const space of snapshot) {
+              if (space !== '') {
+                if (space.slice(space.length - 4) !== '.eth') {
+                  notifyError('Snapshot name must be in the form of *.eth');
+                  return;
+                }
+              }
+            }
+            // Update ChainCategories
+            try {
+              for (const category of Object.keys(this.selectedTags)) {
+                await setChainCategories(
+                  vnode.attrs.chain.id,
+                  this.categoryMap[category],
+                  this.selectedTags[category]
+                );
+              }
+            } catch (err) {
+              console.log(err);
+            }
+
+            try {
+              await vnode.attrs.chain.updateChainData({
                 name,
                 description,
                 website,
@@ -267,52 +303,13 @@ export class ChainMetadataRows
                 terms,
                 iconUrl,
                 defaultSummaryView,
-              } = this;
-              for (const space of snapshot) {
-                if (space !== '') {
-                  if (space.slice(space.length - 4) !== '.eth') {
-                    notifyError('Snapshot name must be in the form of *.eth');
-                    return;
-                  }
-                }
-              }
-              // Update ChainCategories
-              try {
-                for (const category of Object.keys(this.selectedTags)) {
-                  await setChainCategories(
-                    vnode.attrs.chain.id,
-                    this.categoryMap[category],
-                    this.selectedTags[category]
-                  );
-                }
-              } catch (err) {
-                console.log(err);
-              }
-
-              try {
-                await vnode.attrs.chain.updateChainData({
-                  name,
-                  description,
-                  website,
-                  discord,
-                  element,
-                  telegram,
-                  github,
-                  stagesEnabled,
-                  customStages,
-                  customDomain,
-                  snapshot,
-                  terms,
-                  iconUrl,
-                  defaultSummaryView,
-                });
-                notifySuccess('Chain updated');
-              } catch (err) {
-                notifyError(err.responseJSON?.error || 'Chain update failed');
-              }
-            }}
-          />
-        </div>
+              });
+              notifySuccess('Chain updated');
+            } catch (err) {
+              notifyError(err.responseJSON?.error || 'Chain update failed');
+            }
+          }}
+        />
       </div>
     );
   }
