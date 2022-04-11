@@ -63,8 +63,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
   private activityFetched: boolean;
 
   oncreate() {
-    console.log('create');
-    console.log(app);
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
       Scope: app.activeChainId(),
@@ -80,8 +78,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
   }
 
   oninit(vnode) {
-    console.log('init');
-    console.log(app);
     this.lookback = {};
     this.postsDepleted = {};
     this.topicInitialized = {};
@@ -108,7 +104,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
   }
 
   view(vnode) {
-    console.log('view');
     let { topic } = vnode.attrs;
 
     if (!app.chain) return;
@@ -367,7 +362,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
 
     const showSummaryListing = !isLoading && onSummaryView;
     const showRecentListing = !isLoading && !onSummaryView;
-
+    console.log(app.threads);
     return (
       <Sublayout
         title="Discussions"

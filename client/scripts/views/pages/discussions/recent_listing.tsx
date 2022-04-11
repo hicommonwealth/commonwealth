@@ -11,6 +11,7 @@ import { orderDiscussionsbyLastComment } from './helpers';
 import { DiscussionFilterBar } from './discussion_filter_bar';
 import LoadingRow from '../../components/loading_row';
 import Sublayout from '../../sublayout';
+import { pluralize } from 'helpers';
 
 interface DiscussionScrollAttrs {
   postsDepleted: boolean;

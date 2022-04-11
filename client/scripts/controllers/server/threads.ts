@@ -6,7 +6,7 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { ProposalStore, FilterScopedThreadStore } from 'stores';
+import { ProposalStore, RecentListingStore } from 'stores';
 import {
   OffchainThread,
   OffchainAttachment,
@@ -209,7 +209,7 @@ export interface VersionHistory {
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
-  private _listingStore = new FilterScopedThreadStore();
+  private _listingStore = new RecentListingStore();
   private _summaryStore = new ProposalStore<OffchainThread>();
 
   public get store() {
