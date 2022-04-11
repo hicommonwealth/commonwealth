@@ -4,13 +4,15 @@ import m from 'mithril';
 import app from 'state';
 import { Button, Table } from 'construct-ui';
 
-import { ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 
 import { ChainInfo } from 'client/scripts/models';
 import ManageRolesRow from './manage_roles_row';
+import { buildChainToCategoriesMap } from '../community_cards';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 interface IChainOrCommMetadataManagementAttrs {
   chain?: ChainInfo;
@@ -39,8 +41,77 @@ interface IChainMetadataManagementState {
   network: ChainNetwork;
   symbol: string;
   snapshot: string[];
+  selectedTags: { [type in ChainCategoryType]?: boolean };
+  categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
 }
+
+const setChainCategories = async (
+  chain_id: string,
+  category_type_id: number,
+  create: boolean
+) => {
+  return new Promise<void>((resolve, reject) => {
+    const params = {
+      chain_id,
+      category_type_id,
+      create,
+      auth: true,
+      jwt: app.user.jwt,
+    };
+    $.post(`${app.serverUrl()}/updateChainCategory`, params)
+      .then((response) => {
+        if (create && response.result) {
+          app.config.chainCategories = app.config.chainCategories.concat([
+            {
+              id: response.result.id,
+              chain_id: response.result.chain_id,
+              category_type_id: response.result.category_type_id,
+            },
+          ]);
+        } else if (!create) {
+          app.config.chainCategories = app.config.chainCategories.filter(
+            (data) => data.id != response.result.id
+          );
+        }
+        resolve();
+        m.redraw();
+      })
+      .catch((err) => {
+        reject();
+      });
+  });
+};
+
+const setSelectedTags = (chain: string) => {
+  const categoryTypes = app.config.chainCategoryTypes;
+  const chainsAndCategories = app.config.chainCategories;
+  const chainToCategoriesMap: { [chain: string]: ChainCategoryType[] } =
+    buildChainToCategoriesMap(categoryTypes, chainsAndCategories);
+
+  const types = Object.keys(ChainCategoryType);
+  let selectedTags = {};
+  for (const type of types) {
+    selectedTags[type] = false;
+  }
+
+  if (chainToCategoriesMap[chain]) {
+    for (const tag of chainToCategoriesMap[chain]) {
+      selectedTags[tag] = true;
+    }
+  }
+
+  return selectedTags;
+};
+
+const buildCategoryMap = () => {
+  const categoryTypes = app.config.chainCategoryTypes;
+  let categoryMap = {};
+  for (const data of categoryTypes) {
+    categoryMap[data.category_name] = data.id;
+  }
+  return categoryMap;
+};
 
 const ChainMetadataManagementTable: m.Component<
   IChainOrCommMetadataManagementAttrs,
@@ -63,6 +134,8 @@ const ChainMetadataManagementTable: m.Component<
     vnode.state.symbol = vnode.attrs.chain.symbol;
     vnode.state.snapshot = vnode.attrs.chain.snapshot;
     vnode.state.defaultSummaryView = vnode.attrs.chain.defaultSummaryView;
+    vnode.state.selectedTags = setSelectedTags(vnode.attrs.chain.id);
+    vnode.state.categoryMap = buildCategoryMap();
   },
   view: (vnode: any) => {
     return m('.ChainMetadataManagementTable', [
@@ -207,6 +280,24 @@ const ChainMetadataManagementTable: m.Component<
               vnode.state.terms = v;
             },
           }),
+          m('.tag-row', [
+            m('label', 'Community Tags'),
+            m('.tag-group', [
+              Object.keys(vnode.state.selectedTags).map((key) => {
+                return m(CWButton, {
+                  label: key,
+                  className: 'filter-button',
+                  buttonType: vnode.state.selectedTags[key]
+                    ? 'primary'
+                    : 'secondary',
+                  onclick: () => {
+                    vnode.state.selectedTags[key] =
+                      !vnode.state.selectedTags[key];
+                  },
+                });
+              }),
+            ]),
+          ]),
           m('tr', [
             m('td', 'Admins'),
             m('td', [
@@ -263,6 +354,19 @@ const ChainMetadataManagementTable: m.Component<
                 }
               }
             }
+            // Update ChainCategories
+            try {
+              for (const category of Object.keys(vnode.state.selectedTags)) {
+                await setChainCategories(
+                  vnode.attrs.chain.id,
+                  vnode.state.categoryMap[category],
+                  vnode.state.selectedTags[category]
+                );
+              }
+            } catch (e) {
+              console.log(e);
+            }
+
             try {
               await vnode.attrs.chain.updateChainData({
                 name,

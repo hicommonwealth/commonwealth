@@ -13,24 +13,36 @@ import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
+import { iconLookup } from './cw_icons/cw_icon_lookup';
 
-const displayColors = (hexList) => {
-  return Object.entries(hexList).map(([k, v]) => {
-    return (
-      <div class="color-row">
-        {k}
-        <div class="color" style={`background: ${v};`} />
-      </div>
-    );
-  });
-};
+// const displayColors = (hexList) => {
+//   return Object.entries(hexList).map(([k, v]) => {
+//     return (
+//       <div class="color-row">
+//         {k}
+//         <div class="color" style={`background: ${v};`} />
+//       </div>
+//     );
+//   });
+// };
 
-const displayGradients = (gradientNames: string[]) => {
-  return gradientNames.map((gradient) => {
+// const displayGradients = (gradientNames: string[]) => {
+//   return gradientNames.map((gradient) => {
+//     return (
+//       <div class="color-row">
+//         {gradient}
+//         <div class={`color ${gradient}`} />
+//       </div>
+//     );
+//   });
+// };
+
+const displayIcons = (icons) => {
+  return Object.entries(icons).map(([k, v]) => {
     return (
-      <div class="color-row">
-        {gradient}
-        <div class={`color ${gradient}`} />
+      <div class="icon-container">
+        <div class="icon-name">{k}</div>
+        <CWIcon iconName={k} />
       </div>
     );
   });
@@ -48,41 +60,17 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        <h1>Colors</h1>
-        <div class="color-gallery">
-          {displayColors({
-            Black: '#000000',
-            DarkGray: '#333333',
-            MidiGray: '#666666',
-            LiteGray: '#999999',
-            DisableGray: '#DDDDDD',
-            BackgroundGray: '#F4F4F4',
-            DarkPurp: '#4723AD',
-            MidiPurp: '#9075DC',
-            LitePurp: '#C7B9EF',
-            XLitePurp: '#F7F4FF',
-            PurpBlue: '#6300FF',
-            PurpBlueLite: '#F3EBFF',
-            HypeRed: '#FF002E',
-            Pinky: '#FFAFBE',
-            FleshPink: '#FFEBEE',
-            DarkGreen: '#008676',
-            CaribGreen: '#00C0A9',
-            FoamGreen: '#B4F1EA',
-            MintGreen: '#F3FFF9',
-            CreamYellow: '#FFFBA1',
-          })}
-        </div>
-        <h1>Gradients</h1>
+        {/* <h1>Gradients</h1>
         <div class="color-gallery">
           {displayGradients([
             'rainbow-gradient-horizontal',
             'rainbow-gradient-diagonal',
             'shadow-gradient',
           ])}
-        </div>
+        </div> */}
         <h1>Icons</h1>
         <div class="icon-gallery">
+          <div class="all-icons-container">{displayIcons(iconLookup)}</div>
           <div class="icon-row">
             Small
             <CWIcon iconName="views" iconSize="small" />

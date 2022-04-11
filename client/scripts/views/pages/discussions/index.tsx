@@ -286,11 +286,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
         topicId = app.topics.getByName(topic, app.activeChainId())?.id;
         if (!topicId) {
           return (
-            <Sublayout
-              class="DiscussionsPage"
-              title="Discussions"
-              showNewProposalButton={true}
-            >
+            <Sublayout title="Discussions" showNewProposalButton={true}>
               {m(EmptyListingPlaceholder, {
                 communityName: app.activeChainId(),
                 topicName: topic,
@@ -315,7 +311,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       };
 
       this.onscroll = _.debounce(async () => {
-        console.log('scrawling');
         if (this.postsDepleted[subpage]) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
@@ -375,14 +370,13 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
 
     return (
       <Sublayout
-        class="DiscussionsPage"
         title="Discussions"
         description={topicDescription}
         showNewProposalButton={true}
         onscroll={this.onscroll}
       >
         {app.chain && (
-          <div class="discussions-main">
+          <div class="DiscussionsPage">
             {!isEmpty && (
               <DiscussionFilterBar
                 topic={topicName}

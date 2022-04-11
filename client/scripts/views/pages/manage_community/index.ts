@@ -5,12 +5,14 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { ChainInfo, RoleInfo, RolePermission, Webhook } from 'models';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { PageLoading } from '../loading';
 
 const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
@@ -22,7 +24,7 @@ const sortAdminsAndModsFirst = (a, b) => {
   return a.Address.address.localeCompare(b.Address.address);
 };
 
-const deleteChainButton: m.Component<{chain: ChainInfo}> = {
+const deleteChainButton: m.Component<{ chain: ChainInfo }> = {
   view: (vnode) => {
     const { chain } = vnode.attrs;
     return m(CWButton, {
@@ -33,19 +35,22 @@ const deleteChainButton: m.Component<{chain: ChainInfo}> = {
           id: chain.id,
           auth: true,
           jwt: app.user.jwt,
-        }).then((result) => {
-          if (result.status !== 'Success') return;
-          app.config.chains.remove(chain);
-          notifySuccess('Deleted chain!');
-          m.route.set('/');
-          // redirect to /
-        }, (err) => {
-          notifyError('Failed to delete chain!');
-        });
+        }).then(
+          (result) => {
+            if (result.status !== 'Success') return;
+            app.config.chains.remove(chain);
+            notifySuccess('Deleted chain!');
+            m.route.set('/');
+            // redirect to /
+          },
+          (err) => {
+            notifyError('Failed to delete chain!');
+          }
+        );
       },
     });
-  }
-}
+  },
+};
 
 const ManageCommunityPage: m.Component<
   {},
@@ -60,6 +65,16 @@ const ManageCommunityPage: m.Component<
     if (!app.activeChainId()) {
       return;
     }
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+      });
+
+    if (!isAdmin) {
+      navigateToSubpage(``);
+    }
+
     const chainOrCommObj = { chain: app.activeChainId() };
     const loadRoles = async () => {
       try {
@@ -147,17 +162,16 @@ const ManageCommunityPage: m.Component<
       m.redraw();
     };
 
-    return m(
-      Sublayout,
-      {
-        class: 'ManageCommunityPage',
-        title: ['Manage Community'],
-        showNewProposalButton: true,
-      },
-      [
-        m('.manage-community-wrapper', [
-          m('.panel-top', [
-            vnode.state.loadingFinished &&
+    return !vnode.state.loadingFinished
+      ? m(PageLoading)
+      : m(
+          Sublayout,
+          {
+            title: ['Manage Community'],
+            showNewProposalButton: true,
+          },
+          m('.ManageCommunityPage', [
+            m('.panel-top', [
               m(ChainMetadataManagementTable, {
                 admins,
                 chain: app.config.chains.getById(app.activeChainId()),
@@ -165,9 +179,8 @@ const ManageCommunityPage: m.Component<
                 onRoleUpdate: (oldRole, newRole) =>
                   onRoleUpdate(oldRole, newRole),
               }),
-          ]),
-          m('.panel-bottom', [
-            vnode.state.loadingFinished &&
+            ]),
+            m('.panel-bottom', [
               m(AdminPanelTabs, {
                 defaultTab: 1,
                 onRoleUpgrade: (oldRole, newRole) =>
@@ -175,14 +188,13 @@ const ManageCommunityPage: m.Component<
                 roleData: vnode.state.roleData,
                 webhooks: vnode.state.webhooks,
               }),
-          ]),
-          app.user.isSiteAdmin
-            && m(deleteChainButton, {
-              chain: app.config.chains.getById(app.activeChainId())
-            }),
-        ]),
-      ]
-    );
+            ]),
+            app.user.isSiteAdmin &&
+              m(deleteChainButton, {
+                chain: app.config.chains.getById(app.activeChainId()),
+              }),
+          ])
+        );
   },
 };
 

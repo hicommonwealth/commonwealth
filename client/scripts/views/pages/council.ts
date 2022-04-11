@@ -163,7 +163,6 @@ const CouncilPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'CouncilPage',
         title: [
           'Council',
           m(Tag, {
@@ -174,7 +173,7 @@ const CouncilPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      m('.council-container', [
+      m('.CouncilPage', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),

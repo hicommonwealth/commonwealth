@@ -1,17 +1,17 @@
 @import 'client/styles/shared';
 
 .FeedbackModal {
-    textarea {
-        min-height: 90px;
-    }
-    .error-message {
-        margin: 10px 0;
-        font-weight: 500;
-        color: $negative-bg-color;
-    }
-    .success-message {
-        margin: 10px 0;
-        font-weight: 500;
-        color: $positive-bg-color;
-    }
+  textarea {
+    min-height: 90px;
+  }
+  .error-message {
+    margin: 10px 0;
+    font-weight: 500;
+    color: $rorange-500;
+  }
+  .success-message {
+    margin: 10px 0;
+    font-weight: 500;
+    color: $green-500;
+  }
 }

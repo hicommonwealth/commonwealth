@@ -106,6 +106,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                           : ` #${ce.typeId}`,
                       ]}
                       intent="primary"
+                      class="proposal-button"
                       size="xs"
                       compact={true}
                     />
@@ -115,6 +116,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
               <Button
                 label={['Snap ', `${proposal.snapshotProposal.slice(0, 4)}…`]}
                 intent="primary"
+                class="proposal-button"
                 size="xs"
                 compact={true}
               />

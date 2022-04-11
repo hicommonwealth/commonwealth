@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
 .SidebarSectionGroup {
-  border-bottom-color: $disable-grey;
+  border-bottom-color: $neutral-50;
   border-bottom-width: 1px;
   cursor: pointer;
   display: flex;
@@ -54,11 +54,19 @@
 
     &.section-title-text-active {
       font-weight: 500;
-      color: #3a0095;
+      color: $purple-500;
     }
 
     &.section-title-text-stale {
-      color: #999999;
+      color: $neutral-500;
+    }
+
+    &.background {
+      background-color: $purple-50;
+    }
+
+    &.no-background {
+      background-color: none;
     }
 
     .no-carat {
@@ -101,16 +109,16 @@
 
   .title-active {
     font-weight: 500;
-    color: #3a0095;
+    color: $purple-400;
   }
 
   .title-stale {
-    color: #999999;
+    color: $neutral-500;
   }
 
   &.active,
   &:hover {
-    background-color: #ede7ff;
+    background-color: $pink-50;
   }
 
   .cui-icon-hash {
@@ -122,7 +130,7 @@
 
   .row-icon-inactive {
     .cui-icon {
-      color: #999999;
+      color: $neutral-500;
     }
   }
 
@@ -139,12 +147,12 @@
 
   div {
     .cui-icon {
-      color: #999999;
+      color: $neutral-500;
       padding-right: 5px;
       padding-top: 2px;
 
       &:hover {
-        color: #3a0095;
+        color: $purple-500;
         opacity: 100%;
       }
     }
@@ -155,7 +163,7 @@
   }
 
   .unread-icon {
-    background-color: #ff002e;
+    background-color: $rorange-500;
     border-radius: 15px;
     padding-left: 6px;
     padding-right: 6px;
@@ -166,7 +174,7 @@
     p {
       margin-top: 2.75px;
       position: relative;
-      color: white;
+      color: $white;
       font-size: 11px;
       font-weight: 600;
     }

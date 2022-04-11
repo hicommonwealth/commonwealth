@@ -1,9 +1,7 @@
 @import 'client/styles/shared';
 
 .ValidatorsPage {
-  .validators-container {
-    padding: 24px;
-  }
+  padding: 24px;
 
   @include gov-explainer;
 
@@ -13,6 +11,8 @@
 
   .Validator {
     @include card;
+    cursor: default;
+
     height: initial;
     .User {
       font-weight: 600;

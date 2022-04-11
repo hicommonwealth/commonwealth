@@ -6,7 +6,7 @@
   .cui-icon,
   .reply-count,
   .reactions-count {
-    color: black;
+    color: $black;
     font-weight: 500;
   }
   .cui-icon {
@@ -20,8 +20,8 @@
   // border
   &.disabled {
     background: initial !important;
-    color: $text-color-light !important;
-    border-color: $border-color-lightest !important;
+    color: $neutral-500 !important;
+    border-color: $neutral-50 !important;
   }
   &.large {
     display: block;
@@ -30,14 +30,14 @@
     max-height: 43px !important;
     max-width: 45px !important;
     text-align: center;
-    color: $text-color-medium;
-    border: 1px solid #ddd;
+    color: $neutral-500;
+    border: 1px solid $neutral-100;
     display: block;
     border-radius: 12px;
     padding: 0;
     &.active {
-      color: $primary-bg-color;
-      border-color: $primary-bg-color;
+      color: $primary-500;
+      border-color: $primary-500;
       span {
         color: inherit;
       }
@@ -65,7 +65,7 @@
       padding: 0;
       min-width: 26px;
       text-align: center;
-      color: $text-color-medium;
+      color: $neutral-500;
       font-weight: 500;
     }
   }
