@@ -3,6 +3,7 @@
 import m from 'mithril';
 import $ from 'jquery';
 import * as Cui from 'construct-ui';
+import smartTruncate from 'smart-truncate';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
 
@@ -40,10 +41,10 @@ export class UpgradeRolesForm
 
       const roletext = role.permission === 'moderator' ? '(moderator)' : '';
 
-      return `${displayName}: ${role.Address.address.slice(
-        0,
+      return `${displayName}: ${smartTruncate(
+        role.Address.address,
         6
-      )}... ${roletext}`;
+      )} ${roletext}`;
     });
 
     console.log(names);
