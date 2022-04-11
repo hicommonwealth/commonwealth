@@ -4,6 +4,8 @@ import m from 'mithril';
 import $ from 'jquery';
 import * as Cui from 'construct-ui';
 
+import 'pages/manage_community/webhooks_form.scss';
+
 import app from 'state';
 import { Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -79,7 +81,7 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
     return (
       <Cui.Form class="WebhooksForm">
         <Cui.FormGroup>
-          <Cui.List interactive={false} class="active-webhooks">
+          <Cui.List interactive={false}>
             {webhooks.map((webhook) => {
               const label =
                 webhook.url.indexOf('discord') !== -1
@@ -173,13 +175,16 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
             })}
             {webhooks.length === 0 && (
               <Cui.ListItem
-                contentLeft={`No webhooks yet. Slack, Discord, and Telegram webhooks are
+                contentLeft={
+                  <>
+                    No webhooks yet. Slack, Discord, and Telegram webhooks are
                     supported. For more information and examples for setting
-                    these up, please view our ${link(
-                      'a',
-                      'https://docs.commonwealth.im',
-                      ['documentation.']
-                    )}`}
+                    these up, please view our
+                    {link('a', 'https://docs.commonwealth.im', [
+                      ' documentation.',
+                    ])}
+                  </>
+                }
               />
             )}
           </Cui.List>
@@ -195,7 +200,6 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
             class="admin-panel-tab-button"
             intent="none"
             label="Add webhook"
-            style="margin: 10px 0"
             onclick={createWebhook}
             rounded={true}
           />

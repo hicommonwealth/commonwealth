@@ -2,7 +2,6 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 

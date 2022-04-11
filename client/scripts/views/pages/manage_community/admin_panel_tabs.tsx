@@ -3,6 +3,8 @@
 import m from 'mithril';
 import * as Cui from 'construct-ui';
 
+import 'pages/manage_community/admin_panel_tabs.scss';
+
 import { Webhook } from 'models';
 import { WebhooksForm } from './webhooks_form';
 import { UpgradeRolesForm } from './upgrade_roles_form';
@@ -26,17 +28,17 @@ export class AdminPanelTabs implements m.ClassComponent<AdminPanelTabsAttrs> {
       <div class="AdminPanelTabs">
         <Cui.Tabs align="left" bordered={true} fluid={true}>
           <Cui.TabItem
-            label="Webhooks"
-            active={this.index === 2}
-            onclick={() => {
-              this.index = 2;
-            }}
-          />
-          <Cui.TabItem
             label="Admins"
             active={this.index === 1}
             onclick={() => {
               this.index = 1;
+            }}
+          />
+          <Cui.TabItem
+            label="Webhooks"
+            active={this.index === 2}
+            onclick={() => {
+              this.index = 2;
             }}
           />
         </Cui.Tabs>
