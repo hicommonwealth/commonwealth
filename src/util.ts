@@ -30,6 +30,11 @@ import {
   Label as Erc20Label,
 } from './chains/erc20';
 import {
+  Listener as Erc721Listener,
+  Title as Erc721Title,
+  Label as Erc721Label,
+} from './chains/erc721';
+import {
   Listener as AaveListener,
   Title as AaveTitle,
   Label as AaveLabel,
@@ -50,6 +55,8 @@ export function Title(
       return CompoundTitle(kind);
     case SupportedNetwork.ERC20:
       return Erc20Title(kind);
+    case SupportedNetwork.ERC721:
+      return Erc721Title(kind);
     case SupportedNetwork.Moloch:
       return MolochTitle(kind);
     default:
@@ -67,6 +74,8 @@ export function Label(chain: string, event: CWEvent): IEventLabel {
       return CompoundLabel(event.blockNumber, chain, event.data);
     case SupportedNetwork.ERC20:
       return Erc20Label(event.blockNumber, chain, event.data);
+    case SupportedNetwork.ERC721:
+      return Erc721Label(event.blockNumber, chain, event.data);
     case SupportedNetwork.Moloch:
       return MolochLabel(event.blockNumber, chain, event.data);
     default:
@@ -154,6 +163,14 @@ export async function createListener(
       options.url,
       Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
       options.enricherConfig,
+      !!options.verbose
+    );
+  } else if (network === SupportedNetwork.ERC721) {
+    listener = new Erc721Listener(
+      chain,
+      options.tokenAddresses || [options.address],
+      options.url,
+      Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
       !!options.verbose
     );
   } else if (network === SupportedNetwork.Aave) {

@@ -1,6 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
 
+import * as yargs from 'yargs';
+import fetch from 'node-fetch';
+import EthDater from 'ethereum-block-by-date';
+
 import {
   IEventHandler,
   CWEvent,
@@ -10,13 +14,10 @@ import {
   AaveEvents,
   Erc20Events,
   SupportedNetwork,
+  Erc721Events,
 } from '../src/index';
 
 import { contracts, networkSpecs, networkUrls } from './listenerUtils';
-
-import * as yargs from 'yargs';
-import fetch from 'node-fetch';
-import EthDater from 'ethereum-block-by-date';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
@@ -58,13 +59,20 @@ const { argv } = yargs
   })
   .check((data) => {
     if (!data.url && !data.chain) {
-      throw new Error('Must pass either URL or chain name!');
+      if (data.network === SupportedNetwork.Substrate) {
+        throw new Error('Must pass either URL or chain name!');
+      } else {
+        // default to eth mainnet if not on substrate
+        data.chain = 'erc20';
+      }
     }
     if (!networkUrls[data.chain] && !data.url) {
       throw new Error(`no URL found for ${data.chain}`);
     }
     if (
       data.network !== SupportedNetwork.Substrate &&
+      data.network !== SupportedNetwork.ERC20 &&
+      data.network !== SupportedNetwork.ERC721 &&
       !data.contractAddress &&
       !contracts[data.chain]
     ) {
@@ -96,28 +104,30 @@ class StandaloneEventHandler extends IEventHandler {
   }
 }
 const skipCatchup = false;
-const tokenListUrls = [
-  'https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokenlist.aave.eth.link',
-  'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
-  'https://wispy-bird-88a7.uniswap.workers.dev/?url=http://defi.cmc.eth.link',
+const tokenListUrls = ['https://gateway.ipfs.io/ipns/tokens.uniswap.org'];
+const nftListUrls = [
+  'https://raw.githubusercontent.com/jnaviask/collectible-lists/main/test/schema/bigexample.collectiblelist.json',
 ];
 
-async function getTokenLists() {
-  const data = await Promise.all(
-    tokenListUrls.map((listUrl) =>
-      fetch(listUrl)
-        .then((o) => o.json())
-        .catch((e) => {
-          console.error(e);
-          return [];
-        })
-    )
-  );
-  return data
-    .map((o) => o && o.tokens)
-    .flat()
-    .filter((o) => o);
+interface TokenListEntry {
+  chainId: number;
+  address: string;
+  name: string;
+  symbol: string;
+  standard?: string; // erc721
+  decimals?: number; // 18
 }
+
+async function getTokenList(tokenListUrl: string): Promise<TokenListEntry[]> {
+  const data = await fetch(tokenListUrl)
+    .then((o) => o.json())
+    .catch((e) => {
+      console.error(e);
+      return [];
+    });
+  return data?.tokens?.filter((o) => o);
+}
+
 console.log(`Connecting to ${chain} on url ${url}...`);
 
 if (network === SupportedNetwork.Substrate) {
@@ -215,9 +225,10 @@ if (network === SupportedNetwork.Substrate) {
     });
   });
 } else if (network === SupportedNetwork.ERC20) {
-  getTokenLists().then(async (tokens) => {
-    const tokenAddresses = tokens.map((o) => o.address);
-    const tokenNames = tokens.map((o) => o.name);
+  getTokenList(tokenListUrls[0]).then(async (tokens) => {
+    const validTokens = tokens.filter((t) => t.chainId === 1);
+    const tokenAddresses = validTokens.map((o) => o.address);
+    const tokenNames = validTokens.map((o) => o.name);
     const api = await Erc20Events.createApi(url, tokenAddresses, tokenNames);
     Erc20Events.subscribeEvents({
       chain,
@@ -226,6 +237,22 @@ if (network === SupportedNetwork.Substrate) {
       skipCatchup,
       verbose: false,
       enricherConfig: { balanceTransferThresholdPermill: 500_000 }, // 50% of total supply
+    });
+  });
+} else if (network === SupportedNetwork.ERC721) {
+  getTokenList(nftListUrls[0]).then(async (tokens) => {
+    const validTokens = tokens.filter(
+      (t) => t.chainId === 1 && t.standard === 'erc721'
+    );
+    const tokenAddresses = validTokens.map((o) => o.address);
+    const tokenNames = validTokens.map((o) => o.name);
+    const api = await Erc721Events.createApi(url, tokenAddresses, tokenNames);
+    Erc721Events.subscribeEvents({
+      chain,
+      api,
+      handlers: [new StandaloneEventHandler()],
+      skipCatchup,
+      verbose: false,
     });
   });
 }

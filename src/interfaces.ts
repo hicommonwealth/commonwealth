@@ -6,6 +6,7 @@ import * as SubstrateTypes from './chains/substrate/types';
 import * as MolochTypes from './chains/moloch/types';
 import * as CompoundTypes from './chains/compound/types';
 import * as Erc20Types from './chains/erc20/types';
+import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
 
 // add other events here as union types
@@ -19,19 +20,22 @@ export type IChainEventData =
   | MolochTypes.IEventData
   | CompoundTypes.IEventData
   | AaveTypes.IEventData
-  | Erc20Types.IEventData;
+  | Erc20Types.IEventData
+  | Erc721Types.IEventData;
 export type IChainEventKind =
   | SubstrateTypes.EventKind
   | MolochTypes.EventKind
   | CompoundTypes.EventKind
   | AaveTypes.EventKind
-  | Erc20Types.EventKind;
+  | Erc20Types.EventKind
+  | Erc721Types.EventKind;
 export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
   ...MolochTypes.EventKinds,
   ...CompoundTypes.EventKinds,
   ...AaveTypes.EventKinds,
   ...Erc20Types.EventKinds,
+  ...Erc721Types.EventKinds,
 ];
 
 // eslint-disable-next-line no-shadow
@@ -41,6 +45,7 @@ export enum SupportedNetwork {
   Compound = 'compound',
   Moloch = 'moloch',
   ERC20 = 'erc20',
+  ERC721 = 'erc721',
 }
 
 // eslint-disable-next-line no-shadow

@@ -1,22 +1,21 @@
 /**
- * Fetches events from ERC20 contract in real time.
+ * Fetches events from ERC721 contract in real time.
  */
 import { Listener } from '@ethersproject/providers';
 import sleep from 'sleep-promise';
-import BN from 'bn.js';
 
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
-import { ERC20__factory as ERC20Factory } from '../../contractTypes';
+import { ERC721__factory as ERC721Factory } from '../../contractTypes';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, IErc20Contracts } from './types';
+import { RawEvent, IErc721Contracts } from './types';
 
-export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
+export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
   private _name: string;
 
   private _listener: Listener | null;
 
-  constructor(api: IErc20Contracts, name: string, verbose = false) {
+  constructor(api: IErc721Contracts, name: string, verbose = false) {
     super(api, verbose);
     this._name = name;
   }
@@ -29,7 +28,7 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
   ): Promise<void> {
     this._listener = (tokenName: string, event: RawEvent): void => {
       const log = factory.getLogger(
-        addPrefix(__filename, [SupportedNetwork.ERC20, tokenName])
+        addPrefix(__filename, [SupportedNetwork.ERC721, tokenName])
       );
       const logStr = `Received ${this._name} event: ${JSON.stringify(
         event,
@@ -59,7 +58,7 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
     retries = 5
   ): Promise<void> {
     const log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.ERC20, tokenName])
+      addPrefix(__filename, [SupportedNetwork.ERC721, tokenName])
     );
     const existingToken = this.api.tokens.find(({ contract }) => {
       return contract.address === tokenAddress;
@@ -69,10 +68,9 @@ export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
       return;
     }
     try {
-      const contract = ERC20Factory.connect(tokenAddress, this.api.provider);
+      const contract = ERC721Factory.connect(tokenAddress, this.api.provider);
       await contract.deployed();
-      const totalSupply = new BN((await contract.totalSupply()).toString());
-      this.api.tokens.push({ contract, totalSupply, tokenName });
+      this.api.tokens.push({ contract, tokenName });
       contract.on('*', this._listener.bind(this, tokenName));
     } catch (e) {
       await sleep(retryTimeMs);
