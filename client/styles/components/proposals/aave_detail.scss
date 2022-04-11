@@ -130,12 +130,11 @@
   }
 
   p.detail-highlight.emphasize {
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background: linear-gradient(to right, #335fb7, #d48cdd);
     flex: 1;
-    font-size: 24px;
+    font-size: 21px;
     font-weight: 600;
-    min-width: 80px;
+    padding: 4px 8px;
+    margin-right: 8px;
   }
 }
