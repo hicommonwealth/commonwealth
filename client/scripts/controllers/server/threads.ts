@@ -286,7 +286,7 @@ class ThreadsController {
 
       // New posts are added to both the topic and allProposals sub-store
       const storeOptions = { allProposals: true, exclusive: false };
-      this._listingStore.add(result, storeOptions);
+      this._listingStore.add(result);
       const activeEntity = app.chain;
       updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
 
@@ -652,35 +652,6 @@ class ThreadsController {
     });
   }
 
-  fetchBulkThreads = async ({
-    topicId,
-    stage,
-    params,
-  }: FetchBulkThreadsProps) => {
-    const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
-    if (response.status !== 'Success') {
-      throw new Error(`Unsuccessful refresh status: ${response.status}`);
-    }
-    const { threads } = response.result;
-    for (const thread of threads) {
-      const modeledThread = modelFromServer(thread);
-      if (!thread.Address) {
-        console.error('OffchainThread missing address');
-      }
-      try {
-        const storeOptions = {
-          allProposals: !topicId && !stage,
-          exclusive: true,
-        };
-        this._store.add(modeledThread);
-        this._listingStore.add(modeledThread, storeOptions);
-      } catch (e) {
-        console.error(e.message);
-      }
-    }
-    return threads;
-  };
-
   fetchReactionsCount = async (threads) => {
     const { result: reactionCounts } = await $.ajax({
       type: 'POST',
@@ -709,39 +680,62 @@ class ThreadsController {
     }
   };
 
-  // loadNextPage returns false if there are no more threads to load
   public async loadNextPage(options: {
-    chainId: string;
-    cutoffDate: moment.Moment;
-    topicId?: OffchainTopic;
-    stage?: string;
-  }): Promise<boolean> {
-    const { chainId, cutoffDate, topicId, stage } = options;
+    topicName?: string;
+    stageName?: string;
+  }) {
+    if (this.listingStore.isDepleted(options)) {
+      return;
+    }
+    const cutoff_date = this.listingStore.isInitialized(options)
+      ? this.listingStore.getCutoffDate(options).unix()
+      : moment().unix();
+    const { topicName, stageName } = options;
+    const chain = app.activeChainId();
     const params = {
-      chain: chainId,
-      cutoff_date: cutoffDate.toISOString(),
+      chain,
+      cutoff_date,
     };
+    const topicId = app.topics.getByName(topicName, chain)?.id;
+
     if (topicId) params['topic_id'] = topicId;
-    if (stage) params['stage'] = stage;
-    const threads = await this.fetchBulkThreads({ topicId, stage, params });
+    if (stageName) params['stage'] = stageName;
+
+    const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
+    if (response.status !== 'Success') {
+      throw new Error(`Unsuccessful refresh status: ${response.status}`);
+    }
+    const { threads } = response.result;
+    for (const thread of threads) {
+      const modeledThread = modelFromServer(thread);
+      if (!thread.Address) {
+        console.error('OffchainThread missing address');
+      }
+      try {
+        this._store.add(modeledThread);
+        this._listingStore.add(modeledThread);
+      } catch (e) {
+        console.error(e.message);
+      }
+    }
 
     await Promise.all([
       this.fetchReactionsCount(threads),
       app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
         threads,
-        chainId,
+        chain,
       }),
     ]);
-    // Each bulkThreads call that is passed a cutoff_date param limits its query to
-    // the most recent X posts before that date. That count, X, is determined by the pageSize param.
-    // If a query returns less than X posts, it is 'exhausted'; there are no more db entries that match
-    // the call's params. By returning a boolean, the discussion listing can determine whether
-    // it should continue calling the loadNextPage fn on scroll, or else notify the user that all
-    // relevant listing threads have been exhausted.
-    return !(threads.length < DEFAULT_PAGE_SIZE);
+
+    if (!this.listingStore.isInitialized(options)) {
+      this.listingStore.initializeListing(options);
+    }
+    if (threads.length < DEFAULT_PAGE_SIZE) {
+      this.listingStore.depleteListing(options);
+    }
   }
 
-  public initialize(initialThreads: any[] = [], numVotingThreads, reset) {
+  public initialize(initialThreads = [], numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -753,12 +747,7 @@ class ThreadsController {
       }
       try {
         this._store.add(modeledThread);
-        // Initialization only populates AllProposals and pinned
-        const options = {
-          allProposals: true,
-          exclusive: !modeledThread.pinned,
-        };
-        this._listingStore.add(modeledThread, options);
+        this._listingStore.add(modeledThread);
       } catch (e) {
         console.error(e.message);
       }

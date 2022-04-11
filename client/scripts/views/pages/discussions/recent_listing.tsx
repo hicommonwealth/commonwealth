@@ -7,11 +7,12 @@ import 'pages/discussions/summary_listing.scss';
 import app from 'state';
 import { OffchainThread, OffchainTopic } from 'models';
 import { Spinner } from 'construct-ui';
-import { orderDiscussionsbyLastComment } from './helpers';
+import { pluralize } from 'helpers';
+import { debounce } from 'lodash';
 import { DiscussionFilterBar } from './discussion_filter_bar';
 import LoadingRow from '../../components/loading_row';
 import Sublayout from '../../sublayout';
-import { pluralize } from 'helpers';
+import { DiscussionRow } from './discussion_row';
 
 interface DiscussionScrollAttrs {
   postsDepleted: boolean;
@@ -41,6 +42,16 @@ export class DiscussionScroll
   }
 }
 
+export class DiscussionListing
+  implements m.ClassComponent<{ threads: OffchainThread[] }>
+{
+  view(vnode) {
+    return vnode.attrs.threads.map((t) => {
+      return m(DiscussionRow, { proposal: t });
+    });
+  }
+}
+
 interface RecentListingAttrs {}
 export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
   private initializing: boolean;
@@ -52,31 +63,73 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
   private topic: string;
   private stage: string;
 
-  oninit() {
-    return null;
+  onScroll() {
+    const options = {
+      topicName: this.topic,
+      stageName: this.stage,
+    };
+
+    return debounce(async () => {
+      const params = {
+        topicName: this.topic,
+        stageName: this.stage,
+      };
+      if (app.threads.listingStore.isDepleted(params)) return;
+      const scrollHeight = $(document).height();
+      const scrollPos = $(window).height() + $(window).scrollTop();
+      if (scrollPos > scrollHeight - 400) {
+        await app.threads.loadNextPage(options);
+        m.redraw();
+      }
+    }, 400);
   }
 
-  view() {
-    if (this.initializing) {
-      <div class="RecentListing">
-        <DiscussionFilterBar
-          topic={this.topic}
-          stage={this.stage}
-          parentState={this}
-          disabled={true}
-        />
-        {m(LoadingRow)}
-      </div>;
-    }
-
+  oninit() {
     // TODO: More robust method of topic-determination
     this.topic = m.route.get().split('/')[2];
     this.stage = m.route.param('stage');
+  }
 
-    // TODO: Handle pinned, lastVisited
-    const allThreads = app.threads.listingStore
-      .getByCommunityTopicAndStage(app.activeChainId(), this.topic, this.stage)
-      .sort(orderDiscussionsbyLastComment);
+  view() {
+    const subpageParams = {
+      topicName: this.topic,
+      stageName: this.stage,
+    };
+
+    if (!app.threads.listingStore.isInitialized(subpageParams)) {
+      this.initializing = true;
+      app.threads
+        .loadNextPage({
+          topicName: this.topic,
+          stageName: this.stage,
+        })
+        .then(() => {
+          this.initializing = false;
+        });
+    }
+    if (this.initializing) {
+      return (
+        <div class="RecentListing">
+          <DiscussionFilterBar
+            topic={this.topic}
+            stage={this.stage}
+            parentState={this}
+            disabled={true}
+          />
+          {m(LoadingRow)}
+        </div>
+      );
+    }
+
+    // TODO: Handle lastVisited
+    const pinnedThreads = app.threads.listingStore.getListingThreads({
+      ...subpageParams,
+      pinned: true,
+    });
+    const unpinnedThreads = app.threads.listingStore.getListingThreads({
+      ...subpageParams,
+      pinned: false,
+    });
 
     return (
       <Sublayout
@@ -84,7 +137,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
         title="Discussions"
         description={null} // TODO
         showNewProposalButton={true}
-        // onscroll={this.onscroll}
+        onscroll={this.onScroll}
       >
         <div class="RecentListing">
           <DiscussionFilterBar
@@ -92,10 +145,12 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
             stage={this.stage}
             parentState={this}
           />
+          <DiscussionListing threads={pinnedThreads} />
+          <DiscussionListing threads={unpinnedThreads} />
           <DiscussionScroll
-            postsDepleted={this.postsDepleted}
+            postsDepleted={app.threads.listingStore.isDepleted(subpageParams)}
             subpageName={this.topic || this.stage}
-            totalThreadCount={this.allThreads.length}
+            totalThreadCount={pinnedThreads.length + unpinnedThreads.length}
           />
         </div>
       </Sublayout>
