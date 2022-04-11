@@ -1,0 +1,65 @@
+@import 'client/styles/shared';
+@import 'construct-ui/src/_shared/_colors';
+
+.ProfilePage {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  .ProfileHeader {
+
+    margin: 30px 0;
+
+    .profile-content {
+      padding: 20px 40px;
+
+      .section {
+        margin: 5px 0;
+      }
+
+      .profile-name {
+        display: flex;
+
+        .profile-icon {
+          margin: 5px 0 0 10px;
+        }
+      }
+    }
+
+  } 
+
+  .ProfileActivity {
+    margin: 30px 0;
+
+    .activity-nav {
+      display: flex;
+
+      .activity-nav-option {
+        min-width: 50px;
+        padding: 5px 0;
+        margin-right: 20px;
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      .selected {
+        border-bottom: 2px solid #4723AD;
+      }
+    }
+
+    .activity-section {
+      margin: 30px 0;
+      .activity {
+        height: 60px;
+        padding: 10px 10px;
+        border-bottom: 1px solid $lite-gray;
+      }
+    }
+
+  }
+
+}
+
+
+

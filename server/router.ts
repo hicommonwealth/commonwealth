@@ -51,6 +51,7 @@ import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
 import deleteSocialAccount from './routes/deleteSocialAccount';
 import getProfile from './routes/getProfile';
+import getNewProfile from './routes/getNewProfile';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -311,6 +312,7 @@ function setupRouter(
   router.get('/searchComments', searchComments.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
+  router.get('/profile/v2', getNewProfile.bind(this, models));
 
   // offchain discussion drafts
   router.post(

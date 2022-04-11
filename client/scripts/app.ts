@@ -857,6 +857,19 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: true,
             }),
+
+            // TODO: determine whether this should exist here as a scoped route or above as a custom domain route
+            // Profiles New  
+            '/profile/:address': importRoute('views/pages/new_profile', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            
+            '/:scope/profile/:address': importRoute('views/pages/new_profile', {
+              scoped: true,
+              hideSidebar: false,
+            }),
+
             // Notifications
             '/:scope/notifications': importRoute(
               'views/pages/notifications_page',
@@ -903,7 +916,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
             '/:scope': importRoute('views/pages/discussions', {
               scoped: true,
-              deferChain: true,
+              deferChain: true,  
             }),
             '/:scope/discussions/:topic': importRoute(
               'views/pages/discussions',
