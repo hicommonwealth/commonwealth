@@ -132,9 +132,11 @@
   p.detail-highlight.emphasize {
     background: linear-gradient(to right, #335fb7, #d48cdd);
     flex: 1;
-    font-size: 21px;
+    font-size: 24px;
     font-weight: 600;
-    padding: 4px 8px;
-    margin-right: 8px;
+    min-width: 80px;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    // these webkit styles have to go last in order to apply correctly
   }
 }
