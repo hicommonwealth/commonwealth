@@ -84,10 +84,9 @@ const bulkThreads = async (
         WHERE t.deleted_at IS NULL
           AND t.chain = $chain 
           ${topicOptions}
-          AND t.created_at < $created_at
-          AND t.last_commented_on < $created_at
+          AND COALESCE(t.last_commented_on, t.created_at) < $created_at
           AND t.pinned = false
-          GROUP BY (t.id, t.last_commented_on, t.created_at)
+          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at))
           ORDER BY COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
