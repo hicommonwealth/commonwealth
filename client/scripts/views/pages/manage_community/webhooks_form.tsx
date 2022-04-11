@@ -196,7 +196,6 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
             placeholder="https://hooks.slack.com/services/"
           />
           <Cui.Button
-            class="admin-panel-tab-button"
             intent="none"
             label="Add webhook"
             onclick={createWebhook}
