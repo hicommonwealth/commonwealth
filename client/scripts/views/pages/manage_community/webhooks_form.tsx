@@ -89,15 +89,13 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
                   : webhook.url.indexOf('slack') !== -1
                   ? 'Slack'
                   : null;
+
               return (
                 <Cui.ListItem
                   contentLeft={
-                    <>
-                      <div class="top" style="display: block;">
-                        {webhook.url}
-                      </div>
-                      <div class="bottom">
-                        {label && <Cui.Tag size="xs" label={label} />}
+                    <div class="webhook-row">
+                      <div class="url">{webhook.url}</div>
+                      <div class="label-and-tags">
                         <Cui.Button
                           class="settings-button"
                           iconRight={Cui.Icons.SETTINGS}
@@ -119,12 +117,13 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
                             });
                           }}
                         />
+                        {label && <Cui.Tag size="xs" label={label} />}
                         <Cui.Tag
                           size="xs"
                           label={pluralize(webhook.categories.length, 'event')}
                         />
                       </div>
-                    </>
+                    </div>
                   }
                   contentRight={
                     <Cui.Icon
