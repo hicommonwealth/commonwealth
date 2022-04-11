@@ -20,7 +20,7 @@ import {
   LoginSelectorMenuLeft,
   LoginSelectorMenuRight,
 } from 'views/components/header/login_selector';
-import { getNewProposalMenu } from 'views/components/new_proposal_button';
+import { NewProposalMenu } from 'views/components/new_proposal_button';
 import { LoginModal } from '../modals/login_modal';
 import { ExternalLinksModule } from '../components/sidebar/external_links_module';
 import { CommunitySelector } from '../components/sidebar/community_selector';
@@ -103,7 +103,9 @@ export class MobileSidebar implements m.ClassComponent {
                 this.showNewThreadOptions = !this.showNewThreadOptions;
               }}
             />
-            {this.showNewThreadOptions && getNewProposalMenu([], true)}
+            {this.showNewThreadOptions && (
+              <NewProposalMenu candidates={[]} mobile={true} />
+            )}
           </Menu>
         ) : (
           <MenuItem

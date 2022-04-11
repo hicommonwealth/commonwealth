@@ -58,7 +58,7 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;
-  const isExistingMagicUser = previousUser && !!previousUser.Addresses;
+  const isExistingMagicUser = previousUser && previousUser.Addresses?.length > 0;
   if (isExistingMagicUser // existing magic users should always use magic login, even if they're in the wrong community
       || (isNewRegistration && magicChain?.base && MAGIC_SUPPORTED_BASES.includes(magicChain.base)
           && !req.body.forceEmailLogin)) {
