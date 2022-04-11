@@ -66,13 +66,16 @@ const NewProfileActivity : m.Component<ProfileActivityAttrs, ProfileActivityStat
             onclick={()=>{handleClick(ProfileActivity.All, vnode.state)}}
           >
             <h4> All </h4>
+            <div className="activity-count"> <p> { vnode.attrs.comments?.length } </p> </div>
           </div>
           <div className={vnode.state.selectedActivity == ProfileActivity.Threads ? 
               "activity-nav-option selected" : "activity-nav-option"}  
             onclick={()=>{handleClick(ProfileActivity.Threads, vnode.state)}}
           >
             <h4> Threads </h4>
+            <div className="activity-count"> <p> { vnode.attrs.threads?.length } </p> </div>
           </div>
+          <div className="divider"></div>
           <div className={vnode.state.selectedActivity == ProfileActivity.Communities ? 
               "activity-nav-option selected" : "activity-nav-option"}  
             onclick={()=>{handleClick(ProfileActivity.Communities, vnode.state)}}

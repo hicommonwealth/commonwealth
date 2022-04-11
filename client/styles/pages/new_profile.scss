@@ -35,16 +35,53 @@
       display: flex;
 
       .activity-nav-option {
+        position: relative;
+        display: flex;
         min-width: 50px;
-        padding: 5px 0;
+        padding: 6px 0;
         margin-right: 20px;
         &:hover {
           cursor: pointer;
+          h4 {
+            color: black;
+          }
+        }
+        
+        h4 {
+          color: $lite-gray;
+          margin-top: 2px;
+          transition: color .2s ease-in;
+        }
+
+        .activity-count {
+          position: relative;
+          width: 45px;
+          height: 25px;
+          background-color: $background-gray;
+          border-radius: 12px;
+          margin-left: 12px;
+
+          p {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            font-size: small;
+            font-weight: 600;
+          }
         }
       }
-
       .selected {
         border-bottom: 2px solid #4723AD;
+        h4 {
+          color: black;
+        }
+      }
+      .divider {
+        width: 1px;
+        height: 24px;
+        border-right: 1px solid $lite-gray;
+        margin: 7px 20px 0 0;
       }
     }
 
