@@ -11,41 +11,66 @@ module.exports = {
 
       // populate column for all but default eth addresses
       // update by base
-      // TODO: base is on "chain" but not "address", need to figure out how to make that query
-      await queryInterface.bulkUpdate('Addresses',
-        { wallet_id: 'phantom' },
-        { base: 'solana' },
-        { transaction, });
-      await queryInterface.bulkUpdate('Addresses',
-        { wallet_id: 'near' },
-        { base: 'near' },
-        { transaction, });
-      await queryInterface.bulkUpdate('Addresses',
-        { wallet_id: 'polkadot' },
-        { base: 'substrate' },
-        { transaction, });
-      await queryInterface.bulkUpdate('Addresses',
-        { wallet_id: 'keplr' },
-        { base: 'cosmos' },
-        { transaction, });
+      await queryInterface.sequelize.query(`
+        UPDATE "Addresses" SET wallet_id = 'phantom'
+        WHERE chain IN (
+          SELECT "Chains".id FROM "Chains" WHERE "Chains".base = 'solana'
+        );
+      `, {
+          raw: true, type: 'RAW', transaction,
+      });
+      await queryInterface.sequelize.query(`
+        UPDATE "Addresses" SET wallet_id = 'near'
+        WHERE chain IN (
+          SELECT "Chains".id FROM "Chains" WHERE "Chains".base = 'near'
+        );
+      `, {
+          raw: true, type: 'RAW', transaction,
+      });
+      await queryInterface.sequelize.query(`
+        UPDATE "Addresses" SET wallet_id = 'polkadot'
+        WHERE chain IN (
+          SELECT "Chains".id FROM "Chains" WHERE "Chains".base = 'substrate'
+        );
+      `, {
+          raw: true, type: 'RAW', transaction,
+      });
+      await queryInterface.sequelize.query(`
+        UPDATE "Addresses" SET wallet_id = 'keplr'
+        WHERE chain IN (
+          SELECT "Chains".id FROM "Chains" WHERE "Chains".base = 'cosmos'
+        );
+      `, {
+          raw: true, type: 'RAW', transaction,
+      });
 
       // update by network
-      await queryInterface.bulkUpdate('Addresses',
-        { wallet_id: 'ronin' },
-        { network: 'axie-infinity' },
-        { transaction, });
-      await queryInterface.bulkUpdate('Addresses',
-        { wallet_id: 'inj-metamask' },
-        { network: 'injective' },
-        { transaction, });
-      await queryInterface.bulkUpdate('Addresses',
-        { wallet_id: 'inj-metamask' },
-        { network: 'injective-testnet' },
-        { transaction, });
-      await queryInterface.bulkUpdate('Addresses',
-        { wallet_id: 'terrastation' },
-        { network: 'terra' },
-        { transaction, });
+      await queryInterface.sequelize.query(`
+        UPDATE "Addresses" SET wallet_id = 'ronin'
+        WHERE chain IN (
+          SELECT "Chains".id FROM "Chains" WHERE "Chains".network = 'axie-infinity'
+        );
+      `, {
+          raw: true, type: 'RAW', transaction,
+      });
+      await queryInterface.sequelize.query(`
+        UPDATE "Addresses" SET wallet_id = 'inj-metamask'
+        WHERE chain IN (
+          SELECT "Chains".id
+          FROM "Chains"
+          WHERE "Chains".network = 'injective' OR "Chains".network = 'injective-testnet'
+        );
+      `, {
+          raw: true, type: 'RAW', transaction,
+      });
+      await queryInterface.sequelize.query(`
+        UPDATE "Addresses" SET wallet_id = 'terrastation'
+        WHERE chain IN (
+          SELECT "Chains".id FROM "Chains" WHERE "Chains".network = 'terra'
+        );
+      `, {
+          raw: true, type: 'RAW', transaction,
+      });
 
       // update for magic specifically
       await queryInterface.bulkUpdate('Addresses',
