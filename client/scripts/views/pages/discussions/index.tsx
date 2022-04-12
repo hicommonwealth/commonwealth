@@ -52,12 +52,8 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   }
 
   initializeSummaryView() {
-    // If URI specifies topic or stage, override
-    if (this.topicName || this.stageName) {
-      this.summaryView = false;
-    }
     // If admin has set summary view as community default
-    else if (app.chain.meta.chain.defaultSummaryView) {
+    if (app.chain.meta.chain.defaultSummaryView) {
       this.summaryView = true;
     }
     // If user is returning to a listing page previously toggled to summary
@@ -96,6 +92,10 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     this.stageName = m.route.param('stage');
     if (!this.summaryViewInitialized) {
       this.initializeSummaryView();
+    }
+    // If URI specifies topic or stage, override default/historical settings
+    if (this.topicName || this.stageName) {
+      this.summaryView = false;
     }
     if (!this.summaryView) {
       localStorage.setItem('discussion-summary-toggle', 'false');

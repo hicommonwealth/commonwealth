@@ -1,9 +1,8 @@
 /* @jsx m */
 
-import m from 'mithril';
-import $ from 'jquery';
-
 import 'pages/discussions/summary_listing.scss';
+
+import m from 'mithril';
 
 import app from 'state';
 import { OffchainThread, OffchainTopic } from 'models';
@@ -14,6 +13,7 @@ import { DiscussionFilterBar } from './discussion_filter_bar';
 import LoadingRow from '../../components/loading_row';
 import Sublayout from '../../sublayout';
 import { DiscussionRow } from './discussion_row';
+import EmptyListingPlaceholder from '../../components/empty_topic_placeholder';
 
 interface DiscussionScrollAttrs {
   postsDepleted: boolean;
@@ -59,8 +59,6 @@ interface RecentListingAttrs {
 }
 export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
   private initializing: boolean;
-  private allThreads: OffchainThread[];
-  private postsDepleted: boolean;
   // TODO: Better variable name
   private isEmpty: boolean;
   // TODO: Try to get a proper OffchainTopic/Stage object
@@ -102,9 +100,12 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
       pinned: false,
     });
 
-    console.log({ pinnedThreads, unpinnedThreads });
-
-    console.log({ pinnedThreads, unpinnedThreads });
+    if (!pinnedThreads.length && !unpinnedThreads.length) {
+      return m(EmptyListingPlaceholder, {
+        stageName,
+        topicName,
+      });
+    }
 
     return (
       <div class="RecentListing">
@@ -119,11 +120,3 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
     );
   }
 }
-
-// const content = isEmpty
-//   ? m(EmptyListingPlaceholder, {
-//       stageName: stage,
-//       communityName,
-//       topicName,
-//     })
-// : m(Listing, { content: sortedListing })}

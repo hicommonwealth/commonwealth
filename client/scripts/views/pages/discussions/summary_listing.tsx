@@ -1,65 +1,38 @@
 /* @jsx m */
 
-import m from 'mithril';
-
 import 'pages/discussions/summary_listing.scss';
 
+import m from 'mithril';
 import app from 'state';
-import { OffchainThread } from 'models';
+import { OffchainTopic } from 'client/scripts/models';
 import LoadingRow from '../../components/loading_row';
 import SummaryRow from './summary_row';
+
 export class SummaryListing implements m.ClassComponent {
-  private activityFetched: boolean;
   private initializing: boolean;
-  private recentThreads: OffchainThread[];
   private isMobile: boolean;
 
   oninit() {
-    this.isMobile = window.innerWidth < 767.98;
-    // TODO Graham 4/5/22: Investigate recentActivity controller
     this.initializing = true;
-    app.recentActivity
-      .getRecentTopicActivity({
-        chainId: app.activeChainId(),
-      })
-      .then((res) => {
-        this.initializing = false;
-        this.recentThreads = res;
-      });
+    app.recentActivity.getRecentTopicActivity().then(() => {
+      this.initializing = false;
+      m.redraw();
+    });
   }
 
   view() {
-    if (!this.activityFetched) {
-      this.initializing = true;
-      app.recentActivity
-        .getRecentTopicActivity({
-          chainId: app.activeChainId(),
-        })
-        .then((res) => {
-          this.activityFetched = true;
-          this.initializing = false;
-          this.recentThreads = res;
-          m.redraw();
-        });
-    }
     if (this.initializing) {
       return m(LoadingRow);
     }
 
-    // TODO
-    // this.recentThreads = app.recentActivity.getAll();
-
+    const recentThreads = app.threads.summaryStore.getAll();
     const sortedTopics = app.topics
       .getByCommunity(app.activeChainId())
-      .sort((a, b) => {
-        if (a.name.toLowerCase() < b.name.toLowerCase()) {
-          return -1;
-        }
-        if (a.name.toLowerCase() > b.name.toLowerCase()) {
-          return 1;
-        }
-        return 0;
+      .sort((a: OffchainTopic, b: OffchainTopic) => {
+        return a.name.localeCompare(b.name);
       });
+
+    const isMobile = window.innerWidth < 767.98;
 
     return (
       <div class="SummaryListing">
@@ -71,12 +44,12 @@ export class SummaryListing implements m.ClassComponent {
         )}
         <div class="row-wrap">
           {sortedTopics.map((topic) => {
-            const topicScopedThreads = this.recentThreads.filter(
+            const topicScopedThreads = recentThreads.filter(
               (thread) => thread.topic?.id === topic?.id
             );
             return (
               <SummaryRow
-                isMobile={this.isMobile}
+                isMobile={isMobile}
                 monthlyThreads={topicScopedThreads}
                 topic={topic}
               />

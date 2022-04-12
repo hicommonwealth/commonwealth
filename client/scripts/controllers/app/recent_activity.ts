@@ -35,7 +35,6 @@ export const modelAbridgedThreadFromServer = (
 };
 
 class RecentActivityController {
-  // TODO
   // private _threadsStore = new ActiveThreadsStore();
   // private _addressStore = new ActiveAddressesStore();
   private _communityThreadCount = {};
@@ -72,15 +71,10 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentTopicActivity(options: {
-    chainId: string;
-    threadsPerTopic?: number;
-  }): Promise<OffchainThread[]> {
-    const { chainId } = options;
-    const threadsPerTopic = options.threadsPerTopic || 3;
+  public async getRecentTopicActivity(): Promise<OffchainThread[]> {
     const params = {
-      chain: chainId,
-      threads_per_topic: threadsPerTopic,
+      chain: app.activeChainId(),
+      threads_per_topic: 3,
     };
 
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);

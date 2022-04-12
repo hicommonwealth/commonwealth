@@ -685,14 +685,12 @@ class ThreadsController {
     topicName?: string;
     stageName?: string;
   }) {
-    debugger;
     if (this.listingStore.isDepleted(options)) {
       return;
     }
     const cutoff_date = this.listingStore.isInitialized(options)
       ? this.listingStore.getCutoffDate(options).toISOString()
       : moment().toISOString();
-    console.log({ cutoff_date });
     const { topicName, stageName } = options;
     const chain = app.activeChainId();
     const params = {
@@ -709,7 +707,6 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads } = response.result;
-    console.log(threads);
     const modeledThreads: OffchainThread[] = threads.map((t) => {
       return modelFromServer(t);
     });
@@ -724,12 +721,11 @@ class ThreadsController {
       }
     });
 
+    // Update listing cutoff date (date up to which threads have been fetched)
     if (modeledThreads?.length) {
-      console.log(modeledThreads);
       const lastThread = modeledThreads.sort(orderDiscussionsbyLastComment)[
         modeledThreads.length - 1
       ];
-      console.log(lastThread);
       const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
       this.listingStore.setCutoffDate(options, cutoffDate);
     }

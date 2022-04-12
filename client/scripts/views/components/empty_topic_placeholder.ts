@@ -8,26 +8,30 @@ import { NewProposalButton } from 'views/components/new_proposal_button';
 const EmptyListingPlaceholder: m.Component<{
   stageName?: string;
   topicName?: string;
-  communityName?: string;
 }> = {
   view: (vnode) => {
-    const { stageName, topicName, communityName } = vnode.attrs;
+    const { stageName, topicName } = vnode.attrs;
     if (stageName) {
       return m('.EmptyStagePlaceholder', [
         'There are no threads matching your filter.',
       ]);
     }
     return m('.EmptyListingPlaceholder', [
-      m('.icon-circle', [m(Icon, { name: Icons.HASH, size: 'xl' })]),
       m('h1', [
         'Welcome to the ',
         topicName
           ? [m('strong', topicName), ' topic!']
-          : [m('strong', communityName), ' community!'],
+          : [m('strong', app.activeChainId()), ' community!'],
       ]),
-      m('p', 'There are no threads here yet.'),
-      !app.isLoggedIn() && m('p', 'Log in to create a new thread.'),
-      m(NewProposalButton, { fluid: false, threadOnly: true }),
+      m('.description', [
+        m('br'),
+        m('p', 'There are no threads here yet. '),
+        !app.isLoggedIn()
+          ? m('p', 'Log in to create a new thread.')
+          : !app.user.activeAccount
+          ? m('p', 'Connect a Web3 address to create a new thread.')
+          : m(NewProposalButton, { fluid: false, threadOnly: true }),
+      ]),
     ]);
   },
 };
