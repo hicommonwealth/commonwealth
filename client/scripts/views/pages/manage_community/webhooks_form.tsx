@@ -27,10 +27,13 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
 
     const createWebhook = (e) => {
       e.preventDefault();
+
       const $webhookInput = $(e.target)
         .closest('form')
         .find('[name="webhookUrl"]');
+
       const webhookUrl = $webhookInput.val();
+
       if (webhookUrl === null) return;
 
       this.disabled = true;
@@ -194,6 +197,12 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
             id="webhookUrl"
             autocomplete="off"
             placeholder="https://hooks.slack.com/services/"
+            onkeydown={(e) => {
+              // disable enter key
+              if (e.keyCode === 13) {
+                e.preventDefault();
+              }
+            }}
           />
           <Cui.Button
             intent="none"
