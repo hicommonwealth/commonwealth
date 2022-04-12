@@ -32,7 +32,7 @@ export class DiscussionFilterBar
 
     const { stagesEnabled, customStages } = communityInfo;
 
-    const { topics } = app.chain.meta.chain;
+    const topics  = app.topics.getByCommunity(app.activeChainId());
 
     const featuredTopics = topics
       .filter((t) => t.featuredInSidebar)
