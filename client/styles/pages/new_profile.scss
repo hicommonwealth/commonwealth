@@ -102,18 +102,18 @@
 
       .activity {
         position: relative;
-        height: 120px;
+        height: 130px;
         padding: 10px 25px;
         border-bottom: 1px solid $lite-gray;
 
-        .comment-icon {
+        .comment-icon, .address-icon {
           position: absolute;
-          top: 13px;
+          top: 14px;
           left: 0px;
         }
 
-        .comment-chain, .thread-chain {
-          margin-bottom: 15px;
+        .comment-chain, .thread-chain, .address-name {
+          margin-bottom: 10px;
           p {
             color: $midi-gray;
           }
@@ -132,6 +132,19 @@
           width: 85%;
           max-height: 90px;
           font-size: 16px;
+        }
+
+        .thread-title {
+          margin-bottom: 10px;
+        }
+
+        .thread-body {
+          width: 85%;
+          color: $midi-gray;
+        }
+
+        .address-text {
+          margin-bottom: 10px;
         }
 
         .heavy {
@@ -177,7 +190,6 @@
           }
         }
       }
-
     }
 
   }

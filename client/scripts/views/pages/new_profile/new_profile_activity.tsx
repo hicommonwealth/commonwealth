@@ -54,16 +54,21 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs) =>
   if (option === ProfileActivity.Threads)  
     return attrs.threads?.map(t => 
       <div className="activity"> 
+        <div className="comment-icon">
+          <CWIcon iconName="feedback" iconSize="small" />
+        </div>
         <div className="thread-chain"> 
-          <p> in <span className="heavy"> { t.chain } </span> </p>
+          <p> Thread in <span className="heavy"> { t.chain } </span> </p>
         </div>
         <div className="thread-date"> 
           <p> { transformTimestamp(t.created_at) } </p> 
         </div>
-        <div className="">
+        <div className="thread-title">
           <p> { t.title } </p> 
         </div>
-        
+        <div className="thread-body">
+          <p> { t.plaintext } </p>
+        </div>
       </div>
     )
   if (option === ProfileActivity.Communities)
@@ -80,7 +85,19 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs) =>
     )
   if (option == ProfileActivity.Addresses)
     return attrs.addresses?.map(a => 
-      <div className="activity"> <p> { a.address } </p> </div>
+      <div className="activity"> 
+        <div className="address-icon">
+          <CWIcon iconName="account" iconSize="small" /> 
+        </div>
+        <div className="address-info">
+          <div className="address-text">
+            <p> You own address <span className="heavy"> { a.address } </span> </p> 
+          </div>
+          <div className="address-name">
+            <p> named <span className="heavy"> { a.name }  </span> on the <span className="heavy"> { a.chain }</span> chain. </p>
+          </div>
+        </div>
+      </div>
     )
 }
 
