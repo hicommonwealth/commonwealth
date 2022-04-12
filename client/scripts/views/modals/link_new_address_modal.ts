@@ -158,8 +158,9 @@ const LinkAccountItem: m.Component<
           try {
             const signerAccount = await createUserWithAddress(
               address,
+              webWallet.name,
               undefined,
-              targetCommunity
+              targetCommunity,
             );
             vnode.state.linking = true;
             m.redraw();
@@ -309,7 +310,7 @@ const LinkNewAddressModal: m.Component<
               account.addressId,
               account.address,
               account.chain.id,
-              undefined
+              account.walletId,
             );
             app.user.addresses.push(addressInfo);
           }
@@ -398,6 +399,7 @@ const LinkNewAddressModal: m.Component<
       }
     };
 
+    const webWallet = vnode.attrs.webWallet;
     const prepopulatedAddressInputFn = async (address) => {
       vnode.state.error = null;
 
@@ -414,6 +416,7 @@ const LinkNewAddressModal: m.Component<
         try {
           vnode.state.newAddress = await createUserWithAddress(
             address,
+            webWallet.name,
             vnode.state.isEd25519 ? 'ed25519' : undefined,
             targetCommunity
           );
@@ -433,7 +436,6 @@ const LinkNewAddressModal: m.Component<
       prepopulatedAddressInputFn(vnode.attrs.prepopulateAddress);
     }
 
-    const webWallet = vnode.attrs.webWallet;
     const initWebWallet = async () => {
       // initialize API if needed before starting webwallet
       if (vnode.state.initializingWallet) return;
@@ -595,7 +597,6 @@ const LinkNewAddressModal: m.Component<
                   app.chain.base === ChainBase.Substrate
                   ? []
                   : [
-                      // TODO: include walletId here
                       webWallet?.accounts.map((addressOrAccount) =>
                         m(LinkAccountItem, {
                           account:
