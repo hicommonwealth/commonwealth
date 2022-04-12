@@ -2,7 +2,7 @@ import 'components/proposal_card.scss';
 
 import m from 'mithril';
 import moment from 'moment';
-import { Icon, Icons, Tag } from 'construct-ui';
+import { Tag } from 'construct-ui';
 import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
 
 import app from 'state';
@@ -28,6 +28,7 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
 import Countdown from 'views/components/countdown';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 export const getStatusClass = (proposal: AnyProposal) =>
   proposal.isPassing === ProposalStatus.Passing
@@ -347,8 +348,11 @@ const ProposalCard: m.Component<{ proposal: AnyProposal; injectedContent? }> = {
                   },
                 },
                 [
-                  m(Icon, { name: Icons.ARROW_UP_RIGHT, size: 'xs' }),
-                  proposal.threadTitle ? proposal.threadTitle : 'Go to thread',
+                  m(CWIcon, { iconName: 'expand', size: 'small' }),
+                  m(
+                    'span',
+                    proposal.threadTitle ? proposal.threadTitle : 'Go to thread'
+                  ),
                 ]
               ),
             ]),

@@ -2,7 +2,7 @@ import 'components/login_with_wallet_dropdown.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, PopoverMenu, MenuItem, Icon, Icons } from 'construct-ui';
+import { Button, PopoverMenu, MenuItem } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -77,13 +77,12 @@ const LoginWithWalletDropdown: m.Component<{
       ChainBase.Solana,
     ].filter((base) => allChains.find((chain) => chain.base === base));
 
-    const emptyWalletMenuItem = 
-      m(MenuItem, {
-        label: m('.chain-login-label', [
-          // TODO Graham 4/7/22: Better copy
-          m('.chain-login-label-name', 'No wallets found'),
-        ]),
-      });
+    const emptyWalletMenuItem = m(MenuItem, {
+      label: m('.chain-login-label', [
+        // TODO Graham 4/7/22: Better copy
+        m('.chain-login-label-name', 'No wallets found'),
+      ]),
+    });
 
     const getMenuItemsForChainBase = (base: ChainBase) => {
       const wallets = app.wallets.availableWallets(base);
@@ -148,9 +147,8 @@ const LoginWithWalletDropdown: m.Component<{
       trigger: m(Button, {
         intent: 'primary',
         fluid: true,
-        class: 'login-with-web3',
         rounded: true,
-        label: [label, m(Icon, { name: Icons.CHEVRON_DOWN })],
+        label,
       }),
       addToStack: true,
       closeOnContentClick: true,

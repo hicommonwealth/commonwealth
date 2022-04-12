@@ -156,6 +156,10 @@ $text-size-mobile-header: 22px;
   .cui-tabs-item {
     color: $neutral-500;
     margin: 0 24px 0 0;
+
+    @include sm-max {
+      margin: 0 16px 0 0;
+    }
   }
 
   .cui-tabs-item:hover {

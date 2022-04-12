@@ -30,7 +30,7 @@ export class ChainIcon implements m.ClassComponent<ChainIconAttrs> {
           />
         ) : (
           <div
-            class="chain-icon.no-image"
+            class="chain-icon .no-image"
             style={`width: ${size}px; height: ${size}px;`}
             onclick={onclick}
           >
