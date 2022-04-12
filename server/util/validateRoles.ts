@@ -16,12 +16,10 @@ const validateRoles = async (
 ): Promise<boolean> => {
   if (!user) return false;
 
-  console.log(user.isAdmin);
   if (user.isAdmin) return true;
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  console.log(userOwnedAddressIds);
   const allowedRoles =
     minimum_role === 'member'
       ? ['admin, moderator, member']
@@ -36,7 +34,6 @@ const validateRoles = async (
       permission: allowedRoles,
     },
   });
-  console.log(!!userRole);
 
   return !!userRole;
 };

@@ -7,7 +7,7 @@ import { DB } from '../database';
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   TopicRequired: 'Topic name required',
-  MustBeAdmin: 'Must be an admin',
+  MustBeAdminOrMod: 'Must be an admin or moderator',
   InvalidTokenThreshold: 'Invalid token threshold',
   DefaultTemplateRequired: 'Default Template required',
   InvalidTopicName: 'Only alphanumeric chars allowed',
@@ -40,7 +40,7 @@ const createTopic = async (
     chain.id
   );
   if (!isAdminOrMod) {
-    return next(new Error(Errors.MustBeAdmin));
+    return next(new Error(Errors.MustBeAdminOrMod));
   }
 
   const token_threshold_test = parseInt(req.body.token_threshold, 10);

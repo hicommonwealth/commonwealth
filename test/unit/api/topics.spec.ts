@@ -95,7 +95,7 @@ describe('Topic Tests', () => {
     });
   });
 
-  describe('Update Topics', () => {
+  describe('Update Topic', () => {
     let thread;
 
     before(async () => {

@@ -306,12 +306,7 @@ const createThread = async (
     }
 
     if (chain && chain.type === ChainType.Token) {
-      const isAdmin = await validateRoles(
-        models,
-        req.user,
-        'moderator',
-        chain.id
-      );
+      const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
 
       if (!isAdmin) {
         const canReact = await tokenBalanceCache.validateTopicThreshold(

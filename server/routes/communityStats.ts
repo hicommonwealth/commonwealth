@@ -24,7 +24,7 @@ const communityStats = async (
     chain.id
   );
   if (!isAdminOrMod) {
-    return next(new Error('Must be admin'));
+    return next(new Error('Must be admin or mod'));
   }
 
   // get new objects created over the last 14 days

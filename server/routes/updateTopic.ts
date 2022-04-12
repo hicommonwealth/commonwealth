@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
+import { OffchainTopicInstance } from 'server/models/offchain_topic';
 import validateRoles from '../util/validateRoles';
 import { DB } from '../database';
 
@@ -46,7 +47,7 @@ const updateTopic = async (
   }
 
   // remove deleted topics
-  let newTopic;
+  let newTopic: OffchainTopicInstance;
   if (req.body.topic_id) {
     thread.topic_id = req.body.topic_id;
     await thread.save();
