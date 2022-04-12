@@ -22,7 +22,7 @@
     align-items: center;
     height: 100%;
     width: 100%;
-    color: $neutral-500;
+    color: $neutral-600;
     z-index: 1;
     &.hidden {
       display: none;
@@ -37,15 +37,10 @@
     background-color: $neutral-50;
     clip-path: circle(12px at center);
     -webkit-clip-path: circle(12px at center);
-    color: inherit;
-    font-size: 14px;
     cursor: pointer;
+
     &:hover {
-      color: $neutral-500;
-    }
-    > svg {
-      margin: -3px 0;
-      margin-right: 6px;
+      color: $neutral-800;
     }
   }
   .dropzone-previews {

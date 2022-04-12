@@ -15,8 +15,6 @@ import {
   FormGroup,
   Input,
   Button,
-  Icon,
-  Icons,
   List,
   ListItem,
   Tag,
@@ -41,6 +39,7 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 interface IThreadForm {
   topicName?: string;
@@ -623,9 +622,8 @@ export const NewThreadForm: m.Component<
                     class: 'tab-right',
                     label: [
                       'Full editor',
-                      m(Icon, {
-                        name: Icons.ARROW_UP_RIGHT,
-                        style: 'margin-left: 5px;',
+                      m(CWIcon, {
+                        iconName: 'expand',
                       }),
                     ],
                     onclick: (e) => {
@@ -1015,7 +1013,7 @@ export const NewThreadForm: m.Component<
                     contentRight: [
                       fromDraft === draft.id
                         ? m('.discussion-draft-title-wrap', [
-                            m(Icon, { name: Icons.EDIT }),
+                            m(CWIcon, { iconName: 'edit' }),
                             m(
                               '.discussion-draft-title',
                               draft.title || 'Untitled'
