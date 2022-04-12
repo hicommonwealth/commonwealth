@@ -235,7 +235,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
     const activeAccountsByRole = app.user.getActiveAccountsByRole();
 
     const nAccountsWithoutRole = activeAccountsByRole.filter(
-      ([role]) => !role
+      ([account, role], index) => !role
     ).length;
 
     if (!this.profileLoadComplete && app.profiles.allLoaded()) {
