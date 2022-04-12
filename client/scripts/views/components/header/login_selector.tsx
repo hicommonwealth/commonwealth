@@ -48,7 +48,7 @@ export class LoginSelectorMenuLeft
       vnode.attrs;
 
     return (
-      <Cui.Menu class="LoginSelectorMenu">
+      <>
         {activeAddressesWithRole.map((account) => (
           <Cui.MenuItem
             align="left"
@@ -122,7 +122,7 @@ export class LoginSelectorMenuLeft
             </div>
           }
         />
-      </Cui.Menu>
+      </>
     );
   }
 }
@@ -136,7 +136,7 @@ export class LoginSelectorMenuRight
     const { mobile } = vnode.attrs;
 
     return (
-      <Cui.Menu class="LoginSelectorMenu">
+      <>
         <Cui.MenuItem
           onclick={() =>
             app.activeChainId()
@@ -194,7 +194,7 @@ export class LoginSelectorMenuRight
             </div>
           }
         />
-      </Cui.Menu>
+      </>
     );
   }
 }
@@ -398,7 +398,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
           !app.chainPreloading &&
           this.profileLoadComplete &&
           app.user.activeAccount && (
-            <Cui.Popover
+            <Cui.PopoverMenu
               hasArrow={false}
               closeOnContentClick={true}
               transitionDuration={0}
@@ -420,7 +420,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               }
             />
           )}
-        <Cui.Popover
+        <Cui.PopoverMenu
           hasArrow={false}
           closeOnContentClick={true}
           transitionDuration={0}
