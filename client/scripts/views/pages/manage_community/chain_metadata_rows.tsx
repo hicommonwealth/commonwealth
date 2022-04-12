@@ -277,8 +277,8 @@ export class ChainMetadataRows
             try {
               for (const category of Object.keys(this.selectedTags)) {
                 await setChainCategories(
-                  vnode.attrs.chain.id,
                   this.categoryMap[category],
+                  vnode.attrs.chain.id,
                   this.selectedTags[category]
                 );
               }
