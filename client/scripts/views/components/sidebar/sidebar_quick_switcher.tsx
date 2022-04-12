@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
+import { Button, Icon, Icons } from 'construct-ui';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
@@ -10,7 +10,6 @@ import { link } from 'helpers';
 import { ChainInfo } from 'models';
 import { ChainIcon } from 'views/components/chain_icon';
 import { CommunitySelector } from 'views/components/sidebar/community_selector';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 type SidebarQuickSwitcherItemAttrs = {
   item: ChainInfo;
@@ -60,7 +59,7 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
         <div class="community-nav-bar">
           <Button
             rounded={true}
-            label={<CWIcon iconName="home" iconSize="small" />}
+            label={<Icon name={Icons.HOME} />}
             onclick={(e) => {
               e.preventDefault();
               m.route.set('/');
@@ -70,7 +69,7 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
           {app.isLoggedIn() && (
             <Button
               rounded={true}
-              label={<CWIcon iconName="plus" iconSize="small" />}
+              label={<Icon name={Icons.PLUS} />}
               onclick={(e) => {
                 e.preventDefault();
                 m.route.set('/createCommunity');
