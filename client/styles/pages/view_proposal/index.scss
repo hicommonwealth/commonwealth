@@ -384,6 +384,7 @@ $discussion-title-font-size: 1.45rem;
       }
     }
     svg {
+      cursor: pointer;
       stroke: $neutral-500;
     }
     svg:hover {

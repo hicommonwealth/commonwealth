@@ -1,9 +1,9 @@
 import 'components/empty_topic_placeholder.scss';
 
 import m from 'mithril';
-import { Icon, Icons } from 'construct-ui';
 import app from 'state';
 import { NewProposalButton } from 'views/components/new_proposal_button';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 const EmptyListingPlaceholder: m.Component<{
   stageName?: string;

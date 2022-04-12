@@ -31,7 +31,6 @@
 
     .cui-tabs-item {
       font-size: $text-size-mobile-header;
-      padding: 13px 4% 7px;
       width: initial;
     }
   }
@@ -57,10 +56,6 @@
     .cui-menu-divider {
       margin: 12px 0 18px;
     }
-  }
-
-  .cui-icon {
-    margin-right: 25px !important;
   }
 
   .LoginSelectorMenu,
@@ -92,27 +87,18 @@
   }
 }
 
-.MobileAccountMenu {
+.cui-menu .MobileAccountMenu {
+  border: none;
   width: 100%;
 
-  .cui-menu {
-    border: none;
-
+  .cui-button-label {
     .label-wrap {
       align-items: center;
       display: flex;
-
-      svg {
-        fill: none; // temporary while custom icons are replaced
-        height: 28px;
-        margin-right: 25px;
-        stroke-width: 1px;
-        width: 28px;
-      }
+      flex-direction: row;
 
       span {
-        position: relative;
-        top: 2px;
+        margin-left: 16px;
       }
     }
   }
@@ -127,7 +113,7 @@
   }
 
   span {
-    color: $black;
+    // color: $black;
     font-size: 18px;
   }
 }
