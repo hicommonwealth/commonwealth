@@ -139,7 +139,7 @@ button,
 
 // button color fixes
 .cui-button {
-  color: $neutral-800;
+  color: $neutral-600;
   background: $white;
   transition: none;
 
@@ -172,28 +172,16 @@ button,
     }
   }
 
-  // adjust sublabel colors to grey from blue grey
-  .cui-button-sublabel {
-    color: $black;
-  }
-
-  &.cui-basic .cui-button-sublabel,
-  &.cui-outlined .cui-button-sublabel {
-    color: $black;
-  }
-
   // adjust basic button styles
   &.cui-basic,
   .cui-button-group.cui-basic & {
     &:hover {
       background: $neutral-100;
-      color: $black;
     }
 
     &:active,
     &.cui-active {
       background: $neutral-100;
-      color: $black;
     }
   }
 }

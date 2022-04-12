@@ -433,7 +433,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               fluid={true}
               compact={true}
               size={small ? 'sm' : 'default'}
-              label={<Cui.Icon name={Cui.Icons.USER} />}
+              label={<CWIcon iconName="person" iconSize="small" />}
             />
           }
           content={<LoginSelectorMenuRight />}
