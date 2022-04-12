@@ -3,7 +3,7 @@ import 'components/empty_topic_placeholder.scss';
 import m from 'mithril';
 import { Icon, Icons } from 'construct-ui';
 import app from 'state';
-import NewProposalButton from 'views/components/new_proposal_button';
+import { NewProposalButton } from 'views/components/new_proposal_button';
 
 const EmptyListingPlaceholder: m.Component<{
   stageName?: string;

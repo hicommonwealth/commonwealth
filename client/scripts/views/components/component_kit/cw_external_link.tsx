@@ -26,7 +26,7 @@ export class CWExternalLink implements m.ClassComponent<ExternalLinkAttrs> {
         rel="noopener noreferrer"
       >
         <span>{label}</span>
-        <CWIcon iconName="external-link" />
+        <CWIcon iconName="externalLink" />
       </a>
     );
   }

@@ -11,6 +11,7 @@ import Listing from 'views/pages/listing';
 
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import ProposalRow from './proposal_row';
+import { PageLoading } from '../loading';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -72,21 +73,13 @@ const SnapshotProposalsPage: m.Component<
   view: (vnode) => {
     const { selectedFilter } = vnode.state;
     const { snapshotId } = vnode.attrs;
+
     if (!app.snapshot.initialized || app.snapshot?.space?.id != snapshotId) {
       app.snapshot.init(snapshotId).then(() => {
         m.redraw();
       });
 
-      return m(
-        Sublayout,
-        {
-          class: 'DiscussionsPage',
-          title: 'Proposals',
-          description: '',
-          showNewProposalButton: true,
-        },
-        [m(Spinner, { active: true, fill: true, size: 'lg' })]
-      );
+      return m(PageLoading);
     }
 
     const checkProposalByFilter = (
@@ -119,14 +112,13 @@ const SnapshotProposalsPage: m.Component<
     return m(
       Sublayout,
       {
-        class: 'DiscussionsPage',
         title: 'Proposals',
         description: '',
         showNewProposalButton: true,
       },
       [
         app.chain && [
-          m('.discussions-main', [
+          m('.DiscussionsPage', [
             m(SnapshotProposalStagesBar, {
               selected: selectedFilter,
               onChangeFilter,

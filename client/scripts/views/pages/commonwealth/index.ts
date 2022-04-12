@@ -3,8 +3,8 @@ import m from 'mithril';
 
 import GeometricPatternSection from './geometric_pattern_section';
 import HeaderLandingPage from '../landing/landing_page_header';
-import { LandingPageFooter } from '../landing/landing_page_footer';
 import LandingPageButton from '../landing/landing_page_button';
+import { Footer } from '../../footer';
 
 const WhyCommonWealthView: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -252,7 +252,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           })
         ),
       ]),
-      m(LandingPageFooter, {
+      m(Footer, {
         list: [
           { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
           {

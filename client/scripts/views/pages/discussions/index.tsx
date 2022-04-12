@@ -277,11 +277,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
         topicId = app.topics.getByName(topic, app.activeChainId())?.id;
         if (!topicId) {
           return (
-            <Sublayout
-              class="DiscussionsPage"
-              title="Discussions"
-              showNewProposalButton={true}
-            >
+            <Sublayout title="Discussions" showNewProposalButton={true}>
               {m(EmptyListingPlaceholder, {
                 communityName: app.activeChainId(),
                 topicName: topic,
@@ -306,7 +302,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       };
 
       this.onscroll = _.debounce(async () => {
-        console.log('scrawling');
         if (this.postsDepleted[subpage]) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
@@ -363,52 +358,45 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
 
     return (
       <Sublayout
-        class="DiscussionsPage"
         title="Discussions"
         description={topicDescription}
         showNewProposalButton={true}
         onscroll={this.onscroll}
       >
         {app.chain && (
-          <div class="discussions-main">
-            {!isEmpty && (
-              <DiscussionFilterBar
-                topic={topicName}
-                stage={stage}
-                parentState={this}
-                disabled={isLoading || stillFetching}
-              />
-            )}
-            <div class="listing-wrap">
-              {onSummaryView
-                ? isLoading
-                  ? m(LoadingRow)
-                  : m(Listing, {
-                      content: [
-                        <SummaryListing recentThreads={recentThreads} />,
-                      ],
-                    })
-                : isLoading
+          <div class="DiscussionsPage">
+            <DiscussionFilterBar
+              topic={topicName}
+              stage={stage}
+              parentState={this}
+              disabled={isLoading || stillFetching}
+            />
+            {onSummaryView
+              ? isLoading
                 ? m(LoadingRow)
-                : isEmpty
-                ? m(EmptyListingPlaceholder, {
-                    stageName: stage,
-                    communityName,
-                    topicName,
+                : m(Listing, {
+                    content: [<SummaryListing recentThreads={recentThreads} />],
                   })
-                : m(Listing, { content: sortedListing })}
-              {postsDepleted ? (
-                <div class="infinite-scroll-reached-end">
-                  Showing {allThreads.length} of{' '}
-                  {pluralize(allThreads.length, 'thread')}
-                  {topic ? ` under the topic '${topic}'` : ''}
-                </div>
-              ) : isEmpty ? null : (
-                <div class="infinite-scroll-spinner-wrap">
-                  <Spinner active={!this.postsDepleted[subpage]} size="lg" />
-                </div>
-              )}
-            </div>
+              : isLoading
+              ? m(LoadingRow)
+              : isEmpty
+              ? m(EmptyListingPlaceholder, {
+                  stageName: stage,
+                  communityName,
+                  topicName,
+                })
+              : m(Listing, { content: sortedListing })}
+            {postsDepleted && !onSummaryView ? (
+              <div class="infinite-scroll-reached-end">
+                Showing {allThreads.length} of{' '}
+                {pluralize(allThreads.length, 'thread')}
+                {topic ? ` under the topic '${topic}'` : ''}
+              </div>
+            ) : (isEmpty || onSummaryView) ? null : (
+              <div class="infinite-scroll-spinner-wrap">
+                <Spinner active={!this.postsDepleted[subpage]} size="lg" />
+              </div>
+            )}
           </div>
         )}
       </Sublayout>

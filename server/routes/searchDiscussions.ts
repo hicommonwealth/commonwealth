@@ -105,7 +105,7 @@ const searchDiscussions = async (
     FROM "OffchainThreads"
     JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id, 
     websearch_to_tsquery('english', $searchTerm) as query
-    WHERE query @@ "OffchainThreads"._search ${communityOptions} 
+    WHERE query @@ "OffchainThreads"._search ${communityOptions} AND "OffchainThreads".deleted_at IS NULL
     ${sort} LIMIT $limit
 `,
       {

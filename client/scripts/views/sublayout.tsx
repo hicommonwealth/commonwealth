@@ -8,24 +8,21 @@ import app from 'state';
 import { handleEmailInvites } from 'views/components/header/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
 import { MobileHeader } from 'views/mobile/mobile_header';
-import { LandingPageFooter } from 'views/pages/landing/landing_page_footer';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './sublayout_header_left';
 import { SublayoutHeaderRight } from './sublayout_header_right';
-import { isNotUndefined } from '../helpers/typeGuards';
 import { TokenHero } from './token_hero';
 import { TokenTerms } from './token_terms';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
+import { Footer } from './footer';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
-  class?: string;
   hero?: any;
   hideSearch?: boolean;
-  rightContent?: any;
+  onscroll?: any; // lazy loading for page content
   showNewProposalButton?: boolean;
   title?: any; // displayed at the top of the layout
-  onscroll?: any; // lazy loading for page content
 };
 
 const footercontents = [
@@ -58,10 +55,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       alwaysShowTitle,
       hero,
       hideSearch,
-      rightContent,
+      onscroll,
       showNewProposalButton,
       title,
-      onscroll,
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta.chain : null;
@@ -73,12 +69,8 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     }
 
     return (
-      <div
-        class={`Sublayout ${
-          isNotUndefined(vnode.attrs.class) ? vnode.attrs.class : ''
-        }`}
-      >
-        <SidebarQuickSwitcher />
+      <div class="Sublayout">
+        {!app.isCustomDomain() && <SidebarQuickSwitcher />}
         <div class="header-and-body-container">
           <MobileHeader />
           <div class="header-container">
@@ -98,20 +90,8 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             <div class="body" onscroll={onscroll}>
               <TokenHero chain={chain} hero={hero} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
-              <div
-                class="inner-body"
-                style={
-                  isNotUndefined(rightContent)
-                    ? 'display: flex; flex-direction: row;'
-                    : ''
-                }
-              >
-                {vnode.children}
-                {isNotUndefined(rightContent) && rightContent}
-              </div>
-              {!app.isCustomDomain() && (
-                <LandingPageFooter list={footercontents} />
-              )}
+              {vnode.children}
+              {!app.isCustomDomain() && <Footer list={footercontents} />}
             </div>
           </div>
         </div>

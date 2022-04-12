@@ -1,6 +1,8 @@
 @import 'client/styles/shared';
 
 .CreateCommunityIndex {
+  display: flex;
+  flex-direction: column;
   padding: 24px;
   width: 100%;
 
@@ -10,6 +12,8 @@
   }
 
   .CreateCommunityForm {
+    display: flex;
+    flex-direction: column;
     margin: 32px auto auto;
     width: 480px;
 
@@ -47,20 +51,22 @@
     }
 
     .AvatarUpload {
-      color: red;
-      height: 92px;
+      color: $rorange-500;
+      height: 96px;
       margin: auto 0;
-      width: 92px;
+      width: 96px;
     }
 
     .id {
-      background-color: #fffff3;
+      align-items: center;
+      background-color: $yellow-50;
       border-radius: 4px;
-      height: 42px;
-      padding: 8px 15px;
+      display: flex;
+      height: 40px;
+      padding: 8px 16px;
 
       &.placeholder {
-        color: #cccccc;
+        color: $neutral-200;
         font-style: italic;
       }
     }
@@ -74,7 +80,7 @@
       height: 20px;
 
       .error {
-        color: $hype-red;
+        color: $rorange-500;
         margin-top: 8px;
       }
 

@@ -22,8 +22,8 @@ import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_pr
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import ConvictionsChooser from 'views/components/proposals/convictions_chooser';
-import BalanceInfo from 'views/components/proposals/balance_info';
+import { ConvictionsChooser } from 'views/components/proposals/convictions_chooser';
+import { BalanceInfo } from 'views/components/proposals/balance_info';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';

@@ -1,4 +1,3 @@
-@import 'construct-ui/src/_shared/_colors';
 @import 'shared.scss';
 
 //
@@ -15,29 +14,10 @@ $cui-font-weight: $cui-font-weight-normal;
 $cui-font-size: floor($cui-base-size * 1.4);
 
 //
-// text colors
-//
-
-$cui-body-color: $text-color-black;
-$cui-hover-color: tint($blue-grey50, 25%);
-$cui-base-text-color: lighten($grey800, 3%);
-
-//
 // component styling
 //
 
 $cui-base-height: floor($cui-base-size * 2.8);
-
-//
-// component colors
-//
-
-$cui-base-bg-color: $base-bg-color;
-$cui-primary-bg-color: $primary-bg-color;
-$cui-positive-bg-color: $positive-bg-color;
-$cui-negative-bg-color: $negative-bg-color;
-$cui-base-border-color: #c5cdd1;
-$cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
 
 @import 'construct-ui/src/utils/focus-manager/index.scss';
 @import 'construct-ui/src/components/index.scss';
@@ -59,11 +39,11 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
 }
 
 .cui-popover-content {
-  border-color: $cui-popover-arrow-border-color;
+  border-color: $neutral-200;
 }
 
 .cui-menu .cui-menu-divider {
-  border-color: lighten($cui-popover-arrow-border-color, 2%);
+  border-color: $neutral-200;
 }
 
 .cui-button {
@@ -80,6 +60,10 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
   font-weight: $cui-font-weight-bold; // fix weight
 }
 
+.cui-callout.cui-primary {
+  background: $purple-50;
+}
+
 .cui-callout .cui-callout-header {
   font-weight: $cui-font-weight-bold; // fix weight
 }
@@ -94,6 +78,7 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
 
 .cui-tabs .cui-tabs-item {
   font-weight: $cui-font-weight-bold; // fix weight
+  padding: 8px;
 }
 
 .cui-card h4 {
@@ -104,8 +89,31 @@ $cui-popover-arrow-border-color: lighten($cui-base-border-color, 8%);
   font-weight: $cui-font-weight-heavy; // fix weight
 }
 
+.cui-switch input:checked ~ .cui-control-indicator {
+  background-color: $purple-300;
+}
+
 .cui-switch .cui-control-indicator::after {
   box-sizing: border-box; // fix switch sizing
+}
+.cui-input textarea {
+  border-radius: 4px;
+  border: 2px solid $white;
+  background-color: $neutral-50;
+  box-shadow: none;
+  padding: 4px 8px;
+
+  &:hover {
+    border: 2px solid $purple-200;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-within {
+    border: 2px solid $purple-300;
+  }
 }
 
 // button link fixes
@@ -116,57 +124,74 @@ button,
   }
 }
 
+.cui-tabs-item {
+  color: $neutral-400;
+}
+
+.cui-tabs-item.cui-active {
+  color: $neutral-500;
+  border-color: $neutral-500;
+}
+
+.cui-tabs-item:hover {
+  color: $neutral-600;
+}
+
 // button color fixes
 .cui-button {
-  background: $background-color-white;
+  background: $white;
   transition: none;
 
   &:active,
   &.cui-active {
-    background: $background-color-white;
+    background: $white;
     box-shadow: none;
   }
 
   &:hover {
-    background: $background-color-white;
+    background: $white;
   }
 
   // adjust rounded button styles
   &.cui-rounded {
-    border-color: $grey200;
+    border-color: $neutral-100;
 
     &:hover {
-      border-color: $grey700;
+      border-color: $neutral-600;
     }
 
     &:active,
     &.cui-active {
-      border-color: $grey700;
+      border-color: $neutral-600;
+    }
+
+    &.cui-disabled {
+      border: none;
     }
   }
 
   // adjust sublabel colors to grey from blue grey
   .cui-button-sublabel {
-    color: $grey400;
+    color: $black;
   }
 
   &.cui-basic .cui-button-sublabel,
   &.cui-outlined .cui-button-sublabel {
-    color: $grey400;
+    color: $black;
   }
 
   // adjust basic button styles
   &.cui-basic,
   .cui-button-group.cui-basic & {
     &:hover {
-      background: $background-color-white-hover;
-      color: $cui-base-text-color;
+      background: $neutral-100;
+      color: $black;
     }
 
     &:active,
     &.cui-active {
-      background: $background-color-light;
-      color: $cui-base-text-color;
+      background: $neutral-100;
+      color: $black;
     }
   }
 }
@@ -174,9 +199,70 @@ button,
 // set text color on active buttons
 .cui-button.cui-primary,
 .cui-button-group.cui-primary .cui-button {
-  a {
-    color: $text-color-white;
+  background: $purple-300;
+  border: $purple-300;
+
+  &:hover {
+    background: $purple-400;
+    border: $purple-400;
   }
+
+  a {
+    color: $white;
+  }
+}
+
+.cui-button.cui-primary.cui-active {
+  background: $purple-300;
+  border: $purple-300;
+  box-shadow: none;
+
+  &:hover {
+    background: $purple-400;
+    border: $purple-400;
+  }
+
+  a {
+    color: $white;
+  }
+}
+
+.cui-button.cui-primary[disabled],
+.cui-button.cui-primary.cui-disabled {
+  color: $white;
+  background: $purple-100;
+  pointer-events: none;
+}
+
+.cui-button.cui-negative,
+.cui-button-group.cui-negative .cui-button {
+  background: $rorange-300;
+  border-color: $rorange-300;
+
+  &:hover {
+    background: $rorange-400;
+    border-color: $rorange-400;
+  }
+
+  a {
+    color: $white;
+  }
+}
+
+.cui-button.cui-warning,
+.cui-button-group.cui-warning .cui-button {
+  background: $purple-300;
+  border-color: $purple-300;
+}
+
+.cui-button.cui-positive,
+.cui-button-group.cui-positive .cui-button {
+  background: $green-500;
+  border-color: $green-500;
+}
+
+.cui-radio input:checked ~ .cui-control-indicator:after {
+  background: $purple-300;
 }
 
 // set z-index
@@ -188,12 +274,13 @@ button,
 }
 
 .cui-callout.cui-primary {
-  border-color: $text-color-primary-light;
+  border-color: $purple-50;
+  color: $neutral-800;
 }
 
 .cui-callout a {
   font-weight: 500;
-  color: $text-color-primary;
+  color: $purple-400;
 }
 
 // adjust input padding
@@ -224,11 +311,7 @@ button,
     min-width: $icon-size;
   }
 
-  @include cui-tag-style(
-    $cui-base-text-color,
-    $cui-hover-color,
-    tint($blue-grey100, 10%)
-  );
+  @include cui-tag-style($neutral-600, $primary-50, $primary-100);
 
   @each $size in $cui-sizes {
     &.cui-#{$size},
@@ -277,7 +360,7 @@ button,
 }
 
 .cui-icon {
-  color: $text-color-black;
+  color: $neutral-800;
 }
 
 // reduce menu padding
@@ -291,14 +374,14 @@ button,
   }
 
   > .cui-button.cui-basic {
-    color: $text-color-black;
+    color: $neutral-800;
 
     .cui-icon svg {
-      stroke: $text-color-black;
+      stroke: $neutral-800;
     }
 
     a {
-      color: $text-color-black;
+      color: $neutral-800;
     }
   }
 
@@ -338,13 +421,13 @@ button,
 // make spinner visually minimal
 .cui-spinner .cui-spinner-icon {
   border-color: transparent;
-  border-top-color: $text-color-darker !important;
-  border-right-color: $text-color-darker !important;
+  border-top-color: $neutral-900 !important;
+  border-right-color: $neutral-900 !important;
 }
 
 .cui-spinner-message {
   margin-top: 0.8em;
-  color: $text-color-darker;
+  color: $neutral-900;
 }
 
 // make spinner slower
