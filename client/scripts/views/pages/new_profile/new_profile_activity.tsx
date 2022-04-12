@@ -57,7 +57,15 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs) =>
     )
   if (option === ProfileActivity.Communities)
     return attrs.chains?.map(c => 
-      <div className="activity"> <p> { c.name } </p> </div>
+      <a href={"/" + c.id}>
+        <div className="chain-entity"> 
+          <div className="chain-info">
+            <img src={c.icon_url} />
+            <p> { c.symbol } </p>
+          </div>
+        </div>
+      </a>
+      
     )
   if (option == ProfileActivity.Addresses)
     return attrs.addresses?.map(a => 

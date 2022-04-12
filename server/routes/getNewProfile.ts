@@ -35,6 +35,15 @@ const getNewProfile = async (models: DB, req: Request, res: Response, next: Next
     }
   })
 
+  const chainIds = [... new Set<string>(addresses.map(a => a.chain))]
+  const chains = await models.Chain.findAll({
+    where: {
+      id: {
+        [Op.in]: chainIds,
+      },
+    }
+  })
+
   const threads = await models.OffchainThread.findAll({
     where: {
       address_id: addressModel.id
@@ -54,7 +63,8 @@ const getNewProfile = async (models: DB, req: Request, res: Response, next: Next
       profile: profileModel,
       addresses: addresses.map((a) => a.toJSON()),
       threads: threads.map((t) => t.toJSON()), 
-      comments: comments.map((c) => c.toJSON())
+      comments: comments.map((c) => c.toJSON()),
+      chains: chains.map((c) => c.toJSON()),
     })
 }
 

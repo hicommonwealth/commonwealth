@@ -41,7 +41,7 @@ class NewProfile implements m.Component<{}, ProfileState> {
     vnode.state.profile = response.profile
     vnode.state.threads = response.threads
     vnode.state.comments = response.comments
-    vnode.state.chains = [... new Set<ChainInfo>(response.addresses.map(a => a.chain))]
+    vnode.state.chains = response.chains
     vnode.state.addresses = response.addresses
     m.redraw()
   } 
