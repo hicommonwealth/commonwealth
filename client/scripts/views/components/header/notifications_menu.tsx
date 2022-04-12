@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
-import { PopoverMenu, Button, Icon, Icons } from 'construct-ui';
+import { PopoverMenu, Button } from 'construct-ui';
 
 import 'components/header/notifications_menu.scss';
 
@@ -10,6 +10,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import NotificationRow from 'views/components/notification_row';
 import { sortNotifications } from 'helpers/notifications';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 const MAX_NOTIFS = 40; // limit number of notifications shown
 
@@ -110,12 +111,12 @@ export class NotificationsMenu
         trigger={
           <Button
             class="toggle"
-            style="padding: 8px;"
+            style="padding: 8px; display: flex;"
             intent={unreadNotificationsCount > 0 ? 'primary' : undefined}
             label={
               <>
                 {unreadNotificationsCount === 0 ? (
-                  <Icon style="display: flex;" name={Icons.BELL} />
+                  <CWIcon iconName="bell" style="display: flex;" />
                 ) : (
                   <span>
                     {unreadNotificationsCount > 9

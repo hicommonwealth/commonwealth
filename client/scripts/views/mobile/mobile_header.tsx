@@ -11,6 +11,7 @@ import { SearchBar } from 'views/components/search_bar';
 import { MobileSidebar } from './mobile_sidebar';
 import { CustomHamburgerIcon } from './mobile_icons';
 import { InvitesMenu } from '../components/header/invites_menu';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
 export class MobileHeader implements m.ClassComponent {
   private sidebarOpen: boolean;
@@ -49,7 +50,7 @@ export class MobileHeader implements m.ClassComponent {
                 compact={true}
                 label={
                   this.sidebarOpen ? (
-                    <Icon name={Icons.X} />
+                    <CWIcon iconName="close" iconSize="small" />
                   ) : (
                     m(CustomHamburgerIcon)
                   )

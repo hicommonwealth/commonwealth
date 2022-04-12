@@ -139,6 +139,7 @@ button,
 
 // button color fixes
 .cui-button {
+  color: $neutral-800;
   background: $white;
   transition: none;
 
@@ -149,6 +150,7 @@ button,
   }
 
   &:hover {
+    color: $neutral-700;
     background: $white;
   }
 

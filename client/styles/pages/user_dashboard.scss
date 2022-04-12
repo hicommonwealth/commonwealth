@@ -42,7 +42,24 @@
       font-size: 18px;
 
       @include md-max {
-        display: block;
+        align-items: center;
+        border-radius: 10px;
+        color: $purple-400;
+        cursor: pointer;
+        display: flex;
+        flex-direction: row;
+        font-weight: 500;
+        height: 40px;
+        padding: 4px 16px;
+
+        svg {
+          margin: 1px 0 0 8px;
+        }
+
+        &:hover {
+          background-color: $purple-50;
+          text-decoration: none;
+        }
       }
     }
   }

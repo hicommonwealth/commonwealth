@@ -3,7 +3,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import { TabItem, Tabs, Icon, Icons, Spinner } from 'construct-ui';
+import { TabItem, Tabs, Spinner } from 'construct-ui';
 
 import 'pages/user_dashboard.scss';
 
@@ -12,6 +12,7 @@ import { DashboardActivityNotification } from 'models';
 import UserDashboardRow from 'views/components/user_dashboard_row';
 import Sublayout from 'views/sublayout';
 import DashboardExplorePreview from '../components/dashboard_explore_preview';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
 const fetchActivity = async (request: string) => {
   const activity = await $.post(`${app.serverUrl()}/viewActivity`, {
@@ -150,7 +151,7 @@ export class UserDashboard implements m.ClassComponent {
                 }}
               >
                 View more communities
-                <Icon name={Icons.EXTERNAL_LINK} />
+                <CWIcon iconName="externalLink" iconSize="small" />
               </div>
             </div>
             <Tabs align="left" bordered={false} fluid={true}>
