@@ -14,7 +14,7 @@ import { DiscussionFilterBar } from './discussion_filter_bar';
 
 // TODO LIST
 // * LastVisited logic
-// * Investigate possible redundant fetching
+// * Investigate possible redundant fetches originating in onscroll
 // * Finish adding localhost-cached scrollback
 
 class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
@@ -24,7 +24,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   private topicName: string;
   private stageName: string;
 
-  getDescription() {
+  getPageDescription() {
     if (!this.topicName) return;
     const topic = app.topics.getByName(this.topicName, app.activeChainId());
     return topic.description;
@@ -74,7 +74,6 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     const scrollEle = document.getElementsByClassName('Body')[0];
     const { scrollHeight, scrollTop } = scrollEle;
 
-    // TODO: Investigate possible redundant fetching
     if (scrollHeight - 1000 < scrollTop) {
       await app.threads.loadNextPage({ topicName, stageName });
       m.redraw();
@@ -102,7 +101,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     return (
       <Sublayout
         title="Discussions"
-        description={this.getDescription()}
+        description={this.getPageDescription()}
         showNewProposalButton={true}
         onscroll={!this.summaryView ? debounce(this.onscroll, 400) : null}
       >

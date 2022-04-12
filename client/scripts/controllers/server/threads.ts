@@ -286,7 +286,6 @@ class ThreadsController {
       if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
-      const storeOptions = { allProposals: true, exclusive: false };
       this._listingStore.add(result);
       const activeEntity = app.chain;
       updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
@@ -351,7 +350,7 @@ class ThreadsController {
           this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
-        this._listingStore.update(result);
+        this._listingStore.add(result);
         return result;
       },
       error: (err) => {
@@ -526,7 +525,7 @@ class ThreadsController {
         snapshot_proposal: args.snapshotProposal,
         jwt: app.user.jwt,
       },
-      success: (response) => {
+      success: () => {
         const thread = this._store.getByIdentifier(args.threadId);
         if (!thread) return;
         thread.snapshotProposal = args.snapshotProposal;
@@ -556,7 +555,7 @@ class ThreadsController {
         chain_entity_id: args.entities.map((ce) => ce.id),
         jwt: app.user.jwt,
       },
-      success: (response) => {
+      success: () => {
         const thread = this._store.getByIdentifier(args.threadId);
         if (!thread) return;
         thread.chainEntities.splice(0);
@@ -688,14 +687,13 @@ class ThreadsController {
     if (this.listingStore.isDepleted(options)) {
       return;
     }
-    const cutoff_date = this.listingStore.isInitialized(options)
-      ? this.listingStore.getCutoffDate(options).toISOString()
-      : moment().toISOString();
     const { topicName, stageName } = options;
     const chain = app.activeChainId();
     const params = {
       chain,
-      cutoff_date,
+      cutoff_date: this.listingStore.isInitialized(options)
+        ? this.listingStore.getCutoffDate(options).toISOString()
+        : moment().toISOString(),
     };
     const topicId = app.topics.getByName(topicName, chain)?.id;
 
@@ -713,7 +711,6 @@ class ThreadsController {
 
     modeledThreads.forEach((thread) => {
       try {
-        // TODO: Ensure duplicates prevented or non-problematic
         this._store.add(thread);
         this._listingStore.add(thread);
       } catch (e) {
@@ -744,7 +741,6 @@ class ThreadsController {
     if (threads.length < DEFAULT_PAGE_SIZE) {
       this.listingStore.depleteListing(options);
     }
-    debugger;
   }
 
   public initialize(initialThreads = [], numVotingThreads, reset) {

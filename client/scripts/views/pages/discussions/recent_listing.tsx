@@ -30,51 +30,29 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
 
   view(vnode) {
     const { topicName, stageName } = vnode.attrs;
-    const { listingStore } = app.threads;
+    const { getThreads, isDepleted, isInitialized } = app.threads.listingStore;
 
-    const listingInitialized = listingStore.isInitialized({
-      topicName,
-      stageName,
-    });
-    const listingDepleted = listingStore.isDepleted({
-      topicName,
-      stageName,
-    });
+    const listingInitialized = isInitialized({ topicName, stageName });
+    const listingDepleted = isDepleted({ topicName, stageName });
 
     // Fetch first 20 unpinned threads
     if (!listingInitialized) {
       this.initializing = true;
-      app.threads
-        .loadNextPage({
-          topicName,
-          stageName,
-        })
-        .then(() => {
-          this.initializing = false;
-          m.redraw();
-        });
+      app.threads.loadNextPage({ topicName, stageName }).then(() => {
+        this.initializing = false;
+        m.redraw();
+      });
     }
     if (this.initializing) {
       return m(LoadingRow);
     }
 
-    const pinnedThreads = listingStore.getThreads({
-      topicName,
-      stageName,
-      pinned: true,
-    });
-    const unpinnedThreads = listingStore.getThreads({
-      topicName,
-      stageName,
-      pinned: false,
-    });
-    const totalThreadCount = pinnedThreads.length + unpinnedThreads.length;
+    const pinnedThreads = getThreads({ topicName, stageName, pinned: true });
+    const unpinnedThreads = getThreads({ topicName, stageName, pinned: false });
 
+    const totalThreadCount = pinnedThreads.length + unpinnedThreads.length;
     if (!totalThreadCount) {
-      return m(EmptyListingPlaceholder, {
-        stageName,
-        topicName,
-      });
+      return m(EmptyListingPlaceholder, { stageName, topicName });
     }
 
     return (
