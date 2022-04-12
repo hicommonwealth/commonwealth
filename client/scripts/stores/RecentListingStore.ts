@@ -1,4 +1,4 @@
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 import IdStore from './IdStore';
 import { OffchainThread } from '../models';
 import { orderDiscussionsbyLastComment } from '../views/pages/discussions/helpers';
@@ -11,53 +11,51 @@ interface IListingParams {
 
 interface IListingFetchState {
   allThreadsInitialized: boolean;
-  topicInitialization: { [topicName: string]: boolean };
-  stageInitialization: { [stageName: string]: boolean };
+  topicInitialized: { [topicName: string]: boolean };
+  stageInitialized: { [stageName: string]: boolean };
 
   allThreadsCutoffDate: moment.Moment;
   topicCutoffDate: { [topicName: string]: moment.Moment };
   stageCutoffDate: { [stageName: string]: moment.Moment };
 
   allThreadsDepleted: boolean;
-  topicDepletion: { [topicName: string]: boolean };
-  stageDepletion: { [stageName: string]: boolean };
+  topicDepleted: { [topicName: string]: boolean };
+  stageDepleted: { [stageName: string]: boolean };
 }
 
 class RecentListingStore extends IdStore<OffchainThread> {
   private threads = new Array<OffchainThread>();
   private fetchState: IListingFetchState = {
     allThreadsInitialized: false,
-    topicInitialization: {},
-    stageInitialization: {},
+    topicInitialized: {},
+    stageInitialized: {},
 
     allThreadsCutoffDate: moment(),
     topicCutoffDate: {},
     stageCutoffDate: {},
 
     allThreadsDepleted: false,
-    topicDepletion: {},
-    stageDepletion: {},
+    topicDepleted: {},
+    stageDepleted: {},
   };
 
   public add(thread: OffchainThread) {
-    const matchingThread = this.threads.filter((t) => t.id === thread.id)[0];
-    if (matchingThread) {
-      this.remove(matchingThread);
-    }
+    const existingThread = this.getById(thread.id);
+    if (existingThread) this.remove(existingThread);
+
     super.add(thread);
     this.threads.push(thread);
     return this;
   }
 
   public remove(thread: OffchainThread) {
-    // TODO: Assess reliable inter-store id strategies, e.g. super.getById(thread.id);
-    super.remove(thread);
-    const matchingThread = this.threads.filter((t) => t.id === thread.id)[0];
-    if (!matchingThread) return;
-    const proposalIndex = this.threads.indexOf(matchingThread);
+    const existingThread = this.getById(thread.id);
+    if (!existingThread) return;
+    const proposalIndex = this.threads.indexOf(existingThread);
     if (proposalIndex === -1) return;
-    this.threads.splice(proposalIndex, 1);
 
+    super.remove(thread);
+    this.threads.splice(proposalIndex, 1);
     return this;
   }
 
@@ -66,36 +64,88 @@ class RecentListingStore extends IdStore<OffchainThread> {
     this.threads = [];
   }
 
+  public getById(id) {
+    return this.threads.find((t) => t.id === id);
+  }
+
+  public getThreads(params: IListingParams): OffchainThread[] {
+    const { topicName, stageName, pinned } = params;
+
+    let unsortedThreads;
+    if (topicName) {
+      unsortedThreads = this.threads.filter(
+        (t) => t.topic.name === topicName && t.pinned === pinned
+      );
+    } else if (stageName) {
+      unsortedThreads = this.threads.filter(
+        (t) => t.stage === stageName && t.pinned === pinned
+      );
+    } else {
+      unsortedThreads = this.threads.filter((t) => t.pinned === pinned);
+    }
+
+    return unsortedThreads.sort(orderDiscussionsbyLastComment);
+  }
+
   public getPinnedThreads(): OffchainThread[] {
     return this.threads
       .filter((t) => t.pinned)
       .sort(orderDiscussionsbyLastComment);
   }
 
-  public getListingThreads(params: IListingParams): OffchainThread[] {
-    const { topicName, stageName, pinned } = params;
-    console.log({
-      params,
-      threads: this.threads,
-    });
-    debugger;
+  // Initialization, i.e. "Have we begun fetching threads of this type?"
+
+  public isInitialized(params: IListingParams): boolean {
+    const { topicName, stageName } = params;
     if (topicName) {
-      return this.threads
-        .filter((t) => t.topic.name === topicName && t.pinned === pinned)
-        .sort(orderDiscussionsbyLastComment);
+      return this.fetchState.topicInitialized[topicName];
     } else if (stageName) {
-      return this.threads
-        .filter((t) => t.stage === stageName && t.pinned === pinned)
-        .sort(orderDiscussionsbyLastComment);
+      return this.fetchState.stageInitialized[stageName];
     } else {
-      return this.threads
-        .filter((t) => t.pinned === pinned)
-        .sort(orderDiscussionsbyLastComment);
+      return this.fetchState.allThreadsInitialized;
     }
   }
 
+  public initializeListing(params: IListingParams) {
+    const { topicName, stageName } = params;
+    if (topicName) {
+      this.fetchState.topicInitialized[topicName] = true;
+    } else if (stageName) {
+      this.fetchState.stageInitialized[stageName] = true;
+    } else {
+      this.fetchState.allThreadsInitialized = true;
+    }
+  }
+
+  // Subpage depletion status, i.e. "Have all threads of this type been fetched?"
+
+  public isDepleted(params: IListingParams): boolean {
+    const { topicName, stageName } = params;
+    if (topicName) {
+      return this.fetchState.topicDepleted[topicName];
+    } else if (stageName) {
+      return this.fetchState.stageDepleted[stageName];
+    } else {
+      return this.fetchState.allThreadsDepleted;
+    }
+  }
+
+  public depleteListing(params: IListingParams) {
+    const { topicName, stageName } = params;
+    if (topicName) {
+      this.fetchState.topicDepleted[topicName] = true;
+    } else if (stageName) {
+      this.fetchState.stageDepleted[stageName] = true;
+    } else {
+      this.fetchState.allThreadsDepleted = true;
+    }
+  }
+
+  // Cutoff date, i.e. "Up to what archival point have threads been fetched?"
+
   public getCutoffDate(params: IListingParams): moment.Moment {
     const { topicName, stageName } = params;
+
     if (topicName) {
       return this.fetchState.topicCutoffDate[topicName];
     } else if (stageName) {
@@ -116,49 +166,7 @@ class RecentListingStore extends IdStore<OffchainThread> {
     }
   }
 
-  public depleteListing(params: IListingParams) {
-    const { topicName, stageName } = params;
-    if (topicName) {
-      this.fetchState.topicDepletion[topicName] = true;
-    } else if (stageName) {
-      this.fetchState.stageDepletion[stageName] = true;
-    } else {
-      this.fetchState.allThreadsDepleted = true;
-    }
-  }
-
-  public isDepleted(params: IListingParams): boolean {
-    const { topicName, stageName } = params;
-    if (topicName) {
-      return this.fetchState.topicDepletion[topicName];
-    } else if (stageName) {
-      return this.fetchState.stageDepletion[stageName];
-    } else {
-      return this.fetchState.allThreadsDepleted;
-    }
-  }
-
-  public initializeListing(params: IListingParams) {
-    const { topicName, stageName } = params;
-    if (topicName) {
-      this.fetchState.topicInitialization[topicName] = true;
-    } else if (stageName) {
-      this.fetchState.stageInitialization[stageName] = true;
-    } else {
-      this.fetchState.allThreadsInitialized = true;
-    }
-  }
-
-  public isInitialized(params: IListingParams): boolean {
-    const { topicName, stageName } = params;
-    if (topicName) {
-      return this.fetchState.topicInitialization[topicName];
-    } else if (stageName) {
-      return this.fetchState.stageInitialization[stageName];
-    } else {
-      return this.fetchState.allThreadsInitialized;
-    }
-  }
+  // When topics are deleted, the threads associated with them must be updated
 
   public removeTopic(topicName: string) {
     this.threads
