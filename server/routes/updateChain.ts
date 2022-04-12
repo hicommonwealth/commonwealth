@@ -48,7 +48,12 @@ const updateChain = async (
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new Error(Errors.NoChainFound));
   else {
-    const isAdmin = validateRoles(models, req.user.user, 'moderator', chain.id);
+    const isAdmin = await validateRoles(
+      models,
+      req.user.user,
+      'moderator',
+      chain.id
+    );
     if (!isAdmin) {
       return next(new Error(Errors.NotAdmin));
     }

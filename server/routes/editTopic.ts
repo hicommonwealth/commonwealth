@@ -47,7 +47,7 @@ const editTopic = async (
     return next(new Error(Errors.NotVerified));
   }
 
-  const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (isAdmin === null) {
     return next(new Error(Errors.NotAdmin));
   }

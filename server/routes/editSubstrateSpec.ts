@@ -18,7 +18,7 @@ const editSubstrateSpec = async (
   if (chain.base !== ChainBase.Substrate)
     return next(new Error('Chain must be substrate'));
 
-  const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (!isAdmin) return next(new Error('Must be admin to edit'));
 
   const nodes = await chain.getChainNodes();

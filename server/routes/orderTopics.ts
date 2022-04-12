@@ -25,12 +25,7 @@ const OrderTopics = async (
   if (error) return next(new Error(error));
 
   if (!req.user) return next(new Error(OrderTopicsErrors.NoUser));
-  const isAdminOrMod: boolean = await validateRoles(
-    models,
-    req,
-    'moderator',
-    chain.id
-  );
+  const isAdminOrMod = await validateRoles(models, req, 'moderator', chain.id);
   if (!isAdminOrMod) return next(new Error(OrderTopicsErrors.NoPermission));
 
   const newTopicOrder: string[] = req.body['order[]'];

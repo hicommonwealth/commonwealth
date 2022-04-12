@@ -18,7 +18,7 @@ const createWebhook = async (
 
   // only admins should be able to get webhooks
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (!isAdmin) return next(new Error(Errors.NotAdmin));
   // check if webhook url exists already in the community
   if (!req.body.webhookUrl) return next(new Error(Errors.MissingWebhook));

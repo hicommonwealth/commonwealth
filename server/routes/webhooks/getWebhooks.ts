@@ -17,7 +17,7 @@ const getWebhooks = async (
 
   // only admins should be able to get webhooks
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (!isAdmin) return next(new Error(Errors.NotAdmin));
   // fetch webhooks
   const webhooks = await models.Webhook.findAll({

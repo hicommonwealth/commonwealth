@@ -35,7 +35,7 @@ const updateTopic = async (
     },
   });
 
-  const isAdminOrMod = validateRoles(
+  const isAdminOrMod = await validateRoles(
     models,
     req.user,
     'moderator',

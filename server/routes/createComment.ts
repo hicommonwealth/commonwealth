@@ -55,7 +55,7 @@ const createComment = async (
   const { parent_id, root_id, text } = req.body;
 
   if (chain && chain.type === ChainType.Token) {
-    const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+    const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
 
     if (!isAdmin) {
       try {

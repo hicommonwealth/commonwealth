@@ -17,7 +17,12 @@ const communityStats = async (
     return next(new Error('Not logged in'));
   }
 
-  const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain.id);
+  const isAdminOrMod = await validateRoles(
+    models,
+    req.user,
+    'moderator',
+    chain.id
+  );
   if (!isAdminOrMod) {
     return next(new Error('Must be admin'));
   }

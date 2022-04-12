@@ -44,7 +44,12 @@ const createInvite = async (
   });
   if (!address) return next(new Error(Errors.AddressNotFound));
 
-  const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain.id);
+  const isAdminOrMod = await validateRoles(
+    models,
+    req.user,
+    'moderator',
+    chain.id
+  );
   if (!isAdminOrMod) return next(new Error(Errors.MustBeAdminOrMod));
 
   const { invitedEmail } = req.body;

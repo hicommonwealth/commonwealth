@@ -33,7 +33,12 @@ const createTopic = async (
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
-  const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain.id);
+  const isAdminOrMod = await validateRoles(
+    models,
+    req.user,
+    'moderator',
+    chain.id
+  );
   if (!isAdminOrMod) {
     return next(new Error(Errors.MustBeAdmin));
   }

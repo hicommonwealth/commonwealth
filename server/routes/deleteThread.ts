@@ -41,7 +41,7 @@ const deleteThread = async (
 
     let thread = myThread;
     if (!myThread) {
-      const isAdminOrMod = validateRoles(
+      const isAdminOrMod = await validateRoles(
         models,
         req.user,
         'moderator',

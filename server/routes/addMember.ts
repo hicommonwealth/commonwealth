@@ -27,7 +27,12 @@ const addMember = async (
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));
 
-  const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain.id);
+  const isAdminOrMod = await validateRoles(
+    models,
+    req.user,
+    'moderator',
+    chain.id
+  );
   if (!isAdminOrMod) return next(new Error(Errors.MustBeAdmin));
 
   const existingAddress = await models.Address.findOne({

@@ -41,7 +41,7 @@ const createReaction = async (
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
 
   if (chain && chain.type === ChainType.Token) {
-    const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+    const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
 
     if (!isAdmin) {
       try {

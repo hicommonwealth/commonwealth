@@ -43,7 +43,7 @@ const deleteComment = async (
         },
         include: [models.Chain],
       });
-      const isAdminOrMod = validateRoles(
+      const isAdminOrMod = await validateRoles(
         models,
         req.user,
         'moderator',

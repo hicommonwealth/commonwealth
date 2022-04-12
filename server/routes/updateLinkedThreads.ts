@@ -53,7 +53,7 @@ const updateLinkedThreads = async (
         },
       });
       if (!collaboration) {
-        const isAdminOrMod = validateRoles(
+        const isAdminOrMod = await validateRoles(
           models,
           req.user,
           'moderator',
