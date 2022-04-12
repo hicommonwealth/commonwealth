@@ -64,6 +64,8 @@ class RecentListingStore extends IdStore<OffchainThread> {
     this.threads = [];
   }
 
+  // Getters
+
   public getById(id) {
     return this.threads.find((t) => t.id === id);
   }

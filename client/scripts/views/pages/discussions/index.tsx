@@ -14,6 +14,8 @@ import { DiscussionFilterBar } from './discussion_filter_bar';
 
 // TODO LIST
 // * LastVisited logic
+// * Investigate possible redundant fetching
+// * Finish adding localhost-cached scrollback
 
 class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   private returningFromThread: boolean;
@@ -22,25 +24,12 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   private topicName: string;
   private stageName: string;
 
-  recentListingScroll = async () => {
-    const params = {
-      topicName: this.topicName,
-      stageName: this.stageName,
-    };
-    if (app.threads.listingStore.isDepleted(params)) return;
+  getDescription() {
+    if (!this.topicName) return;
+    const topic = app.topics.getByName(this.topicName, app.activeChainId());
+    return topic.description;
+  }
 
-    // TODO Graham 4/11/22: This is a terrible class name and should be changed globally
-    const scrollEle = document.getElementsByClassName('Body')[0];
-    const { scrollHeight, scrollTop } = scrollEle;
-
-    // TODO: Handle redundant fetching
-    if (scrollHeight - 1000 < scrollTop) {
-      await app.threads.loadNextPage(params);
-      m.redraw();
-    }
-  };
-
-  // TODO: Only scoped to RecentListing
   handleScrollback() {
     const storedScrollYPos =
       localStorage[`${app.activeChainId()}-discussions-scrollY`];
@@ -52,17 +41,15 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   }
 
   initializeSummaryView() {
-    // If admin has set summary view as community default
+    // Admin has set summary view as community default
     if (app.chain.meta.chain.defaultSummaryView) {
       this.summaryView = true;
     }
-    // If user is returning to a listing page previously toggled to summary
-    else if (this.returningFromThread) {
+    // User is returning to a summary-toggled listing page
+    if (this.returningFromThread) {
       this.summaryView =
         localStorage.getItem('discussion-summary-toggle') === 'true';
     }
-
-    this.summaryViewInitialized = true;
   }
 
   oninit() {
@@ -80,6 +67,20 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     this.handleScrollback();
   }
 
+  onscroll = async () => {
+    const { topicName, stageName } = this;
+    if (app.threads.listingStore.isDepleted({ topicName, stageName })) return;
+
+    const scrollEle = document.getElementsByClassName('Body')[0];
+    const { scrollHeight, scrollTop } = scrollEle;
+
+    // TODO: Investigate possible redundant fetching
+    if (scrollHeight - 1000 < scrollTop) {
+      await app.threads.loadNextPage({ topicName, stageName });
+      m.redraw();
+    }
+  };
+
   view(vnode) {
     if (!app.chain || !app.chain.serverLoaded) {
       return m(PageLoading, {
@@ -90,13 +91,10 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
 
     this.topicName = vnode.attrs.topic;
     this.stageName = m.route.param('stage');
-    if (!this.summaryViewInitialized) {
-      this.initializeSummaryView();
-    }
+
+    if (!this.summaryViewInitialized) this.initializeSummaryView();
     // If URI specifies topic or stage, override default/historical settings
-    if (this.topicName || this.stageName) {
-      this.summaryView = false;
-    }
+    if (this.topicName || this.stageName) this.summaryView = false;
     if (!this.summaryView) {
       localStorage.setItem('discussion-summary-toggle', 'false');
     }
@@ -104,11 +102,9 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     return (
       <Sublayout
         title="Discussions"
-        description={null} // TODO
+        description={this.getDescription()}
         showNewProposalButton={true}
-        onscroll={
-          !this.summaryView ? debounce(this.recentListingScroll, 400) : null
-        }
+        onscroll={!this.summaryView ? debounce(this.onscroll, 400) : null}
       >
         <div class="DiscussionsPage">
           <DiscussionFilterBar
