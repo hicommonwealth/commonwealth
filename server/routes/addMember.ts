@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import validateRoles from 'server/util/validateRoles';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
@@ -14,28 +15,20 @@ export const Errors = {
   AlreadyMember: 'Already a member of this community',
 };
 
-const addMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const addMember = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!chain) return next(new Error(Errors.InvalidCommunity));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));
 
-  // check that either invites_enabled === true, or the user is an admin or mod
-  const adminAddress = await models.Address.findOne({
-    where: {
-      address: req.body.address,
-      user_id: req.user.id,
-    },
-  });
-  const requesterIsAdminOrMod = await models.Role.findAll({
-    where: {
-      address_id: adminAddress.id,
-      chain_id: chain.id,
-      permission: ['admin', 'moderator'],
-    },
-  });
-  if (!requesterIsAdminOrMod) return next(new Error(Errors.MustBeAdmin));
+  const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain.id);
+  if (!isAdminOrMod) return next(new Error(Errors.MustBeAdmin));
 
   const existingAddress = await models.Address.findOne({
     where: {

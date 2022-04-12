@@ -1,5 +1,6 @@
 import { NextFunction } from 'express';
 import { Op } from 'sequelize';
+import validateRoles from 'server/util/validateRoles';
 import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
@@ -47,17 +48,8 @@ const updateChain = async (
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new Error(Errors.NoChainFound));
   else {
-    const userAddressIds = (await req.user.getAddresses())
-      .filter((addr) => !!addr.verified)
-      .map((addr) => addr.id);
-    const userMembership = await models.Role.findOne({
-      where: {
-        address_id: { [Op.in]: userAddressIds },
-        chain_id: chain.id || null,
-        permission: 'admin',
-      },
-    });
-    if (!req.user.isAdmin && !userMembership) {
+    const isAdmin = validateRoles(models, req.user.user, 'moderator', chain.id);
+    if (!isAdmin) {
       return next(new Error(Errors.NotAdmin));
     }
   }

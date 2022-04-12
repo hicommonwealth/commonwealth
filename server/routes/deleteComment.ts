@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import validateRoles from 'server/util/validateRoles';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
@@ -11,7 +12,12 @@ export const Errors = {
   NotOwned: 'Not owned by this user',
 };
 
-const deleteComment = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const deleteComment = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -20,30 +26,30 @@ const deleteComment = async (models: DB, req: Request, res: Response, next: Next
   }
 
   try {
-    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     let comment = await models.OffchainComment.findOne({
       where: {
         id: req.body.comment_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [ models.Address ],
+      include: [models.Address],
     });
     if (!comment) {
       comment = await models.OffchainComment.findOne({
         where: {
           id: req.body.comment_id,
         },
-        include: [ models.Chain ],
+        include: [models.Chain],
       });
-      const roleWhere = {
-        permission: { [Op.in]: ['admin', 'moderator'] },
-        address_id: { [Op.in]: userOwnedAddressIds },
-        chain_id: comment.Chain.id,
-      };
-      const requesterIsAdminOrMod = await models.Role.findOne({
-        where: roleWhere
-      });
-      if (!requesterIsAdminOrMod) {
+      const isAdminOrMod = validateRoles(
+        models,
+        req,
+        'moderator',
+        comment.Chain.id
+      );
+      if (!isAdminOrMod) {
         return next(new Error(Errors.NotOwned));
       }
     }
@@ -53,9 +59,11 @@ const deleteComment = async (models: DB, req: Request, res: Response, next: Next
         offchain_comment_id: comment.id,
       },
     });
-    await Promise.all(subscriptions.map((s) => {
-      return s.destroy();
-    }));
+    await Promise.all(
+      subscriptions.map((s) => {
+        return s.destroy();
+      })
+    );
 
     // actually delete
     await comment.destroy();

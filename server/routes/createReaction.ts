@@ -2,10 +2,14 @@
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
+import validateRoles from 'server/util/validateRoles';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { ChainType, NotificationCategories } from '../../shared/types';
-import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
+import {
+  getProposalUrl,
+  getProposalUrlWithoutObject,
+} from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
@@ -18,7 +22,8 @@ export const Errors = {
   NoReaction: 'Must provide a reaction',
   NoCommentMatch: 'No matching comment found',
   NoProposalMatch: 'No matching proposal found',
-  InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to react',
+  InsufficientTokenBalance:
+    "Users need to hold some of the community's tokens to react",
   BalanceCheckFailed: 'Could not verify user token balance',
 };
 
@@ -36,15 +41,9 @@ const createReaction = async (
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
 
   if (chain && chain.type === ChainType.Token) {
-    // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
-    if (!req.user.isAdmin && isAdmin.length === 0) {
+    const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+
+    if (!isAdmin) {
       try {
         let thread;
         if (thread_id) {
@@ -61,7 +60,10 @@ const createReaction = async (
           });
         }
 
-        const canReact = await tokenBalanceCache.validateTopicThreshold(thread.topic_id, req.body.address);
+        const canReact = await tokenBalanceCache.validateTopicThreshold(
+          thread.topic_id,
+          req.body.address
+        );
         if (!canReact) {
           return next(new Error(Errors.BalanceCheckFailed));
         }
@@ -85,7 +87,7 @@ const createReaction = async (
   const options = {
     reaction,
     address_id: author.id,
-    chain: chain.id
+    chain: chain.id,
   };
 
   if (thread_id) options['thread_id'] = thread_id;
@@ -102,16 +104,17 @@ const createReaction = async (
   let created;
 
   try {
-    [ finalReaction, created ] = await models.OffchainReaction.findOrCreate({
+    [finalReaction, created] = await models.OffchainReaction.findOrCreate({
       where: options,
       defaults: options,
-      include: [ models.Address]
+      include: [models.Address],
     });
 
-    if (created) finalReaction = await models.OffchainReaction.findOne({
-      where: options,
-      include: [ models.Address]
-    });
+    if (created)
+      finalReaction = await models.OffchainReaction.findOne({
+        where: options,
+        include: [models.Address],
+      });
   } catch (err) {
     return next(new Error(err));
   }
@@ -126,10 +129,14 @@ const createReaction = async (
     const [prefix, id] = comment.root_id.split('_');
     if (prefix === 'discussion') {
       proposal = await models.OffchainThread.findOne({
-        where: { id }
+        where: { id },
       });
       cwUrl = getProposalUrl(prefix, proposal, comment);
-    } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+    } else if (
+      prefix.includes('proposal') ||
+      prefix.includes('referendum') ||
+      prefix.includes('motion')
+    ) {
       cwUrl = getProposalUrlWithoutObject(prefix, chain.id, id, comment);
       proposal = id;
     } else {
@@ -143,13 +150,16 @@ const createReaction = async (
     root_type = 'discussion';
   }
 
-  const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
+  const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 
   // dispatch notifications
   const notification_data = {
     created_at: new Date(),
-    root_id: comment ? comment.root_id.split('_')[1] : proposal instanceof models.OffchainThread
-      ? proposal.id : proposal?.root_id,
+    root_id: comment
+      ? comment.root_id.split('_')[1]
+      : proposal instanceof models.OffchainThread
+      ? proposal.id
+      : proposal?.root_id,
     root_title,
     root_type,
     chain_id: finalReaction.chain,
@@ -176,10 +186,10 @@ const createReaction = async (
       url: cwUrl,
       title: proposal.title || '',
       chain: finalReaction.chain,
-      body: (comment_id) ? comment.text : '',
+      body: comment_id ? comment.text : '',
     },
     req.wss,
-    [ finalReaction.Address.address ],
+    [finalReaction.Address.address]
   );
   // update author.last_active (no await)
   author.last_active = new Date();

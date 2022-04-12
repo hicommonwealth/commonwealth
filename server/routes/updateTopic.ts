@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
+import validateRoles from 'server/util/validateRoles';
 import { DB } from '../database';
 
 enum UpdateTopicErrors {
@@ -34,14 +35,12 @@ const updateTopic = async (
     },
   });
 
-  const roles: any[] = await models.Role.findAll({
-    where: {
-      permission: ['admin', 'moderator'],
-      address_id: userAddress.id,
-      chain_id: thread.chain,
-    },
-  });
-  const isAdminOrMod = roles.length > 0;
+  const isAdminOrMod = validateRoles(
+    models,
+    req.user,
+    'moderator',
+    thread.chain
+  );
   if (!isAdminOrMod) {
     return next(new Error(UpdateTopicErrors.NoPermission));
   }

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import validateRoles from 'server/util/validateRoles';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -52,13 +53,13 @@ const updateLinkedThreads = async (
         },
       });
       if (!collaboration) {
-        const requesterIsAdminOrMod = await models.Role.findAll({
-          where: {
-            address_id: { [Op.in]: userOwnedAddressIds },
-            permission: ['admin', 'moderator'],
-          },
-        });
-        if (!requesterIsAdminOrMod) {
+        const isAdminOrMod = validateRoles(
+          models,
+          req.user,
+          'moderator',
+          chain.id
+        );
+        if (!isAdminOrMod) {
           return next(new Error(Errors.InsufficientPermissions));
         }
       }

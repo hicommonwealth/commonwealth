@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { Request, Response, NextFunction } from 'express';
+import validateRoles from 'server/util/validateRoles';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
@@ -13,18 +14,26 @@ export const Errors = {
   NotVerified: 'Must have a verified address to edit or feature topics',
   TopicNotFound: 'Topic not found',
   TopicRequired: 'Topic name required',
-  DefaultTemplateRequired: 'Default Template required'
+  DefaultTemplateRequired: 'Default Template required',
 };
 
-const editTopic = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const editTopic = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.body.id) {
     return next(new Error(Errors.NoTopicId));
   }
   if (!req.body.name) return next(new Error(Errors.TopicRequired));
-  if (req.body.featured_in_new_post === 'true'
-    && (!req.body.default_offchain_template || !req.body.default_offchain_template.trim())) {
+  if (
+    req.body.featured_in_new_post === 'true' &&
+    (!req.body.default_offchain_template ||
+      !req.body.default_offchain_template.trim())
+  ) {
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
@@ -38,16 +47,8 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.NotVerified));
   }
 
-  const roleWhere = {
-    address_id: adminAddress.id,
-    permission: 'admin',
-    chain_id: chain.id,
-  };
-
-  const requesterIsAdminOrMod = await models.Role.findOne({
-    where: roleWhere,
-  });
-  if (requesterIsAdminOrMod === null) {
+  const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  if (isAdmin === null) {
     return next(new Error(Errors.NotAdmin));
   }
 
@@ -59,7 +60,7 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     featured_order,
     featured_in_sidebar,
     featured_in_new_post,
-    default_offchain_template
+    default_offchain_template,
   } = req.body;
   try {
     const topic = await models.OffchainTopic.findOne({ where: { id } });

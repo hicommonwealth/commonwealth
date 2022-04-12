@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
+import validateRoles from 'server/util/validateRoles';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
@@ -32,17 +33,8 @@ const createTopic = async (
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
-  const userAddressIds = (await req.user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-  const adminRoles = await models.Role.findAll({
-    where: {
-      address_id: { [Op.in]: userAddressIds },
-      permission: { [Op.in]: ['admin', 'moderator'] },
-      chain_id: chain.id,
-    },
-  });
-  if (!req.user.isAdmin && adminRoles.length === 0) {
+  const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain.id);
+  if (!isAdminOrMod) {
     return next(new Error(Errors.MustBeAdmin));
   }
 

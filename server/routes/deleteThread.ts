@@ -41,8 +41,12 @@ const deleteThread = async (
 
     let thread = myThread;
     if (!myThread) {
-      const isAdminOrMod = validateRoles(models, req, 'moderator', chain_id);
-
+      const isAdminOrMod = validateRoles(
+        models,
+        req.user,
+        'moderator',
+        chain_id
+      );
       if (!isAdminOrMod) {
         return next(new Error(DeleteThreadErrors.NoPermission));
       }
