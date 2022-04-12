@@ -1,5 +1,7 @@
 /* @jsx m */
 
+import 'pages/discussions/index.scss';
+
 import app from 'state';
 import _, { debounce } from 'lodash';
 import m from 'mithril';
@@ -9,6 +11,9 @@ import { SummaryListing } from './summary_listing';
 import { RecentListing } from './recent_listing';
 import Sublayout from '../../sublayout';
 import { DiscussionFilterBar } from './discussion_filter_bar';
+
+// TODO LIST
+// * LastVisited logic
 
 class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   private returningFromThread: boolean;
@@ -25,7 +30,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     if (app.threads.listingStore.isDepleted(params)) return;
 
     // TODO Graham 4/11/22: This is a terrible class name and should be changed globally
-    const scrollEle = document.getElementsByClassName('body')[0];
+    const scrollEle = document.getElementsByClassName('Body')[0];
     const { scrollHeight, scrollTop } = scrollEle;
 
     // TODO: Handle redundant fetching
@@ -121,8 +126,6 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
         </div>
       </Sublayout>
     );
-
-    // TODO: LastVisited logic
   }
 }
 
