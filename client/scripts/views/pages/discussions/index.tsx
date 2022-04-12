@@ -365,14 +365,12 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       >
         {app.chain && (
           <div class="DiscussionsPage">
-            {!isEmpty && (
-              <DiscussionFilterBar
-                topic={topicName}
-                stage={stage}
-                parentState={this}
-                disabled={isLoading || stillFetching}
-              />
-            )}
+            <DiscussionFilterBar
+              topic={topicName}
+              stage={stage}
+              parentState={this}
+              disabled={isLoading || stillFetching}
+            />
             {onSummaryView
               ? isLoading
                 ? m(LoadingRow)
@@ -388,13 +386,13 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
                   topicName,
                 })
               : m(Listing, { content: sortedListing })}
-            {postsDepleted ? (
+            {postsDepleted && !onSummaryView ? (
               <div class="infinite-scroll-reached-end">
                 Showing {allThreads.length} of{' '}
                 {pluralize(allThreads.length, 'thread')}
                 {topic ? ` under the topic '${topic}'` : ''}
               </div>
-            ) : isEmpty ? null : (
+            ) : (isEmpty || onSummaryView) ? null : (
               <div class="infinite-scroll-spinner-wrap">
                 <Spinner active={!this.postsDepleted[subpage]} size="lg" />
               </div>
