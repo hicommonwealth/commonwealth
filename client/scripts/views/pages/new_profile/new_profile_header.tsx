@@ -28,8 +28,8 @@ const NewProfileHeader : m.Component<ProfileHeaderAttrs> = {
           className="profile-content"
         > 
           <div className="section profile-name">
-            <h3> { profile?.profile_name } </h3>
             <CWAccount className="profile-icon" iconName="account" iconSize="medium" />
+            <h3> { profile?.profile_name } </h3>
           </div>
           
           <div className="section">

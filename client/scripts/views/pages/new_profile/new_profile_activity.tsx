@@ -53,7 +53,18 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs) =>
     )
   if (option === ProfileActivity.Threads)  
     return attrs.threads?.map(t => 
-      <div className="activity"> <p> { t.title } </p> </div>
+      <div className="activity"> 
+        <div className="thread-chain"> 
+          <p> in <span className="heavy"> { t.chain } </span> </p>
+        </div>
+        <div className="thread-date"> 
+          <p> { transformTimestamp(t.created_at) } </p> 
+        </div>
+        <div className="">
+          <p> { t.title } </p> 
+        </div>
+        
+      </div>
     )
   if (option === ProfileActivity.Communities)
     return attrs.chains?.map(c => 

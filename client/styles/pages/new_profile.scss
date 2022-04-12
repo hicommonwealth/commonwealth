@@ -21,7 +21,7 @@
         display: flex;
 
         .profile-icon {
-          margin: 5px 0 0 10px;
+          margin: 5px 10px 0 0;
         }
       }
     }
@@ -112,14 +112,14 @@
           left: 0px;
         }
 
-        .comment-chain {
+        .comment-chain, .thread-chain {
           margin-bottom: 15px;
           p {
             color: $midi-gray;
           }
         }
 
-        .comment-date {
+        .comment-date, .thread-date {
           position: absolute;
           top: 10px;
           right: 10px;
@@ -131,6 +131,7 @@
         .comment-text {
           width: 85%;
           max-height: 90px;
+          font-size: 16px;
         }
 
         .heavy {
