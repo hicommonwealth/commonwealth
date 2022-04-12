@@ -1,6 +1,6 @@
 import { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateRoles from 'server/util/validateRoles';
+import validateRoles from '../util/validateRoles';
 import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';

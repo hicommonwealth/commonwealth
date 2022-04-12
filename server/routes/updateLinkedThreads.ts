@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateRoles from 'server/util/validateRoles';
+import validateRoles from '../util/validateRoles';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';

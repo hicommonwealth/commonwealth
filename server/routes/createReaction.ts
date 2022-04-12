@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
-import validateRoles from 'server/util/validateRoles';
+import validateRoles from '../util/validateRoles';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { ChainType, NotificationCategories } from '../../shared/types';

@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
-import validateRoles from 'server/util/validateRoles';
+import validateRoles from '../util/validateRoles';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateRoles from 'server/util/validateRoles';
+import validateRoles from '../util/validateRoles';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
@@ -45,7 +45,7 @@ const deleteComment = async (
       });
       const isAdminOrMod = validateRoles(
         models,
-        req,
+        req.user,
         'moderator',
         comment.Chain.id
       );

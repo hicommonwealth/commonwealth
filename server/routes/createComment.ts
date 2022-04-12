@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
-import validateRoles from 'server/util/validateRoles';
+import validateRoles from '../util/validateRoles';
 import { parseUserMentions } from '../util/parseUserMentions';
 import {
   ChainType,

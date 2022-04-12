@@ -6,7 +6,7 @@ import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 import { DB } from '../database';
-import validateRoles from 'server/util/validateRoles';
+import validateRoles from '../util/validateRoles';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -35,6 +35,14 @@ const createInvite = async (
   if (req.body.invitedAddress && req.body.invitedEmail) {
     return next(new Error(Errors.NoEmailAndAddress));
   }
+
+  const address = await models.Address.findOne({
+    where: {
+      address: req.body.address,
+      user_id: req.user.id,
+    },
+  });
+  if (!address) return next(new Error(Errors.AddressNotFound));
 
   const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain.id);
   if (!isAdminOrMod) return next(new Error(Errors.MustBeAdminOrMod));

@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
-import validateRoles from 'server/util/validateRoles';
+import validateRoles from '../util/validateRoles';
 import { DB } from '../database';
 
 enum UpdateTopicErrors {

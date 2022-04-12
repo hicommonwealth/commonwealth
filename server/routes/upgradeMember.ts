@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateRoles from 'server/util/validateRoles';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
@@ -30,8 +29,20 @@ const upgradeMember = async (
   if (!address) return next(new Error(Errors.InvalidAddress));
   if (!new_role) return next(new Error(Errors.InvalidRole));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
-  if (!isAdmin) return next(new Error(Errors.MustBeAdmin));
+  const requesterAddresses = await req.user.getAddresses();
+  const requesterAddressIds = requesterAddresses
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
+  const requesterAdminRoles = await models.Role.findAll({
+    where: {
+      chain_id: chain.id,
+      address_id: { [Op.in]: requesterAddressIds },
+      permission: 'admin',
+    },
+  });
+
+  if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
+    return next(new Error(Errors.MustBeAdmin));
 
   const memberAddress = await models.Address.findOne({
     where: {
