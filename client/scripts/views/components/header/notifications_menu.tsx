@@ -116,7 +116,11 @@ export class NotificationsMenu
             label={
               <>
                 {unreadNotificationsCount === 0 ? (
-                  <CWIcon iconName="bell" style="display: flex;" />
+                  <CWIcon
+                    iconName="bell"
+                    iconSize="small"
+                    style="display: flex;"
+                  />
                 ) : (
                   <span>
                     {unreadNotificationsCount > 9
