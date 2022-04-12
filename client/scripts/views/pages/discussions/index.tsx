@@ -1,22 +1,39 @@
 /* @jsx m */
 
 import app from 'state';
-import _ from 'lodash';
+import _, { debounce } from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { PageLoading } from '../loading';
 import { SummaryListing } from './summary_listing';
 import { RecentListing } from './recent_listing';
+import Sublayout from '../../sublayout';
+import { DiscussionFilterBar } from './discussion_filter_bar';
 
-class DiscussionsPage implements m.ClassComponent<null> {
+class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   private returningFromThread: boolean;
   private summaryView: boolean;
-  private topic?: string;
-  private stage?: string;
+  private summaryViewInitialized: boolean;
+  private topicName: string;
+  private stageName: string;
 
-  onscroll() {
-    return null;
-  }
+  recentListingScroll = async () => {
+    const params = {
+      topicName: this.topicName,
+      stageName: this.stageName,
+    };
+    if (app.threads.listingStore.isDepleted(params)) return;
+
+    // TODO Graham 4/11/22: This is a terrible class name and should be changed globally
+    const scrollEle = document.getElementsByClassName('body')[0];
+    const { scrollHeight, scrollTop } = scrollEle;
+
+    // TODO: Handle redundant fetching
+    if (scrollHeight - 1000 < scrollTop) {
+      await app.threads.loadNextPage(params);
+      m.redraw();
+    }
+  };
 
   // TODO: Only scoped to RecentListing
   handleScrollback() {
@@ -29,9 +46,9 @@ class DiscussionsPage implements m.ClassComponent<null> {
     }
   }
 
-  determineIfSummaryView() {
+  initializeSummaryView() {
     // If URI specifies topic or stage, override
-    if (this.topic || this.stage) {
+    if (this.topicName || this.stageName) {
       this.summaryView = false;
     }
     // If admin has set summary view as community default
@@ -43,13 +60,11 @@ class DiscussionsPage implements m.ClassComponent<null> {
       this.summaryView =
         localStorage.getItem('discussion-summary-toggle') === 'true';
     }
+
+    this.summaryViewInitialized = true;
   }
 
   oninit() {
-    console.log('init');
-    this.topic = m.route.param('topic');
-    this.stage = m.route.param('stage');
-
     this.returningFromThread =
       app.lastNavigatedBack() &&
       app.lastNavigatedFrom().includes('/discussion/');
@@ -62,11 +77,9 @@ class DiscussionsPage implements m.ClassComponent<null> {
     });
 
     this.handleScrollback();
-    this.determineIfSummaryView();
   }
 
-  view() {
-    console.log('view');
+  view(vnode) {
     if (!app.chain || !app.chain.serverLoaded) {
       return m(PageLoading, {
         title: 'Discussions',
@@ -74,12 +87,40 @@ class DiscussionsPage implements m.ClassComponent<null> {
       });
     }
 
-    if (this.summaryView) {
-      return <SummaryListing />;
-    } else {
-      localStorage.setItem('discussion-summary-toggle', 'false');
-      return <RecentListing />;
+    this.topicName = vnode.attrs.topic;
+    this.stageName = m.route.param('stage');
+    if (!this.summaryViewInitialized) {
+      this.initializeSummaryView();
     }
+    if (!this.summaryView) {
+      localStorage.setItem('discussion-summary-toggle', 'false');
+    }
+
+    return (
+      <Sublayout
+        title="Discussions"
+        description={null} // TODO
+        showNewProposalButton={true}
+        onscroll={
+          !this.summaryView ? debounce(this.recentListingScroll, 400) : null
+        }
+      >
+        <div class="DiscussionsPage">
+          <DiscussionFilterBar
+            topic={this.topicName}
+            stage={this.stageName}
+            parentState={this}
+          />
+          {this.summaryView && <SummaryListing />}
+          {!this.summaryView && (
+            <RecentListing
+              topicName={this.topicName}
+              stageName={this.stageName}
+            />
+          )}
+        </div>
+      </Sublayout>
+    );
 
     // TODO: LastVisited logic
   }

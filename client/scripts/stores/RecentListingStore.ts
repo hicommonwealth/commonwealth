@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import IdStore from './IdStore';
 import { OffchainThread } from '../models';
 import { orderDiscussionsbyLastComment } from '../views/pages/discussions/helpers';
@@ -40,6 +40,10 @@ class RecentListingStore extends IdStore<OffchainThread> {
   };
 
   public add(thread: OffchainThread) {
+    const matchingThread = this.threads.filter((t) => t.id === thread.id)[0];
+    if (matchingThread) {
+      this.remove(matchingThread);
+    }
     super.add(thread);
     this.threads.push(thread);
     return this;
@@ -70,8 +74,13 @@ class RecentListingStore extends IdStore<OffchainThread> {
 
   public getListingThreads(params: IListingParams): OffchainThread[] {
     const { topicName, stageName, pinned } = params;
+    console.log({
+      params,
+      threads: this.threads,
+    });
+    debugger;
     if (topicName) {
-      this.threads
+      return this.threads
         .filter((t) => t.topic.name === topicName && t.pinned === pinned)
         .sort(orderDiscussionsbyLastComment);
     } else if (stageName) {
@@ -93,6 +102,17 @@ class RecentListingStore extends IdStore<OffchainThread> {
       return this.fetchState.stageCutoffDate[stageName];
     } else {
       return this.fetchState.allThreadsCutoffDate;
+    }
+  }
+
+  public setCutoffDate(params: IListingParams, cutoffDate: moment.Moment) {
+    const { topicName, stageName } = params;
+    if (topicName) {
+      this.fetchState.topicCutoffDate[topicName] = cutoffDate;
+    } else if (stageName) {
+      this.fetchState.stageCutoffDate[stageName] = cutoffDate;
+    } else {
+      this.fetchState.allThreadsCutoffDate = cutoffDate;
     }
   }
 

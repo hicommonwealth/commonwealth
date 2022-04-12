@@ -1,10 +1,5 @@
 import moment from 'moment';
-import {
-  OffchainTopic,
-  AbridgedThread,
-  Profile,
-  OffchainThread,
-} from 'models';
+import { OffchainTopic, AbridgedThread, Profile, OffchainThread } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
@@ -40,6 +35,7 @@ export const modelAbridgedThreadFromServer = (
 };
 
 class RecentActivityController {
+  // TODO
   // private _threadsStore = new ActiveThreadsStore();
   // private _addressStore = new ActiveAddressesStore();
   private _communityThreadCount = {};
@@ -84,7 +80,7 @@ class RecentActivityController {
     const threadsPerTopic = options.threadsPerTopic || 3;
     const params = {
       chain: chainId,
-      threads_per_topic: threadsPerTopic
+      threads_per_topic: threadsPerTopic,
     };
 
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);

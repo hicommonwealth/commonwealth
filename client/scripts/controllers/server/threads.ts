@@ -24,6 +24,7 @@ import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { LinkedThreadAttributes } from 'server/models/linked_thread';
+import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
@@ -684,12 +685,14 @@ class ThreadsController {
     topicName?: string;
     stageName?: string;
   }) {
+    debugger;
     if (this.listingStore.isDepleted(options)) {
       return;
     }
     const cutoff_date = this.listingStore.isInitialized(options)
-      ? this.listingStore.getCutoffDate(options).unix()
-      : moment().unix();
+      ? this.listingStore.getCutoffDate(options).toISOString()
+      : moment().toISOString();
+    console.log({ cutoff_date });
     const { topicName, stageName } = options;
     const chain = app.activeChainId();
     const params = {
@@ -706,17 +709,29 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads } = response.result;
-    for (const thread of threads) {
-      const modeledThread = modelFromServer(thread);
-      if (!thread.Address) {
-        console.error('OffchainThread missing address');
-      }
+    console.log(threads);
+    const modeledThreads: OffchainThread[] = threads.map((t) => {
+      return modelFromServer(t);
+    });
+
+    modeledThreads.forEach((thread) => {
       try {
-        this._store.add(modeledThread);
-        this._listingStore.add(modeledThread);
+        // TODO: Ensure duplicates prevented or non-problematic
+        this._store.add(thread);
+        this._listingStore.add(thread);
       } catch (e) {
         console.error(e.message);
       }
+    });
+
+    if (modeledThreads?.length) {
+      console.log(modeledThreads);
+      const lastThread = modeledThreads.sort(orderDiscussionsbyLastComment)[
+        modeledThreads.length - 1
+      ];
+      console.log(lastThread);
+      const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
+      this.listingStore.setCutoffDate(options, cutoffDate);
     }
 
     await Promise.all([
@@ -733,6 +748,7 @@ class ThreadsController {
     if (threads.length < DEFAULT_PAGE_SIZE) {
       this.listingStore.depleteListing(options);
     }
+    debugger;
   }
 
   public initialize(initialThreads = [], numVotingThreads, reset) {

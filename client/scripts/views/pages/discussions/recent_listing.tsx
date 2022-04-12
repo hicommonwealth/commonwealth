@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import $ from 'jquery';
 
 import 'pages/discussions/summary_listing.scss';
 
@@ -52,7 +53,10 @@ export class DiscussionListing
   }
 }
 
-interface RecentListingAttrs {}
+interface RecentListingAttrs {
+  topicName: string;
+  stageName: string;
+}
 export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
   private initializing: boolean;
   private allThreads: OffchainThread[];
@@ -63,97 +67,55 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
   private topic: string;
   private stage: string;
 
-  onScroll() {
-    const options = {
-      topicName: this.topic,
-      stageName: this.stage,
-    };
+  view(vnode) {
+    const { topicName, stageName } = vnode.attrs;
+    const pageParams = { topicName, stageName };
 
-    return debounce(async () => {
-      const params = {
-        topicName: this.topic,
-        stageName: this.stage,
-      };
-      if (app.threads.listingStore.isDepleted(params)) return;
-      const scrollHeight = $(document).height();
-      const scrollPos = $(window).height() + $(window).scrollTop();
-      if (scrollPos > scrollHeight - 400) {
-        await app.threads.loadNextPage(options);
-        m.redraw();
-      }
-    }, 400);
-  }
+    const listingInitialized =
+      app.threads.listingStore.isInitialized(pageParams);
+    const listingDepleted = app.threads.listingStore.isDepleted(pageParams);
 
-  oninit() {
-    // TODO: More robust method of topic-determination
-    this.topic = m.route.get().split('/')[2];
-    this.stage = m.route.param('stage');
-  }
-
-  view() {
-    const subpageParams = {
-      topicName: this.topic,
-      stageName: this.stage,
-    };
-
-    if (!app.threads.listingStore.isInitialized(subpageParams)) {
+    if (!listingInitialized) {
       this.initializing = true;
       app.threads
         .loadNextPage({
-          topicName: this.topic,
-          stageName: this.stage,
+          topicName,
+          stageName,
         })
         .then(() => {
           this.initializing = false;
+          m.redraw();
         });
     }
     if (this.initializing) {
-      return (
-        <div class="RecentListing">
-          <DiscussionFilterBar
-            topic={this.topic}
-            stage={this.stage}
-            parentState={this}
-            disabled={true}
-          />
-          {m(LoadingRow)}
-        </div>
-      );
+      console.log('initializing');
+      return m(LoadingRow);
     }
 
     // TODO: Handle lastVisited
     const pinnedThreads = app.threads.listingStore.getListingThreads({
-      ...subpageParams,
+      ...pageParams,
       pinned: true,
     });
     const unpinnedThreads = app.threads.listingStore.getListingThreads({
-      ...subpageParams,
+      ...pageParams,
       pinned: false,
     });
 
+    console.log({ pinnedThreads, unpinnedThreads });
+
+    console.log({ pinnedThreads, unpinnedThreads });
+
     return (
-      <Sublayout
-        class="DiscussionsPage"
-        title="Discussions"
-        description={null} // TODO
-        showNewProposalButton={true}
-        onscroll={this.onScroll}
-      >
-        <div class="RecentListing">
-          <DiscussionFilterBar
-            topic={this.topic}
-            stage={this.stage}
-            parentState={this}
-          />
-          <DiscussionListing threads={pinnedThreads} />
-          <DiscussionListing threads={unpinnedThreads} />
-          <DiscussionScroll
-            postsDepleted={app.threads.listingStore.isDepleted(subpageParams)}
-            subpageName={this.topic || this.stage}
-            totalThreadCount={pinnedThreads.length + unpinnedThreads.length}
-          />
-        </div>
-      </Sublayout>
+      <div class="RecentListing">
+        <DiscussionListing threads={pinnedThreads} />
+        <DiscussionListing threads={unpinnedThreads} />
+        <DiscussionScroll
+          postsDepleted={listingDepleted}
+          subpageName={topicName || stageName}
+          totalThreadCount={pinnedThreads.length + unpinnedThreads.length}
+        />
+      </div>
     );
   }
 }
