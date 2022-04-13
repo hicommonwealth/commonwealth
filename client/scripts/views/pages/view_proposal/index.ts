@@ -121,6 +121,7 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -361,7 +362,10 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                     !app.isCustomDomain() &&
                       m('.CommentSocialHeader', [m(SocialSharingCarat)]),
@@ -444,7 +448,10 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                   ]
             ),
@@ -611,7 +618,10 @@ const ProposalComment: m.Component<
                   }),
                 ],
                 transitionDuration: 0,
-                trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                trigger: m(CWIcon, {
+                  iconName: 'chevronDown',
+                  iconSize: 'small',
+                }),
               }),
             ],
             !app.isCustomDomain() &&
