@@ -43,30 +43,33 @@
     &.existing {
       background: initial !important;
       cursor: initial;
+      display: flex;
+      justify-content: space-between;
       .UserBlock {
         opacity: 0.4;
       }
       .role-remove {
-        position: absolute;
-        right: 16px;
-        top: 22px;
+        display: flex;
+        align-items: center;
+        padding: 8px;
         .already-connected {
           position: relative;
           margin-right: 11px;
           font-size: 13.5px;
           color: $neutral-500;
         }
-        .cui-icon svg {
+        svg {
           cursor: pointer;
           stroke: $neutral-500;
-        }
-        .cui-icon:hover svg {
-          stroke: $rorange-500;
+
+          &:hover {
+            stroke: $rorange-500;
+          }
         }
       }
     }
     > .select-address-option-left {
-      padding: 14px 16px 10px;
+      padding: 8px;
       .magic-label {
         font-size: 15px;
         color: $neutral-500;
