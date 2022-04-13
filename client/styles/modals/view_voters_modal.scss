@@ -14,8 +14,8 @@
 //     padding: 12px 16px 11px;
 //     margin-bottom: 20px;
 //     border-radius: 4px;
-//     background: $text-color-darker;
-//     color: $text-color-white;
+//     background: $neutral-900;
+//     color: $white;
 //     font-family: $monospace-fonts;
 //     font-size: 13px;
 //     white-space: pre;
@@ -26,16 +26,16 @@
 //       opacity: 0.9;
 //     }
 //     &::selection {
-//       background: $background-color-selection-on-dark;
+//       background: $yellow-300;
 //     }
 //   }
 // }
 
 // .VoterRow {
 //   display: flex;
-//   border: 1px solid $background-color-light;
+//   border: 1px solid $primary-300;
 //   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
-//   background: $text-color-white;
+//   background: $white;
 //   border-radius: 3px;
 //   margin: 10px 0;
 //   padding: 17px 20px 13px;
@@ -44,7 +44,7 @@
 
 //   // link styling
 //   text-decoration: none;
-//   color: $text-color-black;
+//   color: $neutral-800;
 //   @include hoverFloat;
 
 //   .proposal-pre {
@@ -83,7 +83,6 @@
 //     .proposal-display-id {
 //       font-weight: 500;
 //       font-size: 16px;
-//       line-height: 1.2;
 //     }
 //   }
 //   // main
@@ -99,7 +98,6 @@
 //       font-weight: 500;
 //       margin-bottom: 3px;
 //       word-break: break-word;
-//       line-height: 1.2;
 //       text-overflow: ellipsis;
 //     }
 
@@ -108,9 +106,8 @@
 //       font-weight: 500;
 //       margin-bottom: 3px;
 //       word-break: break-word;
-//       line-height: 1.2;
 //       text-overflow: ellipsis;
-//       color: $text-color-lightest;
+//       color: $neutral-400;
 //     }
 
 //     .proposal-row-metadata {
@@ -122,18 +119,18 @@
 
 //       .proposal-user {
 //         margin-top: 4px;
-//         color: $text-color-lightest;
+//         color: $neutral-400;
 //         .username {
-//           color: $text-color-lightest;
+//           color: $neutral-400;
 //           font-weight: 400;
 //         }
 //       }
 //       .proposal-user-mobile {
 //         display: none;
-//         color: $text-color-lightest;
+//         color: $neutral-400;
 //         .user-display-name username {
 //           position: relative;
-//           color: $text-color-lightest;
+//           color: $neutral-400;
 //           font-weight: 400;
 //           top: 2px;
 //         }

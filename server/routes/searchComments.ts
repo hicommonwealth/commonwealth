@@ -67,7 +67,7 @@ const searchComments = async (
         CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
     JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id, 
     websearch_to_tsquery('english', $searchTerm) as query
-    WHERE query @@ "OffchainComments"._search ${communityOptions} 
+    WHERE query @@ "OffchainComments"._search ${communityOptions} AND "OffchainComments".deleted_at IS NULL
     ${sort} LIMIT $limit
 `,
       {

@@ -15,8 +15,6 @@ import {
   FormGroup,
   Input,
   Button,
-  Icon,
-  Icons,
   List,
   ListItem,
   Tag,
@@ -30,11 +28,9 @@ import {
   OffchainTopic,
   OffchainThreadKind,
   OffchainThreadStage,
-  NodeInfo,
   ITokenAdapter,
 } from 'models';
 
-import { updateLastVisited } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -43,6 +39,7 @@ import EditProfileModal from 'views/modals/edit_profile_modal';
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 interface IThreadForm {
   topicName?: string;
@@ -625,9 +622,8 @@ export const NewThreadForm: m.Component<
                     class: 'tab-right',
                     label: [
                       'Full editor',
-                      m(Icon, {
-                        name: Icons.ARROW_UP_RIGHT,
-                        style: 'margin-left: 5px;',
+                      m(CWIcon, {
+                        iconName: 'expand',
                       }),
                     ],
                     onclick: (e) => {
@@ -681,12 +677,7 @@ export const NewThreadForm: m.Component<
                         localStorage.getItem(
                           `${app.activeChainId()}-active-topic`
                         ),
-                      topics: app.topics.getByCommunity(app.activeChainId()),
-                      featuredTopics: app.topics
-                        .getByCommunity(app.activeChainId())
-                        .filter((ele) =>
-                          activeEntityInfo.featuredTopics.includes(`${ele.id}`)
-                        ),
+                      topics: app.chain.meta.chain.topics,
                       updateFormData: updateTopicState,
                       tabindex: 1,
                     }),
@@ -824,23 +815,14 @@ export const NewThreadForm: m.Component<
                               ),
                         topics:
                           app.topics &&
-                          app.topics
-                            .getByCommunity(app.activeChainId())
-                            .filter((t) => {
-                              return (
-                                isAdmin ||
-                                t.tokenThreshold.isZero() ||
-                                (ITokenAdapter.instanceOf(app.chain) &&
-                                  t.tokenThreshold.lte(app.chain.tokenBalance))
-                              );
-                            }),
-                        featuredTopics: app.topics
-                          .getByCommunity(app.activeChainId())
-                          .filter((ele) =>
-                            activeEntityInfo.featuredTopics.includes(
-                              `${ele.id}`
-                            )
-                          ),
+                          app.chain.meta.chain.topics.filter((t) => {
+                            return (
+                              isAdmin ||
+                              t.tokenThreshold.isZero() ||
+                              (ITokenAdapter.instanceOf(app.chain) &&
+                                t.tokenThreshold.lte(app.chain.tokenBalance))
+                            );
+                          }),
                         updateFormData: updateTopicState,
                         tabindex: 1,
                       }),
@@ -1031,7 +1013,7 @@ export const NewThreadForm: m.Component<
                     contentRight: [
                       fromDraft === draft.id
                         ? m('.discussion-draft-title-wrap', [
-                            m(Icon, { name: Icons.EDIT }),
+                            m(CWIcon, { iconName: 'edit' }),
                             m(
                               '.discussion-draft-title',
                               draft.title || 'Untitled'

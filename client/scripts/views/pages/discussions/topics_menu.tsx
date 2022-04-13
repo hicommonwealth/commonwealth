@@ -4,7 +4,6 @@ import m from 'mithril';
 import {
   Button,
   Icons,
-  Icon,
   PopoverMenu,
   MenuItem,
   MenuDivider,
@@ -15,6 +14,7 @@ import 'pages/discussions/topics_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import EditTopicModal from 'views/modals/edit_topic_modal';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type Topic = {
   defaultOffchainTemplate: string;
@@ -51,7 +51,7 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
         trigger={
           <Button
             rounded={true}
-            compac={true}
+            compact={true}
             label={selectedTopic ? `Topic: ${topic}` : 'All Topics'}
             iconRight={Icons.CHEVRON_DOWN}
             size="sm"
@@ -113,16 +113,22 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
                       }}
                       label={
                         <div class="topic-item">
-                          {active && <Icon name={Icons.CHECK} />}
-                          <div class="topic-item-name">{name}</div>
+                          <div class="icon-and-item-name-container">
+                            {active && (
+                              <CWIcon iconName="check" iconSize="small" />
+                            )}
+                            <div class="topic-item-name" title={name}>
+                              {name}
+                            </div>
+                          </div>
                           {app.user?.isAdminOfEntity({
                             chain: app.activeChainId(),
                           }) && (
                             <Button
                               size="xs"
                               label="Edit"
+                              class="edit-button"
                               compact={true}
-                              rounded={true}
                               onclick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();

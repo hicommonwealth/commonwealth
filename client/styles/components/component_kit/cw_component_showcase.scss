@@ -4,6 +4,13 @@ $margin-bottom: 32px;
 $width: 360px;
 
 .ComponentShowcase {
+  padding: 24px;
+  width: 100%;
+
+  h1 {
+    margin-bottom: 16px;
+  }
+
   .color-gallery {
     display: flex;
     flex-direction: column;
@@ -13,6 +20,7 @@ $width: 360px;
     .color-row {
       align-items: center;
       display: flex;
+      height: 24px;
       justify-content: space-between;
 
       .color {
@@ -38,9 +46,32 @@ $width: 360px;
   .icon-gallery {
     display: flex;
     flex-direction: column;
-    height: 144px;
     margin-bottom: $margin-bottom;
-    width: $width;
+    width: 100%;
+
+    .all-icons-container {
+      display: flex;
+      flex-flow: column;
+      flex-wrap: wrap;
+      height: 448px;
+      margin-bottom: 16px;
+      width: fit-content;
+
+      .icon-container {
+        align-items: flex-start;
+        display: flex;
+        flex-direction: column;
+        height: 40px;
+        justify-content: center;
+        margin: 8px;
+        width: 80px;
+
+        .icon-name {
+          font-size: 10px;
+          margin-bottom: 4px;
+        }
+      }
+    }
 
     .icon-row {
       align-items: center;
@@ -48,8 +79,7 @@ $width: 360px;
       flex-direction: row;
       height: 48px;
       justify-content: space-between;
-      line-height: 1;
-      width: 100%;
+      width: 200px;
     }
   }
 

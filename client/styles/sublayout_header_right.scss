@@ -1,0 +1,22 @@
+.SublayoutHeaderRight {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+
+  > :not(:first-child) {
+    margin-left: 8px;
+  }
+}
+
+.cui-menu {
+  .cui-menu-divider {
+    margin: 0;
+  }
+
+  .cui-button {
+    height: 40px;
+    min-height: 40px;
+    line-height: 40px;
+  }
+}

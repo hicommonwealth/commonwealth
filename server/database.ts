@@ -8,6 +8,8 @@ import { factory, formatFilename } from '../shared/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
 import ChainFactory, { ChainModelStatic } from './models/chain';
+import ChainCategoryFactory, { ChainCategoryModelStatic } from './models/chain_category';
+import ChainCategoryTypeFactory, { ChainCategoryTypeModelStatic } from './models/chain_category_type';
 import ChainEntityFactory, {
   ChainEntityModelStatic,
 } from './models/chain_entity';
@@ -72,6 +74,9 @@ import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
 } from './models/social_account';
+import SsoTokenFactory, {
+  SsoTokenModelStatic,
+} from './models/sso_token';
 import StarredCommunityFactory, {
   StarredCommunityModelStatic,
 } from './models/starred_community';
@@ -87,12 +92,16 @@ import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
-import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
+import NotificationsReadFactory, {
+  NotificationsReadModelStatic,
+} from './models/notifications_read';
 import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
 
 export type Models = {
   Address: AddressModelStatic;
   Chain: ChainModelStatic;
+  ChainCategory: ChainCategoryModelStatic;
+  ChainCategoryType: ChainCategoryTypeModelStatic;
   ChainEntity: ChainEntityModelStatic;
   ChainEvent: ChainEventModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
@@ -121,6 +130,7 @@ export type Models = {
   Profile: ProfileModelStatic;
   Role: RoleModelStatic;
   SocialAccount: SocialAccountModelStatic;
+  SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
   Subscription: SubscriptionModelStatic;
   Token: TokenModelStatic;
@@ -167,6 +177,8 @@ export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
+  ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
+  ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
   ChainEntity: ChainEntityFactory(sequelize, DataTypes),
   ChainEvent: ChainEventFactory(sequelize, DataTypes),
   ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
@@ -195,6 +207,7 @@ const models: Models = {
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
+  SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),

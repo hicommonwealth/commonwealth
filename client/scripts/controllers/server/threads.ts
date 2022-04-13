@@ -19,7 +19,6 @@ import {
 } from 'models';
 import { NotificationCategories } from 'types';
 
-
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
@@ -178,7 +177,7 @@ export const modelFromServer = (thread) => {
 /*
 
 Threads are stored in two stores. One store, the listingStore, is responsible for all posts
-rendered in the forum/community discussions listing (pages/discussions/index.ts). It organizes
+rendered in the forum/community discussions listing (pages/discussions/index.tsx). It organizes
 threads first by community, then by topic/stage or "subpage," using the const ALL_PROPOSALS_KEY to
 store non-topic-sorted threads for the main discussion listing. The relevant sub-store, for a
 given discussion listing, can be accessed via getStoreByCommunityAndTopic, again passing
@@ -725,6 +724,7 @@ class ThreadsController {
     if (topicId) params['topic_id'] = topicId;
     if (stage) params['stage'] = stage;
     const threads = await this.fetchBulkThreads({ topicId, stage, params });
+
     await Promise.all([
       this.fetchReactionsCount(threads),
       app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({

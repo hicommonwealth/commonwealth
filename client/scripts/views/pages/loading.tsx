@@ -3,12 +3,14 @@
 import m from 'mithril';
 import { Spinner } from 'construct-ui';
 
+import 'pages/loading.scss';
+
 import Sublayout from 'views/sublayout';
 
 type PageLoadingAttrs = {
   message?: string;
   showNewProposalButton?: boolean;
-  title?;
+  title?: any;
 };
 
 export class PageLoading implements m.ClassComponent<PageLoadingAttrs> {
@@ -21,12 +23,9 @@ export class PageLoading implements m.ClassComponent<PageLoadingAttrs> {
         showNewProposalButton={showNewProposalButton}
         hideSearch={true}
       >
-        <Spinner
-          fill={true}
-          message={message}
-          size="xl"
-          style="visibility: visible; opacity: 1;"
-        />
+        <div class="LoadingPage">
+          <Spinner message={message} active={true} size="xl" />
+        </div>
       </Sublayout>
     );
   }

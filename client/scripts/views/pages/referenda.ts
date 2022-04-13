@@ -156,7 +156,6 @@ const ReferendaPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'ReferendaPage',
         title: [
           'Referenda',
           m(Tag, {
@@ -167,7 +166,7 @@ const ReferendaPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.ReferendaPage', [
         onSubstrate && m(SubstrateProposalStats),
         m('.clear'),
         m(Listing, {
@@ -180,7 +179,7 @@ const ReferendaPage: m.Component<{}> = {
           columnHeader: 'Inactive Referenda',
         }),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

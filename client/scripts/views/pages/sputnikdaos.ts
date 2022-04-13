@@ -87,7 +87,6 @@ const SputnikDAOsPage: m.Component<
     return m(
       Sublayout,
       {
-        class: 'SputnikDAOsPage',
         title: [
           'Sputnik DAOs',
           m(Tag, {
@@ -98,7 +97,7 @@ const SputnikDAOsPage: m.Component<
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.SputnikDAOsPage', [
         m('.title', 'Sputnik DAOs'),
         m(Table, [
           m('tr', [
@@ -147,7 +146,7 @@ const SputnikDAOsPage: m.Component<
             });
           }),
         ]),
-      ]
+      ])
     );
   },
 };

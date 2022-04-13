@@ -4,8 +4,7 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 60px);
-  padding: 3%;
+  padding: 24px;
   width: 100vw;
 
   * {
@@ -13,6 +12,9 @@
   }
 
   .cui-tabs {
+    margin-bottom: 16px;
+    width: 100%;
+
     @include gradientTabs();
 
     .cui-tabs-item.cui-active {
@@ -27,29 +29,20 @@
         1 !important;
     }
 
-    margin-bottom: 20px;
-
     .cui-tabs-item {
       font-size: $text-size-mobile-header;
-      padding: 13px 4% 7px;
       width: initial;
     }
-  }
-
-  > .cui-menu {
-    overflow-y: scroll;
-    max-width: 600px;
-    // 10px to accomodate scrollbar
-    width: calc(94% - 10px);
   }
 
   .CommunitySelectList {
     overflow-x: hidden;
 
     h4 {
-      color: #aaaaaa;
+      color: $neutral-400;
       font-size: 16px;
       font-weight: 400;
+      margin: 12px 4px;
     }
 
     .cui-list-item {
@@ -58,13 +51,11 @@
   }
 
   .CurrentCommunityMenu {
+    width: 100%;
+
     .cui-menu-divider {
       margin: 12px 0 18px;
     }
-  }
-
-  .cui-icon {
-    margin-right: 25px !important;
   }
 
   .LoginSelectorMenu,
@@ -72,14 +63,14 @@
     .cui-icon svg {
       display: inline-flex;
       height: 28px;
-      stroke: rgb(102, 102, 102) !important;
+      stroke: $neutral-600 !important;
       width: 28px;
     }
   }
 
   .CommunitySelectList {
     a.home-button {
-      color: black;
+      color: $black;
       display: flex;
       font-weight: 500;
       margin: 4px 10px;
@@ -96,26 +87,18 @@
   }
 }
 
-.MobileAccountMenu {
+.cui-menu .MobileAccountMenu {
+  border: none;
   width: 100%;
 
-  .cui-menu {
-    border: none;
-
+  .cui-button-label {
     .label-wrap {
       align-items: center;
       display: flex;
-
-      svg {
-        height: 28px;
-        margin-right: 25px;
-        stroke-width: 1px;
-        width: 28px;
-      }
+      flex-direction: row;
 
       span {
-        position: relative;
-        top: 2px;
+        margin-left: 16px;
       }
     }
   }
@@ -130,7 +113,7 @@
   }
 
   span {
-    color: black;
+    // color: $black;
     font-size: 18px;
   }
 }

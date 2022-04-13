@@ -5,6 +5,7 @@ import m from 'mithril';
 import app from 'state';
 import { OffchainThread } from 'client/scripts/models';
 import { DiscussionRow } from 'views/pages/discussions/discussion_row';
+import { orderDiscussionsbyLastComment } from './helpers';
 
 type IPinnedListingAttrs = {
   proposals: OffchainThread[];
@@ -17,16 +18,10 @@ export const getLastUpdate = (proposal: OffchainThread) => {
   return lastUpdate;
 };
 
-const orderDiscussionsbyDate = (a, b) => {
-  const tsB = Math.max(+b.createdAt);
-  const tsA = Math.max(+a.createdAt);
-  return tsA - tsB;
-};
-
 export class PinnedListing implements m.ClassComponent<IPinnedListingAttrs> {
   view(vnode) {
     const { proposals } = vnode.attrs;
-    const sortedProposals = proposals.sort(orderDiscussionsbyDate);
+    const sortedProposals = proposals.sort(orderDiscussionsbyLastComment);
 
     return sortedProposals.length > 0 ? (
       <>

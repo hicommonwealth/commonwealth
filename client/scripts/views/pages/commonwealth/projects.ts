@@ -57,11 +57,10 @@ const ProjectsPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'ProjectsPage',
         title: 'Projects',
         showNewProposalButton: true,
       },
-      [
+      m('.ProjectsPage', [
         PROJECTS.map((project) => {
           return m(
             Card,
@@ -156,7 +155,7 @@ const ProjectsPage: m.Component<{}> = {
             ]
           );
         }),
-      ]
+      ])
     );
   },
 };
