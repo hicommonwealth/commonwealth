@@ -21,7 +21,7 @@ export const Errors = {
 type CreateAddressReq = {
   address: string;
   chain: string;
-  walletId: WalletId;
+  wallet_id: WalletId;
   community?: string;
   keytype?: string;
 };
@@ -43,7 +43,7 @@ const createAddress = async (
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
   }
-  if (!req.body.walletId || !Object.values(WalletId).includes(req.body.walletId)) {
+  if (!req.body.wallet_id || !Object.values(WalletId).includes(req.body.wallet_id)) {
     return next(new Error(Errors.NeedWallet));
   }
 
@@ -91,7 +91,7 @@ const createAddress = async (
 		existingAddress.last_active = new Date();
 
     // we update addresses with the wallet used to sign in
-    existingAddress.wallet_id = req.body.walletId;
+    existingAddress.wallet_id = req.body.wallet_id;
 
 		const updatedObj = await existingAddress.save();
 
@@ -135,7 +135,7 @@ const createAddress = async (
         verification_token_expires,
         keytype: req.body.keytype,
         last_active,
-        wallet_id: req.body.walletId,
+        wallet_id: req.body.wallet_id,
       });
 
       // if req.user.id is undefined, the address is being used to create a new user,

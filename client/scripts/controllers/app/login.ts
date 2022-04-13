@@ -33,7 +33,7 @@ function createAccount(
     chain: account.chain.id,
     community,
     jwt: app.user.jwt,
-    walletId,
+    wallet_id: walletId,
   });
 }
 
