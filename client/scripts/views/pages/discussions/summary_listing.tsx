@@ -5,7 +5,7 @@ import 'pages/discussions/summary_listing.scss';
 import m from 'mithril';
 import app from 'state';
 import { OffchainTopic } from 'client/scripts/models';
-import LoadingRow from '../../components/loading_row';
+import { LoadingRow } from '../../components/loading_row';
 import SummaryRow from './summary_row';
 
 export class SummaryListing implements m.ClassComponent {
@@ -22,7 +22,7 @@ export class SummaryListing implements m.ClassComponent {
 
   view() {
     if (this.initializing) {
-      return m(LoadingRow);
+      return LoadingRow;
     }
 
     const recentThreads = app.threads.summaryStore.getAll();
