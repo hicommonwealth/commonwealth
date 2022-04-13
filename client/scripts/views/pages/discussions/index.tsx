@@ -16,8 +16,8 @@ import { updateLastVisited } from 'controllers/app/login';
 import { INITIAL_PAGE_SIZE } from 'controllers/server/threads';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import EmptyListingPlaceholder from 'views/components/empty_topic_placeholder';
-import LoadingRow from 'views/components/loading_row';
+import { EmptyListingPlaceholder } from 'views/components/empty_topic_placeholder';
+import { LoadingRow } from 'views/components/loading_row';
 import Listing from 'views/pages/listing';
 import { getLastUpdate, PinnedListing } from './pinned_listing';
 import { DiscussionRow } from './discussion_row';
@@ -139,10 +139,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
     let stage = m.route.param('stage');
     const activeEntity = app.chain;
     if (!activeEntity)
-      return m(PageLoading, {
-        title: 'Discussions',
-        showNewProposalButton: true,
-      });
+      return <PageLoading title="Discussions" showNewProposalButton={true} />;
 
     if (onSummaryView) {
       // overwrite any topic- or stage-scoping in URL
@@ -202,9 +199,13 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       // pinned threads - inserted at the top of the listing
       const pinnedThreads = allThreads.filter((t) => t.pinned);
       if (pinnedThreads.length > 0) {
-        sortedListing.push(m(PinnedListing, { proposals: pinnedThreads }));
-        pinnedListing.push(m(PinnedListing, { proposals: pinnedThreads }));
-        pinnedListing.push(m('.PinnedDivider', m('hr')));
+        sortedListing.push(<PinnedListing proposals={pinnedThreads} />);
+        pinnedListing.push(<PinnedListing proposals={pinnedThreads} />);
+        pinnedListing.push(
+          <div class="PinnedDivider">
+            <hr />
+          </div>
+        );
       }
     }
 
@@ -224,7 +225,11 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
           if (getLastUpdate(firstThread) > lastVisited.unix()) {
             sortedListing.push(getLastSeenDivider(false));
           } else {
-            sortedListing.push(m('PinnedDivider', m('hr')));
+            sortedListing.push(
+              <div class="PinnedDivider">
+                <hr />
+              </div>
+            );
           }
         }
       }
@@ -237,10 +242,11 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
 
       if (noThreadsSeen() || allThreadsSeen()) {
         sortedListing.push(
-          m(
-            '.discussion-group-wrap',
-            unpinnedThreads.map((proposal) => m(DiscussionRow, { proposal }))
-          )
+          <div class="discussion-group-wrap">
+            {unpinnedThreads.map((proposal) => (
+              <DiscussionRow proposal={proposal} />
+            ))}
+          </div>
         );
       } else {
         unpinnedThreads.forEach((proposal) => {
@@ -251,17 +257,21 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
             const sortedListingCopy = sortedListing;
 
             sortedListing = [
-              m('.discussion-group-wrap', sortedListingCopy),
+              <div class="discussion-group-wrap">{sortedListingCopy}</div>,
               getLastSeenDivider(),
-              m('.discussion-group-wrap', [m(DiscussionRow, { proposal })]),
+              <div class="discussion-group-wrap">
+                <DiscussionRow proposal={proposal} />
+              </div>,
             ];
 
             visitMarkerPlaced = true;
           } else {
             if (visitMarkerPlaced) {
-              sortedListing[2].children.push(m(DiscussionRow, { proposal }));
+              sortedListing[2].children.push(
+                <DiscussionRow proposal={proposal} />
+              );
             } else {
-              sortedListing.push(m(DiscussionRow, { proposal }));
+              sortedListing.push(<DiscussionRow proposal={proposal} />);
             }
           }
         });
@@ -278,10 +288,10 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
         if (!topicId) {
           return (
             <Sublayout title="Discussions" showNewProposalButton={true}>
-              {m(EmptyListingPlaceholder, {
-                communityName: app.activeChainId(),
-                topicName: topic,
-              })}
+              <EmptyListingPlaceholder
+                communityName={app.activeChainId()}
+                topicName={topic}
+              />
             </Sublayout>
           );
         }
@@ -371,28 +381,32 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
               parentState={this}
               disabled={isLoading || stillFetching}
             />
-            {onSummaryView
-              ? isLoading
-                ? m(LoadingRow)
-                : m(Listing, {
-                    content: [<SummaryListing recentThreads={recentThreads} />],
-                  })
-              : isLoading
-              ? m(LoadingRow)
-              : isEmpty
-              ? m(EmptyListingPlaceholder, {
-                  stageName: stage,
-                  communityName,
-                  topicName,
-                })
-              : m(Listing, { content: sortedListing })}
+            {onSummaryView ? (
+              isLoading ? (
+                LoadingRow
+              ) : (
+                <Listing
+                  content={<SummaryListing recentThreads={recentThreads} />}
+                />
+              )
+            ) : isLoading ? (
+              LoadingRow
+            ) : isEmpty ? (
+              <EmptyListingPlaceholder
+                stageName={stage}
+                communityName={communityName}
+                topicName={topicName}
+              />
+            ) : (
+              <Listing content={sortedListing} />
+            )}
             {postsDepleted && !onSummaryView ? (
               <div class="infinite-scroll-reached-end">
                 Showing {allThreads.length} of{' '}
                 {pluralize(allThreads.length, 'thread')}
                 {topic ? ` under the topic '${topic}'` : ''}
               </div>
-            ) : (isEmpty || onSummaryView) ? null : (
+            ) : isEmpty || onSummaryView ? null : (
               <div class="infinite-scroll-spinner-wrap">
                 <Spinner active={!this.postsDepleted[subpage]} size="lg" />
               </div>
