@@ -24,10 +24,25 @@ import { DiscussionRow } from './discussion_row';
 import { SummaryListing } from './summary_listing';
 import {
   onFeaturedDiscussionPage,
-  getLastSeenDivider,
   orderDiscussionsbyLastComment,
 } from './helpers';
 import { DiscussionFilterBar } from './discussion_filter_bar';
+
+export const getLastSeenDivider = (hasText = true) => {
+  return (
+    <div class="LastSeenDivider">
+      {hasText ? (
+        <>
+          <hr />
+          <span>Last visit</span>
+          <hr />
+        </>
+      ) : (
+        <hr />
+      )}
+    </div>
+  );
+};
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -392,7 +407,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
                 {pluralize(allThreads.length, 'thread')}
                 {topic ? ` under the topic '${topic}'` : ''}
               </div>
-            ) : (isEmpty || onSummaryView) ? null : (
+            ) : isEmpty || onSummaryView ? null : (
               <div class="infinite-scroll-spinner-wrap">
                 <Spinner active={!this.postsDepleted[subpage]} size="lg" />
               </div>
