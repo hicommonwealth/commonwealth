@@ -1,8 +1,8 @@
 /* @jsx m */
 
 import m from 'mithril';
-
 import { Spinner } from 'construct-ui';
+
 import { pluralize } from 'helpers';
 
 interface ListingScrollAttrs {

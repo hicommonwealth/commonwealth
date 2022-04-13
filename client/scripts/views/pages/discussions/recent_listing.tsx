@@ -16,7 +16,7 @@ export class DiscussionListing
 {
   view(vnode) {
     return vnode.attrs.threads.map((t) => {
-      return m(DiscussionRow, { proposal: t });
+      return <DiscussionRow proposal={t} />;
     });
   }
 }
@@ -45,7 +45,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
       });
     }
     if (this.initializing) {
-      return m(LoadingRow);
+      return LoadingRow;
     }
 
     const pinnedThreads = listingStore.getThreads({
@@ -61,7 +61,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
 
     const totalThreadCount = pinnedThreads.length + unpinnedThreads.length;
     if (!totalThreadCount) {
-      return m(EmptyListingPlaceholder, { stageName, topicName });
+      return <EmptyListingPlaceholder stageName={topicName} />;
     }
 
     // Graham 4/12/22: If desired, reinstate + rewrite lastSeenMarker
