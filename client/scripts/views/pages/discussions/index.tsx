@@ -3,7 +3,7 @@
 import 'pages/discussions/index.scss';
 
 import app from 'state';
-import _, { debounce } from 'lodash';
+import { debounce } from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { PageLoading } from '../loading';

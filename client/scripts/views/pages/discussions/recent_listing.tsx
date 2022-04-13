@@ -6,9 +6,9 @@ import m from 'mithril';
 
 import app from 'state';
 import { OffchainThread } from 'models';
-import LoadingRow from '../../components/loading_row';
+import { LoadingRow } from '../../components/loading_row';
 import { DiscussionRow } from './discussion_row';
-import EmptyListingPlaceholder from '../../components/empty_topic_placeholder';
+import { EmptyListingPlaceholder } from '../../components/empty_topic_placeholder';
 import { ListingScroll } from './listing_scroll';
 
 export class DiscussionListing
