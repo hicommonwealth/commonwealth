@@ -189,6 +189,7 @@ export async function createUserWithAddress(
   const newAccount = app.chain.accounts.get(response.result.address, keytype);
   newAccount.setValidationToken(token);
   newAccount.setAddressId(response.result.id);
+  newAccount.setWalletId(walletId);
   return newAccount;
 }
 
