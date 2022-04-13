@@ -9,6 +9,7 @@ import app from 'state';
 import { AddressInfo, ChainInfo, RoleInfo } from 'models';
 import User from '../widgets/user';
 import { CommunityLabel } from '../community_label';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 const renderCommunity = (item) => {
   const roles: RoleInfo[] = [];
@@ -135,7 +136,10 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
             transitionDuration={0}
             hasArrow={false}
             trigger={
-              <Button rounded={true} label={<Icon name={Icons.MENU} />} />
+              <Button
+                rounded={true}
+                label={<CWIcon iconName="hamburger" iconSize="small" />}
+              />
             }
             class="CommunitySelectList"
             content={communityList}

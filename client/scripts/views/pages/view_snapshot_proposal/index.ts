@@ -2,15 +2,7 @@ import 'pages/snapshot/view_proposal.scss';
 import 'pages/snapshot/list_proposal.scss';
 
 import m from 'mithril';
-import {
-  Spinner,
-  Button,
-  Tabs,
-  TabItem,
-  Icon,
-  Icons,
-  RadioGroup,
-} from 'construct-ui';
+import { Button, Tabs, TabItem, RadioGroup } from 'construct-ui';
 import moment from 'moment';
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -30,6 +22,7 @@ import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 const enum VotingError {
   NOT_VALIDATED = 'Insufficient Voting Power',
@@ -465,9 +458,9 @@ const ViewProposalPage: m.Component<
                           },
                           [
                             m('.truncate', `#${proposal.ipfs}`),
-                            m(Icon, {
-                              name: Icons.EXTERNAL_LINK,
-                              class: 'external-link-icon',
+                            m(CWIcon, {
+                              iconName: 'externalLink',
+                              iconSize: 'small',
                             }),
                           ]
                         ),
@@ -491,9 +484,9 @@ const ViewProposalPage: m.Component<
                                 ? proposal.strategies.length + ' Strategies'
                                 : proposal.strategies[0].name
                             ),
-                            m(Icon, {
-                              name: Icons.EXTERNAL_LINK,
-                              class: 'external-link-icon',
+                            m(CWIcon, {
+                              iconName: 'externalLink',
+                              iconSize: 'small',
                             }),
                           ]
                         ),
@@ -506,9 +499,9 @@ const ViewProposalPage: m.Component<
                           },
                           [
                             m('.truncate', `#${proposal.snapshot}`),
-                            m(Icon, {
-                              name: Icons.EXTERNAL_LINK,
-                              class: 'external-link-icon',
+                            m(CWIcon, {
+                              iconName: 'externalLink',
+                              iconSize: 'small',
                             }),
                           ]
                         ),
