@@ -43,13 +43,17 @@ class NewProfile implements m.Component<{}, ProfileState> {
     vnode.state.comments = response.comments
     vnode.state.chains = response.chains
     vnode.state.addresses = response.addresses
+    vnode.state.socialAccounts = response.socialAccounts
     m.redraw()
   } 
 
   view(vnode) {
     return (
       <div className="ProfilePage">
-        <NewProfileHeader profile={vnode.state.profile} />
+        <NewProfileHeader 
+          profile={vnode.state.profile} 
+          socialAccounts={vnode.state.socialAccounts}
+        />
         <NewProfileActivity 
           threads={vnode.state.threads} 
           comments={vnode.state.comments} 

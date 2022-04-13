@@ -22,16 +22,16 @@ const getNewProfile = async (models: DB, req: Request, res: Response, next: Next
   });
   if (!addressModel) return next(new Error(Errors.NoAddressFound));
 
-  const profileModel = await models.Profile.findOne({
+  const profile = await models.Profile.findOne({
     where: {
       id: addressModel.profile_id,
     },
   });
-  if (!profileModel) return next(new Error(Errors.NoProfileFound));
+  if (!profile) return next(new Error(Errors.NoProfileFound));
 
   const addresses = await models.Address.findAll({
     where: {
-      profile_id: profileModel.id,
+      profile_id: profile.id,
     }
   })
 
@@ -57,14 +57,21 @@ const getNewProfile = async (models: DB, req: Request, res: Response, next: Next
     },
   });
 
+  const socialAccounts = await models.SocialAccount.findAll({
+    where: {
+      user_id: profile.user_id
+    },
+  })
+
   return res
     .status(200)
     .json({
-      profile: profileModel,
-      addresses: addresses.map((a) => a.toJSON()),
-      threads: threads.map((t) => t.toJSON()), 
-      comments: comments.map((c) => c.toJSON()),
-      chains: chains.map((c) => c.toJSON()),
+      profile,
+      addresses: addresses.map(a => a.toJSON()),
+      threads: threads.map(t => t.toJSON()), 
+      comments: comments.map(c => c.toJSON()),
+      chains: chains.map(c => c.toJSON()),
+      socialAccounts: socialAccounts.map(s => s.toJSON()),
     })
 }
 

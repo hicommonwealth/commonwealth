@@ -13,7 +13,7 @@
     .profile-content {
       padding: 20px 40px;
 
-      .section {
+      section {
         margin: 5px 0;
       }
 
@@ -24,6 +24,15 @@
           margin: 5px 10px 0 0;
         }
       }
+
+      .social-accounts {
+        display: flex;
+
+        .social-account-icon {
+          margin-right: 15px;
+        }
+      }
+
     }
 
   } 
