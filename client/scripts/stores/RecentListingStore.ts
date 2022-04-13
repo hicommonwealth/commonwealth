@@ -70,10 +70,6 @@ class RecentListingStore extends IdStore<OffchainThread> {
 
   // Getters
 
-  public getById(id) {
-    return this._threads.find((t) => t.id === id);
-  }
-
   public getThreads(params: IListingParams): OffchainThread[] {
     const { topicName, stageName, pinned } = params;
 
@@ -193,6 +189,9 @@ class RecentListingStore extends IdStore<OffchainThread> {
   // When topics are deleted, the threads associated with them must be updated
 
   public removeTopic(topicName: string) {
+    delete this._fetchState.topicInitialized[topicName];
+    delete this._fetchState.topicCutoffDate[topicName];
+    delete this._fetchState.topicDepleted[topicName];
     this._threads
       .filter((t) => {
         return t.topic?.name === topicName;
