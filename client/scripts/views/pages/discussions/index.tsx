@@ -110,7 +110,6 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
             topic={this.topicName}
             stage={this.stageName}
             parentState={this}
-            // disabled={isLoading || stillFetching}
           />
           {this.summaryView && <SummaryListing />}
           {!this.summaryView && (

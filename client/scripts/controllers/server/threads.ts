@@ -12,7 +12,6 @@ import {
   OffchainAttachment,
   OffchainThreadStage,
   NodeInfo,
-  OffchainTopic,
   Profile,
   ChainEntity,
   NotificationSubscription,
@@ -204,7 +203,7 @@ export interface VersionHistory {
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
-  private _listingStore = new RecentListingStore();
+  private _listingStore: RecentListingStore = new RecentListingStore();
   private _summaryStore = new ProposalStore<OffchainThread>();
 
   public get store() {

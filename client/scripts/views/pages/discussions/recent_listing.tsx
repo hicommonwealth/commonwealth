@@ -64,6 +64,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
       return m(EmptyListingPlaceholder, { stageName, topicName });
     }
 
+    // Graham 4/12/22: If desired, reinstate + rewrite lastSeenMarker
     return (
       <div class="RecentListing">
         <DiscussionListing threads={pinnedThreads} />

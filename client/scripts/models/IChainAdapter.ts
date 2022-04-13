@@ -85,6 +85,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.threads.initialize(threads, numVotingThreads, true);
     this.meta.chain.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
+    if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
+      this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
+        threads: this.app.threads.listingStore.getPinnedThreads(),
+        chain: this.meta.id,
+        pinned: true,
+      });
+    }
 
     this._serverLoaded = true;
     return true;
