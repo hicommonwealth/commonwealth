@@ -24,8 +24,12 @@ interface IListingFetchState {
 }
 
 class RecentListingStore extends IdStore<OffchainThread> {
-  private threads = new Array<OffchainThread>();
-  private fetchState: IListingFetchState = {
+  private _threads = new Array<OffchainThread>();
+  public get threads() {
+    return this._threads;
+  }
+
+  private _fetchState: IListingFetchState = {
     allThreadsInitialized: false,
     topicInitialized: {},
     stageInitialized: {},
@@ -44,30 +48,30 @@ class RecentListingStore extends IdStore<OffchainThread> {
     if (existingThread) this.remove(existingThread);
 
     super.add(thread);
-    this.threads.push(thread);
+    this._threads.push(thread);
     return this;
   }
 
   public remove(thread: OffchainThread) {
     const existingThread = this.getById(thread.id);
     if (!existingThread) return;
-    const proposalIndex = this.threads.indexOf(existingThread);
+    const proposalIndex = this._threads.indexOf(existingThread);
     if (proposalIndex === -1) return;
 
     super.remove(thread);
-    this.threads.splice(proposalIndex, 1);
+    this._threads.splice(proposalIndex, 1);
     return this;
   }
 
   public clear() {
     super.clear();
-    this.threads = [];
+    this._threads = [];
   }
 
   // Getters
 
   public getById(id) {
-    return this.threads.find((t) => t.id === id);
+    return this._threads.find((t) => t.id === id);
   }
 
   public getThreads(params: IListingParams): OffchainThread[] {
@@ -75,22 +79,24 @@ class RecentListingStore extends IdStore<OffchainThread> {
 
     let unsortedThreads;
     if (topicName) {
-      unsortedThreads = this.threads.filter(
-        (t) => t.topic.name === topicName && t.pinned === pinned
+      unsortedThreads = this._threads.filter(
+        (t) => t.topic?.name === topicName && t.pinned === pinned
       );
     } else if (stageName) {
-      unsortedThreads = this.threads.filter(
+      unsortedThreads = this._threads.filter(
         (t) => t.stage === stageName && t.pinned === pinned
       );
     } else {
-      unsortedThreads = this.threads.filter((t) => t.pinned === pinned);
+      unsortedThreads = this._threads.filter((t) => t.pinned === pinned);
     }
 
-    return unsortedThreads.sort(orderDiscussionsbyLastComment);
+    return unsortedThreads
+      .filter((t) => this._isBeforeCutoff(params, t))
+      .sort(orderDiscussionsbyLastComment);
   }
 
   public getPinnedThreads(): OffchainThread[] {
-    return this.threads
+    return this._threads
       .filter((t) => t.pinned)
       .sort(orderDiscussionsbyLastComment);
   }
@@ -100,22 +106,22 @@ class RecentListingStore extends IdStore<OffchainThread> {
   public isInitialized(params: IListingParams): boolean {
     const { topicName, stageName } = params;
     if (topicName) {
-      return this.fetchState.topicInitialized[topicName];
+      return this._fetchState.topicInitialized[topicName];
     } else if (stageName) {
-      return this.fetchState.stageInitialized[stageName];
+      return this._fetchState.stageInitialized[stageName];
     } else {
-      return this.fetchState.allThreadsInitialized;
+      return this._fetchState.allThreadsInitialized;
     }
   }
 
   public initializeListing(params: IListingParams) {
     const { topicName, stageName } = params;
     if (topicName) {
-      this.fetchState.topicInitialized[topicName] = true;
+      this._fetchState.topicInitialized[topicName] = true;
     } else if (stageName) {
-      this.fetchState.stageInitialized[stageName] = true;
+      this._fetchState.stageInitialized[stageName] = true;
     } else {
-      this.fetchState.allThreadsInitialized = true;
+      this._fetchState.allThreadsInitialized = true;
     }
   }
 
@@ -124,22 +130,22 @@ class RecentListingStore extends IdStore<OffchainThread> {
   public isDepleted(params: IListingParams): boolean {
     const { topicName, stageName } = params;
     if (topicName) {
-      return this.fetchState.topicDepleted[topicName];
+      return this._fetchState.topicDepleted[topicName];
     } else if (stageName) {
-      return this.fetchState.stageDepleted[stageName];
+      return this._fetchState.stageDepleted[stageName];
     } else {
-      return this.fetchState.allThreadsDepleted;
+      return this._fetchState.allThreadsDepleted;
     }
   }
 
   public depleteListing(params: IListingParams) {
     const { topicName, stageName } = params;
     if (topicName) {
-      this.fetchState.topicDepleted[topicName] = true;
+      this._fetchState.topicDepleted[topicName] = true;
     } else if (stageName) {
-      this.fetchState.stageDepleted[stageName] = true;
+      this._fetchState.stageDepleted[stageName] = true;
     } else {
-      this.fetchState.allThreadsDepleted = true;
+      this._fetchState.allThreadsDepleted = true;
     }
   }
 
@@ -149,29 +155,45 @@ class RecentListingStore extends IdStore<OffchainThread> {
     const { topicName, stageName } = params;
 
     if (topicName) {
-      return this.fetchState.topicCutoffDate[topicName];
+      return this._fetchState.topicCutoffDate[topicName];
     } else if (stageName) {
-      return this.fetchState.stageCutoffDate[stageName];
+      return this._fetchState.stageCutoffDate[stageName];
     } else {
-      return this.fetchState.allThreadsCutoffDate;
+      return this._fetchState.allThreadsCutoffDate;
     }
   }
 
   public setCutoffDate(params: IListingParams, cutoffDate: moment.Moment) {
     const { topicName, stageName } = params;
     if (topicName) {
-      this.fetchState.topicCutoffDate[topicName] = cutoffDate;
+      this._fetchState.topicCutoffDate[topicName] = cutoffDate;
     } else if (stageName) {
-      this.fetchState.stageCutoffDate[stageName] = cutoffDate;
+      this._fetchState.stageCutoffDate[stageName] = cutoffDate;
     } else {
-      this.fetchState.allThreadsCutoffDate = cutoffDate;
+      this._fetchState.allThreadsCutoffDate = cutoffDate;
     }
+  }
+
+  // Filter function to determine inclusion of threads on listing page
+
+  private _isBeforeCutoff(
+    params: IListingParams,
+    thread: OffchainThread
+  ): boolean {
+    const { topicName, stageName, pinned } = params;
+    const listingCutoff = topicName
+      ? this._fetchState.topicCutoffDate[topicName]
+      : stageName
+      ? this._fetchState.stageCutoffDate[stageName]
+      : this._fetchState.allThreadsCutoffDate;
+    const lastUpdate = thread.lastCommentedOn || thread.createdAt;
+    return (pinned && thread.pinned) || +lastUpdate >= +listingCutoff;
   }
 
   // When topics are deleted, the threads associated with them must be updated
 
   public removeTopic(topicName: string) {
-    this.threads
+    this._threads
       .filter((t) => {
         return t.topic?.name === topicName;
       })

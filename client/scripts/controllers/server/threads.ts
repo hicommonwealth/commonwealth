@@ -28,12 +28,6 @@ import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
-type FetchBulkThreadsProps = {
-  topicId: OffchainTopic;
-  stage: string;
-  params: Record<string, any>;
-};
-
 export const modelFromServer = (thread) => {
   const {
     id,

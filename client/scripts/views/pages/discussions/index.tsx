@@ -67,7 +67,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     this.handleScrollback();
   }
 
-  onscroll = async () => {
+  async onscroll() {
     const { topicName, stageName } = this;
     if (app.threads.listingStore.isDepleted({ topicName, stageName })) return;
 
@@ -78,7 +78,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
       await app.threads.loadNextPage({ topicName, stageName });
       m.redraw();
     }
-  };
+  }
 
   view(vnode) {
     if (!app.chain || !app.chain.serverLoaded) {

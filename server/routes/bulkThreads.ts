@@ -18,9 +18,6 @@ const bulkThreads = async (
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
   const { cutoff_date, topic_id, stage } = req.query;
-  console.log(cutoff_date);
-  console.log(topic_id);
-  console.log(stage);
 
   const bind = { chain: chain.id };
 

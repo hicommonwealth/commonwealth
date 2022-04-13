@@ -30,11 +30,12 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
 
   view(vnode) {
     const { topicName, stageName } = vnode.attrs;
-    const { getThreads, isDepleted, isInitialized } = app.threads.listingStore;
-
-    const listingInitialized = isInitialized({ topicName, stageName });
-    const listingDepleted = isDepleted({ topicName, stageName });
-
+    const { listingStore } = app.threads;
+    const listingInitialized = listingStore.isInitialized({
+      topicName,
+      stageName,
+    });
+    const listingDepleted = listingStore.isDepleted({ topicName, stageName });
     // Fetch first 20 unpinned threads
     if (!listingInitialized) {
       this.initializing = true;
@@ -47,8 +48,16 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
       return m(LoadingRow);
     }
 
-    const pinnedThreads = getThreads({ topicName, stageName, pinned: true });
-    const unpinnedThreads = getThreads({ topicName, stageName, pinned: false });
+    const pinnedThreads = listingStore.getThreads({
+      topicName,
+      stageName,
+      pinned: true,
+    });
+    const unpinnedThreads = listingStore.getThreads({
+      topicName,
+      stageName,
+      pinned: false,
+    });
 
     const totalThreadCount = pinnedThreads.length + unpinnedThreads.length;
     if (!totalThreadCount) {
@@ -60,7 +69,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
         <DiscussionListing threads={pinnedThreads} />
         <DiscussionListing threads={unpinnedThreads} />
         <ListingScroll
-          postsDepleted={listingDepleted}
+          listingDepleted={listingDepleted}
           subpageName={topicName || stageName}
           totalThreadCount={totalThreadCount}
         />
