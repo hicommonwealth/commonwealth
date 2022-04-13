@@ -42,7 +42,24 @@
       font-size: 18px;
 
       @include md-max {
-        display: block;
+        align-items: center;
+        border-radius: 10px;
+        color: $purple-400;
+        cursor: pointer;
+        display: flex;
+        flex-direction: row;
+        font-weight: 500;
+        height: 40px;
+        padding: 4px 16px;
+
+        svg {
+          margin: 1px 0 0 8px;
+        }
+
+        &:hover {
+          background-color: $purple-50;
+          text-decoration: none;
+        }
       }
     }
   }
@@ -96,21 +113,18 @@
   }
 
   .link {
+    align-items: center;
     border-radius: 10px;
     color: $purple-400;
     cursor: pointer;
-    float: right;
+    display: flex;
+    flex-direction: row;
     font-weight: 500;
-    padding: 8px 16px;
-    position: relative;
+    height: 40px;
+    padding: 4px 16px;
 
-    .cui-icon {
-      margin-left: 16px;
-      margin-top: -3px;
-
-      svg {
-        stroke: $purple-400;
-      }
+    svg {
+      margin: 1px 0 0 8px;
     }
 
     &:hover {

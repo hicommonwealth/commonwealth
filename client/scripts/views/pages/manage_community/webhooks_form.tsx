@@ -11,6 +11,7 @@ import { Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import WebhookSettingsModal from 'views/modals/webhook_settings_modal';
 import { link, pluralize } from 'helpers';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type WebhooksFormAttrs = {
   webhooks: Webhook[];
@@ -129,8 +130,9 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
                     </div>
                   }
                   contentRight={
-                    <Cui.Icon
-                      name={Cui.Icons.X}
+                    <CWIcon
+                      iconName="close"
+                      iconSize="small"
                       class={this.disabled ? 'disabled' : ''}
                       onclick={(e) => {
                         e.preventDefault();

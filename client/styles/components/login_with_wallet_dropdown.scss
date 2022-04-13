@@ -1,17 +1,5 @@
 @import 'client/styles/shared';
 
-.login-with-web3 {
-  .cui-icon {
-    position: relative;
-    top: -2px;
-    margin-left: 4px;
-
-    svg polyline {
-      stroke-width: 2.25px;
-    }
-  }
-}
-
 .LoginWithWalletDropdownPopoverMenu {
   .cui-menu .cui-button {
     padding: 4px 16px;

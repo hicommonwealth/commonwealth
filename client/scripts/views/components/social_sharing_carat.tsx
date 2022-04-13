@@ -1,8 +1,9 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { MenuItem, Icons, PopoverMenu, Icon } from 'construct-ui';
+import { MenuItem, Icons, PopoverMenu } from 'construct-ui';
 import { int } from 'aws-sdk/clients/datapipeline';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 type SocialSharingCaratAttrs = { commentID?: int };
 
@@ -54,8 +55,7 @@ export class SocialSharingCarat
             }}
           />,
         ]}
-        inline={true}
-        trigger={<Icon name={Icons.SHARE_2} />}
+        trigger={<CWIcon iconName="share2" iconSize="small" />}
       />
     );
   }

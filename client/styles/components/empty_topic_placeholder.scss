@@ -9,19 +9,14 @@ $size: 46px;
 
 .EmptyListingPlaceholder {
   .icon-circle {
-    display: inline-block;
+    align-items: center;
+    display: flex;
     background: $primary-200;
+    border-radius: $size / 2;
     color: $white;
     width: $size;
     height: $size;
-    border-radius: $size / 2;
-    text-align: center;
-    padding: 12px 0;
-    svg {
-      position: relative;
-      top: 1px;
-      stroke: $white;
-    }
+    justify-content: center;
   }
   h1 {
     font-size: 25px;

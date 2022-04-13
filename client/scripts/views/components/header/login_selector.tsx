@@ -24,7 +24,7 @@ import { LoginModal } from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import AddressSwapper from 'views/components/addresses/address_swapper';
-import * as CustomIcons from 'views/mobile/mobile_icons';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -77,7 +77,7 @@ export class LoginSelectorMenuLeft
             }}
             label={
               <div class="label-wrap">
-                {mobile && m(CustomIcons.CustomEyeIcon)}
+                {mobile && <CWIcon iconName="views" />}
                 <span>View profile</span>
               </div>
             }
@@ -97,7 +97,7 @@ export class LoginSelectorMenuLeft
             }}
             label={
               <div class="label-wrap">
-                {mobile && m(CustomIcons.CustomPencilIcon)}
+                {mobile && <CWIcon iconName="edit" />}
                 <span>Edit profile</span>
               </div>
             }
@@ -111,7 +111,7 @@ export class LoginSelectorMenuLeft
           }
           label={
             <div class="label-wrap">
-              {mobile && m(CustomIcons.CustomWalletIcon)}
+              {mobile && <CWIcon iconName="wallet" />}
               <span>
                 {nAccountsWithoutRole > 0
                   ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
@@ -145,7 +145,7 @@ export class LoginSelectorMenuRight
           }
           label={
             <div class="label-wrap">
-              {mobile && m(CustomIcons.CustomBellIcon)}
+              {mobile && <CWIcon iconName="bell" />}
               <span>Notification settings</span>
             </div>
           }
@@ -158,7 +158,7 @@ export class LoginSelectorMenuRight
           }
           label={
             <div class="label-wrap">
-              {mobile && m(CustomIcons.CustomUserIcon)}
+              {mobile && <CWIcon iconName="person" />}
               <span>Account settings</span>
             </div>
           }
@@ -168,7 +168,7 @@ export class LoginSelectorMenuRight
           onclick={() => app.modals.create({ modal: FeedbackModal })}
           label={
             <div class="label-wrap">
-              {mobile && m(CustomIcons.CustomCommentIcon)}
+              {mobile && <CWIcon iconName="feedback" />}
               <span>Send feedback</span>
             </div>
           }
@@ -189,7 +189,7 @@ export class LoginSelectorMenuRight
           }}
           label={
             <div class="label-wrap">
-              {mobile && m(CustomIcons.CustomLogoutIcon)}
+              {mobile && <CWIcon iconName="logout" />}
               <span>Logout</span>
             </div>
           }
@@ -433,7 +433,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               fluid={true}
               compact={true}
               size={small ? 'sm' : 'default'}
-              label={<Cui.Icon name={Cui.Icons.USER} />}
+              label={<CWIcon iconName="person" iconSize="small" />}
             />
           }
           content={<LoginSelectorMenuRight />}
