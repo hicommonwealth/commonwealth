@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import { Profile } from 'client/scripts/models'
+import { NewProfile as Profile } from 'client/scripts/models'
 import { SocialAccount } from 'client/scripts/models';
 
 import { CWCard } from '../../components/component_kit/cw_card';
@@ -21,7 +21,7 @@ const renderSocialAccounts = (socialAccounts: Array<SocialAccount>) => {
       <div className="social-accounts">
         <div className="social-account-icon">
           {
-            account.provider == "github" ? <CWIcon iconName="github" iconSize="large" />
+            account.provider == "github" ? <a > <CWIcon iconName="github" iconSize="large" /> </a>
             : account.provider == "discord" ? <CWIcon iconName="discord" iconSize="large" />
             : account.provider == "telegram" ? <CWIcon iconName="telegram" iconSize="large" />
             : <div />
@@ -49,7 +49,7 @@ const NewProfileHeader : m.Component<ProfileHeaderAttrs> = {
         > 
           <section className="profile-name">
             <CWAccount className="profile-icon" iconName="account" iconSize="medium" />
-            <h3> { profile?.profile_name } </h3>
+            <h3> { profile?.name } </h3>
           </section>
 
           <section>

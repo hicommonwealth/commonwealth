@@ -8,7 +8,7 @@ import Sublayout from 'views/sublayout';
 import NewProfileHeader from './new_profile_header'
 import NewProfileActivity from './new_profile_activity'
 
-import Profile from 'client/scripts/models/Profile'
+import {NewProfile as Profile} from 'client/scripts/models'
 import OffchainThread from 'client/scripts/models/OffchainThread'
 import ChainInfo from 'client/scripts/models/ChainInfo'
 import OffchainComment from 'client/scripts/models/OffchainComment'
@@ -38,7 +38,17 @@ class NewProfile implements m.Component<{}, ProfileState> {
       jwt: app.user.jwt,
     });
     // TODO: status code error handling with better HTTP call library
+
+    const profile = new Profile()
+    profile.initialize(
+      response.profile.name, 
+      response.profile.email,
+      response.profile.website,
+      response.profile.bio,
+      response.profile.isDefault,
+    );
     vnode.state.profile = response.profile
+    
     vnode.state.threads = response.threads
     vnode.state.comments = response.comments
     vnode.state.chains = response.chains

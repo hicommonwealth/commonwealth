@@ -34,6 +34,7 @@ export { default as ChainEvent } from './ChainEvent';
 export { default as ChainEntity } from './ChainEntity';
 export { default as StarredCommunity } from './StarredCommunity';
 export { default as Webhook } from './Webhook';
+export {default as NewProfile } from './NewProfile'
 
 export { DepositVote, BinaryVote } from './votes';
 
