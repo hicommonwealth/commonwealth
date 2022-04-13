@@ -167,6 +167,10 @@ $discussion-title-font-size: 1.45rem;
         flex-direction: row;
         flex-wrap: wrap;
         margin-bottom: 12px;
+
+        svg {
+          cursor: pointer;
+        }
       }
       .proposal-meta-top {
         display: flex;
