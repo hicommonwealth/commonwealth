@@ -80,11 +80,14 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
     this.topicInitialized[ALL_PROPOSALS_KEY] = false;
     const topic = vnode.attrs.topic;
     const stage = m.route.param('stage');
+
     const subpage =
       topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
+
     const returningFromThread =
       app.lastNavigatedBack() &&
       app.lastNavigatedFrom().includes('/discussion/');
+
     this.lookback[subpage] =
       returningFromThread &&
       localStorage[`${app.activeChainId()}-lookback-${subpage}`]
@@ -103,6 +106,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
     let { topic } = vnode.attrs;
 
     if (!app.chain) return;
+
     if (!this.summaryViewInitialized) {
       if (app.chain?.meta?.chain?.defaultSummaryView) {
         this.summaryView = true;
@@ -118,6 +122,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       }
       this.summaryViewInitialized = true;
     }
+
     const { summaryView, recentThreads, lastSubpage } = this;
     const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
     const onSummaryView = summaryView && !topicSelected;
@@ -137,7 +142,9 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
     }
 
     let stage = m.route.param('stage');
+
     const activeEntity = app.chain;
+
     if (!activeEntity)
       return <PageLoading title="Discussions" showNewProposalButton={true} />;
 
@@ -146,10 +153,12 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       topic = null;
       stage = null;
     }
+
     const subpage =
       topic || stage ? `${topic || ''}#${stage || ''}` : ALL_PROPOSALS_KEY;
 
     const activeNode = app.chain?.meta;
+
     const selectedNodes = app.config.nodes
       .getAll()
       .filter(
@@ -160,6 +169,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
           activeNode.chain &&
           n.chain.id === activeNode.chain.id
       );
+
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
 
     const communityName = selectedNode ? selectedNode.chain.name : '';
@@ -176,9 +186,11 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
     // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
     // for easy comparison with weekly indexes' msecAgo
     const id = (activeEntity.meta as NodeInfo).chain.id;
+
     const lastVisited = moment(allLastVisited[id]).utc();
 
     let sortedListing = [];
+
     const pinnedListing = [];
     // fetch unique addresses count for pinned threads
     if (!app.threadUniqueAddressesCount.getInitializedPinned()) {
@@ -212,6 +224,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
     const unpinnedThreads = allThreads.filter((t) => !t.pinned);
 
     const firstThread = unpinnedThreads[0];
+
     const lastThread = unpinnedThreads[unpinnedThreads.length - 1];
 
     if (unpinnedThreads.length > 0) {
@@ -283,6 +296,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
 
     if (newSubpage) {
       let topicId;
+
       if (topic) {
         topicId = app.topics.getByName(topic, app.activeChainId())?.id;
         if (!topicId) {
@@ -341,7 +355,9 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
     }
 
     let topicName;
+
     let topicDescription;
+
     if (topic && app.activeChainId()) {
       const topics = app.topics.getByCommunity(app.activeChainId());
       const topicObject = topics.find((t) => t.name === topic);
@@ -353,18 +369,61 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       `${app.activeChainId()}-lookback-${subpage}`,
       `${this.lookback[subpage].unix()}`
     );
+
     const stillFetching =
       unpinnedThreads.length === 0 && !this.postsDepleted[subpage];
+
     const isLoading =
       this.loadingRecentThreads ||
       !activeEntity ||
       !activeEntity.serverLoaded ||
       stillFetching;
+
     const isEmpty =
       !isLoading &&
       allThreads.length === 0 &&
       this.postsDepleted[subpage] === true;
     const postsDepleted = allThreads.length > 0 && this.postsDepleted[subpage];
+
+    const getTopContent = () => {
+      if (isLoading) {
+        return LoadingRow;
+      } else if (onSummaryView && !isEmpty) {
+        return (
+          <Listing content={<SummaryListing recentThreads={recentThreads} />} />
+        );
+      } else if (onSummaryView && isEmpty) {
+        return (
+          <EmptyListingPlaceholder
+            stageName={stage}
+            communityName={communityName}
+            topicName={topicName}
+          />
+        );
+      } else {
+        return <Listing content={sortedListing} />;
+      }
+    };
+
+    const getBottomContent = () => {
+      if (!onSummaryView && postsDepleted) {
+        return (
+          <div class="infinite-scroll-reached-end">
+            Showing {allThreads.length} of{' '}
+            {pluralize(allThreads.length, 'thread')}
+            {topic ? ` under the topic '${topic}'` : ''}
+          </div>
+        );
+      } else if (onSummaryView || isEmpty) {
+        return (
+          <div class="infinite-scroll-spinner-wrap">
+            <Spinner active={!this.postsDepleted[subpage]} size="lg" />
+          </div>
+        );
+      } else {
+        return null;
+      }
+    };
 
     return (
       <Sublayout
@@ -373,46 +432,16 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
         showNewProposalButton={true}
         onscroll={this.onscroll}
       >
-        {app.chain && (
-          <div class="DiscussionsPage">
-            <DiscussionFilterBar
-              topic={topicName}
-              stage={stage}
-              parentState={this}
-              disabled={isLoading || stillFetching}
-            />
-            {onSummaryView ? (
-              isLoading ? (
-                LoadingRow
-              ) : (
-                <Listing
-                  content={<SummaryListing recentThreads={recentThreads} />}
-                />
-              )
-            ) : isLoading ? (
-              LoadingRow
-            ) : isEmpty ? (
-              <EmptyListingPlaceholder
-                stageName={stage}
-                communityName={communityName}
-                topicName={topicName}
-              />
-            ) : (
-              <Listing content={sortedListing} />
-            )}
-            {postsDepleted && !onSummaryView ? (
-              <div class="infinite-scroll-reached-end">
-                Showing {allThreads.length} of{' '}
-                {pluralize(allThreads.length, 'thread')}
-                {topic ? ` under the topic '${topic}'` : ''}
-              </div>
-            ) : isEmpty || onSummaryView ? null : (
-              <div class="infinite-scroll-spinner-wrap">
-                <Spinner active={!this.postsDepleted[subpage]} size="lg" />
-              </div>
-            )}
-          </div>
-        )}
+        <div class="DiscussionsPage">
+          <DiscussionFilterBar
+            topic={topicName}
+            stage={stage}
+            parentState={this}
+            disabled={isLoading || stillFetching}
+          />
+          {getTopContent()}
+          {getBottomContent()}
+        </div>
       </Sublayout>
     );
   }

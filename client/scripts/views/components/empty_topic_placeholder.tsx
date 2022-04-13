@@ -36,9 +36,15 @@ export class EmptyListingPlaceholder
         </div>
         <h1>
           Welcome to the{' '}
-          {isNotUndefined(topicName)
-            ? `${(<strong>{topicName}</strong>)} topic!`
-            : `${(<strong>{communityName}</strong>)} community!`}
+          {isNotUndefined(topicName) ? (
+            <>
+              <strong>{topicName}</strong> topic!
+            </>
+          ) : (
+            <>
+              <strong>{communityName}</strong> community!
+            </>
+          )}
         </h1>
         <p>There are no threads here yet.</p>
         {!app.isLoggedIn() && <p>Log in to create a new thread.</p>}
