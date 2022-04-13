@@ -109,6 +109,7 @@ export class DiscussionFilterBar
                 e.preventDefault();
                 parentState.summaryView = false;
                 localStorage.setItem('discussion-summary-toggle', 'false');
+                m.route.set(`/${app.activeChainId()}`);
               }}
             />
           </>

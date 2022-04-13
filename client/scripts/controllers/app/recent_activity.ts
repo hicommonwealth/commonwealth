@@ -1,10 +1,5 @@
 import moment from 'moment';
-import {
-  OffchainTopic,
-  AbridgedThread,
-  Profile,
-  OffchainThread,
-} from 'models';
+import { OffchainTopic, AbridgedThread, Profile, OffchainThread } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
@@ -76,15 +71,10 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentTopicActivity(options: {
-    chainId: string;
-    threadsPerTopic?: number;
-  }): Promise<OffchainThread[]> {
-    const { chainId } = options;
-    const threadsPerTopic = options.threadsPerTopic || 3;
+  public async getRecentTopicActivity(): Promise<OffchainThread[]> {
     const params = {
-      chain: chainId,
-      threads_per_topic: threadsPerTopic
+      chain: app.activeChainId(),
+      threads_per_topic: 3,
     };
 
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
