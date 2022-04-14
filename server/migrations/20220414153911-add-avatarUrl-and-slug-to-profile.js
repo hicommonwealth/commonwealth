@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.addColumn('Profiles', 'avatarUrl', {
+      await queryInterface.addColumn('Profiles', 'avatar_url', {
         type: Sequelize.STRING,
         allowNull: true
       }, { transaction: t });
@@ -16,7 +16,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn('Profiles', 'avatarUrl', { transaction: t });
+      await queryInterface.removeColumn('Profiles', 'avatar_url', { transaction: t });
       await queryInterface.removeColumn('Profiles', 'slug', { transaction: t });
     });
   }
