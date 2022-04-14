@@ -16,14 +16,8 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn('Profiles', 'avatarUrl', {
-        type: Sequelize.STRING,
-        allowNull: true,
-      }, { transaction: t });
-      await queryInterface.removeColumn('Profiles', 'slug', {
-        type: Sequelize.STRING,
-        allowNull: true,
-      }, { transaction: t });
+      await queryInterface.removeColumn('Profiles', 'avatarUrl', { transaction: t });
+      await queryInterface.removeColumn('Profiles', 'slug', { transaction: t });
     });
   }
 };
