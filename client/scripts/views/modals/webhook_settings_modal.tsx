@@ -107,7 +107,7 @@ export class WebhookSettingsModal
               {row('New reaction', [NotificationCategories.NewReaction])}
             </List>
           </div>
-          {isChain && (
+          {isChain && Object.keys(chainNotifications).length > 0 && (
             <div class="chain-events">
               <h4>On-chain events</h4>
               <List interactive={false} size="sm">
