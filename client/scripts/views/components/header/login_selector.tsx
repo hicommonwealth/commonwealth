@@ -34,6 +34,11 @@ const CHAINBASE_SHORT = {
   [ChainBase.Solana]: 'Solana',
 };
 
+const CHAINNETWORK_SHORT = {
+  [ChainNetwork.AxieInfinity]: 'Ronin',
+  [ChainNetwork.Terra]: 'Terra',
+};
+
 type LoginSelectorMenuLeftAttrs = {
   activeAddressesWithRole: any;
   mobile?: boolean;
@@ -387,6 +392,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
                 <span class="hidden-sm">
                   {samebaseAddresses.length === 0
                     ? `No ${
+                      CHAINNETWORK_SHORT[app.chain?.meta?.chain?.network] ||
                         CHAINBASE_SHORT[app.chain?.meta?.chain.base] || ''
                       } address`
                     : 'Join'}
