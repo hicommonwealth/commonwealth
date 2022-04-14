@@ -3,7 +3,7 @@
 import m from 'mithril';
 import { Button } from 'construct-ui';
 
-import 'pages/view_proposal/proposal_sidebar_linked_viewer.scss';
+import 'pages/view_proposal/linked_proposals_card.scss';
 
 import app from 'state';
 import { link } from 'helpers';
@@ -99,7 +99,7 @@ class ProposalSidebarLinkedSnapshot
   }
 }
 
-export class ProposalSidebarLinkedViewer
+export class LinkedProposalsCard
   implements
     m.ClassComponent<{
       openStageEditor: () => void;
@@ -111,7 +111,7 @@ export class ProposalSidebarLinkedViewer
     const { proposal, openStageEditor, showAddProposalButton } = vnode.attrs;
 
     return (
-      <div class="ProposalSidebarLinkedViewer">
+      <div class="LinkedProposalsCard">
         {proposal.chainEntities.length > 0 ||
         proposal.snapshotProposal?.length > 0 ? (
           <h4>Proposals for Thread</h4>

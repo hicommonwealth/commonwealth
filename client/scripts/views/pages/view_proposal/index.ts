@@ -89,10 +89,6 @@ import {
   // ProposalHeaderLinkThreadsMenuItem,
 } from './header';
 import {
-  ProposalSidebarPollEditorModule,
-  ProposalLinkedThreadsEditorModule,
-} from './sidebar';
-import {
   AaveViewProposalDetail,
   AaveViewProposalSummary,
 } from './aave_view_proposal_detail';
@@ -121,7 +117,9 @@ import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { ProposalSidebarLinkedViewer } from './proposal_linked_sidebar_viewer';
+import { PollEditorCard } from './poll_editor_card';
+import { LinkedProposalsCard } from './linked_proposals_card';
+import { LinkedThreadsCard } from './linked_threads_card';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1386,7 +1384,7 @@ const ViewProposalPage: m.Component<
             proposal instanceof OffchainThread &&
               isAuthor &&
               !proposal.offchainVotingEnabled &&
-              m(ProposalSidebarPollEditorModule, {
+              m(PollEditorCard, {
                 proposal,
                 openPollEditor: () => {
                   vnode.state.pollEditorIsOpen = true;
@@ -1394,7 +1392,7 @@ const ViewProposalPage: m.Component<
               }),
             showLinkedSnapshotOptions &&
               proposal instanceof OffchainThread &&
-              m(ProposalSidebarLinkedViewer, {
+              m(LinkedProposalsCard, {
                 proposal,
                 openStageEditor: () => {
                   vnode.state.stageEditorIsOpen = true;
@@ -1403,7 +1401,7 @@ const ViewProposalPage: m.Component<
               }),
             showLinkedThreadOptions &&
               proposal instanceof OffchainThread &&
-              m(ProposalLinkedThreadsEditorModule, {
+              m(LinkedThreadsCard, {
                 proposalId: proposal.id,
                 allowLinking: isAuthor || isAdminOrMod,
               }),
