@@ -9,6 +9,7 @@ import 'pages/create_community.scss';
 import app from 'state';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
+import { ERC721Form } from './erc721_form';
 import { EthChainAttrs } from './types';
 import { EthDaoForm } from './eth_dao_form';
 import { SplTokenForm } from './spl_token_form';
@@ -21,6 +22,7 @@ import Sublayout from '../../sublayout';
 enum CommunityType {
   StarterCommunity = 'Starter Community',
   Erc20Community = 'ERC20',
+  Erc721Community = 'ERC721',
   SubstrateCommunity = 'Substrate',
   SputnikDao = 'Sputnik (V2)',
   Cosmos = 'Cosmos',
@@ -75,6 +77,8 @@ class CreateCommunity implements m.ClassComponent {
           return m(StarterCommunityForm);
         case CommunityType.Erc20Community:
           return m(ERC20Form, { ethChains, ethChainNames });
+        case CommunityType.Erc721Community:
+          return m(ERC721Form, { ethChains, ethChainNames });
         case CommunityType.SputnikDao:
           return m(SputnikForm);
         case CommunityType.SubstrateCommunity:

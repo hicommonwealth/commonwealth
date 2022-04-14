@@ -21,7 +21,6 @@ import {
   OffchainThreadKind,
   OffchainThreadStage,
   AnyProposal,
-  ITokenAdapter,
 } from 'models';
 import { ProposalType } from 'types';
 
@@ -31,6 +30,7 @@ import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
@@ -92,20 +92,8 @@ export const ProposalHeaderOffchainPoll: m.Component<
     const pollingEnded =
       proposal.offchainVotingEndsAt &&
       proposal.offchainVotingEndsAt?.isBefore(moment().utc());
-    const canVote =
-      app.isLoggedIn() &&
-      app.user.activeAccount &&
-      !pollingEnded &&
-      !proposal.getOffchainVoteFor(
-        app.user.activeAccount.chain.id,
-        app.user.activeAccount.address
-      );
 
-    const tokenThresholdFailed =
-      ITokenAdapter.instanceOf(app.chain) &&
-      proposal.topic.tokenThreshold?.gtn(0)
-        ? app.chain.tokenBalance.lt(proposal.topic.tokenThreshold)
-        : false;
+    const tokenThresholdFailed = TopicGateCheck.isGatedTopic(proposal.topic.name);
 
     const vote = async (option, hasVoted, isSelected) => {
       if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
