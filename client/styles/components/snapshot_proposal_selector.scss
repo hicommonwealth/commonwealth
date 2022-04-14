@@ -5,7 +5,7 @@
   border: 1px solid $neutral-100;
   height: 208px;
   margin-bottom: 16px;
-  overflow-y: scroll;
+  overflow-y: hidden;
   width: 552px;
 
   .cui-control-group {
@@ -23,7 +23,7 @@
 
   .cui-list {
     border-radius: 5px;
-    height: 208px;
+    height: 168px;
 
     .cui-list-item {
       height: 56px;
@@ -33,6 +33,7 @@
 
   .cui-query-list-checkmark .cui-list-item-content-left {
     left: 0;
+    position: unset;
   }
 
   .chain-entity {
