@@ -7,7 +7,7 @@ import { providers } from 'ethers';
 import { WhereOptions } from 'sequelize/types';
 import axios from 'axios';
 
-import { ERC20__factory } from '../../shared/eth/types';
+import { ERC20__factory, ERC721__factory } from '../../shared/eth/types';
 
 import JobRunner from './cacheJobRunner';
 
@@ -33,6 +33,7 @@ interface CacheT {
 
 // Uses a tiny class so it's mockable for testing
 export class TokenBalanceProvider {
+
   public async getRoninTokenBalance(address: string) {
     // TODO: make configurable
     const rpcUrl = 'https://api.roninchain.com/rpc';
@@ -74,9 +75,19 @@ export class TokenBalanceProvider {
     return new BN(axsBalanceBigNum.toString()).add(new BN(stakingPoolBalance.toString()));
   }
 
-  public async getEthTokenBalance(url: string, tokenAddress: string, userAddress: string): Promise<BN> {
+  public async getEthTokenBalance(url: string, network: string,
+  tokenAddress: string, userAddress: string): Promise<BN> {
     const provider = new Web3.providers.WebsocketProvider(url);
-    const api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
+    let api;
+    if(network === ChainNetwork.ERC20) {
+      api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider));
+    }
+    else if(network === ChainNetwork.ERC721) {
+      api = ERC721__factory.connect(tokenAddress, new providers.Web3Provider(provider));
+    }
+    else {
+      throw new Error('Invalid token chain network');
+    }
     await api.deployed();
     const balanceBigNum = await api.balanceOf(userAddress);
     provider.disconnect(1000, 'finished');
@@ -220,7 +231,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }
       const url = urls.private_url || urls.url;
       try {
-        balance = await this._balanceProvider.getEthTokenBalance(url, contractAddress, address);
+        balance = await this._balanceProvider.getEthTokenBalance(url, chain.network, contractAddress, address);
       } catch (e) {
         throw new Error(`Could not fetch token balance: ${e.message}`);
       }

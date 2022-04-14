@@ -28,7 +28,6 @@ import {
   OffchainTopic,
   OffchainThreadKind,
   OffchainThreadStage,
-  ITokenAdapter,
 } from 'models';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -36,6 +35,8 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
 import { TopicSelector } from 'views/components/topic_selector';
 import EditProfileModal from 'views/modals/edit_profile_modal';
+
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
@@ -677,7 +678,11 @@ export const NewThreadForm: m.Component<
                         localStorage.getItem(
                           `${app.activeChainId()}-active-topic`
                         ),
-                      topics: app.chain.meta.chain.topics,
+                      topics: app.topics && app.topics.getByCommunity(app.activeChainId()).filter((t) => {
+                        return isAdmin
+                          || t.tokenThreshold.isZero()
+                          || !TopicGateCheck.isGatedTopic(t.name);
+                      }),
                       updateFormData: updateTopicState,
                       tabindex: 1,
                     }),
@@ -815,14 +820,15 @@ export const NewThreadForm: m.Component<
                               ),
                         topics:
                           app.topics &&
-                          app.chain.meta.chain.topics.filter((t) => {
-                            return (
-                              isAdmin ||
-                              t.tokenThreshold.isZero() ||
-                              (ITokenAdapter.instanceOf(app.chain) &&
-                                t.tokenThreshold.lte(app.chain.tokenBalance))
-                            );
-                          }),
+                          app.topics
+                            .getByCommunity(app.activeChainId())
+                            .filter((t) => {
+                              return (
+                                isAdmin ||
+                                t.tokenThreshold.isZero() ||
+                                !TopicGateCheck.isGatedTopic(t.name)
+                              );
+                            }),
                         updateFormData: updateTopicState,
                         tabindex: 1,
                       }),
