@@ -12,6 +12,7 @@ import {
   Checkbox,
 } from 'construct-ui';
 
+import { ChainNetwork } from 'types';
 import QuillEditor from 'views/components/quill_editor';
 import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
@@ -86,7 +87,7 @@ const NewTopicModal: m.Component<
 
     const decimals = app.chain?.meta.chain?.decimals
       ? app.chain.meta.chain.decimals
-      : 18;
+      : (app.chain.network === ChainNetwork.ERC721) ? 0 : 18;
 
     return m('.NewTopicModal', [
       m('.compact-modal-title', [
@@ -225,12 +226,7 @@ const NewTopicModal: m.Component<
                   null,
                   form.featuredInSidebar,
                   form.featuredInNewPost,
-                  app.activeChainId()
-                    ? tokensToWei(
-                        vnode.state.form.tokenThreshold || '0',
-                        app.chain?.meta.chain.decimals || 18
-                      )
-                    : '0',
+                  vnode.state.form.tokenThreshold || '0',
                   defaultOffchainTemplate
                 )
                 .then(() => {

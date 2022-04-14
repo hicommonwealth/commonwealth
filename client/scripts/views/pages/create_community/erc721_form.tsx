@@ -13,7 +13,7 @@ import { initAppState } from 'app';
 import { slugify, slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
-import { IERC20Metadata__factory } from 'eth/types';
+import { IERC721Metadata__factory } from 'eth/types';
 import { IdRow, InputRow, ValidationRow } from 'views/components/metadata_rows';
 import {
   initChainForm,
@@ -28,12 +28,12 @@ import {
 } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 
-type CreateERC20Form = ChainFormFields & EthFormFields & { decimals: number };
+type CreateERC721Form = ChainFormFields & EthFormFields;
 
-type CreateERC20State = ChainFormState & { form: CreateERC20Form };
+type CreateERC721State = ChainFormState & { form: CreateERC721Form };
 
-export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
-  private state: CreateERC20State = {
+export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
+  private state: CreateERC721State = {
     error: '',
     loaded: false,
     loading: false,
@@ -44,7 +44,6 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
       altWalletUrl: '',
       ethChainId: 1,
       chainString: 'Ethereum Mainnet',
-      decimals: 18,
       id: '',
       name: '',
       symbol: 'XYZ',
@@ -69,7 +68,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
       const args = {
         address: this.state.form.address,
         chain_id: this.state.form.ethChainId,
-        chain_network: ChainNetwork.ERC20,
+        chain_network: ChainNetwork.ERC721,
         url: this.state.form.nodeUrl,
         allowUncached: true,
       };
@@ -81,7 +80,6 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             this.state.form.name = res.token.name || '';
             this.state.form.id = res.token.id && slugify(res.token.id);
             this.state.form.symbol = res.token.symbol || '';
-            this.state.form.decimals = +res.token.decimals || 18;
             this.state.form.iconUrl = res.token.icon_url || '';
             if (this.state.form.iconUrl.startsWith('/')) {
               this.state.form.iconUrl = `https://commonwealth.im${this.state.form.iconUrl}`;
@@ -94,12 +92,12 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             this.state.form.github = res.token.github || '';
             this.state.status = 'Success!';
           } else {
-            // attempt to query ERC20Detailed token info from chain
+            // attempt to query ERC721Detailed token info from chain
             console.log('Querying chain for ERC info');
             const provider = new Web3.providers.WebsocketProvider(args.url);
             try {
               const ethersProvider = new providers.Web3Provider(provider);
-              const contract = IERC20Metadata__factory.connect(
+              const contract = IERC721Metadata__factory.connect(
                 args.address,
                 ethersProvider
               );
@@ -109,13 +107,11 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
               this.state.form.name = name || '';
               this.state.form.id = name && slugify(name);
               this.state.form.symbol = symbol || '';
-              this.state.form.decimals = decimals || 18;
               this.state.status = 'Success!';
             } catch (e) {
               this.state.form.name = '';
               this.state.form.id = '';
               this.state.form.symbol = '';
-              this.state.form.decimals = 18;
               this.state.status = 'Verified token but could not load metadata.';
             }
             this.state.form.iconUrl = '';
@@ -191,7 +187,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
                 chain_string: chainString,
                 eth_chain_id: ethChainId,
                 jwt: app.user.jwt,
-                network: ChainNetwork.ERC20,
+                network: ChainNetwork.ERC721,
                 node_url: nodeUrl,
                 type: ChainType.Token,
                 ...this.state.form,
@@ -200,7 +196,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || 'Creating new ERC20 community failed'
+                err.responseJSON?.error || 'Creating new ERC721 community failed'
               );
             } finally {
               this.state.saving = false;
