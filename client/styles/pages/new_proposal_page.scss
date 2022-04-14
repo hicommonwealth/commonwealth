@@ -1,11 +1,9 @@
 @import 'client/styles/shared';
 
 .NewProposalPage {
-  height: 100%;
+  flex: 1;
+  padding: 24px;
 
-  .forum-container {
-    padding: 24px;
-  }
   .error {
     @include error-text();
     margin-bottom: 15px;
@@ -36,7 +34,7 @@
   .council-motion-description {
     margin-top: -12px;
     margin-bottom: 22px;
-    color: $text-color-light;
+    color: $neutral-500;
   }
   .cui-overlay-inline {
     display: block;
@@ -54,17 +52,17 @@
   margin-bottom: 24px;
 
   .executor {
-    background-color: #f4f4f4;
+    background-color: $neutral-50;
     padding: 16px 16px 10px;
     border-radius: 8px;
-    border: 1px solid #dddddd;
+    border: 1px solid $neutral-100;
     min-width: 100%;
     margin-bottom: 20px;
     cursor: pointer;
 
     .label {
       font-size: 14px;
-      color: #666666;
+      color: $neutral-600;
     }
 
     .mt-16 {
@@ -73,8 +71,8 @@
   }
 
   .selected-executor {
-    background-color: #f2fffd;
-    border: 1px solid #00c0a9;
+    background-color: $green-50;
+    border: 1px solid $green-300;
   }
 
   .tabs {
@@ -92,19 +90,19 @@
 
     .helper-text {
       font-size: 14px;
-      color: #999999;
+      color: $neutral-500;
     }
   }
 
   .button {
     border-radius: 8px;
     font-weight: 500;
-    color: #999999;
+    color: $neutral-500;
   }
 
   .active {
-    border-color: #6966ff;
-    color: #6966ff;
+    border-color: $purple-300;
+    color: $purple-300;
   }
 
   .tab-selector {

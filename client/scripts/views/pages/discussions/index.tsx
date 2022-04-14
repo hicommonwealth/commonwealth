@@ -24,10 +24,25 @@ import { DiscussionRow } from './discussion_row';
 import { SummaryListing } from './summary_listing';
 import {
   onFeaturedDiscussionPage,
-  getLastSeenDivider,
   orderDiscussionsbyLastComment,
 } from './helpers';
 import { DiscussionFilterBar } from './discussion_filter_bar';
+
+export const getLastSeenDivider = (hasText = true) => {
+  return (
+    <div class="LastSeenDivider">
+      {hasText ? (
+        <>
+          <hr />
+          <span>Last visit</span>
+          <hr />
+        </>
+      ) : (
+        <hr />
+      )}
+    </div>
+  );
+};
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -231,6 +246,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
 
       const allThreadsSeen = () =>
         firstThread && getLastUpdate(firstThread) < lastVisited.unix();
+
       const noThreadsSeen = () =>
         lastThread && getLastUpdate(lastThread) > lastVisited.unix();
 
@@ -242,27 +258,26 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
           )
         );
       } else {
-        let count = 0;
         unpinnedThreads.forEach((proposal) => {
           if (
             !visitMarkerPlaced &&
             getLastUpdate(proposal) < lastVisited.unix()
           ) {
             const sortedListingCopy = sortedListing;
+
             sortedListing = [
               m('.discussion-group-wrap', sortedListingCopy),
               getLastSeenDivider(),
               m('.discussion-group-wrap', [m(DiscussionRow, { proposal })]),
             ];
+
             visitMarkerPlaced = true;
-            count += 1;
           } else {
             if (visitMarkerPlaced) {
               sortedListing[2].children.push(m(DiscussionRow, { proposal }));
             } else {
               sortedListing.push(m(DiscussionRow, { proposal }));
             }
-            count += 1;
           }
         });
       }
@@ -277,11 +292,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
         topicId = app.topics.getByName(topic, app.activeChainId())?.id;
         if (!topicId) {
           return (
-            <Sublayout
-              class="DiscussionsPage"
-              title="Discussions"
-              showNewProposalButton={true}
-            >
+            <Sublayout title="Discussions" showNewProposalButton={true}>
               {m(EmptyListingPlaceholder, {
                 communityName: app.activeChainId(),
                 topicName: topic,
@@ -306,7 +317,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       };
 
       this.onscroll = _.debounce(async () => {
-        console.log('scrawling');
         if (this.postsDepleted[subpage]) return;
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
@@ -363,52 +373,45 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
 
     return (
       <Sublayout
-        class="DiscussionsPage"
         title="Discussions"
         description={topicDescription}
         showNewProposalButton={true}
         onscroll={this.onscroll}
       >
         {app.chain && (
-          <div class="discussions-main">
-            {!isEmpty && (
-              <DiscussionFilterBar
-                topic={topicName}
-                stage={stage}
-                parentState={this}
-                disabled={isLoading || stillFetching}
-              />
-            )}
-            <div class="listing-wrap">
-              {onSummaryView
-                ? isLoading
-                  ? m(LoadingRow)
-                  : m(Listing, {
-                      content: [
-                        <SummaryListing recentThreads={recentThreads} />,
-                      ],
-                    })
-                : isLoading
+          <div class="DiscussionsPage">
+            <DiscussionFilterBar
+              topic={topicName}
+              stage={stage}
+              parentState={this}
+              disabled={isLoading || stillFetching}
+            />
+            {onSummaryView
+              ? isLoading
                 ? m(LoadingRow)
-                : isEmpty
-                ? m(EmptyListingPlaceholder, {
-                    stageName: stage,
-                    communityName,
-                    topicName,
+                : m(Listing, {
+                    content: [<SummaryListing recentThreads={recentThreads} />],
                   })
-                : m(Listing, { content: sortedListing })}
-              {postsDepleted ? (
-                <div class="infinite-scroll-reached-end">
-                  Showing {allThreads.length} of{' '}
-                  {pluralize(allThreads.length, 'thread')}
-                  {topic ? ` under the topic '${topic}'` : ''}
-                </div>
-              ) : isEmpty ? null : (
-                <div class="infinite-scroll-spinner-wrap">
-                  <Spinner active={!this.postsDepleted[subpage]} size="lg" />
-                </div>
-              )}
-            </div>
+              : isLoading
+              ? m(LoadingRow)
+              : isEmpty
+              ? m(EmptyListingPlaceholder, {
+                  stageName: stage,
+                  communityName,
+                  topicName,
+                })
+              : m(Listing, { content: sortedListing })}
+            {postsDepleted && !onSummaryView ? (
+              <div class="infinite-scroll-reached-end">
+                Showing {allThreads.length} of{' '}
+                {pluralize(allThreads.length, 'thread')}
+                {topic ? ` under the topic '${topic}'` : ''}
+              </div>
+            ) : isEmpty || onSummaryView ? null : (
+              <div class="infinite-scroll-spinner-wrap">
+                <Spinner active={!this.postsDepleted[subpage]} size="lg" />
+              </div>
+            )}
           </div>
         )}
       </Sublayout>

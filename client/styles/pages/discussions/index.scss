@@ -1,13 +1,14 @@
 @import 'client/styles/shared';
 
 .DiscussionsPage {
-  .discussions-main {
-    padding: 24px;
-    width: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+  width: 100%;
 
-    &.empty-list {
-      height: calc(100vh - 200px);
-    }
+  &.empty-list {
+    height: calc(100vh - 200px);
   }
 
   // content
@@ -15,7 +16,7 @@
     margin: 6px 0 8px;
 
     hr {
-      border-bottom: 1px solid $border-color-off-white;
+      border-bottom: 1px solid $neutral-25;
       border: none;
       height: 1px;
       margin-left: 4px;
@@ -30,7 +31,7 @@
     padding: 0 0 3px;
 
     span {
-      color: $last-seen-notification-color;
+      color: $rorange-300;
       font-size: 0.94rem;
       font-weight: 500;
       margin: -6px 0;
@@ -41,15 +42,14 @@
     }
 
     hr {
-      border-bottom: 1px solid lighten($last-seen-notification-color, 11%);
-      border: none;
+      border-bottom: 1px solid $rorange-200;
       height: 1px;
       width: -webkit-fill-available;
     }
   }
 
   .infinite-scroll-reached-end {
-    color: $text-color-light;
+    color: $neutral-500;
     font-size: 0.94rem;
     margin: 20px 0;
     text-align: center;

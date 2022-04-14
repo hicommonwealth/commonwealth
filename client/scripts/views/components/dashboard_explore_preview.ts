@@ -1,12 +1,13 @@
 import 'pages/user_dashboard.scss';
 
 import m from 'mithril';
-import { Col, Icon, Icons, Tag } from 'construct-ui';
+import { Col, Tag } from 'construct-ui';
 import app from 'state';
 import { NodeInfo } from 'client/scripts/models';
 import { pluralize } from 'helpers';
 import { ChainIcon } from './chain_icon';
 import { CWCard } from './component_kit/cw_card';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -114,7 +115,16 @@ const DashboardExplorePreview: m.Component = {
     );
 
     return m(Col, { span: { md: 3 }, class: 'expore-communities-col' }, [
-      m('.title', 'Explore Communities'),
+      m(
+        '.title',
+        {
+          onclick: () => {
+            m.route.set('/communities');
+            m.redraw();
+          },
+        },
+        'Explore Communities'
+      ),
       m('.communities-list', [
         sortedChainsAndCommunities.length > 3
           ? sortedChainsAndCommunities.slice(0, 3)
@@ -132,8 +142,9 @@ const DashboardExplorePreview: m.Component = {
         },
         [
           'View more communities',
-          m(Icon, {
-            name: Icons.EXTERNAL_LINK,
+          m(CWIcon, {
+            iconName: 'externalLink',
+            iconSize: 'small',
           }),
         ]
       ),

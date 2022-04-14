@@ -203,7 +203,10 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
           hasReacted ? ' hasReacted' : ''
         }`}
       >
-        <CWIcon iconName="arrow1" iconSize="small" />
+        <CWIcon
+          iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
+          iconSize="small"
+        />
         <div class="reactions-count">{likes}</div>
       </div>
     );

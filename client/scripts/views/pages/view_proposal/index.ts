@@ -121,6 +121,7 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -361,7 +362,10 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                     !app.isCustomDomain() &&
                       m('.CommentSocialHeader', [m(SocialSharingCarat)]),
@@ -444,7 +448,10 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                   ]
             ),
@@ -561,6 +568,7 @@ const ProposalComment: m.Component<
       isAdmin,
       isLast,
     } = vnode.attrs;
+
     if (!comment) return;
     const parentType = comment.parentComment
       ? CommentParent.Comment
@@ -610,7 +618,10 @@ const ProposalComment: m.Component<
                   }),
                 ],
                 transitionDuration: 0,
-                trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                trigger: m(CWIcon, {
+                  iconName: 'chevronDown',
+                  iconSize: 'small',
+                }),
               }),
             ],
             !app.isCustomDomain() &&
@@ -1196,7 +1207,6 @@ const ViewProposalPage: m.Component<
       return m(
         Sublayout,
         {
-          class: 'ViewProposalPage',
           showNewProposalButton: true,
           title: headerTitle,
         },
@@ -1311,10 +1321,64 @@ const ViewProposalPage: m.Component<
     return m(
       Sublayout,
       {
-        class: 'ViewProposalPage',
         showNewProposalButton: true,
         title: headerTitle,
-        rightContent: m('.right-content-container', [
+      },
+      m('.ViewProposalPage', [
+        m('.view-proposal-page-container', [
+          [
+            m(ProposalHeader, {
+              proposal,
+              commentCount,
+              viewCount,
+              getSetGlobalEditingStatus,
+              proposalPageState: vnode.state,
+              isAuthor,
+              isEditor,
+              isAdmin: isAdminOrMod,
+              stageEditorIsOpen: vnode.state.stageEditorIsOpen,
+              pollEditorIsOpen: vnode.state.pollEditorIsOpen,
+              closeStageEditor: () => {
+                vnode.state.stageEditorIsOpen = false;
+                m.redraw();
+              },
+              closePollEditor: () => {
+                vnode.state.pollEditorIsOpen = false;
+                m.redraw();
+              },
+            }),
+            !(proposal instanceof OffchainThread) &&
+              m(LinkedProposalsEmbed, { proposal }),
+            proposal instanceof AaveProposal && [
+              m(AaveViewProposalSummary, { proposal }),
+              m(AaveViewProposalDetail, { proposal }),
+            ],
+            !(proposal instanceof OffchainThread) &&
+              m(ProposalVotingResults, { proposal }),
+            !(proposal instanceof OffchainThread) &&
+              m(ProposalVotingActions, { proposal }),
+            m(ProposalComments, {
+              proposal,
+              comments,
+              createdCommentCallback,
+              getSetGlobalEditingStatus,
+              proposalPageState: vnode.state,
+              recentlySubmitted: vnode.state.recentlySubmitted,
+              isAdmin: isAdminOrMod,
+            }),
+            !vnode.state.editing &&
+              !vnode.state.parentCommentId &&
+              m(CreateComment, {
+                callback: createdCommentCallback,
+                cancellable: true,
+                getSetGlobalEditingStatus,
+                proposalPageState: vnode.state,
+                parentComment: null,
+                rootProposal: proposal,
+              }),
+          ],
+        ]),
+        m('.right-content-container', [
           [
             proposal instanceof OffchainThread &&
               proposal.hasOffchainPoll &&
@@ -1345,59 +1409,6 @@ const ViewProposalPage: m.Component<
               }),
           ],
         ]),
-      },
-      m('.view-proposal-page-container', [
-        [
-          m(ProposalHeader, {
-            proposal,
-            commentCount,
-            viewCount,
-            getSetGlobalEditingStatus,
-            proposalPageState: vnode.state,
-            isAuthor,
-            isEditor,
-            isAdmin: isAdminOrMod,
-            stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-            pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-            closeStageEditor: () => {
-              vnode.state.stageEditorIsOpen = false;
-              m.redraw();
-            },
-            closePollEditor: () => {
-              vnode.state.pollEditorIsOpen = false;
-              m.redraw();
-            },
-          }),
-          !(proposal instanceof OffchainThread) &&
-            m(LinkedProposalsEmbed, { proposal }),
-          proposal instanceof AaveProposal && [
-            m(AaveViewProposalSummary, { proposal }),
-            m(AaveViewProposalDetail, { proposal }),
-          ],
-          !(proposal instanceof OffchainThread) &&
-            m(ProposalVotingResults, { proposal }),
-          !(proposal instanceof OffchainThread) &&
-            m(ProposalVotingActions, { proposal }),
-          m(ProposalComments, {
-            proposal,
-            comments,
-            createdCommentCallback,
-            getSetGlobalEditingStatus,
-            proposalPageState: vnode.state,
-            recentlySubmitted: vnode.state.recentlySubmitted,
-            isAdmin: isAdminOrMod,
-          }),
-          !vnode.state.editing &&
-            !vnode.state.parentCommentId &&
-            m(CreateComment, {
-              callback: createdCommentCallback,
-              cancellable: true,
-              getSetGlobalEditingStatus,
-              proposalPageState: vnode.state,
-              parentComment: null,
-              rootProposal: proposal,
-            }),
-        ],
       ])
     );
   },

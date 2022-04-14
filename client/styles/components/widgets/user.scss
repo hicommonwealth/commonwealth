@@ -5,11 +5,11 @@
   display: inline-block;
   margin: -3px 0;
   margin-right: 8px;
-  background: $text-color-white;
+  background: $white;
   border-radius: 9999px;
   overflow: hidden;
   .avatar-image {
-    background: $background-color-light;
+    background: $neutral-200;
     background-size: cover;
   }
 }
@@ -18,7 +18,7 @@
   border-radius: 9999px;
   overflow: hidden;
   margin: 0;
-  background: $text-color-white;
+  background: $white;
   box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.1);
   svg {
     margin: 2px;
@@ -26,15 +26,15 @@
   .avatar-image {
     width: 100% !important;
     height: 100% !important;
-    background: $background-color-light;
+    background: $neutral-200;
     background-size: cover;
   }
 }
 
 @mixin roleIcon {
-  background: $background-color-dark-accent;
+  background: $primary-600;
   border-radius: 50%;
-  color: $text-color-white;
+  color: $white;
   display: inline-block;
   font-size: 12px;
   font-weight: 500;
@@ -47,15 +47,15 @@
   top: -2px;
 
   &.green {
-    background: $positive-bg-color;
+    background: $green-500;
   }
 
   &.red {
-    background: $negative-bg-color;
+    background: $rorange-500;
   }
 
   &.gray {
-    background: $background-color-medium-accent;
+    background: $primary-400;
   }
 
   &.long {
@@ -93,7 +93,7 @@
     font-size: 75%;
     font-weight: 500;
     margin-left: 4px;
-    background: $background-color-light;
+    background: $neutral-200;
     border-radius: 99px;
     padding: 4px 8px;
     text-decoration: none !important;
@@ -138,7 +138,7 @@
     clear: both;
     a {
       text-decoration: none !important;
-      color: $text-color-black !important;
+      color: $neutral-800 !important;
     }
     a:hover {
       text-decoration: underline !important;
@@ -149,7 +149,7 @@
   }
   .user-address,
   .user-chain {
-    color: $text-color-light !important;
+    color: $neutral-500 !important;
   }
   .role-tag {
     margin-top: 10px !important;
@@ -184,7 +184,6 @@
     justify-content: right;
     width: 60px;
     .user-block-selected {
-      flex: 1;
       text-align: right;
       position: relative;
       top: -2px;

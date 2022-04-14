@@ -3,7 +3,7 @@ import 'modals/select_address_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Tag, Button, Icon, Icons } from 'construct-ui';
+import { Tag, Button } from 'construct-ui';
 
 import app from 'state';
 import { ChainBase } from 'types';
@@ -15,6 +15,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { formatAddressShort } from '../../../../shared/utils';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
 const SelectAddressModal: m.Component<
   {},
@@ -140,13 +141,11 @@ const SelectAddressModal: m.Component<
                           activeEntityInfo?.name
                         }'`
                       ),
-                      m(
-                        'span.icon',
-                        {
-                          onclick: deleteRole.bind(this, index),
-                        },
-                        m(Icon, { name: Icons.X })
-                      ),
+                      m(CWIcon, {
+                        iconName: 'close',
+                        iconSize: 'small',
+                        onclick: deleteRole.bind(this, index),
+                      }),
                     ]),
                   ])
               ),

@@ -27,7 +27,6 @@ class ChainInfo {
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public defaultSummaryView: boolean;
-  public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
@@ -58,7 +57,6 @@ class ChainInfo {
     blockExplorerIds,
     collapsedOnHomepage,
     defaultSummaryView,
-    featuredTopics,
     topics,
     adminsAndMods,
     base,
@@ -89,7 +87,6 @@ class ChainInfo {
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultSummaryView = defaultSummaryView;
-    this.featuredTopics = featuredTopics || [];
     this.topics = topics ? topics.map((t) => new OffchainTopic(t)) : [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
@@ -119,7 +116,6 @@ class ChainInfo {
     block_explorer_ids,
     collapsed_on_homepage,
     default_summary_view,
-    featured_topics,
     topics,
     adminsAndMods,
     base,
@@ -156,7 +152,6 @@ class ChainInfo {
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       defaultSummaryView: default_summary_view,
-      featuredTopics: featured_topics,
       topics,
       adminsAndMods,
       base,
@@ -271,34 +266,6 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultSummaryView = updatedChain.default_summary_view;
-  }
-
-  public addFeaturedTopic(topic: string) {
-    this.featuredTopics.push(topic);
-  }
-
-  public removeFeaturedTopic(topic: string) {
-    if (this.featuredTopics.includes(topic)) {
-      this.featuredTopics.splice(this.featuredTopics.indexOf(topic), 1);
-    }
-  }
-
-  public async updateFeaturedTopics(topics: string[]) {
-    try {
-      // TODO: Change to PUT /chain
-      await $.post(`${app.serverUrl()}/updateChain`, {
-        id: app.activeChainId(),
-        'featured_topics[]': topics,
-        jwt: app.user.jwt,
-      });
-    } catch (err) {
-      console.log('Failed to update featured topics');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to update featured topics'
-      );
-    }
   }
 }
 

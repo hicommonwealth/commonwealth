@@ -11,11 +11,11 @@
 
   // disable arrows on number
   input[type='number'] {
-    -moz-appearance:textfield;
+    -moz-appearance: textfield;
   }
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
+    -webkit-appearance: none;
   }
 
   .token-settings {
@@ -24,7 +24,7 @@
 
   .switch-caption {
     display: inline-flex;
-    color: $text-color-light;
+    color: $neutral-500;
     font-size: 94%;
     position: relative;
     top: 1px;

@@ -1,11 +1,10 @@
 @import 'client/styles/shared';
 
 .NotificationSettingsPage {
-  .forum-container {
-    padding: 24px;
-  }
+  padding: 24px;
+
   .EmailIntervalConfiguration {
-    background: $background-color-light;
+    background: $neutral-100;
     padding: 18px 24px 8px;
     border-radius: 5px;
     margin-top: 8px;
@@ -36,7 +35,7 @@
     th {
       font-weight: 500;
       padding: 6px 0 12px;
-      border-bottom-color: $border-color-light;
+      border-bottom-color: $neutral-100;
     }
     td {
       border: none;
@@ -48,13 +47,13 @@
           margin-left: 8px;
         }
         .ChainEventDetails {
-          color: $text-color-light;
+          color: $neutral-500;
           font-size: 0.8em;
         }
       }
       .item-metadata {
         font-size: 90%;
-        color: $text-color-medium;
+        color: $neutral-500;
         margin-left: 6px;
       }
     }
@@ -77,7 +76,7 @@
         text-align: left;
       }
       button.sometimes {
-        color: $text-color-light;
+        color: $neutral-500;
       }
     }
   }
@@ -97,9 +96,9 @@
     background: none;
   }
   .cui-list-item.cui-selected {
-    background: $background-color-light;
+    background: $primary-300;
   }
   .cui-list-item:hover {
-    background: $background-color-light !important;
+    background: $primary-300 !important;
   }
 }

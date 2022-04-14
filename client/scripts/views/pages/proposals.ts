@@ -27,7 +27,7 @@ import { PageNotFound } from 'views/pages/404';
 import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
-import AaveProposalCardDetail from '../components/proposals/aave_proposal_card_detail';
+import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -391,7 +391,6 @@ const ProposalsPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'ProposalsPage',
         title: [
           'Proposals',
           m(Tag, {
@@ -402,7 +401,7 @@ const ProposalsPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      m('.proposals-container', [
+      m('.ProposalsPage', [
         onSubstrate && m(SubstrateProposalStats),
         onCompound && m(CompoundProposalStats),
         m('.clear'),

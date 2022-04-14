@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Icons, Icon, PopoverMenu, MenuItem } from 'construct-ui';
+import { PopoverMenu, MenuItem } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -10,6 +10,8 @@ import { ITokenAdapter } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicThresholdsModal from 'views/modals/edit_topic_thresholds_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
+import OrderTopicsModal from '../modals/order_topics_modal';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 export class CommunityOptionsPopover implements m.ClassComponent {
   view() {
@@ -32,7 +34,7 @@ export class CommunityOptionsPopover implements m.ClassComponent {
         transitionDuration={0}
         hoverCloseDelay={0}
         closeOnContentClick={true}
-        trigger={<Icon name={Icons.CHEVRON_DOWN} />}
+        trigger={<CWIcon iconName="chevronDown" iconSize="small" />}
         content={[
           isAdmin && (
             <MenuItem
@@ -52,6 +54,20 @@ export class CommunityOptionsPopover implements m.ClassComponent {
               }}
             />
           ),
+          isAdmin &&
+            app.chain.meta.chain.topics.filter(
+              (topic) => topic.featuredInSidebar
+            ).length > 0 && (
+              <MenuItem
+                label="Order sidebar topics"
+                onclick={(e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: OrderTopicsModal,
+                  });
+                }}
+              />
+            ),
           isAdmin && (
             <MenuItem
               label="Invite members"

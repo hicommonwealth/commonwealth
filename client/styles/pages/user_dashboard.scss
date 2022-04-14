@@ -3,6 +3,7 @@
 .UserDashboard {
   align-items: flex-start;
   display: flex;
+  flex: 1;
   justify-content: center;
   padding: 24px;
 
@@ -29,7 +30,7 @@
 
   .title {
     align-items: center;
-    color: black;
+    color: $black;
     display: flex;
     font-size: 30px;
     font-weight: 500;
@@ -41,7 +42,24 @@
       font-size: 18px;
 
       @include md-max {
-        display: block;
+        align-items: center;
+        border-radius: 10px;
+        color: $purple-400;
+        cursor: pointer;
+        display: flex;
+        flex-direction: row;
+        font-weight: 500;
+        height: 40px;
+        padding: 4px 16px;
+
+        svg {
+          margin: 1px 0 0 8px;
+        }
+
+        &:hover {
+          background-color: $purple-50;
+          text-decoration: none;
+        }
       }
     }
   }
@@ -50,14 +68,12 @@
     @include gradientTabs();
 
     .cui-tabs-item {
-      color: #ddd;
+      color: $neutral-100;
       font-size: 24px;
       font-weight: 500;
-      margin: 0 34px 0 0 !important;
-      padding: 13px 0 0 0;
 
       &.cui-active {
-        color: black;
+        color: $black;
       }
     }
   }
@@ -74,6 +90,9 @@
     align-items: center;
     display: flex;
     flex-direction: column;
+    .title {
+      cursor: pointer;
+    }
   }
 
   .home-card {
@@ -94,25 +113,22 @@
   }
 
   .link {
+    align-items: center;
     border-radius: 10px;
-    color: #4723ad;
+    color: $purple-400;
     cursor: pointer;
-    float: right;
+    display: flex;
+    flex-direction: row;
     font-weight: 500;
-    padding: 8px 16px;
-    position: relative;
+    height: 40px;
+    padding: 4px 16px;
 
-    .cui-icon {
-      margin-left: 16px;
-      margin-top: -3px;
-
-      svg {
-        stroke: #4723ad;
-      }
+    svg {
+      margin: 1px 0 0 8px;
     }
 
     &:hover {
-      background-color: #f7f4ff;
+      background-color: $purple-50;
       text-decoration: none;
     }
   }

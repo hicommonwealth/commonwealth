@@ -20,7 +20,7 @@ import {
   LoginSelectorMenuLeft,
   LoginSelectorMenuRight,
 } from 'views/components/header/login_selector';
-import { getNewProposalMenu } from 'views/components/new_proposal_button';
+import { NewProposalMenu } from 'views/components/new_proposal_button';
 import { LoginModal } from '../modals/login_modal';
 import { ExternalLinksModule } from '../components/sidebar/external_links_module';
 import { CommunitySelector } from '../components/sidebar/community_selector';
@@ -52,14 +52,15 @@ class MobileAccountMenu implements m.ClassComponent {
       <Menu class="MobileAccountMenu">
         {app.isLoggedIn() ? (
           <>
-            {app.activeChainId() &&
-              m(LoginSelectorMenuLeft, {
-                activeAddressesWithRole,
-                nAccountsWithoutRole,
-                mobile: true,
-              })}
+            {app.activeChainId() && (
+              <LoginSelectorMenuLeft
+                activeAddressesWithRole={activeAddressesWithRole}
+                nAccountsWithoutRole={nAccountsWithoutRole}
+                mobile={true}
+              />
+            )}
             {app.activeChainId() && <MenuDivider />}
-            {m(LoginSelectorMenuRight, { mobile: true })}
+            <LoginSelectorMenuRight mobile={true} />
           </>
         ) : (
           <MenuItem
@@ -102,7 +103,9 @@ export class MobileSidebar implements m.ClassComponent {
                 this.showNewThreadOptions = !this.showNewThreadOptions;
               }}
             />
-            {this.showNewThreadOptions && getNewProposalMenu([], true)}
+            {this.showNewThreadOptions && (
+              <NewProposalMenu candidates={[]} mobile={true} />
+            )}
           </Menu>
         ) : (
           <MenuItem
@@ -156,7 +159,7 @@ export class MobileSidebar implements m.ClassComponent {
           CurrentCommunityMenu
         ) : this.activeTab === MenuTabs.AllCommunities ? (
           <Menu class="AllCommunitiesMenu">
-            <CommunitySelector showListOnly={true} showHomeButtonAtTop={true} />
+            <CommunitySelector isMobile={true} />
           </Menu>
         ) : (
           <MobileAccountMenu />

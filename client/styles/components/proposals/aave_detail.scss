@@ -3,40 +3,50 @@
 .AaveProposalCardDetail {
   display: grid;
   grid-template-rows: 3fr 4fr 3fr;
-  row-gap: 22px;
   max-height: 254px;
+  row-gap: 22px;
+
   > div {
     display: flex;
     max-width: 100%;
     overflow: hidden;
+
     p {
       display: flex;
       justify-content: left;
     }
   }
+
   p {
     font-size: 18px;
   }
+
   .aave-metadata {
     display: flex;
     max-width: 100%;
+
     .aave-author {
-      width: calc(70% - 15px);
       padding-right: 15px;
+      width: calc(70% - 15px);
+
       .detail-highlight {
         overflow-x: hidden;
       }
+
       .card-subheader {
         margin-top: 2px;
       }
     }
+
     .aave-status {
       max-width: calc(30%);
     }
   }
+
   .aave-voting,
   .aave-requirements {
     flex-direction: column;
+
     .aave-support,
     .aave-turnout,
     .aave-differential,
@@ -44,32 +54,37 @@
     .aave-differential-requirement {
       display: grid;
       grid-template-columns: 52px auto;
+
       .detail-highlight {
         justify-self: start;
       }
     }
   }
   .proposal-injected-status {
+    color: $neutral-800;
     margin-bottom: 4px;
-    color: $text-color-black;
   }
   .b-box {
-    border: 1px solid $border-color-lightest;
-    border-radius: 8px;
     border-bottom: none;
+    border-radius: 8px;
+    border: 1px solid $neutral-50;
     margin-bottom: 18px;
+
     .b-row {
-      padding: 0 10px;
-      padding-top: 5px;
-      border-bottom: 1px solid $border-color-lightest;
+      border-bottom: 1px solid $neutral-50;
       display: flex;
+      padding-top: 5px;
+      padding: 0 10px;
+
       &.waiting {
-        color: $text-color-light;
+        color: $neutral-500;
       }
+
       &:last-child {
         border-radius: 0 0 8px 8px;
       }
     }
+
     .b-col {
       min-width: 24px;
     }
@@ -77,9 +92,11 @@
   .cui-button + .cui-button {
     margin-top: 6px;
   }
+
   .detail-highlight {
-    color: #4723ad;
+    color: $purple-500;
     padding-right: 8px;
+
     &.emphasize {
       font-weight: 600;
     }
@@ -89,31 +106,37 @@
 .AaveViewProposalDetail,
 .AaveViewProposalSummary {
   margin-top: 28px;
+
   h3 {
     font-size: 23px;
     font-weight: 500;
     margin-bottom: 8px;
   }
+
   div {
+    align-items: baseline;
+    border-bottom: 1px solid $neutral-25;
     display: flex;
     justify-content: left;
-    border-bottom: 1px solid #eeeeee;
-    align-items: baseline;
   }
+
   div:last-child {
     border-bottom: none;
   }
+
   p {
-    font-size: 18px;
     flex: 8;
+    font-size: 18px;
   }
+
   p.detail-highlight.emphasize {
-    flex: 1;
     background: linear-gradient(to right, #335fb7, #d48cdd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    flex: 1;
     font-size: 24px;
     font-weight: 600;
     min-width: 80px;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    // these webkit styles have to go last in order to apply correctly
   }
 }
