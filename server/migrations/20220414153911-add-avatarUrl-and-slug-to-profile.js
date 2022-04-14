@@ -20,7 +20,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       }, { transaction: t });
-      await queryInterface.removeColumn('Profiles', 'avatarUrl', {
+      await queryInterface.removeColumn('Profiles', 'slug', {
         type: Sequelize.STRING,
         allowNull: true,
       }, { transaction: t });
