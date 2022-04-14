@@ -93,7 +93,7 @@ export class WebhookSettingsModal
     return (
       <div class="WebhookSettingsModal">
         <div class="compact-modal-title">
-          <h3>Webhook Settingss</h3>
+          <h3>Webhook Settings</h3>
           <CompactModalExitButton />
         </div>
         <div class="compact-modal-body">
