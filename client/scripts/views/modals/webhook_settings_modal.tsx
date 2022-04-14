@@ -17,6 +17,7 @@ import {
   DydxChainNotificationTypes,
 } from 'helpers/chain_notification_types';
 import { notifyError } from 'controllers/app/notifications';
+import { CompactModalExitButton } from '../components/component_kit/cw_modal';
 
 type WebhookSettingsModalAttrs = {
   updateSuccessCallback: () => void;
@@ -88,69 +89,63 @@ export class WebhookSettingsModal
         />
       );
     };
+
     return (
       <div class="WebhookSettingsModal">
-        <div
-          class="CompactModalExitButton"
-          onclick={(e) => {
-            e.preventDefault();
-            $(e.target).trigger('modalexit');
-          }}
-        >
-          {m.trust('&times;')}
+        <div class="compact-modal-title">
+          <h3>Webhook Settingss</h3>
+          <CompactModalExitButton />
         </div>
-        <div class="title-section">
-          <h4>Webhook Settings</h4>
+        <div class="compact-modal-body">
           <p>Which events should trigger this webhook?</p>
-        </div>
-        <div class="forum-events">
-          <h4>Off-chain discussions</h4>,
-          <List interactive={false} size="sm">
-            {row('New thread', [NotificationCategories.NewThread])}
-            {row('New comment', [NotificationCategories.NewComment])}
-            {row('New reaction', [NotificationCategories.NewReaction])}
-          </List>
-        </div>
-        {isChain && (
-          <div class="chain-events">
-            <h4>On-chain events</h4>,
+          <div class="forum-events">
+            <h4>Off-chain discussions</h4>
             <List interactive={false} size="sm">
-              {/* iterate over chain events */}
-              {Object.keys(chainNotifications).map((k) =>
-                row(`${k} event`, chainNotifications[k])
-              )}
+              {row('New thread', [NotificationCategories.NewThread])}
+              {row('New comment', [NotificationCategories.NewComment])}
+              {row('New reaction', [NotificationCategories.NewReaction])}
             </List>
           </div>
-        )}
-        <Button
-          label="Save webhook settings"
-          class="settings-save-button"
-          intent="primary"
-          rounded={true}
-          onclick={(e) => {
-            e.preventDefault();
-            const chainOrCommObj = { chain: webhook.chain_id };
-            $.ajax({
-              url: `${app.serverUrl()}/updateWebhook`,
-              data: {
-                webhookId: webhook.id,
-                categories: this.selectedCategories,
-                ...chainOrCommObj,
-                jwt: app.user.jwt,
-              },
-              type: 'POST',
-              success: (result) => {
-                const updatedWebhook = Webhook.fromJSON(result.result);
-                vnode.attrs.updateSuccessCallback(updatedWebhook);
-                $(e.target).trigger('modalexit');
-              },
-              error: (err) => {
-                notifyError(err.statusText);
-                m.redraw();
-              },
-            });
-          }}
-        />
+          {isChain && (
+            <div class="chain-events">
+              <h4>On-chain events</h4>
+              <List interactive={false} size="sm">
+                {/* iterate over chain events */}
+                {Object.keys(chainNotifications).map((k) =>
+                  row(`${k} event`, chainNotifications[k])
+                )}
+              </List>
+            </div>
+          )}
+          <Button
+            label="Save webhook settings"
+            intent="primary"
+            rounded={true}
+            onclick={(e) => {
+              e.preventDefault();
+              const chainOrCommObj = { chain: webhook.chain_id };
+              $.ajax({
+                url: `${app.serverUrl()}/updateWebhook`,
+                data: {
+                  webhookId: webhook.id,
+                  categories: this.selectedCategories,
+                  ...chainOrCommObj,
+                  jwt: app.user.jwt,
+                },
+                type: 'POST',
+                success: (result) => {
+                  const updatedWebhook = Webhook.fromJSON(result.result);
+                  vnode.attrs.updateSuccessCallback(updatedWebhook);
+                  $(e.target).trigger('modalexit');
+                },
+                error: (err) => {
+                  notifyError(err.statusText);
+                  m.redraw();
+                },
+              });
+            }}
+          />
+        </div>
       </div>
     );
   }
