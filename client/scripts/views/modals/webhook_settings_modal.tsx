@@ -40,6 +40,7 @@ export class WebhookSettingsModal
     const { webhook } = vnode.attrs;
     const isChain = !!webhook.chain_id;
 
+    // TODO: @ZAK make this generic or based on chain-event listening status on backend
     const chainNotifications =
       webhook.chain_id === 'edgeware'
         ? EdgewareChainNotificationTypes
