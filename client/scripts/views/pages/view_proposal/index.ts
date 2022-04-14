@@ -90,7 +90,6 @@ import {
 } from './header';
 import {
   ProposalSidebarPollEditorModule,
-  ProposalSidebarLinkedViewer,
   ProposalLinkedThreadsEditorModule,
 } from './sidebar';
 import {
@@ -122,6 +121,7 @@ import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { ProposalSidebarLinkedViewer } from './proposal_linked_sidebar_viewer';
 
 const MAX_THREAD_LEVEL = 2;
 

@@ -1,14 +1,9 @@
 import m, { RouteOptions } from 'mithril';
 import { ICardListItem } from 'models/interfaces';
-import moment, { Moment } from 'moment';
-import BN from 'bn.js';
+import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import app from 'state';
 import { OffchainThreadStage } from 'models';
-
-export async function sleep(msec) {
-  return new Promise((resolve) => setTimeout(resolve, msec));
-}
 
 export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   if (stage === OffchainThreadStage.Discussion) {
@@ -35,38 +30,36 @@ export function parseCustomStages(str) {
   } catch (e) {
     return [];
   }
-  return arr.map((s) => s?.toString()).filter((s) => s) as unknown as OffchainThreadStage[];
+  return arr
+    .map((s) => s?.toString())
+    .filter((s) => s) as unknown as OffchainThreadStage[];
 }
 
 /*
  * mithril link helper
  */
 export function externalLink(selector, target, children) {
-  return m(selector, {
-    href: target,
-    target: '_blank',
-    rel: 'noopener noreferrer',
-    onclick: (e) => {
-      if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
-      if (target.startsWith(`${document.location.origin}/`)) {
-        // don't open a new window if the link is on Commonwealth
-        e.preventDefault();
-        e.stopPropagation();
-        m.route.set(target);
-      }
+  return m(
+    selector,
+    {
+      href: target,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+      onclick: (e) => {
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+        if (target.startsWith(`${document.location.origin}/`)) {
+          // don't open a new window if the link is on Commonwealth
+          e.preventDefault();
+          e.stopPropagation();
+          m.route.set(target);
+        }
+      },
     },
-  }, children);
+    children
+  );
 }
 
-export function link(
-  selector: string,
-  target: string,
-  children,
-  extraAttrs?: object,
-  saveScrollPositionAs?: string,
-  beforeRouteSet?: Function,
-  afterRouteSet?: Function,
-) {
+export function link(selector: string, target: string, children) {
   const attrs = {
     href: target,
     onclick: (e) => {
@@ -76,24 +69,14 @@ export function link(
       e.preventDefault();
       e.stopPropagation();
 
-      if (saveScrollPositionAs) {
-        localStorage[saveScrollPositionAs] = window.scrollY;
-      }
-      if (beforeRouteSet) beforeRouteSet();
-      const routeArgs: [string, any?, RouteOptions?] = window.location.href.split('?')[0] === target.split('?')[0]
-        ? [target, {}, { replace: true }]
-        : [target];
-      if (afterRouteSet) {
-        (async () => {
-          await m.route.set(...routeArgs);
-          afterRouteSet();
-        })();
-      } else {
-        m.route.set(...routeArgs);
-      }
+      const routeArgs: [string, any?, RouteOptions?] =
+        window.location.href.split('?')[0] === target.split('?')[0]
+          ? [target, {}, { replace: true }]
+          : [target];
+      m.route.set(...routeArgs);
     },
   };
-  if (extraAttrs) Object.assign(attrs, extraAttrs);
+
   return m(selector, attrs, children);
 }
 
@@ -109,34 +92,6 @@ export function extractDomain(url) {
 export function removeUrlPrefix(url) {
   return url.replace(/^https?:\/\//, '');
 }
-
-/*
- * icons
- */
-export const SwitchIcon = {
-  view: (vnode) => {
-    return m('svg.SwitchIcon', {
-      width: '10px',
-      height: '24px',
-      viewBox: '0 0 10 24',
-    }, [
-      m('g', {
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round'
-      }, [
-        m('polyline', {
-          stroke: '#979797',
-          points: '1 5 5 1 9 5'
-        }),
-        m('polyline', {
-          stroke: '#979797',
-          transform: 'translate(5.000000, 21.000000) scale(1, -1) translate(-5.000000, -21.000000) ',
-          points: '1 23 5 19 9 23'
-        })
-      ]),
-    ]);
-  }
-};
 
 /*
  * comparators
@@ -158,12 +113,18 @@ export function byAscendingUpdatedDate(a, b) {
 }
 
 export function orderAccountsByAddress(a, b) {
-  return a.address < b.address ? -1
-    : a.address > b.address ? 1 : 0;
+  return a.address < b.address ? -1 : a.address > b.address ? 1 : 0;
 }
 
 export function isSameAccount(a, b) {
-  return a && b && a.chain && b.chain && a.chain.id === b.chain.id && a.address === b.address;
+  return (
+    a &&
+    b &&
+    a.chain &&
+    b.chain &&
+    a.chain.id === b.chain.id &&
+    a.address === b.address
+  );
 }
 
 /*
@@ -172,42 +133,39 @@ export function isSameAccount(a, b) {
 
 export function pluralize(num: number, str: string) {
   if (str === 'day') {
-    return `${num} ${str.slice(0, str.length - 1)}${(num === 1) ? 'y' : 'ys'}`;
+    return `${num} ${str.slice(0, str.length - 1)}${num === 1 ? 'y' : 'ys'}`;
   } else if (str.endsWith('y')) {
-    return `${num} ${str.slice(0, str.length - 1)}${(num === 1) ? 'y' : 'ies'}`;
+    return `${num} ${str.slice(0, str.length - 1)}${num === 1 ? 'y' : 'ies'}`;
   } else if (str.endsWith('ss')) {
     return `${num} ${str}${num === 1 ? '' : 'es'}`;
   } else {
-    return `${num} ${str}${(num === 1 || str.endsWith('s')) ? '' : 's'}`;
+    return `${num} ${str}${num === 1 || str.endsWith('s') ? '' : 's'}`;
   }
 }
 
 export function pluralizeWithoutNumberPrefix(num: number, str: string) {
   if (str.endsWith('y')) {
-    return `${str.slice(0, str.length - 1)}${(num === 1) ? 'y' : 'ies'}`;
+    return `${str.slice(0, str.length - 1)}${num === 1 ? 'y' : 'ies'}`;
   } else if (str.endsWith('ss')) {
     return `${str}${num === 1 ? '' : 'es'}`;
   } else {
-    return `${str}${(num === 1 || str.endsWith('s')) ? '' : 's'}`;
-  }
-}
-
-export function articlize(str: string) {
-  if (str.trimLeft().match(/^[aeiouAEIOU]/)) {
-    return `an ${str.trimLeft()}`;
-  } else {
-    return `a ${str.trimLeft()}`;
+    return `${str}${num === 1 || str.endsWith('s') ? '' : 's'}`;
   }
 }
 
 export function formatAsTitleCase(str: string) {
-  return str.toLowerCase().split(' ').map((word) => {
-    return word.replace(word[0], word[0].toUpperCase());
-  }).join(' ');
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map((word) => {
+      return word.replace(word[0], word[0].toUpperCase());
+    })
+    .join(' ');
 }
 
 export function formatLastUpdated(timestamp) {
-  if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
+  if (timestamp.isBefore(moment().subtract(365, 'days')))
+    return timestamp.format('MMM D YYYY');
   const formatted = timestamp.fromNow(true);
   return `${formatted
     .replace(' days', 'd')
@@ -215,11 +173,12 @@ export function formatLastUpdated(timestamp) {
     .replace(' hours', 'h')
     .replace(' hour', 'h')
     .replace(' months', 'mo')
-    .replace(' month', 'mo')} ${(formatted === 'now') ? '' : 'ago'}`;
+    .replace(' month', 'mo')} ${formatted === 'now' ? '' : 'ago'}`;
 }
 
 export function formatTimestamp(timestamp) {
-  if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
+  if (timestamp.isBefore(moment().subtract(365, 'days')))
+    return timestamp.format('MMM D YYYY');
   const formatted = timestamp.fromNow(true);
   return `${formatted
     .replace(' days', 'd')
@@ -231,7 +190,8 @@ export function formatTimestamp(timestamp) {
 }
 
 export function formatTimestampAsDate(timestamp: moment.Moment) {
-  if (timestamp.isBefore(moment().startOf('year'))) return timestamp.format('MMM D YYYY')
+  if (timestamp.isBefore(moment().startOf('year')))
+    return timestamp.format('MMM D YYYY');
   else return timestamp.format('MMM D');
 }
 
@@ -252,7 +212,7 @@ export function formatPercentShort(num: number) {
   return `${(num * 100).toFixed(1)}%`;
 }
 
-/* Choose Total Digits to Display*/
+/* Choose Total Digits to Display */
 export function formatPercent(num: number, digits: number) {
   if (num === 0) return '0%';
   if (num === 1) return '100%';
@@ -260,13 +220,16 @@ export function formatPercent(num: number, digits: number) {
   return `${(num * 100).toFixed(digits)}%`;
 }
 
-export function formatDuration(duration: moment.Duration, includeSeconds = true) {
+export function formatDuration(
+  duration: moment.Duration,
+  includeSeconds = true
+) {
   const days = Math.floor(duration.asDays());
   return [
-    (days) ? (`${days}d `) : '',
-    (days || duration.hours()) ? (`${duration.hours()}h `) : '',
-    (days || duration.minutes()) ? (`${duration.minutes()}m `) : '',
-    (includeSeconds) ? `${duration.seconds()}s` : '',
+    days ? `${days}d ` : '',
+    days || duration.hours() ? `${duration.hours()}h ` : '',
+    days || duration.minutes() ? `${duration.minutes()}m ` : '',
+    includeSeconds ? `${duration.seconds()}s` : '',
   ].join('');
 }
 
@@ -277,11 +240,11 @@ export function formatProposalHashShort(hash: string) {
 
 export function renderMultilineText(text: string) {
   if (!text) return;
-  const paragraphs = text.split('\n')
+  const paragraphs = text
+    .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs
-    .map((p) => m('p', p));
+  return paragraphs.map((p) => m('p', p));
 }
 
 /*

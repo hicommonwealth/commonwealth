@@ -276,7 +276,7 @@ export const ProposalHeaderVotingInterfaceLink: m.Component<{
       externalLink('a.voting-link', proposal['votingInterfaceLink'], [
         proposal['votingInterfaceLinkLabel'] ||
           extractDomain(proposal['votingInterfaceLink']),
-        m(CWIcon, { iconName: 'externalLink' }),
+        m(CWIcon, { iconName: 'externalLink', iconSize: 'small' }),
       ]),
     ]);
   },
@@ -296,7 +296,7 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
       return m('.ProposalHeaderThreadLink', [
         link('a.thread-link', path, [
           'Go to discussion',
-          m(CWIcon, { iconName: 'externalLink' }),
+          m(CWIcon, { iconName: 'externalLink', iconSize: 'small' }),
         ]),
       ]);
     },
@@ -313,7 +313,7 @@ export const ProposalHeaderSnapshotThreadLink: m.Component<{
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [
         decodeURIComponent(title),
-        m(CWIcon, { iconName: 'externalLink' }),
+        m(CWIcon, { iconName: 'externalLink', iconSize: 'small' }),
       ]),
     ]);
   },
