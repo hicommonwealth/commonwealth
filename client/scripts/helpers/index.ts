@@ -5,6 +5,10 @@ import BigNumber from 'bignumber.js';
 import app from 'state';
 import { OffchainThreadStage } from 'models';
 
+export async function sleep(msec) {
+  return new Promise((resolve) => setTimeout(resolve, msec));
+}
+
 export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
   if (stage === OffchainThreadStage.Discussion) {
     return 'Discussion';
@@ -59,7 +63,15 @@ export function externalLink(selector, target, children) {
   );
 }
 
-export function link(selector: string, target: string, children) {
+export function link(
+  selector: string,
+  target: string,
+  children,
+  extraAttrs?: object,
+  saveScrollPositionAs?: string,
+  beforeRouteSet?: Function,
+  afterRouteSet?: Function
+) {
   const attrs = {
     href: target,
     onclick: (e) => {
@@ -69,14 +81,25 @@ export function link(selector: string, target: string, children) {
       e.preventDefault();
       e.stopPropagation();
 
+      if (saveScrollPositionAs) {
+        localStorage[saveScrollPositionAs] = window.scrollY;
+      }
+      if (beforeRouteSet) beforeRouteSet();
       const routeArgs: [string, any?, RouteOptions?] =
         window.location.href.split('?')[0] === target.split('?')[0]
           ? [target, {}, { replace: true }]
           : [target];
-      m.route.set(...routeArgs);
+      if (afterRouteSet) {
+        (async () => {
+          await m.route.set(...routeArgs);
+          afterRouteSet();
+        })();
+      } else {
+        m.route.set(...routeArgs);
+      }
     },
   };
-
+  if (extraAttrs) Object.assign(attrs, extraAttrs);
   return m(selector, attrs, children);
 }
 
@@ -153,6 +176,14 @@ export function pluralizeWithoutNumberPrefix(num: number, str: string) {
   }
 }
 
+export function articlize(str: string) {
+  if (str.trimLeft().match(/^[aeiouAEIOU]/)) {
+    return `an ${str.trimLeft()}`;
+  } else {
+    return `a ${str.trimLeft()}`;
+  }
+}
+
 export function formatAsTitleCase(str: string) {
   return str
     .toLowerCase()
@@ -212,7 +243,7 @@ export function formatPercentShort(num: number) {
   return `${(num * 100).toFixed(1)}%`;
 }
 
-/* Choose Total Digits to Display */
+/* Choose Total Digits to Display*/
 export function formatPercent(num: number, digits: number) {
   if (num === 0) return '0%';
   if (num === 1) return '100%';
