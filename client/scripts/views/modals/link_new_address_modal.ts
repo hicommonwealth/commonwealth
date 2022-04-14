@@ -171,6 +171,7 @@ const LinkAccountItem: m.Component<
             linkNewAddressModalVnode.state.linkingComplete = true;
             accountVerifiedCallback(signerAccount);
           } catch (err) {
+            console.error(err.message);
             // catch when the user rejects the sign message prompt
             vnode.state.linking = false;
             errorCallback('Verification failed');
