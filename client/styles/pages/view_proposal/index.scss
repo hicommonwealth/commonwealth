@@ -54,16 +54,21 @@ $discussion-title-font-size: 1.45rem;
   .comment-body-bottom {
     display: flex;
     justify-content: space-between;
+
     .comment-response-row,
     .proposal-response-row {
       width: 100%;
       display: flex;
       max-width: 300px;
       align-items: center;
-      .InlineReplyButton,
-      .ProposalBodyReaction {
+      margin-top: 16px;
+
+      > * {
+        margin-right: 8px;
+      }
+
+      .InlineReplyButton {
         border: 1px solid $neutral-500;
-        margin-right: 7%;
         padding: 6px;
         cursor: pointer;
         border-radius: 20px;
@@ -72,37 +77,31 @@ $discussion-title-font-size: 1.45rem;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-right: 10%;
         padding: 6px;
-        cursor: pointer;
 
         &:hover {
           border: 1px solid $purple-400;
 
           .cui-icon,
-          .reply-count,
-          .reactions-count {
+          .reply-count {
             color: $purple-400;
           }
         }
         .active {
           .cui-icon,
-          .reply-count,
-          .reactions-count {
+          .reply-count {
             color: $purple-400 !important;
           }
         }
         .cui-icon,
-        .reply-count,
-        .reactions-count {
+        .reply-count {
           color: $neutral-500;
           font-weight: 500;
         }
         .cui-icon {
           margin-right: 8px;
         }
-        .reply-count,
-        .reactions-count {
+        .reply-count {
           position: relative;
           top: -1px;
         }
@@ -322,13 +321,6 @@ $discussion-title-font-size: 1.45rem;
     }
   }
 
-  .ProposalHeader .proposal-content {
-    .ProposalBodyReaction,
-    .InlineReplyButton {
-      margin-top: $discussion-reaction-padding;
-    }
-  }
-
   .ProposalComments {
     .new-comment-child {
       margin-left: 72px;
@@ -336,10 +328,6 @@ $discussion-title-font-size: 1.45rem;
         margin-left: 0 !important;
         width: 100%;
       }
-    }
-    .ProposalBodyReaction,
-    .InlineReplyButton {
-      margin-top: $discussion-reaction-padding;
     }
   }
 
@@ -563,9 +551,6 @@ $discussion-title-font-size: 1.45rem;
     &:hover {
       stroke: $neutral-500;
     }
-  }
-  .ProposalBodyReaction {
-    display: inline-block;
   }
   .InlineReplyButton {
     display: flex;

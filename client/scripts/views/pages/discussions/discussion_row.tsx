@@ -68,7 +68,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             <CWIcon iconName="pin" iconSize="small" />
           </div>
         ) : (
-          <ReactionButton post={proposal} />
+          <ReactionButton post={proposal} reactionType="discussionRow" />
         )}
         <div class="title-container">
           <div class="row-header">{proposal.title}</div>

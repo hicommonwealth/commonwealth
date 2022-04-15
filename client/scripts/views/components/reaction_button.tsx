@@ -3,7 +3,6 @@
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Popover } from 'construct-ui';
-import BN from 'bn.js';
 import $ from 'jquery';
 
 import 'components/reaction_button.scss';
@@ -16,7 +15,6 @@ import {
   OffchainThread,
   AnyProposal,
   AddressInfo,
-  ITokenAdapter,
   ChainInfo,
 } from 'models';
 import User from 'views/components/widgets/user';
@@ -25,6 +23,8 @@ import { LoginModal } from '../modals/login_modal';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
+
+type ReactionType = 'discussionRow' | 'threadComment';
 
 type ReactorAttrs = {
   likes: number;
@@ -35,6 +35,7 @@ type Post = OffchainThread | AnyProposal | OffchainComment<any>;
 
 type ReactionButtonAttrs = {
   post: Post;
+  reactionType: ReactionType;
 };
 
 const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
@@ -136,24 +137,27 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
   }
 
   view(vnode: m.VnodeDOM<ReactionButtonAttrs, this>) {
-    const { post } = vnode.attrs;
+    const { post, reactionType } = vnode.attrs;
     const reactionCounts = app.reactionCounts.getByPost(post);
     const { likes = 0, hasReacted } = reactionCounts || {};
 
     // token balance check if needed
-    const isAdmin = app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({ chain: app.activeChainId()});
-    let topicName = "";
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({ chain: app.activeChainId() });
+    let topicName = '';
     if (post instanceof OffchainThread && post.topic && app.topics) {
       topicName = (post as OffchainThread).topic.name;
     } else if (post instanceof OffchainComment) {
       // post.rootProposal has typescript typedef number but in practice seems to be a string
-      const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
+      const parentThread = app.threads.getById(
+        parseInt(post.rootProposal.toString().split('_')[1], 10)
+      );
       topicName = parentThread.topic.name;
     }
-    this.loading = vnode.state.loading || (
-      !isAdmin && TopicGateCheck.isGatedTopic(topicName)
-    );
+    this.loading =
+      vnode.state.loading ||
+      (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
 
     const activeAddress = app.user.activeAccount?.address;
 
@@ -191,7 +195,7 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
       });
     };
 
-    const reactionButton = (
+    const reactionButtonComponent = (
       <div
         onmouseenter={async () => {
           this.reactors = await fetchReactionsByPost(post);
@@ -199,13 +203,15 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
         onclick={async (e) =>
           onReactionClick(e, hasReacted, dislike, like, post)
         }
-        class={`ReactionButton${this.loading ? ' disabled' : ''}${
-          hasReacted ? ' hasReacted' : ''
-        }`}
+        class={`${
+          reactionType === 'discussionRow'
+            ? 'ReactionButton'
+            : 'ThreadReactionButton'
+        }${this.loading ? ' disabled' : ''}${hasReacted ? ' has-reacted' : ''}`}
       >
         <CWIcon
           iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
-          iconSize="small"
+          iconSize={reactionType === 'discussionRow' ? 'small' : 'medium'}
         />
         <div class="reactions-count">{likes}</div>
       </div>
@@ -222,11 +228,11 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
             })}
           </div>
         }
-        trigger={reactionButton}
+        trigger={reactionButtonComponent}
         hoverOpenDelay={100}
       />
     ) : (
-      reactionButton
+      reactionButtonComponent
     );
   }
 }

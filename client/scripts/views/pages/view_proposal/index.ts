@@ -109,7 +109,6 @@ import {
   ProposalBodyText,
   ProposalBodyAttachments,
   ProposalBodyEditor,
-  ProposalBodyReaction,
   ProposalBodyEditMenuItem,
   ProposalBodyDeleteMenuItem,
   EditPermissionsButton,
@@ -122,6 +121,7 @@ import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { ReactionButton } from '../../components/reaction_button';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -514,7 +514,10 @@ const ProposalHeader: m.Component<
                   ]),
                 !vnode.state.editing &&
                   m('.proposal-response-row', [
-                    m(ProposalBodyReaction, { item: proposal }),
+                    m(ReactionButton, {
+                      post: proposal,
+                      reactionType: 'threadComment',
+                    }),
                     m(InlineReplyButton, {
                       commentReplyCount: commentCount,
                       onclick: (e) => {
@@ -675,7 +678,10 @@ const ProposalComment: m.Component<
             !vnode.state.editing &&
               !comment.deleted &&
               m('.comment-response-row', [
-                m(ProposalBodyReaction, { item: comment }),
+                m(ReactionButton, {
+                  post: proposal,
+                  reactionType: 'threadComment',
+                }),
                 m(InlineReplyButton, {
                   commentReplyCount,
                   onclick: (e) => {

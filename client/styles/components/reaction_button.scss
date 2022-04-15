@@ -5,6 +5,7 @@
   border-radius: 12px;
   border: 1px solid $neutral-300;
   color: $neutral-500;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   font-weight: 500;
@@ -13,7 +14,7 @@
   margin-right: 24px;
   min-width: 48px;
 
-  &.hasReacted {
+  &.has-reacted {
     border-color: $primary-500;
     color: $primary-500;
   }
@@ -31,6 +32,42 @@
   .reactions-count {
     font-size: 14px;
     margin: 2px auto 4px;
+  }
+}
+
+.ThreadReactionButton {
+  align-items: center;
+  border: 1px solid $neutral-500;
+  border-radius: 20px;
+  color: $neutral-500;
+  cursor: pointer;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  width: 72px;
+
+  &:hover {
+    border: 1px solid $purple-400;
+    color: $purple-400;
+  }
+
+  &.has-reacted {
+    border-color: $purple-400;
+    color: $purple-400;
+  }
+
+  &.disabled {
+    border-color: $neutral-50;
+    color: $neutral-500;
+    pointer-events: none;
+  }
+
+  .reactions-count {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-left: 4px;
   }
 }
 
