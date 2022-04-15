@@ -5,11 +5,8 @@ import {
   PopoverMenu,
   MenuDivider,
   MenuItem,
-  Icon,
-  Icons,
   Button,
   Input,
-  Size,
 } from 'construct-ui';
 
 import 'pages/view_proposal/index.scss';
@@ -122,6 +119,7 @@ import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ReactionButton } from '../../components/reaction_button';
+import { InlineReplyButton } from '../../components/inline_reply_button';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -179,28 +177,6 @@ const scrollToForm = (parentId?: number) => {
     // focus the reply form
     $reply.find('.ql-editor').focus();
   }, 1);
-};
-
-const InlineReplyButton: m.Component<
-  { commentReplyCount: number; onclick },
-  {}
-> = {
-  view: (vnode) => {
-    const { commentReplyCount, onclick } = vnode.attrs;
-    return m(
-      '.InlineReplyButton',
-      {
-        onclick,
-      },
-      [
-        m(Icon, {
-          name: Icons.MESSAGE_SQUARE,
-          size: Size.XL,
-        }),
-        m('.reply-count', commentReplyCount),
-      ]
-    );
-  },
 };
 
 const ProposalHeader: m.Component<
@@ -336,7 +312,7 @@ const ProposalHeader: m.Component<
                           (isAuthor || isAdmin) &&
                             app.chain?.meta.chain.snapshot.length > 0 &&
                             m(MenuItem, {
-                              onclick: (e) => {
+                              onclick: () => {
                                 const snapshotSpaces =
                                   app.chain.meta.chain.snapshot;
                                 if (snapshotSpaces.length > 1) {
@@ -520,7 +496,7 @@ const ProposalHeader: m.Component<
                     }),
                     m(InlineReplyButton, {
                       commentReplyCount: commentCount,
-                      onclick: (e) => {
+                      onclick: () => {
                         if (!proposalPageState.replying) {
                           proposalPageState.replying = true;
                           scrollToForm();
@@ -684,7 +660,7 @@ const ProposalComment: m.Component<
                 }),
                 m(InlineReplyButton, {
                   commentReplyCount,
-                  onclick: (e) => {
+                  onclick: () => {
                     if (
                       !proposalPageState.replying ||
                       proposalPageState.parentCommentId !== comment.id
@@ -1016,7 +992,7 @@ const ViewProposalPage: m.Component<
     if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
       app.comments
         .refresh(proposal, app.activeChainId())
-        .then(async (result) => {
+        .then(async () => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
             .filter((c) => c.parentComment === null);
@@ -1042,7 +1018,7 @@ const ViewProposalPage: m.Component<
           }
           m.redraw();
         })
-        .catch((err) => {
+        .catch(() => {
           notifyError('Failed to load comments');
           vnode.state.comments = [];
           m.redraw();

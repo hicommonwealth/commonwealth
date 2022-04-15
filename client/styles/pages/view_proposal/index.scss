@@ -40,6 +40,10 @@ $discussion-title-font-size: 1.45rem;
     margin-right: 32px;
     padding: 24px 0 24px 24px;
     width: 736px;
+
+    @include sm-max {
+      width: 100%;
+    }
   }
   .ProposalHeader {
     .proposal-content {
@@ -65,46 +69,6 @@ $discussion-title-font-size: 1.45rem;
 
       > * {
         margin-right: 8px;
-      }
-
-      .InlineReplyButton {
-        border: 1px solid $neutral-500;
-        padding: 6px;
-        cursor: pointer;
-        border-radius: 20px;
-        width: 70px;
-        height: 30px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 6px;
-
-        &:hover {
-          border: 1px solid $purple-400;
-
-          .cui-icon,
-          .reply-count {
-            color: $purple-400;
-          }
-        }
-        .active {
-          .cui-icon,
-          .reply-count {
-            color: $purple-400 !important;
-          }
-        }
-        .cui-icon,
-        .reply-count {
-          color: $neutral-500;
-          font-weight: 500;
-        }
-        .cui-icon {
-          margin-right: 8px;
-        }
-        .reply-count {
-          position: relative;
-          top: -1px;
-        }
       }
     }
     .proposal-body-button-group,
@@ -310,6 +274,8 @@ $discussion-title-font-size: 1.45rem;
       display: flex;
       flex-direction: row;
       align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
     }
     .comment-body-bottom {
       padding: 4px 0 2px;
