@@ -146,7 +146,7 @@ export class LinkedProposalsCard
             rounded={true}
             compact={true}
             fluid={true}
-            label={app.chain ? 'Connect a proposal' : 'Update status'}
+            label="Connect a proposal"
             onclick={(e) => {
               e.preventDefault();
               openStageEditor();
