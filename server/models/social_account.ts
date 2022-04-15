@@ -7,6 +7,7 @@ export type SocialAccountAttributes = {
   provider: string;
   provider_username: string;
   provider_userid: string;
+  user_id: string;
   access_token: string;
   refresh_token: string;
   id?: number;
@@ -33,6 +34,7 @@ export default (
     provider: { type: dataTypes.STRING },
     provider_username: { type: dataTypes.STRING },
     provider_userid: { type: dataTypes.STRING },
+    user_id: { type: dataTypes.STRING },
     access_token: { type: dataTypes.STRING },
     refresh_token: { type: dataTypes.STRING },
     created_at: { type: dataTypes.DATE, allowNull: false },

@@ -1,0 +1,207 @@
+@import 'client/styles/shared';
+@import 'construct-ui/src/_shared/_colors';
+
+.ProfilePage {
+  position: relative;
+  width: 70%;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  .ProfileHeader {
+
+    margin: 30px 0;
+
+    .profile-content {
+      padding: 20px 40px;
+
+      section {
+        margin: 5px 0;
+      }
+
+      .profile-name {
+        display: flex;
+
+        .profile-icon {
+          margin: 5px 10px 0 0;
+        }
+      }
+
+      .social-accounts {
+        display: flex;
+
+        .social-account-icon {
+          margin-right: 15px;
+        }
+      }
+
+    }
+
+  } 
+
+  .ProfileActivity {
+    margin: 30px 0;
+
+    .activity-nav {
+      display: flex;
+
+      .activity-nav-option {
+        position: relative;
+        display: flex;
+        min-width: 50px;
+        padding: 6px 0;
+        margin-right: 20px;
+
+        h4 {
+          color: #DDDDDD;
+          margin-top: 2px;
+          transition: color .2s ease-in;
+        }
+
+        .activity-count {
+          position: relative;
+          width: 45px;
+          height: 25px;
+          background-color: white;
+          border-radius: 12px;
+          margin-left: 12px;
+          transition: background-color .2s ease-in;
+
+          p {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            font-size: small;
+            font-weight: 600;
+          }
+        }
+
+        &:hover {
+          cursor: pointer;
+          h4 {
+            color: #BBBBBB;
+          }
+
+          .activity-count {
+            background-color: #EFEFEF;
+          }
+        }
+
+        &.selected {
+          border-bottom: 2px solid #4723AD;
+          h4 {
+            color: black;
+          }
+
+          .activity-count {
+            background-color: #EFEFEF;
+          }
+        }
+      }
+
+      .divider {
+        width: 1px;
+        height: 24px;
+        border-right: 1px solid #DDDDDD;
+        margin: 7px 20px 0 0;
+      }
+    }
+
+    .activity-section {
+      margin: 40px 0;
+
+      .activity {
+        position: relative;
+        height: 130px;
+        padding: 10px 25px;
+        border-bottom: 1px solid #DDDDDD;
+
+        .comment-icon, .address-icon {
+          position: absolute;
+          top: 14px;
+          left: 0px;
+        }
+
+        .comment-chain, .thread-chain, .address-name {
+          margin-bottom: 10px;
+          p {
+            color: #BBBBBB;
+          }
+        }
+
+        .comment-date, .thread-date {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          p {
+            color: #BBBBBB;
+          }
+        }
+
+        .comment-text {
+          width: 85%;
+          max-height: 90px;
+          font-size: 16px;
+        }
+
+        .thread-title {
+          margin-bottom: 10px;
+        }
+
+        .thread-body {
+          width: 85%;
+          color: #BBBBBB;
+        }
+
+        .address-text {
+          margin-bottom: 10px;
+        }
+
+        .heavy {
+          color: black;
+          font-weight: 600;
+        }
+      }
+
+      .chain-entity {
+        position: relative;
+        display: inline-block;
+        width: 140px;
+        height: 140px;
+        margin: 15px;
+
+        background-color: #EFEFEF;
+        border-radius: 6px;
+        border: 1px solid #EFEFEF;
+
+        &:hover {
+          cursor: pointer;
+          border: 1px solid #EEEEEE;
+        }
+
+        .chain-info {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -53%);
+          width: 65%;
+          height: 65%;
+
+          img {
+            width: 100%;
+            height: 100%;
+          }
+
+          p {
+            margin-top: 4px;
+            text-align: center;
+            color: #BBBBBB;
+            font-size: 13px;
+          }
+        }
+      }
+    }
+
+  }
+
+}
