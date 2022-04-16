@@ -198,7 +198,7 @@ export function useMagicAuth(models: DB) {
           include: [ models.Address ],
         });
         return cb(null, newUser);
-      } else if (existingUser.Addresses) {
+      } else if (existingUser.Addresses?.length > 0) {
         // each user should only ever have one token issued by Magic
         const ssoToken = await models.SsoToken.findOne({
           where: {

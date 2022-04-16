@@ -24,10 +24,25 @@ import { DiscussionRow } from './discussion_row';
 import { SummaryListing } from './summary_listing';
 import {
   onFeaturedDiscussionPage,
-  getLastSeenDivider,
   orderDiscussionsbyLastComment,
 } from './helpers';
 import { DiscussionFilterBar } from './discussion_filter_bar';
+
+export const getLastSeenDivider = (hasText = true) => {
+  return (
+    <div class="LastSeenDivider">
+      {hasText ? (
+        <>
+          <hr />
+          <span>Last visit</span>
+          <hr />
+        </>
+      ) : (
+        <hr />
+      )}
+    </div>
+  );
+};
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -365,14 +380,12 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
       >
         {app.chain && (
           <div class="DiscussionsPage">
-            {!isEmpty && (
-              <DiscussionFilterBar
-                topic={topicName}
-                stage={stage}
-                parentState={this}
-                disabled={isLoading || stillFetching}
-              />
-            )}
+            <DiscussionFilterBar
+              topic={topicName}
+              stage={stage}
+              parentState={this}
+              disabled={isLoading || stillFetching}
+            />
             {onSummaryView
               ? isLoading
                 ? m(LoadingRow)
@@ -388,13 +401,13 @@ class DiscussionsPage implements m.ClassComponent<DiscussionsPageAttrs> {
                   topicName,
                 })
               : m(Listing, { content: sortedListing })}
-            {postsDepleted ? (
+            {postsDepleted && !onSummaryView ? (
               <div class="infinite-scroll-reached-end">
                 Showing {allThreads.length} of{' '}
                 {pluralize(allThreads.length, 'thread')}
                 {topic ? ` under the topic '${topic}'` : ''}
               </div>
-            ) : isEmpty ? null : (
+            ) : isEmpty || onSummaryView ? null : (
               <div class="infinite-scroll-spinner-wrap">
                 <Spinner active={!this.postsDepleted[subpage]} size="lg" />
               </div>

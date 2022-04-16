@@ -49,7 +49,7 @@ const updateEmail = async (models: DB, req: Request, res: Response, next: NextFu
     }],
   });
   if (!user) return next(new Error(Errors.NoUser));
-  if (user.Addresses && (await user.Addresses.length) > 0) return next(new Error(Errors.NoUpdateForMagic));
+  if (user.Addresses?.length > 0) return next(new Error(Errors.NoUpdateForMagic));
   // ensure no more than 3 tokens have been created in the last 5 minutes
   const recentTokens = await models.LoginToken.findAndCountAll({
     where: {

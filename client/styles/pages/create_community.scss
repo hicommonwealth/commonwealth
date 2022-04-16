@@ -1,6 +1,9 @@
 @import 'client/styles/shared';
 
 .CreateCommunityIndex {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   padding: 24px;
   width: 100%;
 
@@ -10,6 +13,8 @@
   }
 
   .CreateCommunityForm {
+    display: flex;
+    flex-direction: column;
     margin: 32px auto auto;
     width: 480px;
 
@@ -48,9 +53,9 @@
 
     .AvatarUpload {
       color: $rorange-500;
-      height: 92px;
+      height: 96px;
       margin: auto 0;
-      width: 92px;
+      width: 96px;
     }
 
     .id {

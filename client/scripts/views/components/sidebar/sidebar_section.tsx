@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Icon, Icons } from 'construct-ui';
 
 import 'components/sidebar/sidebar_section.scss';
 
@@ -10,6 +9,7 @@ import {
   SectionGroupAttrs,
   SidebarSectionAttrs,
 } from './types';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 class SubSection implements m.ClassComponent<SubSectionAttrs> {
   view(vnode) {
@@ -44,7 +44,7 @@ class SubSection implements m.ClassComponent<SubSectionAttrs> {
         class={`SubSection${isActive ? ' active' : ''}`}
         onclick={(e) => clickHandler(e)}
       >
-        {rowIcon && m(Icon, { name: Icons.HASH })}
+        {rowIcon && <CWIcon iconName="hash" iconSize="small" />}
         <div class={titleTextClass}>{title}</div>
         {rightIcon && <div class="right-icon">{rightIcon}</div>}
       </div>
@@ -83,13 +83,11 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
       onclick(e, this.toggled);
     };
 
-    const carat = this.toggled
-      ? m(Icon, {
-          name: Icons.CHEVRON_DOWN,
-        })
-      : m(Icon, {
-          name: Icons.CHEVRON_RIGHT,
-        });
+    const carat = this.toggled ? (
+      <CWIcon iconName="chevronDown" iconSize="small" />
+    ) : (
+      <CWIcon iconName="chevronRight" iconSize="small" />
+    );
 
     let titleTextClass = '';
 
@@ -206,13 +204,11 @@ export class SidebarSectionGroup
       this.hoverColor = 'none';
     };
 
-    const carat = toggled
-      ? m(Icon, {
-          name: Icons.CHEVRON_DOWN,
-        })
-      : m(Icon, {
-          name: Icons.CHEVRON_RIGHT,
-        });
+    const carat = toggled ? (
+      <CWIcon iconName="chevronDown" iconSize="small" />
+    ) : (
+      <CWIcon iconName="chevronRight" iconSize="small" />
+    );
 
     return (
       <div

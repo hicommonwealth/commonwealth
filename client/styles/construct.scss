@@ -89,8 +89,31 @@ $cui-base-height: floor($cui-base-size * 2.8);
   font-weight: $cui-font-weight-heavy; // fix weight
 }
 
+.cui-switch input:checked ~ .cui-control-indicator {
+  background-color: $purple-300;
+}
+
 .cui-switch .cui-control-indicator::after {
   box-sizing: border-box; // fix switch sizing
+}
+.cui-input textarea {
+  border-radius: 4px;
+  border: 2px solid $white;
+  background-color: $neutral-50;
+  box-shadow: none;
+  padding: 4px 8px;
+
+  &:hover {
+    border: 2px solid $purple-200;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-within {
+    border: 2px solid $purple-300;
+  }
 }
 
 // button link fixes
@@ -116,6 +139,7 @@ button,
 
 // button color fixes
 .cui-button {
+  color: $neutral-600;
   background: $white;
   transition: none;
 
@@ -126,6 +150,7 @@ button,
   }
 
   &:hover {
+    color: $neutral-700;
     background: $white;
   }
 
@@ -147,28 +172,16 @@ button,
     }
   }
 
-  // adjust sublabel colors to grey from blue grey
-  .cui-button-sublabel {
-    color: $black;
-  }
-
-  &.cui-basic .cui-button-sublabel,
-  &.cui-outlined .cui-button-sublabel {
-    color: $black;
-  }
-
   // adjust basic button styles
   &.cui-basic,
   .cui-button-group.cui-basic & {
     &:hover {
       background: $neutral-100;
-      color: $black;
     }
 
     &:active,
     &.cui-active {
       background: $neutral-100;
-      color: $black;
     }
   }
 }
