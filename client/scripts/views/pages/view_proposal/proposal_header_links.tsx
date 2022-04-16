@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /* @jsx m */
 
 import m from 'mithril';
@@ -34,89 +35,116 @@ export class ProposalHeaderExternalLink
   }
 }
 
-export const ProposalHeaderBlockExplorerLink: m.Component<{
-  proposal: AnyProposal;
-}> = {
-  view: (vnode) => {
+export class ProposalHeaderBlockExplorerLink
+  implements
+    m.ClassComponent<{
+      proposal: AnyProposal;
+    }>
+{
+  view(vnode) {
     const { proposal } = vnode.attrs;
     if (!proposal || !proposal['blockExplorerLink']) return;
-    return m('.ProposalHeaderBlockExplorerLink', [
-      externalLink('a.voting-link', proposal['blockExplorerLink'], [
-        proposal['blockExplorerLinkLabel'] ||
-          extractDomain(proposal['blockExplorerLink']),
-        m(CWIcon, { iconName: 'externalLink' }),
-      ]),
-    ]);
-  },
-};
 
-export const ProposalHeaderExternalSnapshotLink: m.Component<{
-  proposal: SnapshotProposal;
-  spaceId: string;
-}> = {
-  view: (vnode) => {
+    return (
+      <div class="ProposalHeaderBlockExplorerLink">
+        {externalLink('a.voting-link', proposal['blockExplorerLink'], [
+          proposal['blockExplorerLinkLabel'] ||
+            extractDomain(proposal['blockExplorerLink']),
+          <CWIcon iconName="externalLink" />,
+        ])}
+      </div>
+    );
+  }
+}
+
+export class ProposalHeaderExternalSnapshotLink
+  implements
+    m.ClassComponent<{
+      proposal: SnapshotProposal;
+      spaceId: string;
+    }>
+{
+  view(vnode) {
     const { proposal, spaceId } = vnode.attrs;
     if (!proposal || !proposal.id || !spaceId) return;
 
-    return m('.ProposalHeaderBlockExplorerLink', [
-      externalLink(
-        'a.voting-link',
-        `https://snapshot.org/#/${spaceId}/proposal/${proposal.id}`,
-        [`View on Snapshot`, m(CWIcon, { iconName: 'externalLink' })]
-      ),
-    ]);
-  },
-};
+    return (
+      <div class="ProposalHeaderBlockExplorerLink">
+        {externalLink(
+          'a.voting-link',
+          `https://snapshot.org/#/${spaceId}/proposal/${proposal.id}`,
+          [`View on Snapshot`, <CWIcon iconName="externalLink" />]
+        )}
+      </div>
+    );
+  }
+}
 
-export const ProposalHeaderVotingInterfaceLink: m.Component<{
-  proposal: AnyProposal;
-}> = {
-  view: (vnode) => {
+export class ProposalHeaderVotingInterfaceLink
+  implements
+    m.ClassComponent<{
+      proposal: AnyProposal;
+    }>
+{
+  view(vnode) {
     const { proposal } = vnode.attrs;
     if (!proposal || !proposal['votingInterfaceLink']) return;
-    return m('.ProposalHeaderVotingInterfaceLink', [
-      externalLink('a.voting-link', proposal['votingInterfaceLink'], [
-        proposal['votingInterfaceLinkLabel'] ||
-          extractDomain(proposal['votingInterfaceLink']),
-        m(CWIcon, { iconName: 'externalLink' }),
-      ]),
-    ]);
-  },
-};
 
-export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
-  {
-    view: (vnode) => {
-      const { proposal } = vnode.attrs;
-      if (!proposal || !proposal.threadId) return;
-      const path = getProposalUrlPath(
-        ProposalType.OffchainThread,
-        `${proposal.threadId}`,
-        false,
-        proposal['chain']
-      );
-      return m('.ProposalHeaderThreadLink', [
-        link('a.thread-link', path, [
+    return (
+      <div class="ProposalHeaderVotingInterfaceLink">
+        {externalLink('a.voting-link', proposal['votingInterfaceLink'], [
+          proposal['votingInterfaceLinkLabel'] ||
+            extractDomain(proposal['votingInterfaceLink']),
+          <CWIcon iconName="externalLink" />,
+        ])}
+      </div>
+    );
+  }
+}
+
+export class ProposalHeaderThreadLink
+  implements m.ClassComponent<{ proposal: AnyProposal }>
+{
+  view(vnode) {
+    const { proposal } = vnode.attrs;
+    if (!proposal || !proposal.threadId) return;
+
+    const path = getProposalUrlPath(
+      ProposalType.OffchainThread,
+      `${proposal.threadId}`,
+      false,
+      proposal['chain']
+    );
+
+    return (
+      <div class="ProposalHeaderThreadLink">
+        {link('a.thread-link', path, [
           'Go to discussion',
-          m(CWIcon, { iconName: 'externalLink' }),
-        ]),
-      ]);
-    },
-  };
+          <CWIcon iconName="externalLink" />,
+        ])}
+      </div>
+    );
+  }
+}
 
-export const ProposalHeaderSnapshotThreadLink: m.Component<{
-  thread: { id: string; title: string };
-}> = {
-  view: (vnode) => {
+export class ProposalHeaderSnapshotThreadLink
+  implements
+    m.ClassComponent<{
+      thread: { id: string; title: string };
+    }>
+{
+  view(vnode) {
     const { id, title } = vnode.attrs.thread;
     if (!id) return;
     const proposalLink = getProposalUrlPath(ProposalType.OffchainThread, id);
 
-    return m('.ProposalHeaderThreadLink', [
-      link('a.thread-link', proposalLink, [
-        decodeURIComponent(title),
-        m(CWIcon, { iconName: 'externalLink' }),
-      ]),
-    ]);
-  },
-};
+    return (
+      <div class="ProposalHeaderThreadLink">
+        {link('a.thread-link', proposalLink, [
+          decodeURIComponent(title),
+          <CWIcon iconName="externalLink" />,
+        ])}
+      </div>
+    );
+  }
+}
