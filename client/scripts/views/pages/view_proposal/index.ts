@@ -241,7 +241,6 @@ const ProposalHeader: m.Component<
       isEditor,
       isAdmin,
     } = vnode.attrs;
-
     const attachments =
       proposal instanceof OffchainThread
         ? (proposal as OffchainThread).attachments
