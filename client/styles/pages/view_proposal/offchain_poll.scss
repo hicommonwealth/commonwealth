@@ -1,0 +1,67 @@
+@import 'shared';
+
+.ProposalHeaderOffchainPoll {
+  border-radius: 10px;
+  border: 1px solid $neutral-100;
+  padding: 22px 18px 21px;
+  margin-bottom: 24px;
+
+  .offchain-poll-header {
+    font-weight: 600;
+  }
+
+  .offchain-poll-options {
+    margin: 16px 0;
+
+    .offchain-poll-option {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .offchain-poll-option-left {
+        margin: 6px 0;
+        flex: 1;
+      }
+    }
+  }
+
+  .offchain-poll-caption {
+    font-size: 14px;
+    color: $neutral-500;
+    margin-bottom: 24px;
+  }
+
+  .offchain-poll-invalid,
+  .offchain-poll-no-voters {
+    font-size: 16px;
+    color: $neutral-500;
+  }
+
+  .offchain-poll-voters {
+    margin-top: 10px;
+
+    .vote-synopsis {
+      margin-top: 10px;
+
+      .option-with-votes {
+        margin: 10px 0;
+
+        .poll-bar {
+          height: 5px;
+          border-radius: 5px;
+          background-color: $primary-500;
+        }
+
+        .option-results-label {
+          display: flex;
+          margin-bottom: 4px;
+        }
+
+        a {
+          margin-top: 10px;
+          display: inline-block;
+        }
+      }
+    }
+  }
+}

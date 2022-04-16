@@ -71,11 +71,6 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import {
-  ProposalHeaderExternalLink,
-  ProposalHeaderBlockExplorerLink,
-  ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderOffchainPoll,
-  ProposalHeaderThreadLink,
   ProposalHeaderTopics,
   ProposalHeaderTitle,
   ProposalHeaderStage,
@@ -122,6 +117,13 @@ import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { OffchainPoll } from './offchain_poll';
+import {
+  ProposalHeaderBlockExplorerLink,
+  ProposalHeaderExternalLink,
+  ProposalHeaderThreadLink,
+  ProposalHeaderVotingInterfaceLink,
+} from './proposal_header_links';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1382,7 +1384,7 @@ const ViewProposalPage: m.Component<
           [
             proposal instanceof OffchainThread &&
               proposal.hasOffchainPoll &&
-              m(ProposalHeaderOffchainPoll, { proposal }),
+              m(OffchainPoll, { proposal }),
             proposal instanceof OffchainThread &&
               isAuthor &&
               !proposal.offchainVotingEnabled &&
