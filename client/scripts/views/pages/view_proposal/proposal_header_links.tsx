@@ -3,7 +3,7 @@
 
 import m from 'mithril';
 
-// import 'pages/view_proposal/proposal_header_links.scss';
+import 'pages/view_proposal/proposal_header_links.scss';
 
 import { link, externalLink, extractDomain } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
@@ -25,8 +25,8 @@ export class ProposalHeaderExternalLink
     if (proposal.kind !== OffchainThreadKind.Link) return;
 
     return (
-      <div class="ProposalHeaderExternalLink">
-        {externalLink('a.external-link', proposal.url, [
+      <div class="ProposalHeaderLink">
+        {externalLink('a', proposal.url, [
           extractDomain(proposal.url),
           <CWIcon iconName="externalLink" />,
         ])}
@@ -46,8 +46,8 @@ export class ProposalHeaderBlockExplorerLink
     if (!proposal || !proposal['blockExplorerLink']) return;
 
     return (
-      <div class="ProposalHeaderBlockExplorerLink">
-        {externalLink('a.voting-link', proposal['blockExplorerLink'], [
+      <div class="ProposalHeaderLink">
+        {externalLink('a', proposal['blockExplorerLink'], [
           proposal['blockExplorerLinkLabel'] ||
             extractDomain(proposal['blockExplorerLink']),
           <CWIcon iconName="externalLink" />,
@@ -69,9 +69,9 @@ export class ProposalHeaderExternalSnapshotLink
     if (!proposal || !proposal.id || !spaceId) return;
 
     return (
-      <div class="ProposalHeaderBlockExplorerLink">
+      <div class="ProposalHeaderLink">
         {externalLink(
-          'a.voting-link',
+          'a',
           `https://snapshot.org/#/${spaceId}/proposal/${proposal.id}`,
           [`View on Snapshot`, <CWIcon iconName="externalLink" />]
         )}
@@ -91,8 +91,8 @@ export class ProposalHeaderVotingInterfaceLink
     if (!proposal || !proposal['votingInterfaceLink']) return;
 
     return (
-      <div class="ProposalHeaderVotingInterfaceLink">
-        {externalLink('a.voting-link', proposal['votingInterfaceLink'], [
+      <div class="ProposalHeaderLink">
+        {externalLink('a', proposal['votingInterfaceLink'], [
           proposal['votingInterfaceLinkLabel'] ||
             extractDomain(proposal['votingInterfaceLink']),
           <CWIcon iconName="externalLink" />,
@@ -117,8 +117,8 @@ export class ProposalHeaderThreadLink
     );
 
     return (
-      <div class="ProposalHeaderThreadLink">
-        {link('a.thread-link', path, [
+      <div class="ProposalHeaderLink">
+        {link('a', path, [
           'Go to discussion',
           <CWIcon iconName="externalLink" />,
         ])}
@@ -139,8 +139,8 @@ export class ProposalHeaderSnapshotThreadLink
     const proposalLink = getProposalUrlPath(ProposalType.OffchainThread, id);
 
     return (
-      <div class="ProposalHeaderThreadLink">
-        {link('a.thread-link', proposalLink, [
+      <div class="ProposalHeaderLink">
+        {link('a', proposalLink, [
           decodeURIComponent(title),
           <CWIcon iconName="externalLink" />,
         ])}
