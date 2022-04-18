@@ -32,7 +32,7 @@ export class DiscussionFilterBar
 
     const { stagesEnabled, customStages } = communityInfo;
 
-    const topics  = app.topics.getByCommunity(app.activeChainId());
+    const topics = app.topics.getByCommunity(app.activeChainId());
 
     const featuredTopics = topics
       .filter((t) => t.featuredInSidebar)
@@ -54,12 +54,11 @@ export class DiscussionFilterBar
         ]
       : parseCustomStages(customStages);
 
-    const selectedStage = stages.find((s) => s === (stage as any));
+    const selectedStage = stages.find(
+      (s) => s === (stage as OffchainThreadStage)
+    );
 
-    const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
-
-    const summaryViewEnabled =
-      vnode.attrs.parentState.summaryView && !topicSelected;
+    const summaryViewEnabled = vnode.attrs.parentState.summaryView;
 
     return (
       <div class="DiscussionFilterBar">
@@ -93,9 +92,11 @@ export class DiscussionFilterBar
               disabled={disabled}
               onclick={async (e) => {
                 e.preventDefault();
-                localStorage.setItem('discussion-summary-toggle', 'true');
-                parentState.summaryView = true;
                 navigateToSubpage('/');
+                localStorage.setItem('discussion-summary-toggle', 'true');
+                setTimeout(() => {
+                  parentState.summaryView = true;
+                }, 0);
               }}
             />
             <Button
@@ -107,9 +108,11 @@ export class DiscussionFilterBar
               disabled={disabled}
               onclick={async (e) => {
                 e.preventDefault();
-                parentState.summaryView = false;
                 localStorage.setItem('discussion-summary-toggle', 'false');
                 m.route.set(`/${app.activeChainId()}`);
+                setTimeout(() => {
+                  parentState.summaryView = false;
+                }, 0);
               }}
             />
           </>
