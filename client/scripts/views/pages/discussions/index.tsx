@@ -12,12 +12,8 @@ import { RecentListing } from './recent_listing';
 import Sublayout from '../../sublayout';
 import { DiscussionFilterBar } from './discussion_filter_bar';
 
-// Graham 4/18/22 Todo:
-// * LastVisited logic
-// * Investigate possible redundant fetches originating in onscroll
-
+// Graham 4/18/22 Todo: Consider re-implementing LastVisited logic
 class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
-  private returningFromThread: boolean;
   private summaryView: boolean;
   private summaryViewInitialized: boolean;
   private topicName: string;
@@ -55,7 +51,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   handleScrollback() {
     const storedScrollYPos =
       localStorage[`${app.activeChainId()}-discussions-scrollY`];
-    if (this.returningFromThread && storedScrollYPos) {
+    if (app.lastNavigatedBack() && storedScrollYPos) {
       setTimeout(() => {
         this.scrollEle.scrollTo(0, Number(storedScrollYPos));
       }, 100);
@@ -67,41 +63,38 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     if (app.chain.meta.chain.defaultSummaryView) {
       this.summaryView = true;
     }
+
     // User is returning to a summary-toggled listing page
-    if (this.returningFromThread) {
-      this.summaryView =
-        localStorage.getItem('discussion-summary-toggle') === 'true';
+    if (app.lastNavigatedBack()) {
+      const summaryToggled = localStorage.getItem('discussion-summary-toggle');
+      this.summaryView = summaryToggled === 'true';
     }
+
     this.summaryViewInitialized = true;
   }
 
   async onscroll() {
+    localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+      this.scrollEle.scrollTop;
+
     const { fetchingThreads, topicName, stageName } = this;
-    const noThreadsRemaining = app.threads.listingStore.isDepleted({
-      topicName,
-      stageName,
-    });
-    if (fetchingThreads || noThreadsRemaining) {
-      return;
-    }
+    if (fetchingThreads) return;
+
+    const params = { topicName, stageName };
+    const noThreadsRemaining = app.threads.listingStore.isDepleted(params);
+    if (noThreadsRemaining) return;
 
     const { scrollHeight, scrollTop } = this.scrollEle;
+    const fetchpointNotReached = scrollHeight - 1000 >= scrollTop;
+    if (fetchpointNotReached) return;
 
-    if (scrollHeight - 1000 < scrollTop) {
-      this.fetchingThreads = true;
-      await app.threads.loadNextPage({ topicName, stageName });
-      this.fetchingThreads = false;
-      m.redraw();
-    }
+    this.fetchingThreads = true;
+    await app.threads.loadNextPage({ topicName, stageName });
+    this.fetchingThreads = false;
+    m.redraw();
   }
 
   // Lifecycle methods
-
-  oninit() {
-    this.returningFromThread =
-      app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes('/discussion/');
-  }
 
   oncreate() {
     mixpanel.track('PageVisit', {

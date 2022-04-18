@@ -90,12 +90,13 @@ export class DiscussionFilterBar
               label="Summary"
               size="sm"
               disabled={disabled}
-              onclick={async (e) => {
+              onclick={(e) => {
                 e.preventDefault();
                 navigateToSubpage('/');
                 localStorage.setItem('discussion-summary-toggle', 'true');
                 setTimeout(() => {
                   parentState.summaryView = true;
+                  m.redraw();
                 }, 0);
               }}
             />
@@ -106,12 +107,13 @@ export class DiscussionFilterBar
               label="Latest"
               size="sm"
               disabled={disabled}
-              onclick={async (e) => {
+              onclick={(e) => {
                 e.preventDefault();
                 localStorage.setItem('discussion-summary-toggle', 'false');
-                m.route.set(`/${app.activeChainId()}`);
+                navigateToSubpage('/');
                 setTimeout(() => {
                   parentState.summaryView = false;
+                  m.redraw();
                 }, 0);
               }}
             />
