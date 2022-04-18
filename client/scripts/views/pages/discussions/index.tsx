@@ -22,6 +22,11 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   private summaryViewInitialized: boolean;
   private topicName: string;
   private stageName: string;
+  private fetchingThreads: boolean;
+
+  get scrollEle() {
+    return document.getElementsByClassName('Body')[0];
+  }
 
   // Helpers
 
@@ -50,10 +55,9 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   handleScrollback() {
     const storedScrollYPos =
       localStorage[`${app.activeChainId()}-discussions-scrollY`];
-    console.log({ storedScrollYPos });
     if (this.returningFromThread && storedScrollYPos) {
       setTimeout(() => {
-        window.scrollTo(0, Number(storedScrollYPos));
+        this.scrollEle.scrollTo(0, Number(storedScrollYPos));
       }, 100);
     }
   }
@@ -72,21 +76,21 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   }
 
   async onscroll() {
-    const { topicName, stageName } = this;
-    const { listingStore } = app.threads;
-    if (listingStore.isDepleted({ topicName, stageName })) {
+    const { fetchingThreads, topicName, stageName } = this;
+    const noThreadsRemaining = app.threads.listingStore.isDepleted({
+      topicName,
+      stageName,
+    });
+    if (fetchingThreads || noThreadsRemaining) {
       return;
     }
 
-    const scrollEle = document.getElementsByClassName('Body')[0];
-    const { scrollHeight, scrollTop } = scrollEle;
+    const { scrollHeight, scrollTop } = this.scrollEle;
 
     if (scrollHeight - 1000 < scrollTop) {
-      console.log(' fetching ');
-      console.log(
-        app.threads.listingStore.getThreads({ topicName, stageName })
-      );
+      this.fetchingThreads = true;
       await app.threads.loadNextPage({ topicName, stageName });
+      this.fetchingThreads = false;
       m.redraw();
     }
   }
@@ -120,7 +124,6 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     this.stageName = m.route.param('stage');
 
     if (!this.summaryViewInitialized) this.initializeSummaryView();
-    // If URI specifies topic or stage, override default/historical settings
     if (this.topicName || this.stageName) this.summaryView = false;
     if (!this.summaryView) {
       localStorage.setItem('discussion-summary-toggle', 'false');

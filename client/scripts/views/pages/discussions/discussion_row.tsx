@@ -57,9 +57,9 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
           if ($(e.target).hasClass('cui-tag')) return;
           if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
           e.preventDefault();
-          console.log(window.scrollY);
+          const scrollEle = document.getElementsByClassName('Body')[0];
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
-            window.scrollY;
+            scrollEle.scrollTop;
           m.route.set(discussionLink);
         }}
         key={proposal.id}
