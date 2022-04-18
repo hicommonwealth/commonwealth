@@ -57,7 +57,16 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
             <p> { transformTimestamp(comment.created_at) } </p> 
           </div>
           <div className="comment-text">
-            <p> { comment.plaintext } </p> 
+            <p> 
+              { 
+                comment.plaintext.length > 300 ?
+                `${comment.plaintext.slice(0,300)}...` :
+                comment.plaintext
+              } 
+            </p> 
+            { 
+              // TODO: Adjust character count limit for responsiveness
+            }
           </div>
         </div>
       )
