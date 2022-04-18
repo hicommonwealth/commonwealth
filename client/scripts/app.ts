@@ -298,6 +298,13 @@ export async function selectNode(
       )
     ).default;
     newChain = new ERC20(n, app);
+  } else if (n.chain.network === ChainNetwork.ERC721) {
+    const ERC721 = (await import(
+    //   /* webpackMode: "lazy" */
+    //   /* webpackChunkName: "erc721-main" */
+      './controllers/chain/ethereum/NftAdapter'
+    )).default;
+    newChain = new ERC721(n, app);
   } else if (n.chain.network === ChainNetwork.SPL) {
     const SPL = (
       await import(
@@ -407,10 +414,8 @@ export async function initChain(): Promise<void> {
 }
 
 export async function initNewTokenChain(address: string) {
-  const response = await $.getJSON('/api/getTokenForum', {
-    address,
-    autocreate: true,
-  });
+  const chain_network = app.chain.network;
+  const response = await $.getJSON('/api/getTokenForum', { address, chain_network, autocreate: true });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');

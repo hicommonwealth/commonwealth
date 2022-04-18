@@ -9,7 +9,7 @@ import 'pages/manage_community/webhooks_form.scss';
 import app from 'state';
 import { Webhook } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import WebhookSettingsModal from 'views/modals/webhook_settings_modal';
+import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import { link, pluralize } from 'helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 

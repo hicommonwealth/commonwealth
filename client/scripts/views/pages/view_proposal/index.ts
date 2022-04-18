@@ -121,6 +121,7 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -240,7 +241,6 @@ const ProposalHeader: m.Component<
       isEditor,
       isAdmin,
     } = vnode.attrs;
-
     const attachments =
       proposal instanceof OffchainThread
         ? (proposal as OffchainThread).attachments
@@ -361,7 +361,10 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                     !app.isCustomDomain() &&
                       m('.CommentSocialHeader', [m(SocialSharingCarat)]),
@@ -444,7 +447,10 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                   ]
             ),
@@ -611,7 +617,10 @@ const ProposalComment: m.Component<
                   }),
                 ],
                 transitionDuration: 0,
-                trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                trigger: m(CWIcon, {
+                  iconName: 'chevronDown',
+                  iconSize: 'small',
+                }),
               }),
             ],
             !app.isCustomDomain() &&
@@ -1003,7 +1012,7 @@ const ViewProposalPage: m.Component<
         .then(async (result) => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
-            .filter((c) => c.parentComment === null);
+            // .filter((c) => c.parentComment === null); // TODO: Why was this written?
           // fetch reactions
           const { result: reactionCounts } = await $.ajax({
             type: 'POST',

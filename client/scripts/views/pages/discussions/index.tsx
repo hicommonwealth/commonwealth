@@ -15,7 +15,6 @@ import { DiscussionFilterBar } from './discussion_filter_bar';
 // Graham 4/18/22 Todo:
 // * LastVisited logic
 // * Investigate possible redundant fetches originating in onscroll
-// * Finish adding localhost-cached scrollback
 
 class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   private returningFromThread: boolean;
@@ -26,6 +25,22 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
 
   // Helpers
 
+  getLastSeenDivider(hasText = true) {
+    return (
+      <div class="LastSeenDivider">
+        {hasText ? (
+          <>
+            <hr />
+            <span>Last visit</span>
+            <hr />
+          </>
+        ) : (
+          <hr />
+        )}
+      </div>
+    );
+  }
+
   getPageDescription() {
     if (!this.topicName) return;
     const topic = app.topics.getByName(this.topicName, app.activeChainId());
@@ -35,6 +50,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   handleScrollback() {
     const storedScrollYPos =
       localStorage[`${app.activeChainId()}-discussions-scrollY`];
+    console.log({ storedScrollYPos });
     if (this.returningFromThread && storedScrollYPos) {
       setTimeout(() => {
         window.scrollTo(0, Number(storedScrollYPos));
@@ -52,6 +68,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
       this.summaryView =
         localStorage.getItem('discussion-summary-toggle') === 'true';
     }
+    this.summaryViewInitialized = true;
   }
 
   async onscroll() {

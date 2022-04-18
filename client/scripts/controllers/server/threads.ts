@@ -641,6 +641,7 @@ class ThreadsController {
       const existing = this._store.getByIdentifier(thread.id);
       if (existing) this._store.remove(existing);
       this._store.update(thread);
+      this.fetchReactionsCount([thread]);
       return thread;
     });
   }
