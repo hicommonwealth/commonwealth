@@ -1,70 +1,70 @@
 @import 'client/styles/shared';
 
 .ThreadSelector {
-    padding: 0;
-    border: 1px solid #ddd;
-    margin: 10px 0 20px;
+  padding: 0;
+  border: 1px solid $neutral-100;
+  margin: 10px 0 20px;
+  border-radius: 5px;
+  .cui-control-group {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .cui-input {
+    width: calc(100% - 1px);
+    input {
+      border-top: none;
+      border-right: none;
+      border-left: none;
+      border-bottom-color: $neutral-100;
+      height: 44px;
+      border-radius: 0;
+      padding: 22px 14px 15.6px;
+    }
+  }
+  .cui-list {
+    min-height: 150px;
+    max-height: 150px;
     border-radius: 5px;
-    .cui-control-group {
-        margin-bottom: 0;
-        display: flex;
-        flex-direction: column;
+    .cui-active {
+      background: initial;
     }
-    .cui-input {
-        width: calc(100% - 1px);
-        input {
-            border-top: none;
-            border-right: none;
-            border-left: none;
-            border-bottom-color: $border-color-light;
-            height: 44px;
-            border-radius: 0;
-            padding: 22px 14px 15.6px;
+    .cui-list-item {
+      padding-left: 14px;
+      padding-right: 14px;
+      border-bottom: 1px solid $neutral-100;
+      .linked-thread-info {
+        .linked-thread-top {
+          font-weight: 500;
         }
-    }
-    .cui-list {
-        min-height: 150px;
-        max-height: 150px;
-        border-radius: 5px;
-        .cui-active {
-            background: initial;
+        .linked-thread-bottom {
+          font-size: 88%;
+          font-weight: 400;
+          color: darkgray;
         }
-        .cui-list-item {
-            padding-left: 14px;
-            padding-right: 14px; 
-            border-bottom: 1px solid $border-color-light;
-            .linked-thread-info {
-                .linked-thread-top {
-                    font-weight: 500;
-                }
-                .linked-thread-bottom {
-                    font-size: 88%;
-                    font-weight: 400;
-                    color: darkgray;
-                }
-            }
-            &:last-child {
-                border-bottom: none;
-            }
-        }
+      }
+      &:last-child {
+        border-bottom: none;
+      }
     }
-    .cui-query-list-empty {
-        position: relative;
-        top: 50px;
-        bottom: 50px;
-        .cui-query-list-message {
-            text-align: center;
-        }
+  }
+  .cui-query-list-empty {
+    position: relative;
+    top: 50px;
+    bottom: 50px;
+    .cui-query-list-message {
+      text-align: center;
     }
-    .cui-query-list-checkmark .cui-list-item-content-left {
-        left: 0;
-    }
-    .linked-threads-selector-placeholder {
-        padding: 112px 0;
-        text-align: center;
-    }
-    .linked-threads-selector-placeholder-text {
-        height: 30px;
-        color: $text-color-medium-dark;
-    }
+  }
+  .cui-query-list-checkmark .cui-list-item-content-left {
+    left: 0;
+  }
+  .linked-threads-selector-placeholder {
+    padding: 112px 0;
+    text-align: center;
+  }
+  .linked-threads-selector-placeholder-text {
+    height: 30px;
+    color: $neutral-600;
+  }
 }

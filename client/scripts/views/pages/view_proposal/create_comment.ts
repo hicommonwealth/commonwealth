@@ -7,6 +7,7 @@ import { Button, Callout } from 'construct-ui';
 import app from 'state';
 
 import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
+import { ChainNetwork } from 'types';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -154,7 +155,9 @@ const CreateComment: m.Component<{
       || !app.isAdapterReady
       || (!isAdmin && topicGated);
 
-    const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
+    const decimals = app.chain?.meta.chain?.decimals
+      ? app.chain.meta.chain.decimals
+      : (app.chain.network === ChainNetwork.ERC721) ? 0 : 18;
     return m('.CreateComment', {
       class: parentScopedClass
     }, [

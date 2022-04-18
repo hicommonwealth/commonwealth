@@ -2,7 +2,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment';
-import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
+import { Button, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -34,6 +34,7 @@ import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 export const ProposalHeaderExternalLink: m.Component<{
   proposal: AnyProposal | OffchainThread;
@@ -46,7 +47,7 @@ export const ProposalHeaderExternalLink: m.Component<{
     return m('.ProposalHeaderExternalLink', [
       externalLink('a.external-link', proposal.url, [
         extractDomain(proposal.url),
-        m(Icon, { name: Icons.EXTERNAL_LINK }),
+        m(CWIcon, { iconName: 'externalLink' }),
       ]),
     ]);
   },
@@ -74,9 +75,7 @@ export const ProposalHeaderOffchainPoll: m.Component<
       // fetch from backend, and then set
       $.get(
         `/api/viewOffchainVotes?thread_id=${proposal.id}${
-          app.activeChainId()
-            ? `&chain=${app.activeChainId()}`
-            : ''
+          app.activeChainId() ? `&chain=${app.activeChainId()}` : ''
         }`
       )
         .then((result) => {
@@ -90,16 +89,9 @@ export const ProposalHeaderOffchainPoll: m.Component<
         });
     }
 
-    const pollingEnded = proposal.offchainVotingEndsAt
-      && proposal.offchainVotingEndsAt?.isBefore(moment().utc());
-    const canVote =
-      app.isLoggedIn() &&
-      app.user.activeAccount &&
-      !pollingEnded &&
-      !proposal.getOffchainVoteFor(
-        app.user.activeAccount.chain.id,
-        app.user.activeAccount.address
-      );
+    const pollingEnded =
+      proposal.offchainVotingEndsAt &&
+      proposal.offchainVotingEndsAt?.isBefore(moment().utc());
 
     const tokenThresholdFailed = TopicGateCheck.isGatedTopic(proposal.topic.name);
 
@@ -206,14 +198,17 @@ export const ProposalHeaderOffchainPoll: m.Component<
       m('.offchain-poll-caption', [
         proposal.offchainVotingEndsAt
           ? [
-              !pollingEnded && moment().from(proposal.offchainVotingEndsAt).replace(' ago', ''),
+              !pollingEnded &&
+                moment()
+                  .from(proposal.offchainVotingEndsAt)
+                  .replace(' ago', ''),
               !pollingEnded && ' left',
               m('br'),
               !pollingEnded && 'Ends ',
               pollingEnded && 'Ended ',
               proposal.offchainVotingEndsAt?.format('lll'),
             ]
-          : 'Poll does not expire.'
+          : 'Poll does not expire.',
       ]),
       m('.offchain-poll-header', 'Voters'),
       m('.offchain-poll-voters', [
@@ -235,7 +230,7 @@ export const ProposalHeaderBlockExplorerLink: m.Component<{
       externalLink('a.voting-link', proposal['blockExplorerLink'], [
         proposal['blockExplorerLinkLabel'] ||
           extractDomain(proposal['blockExplorerLink']),
-        m(Icon, { name: Icons.EXTERNAL_LINK }),
+        m(CWIcon, { iconName: 'externalLink' }),
       ]),
     ]);
   },
@@ -253,7 +248,7 @@ export const ProposalHeaderExternalSnapshotLink: m.Component<{
       externalLink(
         'a.voting-link',
         `https://snapshot.org/#/${spaceId}/proposal/${proposal.id}`,
-        [`View on Snapshot`, m(Icon, { name: Icons.EXTERNAL_LINK })]
+        [`View on Snapshot`, m(CWIcon, { iconName: 'externalLink' })]
       ),
     ]);
   },
@@ -269,7 +264,7 @@ export const ProposalHeaderVotingInterfaceLink: m.Component<{
       externalLink('a.voting-link', proposal['votingInterfaceLink'], [
         proposal['votingInterfaceLinkLabel'] ||
           extractDomain(proposal['votingInterfaceLink']),
-        m(Icon, { name: Icons.EXTERNAL_LINK }),
+        m(CWIcon, { iconName: 'externalLink' }),
       ]),
     ]);
   },
@@ -280,29 +275,33 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
     view: (vnode) => {
       const { proposal } = vnode.attrs;
       if (!proposal || !proposal.threadId) return;
-      const path = getProposalUrlPath(ProposalType.OffchainThread, `${proposal.threadId}`, false, proposal['chain']);
+      const path = getProposalUrlPath(
+        ProposalType.OffchainThread,
+        `${proposal.threadId}`,
+        false,
+        proposal['chain']
+      );
       return m('.ProposalHeaderThreadLink', [
-        link(
-          'a.thread-link',
-          path,
-          ['Go to discussion', m(Icon, { name: Icons.EXTERNAL_LINK })]
-        ),
+        link('a.thread-link', path, [
+          'Go to discussion',
+          m(CWIcon, { iconName: 'externalLink' }),
+        ]),
       ]);
     },
   };
 
 export const ProposalHeaderSnapshotThreadLink: m.Component<{
-  thread: {id: string, title: string}
+  thread: { id: string; title: string };
 }> = {
   view: (vnode) => {
     const { id, title } = vnode.attrs.thread;
     if (!id) return;
-    const proposalLink = getProposalUrlPath(ProposalType.OffchainThread, id)
+    const proposalLink = getProposalUrlPath(ProposalType.OffchainThread, id);
 
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [
         decodeURIComponent(title),
-        m(Icon, { name: Icons.EXTERNAL_LINK }),
+        m(CWIcon, { iconName: 'externalLink' }),
       ]),
     ]);
   },
@@ -347,7 +346,10 @@ export const ProposalHeaderTitle: m.Component<{
         proposal.readOnly &&
         m(Tag, {
           size: 'xs',
-          label: [m(Icon, { name: Icons.LOCK, size: 'xs' }), ' Locked'],
+          label: [
+            m(CWIcon, { iconName: 'lock', iconSize: 'small' }),
+            ' Locked',
+          ],
         }),
     ]);
   },
@@ -483,7 +485,10 @@ export const ProposalTitleSaveEdit: m.Component<{
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
     if (!proposal) return;
-    const proposalLink = getProposalUrlPath(proposal.slug, `${proposal.identifier}-${slugify(proposal.title)}`);
+    const proposalLink = getProposalUrlPath(
+      proposal.slug,
+      `${proposal.identifier}-${slugify(proposal.title)}`
+    );
 
     return m('.ProposalTitleSaveEdit', [
       m(
