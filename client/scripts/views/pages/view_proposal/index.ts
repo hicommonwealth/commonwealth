@@ -1012,7 +1012,7 @@ const ViewProposalPage: m.Component<
         .then(async (result) => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
-            .filter((c) => c.parentComment === null);
+            // .filter((c) => c.parentComment === null); // TODO: Why was this written?
           // fetch reactions
           const { result: reactionCounts } = await $.ajax({
             type: 'POST',
