@@ -9,46 +9,18 @@ import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { Account, AddressInfo, Profile } from 'client/scripts/models';
 import numeral from 'numeral';
+import { DelegateInfo } from '.';
 
 type DelegateCardAttrs = {
-  delegate: Account<any> | AddressInfo | Profile; // This is fetched in the parent component because DelegateCard siblings may find it useful
+  delegateInfo: DelegateInfo;
+  updateDelegate: (
+    delegate: DelegateInfo | null,
+    action: string
+  ) => Promise<void>;
 };
 
-type delegateInto = {
-  voteWeight: number;
-  totalVotes: number;
-  proposals: number;
-  latestProposal: {
-    proposalTitle: String;
-    proposalVoteOutcome: boolean; // This might need to be an enum if we have options beyond "pass" and "not pass"
-  };
-};
-
-const delegateInfoMockData = {
-  voteWeight: 0.129,
-  totalVotes: 330000000,
-  proposals: 11,
-  latestProposal: {
-    proposalTitle: 'Governance Proposal to Set Maximum per Block Gas',
-    proposalVoteOutcome: true,
-  },
-};
 class DelegateCard implements m.ClassComponent<DelegateCardAttrs> {
-  private fetchedDelegateInfo: boolean;
-  private delegateInfo: any;
-  // TODO: define the shape of this object that gets returned from the route. Currently using a temporary (potentially permanent)
-  // object shape. delegateInfo needs to store the Vote Weight, Total Votes, Proposals, Recent Proposal Vote
-  // (and a reference to the outcome)
-  oninit(vnode) {
-    this.fetchedDelegateInfo = false;
-  }
   view(vnode) {
-    if (!this.fetchedDelegateInfo) {
-      // TODO: Fetch here to update the fetchedDelegateInfo
-      this.delegateInfo = delegateInfoMockData;
-      this.fetchedDelegateInfo = true;
-      m.redraw();
-    }
     return (
       <CWCard
         elevation="elevation-2"
@@ -58,16 +30,16 @@ class DelegateCard implements m.ClassComponent<DelegateCardAttrs> {
         <div class="card-body">
           <div class="top-section">
             <div class="top-left">
-              {vnode.attrs.delegate &&
+              {vnode.attrs.delegateInfo &&
                 m(User, {
-                  user: vnode.attrs.delegate,
+                  user: vnode.attrs.delegateInfo.delegate,
                   avatarOnly: true,
                   avatarSize: 40,
                   popover: true,
                 })}
               <div class="profile-section">
                 <div class="profile-name">
-                  {(vnode.attrs.delegate as Profile)?.name}
+                  {(vnode.attrs.delegateInfo.delegate as Profile)?.name}
                   {
                     // This is not quite working rn ^
                   }
@@ -81,10 +53,15 @@ class DelegateCard implements m.ClassComponent<DelegateCardAttrs> {
                   }}
                 >
                   <div class="address">
-                    {(vnode.attrs.delegate as Profile)?.address.slice(0, 5) +
+                    {(
+                      vnode.attrs.delegateInfo.delegate as Profile
+                    )?.address.slice(0, 5) +
                       '...' +
-                      (vnode.attrs.delegate as Profile)?.address.slice(
-                        (vnode.attrs.delegate as Profile)?.address.length - 5
+                      (
+                        vnode.attrs.delegateInfo.delegate as Profile
+                      )?.address.slice(
+                        (vnode.attrs.delegateInfo.delegate as Profile)?.address
+                          .length - 5
                       )}
                   </div>
                   <img
@@ -98,34 +75,31 @@ class DelegateCard implements m.ClassComponent<DelegateCardAttrs> {
               <div class="stats-group">
                 <StatSection
                   title="Vote Weight"
-                  displayValue={numeral(this.delegateInfo.voteWeight).format(
-                    '0.0%'
-                  )}
+                  displayValue={numeral(
+                    vnode.attrs.delegateInfo.voteWeight
+                  ).format('0.0%')}
                   persist={true}
-                  dataFetched={this.fetchedDelegateInfo}
+                  dataFetched={vnode.attrs.delegateInfo}
                 />
                 <StatSection
                   title="Total Votes"
-                  displayValue={numeral(this.delegateInfo.totalVotes).format(
-                    '0 a'
-                  )}
+                  displayValue={numeral(
+                    vnode.attrs.delegateInfo.totalVotes
+                  ).format('0 a')}
                   secondaryCount="158"
                   persist={false}
-                  dataFetched={this.fetchedDelegateInfo}
+                  dataFetched={vnode.attrs.delegateInfo}
                 />
                 <StatSection
                   title="Proposal Votes"
-                  displayValue={this.delegateInfo.proposals.toString()}
+                  displayValue={vnode.attrs.delegateInfo.proposals.toString()}
                   persist={false}
-                  dataFetched={this.fetchedDelegateInfo}
+                  dataFetched={vnode.attrs.delegateInfo}
                 />
               </div>
               <CWButton
                 label="Remove"
-                onclick={() => {
-                  console.log('would be removing the delegate here!');
-                  // TODO: make a call to the remove delegate function on Jasons controller; resolve UI implications
-                }}
+                onclick={() => vnode.attrs.updateDelegate(null, 'remove')}
                 buttonType="secondary"
               />
             </div>
@@ -133,7 +107,7 @@ class DelegateCard implements m.ClassComponent<DelegateCardAttrs> {
           <div class="bottom-section">
             <div class="latest">Latest Proposal: </div>
             <div class="recent-proposal-text">
-              {this.delegateInfo.latestProposal.proposalTitle}
+              {vnode.attrs.delegateInfo.recentProposal.proposalText}
             </div>
             {
               // TODO: Insert arrow icon here when its implemented
@@ -141,12 +115,12 @@ class DelegateCard implements m.ClassComponent<DelegateCardAttrs> {
             <div class="voted">Voted: </div>
             <div
               class={
-                this.delegateInfo.latestProposal.proposalVoteOutcome
+                vnode.attrs.delegateInfo.recentProposal.outcome
                   ? 'passed'
                   : 'not-passed'
               }
             >
-              {this.delegateInfo.latestProposal.proposalVoteOutcome
+              {vnode.attrs.delegateInfo.recentProposal.outcome
                 ? 'PASSED'
                 : 'NOT PASSED'}
             </div>

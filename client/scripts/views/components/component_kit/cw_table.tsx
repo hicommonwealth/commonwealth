@@ -18,6 +18,7 @@ export type TableEntry = {
   buttonDetails?: {
     buttonType: ButtonType;
     onclick?: any;
+    disabled: boolean;
   };
 };
 
@@ -96,6 +97,7 @@ export class CWTable implements m.ClassComponent<TableAttrs> {
                         label={data.value}
                         buttonType={data.buttonDetails.buttonType}
                         onclick={data.buttonDetails.onclick}
+                        disabled={data.buttonDetails.disabled}
                       />
                     </td>
                   );

@@ -13,10 +13,11 @@ import {
 } from '../../components/component_kit/cw_table';
 import User from '../../components/widgets/user';
 import numeral from 'numeral';
+import _ from 'lodash';
 
 type DelegationPageAttrs = { topic?: string };
 
-type DelegateInfo = {
+export type DelegateInfo = {
   delegate: Account<any> | AddressInfo | Profile;
   delegateAddress: string;
   delegateName: string;
@@ -24,11 +25,21 @@ type DelegateInfo = {
   totalVotes: number;
   proposals: number;
   rank: number;
+  recentProposal: {
+    proposalText: string;
+    outcome: boolean; // true if they voted with majority?
+    proposalLink: string; // url of the proposal on CW
+  };
 };
 
 function buildTableData(
   delegates: Array<DelegateInfo>,
-  keywordFragment: string
+  currentDelegate: DelegateInfo,
+  keywordFragment: string,
+  updateSelectedDelegate: (
+    delegate: DelegateInfo | null,
+    action: string
+  ) => Promise<void>
 ): Array<Array<TableEntry>> {
   let result = [];
   for (const delegateInfo of delegates) {
@@ -40,7 +51,10 @@ function buildTableData(
       voteWeight,
       proposals,
       rank,
+      recentProposal,
     } = delegateInfo;
+
+    const isSelectedDelegate = _.isEqual(delegateInfo, currentDelegate);
 
     let currentRow = [
       {
@@ -73,11 +87,16 @@ function buildTableData(
       },
       { value: proposals, type: TableEntryType.String, align: 'right' },
       {
-        value: 'Delegate',
+        value: isSelectedDelegate ? 'Selected' : 'Delegate',
         type: TableEntryType.Button,
         buttonDetails: {
-          onclick: () => console.log('clicked!'), // TODO: Replace with controller delegate() call
-          buttonType: 'secondary',
+          onclick: () => {
+            if (!isSelectedDelegate) {
+              updateSelectedDelegate(delegateInfo, 'update');
+              m.redraw();
+            }
+          },
+          buttonType: isSelectedDelegate ? 'primary' : 'secondary',
         },
         align: 'right',
       },
@@ -101,78 +120,145 @@ function buildTableData(
 }
 
 class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
-  private delegate: Account<any> | AddressInfo | Profile;
+  private delegate: DelegateInfo;
   private delegates: Array<DelegateInfo>;
   private filteredDelegateInfo: Array<Array<TableEntry>>;
+  private tableRendered: boolean;
+  oninit(vnode) {
+    // TODO: Replace below with processDelegates() call
+
+    // Load Delegates
+    const dummyData: Array<DelegateInfo> = [
+      {
+        delegate: app.user.activeAccount,
+        delegateAddress: '0xasdsasd24ewrqwsdanf',
+        delegateName: 'Alex Young',
+        voteWeight: 0.129,
+        totalVotes: 100,
+        proposals: 4,
+        rank: 1,
+        recentProposal: {
+          proposalText: 'A proposal 1',
+          outcome: true,
+          proposalLink: '...',
+        },
+      },
+      {
+        delegate: app.user.activeAccount,
+        delegateAddress: '0x1234asdf14sdfa',
+        delegateName: 'Other Guy',
+        voteWeight: 0.129,
+        totalVotes: 100,
+        proposals: 4,
+        rank: 2,
+        recentProposal: {
+          proposalText: 'A proposal 1',
+          outcome: true,
+          proposalLink: '...',
+        },
+      },
+      {
+        delegate: app.user.activeAccount,
+        delegateAddress: '0xas34asdf14sdfa',
+        delegateName: 'Zak',
+        voteWeight: 0.1,
+        totalVotes: 40,
+        proposals: 4,
+        rank: 3,
+        recentProposal: {
+          proposalText: 'A proposal 1',
+          outcome: true,
+          proposalLink: '...',
+        },
+      },
+      {
+        delegate: app.user.activeAccount,
+        delegateAddress: '0x1234asdf14sdfa',
+        delegateName: 'Jason',
+        voteWeight: 0.029,
+        totalVotes: 50,
+        proposals: 10,
+        rank: 4,
+        recentProposal: {
+          proposalText: 'A proposal 1',
+          outcome: true,
+          proposalLink: '...',
+        },
+      },
+      {
+        delegate: app.user.activeAccount,
+        delegateAddress: '0x1234asdf14sdfa',
+        delegateName: 'Alex2 Young2',
+        voteWeight: 0.003,
+        totalVotes: 50,
+        proposals: 10,
+        rank: 5,
+        recentProposal: {
+          proposalText: 'A proposal 1',
+          outcome: true,
+          proposalLink: '...',
+        },
+      },
+    ]; // TODO: Replace with fetch of all the delegates
+    this.delegates = [];
+
+    // TODO: remove this duplicate data that was used for testing
+    for (let i = 0; i < 5; i++) {
+      this.delegates = this.delegates.concat(dummyData);
+    }
+
+    // Load Selected Delegate
+    this.delegate = {
+      delegate: app.user.activeAccount,
+      delegateAddress: '0xasdsasd24ewrqwsdanf',
+      delegateName: 'Alex Young',
+      voteWeight: 0.129,
+      totalVotes: 100,
+      proposals: 4,
+      rank: 1,
+      recentProposal: {
+        proposalText: 'A proposal 1',
+        outcome: true,
+        proposalLink: '...',
+      },
+    }; // TODO: Replace this with an actual fetch of the user's selected delegate. Include handling for if none exists
+  }
   view(vnode) {
-    if (!this.delegate) {
-      this.delegate = app.user.activeAccount; // TODO: Replace this with an actual fetch of the user's selected delegate. Include handling for if none exists
-      m.redraw();
-    }
-
-    if (!this.delegates) {
-      const dummyData: Array<DelegateInfo> = [
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0xasdsasd24ewrqwsdanf',
-          delegateName: 'Alex Young',
-          voteWeight: 0.129,
-          totalVotes: 100,
-          proposals: 4,
-          rank: 1, // TODO: Determine if the sorting happens in the route or here. If not here, then we need to sort and add this rank value
-        },
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0x1234asdf14sdfa',
-          delegateName: 'Other Guy',
-          voteWeight: 0.129,
-          totalVotes: 100,
-          proposals: 4,
-          rank: 2,
-        },
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0xas34asdf14sdfa',
-          delegateName: 'Zak',
-          voteWeight: 0.1,
-          totalVotes: 40,
-          proposals: 4,
-          rank: 3,
-        },
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0x1234asdf14sdfa',
-          delegateName: 'Jason',
-          voteWeight: 0.029,
-          totalVotes: 50,
-          proposals: 10,
-          rank: 4,
-        },
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0x1234asdf14sdfa',
-          delegateName: 'Alex2 Young2',
-          voteWeight: 0.003,
-          totalVotes: 50,
-          proposals: 10,
-          rank: 5,
-        },
-      ]; // TODO: Replace with fetch of all the delegates
-      this.delegates = [];
-
-      // TODO: remove this duplicate data that was used for testing
-      for (let i = 0; i < 5; i++) {
-        this.delegates = this.delegates.concat(dummyData);
+    const updateSelectedDelegate = async (
+      delegate: DelegateInfo,
+      action: string
+    ) => {
+      if (action === 'update') {
+        this.delegate = delegate;
+        // TODO: Call the controllers with setDelegate()
+      } else if (action === 'remove') {
+        this.delegate = null;
+        // TODO: Call the controllers with removeDelegate()
       }
-
-      this.filteredDelegateInfo = buildTableData(this.delegates, '');
-      m.redraw();
-    }
-
-    const updateFilter = (value: string) => {
-      this.filteredDelegateInfo = buildTableData(this.delegates, value);
+      this.tableRendered = false;
       m.redraw();
     };
+
+    // Handle Search Bar
+    const updateFilter = (value: string) => {
+      this.filteredDelegateInfo = buildTableData(
+        this.delegates,
+        this.delegate,
+        value,
+        updateSelectedDelegate
+      );
+      m.redraw();
+    };
+
+    if (!this.tableRendered) {
+      this.filteredDelegateInfo = buildTableData(
+        this.delegates,
+        this.delegate,
+        '',
+        updateSelectedDelegate
+      );
+      this.tableRendered = true;
+    }
 
     return (
       <Sublayout class="DelegationPage" title="Delegation">
@@ -184,7 +270,10 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
               {
                 // TODO: Include Info Icon when accessible
               }
-              <DelegateCard delegate={this.delegate} />
+              <DelegateCard
+                delegateInfo={this.delegate}
+                updateDelegate={updateSelectedDelegate}
+              />
             </div>
           ) : (
             <div class="delegate-card-wrapper">
