@@ -14,53 +14,69 @@ type ProfileHeaderAttrs = {
   socialAccounts: Array<SocialAccount>,
 };
 
+type ProfileHeaderState = {
+  isBioExpanded: boolean
+}
+
+const maxBioCharCount = 325;
+
 const renderSocialAccounts = (socialAccounts: Array<SocialAccount>) => {
     return socialAccounts?.map(account => 
-      <div className="social-accounts">
-        <div className="social-account-icon">
-          {
-            account.provider == "github" ? <a > <CWIcon iconName="github" iconSize="large" /> </a>
-            : account.provider == "discord" ? <CWIcon iconName="discord" iconSize="large" />
-            : account.provider == "telegram" ? <CWIcon iconName="telegram" iconSize="large" />
-            : <div />
-          }
-        </div>
-      </div>  
+      <div className="social-account-icon">
+        {
+          account.provider == "github" ? <a > <CWIcon iconName="github" iconSize="large" /> </a>
+          : account.provider == "discord" ? <CWIcon iconName="discord" iconSize="large" />
+          : account.provider == "telegram" ? <CWIcon iconName="telegram" iconSize="large" />
+          : <div />
+        }
+      </div>
     )
 }
 
-class NewProfileHeader implements m.Component<ProfileHeaderAttrs, {}> {
+class NewProfileHeader implements m.Component<ProfileHeaderAttrs, ProfileHeaderState> {
   
+  oninit(vnode) {
+    vnode.state.isBioExpanded = false
+  }
+
   view(vnode) {
     const { profile, socialAccounts } = vnode.attrs;
 
     return(
       <div className="ProfileHeader">
-        <div className="profile-image"> 
-            { /* profile image */ }
-        </div>
-
         <CWCard
           interactive={true}
           fullWidth={true}
-          className="profile-content"
+          className={vnode.state.isBioExpanded ? "profile-info expand" : "profile-info"}
         > 
-          <section className="profile-name">
-            <CWIcon className="profile-icon" iconName="person" iconSize="small" />
-            <h3> { profile?.name } </h3>
+          <div className="profile-image"> 
+            <img src={profile?.avatarUrl} />
+          </div>
+
+          <section className="profile-name-and-bio">
+            <h3 className="name"> { profile?.name } </h3>
+            <p className="bio"> 
+              { 
+                profile?.bio.length > maxBioCharCount && !vnode.state.isBioExpanded ? 
+                `${profile?.bio.slice(0, maxBioCharCount)}...`: profile?.bio 
+              } 
+            </p>
+            {
+              profile?.bio.length > maxBioCharCount ? 
+              <div className="read-more" 
+                onclick={() => { vnode.state.isBioExpanded = !vnode.state.isBioExpanded }}
+              > 
+                <p> 
+                  { !vnode.state.isBioExpanded ? "Read More" : "Read Less" } 
+                </p> 
+              </div>
+              : <div />
+            }
           </section>
 
-          <section>
-            <p> { profile?.bio } </p>
-          </section>
-
-          <section>
-            <a> { profile?.website } </a>
-          </section>
-
-          <section>
+          <section className="social-accounts">
             { 
-              // renderSocialAccounts(socialAccounts)
+              renderSocialAccounts(socialAccounts)
             }
           </section>
         </CWCard>
