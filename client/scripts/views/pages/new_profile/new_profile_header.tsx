@@ -18,15 +18,25 @@ type ProfileHeaderState = {
   isBioExpanded: boolean
 }
 
-const maxBioCharCount = 325;
+const maxBioCharCount = 220;
+// TODO: Adjust value for responsiveness
 
 const renderSocialAccounts = (socialAccounts: Array<SocialAccount>) => {
     return socialAccounts?.map(account => 
       <div className="social-account-icon">
         {
-          account.provider == "github" ? <a > <CWIcon iconName="github" iconSize="large" /> </a>
-          : account.provider == "discord" ? <CWIcon iconName="discord" iconSize="large" />
-          : account.provider == "telegram" ? <CWIcon iconName="telegram" iconSize="large" />
+          account.provider == "github" ? 
+            <a href={`https://github.com/${account.username}`} target="_blank"> 
+              <CWIcon iconName="github" iconSize="large" /> 
+            </a>
+          : account.provider == "discord" ? 
+            <a href={`https://discordapp.com/users/${account.username}`} target="_blank">
+              <CWIcon iconName="discord" iconSize="large" />
+            </a>
+          : account.provider == "telegram" ? 
+            <a href={`https://t.me/${account.username}`} target="_blank">
+              <CWIcon iconName="telegram" iconSize="large" />
+            </a>
           : <div />
         }
       </div>

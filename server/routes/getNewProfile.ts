@@ -61,7 +61,7 @@ const getNewProfile = async (models: DB, req: Request, res: Response, next: Next
     where: {
       user_id: profile.user_id
     },
-    // TODO : ignore user_id 
+    attributes: { exclude: ['user_id'] },
   })
 
   return res

@@ -9,11 +9,12 @@ import NewProfileHeader from './new_profile_header'
 import NewProfileActivity from './new_profile_activity'
 
 import { NewProfile as Profile } from '../../../../scripts/models'
-import OffchainThread from 'client/scripts/models/OffchainThread'
-import ChainInfo from 'client/scripts/models/ChainInfo'
-import OffchainComment from 'client/scripts/models/OffchainComment'
-import AddressInfo from 'client/scripts/models/AddressInfo'
-import { IUniqueId } from 'client/scripts/models/interfaces';
+import OffchainThread from '../../../../scripts/models/OffchainThread'
+import ChainInfo from '../../../../scripts/models/ChainInfo'
+import OffchainComment from '../../../../scripts/models/OffchainComment'
+import AddressInfo from '../../../../scripts/models/AddressInfo'
+import SocialAccount from '../../../../scripts/models/SocialAccount';
+import { IUniqueId } from '../../../../scripts/models/interfaces';
 
 import 'pages/new_profile.scss';
 
@@ -24,6 +25,7 @@ type ProfileState = {
   comments: Array<OffchainComment<IUniqueId>>,
   chains: Array<ChainInfo>,
   addresses: Array<AddressInfo>, 
+  socialAccounts: Array<SocialAccount>,
 };
 
 class NewProfile implements m.Component<{}, ProfileState> {
@@ -43,9 +45,11 @@ class NewProfile implements m.Component<{}, ProfileState> {
     vnode.state.profile = Profile.fromJSON(response.profile)    
     vnode.state.threads = response.threads
     vnode.state.comments = response.comments
-    vnode.state.chains = response.chains
-    vnode.state.addresses = response.addresses
-    vnode.state.socialAccounts = response.socialAccounts
+    vnode.state.chains = response.chains.map(c => ChainInfo.fromJSON(c))
+    vnode.state.addresses = response.addresses.map(a => 
+      new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic, a.ghost_address))
+    vnode.state.socialAccounts = response.socialAccounts.map(a => 
+      new SocialAccount(a.provider, a.provider_username))
     m.redraw()
   } 
 
