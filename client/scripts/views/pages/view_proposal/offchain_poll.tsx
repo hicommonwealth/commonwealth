@@ -101,10 +101,8 @@ export class OffchainPoll
 
           return (
             <div class="option-with-votes">
-              <div class="option-results-label">
-                <div style="font-weight: 500; margin-right: 5px;">
-                  {optionWithVotes.option}
-                </div>
+              <div class="option-result-label">
+                <div class="option-text">{optionWithVotes.option}</div>
                 <div>{optionVoteCount}</div>
               </div>
               <div
@@ -132,15 +130,15 @@ export class OffchainPoll
     );
 
     return (
-      <div class="ProposalHeaderOffchainPoll">
-        <div class="offchain-poll-header">
+      <div class="OffchainPoll">
+        <h4>
           {proposal.offchainVotingOptions?.name ||
             (pollingEnded ? 'Poll closed' : 'Poll open')}
-        </div>
+        </h4>
         {!proposal.offchainVotingOptions?.choices && (
-          <div class="offchain-poll-invalid">[Error loading poll]</div>
+          <div class="invalid">[Error loading poll]</div>
         )}
-        <div class="offchain-poll-options">
+        <div class="options">
           {proposal.offchainVotingOptions?.choices?.map((option) => {
             const hasVoted =
               app.user.activeAccount &&
@@ -152,9 +150,9 @@ export class OffchainPoll
             const isSelected = hasVoted?.option === option;
 
             return (
-              <div class="offchain-poll-option">
-                <div class="offchain-poll-option-left">{option}</div>,
-                <div class="offchain-poll-option-right">
+              <div class="option">
+                <div class="option-left">{option}</div>
+                <div class="option-right">
                   <Button
                     onclick={vote.bind(this, option, isSelected)}
                     label={isSelected ? 'Voted' : 'Vote'}
@@ -174,7 +172,7 @@ export class OffchainPoll
             );
           })}
         </div>
-        <div class="offchain-poll-caption">
+        <div class="caption">
           {proposal.offchainVotingEndsAt ? (
             <>
               {!pollingEnded &&
@@ -191,10 +189,10 @@ export class OffchainPoll
             'Poll does not expire.'
           )}
         </div>
-        <div class="offchain-poll-header">Voters</div>,
-        <div class="offchain-poll-voters">
+        <h4>Voters</h4>
+        <div class="voters">
           {proposal.offchainVotes.length === 0 ? (
-            <div class="offchain-poll-no-voters">Nobody has voted</div>
+            <div class="no-voters">Nobody has voted</div>
           ) : (
             voteSynopsis
           )}
