@@ -47,8 +47,6 @@ export class UpgradeRolesForm
       )} ${roletext}`;
     });
 
-    console.log(names);
-
     const chainOrCommObj = { chain: app.activeChainId() };
 
     return (

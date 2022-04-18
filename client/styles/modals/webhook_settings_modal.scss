@@ -1,13 +1,20 @@
 @import 'client/styles/shared';
 
 .WebhookSettingsModal {
-  padding: 0 20px 20px;
-
-  .settings-save-button {
-    margin-top: 15px;
+  p {
+    margin-bottom: 16px;
   }
 
-  .CompactModalExitButton.dark {
-    color: $black;
+  h4 {
+    margin-bottom: 16px;
+  }
+  .cui-list {
+    margin-bottom: 16px;
+
+    .cui-list-item {
+      border: none;
+      margin-bottom: 8px;
+      padding: 0;
+    }
   }
 }

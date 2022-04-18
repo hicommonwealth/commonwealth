@@ -6,7 +6,8 @@ import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, OffchainComment, AnyProposal, Account, ITokenAdapter } from 'models';
+import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
+import { ChainNetwork } from 'types';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
@@ -15,6 +16,7 @@ import User from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';
 import { weiToTokens } from 'helpers';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
@@ -146,17 +148,16 @@ const CreateComment: m.Component<{
       || !app.user.activeAccount;
 
     // token balance check if needed
-    let tokenPostingThreshold: BN | null = null;
-    if (ITokenAdapter.instanceOf(app.chain)) {
-      const tokenBalance = app.chain.tokenBalance;
-      tokenPostingThreshold = app.topics.getByName(
-        activeTopicName,
-        app.activeChainId()
-      )?.tokenThreshold;
-      disabled = disabled || (!isAdmin && tokenPostingThreshold && tokenPostingThreshold.gt(tokenBalance));
-    }
+    const tokenPostingThreshold : BN = TopicGateCheck.getTopicThreshold(activeTopicName);
+    const userBalance : BN = TopicGateCheck.getUserBalance();
+    const topicGated = TopicGateCheck.isGatedTopic(activeTopicName);
+    disabled = disabled
+      || !app.isAdapterReady
+      || (!isAdmin && topicGated);
 
-    const decimals = app.chain?.meta.chain?.decimals ? app.chain.meta.chain.decimals : 18;
+    const decimals = app.chain?.meta.chain?.decimals
+      ? app.chain.meta.chain.decimals
+      : (app.chain.network === ChainNetwork.ERC721) ? 0 : 18;
     return m('.CreateComment', {
       class: parentScopedClass
     }, [
@@ -216,11 +217,10 @@ const CreateComment: m.Component<{
                   `Commenting in "${activeTopicName}" requires `,
                   `${weiToTokens(tokenPostingThreshold.toString(), decimals)} `,
                   `${app.chain.meta.chain.symbol}. `,
-                    ITokenAdapter.instanceOf(app.chain)
-                    && app.chain.tokenBalance
+                    userBalance
                     && app.user.activeAccount
                     && `You have ${
-                      weiToTokens(app.chain.tokenBalance.toString(), decimals)
+                      weiToTokens(userBalance.toString(), decimals)
                     } ${app.chain.meta.chain.symbol}.`
                 ]
                 : null
