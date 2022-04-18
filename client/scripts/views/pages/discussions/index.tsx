@@ -12,7 +12,7 @@ import { RecentListing } from './recent_listing';
 import Sublayout from '../../sublayout';
 import { DiscussionFilterBar } from './discussion_filter_bar';
 
-// TODO LIST
+// Graham 4/18/22 Todo:
 // * LastVisited logic
 // * Investigate possible redundant fetches originating in onscroll
 // * Finish adding localhost-cached scrollback
@@ -23,6 +23,8 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   private summaryViewInitialized: boolean;
   private topicName: string;
   private stageName: string;
+
+  // Helpers
 
   getPageDescription() {
     if (!this.topicName) return;
@@ -52,6 +54,28 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     }
   }
 
+  async onscroll() {
+    const { topicName, stageName } = this;
+    const { listingStore } = app.threads;
+    if (listingStore.isDepleted({ topicName, stageName })) {
+      return;
+    }
+
+    const scrollEle = document.getElementsByClassName('Body')[0];
+    const { scrollHeight, scrollTop } = scrollEle;
+
+    if (scrollHeight - 1000 < scrollTop) {
+      console.log(' fetching ');
+      console.log(
+        app.threads.listingStore.getThreads({ topicName, stageName })
+      );
+      await app.threads.loadNextPage({ topicName, stageName });
+      m.redraw();
+    }
+  }
+
+  // Lifecycle methods
+
   oninit() {
     this.returningFromThread =
       app.lastNavigatedBack() &&
@@ -65,19 +89,6 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     });
 
     this.handleScrollback();
-  }
-
-  async onscroll() {
-    const { topicName, stageName } = this;
-    if (app.threads.listingStore.isDepleted({ topicName, stageName })) return;
-
-    const scrollEle = document.getElementsByClassName('Body')[0];
-    const { scrollHeight, scrollTop } = scrollEle;
-
-    if (scrollHeight - 1000 < scrollTop) {
-      await app.threads.loadNextPage({ topicName, stageName });
-      m.redraw();
-    }
   }
 
   view(vnode) {
@@ -103,7 +114,9 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
         title="Discussions"
         description={this.getPageDescription()}
         showNewProposalButton={true}
-        onscroll={!this.summaryView ? debounce(this.onscroll, 400) : null}
+        onscroll={
+          !this.summaryView ? debounce(this.onscroll.bind(this), 400) : null
+        }
       >
         <div class="DiscussionsPage">
           <DiscussionFilterBar

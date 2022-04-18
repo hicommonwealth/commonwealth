@@ -677,6 +677,7 @@ class ThreadsController {
     topicName?: string;
     stageName?: string;
   }) {
+    console.log(`Loading ${options.topicName || options.stageName}`);
     if (this.listingStore.isDepleted(options)) {
       return;
     }
