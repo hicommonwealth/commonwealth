@@ -217,7 +217,6 @@ const ProposalHeader: m.Component<
       isEditor,
       isAdmin,
     } = vnode.attrs;
-
     const attachments =
       proposal instanceof OffchainThread
         ? (proposal as OffchainThread).attachments
@@ -995,7 +994,7 @@ const ViewProposalPage: m.Component<
         .then(async () => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
-            .filter((c) => c.parentComment === null);
+            // .filter((c) => c.parentComment === null); // TODO: Why was this written?
           // fetch reactions
           const { result: reactionCounts } = await $.ajax({
             type: 'POST',
