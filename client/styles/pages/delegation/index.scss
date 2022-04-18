@@ -2,6 +2,8 @@
 
 .wrapper {
   margin-top: 40px;
+  margin-left: 25px;
+  margin-right: 25px;
   .header {
     font-weight: 500;
     font-size: 32px;
@@ -11,7 +13,7 @@
   .delegate-missing-header {
     font-weight: 500;
     font-size: 40px;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
   }
 
   .subheader {
@@ -22,8 +24,8 @@
   }
 
   .info-text {
-    max-width: 450px;
-    margin-top: -8px;
+    max-width: 500px;
+    font-size: 18px;
   }
 }
 

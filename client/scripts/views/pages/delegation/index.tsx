@@ -276,7 +276,7 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
               />
             </div>
           ) : (
-            <div class="delegate-card-wrapper">
+            <div class="wrapper">
               <div class="delegate-missing-header">Choose a delegate</div>
               <div class="info-text">
                 It's tough to keep up with DAO governance. Find a delegate that
