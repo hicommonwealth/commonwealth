@@ -38,6 +38,9 @@ export async function getUrlsForEthChainId(models: DB, chainId: number, includeP
 > {
   const chainIds = await getSupportedEthChainIds(models);
   const chain = chainIds[chainId];
+  if (!chain?.url) {
+    return null;
+  }
   if (!includePrivateUrl) {
     return chain;
   }
