@@ -654,7 +654,7 @@ const ProposalComment: m.Component<
               !comment.deleted &&
               m('.comment-response-row', [
                 m(ReactionButton, {
-                  post: proposal,
+                  post: comment,
                   reactionType: 'threadComment',
                 }),
                 m(InlineReplyButton, {
@@ -992,9 +992,8 @@ const ViewProposalPage: m.Component<
       app.comments
         .refresh(proposal, app.activeChainId())
         .then(async () => {
-          vnode.state.comments = app.comments
-            .getByProposal(proposal)
-            // .filter((c) => c.parentComment === null); // TODO: Why was this written?
+          vnode.state.comments = app.comments.getByProposal(proposal);
+          // .filter((c) => c.parentComment === null); // TODO: Why was this written?
           // fetch reactions
           const { result: reactionCounts } = await $.ajax({
             type: 'POST',
