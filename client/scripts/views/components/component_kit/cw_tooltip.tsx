@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_tooltip.scss';
 
 import { ComponentType } from './types';
@@ -8,8 +9,8 @@ import { CWButton } from './cw_button';
 import { CWPopover } from './cw_popover';
 
 type TooltipAttrs = {
-  triggerLabel: string;
   tooltipContent: string | m.Vnode;
+  triggerLabel: string;
 };
 export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
   isPopoverOpen: boolean;

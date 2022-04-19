@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_component_showcase.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
@@ -13,7 +14,6 @@ import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
-import { CWTooltip } from './cw_tooltip';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 
 // const displayColors = (hexList) => {
