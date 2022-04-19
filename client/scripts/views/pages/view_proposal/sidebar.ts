@@ -95,7 +95,7 @@ export const ProposalSidebarLinkedSnapshot: m.Component<
           ]
         : [
             link('a', proposalLink, [
-              `Snapshot: ${vnode.state.snapshot.title.slice(0, 20)} ...`,
+              `Snapshot: ${vnode.state.snapshot?.title.slice(0, 20)} ...`,
             ]),
           ]
     );

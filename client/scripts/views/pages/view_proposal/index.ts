@@ -243,7 +243,6 @@ const ProposalHeader: m.Component<
       isEditor,
       isAdmin,
     } = vnode.attrs;
-
     const attachments =
       proposal instanceof OffchainThread
         ? (proposal as OffchainThread).attachments
@@ -1025,7 +1024,7 @@ const ViewProposalPage: m.Component<
             },
             data: JSON.stringify({
               proposal_ids: [proposalId],
-              comment_ids: vnode.state.comments.map((comment) => comment.id),
+              comment_ids: app.comments.getByProposal(proposal).map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
             }),
           });
