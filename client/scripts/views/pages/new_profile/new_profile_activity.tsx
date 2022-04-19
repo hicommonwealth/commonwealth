@@ -36,6 +36,7 @@ const handleClick = (option: ProfileActivity, state: ProfileActivityState) => {
 }
 
 const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, state: ProfileActivityState) => {
+  
   const shouldFilterCommunities = Object.keys(state.communityFilters).length > 0
   const shouldFilterAddresses = Object.keys(state.addressFilters).length > 0
 
@@ -98,6 +99,9 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
           </div>
           <div className="thread-body">
             <p> { thread.plaintext } </p>
+            { 
+              // TODO: Limit text character count
+            }
           </div>
         </div>
       )

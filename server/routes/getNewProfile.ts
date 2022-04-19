@@ -44,16 +44,21 @@ const getNewProfile = async (models: DB, req: Request, res: Response, next: Next
     }
   })
 
+  const addressIds = [...new Set<number>(addresses.map(a => a.id))]
   const threads = await models.OffchainThread.findAll({
     where: {
-      address_id: addressModel.id
+      address_id: {
+        [Op.in]: addressIds,  
+      },  
     },
     include: [ { model: models.Address, as: 'Address' } ],
   });
 
   const comments = await models.OffchainComment.findAll({
     where: {
-      address_id: addressModel.id,
+      address_id: {
+        [Op.in]: addressIds,  
+      },  
     },
   });
 
