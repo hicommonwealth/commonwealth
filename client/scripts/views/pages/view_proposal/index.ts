@@ -113,11 +113,12 @@ import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { ReactionButton } from '../../components/reaction_button';
 import { InlineReplyButton } from '../../components/inline_reply_button';
 import { PollEditorCard } from './poll_editor_card';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
+import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
+import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -487,9 +488,8 @@ const ProposalHeader: m.Component<
                   ]),
                 !vnode.state.editing &&
                   m('.proposal-response-row', [
-                    m(ReactionButton, {
-                      post: proposal,
-                      reactionType: 'threadComment',
+                    m(ThreadReactionButton, {
+                      thread: proposal,
                     }),
                     m(InlineReplyButton, {
                       commentReplyCount: commentCount,
@@ -651,9 +651,8 @@ const ProposalComment: m.Component<
             !vnode.state.editing &&
               !comment.deleted &&
               m('.comment-response-row', [
-                m(ReactionButton, {
-                  post: comment,
-                  reactionType: 'threadComment',
+                m(CommentReactionButton, {
+                  comment,
                 }),
                 m(InlineReplyButton, {
                   commentReplyCount,
