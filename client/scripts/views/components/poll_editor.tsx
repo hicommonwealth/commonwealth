@@ -176,7 +176,6 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
                 onChangeHandler();
               }}
             />
-            ,
             <Button
               label="Save changes"
               intent="primary"
