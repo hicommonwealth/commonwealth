@@ -391,24 +391,6 @@ $discussion-title-font-size: 1.45rem;
     }
   }
 
-  .ProposalSidebarLinkedViewer {
-    border-radius: 10px;
-    border: 1px solid $neutral-50;
-    padding: 22px 18px 21px;
-    margin-bottom: 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .placeholder-copy {
-      margin-bottom: 10px;
-      font-weight: 500;
-    }
-  }
-
-  .ConnectProposalButtonWrapper {
-    margin-top: 10px;
-  }
-
   .right-content-container {
     display: flex;
     flex-direction: column;

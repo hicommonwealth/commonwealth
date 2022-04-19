@@ -86,11 +86,6 @@ import {
   // ProposalHeaderLinkThreadsMenuItem,
 } from './header';
 import {
-  ProposalSidebarPollEditorModule,
-  ProposalSidebarLinkedViewer,
-  ProposalLinkedThreadsEditorModule,
-} from './sidebar';
-import {
   AaveViewProposalDetail,
   AaveViewProposalSummary,
 } from './aave_view_proposal_detail';
@@ -120,6 +115,9 @@ import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ReactionButton } from '../../components/reaction_button';
 import { InlineReplyButton } from '../../components/inline_reply_button';
+import { PollEditorCard } from './poll_editor_card';
+import { LinkedProposalsCard } from './linked_proposals_card';
+import { LinkedThreadsCard } from './linked_threads_card';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1293,6 +1291,7 @@ const ViewProposalPage: m.Component<
     }
     const showLinkedSnapshotOptions =
       (proposal as OffchainThread).snapshotProposal?.length > 0 ||
+      (proposal as OffchainThread).chainEntities?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
     const showLinkedThreadOptions =
@@ -1368,7 +1367,7 @@ const ViewProposalPage: m.Component<
             proposal instanceof OffchainThread &&
               isAuthor &&
               !proposal.offchainVotingEnabled &&
-              m(ProposalSidebarPollEditorModule, {
+              m(PollEditorCard, {
                 proposal,
                 openPollEditor: () => {
                   vnode.state.pollEditorIsOpen = true;
@@ -1376,7 +1375,7 @@ const ViewProposalPage: m.Component<
               }),
             showLinkedSnapshotOptions &&
               proposal instanceof OffchainThread &&
-              m(ProposalSidebarLinkedViewer, {
+              m(LinkedProposalsCard, {
                 proposal,
                 openStageEditor: () => {
                   vnode.state.stageEditorIsOpen = true;
@@ -1385,7 +1384,7 @@ const ViewProposalPage: m.Component<
               }),
             showLinkedThreadOptions &&
               proposal instanceof OffchainThread &&
-              m(ProposalLinkedThreadsEditorModule, {
+              m(LinkedThreadsCard, {
                 proposalId: proposal.id,
                 allowLinking: isAuthor || isAdminOrMod,
               }),
