@@ -1,0 +1,182 @@
+@import 'client/styles/shared';
+
+.SidebarSectionGroup {
+  border-bottom-color: $neutral-50;
+  border-bottom-width: 1px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+
+  .section-group-title-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 8px 8px 16px;
+
+    .title-text {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    // .cui-icon {
+    //   position: unset;
+    // }
+
+    .right-icon {
+      .cui-icon-plus-circle {
+        margin-top: -10px;
+        opacity: 90%;
+      }
+    }
+  }
+
+  .sections-container {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.SectionGroup {
+  .SectionGroupTitle {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+
+    .title-text {
+      overflow: hidden;
+      padding-right: 8px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 400;
+      font-size: 14px;
+    }
+
+    &.section-title-text-active {
+      font-weight: 500;
+      color: $purple-500;
+    }
+
+    &.section-title-text-stale {
+      color: $neutral-500;
+    }
+
+    &.background {
+      background-color: $purple-50;
+    }
+
+    &.no-background {
+      background-color: none;
+    }
+
+    .no-carat {
+      width: 22px;
+    }
+
+    .carat {
+      display: inline-block;
+      margin-left: 6px;
+      margin-top: -2px;
+    }
+
+    .right-icon {
+      .cui-icon-edit {
+        margin-top: -1px;
+      }
+    }
+  }
+}
+
+.SubSection {
+  padding-left: 32px;
+  font-weight: 400;
+  font-size: 17px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  [class^='title'] {
+    display: inline-block;
+    padding-top: 3px;
+    padding-left: 4px;
+    margin-bottom: 1px;
+    margin-left: 4px;
+    align-self: baseline;
+  }
+
+  .title-active {
+    font-weight: 500;
+    color: $purple-400;
+  }
+
+  .title-stale {
+    color: $neutral-500;
+  }
+
+  &.active,
+  &:hover {
+    background-color: $pink-50;
+  }
+
+  .cui-icon-hash {
+    display: inline-block;
+    margin-top: 1px;
+    scale: 0.85;
+    padding-bottom: 4px;
+  }
+
+  .row-icon-inactive {
+    .cui-icon {
+      color: $neutral-500;
+    }
+  }
+
+  .right-icon {
+    .cui-icon-edit {
+      margin-top: -1px;
+    }
+  }
+}
+
+.right-icon {
+  margin-left: auto;
+  display: inline-block;
+
+  div {
+    .cui-icon {
+      color: $neutral-500;
+      padding-right: 5px;
+      padding-top: 2px;
+
+      &:hover {
+        color: $purple-500;
+        opacity: 100%;
+      }
+    }
+  }
+
+  .admin-menu {
+    position: fixed;
+  }
+
+  .unread-icon {
+    background-color: $rorange-500;
+    border-radius: 15px;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin-right: 4px;
+    margin-top: 2px;
+    display: inline-block;
+
+    p {
+      margin-top: 2.75px;
+      position: relative;
+      color: $white;
+      font-size: 11px;
+      font-weight: 600;
+    }
+  }
+}

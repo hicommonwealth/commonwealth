@@ -11,6 +11,7 @@ import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from '.
 export interface WebhookContent {
   notificationCategory: string;
   chain?: string;
+  body?: string;
   community?: string;
   author_chain?: string;
   title: string;

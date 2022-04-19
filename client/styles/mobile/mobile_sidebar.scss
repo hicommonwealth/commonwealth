@@ -1,106 +1,119 @@
 @import 'client/styles/shared';
 
 .MobileSidebar {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3%;
-    min-height: calc(100vh - 60px);
-    width: 100vw;
-    * {
-        -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  width: 100vw;
+
+  * {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  }
+
+  .cui-tabs {
+    margin-bottom: 16px;
+    width: 100%;
+
+    @include gradientTabs();
+
+    .cui-tabs-item.cui-active {
+      border-image: linear-gradient(
+          to right,
+          #79e0e8,
+          #bf8e60,
+          #d69fcc,
+          #6086d1,
+          #b37dba
+        )
+        1 !important;
     }
-    .cui-tabs {
-        @include gradientTabs();
-        .cui-tabs-item.cui-active {
-            border-image: linear-gradient(to right, #79E0E8,
-            #BF8E60, #D69FCC, #6086D1, #B37DBA) 1 !important;
-        }
-        margin-bottom: 20px;
-        .cui-tabs-item {
-            padding: 13px 4% 7px;
-            font-size: $text-size-mobile-header;
-            width: initial;
-        }
+
+    .cui-tabs-item {
+      font-size: $text-size-mobile-header;
+      width: initial;
     }
-    > .cui-menu {
-        max-width: 600px;
-        // 10px to accomodate scrollbar
-        width: calc(94% - 10px);
-        overflow-y: scroll;
+  }
+
+  .CommunitySelectList {
+    overflow-x: hidden;
+
+    h4 {
+      color: $neutral-400;
+      font-size: 16px;
+      font-weight: 400;
+      margin: 12px 4px;
     }
-    .CommunitySelectList {
-        overflow-x: hidden;
-        h4 {
-            color: #AAAAAA;
-            font-size: 16px;
-            font-weight: 400;
-        }
-        .cui-list-item {
-            margin: 0;
-        }
+
+    .cui-list-item {
+      margin: 0;
     }
-    .CurrentCommunityMenu {
-        .cui-menu-divider {
-            margin: 12px 0 18px;
-        }
+  }
+
+  .CurrentCommunityMenu {
+    width: 100%;
+
+    .cui-menu-divider {
+      margin: 12px 0 18px;
     }
-    .cui-icon {
-        margin-right: 25px !important;
+  }
+
+  .LoginSelectorMenu,
+  .NewProposalMenu {
+    .cui-icon svg {
+      display: inline-flex;
+      height: 28px;
+      stroke: $neutral-600 !important;
+      width: 28px;
     }
-    .LoginSelectorMenu, .NewProposalMenu {
-        .cui-icon svg {
-            display: inline-flex;
-            stroke: rgb(102, 102, 102) !important;
-            height: 28px;
-            width: 28px;
-        }
+  }
+
+  .CommunitySelectList {
+    a.home-button {
+      color: $black;
+      display: flex;
+      font-weight: 500;
+      margin: 4px 10px;
+      width: 100%;
+
+      &:hover {
+        text-transform: none;
+      }
+
+      img {
+        margin-right: 13px;
+      }
     }
-    .CommunitySelectList {
-        a.home-button {
-            display: flex;
-            color: black;
-            font-weight: 500;
-            margin: 4px 10px;
-            width: 100%;
-            &:hover {
-                text-transform: none;
-            }
-            img {
-                margin-right: 13px;
-            }
-        }
-    }
+  }
 }
 
-.MobileAccountMenu {
-    width: 100%;
-    .cui-menu {
-        border: none;
-        .label-wrap {
-            display: flex;
-            align-items: center;
-            svg {
-                margin-right: 25px;
-                stroke-width: 1px;
-                height: 28px;
-                width: 28px;
-            }
-            span {
-                position: relative;
-                top: 2px;
-            }
-        }
+.cui-menu .MobileAccountMenu {
+  border: none;
+  width: 100%;
+
+  .cui-button-label {
+    .label-wrap {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+
+      span {
+        margin-left: 16px;
+      }
     }
-    .user-block-left {
-        padding: 0px;
-        margin-right: 25px;
-    }
-    .cui-menu-divider {
-        margin: 12px 0 14px;
-    }
-    span {
-        color: black;
-        font-size: 18px;
-    }
+  }
+
+  .user-block-left {
+    margin-right: 25px;
+    padding: 0px;
+  }
+
+  .cui-menu-divider {
+    margin: 12px 0 14px;
+  }
+
+  span {
+    // color: $black;
+    font-size: 18px;
+  }
 }

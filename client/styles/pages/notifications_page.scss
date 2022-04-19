@@ -1,12 +1,19 @@
 @import 'client/styles/shared';
 
 .NotificationsPage {
-    .NotificationsList {
-        margin-top: 20px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        .no-notifications {
-            padding: 20px 20px 16px
-        }
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+  font-size: 15px;
+
+  .NotificationsList {
+    border-radius: 4px;
+    border: 1px solid $neutral-100;
+    margin-top: 20px;
+
+    .no-notifications {
+      padding: 20px 20px 16px;
     }
+  }
 }

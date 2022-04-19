@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "esnext",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "../build",
+    "baseUrl": "..",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": false
+  },
+  "files": [
+    "scripts/chainEventsConsumer.ts",
+    "scripts/dbNode.ts",
+  ],
+  "include": [
+    "models/*",
+    "models/",
+    "socket/*",
+    "scripts",
+    "eventHandlers",
+  ],
+  "exclude": [
+    "./node_modules",
+    "passport.ts",
+    "server/router.ts",
+    "server/webhookNotifier.ts",
+    "server/migrations",
+    "node_modules",
+    "build",
+    "dist"
+  ]
+}

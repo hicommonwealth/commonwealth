@@ -1,4 +1,6 @@
 import { ChainAttributes } from 'server/models/chain';
+import { ChainEventAttributes } from 'server/models/chain_event';
+import moment from 'moment';
 
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
@@ -52,6 +54,11 @@ export enum ChainType {
   Offchain = 'offchain',
 }
 
+export enum ChainCategoryType {
+  DeFi = 'DeFi',
+  DAO = 'DAO',
+}
+
 // TODO: remove many of these chain networks, esp substrate (make them all "Substrate"),
 // and just use id to identify specific chains for conditionals
 export enum ChainNetwork {
@@ -81,6 +88,7 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
   ALEX = 'alex',
   ERC20 = 'erc20',
+  ERC721 = 'erc721',
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',
@@ -90,31 +98,33 @@ export enum ChainNetwork {
   SolanaTestnet = 'solana-testnet',
   Solana = 'solana',
   SPL = 'spl', // solana token
+  AxieInfinity = 'axie-infinity',
 }
 
-export enum WebsocketEventType {
-  Connection = 'connection',
-  Message = 'message',
-  Upgrade = 'upgrade',
-  Close = 'close',
+export enum WebsocketMessageNames {
+  ChainEventNotification = 'chain-event-notification',
+  NewSubscriptions = 'new-subscriptions',
+  DeleteSubscriptions = 'delete-subscriptions',
 }
 
-export enum WebsocketMessageType {
-  Message = 'message',
-  Heartbeat = 'heartbeat',
-  HeartbeatPong = 'heartbeat-pong',
-  InitializeScrollback = 'scrollback',
-  Typing = 'typing',
-  Notification = 'notification',
-  ChainEntity = 'chain-entity',
+export enum WebsocketNamespaces {
+  ChainEvents = 'chain-events',
 }
 
-export interface IWebsocketsPayload<T> {
-  event: WebsocketMessageType;
-  jwt?: string; // for outgoing payloads
-  chain?: string; // for incoming payloads
-  address?: string; // for incoming payloads
-  data?: T;
+export type ChainEventNotification = {
+  id: string;
+  notification_data: '';
+  chain_event_id: string;
+  category_id: 'chain-event';
+  chain_id: string;
+  updated_at: moment.Moment;
+  created_at: moment.Moment;
+  ChainEvent: ChainEventAttributes;
+};
+
+export enum WebsocketEngineEvents {
+  CreateRoom = 'create-room',
+  DeleteRoom = 'delete-room',
 }
 
 export interface InviteCodeAttributes {
@@ -131,7 +141,7 @@ export interface InviteCodeAttributes {
 
 export interface IPostNotificationData {
   created_at: any;
-  root_id: string;
+  root_id: number | string;
   root_title: string;
   root_type: string;
   comment_id?: number;
@@ -156,7 +166,7 @@ export interface ICommunityNotificationData {
 export interface IChainEventNotificationData {
   chainEvent: any;
   chainEventType: any;
-  chain_id: string
+  chain_id: string;
 }
 
 export const PROFILE_NAME_MAX_CHARS = 40;

@@ -58,6 +58,8 @@ export const DATABASE_URI =
 export const RABBITMQ_URI = (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') ?
   'amqp://guest:guest@localhost:5672' : process.env.CLOUDAMQP_URL;
 
+export const REDIS_URL = process.env.REDIS_URL
+
 // limit logins in the last 5 minutes
 // increased because of chain waitlist registrations
 export const LOGIN_RATE_LIMIT_TRIES = 15;
@@ -73,3 +75,5 @@ export const MAGIC_DEFAULT_CHAIN = process.env.MAGIC_DEFAULT_CHAIN || 'ethereum'
 
 export const DEFAULT_COMMONWEALTH_LOGO =
   'https://commonwealth.im/static/img/logo.png';
+
+export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;

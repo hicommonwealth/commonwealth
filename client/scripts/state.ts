@@ -1,27 +1,25 @@
 import { ChainStore, NodeStore } from 'stores';
-import {
-  ContractCategory,
-  IChainAdapter,
-  NotificationCategory,
-} from 'models';
+import { ContractCategory, IChainAdapter, NotificationCategory } from 'models';
 import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import { InviteCodeAttributes } from 'types';
+import { WebSocketController } from 'controllers/server/socket';
 import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
 import SnapshotController from './controllers/chain/snapshot';
-import SearchController from './controllers/server/search'
+import SearchController from './controllers/server/search';
 import ReactionsController from './controllers/server/reactions';
 import ReactionCountsController from './controllers/server/reactionCounts';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
-import WebsocketController from './controllers/server/socket';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
+import { ChainCategoryAttributes } from 'server/models/chain_category';
+import { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -36,7 +34,7 @@ export const enum LoginState {
 }
 
 export interface IApp {
-  socket: WebsocketController;
+  socket: WebSocketController;
   chain: IChainAdapter<any, any>;
 
   chainPreloading: boolean;
@@ -76,6 +74,8 @@ export interface IApp {
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     invites: InviteCodeAttributes[];
+    chainCategories?: ChainCategoryAttributes[];
+    chainCategoryTypes?: ChainCategoryTypeAttributes[];
   };
   loginStatusLoaded(): boolean;
   isLoggedIn(): boolean;
@@ -141,16 +141,21 @@ const app: IApp = {
   },
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,
-  isLoggedIn:        () => app.loginState === LoginState.LoggedIn,
-  isProduction:      () => document.location.origin.indexOf('commonwealth.im') !== -1,
-  serverUrl:         () => '/api',
+  isLoggedIn: () => app.loginState === LoginState.LoggedIn,
+  isProduction: () =>
+    document.location.origin.indexOf('commonwealth.im') !== -1,
+  serverUrl: () => '/api',
 
   loadingError: null,
 
   _customDomainId: null,
   isCustomDomain: () => app._customDomainId !== null,
-  customDomainId: () => { return app._customDomainId; },
-  setCustomDomain: (d) => { app._customDomainId = d; },
+  customDomainId: () => {
+    return app._customDomainId;
+  },
+  setCustomDomain: (d) => {
+    app._customDomainId = d;
+  },
 
   _lastNavigatedFrom: null,
   _lastNavigatedBack: false,

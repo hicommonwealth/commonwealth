@@ -12,6 +12,7 @@ import {
   Checkbox,
 } from 'construct-ui';
 
+import { ChainNetwork } from 'types';
 import QuillEditor from 'views/components/quill_editor';
 import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
@@ -86,7 +87,7 @@ const NewTopicModal: m.Component<
 
     const decimals = app.chain?.meta.chain?.decimals
       ? app.chain.meta.chain.decimals
-      : 18;
+      : (app.chain.network === ChainNetwork.ERC721) ? 0 : 18;
 
     return m('.NewTopicModal', [
       m('.compact-modal-title', [
@@ -100,22 +101,31 @@ const NewTopicModal: m.Component<
             label: 'Name',
             defaultValue: vnode.state.form.name,
             oninput: (e) => {
-              vnode.state.form.name = (e.target as any).value;
+              vnode.state.form.name = (e.target as HTMLInputElement).value;
             },
             inputValidationFn: (text) => {
+              let errorMsg;
+              const currentCommunityTopicNames =
+                app.chain.meta.chain.topics.map((t) => t.name.toLowerCase());
+              if (currentCommunityTopicNames.includes(text.toLowerCase())) {
+                errorMsg = 'Topic name already used within community.';
+                vnode.state.error = errorMsg;
+                m.redraw();
+                return [ValidationStatus.Failure, errorMsg];
+              }
               const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
               if (disallowedCharMatches) {
-                return [
-                  ValidationStatus.Failure,
-                  `The ${pluralizeWithoutNumberPrefix(
-                    disallowedCharMatches.length,
-                    'char'
-                  )} 
-                  ${disallowedCharMatches.join(', ')} are not permitted`,
-                ];
-              } else {
-                return [ValidationStatus.Success, 'Valid topic name'];
+                errorMsg = `The ${pluralizeWithoutNumberPrefix(
+                  disallowedCharMatches.length,
+                  'char'
+                )} 
+                ${disallowedCharMatches.join(', ')} are not permitted`;
+                vnode.state.error = errorMsg;
+                m.redraw();
+                return [ValidationStatus.Failure, errorMsg];
               }
+              if (vnode.state.error) delete vnode.state.error;
+              return [ValidationStatus.Success, 'Valid topic name'];
             },
             autocomplete: 'off',
             autofocus: true,
@@ -188,7 +198,7 @@ const NewTopicModal: m.Component<
             ]),
           m(Button, {
             intent: 'primary',
-            disabled: vnode.state.saving || disabled,
+            disabled: vnode.state.saving || vnode.state.error || disabled,
             rounded: true,
             onclick: async (e) => {
               e.preventDefault();
@@ -216,12 +226,7 @@ const NewTopicModal: m.Component<
                   null,
                   form.featuredInSidebar,
                   form.featuredInNewPost,
-                  app.activeChainId()
-                    ? tokensToWei(
-                        vnode.state.form.tokenThreshold || '0',
-                        app.chain?.meta.chain.decimals || 18
-                      )
-                    : '0',
+                  vnode.state.form.tokenThreshold || '0',
                   defaultOffchainTemplate
                 )
                 .then(() => {

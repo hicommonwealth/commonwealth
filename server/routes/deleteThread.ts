@@ -2,17 +2,23 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import validateRoles from '../util/validateRoles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 enum DeleteThreadErrors {
   NoUser = 'Not logged in',
   NoThread = 'Must provide thread_id',
-  NoPermission = 'Not owned by this user'
+  NoPermission = 'Not owned by this user',
 }
 
-const deleteThread = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const { thread_id } = req.body;
+const deleteThread = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { thread_id, chain_id } = req.body;
   if (!req.user) {
     return next(new Error(DeleteThreadErrors.NoUser));
   }
@@ -22,50 +28,41 @@ const deleteThread = async (models: DB, req: Request, res: Response, next: NextF
 
   try {
     const userOwnedAddressIds = (await req.user.getAddresses())
-      .filter((addr) => !!addr.verified).map((addr) => addr.id);
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
 
-    // allow either the author or admin/mods to delete threads
     const myThread = await models.OffchainThread.findOne({
       where: {
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [ models.Chain ]
+      include: [models.Chain],
     });
 
-    const thread = myThread || await models.OffchainThread.findOne({
-      where: {
-        id: req.body.thread_id,
-      },
-      include: [ models.Chain ]
-    });
+    let thread = myThread;
+    if (!myThread) {
+      const isAdminOrMod = validateRoles(models, req, 'moderator', chain_id);
 
-    if (!thread) {
-      return next(new Error(DeleteThreadErrors.NoThread));
-    }
+      if (!isAdminOrMod) {
+        return next(new Error(DeleteThreadErrors.NoPermission));
+      }
 
-    const userRole = await models.Role.findOne({
-      where: {
-        address_id: userOwnedAddressIds,
-        chain_id: thread.Chain.id,
-        permission: ['admin', 'moderator'],
-      },
-    });
+      thread = await models.OffchainThread.findOne({
+        where: {
+          id: req.body.thread_id,
+        },
+        include: [models.Chain],
+      });
 
-    const isAdminOrMod = userRole?.permission === 'admin' || userRole?.permission === 'moderator';
-
-    if (!myThread && (!isAdminOrMod && !req.user.isAdmin)) {
-      return next(new Error(DeleteThreadErrors.NoPermission));
+      if (!thread) {
+        return next(new Error(DeleteThreadErrors.NoThread));
+      }
     }
 
     const topic = await models.OffchainTopic.findOne({
       where: { id: thread.topic_id },
-      include: [ { model: models.OffchainThread, as: 'threads' } ]
+      include: [{ model: models.OffchainThread, as: 'threads' }],
     });
-    const featuredTopics = thread.Chain.featured_topics;
-    if (topic && !featuredTopics.includes(`${topic.id}`) && topic.threads.length <= 1) {
-      topic.destroy();
-    }
 
     // find and delete all associated subscriptions
     const subscriptions = await models.Subscription.findAll({
@@ -73,9 +70,11 @@ const deleteThread = async (models: DB, req: Request, res: Response, next: NextF
         offchain_thread_id: thread.id,
       },
     });
-    await Promise.all(subscriptions.map((s) => {
-      return s.destroy();
-    }));
+    await Promise.all(
+      subscriptions.map((s) => {
+        return s.destroy();
+      })
+    );
 
     await thread.destroy();
     return res.json({ status: 'Success' });

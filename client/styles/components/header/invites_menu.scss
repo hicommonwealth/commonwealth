@@ -1,22 +1,24 @@
 @import 'client/styles/shared';
 
-.cui-popover.cui-popover-menu.InvitesMenu {
-    top: 1px !important;
-}
-
 .invites-button-wrap {
-    position: relative;
-    margin-left: 7px;
-    .invites-count-pip {
-        position: absolute;
-        top: 29px;
-        right: -5px;
-        height: 12px;
-        width: 12px;
-        border-radius: 50%;
-        background: red;
-        color: white;
-        line-height: 1;
-        font-size: 12px;
+  position: relative;
+
+  .invites-count-container {
+    background: red;
+    border-radius: 50%;
+    color: $white;
+    font-size: 12px;
+    height: 14px;
+    line-height: 16px;
+    position: absolute;
+    right: -5px;
+    top: 29px;
+    width: 14px;
+
+    .invites-count {
+      position: relative;
+      right: -1px;
+      top: -4px;
     }
+  }
 }

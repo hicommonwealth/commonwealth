@@ -54,7 +54,7 @@ async function handleFatalError(
       process.exit(1);
       break;
     default:
-      log.error(`${chain ? `[${chain}]: ` : ''}${JSON.stringify(error)}`);
+      log.error(`${chain ? `[${chain}]: ` : ''} ${error.message}`);
 
       if (chain && chain.indexOf('erc20') === -1 && chainErrors[chain] >= 4) {
         listeners[chain].unsubscribe();
@@ -122,7 +122,7 @@ async function mainProcess(
     );
 
   let query =
-    'SELECT "Chains"."id", "substrate_spec", "url", "address", "base", "type", "network", "ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
+    'SELECT "Chains"."id", "substrate_spec", "url", "private_url", "address", "base", "type", "network", "ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
   const allChains = (await pool.query(query)).rows;
 
   // gets the chains specific to this node
@@ -181,7 +181,11 @@ async function mainProcess(
   const erc20Tokens = myChainData.filter(
     (chain) =>
       chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
-  );
+  ).map((chain) => {
+    // replace url with private_url if available
+    chain.url = chain.private_url || chain.url;
+    return chain;
+  });
   const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
   for (const [url, tokens] of Object.entries(erc20ByUrl)) {
     const tokenKey = `erc20_${url}`;
@@ -294,7 +298,7 @@ async function mainProcess(
         listeners[chain.id] = await createListener(chain.id, network, {
           address: chain.address,
           archival: false,
-          url: chain.url,
+          url: chain.private_url || chain.url,
           spec: chain.substrate_spec,
           skipCatchup: false,
           verbose: false, // using this will print event before chain is added to it
@@ -447,7 +451,7 @@ async function initializer(): Promise<void> {
   // setup sql client pool
   pool = new Pool({
     connectionString: DATABASE_URI,
-    ssl: {
+    ssl: process.env.NODE_ENV !== 'production' ? false : {
       rejectUnauthorized: false,
     },
     max: 3,

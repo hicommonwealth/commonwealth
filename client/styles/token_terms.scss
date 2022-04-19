@@ -1,0 +1,34 @@
+@import 'client/styles/shared';
+
+.TokenTerms {
+  align-items: center;
+  background-color: $neutral-100;
+  color: $neutral-900;
+  display: flex;
+  flex-direction: row;
+  min-height: 32px;
+  justify-content: center;
+  padding-left: 16px;
+
+  a {
+    margin: 0 auto;
+
+    .terms-text {
+      display: flex;
+      font-size: 12px;
+      height: 100%;
+      text-align: center;
+      word-wrap: break-word;
+    }
+  }
+
+  svg {
+    cursor: pointer;
+    fill: currentColor;
+    margin: 0 16px;
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}
