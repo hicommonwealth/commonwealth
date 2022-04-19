@@ -1012,7 +1012,7 @@ const ViewProposalPage: m.Component<
         .then(async (result) => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
-            // .filter((c) => c.parentComment === null); // TODO: Why was this written?
+            .filter((c) => c.parentComment === null);
           // fetch reactions
           const { result: reactionCounts } = await $.ajax({
             type: 'POST',
@@ -1022,7 +1022,7 @@ const ViewProposalPage: m.Component<
             },
             data: JSON.stringify({
               proposal_ids: [proposalId],
-              comment_ids: vnode.state.comments.map((comment) => comment.id),
+              comment_ids: app.comments.getByProposal(proposal).map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
             }),
           });
