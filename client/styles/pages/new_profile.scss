@@ -63,13 +63,24 @@
         }
       }
 
-      .social-accounts {
+      .social-accounts-and-edit {
+        position: relative;
         grid-area: social;
         display: flex;
         border-top: 1px solid #CCCCCC;
         padding: 10px 15px;
+
         .social-account-icon {
           margin-right: 30px;
+        }
+
+        .edit-button {
+          position: absolute;
+          right: 15px;
+          bottom: 10px;
+          button {
+            height: 35px;
+          }
         }
       }
     }

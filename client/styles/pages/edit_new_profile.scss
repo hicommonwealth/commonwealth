@@ -1,0 +1,78 @@
+@import 'client/styles/shared';
+@import 'construct-ui/src/_shared/_colors';
+
+.EditProfilePage {
+
+  padding: 50px;
+
+  .edit-pane {
+    position: relative;
+    width: 100%;
+    display: flex;
+    margin: 50px 0;
+
+    .save-button {
+      position: absolute;
+      top: -20px;
+      right: 0;
+    }
+
+    .general-info {
+      flex: 1;
+      margin-right: 50px;
+
+      .title {
+        margin-bottom: 24px;
+      }
+
+      .bio-field {
+        height: 200px;
+      }
+
+      input[name="bio-form-field"] {
+        height: 150px;
+      }
+
+      .profile-image-section {
+
+        .title {
+          margin-bottom: 24px;
+        }
+
+        .flex {
+          width: 100%;
+          // display: flex;
+          align-items: center;
+
+          .profile-image {
+            width: 90px;
+            height: 90px;
+            img {
+              border-radius: 50%;
+            }
+          }
+
+          p {
+            margin: 0 20px;
+            color: #999999;
+          }
+
+          input[name="profile-image-form-field"] {
+            
+          }
+        }
+
+      }
+    }
+
+    .social-links {
+      flex: 1;
+
+      .title {
+        margin-bottom: 24px;
+      }
+    }
+
+  }
+
+}

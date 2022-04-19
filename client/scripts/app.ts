@@ -866,6 +866,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
+            '/profile/:address/edit': importRoute('views/pages/edit_new_profile', {
+              scoped: false,
+              hideSidebar: false,
+            }),
             // Notifications
             '/:scope/notifications': importRoute(
               'views/pages/notifications_page',

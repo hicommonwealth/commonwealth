@@ -6,6 +6,7 @@ import { NewProfile as Profile } from 'client/scripts/models'
 import { SocialAccount } from 'client/scripts/models';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWButton } from '../../components/component_kit/cw_button'
 
 import 'pages/new_profile.scss';
 
@@ -84,10 +85,17 @@ class NewProfileHeader implements m.Component<ProfileHeaderAttrs, ProfileHeaderS
             }
           </section>
 
-          <section className="social-accounts">
+          <section className="social-accounts-and-edit">
             { 
               renderSocialAccounts(socialAccounts)
             }
+            <div className="edit-button">
+              <CWButton
+                label="Edit"
+                buttonType="primary"
+                onclick={() => m.route.set(`${m.route.get()}/edit`)}
+              />
+            </div>
           </section>
         </CWCard>
 

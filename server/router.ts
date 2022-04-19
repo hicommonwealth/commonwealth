@@ -90,6 +90,7 @@ import deleteChainNode from './routes/deleteChainNode';
 import updateChain from './routes/updateChain';
 import bulkProfiles from './routes/bulkProfiles';
 import updateProfile from './routes/updateProfile';
+import updateNewProfile from './routes/updateNewProfile';
 import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
@@ -484,6 +485,13 @@ function setupRouter(
     updateProfile.bind(this, models, identityFetchCache)
   );
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
+
+  // new profile
+  router.post(
+    '/updateProfile/v2',
+    passport.authenticate('jwt', { session: false }),
+    updateNewProfile.bind(this, models)
+  );
 
   // social accounts
   router.delete(
