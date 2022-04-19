@@ -27,7 +27,7 @@ import MolochProposal, {
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
-import Countdown from 'views/components/countdown';
+import { Countdown } from 'views/components/countdown';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 export const getStatusClass = (proposal: AnyProposal) =>
