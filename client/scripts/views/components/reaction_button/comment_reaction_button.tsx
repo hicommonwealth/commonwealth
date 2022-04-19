@@ -15,12 +15,12 @@ import {
   onReactionClick,
 } from './helpers';
 
-type ReactionButtonAttrs = {
+type CommentReactionButtonAttrs = {
   comment: OffchainComment<any>;
 };
 
 export class CommentReactionButton
-  implements m.ClassComponent<ReactionButtonAttrs>
+  implements m.ClassComponent<CommentReactionButtonAttrs>
 {
   private loading: boolean;
   private reactors: any;
@@ -29,7 +29,7 @@ export class CommentReactionButton
     this.loading = false;
   }
 
-  view(vnode: m.VnodeDOM<ReactionButtonAttrs, this>) {
+  view(vnode: m.VnodeDOM<CommentReactionButtonAttrs, this>) {
     const { comment } = vnode.attrs;
     const reactionCounts = app.reactionCounts.getByPost(comment);
     const { likes = 0, hasReacted } = reactionCounts || {};
@@ -47,8 +47,7 @@ export class CommentReactionButton
     const topicName = parentThread.topic.name;
 
     this.loading =
-      vnode.state.loading ||
-      (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
+      this.loading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
 
     const activeAddress = app.user.activeAccount?.address;
 

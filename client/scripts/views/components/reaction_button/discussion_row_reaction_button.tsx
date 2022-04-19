@@ -15,12 +15,12 @@ import {
   onReactionClick,
 } from './helpers';
 
-type ReactionButtonAttrs = {
+type DiscussionRowReactionButtonAttrs = {
   thread: OffchainThread;
 };
 
 export class DiscussionRowReactionButton
-  implements m.ClassComponent<ReactionButtonAttrs>
+  implements m.ClassComponent<DiscussionRowReactionButtonAttrs>
 {
   private loading: boolean;
   private reactors: any;
@@ -29,7 +29,7 @@ export class DiscussionRowReactionButton
     this.loading = false;
   }
 
-  view(vnode: m.VnodeDOM<ReactionButtonAttrs, this>) {
+  view(vnode: m.VnodeDOM<DiscussionRowReactionButtonAttrs, this>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};
@@ -46,8 +46,7 @@ export class DiscussionRowReactionButton
     }
 
     this.loading =
-      vnode.state.loading ||
-      (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
+      this.loading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
 
     const activeAddress = app.user.activeAccount?.address;
 
