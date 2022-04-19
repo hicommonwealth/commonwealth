@@ -43,6 +43,7 @@ import viewActivity from './routes/viewActivity';
 import markNotificationsRead from './routes/markNotificationsRead';
 import clearReadNotifications from './routes/clearReadNotifications';
 import clearNotifications from './routes/clearNotifications';
+import getDelegationData from './routes/getDelegationData';
 import bulkMembers from './routes/bulkMembers';
 import bulkAddresses from './routes/bulkAddresses';
 import createInvite from './routes/createInvite';
@@ -566,6 +567,11 @@ function setupRouter(
     '/disableImmediateEmails',
     passport.authenticate('jwt', { session: false }),
     disableImmediateEmails.bind(this, models)
+  );
+  router.get(
+    '/getDelegationData',
+    passport.authenticate('jwt', { session: false }),
+    getDelegationData.bind(this, models)
   );
 
   // chain categories
