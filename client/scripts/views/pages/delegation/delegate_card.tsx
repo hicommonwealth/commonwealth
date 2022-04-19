@@ -1,15 +1,46 @@
 /* @jsx m */
+
 import m from 'mithril';
-import { CWCard } from '../../components/component_kit/cw_card';
-import 'pages/delegation/delegate_card.scss';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { Spinner } from 'construct-ui';
-import User from '../../components/widgets/user';
-import app from 'state';
-import { notifySuccess } from 'controllers/app/notifications';
-import { Account, AddressInfo, Profile } from 'client/scripts/models';
 import numeral from 'numeral';
+
+import 'pages/delegation/delegate_card.scss';
+import { notifySuccess } from 'controllers/app/notifications';
+import { Profile } from 'client/scripts/models';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWButton } from '../../components/component_kit/cw_button';
+import User from '../../components/widgets/user';
 import { DelegateInfo } from '.';
+
+type StatSectionAttrs = {
+  title: string;
+  displayValue: string;
+  secondaryCount?: string;
+  persist: boolean;
+  dataFetched: boolean;
+};
+class StatSection implements m.ClassComponent<StatSectionAttrs> {
+  view(vnode) {
+    return (
+      <div class={`stat-section${!vnode.attrs.persist ? '-hidden' : ''}`}>
+        <div class="title">
+          <div>{vnode.attrs.title}</div>
+
+          {vnode.attrs.secondaryCount && (
+            <div class="secondary-count">{vnode.attrs.secondaryCount}</div>
+          )}
+        </div>
+        {vnode.attrs.dataFetched ? (
+          <div class="display-value">{vnode.attrs.displayValue}</div>
+        ) : (
+          <div style={'margin-left: 30px'}>
+            <Spinner active={true} size="xs" />
+          </div>
+        )}
+      </div>
+    );
+  }
+}
 
 type DelegateCardAttrs = {
   delegateInfo: DelegateInfo;
@@ -127,36 +158,6 @@ class DelegateCard implements m.ClassComponent<DelegateCardAttrs> {
           </div>
         </div>
       </CWCard>
-    );
-  }
-}
-
-type StatSectionAttrs = {
-  title: string;
-  displayValue: string;
-  secondaryCount?: string;
-  persist: boolean;
-  dataFetched: boolean;
-};
-class StatSection implements m.ClassComponent<StatSectionAttrs> {
-  view(vnode) {
-    return (
-      <div class={`stat-section${!vnode.attrs.persist ? '-hidden' : ''}`}>
-        <div class="title">
-          <div>{vnode.attrs.title}</div>
-
-          {vnode.attrs.secondaryCount && (
-            <div class="secondary-count">{vnode.attrs.secondaryCount}</div>
-          )}
-        </div>
-        {vnode.attrs.dataFetched ? (
-          <div class="display-value">{vnode.attrs.displayValue}</div>
-        ) : (
-          <div style={'margin-left: 30px'}>
-            <Spinner active={true} size="xs" />
-          </div>
-        )}
-      </div>
     );
   }
 }

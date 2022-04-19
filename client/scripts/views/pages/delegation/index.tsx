@@ -1,10 +1,13 @@
 /* @jsx m */
+
 import m from 'mithril';
-import Sublayout from '../../sublayout';
-import DelegateCard from './delegate_card';
+import numeral from 'numeral';
+import _ from 'lodash';
+
 import 'pages/delegation/index.scss';
+
+import { Account, AddressInfo, Profile } from 'models';
 import app from 'state';
-import { Account, AddressInfo, Profile } from 'client/scripts/models';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import {
   CWTable,
@@ -12,8 +15,8 @@ import {
   TableEntryType,
 } from '../../components/component_kit/cw_table';
 import User from '../../components/widgets/user';
-import numeral from 'numeral';
-import _ from 'lodash';
+import DelegateCard from './delegate_card';
+import Sublayout from '../../sublayout';
 
 type DelegationPageAttrs = { topic?: string };
 
@@ -41,7 +44,8 @@ function buildTableData(
     action: string
   ) => Promise<void>
 ): Array<Array<TableEntry>> {
-  let result = [];
+  const result = [];
+
   for (const delegateInfo of delegates) {
     const {
       delegate,
@@ -56,7 +60,7 @@ function buildTableData(
 
     const isSelectedDelegate = _.isEqual(delegateInfo, currentDelegate);
 
-    let currentRow = [
+    const currentRow = [
       {
         value: rank,
         type: TableEntryType.String,
@@ -124,7 +128,7 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
   private delegates: Array<DelegateInfo>;
   private filteredDelegateInfo: Array<Array<TableEntry>>;
   private tableRendered: boolean;
-  oninit(vnode) {
+  oninit() {
     // TODO: Replace below with processDelegates() call
 
     // Load Delegates
@@ -223,7 +227,7 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
       },
     }; // TODO: Replace this with an actual fetch of the user's selected delegate. Include handling for if none exists
   }
-  view(vnode) {
+  view() {
     const updateSelectedDelegate = async (
       delegate: DelegateInfo,
       action: string
@@ -261,7 +265,7 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
     }
 
     return (
-      <Sublayout class="DelegationPage" title="Delegation">
+      <Sublayout title="Delegation">
         <div class="top-section">
           {this.delegate ? (
             <div class="wrapper">
