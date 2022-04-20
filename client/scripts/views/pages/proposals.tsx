@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import 'pages/proposals.scss';
+/* @jsx m */
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Button, Tag } from 'construct-ui';
 import BN from 'bn.js';
+
+import 'pages/proposals.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -30,9 +31,8 @@ import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
-  view: (vnode) => {
+  view: () => {
     if (!app.chain) return;
-    const activeAccount = app.user.activeAccount;
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -69,10 +69,10 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
 };
 
 const CompoundProposalStats: m.Component<{}, {}> = {
-  view: (vnode) => {
+  view: () => {
     if (!app.chain) return;
     if (!(app.chain instanceof Compound)) return;
-    const activeAccount = app.user.activeAccount;
+
     const symbol = app.chain.meta.chain.symbol;
 
     return m('.stats-box', [
@@ -105,7 +105,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
         ]),
         m(Button, {
           intent: 'primary',
-          onclick: (e) => navigateToSubpage('/new/proposal'),
+          onclick: () => navigateToSubpage('/new/proposal'),
           label: 'New proposal',
         }),
       ]),
@@ -135,7 +135,7 @@ function getModules(): ProposalModule<any, any, any>[] {
 }
 
 const ProposalsPage: m.Component<{}> = {
-  oncreate: (vnode) => {
+  oncreate: () => {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');
@@ -151,7 +151,7 @@ const ProposalsPage: m.Component<{}> = {
       }, 100);
     }
   },
-  view: (vnode) => {
+  view: () => {
     if (!app.chain || !app.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
@@ -252,7 +252,7 @@ const ProposalsPage: m.Component<{}> = {
         : [
             m('.active-proposals', [
               (activeDemocracyProposals || [])
-                .map((proposal) => m(ProposalCard, { proposal }))
+                .map((proposal) => <ProposalCard proposal={proposal} />)
                 .concat(
                   (activeCouncilProposals || []).map((proposal) =>
                     m(ProposalCard, { proposal })
@@ -344,11 +344,11 @@ const ProposalsPage: m.Component<{}> = {
         : [
             m('.inactive-proposals', [
               (inactiveDemocracyProposals || [])
-                .map((proposal) => m(ProposalCard, { proposal }))
+                .map((proposal) => <ProposalCard proposal={proposal} />)
                 .concat(
-                  (inactiveCouncilProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
+                  (inactiveCouncilProposals || []).map((proposal) => (
+                    <ProposalCard proposal={proposal} />
+                  ))
                 )
                 .concat(
                   (inactiveCosmosProposals || []).map((proposal) =>
@@ -380,13 +380,6 @@ const ProposalsPage: m.Component<{}> = {
                 ),
             ]),
           ];
-
-    // XXX: display these
-    const visibleTechnicalCommitteeProposals =
-      app.chain &&
-      (app.chain.network === ChainNetwork.Kusama ||
-        app.chain.network === ChainNetwork.Polkadot) &&
-      (app.chain as Substrate).technicalCommittee.store.getAll();
 
     return m(
       Sublayout,
