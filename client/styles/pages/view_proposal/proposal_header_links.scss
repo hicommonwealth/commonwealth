@@ -8,10 +8,11 @@
 
   a:link,
   a:visited {
+    align-items: center;
     background: $neutral-200;
     border-radius: 99px;
     color: $neutral-500;
-    display: block;
+    display: flex;
     padding: 8px 16px;
     text-decoration: none !important;
   }
@@ -19,12 +20,12 @@
   svg {
     $size: 14px;
     height: $size;
-    margin-left: 5px;
+    margin-left: 8px;
     min-height: $size;
     min-width: $size;
     position: relative;
     stroke: $primary-500;
-    top: -1px;
+    top: 1px;
     width: $size;
   }
 
