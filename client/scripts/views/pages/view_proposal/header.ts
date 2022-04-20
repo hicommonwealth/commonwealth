@@ -93,7 +93,9 @@ export const ProposalHeaderOffchainPoll: m.Component<
       proposal.offchainVotingEndsAt &&
       proposal.offchainVotingEndsAt?.isBefore(moment().utc());
 
-    const tokenThresholdFailed = TopicGateCheck.isGatedTopic(proposal.topic.name);
+    const tokenThresholdFailed = TopicGateCheck.isGatedTopic(
+      proposal.topic.name
+    );
 
     const vote = async (option, hasVoted, isSelected) => {
       if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
@@ -409,7 +411,7 @@ export const ProposalHeaderOnchainStatus: m.Component<{
     return m(
       '.ProposalHeaderOnchainStatus',
       { class: getStatusClass(proposal) },
-      getStatusText(proposal, true)
+      getStatusText(proposal)
     );
   },
 };

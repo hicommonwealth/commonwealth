@@ -19,7 +19,7 @@ import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import ProposalCard from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 

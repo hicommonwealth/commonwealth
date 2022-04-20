@@ -1,9 +1,11 @@
-import 'components/proposal_card.scss';
+/* @jsx m */
 
 import m from 'mithril';
 import moment from 'moment';
 import { Tag } from 'construct-ui';
 import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
+
+import 'components/proposal_card.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -29,6 +31,7 @@ import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
 import { Countdown } from 'views/components/countdown';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWCard } from './component_kit/cw_card';
 
 export const getStatusClass = (proposal: AnyProposal) =>
   proposal.isPassing === ProposalStatus.Passing
@@ -41,10 +44,7 @@ export const getStatusClass = (proposal: AnyProposal) =>
     ? 'fail'
     : '';
 
-export const getStatusText = (
-  proposal: AnyProposal,
-  showCountdown: boolean
-) => {
+export const getStatusText = (proposal: AnyProposal) => {
   if (proposal.completed && proposal instanceof SubstrateDemocracyProposal) {
     if (proposal.isPassing === ProposalStatus.Passed)
       return 'Passed, moved to referendum';
@@ -92,25 +92,25 @@ export const getStatusText = (
   const countdown =
     proposal.endTime.kind === 'fixed'
       ? [
-          m(Countdown, {
-            duration: moment.duration(proposal.endTime.time.diff(moment())),
-          }),
+          <Countdown
+            duration={moment.duration(proposal.endTime.time.diff(moment()))}
+          />,
           ' left',
         ]
       : proposal.endTime.kind === 'fixed_block'
       ? [
-          m(Countdown, {
-            duration: blocknumToDuration(proposal.endTime.blocknum),
-          }),
+          <Countdown
+            duration={blocknumToDuration(proposal.endTime.blocknum)}
+          />,
           ` left (ends on block ${formatNumberLong(
             proposal.endTime.blocknum
           )})`,
         ]
       : proposal.endTime.kind === 'dynamic'
       ? [
-          m(Countdown, {
-            duration: blocknumToDuration(proposal.endTime.getBlocknum()),
-          }),
+          <Countdown
+            duration={blocknumToDuration(proposal.endTime.getBlocknum())}
+          />,
           ` left (ends on block ${formatNumberLong(
             proposal.endTime.getBlocknum()
           )})`,
@@ -193,173 +193,153 @@ export const getStatusText = (
   return '';
 };
 
-// export const getSecondaryStatusText = (proposal: AnyProposal): string | null => {
-//   if (proposal instanceof MolochProposal) {
-//     if (proposal.state === MolochProposalState.NotStarted) {
-//       return 'Waiting for voting to start...';
-//     } else if (proposal.state === MolochProposalState.Voting) {
-//       return 'Voting Phase.';
-//     } else if (proposal.state === MolochProposalState.GracePeriod) {
-//       return 'Voting completed. Proposal in grace period.';
-//     } else if (proposal.state === MolochProposalState.InProcessingQueue) {
-//       return 'Voting completed. Waiting for prior proposals to process.';
-//     } else if (proposal.state === MolochProposalState.ReadyToProcess) {
-//       return 'Voting completed. Proposal ready for processing.';
-//     } else {
-//       return null;
-//     }
-//   } else {
-//     return null;
-//   }
-// };
-
-const ProposalCard: m.Component<{ proposal: AnyProposal; injectedContent? }> = {
-  view: (vnode) => {
+export class ProposalCard
+  implements m.ClassComponent<{ proposal: AnyProposal; injectedContent? }>
+{
+  view(vnode) {
     const { proposal, injectedContent } = vnode.attrs;
-    const { author, createdAt, slug, identifier, title } = proposal;
 
-    return m('.ProposalCard', [
-      m(
-        '.proposal-card-top',
-        {
-          onclick: (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            localStorage[`${app.activeChainId()}-proposals-scrollY`] =
-              window.scrollY;
-            const path = getProposalUrlPath(
-              proposal.slug,
-              `${proposal.identifier}-${slugify(proposal.title)}`,
-              true
-            );
-            navigateToSubpage(path); // avoid resetting scroll point
-          },
-        },
-        [
-          m('.proposal-card-metadata', [
-            m(Tag, {
-              label: [
-                chainEntityTypeToProposalShortName(
-                  proposalSlugToChainEntityType(proposal.slug)
-                ),
-                ' ',
-                proposal.shortIdentifier,
-              ],
-              intent: 'primary',
-              rounded: true,
-              size: 'xs',
-            }),
-            (proposal instanceof SubstrateDemocracyProposal ||
-              proposal instanceof SubstrateCollectiveProposal) &&
-              proposal.getReferendum() &&
-              m(Tag, {
-                label: `REF #${proposal.getReferendum().identifier}`,
-                intent: 'primary',
-                rounded: true,
-                size: 'xs',
-                class: 'proposal-became-tag',
-              }),
-            proposal instanceof SubstrateDemocracyReferendum &&
-              (() => {
-                const originatingProposalOrMotion =
-                  proposal.getProposalOrMotion(proposal.preimage);
-                return m(Tag, {
-                  label:
+    return (
+      <CWCard
+        elevation="elevation-2"
+        className="ProposalCard"
+        onclick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+            window.scrollY;
+          const path = getProposalUrlPath(
+            proposal.slug,
+            `${proposal.identifier}-${slugify(proposal.title)}`,
+            true
+          );
+          navigateToSubpage(path); // avoid resetting scroll point
+        }}
+      >
+        <div class="proposal-card-metadata">
+          <Tag
+            label={[
+              chainEntityTypeToProposalShortName(
+                proposalSlugToChainEntityType(proposal.slug)
+              ),
+              ' ',
+              proposal.shortIdentifier,
+            ]}
+            intent="primary"
+            rounded={true}
+            size="xs"
+          />
+          {(proposal instanceof SubstrateDemocracyProposal ||
+            proposal instanceof SubstrateCollectiveProposal) &&
+            proposal.getReferendum() && (
+              <Tag
+                label={`REF #${proposal.getReferendum().identifier}`}
+                intent="primary"
+                rounded={true}
+                size="xs"
+                class="proposal-became-tag"
+              />
+            )}
+          {proposal instanceof SubstrateDemocracyReferendum &&
+            (() => {
+              const originatingProposalOrMotion = proposal.getProposalOrMotion(
+                proposal.preimage
+              );
+              return (
+                <Tag
+                  label={
                     originatingProposalOrMotion instanceof
                     SubstrateDemocracyProposal
                       ? `PROP #${originatingProposalOrMotion.identifier}`
                       : originatingProposalOrMotion instanceof
                         SubstrateCollectiveProposal
                       ? `MOT #${originatingProposalOrMotion.identifier}`
-                      : 'MISSING PROP',
-                  intent: 'primary',
-                  rounded: true,
-                  size: 'xs',
-                  class: 'proposal-became-tag',
-                });
-              })(),
-            proposal instanceof SubstrateTreasuryProposal &&
-              !proposal.data.index &&
-              m(Tag, {
-                label: 'MISSING DATA',
-                intent: 'primary',
-                rounded: true,
-                size: 'xs',
-                class: 'proposal-became-tag',
-              }),
-            m('.proposal-title', proposal.title),
-            proposal instanceof SubstrateTreasuryProposal &&
-              m('.proposal-amount', proposal.value?.format(true)),
-            proposal instanceof SubstrateDemocracyReferendum &&
-              m('.proposal-amount', proposal.threshold),
-            proposal instanceof AaveProposal &&
-              m(
-                'p.card-subheader.proposal-description',
-                proposal.ipfsData?.shortDescription || 'Proposal'
-              ),
-            // // linked treasury proposals
-            // proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
-            //   && proposal.preimage?.method === 'approveProposal'
-            //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-            // proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
-            //   && proposal.preimage?.method === 'approveProposal'
-            //   && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
-            // proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
-            //   && proposal.call?.method === 'approveProposal'
-            //   && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
-            // linked referenda
-          ]),
-          injectedContent
-            ? m('.proposal-injected', [
-                m(injectedContent, {
-                  proposal,
-                  statusClass: getStatusClass(proposal),
-                  statusText: getStatusText(proposal, true),
-                }),
-              ])
-            : m(
-                '.proposal-status',
-                { class: getStatusClass(proposal) },
-                getStatusText(proposal, true)
-              ),
-          // thread link
-          proposal.threadId &&
-            m('.proposal-thread-link', [
-              m(
-                'a',
-                {
-                  href: getProposalUrlPath(
+                      : 'MISSING PROP'
+                  }
+                  intent="primary"
+                  rounded={true}
+                  size="xs"
+                  class="proposal-became-tag"
+                />
+              );
+            })()}
+          {proposal instanceof SubstrateTreasuryProposal &&
+            !proposal.data.index && (
+              <Tag
+                label="MISSING DATA"
+                intent="primary"
+                rounded={true}
+                size="xs"
+                class="proposal-became-tag"
+              />
+            )}
+          <div class="proposal-title">{proposal.title}</div>
+          {proposal instanceof SubstrateTreasuryProposal && (
+            <div class="proposal-amount">{proposal.value?.format(true)}</div>
+          )}
+          {proposal instanceof SubstrateDemocracyReferendum && (
+            <div class="proposal-amount">{proposal.threshold}</div>
+          )}
+          {proposal instanceof AaveProposal && (
+            <p class="card-subheader">
+              {proposal.ipfsData?.shortDescription || 'Proposal'}
+            </p>
+          )}
+          {/* linked treasury proposals
+            proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
+               && proposal.preimage?.method === 'approveProposal'
+              && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+             proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
+              && proposal.preimage?.method === 'approveProposal'
+              && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+             proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
+               && proposal.call?.method === 'approveProposal'
+               && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
+             linked referenda */}
+        </div>
+        {injectedContent ? (
+          <div class="proposal-injected">
+            {m(injectedContent, {
+              proposal,
+              statusClass: getStatusClass(proposal),
+              statusText: getStatusText(proposal),
+            })}
+          </div>
+        ) : (
+          <div class={`proposal-status ${getStatusClass(proposal)}`}>
+            {getStatusText(proposal)}
+          </div>
+        )}
+        {proposal.threadId && (
+          <div class="proposal-thread-link">
+            <a
+              href={getProposalUrlPath(
+                ProposalType.OffchainThread,
+                `${proposal.threadId}`
+              )}
+              onclick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+                  window.scrollY;
+                navigateToSubpage(
+                  getProposalUrlPath(
                     ProposalType.OffchainThread,
-                    `${proposal.threadId}`
-                  ),
-                  onclick: (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    localStorage[`${app.activeChainId()}-proposals-scrollY`] =
-                      window.scrollY;
-                    navigateToSubpage(
-                      getProposalUrlPath(
-                        ProposalType.OffchainThread,
-                        `${proposal.threadId}`,
-                        true
-                      )
-                    );
-                    // avoid resetting scroll point
-                  },
-                },
-                [
-                  m(CWIcon, { iconName: 'expand', size: 'small' }),
-                  m(
-                    'span',
-                    proposal.threadTitle ? proposal.threadTitle : 'Go to thread'
-                  ),
-                ]
-              ),
-            ]),
-        ]
-      ),
-    ]);
-  },
-};
-
-export default ProposalCard;
+                    `${proposal.threadId}`,
+                    true
+                  )
+                );
+                // avoid resetting scroll point
+              }}
+            >
+              <CWIcon iconName="expand" iconSize="small" />
+              <span>
+                {proposal.threadTitle ? proposal.threadTitle : 'Go to thread'}
+              </span>
+            </a>
+          </div>
+        )}
+      </CWCard>
+    );
+  }
+}
