@@ -193,15 +193,19 @@ export const getStatusText = (proposal: AnyProposal) => {
   return '';
 };
 
-export class ProposalCard
-  implements m.ClassComponent<{ proposal: AnyProposal; injectedContent? }>
-{
+type ProposalCardAttrs = {
+  injectedContent?: any;
+  proposal: AnyProposal;
+};
+
+export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
   view(vnode) {
     const { proposal, injectedContent } = vnode.attrs;
 
     return (
       <CWCard
         elevation="elevation-2"
+        interactive={true}
         className="ProposalCard"
         onclick={(e) => {
           e.stopPropagation();
@@ -273,7 +277,9 @@ export class ProposalCard
                 class="proposal-became-tag"
               />
             )}
-          <div class="proposal-title">{proposal.title}</div>
+          <div class="proposal-title" title={proposal.title}>
+            {proposal.title}
+          </div>
           {proposal instanceof SubstrateTreasuryProposal && (
             <div class="proposal-amount">{proposal.value?.format(true)}</div>
           )}
