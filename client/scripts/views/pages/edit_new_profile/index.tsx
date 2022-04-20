@@ -9,6 +9,7 @@ import Sublayout from 'views/sublayout';
 import { NewProfile as Profile } from '../../../../scripts/models'
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput, ValidationStatus } from '../../components/component_kit/cw_text_input';
+import { Spinner } from 'construct-ui';
 
 import 'pages/edit_new_profile.scss';
 
@@ -55,8 +56,12 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
       ...('avatarUrl' in vnode.state.profileUpdate) && {avatarUrl: vnode.state.profileUpdate.avatarUrl},
       ...('website' in vnode.state.profileUpdate) && {website: vnode.state.profileUpdate.website},
       jwt: app.user.jwt,
-    })
-    if (response.status == 'Success'){
+    }).catch((error) => {
+      // TODO : Error handling
+      return
+    });
+
+    if (response?.status == 'Success'){
       vnode.state.saved = true
       m.redraw()
       // Redirect
@@ -114,6 +119,10 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
       <div className="EditProfilePage">
         <h3> Edit Profile </h3>
         <div className="edit-pane">
+
+          {
+            vnode.state.saved ? <Spinner className="spinner" active={true} size="lg" /> : <div />
+          }
 
           <CWButton         
             label={vnode.state.saved ? "Saved!" : "Save"}
