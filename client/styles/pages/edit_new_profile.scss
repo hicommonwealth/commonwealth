@@ -15,6 +15,16 @@
       position: absolute;
       top: -20px;
       right: 0;
+
+      &.confirm {
+        background-color: green;
+        color: white;
+      }
+
+      &.fail {
+        background-color: red;
+        color: white;
+      }
     }
 
     .general-info {
@@ -40,8 +50,8 @@
         }
 
         .flex {
+          display: flex;
           width: 100%;
-          // display: flex;
           align-items: center;
 
           .profile-image {

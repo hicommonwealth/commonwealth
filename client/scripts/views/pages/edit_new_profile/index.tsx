@@ -16,6 +16,7 @@ type EditProfileState = {
   address: string,
   profile: Profile,
   profileUpdate: Object,
+  saved: boolean,
 }
 
 enum InputFormField {
@@ -32,6 +33,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
     vnode.state.address = m.route.param("address")
     this.getProfile(vnode, vnode.state.address)
     vnode.state.profileUpdate = {}
+    vnode.state.saved = false
   }
 
   getProfile = async (vnode, address: string) => {
@@ -48,13 +50,22 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
     const response = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
       address: vnode.state.address,  
       ...('email' in vnode.state.profileUpdate) && {email: vnode.state.profileUpdate.email},
-      ...('slug' in vnode.state.profileUpdate) && {slug: vnode.state.profileUpdate.slug},
+      ...('name' in vnode.state.profileUpdate) && {name: vnode.state.profileUpdate.name},
       ...('bio' in vnode.state.profileUpdate) && {bio: vnode.state.profileUpdate.bio},
       ...('avatarUrl' in vnode.state.profileUpdate) && {avatarUrl: vnode.state.profileUpdate.avatarUrl},
       ...('website' in vnode.state.profileUpdate) && {website: vnode.state.profileUpdate.website},
       jwt: app.user.jwt,
     })
-    // TODO : Error handling
+    if (response.status == 'Success'){
+      vnode.state.saved = true
+      m.redraw()
+      // Redirect
+      setTimeout(()=>{
+        m.route.set(`/profile/${vnode.state.address}`)
+      }, 1500)
+    } else {
+      // TODO : Error handling
+    }
   }
 
   handleInputChange = (vnode, value, formField: InputFormField) => {
@@ -66,10 +77,10 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
     }
 
     if (formField === InputFormField.ProfileName) {
-      if (value.length > 0 && value != vnode.state.profile?.slug)
-        vnode.state.profileUpdate.slug = value
+      if (value.length > 0 && value != vnode.state.profile?.name)
+        vnode.state.profileUpdate.name = value
       else
-        delete vnode.state.profileUpdate.slug
+        delete vnode.state.profileUpdate.name
     }
 
     if (formField === InputFormField.Bio) {
@@ -96,8 +107,6 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
 
   handleSaveProfile = (vnode) => {
     this.updateProfile(vnode)
-    // Redirect
-    // m.route.set(`profile/${vnode.state.address}}`)
   }
 
   view(vnode) {
@@ -107,10 +116,10 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
         <div className="edit-pane">
 
           <CWButton         
-            label="Save"
+            label={vnode.state.saved ? "Saved!" : "Save"}
             buttonType="primary"
             onclick={()=>{ this.handleSaveProfile(vnode) }} 
-            className="save-button"
+            className={vnode.state.saved ? "save-button confirm" : "save-button"}
           />
 
           <div className="general-info">
@@ -133,7 +142,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
             />
           
             <CWTextInput
-              name="slug-form-field"
+              name="name-form-field"
               inputValidationFn={(val: string): [ValidationStatus, string] => {
                 if (val.match(/[^A-Za-z0-9]/)) {
                   return [ValidationStatus.Failure, 'Must enter characters A-Z'];
@@ -142,7 +151,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
                 }
               }}
               label="Profile Name"
-              placeholder={vnode.state.profile?.slug}
+              placeholder={vnode.state.profile?.name}
               oninput={(e) => {
                 this.handleInputChange(vnode, (e.target as any).value, InputFormField.ProfileName)
               }}
@@ -150,13 +159,6 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
 
             <CWTextInput
               name="bio-form-field"
-              inputValidationFn={(val: string): [ValidationStatus, string] => {
-                if (val.match(/[^A-Za-z@.0-9*#]/)) {
-                  return [ValidationStatus.Failure, 'Must enter characters A-Z'];
-                } else {
-                  return [ValidationStatus.Success, 'Input validated'];
-                }
-              }}
               label="Bio"
               placeholder={vnode.state.profile?.bio}
               oninput={(e) => {
@@ -192,7 +194,6 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
           </div>
           <div className="social-links">
             <h4 className="title"> Links </h4>
-
             <CWTextInput
               name="website-form-field"
               inputValidationFn={(val: string): [ValidationStatus, string] => {
@@ -208,10 +209,10 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
                 this.handleInputChange(vnode, (e.target as any).value, InputFormField.Website)
               }}
             />
-
           </div>
         </div>        
       </div>
+
     )
   }
 }

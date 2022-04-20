@@ -16,11 +16,12 @@ const updateNewProfile = async (
     return next(new Error(Errors.NoAddressProvided));
   }
 
-  if (!req.body.email && !req.body.slug && !req.body.bio && !req.body.website && !req.body.avatarUrl) {
+  if (!req.body.email && !req.body.slug && !req.body.name && 
+    !req.body.bio && !req.body.website && !req.body.avatarUrl) {
     return next(new Error(Errors.InvalidUpdate));
   }
 
-  const { address, email, slug, bio, website, avatarUrl } = req.body;
+  const { address, email, slug, name, bio, website, avatarUrl } = req.body;
 
   const addressModel = await models.Address.findOne({
     where: {
@@ -40,9 +41,10 @@ const updateNewProfile = async (
   const updateStatus = await models.Profile.update({
     ...email && {email: email},
     ...slug && {slug: slug},
+    ...name && {profile_name: name},
     ...bio && {bio: bio},
     ...website && {website: website},
-    ...avatarUrl && {avatarUrl: avatarUrl},
+    ...avatarUrl && {avatar_url: avatarUrl},
     }, 
       {
         where: {
