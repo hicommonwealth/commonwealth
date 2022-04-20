@@ -15,13 +15,23 @@ import 'pages/edit_new_profile.scss';
 type EditProfileState = {
   address: string,
   profile: Profile,
+  profileUpdate: Object,
 }
+
+enum InputFormField {
+  Email,
+  ProfileName,
+  Bio,
+  ProfileImage,
+  Website,
+} 
 
 class EditNewProfile implements m.Component<{}, EditProfileState> {
 
   oninit(vnode) {
     vnode.state.address = m.route.param("address")
     this.getProfile(vnode, vnode.state.address)
+    vnode.state.profileUpdate = {}
   }
 
   getProfile = async (vnode, address: string) => {
@@ -31,27 +41,63 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
     });
     // TODO : Error handling
     vnode.state.profile = Profile.fromJSON(response.profile) 
+    m.redraw()
   }
 
   updateProfile = async (vnode) => {
-    const response = await $.get(`${app.serverUrl()}/updateProfile/v2`, {
+    const response = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
       address: vnode.state.address,  
-      bio: "Ruining my bio",
+      ...('email' in vnode.state.profileUpdate) && {email: vnode.state.profileUpdate.email},
+      ...('slug' in vnode.state.profileUpdate) && {slug: vnode.state.profileUpdate.slug},
+      ...('bio' in vnode.state.profileUpdate) && {bio: vnode.state.profileUpdate.bio},
+      ...('avatarUrl' in vnode.state.profileUpdate) && {avatarUrl: vnode.state.profileUpdate.avatarUrl},
+      ...('website' in vnode.state.profileUpdate) && {website: vnode.state.profileUpdate.website},
+      jwt: app.user.jwt,
     })
-    vnode.state.profile = response.profile
-    console.log(vnode.state.profile)
     // TODO : Error handling
+  }
+
+  handleInputChange = (vnode, value, formField: InputFormField) => {
+    if (formField === InputFormField.Email) {
+      if (value.length > 0 && value != vnode.state.profile?.email)
+        vnode.state.profileUpdate.email = value
+      else
+        delete vnode.state.profileUpdate.email
+    }
+
+    if (formField === InputFormField.ProfileName) {
+      if (value.length > 0 && value != vnode.state.profile?.slug)
+        vnode.state.profileUpdate.slug = value
+      else
+        delete vnode.state.profileUpdate.slug
+    }
+
+    if (formField === InputFormField.Bio) {
+      if (value.length > 0 && value != vnode.state.profile?.bio)
+        vnode.state.profileUpdate.bio = value
+      else
+        delete vnode.state.profileUpdate.bio
+    }
+
+    if (formField === InputFormField.ProfileImage) {
+      if (value.length > 0 && value != vnode.state.profile?.avatarUrl)
+        vnode.state.profileUpdate.avatarUrl = value
+      else
+        delete vnode.state.profileUpdate.avatarUrl
+    }
+
+    if (formField === InputFormField.Website) {
+      if (value.length > 0 && value != vnode.state.profile?.website)
+        vnode.state.profileUpdate.website = value
+      else
+        delete vnode.state.profileUpdate.website
+    }
   }
 
   handleSaveProfile = (vnode) => {
     this.updateProfile(vnode)
     // Redirect
     // m.route.set(`profile/${vnode.state.address}}`)
-  }
-
-  addLineBreaks = (text: string) => {
-    // TODO
-    return text
   }
 
   view(vnode) {
@@ -73,7 +119,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
             <CWTextInput
               name="email-form-field"
               inputValidationFn={(val: string): [ValidationStatus, string] => {
-                if (val.match(/[^A-Za-z@.]/)) {
+                if (val.match(/[^A-Za-z0-9@.]/)) {
                   return [ValidationStatus.Failure, 'Must enter characters A-Z'];
                 } else {
                   return [ValidationStatus.Success, 'Input validated'];
@@ -81,6 +127,9 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
               }}
               label="Email"
               placeholder={vnode.state.profile?.email}
+              oninput={(e) => {
+                this.handleInputChange(vnode, (e.target as any).value, InputFormField.Email)
+              }}
             />
           
             <CWTextInput
@@ -94,6 +143,9 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
               }}
               label="Profile Name"
               placeholder={vnode.state.profile?.slug}
+              oninput={(e) => {
+                this.handleInputChange(vnode, (e.target as any).value, InputFormField.ProfileName)
+              }}
             />
 
             <CWTextInput
@@ -106,7 +158,10 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
                 }
               }}
               label="Bio"
-              placeholder={this.addLineBreaks(vnode.state.profile?.bio)}
+              placeholder={vnode.state.profile?.bio}
+              oninput={(e) => {
+                this.handleInputChange(vnode, (e.target as any).value, InputFormField.Bio)
+              }}
             />
 
             <div className="profile-image-section">
@@ -127,6 +182,9 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
                   }}
                   label="Image URL"
                   placeholder={vnode.state.profile?.avatarUrl}
+                  oninput={(e) => {
+                    this.handleInputChange(vnode, (e.target as any).value, InputFormField.ProfileImage)
+                  }}
                 />
               </div>
             </div>
@@ -138,7 +196,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
             <CWTextInput
               name="website-form-field"
               inputValidationFn={(val: string): [ValidationStatus, string] => {
-                if (val.match(/[^A-Za-z@.]/)) {
+                if (val.match(/[^A-Za-z0-9@.-]/)) {
                   return [ValidationStatus.Failure, 'Must enter characters A-Z'];
                 } else {
                   return [ValidationStatus.Success, 'Input validated'];
@@ -146,6 +204,9 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
               }}
               label="Website"
               placeholder={vnode.state.profile?.website}
+              oninput={(e) => {
+                this.handleInputChange(vnode, (e.target as any).value, InputFormField.Website)
+              }}
             />
 
           </div>

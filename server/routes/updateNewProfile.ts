@@ -12,8 +12,6 @@ const updateNewProfile = async (
   models: DB, req: Request, res: Response, next: NextFunction
 ) => {
 
-  console.log("SERVERSIDEEEE", req)
-
   if (!req.body.address) {
     return next(new Error(Errors.NoAddressProvided));
   }
@@ -39,8 +37,12 @@ const updateNewProfile = async (
   });
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
-  const profileUpdate = await models.Profile.update({
-    bio
+  const updateStatus = await models.Profile.update({
+    ...email && {email: email},
+    ...slug && {slug: slug},
+    ...bio && {bio: bio},
+    ...website && {website: website},
+    ...avatarUrl && {avatarUrl: avatarUrl},
     }, 
       {
         where: {
@@ -48,11 +50,14 @@ const updateNewProfile = async (
       }
   })
 
-  console.log("SERVER SIDEEEEEE")
-
+  if (!updateStatus) {
+    return res.json({
+      status: 'Failed',
+    })
+  }
+  
   return res.json({ 
-    status: 'Success', 
-    result: { profile: profileUpdate } 
+    status: 'Success'
   });
 }
 

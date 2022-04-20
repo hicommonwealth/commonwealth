@@ -488,7 +488,7 @@ function setupRouter(
 
   // new profile
   router.post(
-    '/updateProfile/v2',
+    '/updateProfile/v2', 
     passport.authenticate('jwt', { session: false }),
     updateNewProfile.bind(this, models)
   );
