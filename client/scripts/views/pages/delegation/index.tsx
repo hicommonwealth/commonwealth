@@ -17,6 +17,8 @@ import ProfilesController from '../../../controllers/server/profiles';
 import numeral from 'numeral';
 import { chain } from 'lodash';
 import { ChainNetwork } from 'shared/types';
+import CompoundChain from 'client/scripts/controllers/chain/ethereum/compound/chain';
+import AaveChain from 'client/scripts/controllers/chain/ethereum/aave/chain';
 
 type DelegationPageAttrs = { topic?: string };
 
@@ -156,6 +158,20 @@ function buildTableData(
       rank,
     } = delegateInfo;
 
+
+
+
+
+
+    let controller;
+
+    if(standard == GovernanceStandard.Aave) {
+      controller = new AaveChain(app);
+    }
+    else {
+      controller = new CompoundChain(app);
+    }
+    controller.init(app.chain.meta);
     let currentRow = [
       {
         value: rank,
@@ -190,7 +206,8 @@ function buildTableData(
         value: 'Delegate',
         type: TableEntryType.Button,
         buttonDetails: {
-          onclick: () => console.log('clicked!'), // TODO: Replace with controller delegate() call
+          
+          onclick: () => controller.setDelegate(delegateAddress),
           buttonType: 'secondary',
         },
         align: 'right',
@@ -215,73 +232,14 @@ function buildTableData(
 }
 
 class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
-  private delegate: Account<any> | AddressInfo | Profile;
+  private delegate: DelegateInfo;
   private delegates: Array<DelegateInfo>;
   private filteredDelegateInfo: Array<Array<TableEntry>>;
   view(vnode) {
-    if (!this.delegate) {
-      this.delegate = app.user.activeAccount; // TODO: Replace this with an actual fetch of the user's selected delegate. Include handling for if none exists
-      m.redraw();
-    }
+    [this.delegate, this.delegates] = await processDelegates();
 
-    if (!this.delegates) {
-      const dummyData: Array<DelegateInfo> = [
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0xasdsasd24ewrqwsdanf',
-          delegateName: 'Alex Young',
-          voteWeight: 0.129,
-          totalVotes: 100,
-          proposals: 4,
-          rank: 1, // TODO: Determine if the sorting happens in the route or here. If not here, then we need to sort and add this rank value
-        },
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0x1234asdf14sdfa',
-          delegateName: 'Other Guy',
-          voteWeight: 0.129,
-          totalVotes: 100,
-          proposals: 4,
-          rank: 2,
-        },
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0xas34asdf14sdfa',
-          delegateName: 'Zak',
-          voteWeight: 0.1,
-          totalVotes: 40,
-          proposals: 4,
-          rank: 3,
-        },
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0x1234asdf14sdfa',
-          delegateName: 'Jason',
-          voteWeight: 0.029,
-          totalVotes: 50,
-          proposals: 10,
-          rank: 4,
-        },
-        {
-          delegate: app.user.activeAccount,
-          delegateAddress: '0x1234asdf14sdfa',
-          delegateName: 'Alex2 Young2',
-          voteWeight: 0.003,
-          totalVotes: 50,
-          proposals: 10,
-          rank: 5,
-        },
-      ]; // TODO: Replace with fetch of all the delegates
-      this.delegates = [];
-
-      // TODO: remove this duplicate data that was used for testing
-      for (let i = 0; i < 5; i++) {
-        this.delegates = this.delegates.concat(dummyData);
-      }
-
-      this.filteredDelegateInfo = buildTableData(this.delegates, '');
-      m.redraw();
-    }
+    this.filteredDelegateInfo = buildTableData(this.delegates, '');
+    m.redraw();
 
     const updateFilter = (value: string) => {
       this.filteredDelegateInfo = buildTableData(this.delegates, value);
