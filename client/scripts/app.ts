@@ -675,6 +675,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/delegation': importRoute('views/pages/delegation', {
+              scoped: true,
+              deferChain: true,
+            }),
             '/sputnik-daos': importRoute('views/pages/sputnikdaos', {
               scoped: true,
               deferChain: true,
@@ -789,6 +793,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             '/:scope/search': redirectRoute(() => '/search'),
             '/:scope/members': redirectRoute(() => '/members'),
+            '/:scope/delegation': redirectRoute(() => '/delegation'),
             '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
             '/:scope/chat': redirectRoute(() => '/chat'),
             '/:scope/new/discussion': redirectRoute(() => '/new/discussion'),
@@ -919,6 +924,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/:scope/members': importRoute('views/pages/members', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/:scope/delegation': importRoute('views/pages/delegation', {
               scoped: true,
               deferChain: true,
             }),
