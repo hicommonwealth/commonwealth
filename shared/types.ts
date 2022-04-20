@@ -106,7 +106,6 @@ export enum ChainNetwork {
   HydraDX = 'hydradx',
   Crust = 'crust',
   Sputnik = 'sputnik',
-  Commonwealth = 'commonwealth',
   SolanaDevnet = 'solana-devnet',
   SolanaTestnet = 'solana-testnet',
   Solana = 'solana',

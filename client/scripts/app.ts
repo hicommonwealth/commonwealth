@@ -323,15 +323,6 @@ export async function selectNode(
       )
     ).default;
     newChain = new Solana(n, app);
-  } else if (n.chain.network === ChainNetwork.Commonwealth) {
-    const Commonwealth = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "commonwealth-main" */
-        './controllers/chain/ethereum/commonwealth/adapter'
-      )
-    ).default;
-    newChain = new Commonwealth(n, app);
   } else if (
     n.chain.base === ChainBase.Ethereum &&
     n.chain.type === ChainType.Offchain
