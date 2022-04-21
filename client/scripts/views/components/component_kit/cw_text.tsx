@@ -52,7 +52,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
 
     return (
       <div
-        class={getClasses(
+        class={getClasses<TextAttrs>(
           {
             type,
             fontWeight,
