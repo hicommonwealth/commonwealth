@@ -17,18 +17,16 @@ export const getButtonClasses = (
 
 export const getIconClasses = (styleAttrs: IconStyleAttrs): string =>
   `${Object.entries(styleAttrs)
-    .filter(([key, value]) => key && value) // filters out keys that don't have values
-    .map(
-      ([key, value]) =>
-        key === 'disabled' ? (value === true ? 'disabled' : null) : value // returns disabled string instead of boolean
+    .filter(([key, value]) => key && value)
+    .map(([key, value]) =>
+      key === 'disabled' ? (value === true ? 'disabled' : null) : value
     )
     .join(' ')}`;
 
 export const getTextInputClasses = (styleAttrs: InputStyleAttrs): string =>
   `${Object.entries(styleAttrs)
-    .filter(([key, value]) => key && value) // filters out keys that don't have values
-    .map(
-      ([key, value]) =>
-        key === 'disabled' ? (value === true ? 'disabled' : null) : value // returns disabled string instead of boolean
+    .filter(([key, value]) => key && value)
+    .map(([key, value]) =>
+      key === 'disabled' ? (value === true ? 'disabled' : null) : value
     )
     .join(' ')}`;

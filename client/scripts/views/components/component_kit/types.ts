@@ -1,13 +1,10 @@
 export enum ComponentType {
-  BodyText = 'BodyText',
   Button = 'Button',
   ButtonGroup = 'ButtonGroup',
   Card = 'Card',
-  DisplayText = 'DisplayText',
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',
-  HeadingText = 'HeadingText',
   Modal = 'Modal',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',

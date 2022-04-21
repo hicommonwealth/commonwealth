@@ -1,6 +1,6 @@
 @import 'shared';
 
-@mixin baseTextStyles {
+.Text {
   color: $neutral-800;
   display: flex;
 
@@ -14,97 +14,71 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-}
 
-.BodyText {
-  @include baseTextStyles;
-
-  font-family: $font-family-neue-haas-unica;
-
-  &.body-01 {
+  &.b1 {
+    font-family: $font-family-neue-haas-unica;
     font-size: 16px;
     letter-spacing: 0.02em;
     line-height: 24px;
   }
 
-  &.body-02 {
+  &.b2 {
+    font-family: $font-family-neue-haas-unica;
     font-size: 14px;
     line-height: 20px;
+
+    &.bold,
+    &.italic {
+      letter-spacing: 0.02em;
+    }
   }
 
-  &.regular {
-    font-weight: 400;
-  }
-
-  &.bold {
-    font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-
-  &.italic {
-    font-style: italic;
-    letter-spacing: 0.02em;
-  }
-}
-
-.HeadingText {
-  @include baseTextStyles;
-
-  font-family: $font-family-silka;
-
-  &.heading-01 {
+  &.h1 {
+    font-family: $font-family-silka;
     font-size: 42px;
     line-height: 56px;
   }
 
-  &.heading-02 {
+  &.h2 {
+    font-family: $font-family-silka;
     font-size: 35px;
     line-height: 48px;
   }
 
-  &.heading-03 {
+  &.h3 {
+    font-family: $font-family-silka;
     font-size: 29px;
     line-height: 36px;
   }
 
-  &.heading-04 {
+  &.h4 {
+    font-family: $font-family-silka;
     font-size: 20px;
     line-height: 24px;
   }
 
-  &.heading-05 {
+  &.h5 {
+    font-family: $font-family-silka;
     font-size: 18px;
     line-height: 24px;
   }
 
-  &.medium {
-    font-weight: 400;
-  }
-
-  &.semi-bold {
-    font-weight: 600;
-  }
-
-  &.bold {
-    font-weight: 700;
-  }
-}
-
-.DisplayText {
-  @include baseTextStyles;
-
-  font-family: $font-family-silka;
-
-  &.display-01 {
+  &.d1 {
+    font-family: $font-family-silka;
     font-size: 67px;
     letter-spacing: -0.02em;
     line-height: 80px;
   }
 
-  &.display-02 {
+  &.d2 {
+    font-family: $font-family-silka;
     font-size: 54px;
     letter-spacing: -0.01em;
     line-height: 64px;
+  }
+
+  &.regular {
+    font-weight: 400;
   }
 
   &.semi-bold {
@@ -117,5 +91,9 @@
 
   &.black {
     font-weight: 900;
+  }
+
+  &.italic {
+    font-style: italic;
   }
 }

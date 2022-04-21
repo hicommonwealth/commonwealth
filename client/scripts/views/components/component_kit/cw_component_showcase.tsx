@@ -14,7 +14,7 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
-import { CWBodyText, CWDisplayText, CWHeadingText } from './cw_text';
+import { CWText } from './cw_text';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -63,59 +63,69 @@ export class ComponentShowcase implements m.ClassComponent {
       <div class="ComponentShowcase">
         <h1>Text</h1>
         <div class="text-gallery">
-          <CWDisplayText>Display 01</CWDisplayText>
-          <CWDisplayText fontStyle="bold">Display 01</CWDisplayText>
-          <CWDisplayText fontStyle="black">Display 01</CWDisplayText>
-          <CWDisplayText>Display 02</CWDisplayText>
-          <CWDisplayText type="display-02" fontStyle="bold">
-            Display 02
-          </CWDisplayText>
-          <CWDisplayText type="display-02" fontStyle="black">
-            Display 02
-          </CWDisplayText>
-          <CWHeadingText>Heading 01</CWHeadingText>
-          <CWHeadingText fontStyle="semi-bold">
-            Heading 01 semi bold
-          </CWHeadingText>
-          <CWHeadingText fontStyle="bold">Heading 01 bold</CWHeadingText>
-          <CWHeadingText type="heading-02">Heading 02</CWHeadingText>
-          <CWHeadingText type="heading-02" fontStyle="semi-bold">
-            Heading 02 semi bold
-          </CWHeadingText>
-          <CWHeadingText type="heading-02" fontStyle="bold">
-            Heading 02 bold
-          </CWHeadingText>
-          <CWHeadingText type="heading-03">Heading 03</CWHeadingText>
-          <CWHeadingText type="heading-03" fontStyle="semi-bold">
-            Heading 03 semi bold
-          </CWHeadingText>
-          <CWHeadingText type="heading-03" fontStyle="bold">
-            Heading 03 bold
-          </CWHeadingText>
-          <CWHeadingText type="heading-04">Heading 04</CWHeadingText>
-          <CWHeadingText type="heading-04" fontStyle="semi-bold">
-            Heading 04 semi bold
-          </CWHeadingText>
-          <CWHeadingText type="heading-04" fontStyle="bold">
-            Heading 04 bold
-          </CWHeadingText>
-          <CWHeadingText type="heading-05">Heading 05</CWHeadingText>
-          <CWHeadingText type="heading-05" fontStyle="semi-bold">
-            Heading 05 semi bold
-          </CWHeadingText>
-          <CWHeadingText type="heading-05" fontStyle="bold">
-            Heading 05 bold
-          </CWHeadingText>
-          <CWBodyText>Body 01</CWBodyText>
-          <CWBodyText fontStyle="bold">Body 01 bold</CWBodyText>
-          <CWBodyText fontStyle="italic">Body 01 italic</CWBodyText>
-          <CWBodyText type="body-02">Body 02</CWBodyText>
-          <CWBodyText type="body-02" fontStyle="bold">
-            Body 02 bold
-          </CWBodyText>
-          <CWBodyText type="body-02" fontStyle="italic">
-            Body 02 italic
-          </CWBodyText>
+          <CWText type="d1">Display1</CWText>
+          <CWText type="d1" fontStyle="bold">
+            Display1
+          </CWText>
+          <CWText type="d1" fontStyle="black">
+            Display1
+          </CWText>
+          <CWText type="d2">Display2</CWText>
+          <CWText type="d2" fontStyle="bold">
+            Display2
+          </CWText>
+          <CWText type="d2" fontStyle="black">
+            Display2
+          </CWText>
+          <CWText type="h1">Heading1</CWText>
+          <CWText type="h1" fontStyle="semi-bold">
+            Heading1 semi bold
+          </CWText>
+          <CWText type="h1" fontStyle="bold">
+            Heading1 bold
+          </CWText>
+          <CWText type="h2">Heading2</CWText>
+          <CWText type="h2" fontStyle="semi-bold">
+            Heading2 semi bold
+          </CWText>
+          <CWText type="h2" fontStyle="bold">
+            Heading2 bold
+          </CWText>
+          <CWText type="h3">Heading3</CWText>
+          <CWText type="h3" fontStyle="semi-bold">
+            Heading3 semi bold
+          </CWText>
+          <CWText type="h3" fontStyle="bold">
+            Heading3 bold
+          </CWText>
+          <CWText type="h4">Heading4</CWText>
+          <CWText type="h4" fontStyle="semi-bold">
+            Heading4 semi bold
+          </CWText>
+          <CWText type="h4" fontStyle="bold">
+            Heading4 bold
+          </CWText>
+          <CWText type="h5">Heading5</CWText>
+          <CWText type="h5" fontStyle="semi-bold">
+            Heading5 semi bold
+          </CWText>
+          <CWText type="h5" fontStyle="bold">
+            Heading5 bold
+          </CWText>
+          <CWText type="b1">Body 01</CWText>
+          <CWText type="b1" fontStyle="bold">
+            Body1 bold
+          </CWText>
+          <CWText type="b1" fontStyle="italic">
+            Body1 italic
+          </CWText>
+          <CWText type="b2">Body2</CWText>
+          <CWText type="b2" fontStyle="bold">
+            Body2 bold
+          </CWText>
+          <CWText type="b2" fontStyle="italic">
+            Body2 italic
+          </CWText>
         </div>
         <h1>Icons</h1>
         <div class="icon-gallery">

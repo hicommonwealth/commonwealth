@@ -6,88 +6,44 @@ import 'components/component_kit/cw_text.scss';
 
 import { ComponentType } from './types';
 
-type BaseTextAttrs = {
-  //   color?: string; // not sure how to do this one using a scss color variable
+type FontStyle = 'regular' | 'semi-bold' | 'bold' | 'black' | 'italic';
+type FontType = 'd1' | 'd2' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'b1' | 'b2';
+
+type TextAttrs = {
   disabled?: boolean;
+  fontStyle: FontStyle;
   noWrap?: boolean;
+  type: FontType;
 };
 
-type BodyTextAttrs = {
-  fontStyle: 'regular' | 'bold' | 'italic';
-  type: 'body-01' | 'body-02';
-} & BaseTextAttrs;
+export const getTextClasses = (
+  componentType: string,
+  styleAttrs: TextAttrs
+): string =>
+  `${componentType} ${Object.entries(styleAttrs)
+    .filter(([key, value]) => key && value)
+    .map(([key, value]) =>
+      typeof value === 'boolean' ? (value ? key.toString() : null) : value
+    )
+    .join(' ')}`;
 
-export class CWBodyText implements m.ClassComponent<BodyTextAttrs> {
+export class CWText implements m.ClassComponent<TextAttrs> {
   view(vnode) {
     const {
       disabled = false,
       fontStyle = 'regular',
       noWrap = true,
-      type = 'body-01',
+      type,
     } = vnode.attrs;
 
     return (
       <div
-        class={`${ComponentType.BodyText} ${type} ${fontStyle} ${
-          disabled ? 'disabled' : ''
-        } ${noWrap ? 'no-wrap' : ''}`}
-      >
-        {vnode.children}
-      </div>
-    );
-  }
-}
-
-type HeadingTextAttrs = {
-  fontStyle: 'medium' | 'semi-bold' | 'bold';
-  type:
-    | 'heading-01'
-    | 'heading-02'
-    | 'heading-03'
-    | 'heading-04'
-    | 'heading-05';
-} & BaseTextAttrs;
-
-export class CWHeadingText implements m.ClassComponent<HeadingTextAttrs> {
-  view(vnode) {
-    const {
-      disabled = false,
-      fontStyle = 'medium',
-      noWrap = true,
-      type = 'heading-01',
-    } = vnode.attrs;
-
-    return (
-      <div
-        class={`${ComponentType.HeadingText} ${type} ${fontStyle} ${
-          disabled ? 'disabled' : ''
-        } ${noWrap ? 'no-wrap' : ''}`}
-      >
-        {vnode.children}
-      </div>
-    );
-  }
-}
-
-type DisplayTextAttrs = {
-  fontStyle: 'semi-bold' | 'bold' | 'black';
-  type: 'display-01' | 'display-02';
-} & BaseTextAttrs;
-
-export class CWDisplayText implements m.ClassComponent<DisplayTextAttrs> {
-  view(vnode) {
-    const {
-      disabled = false,
-      fontStyle = 'semi-bold',
-      noWrap = true,
-      type = 'display-01',
-    } = vnode.attrs;
-
-    return (
-      <div
-        class={`${ComponentType.DisplayText} ${type} ${fontStyle} ${
-          disabled ? 'disabled' : ''
-        } ${noWrap ? 'no-wrap' : ''}`}
+        class={getTextClasses(ComponentType.Text, {
+          type,
+          fontStyle,
+          disabled,
+          noWrap,
+        })}
       >
         {vnode.children}
       </div>
