@@ -52,7 +52,7 @@ export class CompactModalExitButton implements m.ClassComponent {
   view() {
     return (
       <CWIcon
-        iconName="x"
+        iconName="close"
         onclick={(e) => {
           e.preventDefault();
           $(e.target).trigger('modalexit');

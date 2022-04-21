@@ -7,8 +7,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
-  border: 1px solid $background-color-light;
+  background-color: $white;
+  border: 1px solid $neutral-300;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
   > .User,
   .ChainIcon,
@@ -22,7 +22,7 @@
     align-items: center;
     height: 100%;
     width: 100%;
-    color: $text-color-light;
+    color: $neutral-600;
     z-index: 1;
     &.hidden {
       display: none;
@@ -34,18 +34,13 @@
     align-items: center;
     height: 24px;
     width: 24px;
-    background-color: lightgray;
+    background-color: $neutral-50;
     clip-path: circle(12px at center);
     -webkit-clip-path: circle(12px at center);
-    color: inherit;
-    font-size: 14px;
     cursor: pointer;
+
     &:hover {
-      color: $text-color-medium;
-    }
-    > svg {
-      margin: -3px 0;
-      margin-right: 6px;
+      color: $neutral-800;
     }
   }
   .dropzone-previews {
@@ -203,7 +198,7 @@
 
   &.dz-drag-hover {
     border-style: solid;
-    border: 2px solid $primary-bg-color;
+    border: 2px solid $primary-500;
     border-radius: 5px;
     margin: -8px -2px;
   }
@@ -225,8 +220,8 @@
         height: 100%;
         width: 100%;
         border-radius: $image-border-radius;
-        background: $text-color-light;
-        background: linear-gradient(to bottom, $background-color-light, #ddd);
+        background: $neutral-500;
+        background: linear-gradient(to bottom, $primary-300, $neutral-100);
       }
       .dz-details {
         opacity: 1;
@@ -235,7 +230,7 @@
     &.dz-image-preview {
       height: 100%;
       width: 100%;
-      background: white;
+      background: $white;
       .dz-details {
         @include prefix(
           (
@@ -354,12 +349,8 @@
       border-radius: 8px;
       overflow: hidden;
       .dz-upload {
-        background: $background-color-dark-accent;
-        background: linear-gradient(
-          to bottom,
-          $background-color-dark-accent,
-          $background-color-darker-accent
-        );
+        background: $primary-600;
+        background: linear-gradient(to bottom, $primary-600, $primary-800);
         position: absolute;
         top: 0;
         left: 0;
@@ -385,7 +376,7 @@
 
     .dz-error-message {
       $width: $image-size + 20px;
-      $color: $negative-bg-color;
+      $color: $rorange-500;
 
       pointer-events: none;
       z-index: 1000;
@@ -406,7 +397,7 @@
       background: $color;
       background: linear-gradient(to bottom, $color, darken($color, 5%));
       padding: 0.5em 1.2em;
-      color: $text-color-white;
+      color: $white;
 
       // The triangle pointing up
       &:after {

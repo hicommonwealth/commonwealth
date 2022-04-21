@@ -9,6 +9,7 @@ import $ from 'jquery';
 import 'components/reaction_button.scss';
 
 import app from 'state';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import {
   Proposal,
   OffchainComment,
@@ -20,7 +21,7 @@ import {
 } from 'models';
 import User from 'views/components/widgets/user';
 import SelectAddressModal from '../modals/select_address_modal';
-import LoginModal from '../modals/login_modal';
+import { LoginModal } from '../modals/login_modal';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
@@ -126,30 +127,6 @@ const onReactionClick = (
   }
 };
 
-const gettokenPostingThreshold = (post: Post) => {
-  let tokenPostingThreshold: BN;
-
-  if (post instanceof OffchainThread && post.topic && app.topics) {
-    tokenPostingThreshold = app.topics.getByName(
-      (post as OffchainThread).topic.name,
-      app.activeChainId()
-    )?.tokenThreshold;
-  } else if (post instanceof OffchainComment) {
-    // post.rootProposal has typescript typedef number but in practice seems to be a string
-    const parentThread = app.threads.getById(
-      parseInt(post.rootProposal.toString().split('_')[1], 10)
-    );
-    tokenPostingThreshold = app.topics.getByName(
-      parentThread.topic.name,
-      app.activeChainId()
-    )?.tokenThreshold;
-  } else {
-    tokenPostingThreshold = new BN(0);
-  }
-
-  return tokenPostingThreshold;
-};
-
 export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
   private loading: boolean;
   private reactors: any;
@@ -158,26 +135,25 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
     this.loading = false;
   }
 
-  view(vnode) {
+  view(vnode: m.VnodeDOM<ReactionButtonAttrs, this>) {
     const { post } = vnode.attrs;
     const reactionCounts = app.reactionCounts.getByPost(post);
     const { likes = 0, hasReacted } = reactionCounts || {};
 
     // token balance check if needed
-    if (ITokenAdapter.instanceOf(app.chain)) {
-      const tokenBalance = app.chain.tokenBalance;
-
-      const isAdmin =
-        app.user.isSiteAdmin ||
-        app.user.isAdminOfEntity({ chain: app.activeChainId() });
-
-      const tokenPostingThreshold = gettokenPostingThreshold(post);
-
-      this.loading =
-        !isAdmin &&
-        tokenPostingThreshold &&
-        tokenPostingThreshold.gt(tokenBalance);
+    const isAdmin = app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({ chain: app.activeChainId()});
+    let topicName = "";
+    if (post instanceof OffchainThread && post.topic && app.topics) {
+      topicName = (post as OffchainThread).topic.name;
+    } else if (post instanceof OffchainComment) {
+      // post.rootProposal has typescript typedef number but in practice seems to be a string
+      const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
+      topicName = parentThread.topic.name;
     }
+    this.loading = vnode.state.loading || (
+      !isAdmin && TopicGateCheck.isGatedTopic(topicName)
+    );
 
     const activeAddress = app.user.activeAccount?.address;
 
@@ -227,7 +203,10 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
           hasReacted ? ' hasReacted' : ''
         }`}
       >
-        <CWIcon iconName="arrow1" iconSize="small" />
+        <CWIcon
+          iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
+          iconSize="small"
+        />
         <div class="reactions-count">{likes}</div>
       </div>
     );

@@ -32,39 +32,14 @@ export class DiscussionFilterBar
 
     const { stagesEnabled, customStages } = communityInfo;
 
-    const featuredTopicIds = communityInfo.featuredTopics;
-
-    const topics = app.topics
-      .getByCommunity(app.activeChainId())
-      .map(
-        ({
-          id,
-          name,
-          description,
-          telegram,
-          featuredInSidebar,
-          featuredInNewPost,
-          defaultOffchainTemplate,
-        }) => {
-          return {
-            id,
-            name,
-            description,
-            telegram,
-            featured_order: featuredTopicIds.indexOf(`${id}`),
-            featuredInSidebar,
-            featuredInNewPost,
-            defaultOffchainTemplate,
-          };
-        }
-      );
+    const topics  = app.topics.getByCommunity(app.activeChainId());
 
     const featuredTopics = topics
-      .filter((t) => t.featured_order !== -1)
-      .sort((a, b) => Number(a.featured_order) - Number(b.featured_order));
-
+      .filter((t) => t.featuredInSidebar)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => a.order - b.order);
     const otherTopics = topics
-      .filter((t) => t.featured_order === -1)
+      .filter((t) => !t.featuredInSidebar)
       .sort((a, b) => a.name.localeCompare(b.name));
 
     const selectedTopic = topics.find((t) => topic && topic === t.name);
@@ -83,7 +58,8 @@ export class DiscussionFilterBar
 
     const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
 
-    const summaryViewEnabled = parentState.summaryView && !topicSelected;
+    const summaryViewEnabled =
+      vnode.attrs.parentState.summaryView && !topicSelected;
 
     return (
       <div class="DiscussionFilterBar">

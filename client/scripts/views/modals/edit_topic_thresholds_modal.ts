@@ -6,6 +6,7 @@ import app from 'state';
 import { Button, Form } from 'construct-ui';
 
 import { OffchainTopic } from 'models';
+import { ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import TokenDecimalInput from 'views/components/token_decimal_input';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
@@ -33,8 +34,7 @@ const EditTopicThresholdsRow: m.Component<
     }
     const decimals = app.chain?.meta.chain?.decimals
       ? app.chain.meta.chain.decimals
-      : 18;
-
+      : (app.chain.network === ChainNetwork.ERC721) ? 0 : 18;
     return m(Form, [
       m('.topic-name', [topic.name]),
       m(TokenDecimalInput, {

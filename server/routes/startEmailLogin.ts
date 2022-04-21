@@ -40,6 +40,11 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
     where: {
       email,
     },
+    include: [{
+      model: models.Address,
+      where: { is_magic: true },
+      required: false,
+    }]
   });
 
   // check whether to recommend magic.link registration instead
@@ -53,7 +58,7 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;
-  const isExistingMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
+  const isExistingMagicUser = previousUser && previousUser.Addresses?.length > 0;
   if (isExistingMagicUser // existing magic users should always use magic login, even if they're in the wrong community
       || (isNewRegistration && magicChain?.base && MAGIC_SUPPORTED_BASES.includes(magicChain.base)
           && !req.body.forceEmailLogin)) {

@@ -163,7 +163,6 @@ const TreasuryPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'TreasuryPage',
         title: [
           'Treasury',
           m(Tag, {
@@ -174,7 +173,7 @@ const TreasuryPage: m.Component<{}> = {
         ],
         showNewProposalButton: true,
       },
-      [
+      m('.TreasuryPage', [
         onSubstrate && m(SubstrateProposalStats),
         m('.clear'),
         m(Listing, {
@@ -187,7 +186,7 @@ const TreasuryPage: m.Component<{}> = {
           columnHeader: 'Inactive Treasury Proposals',
         }),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

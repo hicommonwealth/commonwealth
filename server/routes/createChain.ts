@@ -16,6 +16,7 @@ import { getUrlsForEthChainId } from '../util/supportedEthChains';
 import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { modelFromServer } from 'client/scripts/controllers/server/reactions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -45,6 +46,7 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
+  FailedToAssignAdmin: 'Failed to assign admin'
 };
 
 type CreateChainReq = ChainAttributes & Omit<ChainNodeAttributes, 'id'> & {
@@ -103,6 +105,7 @@ const createChain = async (
   let eth_chain_id: number = null;
   let url = req.body.node_url;
   let altWalletUrl = req.body.alt_wallet_url;
+  let privateUrl;
 
   // always generate a chain id
   if (req.body.base === ChainBase.Ethereum) {
@@ -121,10 +124,13 @@ const createChain = async (
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
     const urls = await getUrlsForEthChainId(models, eth_chain_id);
     if (urls) {
-      const { url: ethChainUrl, alt_wallet_url } = urls;
+      const { url: ethChainUrl, alt_wallet_url, private_url } = urls;
       url = ethChainUrl;
       if (alt_wallet_url) {
         altWalletUrl = alt_wallet_url;
+      }
+      if (private_url) {
+        privateUrl = private_url;
       }
     } else {
       // If using overridden URL, then user must be admin -- we do not allow users to submit
@@ -144,7 +150,7 @@ const createChain = async (
       return next(new Error(Errors.ChainAddressExists));
     }
 
-    const provider = new Web3.providers.WebsocketProvider(url);
+    const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
     provider.disconnect(1000, 'finished');
@@ -263,60 +269,39 @@ const createChain = async (
     eth_chain_id,
     token_name,
     alt_wallet_url: altWalletUrl,
+    private_url: privateUrl,
   });
+  const nodeJSON = node.toJSON();
+  delete nodeJSON.private_url;
 
-  const userOwnedAddresses = await req.user.getAddresses();
-  const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
-  const validAddress = await models.Address.scope('withPrivateData').findOne({
-    where: {
-      id: { [Op.in]: userOwnedAddressIds },
-      user_id: req.user.id,
-    }
-  });
-  let verificationToken = validAddress.verification_token;
-  let verificationTokenExpires = validAddress.verification_token_expires;
-  const isOriginalTokenValid = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
 
-  if (!isOriginalTokenValid) {
-    const chains = await models.Chain.findAll({
-      where: { base: chain.base }
-    });
-
-    verificationToken = crypto.randomBytes(18).toString('hex');
-    verificationTokenExpires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
-
-    await models.Address.update({
-      verification_token: verificationToken,
-      verification_token_expires: verificationTokenExpires
-    }, {
+  // try to make admin one of the user's addresses
+  // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
+  try {
+    const addressToBeAdmin = await models.Address.findOne({
       where: {
-        user_id: validAddress.user_id,
-        address: req.body.address,
-        chain: { [Op.in]: chains.map((ch) => ch.id) }
-      }
+        user_id: req.user.id,
+      },
+      include: [{
+        model: models.Chain,
+        where: { base: chain.base },
+        required: true,
+      }]
     });
+
+    if (!addressToBeAdmin) throw Error(Errors.FailedToAssignAdmin);
+
+    await models.Role.create({
+      address_id: addressToBeAdmin.id,
+      chain_id: chain.name,
+      permission: 'admin',
+    });
+  } catch (err) {
+    log.error(Errors.FailedToAssignAdmin);
   }
 
-  const newAddress = await models.Address.create({
-    user_id: validAddress.user_id,
-    profile_id: validAddress.profile_id,
-    address: validAddress.address,
-    chain: chain.name,
-    verification_token: validAddress.verification_token,
-    verification_token_expires: validAddress.verification_token_expires,
-    verified: validAddress.verified,
-    keytype: validAddress.keytype,
-    name: validAddress.name,
-    last_active: new Date(),
-  });
+  return success(res, { chain: chain.toJSON(), node: nodeJSON });
 
-  await models.Role.create({
-    address_id: newAddress.id,
-    chain_id: chain.name,
-    permission: 'admin',
-  });
-
-  return success(res, { chain: chain.toJSON(), node: node.toJSON() });
 };
 
 export default createChain;

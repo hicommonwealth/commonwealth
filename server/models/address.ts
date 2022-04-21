@@ -1,11 +1,12 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes, UserInstance } from './user';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
 import { ProfileInstance } from './profile';
+import { SsoTokenInstance } from './sso_token';
 
 export type AddressAttributes = {
 	address: string;
@@ -40,6 +41,7 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
 	getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
 	getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
 	getRoles: Sequelize.HasManyGetAssociationsMixin<RoleInstance>;
+	getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 }
 
 export type AddressModelStatic = ModelStatic<AddressInstance>;
@@ -92,6 +94,7 @@ export default (
 		models.Address.belongsTo(models.Profile, { foreignKey: 'profile_id', targetKey: 'id' });
 		models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
 		models.Address.hasOne(models.OffchainProfile);
+		models.Address.hasOne(models.SsoToken);
 		models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
 		models.Address.belongsToMany(models.OffchainThread, {
 			through: models.Collaboration,

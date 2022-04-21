@@ -1,105 +1,106 @@
 @import 'client/styles/shared';
 
 .VotingResults {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+  flex-wrap: wrap;
+
+  .VoteRow {
     display: flex;
-    background-color: $background-color-light;
-    justify-content: space-between;
-    margin-top: 25px;
-    flex-wrap: wrap;
-
-    .VoteRow {
-        display: flex;
-        &:hover {
-            background: #f9fafd;
-        }
-        .row-left {
-            line-height: 1.1;
-            flex: 1;
-            text-align: left;
-        }
-    
-        .row-right {
-            line-height: 1.1;
-            flex: 1;
-            text-align: right;
-        }
+    &:hover {
+      background: $neutral-50;
+    }
+    .row-left {
+      flex: 1;
+      text-align: left;
     }
 
-    .results-column {
-        display: flex;
-        flex-direction: column;
-        background-color: $background-color-light;
-        padding: 18px 0 12px;
-        flex: 1;
-        min-width: 48%;
-        max-width: 48%;
-        border-radius: 10px;
-        .results-cell, .results-header,
-        .results-subheader > span {
-            padding: 0 26px;
-        }
-        .results-header {
-            font-weight: 500;
-            margin-bottom: 14px;
-        }
-        .results-subheader {
-            display: flex;
-            justify-content: space-between;
-            color: #666666;
-            font-size: 18px;
-            font-weight: 500;
-            border-bottom: 1px solid #DDDDDD;
-            line-height: 2;
-            margin-bottom: 20px;
-        }
-        &.yes-votes {
-            border: 2px solid #C5EEE9;
-            .results-header {
-                font-size: 24px;
-                color: #009785;
-            }
-        }
-        &.no-votes {
-            border: 2px solid #FFD5DC;
-            .results-header {
-                font-size: 24px;
-                color: #C60024;
-            }
-        }
+    .row-right {
+      flex: 1;
+      text-align: right;
     }
-    @include lg-max {
-        display: block;
-        width: 100%;
-        .results-column, .results-header, .results-cell {
-            min-width: 100%;
-            max-width: 100%;
-        }
+  }
+
+  .results-column {
+    display: flex;
+    flex-direction: column;
+    background-color: $neutral-100;
+    padding: 18px 0 12px;
+    flex: 1;
+    min-width: 48%;
+    max-width: 48%;
+    border-radius: 10px;
+    margin-bottom: 8px;
+
+    .results-cell,
+    .results-header,
+    .results-subheader > span {
+      padding: 0 26px;
     }
-    .vote {
-        display: flex;
-        margin-bottom: 4px;
-        .vote-voter {
-            flex: 1;
-        }
-        .vote-choice {
-            display: inline-block;
-            padding: 2px 6px;
-            background: $background-color-light;
-            border-radius: 9999px;
-            margin-left: 4px;
-        }
-        .vote-weight {
-            margin-left: 4px;
-        }
-        .vote-deposit {
-            text-align: right;
-            margin-left: 4px;
-        }
+    .results-header {
+      font-weight: 500;
+      margin-bottom: 14px;
     }
-    .no-votes {
-        color: $text-color-light;
+    .results-subheader {
+      display: flex;
+      justify-content: space-between;
+      color: $neutral-600;
+      font-size: 18px;
+      font-weight: 500;
+      border-bottom: 1px solid $neutral-100;
+      margin-bottom: 20px;
     }
-    .expand-listing-button {
-        color: $text-color-light;
+    &.yes-votes {
+      border: 2px solid $green-100;
+      .results-header {
+        font-size: 24px;
+        color: $green-500;
+      }
     }
+    &.no-votes {
+      border: 2px solid $pink-100;
+      .results-header {
+        font-size: 24px;
+        color: $rorange-500;
+      }
+    }
+  }
+  @include lg-max {
+    display: block;
+    width: 100%;
+    .results-column,
+    .results-header,
+    .results-cell {
+      min-width: 100%;
+      max-width: 100%;
+    }
+  }
+  .vote {
+    display: flex;
+    margin-bottom: 4px;
+    .vote-voter {
+      flex: 1;
+    }
+    .vote-choice {
+      display: inline-block;
+      padding: 2px 6px;
+      background: $primary-300;
+      border-radius: 9999px;
+      margin-left: 4px;
+    }
+    .vote-weight {
+      margin-left: 4px;
+    }
+    .vote-deposit {
+      text-align: right;
+      margin-left: 4px;
+    }
+  }
+  .no-votes {
+    color: $neutral-500;
+  }
+  .expand-listing-button {
+    color: $neutral-500;
+  }
 }

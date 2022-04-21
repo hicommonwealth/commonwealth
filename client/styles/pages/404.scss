@@ -1,18 +1,13 @@
 @import 'client/styles/shared';
 
 .PageNotFound {
-  .page-not-found-container {
-    position: relative;
-  }
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
 
   .cui-empty-state {
-    margin-top: 120px;
-    height: 100%;
-    width: 100%;
-
-    svg {
-      stroke: $text-color-black;
-      stroke-width: 1.6px;
-    }
+    position: unset;
   }
 }

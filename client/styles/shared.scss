@@ -1,88 +1,22 @@
-@import 'mixins/functions';
 @import 'mixins/animation';
 @import 'mixins/responsive';
 @import 'mixins/dragula';
-@import 'construct-ui/src/_shared/_colors';
+@import 'mixins/colors';
 
-//
 // layout parameters
 
-$sidebar-width: 220px;
-$quick-switcher-width: 64px;
+$sidebar-width: 232px;
+$quick-switcher-width: 56px;
 $layout-max-width: 1280px;
 $layout-padding: 36px;
 $layout-padding-xs: 20px;
 
-//
 // base fonts
 
-$fonts: Calibre, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-  'Segoe UI Symbol';
+$fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
+  'Segoe UI Emoji', 'Segoe UI Symbol';
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
   'Courier New', Courier, monospace;
-
-//
-// base colors
-
-$base-bg-color: #ffffff;
-$primary-bg-color: #4f6dbd; // also used for text
-$positive-bg-color: #41a360; // also used for text
-$negative-bg-color: #d4302f; // also used for text
-$disable-grey: #dddddd;
-
-$layout-color: #f6f6f6;
-
-$intermediate-icon-color: #ffa200;
-$positive-icon-color: #7ed320;
-$failure-icon-color: #db322d;
-
-$last-seen-notification-color: #ea7a60;
-
-$text-color-white: #fff;
-$text-color-lightest: #b5b7b9; // light text on white background
-$text-color-lighter: #a3a4a7; // light text on white background
-$text-color-light: #9a9da4; // light text on light background
-$text-color-medium: #777; // medium text on any background
-$text-color-medium-dark: #555; // light off-black text on any background
-$text-color-darker: #333; // off-black text on any background
-$text-color-black: #222; // black text on any background
-
-$text-color-primary-light: tint($primary-bg-color, 75%);
-$text-color-primary: $primary-bg-color;
-
-//
-// background colors
-
-$background-color-white: #ffffff;
-$background-color-black-hover: tint(#484744, 30%);
-$background-color-white-hover: tint($primary-bg-color, 96.5%);
-$background-color-black: #262523;
-$background-color-white-hover-0: tint(#fafafa, 10%);
-$background-color-light: desaturate(tint($primary-bg-color, 90%), 12%);
-$background-color-light-hover: desaturate(tint($primary-bg-color, 86.5%), 12%);
-$background-color-medium-light: desaturate(tint($primary-bg-color, 75%), 25%);
-
-$background-color-light-positive: #cce8cc;
-$background-color-light-negative: #e8cccc;
-
-$background-color-medium-accent: tint($primary-bg-color, 50%);
-
-$background-color-dark-accent: $primary-bg-color;
-$background-color-dark-monochrome: #36393f;
-$background-color-darker-accent: shade($primary-bg-color, 4%);
-$background-color-darker-monochrome: #2f3136;
-
-$background-color-unread: #ffffe0; // notifications color
-$background-color-selection-on-dark: #ffdd00;
-$background-color-new-comment: #fffba1;
-
-//
-// border colors
-
-$border-color: #c5cdd1;
-$border-color-light: #e0e4f1;
-$border-color-lightest: #e0e4f1;
-$border-color-off-white: #eee;
 
 //
 // mobile specs
@@ -90,23 +24,23 @@ $border-color-off-white: #eee;
 $text-size-mobile-header: 22px;
 
 @mixin error-text {
-  color: $negative-bg-color;
+  color: $rorange-500;
   font-weight: 500;
 }
 
 @mixin success-text {
-  color: $positive-bg-color;
+  color: $green-500;
   font-weight: 500;
 }
 
 @mixin attachments {
   p {
-    color: $text-color-light;
+    color: $neutral-500;
     font-weight: 500;
   }
 
   a.attachment-item {
-    background: $background-color-light;
+    background: $primary-300;
     display: inline-block;
     margin-right: 10px;
     max-height: 100px;
@@ -115,7 +49,7 @@ $text-size-mobile-header: 22px;
     text-decoration: none;
 
     &:hover {
-      background: $background-color-light-hover;
+      background: $primary-200;
     }
 
     img {
@@ -127,11 +61,10 @@ $text-size-mobile-header: 22px;
 
 @mixin gov-explainer {
   .stats-box {
-    background-color: #f8f8f8;
+    background-color: $neutral-50;
     border-radius: 10px;
     display: flex;
     margin-bottom: 20px;
-    margin-top: 20px;
     padding: 24px 20px 20px;
 
     .stats-box-left {
@@ -140,17 +73,15 @@ $text-size-mobile-header: 22px;
     }
 
     .stats-box-right {
-      line-height: 1.25;
-
       p {
         margin: 4px 0 0;
       }
     }
 
     .stats-box-stat {
-      color: #888;
+      color: $neutral-500;
       display: inline-block;
-      margin: 6px 0 0;
+      margin: 8px 0;
 
       &::after {
         content: ' ';
@@ -159,7 +90,7 @@ $text-size-mobile-header: 22px;
     }
 
     .stats-box-action {
-      color: #888;
+      color: $neutral-500;
       display: inline-block;
       margin: 6px 0 0;
 
@@ -186,14 +117,14 @@ $text-size-mobile-header: 22px;
   }
 
   .no-proposals {
-    color: $text-color-light;
+    color: $neutral-500;
     margin-top: 10px;
   }
 }
 
 @mixin card {
   border-radius: 15px;
-  border: 1px solid $border-color-off-white;
+  border: 1px solid $neutral-25;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.07);
   cursor: pointer;
   float: left;
@@ -223,16 +154,19 @@ $text-size-mobile-header: 22px;
 
 @mixin gradientTabs() {
   .cui-tabs-item {
-    color: $text-color-light;
-    margin: 0 !important;
-    padding: 13px 15px 7px;
+    color: $neutral-500;
+    margin: 0 24px 0 0;
+
+    @include sm-max {
+      margin: 0 16px 0 0;
+    }
   }
 
   .cui-tabs-item:hover {
     // these styles can't be alphabetized or else they'll apply incorrectly
-    color: #666666;
+    color: $neutral-600;
     border-width: 2px;
-    border-color: #dddddd;
+    border-color: $neutral-25;
     border-style: solid;
     border-top: 0;
     border-left: 0;
@@ -241,45 +175,38 @@ $text-size-mobile-header: 22px;
 
   .cui-tabs-item.cui-active {
     // these styles can't be alphabetized or else they'll apply incorrectly
-    color: $text-color-black;
+    color: $neutral-800;
     border-width: 2px;
     border-style: solid;
     border-top: 0;
     border-left: 0;
     border-right: 0;
-    border-image: linear-gradient(to right, #6086d1, #b37dba) 1;
   }
 }
 
-// Gabe 3/4/22
-// newer styles that will probably be replaced somewhat by v2
+@mixin narrowBrowserHeader {
+  .NewProposalButton {
+    .cui-button {
+      padding: 0 10px;
 
-$black: #000000;
-$dark-gray: #333333;
-$midi-gray: #666666;
-$lite-gray: #999999;
-$disable-gray: #dddddd;
-$background-gray: #f4f4f4;
-$white: #ffffff;
+      .cui-button-label {
+        top: 2px;
+      }
+    }
+  }
 
-$dark-purp: #4723ad;
-$midi-purp: #9075dc;
-$lite-purp: #c7b9ef;
-$xlite-purp: #f7f4ff;
+  .role-icon {
+    display: none;
+  }
 
-$purp-blue: #6300ff;
-$purp-blue-lite: #f3ebff;
+  .LoginSelectorMenu .user-display-name {
+    display: inline;
+  }
 
-$hype-red: #ff002e;
-$pinky: #ffafbe;
-$flesh-pink: #ffebee;
-
-$dark-green: #008676;
-$carib-green: #00c0a9;
-$foam-green: #b4f1ea;
-$mint-green: #f3fff9;
-
-$cream-yellow: #fffba1;
+  .cui-button-label .cui-icon-user {
+    margin-right: 0;
+  }
+}
 
 $elevation-1-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
 $elevation-2-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
@@ -332,7 +259,7 @@ h3 {
 @mixin link {
   @include body;
   font-weight: 500;
-  color: #140994;
+  color: $primary-700;
 }
 
 @mixin button-label {
@@ -343,8 +270,7 @@ h3 {
 @mixin form-label {
   @include body;
   font-size: 14px;
-  line-height: 16.8px;
-  color: #666666;
+  color: $neutral-600;
 }
 
 @mixin rainbow-gradient-horizontal {

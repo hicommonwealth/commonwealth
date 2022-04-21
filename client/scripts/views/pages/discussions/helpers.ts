@@ -1,4 +1,3 @@
-import m from 'mithril';
 import moment from 'moment';
 
 import { OffchainThread } from 'client/scripts/models';
@@ -23,13 +22,6 @@ export const getLastUpdate = (proposal: OffchainThread): number => {
   const createdAt = proposal.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
-};
-
-export const getLastSeenDivider = (hasText = true) => {
-  return m(
-    '.LastSeenDivider',
-    hasText ? [m('hr'), m('span', 'Last visit'), m('hr')] : [m('hr')]
-  );
 };
 
 export const onFeaturedDiscussionPage = (p, topic) =>

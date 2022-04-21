@@ -163,7 +163,6 @@ const CouncilPage: m.Component<{}> = {
     return m(
       Sublayout,
       {
-        class: 'CouncilPage',
         title: [
           'Council',
           m(Tag, {
@@ -173,9 +172,8 @@ const CouncilPage: m.Component<{}> = {
           }),
         ],
         showNewProposalButton: true,
-        showCouncilMenu: true,
       },
-      [
+      m('.CouncilPage', [
         // stats
         m('.stats-box', [
           m('.stats-box-left', '💭'),
@@ -255,7 +253,7 @@ const CouncilPage: m.Component<{}> = {
           .filter(([account]) => !councillors.includes(account))
           .map(([account]) => m(Councillor, { account })),
         m('.clear'),
-      ]
+      ])
     );
   },
 };

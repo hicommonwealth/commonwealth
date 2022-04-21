@@ -10,7 +10,6 @@ import { isNotUndefined } from 'helpers/typeGuards';
 
 type TopicSelectorAttrs = {
   defaultTopic?: OffchainTopic | string | boolean;
-  featuredTopics: OffchainTopic[];
   tabindex?: number;
   topics: OffchainTopic[];
   updateFormData: () => void;
@@ -18,8 +17,7 @@ type TopicSelectorAttrs = {
 
 export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
   view(vnode) {
-    const { defaultTopic, featuredTopics, tabindex, topics, updateFormData } =
-      vnode.attrs;
+    const { defaultTopic, tabindex, topics, updateFormData } = vnode.attrs;
 
     let selectedTopic;
 
@@ -30,6 +28,10 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
     } else if (defaultTopic && defaultTopic instanceof OffchainTopic) {
       selectedTopic = defaultTopic;
     }
+
+    const featuredTopics = topics
+      .filter((topic) => topic.featuredInSidebar)
+      .sort((a, b) => b.order - a.order);
 
     const itemRender = (topic) => {
       return (
@@ -73,13 +75,13 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
         checkmark={false}
         closeOnSelect={true}
         emptyContent={
-          // TODO: This should be unused now that we allow communities without topics
+          // This appears if no topics are available because all require token thresholds
           <Callout
             size="sm"
             class="no-matching-topics"
             icon={Icons.ALERT_TRIANGLE}
             intent="negative"
-            content="This community has not been configured with topics yet"
+            content="Insufficient token balance."
           />
         }
         itemPredicate={itemPredicate}
