@@ -3,7 +3,7 @@ import app from 'state';
 import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
@@ -22,7 +22,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _offlineSigner: OfflineDirectSigner;
   private _client: SigningStargateClient;
 
-  public readonly name = 'keplr';
+  public readonly name = WalletId.Keplr;
   public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
 

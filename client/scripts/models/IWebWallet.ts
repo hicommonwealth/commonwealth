@@ -1,8 +1,8 @@
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import Account from './Account';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
-  name: string;
+  name: WalletId;
   label: string;
   available: boolean;
   enabled: boolean;
