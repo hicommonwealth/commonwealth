@@ -15,6 +15,8 @@ export type ProfileAttributes = {
   website?: string;
   bio?: string;
   is_default?: boolean;
+  avatar_url?: string;
+  slug?: string;
 
   // associations
   User?: UserAttributes;
@@ -42,6 +44,8 @@ export default (
       website: { type: dataTypes.STRING, allowNull: true },
       bio: { type: dataTypes.TEXT, allowNull: true },
       is_default: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      avatar_url: { type: dataTypes.STRING, allowNull: true},
+      slug: { type: dataTypes.STRING, allowNull: true},
     }, {
       tableName: 'Profiles',
       underscored: true,

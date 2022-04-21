@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Icon, Icons, Tag } from 'construct-ui';
+import { Button, Tag } from 'construct-ui';
 
 import 'pages/discussions/discussion_row.scss';
 
@@ -75,7 +75,10 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
           <div class="row-subheader">
             {proposal.readOnly && (
               <div class="discussion-locked">
-                <Tag size="xs" label={<Icon name={Icons.LOCK} size="xs" />} />
+                <Tag
+                  size="xs"
+                  label={<CWIcon iconName="lock" iconSize="small" />}
+                />
               </div>
             )}
             {proposal.offchainVotingEnabled && (

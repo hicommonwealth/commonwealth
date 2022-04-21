@@ -23,6 +23,7 @@ const TokenDecimalInput: m.Component<{
   },
   view: (vnode) => {
     const { onInputChange, decimals } = vnode.attrs;
+
     return m('.TokenDecimalInput', [
       m(Input, {
         title: '',
@@ -51,7 +52,7 @@ const TokenDecimalInput: m.Component<{
           }
         },
       }),
-      m('.token-settings', [
+      decimals > 0 && m('.token-settings',
         m(Switch, {
           title: '',
           defaultValue: vnode.state.isInputInWei,
@@ -69,7 +70,7 @@ const TokenDecimalInput: m.Component<{
           },
         }),
         m('.switch-caption', vnode.state.switchCaption),
-      ])
+      )
     ]);
   }
 };

@@ -167,6 +167,10 @@ $discussion-title-font-size: 1.45rem;
         flex-direction: row;
         flex-wrap: wrap;
         margin-bottom: 12px;
+
+        svg {
+          cursor: pointer;
+        }
       }
       .proposal-meta-top {
         display: flex;
@@ -304,6 +308,9 @@ $discussion-title-font-size: 1.45rem;
     }
     .comment-body-top {
       font-size: $discussion-meta-font-size;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
     }
     .comment-body-bottom {
       padding: 4px 0 2px;
@@ -428,24 +435,6 @@ $discussion-title-font-size: 1.45rem;
         display: block;
       }
     }
-  }
-
-  .ProposalSidebarLinkedViewer {
-    border-radius: 10px;
-    border: 1px solid $neutral-50;
-    padding: 22px 18px 21px;
-    margin-bottom: 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .placeholder-copy {
-      margin-bottom: 10px;
-      font-weight: 500;
-    }
-  }
-
-  .ConnectProposalButtonWrapper {
-    margin-top: 10px;
   }
 
   .right-content-container {
