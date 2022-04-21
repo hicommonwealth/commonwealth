@@ -46,6 +46,20 @@ $width: 360px;
   .text-gallery {
     display: flex;
     flex-direction: column;
+
+    .text-row {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      height: 48px;
+      justify-content: space-between;
+      width: 400px;
+
+      .ellipsis-row {
+        display: flex;
+        width: 200px;
+      }
+    }
   }
 
   .icon-gallery {

@@ -5,7 +5,7 @@
   display: flex;
 
   &.disabled {
-    color: $neutral-100;
+    color: $neutral-300;
   }
 
   &.noWrap {
@@ -77,11 +77,42 @@
     line-height: 64px;
   }
 
+  &.caption {
+    font-family: $font-family-neue-haas-unica;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    line-height: 16px;
+
+    &.uppercase {
+      font-weight: 500;
+    }
+  }
+
+  &.buttonSm {
+    font-family: $font-family-silka;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 24px;
+  }
+
+  &.buttonLg {
+    font-family: $font-family-silka;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 28px;
+  }
+
   &.regular {
     font-weight: 400;
   }
 
-  &.semi-bold {
+  &.medium {
+    font-weight: 500;
+  }
+
+  &.semiBold {
     font-weight: 600;
   }
 
@@ -95,5 +126,9 @@
 
   &.italic {
     font-style: italic;
+  }
+
+  &.uppercase {
+    text-transform: uppercase;
   }
 }
