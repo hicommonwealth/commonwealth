@@ -289,7 +289,8 @@ const createChain = async (
       }]
     });
 
-    if (!addressToBeAdmin) throw Error(Errors.FailedToAssignAdmin);
+    if (!addressToBeAdmin ||
+      [ChainBase.Substrate, ChainBase.CosmosSDK].includes(chain.base)) throw Error(Errors.FailedToAssignAdmin);
 
     await models.Role.create({
       address_id: addressToBeAdmin.id,
