@@ -5,6 +5,7 @@ import m from 'mithril';
 import 'components/component_kit/cw_text.scss';
 
 import { ComponentType } from './types';
+import { getClasses } from './helpers';
 
 type FontWeight =
   | 'regular'
@@ -39,17 +40,6 @@ type TextAttrs = {
   type: FontType;
 };
 
-export const getTextClasses = (
-  componentType: string,
-  styleAttrs: TextAttrs
-): string =>
-  `${componentType} ${Object.entries(styleAttrs)
-    .filter(([key, value]) => key && value)
-    .map(([key, value]) =>
-      typeof value === 'boolean' ? (value ? key : null) : value
-    )
-    .join(' ')}`;
-
 export class CWText implements m.ClassComponent<TextAttrs> {
   view(vnode) {
     const {
@@ -62,13 +52,16 @@ export class CWText implements m.ClassComponent<TextAttrs> {
 
     return (
       <div
-        class={getTextClasses(ComponentType.Text, {
-          type,
-          fontWeight,
-          disabled,
-          fontStyle,
-          noWrap,
-        })}
+        class={getClasses(
+          {
+            type,
+            fontWeight,
+            disabled,
+            fontStyle,
+            noWrap,
+          },
+          ComponentType.Text
+        )}
       >
         {vnode.children}
       </div>
