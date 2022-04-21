@@ -328,7 +328,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
                               a.address,
                               a.chain,
                               a.keytype,
-                              a.is_magic
+                              a.wallet_id
                             );
                           })
                         );

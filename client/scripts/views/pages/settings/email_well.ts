@@ -9,6 +9,7 @@ import { Button, Colors, Input, Icons, Icon } from 'construct-ui';
 
 import { SocialAccount } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { WalletId } from 'types';
 
 interface IState {
   email: string;
@@ -72,7 +73,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
             disabled:
               (!emailInputUpdated && emailVerified) ||
               verificationSent ||
-              app.user.addresses.some((a) => a.isMagic),
+              app.user.addresses.some((a) => a.walletId === WalletId.Magic),
             rounded: true,
             onclick: async () => {
               vnode.state.errorMessage = null;

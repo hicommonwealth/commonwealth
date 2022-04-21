@@ -5,7 +5,7 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
 import { sequelize, DB } from '../database';
 import { ProfileAttributes } from '../models/profile';
-import { DynamicTemplate, NotificationCategories } from '../../shared/types';
+import { DynamicTemplate, NotificationCategories, WalletId } from '../../shared/types';
 
 import { AppError, ServerError } from '../util/errors';
 import { UserAttributes } from '../models/user';
@@ -226,6 +226,7 @@ const finishSsoLogin = async (
         last_active: new Date(),
         user_id: user.id,
         profile_id: profile.id,
+        wallet_id: WalletId.Ronin,
       }, { transaction: t });
 
       await models.Role.create({
