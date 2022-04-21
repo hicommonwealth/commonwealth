@@ -1,8 +1,17 @@
 @import 'shared';
 
-.BodyText {
+@mixin baseTextStyles {
   color: $neutral-800;
   display: flex;
+
+  &.disabled {
+    color: $neutral-100;
+  }
+}
+
+.BodyText {
+  @include baseTextStyles;
+
   font-family: $font-family-neue-haas-unica;
 
   &.body-01 {
@@ -32,8 +41,8 @@
 }
 
 .HeadingText {
-  color: $neutral-800;
-  display: flex;
+  @include baseTextStyles;
+
   font-family: $font-family-silka;
 
   &.heading-01 {
@@ -75,8 +84,8 @@
 }
 
 .DisplayText {
-  color: $neutral-800;
-  display: flex;
+  @include baseTextStyles;
+
   font-family: $font-family-silka;
 
   &.display-01 {
