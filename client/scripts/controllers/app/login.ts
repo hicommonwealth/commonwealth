@@ -9,7 +9,7 @@ import { isSameAccount } from 'helpers';
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import {
   ChainInfo,
   SocialAccount,
@@ -23,6 +23,7 @@ const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(
   account: Account<any>,
+  walletId: WalletId,
   community?: string
 ) {
   return $.post(`${app.serverUrl()}/createAddress`, {
@@ -32,6 +33,7 @@ function createAccount(
     chain: account.chain.id,
     community,
     jwt: app.user.jwt,
+    wallet_id: walletId,
   });
 }
 
@@ -166,7 +168,9 @@ export function updateActiveUser(data) {
     app.user.setEmailVerified(data.emailVerified);
     app.user.setJWT(data.jwt);
 
-    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic, a.ghost_address)));
+    app.user.setAddresses(data.addresses.map(
+      (a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.wallet_id, a.ghost_address)
+    ));
     app.user.setSocialAccounts(data.socialAccounts.map((sa) => new SocialAccount(sa.provider, sa.provider_username)));
 
     app.user.setSiteAdmin(data.isAdmin);
@@ -177,14 +181,15 @@ export function updateActiveUser(data) {
 }
 
 export async function createUserWithAddress(
-  address: string, keytype?: string, community?: string
+  address: string, walletId: WalletId, keytype?: string, community?: string,
 ): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
-  const response = await createAccount(account, community);
+  const response = await createAccount(account, walletId, community);
   const token = response.result.verification_token;
   const newAccount = app.chain.accounts.get(response.result.address, keytype);
   newAccount.setValidationToken(token);
   newAccount.setAddressId(response.result.id);
+  newAccount.setWalletId(walletId);
   return newAccount;
 }
 

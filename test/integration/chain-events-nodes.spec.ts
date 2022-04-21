@@ -260,7 +260,7 @@ async function prepareDB(client): Promise<void> {
     for (const [chain, data] of Object.entries(fetchedIdentities)) {
       // eslint-disable-next-line max-len
       query = format(
-        "INSERT INTO \"Addresses\" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator, is_magic) VALUES (%L, %L, '1', '2020-05-01', '2020-05-01', DEFAULT, DEFAULT, DEFAULT)",
+        "INSERT INTO \"Addresses\" (address, chain, verification_token, created_at, updated_at, is_councillor, is_validator) VALUES (%L, %L, '1', '2020-05-01', '2020-05-01', DEFAULT, DEFAULT)",
         data.address,
         chain
       );

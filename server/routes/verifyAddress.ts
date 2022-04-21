@@ -26,7 +26,7 @@ import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/key
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { DynamicTemplate, ChainBase, NotificationCategories, ChainNetwork } from '../../shared/types';
+import { DynamicTemplate, ChainBase, NotificationCategories, ChainNetwork, WalletId } from '../../shared/types';
 import AddressSwapper from '../util/addressSwapper';
 import { AppError, ServerError } from '../util/errors';
 
@@ -45,6 +45,7 @@ export const Errors = {
   CouldNotVerifySignature: 'Failed to verify signature',
   BadSecret: 'Invalid jwt secret',
   BadToken: 'Invalid login token',
+  WrongWallet: 'Verified with different wallet than created',
 };
 
 // Address.verifySignature
@@ -266,6 +267,7 @@ const processAddress = async (
   models: DB,
   chain: ChainInstance,
   address: string,
+  wallet_id: WalletId,
   signature?: string,
   user?: Express.User
 ): Promise<void> => {
@@ -274,6 +276,9 @@ const processAddress = async (
   });
   if (!existingAddress) {
     throw new AppError(Errors.AddressNF);
+  }
+  if (existingAddress.wallet_id !== wallet_id) {
+    throw new AppError(Errors.WrongWallet);
   }
 
   // first, check whether the token has expired
@@ -341,7 +346,7 @@ const verifyAddress = async (models: DB, req: Request, res: Response, next: Next
   const address = chain.base === ChainBase.Substrate
     ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
     : req.body.address;
-  await processAddress(models, chain, address, req.body.signature, req.user);
+  await processAddress(models, chain, address, req.body.wallet_id, req.body.signature, req.user);
 
   if (req.user) {
     // if user was already logged in, we're done

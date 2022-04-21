@@ -93,7 +93,7 @@ class ProposalSidebarLinkedSnapshot
       `Snapshot: ${
         !this.snapshotProposalsLoaded
           ? proposal.snapshotProposal
-          : this.snapshot.title
+          : this.snapshot?.title
       }`,
     ]);
   }
