@@ -4,7 +4,7 @@ import { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 
@@ -12,9 +12,9 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];
-  private _enabling: boolean = false;
+  private _enabling = false;
 
-  public readonly name = 'polkadot';
+  public readonly name = WalletId.Polkadot;
   public readonly label = 'polkadot.js';
   public readonly chain = ChainBase.Substrate;
 

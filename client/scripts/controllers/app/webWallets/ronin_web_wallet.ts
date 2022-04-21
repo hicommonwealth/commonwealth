@@ -1,10 +1,10 @@
-import { ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainNetwork, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of Ronin login
 // is handled through redirects involving the `/finishAxieLogin` page.
 class RoninWebWalletController implements IWebWallet<any> {
-  public readonly name = 'ronin';
+  public readonly name = WalletId.Ronin;
   public readonly label = 'Ronin Wallet';
   public readonly available = true;
   public readonly chain = ChainBase.Ethereum;

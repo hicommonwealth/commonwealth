@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction } from 'express';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import Web3 from 'web3';
@@ -6,19 +6,37 @@ import { PublicKey } from '@solana/web3.js';
 
 import AddressSwapper from '../util/addressSwapper';
 import { DB } from '../database';
-import { ChainBase } from '../../shared/types';
+import { TypedRequestBody, TypedResponse, success } from '../types';
+import { ChainBase, WalletId } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { AddressAttributes } from '../models/address';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
+  NeedWallet: 'Must provide valid walletId',
   InvalidChain: 'Invalid chain',
   InvalidAddress: 'Invalid address',
 };
 
-const createAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+type CreateAddressReq = {
+  address: string;
+  chain: string;
+  wallet_id: WalletId;
+  community?: string;
+  keytype?: string;
+};
+
+type CreateAddressResp = AddressAttributes;
+
+const createAddress = async (
+  models: DB,
+  req: TypedRequestBody<CreateAddressReq>,
+  res: TypedResponse<CreateAddressResp>,
+  next: NextFunction,
+) => {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.
@@ -27,6 +45,9 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
   }
   if (!req.body.chain) {
     return next(new Error(Errors.NeedChain));
+  }
+  if (!req.body.wallet_id || !Object.values(WalletId).includes(req.body.wallet_id)) {
+    return next(new Error(Errors.NeedWallet));
   }
 
   const chain = await models.Chain.findOne({
@@ -92,6 +113,9 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
 		existingAddress.verification_token_expires = verification_token_expires;
 		existingAddress.last_active = new Date();
 
+    // we update addresses with the wallet used to sign in
+    existingAddress.wallet_id = req.body.wallet_id;
+
 		const updatedObj = await existingAddress.save();
 
     // even if this is the existing address, there is a case to login to community through this address's chain
@@ -108,7 +132,7 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
         });
       }
     }
-    return res.json({ status: 'Success', result: updatedObj.toJSON() });
+    return success(res, updatedObj.toJSON());
   } else {
     // address doesn't exist, add it to the database
     try {
@@ -134,6 +158,7 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
         verification_token_expires,
         keytype: req.body.keytype,
         last_active,
+        wallet_id: req.body.wallet_id,
       });
 
       // if req.user.id is undefined, the address is being used to create a new user,
@@ -146,7 +171,7 @@ const createAddress = async (models: DB, req: Request, res: Response, next: Next
         });
       }
 
-      return res.json({ status: 'Success', result: newObj.toJSON() });
+      return success(res, newObj.toJSON());
     } catch (e) {
       return next(e);
     }
