@@ -4,7 +4,7 @@ export const getClasses = <T>(styleAttrs: T, componentType?: string): string =>
   `${isNotUndefined(componentType) ? `${componentType} ` : ''}${Object.entries(
     styleAttrs
   )
-    .filter(([key, value]) => key && value)
+    .filter(([key, value]) => isNotUndefined(key) && isNotUndefined(value))
     .map(([key, value]) =>
       typeof value === 'boolean' ? (value ? key : null) : value
     )
