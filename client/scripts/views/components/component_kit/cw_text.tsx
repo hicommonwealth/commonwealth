@@ -9,6 +9,7 @@ import { ComponentType } from './types';
 type BaseTextAttrs = {
   //   color?: string; // not sure how to do this one using a scss color variable
   disabled?: boolean;
+  noWrap?: boolean;
 };
 
 type BodyTextAttrs = {
@@ -21,6 +22,7 @@ export class CWBodyText implements m.ClassComponent<BodyTextAttrs> {
     const {
       disabled = false,
       fontStyle = 'regular',
+      noWrap = true,
       type = 'body-01',
     } = vnode.attrs;
 
@@ -28,7 +30,7 @@ export class CWBodyText implements m.ClassComponent<BodyTextAttrs> {
       <div
         class={`${ComponentType.BodyText} ${type} ${fontStyle} ${
           disabled ? 'disabled' : ''
-        }`}
+        } ${noWrap ? 'no-wrap' : ''}`}
       >
         {vnode.children}
       </div>
@@ -51,6 +53,7 @@ export class CWHeadingText implements m.ClassComponent<HeadingTextAttrs> {
     const {
       disabled = false,
       fontStyle = 'medium',
+      noWrap = true,
       type = 'heading-01',
     } = vnode.attrs;
 
@@ -58,7 +61,7 @@ export class CWHeadingText implements m.ClassComponent<HeadingTextAttrs> {
       <div
         class={`${ComponentType.HeadingText} ${type} ${fontStyle} ${
           disabled ? 'disabled' : ''
-        }`}
+        } ${noWrap ? 'no-wrap' : ''}`}
       >
         {vnode.children}
       </div>
@@ -76,6 +79,7 @@ export class CWDisplayText implements m.ClassComponent<DisplayTextAttrs> {
     const {
       disabled = false,
       fontStyle = 'semi-bold',
+      noWrap = true,
       type = 'display-01',
     } = vnode.attrs;
 
@@ -83,7 +87,7 @@ export class CWDisplayText implements m.ClassComponent<DisplayTextAttrs> {
       <div
         class={`${ComponentType.DisplayText} ${type} ${fontStyle} ${
           disabled ? 'disabled' : ''
-        }`}
+        } ${noWrap ? 'no-wrap' : ''}`}
       >
         {vnode.children}
       </div>

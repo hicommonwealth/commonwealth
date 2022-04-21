@@ -7,6 +7,13 @@
   &.disabled {
     color: $neutral-100;
   }
+
+  &.no-wrap {
+    display: unset;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .BodyText {
