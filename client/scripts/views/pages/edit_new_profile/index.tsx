@@ -18,6 +18,7 @@ type EditProfileState = {
   profile: Profile,
   profileUpdate: Object,
   saved: boolean,
+  failed: boolean,
 }
 
 enum InputFormField {
@@ -35,6 +36,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
     this.getProfile(vnode, vnode.state.address)
     vnode.state.profileUpdate = {}
     vnode.state.saved = false
+    vnode.state.failed = false
   }
 
   getProfile = async (vnode, address: string) => {
@@ -57,8 +59,11 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
       ...('website' in vnode.state.profileUpdate) && {website: vnode.state.profileUpdate.website},
       jwt: app.user.jwt,
     }).catch((error) => {
-      // TODO : Error handling
-      return
+      vnode.state.failed = true
+      setTimeout(() => {
+        vnode.state.failed = false
+        m.redraw()
+      }, 2500)
     });
 
     if (response?.status == 'Success'){
@@ -69,8 +74,13 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
         m.route.set(`/profile/${vnode.state.address}`)
       }, 1500)
     } else {
-      // TODO : Error handling
+      vnode.state.failed = true;
+      setTimeout(() => {
+        vnode.state.failed = false
+        m.redraw()
+      }, 2500)
     }
+
   }
 
   handleInputChange = (vnode, value, formField: InputFormField) => {
@@ -111,7 +121,15 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
   }
 
   handleSaveProfile = (vnode) => {
-    this.updateProfile(vnode)
+    if (Object.keys(vnode.state.profileUpdate).length > 0) {
+      this.updateProfile(vnode)
+    } else {
+      vnode.state.failed = true
+      setTimeout((vnode) => {
+        vnode.state.failed = false
+        m.redraw()
+      }, 2500, vnode)
+    }
   }
 
   view(vnode) {
@@ -119,11 +137,15 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
       <div className="EditProfilePage">
         <h3> Edit Profile </h3>
         <div className="edit-pane">
-
           {
-            vnode.state.saved ? <Spinner className="spinner" active={true} size="lg" /> : <div />
+            vnode.state.saved ? <Spinner active={true} size="lg" /> : <div />
           }
-
+          
+          <div className={vnode.state.failed ? 'save-button-message show' : 
+            'save-button-message'}> 
+            <p> No changes saved. </p> 
+          </div>
+          
           <CWButton         
             label={vnode.state.saved ? "Saved!" : "Save"}
             buttonType="primary"
