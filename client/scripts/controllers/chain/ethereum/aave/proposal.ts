@@ -283,9 +283,9 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    $.getJSON(`https://ipfs.infura.io:5001/api/v0/cat?arg=${this._ipfsAddress}`)
+    $.post(`https://ipfs.infura.io:5001/api/v0/cat?arg=${this._ipfsAddress}`)
       .then((ipfsData) => {
-        this._ipfsData = ipfsData;
+        this._ipfsData = JSON.parse(ipfsData);
       })
       .catch((e) =>
         console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`)

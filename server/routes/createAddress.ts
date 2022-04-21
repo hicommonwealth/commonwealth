@@ -1,6 +1,8 @@
 import { NextFunction } from 'express';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
+import Web3 from 'web3';
+import { PublicKey } from '@solana/web3.js';
 
 import AddressSwapper from '../util/addressSwapper';
 import { DB } from '../database';
@@ -16,6 +18,7 @@ export const Errors = {
   NeedChain: 'Must provide chain',
   NeedWallet: 'Must provide valid walletId',
   InvalidChain: 'Invalid chain',
+  InvalidAddress: 'Invalid address',
 };
 
 type CreateAddressReq = {
@@ -55,12 +58,32 @@ const createAddress = async (
     return next(new Error(Errors.InvalidChain));
   }
 
-  let encodedAddress = req.body.address;
-  if (chain.base === ChainBase.Substrate) {
-    encodedAddress = AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix });
-  } else if (chain.base === ChainBase.CosmosSDK && chain.bech32_prefix) {
-    const { words } = bech32.decode(req.body.address, 50);
-    encodedAddress = bech32.encode(chain.bech32_prefix, words);
+  // test / convert address as needed
+  let encodedAddress = (req.body.address as string).trim();
+  try {
+    if (chain.base === ChainBase.Substrate) {
+      encodedAddress = AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix });
+    } else if (chain.bech32_prefix) { // cosmos or injective
+      const { words } = bech32.decode(req.body.address, 50);
+      encodedAddress = bech32.encode(chain.bech32_prefix, words);
+    } else if (chain.base === ChainBase.Ethereum) {
+      if (!Web3.utils.isAddress(encodedAddress)) {
+        throw new Error('Eth address is not valid');
+      }
+    } else if (chain.base === ChainBase.NEAR) {
+      const nearRegex = /^[a-z0-9_\-.]*$/;
+      if (!nearRegex.test(encodedAddress)) {
+        throw new Error('NEAR address is not valid');
+      }
+    } else if (chain.base === ChainBase.Solana) {
+      const key = new PublicKey(encodedAddress);
+      if (key.toBase58() !== encodedAddress) {
+        throw new Error(`Solana address is not valid: ${key.toBase58()}`);
+      }
+    }
+  } catch (e) {
+    log.info(`Invalid address passed: ${encodedAddress}: ${e.message}`);
+    return next(new Error(Errors.InvalidAddress));
   }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne({

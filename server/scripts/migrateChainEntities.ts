@@ -33,7 +33,7 @@ export async function migrateChainEntity(chain: string): Promise<void> {
   }
 
   // query one node for each supported chain
-  const node: ChainNodeInstance = await models['ChainNode'].findOne({
+  const node: ChainNodeInstance = await models['ChainNode'].scope('withPrivateData').findOne({
     where: { chain },
     include: {
       model: models.Chain,
@@ -52,7 +52,7 @@ export async function migrateChainEntity(chain: string): Promise<void> {
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
     if (node.Chain.base === ChainBase.Substrate) {
-      const nodeUrl = constructSubstrateUrl(node.url);
+      const nodeUrl = constructSubstrateUrl(node.private_url || node.url);
       const api = await SubstrateEvents.createApi(
         nodeUrl,
         node.Chain.substrate_spec
@@ -63,11 +63,11 @@ export async function migrateChainEntity(chain: string): Promise<void> {
       // TODO: construct dater
       throw new Error('Moloch migration not yet implemented.');
     } else if (node.Chain.network === ChainNetwork.Compound) {
-      const api = await CompoundEvents.createApi(node.url, node.address);
+      const api = await CompoundEvents.createApi(node.private_url || node.url, node.address);
       fetcher = new CompoundEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else if (node.Chain.network === ChainNetwork.Aave) {
-      const api = await AaveEvents.createApi(node.url, node.address);
+      const api = await AaveEvents.createApi(node.private_url || node.url, node.address);
       fetcher = new AaveEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else {
