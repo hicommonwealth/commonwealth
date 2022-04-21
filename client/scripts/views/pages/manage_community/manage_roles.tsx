@@ -47,7 +47,7 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
                     addr.address,
                     addr.chain,
                     null,
-                    addr.is_magic
+                    addr.wallet_id
                   ), // role.Address, // make AddressInfo?
                   popover: true,
                   linkify: false,

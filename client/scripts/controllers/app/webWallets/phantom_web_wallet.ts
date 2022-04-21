@@ -1,6 +1,6 @@
 declare let window: any;
 
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
 
 class PhantomWebWalletController implements IWebWallet<string> {
@@ -9,7 +9,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
 
-  public readonly name = 'phantom';
+  public readonly name = WalletId.Phantom;
   public readonly label = 'Phantom';
   public readonly chain = ChainBase.Solana;
 
