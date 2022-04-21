@@ -32,7 +32,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
     const {
       disabled = false,
       fontStyle = 'regular',
-      noWrap = true,
+      noWrap = true, // parent must be flex container for this to work
       type,
     } = vnode.attrs;
 
