@@ -1,10 +1,13 @@
 /* @jsx m */
+
 import m from 'mithril';
-import Sublayout from '../../sublayout';
-import DelegateCard from './delegate_card';
+import numeral from 'numeral';
+import _ from 'lodash';
+
 import 'pages/delegation/index.scss';
+
+import { Account, AddressInfo, Profile } from 'models';
 import app from 'state';
-import { Account, AddressInfo, Profile } from 'client/scripts/models';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import {
   CWTable,
@@ -14,15 +17,17 @@ import {
 import User from '../../components/widgets/user';
 import getDelegationData, { GovernanceStandard } from 'server/routes/getDelegationData';
 import ProfilesController from '../../../controllers/server/profiles';
-import numeral from 'numeral';
 import { chain } from 'lodash';
 import { ChainNetwork } from 'shared/types';
 import CompoundChain from 'client/scripts/controllers/chain/ethereum/compound/chain';
 import AaveChain from 'client/scripts/controllers/chain/ethereum/aave/chain';
+import DelegateCard from './delegate_card';
+import Sublayout from '../../sublayout';
+import { ViewController } from '@magic-sdk/provider';
 
 type DelegationPageAttrs = { topic?: string };
 
-type DelegateInfo = {
+export type DelegateInfo = {
   delegate: Account<any> | AddressInfo | Profile;
   delegateAddress: string;
   delegateName: string;
@@ -30,6 +35,11 @@ type DelegateInfo = {
   totalVotes: number;
   proposals: number;
   rank: number;
+  recentProposal: {
+    proposalText: string;
+    outcome: boolean; // true if they voted with majority?
+    proposalLink: string; // url of the proposal on CW
+  };
 };
 
 
@@ -47,10 +57,15 @@ async function processDelegates(): Promise<[DelegateInfo, DelegateInfo[]]>{
     standard = GovernanceStandard.ERC20Votes;
   }
 
-  const delegationEvents = $.get(`${app.serverUrl()}/getDelegationData`, {
+  const response = await $.get(`${app.serverUrl()}/getDelegationData`, {
     delegation_standard: standard,
     chain: app.chain
   });
+  if (response.status !== 'Success') {
+    throw new Error(`Cannot fetch events: ${response.status}`);
+  }
+
+
 
   // Specifies number of votes per delegate
   let delegateWeighting: Map<string, number> = new Map();
@@ -60,74 +75,90 @@ async function processDelegates(): Promise<[DelegateInfo, DelegateInfo[]]>{
 
   // TODO extract data from other events
   let totalVotesCast = 0;
-  for(const event in delegationEvents) {
-    if(true) {
-      const eventType = event.chain_event_type_id;
-      const eventData = event.event_data;
 
-      switch(standard) {
-        case GovernanceStandard.ERC20Votes:
-          switch(eventType) {
-            case "delegate-votes-changed":
-              delegateWeighting[eventData.delegate] = eventData.newBalance;
-              totalVotesCast += (eventData.newBalance - eventData.oldBalance);
-              break;
-            case "delegate-changed":
-              break;
-          }
-          break;
-        case GovernanceStandard.Compound:
-          switch(eventType) {
-            case "proposal-created":
-              break;
-            case "vote-cast":
-              // delegateWeighting[eventData.eventData.votes] = 
-              break;
-            case "proposal-canceled":
-              break;
-            case "proposal-queued":
-              break;
-            case "proposal-executed":
-              break;
-            case "delegated-power-changed":
-              break;
-          }
-          break;
-        case GovernanceStandard.Aave:
-          switch(eventType) {
-            case "vote-emitted":
-              break;
-            case "proposal-created":
-              break;
-            case "proposal-queued":
-              break;
-            case "delegate-changed":
-              break;
-            case "delegated-power-changed":
-              break;
-          }
-          break;
-      }
-  }
+
+  response.result.map((rawEvent) => {
+    const {
+      chain_event_type_id,
+      event_data,
+    } = rawEvent;
+    // some simple string manipulation likely needs to be done here for the chain_event_type_id.
+    const eventType = chain_event_type_id;
+    const eventData = event_data;
+
+    switch(standard) {
+      case GovernanceStandard.ERC20Votes:
+        switch(eventType) {
+          case "delegate-votes-changed":
+            delegateWeighting[eventData.delegate] = eventData.newBalance;
+            totalVotesCast += (eventData.newBalance - eventData.oldBalance);
+            break;
+          case "delegate-changed":
+            break;
+          default:
+            break;
+        }
+        break;
+      case GovernanceStandard.Compound:
+        switch(eventType) {
+          case "proposal-created":
+            break;
+          case "vote-cast":
+            // delegateWeighting[eventData.eventData.votes] = 
+            break;
+          case "proposal-canceled":
+            break;
+          case "proposal-queued":
+            break;
+          case "proposal-executed":
+            break;
+          case "delegated-power-changed":
+            break;
+          default:
+            break;
+        }
+        break;
+      case GovernanceStandard.Aave:
+        switch(eventType) {
+          case "vote-emitted":
+            break;
+          case "proposal-created":
+            break;
+          case "proposal-queued":
+            break;
+          case "delegate-changed":
+            break;
+          case "delegated-power-changed":
+            break;
+          default:
+            break;
+        }
+        break;
+      default:
+        break;
+    }
+    // return is useless, since this isn't used again.
+    return rawEvent;
+  });
 
   const prof : ProfilesController = new ProfilesController();
 
   // rank-order addresses by total votes:
   const rankOrderedMap = new Map([...delegateWeighting.entries()].sort((a,b)=>b[1]-a[1]));
-  var allDelegates : DelegateInfo[];
+  let allDelegates : DelegateInfo[];
 
-  var delegateOfUser : DelegateInfo = null;
+  let delegateOfUser : DelegateInfo = null;
 
   // Once this table is built (and rank-ordered), create DelegateInfo cards
-  var rank = 1;
+  let rank = 1;
   for(let address of delegateWeighting.keys()) {
-    var delegateAddress = address;
-    var delegate : Profile = prof.getProfile(chain.name, delegateAddress);
-    var delegateName : string = delegate.name;
-    var totalVotes = delegateWeighting[address];
-    var voteWeight = parseFloat((totalVotes / totalVotesCast).toFixed(2)); 
-    //TODO fix proposals
-    var proposals = 0;
+    let delegateAddress = address;
+    let delegate : Profile = prof.getProfile(chain.name, delegateAddress);
+    let delegateName : string = delegate.name;
+    let totalVotes = delegateWeighting[address];
+    let voteWeight = parseFloat((totalVotes / totalVotesCast).toFixed(2)); 
+    // TODO fix proposals
+    let proposals = 0;
 
     // push current delegate information
     var newDelegateInfo : DelegateInfo = {delegate, delegateAddress, delegateName, voteWeight, totalVotes, proposals, rank};
@@ -144,9 +175,15 @@ async function processDelegates(): Promise<[DelegateInfo, DelegateInfo[]]>{
 
 function buildTableData(
   delegates: Array<DelegateInfo>,
-  keywordFragment: string
+  currentDelegate: DelegateInfo,
+  keywordFragment: string,
+  updateSelectedDelegate: (
+    delegate: DelegateInfo | null,
+    action: string
+  ) => Promise<void>
 ): Array<Array<TableEntry>> {
-  let result = [];
+  const result = [];
+
   for (const delegateInfo of delegates) {
     const {
       delegate,
@@ -156,12 +193,8 @@ function buildTableData(
       voteWeight,
       proposals,
       rank,
+      recentProposal,
     } = delegateInfo;
-
-
-
-
-
 
     let controller;
 
@@ -172,7 +205,10 @@ function buildTableData(
       controller = new CompoundChain(app);
     }
     controller.init(app.chain.meta);
-    let currentRow = [
+
+    const isSelectedDelegate = _.isEqual(delegateInfo, currentDelegate);
+
+    const currentRow = [
       {
         value: rank,
         type: TableEntryType.String,
@@ -203,12 +239,16 @@ function buildTableData(
       },
       { value: proposals, type: TableEntryType.String, align: 'right' },
       {
-        value: 'Delegate',
+        value: isSelectedDelegate ? 'Selected' : 'Delegate',
         type: TableEntryType.Button,
         buttonDetails: {
-          
-          onclick: () => controller.setDelegate(delegateAddress),
-          buttonType: 'secondary',
+          onclick: () => {
+            if (!isSelectedDelegate) {
+              updateSelectedDelegate(delegateInfo, 'update');
+              m.redraw();
+            }
+          },
+          buttonType: isSelectedDelegate ? 'primary' : 'secondary',
         },
         align: 'right',
       },
@@ -235,19 +275,51 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
   private delegate: DelegateInfo;
   private delegates: Array<DelegateInfo>;
   private filteredDelegateInfo: Array<Array<TableEntry>>;
-  view(vnode) {
-    [this.delegate, this.delegates] = await processDelegates();
-
-    this.filteredDelegateInfo = buildTableData(this.delegates, '');
-    m.redraw();
-
-    const updateFilter = (value: string) => {
-      this.filteredDelegateInfo = buildTableData(this.delegates, value);
+  private tableRendered: boolean;
+  oninit() {
+    // TODO: Replace below with processDelegates() call
+    [this.delegate, this.delegates] = processDelegates();
+  }
+  view() {
+    const updateSelectedDelegate = async (
+      delegate: DelegateInfo,
+      action: string
+    ) => {
+      if (action === 'update') {
+        this.delegate = delegate;
+        // TODO: Call the controllers with setDelegate()
+        controller.setDelegate(delegate.delegateAddress);
+      } else if (action === 'remove') {
+        this.delegate = null;
+        // TODO: Call the controllers with removeDelegate()
+      }
+      this.tableRendered = false;
       m.redraw();
     };
 
+    // Handle Search Bar
+    const updateFilter = (value: string) => {
+      this.filteredDelegateInfo = buildTableData(
+        this.delegates,
+        this.delegate,
+        value,
+        updateSelectedDelegate
+      );
+      m.redraw();
+    };
+
+    if (!this.tableRendered) {
+      this.filteredDelegateInfo = buildTableData(
+        this.delegates,
+        this.delegate,
+        '',
+        updateSelectedDelegate
+      );
+      this.tableRendered = true;
+    }
+
     return (
-      <Sublayout class="DelegationPage" title="Delegation">
+      <Sublayout title="Delegation">
         <div class="top-section">
           {this.delegate ? (
             <div class="wrapper">
@@ -256,10 +328,13 @@ class DelegationPage implements m.ClassComponent<DelegationPageAttrs> {
               {
                 // TODO: Include Info Icon when accessible
               }
-              <DelegateCard delegate={this.delegate} />
+              <DelegateCard
+                delegateInfo={this.delegate}
+                updateDelegate={updateSelectedDelegate}
+              />
             </div>
           ) : (
-            <div class="delegate-card-wrapper">
+            <div class="wrapper">
               <div class="delegate-missing-header">Choose a delegate</div>
               <div class="info-text">
                 It's tough to keep up with DAO governance. Find a delegate that

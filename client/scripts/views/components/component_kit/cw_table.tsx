@@ -18,6 +18,7 @@ export type TableEntry = {
   buttonDetails?: {
     buttonType: ButtonType;
     onclick?: any;
+    disabled: boolean;
   };
 };
 
@@ -32,15 +33,18 @@ export type TableAttrs = {
 };
 export class CWTable implements m.ClassComponent<TableAttrs> {
   private dataMatches: boolean;
-  oninit(vnode) {
+
+  oninit() {
     this.dataMatches = true;
   }
+
   view(vnode) {
     for (const data of vnode.attrs.data) {
-      if (data.length != vnode.attrs.columns.length) {
+      if (data.length !== vnode.attrs.columns.length) {
         this.dataMatches = false; // Enforce data matches expected columns
       }
     }
+
     return this.dataMatches ? (
       <table class="Table">
         <tr>
@@ -96,10 +100,11 @@ export class CWTable implements m.ClassComponent<TableAttrs> {
                         label={data.value}
                         buttonType={data.buttonDetails.buttonType}
                         onclick={data.buttonDetails.onclick}
+                        disabled={data.buttonDetails.disabled}
                       />
                     </td>
                   );
-                } else if (data.type === TableEntryType.Component) {
+                } else {
                   // Add styling
                   return (
                     <td
