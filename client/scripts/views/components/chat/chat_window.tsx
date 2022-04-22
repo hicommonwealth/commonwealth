@@ -112,7 +112,9 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       <div class="ChatPage">
         <div class="chat-messages">
           {groupedMessages.length === 0 && app.socket.chatNs.isConnected && (
-            <div class="chat-message-placeholder">No messages yet</div>
+            <div class="no-messages-container">
+              <div class="no-messages-placeholder">No messages yet</div>
+            </div>
           )}
           {groupedMessages.map((grp) => (
             <div class="chat-message-group">

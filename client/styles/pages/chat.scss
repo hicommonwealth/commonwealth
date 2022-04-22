@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  overflow: hidden;
 
   .chat-messages,
   .chat-composer-unavailable {
@@ -11,12 +12,21 @@
   }
 
   .chat-messages {
-    height: calc(100vh - 152px); // header + message composer
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
 
-    .chat-message-placeholder {
-      color: $neutral-500;
-      margin: 16px 0;
+    .no-messages-container {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: flex-end;
+
+      .no-messages-placeholder {
+        color: $neutral-500;
+        margin: 16px 0;
+      }
     }
 
     .chat-message-group {
@@ -26,6 +36,7 @@
         align-items: center;
         display: flex;
         flex-direction: row;
+        height: 24px;
 
         .User {
           display: flex;
@@ -77,6 +88,7 @@
     border-top: 1px solid $neutral-200;
     display: flex;
     flex-direction: row;
+    flex-shrink: 0;
     height: 64px;
     padding: 0 56px;
     width: 100%;
