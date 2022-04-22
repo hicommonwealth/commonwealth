@@ -23,7 +23,7 @@
   margin: 0;
   padding: 6px 10px;
   &.selected {
-    background: $primary-300;
+    background: $neutral-100;
     @include xs-max {
       margin: 0px -22px;
       padding-right: 22px;
