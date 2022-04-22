@@ -64,7 +64,7 @@ export default class CompoundChain extends EthereumChain {
     try {
       const contract = await attachSigner(
         this.app.wallets,
-        this.app.user.activeAccount.address,
+        this.app.user.activeAccount,
         this.compoundApi.Token
       );
       if (this.compoundApi.isTokenMPond(contract)) {

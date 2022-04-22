@@ -25,12 +25,13 @@ export const generateEthAddress = () => {
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {
+    const wallet_id = 'metamask';
     const { keypair, address } = generateEthAddress();
     let res = await chai.request
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain });
+      .send({ address, chain, wallet_id });
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
@@ -41,13 +42,14 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, signature });
+      .send({ address, chain, signature, wallet_id });
     console.log(JSON.stringify(res.body));
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email };
   }
   if (chain === 'edgeware') {
+    const wallet_id = 'polkadot';
     const keyPair = new Keyring({
       type: 'sr25519',
       ss58Format: 7,
@@ -57,7 +59,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address: keyPair.address, chain });
+      .send({ address: keyPair.address, chain, wallet_id });
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const u8aSignature = keyPair.sign(stringToU8a(token));
@@ -66,7 +68,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, signature });
+      .send({ address, chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email };

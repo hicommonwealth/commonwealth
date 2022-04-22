@@ -1,4 +1,4 @@
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
 import { Extension, Msg, MsgStoreCode, StdFee } from '@terra-money/terra.js';
 
@@ -8,7 +8,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabling: boolean = false;
   private _extension = new Extension()
 
-  public readonly name = 'terrastation';
+  public readonly name = WalletId.TerraStation;
   public readonly label = 'TerraStation';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly specificChain = 'terra';
