@@ -35,7 +35,7 @@ import { pathIsDiscussion } from './identifiers';
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
 import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
-import(/* webpackPrefetch: true */ 'views/pages/discussions');
+import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
 // eslint-disable-next-line max-len
@@ -284,7 +284,10 @@ export async function selectNode(
       )
     ).default;
     newChain = new Aave(n, app);
-  } else if (n.chain.network === ChainNetwork.ERC20 || n.chain.network === ChainNetwork.AxieInfinity) {
+  } else if (
+    n.chain.network === ChainNetwork.ERC20 ||
+    n.chain.network === ChainNetwork.AxieInfinity
+  ) {
     const ERC20 = (
       await import(
         //   /* webpackMode: "lazy" */
@@ -327,12 +330,17 @@ export async function selectNode(
       )
     ).default;
     newChain = new Commonwealth(n, app);
-  } else if (n.chain.base === ChainBase.Ethereum && n.chain.type === ChainType.Offchain) {
-    const Ethereum = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "ethereum-main" */
-      './controllers/chain/ethereum/main'
-    )).default;
+  } else if (
+    n.chain.base === ChainBase.Ethereum &&
+    n.chain.type === ChainType.Offchain
+  ) {
+    const Ethereum = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "ethereum-main" */
+        './controllers/chain/ethereum/main'
+      )
+    ).default;
     newChain = new Ethereum(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -891,7 +899,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true }
             ),
             '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
-              scoped: false
+              scoped: false,
             }),
             // Settings
             '/settings': redirectRoute(() => '/edgeware/settings'),
