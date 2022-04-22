@@ -1,26 +1,11 @@
 @import 'client/styles/shared';
 @import 'client/styles/facelift';
 
-.CommunitySelector {
-  .cui-button {
-    height: 38px;
-    width: 38px;
-    padding: 0;
-
-    .cui-icon {
-      position: relative;
-      top: -2px;
-    }
-  }
-}
-
 .CommunitySelectList {
   transform: none !important; // override any scrolling effects
   left: $quick-switcher-width !important;
 
   @include sm-max {
-    // left: 0 !important;
-    // top: 60px !important;
     overflow-y: scroll;
   }
 
@@ -33,60 +18,46 @@
     max-height: 100vh;
     overflow-y: auto;
     text-align: left;
-    // @include xs-max {
-    //     margin: 0 10px;
-    //     width: calc(100vw - 20px);
-    //     max-height: calc(100vh - 70px);
-    // }
   }
 
   .cui-menu {
-    background: $background-color-white-hover;
+    background: $neutral-50;
     border: none;
     max-width: 360px;
     width: 360px;
-    padding: 24px 4px 8px;
-    // @include xs-max {
-    //     max-width: 100%;
-    //     width: 100%;
-    // }
+    padding: 8px;
 
     h4 {
-      margin: 20px 24px 10px;
-      color: $text-color-light;
+      margin: 16px 12px;
+      color: $neutral-500;
       font-weight: 400;
       font-size: 16px;
-    }
-
-    h4:first-child {
-      margin-top: 0;
     }
 
     .community-placeholder {
       margin: 0 24px;
       font-size: 16px;
-      color: $text-color-light;
+      color: $neutral-500;
     }
   }
 
   .cui-list-item {
-    padding: 4px 10px;
-    margin: 0 14px;
+    padding: 4px 8px;
+    margin: 0 8px;
     border-radius: 4px;
-    min-height: 35px;
+    height: 32px;
     border: none;
     user-select: none;
 
     &.cui-selected {
-      background: $background-color-light-hover;
-      color: $text-color-black;
+      background: $purple-50;
+      color: $neutral-800;
     }
 
     &:hover {
-      background: $background-color-light-hover;
+      background: $purple-50;
     }
 
-    .ChainIcon,
     .CommunityIcon {
       position: relative;
       top: -1px;
@@ -97,34 +68,37 @@
       overflow: hidden;
       text-overflow: ellipsis;
 
-      .User {
-        position: relative;
-        top: 4px;
-        margin-left: 4px;
-      }
+      .community-star-toggle {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
-      .star-icon {
-        display: inline-block;
-        position: relative;
-        top: -1px;
-        margin-left: 10px;
+        .User {
+          margin-right: 8px;
+        }
+
+        .star-icon {
+          display: flex;
+          height: 100%;
+          flex-direction: column;
+          justify-content: center;
+        }
       }
     }
   }
 
   .cui-list-item.select-list-back-home {
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-top: 16px;
     font-size: 16px;
-    padding-top: 9px;
+    padding: 8px;
   }
 
   // stars
   .community-star-toggle .cui-icon svg {
-    stroke: lighten(#546e7b, 40%);
+    stroke: $primary-200;
   }
 
-  $star-color: #ecbc00;
+  $star-color: $yellow-400;
 
   .community-star-toggle .cui-icon:hover svg {
     stroke: $star-color !important;

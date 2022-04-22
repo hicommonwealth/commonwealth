@@ -15,7 +15,6 @@ import {
 import app from 'state';
 import { OffchainThread } from 'models';
 import { SearchParams } from 'models/SearchQuery';
-import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from '../../../../shared/utils';
 

@@ -1,0 +1,91 @@
+@import 'client/styles/shared';
+
+.NotificationRow {
+  display: flex;
+  flex-direction: column;
+  padding: 17px 22px;
+  margin: 0;
+  cursor: pointer;
+  border-bottom: 1px solid $neutral-50;
+  text-decoration: none !important;
+  color: $black !important;
+  &:hover {
+    background: $primary-400;
+  }
+  &.unread {
+    background: $yellow-100;
+  }
+  > .User {
+    width: min-content;
+  }
+  > .User,
+  > .UserGallery {
+    margin-bottom: 17px;
+  }
+  > .UserGallery .User {
+    margin-right: 4px;
+  }
+  .comment-body {
+    flex: 1;
+    &:first-child {
+      // chain notifications don't have a User/UserGallery
+      margin-top: 8px;
+    }
+    .chain-event-notification-top {
+      display: flex;
+      justify-content: space-between;
+      .cui-icon-action svg:hover {
+        color: $rorange-500;
+      }
+    }
+  }
+  .comment-body-title {
+    .User .user-display-name,
+    span.commented-obj {
+      font-weight: 500;
+    }
+  }
+  .comment-body-excerpt {
+    margin: 7px 0 8px;
+    color: $neutral-500;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    .QuillFormattedText {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .comment-body-bottom-wrap {
+    font-size: 15px;
+    margin-top: 12px; // needed because .comment-body-excerpt may not be present
+  }
+  .comment-body-created {
+    display: inline;
+    color: $neutral-500;
+  }
+  .comment-body-mark-as-read {
+    display: inline;
+    color: $neutral-500;
+    margin-left: 8px;
+    .cui-spinner {
+      position: relative;
+      top: -1px;
+      .cui-spinner-icon {
+        border-color: transparent;
+        border-top-color: $primary-600 !important;
+        border-right-color: $primary-600 !important;
+      }
+    }
+  }
+  .comment-body-mark-as-read:hover {
+    color: $primary-600;
+  }
+}
+
+.NotificationRowMarkAsRead {
+  .cui-popover-content {
+    padding: 15px 20px 10px;
+  }
+}

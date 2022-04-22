@@ -1,7 +1,9 @@
 /* @jsx m */
 
 import m from 'mithril';
+import { EmptyState, Icons, Spinner } from 'construct-ui';
 
+import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
 
 import {
@@ -11,24 +13,15 @@ import {
   selectNode,
 } from 'app';
 import app from 'state';
-import Sublayout from 'views/sublayout';
 import { AppToasts } from 'views/toast';
 import { PageNotFound } from 'views/pages/404';
 import { AppModals } from './app_modals';
 
-type LoadingLayoutAttrs = { hideSidebar?: boolean };
-
-export class LoadingLayout implements m.ClassComponent<LoadingLayoutAttrs> {
-  view(vnode) {
-    const { hideSidebar } = vnode.attrs;
-
+class LoadingLayout implements m.ClassComponent {
+  view() {
     return (
-      <div
-        class={`Layout mithril-app ${
-          app.isCustomDomain() ? 'custom-domain' : ''
-        }`}
-      >
-        <Sublayout isLoadingLayout={true} hideSidebar={hideSidebar} />
+      <div class="Layout">
+        <Spinner active={true} fill={true} size="xl" />
         <AppModals />
         <AppToasts />
       </div>
@@ -48,7 +41,6 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
 
   view(vnode) {
     const { scope, deferChain, hideSidebar } = vnode.attrs;
-
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
 
@@ -58,18 +50,14 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
 
     if (app.loadingError) {
       return (
-        <div
-          class={`Layout mithril-app ${
-            app.isCustomDomain() ? 'custom-domain' : ''
-          }`}
-        >
-          <Sublayout
-            errorLayout={
-              <div>
-                <p style="color: #222">
-                  Application error: ${app.loadingError}
-                </p>
-                <p style="color: #222">Please try again later</p>
+        <div class="Layout">
+          <EmptyState
+            fill={true}
+            icon={Icons.ALERT_TRIANGLE}
+            content={
+              <div class="loading-error">
+                <p>Application error: {app.loadingError}</p>
+                <p>Please try again later</p>
               </div>
             }
           />
@@ -79,20 +67,16 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       );
     } else if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
-      return <LoadingLayout hideSidebar={hideSidebar} />;
+      return <LoadingLayout />;
     } else if (scope && scopeIsEthereumAddress && scope !== this.loadingScope) {
       this.loadingScope = scope;
       initNewTokenChain(scope);
-      return <LoadingLayout hideSidebar={hideSidebar} />;
+      return <LoadingLayout />;
     } else if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return (
-        <div
-          class={`Layout mithril-app ${
-            app.isCustomDomain() ? 'custom-domain' : ''
-          }`}
-        >
+        <div class="Layout">
           <PageNotFound />
           <AppModals />
           <AppToasts />
@@ -113,12 +97,12 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
             initChain();
           }
         });
-        return <LoadingLayout hideSidebar={hideSidebar} />;
+        return <LoadingLayout />;
       }
     } else if (scope && this.deferred && !deferChain) {
       this.deferred = false;
       initChain();
-      return <LoadingLayout hideSidebar={hideSidebar} />;
+      return <LoadingLayout />;
     } else if (!scope && app.chain && app.chain.network) {
       // Handle the case where we unload the network or community, if we're
       // going to a page that doesn't have one
@@ -130,14 +114,10 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
           m.redraw();
         });
       }
-      return <LoadingLayout hideSidebar={hideSidebar} />;
+      return <LoadingLayout />;
     }
     return (
-      <div
-        class={`Layout mithril-app ${hideSidebar ? 'hide-sidebar' : ''} ${
-          app.isCustomDomain() ? 'custom-domain' : ''
-        }`}
-      >
+      <div class={`Layout${hideSidebar ? ' hide-sidebar' : ''}`}>
         {vnode.children}
         <AppModals />
         <AppToasts />

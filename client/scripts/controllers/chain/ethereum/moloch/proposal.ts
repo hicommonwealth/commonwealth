@@ -315,7 +315,7 @@ export default class MolochProposal extends Proposal<
   // web wallet TX only
   public async submitVoteWebTx(vote: MolochProposalVote) {
     const address = vote.account.address;
-    const contract = await attachSigner(this._Members.app.wallets, address, this._Members.api.Contract);
+    const contract = await attachSigner(this._Members.app.wallets, vote.account, this._Members.api.Contract);
 
     if (!(await this._Members.isDelegate(address))) {
       throw new Error('sender must be valid delegate');
@@ -360,8 +360,11 @@ export default class MolochProposal extends Proposal<
 
   public async processTx() {
     // TODO: is this the correct user to process?
-    const address = this._Members.app.user.activeAccount.address;
-    const contract = await attachSigner(this._Members.app.wallets, address, this._Members.api.Contract);
+    const contract = await attachSigner(
+      this._Members.app.wallets,
+      this._Members.app.user.activeAccount,
+      this._Members.api.Contract
+    );
 
     if (this.state !== MolochProposalState.ReadyToProcess) {
       throw new Error('proposal not ready to process');
@@ -380,8 +383,9 @@ export default class MolochProposal extends Proposal<
 
   public async abortTx() {
     const address = this.applicantAddress;
-    const contract = await attachSigner(this._Members.app.wallets, address, this._Members.api.Contract);
-
+    if (this._Members.app.user.activeAccount.address !== address) {
+      throw new Error('only applicant can abort');
+    }
     if (this.isAborted) {
       throw new Error('proposal already aborted');
     }
@@ -390,9 +394,11 @@ export default class MolochProposal extends Proposal<
       throw new Error('proposal not in abort window');
     }
 
-    if (address !== this.applicantAddress) {
-      throw new Error('only applicant can abort');
-    }
+    const contract = await attachSigner(
+      this._Members.app.wallets,
+      this._Members.app.user.activeAccount,
+      this._Members.api.Contract
+    );
 
     const tx = await contract.abort(
       this.data.identifier,

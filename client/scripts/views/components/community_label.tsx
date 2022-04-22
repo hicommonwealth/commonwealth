@@ -1,13 +1,14 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Icon, Icons } from 'construct-ui';
 
 import 'components/community_label.scss';
 
 import { ChainInfo } from 'models';
 import { ChainIcon, TokenIcon } from 'views/components/chain_icon';
 import { ChainStatusIndicator } from 'views/components/chain_status_indicator';
+import { isNotUndefined } from 'helpers/typeGuards';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 type CommunityLabelAttrs = {
   chain?: ChainInfo;
@@ -18,12 +19,12 @@ type CommunityLabelAttrs = {
 };
 
 const getCommunityNameIcon = (chain: ChainInfo, token: any) => {
-  if (chain) {
+  if (isNotUndefined(chain)) {
     return <ChainStatusIndicator hideLabel={true} />;
   } else if (token.privacyEnabled) {
-    return <Icon name={Icons.LOCK} size="xs" />;
+    return <CWIcon iconName="lock" size="small" />;
   } else {
-    <Icon name={Icons.GLOBE} size="xs" />;
+    <CWIcon iconName="website" size="small" />;
   }
 };
 
@@ -31,7 +32,7 @@ export class CommunityLabel implements m.ClassComponent<CommunityLabelAttrs> {
   view(vnode) {
     const { chain, hasLink, showStatus, size = 18, token } = vnode.attrs;
 
-    if (chain || token)
+    if (isNotUndefined(chain) || isNotUndefined(token))
       return (
         <div class="CommunityLabel">
           {chain ? (

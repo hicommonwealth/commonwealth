@@ -41,14 +41,20 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
   }
 
   public format(): string {
-    return `${formatNumberLong(+Web3.utils.fromWei(this.power))} ${this.account.chain.symbol}`;
+    return `${formatNumberLong(+Web3.utils.fromWei(this.power))} ${
+      this.account.chain.symbol
+    }`;
   }
 }
 
 const ONE_HUNDRED_WITH_PRECISION = 10000;
 
-const backportEntityToAdapter = (entity: ChainEntity): IAaveProposalResponse => {
-  const startEvent = entity.chainEvents.find((e) => e.data.kind === AaveTypes.EventKind.ProposalCreated);
+const backportEntityToAdapter = (
+  entity: ChainEntity
+): IAaveProposalResponse => {
+  const startEvent = entity.chainEvents.find(
+    (e) => e.data.kind === AaveTypes.EventKind.ProposalCreated
+  );
   const startData = startEvent.data as AaveTypes.IProposalCreated;
   return {
     identifier: `${startData.id}`,
@@ -90,7 +96,9 @@ export default class AaveProposal extends Proposal<
   private _Accounts: EthereumAccounts;
   private _Gov: AaveGovernance;
   private _Executor: AaveExecutor;
-  public get Executor() { return this._Executor; }
+  public get Executor() {
+    return this._Executor;
+  }
 
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
@@ -114,17 +122,25 @@ export default class AaveProposal extends Proposal<
       case AaveTypes.ProposalState.FAILED:
         return ProposalStatus.Failed;
       case AaveTypes.ProposalState.ACTIVE:
-        return this._isPassed() ? ProposalStatus.Passing : ProposalStatus.Failing;
+        return this._isPassed()
+          ? ProposalStatus.Passing
+          : ProposalStatus.Failing;
       default:
         // PENDING
         return ProposalStatus.None;
     }
   }
 
-  public get author() { return this._Accounts.get(this.data.proposer); }
+  public get author() {
+    return this._Accounts.get(this.data.proposer);
+  }
 
-  public get votingType() { return VotingType.ConvictionYesNoVoting; }
-  public get votingUnit() { return VotingUnit.PowerVote; }
+  public get votingType() {
+    return VotingType.ConvictionYesNoVoting;
+  }
+  public get votingUnit() {
+    return VotingUnit.PowerVote;
+  }
 
   public async queryStateFromChain(): Promise<AaveTypes.ProposalState> {
     const state = await this._Gov.api.Governance.getProposalState(this.data.id);
@@ -137,29 +153,38 @@ export default class AaveProposal extends Proposal<
   public get state(): AaveTypes.ProposalState {
     const currentTime = Date.now() / 1000;
     if (this.data.cancelled) return AaveTypes.ProposalState.CANCELED;
-    if (currentTime <= blocknumToTime(this.data.startBlock).unix()) return AaveTypes.ProposalState.PENDING;
-    if (currentTime <= blocknumToTime(this.data.endBlock).unix()) return AaveTypes.ProposalState.ACTIVE;
+    if (currentTime <= blocknumToTime(this.data.startBlock).unix())
+      return AaveTypes.ProposalState.PENDING;
+    if (currentTime <= blocknumToTime(this.data.endBlock).unix())
+      return AaveTypes.ProposalState.ACTIVE;
     if (this._isPassed() === false) return AaveTypes.ProposalState.FAILED;
-    if (!this.data.executionTime && !this.data.queued) return AaveTypes.ProposalState.SUCCEEDED;
+    if (!this.data.executionTime && !this.data.queued)
+      return AaveTypes.ProposalState.SUCCEEDED;
     if (this.data.executed) return AaveTypes.ProposalState.EXECUTED;
-    if (currentTime > (this.data.executionTime + this._Executor.gracePeriod)) return AaveTypes.ProposalState.EXPIRED;
+    if (currentTime > this.data.executionTime + this._Executor.gracePeriod)
+      return AaveTypes.ProposalState.EXPIRED;
     if (this.data.queued) return AaveTypes.ProposalState.QUEUED;
     return null;
   }
 
-  public get startBlock() { return this.data.startBlock; }
+  public get startBlock() {
+    return this.data.startBlock;
+  }
 
   public get endTime(): ProposalEndTime {
     const state = this.state;
 
     // waiting to start
-    if (state === AaveTypes.ProposalState.PENDING) return { kind: 'fixed_block', blocknum: this.data.startBlock };
+    if (state === AaveTypes.ProposalState.PENDING)
+      return { kind: 'fixed_block', blocknum: this.data.startBlock };
 
     // started
-    if (state === AaveTypes.ProposalState.ACTIVE) return { kind: 'fixed_block', blocknum: this.data.endBlock };
+    if (state === AaveTypes.ProposalState.ACTIVE)
+      return { kind: 'fixed_block', blocknum: this.data.endBlock };
 
     // queued but not ready for execution
-    if (state === AaveTypes.ProposalState.QUEUED) return { kind: 'fixed', time: moment.unix(this.data.executionTime) };
+    if (state === AaveTypes.ProposalState.QUEUED)
+      return { kind: 'fixed', time: moment.unix(this.data.executionTime) };
 
     // unavailable if: waiting to passed/failed but not in queue, or completed
     return { kind: 'unavailable' };
@@ -175,7 +200,9 @@ export default class AaveProposal extends Proposal<
     const yesPower = sumVotes(votes.filter((v) => v.choice));
     const noPower = sumVotes(votes.filter((v) => !v.choice));
     if (yesPower.isZero() && noPower.isZero()) return 0;
-    const supportBn = yesPower.muln(ONE_HUNDRED_WITH_PRECISION).div(yesPower.add(noPower));
+    const supportBn = yesPower
+      .muln(ONE_HUNDRED_WITH_PRECISION)
+      .div(yesPower.add(noPower));
     return +supportBn / ONE_HUNDRED_WITH_PRECISION;
   }
 
@@ -184,7 +211,9 @@ export default class AaveProposal extends Proposal<
       return null;
     }
     const totalPowerVoted = sumVotes(this.getVotes());
-    const turnoutBn = totalPowerVoted.muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    const turnoutBn = totalPowerVoted
+      .muln(ONE_HUNDRED_WITH_PRECISION)
+      .div(this._votingSupplyAtStart);
     return +turnoutBn / ONE_HUNDRED_WITH_PRECISION;
   }
 
@@ -196,8 +225,12 @@ export default class AaveProposal extends Proposal<
     const votes = this.getVotes();
     const yesPower = sumVotes(votes.filter((v) => v.choice));
     const noPower = sumVotes(votes.filter((v) => !v.choice));
-    const forProportion = yesPower.muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
-    const againstProportion = noPower.muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
+    const forProportion = yesPower
+      .muln(ONE_HUNDRED_WITH_PRECISION)
+      .div(this._votingSupplyAtStart);
+    const againstProportion = noPower
+      .muln(ONE_HUNDRED_WITH_PRECISION)
+      .div(this._votingSupplyAtStart);
     return (+forProportion - +againstProportion) / ONE_HUNDRED_WITH_PRECISION;
   }
 
@@ -213,7 +246,9 @@ export default class AaveProposal extends Proposal<
   private _minVotingPowerNeeded: BN;
   private _ipfsAddress: string;
   private _ipfsData: AipIpfsObject;
-  public get ipfsData() { return this._ipfsData; }
+  public get ipfsData() {
+    return this._ipfsData;
+  }
 
   // Check whether a proposal has enough extra FOR-votes than AGAINST-votes
   // FOR VOTES - AGAINST VOTES > VOTE_DIFFERENTIAL * voting supply
@@ -224,8 +259,12 @@ export default class AaveProposal extends Proposal<
     const votes = this.getVotes();
     const yesVotes = votes.filter((v) => v.choice);
     const noVotes = votes.filter((v) => !v.choice);
-    const forProportion = sumVotes(yesVotes).muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart);
-    const againstProportion = sumVotes(noVotes).muln(ONE_HUNDRED_WITH_PRECISION).div(this._votingSupplyAtStart)
+    const forProportion = sumVotes(yesVotes)
+      .muln(ONE_HUNDRED_WITH_PRECISION)
+      .div(this._votingSupplyAtStart);
+    const againstProportion = sumVotes(noVotes)
+      .muln(ONE_HUNDRED_WITH_PRECISION)
+      .div(this._votingSupplyAtStart)
       .add(this._Executor.voteDifferential);
     return forProportion.gt(againstProportion);
   }
@@ -244,18 +283,28 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    $.getJSON(`https://ipfs.infura.io:5001/api/v0/cat?arg=${this._ipfsAddress}`).then((ipfsData) => {
-      this._ipfsData = ipfsData;
-    }).catch((e) => console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`));
+    $.post(`https://ipfs.infura.io:5001/api/v0/cat?arg=${this._ipfsAddress}`)
+      .then((ipfsData) => {
+        this._ipfsData = JSON.parse(ipfsData);
+      })
+      .catch((e) =>
+        console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`)
+      );
 
     try {
-      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(this.data.startBlock);
+      const totalVotingSupplyAtStart =
+        await this._Gov.api.Strategy.getTotalVotingSupplyAt(
+          this.data.startBlock
+        );
       this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
     } catch (e2) {
       console.error(
         'Failed to fetch total voting supply at proposal start block, using hardcoded value.'
       );
-      this._votingSupplyAtStart = Web3.utils.toWei(new BN(1_000_000_000), 'ether');
+      this._votingSupplyAtStart = Web3.utils.toWei(
+        new BN(1_000_000_000),
+        'ether'
+      );
     }
 
     this._minVotingPowerNeeded = this._votingSupplyAtStart
@@ -266,7 +315,10 @@ export default class AaveProposal extends Proposal<
 
     // special case for expiration because no event is emitted
     // TODO: hook onto specific block and set expired automatically
-    if (this.state === AaveTypes.ProposalState.EXPIRED || this.state === AaveTypes.ProposalState.FAILED) {
+    if (
+      this.state === AaveTypes.ProposalState.EXPIRED ||
+      this.state === AaveTypes.ProposalState.FAILED
+    ) {
       this.complete(this._Gov.store);
     }
   }
@@ -275,7 +327,7 @@ export default class AaveProposal extends Proposal<
     Chain: AaveChain,
     Accounts: EthereumAccounts,
     Gov: AaveGovernance,
-    entity: ChainEntity,
+    entity: ChainEntity
   ) {
     // must set identifier before super() because of how response object is named
     super(ProposalType.AaveProposal, backportEntityToAdapter(entity));
@@ -284,12 +336,16 @@ export default class AaveProposal extends Proposal<
     this._Accounts = Accounts;
     this._Gov = Gov;
 
-    entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
+    entity.chainEvents
+      .sort((e1, e2) => e1.blockNumber - e2.blockNumber)
+      .forEach((e) => this.update(e));
 
     this._Executor = this._Gov.api.getExecutor(this.data.executor);
     this._Gov.store.add(this);
     // insert Qm prefix via hex
-    this._ipfsAddress = bs58.encode(Buffer.from(`1220${this.data.ipfsHash.slice(2)}`, 'hex'));
+    this._ipfsAddress = bs58.encode(
+      Buffer.from(`1220${this.data.ipfsHash.slice(2)}`, 'hex')
+    );
   }
 
   public update(e: ChainEvent) {
@@ -302,7 +358,7 @@ export default class AaveProposal extends Proposal<
         const vote = new AaveProposalVote(
           this._Accounts.get(e.data.voter),
           e.data.support,
-          power,
+          power
         );
         this.addOrUpdateVote(vote);
         break;
@@ -338,10 +394,12 @@ export default class AaveProposal extends Proposal<
   }
 
   public get isCancellable() {
-    return !(this.state === AaveTypes.ProposalState.CANCELED
-      || this.state === AaveTypes.ProposalState.FAILED
-      || this.state === AaveTypes.ProposalState.EXECUTED
-      || this.state === AaveTypes.ProposalState.EXPIRED);
+    return !(
+      this.state === AaveTypes.ProposalState.CANCELED ||
+      this.state === AaveTypes.ProposalState.FAILED ||
+      this.state === AaveTypes.ProposalState.EXECUTED ||
+      this.state === AaveTypes.ProposalState.EXPIRED
+    );
   }
 
   public get isQueueable() {
@@ -352,8 +410,6 @@ export default class AaveProposal extends Proposal<
     if (this.data.cancelled) {
       throw new Error('proposal already canceled');
     }
-
-    const address = this._Gov.app.user.activeAccount.address;
 
     // validate proposal state
     if (!this.isCancellable) {
@@ -370,20 +426,23 @@ export default class AaveProposal extends Proposal<
     const isCancellable = await executor.contract.validateProposalCancellation(
       this._Gov.api.Governance.address,
       this.data.proposer,
-      blockNumber - 1,
+      blockNumber - 1
     );
     if (!isCancellable) {
       const guardian = await this._Gov.api.Governance.getGuardian();
-      if (address !== guardian) {
+      if (this._Gov.app.user.activeAccount.address !== guardian) {
         throw new Error('proposal cannot be cancelled');
       }
     }
 
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Governance);
-    const tx = await contract.cancel(
-      this.data.identifier,
-      { gasLimit: this._Gov.api.gasLimit }
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
     );
+    const tx = await contract.cancel(this.data.identifier, {
+      gasLimit: this._Gov.api.gasLimit,
+    });
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to cancel proposal');
@@ -392,15 +451,17 @@ export default class AaveProposal extends Proposal<
   }
 
   public async queueTx() {
-    const address = this._Gov.app.user.activeAccount.address;
-
     // validate proposal state
     if (this.state !== AaveTypes.ProposalState.SUCCEEDED) {
       throw new Error('Proposal not in succeeded state');
     }
 
     // no user validation needed
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Governance);
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
+    );
     const tx = await contract.queue(this.data.id);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -410,20 +471,24 @@ export default class AaveProposal extends Proposal<
 
   public get isExecutable() {
     // will be EXPIRED if over grace period
-    return this.state === AaveTypes.ProposalState.QUEUED
-      && this.data.executionTime
-      && this.data.executionTime <= this._Gov.app.chain.block.lastTime.unix();
+    return (
+      this.state === AaveTypes.ProposalState.QUEUED &&
+      this.data.executionTime &&
+      this.data.executionTime <= this._Gov.app.chain.block.lastTime.unix()
+    );
   }
 
   public async executeTx() {
-    const address = this._Gov.app.user.activeAccount.address;
-
     if (!this.isExecutable) {
       throw new Error('proposal not in executable state');
     }
 
     // no user validation needed
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Governance);
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
+    );
     const tx = await contract.execute(this.data.id);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -441,12 +506,19 @@ export default class AaveProposal extends Proposal<
     }
 
     // ensure user hasn't voted
-    const previousVote = await this._Gov.api.Governance.getVoteOnProposal(this.data.id, address);
+    const previousVote = await this._Gov.api.Governance.getVoteOnProposal(
+      this.data.id,
+      address
+    );
     if (previousVote && !previousVote.votingPower.isZero()) {
       throw new Error('user has already voted on this proposal');
     }
 
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Governance);
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Governance
+    );
     const tx = await contract.submitVote(this.data.id, vote.choice);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {

@@ -6,7 +6,7 @@ import 'components/sidebar/index.scss';
 
 import { navigateToSubpage } from 'app';
 import app from 'state';
-import { SidebarSection } from './sidebar_section';
+import { SidebarSectionGroup } from './sidebar_section';
 import {
   MobileSidebarSectionAttrs,
   SectionGroupAttrs,
@@ -78,13 +78,11 @@ export class DiscussionSection
     const onSputnikDaosPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
 
-    const topics = app.topics
+    const topics = app.topics.store
       .getByCommunity(app.activeChainId())
-      .map(({ id, name, featuredInSidebar }) => {
-        return { id, name, featuredInSidebar };
-      })
       .filter((t) => t.featuredInSidebar)
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => a.order - b.order);
 
     const discussionsLabel = ['vesuvius', 'olympus'].includes(
       app.activeChainId()
@@ -205,6 +203,6 @@ export class DiscussionSection
       toggleDisabled: vnode.attrs.mobile,
     };
 
-    return <SidebarSection {...sidebarSectionData} />;
+    return <SidebarSectionGroup {...sidebarSectionData} />;
   }
 }

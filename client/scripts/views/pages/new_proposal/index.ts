@@ -6,7 +6,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
+import { PageLoading } from 'views/pages/loading';
 import { ProposalType } from 'types';
 import {
   proposalSlugToClass,
@@ -62,14 +62,13 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
     return m(
       Sublayout,
       {
-        class: 'NewProposalPage',
         title: `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(
           vnode.state.typeEnum
         )}`,
         showNewProposalButton: true,
       },
       [
-        m('.forum-container', [
+        m('.NewProposalPage', [
           m(
             'h3',
             `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(

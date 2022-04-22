@@ -1,30 +1,42 @@
 @import 'client/styles/shared';
 
 .SearchPage {
-  padding-bottom: 40px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 904px;
 
-  .sublayout-main-col {
-    padding: 0 5%;
-  }
-  .sublayout-sidebar-col {
-    max-width: 0px;
-    padding-right: 0;
+  @include sm-max {
+    width: 100%;
   }
 
   .search-page-input {
     margin-top: 30px;
   }
+
   .search-error {
     margin: 21px 0 8px;
   }
+
   .cui-tabs {
     @include gradientTabs();
   }
+
   .search-results-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    .search-results {
+      display: flex;
+      flex-direction: column;
+    }
+
     .search-results-caption {
       margin: 20px 0;
       text-align: center;
-      color: $text-color-light;
+      color: $neutral-500;
+
       .search-results-clear {
         margin-left: 10px;
       }
@@ -51,17 +63,21 @@
     }
     .search-results-list {
       padding: 10px 20px;
+
       .cui-list {
         max-height: none !important;
       }
+
       .cui-list-item {
         border-top: none;
         border-bottom: none;
         min-height: 100px;
         padding: 5px 5px 5px 10px;
+
         &:hover {
-          background-color: $background-color-white-hover;
+          background-color: $primary-400;
         }
+
         .cui-list-item-content-left {
           height: 100px;
           width: 50px;
@@ -71,367 +87,87 @@
           align-items: center;
           margin-right: 4px;
         }
+
         .search-results-item {
-          display: block;
           padding: 20px;
-          color: $text-color-black;
+          color: $neutral-800;
           text-decoration: none;
           width: 100%;
           overflow: hidden;
+
           /* Member results */
           .user-block-name {
             opacity: 1;
             font-weight: 500;
             margin-bottom: 2px;
           }
+
           .user-block-address {
             font-size: 18px;
             margin-top: 2px;
             opacity: 1;
-            color: $text-color-light;
+            color: $neutral-500;
+
             mark {
-              background: $background-color-light;
+              background: $primary-300;
               border-radius: 5px;
-              color: black !important;
+              color: $black !important;
             }
           }
+
           .search-results-thread-header {
-            color: $text-color-light;
+            color: $neutral-500;
             text-transform: uppercase;
             font-size: 13px;
             margin-bottom: 2px;
           }
+
           /* Thread results */
           .search-results-thread-title {
             font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
+
           .search-results-thread-subtitle {
             margin: 2px 0 3px;
+
             .created-at {
               font-weight: 400;
-              color: $text-color-light;
+              color: $neutral-500;
             }
+
             .User {
               margin-left: 14px;
               font-weight: 400;
-              color: $text-color-light;
+              color: $neutral-500;
             }
           }
+
           .search-results-thread-body {
-            color: $text-color-light;
+            color: $neutral-500;
           }
+
           .search-results-comment {
-            color: $text-color-light;
+            color: $neutral-500;
           }
+
           .search-results-thread-body,
           .search-results-comment {
             mark {
-              background: $background-color-light;
+              background: $primary-300;
               padding: 5px 2px 0;
               margin: 0 3px;
               border-radius: 5px;
             }
           }
         }
+
         .search-results-item:hover {
           cursor: pointer;
         }
       }
-    }
-  }
-}
-
-.SearchBar {
-  margin: -1px 4%;
-  padding: 0 1px;
-  flex: 6;
-  position: relative;
-  .cui-input {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    border-radius: 25px;
-    font-size: 14px;
-    color: black;
-    border: 1px solid $border-color-lightest;
-    svg.SearchIcon {
-      z-index: 2;
-      position: relative;
-      left: 30px;
-      margin-left: -15px;
-      fill: url(#paint0_linear);
-    }
-    .chain-icon,
-    .community-icon,
-    .cui-icon-x,
-    .cui-icon-corner-down-left {
-      z-index: 2;
-      right: 30px;
-      margin-right: -15px;
-      border-radius: 50%;
-    }
-    .cui-icon-corner-down-left {
-      right: 50px;
-      margin-right: -30px;
-    }
-
-    .chain-icon,
-    .community-icon {
-      position: relative;
-    }
-    .ChainIcon,
-    .CommunityIcon {
-      position: absolute;
-      right: -14px;
-      width: 18px;
-    }
-    &:focus-within {
-      background: linear-gradient(to bottom, #91ace1, #ddbfe1) !important;
-      border: none;
-      padding: 0 1px;
-    }
-    &:hover {
-      background: linear-gradient(to bottom, #cddefe, #e7d8e9);
-    }
-    input {
-      height: 31px;
-      padding: 20px 15px 15px;
-      padding-right: 38px;
-      position: relative;
-      background: #efefef;
-      border: none;
-      outline: 0;
-    }
-  }
-  .search-results-list,
-  .cui-list {
-    position: absolute;
-    z-index: 11;
-    top: 40px;
-    left: 0;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.15);
-    width: 100%;
-    padding: 20px 0 10px 0;
-    overflow-y: visible;
-    max-height: 90vh !important;
-    min-width: 400px;
-    overflow-y: scroll;
-
-    &.search-results-loading {
-      display: flex;
-      justify-content: center;
-    }
-    .cui-list-item {
-      border-bottom: none;
-      padding: 5px 20px !important;
-      top: 0 !important;
-      &:focus {
-        outline: #cfcbff auto 2px;
-      }
-      .search-results-item {
-        color: $text-color-black;
-        text-decoration: none;
-        padding: 6px 0;
-        font-size: 18px;
-        overflow: hidden;
-        line-height: 1.2;
-
-        .search-results-thread-title {
-          font-weight: 500;
-          margin-bottom: 4px;
-        }
-        .search-results-thread-subtitle {
-          margin-bottom: 2px;
-          .User {
-            margin-left: 5px;
-          }
-        }
-        mark {
-          background-color: #cfcbff;
-        }
-      }
-      &.disabled,
-      &.no-results {
-        font-weight: 500;
-        font-size: 14px;
-        letter-spacing: 0.3px;
-        line-height: 14px;
-        color: $text-color-medium-dark;
-        margin-top: 15px;
-        top: 2px;
-        &:first-child {
-          margin-top: 0px;
-        }
-        &:hover {
-          background: white;
-        }
-      }
-      &.disabled {
-        margin-top: 5px;
-        &:hover {
-          cursor: default;
-        }
-      }
-      &.no-results {
-        display: flex;
-        justify-content: space-between;
-        b {
-          width: 50%;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
-        }
-        span {
-          width: 50%;
-          color: $primary-bg-color;
-          text-align: right;
-        }
-      }
-      &.bottom-border {
-        border-bottom: 1px solid $background-color-light;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-      }
-      &.search-history-item {
-        padding-top: 10px !important;
-        .cui-list-item-content-left {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          align-content: space-around;
-
-          p {
-            padding-top: 5px;
-            &.search-history-tag-seperator {
-              color: $text-color-light;
-              margin: 0 5px 0 2px;
-            }
-          }
-
-          .cui-icon {
-            margin: 0 5px;
-            color: $text-color-lightest;
-          }
-
-          .cui-tag {
-            border-radius: 10px;
-            text-transform: capitalize;
-            margin-right: 3px;
-
-            &.search-history-primary-tag {
-              border: 1px solid #6300ff;
-              color: #4a00bc;
-            }
-          }
-
-          .cui-tag:first-child {
-            margin-left: 10px;
-          }
-        }
-        .cui-list-item-content-right {
-          padding-top: 1px;
-          z-index: 10;
-
-          .cui-icon:hover {
-            color: $text-color-black;
-            transform: scale(1.2);
-            transition: 100ms;
-          }
-        }
-      }
-      &.search-history-no-results {
-        font-size: 18px;
-        text-align: center;
-        justify-content: center;
-        color: $text-color-lighter;
-
-        &:hover {
-          background: white !important;
-          cursor: initial !important;
-        }
-      }
-      &.upper-border {
-        border-top: 1px solid $background-color-light !important;
-        padding-top: 15px !important;
-        margin-top: 5px;
-      }
-      .cui-button {
-        margin-right: 10px;
-        margin-bottom: 10px;
-        padding: 15px 15px !important;
-        font-size: 18px !important;
-        border-radius: 10px !important;
-        border: 1px solid white;
-        background: #f4f4f4;
-
-        &.cui-active {
-          background: #f2edff;
-          border: 1px solid #6300ff;
-        }
-
-        &.cui-active:hover {
-          background: #e8e1fd;
-          border: 1px solid #4a00bc;
-        }
-
-        .cui-button-label {
-          margin: 0;
-          padding: 0;
-        }
-
-        &.disabled {
-          pointer-events: none;
-          background: #bebebe;
-          color: $text-color-light;
-        }
-      }
-      .cui-button:hover {
-        background: #e7e7e7;
-      }
-      .cui-spinner {
-        width: 100%;
-        height: 25px;
-      }
-    }
-    .UserBlock {
-      .user-block-left {
-        display: flex;
-        align-items: center;
-      }
-      .user-block-right {
-        display: none;
-      }
-    }
-    .search-filter-button-bar {
-      display: flex;
-      flex-wrap: wrap;
-    }
-  }
-}
-
-@media only screen and (max-width: 800px) {
-  .search-results-list {
-    left: -55px !important;
-    width: 97vw !important;
-  }
-
-  .search-filter-button-bar {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
-    padding-right: 0 !important;
-  }
-
-  .search-history-tag-seperator {
-    display: none;
-  }
-
-  .cui-list-item-content-left {
-    overflow: scroll;
-    .cui-tag {
-      margin-left: 3px;
-      font-size: 16px;
     }
   }
 }

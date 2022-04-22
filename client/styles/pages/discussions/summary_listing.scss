@@ -1,132 +1,88 @@
 @import 'shared';
-@import 'shared';
-@import 'mixins/responsive';
 
 .SummaryListing {
   display: flex;
   flex-direction: column;
 
-  .SummaryRow {
+  .row-header {
     display: flex;
-    padding: 15px 0;
-    border-top: 1px solid $disable-gray;
-    max-width: 100%;
+    flex-direction: row;
+    margin-bottom: 16px;
 
-    .recent-thread-cell {
-      display: flex;
-      flex-direction: column;
-      .thread-summary {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 15px;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-        a.thread-title {
-          flex: 4;
-          color: $purp-blue;
-          &:hover {
-            text-decoration: none;
-          }
-        }
-        .last-updated {
-          flex: 1;
-          text-align: left;
-          min-width: max-content;
-          span {
-            color: $lite-gray;
-          }
-        }
-      }
-    }
-    .topic-header,
-    .topic-cell {
-      h3 {
-        font-size: 24px;
-        font-weight: 500;
-        cursor: pointer;
-      }
+    h4 {
+      color: $neutral-600;
+      flex: 1;
+      font-weight: 500;
     }
   }
 
-  h4 {
-    color: $midi-gray;
-    font-size: 18px;
-    margin-bottom: 10px;
-    display: flex;
-    font-weight: 500;
-  }
   .row-wrap {
     display: flex;
     flex-direction: column;
   }
 
-  .topic-header,
-  .topic-cell {
-    flex: 385;
-  }
-  .recent-thread-header,
-  .recent-thread-cell {
-    flex: 430;
-    .thread-title {
-      flex: 335;
-    }
-    .last-updated {
-      flex: 95;
-      width: auto;
-      // implement with "last commenter" icon
-      // margin-right: 25px;
-    }
-  }
+  .SummaryRow {
+    border-top: 1px solid $neutral-100;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 16px 0;
 
-  @include lg-min {
-    .topic-header,
-    .topic-cell,
-    .recent-thread-header,
-    .thread-title {
-      margin-right: 50px;
+    .topic-header {
+      color: $neutral-600;
     }
-  }
 
-  @include lg-min {
-    .topic-header,
-    .topic-cell,
-    .recent-thread-header,
-    .thread-title {
-      margin-right: 40px;
-    }
-  }
-
-  @include md-max {
-    .topic-header,
     .topic-cell {
-      flex: 225;
-      margin-right: 25px;
-    }
-    .recent-thread-header,
-    .recent-thread-cell {
-      flex: 225;
-    }
-    .thread-summary {
-      display: flex;
-      flex-direction: column;
-    }
-  }
+      flex: 1;
 
-  @include sm-max {
-    .SummaryRow {
+      @include sm-max {
+        margin-bottom: 8px;
+      }
+
+      h3 {
+        cursor: pointer;
+        margin-bottom: 8px;
+      }
+
+      p {
+        font-size: 15px;
+        padding-right: 16px;
+      }
+    }
+
+    .recent-thread-header {
+      color: $neutral-600;
+    }
+
+    @include sm-max {
       flex-direction: column;
-      .topic-header,
-      .recent-thread-header {
-        margin-bottom: 7px;
-      }
-      .topic-cell {
-        margin-bottom: 15px;
-      }
-      .last-updated {
+    }
+
+    .recent-thread-cell {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+
+      .thread-summary {
         display: flex;
+        flex-direction: row;
         justify-content: space-between;
+        margin-bottom: 16px;
+
+        .thread-title {
+          display: flex;
+          color: $purple-400;
+          margin-right: 16px;
+        }
+
+        .last-updated {
+          color: $neutral-500;
+          min-width: max-content;
+        }
+
+        @include sm-max {
+          flex-direction: column;
+        }
       }
     }
   }

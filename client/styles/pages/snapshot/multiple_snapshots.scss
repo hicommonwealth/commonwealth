@@ -1,56 +1,50 @@
 @import 'client/styles/shared';
 
 .SnapshotSpaceCard {
-    @include card;
-    padding: 0;
-    margin-top: 40px;
-    height: initial;
-    .spaces-card-top {
-        position: relative;
-        padding: 24px 24px 22px;
-        min-height: 140px;
-        width: 100%;
+  @include card;
+  padding: 0;
+  margin-top: 40px;
+  height: initial;
+  .spaces-card-top {
+    position: relative;
+    padding: 24px 24px 22px;
+    min-height: 140px;
+    width: 100%;
+  }
+  .spaces-card-metadata {
+    min-height: 60px;
+    max-height: 60px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    display: flex;
+  }
+  .card-subheader {
+    color: $neutral-600;
+    font-size: 14px;
+    margin-left: auto;
+    margin-top: 12px;
+  }
+  .spaces-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 9px 0 0px;
+  }
+  .space-status {
+    position: absolute;
+    bottom: 14px;
+    font-weight: 400;
+    margin-bottom: 4px;
+    color: $neutral-500;
+    &.pass {
+      color: $green-500;
     }
-    .spaces-card-metadata {
-        min-height: 60px;
-        max-height: 60px;
-        margin-bottom: 10px;
-        overflow: hidden;
-        display: flex;
+    &.fail {
+      color: $rorange-500;
     }
-    .card-subheader {
-        color: #666666;
-        font-size: 14px;
-        line-height: 1.1;
-        margin-left: auto;
-        margin-top: 12px;
-    }
-    .spaces-title {
-        font-size: 18px;
-        font-weight: 500;
-        line-height: 1.1;
-        margin: 9px 0 0px;
-    }
-    .space-status {
-        position: absolute;
-        bottom: 14px;
-        font-weight: 400;
-        line-height: 1.1;
-        margin-bottom: 4px;
-        color: $text-color-light;
-        &.pass {
-            color: $positive-bg-color;
-        }
-        &.fail {
-            color: $negative-bg-color;
-        }
-    }
+  }
 }
 
 .SnapshotSpaceTextHeader {
-    font-size: 18px;
-    font-weight: 500;
-    line-height: 1.1;
-    margin-top: 40px;
-    margin-bottom: -20px;
+  font-size: 18px;
+  font-weight: 500;
 }

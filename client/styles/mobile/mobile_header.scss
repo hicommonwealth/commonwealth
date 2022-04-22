@@ -1,93 +1,39 @@
 @import 'client/styles/shared';
 
-@mixin sidebar {
-  .OffchainNavigationModule {
-    button {
-      height: 100%;
-    }
-
-    button > span {
-      white-space: normal;
-      text-align: left;
-    }
-  }
-
-  .cui-button.cui-active {
-    background: linear-gradient(
-      268.91deg,
-      #91bfff -61.91%,
-      #91ffa0 2.69%,
-      #fbff91 60.22%,
-      #ff9191 131.89%
-    );
-
-    border: 1px solid transparent;
-  }
-
-  .cui-button.sub-button {
-    margin-left: 18px;
-    width: calc(100% - 18px);
-  }
-
-  .cui-button.cui-align-center {
-    justify-content: left;
-  }
-
-  .ExternalLinksModule {
-    margin-top: 10px;
-  }
-
-  .SubscriptionButton {
-    margin-bottom: 10px;
-  }
-
-  .ChainStatusModule {
-    .chain-deferred {
-      color: $text-color-medium;
-    }
-
-    // form stuff
-    .form-group {
-      margin-bottom: 0;
-
-      select {
-        width: 100%;
-        border-color: $border-color-lightest;
-        border-radius: 2px;
-        padding: 5px 6px;
-      }
-
-      .chain-status-main {
-        width: calc(100% - 28px);
-      }
-    }
-
-    .cui-button-label {
-      text-align: left;
-      width: 100%;
-    }
-
-    .cui-icon svg {
-      min-width: 12px;
-      min-height: 12px;
-      width: 12px;
-      height: 12px;
-    }
-  }
-}
-
 .MobileHeader {
+  display: none;
+
+  @include sm-max {
+    display: flex;
+    left: 0;
+    padding: 8px 16px;
+    position: fixed;
+    height: 88px;
+    top: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 100%;
+    z-index: 99;
+    flex-direction: row;
+    align-items: center;
+
+    .mobile-popover-trigger {
+      border: none;
+      box-shadow: none;
+    }
+  }
+
   * {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   }
   // only content styles here. layout styles are in layout.scss
-  background: $background-color-white;
-  border-bottom: 1px solid $border-color-lightest;
+  background: $white;
+  border-bottom: 1px solid $neutral-50;
 
   img.mobile-logo {
-    height: 34px;
-    position: relative;
-    top: 1px;
+    height: 32px;
   }
 
   .mobile-header-center {
@@ -103,14 +49,20 @@
     }
   }
 
+  .mobile-header-right {
+    display: flex;
+    height: 100%;
+    align-items: center;
+  }
+
   // TODO: split this up so CSS classes aren't duplicated
   .mobile-header-left,
   .mobile-header-center,
   .mobile-header-right {
     .CommunitySelector .cui-button {
-      background: $background-color-white;
+      background: $white;
       border-radius: 4px !important;
-      border: 1px solid #c5cdd1 !important;
+      border: 1px solid $neutral-300 !important;
       overflow: hidden;
       padding: 0 14px;
       width: 100%;
@@ -130,38 +82,14 @@
       display: inline-block;
     }
 
-    > .cui-button,
-    > .MobileNewProposalButton,
-    > .community-label,
-    > .LoginSelector {
-      margin-left: 5px;
-    }
-
     > .cui-button {
-      &.no-border {
-        border: none;
-      }
-
       .cui-button-label {
-        display: inline-block;
-        position: relative;
-        top: 1px;
+        display: flex;
 
         .CustomHamburgerIcon {
           position: relative;
           right: 1.5px;
         }
-      }
-    }
-
-    .mobile-header-trigger {
-      box-sizing: content-box;
-      width: 26px;
-
-      .cui-icon-x > svg {
-        height: 26px;
-        width: 26px;
-        stroke: black;
       }
     }
 
@@ -174,20 +102,15 @@
     }
 
     @include sm-max {
-      .MobileNewProposalButton .cui-button {
-        padding: 0 10px;
-        .cui-button-label {
-          top: 2px;
-        }
+      .cui-icon {
+        margin: auto;
       }
 
-      .cui-button.mobile-header-trigger {
-        padding-left: 12px;
-        padding-right: 12px;
+      .MobileNewProposalButton .cui-button {
+        padding: 0 10px;
 
-        .cui-icon {
-          margin-left: -2px;
-          margin-right: -2px;
+        .cui-button-label {
+          top: 2px;
         }
       }
 
@@ -244,10 +167,8 @@
 }
 
 .MobileHeaderPopoverMenu {
-  @include sidebar();
-
   position: absolute;
-  top: 61px !important;
+  top: 64px !important;
   transform: none !important;
   will-change: initial !important;
 
@@ -260,7 +181,7 @@
   }
 
   .section-header {
-    color: $text-color-light;
+    color: $neutral-500;
     font-size: 18px;
     margin-bottom: 6px;
     margin-top: 20px;

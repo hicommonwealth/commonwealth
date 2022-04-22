@@ -30,10 +30,13 @@ export const Errors = {
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
-  InvalidChainIdOrUrl: 'Could not determine a valid endpoint for provided chain',
+  InvalidChainIdOrUrl:
+    'Could not determine a valid endpoint for provided chain',
   ChainAddressExists: 'The address already exists',
-  ChainIDExists: 'The id for this chain already exists, please choose another id',
-  ChainNameExists: 'The name for this chain already exists, please choose another name',
+  ChainIDExists:
+    'The id for this chain already exists, please choose another id',
+  ChainNameExists:
+    'The name for this chain already exists, please choose another name',
   InvalidIconUrl: 'Icon url must begin with https://',
   InvalidWebsite: 'Website must begin with https://',
   InvalidDiscord: 'Discord must begin with https://',
@@ -44,10 +47,11 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
-type CreateChainReq = ChainAttributes & Omit<ChainNodeAttributes, 'id'> & {
-  id: string;
-  node_url: string;
-};
+type CreateChainReq = ChainAttributes &
+  Omit<ChainNodeAttributes, 'id'> & {
+    id: string;
+    node_url: string;
+  };
 
 type CreateChainResp = {
   chain: ChainAttributes;
@@ -64,7 +68,10 @@ const createChain = async (
     return next(new Error('Not logged in'));
   }
   // require Admin privilege for creating Chain/DAO
-  if (req.body.type !== ChainType.Token && req.body.type !== ChainType.Offchain) {
+  if (
+    req.body.type !== ChainType.Token &&
+    req.body.type !== ChainType.Offchain
+  ) {
     if (!req.user.isAdmin) {
       return next(new Error(Errors.NotAdmin));
     }
@@ -92,7 +99,7 @@ const createChain = async (
   }
 
   const existingBaseChain = await models.Chain.findOne({
-    where: { base: req.body.base }
+    where: { base: req.body.base },
   });
   if (!existingBaseChain) {
     return next(new Error(Errors.InvalidBase));
@@ -100,6 +107,7 @@ const createChain = async (
   let eth_chain_id: number = null;
   let url = req.body.node_url;
   let altWalletUrl = req.body.alt_wallet_url;
+  let privateUrl;
 
   // always generate a chain id
   if (req.body.base === ChainBase.Ethereum) {
@@ -110,7 +118,10 @@ const createChain = async (
   }
 
   // if not offchain, also validate the address
-  if (req.body.base === ChainBase.Ethereum && req.body.type !== ChainType.Offchain) {
+  if (
+    req.body.base === ChainBase.Ethereum &&
+    req.body.type !== ChainType.Offchain
+  ) {
     if (!Web3.utils.isAddress(req.body.address)) {
       return next(new Error(Errors.InvalidAddress));
     }
@@ -118,10 +129,13 @@ const createChain = async (
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
     const urls = await getUrlsForEthChainId(models, eth_chain_id);
     if (urls) {
-      const { url: ethChainUrl, alt_wallet_url } = urls;
+      const { url: ethChainUrl, alt_wallet_url, private_url } = urls;
       url = ethChainUrl;
       if (alt_wallet_url) {
         altWalletUrl = alt_wallet_url;
+      }
+      if (private_url) {
+        privateUrl = private_url;
       }
     } else {
       // If using overridden URL, then user must be admin -- we do not allow users to submit
@@ -135,13 +149,13 @@ const createChain = async (
     }
 
     const existingChainNode = await models.ChainNode.findOne({
-      where: { address: req.body.address, eth_chain_id }
+      where: { address: req.body.address, eth_chain_id },
     });
     if (existingChainNode) {
       return next(new Error(Errors.ChainAddressExists));
     }
 
-    const provider = new Web3.providers.WebsocketProvider(url);
+    const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
     provider.disconnect(1000, 'finished');
@@ -150,7 +164,10 @@ const createChain = async (
     }
 
     // TODO: test altWalletUrl if available
-  } else if (req.body.base === ChainBase.Solana && req.body.type !== ChainType.Offchain) {
+  } else if (
+    req.body.base === ChainBase.Solana &&
+    req.body.type !== ChainType.Offchain
+  ) {
     let pubKey: solw3.PublicKey;
     try {
       pubKey = new solw3.PublicKey(req.body.address);
@@ -169,7 +186,10 @@ const createChain = async (
     } catch (e) {
       return next(new Error(Errors.InvalidNodeUrl));
     }
-  } else if (req.body.base === ChainBase.CosmosSDK && req.body.type !== ChainType.Offchain) {
+  } else if (
+    req.body.base === ChainBase.CosmosSDK &&
+    req.body.type !== ChainType.Offchain
+  ) {
     // test cosmos endpoint validity -- must be http(s)
     if (!urlHasValidHTTPPrefix(url)) {
       return next(new Error(Errors.InvalidNodeUrl));
@@ -208,7 +228,7 @@ const createChain = async (
     bech32_prefix,
     decimals,
     address,
-    token_name
+    token_name,
   } = req.body;
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -225,7 +245,7 @@ const createChain = async (
   }
 
   const oldChain = await models.Chain.findOne({
-    where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }]  },
+    where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
   });
   if (oldChain && oldChain.id === req.body.id) {
     return next(new Error(Errors.ChainIDExists));
@@ -260,12 +280,15 @@ const createChain = async (
     eth_chain_id,
     token_name,
     alt_wallet_url: altWalletUrl,
+    private_url: privateUrl,
   });
+  const nodeJSON = node.toJSON();
+  delete nodeJSON.private_url;
 
   const chatChannels = await models.ChatChannel.create({
     name: 'General',
     chain_id: chain.id,
-    category: '' // TODO: update?
+    category: '', // TODO: update?
   });
 
   return success(res, { chain: chain.toJSON(), node: node.toJSON() });

@@ -8,6 +8,8 @@ import { factory, formatFilename } from '../shared/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
 import ChainFactory, { ChainModelStatic } from './models/chain';
+import ChainCategoryFactory, { ChainCategoryModelStatic } from './models/chain_category';
+import ChainCategoryTypeFactory, { ChainCategoryTypeModelStatic } from './models/chain_category_type';
 import ChainEntityFactory, {
   ChainEntityModelStatic,
 } from './models/chain_entity';
@@ -32,21 +34,6 @@ import ContractItemFactory, {
 import DiscussionDraftFactory, {
   DiscussionDraftModelStatic,
 } from './models/discussion_draft';
-import EdgewareLockdropBalanceFactory, {
-  EdgewareLockdropBalanceModelStatic,
-} from './models/edgeware_lockdrop_balance';
-import EdgewareLockdropEventFactory, {
-  EdgewareLockdropEventModelStatic,
-} from './models/edgeware_lockdrop_event';
-import EdgewareLockdropEverythingFactory, {
-  EdgewareLockdropEverythingModelStatic,
-} from './models/edgeware_lockdrop_everything';
-import HedgehogAuthenticationFactory, {
-  HedgehogAuthenticationModelStatic,
-} from './models/hedgehog_authentication';
-import HedgehogUserFactory, {
-  HedgehogUserModelStatic,
-} from './models/hedgehog_user';
 import IdentityCacheFactory, {
   IdentityCacheStatic,
 } from './models/identity_cache';
@@ -88,6 +75,9 @@ import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
 } from './models/social_account';
+import SsoTokenFactory, {
+  SsoTokenModelStatic,
+} from './models/sso_token';
 import StarredCommunityFactory, {
   StarredCommunityModelStatic,
 } from './models/starred_community';
@@ -103,11 +93,16 @@ import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
-import NotificationsReadFactory, { NotificationsReadModelStatic } from './models/notifications_read';
+import NotificationsReadFactory, {
+  NotificationsReadModelStatic,
+} from './models/notifications_read';
+import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
 
 export type Models = {
   Address: AddressModelStatic;
   Chain: ChainModelStatic;
+  ChainCategory: ChainCategoryModelStatic;
+  ChainCategoryType: ChainCategoryTypeModelStatic;
   ChainEntity: ChainEntityModelStatic;
   ChainEvent: ChainEventModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
@@ -118,13 +113,9 @@ export type Models = {
   ContractCategory: ContractCategoryModelStatic;
   ContractItem: ContractItemModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
-  EdgewareLockdropBalance: EdgewareLockdropBalanceModelStatic;
-  EdgewareLockdropEvent: EdgewareLockdropEventModelStatic;
-  EdgewareLockdropEverything: EdgewareLockdropEverythingModelStatic;
-  HedgehogAuthentication: HedgehogAuthenticationModelStatic;
-  HedgehogUser: HedgehogUserModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
+  IpfsPins: IpfsPinsModelStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
@@ -141,6 +132,7 @@ export type Models = {
   Profile: ProfileModelStatic;
   Role: RoleModelStatic;
   SocialAccount: SocialAccountModelStatic;
+  SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
   Subscription: SubscriptionModelStatic;
   Token: TokenModelStatic;
@@ -187,6 +179,8 @@ export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
+  ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
+  ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
   ChainEntity: ChainEntityFactory(sequelize, DataTypes),
   ChainEvent: ChainEventFactory(sequelize, DataTypes),
   ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
@@ -197,16 +191,9 @@ const models: Models = {
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
   ContractItem: ContractItemFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
-  EdgewareLockdropBalance: EdgewareLockdropBalanceFactory(sequelize, DataTypes),
-  EdgewareLockdropEvent: EdgewareLockdropEventFactory(sequelize, DataTypes),
-  EdgewareLockdropEverything: EdgewareLockdropEverythingFactory(
-    sequelize,
-    DataTypes
-  ),
-  HedgehogAuthentication: HedgehogAuthenticationFactory(sequelize, DataTypes),
-  HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
+  IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
@@ -223,6 +210,7 @@ const models: Models = {
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
+  SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),

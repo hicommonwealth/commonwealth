@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button, Icon, Icons } from 'construct-ui';
+import { Button } from 'construct-ui';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
@@ -10,6 +10,7 @@ import { link } from 'helpers';
 import { ChainInfo } from 'models';
 import { ChainIcon } from 'views/components/chain_icon';
 import { CommunitySelector } from 'views/components/sidebar/community_selector';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 type SidebarQuickSwitcherItemAttrs = {
   item: ChainInfo;
@@ -24,17 +25,11 @@ class SidebarQuickSwitcherItem
 
     return (
       <div class="SidebarQuickSwitcherItem" key={`chain-${item.id}`}>
-        <div
-          class={`quick-switcher-option ${
-            item.id === app?.chain?.meta?.chain?.id
-          }`}
-        >
-          <ChainIcon
-            size={size}
-            chain={item}
-            onclick={link ? () => m.route.set(`/${item.id}`) : null}
-          />
-        </div>
+        <ChainIcon
+          size={size}
+          chain={item}
+          onclick={link ? () => m.route.set(`/${item.id}`) : null}
+        />
       </div>
     );
   }
@@ -53,23 +48,19 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
 
     const starredCommunities = allCommunities.filter((item) => {
       // filter out non-starred communities
-      if (
-        item instanceof ChainInfo &&
-        !app.communities.isStarred(item.id, null)
-      )
+      if (item instanceof ChainInfo && !app.communities.isStarred(item.id))
         return false;
       return true;
     });
 
-    const size = 36;
+    const size = 32;
 
     return (
       <div class="SidebarQuickSwitcher">
         <div class="community-nav-bar">
           <Button
-            class="sidebar-home-link"
             rounded={true}
-            label={<Icon name={Icons.HOME} />}
+            label={<CWIcon iconName="home" iconSize="small" />}
             onclick={(e) => {
               e.preventDefault();
               m.route.set('/');
@@ -78,9 +69,8 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
           <CommunitySelector />
           {app.isLoggedIn() && (
             <Button
-              class="create-community"
               rounded={true}
-              label={<Icon name={Icons.PLUS} />}
+              label={<CWIcon iconName="plus" iconSize="small" />}
               onclick={(e) => {
                 e.preventDefault();
                 m.route.set('/createCommunity');

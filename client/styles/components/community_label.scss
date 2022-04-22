@@ -1,5 +1,4 @@
 @import 'client/styles/shared';
-@import 'client/styles/facelift';
 
 .CommunityLabel {
   align-items: center;
@@ -10,6 +9,7 @@
     @include header;
 
     align-items: center;
+    color: $neutral-800;
     display: flex;
     justify-content: left;
     margin: 0 8px;

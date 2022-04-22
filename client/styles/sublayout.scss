@@ -1,360 +1,50 @@
 @import 'client/styles/shared';
 
-@mixin narrowBrowserHeader {
-  .sublayout-header-right {
-    > .cui-button > .cui-button-label > .User {
-      .user-display-name {
+.Sublayout {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+
+  .header-and-body-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+
+    .header-container {
+      align-items: center;
+      border-bottom: 1px solid $neutral-50;
+      display: flex;
+      flex-direction: row;
+      height: 88px;
+      justify-content: space-between;
+      min-height: 88px;
+      padding: 0 24px;
+
+      @include sm-max {
         display: none;
       }
-
-      .user-avatar {
-        margin: 0px;
-        margin-right: 0px;
-        position: relative;
-        top: 2px;
-      }
-    }
-
-    .NewProposalButton {
-      .cui-button {
-        padding: 0 10px;
-
-        .cui-button-label {
-          top: 2px;
-        }
-      }
     }
   }
 
-  .role-icon {
-    display: none;
-  }
-
-  .LoginSelectorMenu .user-display-name {
-    display: inline;
-  }
-
-  .cui-button-label .cui-icon-user {
-    margin-right: 0;
-  }
-
-  .hiringBtn {
-    display: none;
-  }
-}
-
-.Sublayout {
-  display: block;
-
-  &.Homepage {
-    .sublayout-main-col {
-      min-height: calc(100vh - 140px);
-      padding-bottom: 80px;
-      position: relative;
-
-      &.no-right-content {
-        max-width: 100%;
-        padding: 0;
-        width: 100%;
-      }
-
-      display: flex;
-    }
-
-    .sublayout-grid {
-      max-width: 100%;
-      min-height: calc(100vh - 150px);
-      padding: 0 0;
-      position: relative;
-
-      @include xs-max {
-        padding: 0 0;
-      }
-
-      &.flex-center {
-        align-items: flex-start;
-        display: flex;
-      }
-    }
-  }
-
-  .sublayout-grid {
+  .sidebar-and-body-container {
     display: flex;
-    margin: 0 auto;
-    max-width: $layout-max-width;
-    min-height: calc(100vh - 150px);
-    padding: 0 $layout-padding;
-    position: relative;
+    flex-direction: row;
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
 
-    @include xs-max {
-      padding: 0 $layout-padding-xs;
+    @include sm-max {
+      margin-top: 88px;
     }
 
-    &.flex-center {
+    .body {
       display: flex;
-      justify-content: center;
-    }
-  }
-  .sublayout-sidebar-col {
-    flex: 1;
-    max-width: $sidebar-width;
-    padding-right: 48px;
-  }
-
-  @include sm-max {
-    .sublayout-sidebar-col {
-      display: none;
-    }
-  }
-
-  .hide-sidebar & {
-    .sublayout-sidebar-col {
-      display: none;
-    }
-  }
-
-  .sublayout-main-col {
-    flex: 3;
-    max-width: calc(100% - #{$sidebar-width});
-    padding-right: 20px;
-    padding: 0;
-
-    &.no-right-content {
-      max-width: 100%;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
       width: 100%;
-    }
-
-    @include sm-max {
-      max-width: 100%;
-      padding: 0;
-    }
-
-    @include xs-max {
-      min-width: calc(100vw - 80px);
-    }
-  }
-
-  .sublayout-right-col {
-    flex: 1.75;
-    max-width: calc(#{$sidebar-width} + 32px);
-    padding: 36px 0 36px 36px;
-
-    @include xl-min {
-      max-width: calc(#{$sidebar-width} + 48px);
-      padding: 36px 20px 36px 32px;
-    }
-
-    @include xs-max {
-      min-width: calc(#{$sidebar-width} + 20px);
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-  }
-
-  .hide-sidebar & {
-    .sublayout-main-col {
-      margin: 0 auto;
-      padding: 0;
-      width: 100%;
-    }
-  }
-
-  @include md-max {
-    .sublayout-main-col {
-      padding: 0;
-      width: calc(100% - #{$sidebar-width});
-    }
-  }
-
-  .sublayout-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-
-    @include sm-max {
-      display: none;
-    }
-
-    background-color: white;
-    border-bottom: 1px solid $disable-grey;
-    margin: 0 auto;
-    padding-right: 20px;
-    padding: 24px 0 22px;
-
-    @include md-max {
-      @include narrowBrowserHeader();
-      padding-right: 0;
-
-      // .sublayout-header-heading {
-      //     display: none !important;
-      // }
-    }
-
-    @include lg-max {
-      @include narrowBrowserHeader();
-    }
-
-    .hide-sidebar & {
-      padding-right: 0;
-    }
-
-    .sublayout-header-inner {
-      display: flex;
-      margin: 0 auto;
-      max-width: $layout-max-width;
-      padding: 0 $layout-padding;
-
-      .SearchBar {
-        flex: 8;
-      }
-
-      .hide-sidebar & {
-        margin: 0 auto;
-      }
-
-      .hiringBtn {
-        color: #4a4a4a;
-        font-weight: 500;
-        height: 36px;
-        margin: 0 7px;
-        min-width: 120px;
-      }
-    }
-
-    .sublayout-header-left {
-      align-items: center;
-      display: flex;
-      flex: 2;
-      margin-top: 0 !important;
-      white-space: nowrap;
-
-      .inner-heading-container {
-        align-items: center;
-        display: flex;
-        flex-direction: row;
-
-        > .ChainIcon {
-          height: 22px;
-          margin-right: 10px;
-          width: 22px;
-        }
-
-        > .CommunityIcon {
-          display: inline-block;
-          margin-right: 14px;
-          position: relative;
-
-          .no-image {
-            position: relative;
-          }
-        }
-
-        .CommunitySelector,
-        .sublayout-header-heading {
-          align-items: baseline;
-          display: flex;
-        }
-
-        h4.sublayout-header-heading {
-          font-size: 1.15rem;
-          font-weight: 600;
-          margin: 7px 0 0 0;
-          white-space: nowrap;
-
-          a {
-            color: $text-color-black;
-          }
-
-          .breadcrumb {
-            color: $text-color-lightest;
-            margin: 0 8px;
-          }
-
-          .cui-tag {
-            line-height: 1.1;
-            margin: -1px 0;
-          }
-
-          .cui-icon {
-            position: relative;
-
-            &.cui-icon-chevron-down {
-              top: 1px;
-            }
-
-            &::before {
-              content: ' ';
-              width: 5px;
-            }
-          }
-
-          .sublayout-header-heading-wrapper {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-        }
-      }
-
-      h3 {
-        font-size: 1.15rem;
-        font-weight: 600;
-        margin: 8px 0 0;
-      }
-    }
-
-    .sublayout-header-right {
-      align-items: center;
-      display: flex;
-      flex-direction: row-reverse;
-      flex: 3;
-      text-align: right;
-
-      > .cui-button,
-      > .LoginSelector {
-        margin-left: 7px;
-      }
-    }
-  }
-
-  .sublayout-body {
-    min-height: calc(100vh - 140px);
-    padding-bottom: 80px;
-    padding: 1px 0; // prevent margins from flowing outside the container
-    position: relative;
-  }
-
-  .sublayout-body-sidebar {
-    margin-left: $sidebar-width;
-    min-height: calc(100vh - 140px);
-    padding-bottom: 80px;
-    padding: 1px 0; // prevent margins from flowing outside the container
-    position: relative;
-
-    @include sm-max {
-      margin-left: 0px;
-    }
-  }
-
-  .token-banner {
-    background: $background-color-white-hover;
-    color: $text-color-darker;
-    padding: 8px 0 2px;
-    text-align: center;
-  }
-
-  .token-banner-terms {
-    background-color: $layout-color;
-    margin-left: $sidebar-width;
-    padding: 5px 0 5px 0;
-    text-align: center;
-
-    .close-button {
-      cursor: pointer;
-      line-height: 1.5;
-      position: absolute;
-      right: 1rem;
     }
   }
 }
