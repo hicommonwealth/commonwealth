@@ -107,8 +107,6 @@ import deleteChatCategory from './routes/chat/deleteChatCategory';
 import renameChatChannel from './routes/chat/renameChatChannel';
 import renameChatCategory from './routes/chat/renameChatCategory';
 
-import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
-import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';

@@ -10,7 +10,7 @@ import { navigateToSubpage } from 'app';
 import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
-import { SidebarSection } from '../sidebar/sidebar_section';
+import { SidebarSectionGroup } from '../sidebar/sidebar_section';
 import {
   CreateCategory,
   CreateChannel,
@@ -170,9 +170,9 @@ export class ChatSection
 
   view(vnode) {
     if (!app.socket) return;
-    if (!this.loaded) return <Spinner/>;
+    if (!this.loaded) return <Spinner />;
 
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId()})
+    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId() });
     this.channels = {};
     vnode.attrs.channels.forEach((c) => {
       const { ChatMessages, ...metadata } = c;
@@ -443,6 +443,6 @@ export class ChatSection
       ),
     };
 
-    return <SidebarSection {...sidebarSectionData} />;
+    return <SidebarSectionGroup {...sidebarSectionData} />;
   }
 }
