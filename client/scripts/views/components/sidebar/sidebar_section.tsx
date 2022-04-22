@@ -47,7 +47,7 @@ class SubSection implements m.ClassComponent<SubSectionAttrs> {
       >
         {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
         <div class={titleTextClass}>{title}</div>
-        {isNotUndefined(rightIcon) && rightIcon}
+        {isNotUndefined(rightIcon) && <div class="right-icon">{rightIcon}</div>}
       </div>
     );
   }

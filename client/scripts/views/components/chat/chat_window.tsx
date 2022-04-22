@@ -12,7 +12,7 @@ import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { WebsocketMessageNames } from 'types';
-import { Icon, Icons, Size } from 'construct-ui';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -160,11 +160,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                 : 'Disconnected',
               onkeypress: handleSubmitMessage,
             })}
-            <Icon
-              name={Icons.SEND}
-              onclick={handleSubmitMessage}
-              size={Size.LG}
-            />
+            <CWIcon iconName="send" onclick={handleSubmitMessage} />
           </form>
         )}
       </div>
