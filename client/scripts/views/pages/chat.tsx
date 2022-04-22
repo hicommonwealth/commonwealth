@@ -21,7 +21,7 @@ const ChatPage: m.Component<never, never> = {
     return !app.socket.chatNs.hasChannels() ? (
       <PageLoading />
     ) : (
-      <Sublayout>
+      <Sublayout hideFooter={true}>
         <ChatWindow channel_id={channel_id} />
       </Sublayout>
     );

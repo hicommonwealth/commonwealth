@@ -11,7 +11,7 @@
   }
 
   .chat-messages {
-    height: calc(100vh - 368px); // header + footer + message composer
+    height: calc(100vh - 128px); // header + message composer
     overflow-y: auto;
 
     .chat-message-placeholder {
@@ -33,7 +33,7 @@
     }
 
     .chat-message-text {
-      margin: 2px 0;
+      height: 24px;
     }
 
     .User {
