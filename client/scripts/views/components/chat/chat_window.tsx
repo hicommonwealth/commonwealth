@@ -92,6 +92,11 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
         const $textarea = $(e.target)
           .closest('form')
           .find('textarea.ResizableTextarea');
+
+        if ($textarea.val().toString().length === 0) {
+          return;
+        }
+
         const message = {
           message: $textarea.val(),
           address: app.user.activeAccount.address,

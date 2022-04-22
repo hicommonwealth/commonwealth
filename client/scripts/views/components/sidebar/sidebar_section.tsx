@@ -46,7 +46,9 @@ class SubSection implements m.ClassComponent<SubSectionAttrs> {
         onclick={(e) => clickHandler(e)}
       >
         {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
-        <div class={titleTextClass}>{title}</div>
+        <div class={titleTextClass} title={title}>
+          {title}
+        </div>
         {isNotUndefined(rightIcon) && <div class="right-icon">{rightIcon}</div>}
       </div>
     );

@@ -84,9 +84,20 @@
   height: 32px;
   padding: 0 8px 0 32px;
 
-  &.title-active {
-    font-weight: 500;
+  .title-active {
     color: $purple-400;
+    font-weight: 500;
+    margin-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .title-stale {
+    margin-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &.active,
