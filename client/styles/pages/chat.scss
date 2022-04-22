@@ -11,7 +11,7 @@
   }
 
   .chat-messages {
-    max-height: 600px;
+    height: calc(100vh - 368px); // header + footer + message composer
     overflow-y: auto;
 
     .chat-message-placeholder {
