@@ -88,10 +88,12 @@ class RecentActivityController {
       if (!thread.Address) {
         console.error('OffchainThread missing address');
       }
-      try {
-        app.threads.summaryStore.add(modeledThread);
-      } catch (e) {
-        console.error(e.message);
+      if (!app.threads.summaryStore.getByIdentifier(thread.id)) {
+        try {
+          app.threads.summaryStore.add(modeledThread);
+        } catch (e) {
+          console.error(e.message);
+        }
       }
       return modeledThread;
     });
