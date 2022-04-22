@@ -13,7 +13,7 @@ import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { WebsocketMessageNames } from 'types';
-import {Icon, Icons, Size} from 'construct-ui';
+import { Icon, Icons, Size } from 'construct-ui';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -127,9 +127,12 @@ const ChatWindow: m.Component<IAttrs, IState> = {
               </div>
               <div class="clear" />
               {grp.messages.map((msg) => (
-                  <div class="chat-message-text">
-                    {m(MarkdownFormattedText, { doc: msg.message, openLinksInNewTab: true })}
-                  </div>
+                <div class="chat-message-text">
+                  {m(MarkdownFormattedText, {
+                    doc: msg.message,
+                    openLinksInNewTab: true,
+                  })}
+                </div>
               ))}
             </div>
           ))}
@@ -158,7 +161,11 @@ const ChatWindow: m.Component<IAttrs, IState> = {
                 : 'Disconnected',
               onkeypress: handleSubmitMessage,
             })}
-            <Icon name={Icons.SEND} onclick={handleSubmitMessage} size={Size.LG}/>
+            <Icon
+              name={Icons.SEND}
+              onclick={handleSubmitMessage}
+              size={Size.LG}
+            />
           </form>
         )}
       </div>
