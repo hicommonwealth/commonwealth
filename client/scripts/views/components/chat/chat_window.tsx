@@ -111,18 +111,20 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
           )}
           {groupedMessages.map((grp) => (
             <div class="chat-message-group">
-              {m(User, {
-                user: new AddressInfo(
-                  null,
-                  grp.address,
-                  app.activeChainId(),
-                  null
-                ),
-                linkify: true,
-                avatarSize: 24,
-              })}
-              <div class="chat-message-group-timestamp">
-                {formatTimestampForChat(grp.messages[0].created_at)}
+              <div class="user-and-timestamp-container">
+                {m(User, {
+                  user: new AddressInfo(
+                    null,
+                    grp.address,
+                    app.activeChainId(),
+                    null
+                  ),
+                  linkify: true,
+                  avatarSize: 24,
+                })}
+                <div class="chat-message-group-timestamp">
+                  {formatTimestampForChat(grp.messages[0].created_at)}
+                </div>
               </div>
               <div class="clear" />
               {grp.messages.map((msg) => (

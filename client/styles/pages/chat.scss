@@ -7,7 +7,7 @@
 
   .chat-messages,
   .chat-composer-unavailable {
-    padding: 0 16px;
+    padding: 0 56px;
   }
 
   .chat-messages {
@@ -21,6 +21,25 @@
 
     .chat-message-group {
       margin: 16px 0;
+
+      .user-and-timestamp-container {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+
+        .User {
+          display: flex;
+
+          a {
+            color: $neutral-600;
+          }
+        }
+
+        .chat-message-group-timestamp {
+          color: $neutral-400;
+          margin-left: 8px;
+        }
+      }
     }
 
     .chat-message-group + .chat-message-group {
@@ -28,12 +47,15 @@
     }
 
     .chat-message-group-timestamp {
-      float: right;
       color: $neutral-500;
     }
 
     .chat-message-text {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
       height: 24px;
+      padding-left: 32px;
     }
 
     .User {

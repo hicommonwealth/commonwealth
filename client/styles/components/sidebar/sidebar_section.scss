@@ -17,17 +17,6 @@
       font-size: 18px;
       font-weight: 600;
     }
-
-    // .cui-icon {
-    //   position: unset;
-    // }
-
-    .right-icon {
-      .cui-icon-plus-circle {
-        margin-top: -10px;
-        opacity: 90%;
-      }
-    }
   }
 
   .sections-container {
@@ -38,10 +27,11 @@
 
 .SubSectionGroup {
   .SubSectionGroupTitle {
-    height: 32px;
-    display: flex;
     align-items: center;
+    display: flex;
+    height: 32px;
     min-width: 0;
+    padding: 0 8px;
 
     .title-text {
       overflow: hidden;
@@ -69,6 +59,11 @@
       background-color: unset;
     }
 
+    &.active,
+    &:hover {
+      background-color: $purple-50;
+    }
+
     .no-carat {
       width: 24px;
     }
@@ -78,12 +73,6 @@
       display: flex;
       margin: 0 4px;
     }
-
-    .right-icon {
-      .cui-icon-edit {
-        margin-top: -1px;
-      }
-    }
   }
 }
 
@@ -91,80 +80,42 @@
   align-items: center;
   display: flex;
   flex-direction: row;
-  font-size: 17px;
-  font-weight: 400;
+  font-size: 14px;
   height: 32px;
-  padding-left: 32px;
+  padding: 0 8px 0 32px;
 
-  svg {
-    margin-right: 4px;
-    position: relative;
-    top: 2px;
-  }
-
-  .title-active {
+  &.title-active {
     font-weight: 500;
     color: $purple-400;
   }
 
-  .title-stale {
-    color: $neutral-500;
-  }
-
   &.active,
   &:hover {
-    background-color: $pink-50;
-  }
-
-  .row-icon-inactive {
-    .cui-icon {
-      color: $neutral-500;
-    }
-  }
-
-  .right-icon {
-    .cui-icon-edit {
-      margin-top: -1px;
-    }
+    background-color: $purple-50;
   }
 }
 
 .right-icon {
+  display: flex;
   margin-left: auto;
-  display: inline-block;
-
-  div {
-    .cui-icon {
-      color: $neutral-500;
-      padding-right: 5px;
-      padding-top: 2px;
-
-      &:hover {
-        color: $purple-500;
-        opacity: 100%;
-      }
-    }
-  }
+  margin-top: -1px;
+  position: relative;
 
   .admin-menu {
     position: fixed;
+    z-index: 1000;
   }
 
   .unread-icon {
+    align-items: center;
     background-color: $rorange-500;
-    border-radius: 15px;
-    padding-left: 6px;
-    padding-right: 6px;
+    border-radius: 1000px;
+    color: $white;
+    display: flex;
+    height: 16px;
+    justify-content: center;
     margin-right: 4px;
-    margin-top: 2px;
-    display: inline-block;
-
-    p {
-      margin-top: 2.75px;
-      position: relative;
-      color: $white;
-      font-size: 11px;
-      font-weight: 600;
-    }
+    padding: 2px 4px 3px;
+    min-width: 16px;
   }
 }

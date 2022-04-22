@@ -268,7 +268,7 @@ export class ChatSection
       );
 
       return (
-        <div>
+        <>
           <Icon
             name={Icons.EDIT}
             onmouseenter={handleMouseover}
@@ -276,7 +276,7 @@ export class ChatSection
           />
           {this.menuToggleTree['children'][category]['toggledState'] &&
             menuComponent}
-        </div>
+        </>
       );
     };
 
@@ -339,11 +339,9 @@ export class ChatSection
       );
 
       return (
-        <div>
+        <>
           {channel.unread > 0 && (
-            <div class="unread-icon">
-              <p>{channel.unread}</p>
-            </div>
+            <div class="unread-icon">{channel.unread}</div>
           )}
           <Icon
             name={Icons.EDIT}
@@ -353,7 +351,7 @@ export class ChatSection
           {this.menuToggleTree['children'][channel.category]['children'][
             channel.name
           ]['toggledState'] && menuComponent}
-        </div>
+        </>
       );
     };
 
@@ -400,6 +398,7 @@ export class ChatSection
       });
       m.redraw();
     };
+
     const overlayContent: m.Vnode = this.adminModals['CreateCategory'] ? (
       <CreateCategory handleClose={closeOverlay} />
     ) : this.adminModals['CreateChannel'] ? (
@@ -418,9 +417,7 @@ export class ChatSection
       />
     ) : this.adminModals['DeleteChannel'] ? (
       <DeleteChannel handleClose={closeOverlay} channel={this.adminChannel} />
-    ) : (
-      <div></div>
-    );
+    ) : null;
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'CHAT',
