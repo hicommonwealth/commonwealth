@@ -8,8 +8,8 @@ import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
-import { ChainStatusModule } from './chain_status_module';
 import { ExternalLinksModule } from './external_links_module';
+import { ChatSection } from '../chat/chat_section';
 
 export class Sidebar implements m.ClassComponent {
   view() {
@@ -17,6 +17,12 @@ export class Sidebar implements m.ClassComponent {
       <div class="Sidebar">
         <DiscussionSection />
         <GovernanceSection />
+        {app.socket && (
+          <ChatSection
+            channels={Object.values(app.socket.chatNs.channels)}
+            activeChannel={m.route.param()['channel']}
+          />
+        )}
         <ExternalLinksModule />
         <div class="buttons-container">
           {app.isLoggedIn() && app.chain && (

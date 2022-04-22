@@ -36,8 +36,8 @@
   }
 }
 
-.SectionGroup {
-  .SectionGroupTitle {
+.SubSectionGroup {
+  .SubSectionGroupTitle {
     height: 32px;
     display: flex;
     align-items: center;
@@ -66,17 +66,17 @@
     }
 
     &.no-background {
-      background-color: none;
+      background-color: unset;
     }
 
     .no-carat {
-      width: 22px;
+      width: 24px;
     }
 
     .carat {
-      display: inline-block;
-      margin-left: 6px;
-      margin-top: -2px;
+      align-items: center;
+      display: flex;
+      margin: 0 4px;
     }
 
     .right-icon {
@@ -88,23 +88,18 @@
 }
 
 .SubSection {
-  padding-left: 32px;
-  font-weight: 400;
-  font-size: 17px;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  height: 30px;
+  align-items: center;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  font-size: 17px;
+  font-weight: 400;
+  height: 32px;
+  padding-left: 32px;
 
-  [class^='title'] {
-    display: inline-block;
-    padding-top: 3px;
-    padding-left: 4px;
-    margin-bottom: 1px;
-    margin-left: 4px;
-    align-self: baseline;
+  svg {
+    margin-right: 4px;
+    position: relative;
+    top: 2px;
   }
 
   .title-active {
@@ -119,13 +114,6 @@
   &.active,
   &:hover {
     background-color: $pink-50;
-  }
-
-  .cui-icon-hash {
-    display: inline-block;
-    margin-top: 1px;
-    scale: 0.85;
-    padding-bottom: 4px;
   }
 
   .row-icon-inactive {

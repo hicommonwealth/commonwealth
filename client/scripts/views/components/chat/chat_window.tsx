@@ -1,13 +1,12 @@
 /* @jsx m */
 
-import 'pages/chat.scss';
-
 import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment';
 
-import app from 'state';
+import 'pages/chat.scss';
 
+import app from 'state';
 import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
@@ -29,42 +28,42 @@ const formatTimestampForChat = (timestamp) => {
   else return timestamp.format('h:mma');
 };
 
-interface IAttrs {
+type ChatWindowAttrs = {
   channel_id: string;
-}
+};
 
-interface IState {
-  scrollToBottom: () => void;
-  onIncomingMessage: (any: any) => void;
-  shouldScroll: boolean;
-}
+export class ChatWindow implements m.Component<ChatWindowAttrs> {
+  private onIncomingMessage: (any: any) => void;
+  private scrollToBottom: () => void;
+  private shouldScroll: boolean;
 
-const ChatWindow: m.Component<IAttrs, IState> = {
-  oninit: (vnode) => {
-    vnode.state.shouldScroll = true;
-    vnode.state.scrollToBottom = () => {
+  oninit(vnode) {
+    this.shouldScroll = true;
+    this.scrollToBottom = () => {
       const scroller = $((vnode as any).dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
-    vnode.state.onIncomingMessage = (msg) => {
+    this.onIncomingMessage = (msg) => {
       const { chat_channel_id } = msg;
       if (chat_channel_id === vnode.attrs.channel_id) {
-        vnode.state.shouldScroll = false;
+        this.shouldScroll = false;
       }
       m.redraw();
     };
     app.socket.chatNs.addListener(
       WebsocketMessageNames.ChatMessage,
-      vnode.state.onIncomingMessage.bind(vnode)
+      this.onIncomingMessage.bind(vnode)
     );
-  },
-  onremove: (vnode) => {
+  }
+
+  onremove() {
     app.socket.chatNs.removeListener(
       WebsocketMessageNames.ChatMessage,
-      vnode.state.onIncomingMessage
+      this.onIncomingMessage
     );
-  },
-  view: (vnode) => {
+  }
+
+  view(vnode) {
     const { channel_id } = vnode.attrs;
     app.socket.chatNs.readMessages(channel_id);
     const channel = app.socket.chatNs.channels[channel_id];
@@ -105,7 +104,7 @@ const ChatWindow: m.Component<IAttrs, IState> = {
     };
 
     return (
-      <div class="chat-window">
+      <div class="ChatPage">
         <div class="chat-messages">
           {groupedMessages.length === 0 && app.socket.chatNs.isConnected && (
             <div class="chat-message-placeholder">No messages yet</div>
@@ -170,12 +169,11 @@ const ChatWindow: m.Component<IAttrs, IState> = {
         )}
       </div>
     );
-  },
-  onupdate: (vnode) => {
-    if (vnode.state.shouldScroll) {
-      vnode.state.scrollToBottom();
-    }
-  },
-};
+  }
 
-export default ChatWindow;
+  onupdate() {
+    if (this.shouldScroll) {
+      this.scrollToBottom();
+    }
+  }
+}

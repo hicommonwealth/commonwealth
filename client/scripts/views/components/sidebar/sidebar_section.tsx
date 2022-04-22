@@ -4,6 +4,7 @@ import m from 'mithril';
 
 import 'components/sidebar/sidebar_section.scss';
 
+import { isNotUndefined } from 'helpers/typeGuards';
 import {
   SubSectionAttrs,
   SectionGroupAttrs,
@@ -44,14 +45,14 @@ class SubSection implements m.ClassComponent<SubSectionAttrs> {
         class={`SubSection${isActive ? ' active' : ''}`}
         onclick={(e) => clickHandler(e)}
       >
-        {rowIcon && <CWIcon iconName="hash" iconSize="small" />}
+        {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
         <div class={titleTextClass}>{title}</div>
-        {rightIcon && <div class="right-icon">{rightIcon}</div>}
+        {isNotUndefined(rightIcon) && rightIcon}
       </div>
     );
   }
 }
-class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
+class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
 
@@ -122,12 +123,12 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
 
     return (
       <div
-        class="SectionGroup"
+        class="SubSectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
         onmouseleave={() => mouseLeaveHandler()}
       >
         <div
-          class={`SectionGroupTitle ${
+          class={`SubSectionGroupTitle ${
             this.hoverOn ? 'background' : backgroundColorClass
           }`}
           onclick={(e) => clickHandler(e)}
@@ -228,7 +229,7 @@ export class SidebarSectionGroup
         {this.toggled && (
           <div class="sections-container">
             {displayData.map((sectionGroup) => (
-              <SectionGroup {...sectionGroup} />
+              <SubSectionGroup {...sectionGroup} />
             ))}
           </div>
         )}

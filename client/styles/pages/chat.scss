@@ -1,6 +1,6 @@
 @import 'client/styles/shared';
 
-.Chat {
+.ChatPage {
   position: relative;
   height: calc(100vh - 100px);
   background: $white;
@@ -10,6 +10,7 @@
   .chat-composer-unavailable {
     padding: 13px 24px;
   }
+
   .chat-messages {
     position: absolute;
     top: 0;
@@ -17,35 +18,44 @@
     height: calc(100vh - 100px);
     border-bottom: 1px solid $neutral-25;
     overflow-y: scroll;
+
     .chat-message-placeholder {
       margin: 16px 0;
       color: $neutral-500;
     }
+
     .chat-message-group {
       margin: 18px 0;
     }
+
     .chat-message-group + .chat-message-group {
       margin-top: 20px;
     }
+
     .chat-message-group-timestamp {
       float: right;
       color: $neutral-500;
     }
+
     .chat-message-text {
       margin: 2px 0;
     }
+
     .User {
       margin-bottom: 2px;
+
       a {
         color: $neutral-500;
         text-decoration: none;
       }
     }
+
     .chat-messages-typing {
       color: $neutral-500;
       margin: 8px 0;
     }
   }
+
   .chat-composer {
     position: absolute;
     bottom: 0;
@@ -53,6 +63,7 @@
     width: 100%;
     padding: 0;
     margin: 0;
+
     textarea.ResizableTextarea {
       width: 100%;
       border: none;
@@ -63,6 +74,7 @@
       padding: 13px 24px;
     }
   }
+
   .chat-composer-unavailable {
     position: absolute;
     bottom: 0;
