@@ -157,39 +157,41 @@ const bulkThreads = async (
       return data;
     });
   } else {
-    threads = (
-      await models.OffchainThread.findAll({
-        where: { chain: chain.id },
-        include: [
-          {
-            model: models.Address,
-            as: 'Address',
-          },
-          {
-            model: models.Address,
-            as: 'collaborators',
-          },
-          {
-            model: models.OffchainTopic,
-            as: 'topic',
-          },
-          {
-            model: models.ChainEntity,
-          },
-          {
-            model: models.LinkedThread,
-            as: 'linked_threads',
-          },
-        ],
-        attributes: { exclude: ['version_history'] },
-        order: [['created_at', 'DESC']],
-      })
-    ).map((t, idx) => {
-      const row = t.toJSON();
-      const last_edited = getLastEdited(row);
-      row['last_edited'] = last_edited;
-      return row;
-    });
+    threads =
+      // TODO: May need to include last_commented_on in order, if this else is used
+      (
+        await models.OffchainThread.findAll({
+          where: { chain: chain.id },
+          include: [
+            {
+              model: models.Address,
+              as: 'Address',
+            },
+            {
+              model: models.Address,
+              as: 'collaborators',
+            },
+            {
+              model: models.OffchainTopic,
+              as: 'topic',
+            },
+            {
+              model: models.ChainEntity,
+            },
+            {
+              model: models.LinkedThread,
+              as: 'linked_threads',
+            },
+          ],
+          attributes: { exclude: ['version_history'] },
+          order: [['created_at', 'DESC']],
+        })
+      ).map((t, idx) => {
+        const row = t.toJSON();
+        const last_edited = getLastEdited(row);
+        row['last_edited'] = last_edited;
+        return row;
+      });
   }
 
   const countsQuery = `
@@ -201,7 +203,9 @@ const bulkThreads = async (
       bind,
       type: QueryTypes.SELECT,
     });
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting').length;
+  const numVotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'voting'
+  ).length;
 
   return res.json({
     status: 'Success',
