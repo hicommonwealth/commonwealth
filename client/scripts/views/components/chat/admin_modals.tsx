@@ -8,6 +8,7 @@ import { IChannel } from 'client/scripts/controllers/server/socket/chatNs';
 import { CWCard } from '../component_kit/cw_card';
 import { CWButton } from '../component_kit/cw_button';
 import { CWTextInput } from '../component_kit/cw_text_input';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 export class CreateCategory
   implements m.ClassComponent<{ handleClose: Function }>
@@ -39,16 +40,11 @@ export class CreateCategory
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <Icon
-          name={Icons.X}
-          size={Size.XL}
-          onclick={vnode.attrs.handleClose}
-        ></Icon>
-        <h2>Create a Category</h2>
-        <h4>
-          A new category will be added to chat. <br />
-          <br />
-        </h4>
+        <div class="header">
+          <h3>Create Category</h3>
+          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+        </div>
+        <h4>A new category will be added to chat.</h4>
         <CWTextInput
           label="*Category Title"
           placeholder="Enter a category title"
@@ -99,16 +95,13 @@ export class CreateChannel
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <Icon
-          name={Icons.X}
-          size={Size.XL}
-          onclick={vnode.attrs.handleClose}
-        ></Icon>
-        <h2>Create a Channel</h2>
+        <div class="header">
+          <h3>Create Channel</h3>
+          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+        </div>
         <h4>
           A new channel will be added to the <b>{vnode.attrs.category}</b>{' '}
-          category <br />
-          <br />
+          category
         </h4>
         <CWTextInput
           label="*Channel Title"
@@ -154,15 +147,12 @@ export class RenameChannel
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <Icon
-          name={Icons.X}
-          size={Size.XL}
-          onclick={vnode.attrs.handleClose}
-        ></Icon>
-        <h2>Rename Channel</h2>
+        <div class="header">
+          <h3>Rename Channel</h3>
+          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+        </div>
         <h4>
-          Give a new name to <b>{vnode.attrs.channel.name}</b> <br />
-          <br />
+          Give a new name to <b>{vnode.attrs.channel.name}</b>
         </h4>
         <CWTextInput
           label="*Channel Name"
@@ -208,15 +198,12 @@ export class RenameCategory
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <Icon
-          name={Icons.X}
-          size={Size.XL}
-          onclick={vnode.attrs.handleClose}
-        ></Icon>
-        <h2>Rename Category</h2>
+        <div class="header">
+          <h3>Rename Category</h3>
+          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+        </div>
         <h4>
-          Give a new name to <b>{vnode.attrs.category}</b> <br />
-          <br />
+          Give a new name to <b>{vnode.attrs.category}</b>
         </h4>
         <CWTextInput
           label="*Category Name"
@@ -251,17 +238,13 @@ export class DeleteChannel
 
     return (
       <CWCard className="danger" elevation="elevation-1" interactive={false}>
-        <Icon
-          name={Icons.X}
-          size={Size.XL}
-          onclick={vnode.attrs.handleClose}
-        ></Icon>
-        <h2>Delete Channel</h2>
+        <div class="header">
+          <h3>Delete Channel</h3>
+          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+        </div>
         <h4>
           The <b>{vnode.attrs.channel.name} </b> channel will be deleted.
           <b> All messages within will be lost forever.</b> Ok?
-          <br />
-          <br />
         </h4>
         <div class="button-bar">
           <CWButton
@@ -291,18 +274,14 @@ export class DeleteCategory
 
     return (
       <CWCard className="danger" elevation="elevation-1" interactive={false}>
-        <Icon
-          name={Icons.X}
-          size={Size.XL}
-          onclick={vnode.attrs.handleClose}
-        ></Icon>
-        <h2>Delete Category</h2>
+        <div class="header">
+          <h3>Delete Category</h3>
+          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+        </div>
         <h4>
           Deleting the <b>{vnode.attrs.category}</b> category will delete all
           channels inside.
           <b> All messages inside all the channels will be lost forever.</b> Ok?
-          <br />
-          <br />
         </h4>
         <div class="button-bar">
           <CWButton

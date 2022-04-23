@@ -75,14 +75,26 @@
   .Card {
     cursor: default;
     max-width: none;
-    padding: 20px 25px;
     position: relative;
     width: 500px;
     z-index: 100;
 
+    .header {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      width: 100%;
+
+      svg {
+        cursor: pointer;
+      }
+    }
+
     h4 {
-      color: $neutral-600;
       font-weight: 400;
+      margin-bottom: 24px;
     }
 
     .TextInput {
@@ -103,7 +115,7 @@
       width: 100%;
 
       button {
-        margin-left: 5px;
+        margin-left: 8px;
 
         &.danger {
           background-color: $rorange-500;
