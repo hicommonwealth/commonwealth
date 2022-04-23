@@ -3,7 +3,6 @@
 
 import m from 'mithril';
 import app from 'state';
-import { Icon, Icons, Size } from 'construct-ui';
 import { IChannel } from 'client/scripts/controllers/server/socket/chatNs';
 import { CWCard } from '../component_kit/cw_card';
 import { CWButton } from '../component_kit/cw_button';
@@ -11,7 +10,7 @@ import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 export class CreateCategory
-  implements m.ClassComponent<{ handleClose: Function }>
+  implements m.ClassComponent<{ handleClose: () => void }>
 {
   category: string;
   channel: string;
@@ -73,7 +72,7 @@ export class CreateCategory
 }
 
 export class CreateChannel
-  implements m.ClassComponent<{ handleClose: Function; category: string }>
+  implements m.ClassComponent<{ handleClose: () => void; category: string }>
 {
   channel: string;
   oninit() {
@@ -126,7 +125,7 @@ export class CreateChannel
 }
 
 export class RenameChannel
-  implements m.ClassComponent<{ handleClose: Function; channel: IChannel }>
+  implements m.ClassComponent<{ handleClose: () => void; channel: IChannel }>
 {
   channel_name: string;
   oninit() {
@@ -177,7 +176,7 @@ export class RenameChannel
 }
 
 export class RenameCategory
-  implements m.ClassComponent<{ handleClose: Function; category: string }>
+  implements m.ClassComponent<{ handleClose: () => void; category: string }>
 {
   new_category: string;
   oninit() {
@@ -228,7 +227,7 @@ export class RenameCategory
 }
 
 export class DeleteChannel
-  implements m.ClassComponent<{ handleClose: Function; channel: IChannel }>
+  implements m.ClassComponent<{ handleClose: () => void; channel: IChannel }>
 {
   view(vnode) {
     const handleSubmit = async () => {
@@ -264,7 +263,7 @@ export class DeleteChannel
 }
 
 export class DeleteCategory
-  implements m.ClassComponent<{ handleClose: Function; category: string }>
+  implements m.ClassComponent<{ handleClose: () => void; category: string }>
 {
   view(vnode) {
     const handleSubmit = async () => {
