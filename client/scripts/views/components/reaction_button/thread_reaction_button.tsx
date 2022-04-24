@@ -1,6 +1,6 @@
 /* @jsx m */
 
-// import 'components/reaction_button/comment_reaction_button.scss';
+import 'components/reaction_button/comment_reaction_button.scss';
 
 import m from 'mithril';
 import app from 'state';
