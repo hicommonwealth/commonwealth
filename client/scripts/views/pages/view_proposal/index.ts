@@ -984,6 +984,12 @@ const ViewProposalPage: m.Component<
       );
     }
 
+    // load proposal
+    if (!vnode.state.prefetch[proposalIdAndType]['threadReactionsStarted']) {
+      app.threads.fetchReactionsCount([proposal]).then(() => m.redraw);
+      vnode.state.prefetch[proposalIdAndType]['threadReactionsStarted'] = true;
+    }
+
     // load comments
     if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
       app.comments
@@ -1008,7 +1014,11 @@ const ViewProposalPage: m.Component<
           });
           // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier(rc);
+            const id = app.reactionCounts.store.getIdentifier({
+              threadId: rc.thread_id,
+              proposalId: rc.proposal_id,
+              commentId: rc.comment_id,
+            });
             app.reactionCounts.store.add(
               modelReactionCountFromServer({ ...rc, id })
             );

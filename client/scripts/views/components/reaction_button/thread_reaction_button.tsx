@@ -1,13 +1,12 @@
 /* @jsx m */
 
+// import 'components/reaction_button/comment_reaction_button.scss';
+
 import m from 'mithril';
-import { Popover } from 'construct-ui';
-
-import 'components/reaction_button/comment_reaction_button.scss';
-
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { OffchainThread, ChainInfo } from 'models';
+import { Popover } from 'construct-ui';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import {
   fetchReactionsByPost,
@@ -31,7 +30,7 @@ export class ThreadReactionButton
 
   view(vnode: m.VnodeDOM<ThreadReactionButtonAttrs, this>) {
     const { thread } = vnode.attrs;
-    const reactionCounts = app.reactionCounts.getByPost(thread);
+    const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};
 
     // token balance check if needed

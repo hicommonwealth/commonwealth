@@ -31,7 +31,7 @@ export class CommentReactionButton
 
   view(vnode: m.VnodeDOM<CommentReactionButtonAttrs, this>) {
     const { comment } = vnode.attrs;
-    const reactionCounts = app.reactionCounts.getByPost(comment);
+    const reactionCounts = app.reactionCounts.store.getByPost(comment);
     const { likes = 0, hasReacted } = reactionCounts || {};
 
     // token balance check if needed
