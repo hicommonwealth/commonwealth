@@ -73,7 +73,7 @@ export class GovernanceSection
       app.user.activeAccount &&
       app.chain?.network === ChainNetwork.Aave;
     const showSnapshotOptions =
-      isNotOffchain && app.chain?.meta.chain.snapshot.length > 0;
+      isNotOffchain && app.chain?.meta.chain.snapshot?.length > 0;
     const showReferenda =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
