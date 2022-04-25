@@ -6,15 +6,15 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_icon.scss';
 
-import { IconAttrs } from './cw_icon';
-import { getIconClasses } from '../helpers';
+import { IconAttrs, IconStyleAttrs } from './cw_icon';
+import { getClasses } from '../helpers';
 
 export const CWArrowLeft: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -37,7 +37,7 @@ export const CWArrowRight: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -60,7 +60,7 @@ export const CWBadge: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -80,7 +80,7 @@ export const CWBell: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -104,7 +104,7 @@ export const CWCautionCircle: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -129,7 +129,7 @@ export const CWCautionTriangle: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -154,7 +154,7 @@ export const CWCheck: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -177,7 +177,7 @@ export const CWChevronDown: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -200,7 +200,7 @@ export const CWChevronLeft: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -223,7 +223,7 @@ export const CWChevronRight: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -246,7 +246,7 @@ export const CWChevronUp: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -269,7 +269,7 @@ export const CWClose: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -296,7 +296,7 @@ export const CWCloud: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -323,7 +323,7 @@ export const CWCollapse: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -346,7 +346,7 @@ export const CWCopy: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -370,7 +370,7 @@ export const CWCouncilProposal: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -389,7 +389,7 @@ export const CWCow: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -412,7 +412,7 @@ export const CWDemocraticProposal: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -435,7 +435,7 @@ export const CWDiscord: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -454,7 +454,7 @@ export const CWDots: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -473,7 +473,7 @@ export const CWDownvote: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -492,7 +492,7 @@ export const CWEdit: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -515,7 +515,7 @@ export const CWElement: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -538,7 +538,7 @@ export const CWExpand: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -561,7 +561,7 @@ export const CWExternalLink: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -584,7 +584,7 @@ export const CWFeedback: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -607,7 +607,7 @@ export const CWFilter: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -630,7 +630,7 @@ export const CWFlag: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -653,7 +653,7 @@ export const CWFlame: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -672,7 +672,7 @@ export const CWGear: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -745,7 +745,7 @@ export const CWGithub: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="33"
         height="32"
@@ -768,7 +768,7 @@ export const CWHamburger: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="33"
         height="32"
@@ -787,7 +787,7 @@ export const CWHash: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="33"
         height="32"
@@ -810,7 +810,7 @@ export const CWHeartEmpty: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -833,7 +833,7 @@ export const CWHeartFilled: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -856,7 +856,7 @@ export const CWHelp: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -879,7 +879,7 @@ export const CWHome: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -902,7 +902,7 @@ export const CWInfoEmpty: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -926,7 +926,7 @@ export const CWInfoFilled: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -949,7 +949,7 @@ export const CWJar: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -973,7 +973,7 @@ export const CWLock: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -996,7 +996,7 @@ export const CWLogout: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1024,7 +1024,7 @@ export const CWMail: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1047,7 +1047,7 @@ export const CWPeople: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1071,7 +1071,7 @@ export const CWPerson: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1094,7 +1094,7 @@ export const CWPin: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="33"
         height="32"
@@ -1115,7 +1115,7 @@ export const CWPlus: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1135,7 +1135,7 @@ export const CWPlusCircle: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1158,7 +1158,7 @@ export const CWSearch: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1181,7 +1181,7 @@ export const CWSend: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1204,7 +1204,7 @@ export const CWShare: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1227,7 +1227,7 @@ export const CWShare2: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1250,7 +1250,7 @@ export const CWStar: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1269,7 +1269,7 @@ export const CWSun: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1338,7 +1338,7 @@ export const CWTelegram: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1361,7 +1361,7 @@ export const CWTrash: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1385,7 +1385,7 @@ export const CWTreasuryProposal: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1408,7 +1408,7 @@ export const CWTwitter: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1427,7 +1427,7 @@ export const CWUpvote: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1446,7 +1446,7 @@ export const CWViews: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1470,7 +1470,7 @@ export const CWWallet: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -1499,7 +1499,7 @@ export const CWWebsite: m.Component<IconAttrs> = {
     const { className, disabled, iconSize, onclick } = vnode.attrs;
     return (
       <svg
-        class={getIconClasses({ disabled, iconSize, className })}
+        class={getClasses<IconStyleAttrs>({ disabled, iconSize, className })}
         xmlns="http://www.w3.org/2000/svg"
         width="30"
         height="30"
