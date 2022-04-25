@@ -29,9 +29,11 @@
 
 .LoadingRow {
   margin: 30px 0;
+
   @include xs-max {
     margin: 15px 0 0 0;
   }
+
   .forum-container > & {
     margin: 0 0 -7px 0;
   }
@@ -52,14 +54,15 @@
     background: $neutral-300;
     height: 15px;
     min-width: 100px;
+
     @include placeholder-shimmer;
   }
+
   .title-block {
     height: 28px;
     width: 240px;
   }
-  .metadata-block {
-  }
+
   .content-block {
     margin-bottom: 6px;
     margin-right: 4px;

@@ -18,11 +18,10 @@ import { Footer } from './footer';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
-  hero?: any;
   hideSearch?: boolean;
-  onscroll?: any; // lazy loading for page content
+  onscroll: () => null; // lazy loading for page content
   showNewProposalButton?: boolean;
-  title?: any; // displayed at the top of the layout
+  title?: string; // displayed at the top of the layout
 };
 
 const footercontents = [
@@ -53,7 +52,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   view(vnode) {
     const {
       alwaysShowTitle,
-      hero,
       hideSearch,
       onscroll,
       showNewProposalButton,
@@ -87,8 +85,8 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           </div>
           <div class="sidebar-and-body-container">
             <Sidebar />
-            <div class="body" onscroll={onscroll}>
-              <TokenHero chain={chain} hero={hero} />
+            <div class="Body" onscroll={onscroll}>
+              <TokenHero chain={chain} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
               {vnode.children}
               {!app.isCustomDomain() && <Footer list={footercontents} />}
