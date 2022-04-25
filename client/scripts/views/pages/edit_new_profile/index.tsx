@@ -10,6 +10,7 @@ import { NewProfile as Profile } from '../../../../scripts/models'
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput, ValidationStatus } from '../../components/component_kit/cw_text_input';
 import { Spinner } from 'construct-ui';
+import AvatarUpload, {AvatarScope}  from '../../../views/components/avatar_upload'
 
 import 'pages/edit_new_profile.scss';
 
@@ -19,6 +20,7 @@ type EditProfileState = {
   profileUpdate: Object,
   saved: boolean,
   failed: boolean,
+  imageUploading: boolean,
 }
 
 enum InputFormField {
@@ -37,6 +39,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
     vnode.state.profileUpdate = {}
     vnode.state.saved = false
     vnode.state.failed = false
+    vnode.state.imageUploading = false
   }
 
   getProfile = async (vnode, address: string) => {
@@ -138,7 +141,8 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
         <h3> Edit Profile </h3>
         <div className="edit-pane">
           {
-            vnode.state.saved ? <Spinner active={true} size="lg" /> : <div />
+            (vnode.state.saved || vnode.state.imageUploading) ? 
+            <Spinner active={true} size="lg" /> : <div />
           }
           
           <div className={vnode.state.failed ? 'save-button-message show' : 
@@ -200,9 +204,29 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
             <div className="profile-image-section">
               <h4 className="title"> Profile Image </h4>
               <div className="flex">
-                <div className="profile-image">
+
+                <div className={vnode.state.profileUpdate?.avatarUrl ? 
+                  "profile-image hide" : "profile-image"}
+                >
                   <img src={vnode.state.profile?.avatarUrl} />
                 </div>
+  
+                <AvatarUpload 
+                  avatarScope={AvatarScope.Account} 
+                  uploadStartedCallback={() => {
+                    vnode.state.imageUploading = true
+                  }}
+                  uploadCompleteCallback={(files) => {
+                    vnode.state.imageUploading = false
+                    files.forEach((f) => {
+                      if (!f.uploadURL) return;
+                      // const url = f.uploadURL.replace(/\?.*/, '').trim();  // edit_profile_modal.ts L31
+                      vnode.state.profileUpdate.avatarUrl = f.uploadURL
+                    });
+                    m.redraw();
+                  }}
+                  />
+
                 <p> OR </p>
                 <CWTextInput
                   name="profile-image-form-field"
@@ -214,7 +238,11 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
                     }
                   }}
                   label="Image URL"
-                  placeholder={vnode.state.profile?.avatarUrl}
+                  placeholder={
+                    vnode.state.profileUpdate?.avatarUrl ? 
+                    vnode.state.profileUpdate?.avatarUrl :
+                    vnode.state.profile?.avatarUrl
+                  }
                   oninput={(e) => {
                     this.handleInputChange(vnode, (e.target as any).value, InputFormField.ProfileImage)
                   }}

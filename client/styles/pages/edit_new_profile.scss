@@ -68,6 +68,7 @@
         }
 
         .flex {
+          position: relative;
           display: flex;
           width: 100%;
           align-items: center;
@@ -75,9 +76,37 @@
           .profile-image {
             width: 90px;
             height: 90px;
+            min-width: 90px;
+            min-height: 90px;
             img {
               border-radius: 50%;
             }
+            &.hide {
+              img {
+                display: none;
+              }
+            }
+          }
+
+          .AvatarUpload {
+            position: absolute;
+            left: 45px;
+            top: 45px;
+            transform: translate(-50%, -50%); 
+            opacity: .45;
+            transition: opacity .3s ease;
+            &:hover {
+              opacity: 1;
+            }
+
+            .dz-image {
+              width: 90px;
+              height: 90px;
+            }
+          }
+
+          .TextInput {
+            width: 75%;
           }
 
           p {
