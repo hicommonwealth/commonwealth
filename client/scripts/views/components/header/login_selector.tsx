@@ -2,7 +2,6 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import * as Cui from 'construct-ui';
 
 import 'components/header/login_selector.scss';
@@ -190,7 +189,6 @@ export class LoginSelectorMenuRight
                 // eslint-disable-next-line no-restricted-globals
                 location.reload();
               });
-            mixpanel.reset();
           }}
           label={
             <div class="label-wrap">
@@ -392,8 +390,9 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
                 <span class="hidden-sm">
                   {samebaseAddresses.length === 0
                     ? `No ${
-                      CHAINNETWORK_SHORT[app.chain?.meta?.chain?.network] ||
-                        CHAINBASE_SHORT[app.chain?.meta?.chain.base] || ''
+                        CHAINNETWORK_SHORT[app.chain?.meta?.chain?.network] ||
+                        CHAINBASE_SHORT[app.chain?.meta?.chain.base] ||
+                        ''
                       } address`
                     : 'Join'}
                 </span>

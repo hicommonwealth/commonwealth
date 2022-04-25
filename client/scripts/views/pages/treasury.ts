@@ -1,7 +1,6 @@
 import 'pages/treasury.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { Tag } from 'construct-ui';
 
 import app from 'state';
@@ -89,7 +88,6 @@ function getModules() {
 
 const TreasuryPage: m.Component<{}> = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'TreasuryPage' });
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
     if (

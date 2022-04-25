@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { Popover } from 'construct-ui';
 import BN from 'bn.js';
 import $ from 'jquery';
@@ -113,17 +112,6 @@ const onReactionClick = (
     } else {
       like(chain, chainId, userAddress);
     }
-
-    mixpanel.track('Create Reaction ', {
-      'Step No': 1,
-      Step: 'Create Reaction',
-      'Post Name': `${post.slug}: ${post.identifier}`,
-      Scope: app.activeChainId(),
-    });
-    mixpanel.people.increment('Reaction');
-    mixpanel.people.set({
-      'Last Reaction Created': new Date().toISOString(),
-    });
   }
 };
 
@@ -141,19 +129,22 @@ export class ReactionButton implements m.ClassComponent<ReactionButtonAttrs> {
     const { likes = 0, hasReacted } = reactionCounts || {};
 
     // token balance check if needed
-    const isAdmin = app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({ chain: app.activeChainId()});
-    let topicName = "";
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({ chain: app.activeChainId() });
+    let topicName = '';
     if (post instanceof OffchainThread && post.topic && app.topics) {
       topicName = (post as OffchainThread).topic.name;
     } else if (post instanceof OffchainComment) {
       // post.rootProposal has typescript typedef number but in practice seems to be a string
-      const parentThread = app.threads.getById(parseInt(post.rootProposal.toString().split('_')[1], 10));
+      const parentThread = app.threads.getById(
+        parseInt(post.rootProposal.toString().split('_')[1], 10)
+      );
       topicName = parentThread.topic.name;
     }
-    this.loading = vnode.state.loading || (
-      !isAdmin && TopicGateCheck.isGatedTopic(topicName)
-    );
+    this.loading =
+      vnode.state.loading ||
+      (!isAdmin && TopicGateCheck.isGatedTopic(topicName));
 
     const activeAddress = app.user.activeAccount?.address;
 

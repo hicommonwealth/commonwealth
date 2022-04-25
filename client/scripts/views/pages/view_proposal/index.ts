@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import {
   PopoverMenu,
   MenuDivider,
@@ -853,13 +852,7 @@ const ViewProposalPage: m.Component<
 > = {
   oncreate: (vnode) => {
     // writes type field if accessed as /proposal/XXX (shortcut for non-substrate chains)
-    mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
-    mixpanel.track('Proposal Funnel', {
-      'Step No': 1,
-      Step: 'Viewing Proposal',
-      'Proposal Name': `${vnode.attrs.type}: ${vnode.attrs.identifier}`,
-      Scope: app.activeChainId(),
-    });
+
     if (!vnode.state.editing) {
       vnode.state.editing = false;
     }
@@ -1020,7 +1013,9 @@ const ViewProposalPage: m.Component<
             },
             data: JSON.stringify({
               proposal_ids: [proposalId],
-              comment_ids: app.comments.getByProposal(proposal).map((comment) => comment.id),
+              comment_ids: app.comments
+                .getByProposal(proposal)
+                .map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
             }),
           });

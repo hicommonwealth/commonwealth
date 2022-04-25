@@ -1,5 +1,4 @@
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import BN from 'bn.js';
 import $ from 'jquery';
 import { Icon, Icons, Popover, Size } from 'construct-ui';
@@ -220,16 +219,6 @@ const ThreadReactionButton: m.Component<
                   m.redraw();
                 });
             }
-            mixpanel.track('Create Reaction ', {
-              'Step No': 1,
-              Step: 'Create Reaction',
-              'Post Name': `${post.slug}: ${post.identifier}`,
-              Scope: app.activeChainId(),
-            });
-            mixpanel.people.increment('Reaction');
-            mixpanel.people.set({
-              'Last Reaction Created': new Date().toISOString(),
-            });
           }
         },
       },
