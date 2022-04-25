@@ -995,8 +995,9 @@ const ViewProposalPage: m.Component<
       app.comments
         .refresh(proposal, app.activeChainId())
         .then(async () => {
-          vnode.state.comments = app.comments.getByProposal(proposal);
-          // .filter((c) => c.parentComment === null); // TODO: Why was this written?
+          vnode.state.comments = app.comments
+            .getByProposal(proposal)
+            .filter((c) => c.parentComment === null);
           // fetch reactions
           const { result: reactionCounts } = await $.ajax({
             type: 'POST',
