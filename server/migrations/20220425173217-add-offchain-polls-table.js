@@ -6,7 +6,23 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
-      name: {
+      chain_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Chain',
+          key: 'id',
+        },
+      },
+      thread_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'OffchainThread',
+          key: 'id',
+        },
+      },
+      prompt: {
         type: Sequelize.STRING,
         allowNull: false,
       },
