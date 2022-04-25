@@ -5,7 +5,7 @@ import 'components/component_kit/cw_engagement_button.scss';
 
 import { CWIcon } from './cw_icons/cw_icon';
 import { ComponentType, StyleAttrs } from './types';
-import { getButtonClasses } from './helpers';
+import { getClasses } from './helpers';
 
 export type EngagementButtonSize = 'sm' | 'lg';
 
@@ -32,11 +32,14 @@ export class CWEngagementButton
 
     return (
       <button
-        class={getButtonClasses(ComponentType.EngagementButton, {
-          className,
-          disabled,
-          buttonSize,
-        })}
+        class={getClasses<EngagementButtonStyleAttrs>(
+          {
+            className,
+            disabled,
+            buttonSize,
+          },
+          ComponentType.EngagementButton
+        )}
         onclick={onclick}
         disabled={disabled}
       >
