@@ -32,7 +32,7 @@ export class DiscussionFilterBar
 
     const { stagesEnabled, customStages } = communityInfo;
 
-    const topics  = app.topics.getByCommunity(app.activeChainId());
+    const topics = app.topics.getByCommunity(app.activeChainId());
 
     const featuredTopics = topics
       .filter((t) => t.featuredInSidebar)
@@ -54,12 +54,11 @@ export class DiscussionFilterBar
         ]
       : parseCustomStages(customStages);
 
-    const selectedStage = stages.find((s) => s === (stage as any));
+    const selectedStage = stages.find(
+      (s) => s === (stage as OffchainThreadStage)
+    );
 
-    const topicSelected = onFeaturedDiscussionPage(m.route.get(), topic);
-
-    const summaryViewEnabled =
-      vnode.attrs.parentState.summaryView && !topicSelected;
+    const summaryViewEnabled = vnode.attrs.parentState.summaryView;
 
     return (
       <div class="DiscussionFilterBar">
@@ -91,11 +90,14 @@ export class DiscussionFilterBar
               label="Summary"
               size="sm"
               disabled={disabled}
-              onclick={async (e) => {
+              onclick={(e) => {
                 e.preventDefault();
-                localStorage.setItem('discussion-summary-toggle', 'true');
-                parentState.summaryView = true;
                 navigateToSubpage('/');
+                localStorage.setItem('discussion-summary-toggle', 'true');
+                setTimeout(() => {
+                  parentState.summaryView = true;
+                  m.redraw();
+                }, 0);
               }}
             />
             <Button
@@ -105,10 +107,14 @@ export class DiscussionFilterBar
               label="Latest"
               size="sm"
               disabled={disabled}
-              onclick={async (e) => {
+              onclick={(e) => {
                 e.preventDefault();
-                parentState.summaryView = false;
                 localStorage.setItem('discussion-summary-toggle', 'false');
+                navigateToSubpage('/');
+                setTimeout(() => {
+                  parentState.summaryView = false;
+                  m.redraw();
+                }, 0);
               }}
             />
           </>

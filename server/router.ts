@@ -122,6 +122,7 @@ import updateAddress from './routes/updateAddress';
 import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
+import setAddressWallet from './routes/setAddressWallet';
 
 function setupRouter(
   app: Express,
@@ -566,6 +567,11 @@ function setupRouter(
     '/disableImmediateEmails',
     passport.authenticate('jwt', { session: false }),
     disableImmediateEmails.bind(this, models)
+  );
+  router.post(
+    '/setAddressWallet',
+    passport.authenticate('jwt', { session: false }),
+    setAddressWallet.bind(this, models)
   );
 
   // chain categories

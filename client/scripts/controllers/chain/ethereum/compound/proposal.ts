@@ -341,9 +341,12 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already cancelled');
     }
 
-    const address = this._Gov.app.user.activeAccount.address;
     let tx: ContractTransaction;
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Contract
+    );
     try {
       const gasLimit = await contract.estimateGas['cancel(uint256)'](this.data.identifier);
       tx = await contract['cancel(uint256)'](
@@ -354,7 +357,7 @@ export default class CompoundProposal extends Proposal<
       // workaround for Oz without BravoCompatLayer
       // uses GovernorMock because it supports the proper cancel ABI vs BravoCompat
       const contractNoSigner = GovernorMock__factory.connect(this._Gov.api.contractAddress, this._Gov.api.Provider);
-      const ozContract = await attachSigner(this._Gov.app.wallets, address, contractNoSigner);
+      const ozContract = await attachSigner(this._Gov.app.wallets, this._Gov.app.user.activeAccount, contractNoSigner);
       const descriptionHash = utils.keccak256(
         utils.toUtf8Bytes(this.data.description)
       );
@@ -390,8 +393,11 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already queued');
     }
 
-    const address = this._Gov.app.user.activeAccount.address;
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Contract
+    );
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
@@ -434,8 +440,11 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already executed');
     }
 
-    const address = this._Gov.app.user.activeAccount.address;
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Contract
+    );
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
@@ -479,7 +488,7 @@ export default class CompoundProposal extends Proposal<
     const address = vote.account.address;
     const contract = await attachSigner(
       this._Gov.app.wallets,
-      address,
+      vote.account,
       this._Gov.api.Contract,
     );
     if (!(await this._Chain.isDelegate(address, this.data.startBlock))) {
