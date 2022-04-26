@@ -17,6 +17,8 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   view(vnode) {
     const { content, isOpen, closePopover } = vnode.attrs;
 
-    return <CWOverlay isOpen={isOpen} content={content} />;
+    return (
+      <CWOverlay isOpen={isOpen} content={content} onClose={closePopover} />
+    );
   }
 }

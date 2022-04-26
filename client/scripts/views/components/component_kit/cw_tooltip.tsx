@@ -24,6 +24,7 @@ export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
   }
 
   closePopover() {
+    console.log('in');
     this.isPopoverOpen = false;
   }
 

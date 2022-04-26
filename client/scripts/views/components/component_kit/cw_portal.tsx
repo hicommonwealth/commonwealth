@@ -13,13 +13,17 @@ export class CWPortal implements m.ClassComponent<PortalAttrs> {
 
   oncreate(vnode) {
     const rootElement = document.createElement('div');
+
     const container = isNotUndefined(vnode.attrs.container)
       ? vnode.attrs.container
       : document.body;
+
     container.appendChild(rootElement);
+
     this.rootElement = rootElement;
 
     this.content = { view: () => vnode.children };
+
     m.mount(this.rootElement, this.content);
   }
 
