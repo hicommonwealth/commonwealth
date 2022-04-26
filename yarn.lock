@@ -10579,7 +10579,7 @@ https-browserify@^1.0.0:
   resolved "https://registry.npmjs.org/https-browserify/-/https-browserify-1.0.0.tgz"
   integrity sha1-7AbBDgo0wPL68Zn3/X/Hj//QPHM=
 
-https-proxy-agent@^5.0.0:
+https-proxy-agent@5.0.0, https-proxy-agent@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-5.0.0.tgz#e2a90542abb68a762e0a0850f6c9edadfd8506b2"
   integrity sha512-EkYm5BcKUGiduxzSt3Eppko+PiNWNEpa4ySk9vTC6wDsQJW9rHSa+UhGNJoRYp7bz6Ht1eaRIa6QaJqO5rCFbA==
@@ -12971,6 +12971,13 @@ mixpanel-browser@^2.45.0:
   version "2.45.0"
   resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.45.0.tgz#a2973be5b66e6d2799ef95a1e55b8ad8eede57e8"
   integrity sha512-PQ1DaTk68yyYtLA0iejmzPA9iNDhT4uIZpqZjRTw7HWpYfl123fydHb2laKanaKjm8YDmrGGz3+xZ4Q6joogyg==
+
+mixpanel@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/mixpanel/-/mixpanel-0.14.0.tgz#5d948c30cd1ad17acb235dc084478c7b32eff04f"
+  integrity sha512-PY2zSMXCGHSEnuuFnlPeSX3R7YeU3/8IaSUgmGc9DnM2U7weg6sfdKu7s5+3euwGz0R1KHQoUJOUbIuXtHgGmA==
+  dependencies:
+    https-proxy-agent "5.0.0"
 
 mkdirp-promise@^5.0.1:
   version "5.0.1"

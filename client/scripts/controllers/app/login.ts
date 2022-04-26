@@ -15,7 +15,7 @@ import {
   SocialAccount,
   Account,
   AddressInfo,
-  ITokenAdapter
+  ITokenAdapter,
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
@@ -28,8 +28,10 @@ function createAccount(
 ) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
-    keytype: account.chainBase === ChainBase.Substrate
-      && (account as any).isEd25519 ? 'ed25519' : undefined,
+    keytype:
+      account.chainBase === ChainBase.Substrate && (account as any).isEd25519
+        ? 'ed25519'
+        : undefined,
     chain: account.chain.id,
     community,
     jwt: app.user.jwt,
@@ -37,15 +39,44 @@ function createAccount(
   });
 }
 
+const enum MixpanelLoginFlowEvents {
+  LOGIN_BUTTON_PRESS = 'Login Button Press',
+  LOGIN_SUCCESSFUL = 'Login Successful',
+}
+
+const enum LoginEntryPoint {
+  HOMEPAGE = 'Homepage',
+  COMMUNITY = 'Community',
+}
+
+type MixpanelEvents = MixpanelLoginFlowEvents; // One for each analytics mini project
+
+// Base Payload Definitions
+interface BaseMixpanelPayload {
+  uid: string;
+  event: MixpanelEvents;
+}
+
+// Properties for a Specific Event
+interface MixpanelLoginPayload extends BaseMixpanelPayload {
+  entryPoint: LoginEntryPoint;
+  event: MixpanelLoginFlowEvents;
+}
+const lol: MixpanelLoginPayload = {
+  entryPoint: LoginEntryPoint.COMMUNITY,
+  event: MixpanelLoginFlowEvents.LOGIN_BUTTON_PRESS,
+  uid: '',
+};
+type MixpanelPayload = MixpanelLoginPayload | BaseMixpanelPayload; // Any Other Payload Types we add
 export function linkExistingAddressToChainOrCommunity(
   address: string,
   chain: string,
-  originChain: string,
+  originChain: string
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
-    'address': address,
-    'chain': chain,
-    'originChain': originChain,
+    address: address,
+    chain: chain,
+    originChain: originChain,
     jwt: app.user.jwt,
   });
 }
@@ -60,7 +91,10 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
 
   if (!role || role.is_user_default) {
     app.user.ephemerallySetActiveAccount(account);
-    if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+    if (
+      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+        .length === 0
+    ) {
       app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
     }
     return;
@@ -83,16 +117,23 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   }
 
   // update is_user_default
-  app.user.getAllRolesInCommunity({ chain })
-    .forEach((r) => { r.is_user_default = false; });
+  app.user.getAllRolesInCommunity({ chain }).forEach((r) => {
+    r.is_user_default = false;
+  });
   role.is_user_default = true;
   app.user.ephemerallySetActiveAccount(account);
-  if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+  if (
+    app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
+    0
+  ) {
     app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
   }
 }
 
-export async function updateLastVisited(activeEntity: ChainInfo, updateFrontend?: boolean) {
+export async function updateLastVisited(
+  activeEntity: ChainInfo,
+  updateFrontend?: boolean
+) {
   if (!app.isLoggedIn()) return;
   try {
     const timestamp = moment();
@@ -123,7 +164,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.user.isMember({ chain: chain.id, account })
+    return app.user.isMember({ chain: chain.id, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -132,11 +173,16 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
-    const existingAddress = app.user.getDefaultAddressInCommunity({ chain: chain.id })
+    const existingAddress = app.user.getDefaultAddressInCommunity({
+      chain: chain.id,
+    });
 
     if (existingAddress) {
       const account = app.user.activeAccounts.find((a) => {
-        return a.chain.id === existingAddress.chain && a.address === existingAddress.address;
+        return (
+          a.chain.id === existingAddress.chain &&
+          a.address === existingAddress.address
+        );
       });
       if (account) await setActiveAccount(account);
     }
@@ -168,10 +214,24 @@ export function updateActiveUser(data) {
     app.user.setEmailVerified(data.emailVerified);
     app.user.setJWT(data.jwt);
 
-    app.user.setAddresses(data.addresses.map(
-      (a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.wallet_id, a.ghost_address)
-    ));
-    app.user.setSocialAccounts(data.socialAccounts.map((sa) => new SocialAccount(sa.provider, sa.provider_username)));
+    app.user.setAddresses(
+      data.addresses.map(
+        (a) =>
+          new AddressInfo(
+            a.id,
+            a.address,
+            a.chain,
+            a.keytype,
+            a.wallet_id,
+            a.ghost_address
+          )
+      )
+    );
+    app.user.setSocialAccounts(
+      data.socialAccounts.map(
+        (sa) => new SocialAccount(sa.provider, sa.provider_username)
+      )
+    );
 
     app.user.setSiteAdmin(data.isAdmin);
     app.user.setDisableRichText(data.disableRichText);
@@ -181,7 +241,10 @@ export function updateActiveUser(data) {
 }
 
 export async function createUserWithAddress(
-  address: string, walletId: WalletId, keytype?: string, community?: string,
+  address: string,
+  walletId: WalletId,
+  keytype?: string,
+  community?: string
 ): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
   const response = await createAccount(account, walletId, community);
@@ -206,7 +269,9 @@ export async function unlinkLogin(account) {
   // This might be more gracefully handled by calling initAppState again.
   let index = app.user.activeAccounts.indexOf(account);
   app.user.activeAccounts.splice(index, 1);
-  index = app.user.addresses.indexOf(app.user.addresses.find((a) => a.address === account.address));
+  index = app.user.addresses.indexOf(
+    app.user.addresses.find((a) => a.address === account.address)
+  );
   app.user.addresses.splice(index, 1);
 
   if (!unlinkingCurrentlyActiveAccount) return;
@@ -218,13 +283,15 @@ export async function unlinkLogin(account) {
 }
 
 export async function loginWithMagicLink(email: string) {
-  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, { extensions: [
-    new PolkadotExtension({
-      // we don't need a real node URL because we're only generating an address,
-      // not doing anything requiring chain connection
-      rpcUrl: 'ws://localhost:9944',
-    })
-  ] });
+  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, {
+    extensions: [
+      new PolkadotExtension({
+        // we don't need a real node URL because we're only generating an address,
+        // not doing anything requiring chain connection
+        rpcUrl: 'ws://localhost:9944',
+      }),
+    ],
+  });
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
@@ -232,11 +299,11 @@ export async function loginWithMagicLink(email: string) {
       Authorization: `Bearer ${didToken}`,
     },
     xhrFields: {
-      withCredentials: true
+      withCredentials: true,
     },
     data: {
       // send chain/community to request
-      'chain': app.activeChainId(),
+      chain: app.activeChainId(),
     },
   });
   if (response.status === 'Success') {
