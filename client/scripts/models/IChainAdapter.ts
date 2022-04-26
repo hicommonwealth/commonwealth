@@ -81,7 +81,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
 
     const {
-      threads,
+      pinnedThreads,
       topics,
       admins,
       activeUsers,
@@ -89,7 +89,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       chatChannels,
     } = response.result;
     this.app.topics.initialize(topics, true);
-    this.app.threads.initialize(threads, numVotingThreads, true);
+    this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.chain.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     if (this.app.socket && this.app.loginState === LoginState.LoggedIn) {

@@ -76,6 +76,17 @@ const bulkOffchain = async (
                 model: models.LinkedThread,
                 as: 'linked_threads',
               },
+              {
+                model: models.OffchainReaction,
+                as: 'reactions',
+                include: [
+                  {
+                    model: models.Address,
+                    as: 'Address',
+                    required: true,
+                  },
+                ],
+              },
             ],
             attributes: { exclude: ['version_history'] },
           });
@@ -106,7 +117,10 @@ const bulkOffchain = async (
             (new Date() as any) - 1000 * 24 * 60 * 60 * 30
           );
           const activeUsers = {};
-          const where = { updated_at: { [Op.gt]: thirtyDaysAgo }, chain: chain.id };
+          const where = {
+            updated_at: { [Op.gt]: thirtyDaysAgo },
+            chain: chain.id,
+          };
 
           const monthlyComments = await models.OffchainComment.findAll({
             where,
@@ -165,7 +179,7 @@ const bulkOffchain = async (
     result: {
       topics: topics.map((t) => t.toJSON()),
       numVotingThreads,
-      threads: pinnedThreads, // already converted to JSON earlier
+      pinnedThreads, // already converted to JSON earlier
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
       chatChannels: JSON.stringify(chatChannels)

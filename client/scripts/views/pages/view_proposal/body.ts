@@ -45,9 +45,6 @@ import {
 import { ChainType } from '../../../../../shared/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
-import ThreadReactionButton, {
-  ReactionType,
-} from '../../components/thread_reaction_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 export enum GlobalStatus {
@@ -872,20 +869,5 @@ export const ProposalBodyEditor: m.Component<
           : `edit-comment-${item.id}`,
       }),
     ]);
-  },
-};
-
-export const ProposalBodyReaction: m.Component<{
-  item: OffchainThread | AnyProposal | OffchainComment<any>;
-}> = {
-  view: (vnode) => {
-    const { item } = vnode.attrs;
-    if (!item) return;
-
-    return m(ThreadReactionButton, {
-      post: item,
-      type: ReactionType.Like,
-      tooltip: true,
-    });
   },
 };
