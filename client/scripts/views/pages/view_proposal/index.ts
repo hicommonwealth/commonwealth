@@ -5,11 +5,8 @@ import {
   PopoverMenu,
   MenuDivider,
   MenuItem,
-  Icon,
-  Icons,
   Button,
   Input,
-  Size,
 } from 'construct-ui';
 
 import 'pages/view_proposal/index.scss';
@@ -99,7 +96,6 @@ import {
   ProposalBodyText,
   ProposalBodyAttachments,
   ProposalBodyEditor,
-  ProposalBodyReaction,
   ProposalBodyEditMenuItem,
   ProposalBodyDeleteMenuItem,
   EditPermissionsButton,
@@ -119,9 +115,12 @@ import {
   ProposalHeaderThreadLink,
   ProposalHeaderVotingInterfaceLink,
 } from './proposal_header_links';
+import { InlineReplyButton } from '../../components/inline_reply_button';
 import { PollEditorCard } from './poll_editor_card';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
+import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
+import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -179,28 +178,6 @@ const scrollToForm = (parentId?: number) => {
     // focus the reply form
     $reply.find('.ql-editor').focus();
   }, 1);
-};
-
-const InlineReplyButton: m.Component<
-  { commentReplyCount: number; onclick },
-  {}
-> = {
-  view: (vnode) => {
-    const { commentReplyCount, onclick } = vnode.attrs;
-    return m(
-      '.InlineReplyButton',
-      {
-        onclick,
-      },
-      [
-        m(Icon, {
-          name: Icons.MESSAGE_SQUARE,
-          size: Size.XL,
-        }),
-        m('.reply-count', commentReplyCount),
-      ]
-    );
-  },
 };
 
 const ProposalHeader: m.Component<
@@ -335,7 +312,7 @@ const ProposalHeader: m.Component<
                           (isAuthor || isAdmin) &&
                             app.chain?.meta.chain.snapshot.length > 0 &&
                             m(MenuItem, {
-                              onclick: (e) => {
+                              onclick: () => {
                                 const snapshotSpaces =
                                   app.chain.meta.chain.snapshot;
                                 if (snapshotSpaces.length > 1) {
@@ -513,10 +490,12 @@ const ProposalHeader: m.Component<
                   ]),
                 !vnode.state.editing &&
                   m('.proposal-response-row', [
-                    m(ProposalBodyReaction, { item: proposal }),
+                    m(ThreadReactionButton, {
+                      thread: proposal,
+                    }),
                     m(InlineReplyButton, {
                       commentReplyCount: commentCount,
-                      onclick: (e) => {
+                      onclick: () => {
                         if (!proposalPageState.replying) {
                           proposalPageState.replying = true;
                           scrollToForm();
@@ -674,10 +653,12 @@ const ProposalComment: m.Component<
             !vnode.state.editing &&
               !comment.deleted &&
               m('.comment-response-row', [
-                m(ProposalBodyReaction, { item: comment }),
+                m(CommentReactionButton, {
+                  comment,
+                }),
                 m(InlineReplyButton, {
                   commentReplyCount,
-                  onclick: (e) => {
+                  onclick: () => {
                     if (
                       !proposalPageState.replying ||
                       proposalPageState.parentCommentId !== comment.id
@@ -1005,11 +986,17 @@ const ViewProposalPage: m.Component<
       );
     }
 
+    // load proposal
+    if (!vnode.state.prefetch[proposalIdAndType]['threadReactionsStarted']) {
+      app.threads.fetchReactionsCount([proposal]).then(() => m.redraw);
+      vnode.state.prefetch[proposalIdAndType]['threadReactionsStarted'] = true;
+    }
+
     // load comments
     if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
       app.comments
         .refresh(proposal, app.activeChainId())
-        .then(async (result) => {
+        .then(async () => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
             .filter((c) => c.parentComment === null);
@@ -1030,14 +1017,18 @@ const ViewProposalPage: m.Component<
           });
           // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier(rc);
+            const id = app.reactionCounts.store.getIdentifier({
+              threadId: rc.thread_id,
+              proposalId: rc.proposal_id,
+              commentId: rc.comment_id,
+            });
             app.reactionCounts.store.add(
               modelReactionCountFromServer({ ...rc, id })
             );
           }
           m.redraw();
         })
-        .catch((err) => {
+        .catch(() => {
           notifyError('Failed to load comments');
           vnode.state.comments = [];
           m.redraw();

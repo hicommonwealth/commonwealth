@@ -40,6 +40,10 @@ $discussion-title-font-size: 1.45rem;
     margin-right: 32px;
     padding: 24px 0 24px 24px;
     width: 736px;
+
+    @include sm-max {
+      width: 100%;
+    }
   }
   .ProposalHeader {
     .proposal-content {
@@ -54,58 +58,17 @@ $discussion-title-font-size: 1.45rem;
   .comment-body-bottom {
     display: flex;
     justify-content: space-between;
+
     .comment-response-row,
     .proposal-response-row {
       width: 100%;
       display: flex;
       max-width: 300px;
       align-items: center;
-      .InlineReplyButton,
-      .ProposalBodyReaction {
-        border: 1px solid $neutral-500;
-        margin-right: 7%;
-        padding: 6px;
-        cursor: pointer;
-        border-radius: 20px;
-        width: 70px;
-        height: 30px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-right: 10%;
-        padding: 6px;
-        cursor: pointer;
+      margin-top: 16px;
 
-        &:hover {
-          border: 1px solid $purple-400;
-
-          .cui-icon,
-          .reply-count,
-          .reactions-count {
-            color: $purple-400;
-          }
-        }
-        .active {
-          .cui-icon,
-          .reply-count,
-          .reactions-count {
-            color: $purple-400 !important;
-          }
-        }
-        .cui-icon,
-        .reply-count,
-        .reactions-count {
-          color: $neutral-500;
-          font-weight: 500;
-        }
-        .cui-icon {
-          margin-right: 8px;
-        }
-        .reply-count,
-        .reactions-count {
-          position: relative;
-          top: -1px;
-        }
+      > * {
+        margin-right: 8px;
       }
     }
     .proposal-body-button-group,
@@ -279,6 +242,8 @@ $discussion-title-font-size: 1.45rem;
       display: flex;
       flex-direction: row;
       align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
     }
     .comment-body-bottom {
       padding: 4px 0 2px;
@@ -290,13 +255,6 @@ $discussion-title-font-size: 1.45rem;
     }
   }
 
-  .ProposalHeader .proposal-content {
-    .ProposalBodyReaction,
-    .InlineReplyButton {
-      margin-top: $discussion-reaction-padding;
-    }
-  }
-
   .ProposalComments {
     .new-comment-child {
       margin-left: 72px;
@@ -304,10 +262,6 @@ $discussion-title-font-size: 1.45rem;
         margin-left: 0 !important;
         width: 100%;
       }
-    }
-    .ProposalBodyReaction,
-    .InlineReplyButton {
-      margin-top: $discussion-reaction-padding;
     }
   }
 
@@ -463,9 +417,6 @@ $discussion-title-font-size: 1.45rem;
     &:hover {
       stroke: $neutral-500;
     }
-  }
-  .ProposalBodyReaction {
-    display: inline-block;
   }
   .InlineReplyButton {
     display: flex;

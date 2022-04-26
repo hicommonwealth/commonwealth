@@ -14,6 +14,8 @@ const log = factory.getLogger(formatFilename(__filename));
 The reduce function goes through each result returned by query that counts
 and checks whether there's a match between thread/comment/proposal ids
  */
+
+// TODO Graham 4/24/22: Rename file + fn to getReactionCount
 const reactionsCounts = async (
   models: DB,
   req: Request,
@@ -64,39 +66,35 @@ const reactionsCounts = async (
             })
           : [],
       ]));
+
       return res.json({
         status: 'Success',
         result: reacCounts.reduce((acc, rc) => {
-          const rcJSon: any = rc.toJSON();
-          const {
-            thread_id: threadId,
-            comment_id: commentId,
-            proposal_id: proposalId,
-            reaction,
-            count,
-          } = rcJSon;
+          const rcJSon = rc.toJSON();
           const id =
             rcJSon.thread_id || rcJSon.comment_id || rcJSon.proposal_id;
           const index = acc.findIndex(
             ({ thread_id, comment_id, proposal_id }) =>
               id === thread_id || id === comment_id || id === proposal_id
           );
-          const hasReacted = myReactions.some(
+          const has_reacted = myReactions.some(
             ({ thread_id, comment_id, proposal_id }) => {
               return (
                 id === thread_id || id === comment_id || id === proposal_id
               );
             }
           );
+          const { reaction, count, thread_id, comment_id, proposal_id } =
+            rcJSon as never;
           if (index > 0) {
             acc[index][reaction] = count;
           } else {
             acc.push({
-              threadId,
-              commentId,
-              proposalId,
+              thread_id,
+              comment_id,
+              proposal_id,
               [reaction]: count,
-              hasReacted,
+              has_reacted,
             });
           }
           return acc;
