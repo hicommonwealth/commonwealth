@@ -192,14 +192,14 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
               }}
             />
 
-            <CWTextInput
-              name="bio-form-field"
-              label="Bio"
-              placeholder={vnode.state.profile?.bio}
-              oninput={(e) => {
-                this.handleInputChange(vnode, (e.target as any).value, InputFormField.Bio)
-              }}
-            />
+            <div className="bio-container">
+              <label>Bio</label>
+              <textarea className="bio-textarea" placeholder={vnode.state.profile?.bio} 
+                oninput={(e) => {
+                  this.handleInputChange(vnode, (e.target as any).value, InputFormField.Bio)
+                }}
+              />
+            </div>
 
             <div className="profile-image-section">
               <h4 className="title"> Profile Image </h4>

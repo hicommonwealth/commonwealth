@@ -53,12 +53,28 @@
         margin-bottom: 24px;
       }
 
-      .bio-field {
-        height: 200px;
-      }
-
       input[name="bio-form-field"] {
         height: 150px;
+      }
+
+      .bio-container {
+        label {
+          font-size: 14px;
+          color: #656167;
+        }
+        
+        .bio-textarea {
+          width: 100%;
+          height: 150px;
+          padding: 10px;
+          background-color: #f7f6f7;
+          border: 2px solid white;
+          border-radius: 4px;
+          margin: 4px 0 24px 0;
+          &:hover, &:focus {
+            border: 2px solid #bd99ff;          
+          }
+        }
       }
 
       .profile-image-section {

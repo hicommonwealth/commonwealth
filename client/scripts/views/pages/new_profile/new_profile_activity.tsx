@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import moment from 'moment';
 
 import OffchainThread from 'client/scripts/models/OffchainThread'
 import ChainInfo from 'client/scripts/models/ChainInfo'
@@ -29,6 +30,8 @@ type ProfileActivityState = {
   isAddressesOpen: boolean,
   communityFilters: Object,
   addressFilters: Object,
+  commentCharLimit: number,
+  threadCharLimit: number,
 }
 
 const handleClick = (option: ProfileActivity, state: ProfileActivityState) => {
@@ -60,14 +63,11 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
           <div className="comment-text">
             <p> 
               { 
-                comment.plaintext.length > 300 ?
-                `${comment.plaintext.slice(0,300)}...` :
+                comment.plaintext.length > state.commentCharLimit ?
+                `${comment.plaintext.slice(0, state.commentCharLimit)}...` :
                 comment.plaintext
               } 
             </p> 
-            { 
-              // TODO: Adjust character count limit for responsiveness
-            }
           </div>
         </div>
       )
@@ -98,10 +98,13 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
             <p> { thread.title } </p> 
           </div>
           <div className="thread-body">
-            <p> { thread.plaintext } </p>
-            { 
-              // TODO: Limit text character count
-            }
+            <p> 
+              { 
+                thread.plaintext.length > state.threadCharLimit ? 
+                `${thread.plaintext.slice(0, state.threadCharLimit)}...` :
+                thread.plaintext
+              } 
+            </p>
           </div>
         </div>
       )
@@ -126,10 +129,10 @@ const handleAddressFilter = (address: string, state: ProfileActivityState) => {
 }
 
 const transformTimestamp = (timestamp) => {
-  let date = new Date(timestamp)
-  let dateString = date.toDateString()
-  let timeString = date.toLocaleTimeString()
-  return `${dateString} ${timeString}`
+  let fromNow = moment(timestamp).fromNow();
+  return (fromNow === 'a day ago') ?
+    `${moment(Date.now()).diff(timestamp, 'hours')} hours ago`
+    : fromNow
 }
 
 class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileActivityState> {
@@ -140,9 +143,16 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
     vnode.state.isAddressesOpen = false;
     vnode.state.communityFilters = {};
     vnode.state.addressFilters = {};
+    vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 150;
+    vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 60;
   }
 
   view(vnode) {
+    window.addEventListener('resize', () => {
+      vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 150;
+      vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 90;
+    }, { passive: true });
+
     return(
       <div className="ProfileActivity">
         <div className="activity-nav">
@@ -207,8 +217,7 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
                       handleAddressFilter(address.address, vnode.state)}}
                     > 
                       <p> 
-                        <span className="heavy"> { address.chain } </span> &nbsp; &nbsp;
-                        { `${address.address.slice(0, 6)}...${address.address.slice(-6)}` }
+                        { `${address.address.slice(0, 12)}...${address.address.slice(-12)}` }
                       </p> 
                       { 
                         address.address in vnode.state.addressFilters ?
