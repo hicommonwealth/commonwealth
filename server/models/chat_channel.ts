@@ -38,6 +38,7 @@ export default (
       chain_id: {
         type: Sequelize.STRING,
         allowNull: false,
+        onDelete: 'CASCADE',
         references: {
           model: 'Chains',
           key: 'id',
@@ -69,6 +70,9 @@ export default (
     models.ChatChannel.hasMany(models.ChatMessage, {
       foreignKey: 'chat_channel_id',
     });
+    models.ChatChannel.belongsTo(models.Chain, {
+        onDelete: 'CASCADE'
+    })
   };
   return ChatChannel;
 };
