@@ -143,14 +143,14 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
     vnode.state.isAddressesOpen = false;
     vnode.state.communityFilters = {};
     vnode.state.addressFilters = {};
-    vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 150;
-    vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 60;
+    vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 140;
+    vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
   }
 
   view(vnode) {
     window.addEventListener('resize', () => {
-      vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 150;
-      vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 90;
+      vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 140;
+      vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
     }, { passive: true });
 
     return(

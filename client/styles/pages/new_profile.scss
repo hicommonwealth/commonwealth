@@ -56,6 +56,7 @@
           line-height: 21px;
         }
         .read-more {
+          margin-bottom: 15px;
           color: #338FFF;
           &:hover {
             cursor: pointer;
@@ -250,6 +251,30 @@
 
 @media only screen and (max-width: 1024px) {
   .ProfilePage {
+
+    .ProfileHeader {
+
+      .profile-info {
+        height: 260px;
+        grid-template-columns: 20% 80%;
+        grid-template-rows: 80% 20%;  
+
+        .profile-image {
+          img {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: none;
+          }
+        }
+      }
+
+      .social-accounts-and-edit {
+        padding: 15px 15px;
+      }
+
+    }
+
     .ProfileActivity {
       .activity-section {
         .activity {
@@ -260,5 +285,23 @@
       }
     }
   }
+}
+
+@media only screen and (max-width: 768px) {
+  .ProfilePage {
+
+    .ProfileHeader {
+
+      .profile-info {
+        height: 300px;
+        grid-template-columns: 30% 70%;
+        grid-template-rows: 85% 15%;  
+
+      }
+
+    }
+
+  }
+
 }
 

@@ -19,7 +19,7 @@ type ProfileHeaderState = {
   isBioExpanded: boolean
 }
 
-const maxBioCharCount = 220;
+const maxBioCharCount = 190;
 // TODO: Adjust value for responsiveness
 
 const renderSocialAccounts = (socialAccounts: Array<SocialAccount>) => {
