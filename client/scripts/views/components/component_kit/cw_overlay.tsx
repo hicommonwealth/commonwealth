@@ -2,7 +2,10 @@
 
 import m from 'mithril';
 
+import 'components/component_kit/cw_overlay.scss';
+
 import { CWPortal, PortalAttrs } from './cw_portal';
+import { ComponentType } from './types';
 
 type OverlayableAttrs = {
   inline?: boolean;
@@ -14,27 +17,24 @@ type OverlayAttrs = {
   isOpen?: boolean;
 } & OverlayableAttrs;
 
-export class Overlay implements m.ClassComponent<OverlayAttrs> {
+export class CWOverlay implements m.ClassComponent<OverlayAttrs> {
   private shouldRender: boolean;
-
-  oninit(vnode) {
-    this.shouldRender = !!vnode.attrs.isOpen;
-  }
 
   onremove() {
     if (this.shouldRender === true) {
       this.handleClose();
-      this.handleClosed();
       this.shouldRender = false;
     }
   }
 
-  public view(vnode) {
+  view(vnode) {
+    console.log('in overlay view isOpen', vnode.attrs.isOpen);
     const { inline, portalAttrs } = vnode.attrs;
 
-    if (!this.shouldRender) {
-      return null;
-    }
+    // if (!this.shouldRender) {
+    //   // console.log('in overlay check');
+    //   return null;
+    // }
 
     // const innerContent = [
     //     hasBackdrop && m('', {
@@ -58,13 +58,13 @@ export class Overlay implements m.ClassComponent<OverlayAttrs> {
     //     onupdate: this.onContainerUpdate
     //   }, innerContent);
 
-    const container = <div>poop</div>;
-
-    return inline ? (
-      container
-    ) : (
-      <CWPortal {...portalAttrs}>{container}</CWPortal>
+    const container = (
+      <div class={ComponentType.Overlay}>{vnode.attrs.content}</div>
     );
+
+    return vnode.attrs.isOpen ? (
+      <CWPortal {...portalAttrs}>{container}</CWPortal>
+    ) : null;
   }
 
   onContainerCreate = ({ dom }: m.VnodeDOM) => {

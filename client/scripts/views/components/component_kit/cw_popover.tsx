@@ -4,7 +4,8 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_popover.scss';
 
-import { ComponentType } from './types';
+// import { ComponentType } from './types';
+import { CWOverlay } from './cw_overlay';
 
 type PopoverAttrs = {
   closePopover: () => void;
@@ -15,11 +16,7 @@ type PopoverAttrs = {
 export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   view(vnode) {
     const { content, isOpen, closePopover } = vnode.attrs;
-    return isOpen ? (
-      <div class={ComponentType.Popover}>
-        {content}
-        <div onclick={closePopover} class={ComponentType.Overlay}></div>
-      </div>
-    ) : null;
+
+    return <CWOverlay isOpen={isOpen} content={content} />;
   }
 }

@@ -1,5 +1,6 @@
 /* @jsx m */
 
+import { isNotUndefined } from 'helpers/typeGuards';
 import m from 'mithril';
 
 export type PortalAttrs = {
@@ -10,9 +11,11 @@ export class CWPortal implements m.ClassComponent<PortalAttrs> {
   private rootElement: HTMLElement;
   private content: m.Component; // should this type be wider?
 
-  public oncreate(vnode) {
+  oncreate(vnode) {
     const rootElement = document.createElement('div');
-    const container = vnode.attrs.container || document.body;
+    const container = isNotUndefined(vnode.attrs.container)
+      ? vnode.attrs.container
+      : document.body;
     container.appendChild(rootElement);
     this.rootElement = rootElement;
 
@@ -21,7 +24,9 @@ export class CWPortal implements m.ClassComponent<PortalAttrs> {
   }
 
   onremove(vnode) {
-    const container = vnode.attrs.container || document.body;
+    const container = isNotUndefined(vnode.attrs.container)
+      ? vnode.attrs.container
+      : document.body;
 
     if (container.contains(this.rootElement)) {
       m.mount(this.rootElement, null);
@@ -29,7 +34,7 @@ export class CWPortal implements m.ClassComponent<PortalAttrs> {
     }
   }
 
-  public view() {
-    return m.fragment({}, '');
+  view() {
+    return null;
   }
 }

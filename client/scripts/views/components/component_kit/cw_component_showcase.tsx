@@ -15,6 +15,8 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
+import { CWPopover } from './cw_popover';
+import { CWTooltip } from './cw_tooltip';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -22,17 +24,6 @@ import { iconLookup } from './cw_icons/cw_icon_lookup';
 //       <div class="color-row">
 //         {k}
 //         <div class="color" style={`background: ${v};`} />
-//       </div>
-//     );
-//   });
-// };
-
-// const displayGradients = (gradientNames: string[]) => {
-//   return gradientNames.map((gradient) => {
-//     return (
-//       <div class="color-row">
-//         {gradient}
-//         <div class={`color ${gradient}`} />
 //       </div>
 //     );
 //   });
@@ -61,14 +52,8 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        {/* <h1>Gradients</h1>
-        <div class="color-gallery">
-          {displayGradients([
-            'rainbow-gradient-horizontal',
-            'rainbow-gradient-diagonal',
-            'shadow-gradient',
-          ])}
-        </div> */}
+        <h1>Popover</h1>
+        <CWTooltip tooltipContent={<div>butt</div>} triggerLabel="Click" />
         <h1>Icons</h1>
         <div class="icon-gallery">
           <div class="all-icons-container">{displayIcons(iconLookup)}</div>
