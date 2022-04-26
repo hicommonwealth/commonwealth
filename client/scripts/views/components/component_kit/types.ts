@@ -10,6 +10,7 @@ export enum ComponentType {
   Popover = 'Popover',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  Text = 'Text',
   TextInput = 'TextInput',
   Tooltip = 'Tooltip',
 }
