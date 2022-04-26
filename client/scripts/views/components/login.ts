@@ -4,6 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup } from 'construct-ui';
 import app from 'state';
+import { ChainNetwork } from 'types';
 import { loginWithMagicLink } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
@@ -36,6 +37,18 @@ const Login: m.Component<{}, {
 }> = {
   view: (vnode) => {
     const defaultEmail = m.route.param('inviteEmail');
+    // only provide wallet dropdown on Axie
+    if (app?.chain?.network === ChainNetwork.AxieInfinity) {
+      return m(Form, { gutter: 10 }, [
+        m(FormGroup, { span: 12 }, [
+          m(LoginWithWalletDropdown, {
+            label: 'Continue with wallet',
+            joiningChain: null,
+            loggingInWithAddress: true,
+          }),
+        ]),
+      ]);
+    }
     return m('.Login', {
       onclick: (e) => {
         e.stopPropagation();
