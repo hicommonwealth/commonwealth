@@ -18,7 +18,7 @@
   }
 
   &:hover {
-    background: #f7f4ff;
+    background: $neutral-50;
     border-radius: 15px;
   }
 
@@ -38,7 +38,7 @@
         font-weight: 600;
 
         span.comment-counts {
-          color: #666666;
+          color: $neutral-600;
           font-weight: 400;
         }
 
@@ -56,7 +56,7 @@
         }
 
         span.block-number {
-          color: #666666;
+          color: $neutral-600;
           font-weight: 400;
           margin-left: 20px;
         }
@@ -90,13 +90,13 @@
   }
 
   .subscribe-button {
-    background: #f7f4ff;
-    border: 1px solid #4723ad !important;
-    color: #4723ad;
+    background: $neutral-50;
+    border: 1px solid $purple-400 !important;
+    color: $purple-400;
     cursor: pointer;
 
     svg {
-      stroke: #4723ad;
+      stroke: $purple-400;
     }
   }
 
@@ -120,7 +120,7 @@
       }
 
       button {
-        border: 1px solid #ddd;
+        border: 1px solid $neutral-100;
         margin-right: 25px;
 
         @include sm-max {
@@ -129,13 +129,13 @@
         }
 
         &:hover {
-          background: #f7f4ff;
-          border: 1px solid #4723ad;
-          color: #4723ad;
+          background: $neutral-50;
+          border: 1px solid $purple-400;
+          color: $purple-400;
           cursor: pointer;
 
           svg {
-            stroke: #4723ad;
+            stroke: $purple-400;
           }
         }
       }
@@ -143,12 +143,12 @@
 
     &-right {
       svg {
-        stroke: #666;
+        stroke: $neutral-600;
       }
 
       button {
         border: none;
-        color: #666;
+        color: $neutral-600;
         background: transparent;
       }
     }

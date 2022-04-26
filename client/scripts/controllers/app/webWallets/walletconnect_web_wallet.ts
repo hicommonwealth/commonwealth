@@ -1,4 +1,4 @@
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
 import app from 'state';
 import Web3 from 'web3';
@@ -13,7 +13,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   private _provider: WalletConnectProvider;
   private _web3: Web3;
 
-  public readonly name = 'walletconnect';
+  public readonly name = WalletId.WalletConnect;
   public readonly label = 'WalletConnect';
   public readonly chain = ChainBase.Ethereum;
   public readonly available = true;

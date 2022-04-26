@@ -5,39 +5,59 @@ $width: 360px;
 
 .ComponentShowcase {
   padding: 24px;
+  width: 100%;
 
   h1 {
     margin-bottom: 16px;
   }
 
-  .color-gallery {
+  // .color-gallery {
+  //   display: flex;
+  //   flex-direction: column;
+  //   margin-bottom: $margin-bottom;
+  //   width: $width;
+
+  //   .color-row {
+  //     align-items: center;
+  //     display: flex;
+  //     height: 24px;
+  //     justify-content: space-between;
+
+  //     .color {
+  //       border-radius: 6px;
+  //       height: 16px;
+  //       width: 88px;
+  //     }
+
+  //     .rainbow-gradient-horizontal {
+  //       @include rainbow-gradient-horizontal;
+  //     }
+
+  //     .rainbow-gradient-diagonal {
+  //       @include rainbow-gradient-diagonal;
+  //     }
+
+  //     .shadow-gradient {
+  //       @include shadow-gradient;
+  //     }
+  //   }
+  // }
+
+  .text-gallery {
     display: flex;
     flex-direction: column;
-    margin-bottom: $margin-bottom;
-    width: $width;
 
-    .color-row {
+    .text-row {
       align-items: center;
       display: flex;
-      height: 24px;
+      flex-direction: row;
+      height: 48px;
       justify-content: space-between;
+      width: 400px;
 
-      .color {
-        border-radius: 6px;
-        height: 16px;
-        width: 88px;
-      }
-
-      .rainbow-gradient-horizontal {
-        @include rainbow-gradient-horizontal;
-      }
-
-      .rainbow-gradient-diagonal {
-        @include rainbow-gradient-diagonal;
-      }
-
-      .shadow-gradient {
-        @include shadow-gradient;
+      .ellipsis-row {
+        display: flex;
+        width: 200px;
       }
     }
   }
@@ -45,9 +65,32 @@ $width: 360px;
   .icon-gallery {
     display: flex;
     flex-direction: column;
-    height: 144px;
     margin-bottom: $margin-bottom;
-    width: $width;
+    width: 100%;
+
+    .all-icons-container {
+      display: flex;
+      flex-flow: column;
+      flex-wrap: wrap;
+      height: 448px;
+      margin-bottom: 16px;
+      width: fit-content;
+
+      .icon-container {
+        align-items: flex-start;
+        display: flex;
+        flex-direction: column;
+        height: 40px;
+        justify-content: center;
+        margin: 8px;
+        width: 80px;
+
+        .icon-name {
+          font-size: 10px;
+          margin-bottom: 4px;
+        }
+      }
+    }
 
     .icon-row {
       align-items: center;
@@ -55,7 +98,7 @@ $width: 360px;
       flex-direction: row;
       height: 48px;
       justify-content: space-between;
-      width: 100%;
+      width: 200px;
     }
   }
 

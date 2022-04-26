@@ -1,6 +1,7 @@
-import { IWebWallet } from 'models';
-import { ChainBase } from 'types';
+import { Account, IWebWallet } from 'models';
+import { ChainBase, WalletId } from 'types';
 import app from 'state';
+import $ from 'jquery';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
@@ -9,6 +10,7 @@ import NearWebWalletController from './webWallets/near_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import InjectiveWebWalletController from './webWallets/injective_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
+import RoninWebWalletController from './webWallets/ronin_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
@@ -16,20 +18,51 @@ export default class WebWalletController {
     return this._wallets;
   }
 
-  // TODO filter out wallets that are specific to a chain (and the current page isn't that chain)
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
+    // handle case like injective, axie, where we require a specific wallet
+    const specificChain = app.chain?.meta?.chain?.id;
+    if (app.chain?.meta?.chain?.id) {
+      const specificWallet = this._wallets.find((w) => w.specificChain === specificChain);
+      if (specificWallet) return [ specificWallet ];
+    }
+
+    // handle general case of wallet by chain base
     return this._wallets.filter((w) => w.available
-      && (!chain || w.chain === chain)
-      // if a specific chain is specified on a wallet AND a current chain is defined (aka not on home page) then load
-      // the wallet if the current chain is the same as the specific chain
-      && ((w.specificChain && app.chain?.meta?.chain.id) ? w.specificChain === app.chain.meta.chain.id : true));
+      && !w.specificChain // omit chain-specific wallets unless on correct chain
+      && (!chain || w.chain === chain));
   }
 
   public getByName(name: string): IWebWallet<any> | undefined {
     return this._wallets.find((w) => w.name === name);
   }
 
-  public async locateWallet(address: string, chain?: ChainBase): Promise<IWebWallet<any>> {
+  // sets a WalletId on the backend for an account whose walletId has not already been set
+  private async _setWalletId(account: Account<any>, wallet: WalletId): Promise<void> {
+    if (app.user.activeAccount.address !== account.address) {
+      console.error('account must be active to set wallet id');
+      return;
+    }
+
+    // do nothing on failure
+    try {
+      await $.post(`${app.serverUrl()}/setAddressWallet`, {
+        address: account.address,
+        author_chain: account.chain.id,
+        wallet_id: wallet,
+        jwt: app.user.jwt
+      });
+    } catch (e) {
+      console.error(`Failed to set wallet for address: ${e.message}`);
+    }
+  }
+
+  public async locateWallet(account: Account<any>, chain?: ChainBase): Promise<IWebWallet<any>> {
+    if (chain && account.chainBase !== chain) {
+      throw new Error('account on wrong chain base');
+    }
+    if (account.walletId) {
+      return this.getByName(account.walletId);
+    }
     const availableWallets = this.availableWallets(chain);
     if (availableWallets.length === 0) {
       throw new Error('No wallet available');
@@ -40,13 +73,14 @@ export default class WebWalletController {
         await wallet.enable();
       }
       // TODO: ensure that we can find any wallet, even if non-string accounts
-      if (wallet.accounts.find((acc) => acc === address)) {
+      if (wallet.accounts.find((acc) => acc === account.address)) {
         console.log(`Found wallet: ${wallet.name}`);
+        await this._setWalletId(account, wallet.name);
         return wallet;
       }
       // TODO: disable if not found
     }
-    throw new Error(`No wallet found for ${address}`);
+    throw new Error(`No wallet found for ${account.address}`);
   }
 
   constructor() {
@@ -59,6 +93,7 @@ export default class WebWalletController {
       new TerraStationWebWalletController(),
       new InjectiveWebWalletController(),
       new PhantomWebWalletController(),
+      new RoninWebWalletController(),
     ];
   }
 }

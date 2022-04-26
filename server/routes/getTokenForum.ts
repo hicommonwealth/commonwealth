@@ -20,6 +20,8 @@ const getTokenForum = async (
 
   // default to mainnet
   const chain_id = +req.query.chain_id || 1;
+  // default to ERC20
+  const chain_network = req.query.chain_network? req.query.chain_network : ChainNetwork.ERC20;
   const token = await models.Token.findOne({
     where: {
       address: { [Op.iLike]: address },
@@ -29,7 +31,7 @@ const getTokenForum = async (
   const urls = await getUrlsForEthChainId(models, chain_id);
   let url;
   if (urls) {
-    url = urls.private_url || urls.url;
+    url = urls.url;
   } else {
     url = req.query.url;
     if (!url) {
@@ -42,7 +44,7 @@ const getTokenForum = async (
   }
 
   try {
-    const provider = new Web3.providers.WebsocketProvider(url);
+    const provider = new Web3.providers.WebsocketProvider(urls?.private_url || url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(address);
     provider.disconnect(1000, 'finished');
@@ -56,7 +58,7 @@ const getTokenForum = async (
           where: { id: token.id },
           defaults: {
             active: true,
-            network: ChainNetwork.ERC20,
+            network: chain_network,
             type: ChainType.Token,
             icon_url: token.icon_url,
             symbol: token.symbol,
@@ -74,9 +76,12 @@ const getTokenForum = async (
             url,
             address: token.address,
             eth_chain_id: chain_id,
+            private_url: urls?.private_url,
           },
           transaction: t,
         });
+        const nodeJSON = node.toJSON();
+        delete nodeJSON.private_url;
         return { chain: chain.toJSON(), node: node.toJSON() };
       });
       return res.json({ status: 'Success', result });

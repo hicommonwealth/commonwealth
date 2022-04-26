@@ -1,3 +1,5 @@
+@import 'shared.scss';
+
 .topic-loading-spinner-wrap {
   height: 120px;
   width: 100%;
@@ -12,11 +14,10 @@
 }
 
 .SnapshotViewProposalPage {
-  .view-proposal-container {
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
-  }
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+
   .proposal-body {
     display: flex;
     flex-direction: row;
@@ -35,7 +36,7 @@
 
       .snapshot-proposal-hash {
         font-weight: 600;
-        color: #666666;
+        color: $neutral-600;
         margin-top: 6px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -57,8 +58,8 @@
         }
 
         .vote-count {
-          background-color: #666666;
-          color: white;
+          background-color: $neutral-600;
+          color: $white;
           font-weight: 500;
           border-radius: 9999px;
           padding: 4px 8px;
@@ -66,16 +67,16 @@
       }
 
       .votes-container {
-        border: 2px solid #eeeeee;
+        border: 2px solid $neutral-100;
         border-radius: 10px;
-        background-color: #f8f8f8;
+        background-color: $neutral-50;
         margin-top: 18px;
 
         .t-head {
           display: flex;
           justify-content: space-between;
-          border-bottom: 2px solid #eeeeee;
-          color: #666666;
+          border-bottom: 2px solid $neutral-100;
+          color: $neutral-600;
           font-weight: 500;
           padding: 18px 18px 14px;
         }
@@ -109,8 +110,8 @@
           text-transform: uppercase;
           width: 100%;
           padding: 18px 0 14px 0;
-          color: #4723ad;
-          border-top: 1px solid #dddddd;
+          color: $purple-400;
+          border-top: 1px solid $neutral-100;
         }
       }
     }
@@ -122,7 +123,7 @@
 
       .proposal-info-box,
       .VoteAction {
-        border: 1px solid #dddddd;
+        border: 1px solid $neutral-100;
         border-radius: 8px;
         padding: 20px 0;
         margin-top: 24px;
@@ -142,7 +143,7 @@
           margin-left: -20px;
           .vote-message {
             margin-top: 5px;
-            color: #303f9f;
+            color: $neutral-600;
           }
         }
       }
@@ -152,16 +153,12 @@
         font-weight: 500;
       }
 
-      .external-link-icon {
-        margin-left: 0.25rem;
-      }
-
       .info-block {
         display: flex;
         margin: 16px 0 4px;
 
         .labels {
-          color: #666666;
+          color: $neutral-600;
           margin-right: 24px;
           flex-shrink: 0;
 
@@ -172,6 +169,10 @@
 
         .values {
           overflow: hidden;
+
+          svg {
+            margin-left: 4px;
+          }
 
           .-mt-10 {
             margin-top: -10px;
@@ -191,7 +192,7 @@
       }
 
       .linked-discussion {
-        border-top: 1px solid #eeeeee;
+        border-top: 1px solid $neutral-100;
         padding-top: 16px;
       }
 
@@ -231,7 +232,7 @@
       }
 
       .symbol {
-        color: #666666;
+        color: $neutral-600;
         margin-left: 4px;
       }
 
@@ -243,17 +244,17 @@
         width: 100%;
         height: 6px;
         border-radius: 5px;
-        background-color: #dddddd;
+        background-color: $neutral-100;
       }
 
       .result-progress::-webkit-progress-value {
         border-radius: 5px;
-        background-color: #00c0a9;
+        background-color: $green-400;
       }
 
       .snapshot-link {
         font-weight: 500;
-        color: #4723ad;
+        color: $purple-400;
         display: flex;
       }
 
@@ -265,7 +266,7 @@
   }
 
   .back-button {
-    color: #999999;
+    color: $neutral-500;
     display: flex;
     align-items: flex-start;
     cursor: pointer;

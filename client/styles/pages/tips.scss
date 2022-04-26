@@ -1,9 +1,8 @@
 @import 'client/styles/shared';
 
 .TipsPage {
-  .tips-container {
-    padding: 24px;
-  }
+  flex: 1;
+  padding: 24px;
 
   @include gov-explainer;
 

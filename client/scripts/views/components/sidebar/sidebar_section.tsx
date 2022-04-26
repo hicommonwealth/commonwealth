@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Icon, Icons } from 'construct-ui';
 
 import 'components/sidebar/sidebar_section.scss';
 
@@ -10,6 +9,7 @@ import {
   SectionGroupAttrs,
   SidebarSectionAttrs,
 } from './types';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 class SubSection implements m.ClassComponent<SubSectionAttrs> {
   view(vnode) {
@@ -44,7 +44,7 @@ class SubSection implements m.ClassComponent<SubSectionAttrs> {
         class={`SubSection${isActive ? ' active' : ''}`}
         onclick={(e) => clickHandler(e)}
       >
-        {rowIcon && m(Icon, { name: Icons.HASH })}
+        {rowIcon && <CWIcon iconName="hash" iconSize="small" />}
         <div class={titleTextClass}>{title}</div>
         {rightIcon && <div class="right-icon">{rightIcon}</div>}
       </div>
@@ -83,13 +83,11 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
       onclick(e, this.toggled);
     };
 
-    const carat = this.toggled
-      ? m(Icon, {
-          name: Icons.CHEVRON_DOWN,
-        })
-      : m(Icon, {
-          name: Icons.CHEVRON_RIGHT,
-        });
+    const carat = this.toggled ? (
+      <CWIcon iconName="chevronDown" iconSize="small" />
+    ) : (
+      <CWIcon iconName="chevronRight" iconSize="small" />
+    );
 
     let titleTextClass = '';
 
@@ -99,10 +97,10 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
       titleTextClass = 'section-title-text-stale';
     }
 
-    let backgroundColor = 'none';
+    let backgroundColorClass = 'no-background';
 
     if (isActive && !containsChildren) {
-      backgroundColor = '#EDE7FF';
+      backgroundColorClass = 'background';
     }
 
     const mouseEnterHandler = (e) => {
@@ -111,13 +109,14 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
         e.stopPropagation();
       }
       if (!this.toggled) {
-        backgroundColor = '#EDE7FF';
+        backgroundColorClass = 'background';
         this.hoverOn = true;
       }
     };
 
     const mouseLeaveHandler = () => {
-      backgroundColor = isActive && !containsChildren ? '#EDE7FF' : 'none';
+      backgroundColorClass =
+        isActive && !containsChildren ? 'background' : 'no-background';
       this.hoverOn = false;
     };
 
@@ -128,11 +127,10 @@ class SectionGroup implements m.ClassComponent<SectionGroupAttrs> {
         onmouseleave={() => mouseLeaveHandler()}
       >
         <div
-          class="SectionGroupTitle"
-          onclick={(e) => clickHandler(e)}
-          style={`background-color: ${
-            this.hoverOn ? '#EDE7FF' : backgroundColor
+          class={`SectionGroupTitle ${
+            this.hoverOn ? 'background' : backgroundColorClass
           }`}
+          onclick={(e) => clickHandler(e)}
         >
           {containsChildren ? (
             <div class="carat">{carat}</div>
@@ -206,13 +204,11 @@ export class SidebarSectionGroup
       this.hoverColor = 'none';
     };
 
-    const carat = toggled
-      ? m(Icon, {
-          name: Icons.CHEVRON_DOWN,
-        })
-      : m(Icon, {
-          name: Icons.CHEVRON_RIGHT,
-        });
+    const carat = toggled ? (
+      <CWIcon iconName="chevronDown" iconSize="small" />
+    ) : (
+      <CWIcon iconName="chevronRight" iconSize="small" />
+    );
 
     return (
       <div

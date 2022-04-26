@@ -1,10 +1,11 @@
 /* @jsx m */
 
 import m, { Vnode } from 'mithril';
+
 import 'components/component_kit/cw_button.scss';
 
 import { ButtonType, ComponentType, StyleAttrs } from './types';
-import { getButtonClasses } from './helpers';
+import { getClasses } from './helpers';
 
 export type ButtonStyleAttrs = {
   buttonType?: ButtonType;
@@ -26,11 +27,14 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
     } = vnode.attrs;
     return (
       <button
-        class={getButtonClasses(ComponentType.Button, {
-          disabled,
-          className,
-          buttonType,
-        })}
+        class={getClasses<ButtonStyleAttrs>(
+          {
+            disabled,
+            className,
+            buttonType,
+          },
+          ComponentType.Button
+        )}
         onclick={onclick}
         disabled={disabled}
       >

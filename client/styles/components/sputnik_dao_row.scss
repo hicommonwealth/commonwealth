@@ -1,22 +1,21 @@
 @import 'client/styles/shared';
 
 .nearRow {
-    border: 0px;
+  border: 0px;
 
-    td {
-        border: 0;
-    }
+  td {
+    border: 0;
+  }
 
-    td.link {
-        color: $text-color-primary;
-    }
+  td.link {
+    color: $primary-500;
+  }
 }
 
 .clickable {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .nearRow:hover {
-    background: $background-color-white-hover;
+  background: $neutral-100;
 }
-

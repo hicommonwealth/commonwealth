@@ -7,7 +7,7 @@
     margin-bottom: 24px;
   }
   .vote-info {
-    border: 1px solid #4f6dbd;
+    border: 1px solid $primary-300;
     border-radius: 8px;
     padding: 24px;
 
@@ -17,7 +17,7 @@
       margin: 5px;
       font-weight: bold;
       .text-blue {
-        color: #4f6dbd;
+        color: $primary-400;
       }
 
       a {

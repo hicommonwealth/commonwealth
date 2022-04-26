@@ -5,11 +5,8 @@ import {
   PopoverMenu,
   MenuDivider,
   MenuItem,
-  Icon,
-  Icons,
   Button,
   Input,
-  Size,
 } from 'construct-ui';
 
 import 'pages/view_proposal/index.scss';
@@ -89,11 +86,6 @@ import {
   // ProposalHeaderLinkThreadsMenuItem,
 } from './header';
 import {
-  ProposalSidebarPollEditorModule,
-  ProposalSidebarLinkedViewer,
-  ProposalLinkedThreadsEditorModule,
-} from './sidebar';
-import {
   AaveViewProposalDetail,
   AaveViewProposalSummary,
 } from './aave_view_proposal_detail';
@@ -109,7 +101,6 @@ import {
   ProposalBodyText,
   ProposalBodyAttachments,
   ProposalBodyEditor,
-  ProposalBodyReaction,
   ProposalBodyEditMenuItem,
   ProposalBodyDeleteMenuItem,
   EditPermissionsButton,
@@ -121,6 +112,13 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { InlineReplyButton } from '../../components/inline_reply_button';
+import { PollEditorCard } from './poll_editor_card';
+import { LinkedProposalsCard } from './linked_proposals_card';
+import { LinkedThreadsCard } from './linked_threads_card';
+import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
+import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -180,28 +178,6 @@ const scrollToForm = (parentId?: number) => {
   }, 1);
 };
 
-const InlineReplyButton: m.Component<
-  { commentReplyCount: number; onclick },
-  {}
-> = {
-  view: (vnode) => {
-    const { commentReplyCount, onclick } = vnode.attrs;
-    return m(
-      '.InlineReplyButton',
-      {
-        onclick,
-      },
-      [
-        m(Icon, {
-          name: Icons.MESSAGE_SQUARE,
-          size: Size.XL,
-        }),
-        m('.reply-count', commentReplyCount),
-      ]
-    );
-  },
-};
-
 const ProposalHeader: m.Component<
   {
     commentCount: number;
@@ -240,7 +216,6 @@ const ProposalHeader: m.Component<
       isEditor,
       isAdmin,
     } = vnode.attrs;
-
     const attachments =
       proposal instanceof OffchainThread
         ? (proposal as OffchainThread).attachments
@@ -335,7 +310,7 @@ const ProposalHeader: m.Component<
                           (isAuthor || isAdmin) &&
                             app.chain?.meta.chain.snapshot.length > 0 &&
                             m(MenuItem, {
-                              onclick: (e) => {
+                              onclick: () => {
                                 const snapshotSpaces =
                                   app.chain.meta.chain.snapshot;
                                 if (snapshotSpaces.length > 1) {
@@ -361,7 +336,10 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                     !app.isCustomDomain() &&
                       m('.CommentSocialHeader', [m(SocialSharingCarat)]),
@@ -444,7 +422,10 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                   ]
             ),
@@ -507,10 +488,12 @@ const ProposalHeader: m.Component<
                   ]),
                 !vnode.state.editing &&
                   m('.proposal-response-row', [
-                    m(ProposalBodyReaction, { item: proposal }),
+                    m(ThreadReactionButton, {
+                      thread: proposal,
+                    }),
                     m(InlineReplyButton, {
                       commentReplyCount: commentCount,
-                      onclick: (e) => {
+                      onclick: () => {
                         if (!proposalPageState.replying) {
                           proposalPageState.replying = true;
                           scrollToForm();
@@ -611,7 +594,10 @@ const ProposalComment: m.Component<
                   }),
                 ],
                 transitionDuration: 0,
-                trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                trigger: m(CWIcon, {
+                  iconName: 'chevronDown',
+                  iconSize: 'small',
+                }),
               }),
             ],
             !app.isCustomDomain() &&
@@ -665,10 +651,12 @@ const ProposalComment: m.Component<
             !vnode.state.editing &&
               !comment.deleted &&
               m('.comment-response-row', [
-                m(ProposalBodyReaction, { item: comment }),
+                m(CommentReactionButton, {
+                  comment,
+                }),
                 m(InlineReplyButton, {
                   commentReplyCount,
-                  onclick: (e) => {
+                  onclick: () => {
                     if (
                       !proposalPageState.replying ||
                       proposalPageState.parentCommentId !== comment.id
@@ -996,11 +984,17 @@ const ViewProposalPage: m.Component<
       );
     }
 
+    // load proposal
+    if (!vnode.state.prefetch[proposalIdAndType]['threadReactionsStarted']) {
+      app.threads.fetchReactionsCount([proposal]).then(() => m.redraw);
+      vnode.state.prefetch[proposalIdAndType]['threadReactionsStarted'] = true;
+    }
+
     // load comments
     if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
       app.comments
         .refresh(proposal, app.activeChainId())
-        .then(async (result) => {
+        .then(async () => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
             .filter((c) => c.parentComment === null);
@@ -1013,20 +1007,26 @@ const ViewProposalPage: m.Component<
             },
             data: JSON.stringify({
               proposal_ids: [proposalId],
-              comment_ids: vnode.state.comments.map((comment) => comment.id),
+              comment_ids: app.comments
+                .getByProposal(proposal)
+                .map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
             }),
           });
           // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier(rc);
+            const id = app.reactionCounts.store.getIdentifier({
+              threadId: rc.thread_id,
+              proposalId: rc.proposal_id,
+              commentId: rc.comment_id,
+            });
             app.reactionCounts.store.add(
               modelReactionCountFromServer({ ...rc, id })
             );
           }
           m.redraw();
         })
-        .catch((err) => {
+        .catch(() => {
           notifyError('Failed to load comments');
           vnode.state.comments = [];
           m.redraw();
@@ -1197,7 +1197,6 @@ const ViewProposalPage: m.Component<
       return m(
         Sublayout,
         {
-          class: 'ViewProposalPage',
           showNewProposalButton: true,
           title: headerTitle,
         },
@@ -1302,6 +1301,7 @@ const ViewProposalPage: m.Component<
     }
     const showLinkedSnapshotOptions =
       (proposal as OffchainThread).snapshotProposal?.length > 0 ||
+      (proposal as OffchainThread).chainEntities?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
     const showLinkedThreadOptions =
@@ -1312,10 +1312,64 @@ const ViewProposalPage: m.Component<
     return m(
       Sublayout,
       {
-        class: 'ViewProposalPage',
         showNewProposalButton: true,
         title: headerTitle,
-        rightContent: m('.right-content-container', [
+      },
+      m('.ViewProposalPage', [
+        m('.view-proposal-page-container', [
+          [
+            m(ProposalHeader, {
+              proposal,
+              commentCount,
+              viewCount,
+              getSetGlobalEditingStatus,
+              proposalPageState: vnode.state,
+              isAuthor,
+              isEditor,
+              isAdmin: isAdminOrMod,
+              stageEditorIsOpen: vnode.state.stageEditorIsOpen,
+              pollEditorIsOpen: vnode.state.pollEditorIsOpen,
+              closeStageEditor: () => {
+                vnode.state.stageEditorIsOpen = false;
+                m.redraw();
+              },
+              closePollEditor: () => {
+                vnode.state.pollEditorIsOpen = false;
+                m.redraw();
+              },
+            }),
+            !(proposal instanceof OffchainThread) &&
+              m(LinkedProposalsEmbed, { proposal }),
+            proposal instanceof AaveProposal && [
+              m(AaveViewProposalSummary, { proposal }),
+              m(AaveViewProposalDetail, { proposal }),
+            ],
+            !(proposal instanceof OffchainThread) &&
+              m(ProposalVotingResults, { proposal }),
+            !(proposal instanceof OffchainThread) &&
+              m(ProposalVotingActions, { proposal }),
+            m(ProposalComments, {
+              proposal,
+              comments,
+              createdCommentCallback,
+              getSetGlobalEditingStatus,
+              proposalPageState: vnode.state,
+              recentlySubmitted: vnode.state.recentlySubmitted,
+              isAdmin: isAdminOrMod,
+            }),
+            !vnode.state.editing &&
+              !vnode.state.parentCommentId &&
+              m(CreateComment, {
+                callback: createdCommentCallback,
+                cancellable: true,
+                getSetGlobalEditingStatus,
+                proposalPageState: vnode.state,
+                parentComment: null,
+                rootProposal: proposal,
+              }),
+          ],
+        ]),
+        m('.right-content-container', [
           [
             proposal instanceof OffchainThread &&
               proposal.hasOffchainPoll &&
@@ -1323,7 +1377,7 @@ const ViewProposalPage: m.Component<
             proposal instanceof OffchainThread &&
               isAuthor &&
               !proposal.offchainVotingEnabled &&
-              m(ProposalSidebarPollEditorModule, {
+              m(PollEditorCard, {
                 proposal,
                 openPollEditor: () => {
                   vnode.state.pollEditorIsOpen = true;
@@ -1331,7 +1385,7 @@ const ViewProposalPage: m.Component<
               }),
             showLinkedSnapshotOptions &&
               proposal instanceof OffchainThread &&
-              m(ProposalSidebarLinkedViewer, {
+              m(LinkedProposalsCard, {
                 proposal,
                 openStageEditor: () => {
                   vnode.state.stageEditorIsOpen = true;
@@ -1340,65 +1394,12 @@ const ViewProposalPage: m.Component<
               }),
             showLinkedThreadOptions &&
               proposal instanceof OffchainThread &&
-              m(ProposalLinkedThreadsEditorModule, {
+              m(LinkedThreadsCard, {
                 proposalId: proposal.id,
                 allowLinking: isAuthor || isAdminOrMod,
               }),
           ],
         ]),
-      },
-      m('.view-proposal-page-container', [
-        [
-          m(ProposalHeader, {
-            proposal,
-            commentCount,
-            viewCount,
-            getSetGlobalEditingStatus,
-            proposalPageState: vnode.state,
-            isAuthor,
-            isEditor,
-            isAdmin: isAdminOrMod,
-            stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-            pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-            closeStageEditor: () => {
-              vnode.state.stageEditorIsOpen = false;
-              m.redraw();
-            },
-            closePollEditor: () => {
-              vnode.state.pollEditorIsOpen = false;
-              m.redraw();
-            },
-          }),
-          !(proposal instanceof OffchainThread) &&
-            m(LinkedProposalsEmbed, { proposal }),
-          proposal instanceof AaveProposal && [
-            m(AaveViewProposalSummary, { proposal }),
-            m(AaveViewProposalDetail, { proposal }),
-          ],
-          !(proposal instanceof OffchainThread) &&
-            m(ProposalVotingResults, { proposal }),
-          !(proposal instanceof OffchainThread) &&
-            m(ProposalVotingActions, { proposal }),
-          m(ProposalComments, {
-            proposal,
-            comments,
-            createdCommentCallback,
-            getSetGlobalEditingStatus,
-            proposalPageState: vnode.state,
-            recentlySubmitted: vnode.state.recentlySubmitted,
-            isAdmin: isAdminOrMod,
-          }),
-          !vnode.state.editing &&
-            !vnode.state.parentCommentId &&
-            m(CreateComment, {
-              callback: createdCommentCallback,
-              cancellable: true,
-              getSetGlobalEditingStatus,
-              proposalPageState: vnode.state,
-              parentComment: null,
-              rootProposal: proposal,
-            }),
-        ],
       ])
     );
   },

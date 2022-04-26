@@ -6,7 +6,9 @@ import $ from 'jquery';
 import m from 'mithril';
 import { ChainBase } from 'types';
 
-import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
+import ChainEntityController, {
+  EntityRefreshOption,
+} from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { Account, NodeInfo, ProposalModule } from '.';
 
@@ -15,13 +17,19 @@ import { Account, NodeInfo, ProposalModule } from '.';
 // TODO: move this from `app.chain` or else rename `chain`?
 abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   protected _apiInitialized = false;
-  public get apiInitialized() { return this._apiInitialized; }
+  public get apiInitialized() {
+    return this._apiInitialized;
+  }
 
   protected _loaded = false;
-  public get loaded() { return this._loaded; }
+  public get loaded() {
+    return this._loaded;
+  }
 
   protected _failed = false;
-  public get failed() { return this._failed; }
+  public get failed() {
+    return this._failed;
+  }
 
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
@@ -31,7 +39,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public deferred: boolean;
 
   protected _serverLoaded: boolean;
-  public get serverLoaded() { return this._serverLoaded; }
+  public get serverLoaded() {
+    return this._serverLoaded;
+  }
 
   public async initServer(): Promise<boolean> {
     clearLocalStorage();
@@ -62,17 +72,26 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     // If user is no longer on the initializing chain, abort initialization
     // and return false, so that the invoking selectNode fn can similarly
     // break, rather than complete.
-    if (this.meta.chain.id !== (this.app.customDomainId() || m.route.param('scope'))) {
+    if (
+      this.meta.chain.id !==
+      (this.app.customDomainId() || m.route.param('scope'))
+    ) {
       return false;
     }
 
-    const {
-      threads, topics, admins, activeUsers, numVotingThreads
-    } = response.result;
+    const { pinnedThreads, topics, admins, activeUsers, numVotingThreads } =
+      response.result;
     this.app.topics.initialize(topics, true);
-    this.app.threads.initialize(threads, numVotingThreads, true);
+    this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.chain.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
+    if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
+      this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
+        threads: this.app.threads.listingStore.getPinnedThreads(),
+        chain: this.meta.id,
+        pinned: true,
+      });
+    }
 
     this._serverLoaded = true;
     return true;
@@ -93,14 +112,18 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
   public async initApi(): Promise<void> {
     this._apiInitialized = true;
-    console.log(`Started API for ${this.meta.chain.id} on node: ${this.meta.url}.`);
+    console.log(
+      `Started API for ${this.meta.chain.id} on node: ${this.meta.url}.`
+    );
   }
 
   public async initData(): Promise<void> {
     this._loaded = true;
     this.app.chainModuleReady.emit('ready');
     this.app.isModuleReady = true;
-    console.log(`Loaded data for ${this.meta.chain.id} on node: ${this.meta.url}.`);
+    console.log(
+      `Loaded data for ${this.meta.chain.id} on node: ${this.meta.url}.`
+    );
   }
 
   public async deinit(): Promise<void> {
@@ -117,7 +140,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
     // TODO: does this need debouncing?
     if (modules.some((mod) => !mod.initializing && !mod.ready)) {
-      await Promise.all(modules.map((mod) => mod.init(this.chain, this.accounts)));
+      await Promise.all(
+        modules.map((mod) => mod.init(this.chain, this.accounts))
+      );
     }
     m.redraw();
   }

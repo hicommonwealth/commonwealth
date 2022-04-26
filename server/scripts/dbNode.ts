@@ -181,7 +181,11 @@ async function mainProcess(
   const erc20Tokens = myChainData.filter(
     (chain) =>
       chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
-  );
+  ).map((chain) => {
+    // replace url with private_url if available
+    chain.url = chain.private_url || chain.url;
+    return chain;
+  });
   const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
   for (const [url, tokens] of Object.entries(erc20ByUrl)) {
     const tokenKey = `erc20_${url}`;

@@ -2,7 +2,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 import moment from 'moment';
-import { Button, Icon, Icons, Tag, MenuItem, Input } from 'construct-ui';
+import { Button, Icons, Tag, MenuItem, Input } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -21,7 +21,6 @@ import {
   OffchainThreadKind,
   OffchainThreadStage,
   AnyProposal,
-  ITokenAdapter,
 } from 'models';
 import { ProposalType } from 'types';
 
@@ -31,9 +30,11 @@ import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 export const ProposalHeaderExternalLink: m.Component<{
   proposal: AnyProposal | OffchainThread;
@@ -46,7 +47,7 @@ export const ProposalHeaderExternalLink: m.Component<{
     return m('.ProposalHeaderExternalLink', [
       externalLink('a.external-link', proposal.url, [
         extractDomain(proposal.url),
-        m(Icon, { name: Icons.EXTERNAL_LINK }),
+        m(CWIcon, { iconName: 'externalLink' }),
       ]),
     ]);
   },
@@ -91,20 +92,8 @@ export const ProposalHeaderOffchainPoll: m.Component<
     const pollingEnded =
       proposal.offchainVotingEndsAt &&
       proposal.offchainVotingEndsAt?.isBefore(moment().utc());
-    const canVote =
-      app.isLoggedIn() &&
-      app.user.activeAccount &&
-      !pollingEnded &&
-      !proposal.getOffchainVoteFor(
-        app.user.activeAccount.chain.id,
-        app.user.activeAccount.address
-      );
 
-    const tokenThresholdFailed =
-      ITokenAdapter.instanceOf(app.chain) &&
-      proposal.topic.tokenThreshold?.gtn(0)
-        ? app.chain.tokenBalance.lt(proposal.topic.tokenThreshold)
-        : false;
+    const tokenThresholdFailed = TopicGateCheck.isGatedTopic(proposal.topic.name);
 
     const vote = async (option, hasVoted, isSelected) => {
       if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
@@ -241,7 +230,7 @@ export const ProposalHeaderBlockExplorerLink: m.Component<{
       externalLink('a.voting-link', proposal['blockExplorerLink'], [
         proposal['blockExplorerLinkLabel'] ||
           extractDomain(proposal['blockExplorerLink']),
-        m(Icon, { name: Icons.EXTERNAL_LINK }),
+        m(CWIcon, { iconName: 'externalLink' }),
       ]),
     ]);
   },
@@ -259,7 +248,7 @@ export const ProposalHeaderExternalSnapshotLink: m.Component<{
       externalLink(
         'a.voting-link',
         `https://snapshot.org/#/${spaceId}/proposal/${proposal.id}`,
-        [`View on Snapshot`, m(Icon, { name: Icons.EXTERNAL_LINK })]
+        [`View on Snapshot`, m(CWIcon, { iconName: 'externalLink' })]
       ),
     ]);
   },
@@ -275,7 +264,7 @@ export const ProposalHeaderVotingInterfaceLink: m.Component<{
       externalLink('a.voting-link', proposal['votingInterfaceLink'], [
         proposal['votingInterfaceLinkLabel'] ||
           extractDomain(proposal['votingInterfaceLink']),
-        m(Icon, { name: Icons.EXTERNAL_LINK }),
+        m(CWIcon, { iconName: 'externalLink', iconSize: 'small' }),
       ]),
     ]);
   },
@@ -295,7 +284,7 @@ export const ProposalHeaderThreadLink: m.Component<{ proposal: AnyProposal }> =
       return m('.ProposalHeaderThreadLink', [
         link('a.thread-link', path, [
           'Go to discussion',
-          m(Icon, { name: Icons.EXTERNAL_LINK }),
+          m(CWIcon, { iconName: 'externalLink', iconSize: 'small' }),
         ]),
       ]);
     },
@@ -312,7 +301,7 @@ export const ProposalHeaderSnapshotThreadLink: m.Component<{
     return m('.ProposalHeaderThreadLink', [
       link('a.thread-link', proposalLink, [
         decodeURIComponent(title),
-        m(Icon, { name: Icons.EXTERNAL_LINK }),
+        m(CWIcon, { iconName: 'externalLink', iconSize: 'small' }),
       ]),
     ]);
   },
@@ -357,7 +346,10 @@ export const ProposalHeaderTitle: m.Component<{
         proposal.readOnly &&
         m(Tag, {
           size: 'xs',
-          label: [m(Icon, { name: Icons.LOCK, size: 'xs' }), ' Locked'],
+          label: [
+            m(CWIcon, { iconName: 'lock', iconSize: 'small' }),
+            ' Locked',
+          ],
         }),
     ]);
   },

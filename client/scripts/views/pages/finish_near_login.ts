@@ -15,7 +15,7 @@ import {
 } from 'controllers/app/login';
 import Near from 'controllers/chain/near/main';
 import { NearAccount } from 'controllers/chain/near/account';
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import Sublayout from 'views/sublayout';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { PageLoading } from 'views/pages/loading';
@@ -63,13 +63,13 @@ const redirectToNextPage = () => {
 };
 
 const validate = async (
-  vnode: m.Vnode<{}, IState>,
+  vnode: m.Vnode<Record<string, never>, IState>,
   wallet: WalletConnection
 ) => {
   try {
     // TODO: do we need to do this every time, or only on first connect?
     const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-    await createUserWithAddress(acct.address);
+    await createUserWithAddress(acct.address, WalletId.NearWallet);
     const signature = await acct.signMessage(`${acct.validationToken}\n`);
     await acct.validate(signature);
     if (!app.isLoggedIn()) {
@@ -146,7 +146,7 @@ const validate = async (
   }
 };
 
-const FinishNearLogin: m.Component<{}, IState> = {
+const FinishNearLogin: m.Component<Record<string, never>, IState> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'LoginPage',
@@ -161,51 +161,39 @@ const FinishNearLogin: m.Component<{}, IState> = {
       return m(PageNotFound);
     }
     if (vnode.state.validationError) {
-      return m(
-        Sublayout,
-        {
-          class: 'FinishNearLogin',
-        },
-        [
-          m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
-          m(
-            'button.formular-button-primary',
-            {
-              onclick: (e) => {
-                e.preventDefault();
-                redirectToNextPage();
-              },
+      return m(Sublayout, [
+        m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
+        m(
+          'button.formular-button-primary',
+          {
+            onclick: (e) => {
+              e.preventDefault();
+              redirectToNextPage();
             },
-            'Return Home'
-          ),
-        ]
-      );
+          },
+          'Return Home'
+        ),
+      ]);
     } else if (vnode.state.validationCompleted) {
-      return m(
-        Sublayout,
-        {
-          class: 'FinishNearLogin',
-        },
-        [
-          m('div', {
-            oncreate: (e) => {
-              if (vnode.state.validatedAccount.profile.name) {
-                redirectToNextPage();
-              } else {
-                app.modals.create({
-                  modal: LinkNewAddressModal,
-                  data: {
-                    alreadyInitializedAccount: vnode.state.validatedAccount,
-                  },
-                  exitCallback: () => {
-                    redirectToNextPage();
-                  },
-                });
-              }
-            },
-          }),
-        ]
-      );
+      return m(Sublayout, [
+        m('div', {
+          oncreate: (e) => {
+            if (vnode.state.validatedAccount.profile.name) {
+              redirectToNextPage();
+            } else {
+              app.modals.create({
+                modal: LinkNewAddressModal,
+                data: {
+                  alreadyInitializedAccount: vnode.state.validatedAccount,
+                },
+                exitCallback: () => {
+                  redirectToNextPage();
+                },
+              });
+            }
+          },
+        }),
+      ]);
     } else if (!vnode.state.validating) {
       // chain loaded and on near -- finish login and call lingering txs
       vnode.state.validating = true;

@@ -107,10 +107,14 @@ import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
+import updateChainCategory from './routes/updateChainCategory';
 
+import startSsoLogin from './routes/startSsoLogin';
+import finishSsoLogin from './routes/finishSsoLogin';
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
+import tokenBalance from './routes/tokenBalance';
 import getSupportedEthChains from './routes/getSupportedEthChains';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
@@ -118,6 +122,7 @@ import updateAddress from './routes/updateAddress';
 import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
+import setAddressWallet from './routes/setAddressWallet';
 
 function setupRouter(
   app: Express,
@@ -211,6 +216,7 @@ function setupRouter(
     starCommunity.bind(this, models)
   );
 
+  router.post('/tokenBalance', tokenBalance.bind(this, models, tokenBalanceCache));
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get(
@@ -562,6 +568,18 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     disableImmediateEmails.bind(this, models)
   );
+  router.post(
+    '/setAddressWallet',
+    passport.authenticate('jwt', { session: false }),
+    setAddressWallet.bind(this, models)
+  );
+
+  // chain categories
+  router.post(
+    '/updateChainCategory',
+    passport.authenticate('jwt', { session: false }),
+    updateChainCategory.bind(this, models)
+  );
 
   // settings
   router.post(
@@ -596,6 +614,13 @@ function setupRouter(
     (req, res, next) => {
       return res.json({ status: 'Success', result: req.user.toJSON() });
     }
+  );
+
+  router.post('/auth/sso', startSsoLogin.bind(this, models));
+  router.post(
+    '/auth/sso/callback',
+    // passport.authenticate('jwt', { session: false }),
+    finishSsoLogin.bind(this, models),
   );
 
   // logout

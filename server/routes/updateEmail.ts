@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import moment from 'moment';
 import { LOGIN_RATE_LIMIT_MINS, SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
-import { DynamicTemplate } from '../../shared/types';
+import { DynamicTemplate, WalletId } from '../../shared/types';
 import { DB } from '../database';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -44,12 +44,12 @@ const updateEmail = async (models: DB, req: Request, res: Response, next: NextFu
     },
     include: [{
       model: models.Address,
-      where: { is_magic: true },
+      where: { wallet_id: WalletId.Magic },
       required: false,
     }],
   });
   if (!user) return next(new Error(Errors.NoUser));
-  if (user.Addresses && (await user.Addresses.length) > 0) return next(new Error(Errors.NoUpdateForMagic));
+  if (user.Addresses?.length > 0) return next(new Error(Errors.NoUpdateForMagic));
   // ensure no more than 3 tokens have been created in the last 5 minutes
   const recentTokens = await models.LoginToken.findAndCountAll({
     where: {
