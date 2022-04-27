@@ -139,7 +139,7 @@ const createChain = async (
     }
 
     const existingChainNode = await models.ChainNode.findOne({
-      where: { address: req.body.address, eth_chain_id }
+      where: { eth_chain_id }
     });
     if (existingChainNode) {
       return next(new Error(Errors.ChainAddressExists));
@@ -260,9 +260,7 @@ const createChain = async (
   const node = await models.ChainNode.create({
     chain: id,
     url,
-    address,
     eth_chain_id,
-    token_name,
     alt_wallet_url: altWalletUrl,
     private_url: privateUrl,
   });

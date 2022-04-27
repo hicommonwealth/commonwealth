@@ -104,8 +104,6 @@ const addChainNode = async (
   const node = await models.ChainNode.create({
     chain: chain.id,
     url: req.body.node_url,
-    address: req.body.address || '',
-    token_name: req.body.token_name || null,
     eth_chain_id: req.body.eth_chain_id || null, // TODO: will this work on nullable field?
     alt_wallet_url: req.body.alt_wallet_url || null,
   });
