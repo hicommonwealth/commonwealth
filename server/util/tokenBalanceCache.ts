@@ -168,13 +168,15 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   // query a user's balance on a given token contract and save in cache
   public async getBalance(chain: ChainAttributes, address: string): Promise<BN> {
     const nodes = await this.models.ChainNode.findAll({ where: { chain: chain.id } });
+    const nodesChain = await this.models.Chain.findAll({ where: { id: chain.id } });
     if (!nodes || (chain.base === ChainBase.Ethereum && !nodes[0].eth_chain_id)) {
       throw new Error('Could not find chain node.');
     }
     const [node] = nodes;
+    const [nodeChain] = nodesChain;
     let contractAddress: string;
-    if (node?.address) {
-      contractAddress = node.address;
+    if (nodeChain?.address) {
+      contractAddress = nodeChain.address;
     }
 
     // check the cache for the token balance
