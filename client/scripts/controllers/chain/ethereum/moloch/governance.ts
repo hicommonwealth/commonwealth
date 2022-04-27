@@ -139,7 +139,7 @@ export default class MolochGovernance extends ProposalModule<
     }
 
     // first, we must approve xfer of proposal deposit tokens from the submitter
-    const tokenContract = await attachSigner(this.app.wallets, submitter.address, this.api.token);
+    const tokenContract = await attachSigner(this.app.wallets, submitter, this.api.token);
     const approvalTx = await tokenContract.approve(
       submitter.address,
       this.proposalDeposit.toString(10),
@@ -154,7 +154,7 @@ export default class MolochGovernance extends ProposalModule<
 
     // once approved we assume the applicant has approved the tribute and proceed
     // TODO: this assumes the active user is the signer on the contract -- we should make this explicit
-    await attachSigner(this.app.wallets, submitter.address, this.api.Contract);
+    await attachSigner(this.app.wallets, submitter, this.api.Contract);
     const tx = await this._api.Contract.submitProposal(
       applicantAddress,
       tokenTribute.toString(),

@@ -262,7 +262,6 @@ const getBatchNotificationFields = (
   const pageJump = comment_id
     ? () => jumpHighlightComment(comment_id)
     : () => jumpHighlightComment('parent');
-
   return {
     authorInfo,
     createdAt: moment.utc(created_at),

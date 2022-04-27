@@ -151,9 +151,7 @@ const CreateComment: m.Component<{
     const tokenPostingThreshold : BN = TopicGateCheck.getTopicThreshold(activeTopicName);
     const userBalance : BN = TopicGateCheck.getUserBalance();
     const topicGated = TopicGateCheck.isGatedTopic(activeTopicName);
-    disabled = disabled
-      || !app.isAdapterReady
-      || (!isAdmin && topicGated);
+    disabled = disabled || (!isAdmin && topicGated);
 
     const decimals = app.chain?.meta.chain?.decimals
       ? app.chain.meta.chain.decimals
