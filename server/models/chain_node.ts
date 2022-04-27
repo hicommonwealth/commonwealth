@@ -7,9 +7,6 @@ export type ChainNodeAttributes = {
   chain: string;
   url: string;
   id?: number;
-  address?: string;
-  token_name?: string;
-  ce_verbose?: boolean;
   eth_chain_id?: number;
   alt_wallet_url?: string;
   private_url?: string;
@@ -35,9 +32,6 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       chain: { type: dataTypes.STRING, allowNull: false },
       url: { type: dataTypes.STRING, allowNull: false },
-      address: { type: dataTypes.STRING, allowNull: true },
-      token_name: { type: dataTypes.STRING, allowNull: true },
-      ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
       alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
       private_url: { type: dataTypes.STRING, allowNull: true },
@@ -61,7 +55,9 @@ export default (
   );
 
   ChainNode.associate = (models) => {
-    models.ChainNode.belongsTo(models.Chain, { foreignKey: 'chain' });
+    models.ChainNode.hasMany(models.Chain, { foreignKey: 'chain' });
+    models.ChainNode.hasMany(models.Address, { foreignKey: 'chain' });
+
   };
 
   return ChainNode;

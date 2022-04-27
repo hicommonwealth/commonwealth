@@ -42,6 +42,9 @@ export type ChainAttributes = {
   terms?: string;
   snapshot?: string[];
   bech32_prefix?: string;
+  address?: string;
+  token_name?: string;
+  ce_verbose?: boolean;
 
   // associations
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
@@ -87,6 +90,9 @@ export default (
       id: { type: dataTypes.STRING, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.STRING, allowNull: true },
+      address: { type: dataTypes.STRING, allowNull: true },
+      token_name: { type: dataTypes.STRING, allowNull: true },
+      ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       discord: { type: dataTypes.STRING, allowNull: true },
       element: { type: dataTypes.STRING, allowNull: true },
@@ -135,8 +141,7 @@ export default (
   );
 
   Chain.associate = (models) => {
-    models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
+    models.Chain.belongsTo(models.ChainNode, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Chain.hasMany(models.OffchainTopic, {
       as: 'topics',
