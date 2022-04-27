@@ -35,8 +35,6 @@ import {
   QueryList,
   Classes,
   ListItem,
-  Icon,
-  Icons,
   Popover,
 } from 'construct-ui';
 import {
@@ -47,9 +45,7 @@ import {
 import { ChainType } from '../../../../../shared/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
-import ThreadReactionButton, {
-  ReactionType,
-} from '../../components/thread_reaction_button';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -409,9 +405,9 @@ export const ProposalEditorPermissions: m.Component<
           const user: Profile = app.profiles.getProfile(c.chain, c.address);
           return m('.user-wrap', [
             m(User, { user }),
-            m(Icon, {
-              name: Icons.X,
-              size: 'xs',
+            m(CWIcon, {
+              iconName: 'close',
+              size: 'small',
               class: 'role-x-icon',
               onclick: async () => {
                 // If already scheduled for addition, un-schedule
@@ -873,20 +869,5 @@ export const ProposalBodyEditor: m.Component<
           : `edit-comment-${item.id}`,
       }),
     ]);
-  },
-};
-
-export const ProposalBodyReaction: m.Component<{
-  item: OffchainThread | AnyProposal | OffchainComment<any>;
-}> = {
-  view: (vnode) => {
-    const { item } = vnode.attrs;
-    if (!item) return;
-
-    return m(ThreadReactionButton, {
-      post: item,
-      type: ReactionType.Like,
-      tooltip: true,
-    });
   },
 };

@@ -6,13 +6,12 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { ProposalStore, FilterScopedThreadStore } from 'stores';
+import { ProposalStore, RecentListingStore } from 'stores';
 import {
   OffchainThread,
   OffchainAttachment,
   OffchainThreadStage,
   NodeInfo,
-  OffchainTopic,
   Profile,
   ChainEntity,
   NotificationSubscription,
@@ -24,14 +23,9 @@ import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { LinkedThreadAttributes } from 'server/models/linked_thread';
+import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
-
-type FetchBulkThreadsProps = {
-  topicId: OffchainTopic;
-  stage: string;
-  params: Record<string, any>;
-};
 
 export const modelFromServer = (thread) => {
   const {
@@ -209,7 +203,7 @@ export interface VersionHistory {
 
 class ThreadsController {
   private _store = new ProposalStore<OffchainThread>();
-  private _listingStore = new FilterScopedThreadStore();
+  private _listingStore: RecentListingStore = new RecentListingStore();
   private _summaryStore = new ProposalStore<OffchainThread>();
 
   public get store() {
@@ -285,8 +279,7 @@ class ThreadsController {
       if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
-      const storeOptions = { allProposals: true, exclusive: false };
-      this._listingStore.add(result, storeOptions);
+      this._listingStore.add(result);
       const activeEntity = app.chain;
       updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
 
@@ -350,7 +343,7 @@ class ThreadsController {
           this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
-        this._listingStore.update(result);
+        this._listingStore.add(result);
         return result;
       },
       error: (err) => {
@@ -525,7 +518,7 @@ class ThreadsController {
         snapshot_proposal: args.snapshotProposal,
         jwt: app.user.jwt,
       },
-      success: (response) => {
+      success: () => {
         const thread = this._store.getByIdentifier(args.threadId);
         if (!thread) return;
         thread.snapshotProposal = args.snapshotProposal;
@@ -555,7 +548,7 @@ class ThreadsController {
         chain_entity_id: args.entities.map((ce) => ce.id),
         jwt: app.user.jwt,
       },
-      success: (response) => {
+      success: () => {
         const thread = this._store.getByIdentifier(args.threadId);
         if (!thread) return;
         thread.chainEntities.splice(0);
@@ -648,39 +641,15 @@ class ThreadsController {
       const existing = this._store.getByIdentifier(thread.id);
       if (existing) this._store.remove(existing);
       this._store.update(thread);
+      // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
+      this.fetchReactionsCount([thread]);
       return thread;
     });
   }
 
-  fetchBulkThreads = async ({
-    topicId,
-    stage,
-    params,
-  }: FetchBulkThreadsProps) => {
-    const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
-    if (response.status !== 'Success') {
-      throw new Error(`Unsuccessful refresh status: ${response.status}`);
-    }
-    const { threads } = response.result;
-    for (const thread of threads) {
-      const modeledThread = modelFromServer(thread);
-      if (!thread.Address) {
-        console.error('OffchainThread missing address');
-      }
-      try {
-        const storeOptions = {
-          allProposals: !topicId && !stage,
-          exclusive: true,
-        };
-        this._store.add(modeledThread);
-        this._listingStore.add(modeledThread, storeOptions);
-      } catch (e) {
-        console.error(e.message);
-      }
-    }
-    return threads;
-  };
-
+  // TODO Graham 4/24/22: Should this method be in reactionCounts controller?
+  // TODO Graham 4/24/22: All "ReactionsCount" names need renaming to "ReactionCount" (singular)
+  // TODO Graham 4/24/22: All of JB's AJAX requests should be swapped out for .get and .post reqs
   fetchReactionsCount = async (threads) => {
     const { result: reactionCounts } = await $.ajax({
       type: 'POST',
@@ -694,7 +663,11 @@ class ThreadsController {
       }),
     });
     for (const rc of reactionCounts) {
-      const id = app.reactionCounts.store.getIdentifier(rc);
+      const id = app.reactionCounts.store.getIdentifier({
+        threadId: rc.thread_id,
+        proposalId: rc.proposal_id,
+        commentId: rc.comment_id,
+      });
       const existing = app.reactionCounts.store.getById(id);
       if (existing) {
         app.reactionCounts.store.remove(existing);
@@ -709,39 +682,70 @@ class ThreadsController {
     }
   };
 
-  // loadNextPage returns false if there are no more threads to load
   public async loadNextPage(options: {
-    chainId: string;
-    cutoffDate: moment.Moment;
-    topicId?: OffchainTopic;
-    stage?: string;
-  }): Promise<boolean> {
-    const { chainId, cutoffDate, topicId, stage } = options;
+    topicName?: string;
+    stageName?: string;
+  }) {
+    if (this.listingStore.isDepleted(options)) {
+      return;
+    }
+    const { topicName, stageName } = options;
+    const chain = app.activeChainId();
     const params = {
-      chain: chainId,
-      cutoff_date: cutoffDate.toISOString(),
+      chain,
+      cutoff_date: this.listingStore.isInitialized(options)
+        ? this.listingStore.getCutoffDate(options).toISOString()
+        : moment().toISOString(),
     };
+    const topicId = app.topics.getByName(topicName, chain)?.id;
+
     if (topicId) params['topic_id'] = topicId;
-    if (stage) params['stage'] = stage;
-    const threads = await this.fetchBulkThreads({ topicId, stage, params });
+    if (stageName) params['stage'] = stageName;
+
+    const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
+    if (response.status !== 'Success') {
+      throw new Error(`Unsuccessful refresh status: ${response.status}`);
+    }
+    const { threads } = response.result;
+    const modeledThreads: OffchainThread[] = threads.map((t) => {
+      return modelFromServer(t);
+    });
+
+    modeledThreads.forEach((thread) => {
+      try {
+        this._store.add(thread);
+        this._listingStore.add(thread);
+      } catch (e) {
+        console.error(e.message);
+      }
+    });
+
+    // Update listing cutoff date (date up to which threads have been fetched)
+    if (modeledThreads?.length) {
+      const lastThread = modeledThreads.sort(orderDiscussionsbyLastComment)[
+        modeledThreads.length - 1
+      ];
+      const cutoffDate = lastThread.lastCommentedOn || lastThread.createdAt;
+      this.listingStore.setCutoffDate(options, cutoffDate);
+    }
 
     await Promise.all([
       this.fetchReactionsCount(threads),
       app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
         threads,
-        chainId,
+        chain,
       }),
     ]);
-    // Each bulkThreads call that is passed a cutoff_date param limits its query to
-    // the most recent X posts before that date. That count, X, is determined by the pageSize param.
-    // If a query returns less than X posts, it is 'exhausted'; there are no more db entries that match
-    // the call's params. By returning a boolean, the discussion listing can determine whether
-    // it should continue calling the loadNextPage fn on scroll, or else notify the user that all
-    // relevant listing threads have been exhausted.
-    return !(threads.length < DEFAULT_PAGE_SIZE);
+
+    if (!this.listingStore.isInitialized(options)) {
+      this.listingStore.initializeListing(options);
+    }
+    if (threads.length < DEFAULT_PAGE_SIZE) {
+      this.listingStore.depleteListing(options);
+    }
   }
 
-  public initialize(initialThreads: any[] = [], numVotingThreads, reset) {
+  public initialize(initialThreads = [], numVotingThreads, reset) {
     if (reset) {
       this._store.clear();
       this._listingStore.clear();
@@ -753,12 +757,7 @@ class ThreadsController {
       }
       try {
         this._store.add(modeledThread);
-        // Initialization only populates AllProposals and pinned
-        const options = {
-          allProposals: true,
-          exclusive: !modeledThread.pinned,
-        };
-        this._listingStore.add(modeledThread, options);
+        this._listingStore.add(modeledThread);
       } catch (e) {
         console.error(e.message);
       }

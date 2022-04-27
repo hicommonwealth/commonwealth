@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Icon, Icons, Tag } from 'construct-ui';
+import { Button, Tag } from 'construct-ui';
 
 import 'pages/discussions/discussion_row.scss';
 
@@ -26,12 +26,12 @@ import {
   OffchainThreadStage,
   AddressInfo,
 } from 'models';
-import { ReactionButton } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { DiscussionRowMenu } from './discussion_row_menu';
 import { getLastUpdated, isHot } from './helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { DiscussionRowReactionButton } from '../../components/reaction_button/discussion_row_reaction_button';
 
 type DiscussionRowAttrs = {
   onSelect?: any;
@@ -39,7 +39,7 @@ type DiscussionRowAttrs = {
 };
 
 export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
-  view(vnode) {
+  view(vnode: m.VnodeDOM<DiscussionRowAttrs, this>) {
     const { proposal } = vnode.attrs;
 
     const discussionLink = getProposalUrlPath(
@@ -57,8 +57,9 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
           if ($(e.target).hasClass('cui-tag')) return;
           if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
           e.preventDefault();
+          const scrollEle = document.getElementsByClassName('Body')[0];
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
-            window.scrollY;
+            scrollEle.scrollTop;
           m.route.set(discussionLink);
         }}
         key={proposal.id}
@@ -68,14 +69,17 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             <CWIcon iconName="pin" iconSize="small" />
           </div>
         ) : (
-          <ReactionButton post={proposal} />
+          <DiscussionRowReactionButton thread={proposal} />
         )}
         <div class="title-container">
           <div class="row-header">{proposal.title}</div>
           <div class="row-subheader">
             {proposal.readOnly && (
               <div class="discussion-locked">
-                <Tag size="xs" label={<Icon name={Icons.LOCK} size="xs" />} />
+                <Tag
+                  size="xs"
+                  label={<CWIcon iconName="lock" iconSize="small" />}
+                />
               </div>
             )}
             {proposal.offchainVotingEnabled && (

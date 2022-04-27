@@ -4,13 +4,14 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
-import { Tag, Icon, Icons, Popover } from 'construct-ui';
+import { Tag, Popover } from 'construct-ui';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
 import { ChainBase } from 'types';
 import { Account, AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -456,7 +457,7 @@ export const UserBlock: m.Component<{
       m('.user-block-right', [
         m(
           '.user-block-selected',
-          selected ? m(Icon, { name: Icons.CHECK }) : ''
+          selected ? m(CWIcon, { iconName: 'check' }) : ''
         ),
       ]),
     ];

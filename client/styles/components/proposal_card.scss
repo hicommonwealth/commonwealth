@@ -66,12 +66,12 @@
     a:hover {
       text-decoration: none;
     }
-    .cui-icon svg {
-      stroke: $neutral-500;
+
+    svg {
+      display: inline;
       position: relative;
-      top: -1px;
-      left: -2px;
-      opacity: 0.9;
+      right: 8px;
+      top: 4px;
     }
   }
   .proposal-status {

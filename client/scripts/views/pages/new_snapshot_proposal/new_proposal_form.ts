@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import 'pages/new_proposal_page.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
 import {
   Input,
@@ -18,7 +17,6 @@ import {
 
 import moment from 'moment';
 import app from 'state';
-import { navigateToSubpage } from 'app';
 
 import { ChainBase } from 'types';
 import { Account } from 'models';
@@ -26,8 +24,6 @@ import { notifyError } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
-import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import {
   SnapshotSpace,
   getScore,
@@ -35,7 +31,7 @@ import {
   getVersion,
   createProposal,
 } from 'helpers/snapshot_utils';
-import { formatNamedParameters } from 'sequelize/types/utils';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 interface IThreadForm {
   name: string;
@@ -147,7 +143,7 @@ const newThread = async (
   }
 
   const wallet = await app.wallets.locateWallet(
-    author.address,
+    author,
     ChainBase.Ethereum
   );
 
@@ -400,9 +396,9 @@ const NewProposalForm: m.Component<
                       contentRight:
                         idx > 1 &&
                         idx === vnode.state.form.choices.length - 1 &&
-                        m(Icon, {
-                          name: Icons.TRASH,
-                          size: 'xl',
+                        m(CWIcon, {
+                          iconName: 'trash',
+                          iconSize: 'large',
                           style: 'cursor: pointer;',
                           onclick: () => {
                             vnode.state.form.choices.pop();

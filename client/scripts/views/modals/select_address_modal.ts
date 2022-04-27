@@ -3,10 +3,10 @@ import 'modals/select_address_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Tag, Button, Icon, Icons } from 'construct-ui';
+import { Tag, Button } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import { Account, RoleInfo } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
@@ -15,6 +15,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { formatAddressShort } from '../../../../shared/utils';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
 const SelectAddressModal: m.Component<
   {},
@@ -127,7 +128,7 @@ const SelectAddressModal: m.Component<
                         (a) =>
                           a.address === account.address &&
                           a.chain === account.chain.id
-                      )?.isMagic &&
+                      )?.walletId === WalletId.Magic &&
                         m(
                           '.magic-label',
                           `Magically linked to ${app.user.email}`
@@ -140,13 +141,11 @@ const SelectAddressModal: m.Component<
                           activeEntityInfo?.name
                         }'`
                       ),
-                      m(
-                        'span.icon',
-                        {
-                          onclick: deleteRole.bind(this, index),
-                        },
-                        m(Icon, { name: Icons.X })
-                      ),
+                      m(CWIcon, {
+                        iconName: 'close',
+                        iconSize: 'small',
+                        onclick: deleteRole.bind(this, index),
+                      }),
                     ]),
                   ])
               ),
@@ -174,7 +173,7 @@ const SelectAddressModal: m.Component<
                           (a) =>
                             a.address === account.address &&
                             a.chain === account.chain.id
-                        )?.isMagic &&
+                        )?.walletId === WalletId.Magic &&
                           m(
                             '.magic-label',
                             `Magically linked to ${app.user.email}`

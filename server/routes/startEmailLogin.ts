@@ -5,7 +5,7 @@ import {
   MAGIC_DEFAULT_CHAIN
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
-import { DynamicTemplate } from '../../shared/types';
+import { DynamicTemplate, WalletId } from '../../shared/types';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 const sgMail = require('@sendgrid/mail');
@@ -42,7 +42,7 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
     },
     include: [{
       model: models.Address,
-      where: { is_magic: true },
+      where: { wallet_id: WalletId.Magic },
       required: false,
     }]
   });

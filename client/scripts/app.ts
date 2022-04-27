@@ -35,7 +35,7 @@ import { pathIsDiscussion } from './identifiers';
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
 import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
-import(/* webpackPrefetch: true */ 'views/pages/discussions');
+import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
 // eslint-disable-next-line max-len
@@ -286,7 +286,10 @@ export async function selectNode(
       )
     ).default;
     newChain = new Aave(n, app);
-  } else if (n.chain.network === ChainNetwork.ERC20 || n.chain.network === ChainNetwork.AxieInfinity) {
+  } else if (
+    n.chain.network === ChainNetwork.ERC20 ||
+    n.chain.network === ChainNetwork.AxieInfinity
+  ) {
     const ERC20 = (
       await import(
         //   /* webpackMode: "lazy" */
@@ -295,6 +298,13 @@ export async function selectNode(
       )
     ).default;
     newChain = new ERC20(n, app);
+  } else if (n.chain.network === ChainNetwork.ERC721) {
+    const ERC721 = (await import(
+    //   /* webpackMode: "lazy" */
+    //   /* webpackChunkName: "erc721-main" */
+      './controllers/chain/ethereum/NftAdapter'
+    )).default;
+    newChain = new ERC721(n, app);
   } else if (n.chain.network === ChainNetwork.SPL) {
     const SPL = (
       await import(
@@ -322,12 +332,17 @@ export async function selectNode(
       )
     ).default;
     newChain = new Commonwealth(n, app);
-  } else if (n.chain.base === ChainBase.Ethereum && n.chain.type === ChainType.Offchain) {
-    const Ethereum = (await import(
-      /* webpackMode: "lazy" */
-      /* webpackChunkName: "ethereum-main" */
-      './controllers/chain/ethereum/main'
-    )).default;
+  } else if (
+    n.chain.base === ChainBase.Ethereum &&
+    n.chain.type === ChainType.Offchain
+  ) {
+    const Ethereum = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "ethereum-main" */
+        './controllers/chain/ethereum/main'
+      )
+    ).default;
     newChain = new Ethereum(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -399,10 +414,8 @@ export async function initChain(): Promise<void> {
 }
 
 export async function initNewTokenChain(address: string) {
-  const response = await $.getJSON('/api/getTokenForum', {
-    address,
-    autocreate: true,
-  });
+  const chain_network = app.chain.network;
+  const response = await $.getJSON('/api/getTokenForum', { address, chain_network, autocreate: true });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');
@@ -888,7 +901,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true }
             ),
             '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
-              scoped: false
+              scoped: false,
             }),
             // Settings
             '/settings': redirectRoute(() => '/edgeware/settings'),

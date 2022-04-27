@@ -84,10 +84,15 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       let totalDuration = 0;
       let lastBlockTime = +headers.timestamp;
       for (let n = 0; n < nHeadersForBlocktime; n++) {
-        const prevHeader = await this._api.eth.getBlock(`${blockNumber - 1 - n}`);
-        const duration = lastBlockTime -+prevHeader.timestamp;
-        lastBlockTime = +prevHeader.timestamp;
-        totalDuration += duration;
+        const prevBlockNumber = blockNumber - 1 - n;
+        if (prevBlockNumber > 0) {
+          const prevHeader = await this._api.eth.getBlock(`${blockNumber - 1 - n}`);
+          const duration = lastBlockTime -+prevHeader.timestamp;
+          lastBlockTime = +prevHeader.timestamp;
+          totalDuration += duration;
+        } else {
+          break;
+        }
       }
       this.app.chain.block.duration = totalDuration / nHeadersForBlocktime;
       console.log(`Computed block duration: ${this.app.chain.block.duration}`);

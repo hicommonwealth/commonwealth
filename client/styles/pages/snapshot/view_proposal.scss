@@ -153,11 +153,6 @@
         font-weight: 500;
       }
 
-      .external-link-icon {
-        color: $purple-400;
-        margin-left: 0.25rem;
-      }
-
       .info-block {
         display: flex;
         margin: 16px 0 4px;
@@ -174,6 +169,10 @@
 
         .values {
           overflow: hidden;
+
+          svg {
+            margin-left: 4px;
+          }
 
           .-mt-10 {
             margin-top: -10px;

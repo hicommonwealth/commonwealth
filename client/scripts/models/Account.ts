@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import app, { IApp } from 'state';
 import { Coin } from 'adapters/currency';
-import { ChainBase, ChainType } from 'types';
+import { ChainBase, ChainType, WalletId } from 'types';
 
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
@@ -18,6 +18,7 @@ abstract class Account<C extends Coin> {
   // validation token sent by server
   private _validationToken?: string;
   private _addressId?: number;
+  private _walletId?: WalletId;
 
   // A helper for encoding
   private _encoding: number;
@@ -50,6 +51,11 @@ abstract class Account<C extends Coin> {
     this._addressId = id;
   }
 
+  get walletId() { return this._walletId; }
+  public setWalletId(walletId: WalletId) {
+    this._walletId = walletId;
+  }
+
   get validationToken() {
     return this._validationToken;
   }
@@ -70,6 +76,7 @@ abstract class Account<C extends Coin> {
       isToken: this.chain.type === ChainType.Token,
       jwt: this.app.user.jwt,
       signature,
+      wallet_id: this.walletId,
     };
     const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {

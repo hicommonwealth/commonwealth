@@ -15,8 +15,14 @@ $layout-padding-xs: 20px;
 
 $fonts: neue-haas-unica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
   'Segoe UI Emoji', 'Segoe UI Symbol';
+
 $monospace-fonts: SF Mono, Menlo, Monaco, 'Lucida Sans Typewriter',
   'Courier New', Courier, monospace;
+
+$font-family-silka: Silka, sans-serif;
+
+$font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
+  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 
 //
 // mobile specs
@@ -156,6 +162,10 @@ $text-size-mobile-header: 22px;
   .cui-tabs-item {
     color: $neutral-500;
     margin: 0 24px 0 0;
+
+    @include sm-max {
+      margin: 0 16px 0 0;
+    }
   }
 
   .cui-tabs-item:hover {

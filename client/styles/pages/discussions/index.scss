@@ -7,10 +7,6 @@
   padding: 24px;
   width: 100%;
 
-  &.empty-list {
-    height: calc(100vh - 200px);
-  }
-
   // content
   .PinnedDivider {
     margin: 6px 0 8px;
@@ -46,25 +42,5 @@
       height: 1px;
       width: -webkit-fill-available;
     }
-  }
-
-  .infinite-scroll-reached-end {
-    color: $neutral-500;
-    font-size: 0.94rem;
-    margin: 20px 0;
-    text-align: center;
-  }
-
-  .topic-loading-spinner-wrap,
-  .infinite-scroll-spinner-wrap {
-    align-items: center;
-    display: flex;
-    height: 70px;
-    justify-content: center;
-    width: 100%;
-  }
-
-  .topic-loading-spinner-wrap {
-    height: 120px;
   }
 }

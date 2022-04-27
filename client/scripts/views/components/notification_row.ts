@@ -1,6 +1,6 @@
 import 'components/notification_row.scss';
 
-import { Icon, Icons, Spinner } from 'construct-ui';
+import { Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
@@ -22,6 +22,7 @@ import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -261,7 +262,6 @@ const getBatchNotificationFields = (
   const pageJump = comment_id
     ? () => jumpHighlightComment(comment_id)
     : () => jumpHighlightComment('parent');
-
   return {
     authorInfo,
     createdAt: moment.utc(created_at),
@@ -339,8 +339,8 @@ const NotificationRow: m.Component<
             m('.comment-body-top.chain-event-notification-top', [
               `${label.heading} on ${chainName}`,
               !vnode.attrs.onListPage &&
-                m(Icon, {
-                  name: Icons.X,
+                m(CWIcon, {
+                  iconName: 'close',
                   onmousedown: (e) => {
                     e.preventDefault();
                     e.stopPropagation();
