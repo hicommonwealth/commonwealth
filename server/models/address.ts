@@ -7,6 +7,7 @@ import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_p
 import { RoleAttributes, RoleInstance } from './role';
 import { ProfileInstance } from './profile';
 import { SsoTokenInstance } from './sso_token';
+import { WalletId } from '../../shared/types';
 
 export type AddressAttributes = {
 	address: string;
@@ -23,9 +24,9 @@ export type AddressAttributes = {
 	user_id?: number;
 	is_councillor?: boolean;
 	is_validator?: boolean;
-	is_magic?: boolean;
 	ghost_address?: boolean;
 	profile_id?: number;
+	wallet_id?: WalletId;
 	// associations
 	Chain?: ChainAttributes;
 	User?: UserAttributes;
@@ -65,9 +66,9 @@ export default (
 		user_id:                    { type: dataTypes.INTEGER, allowNull: true },
 		is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-		is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		profile_id:    						  { type: dataTypes.INTEGER, allowNull: true },
+		wallet_id:									{ type: dataTypes.STRING, allowNull: true },
 	}, {
 		timestamps: true,
 		createdAt: 'created_at',

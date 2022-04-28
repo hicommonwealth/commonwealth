@@ -15,7 +15,7 @@ import {
 } from 'controllers/app/login';
 import Near from 'controllers/chain/near/main';
 import { NearAccount } from 'controllers/chain/near/account';
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import Sublayout from 'views/sublayout';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { PageLoading } from 'views/pages/loading';
@@ -63,13 +63,13 @@ const redirectToNextPage = () => {
 };
 
 const validate = async (
-  vnode: m.Vnode<{}, IState>,
+  vnode: m.Vnode<Record<string, never>, IState>,
   wallet: WalletConnection
 ) => {
   try {
     // TODO: do we need to do this every time, or only on first connect?
     const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-    await createUserWithAddress(acct.address);
+    await createUserWithAddress(acct.address, WalletId.NearWallet);
     const signature = await acct.signMessage(`${acct.validationToken}\n`);
     await acct.validate(signature);
     if (!app.isLoggedIn()) {
@@ -146,7 +146,7 @@ const validate = async (
   }
 };
 
-const FinishNearLogin: m.Component<{}, IState> = {
+const FinishNearLogin: m.Component<Record<string, never>, IState> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'LoginPage',

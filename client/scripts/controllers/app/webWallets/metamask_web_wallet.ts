@@ -4,7 +4,7 @@ import app from 'state';
 import Web3 from 'web3';
 import $ from 'jquery';
 import { provider } from 'web3-core';
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
@@ -17,7 +17,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   private _provider: provider;
   private _web3: Web3;
 
-  public readonly name = 'metamask';
+  public readonly name = WalletId.Metamask;
   public readonly label = 'Metamask';
   public readonly chain = ChainBase.Ethereum;
 

@@ -143,7 +143,7 @@ const newThread = async (
   }
 
   const wallet = await app.wallets.locateWallet(
-    author.address,
+    author,
     ChainBase.Ethereum
   );
 

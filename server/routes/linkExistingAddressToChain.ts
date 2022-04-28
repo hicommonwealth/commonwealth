@@ -120,6 +120,7 @@ const linkExistingAddressToChain = async (
         verified: originalAddress.verified,
         keytype: originalAddress.keytype,
         name: originalAddress.name,
+        wallet_id: originalAddress.wallet_id,
         last_active: new Date(),
       });
 

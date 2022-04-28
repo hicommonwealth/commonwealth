@@ -6,7 +6,7 @@ import $ from 'jquery';
 import { Tag, Button } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import { Account, RoleInfo } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
@@ -128,7 +128,7 @@ const SelectAddressModal: m.Component<
                         (a) =>
                           a.address === account.address &&
                           a.chain === account.chain.id
-                      )?.isMagic &&
+                      )?.walletId === WalletId.Magic &&
                         m(
                           '.magic-label',
                           `Magically linked to ${app.user.email}`
@@ -173,7 +173,7 @@ const SelectAddressModal: m.Component<
                           (a) =>
                             a.address === account.address &&
                             a.chain === account.chain.id
-                        )?.isMagic &&
+                        )?.walletId === WalletId.Magic &&
                           m(
                             '.magic-label',
                             `Magically linked to ${app.user.email}`

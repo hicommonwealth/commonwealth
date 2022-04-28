@@ -3,13 +3,14 @@ import { ethers, Contract } from 'ethers';
 import { ChainBase } from 'types';
 import WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
-import WalletConnectWebWalletController from '../../app/webWallets/walletconnect_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import { Account } from 'models';
 
 export type ContractFactoryT<ContractT> = (address: string, provider: Provider) => ContractT;
 
 export async function attachSigner<CT extends Contract>(
   wallets: WebWalletController,
-  sender: string,
+  sender: Account<any>,
   contract: CT
 ): Promise<CT> {
   const signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);
@@ -19,7 +20,7 @@ export async function attachSigner<CT extends Contract>(
     const walletProvider = new ethers.providers.Web3Provider(signingWallet.provider as any);
     // 12s minute polling interval (default is 4s)
     walletProvider.pollingInterval = 12000;
-    signer = walletProvider.getSigner(sender);
+    signer = walletProvider.getSigner(sender.address);
   } else {
     throw new Error('Unsupported wallet');
   }

@@ -1,5 +1,5 @@
 import { ITXModalData, NodeInfo, IChainModule, ITXData } from 'models';
-import { ChainNetwork } from 'types';
+import { ChainNetwork, WalletId } from 'types';
 import m from 'mithril';
 import _ from 'lodash';
 import { ApiStatus, IApp } from 'state';
@@ -114,7 +114,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (this._app.chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
-    const wallet = this.app.wallets.getByName('keplr') as KeplrWebWalletController;
+    const wallet = this.app.wallets.getByName(WalletId.Keplr) as KeplrWebWalletController;
     if (!wallet) throw new Error('Keplr wallet not found');
     if (!wallet.enabled) {
       await wallet.enable();
