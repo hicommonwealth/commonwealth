@@ -1,10 +1,11 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_text_input.scss';
 
 import { ComponentType } from './types';
-import { getTextInputClasses } from './helpers';
+import { getClasses } from './helpers';
 
 export enum ValidationStatus {
   Success = 'success',
@@ -53,7 +54,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
         <input
           autofocus={autofocus}
           autocomplete={autocomplete}
-          class={getTextInputClasses({
+          class={getClasses<InputStyleAttrs>({
             validationStatus: this.validationStatus,
             disabled,
           })}

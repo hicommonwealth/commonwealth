@@ -25,18 +25,4 @@ class Listing implements m.ClassComponent<ListingAttrs> {
   }
 }
 
-export class CardsListing implements m.ClassComponent<ListingAttrs> {
-  view(vnode) {
-    const { columnHeader, content } = vnode.attrs;
-    return (
-      <div class="CardsListing">
-        {isNotUndefined(columnHeader) && (
-          <div class="ListingHeader">{columnHeader}</div>
-        )}
-        {content}
-      </div>
-    );
-  }
-}
-
 export default Listing;
