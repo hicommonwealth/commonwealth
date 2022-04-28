@@ -93,7 +93,7 @@ class NewProfileHeader implements m.Component<ProfileHeaderAttrs, ProfileHeaderS
               <CWButton
                 label="Edit"
                 buttonType="primary"
-                onclick={() => m.route.set(`${m.route.get()}/edit`)}
+                onclick={() => m.route.set(`/profile/${m.route.param('address')}/edit`)}
               />
             </div>
           </section>
