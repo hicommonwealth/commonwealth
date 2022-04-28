@@ -14,7 +14,7 @@ import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import { ProposalCard } from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 import Listing from './listing';
 import ErrorPage from './error';

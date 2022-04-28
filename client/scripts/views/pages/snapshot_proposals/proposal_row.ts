@@ -1,9 +1,10 @@
 import m from 'mithril';
 import moment from 'moment';
+import { Tag } from 'construct-ui';
+
 import app from 'state';
 import { formatLastUpdated, formatTimestamp } from 'helpers';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
-import { Tag } from 'construct-ui/lib/esm/components/tag';
 import { navigateToSubpage } from '../../../app';
 
 const ProposalRow: m.Component<

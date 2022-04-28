@@ -1,14 +1,12 @@
-import 'pages/discussions/index.scss';
-
 import m from 'mithril';
 import moment from 'moment';
+import { Button } from 'construct-ui';
+
+import 'pages/discussions/index.scss';
+
 import app from 'state';
-
-import { Spinner, Button } from 'construct-ui';
-
 import Sublayout from 'views/sublayout';
 import Listing from 'views/pages/listing';
-
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import ProposalRow from './proposal_row';
 import { PageLoading } from '../loading';
