@@ -92,9 +92,10 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.chain.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
-    if (this.app.socket && this.app.loginState === LoginState.LoggedIn) {
-      await this.app.socket.chatNs.initialize(JSON.parse(chatChannels));
-    }
+
+    // parse/save the chat channels
+    await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));
+
     if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
       this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
         threads: this.app.threads.listingStore.getPinnedThreads(),

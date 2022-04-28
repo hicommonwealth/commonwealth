@@ -1,8 +1,9 @@
 import $ from 'jquery';
 import app from 'state';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
-import { io } from 'socket.io-client';
+import {io, Socket} from 'socket.io-client';
 import _ from 'lodash';
+import m from 'mithril';
 
 export enum ChatErrors {
     NOT_LOGGED_IN='User must be logged in to load chat'
@@ -20,12 +21,14 @@ export interface IChannel {
 }
 
 export class ChatNamespace {
-    private chatNs;
+    private chatNs: Socket;
     private _isConnected = false;
-    private _intialized = false;
+    private _initialized = false;
     public channels: Record<string, IChannel> = {};
 
-    constructor() {
+    constructor() {}
+
+    public async init() {
         this.chatNs = io(`/${WebsocketNamespaces.Chat}`, {
             transports: ['websocket'],
         });
@@ -35,31 +38,39 @@ export class ChatNamespace {
     }
 
     public async addListener(eventName: string, listener: (any) => void) {
-        this.chatNs.on(eventName, listener);
+        if (this.isConnected) {
+            this.chatNs.on(eventName, listener);
+        }
     }
 
     public async removeListener(eventName: string, listener?: (any) => void) {
-        this.chatNs.off(eventName, listener);
+        if (this.initialized()) this.chatNs.off(eventName, listener);
     }
 
     public sendMessage(message: Record<string, any>, channel: IChannel) {
-        this.chatNs.emit(WebsocketMessageNames.ChatMessage, {
-            socket_room: ChatNamespace.channelToRoomId(channel),
-            ...message
-        })
+        if (this.isConnected) {
+            this.chatNs.emit(WebsocketMessageNames.ChatMessage, {
+                socket_room: ChatNamespace.channelToRoomId(channel),
+                ...message
+            })
+        }
     }
 
-    public connectToChannels(channel_ids: string[]){
-        this.chatNs.emit(WebsocketMessageNames.JoinChatChannel, channel_ids)
+    public connectToChannels(channel_ids: string[]) {
+        if (this.isConnected) this.chatNs.emit(WebsocketMessageNames.JoinChatChannel, channel_ids)
     }
 
-    public disconnectFromChannels(channel_ids: string[]){
-        this.chatNs.emit(WebsocketMessageNames.LeaveChatChannel, channel_ids)
+    public disconnectFromChannels(channel_ids: string[]) {
+        if (this.isConnected) this.chatNs.emit(WebsocketMessageNames.LeaveChatChannel, channel_ids)
     }
 
     private onConnect() {
         this._isConnected = true;
         console.log('Chat namespace connected!')
+
+        if (!_.isEmpty(this.channels) && !this.initialized()) {
+            this.initialize();
+        }
     }
 
     private onDisconnect(reason) {
@@ -75,28 +86,37 @@ export class ChatNamespace {
         return !_.isEmpty(this.channels)
     }
 
-    public intialized() {
-        return this._intialized
+    public initialized() {
+        return this._initialized
     }
 
-    public async initialize(channels: any) {
+    public async refreshChannels(channels: any) {
+        this.channels = {}
         channels.forEach(c => {
             this.channels[c.id] = { unread: 0, ...c }
         });
 
+        if (this.isConnected && !this.initialized()) {
+            await this.initialize();
+        }
+    }
+
+    public async initialize() {
+        console.log("Initializing chat state")
         this.addListener(WebsocketMessageNames.ChatMessage, this.onMessage.bind(this))
         this.connectToChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
-        this._intialized = true;
+        this._initialized = true;
     }
 
     public async deinit() {
-        this._intialized = false;
+        this._initialized = false;
         this.removeListener(WebsocketMessageNames.ChatMessage, this.onMessage.bind(this))
         this.disconnectFromChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
         this.channels = {}
     }
 
     public async reinit() {
+        console.log("re-initializing chat state")
         const raw_channels = await this.getChatMessages()
         const channels = {}
         raw_channels.forEach(c => {
@@ -113,12 +133,14 @@ export class ChatNamespace {
     }
 
     private onMessage(msg) {
+        console.log("onMessage")
         // Ignore message if it is already in ChatMessages, last 5 msgs
         if(this.channels[msg.chat_channel_id].ChatMessages.slice(-5).includes(msg)) {
             return
         }
         this.channels[msg.chat_channel_id].ChatMessages.push(msg)
         this.channels[msg.chat_channel_id].unread++
+        m.redraw();
     }
 
     public readMessages(channel_id: string) {

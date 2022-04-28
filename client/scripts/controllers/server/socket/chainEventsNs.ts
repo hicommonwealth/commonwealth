@@ -7,15 +7,17 @@ export class ChainEventsNamespace {
   private ceNs: Socket;
   private _isConnected = false;
 
-  constructor() {
+  constructor() {}
+
+  public async init() {
     this.ceNs = io(`/${WebsocketNamespaces.ChainEvents}`, {
       transports: ['websocket'],
     });
     this.ceNs.on('connect', this.onConnect.bind(this));
     this.ceNs.on('disconnect', this.onDisconnect.bind(this));
     this.ceNs.on(
-      WebsocketMessageNames.ChainEventNotification,
-      this.onChainEvent.bind(this)
+        WebsocketMessageNames.ChainEventNotification,
+        this.onChainEvent.bind(this)
     );
   }
 

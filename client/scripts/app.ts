@@ -8,29 +8,25 @@ import 'lity/dist/lity.min.css';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { FocusManager } from 'construct-ui';
+import {FocusManager} from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import './fragment-fix';
-import app, { ApiStatus, LoginState } from 'state';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+import app, {ApiStatus, LoginState} from 'state';
+import {ChainBase, ChainNetwork, ChainType} from 'types';
+import {ChainInfo, NodeInfo, NotificationCategory} from 'models';
 
-import { WebSocketController } from 'controllers/server/socket';
+import {WebSocketController} from 'controllers/server/socket';
 
-import {
-  notifyError,
-  notifyInfo,
-  notifySuccess,
-} from 'controllers/app/notifications';
-import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import {notifyError, notifyInfo, notifySuccess,} from 'controllers/app/notifications';
+import {updateActiveAddresses, updateActiveUser} from 'controllers/app/login';
 
-import { Layout } from 'views/layout';
+import {Layout} from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import { LoginModal } from 'views/modals/login_modal';
-import { alertModalWithText } from 'views/modals/alert_modal';
-import { pathIsDiscussion } from './identifiers';
+import {LoginModal} from 'views/modals/login_modal';
+import {alertModalWithText} from 'views/modals/alert_modal';
+import {pathIsDiscussion} from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -92,12 +88,20 @@ export async function initAppState(
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
 
-      if (!app.socket && app.loginState === LoginState.LoggedIn) {
-        app.socket = new WebSocketController(app.user.jwt);
+      if (app.loginState == LoginState.LoggedIn) {
+        console.log("Initializing socket connection with JTW:", app.user.jwt)
+        // init the websocket connection and the chain-events namespace
+        app.socket.init(app.user.jwt).then(() => {
+          if (app.socket.isConnected) {
+            console.log("Websocket connected");
+          } else {
+            console.log("Websocket connection failure");
+          }
+        })
         app.user.notifications.refresh().then(() => m.redraw());
-      } else if (app.socket && app.loginState === LoginState.LoggedOut) {
-        app.socket.disconnect();
-        app.socket = undefined;
+      } else if (app.loginState == LoginState.LoggedOut && app.socket.isConnected) {
+        // TODO: create global deinit function
+        app.socket.disconnect()
       }
 
       app.user.setStarredCommunities(data.user ? data.user.starredCommunities : []);

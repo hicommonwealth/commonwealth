@@ -8,7 +8,13 @@ export class WebSocketController {
   public readonly chainEventsNs: ChainEventsNamespace;
   public readonly chatNs: ChatNamespace;
 
-  public constructor(jwt: string) {
+  public constructor() {
+    // add all custom namespaces i.e. chain-event notifications, chat, thread notifications
+    this.chainEventsNs = new ChainEventsNamespace();
+    this.chatNs = new ChatNamespace();
+  }
+
+  public async init(jwt: string) {
     this._socket = io({
       transports: ['websocket'],
       query: { token: jwt },
@@ -17,9 +23,8 @@ export class WebSocketController {
     this._socket.on('connect_error', this.onConnectError.bind(this));
     this._socket.on('disconnect', this.onDisconnect.bind(this));
 
-    // add all custom namespaces i.e. chain-event notifications, chat, thread notifications
-    this.chainEventsNs = new ChainEventsNamespace();
-    this.chatNs = new ChatNamespace();
+    await this.chatNs.init();
+    await this.chainEventsNs.init();
   }
 
   public async addListener(eventName: string, listener: (any) => void) {

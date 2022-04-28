@@ -44,12 +44,14 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     this.onIncomingMessage = (msg) => {
+      console.log("Message received")
       const { chat_channel_id } = msg;
       if (chat_channel_id === vnode.attrs.channel_id) {
         this.shouldScroll = false;
       }
       m.redraw();
     };
+
     app.socket.chatNs.addListener(
       WebsocketMessageNames.ChatMessage,
       this.onIncomingMessage.bind(vnode)

@@ -71,10 +71,14 @@ export class ChatSection
   async oninit(vnode) {
     this.loaded = false;
 
-    if (_.isEmpty(vnode.attrs.channels)) {
-      await app.socket.chatNs.reinit();
-      vnode.attrs.channels = Object.values(app.socket.chatNs.channels);
-    }
+    // if (_.isEmpty(vnode.attrs.channels)) {
+    //   await app.socket.chatNs.reinit();
+    //   vnode.attrs.channels = Object.values(app.socket.chatNs.channels);
+    // }
+    // if (app.socket.isConnected && !app.socket.chatNs.isConnected) {
+    //   await app.socket.chatNs.init();
+    //   vnode.attrs.channels = Object.values(app.socket.chatNs.channels);
+    // }
 
     this.channelToToggleTree = (channels: IChannel[]) => {
       const toggleTree = {};
@@ -122,8 +126,11 @@ export class ChatSection
     });
 
     this.onIncomingMessage = (msg) => {
-      if (vnode.attrs.activeChannel)
+      console.log("Message received - chat section")
+      if (vnode.attrs.activeChannel) {
+        console.log("Chat channel id:", vnode.attrs.activeChannel);
         app.socket.chatNs.readMessages(vnode.attrs.activeChannel);
+      }
       if (msg.chat_channel_id === vnode.attrs.activeChannel) {
         vnode.attrs.channels.find(
           (c) => c.id === msg.chat_channel_id
@@ -131,6 +138,7 @@ export class ChatSection
       }
       m.redraw.sync();
     };
+
     app.socket.chatNs.addListener(
       WebsocketMessageNames.ChatMessage,
       this.onIncomingMessage.bind(vnode)
