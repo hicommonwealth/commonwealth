@@ -213,7 +213,7 @@ export default (
           notification.id
         }`;
       }
-      if (msg && nRead.Subscription.immediate_email) {
+      if (msg && nRead.Subscription?.immediate_email && nRead.Subscription?.User) {
         // kick off async call and immediately return
         sendImmediateNotificationEmail(nRead.Subscription.User, msg);
       }
