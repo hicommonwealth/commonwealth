@@ -13,15 +13,13 @@ import { ChatSection } from '../chat/chat_section';
 
 export class Sidebar implements m.ClassComponent {
   view() {
+
     return app.chain ? (
       <div class="Sidebar">
         <DiscussionSection />
         <GovernanceSection />
         {app.socket && (
-          <ChatSection
-            channels={Object.values(app.socket.chatNs.channels)}
-            activeChannel={m.route.param()['channel']}
-          />
+          <ChatSection />
         )}
         <ExternalLinksModule />
         <div class="buttons-container">

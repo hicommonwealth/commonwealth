@@ -52,7 +52,7 @@ function setToggleTree(path: string, toggle: boolean) {
 }
 
 export class ChatSection
-  implements m.ClassComponent<{ channels: IChannel[]; activeChannel: string }>
+  implements m.ClassComponent<{ channels: IChannel[]; }>
 {
   channels: {
     [category: string]: IChannel[];
@@ -67,18 +67,13 @@ export class ChatSection
   // eslint-disable-next-line @typescript-eslint/ban-types
   adminChannel: IChannel | {};
   onIncomingMessage: (any: any) => void;
+  chain: string;
+  activeChannel: string;
 
   async oninit(vnode) {
     this.loaded = false;
-
-    // if (_.isEmpty(vnode.attrs.channels)) {
-    //   await app.socket.chatNs.reinit();
-    //   vnode.attrs.channels = Object.values(app.socket.chatNs.channels);
-    // }
-    // if (app.socket.isConnected && !app.socket.chatNs.isConnected) {
-    //   await app.socket.chatNs.init();
-    //   vnode.attrs.channels = Object.values(app.socket.chatNs.channels);
-    // }
+    this.chain = app.activeChainId();
+    this.activeChannel = null;
 
     this.channelToToggleTree = (channels: IChannel[]) => {
       const toggleTree = {};
@@ -118,7 +113,7 @@ export class ChatSection
     this.adminChannel = {};
 
     this.channels = {};
-    vnode.attrs.channels.forEach((c) => {
+    Object.values(app.socket.chatNs.channels).forEach((c) => {
       const { ChatMessages, ...metadata } = c;
       this.channels[metadata.category]
         ? this.channels[metadata.category].push(metadata)
@@ -127,12 +122,11 @@ export class ChatSection
 
     this.onIncomingMessage = (msg) => {
       console.log("Message received - chat section")
-      if (vnode.attrs.activeChannel) {
-        console.log("Chat channel id:", vnode.attrs.activeChannel);
-        app.socket.chatNs.readMessages(vnode.attrs.activeChannel);
+      if (this.activeChannel) {
+        app.socket.chatNs.readMessages(this.activeChannel);
       }
-      if (msg.chat_channel_id === vnode.attrs.activeChannel) {
-        vnode.attrs.channels.find(
+      if (msg.chat_channel_id === this.activeChannel) {
+        Object.values(app.socket.chatNs.channels).find(
           (c) => c.id === msg.chat_channel_id
         ).unread = 0;
       }
@@ -153,8 +147,8 @@ export class ChatSection
   }
 
   onbeforeupdate(vnode, old) {
-    if (!_.isEqual(vnode.attrs.channels, old.attrs.channels)) {
-      vnode.attrs.channels.forEach((c) => {
+    if (!_.isEqual(Object.values(app.socket.chatNs.channels), old.attrs.channels)) {
+      Object.values(app.socket.chatNs.channels).forEach((c) => {
         const { ChatMessages, ...metadata } = c;
         this.channels[metadata.category]
           ? this.channels[metadata.category].push(metadata)
@@ -179,10 +173,10 @@ export class ChatSection
   view(vnode) {
     if (!app.socket) return;
     if (!this.loaded) return <Spinner />;
-
+    this.activeChannel = m.route.param()['channel'];
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId() });
     this.channels = {};
-    vnode.attrs.channels.forEach((c) => {
+    Object.values(app.socket.chatNs.channels).forEach((c) => {
       const { ChatMessages, ...metadata } = c;
       this.channels[metadata.category]
         ? this.channels[metadata.category].push(metadata)
