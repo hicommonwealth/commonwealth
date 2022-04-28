@@ -189,14 +189,21 @@ export default (
     }
 
     // create NotificationsRead instances
-    const nReads = await Promise.all(subscribers.map(async (subscription) => {
-      // create NotificationsRead instance
-      const nRead = await models.NotificationsRead.create({
-        notification_id: notification.id,
-        subscription_id: subscription.id,
-        is_read: false
-      });
+    const nReads = await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
+      subscription_id: subscription.id,
+      notification_id: notification.id,
+      is_read: false
+    })), {
+      include: {
+        model: models.Subscription,
+        include: [{
+          model: models.User,
+        }]
+      }
+    });
 
+    // send emails
+    for (const nRead of nReads) {
       if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
         msg.dynamic_template_data.notification.path = `${
           SERVER_URL
@@ -206,9 +213,11 @@ export default (
           notification.id
         }`;
       }
-      if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
-      return nRead;
-    }));
+      if (msg && nRead.Subscription.immediate_email) {
+        // kick off async call and immediately return
+        sendImmediateNotificationEmail(nRead.Subscription.User, msg);
+      }
+    }
 
     const erc20Tokens = (await models.Chain.findAll({
       where: {
