@@ -45,7 +45,7 @@ export class CWOverlay implements m.ClassComponent<OverlayAttrs> {
       <div
         onClick={(e) => e.stopPropagation()}
         isOpen={isRendered && isOpen}
-        zIndex={zIndex}
+        // zIndex={zIndex}
       >
         <div isOpen={isRendered && isOpen} onClick={onClick} />
         {children}

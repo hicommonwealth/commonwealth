@@ -1,7 +1,5 @@
 // Source: https://github.com/Simspace/monorail/blob/master/src/metaComponents/popOver/PopOver.tsx
 
-import m from 'mithril';
-
 export enum dropDirections {
   Bottom = 'bottom',
   Left = 'left',
