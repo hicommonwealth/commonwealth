@@ -4,34 +4,52 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_overlay.scss';
 
-import { CWPortal } from './cw_portal';
-import { ComponentType } from './types';
-
 type OverlayAttrs = {
-  content?: m.Children;
-  inline?: boolean;
-  isOpen?: boolean;
-  onClose?: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  zIndex: number;
 };
 
 export class CWOverlay implements m.ClassComponent<OverlayAttrs> {
-  private shouldRender: boolean;
+  isRendered: boolean;
 
-  onremove() {
-    if (this.shouldRender === true) {
-      this.shouldRender = false;
-    }
+  oncreate(vnode) {
+    document.addEventListener('keydown', (e: KeyboardEvent) =>
+      this.escFunction(e, vnode)
+    );
+    this.isRendered = true;
   }
 
+  onremove(vnode) {
+    document.removeEventListener('keydown', (e: KeyboardEvent) =>
+      this.escFunction(e, vnode)
+    );
+  }
+
+  escFunction = (event: KeyboardEvent, vnode) => {
+    const { isOpen, togglePopOver } = vnode.attrs;
+
+    if (event.key === 'Escape' && isOpen) {
+      togglePopOver();
+    }
+
+    return null;
+  };
+
   view(vnode) {
-    const { content, isOpen, onClose } = vnode.attrs;
+    const { children } = vnode;
+    const { isOpen, onClick, zIndex } = vnode.attrs;
+    const { isRendered } = this;
 
-    document.addEventListener('mousedown', onClose);
-
-    console.log(isOpen);
-
-    const container = <div class={ComponentType.Overlay}>{content}</div>;
-
-    return isOpen ? <CWPortal>{container}</CWPortal> : null;
+    return (
+      <div
+        onClick={(e) => e.stopPropagation()}
+        isOpen={isRendered && isOpen}
+        zIndex={zIndex}
+      >
+        <div isOpen={isRendered && isOpen} onClick={onClick} />
+        {children}
+      </div>
+    );
   }
 }
