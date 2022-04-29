@@ -16,9 +16,9 @@ import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
-import Listing from './listing';
 import ErrorPage from './error';
 import User from '../components/widgets/user';
+import CardsCollection from './cards_collection';
 
 const TipDetail: m.Component<{ proposal: SubstrateTreasuryTip }> = {
   view: (vnode) => {
@@ -172,14 +172,14 @@ const TipsPage: m.Component<{}> = {
           ]),
         ]),
         m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: activeTipContent,
-          columnHeader: 'Active Tips',
+          header: 'Active Tips',
         }),
         m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: inactiveTipContent,
-          columnHeader: 'Inactive Tips',
+          header: 'Inactive Tips',
         }),
         m('.clear'),
       ])

@@ -25,10 +25,10 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 
 import { PageNotFound } from 'views/pages/404';
-import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
+import CardsCollection from './cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: () => {
@@ -398,14 +398,14 @@ const ProposalsPage: m.Component<{}> = {
         onSubstrate && m(SubstrateProposalStats),
         onCompound && m(CompoundProposalStats),
         m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: activeProposalContent,
-          columnHeader: 'Active',
+          header: 'Active',
         }),
         m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: inactiveProposalContent,
-          columnHeader: 'Inactive',
+          header: 'Inactive',
         }),
         m('.clear'),
       ])

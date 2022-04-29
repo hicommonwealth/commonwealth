@@ -1,18 +1,19 @@
 import m from 'mithril';
+
+import 'pages/discussions/discussion_row.scss';
+import 'pages/snapshot/multiple_snapshots.scss';
+
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import Listing from 'views/pages/listing';
-import { Spinner } from 'construct-ui';
 import {
   loadMultipleSpacesData,
   SnapshotProposal,
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
-import 'pages/discussions/discussion_row.scss';
-import 'pages/snapshot/multiple_snapshots.scss';
 import { OffchainThread } from 'client/scripts/models';
 import SnapshotSpaceCard from './space_card';
 import { PageLoading } from '../loading';
+import CardsCollection from '../cards_collection';
 
 export const enum SPACES_HEADER_MESSAGES {
   NEW_PROPOSAL = 'Select a Snapshot Space to Create a Proposal:',
@@ -100,7 +101,7 @@ const MultipleSnapshotsPage: m.Component<
         m('.SnapshotSpaceTextHeader', [redirect_options.header_message]),
         app.chain &&
           vnode.state.spaces_metadata && [
-            m(Listing, {
+            m(CardsCollection, {
               content: [
                 m(
                   '.discussion-group-wrap',

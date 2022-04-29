@@ -27,9 +27,9 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 
 import { SubstrateBounty } from 'client/scripts/controllers/chain/substrate/bounty';
-import Listing from './listing';
 import ErrorPage from './error';
 import loadSubstrateModules from '../components/load_substrate_modules';
+import CardsCollection from './cards_collection';
 
 function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {
@@ -449,19 +449,19 @@ const BountiesPage: m.Component<{}> = {
           ]),
         ]),
         m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: activeBountyContent,
-          columnHeader: 'Active Bounties',
+          header: 'Active Bounties',
         }),
         m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: pendingBountyContent,
-          columnHeader: 'Payout Pending Review',
+          header: 'Payout Pending Review',
         }),
         m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: inactiveBountyContent,
-          columnHeader: 'Inactive Bounties',
+          header: 'Inactive Bounties',
         }),
         m('.clear'),
       ])

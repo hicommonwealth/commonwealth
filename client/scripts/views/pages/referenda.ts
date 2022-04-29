@@ -17,8 +17,8 @@ import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 
-import Listing from './listing';
 import ErrorPage from './error';
+import CardsCollection from './cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -169,14 +169,14 @@ const ReferendaPage: m.Component<{}> = {
       m('.ReferendaPage', [
         onSubstrate && m(SubstrateProposalStats),
         m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: activeProposalContent,
-          columnHeader: 'Active Referenda',
+          header: 'Active Referenda',
         }),
         m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: inactiveProposalContent,
-          columnHeader: 'Inactive Referenda',
+          header: 'Inactive Referenda',
         }),
         m('.clear'),
       ])
