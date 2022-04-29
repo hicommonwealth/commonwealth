@@ -21,6 +21,7 @@ import {
 } from './admin_modals';
 import {
   ToggleTree,
+  MobileSidebarSectionAttrs,
   SubSectionAttrs,
   SectionGroupAttrs,
   SidebarSectionAttrs,
@@ -52,7 +53,7 @@ function setToggleTree(path: string, toggle: boolean) {
 }
 
 export class ChatSection
-  implements m.ClassComponent<{}>
+  implements m.ClassComponent<MobileSidebarSectionAttrs>
 {
   channels: {
     [category: string]: IChannel[];
@@ -194,9 +195,9 @@ export class ChatSection
       localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
         JSON.stringify(channelToggleTree);
     }
-    const toggleTreeState = JSON.parse(
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`]
-    );
+    const toggleTreeState = vnode.attrs.mobile
+      ? channelToggleTree
+      : JSON.parse(localStorage[`${app.activeChainId()}-chat-toggle-tree`]);
 
     // ---------- Build Section Props ---------- //
 
