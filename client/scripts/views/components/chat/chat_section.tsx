@@ -52,7 +52,7 @@ function setToggleTree(path: string, toggle: boolean) {
 }
 
 export class ChatSection
-  implements m.ClassComponent<{ channels: IChannel[]; }>
+  implements m.ClassComponent<{}>
 {
   channels: {
     [category: string]: IChannel[];
@@ -68,7 +68,7 @@ export class ChatSection
   adminChannel: IChannel | {};
   onIncomingMessage: (any: any) => void;
   chain: string;
-  activeChannel: string;
+  activeChannel: number;
 
   async oninit(vnode) {
     this.loaded = false;
@@ -121,15 +121,16 @@ export class ChatSection
     });
 
     this.onIncomingMessage = (msg) => {
-      console.log("Message received - chat section")
-      if (this.activeChannel) {
-        app.socket.chatNs.readMessages(this.activeChannel);
-      }
-      if (msg.chat_channel_id === this.activeChannel) {
-        Object.values(app.socket.chatNs.channels).find(
-          (c) => c.id === msg.chat_channel_id
-        ).unread = 0;
-      }
+      // console.log("Message received - chat section")
+      // if (this.activeChannel) {
+      //   console.log("Using active channel:", this.activeChannel);
+      //   app.socket.chatNs.readMessages(String(this.activeChannel));
+      // }
+      // if (msg.chat_channel_id === this.activeChannel) {
+      //   Object.values(app.socket.chatNs.channels).find(
+      //     (c) => c.id === msg.chat_channel_id
+      //   ).unread = 0;
+      // }
       m.redraw.sync();
     };
 
@@ -369,6 +370,7 @@ export class ChatSection
         isUpdated: channel.unread > 0,
         onclick: () => {
           navigateToSubpage(`/chat/${channel.id}`);
+          this.activeChannel = channel.id;
         },
         rightIcon: isAdmin && channelRightIcon(channel),
       };
