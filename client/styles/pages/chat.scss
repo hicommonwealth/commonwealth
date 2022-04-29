@@ -82,7 +82,7 @@
     }
   }
 
-  .chat-composer {
+  .chat-composer, .chat-composer-unavailable {
     align-items: center;
     background-color: $neutral-50;
     border-top: 1px solid $neutral-200;
