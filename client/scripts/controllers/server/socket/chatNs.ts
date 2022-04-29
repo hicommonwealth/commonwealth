@@ -25,6 +25,7 @@ export class ChatNamespace {
     private _isConnected = false;
     private _initialized = false;
     public channels: Record<string, IChannel> = {};
+    public activeChannel: string;
 
     constructor() {}
 
@@ -140,6 +141,11 @@ export class ChatNamespace {
         }
         this.channels[msg.chat_channel_id].ChatMessages.push(msg)
         this.channels[msg.chat_channel_id].unread++
+
+        if (this.activeChannel == msg.chat_channel_id) {
+            this.channels[msg.chat_channel_id].unread = 0;
+        }
+
         m.redraw();
     }
 

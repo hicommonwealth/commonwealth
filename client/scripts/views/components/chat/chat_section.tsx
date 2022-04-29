@@ -74,6 +74,7 @@ export class ChatSection
     this.loaded = false;
     this.chain = app.activeChainId();
     this.activeChannel = null;
+    app.socket.chatNs.activeChannel = null;
 
     this.channelToToggleTree = (channels: IChannel[]) => {
       const toggleTree = {};
@@ -120,24 +121,6 @@ export class ChatSection
         : (this.channels[metadata.category] = [metadata]);
     });
 
-    this.onIncomingMessage = (msg) => {
-      // console.log("Message received - chat section")
-      // if (this.activeChannel) {
-      //   console.log("Using active channel:", this.activeChannel);
-      //   app.socket.chatNs.readMessages(String(this.activeChannel));
-      // }
-      // if (msg.chat_channel_id === this.activeChannel) {
-      //   Object.values(app.socket.chatNs.channels).find(
-      //     (c) => c.id === msg.chat_channel_id
-      //   ).unread = 0;
-      // }
-      m.redraw.sync();
-    };
-
-    app.socket.chatNs.addListener(
-      WebsocketMessageNames.ChatMessage,
-      this.onIncomingMessage.bind(vnode)
-    );
     this.loaded = true;
 
     this.menuToggleTree = {
@@ -162,19 +145,12 @@ export class ChatSection
     }
   }
 
-  onremove() {
-    if (app.socket) {
-      app.socket.chatNs.removeListener(
-        WebsocketMessageNames.ChatMessage,
-        this.onIncomingMessage
-      );
-    }
-  }
-
   view(vnode) {
     if (!app.socket) return;
     if (!this.loaded) return <Spinner />;
     this.activeChannel = m.route.param()['channel'];
+    app.socket.chatNs.activeChannel = String(this.activeChannel);
+
     const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId() });
     this.channels = {};
     Object.values(app.socket.chatNs.channels).forEach((c) => {
@@ -371,6 +347,7 @@ export class ChatSection
         onclick: () => {
           navigateToSubpage(`/chat/${channel.id}`);
           this.activeChannel = channel.id;
+          app.socket.chatNs.activeChannel = String(channel.id);
         },
         rightIcon: isAdmin && channelRightIcon(channel),
       };
