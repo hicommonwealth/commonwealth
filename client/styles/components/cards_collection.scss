@@ -3,11 +3,12 @@
 .CardsCollection {
   display: flex;
   flex-direction: column;
+  margin-bottom: 24px;
 
   .header {
     font-size: 32px;
     font-weight: 500;
-    margin: 16px 0;
+    margin-bottom: 16px;
   }
 
   .cards {
