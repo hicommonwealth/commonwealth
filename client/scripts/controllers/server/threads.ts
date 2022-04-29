@@ -641,11 +641,15 @@ class ThreadsController {
       const existing = this._store.getByIdentifier(thread.id);
       if (existing) this._store.remove(existing);
       this._store.update(thread);
+      // TODO Graham 4/24/22: This should happen automatically in thread modelFromServer
       this.fetchReactionsCount([thread]);
       return thread;
     });
   }
 
+  // TODO Graham 4/24/22: Should this method be in reactionCounts controller?
+  // TODO Graham 4/24/22: All "ReactionsCount" names need renaming to "ReactionCount" (singular)
+  // TODO Graham 4/24/22: All of JB's AJAX requests should be swapped out for .get and .post reqs
   fetchReactionsCount = async (threads) => {
     const { result: reactionCounts } = await $.ajax({
       type: 'POST',
@@ -659,7 +663,11 @@ class ThreadsController {
       }),
     });
     for (const rc of reactionCounts) {
-      const id = app.reactionCounts.store.getIdentifier(rc);
+      const id = app.reactionCounts.store.getIdentifier({
+        threadId: rc.thread_id,
+        proposalId: rc.proposal_id,
+        commentId: rc.comment_id,
+      });
       const existing = app.reactionCounts.store.getById(id);
       if (existing) {
         app.reactionCounts.store.remove(existing);
