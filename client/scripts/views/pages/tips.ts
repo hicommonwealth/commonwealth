@@ -171,17 +171,14 @@ const TipsPage: m.Component<{}> = {
             ]),
           ]),
         ]),
-        m('.clear'),
         m(CardsCollection, {
           content: activeTipContent,
           header: 'Active Tips',
         }),
-        m('.clear'),
         m(CardsCollection, {
           content: inactiveTipContent,
           header: 'Inactive Tips',
         }),
-        m('.clear'),
       ])
     );
   },

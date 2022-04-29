@@ -168,17 +168,14 @@ const ReferendaPage: m.Component<{}> = {
       },
       m('.ReferendaPage', [
         onSubstrate && m(SubstrateProposalStats),
-        m('.clear'),
         m(CardsCollection, {
           content: activeProposalContent,
           header: 'Active Referenda',
         }),
-        m('.clear'),
         m(CardsCollection, {
           content: inactiveProposalContent,
           header: 'Inactive Referenda',
         }),
-        m('.clear'),
       ])
     );
   },

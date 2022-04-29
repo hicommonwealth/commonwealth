@@ -397,17 +397,14 @@ const ProposalsPage: m.Component<{}> = {
       m('.ProposalsPage', [
         onSubstrate && m(SubstrateProposalStats),
         onCompound && m(CompoundProposalStats),
-        m('.clear'),
         m(CardsCollection, {
           content: activeProposalContent,
           header: 'Active',
         }),
-        m('.clear'),
         m(CardsCollection, {
           content: inactiveProposalContent,
           header: 'Inactive',
         }),
-        m('.clear'),
       ])
     );
   },

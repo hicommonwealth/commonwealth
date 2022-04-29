@@ -175,17 +175,14 @@ const TreasuryPage: m.Component<{}> = {
       },
       m('.TreasuryPage', [
         onSubstrate && m(SubstrateProposalStats),
-        m('.clear'),
         m(CardsCollection, {
           content: activeTreasuryContent,
           header: 'Active Treasury Proposals',
         }),
-        m('.clear'),
         m(CardsCollection, {
           content: inactiveTreasuryContent,
           header: 'Inactive Treasury Proposals',
         }),
-        m('.clear'),
       ])
     );
   },

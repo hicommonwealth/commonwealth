@@ -448,22 +448,18 @@ const BountiesPage: m.Component<{}> = {
             ]),
           ]),
         ]),
-        m('.clear'),
         m(CardsCollection, {
           content: activeBountyContent,
           header: 'Active Bounties',
         }),
-        m('.clear'),
         m(CardsCollection, {
           content: pendingBountyContent,
           header: 'Payout Pending Review',
         }),
-        m('.clear'),
         m(CardsCollection, {
           content: inactiveBountyContent,
           header: 'Inactive Bounties',
         }),
-        m('.clear'),
       ])
     );
   },
