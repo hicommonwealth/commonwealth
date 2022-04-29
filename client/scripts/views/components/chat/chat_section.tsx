@@ -121,6 +121,14 @@ export class ChatSection
         : (this.channels[metadata.category] = [metadata]);
     });
 
+    this.onIncomingMessage = (msg) => {
+      m.redraw.sync();
+    };
+
+    app.socket.chatNs.addListener(
+      WebsocketMessageNames.ChatMessage,
+      this.onIncomingMessage.bind(vnode)
+    );
     this.loaded = true;
 
     this.menuToggleTree = {
@@ -142,6 +150,15 @@ export class ChatSection
         toggledState: false,
         children: this.categoryToToggleTree(Object.keys(this.channels), false),
       };
+    }
+  }
+
+  onremove() {
+    if (app.socket) {
+      app.socket.chatNs.removeListener(
+        WebsocketMessageNames.ChatMessage,
+        this.onIncomingMessage
+      );
     }
   }
 
