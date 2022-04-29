@@ -12,7 +12,7 @@ import Sublayout from 'views/sublayout';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
-import CardsCollection from '../cards_collection';
+import { CardsCollection } from '../../components/cards_collection';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 

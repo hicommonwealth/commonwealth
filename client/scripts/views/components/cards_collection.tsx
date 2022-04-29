@@ -11,7 +11,7 @@ type CardsCollectionAttrs = {
   content: any[];
 };
 
-class CardsCollection implements m.ClassComponent<CardsCollectionAttrs> {
+export class CardsCollection implements m.ClassComponent<CardsCollectionAttrs> {
   view(vnode) {
     const { header, content } = vnode.attrs;
     return (
@@ -22,5 +22,3 @@ class CardsCollection implements m.ClassComponent<CardsCollectionAttrs> {
     );
   }
 }
-
-export default CardsCollection;

@@ -18,7 +18,7 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 
 import ErrorPage from './error';
-import CardsCollection from './cards_collection';
+import { CardsCollection } from '../components/cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {

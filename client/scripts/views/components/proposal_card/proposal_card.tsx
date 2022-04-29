@@ -34,6 +34,9 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
   view(vnode) {
     const { proposal, injectedContent } = vnode.attrs;
 
+    console.log('injectedContent ', injectedContent);
+    console.log('proposal.isPassing ', proposal.isPassing);
+
     return (
       <CWCard
         elevation="elevation-2"
@@ -143,11 +146,11 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
               statusText: getStatusText(proposal),
             })}
           </div>
-        ) : (
+        ) : proposal.isPassing !== 'none' ? (
           <div class={`proposal-status ${getStatusClass(proposal)}`}>
             {getStatusText(proposal)}
           </div>
-        )}
+        ) : null}
         {proposal.threadId && (
           <div class="proposal-thread-link">
             <a

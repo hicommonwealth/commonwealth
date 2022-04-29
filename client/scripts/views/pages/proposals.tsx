@@ -28,7 +28,7 @@ import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
-import CardsCollection from './cards_collection';
+import { CardsCollection } from '../components/cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: () => {
