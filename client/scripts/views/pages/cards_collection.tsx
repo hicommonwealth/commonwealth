@@ -17,7 +17,7 @@ class CardsCollection implements m.ClassComponent<CardsCollectionAttrs> {
     return (
       <div class="CardsCollection">
         {isNotUndefined(header) && <div class="header">{header}</div>}
-        {content}
+        <div class="cards">{content}</div>
       </div>
     );
   }

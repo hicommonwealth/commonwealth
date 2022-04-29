@@ -1,13 +1,18 @@
 @import 'client/styles/shared';
 
 .CardsCollection {
+  display: flex;
+  flex-direction: column;
+
   .header {
     font-size: 32px;
     font-weight: 500;
     margin: 16px 0;
   }
 
-  // display: grid;
-  // grid-template-columns: repeat(auto-fit, 240px);
-  // grid-gap: 24px;
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 260px);
+    grid-gap: 24px;
+  }
 }
