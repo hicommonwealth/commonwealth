@@ -96,6 +96,7 @@ import NotificationsReadFactory, {
   NotificationsReadModelStatic,
 } from './models/notifications_read';
 import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
+import ProjectFactory, { ProjectModelStatic } from './models/project';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -128,6 +129,7 @@ export type Models = {
   OffchainViewCount: OffchainViewCountModelStatic;
   OffchainVote: OffchainVoteModelStatic;
   Profile: ProfileModelStatic;
+  Project: ProjectModelStatic;
   Role: RoleModelStatic;
   SocialAccount: SocialAccountModelStatic;
   SsoToken: SsoTokenModelStatic;
@@ -205,6 +207,7 @@ const models: Models = {
   OffchainViewCount: OffchainViewCountFactory(sequelize, DataTypes),
   OffchainVote: OffchainVoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
+  Project: ProjectFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),
