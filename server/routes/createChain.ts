@@ -292,6 +292,7 @@ const createChain = async (
 
   const mixpanelData: MixpanelCommunityCreationPayload = {
     chainBase: req.body.base,
+    communityType: null,
     event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
   };
 
