@@ -19,7 +19,7 @@ import { SubstrateForm } from './substrate_form';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 
-enum CommunityType {
+export enum CommunityType {
   StarterCommunity = 'Starter Community',
   Erc20Community = 'ERC20',
   Erc721Community = 'ERC721',

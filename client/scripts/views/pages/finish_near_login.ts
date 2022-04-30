@@ -16,7 +16,9 @@ import Near from 'controllers/chain/near/main';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'types';
 import Sublayout from 'views/sublayout';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
+import LinkNewAddressModal, {
+  getMixpanelEntryPoint,
+} from 'views/modals/link_new_address_modal';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 
@@ -68,7 +70,11 @@ const validate = async (
   try {
     // TODO: do we need to do this every time, or only on first connect?
     const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-    await createUserWithAddress(acct.address, WalletId.NearWallet);
+    await createUserWithAddress(
+      acct.address,
+      WalletId.NearWallet,
+      getMixpanelEntryPoint()
+    );
     const signature = await acct.signMessage(`${acct.validationToken}\n`);
     await acct.validate(signature);
     if (!app.isLoggedIn()) {

@@ -19,12 +19,15 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
+import { mixpanelBrowserIdentify } from 'analytics/mixpanel_browser_util';
+import { MixpanelUserSignupEntryPoint } from 'analytics/types';
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(
   account: Account<any>,
   walletId: WalletId,
-  community?: string
+  community?: string,
+  mixpanelEntryPoint?: MixpanelUserSignupEntryPoint
 ) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
@@ -36,38 +39,10 @@ function createAccount(
     community,
     jwt: app.user.jwt,
     wallet_id: walletId,
+    mixpanel_entry_point: mixpanelEntryPoint,
   });
 }
 
-const enum MixpanelLoginFlowEvents {
-  LOGIN_BUTTON_PRESS = 'Login Button Press',
-  LOGIN_SUCCESSFUL = 'Login Successful',
-}
-
-const enum LoginEntryPoint {
-  HOMEPAGE = 'Homepage',
-  COMMUNITY = 'Community',
-}
-
-type MixpanelEvents = MixpanelLoginFlowEvents; // One for each analytics mini project
-
-// Base Payload Definitions
-interface BaseMixpanelPayload {
-  uid: string;
-  event: MixpanelEvents;
-}
-
-// Properties for a Specific Event
-interface MixpanelLoginPayload extends BaseMixpanelPayload {
-  entryPoint: LoginEntryPoint;
-  event: MixpanelLoginFlowEvents;
-}
-const lol: MixpanelLoginPayload = {
-  entryPoint: LoginEntryPoint.COMMUNITY,
-  event: MixpanelLoginFlowEvents.LOGIN_BUTTON_PRESS,
-  uid: '',
-};
-type MixpanelPayload = MixpanelLoginPayload | BaseMixpanelPayload; // Any Other Payload Types we add
 export function linkExistingAddressToChainOrCommunity(
   address: string,
   chain: string,
@@ -237,17 +212,25 @@ export function updateActiveUser(data) {
     app.user.setDisableRichText(data.disableRichText);
     app.user.setLastVisited(data.lastVisited);
     app.user.setUnseenPosts(data.unseenPosts);
+    // Identify User
+    mixpanelBrowserIdentify(data.addresses[0].id);
   }
 }
 
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
+  mixpanelEntryPoint?: MixpanelUserSignupEntryPoint,
   keytype?: string,
   community?: string
 ): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
-  const response = await createAccount(account, walletId, community);
+  const response = await createAccount(
+    account,
+    walletId,
+    community,
+    mixpanelEntryPoint
+  );
   const token = response.result.verification_token;
   const newAccount = app.chain.accounts.get(response.result.address, keytype);
   newAccount.setValidationToken(token);

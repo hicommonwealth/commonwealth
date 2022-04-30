@@ -8,7 +8,6 @@ import { pluralize } from 'helpers';
 import { ChainIcon } from './chain_icon';
 import { CWCard } from './component_kit/cw_card';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import mixpanel from 'mixpanel-browser';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -137,8 +136,6 @@ const DashboardExplorePreview: m.Component = {
         {
           class: 'link',
           onclick: () => {
-            mixpanel.track('More Communities Viewed');
-            console.log('mixing');
             m.route.set('/communities');
             m.redraw();
           },

@@ -11,8 +11,12 @@ import { ChainBase, WalletId } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
-var Mixpanel = require('mixpanel');
-var mixpanel = Mixpanel.init('0ee7b2f7722162b820f75b35b3de5e27');
+import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import {
+  MixpanelUserSignupEvent,
+  MixpanelUserSignupPayload,
+  MixpanelUserSignupEntryPoint,
+} from '../../shared/analytics/types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -29,6 +33,7 @@ type CreateAddressReq = {
   wallet_id: WalletId;
   community?: string;
   keytype?: string;
+  mixpanel_entry_point?: MixpanelUserSignupEntryPoint;
 };
 
 type CreateAddressResp = AddressAttributes;
@@ -189,7 +194,15 @@ const createAddress = async (
         });
       }
 
-      mixpanel.track('Signup', { source: 'Landing Page' });
+      const mixpanel_data: MixpanelUserSignupPayload = {
+        event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
+        entryPoint: req.body.mixpanel_entry_point
+          ? req.body.mixpanel_entry_point
+          : null,
+        chain: req.body.chain,
+      };
+
+      mixpanelTrack(mixpanel_data);
 
       return success(res, newObj.toJSON());
     } catch (e) {
