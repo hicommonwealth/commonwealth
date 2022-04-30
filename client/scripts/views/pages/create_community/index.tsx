@@ -18,6 +18,11 @@ import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityCreationPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -67,6 +72,12 @@ class CreateCommunity implements m.ClassComponent {
       this.state.loadingEthChains = false;
       m.redraw();
     });
+    const mixpanelData: MixpanelCommunityCreationPayload = {
+      event: MixpanelCommunityCreationEvent.COMMUNITY_CREATION_PAGE_VIEW,
+      chainBase: null,
+      communityType: null,
+    };
+    mixpanelBrowserTrack(mixpanelData);
   }
 
   view() {
@@ -113,6 +124,13 @@ class CreateCommunity implements m.ClassComponent {
                       active={this.state.activeForm === t}
                       onclick={() => {
                         this.state.activeForm = t;
+                        const mixpanelData: MixpanelCommunityCreationPayload = {
+                          event:
+                            MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
+                          chainBase: null,
+                          communityType: t,
+                        };
+                        mixpanelBrowserTrack(mixpanelData);
                       }}
                       style="text-align: center"
                     />

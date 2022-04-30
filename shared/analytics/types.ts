@@ -4,19 +4,11 @@ import { CommunityType } from 'client/scripts/views/pages/create_community';
 import { ChainBase } from 'shared/types';
 
 // LOGIN EVENT - fake
-export const enum MixpanelLoginFlowEvents {
-  LOGIN_BUTTON_PRESS = 'Login Button Press',
-  LOGIN_SUCCESSFUL = 'Login Successful',
+export const enum MixpanelLoginEvent {
+  LOGIN = 'Login',
 }
-
-export const enum LoginEntryPoint {
-  HOMEPAGE = 'Homepage',
-  COMMUNITY = 'Community',
-}
-
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {
-  entryPoint: LoginEntryPoint;
-  event: MixpanelLoginFlowEvents;
+  event: MixpanelLoginEvent;
 }
 // END LOGIN EVENT
 
@@ -40,11 +32,18 @@ export interface MixpanelUserSignupPayload extends BaseMixpanelPayload {
 
 // NEW COMMUNITY CREATION EVENT
 export const enum MixpanelCommunityCreationEvent {
+  COMMUNITY_CREATION_PAGE_VIEW = 'Create Community Page Viewed',
+  CREATE_BUTTON_PRESSED = 'Create Community Button Pressed',
+  COMMUNITY_TYPE_CHOSEN = 'Create Community Type Chosen',
+  CHAIN_SELECTED = 'Create Community Chain Selected',
+  ADDRESS_ADDED = 'Create Community Address Added',
+  WEBSITE_ADDED = 'Create Community Website Added',
   NEW_COMMUNITY_CREATION = 'New Community Creation',
 }
 
 export interface MixpanelCommunityCreationPayload extends BaseMixpanelPayload {
   chainBase: ChainBase;
+  communityType: CommunityType;
   event: MixpanelCommunityCreationEvent;
 }
 // END NEW COMMUNITY CREATION EVENT
@@ -53,7 +52,7 @@ export interface MixpanelCommunityCreationPayload extends BaseMixpanelPayload {
 
 // Include All Event Enums
 export type MixpanelEvents =
-  | MixpanelLoginFlowEvents
+  | MixpanelLoginEvent
   | MixpanelUserSignupEvent
   | MixpanelCommunityCreationEvent;
 

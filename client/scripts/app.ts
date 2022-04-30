@@ -31,6 +31,8 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
+import { MixpanelLoginEvent, MixpanelLoginPayload } from 'analytics/types';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -1107,7 +1109,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           // mixpanel.identify(m.route.param('email').toString());
         }
       } else {
-        console.log('logging in account');
       }
       m.route.set(m.route.param('path'), {}, { replace: true });
     } else if (
@@ -1159,6 +1160,11 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           app.user.notifications.refresh().then(() => m.redraw());
           // grab all discussion drafts
           app.user.discussionDrafts.refreshAll().then(() => m.redraw());
+          const mixpanelData: MixpanelLoginPayload = {
+            event: MixpanelLoginEvent.LOGIN,
+          };
+          mixpanelBrowserTrack(mixpanelData);
+          console.log('wtf');
         }
 
         handleInviteLinkRedirect();

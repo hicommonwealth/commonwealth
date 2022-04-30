@@ -212,8 +212,6 @@ export function updateActiveUser(data) {
     app.user.setDisableRichText(data.disableRichText);
     app.user.setLastVisited(data.lastVisited);
     app.user.setUnseenPosts(data.unseenPosts);
-    // Identify User
-    mixpanelBrowserIdentify(data.addresses[0].id);
   }
 }
 

@@ -15,6 +15,12 @@ import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityCreationPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
+import { CommunityType } from '.';
 
 type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 
@@ -46,6 +52,12 @@ export class SputnikForm implements m.ClassComponent {
           defaultValue={this.state.form.isMainnet}
           onToggle={(checked) => {
             vnode.state.isMainnet = checked;
+            const mixpanelData: MixpanelCommunityCreationPayload = {
+              event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
+              chainBase: ChainBase.CosmosSDK,
+              communityType: CommunityType.SputnikDao,
+            };
+            mixpanelBrowserTrack(mixpanelData);
           }}
           label={(checked) => {
             if (checked !== this.state.form.isMainnet) {
