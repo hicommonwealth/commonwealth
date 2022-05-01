@@ -3,9 +3,34 @@
 import { CommunityType } from 'client/scripts/views/pages/create_community';
 import { ChainBase } from 'shared/types';
 
+// PAGE VIEW EVENTS
+export const enum MixpanelPageViewEvent {
+  LANDING_PAGE_VIEW = 'Landing Page Viewed',
+  COMMUNITY_CREATION_PAGE_VIEW = 'Create Community Page Viewed',
+}
+
+export interface MixpanelPageViewPayload extends BaseMixpanelPayload {
+  event: MixpanelPageViewEvent;
+}
+// END PAGE VIEW EVENTS
+
+// COMMUNITY INTERACTION EVENTS
+export const enum MixpanelCommunityInteractionEvent {
+  CREATE_THREAD = 'Create New Thread',
+  CREATE_COMMENT = 'Create New Comment',
+  CREATE_REACTION = 'Create New Reaction',
+}
+
+export interface MixpanelCommunityInteractionPayload
+  extends BaseMixpanelPayload {
+  event: MixpanelCommunityInteractionEvent;
+  community: string;
+}
+// END COMMUNITY INTERACTION EVENTS
+
 // LOGIN EVENT - fake
 export const enum MixpanelLoginEvent {
-  LOGIN = 'Login',
+  LOGIN = 'Login to Commonwealth',
 }
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {
   event: MixpanelLoginEvent;
@@ -32,7 +57,6 @@ export interface MixpanelUserSignupPayload extends BaseMixpanelPayload {
 
 // NEW COMMUNITY CREATION EVENT
 export const enum MixpanelCommunityCreationEvent {
-  COMMUNITY_CREATION_PAGE_VIEW = 'Create Community Page Viewed',
   CREATE_BUTTON_PRESSED = 'Create Community Button Pressed',
   COMMUNITY_TYPE_CHOSEN = 'Create Community Type Chosen',
   CHAIN_SELECTED = 'Create Community Chain Selected',
@@ -54,7 +78,9 @@ export interface MixpanelCommunityCreationPayload extends BaseMixpanelPayload {
 export type MixpanelEvents =
   | MixpanelLoginEvent
   | MixpanelUserSignupEvent
-  | MixpanelCommunityCreationEvent;
+  | MixpanelCommunityCreationEvent
+  | MixpanelPageViewEvent
+  | MixpanelCommunityInteractionEvent;
 
 // Base Payload - Required for All Events
 export interface BaseMixpanelPayload {
@@ -65,4 +91,6 @@ export interface BaseMixpanelPayload {
 export type MixpanelPayload =
   | MixpanelLoginPayload
   | BaseMixpanelPayload
-  | MixpanelCommunityCreationPayload;
+  | MixpanelCommunityCreationPayload
+  | MixpanelPageViewPayload
+  | MixpanelCommunityInteractionPayload;

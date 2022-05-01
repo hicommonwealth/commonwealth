@@ -71,7 +71,7 @@ interface ILinkNewAddressModalState {
 
 export function getMixpanelEntryPoint(): MixpanelUserSignupEntryPoint {
   let mixpanelEntryPoint = MixpanelUserSignupEntryPoint.LANDING_PAGE;
-
+  console.log(m.route.get());
   if (m.route.get() !== '/') {
     // TODO: This is not comprehensive I dont think
     mixpanelEntryPoint = MixpanelUserSignupEntryPoint.LINKED_THREAD;

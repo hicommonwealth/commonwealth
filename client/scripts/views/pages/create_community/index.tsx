@@ -21,6 +21,8 @@ import Sublayout from '../../sublayout';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
+  MixpanelPageViewEvent,
+  MixpanelPageViewPayload,
 } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 
@@ -72,10 +74,11 @@ class CreateCommunity implements m.ClassComponent {
       this.state.loadingEthChains = false;
       m.redraw();
     });
-    const mixpanelData: MixpanelCommunityCreationPayload = {
-      event: MixpanelCommunityCreationEvent.COMMUNITY_CREATION_PAGE_VIEW,
-      chainBase: null,
-      communityType: null,
+  }
+
+  oncreate() {
+    const mixpanelData: MixpanelPageViewPayload = {
+      event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
     };
     mixpanelBrowserTrack(mixpanelData);
   }

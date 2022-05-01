@@ -13,6 +13,11 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import {
+  MixpanelCommunityInteractionEvent,
+  MixpanelCommunityInteractionPayload,
+} from '../../shared/analytics/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -199,6 +204,12 @@ const createReaction = async (
   // update author.last_active (no await)
   author.last_active = new Date();
   author.save();
+
+  const mixpanelData: MixpanelCommunityInteractionPayload = {
+    event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
+    community: chain.id,
+  };
+  mixpanelTrack(mixpanelData);
 
   return res.json({ status: 'Success', result: finalReaction.toJSON() });
 };

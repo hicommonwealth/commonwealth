@@ -1160,11 +1160,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           app.user.notifications.refresh().then(() => m.redraw());
           // grab all discussion drafts
           app.user.discussionDrafts.refreshAll().then(() => m.redraw());
-          const mixpanelData: MixpanelLoginPayload = {
-            event: MixpanelLoginEvent.LOGIN,
-          };
-          mixpanelBrowserTrack(mixpanelData);
-          console.log('wtf');
         }
 
         handleInviteLinkRedirect();

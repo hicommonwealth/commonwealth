@@ -19,8 +19,15 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-import { mixpanelBrowserIdentify } from 'analytics/mixpanel_browser_util';
-import { MixpanelUserSignupEntryPoint } from 'analytics/types';
+import {
+  mixpanelBrowserIdentify,
+  mixpanelBrowserTrack,
+} from 'analytics/mixpanel_browser_util';
+import {
+  MixpanelLoginEvent,
+  MixpanelLoginPayload,
+  MixpanelUserSignupEntryPoint,
+} from 'analytics/types';
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(
@@ -212,6 +219,11 @@ export function updateActiveUser(data) {
     app.user.setDisableRichText(data.disableRichText);
     app.user.setLastVisited(data.lastVisited);
     app.user.setUnseenPosts(data.unseenPosts);
+    // TODO: Set Mixpanel Identities here
+    const mixpanelData: MixpanelLoginPayload = {
+      event: MixpanelLoginEvent.LOGIN,
+    };
+    mixpanelBrowserTrack(mixpanelData);
   }
 }
 
