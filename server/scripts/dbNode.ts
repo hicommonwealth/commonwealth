@@ -111,7 +111,8 @@ async function mainProcess(
   }
 
   const activeChains: string[] = Object.keys(listeners).map((listenerName): string => {
-    if (!listenerName.startsWith('erc20')) return listenerName;
+    if (!listenerName.startsWith(ChainNetwork.ERC20) &&
+      !listenerName.startsWith(ChainNetwork.ERC721)) return listenerName;
     else {
       return listeners[listenerName].options.tokenNames;
     }
