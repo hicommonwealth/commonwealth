@@ -380,51 +380,6 @@ class ThreadsController {
     });
   }
 
-  public async setPolling(args: {
-    threadId: number;
-    name: string;
-    choices: string[];
-    customDuration?: string;
-  }) {
-    const { threadId, name, choices, customDuration } = args;
-    // start polling
-    await $.ajax({
-      url: `${app.serverUrl()}/updateThreadPolling`,
-      type: 'POST',
-      data: {
-        chain: app.activeChainId(),
-        jwt: app.user.jwt,
-        thread_id: threadId,
-        content: JSON.stringify({ name, choices }),
-        custom_duration: customDuration?.split(' ')[0],
-      },
-      success: (response) => {
-        const thread = this._store.getByIdentifier(threadId);
-        if (!thread) {
-          // TODO: sometimes the thread may not be in the store
-          location.reload();
-          return;
-        }
-        // TODO: This should be handled properly
-        // via controller/store & update method
-        thread.offchainVotingEnabled = true;
-        thread.offchainVotingOptions = { name, choices };
-        thread.offchainVotingNumVotes = 0;
-        thread.offchainVotingEndsAt = response.result.offchain_voting_ends_at
-          ? moment(response.result.offchain_voting_ends_at)
-          : null;
-      },
-      error: (err) => {
-        console.log('Failed to start polling');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to start polling'
-        );
-      },
-    });
-  }
-
   public async setStage(args: {
     threadId: number;
     stage: OffchainThreadStage;
