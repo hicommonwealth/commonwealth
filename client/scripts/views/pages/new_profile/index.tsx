@@ -26,12 +26,22 @@ type ProfileState = {
   chains: Array<ChainInfo>,
   addresses: Array<AddressInfo>, 
   socialAccounts: Array<SocialAccount>,
-};
+  error: ProfileError,
+}
 
+enum ProfileError {
+  None, 
+  NoAddressFound,
+  NoProfileFound,
+  InsufficientProfileData,
+} 
+
+const requiredProfileData = ['name', 'avatarUrl', 'bio']
 class NewProfile implements m.Component<{}, ProfileState> {
 
   oninit(vnode) {
     vnode.state.address = m.route.param("address")
+    vnode.state.error = ProfileError.None
     this.getProfile(vnode, vnode.state.address)
   }
 
@@ -39,12 +49,26 @@ class NewProfile implements m.Component<{}, ProfileState> {
     const response = await $.get(`${app.serverUrl()}/profile/v2`, {
       address,
       jwt: app.user.jwt,
+    }).catch((err) => {
+      if (err.status == 500 && err.responseJSON.error == "No address found") {
+        vnode.state.error = ProfileError.NoAddressFound
+      }
+      if (err.status == 500 && err.responseJSON.error == "No profile found") {
+        vnode.state.error = ProfileError.NoProfileFound
+      }
+      m.redraw()
     });
-    // TODO: status code error handling with better HTTP call library
 
     vnode.state.profile = Profile.fromJSON(response.profile)    
+    const sufficientProfileData = requiredProfileData.every(field => {
+      return field in vnode.state.profile && vnode.state.profile[field]
+    })
+    if (!sufficientProfileData) {
+      vnode.state.error = ProfileError.InsufficientProfileData
+    }
+
     vnode.state.threads = response.threads
-    vnode.state.comments = response.comments
+    vnode.state.comments = response.comments.map(c => OffchainComment.fromJSON(c))
     vnode.state.chains = response.chains.map(c => ChainInfo.fromJSON(c))
     vnode.state.addresses = response.addresses.map(a => 
       new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic, a.ghost_address))
@@ -54,20 +78,51 @@ class NewProfile implements m.Component<{}, ProfileState> {
   } 
 
   view(vnode) {
-    return (
-      <div className="ProfilePage">
-        <NewProfileHeader 
-          profile={vnode.state.profile} 
-          socialAccounts={vnode.state.socialAccounts}
-        />
-        <NewProfileActivity 
-          threads={vnode.state.threads} 
-          comments={vnode.state.comments} 
-          chains={vnode.state.chains} 
-          addresses={vnode.state.addresses} 
-        />
-      </div>
-    );
+    if (vnode.state.error === ProfileError.None) 
+      return (
+        <div className="ProfilePage">
+          <NewProfileHeader 
+            profile={vnode.state.profile} 
+            socialAccounts={vnode.state.socialAccounts}
+          />
+          <NewProfileActivity 
+            threads={vnode.state.threads} 
+            comments={vnode.state.comments} 
+            chains={vnode.state.chains} 
+            addresses={vnode.state.addresses} 
+          />
+        </div>
+      )
+
+    if (vnode.state.error === ProfileError.NoAddressFound)
+      return (
+        <div className="ProfilePage">
+          <div className="ErrorPage">
+            <h3> Not on Commonwealth </h3>
+            <p> If this is your address, sign in using your wallet to set up a profile. </p>
+          </div>
+        </div>
+      )
+
+    if (vnode.state.error === ProfileError.NoProfileFound)
+      return (
+        <div className="ProfilePage">
+          <div className="ErrorPage">
+            <h3> No Profile Found </h3>
+            <p> This address is not registered to Commonwealth. </p>
+          </div>
+        </div>
+      )
+
+    if (vnode.state.error === ProfileError.InsufficientProfileData)
+      return (
+        <div className="ProfilePage">
+          <div className="ErrorPage">
+            <h3> Profile Pending </h3>
+            <p> The profile for this address has not been set up yet. </p>
+          </div>
+        </div>
+      )
   }
 }
 

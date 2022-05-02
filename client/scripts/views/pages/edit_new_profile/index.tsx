@@ -163,7 +163,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
             <CWTextInput
               name="email-form-field"
               inputValidationFn={(val: string): [ValidationStatus, string] => {
-                if (val.match(/[^A-Za-z0-9@.]/)) {
+                if (val.match(/\S+@\S+\.\S+/)) {
                   return [ValidationStatus.Failure, 'Must enter characters A-Z'];
                 } else {
                   return [ValidationStatus.Success, 'Input validated'];

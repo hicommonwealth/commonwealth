@@ -55,6 +55,33 @@ class OffchainComment<T extends IUniqueId> {
     this.lastEdited = lastEdited;
     this.deleted = deleted;
   }
+
+  public static fromJSON({
+    id,
+    chain, 
+    parent_id,
+    address_id,
+    text,
+    created_at,
+    updated_at,
+    deleted_at,
+    version_history,
+    root_id,
+    plaintext,
+    _search,
+  }) {
+    return new OffchainComment({
+      id,
+      chain,
+      parentComment: parent_id,
+      text: text,
+      plaintext: plaintext,
+      createdAt: created_at,
+      versionHistory: version_history,
+      lastEdited: updated_at
+    })
+  }
+
 }
 
 export default OffchainComment;

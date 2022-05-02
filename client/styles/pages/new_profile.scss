@@ -252,10 +252,20 @@
 
   }
 
+  .ErrorPage {
+    min-height: 240px;
+    padding: 60px 0;
+    text-align: center;
+    h3 {
+      margin-bottom: 40px;
+    }
+  }
+
 }
 
 @media only screen and (max-width: 1024px) {
   .ProfilePage {
+    width: 90%;
 
     .ProfileHeader {
 
