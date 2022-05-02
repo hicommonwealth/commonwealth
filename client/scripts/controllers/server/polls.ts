@@ -37,12 +37,12 @@ class PollsController {
     return this._store;
   }
 
-  public async fetchPolls(threadId: number) {
+  public async fetchPolls(chainId: string, threadId: number) {
     await $.ajax({
       url: `${app.serverUrl()}/getPolls`,
       type: 'GET',
       data: {
-        chain: app.activeChainId(),
+        chain: chainId,
         thread_id: threadId,
       },
       success: (response) => {

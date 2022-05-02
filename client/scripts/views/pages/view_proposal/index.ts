@@ -1057,7 +1057,7 @@ const ViewProposalPage: m.Component<
     // load polls
     if (!vnode.state.prefetch[proposalIdAndType]['pollsStarted']) {
       app.polls
-        .fetchPolls((proposal as OffchainThread).id)
+        .fetchPolls(app.activeChainId(), (proposal as OffchainThread).id)
         .then(async () => {
           vnode.state.polls = app.polls.getByThreadId(
             (proposal as OffchainThread).id

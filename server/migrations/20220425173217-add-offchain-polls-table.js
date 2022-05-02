@@ -7,10 +7,10 @@ module.exports = {
         primaryKey: true,
       },
       chain_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
         references: {
-          model: 'Chain',
+          model: 'Chains',
           key: 'id',
         },
       },
@@ -18,7 +18,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'OffchainThread',
+          model: 'OffchainThreads',
           key: 'id',
         },
       },
@@ -51,6 +51,6 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    return queryInterface.removeTable('OffchainPolls');
+    return queryInterface.dropTable('OffchainPolls');
   },
 };

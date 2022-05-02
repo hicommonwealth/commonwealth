@@ -15,9 +15,9 @@ const getPolls = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
+  const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
-  const { thread_id } = req.body;
+  const { thread_id } = req.query;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
 
   const polls = await models.OffchainPoll.findAll({
