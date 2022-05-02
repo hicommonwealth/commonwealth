@@ -52,10 +52,12 @@ interface IState {
 
 const LandingPage: m.Component<{}, IState> = {
   oncreate: () => {
-    const mixpanelData: MixpanelPageViewPayload = {
-      event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
-    };
-    mixpanelBrowserTrack(mixpanelData);
+    if (!app.isLoggedIn()) {
+      const mixpanelData: MixpanelPageViewPayload = {
+        event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
+      };
+      mixpanelBrowserTrack(mixpanelData);
+    }
   },
   oninit: (vnode) => {
     vnode.state.hiddenInputTokenList = true;

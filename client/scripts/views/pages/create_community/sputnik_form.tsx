@@ -99,6 +99,12 @@ export class SputnikForm implements m.ClassComponent {
               type: ChainType.DAO,
               ...this.state.form,
             };
+            const mixpanelData: MixpanelCommunityCreationPayload = {
+              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+              chainBase: null,
+              communityType: null,
+            };
+            mixpanelBrowserTrack(mixpanelData);
 
             try {
               // Gabe 2/14/22 Commenting this bit out because it isn't actually used, but maybe it will be someday?

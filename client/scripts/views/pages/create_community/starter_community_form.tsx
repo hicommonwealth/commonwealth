@@ -91,6 +91,12 @@ export class StarterCommunityForm implements m.ClassComponent {
               bech32_prefix?: string;
               alt_wallet_url?: string;
             } = {};
+            const mixpanelData: MixpanelCommunityCreationPayload = {
+              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+              chainBase: this.state.form.base,
+              communityType: CommunityType.StarterCommunity,
+            };
+            mixpanelBrowserTrack(mixpanelData);
 
             // defaults to be overridden when chain is no longer "starter" type
             switch (this.state.form.base) {

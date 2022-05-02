@@ -63,6 +63,7 @@ export const enum MixpanelCommunityCreationEvent {
   ADDRESS_ADDED = 'Create Community Address Added',
   WEBSITE_ADDED = 'Create Community Website Added',
   NEW_COMMUNITY_CREATION = 'New Community Creation',
+  CREATE_COMMUNITY_ATTEMPTED = 'Create Community Attempted',
 }
 
 export interface MixpanelCommunityCreationPayload extends BaseMixpanelPayload {

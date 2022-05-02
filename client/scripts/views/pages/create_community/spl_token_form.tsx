@@ -18,6 +18,11 @@ import {
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityCreationPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 
 type SplTokenFormFields = {
   cluster: solw3.Cluster;
@@ -141,6 +146,12 @@ export class SplTokenForm implements m.ClassComponent {
           onclick={async () => {
             const { cluster, iconUrl, mint } = this.state.form;
             this.state.saving = true;
+            const mixpanelData: MixpanelCommunityCreationPayload = {
+              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+              chainBase: null,
+              communityType: null,
+            };
+            mixpanelBrowserTrack(mixpanelData);
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 address: mint,

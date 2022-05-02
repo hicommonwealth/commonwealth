@@ -1076,12 +1076,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     // initialize mixpanel, before adding an alias or tracking identity
     try {
-      mixpanel.init('0ee7b2f7722162b820f75b35b3de5e27', { debug: true });
-
       if (
         document.location.host.startsWith('localhost') ||
         document.location.host.startsWith('127.0.0.1')
       ) {
+        mixpanel.init('312b6c5fadb9a88d98dc1fb38de5d900', { debug: true });
+      } else {
+        // Production Mixpanel Project
+        mixpanel.init('993ca6dd7df2ccdc2a5d2b116c0e18c5', { debug: true });
       }
     } catch (e) {
       console.error('Mixpanel initialization error');

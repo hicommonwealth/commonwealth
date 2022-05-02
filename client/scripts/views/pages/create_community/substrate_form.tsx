@@ -16,6 +16,11 @@ import { InputRow } from 'views/components/metadata_rows';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityCreationPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 
 type SubstrateFormFields = {
   nodeUrl: string;
@@ -111,6 +116,12 @@ export class SubstrateForm implements m.ClassComponent {
           disabled={this.state.saving}
           onclick={async () => {
             const { name, nodeUrl, iconUrl, substrateSpec } = this.state.form;
+            const mixpanelData: MixpanelCommunityCreationPayload = {
+              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+              chainBase: null,
+              communityType: null,
+            };
+            mixpanelBrowserTrack(mixpanelData);
             try {
               JSON.parse(substrateSpec);
             } catch (err) {
