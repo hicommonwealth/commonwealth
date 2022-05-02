@@ -21,6 +21,7 @@ type EditProfileState = {
   saved: boolean,
   failed: boolean,
   imageUploading: boolean,
+  error: EditProfileError,
 }
 
 enum InputFormField {
@@ -31,10 +32,20 @@ enum InputFormField {
   Website,
 } 
 
+enum EditProfileError {
+  None,
+  NoProfileFound,
+  UpdateProfileFailed,
+}
+
+const NoAddressFoundError = "No address found"
+const NoProfileFoundError = "No profile found"
+
 class EditNewProfile implements m.Component<{}, EditProfileState> {
 
   oninit(vnode) {
     vnode.state.address = m.route.param("address")
+    vnode.state.error = EditProfileError.None
     this.getProfile(vnode, vnode.state.address)
     vnode.state.profileUpdate = {}
     vnode.state.saved = false
@@ -46,8 +57,16 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
     const response = await $.get(`${app.serverUrl()}/profile/v2`, {
       address,
       jwt: app.user.jwt,
-    });
-    // TODO : Error handling
+    }).catch((err) => {
+      if (err.status == 500 && 
+        (err.responseJSON.error == NoAddressFoundError || 
+        err.responseJSON.error == NoProfileFoundError )
+      ) {
+        vnode.state.error = EditProfileError.NoProfileFound
+        m.route.set(`/profile/${vnode.state.address}`)  // display error page
+      }
+      m.redraw()
+    })
     vnode.state.profile = Profile.fromJSON(response.profile) 
     m.redraw()
   }
@@ -61,7 +80,8 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
       ...('avatarUrl' in vnode.state.profileUpdate) && {avatarUrl: vnode.state.profileUpdate.avatarUrl},
       ...('website' in vnode.state.profileUpdate) && {website: vnode.state.profileUpdate.website},
       jwt: app.user.jwt,
-    }).catch((error) => {
+    }).catch(() => {
+      vnode.state.error = EditProfileError.UpdateProfileFailed
       vnode.state.failed = true
       setTimeout(() => {
         vnode.state.failed = false
@@ -136,144 +156,145 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
   }
 
   view(vnode) {
-    return (
-      <div className="EditProfilePage">
-        <h3> Edit Profile </h3>
-        <div className="edit-pane">
-          {
-            (vnode.state.saved || vnode.state.imageUploading) ? 
-            <Spinner active={true} size="lg" /> : <div />
-          }
-          
-          <div className={vnode.state.failed ? 'save-button-message show' : 
-            'save-button-message'}> 
-            <p> No changes saved. </p> 
-          </div>
-          
-          <CWButton         
-            label={vnode.state.saved ? "Saved!" : "Save"}
-            buttonType="primary"
-            onclick={()=>{ this.handleSaveProfile(vnode) }} 
-            className={vnode.state.saved ? "save-button confirm" : "save-button"}
-          />
 
-          <div className="general-info">
-            <h4 className="title"> General Info </h4>
-
-            <CWTextInput
-              name="email-form-field"
-              inputValidationFn={(val: string): [ValidationStatus, string] => {
-                if (val.match(/\S+@\S+\.\S+/)) {
-                  return [ValidationStatus.Failure, 'Must enter characters A-Z'];
-                } else {
-                  return [ValidationStatus.Success, 'Input validated'];
-                }
-              }}
-              label="Email"
-              placeholder={vnode.state.profile?.email}
-              oninput={(e) => {
-                this.handleInputChange(vnode, (e.target as any).value, InputFormField.Email)
-              }}
-            />
-          
-            <CWTextInput
-              name="name-form-field"
-              inputValidationFn={(val: string): [ValidationStatus, string] => {
-                if (val.match(/[^A-Za-z0-9]/)) {
-                  return [ValidationStatus.Failure, 'Must enter characters A-Z'];
-                } else {
-                  return [ValidationStatus.Success, 'Input validated'];
-                }
-              }}
-              label="Profile Name"
-              placeholder={vnode.state.profile?.name}
-              oninput={(e) => {
-                this.handleInputChange(vnode, (e.target as any).value, InputFormField.ProfileName)
-              }}
+    if (vnode.state.error === EditProfileError.None)
+      return (
+        <div className="EditProfilePage">
+          <h3> Edit Profile </h3>
+          <div className="edit-pane">
+            {
+              (vnode.state.saved || vnode.state.imageUploading) ? 
+              <Spinner active={true} size="lg" /> : <div />
+            }
+            
+            <div className={vnode.state.failed ? 'save-button-message show' : 
+              'save-button-message'}> 
+              <p> No changes saved. </p> 
+            </div>
+            
+            <CWButton         
+              label={vnode.state.saved ? "Saved!" : "Save"}
+              buttonType="primary"
+              onclick={()=>{ this.handleSaveProfile(vnode) }} 
+              className={vnode.state.saved ? "save-button confirm" : "save-button"}
             />
 
-            <div className="bio-container">
-              <label>Bio</label>
-              <textarea className="bio-textarea" placeholder={vnode.state.profile?.bio} 
+            <div className="general-info">
+              <h4 className="title"> General Info </h4>
+
+              <CWTextInput
+                name="email-form-field"
+                inputValidationFn={(val: string): [ValidationStatus, string] => {
+                  if (val.match(/\S+@\S+\.\S+/)) {
+                    return [ValidationStatus.Failure, 'Must enter characters A-Z'];
+                  } else {
+                    return [ValidationStatus.Success, 'Input validated'];
+                  }
+                }}
+                label="Email"
+                placeholder={vnode.state.profile?.email}
                 oninput={(e) => {
-                  this.handleInputChange(vnode, (e.target as any).value, InputFormField.Bio)
+                  this.handleInputChange(vnode, (e.target as any).value, InputFormField.Email)
                 }}
               />
-            </div>
-
-            <div className="profile-image-section">
-              <h4 className="title"> Profile Image </h4>
-              <div className="flex">
-
-                <div className={vnode.state.profileUpdate?.avatarUrl ? 
-                  "profile-image hide" : "profile-image"}
-                >
-                  <img src={vnode.state.profile?.avatarUrl} />
-                </div>
-  
-                <AvatarUpload 
-                  avatarScope={AvatarScope.Account} 
-                  uploadStartedCallback={() => {
-                    vnode.state.imageUploading = true
-                  }}
-                  uploadCompleteCallback={(files) => {
-                    vnode.state.imageUploading = false
-                    files.forEach((f) => {
-                      if (!f.uploadURL) return;
-                      console.log(f)
-                      const url = f.uploadURL.replace(/\?.*/, '').trim();  // edit_profile_modal.ts L31
-                      vnode.state.profileUpdate.avatarUrl = url
-                    });
-                    m.redraw();
-                  }}
-                  />
-
-                <p> OR </p>
-                <CWTextInput
-                  name="profile-image-form-field"
-                  inputValidationFn={(val: string): [ValidationStatus, string] => {
-                    if (val.match(/[^A-Za-z@.0-9*#]/)) {
-                      return [ValidationStatus.Failure, 'Must enter characters A-Z'];
-                    } else {
-                      return [ValidationStatus.Success, 'Input validated'];
-                    }
-                  }}
-                  label="Image URL"
-                  placeholder={
-                    vnode.state.profileUpdate?.avatarUrl ? 
-                    vnode.state.profileUpdate?.avatarUrl :
-                    vnode.state.profile?.avatarUrl
+            
+              <CWTextInput
+                name="name-form-field"
+                inputValidationFn={(val: string): [ValidationStatus, string] => {
+                  if (val.match(/[^A-Za-z0-9]/)) {
+                    return [ValidationStatus.Failure, 'Must enter characters A-Z'];
+                  } else {
+                    return [ValidationStatus.Success, 'Input validated'];
                   }
+                }}
+                label="Profile Name"
+                placeholder={vnode.state.profile?.name}
+                oninput={(e) => {
+                  this.handleInputChange(vnode, (e.target as any).value, InputFormField.ProfileName)
+                }}
+              />
+
+              <div className="bio-container">
+                <label>Bio</label>
+                <textarea className="bio-textarea" placeholder={vnode.state.profile?.bio} 
                   oninput={(e) => {
-                    this.handleInputChange(vnode, (e.target as any).value, InputFormField.ProfileImage)
+                    this.handleInputChange(vnode, (e.target as any).value, InputFormField.Bio)
                   }}
                 />
               </div>
+
+              <div className="profile-image-section">
+                <h4 className="title"> Profile Image </h4>
+                <div className="flex">
+
+                  <div className={vnode.state.profileUpdate?.avatarUrl ? 
+                    "profile-image hide" : "profile-image"}
+                  >
+                    <img src={vnode.state.profile?.avatarUrl} />
+                  </div>
+    
+                  <AvatarUpload 
+                    avatarScope={AvatarScope.Account} 
+                    uploadStartedCallback={() => {
+                      vnode.state.imageUploading = true
+                    }}
+                    uploadCompleteCallback={(files) => {
+                      vnode.state.imageUploading = false
+                      files.forEach((f) => {
+                        if (!f.uploadURL) return;
+                        console.log(f)
+                        const url = f.uploadURL.replace(/\?.*/, '').trim();  // edit_profile_modal.ts L31
+                        vnode.state.profileUpdate.avatarUrl = url
+                      });
+                      m.redraw();
+                    }}
+                    />
+
+                  <p> OR </p>
+                  <CWTextInput
+                    name="profile-image-form-field"
+                    inputValidationFn={(val: string): [ValidationStatus, string] => {
+                      if (val.match(/[^A-Za-z@.0-9*#]/)) {
+                        return [ValidationStatus.Failure, 'Must enter characters A-Z'];
+                      } else {
+                        return [ValidationStatus.Success, 'Input validated'];
+                      }
+                    }}
+                    label="Image URL"
+                    placeholder={
+                      vnode.state.profileUpdate?.avatarUrl ? 
+                      vnode.state.profileUpdate?.avatarUrl :
+                      vnode.state.profile?.avatarUrl
+                    }
+                    oninput={(e) => {
+                      this.handleInputChange(vnode, (e.target as any).value, InputFormField.ProfileImage)
+                    }}
+                  />
+                </div>
+              </div>
+
             </div>
-
-          </div>
-          <div className="social-links">
-            <h4 className="title"> Links </h4>
-            <CWTextInput
-              name="website-form-field"
-              inputValidationFn={(val: string): [ValidationStatus, string] => {
-                if (val.match(/[^A-Za-z0-9@.-]/)) {
-                  return [ValidationStatus.Failure, 'Must enter characters A-Z'];
-                } else {
-                  return [ValidationStatus.Success, 'Input validated'];
-                }
-              }}
-              label="Website"
-              placeholder={vnode.state.profile?.website}
-              oninput={(e) => {
-                this.handleInputChange(vnode, (e.target as any).value, InputFormField.Website)
-              }}
-            />
-          </div>
-        </div>        
-      </div>
-
-    )
+            <div className="social-links">
+              <h4 className="title"> Links </h4>
+              <CWTextInput
+                name="website-form-field"
+                inputValidationFn={(val: string): [ValidationStatus, string] => {
+                  if (val.match(/[^A-Za-z0-9@.-]/)) {
+                    return [ValidationStatus.Failure, 'Must enter characters A-Z'];
+                  } else {
+                    return [ValidationStatus.Success, 'Input validated'];
+                  }
+                }}
+                label="Website"
+                placeholder={vnode.state.profile?.website}
+                oninput={(e) => {
+                  this.handleInputChange(vnode, (e.target as any).value, InputFormField.Website)
+                }}
+              />
+            </div>
+          </div>        
+        </div>
+      )
   }
 }
 

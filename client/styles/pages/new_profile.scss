@@ -252,6 +252,18 @@
 
   }
 
+  .loading-spinner {
+    position: relative;
+    width: 100%;
+    min-height: 350px;
+    .cui-spinner.cui-spinner-active {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
   .ErrorPage {
     min-height: 240px;
     padding: 60px 0;

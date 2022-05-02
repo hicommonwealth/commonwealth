@@ -7,6 +7,7 @@ import $ from 'jquery';
 import Sublayout from 'views/sublayout';
 import NewProfileHeader from './new_profile_header'
 import NewProfileActivity from './new_profile_activity'
+import { Spinner } from 'construct-ui';
 
 import { NewProfile as Profile } from '../../../../scripts/models'
 import OffchainThread from '../../../../scripts/models/OffchainThread'
@@ -26,6 +27,7 @@ type ProfileState = {
   chains: Array<ChainInfo>,
   addresses: Array<AddressInfo>, 
   socialAccounts: Array<SocialAccount>,
+  loading: boolean,
   error: ProfileError,
 }
 
@@ -36,11 +38,15 @@ enum ProfileError {
   InsufficientProfileData,
 } 
 
+const NoAddressFoundError = "No address found"
+const NoProfileFoundError = "No profile found"
+
 const requiredProfileData = ['name', 'avatarUrl', 'bio']
 class NewProfile implements m.Component<{}, ProfileState> {
 
   oninit(vnode) {
     vnode.state.address = m.route.param("address")
+    vnode.state.loading = true
     vnode.state.error = ProfileError.None
     this.getProfile(vnode, vnode.state.address)
   }
@@ -50,19 +56,24 @@ class NewProfile implements m.Component<{}, ProfileState> {
       address,
       jwt: app.user.jwt,
     }).catch((err) => {
-      if (err.status == 500 && err.responseJSON.error == "No address found") {
+      if (err.status == 500 && err.responseJSON.error == NoAddressFoundError) {
         vnode.state.error = ProfileError.NoAddressFound
       }
-      if (err.status == 500 && err.responseJSON.error == "No profile found") {
+      if (err.status == 500 && err.responseJSON.error == NoProfileFoundError) {
         vnode.state.error = ProfileError.NoProfileFound
       }
+      vnode.state.loading = false
       m.redraw()
     });
 
+    if (vnode.state.error != ProfileError.None)
+      return
+      
+    vnode.state.loading = false
     vnode.state.profile = Profile.fromJSON(response.profile)    
-    const sufficientProfileData = requiredProfileData.every(field => {
-      return field in vnode.state.profile && vnode.state.profile[field]
-    })
+    const sufficientProfileData = requiredProfileData.every(field => 
+      field in vnode.state.profile && vnode.state.profile[field]
+    )
     if (!sufficientProfileData) {
       vnode.state.error = ProfileError.InsufficientProfileData
     }
@@ -78,6 +89,16 @@ class NewProfile implements m.Component<{}, ProfileState> {
   } 
 
   view(vnode) {
+
+    if (vnode.state.loading)
+      return (
+        <div className="ProfilePage">
+          <div className="loading-spinner">
+            <Spinner active={true} size="lg" />
+          </div>
+        </div>
+      )
+
     if (vnode.state.error === ProfileError.None) 
       return (
         <div className="ProfilePage">
