@@ -1,32 +1,20 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .EditTopicThresholdsModal {
-  .topic-name {
-    padding-top: 20px;
-    width: 100%;
-  }
-  input {
-    margin-right: 10px;
-  }
+  .compact-modal-body {
+    height: 320px;
+    overflow-y: auto;
 
-  // disable arrows on number
-  input[type='number'] {
-    -moz-appearance: textfield;
-  }
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-  }
+    .EditTopicThresholdsRow {
+      .topic-name {
+        height: 24px;
+      }
 
-  .token-settings {
-    margin-left: 10px;
-  }
-
-  .switch-caption {
-    display: inline-flex;
-    color: $neutral-500;
-    font-size: 94%;
-    position: relative;
-    top: 1px;
+      .input-and-button-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+    }
   }
 }
