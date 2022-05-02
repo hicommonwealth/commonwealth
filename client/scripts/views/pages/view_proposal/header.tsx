@@ -12,13 +12,16 @@ import { pluralize, link, offchainThreadStageToLabel } from 'helpers';
 import { getProposalUrlPath, proposalSlugToFriendlyName } from 'identifiers';
 import { OffchainThread, OffchainThreadStage, AnyProposal } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
-import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import {
+  getStatusClass,
+  getStatusText,
+} from '../../components/proposal_card/helpers';
 
-export const ProposalHeaderSpacer: m.Component<{}> = {
+export const ProposalHeaderSpacer: m.Component = {
   view: () => {
     return m('.ProposalHeaderSpacer', m.trust('&middot;'));
   },
@@ -118,7 +121,7 @@ export const ProposalHeaderOnchainStatus: m.Component<{
     return m(
       '.ProposalHeaderOnchainStatus',
       { class: getStatusClass(proposal) },
-      getStatusText(proposal, true)
+      getStatusText(proposal)
     );
   },
 };
