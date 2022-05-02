@@ -219,11 +219,6 @@ export function updateActiveUser(data) {
     app.user.setDisableRichText(data.disableRichText);
     app.user.setLastVisited(data.lastVisited);
     app.user.setUnseenPosts(data.unseenPosts);
-    // TODO: Set Mixpanel Identities here
-    const mixpanelData: MixpanelLoginPayload = {
-      event: MixpanelLoginEvent.LOGIN,
-    };
-    mixpanelBrowserTrack(mixpanelData);
   }
 }
 
