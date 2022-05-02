@@ -8,6 +8,7 @@ export enum ComponentType {
   Modal = 'Modal',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  Text = 'Text',
   TextInput = 'TextInput',
 }
 

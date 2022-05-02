@@ -11,34 +11,53 @@ $width: 360px;
     margin-bottom: 16px;
   }
 
-  .color-gallery {
+  // .color-gallery {
+  //   display: flex;
+  //   flex-direction: column;
+  //   margin-bottom: $margin-bottom;
+  //   width: $width;
+
+  //   .color-row {
+  //     align-items: center;
+  //     display: flex;
+  //     height: 24px;
+  //     justify-content: space-between;
+
+  //     .color {
+  //       border-radius: 6px;
+  //       height: 16px;
+  //       width: 88px;
+  //     }
+
+  //     .rainbow-gradient-horizontal {
+  //       @include rainbow-gradient-horizontal;
+  //     }
+
+  //     .rainbow-gradient-diagonal {
+  //       @include rainbow-gradient-diagonal;
+  //     }
+
+  //     .shadow-gradient {
+  //       @include shadow-gradient;
+  //     }
+  //   }
+  // }
+
+  .text-gallery {
     display: flex;
     flex-direction: column;
-    margin-bottom: $margin-bottom;
-    width: $width;
 
-    .color-row {
+    .text-row {
       align-items: center;
       display: flex;
-      height: 24px;
+      flex-direction: row;
+      height: 48px;
       justify-content: space-between;
+      width: 400px;
 
-      .color {
-        border-radius: 6px;
-        height: 16px;
-        width: 88px;
-      }
-
-      .rainbow-gradient-horizontal {
-        @include rainbow-gradient-horizontal;
-      }
-
-      .rainbow-gradient-diagonal {
-        @include rainbow-gradient-diagonal;
-      }
-
-      .shadow-gradient {
-        @include shadow-gradient;
+      .ellipsis-row {
+        display: flex;
+        width: 200px;
       }
     }
   }

@@ -4,6 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup } from 'construct-ui';
 import app from 'state';
+import { ChainNetwork } from 'types';
 import { loginWithMagicLink } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
@@ -36,6 +37,29 @@ const Login: m.Component<{}, {
 }> = {
   view: (vnode) => {
     const defaultEmail = m.route.param('inviteEmail');
+    // only provide single wallet button on Axie
+    if (app?.chain?.network === ChainNetwork.AxieInfinity) {
+      return m(Button, {
+        intent: 'primary',
+        rounded: true,
+        onclick: async (e) => {
+          // get a state id from the server
+          const result = await $.post(
+            `${app.serverUrl()}/auth/sso`,
+            { issuer: 'AxieInfinity' },
+          );
+          if (result.status === 'Success' && result.result.stateId) {
+            const stateId = result.result.stateId;
+
+            // redirect to axie page for login
+            window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+          } else {
+            vnode.state.error = result.error || 'Could not login';
+          }
+        },
+        label: 'Continue to Ronin wallet'
+      });
+    }
     return m('.Login', {
       onclick: (e) => {
         e.stopPropagation();
