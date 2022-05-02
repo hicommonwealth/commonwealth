@@ -1378,6 +1378,7 @@ const ViewProposalPage: m.Component<
               m(OffchainPoll, { proposal }),
             proposal instanceof OffchainThread &&
               isAuthor &&
+              (!app.chain?.meta?.chain?.adminOnlyPolling || isAdminOnly) &&
               !proposal.offchainVotingEnabled &&
               m(PollEditorCard, {
                 proposal,
