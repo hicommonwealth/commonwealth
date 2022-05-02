@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-globals */
 import _ from 'lodash';
-import moment from 'moment';
 import $ from 'jquery';
 
 import app from 'state';
@@ -45,8 +44,7 @@ class PollsController {
     customDuration?: string;
   }) {
     const { threadId, prompt, options, customDuration } = args;
-    // start polling
-    await $.ajax({
+    await $.post({
       url: `${app.serverUrl()}/createPoll`,
       type: 'POST',
       data: {
