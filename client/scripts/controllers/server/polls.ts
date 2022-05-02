@@ -40,40 +40,29 @@ class PollsController {
 
   public async setPolling(args: {
     threadId: number;
-    name: string;
-    choices: string[];
+    prompt: string;
+    options: string[];
     customDuration?: string;
   }) {
-    const { threadId, name, choices, customDuration } = args;
+    const { threadId, prompt, options, customDuration } = args;
     // start polling
     await $.ajax({
-      url: `${app.serverUrl()}/updateThreadPolling`,
+      url: `${app.serverUrl()}/createPoll`,
       type: 'POST',
       data: {
         chain: app.activeChainId(),
-        jwt: app.user.jwt,
         thread_id: threadId,
-        content: JSON.stringify({ name, choices }),
+        prompt,
+        'options[]': options,
         custom_duration: customDuration?.split(' ')[0],
+        jwt: app.user.jwt,
       },
       success: (response) => {
-        const thread = this._store.getByIdentifier(threadId);
-        if (!thread) {
-          // TODO: sometimes the thread may not be in the store
-          location.reload();
-          return;
-        }
-        // TODO: This should be handled properly
-        // via controller/store & update method
-        thread.offchainVotingEnabled = true;
-        thread.offchainVotingOptions = { name, choices };
-        thread.offchainVotingNumVotes = 0;
-        thread.offchainVotingEndsAt = response.result.offchain_voting_ends_at
-          ? moment(response.result.offchain_voting_ends_at)
-          : null;
+        const modeledPoll = modelFromServer(response.result);
+        this._store.add(modeledPoll);
       },
       error: (err) => {
-        console.log('Failed to start polling');
+        console.log('Failed to initialize polling');
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error

@@ -6,6 +6,8 @@ import { OffchainThreadAttributes } from './offchain_thread';
 
 export type OffchainPollAttributes = {
   id: number;
+  chain_id: string;
+  thread_id: number;
   prompt: string;
   options: string;
   ends_at: Date;

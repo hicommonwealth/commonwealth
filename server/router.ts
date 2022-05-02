@@ -60,7 +60,7 @@ import getUploadSignature from './routes/getUploadSignature';
 import activeThreads from './routes/activeThreads';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
-import updateThreadPolling from './routes/updateThreadPolling';
+import createPoll from './routes/createPoll';
 import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
@@ -216,7 +216,10 @@ function setupRouter(
     starCommunity.bind(this, models)
   );
 
-  router.post('/tokenBalance', tokenBalance.bind(this, models, tokenBalanceCache));
+  router.post(
+    '/tokenBalance',
+    tokenBalance.bind(this, models, tokenBalanceCache)
+  );
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get(
@@ -237,9 +240,9 @@ function setupRouter(
   );
 
   router.post(
-    '/updateThreadPolling',
+    '/createPoll',
     passport.authenticate('jwt', { session: false }),
-    updateThreadPolling.bind(this, models)
+    createPoll.bind(this, models)
   );
   router.post(
     '/updateThreadStage',
@@ -620,7 +623,7 @@ function setupRouter(
   router.post(
     '/auth/sso/callback',
     // passport.authenticate('jwt', { session: false }),
-    finishSsoLogin.bind(this, models),
+    finishSsoLogin.bind(this, models)
   );
 
   // logout
