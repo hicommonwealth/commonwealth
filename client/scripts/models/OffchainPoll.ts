@@ -1,17 +1,22 @@
+import app from '../state';
 import OffchainVote from './OffchainVote';
 
 class OffchainPoll {
   public readonly id: number;
-  public readonly threadId: string;
+  public readonly threadId: number;
   public readonly chainId: string;
   public readonly createdAt: moment.Moment;
   public readonly endsAt: moment.Moment;
   public readonly prompt: string;
   public readonly options: string[];
-  public readonly votesNum: number;
+
+  private _votesNum: number;
+  public get votesNum() {
+    return this._votesNum;
+  }
 
   private _votes: OffchainVote[];
-  public votes() {
+  public get votes() {
     return this._votes;
   }
 
@@ -32,11 +37,11 @@ class OffchainPoll {
     this.endsAt = endsAt;
     this.prompt = prompt;
     this.options = options;
-    this.votes = votes;
+    this._votes = votes;
   }
 
-  public getOffchainVoteFor(chain: string, address: string) {
-    return this.votes?.find(
+  public getUserVote(chain: string, address: string) {
+    return (this.votes || []).find(
       (vote) => vote.address === address && vote.author_chain === chain
     );
   }
@@ -46,12 +51,14 @@ class OffchainPoll {
       const { address, author_chain, thread_id, option } = data;
       return new OffchainVote({ address, author_chain, thread_id, option });
     });
-    this.votes = votes;
+    this._votes = votes;
+  }
+
+  public getOffchainVotes(): OffchainVote[] {
+    return null;
   }
 
   public async submitOffchainVote(
-    chain: string,
-    community: string,
     authorChain: string,
     address: string,
     option: string
@@ -61,8 +68,6 @@ class OffchainPoll {
       thread_id,
       option,
       address,
-      chain,
-      community,
       author_chain: authorChain,
       jwt: app.user.jwt,
     }).then(() => {
@@ -79,11 +84,10 @@ class OffchainPoll {
       if (existingVoteIndex !== -1) {
         this.votes.splice(existingVoteIndex, 1);
       } else {
-        this.offchainVotingNumVotes += 1;
+        this._votesNum += 1;
       }
       // add new vote
       this.votes.push(vote);
-      m.redraw();
       return vote;
     });
   }

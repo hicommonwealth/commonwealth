@@ -17,7 +17,6 @@ class PollStore extends IdStore<OffchainPoll> {
   // TODO
   // public remove(Poll: OffchainPoll) {
   //   super.remove(Poll);
-  //   delete this._storeId[Poll.identifier];
   //   return this;
   // }
 
