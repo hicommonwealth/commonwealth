@@ -112,7 +112,8 @@ export async function setupWebSocketServer(
   } catch (e) {
     log.error(
       `Failure connecting to ${process.env.NODE_ENV || 'local'}` +
-        'RabbitMQ server. Please fix the RabbitMQ server configuration', e
+        'RabbitMQ server. Please fix the RabbitMQ server configuration',
+      e
     );
     if (!origin.includes('localhost'))
       rollbar.critical(
