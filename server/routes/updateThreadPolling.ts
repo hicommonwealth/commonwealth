@@ -51,7 +51,7 @@ const updateThreadPolling = async (models: DB, req: Request, res: Response, next
           chain_id: thread.Chain.id,
         }
       });
-      if (role?.permission !== 'admin') {
+      if (role?.permission !== 'admin' && !req.user.isAdmin) {
         return next(new Error(Errors.MustBeAdmin));
       }
     }
