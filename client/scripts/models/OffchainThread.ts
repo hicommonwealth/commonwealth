@@ -63,7 +63,7 @@ class OffchainThread implements IUniqueId {
   }
 
   public get hasOffchainPoll() {
-    return this.offchainVotingEnabled;
+    return app.polls.getByThreadId(this.id);
   }
 
   public offchainVotingEnabled: boolean;

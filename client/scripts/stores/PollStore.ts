@@ -1,37 +1,33 @@
-import { IIdentifiable } from 'adapters/shared';
-import Store from './Store';
+import OffchainPoll from '../models/OffchainPoll';
+import IdStore from './IdStore';
 
-class PollStore<PollT extends IIdentifiable> extends Store<PollT> {
-  private _storeId: { [hash: string]: PollT } = {};
+class PollStore extends IdStore<OffchainPoll> {
+  private _storeThreadId: { [id: number]: OffchainPoll[] } = {};
 
-  public add(Poll: PollT) {
-    super.add(Poll);
-    this._storeId[Poll.identifier] = Poll;
-    return this;
-  }
-
-  public update(newPoll: PollT) {
-    const oldPoll = this.getByIdentifier(newPoll.identifier);
-    if (oldPoll) {
-      this.remove(oldPoll);
+  public add(poll: OffchainPoll) {
+    super.add(poll);
+    if (Array.isArray(this._storeThreadId[poll.threadId])) {
+      this._storeThreadId[poll.threadId].push(poll);
+    } else {
+      this._storeThreadId[poll.threadId] = [poll];
     }
-    this.add(newPoll);
     return this;
   }
 
-  public remove(Poll: PollT) {
-    super.remove(Poll);
-    delete this._storeId[Poll.identifier];
-    return this;
-  }
+  // TODO
+  // public remove(Poll: OffchainPoll) {
+  //   super.remove(Poll);
+  //   delete this._storeId[Poll.identifier];
+  //   return this;
+  // }
 
   public clear() {
     super.clear();
-    this._storeId = {};
+    this._storeThreadId = {};
   }
 
-  public getByIdentifier(identifier: string | number): PollT {
-    return this._storeId[identifier];
+  public getByThreadId(threadId: number): OffchainPoll[] {
+    return this._storeThreadId[threadId];
   }
 }
 

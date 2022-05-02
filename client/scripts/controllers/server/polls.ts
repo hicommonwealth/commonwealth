@@ -5,6 +5,7 @@ import $ from 'jquery';
 
 import app from 'state';
 import PollStore from 'client/scripts/stores/PollStore';
+import OffchainPoll from 'client/scripts/models/OffchainPoll';
 
 export const modelFromServer = (poll) => {
   const {
@@ -31,7 +32,7 @@ export const modelFromServer = (poll) => {
 };
 
 class PollsController {
-  private _store = new PollStore<OffchainPoll>();
+  private _store = new PollStore();
 
   public get store() {
     return this._store;
@@ -82,7 +83,7 @@ class PollsController {
     });
   }
 
-  public getByThread(threadId) {
+  public getByThreadId(threadId) {
     return this._store.getByThreadId(threadId);
   }
 }
