@@ -9,7 +9,6 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { parseCustomStages } from 'helpers';
 import { OffchainThreadStage } from 'models';
-import { onFeaturedDiscussionPage } from './helpers';
 import { TopicsMenu } from './topics_menu';
 import { StagesMenu } from './stages_menu';
 
