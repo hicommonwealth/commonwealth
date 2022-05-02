@@ -82,7 +82,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                 />
               </div>
             )}
-            {proposal.offchainVotingEnabled && (
+            {/* {proposal.offchainVotingEnabled && (
               <Button
                 label="Poll"
                 contentRight={pluralize(
@@ -93,7 +93,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                 size="xs"
                 compact={true}
               />
-            )}
+            )} */}
             {proposal.chainEntities?.length > 0 &&
               proposal.chainEntities
                 .sort((a, b) => {

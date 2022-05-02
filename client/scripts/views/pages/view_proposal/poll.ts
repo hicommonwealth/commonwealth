@@ -1,9 +1,8 @@
 import m from 'mithril';
-import app from 'client/scripts/state';
+import app from 'state';
 
-import TopicGateCheck from 'client/scripts/controllers/chain/ethereum/gatedTopic';
-import { OffchainThread } from 'client/scripts/models';
-import OffchainPoll from 'client/scripts/models/OffchainPoll';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import { OffchainThread, OffchainPoll } from 'models';
 import { Button, Icons } from 'construct-ui';
 import moment from 'moment';
 import { alertModalWithText } from '../../modals/alert_modal';

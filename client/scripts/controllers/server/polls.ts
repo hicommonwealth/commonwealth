@@ -3,8 +3,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 
 import app from 'state';
-import PollStore from 'client/scripts/stores/PollStore';
-import OffchainPoll from 'client/scripts/models/OffchainPoll';
+import PollStore from 'stores/PollStore';
+import OffchainPoll from 'models/OffchainPoll';
 
 export const modelFromServer = (poll) => {
   const {

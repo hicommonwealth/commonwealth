@@ -1,8 +1,7 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import OffchainPoll from 'client/scripts/models/OffchainPoll';
-import lookupAddressIsOwnedByUser from 'server/util/lookupAddressIsOwnedByUser';
-import validateChain from 'server/util/validateChain';
+import validateChain from '../util/validateChain';
+import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from '../../shared/logging';
 import { getNextOffchainPollEndingTime } from '../../shared/utils';
 import { DB } from '../database';

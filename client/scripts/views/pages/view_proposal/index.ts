@@ -1117,7 +1117,6 @@ const ViewProposalPage: m.Component<
     }
 
     // load profiles
-    // TODO: recursively fetch child comments as well (prevent reloading flash for threads with child comments)
     if (
       vnode.state.prefetch[proposalIdAndType]['profilesStarted'] === undefined
     ) {
