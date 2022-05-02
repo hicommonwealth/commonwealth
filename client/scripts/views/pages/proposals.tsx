@@ -250,43 +250,41 @@ const ProposalsPage: m.Component<{}> = {
       !activeSputnikProposals?.length
         ? [m('.no-proposals', 'No active proposals')]
         : [
-            m('.active-proposals', [
-              (activeDemocracyProposals || [])
-                .map((proposal) => <ProposalCard proposal={proposal} />)
-                .concat(
-                  (activeCouncilProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                )
-                .concat(
-                  (activeCosmosProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                )
-                .concat(
-                  (activeMolochProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                )
-                .concat(
-                  (activeCompoundProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                )
-                .concat(
-                  (activeAaveProposals || []).map((proposal) => (
-                    <ProposalCard
-                      proposal={proposal}
-                      injectedContent={AaveProposalCardDetail}
-                    />
-                  ))
-                )
-                .concat(
-                  (activeSputnikProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                ),
-            ]),
+            (activeDemocracyProposals || [])
+              .map((proposal) => <ProposalCard proposal={proposal} />)
+              .concat(
+                (activeCouncilProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (activeCosmosProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (activeMolochProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (activeCompoundProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (activeAaveProposals || []).map((proposal) => (
+                  <ProposalCard
+                    proposal={proposal}
+                    injectedContent={AaveProposalCardDetail}
+                  />
+                ))
+              )
+              .concat(
+                (activeSputnikProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              ),
           ];
 
     // inactive proposals
@@ -342,43 +340,41 @@ const ProposalsPage: m.Component<{}> = {
       !inactiveSputnikProposals?.length
         ? [m('.no-proposals', 'No past proposals')]
         : [
-            m('.inactive-proposals', [
-              (inactiveDemocracyProposals || [])
-                .map((proposal) => <ProposalCard proposal={proposal} />)
-                .concat(
-                  (inactiveCouncilProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                )
-                .concat(
-                  (inactiveCosmosProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                )
-                .concat(
-                  (inactiveMolochProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                )
-                .concat(
-                  (inactiveCompoundProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                )
-                .concat(
-                  (inactiveAaveProposals || []).map((proposal) => (
-                    <ProposalCard
-                      proposal={proposal}
-                      injectedContent={AaveProposalCardDetail}
-                    />
-                  ))
-                )
-                .concat(
-                  (inactiveSputnikProposals || []).map((proposal) => (
-                    <ProposalCard proposal={proposal} />
-                  ))
-                ),
-            ]),
+            (inactiveDemocracyProposals || [])
+              .map((proposal) => <ProposalCard proposal={proposal} />)
+              .concat(
+                (inactiveCouncilProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (inactiveCosmosProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (inactiveMolochProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (inactiveCompoundProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (inactiveAaveProposals || []).map((proposal) => (
+                  <ProposalCard
+                    proposal={proposal}
+                    injectedContent={AaveProposalCardDetail}
+                  />
+                ))
+              )
+              .concat(
+                (inactiveSputnikProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              ),
           ];
 
     return m(
