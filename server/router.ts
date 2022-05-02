@@ -61,6 +61,7 @@ import activeThreads from './routes/activeThreads';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import createPoll from './routes/createPoll';
+import getPolls from './routes/getPolls';
 import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
@@ -244,6 +245,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createPoll.bind(this, models)
   );
+  router.get('/getPolls', getPolls.bind(this, models));
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),

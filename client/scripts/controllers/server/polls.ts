@@ -46,7 +46,7 @@ class PollsController {
         thread_id: threadId,
       },
       success: (response) => {
-        console.log(response.result);
+        console.log(response);
         for (const poll of response.result) {
           console.log(poll);
           const modeledPoll = modelFromServer(response.result);
