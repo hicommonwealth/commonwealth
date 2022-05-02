@@ -62,10 +62,6 @@ class OffchainThread implements IUniqueId {
     return `${this.slug}_${this.identifier}`;
   }
 
-  public get hasOffchainPoll() {
-    return app.polls.getByThreadId(this.id);
-  }
-
   constructor({
     author,
     title,

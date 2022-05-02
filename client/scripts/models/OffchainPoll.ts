@@ -46,16 +46,16 @@ class OffchainPoll {
     );
   }
 
-  public setOffchainVotes(voteData) {
+  public getVotes(): OffchainVote[] {
+    return null;
+  }
+
+  public setVotes(voteData) {
     const votes = voteData.map((data) => {
       const { address, author_chain, thread_id, option } = data;
       return new OffchainVote({ address, author_chain, thread_id, option });
     });
     this._votes = votes;
-  }
-
-  public getOffchainVotes(): OffchainVote[] {
-    return null;
   }
 
   public async submitOffchainVote(

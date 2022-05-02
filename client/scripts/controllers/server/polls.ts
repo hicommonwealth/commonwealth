@@ -37,6 +37,33 @@ class PollsController {
     return this._store;
   }
 
+  public async fetchPolls(threadId: number) {
+    await $.ajax({
+      url: `${app.serverUrl()}/getPolls`,
+      type: 'GET',
+      data: {
+        chain: app.activeChainId(),
+        thread_id: threadId,
+      },
+      success: (response) => {
+        console.log(response.result);
+        for (const poll of response.result) {
+          console.log(poll);
+          const modeledPoll = modelFromServer(response.result);
+          this._store.add(modeledPoll);
+        }
+      },
+      error: (err) => {
+        console.log('Failed to fetch thread polls');
+        throw new Error(
+          err.responseJSON && err.responseJSON.error
+            ? err.responseJSON.error
+            : 'Failed to fetch thread polls'
+        );
+      },
+    });
+  }
+
   public async setPolling(args: {
     threadId: number;
     prompt: string;
@@ -44,7 +71,7 @@ class PollsController {
     customDuration?: string;
   }) {
     const { threadId, prompt, options, customDuration } = args;
-    await $.post({
+    await $.ajax({
       url: `${app.serverUrl()}/createPoll`,
       type: 'POST',
       data: {
@@ -64,7 +91,7 @@ class PollsController {
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
-            : 'Failed to start polling'
+            : 'Failed to initialize polling'
         );
       },
     });

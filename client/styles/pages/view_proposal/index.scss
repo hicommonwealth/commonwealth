@@ -402,7 +402,7 @@ $discussion-title-font-size: 1.45rem;
     }
   }
 
-  .ProposalHeaderOffchainPoll,
+  .ProposalPoll,
   .ProposalSidebarPollEditorModule,
   .ProposalLinkedThreadsEditorModule {
     border-radius: 10px;
@@ -436,7 +436,7 @@ $discussion-title-font-size: 1.45rem;
       margin-bottom: 12px;
     }
   }
-  .ProposalHeaderOffchainPoll {
+  .ProposalPoll {
     .offchain-poll-header {
       font-weight: 600;
     }
