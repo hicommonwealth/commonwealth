@@ -41,5 +41,9 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface, Sequelize) => {},
+  down: async (queryInterface, Sequelize) => {
+    // Do we want a proper "down" migration?
+    // Writing manual SQL queries takes a lot of eng time
+    return queryInterface.sequelize.query(`DELETE FROM "OffchainPolls"`);
+  },
 };
