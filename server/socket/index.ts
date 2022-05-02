@@ -110,12 +110,10 @@ export async function setupWebSocketServer(
       'ChainEventsNotificationsSubscription'
     );
   } catch (e) {
-    log.warn(
-      `Failure connecting to ${
-        `${process.env.NODE_ENV} ` || ''
-      }RabbitMQ server. Please fix the RabbitMQ server configuration`
+    log.error(
+      `Failure connecting to ${process.env.NODE_ENV || 'local'}` +
+        'RabbitMQ server. Please fix the RabbitMQ server configuration', e
     );
-    log.error(e);
     if (!origin.includes('localhost'))
       rollbar.critical(
         'Failed to connect to RabbitMQ so the chain-evens notification consumer is DISABLED.' +
@@ -123,8 +121,4 @@ export async function setupWebSocketServer(
         e
       );
   }
-
-  log.info(
-    'Socket.io server and RabbitMQ notifications handler successfully started'
-  );
 }
