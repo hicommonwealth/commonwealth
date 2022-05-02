@@ -6,21 +6,25 @@ import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { OffchainVoteAttributes, OffchainVoteInstance } from '../models/offchain_vote';
+import {
+  OffchainVoteAttributes,
+  OffchainVoteInstance,
+} from '../models/offchain_vote';
 
 export const Errors = {
-  InvalidThread: 'Invalid thread',
+  NoPoll: 'No corresponding poll found',
+  NoThread: 'No corresponding thread found',
   InvalidUser: 'Invalid user',
   PollingClosed: 'Polling already finished',
   BalanceCheckFailed: 'Could not verify user token balance',
 };
 
 type UpdateOffchainVoteReq = {
-  thread_id: number,
-  chain: string,
-  address: string,
-  author_chain: string,
-  option: string,
+  poll_id: number;
+  chain: string;
+  address: string;
+  author_chain: string;
+  option: string;
 };
 
 type UpdateOffchainVoteResp = OffchainVoteAttributes;
@@ -38,20 +42,29 @@ const updateOffchainVote = async (
   if (!author) return next(new Error(Errors.InvalidUser));
   if (authorError) return next(new Error(authorError));
 
+  const { poll_id, address, author_chain, option } = req.body;
+
   // TODO: check that req.option is valid, and import options from shared/types
   // TODO: check and validate req.signature, instead of checking for author
 
-  const thread = await models.OffchainThread.findOne({
-    where: { id: req.body.thread_id, chain: chain.id }
+  const poll = await models.OffchainPoll.findOne({
+    where: { id: poll_id, chain_id: chain.id },
   });
-  if (!thread) return next(new Error(Errors.InvalidThread));
-
-  if (!thread.offchain_voting_ends_at && moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())) {
+  if (!poll) return next(new Error(Errors.NoPoll));
+  if (!poll.ends_at && moment(poll.ends_at).utc().isBefore(moment().utc())) {
     return next(new Error(Errors.PollingClosed));
   }
 
+  const thread = await models.OffchainThread.findOne({
+    where: { id: poll.thread_id },
+  });
+  if (!thread) return next(new Error(Errors.NoThread));
+
   // check token balance threshold if needed
-  const canVote = await tokenBalanceCache.validateTopicThreshold(thread.topic_id, req.body.address);
+  const canVote = await tokenBalanceCache.validateTopicThreshold(
+    thread.topic_id,
+    address
+  );
   if (!canVote) {
     return next(new Error(Errors.BalanceCheckFailed));
   }
@@ -61,27 +74,30 @@ const updateOffchainVote = async (
     // delete existing votes
     const destroyed = await models.OffchainVote.destroy({
       where: {
-        thread_id: req.body.thread_id,
-        address: req.body.address,
-        author_chain: req.body.author_chain,
-        chain: req.body.chain,
+        poll_id: poll.id,
+        address,
+        author_chain,
+        chain_id: chain.id,
       },
-      transaction: t
+      transaction: t,
     });
 
     // create new vote
-    vote = await models.OffchainVote.create({
-      thread_id: req.body.thread_id,
-      address: req.body.address,
-      author_chain: req.body.author_chain,
-      chain: req.body.chain,
-      option: req.body.option,
-    }, { transaction: t });
+    vote = await models.OffchainVote.create(
+      {
+        poll_id: poll.id,
+        address,
+        author_chain,
+        chain_id: chain.id,
+        option,
+      },
+      { transaction: t }
+    );
 
     // update denormalized vote count
     if (destroyed === 0) {
-      thread.offchain_voting_votes = (thread.offchain_voting_votes ?? 0) + 1;
-      await thread.save({ transaction: t });
+      poll.votes = (poll.votes ?? 0) + 1;
+      await poll.save({ transaction: t });
     }
   });
 
