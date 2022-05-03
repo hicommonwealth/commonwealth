@@ -1,4 +1,6 @@
+import $ from 'jquery';
 import moment from 'moment';
+import { notifyError } from '../controllers/app/notifications';
 import app from '../state';
 import OffchainVote from './OffchainVote';
 
@@ -73,28 +75,32 @@ class OffchainPoll {
     address: string,
     option: string
   ) {
-    return $.post(`${app.serverUrl()}/updateOffchainVote`, {
+    const selectedOption = this.options.find((o: string) => o === option);
+    if (!selectedOption) {
+      notifyError('Invalid voting option');
+    }
+    const response = await $.post(`${app.serverUrl()}/updateOffchainVote`, {
       poll_id: this.id,
       chain_id: this.chainId,
       author_chain: authorChain,
-      option,
+      option: selectedOption,
       address,
       jwt: app.user.jwt,
-    }).then((response) => {
-      // TODO Graham 5/3/22: We should have a dedicated controller + store
-      // to handle logic like this
-      const vote = new OffchainVote(response.result);
-      // Remove existing vote
-      const existingVoteIndex = this.votes.findIndex(
-        (v) => v.address === address && v.authorChain === authorChain
-      );
-      if (existingVoteIndex !== -1) {
-        this.votes.splice(existingVoteIndex, 1);
-      }
-      // Add new or updated vote
-      this.votes.push(vote);
-      return vote;
     });
+    // TODO Graham 5/3/22: We should have a dedicated controller + store
+    // to handle logic like this
+    const vote = new OffchainVote(response.result);
+    console.log(vote);
+    // Remove existing vote
+    const existingVoteIndex = this.votes.findIndex(
+      (v) => v.address === address && v.authorChain === authorChain
+    );
+    if (existingVoteIndex !== -1) {
+      this.votes.splice(existingVoteIndex, 1);
+    }
+    // Add new or updated vote
+    this.votes.push(vote);
+    return vote;
   }
 }
 

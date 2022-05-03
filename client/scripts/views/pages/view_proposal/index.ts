@@ -1398,9 +1398,9 @@ const ViewProposalPage: m.Component<
               }),
             proposal instanceof OffchainThread &&
               isAuthor &&
-              !vnode.state.polls?.length &&
               m(PollEditorCard, {
                 proposal,
+                proposalAlreadyHasPolling: !vnode.state.polls?.length,
                 openPollEditor: () => {
                   vnode.state.pollEditorIsOpen = true;
                 },

@@ -150,10 +150,6 @@ export default (
       foreignKey: 'thread_id',
       constraints: false,
     });
-    models.OffchainThread.hasMany(models.OffchainVote, {
-      foreignKey: 'thread_id',
-      constraints: false,
-    });
     models.OffchainThread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
       as: 'linking_threads',

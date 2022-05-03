@@ -9,7 +9,11 @@ import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
 
-const vote = async (poll: OffchainPoll, option, isSelected: boolean) => {
+const vote = async (
+  poll: OffchainPoll,
+  option: string,
+  isSelected: boolean
+) => {
   const { activeAccount } = app.user;
   if (!app.isLoggedIn() || !activeAccount || isSelected) return;
 

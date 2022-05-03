@@ -36,6 +36,7 @@ const updateOffchainVote = async (
   res: TypedResponse<UpdateOffchainVoteResp>,
   next: NextFunction
 ) => {
+  console.log('hitting');
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -50,6 +51,7 @@ const updateOffchainVote = async (
   const poll = await models.OffchainPoll.findOne({
     where: { id: poll_id, chain_id: chain.id },
   });
+  console.log(poll);
   if (!poll) return next(new Error(Errors.NoPoll));
   if (!poll.ends_at && moment(poll.ends_at).utc().isBefore(moment().utc())) {
     return next(new Error(Errors.PollingClosed));
@@ -72,7 +74,7 @@ const updateOffchainVote = async (
   let vote: OffchainVoteInstance;
   await sequelize.transaction(async (t) => {
     // delete existing votes
-    const destroyed = await models.OffchainVote.destroy({
+    await models.OffchainVote.destroy({
       where: {
         poll_id: poll.id,
         address,
@@ -81,7 +83,7 @@ const updateOffchainVote = async (
       },
       transaction: t,
     });
-
+    console.log('destroyed');
     // create new vote
     vote = await models.OffchainVote.create(
       {
@@ -93,12 +95,7 @@ const updateOffchainVote = async (
       },
       { transaction: t }
     );
-
-    // update denormalized vote count
-    if (destroyed === 0) {
-      poll.votes = (poll.votes ?? 0) + 1;
-      await poll.save({ transaction: t });
-    }
+    console.log(vote);
   });
 
   return success(res, vote.toJSON());

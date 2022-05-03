@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import $ from 'jquery';
 import m from 'mithril';
-import moment from 'moment';
-import { Button, Icons, Tag, MenuItem, Input } from 'construct-ui';
+import { Button, Tag, MenuItem, Input } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -21,21 +19,16 @@ import {
   OffchainThreadKind,
   OffchainThreadStage,
   AnyProposal,
-  OffchainVote,
 } from 'models';
 import { ProposalType } from 'types';
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifySuccess } from 'controllers/app/notifications';
 import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { alertModalWithText } from 'views/modals/alert_modal';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import OffchainPoll from 'client/scripts/models/OffchainPoll';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
-import OffchainVotingModal from '../../modals/offchain_voting_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 export const ProposalHeaderExternalLink: m.Component<{
@@ -199,9 +192,7 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
     return m(
       'a.ProposalHeaderStage',
       {
-        href: `/${proposal.chain || proposal.community}?stage=${
-          proposal.stage
-        }`,
+        href: `/${proposal.chain}?stage=${proposal.stage}`,
         onclick: (e) => {
           e.preventDefault();
           navigateToSubpage(`?stage=${proposal.stage}`);

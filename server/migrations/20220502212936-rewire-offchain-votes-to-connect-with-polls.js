@@ -51,7 +51,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     // TODO: Complete data transfer
-    return queryInterface.sequelize.transaction((t) => {
+    return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn('OffchainVotes', 'poll_id', {
         transaction: t,
       });
@@ -62,7 +62,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
-        { transactoin: t }
+        { transaction: t }
       );
     });
   },

@@ -53,7 +53,6 @@ class OffchainThread implements IUniqueId {
   public readonly slug = ProposalType.OffchainThread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
-  public readonly community: string;
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
   public readonly hasPoll: boolean;
@@ -75,7 +74,6 @@ class OffchainThread implements IUniqueId {
     kind,
     stage,
     versionHistory,
-    community,
     chain,
     readOnly,
     // optional args:
@@ -102,7 +100,6 @@ class OffchainThread implements IUniqueId {
     kind: OffchainThreadKind;
     stage: OffchainThreadStage;
     versionHistory: VersionHistory[];
-    community: string;
     chain: string;
     readOnly: boolean;
     body?: string;
@@ -133,7 +130,6 @@ class OffchainThread implements IUniqueId {
     this.pinned = pinned;
     this.url = url;
     this.versionHistory = versionHistory;
-    this.community = community;
     this.chain = chain;
     this.readOnly = readOnly;
     this.collaborators = collaborators || [];

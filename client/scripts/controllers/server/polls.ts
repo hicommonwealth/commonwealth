@@ -1,15 +1,13 @@
 /* eslint-disable no-restricted-globals */
 import _ from 'lodash';
 import $ from 'jquery';
-
-import app from 'state';
-import PollStore from 'stores/PollStore';
-import OffchainPoll from 'models/OffchainPoll';
-import { OffchainPollInstance } from 'server/models/offchain_poll';
-import { OffchainVote } from 'client/scripts/models';
 import moment from 'moment';
+import app from 'state';
 
-export const modelFromServer = (poll: OffchainPollInstance) => {
+import PollStore from 'stores/PollStore';
+import { OffchainPoll, OffchainVote } from 'models';
+
+export const modelFromServer = (poll) => {
   const {
     id,
     thread_id,
@@ -17,16 +15,24 @@ export const modelFromServer = (poll: OffchainPollInstance) => {
     prompt,
     options,
     ends_at,
-    votes,
+    votes = [],
     created_at,
   } = poll;
+
+  let pollOptions;
+  try {
+    console.log(options);
+    pollOptions = JSON.parse(options);
+  } catch (e) {
+    pollOptions = [];
+  }
 
   return new OffchainPoll({
     id,
     threadId: thread_id,
     chainId: chain_id,
     prompt,
-    options: JSON.parse(options),
+    options: pollOptions,
     endsAt: moment(ends_at),
     votes: votes.map((v) => new OffchainVote(v)),
     createdAt: moment(created_at),
@@ -49,10 +55,12 @@ class PollsController {
         thread_id: threadId,
       },
       success: (response) => {
-        console.log(response);
         for (const poll of response.result) {
-          console.log(poll);
-          const modeledPoll = modelFromServer(response.result);
+          const modeledPoll = modelFromServer(poll);
+          const existingPoll = this._store.getById(modeledPoll.id);
+          if (existingPoll) {
+            this._store.remove(existingPoll);
+          }
           this._store.add(modeledPoll);
         }
       },

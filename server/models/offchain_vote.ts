@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { OffchainThreadAttributes } from './offchain_thread';
+import { OffchainPollAttributes } from './offchain_poll';
 
 export type OffchainVoteAttributes = {
   poll_id: number;
@@ -14,7 +15,7 @@ export type OffchainVoteAttributes = {
   updated_at?: Date;
 
   // associations
-  thread?: OffchainThreadAttributes | OffchainThreadAttributes['id'];
+  poll?: OffchainPollAttributes;
 };
 
 export type OffchainVoteInstance = ModelInstance<OffchainVoteAttributes>;
