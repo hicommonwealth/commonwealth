@@ -1,4 +1,5 @@
-@import 'client/styles/shared';
+@import 'shared';
+@import 'components/component_kit/cw_card.scss';
 
 .CardsCollection {
   display: flex;
@@ -13,7 +14,7 @@
 
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 260px);
+    grid-template-columns: repeat(auto-fit, $default-card-width);
     grid-gap: 24px;
   }
 }
