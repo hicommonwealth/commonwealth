@@ -58,6 +58,7 @@ class PollsController {
         for (const poll of response.result) {
           const modeledPoll = modelFromServer(poll);
           const existingPoll = this._store.getById(modeledPoll.id);
+          console.log({ existingPoll });
           if (existingPoll) {
             this._store.remove(existingPoll);
           }

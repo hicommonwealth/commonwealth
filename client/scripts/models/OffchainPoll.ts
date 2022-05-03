@@ -58,17 +58,8 @@ class OffchainPoll {
   }
 
   public getVotes(): OffchainVote[] {
-    return null;
+    return this.votes;
   }
-
-  // TODO: Unused, could be cut?
-  // public setVotes(voteData) {
-  //   const votes = voteData.map((data) => {
-  //     const { address, author_chain, poll_id, option } = data;
-  //     return new OffchainVote({ address, author_chain, poll_id, option });
-  //   });
-  //   this._votes = votes;
-  // }
 
   public async submitOffchainVote(
     authorChain: string,

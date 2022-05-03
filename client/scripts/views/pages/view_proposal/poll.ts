@@ -16,13 +16,19 @@ const vote = async (
 ) => {
   const { activeAccount } = app.user;
   if (!app.isLoggedIn() || !activeAccount || isSelected) return;
-
-  const confirmationText = `Submit your vote for '${option}'?`;
+  const userInfo = [activeAccount.chain.id, activeAccount.address] as const;
+  let confirmationText;
+  if (poll.getUserVote(...userInfo)) {
+    confirmationText = `Change your vote to '${option}'?`;
+  } else {
+    confirmationText = `Submit a vote for '${option}'?`;
+  }
   const confirmed = await confirmationModalWithText(confirmationText)();
   if (!confirmed) return;
   // submit vote
   poll
-    .submitOffchainVote(activeAccount.chain.id, activeAccount.address, option)
+    .submitOffchainVote(...userInfo, option)
+    .then(() => m.redraw())
     .catch(async () => {
       await alertModalWithText(
         'Error submitting vote. Maybe the poll has already ended?'

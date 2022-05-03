@@ -191,7 +191,6 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
                     return;
                   }
                   try {
-                    console.log(this.options);
                     await app.polls.setPolling({
                       threadId: thread.id,
                       prompt: this.prompt,
@@ -201,6 +200,7 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
                       authorChain: app.user.activeAccount.chain.id,
                     });
                     notifySuccess('Poll creation succeeded');
+                    m.redraw();
                   } catch (e) {
                     console.error(e);
                   }

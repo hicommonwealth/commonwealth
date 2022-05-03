@@ -1329,7 +1329,7 @@ const ViewProposalPage: m.Component<
       (proposal as OffchainThread).linkedThreads?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
-
+    console.log(vnode.state.polls);
     return m(
       Sublayout,
       {
@@ -1392,19 +1392,6 @@ const ViewProposalPage: m.Component<
         ]),
         m('.right-content-container', [
           [
-            proposal instanceof OffchainThread &&
-              vnode.state.polls.map((poll) => {
-                return m(ProposalPoll, { poll, thread: proposal });
-              }),
-            proposal instanceof OffchainThread &&
-              isAuthor &&
-              m(PollEditorCard, {
-                proposal,
-                proposalAlreadyHasPolling: !vnode.state.polls?.length,
-                openPollEditor: () => {
-                  vnode.state.pollEditorIsOpen = true;
-                },
-              }),
             showLinkedSnapshotOptions &&
               proposal instanceof OffchainThread &&
               m(LinkedProposalsCard, {
@@ -1419,6 +1406,23 @@ const ViewProposalPage: m.Component<
               m(LinkedThreadsCard, {
                 proposalId: proposal.id,
                 allowLinking: isAuthor || isAdminOrMod,
+              }),
+            proposal instanceof OffchainThread &&
+              isAuthor &&
+              m(PollEditorCard, {
+                proposal,
+                proposalAlreadyHasPolling: !vnode.state.polls?.length,
+                openPollEditor: () => {
+                  vnode.state.pollEditorIsOpen = true;
+                },
+              }),
+            proposal instanceof OffchainThread &&
+              [
+                ...new Map(
+                  vnode.state.polls.map((poll) => [poll.id, poll])
+                ).values(),
+              ].map((poll) => {
+                return m(ProposalPoll, { poll, thread: proposal });
               }),
           ],
         ]),
