@@ -5,6 +5,7 @@ class PollStore extends IdStore<OffchainPoll> {
   private _storeThreadId: { [id: number]: OffchainPoll[] } = {};
 
   public add(poll: OffchainPoll) {
+    console.log(poll);
     super.add(poll);
     if (Array.isArray(this._storeThreadId[poll.threadId])) {
       this._storeThreadId[poll.threadId].push(poll);
@@ -26,7 +27,7 @@ class PollStore extends IdStore<OffchainPoll> {
   }
 
   public getByThreadId(threadId: number): OffchainPoll[] {
-    return this._storeThreadId[threadId];
+    return this._storeThreadId[threadId] || [];
   }
 }
 

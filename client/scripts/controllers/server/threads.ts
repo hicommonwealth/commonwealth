@@ -15,6 +15,7 @@ import {
   Profile,
   ChainEntity,
   NotificationSubscription,
+  OffchainPoll,
 } from 'models';
 import { NotificationCategories } from 'types';
 
@@ -49,10 +50,8 @@ export const modelFromServer = (thread) => {
     collaborators,
     chain_entities,
     ChainEntities,
-    offchain_voting_enabled,
-    offchain_voting_options,
-    offchain_voting_ends_at,
-    offchain_voting_votes,
+    has_poll,
+    polls = [], // associated OffchainPolls
     reactions,
     last_commented_on,
     linked_threads,
@@ -159,10 +158,8 @@ export const modelFromServer = (thread) => {
     chainEntities: chainEntitiesProcessed || ChainEntities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
-    offchainVotingEnabled: offchain_voting_enabled,
-    offchainVotingOptions: offchain_voting_options,
-    offchainVotingEndsAt: offchain_voting_ends_at,
-    offchainVotingNumVotes: offchain_voting_votes,
+    hasPoll: has_poll,
+    polls: polls.map((p) => new OffchainPoll(p)),
     lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
     linkedThreads,
   });

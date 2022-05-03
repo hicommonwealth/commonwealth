@@ -28,7 +28,7 @@ const createPoll = async (
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  const { thread_id, chain_id, prompt, options } = req.body;
+  const { thread_id, prompt, options } = req.body;
   let { custom_duration } = req.body;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
 

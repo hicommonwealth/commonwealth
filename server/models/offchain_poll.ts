@@ -11,11 +11,9 @@ export type OffchainPollAttributes = {
   prompt: string;
   options: string;
   ends_at: Date;
-  votes: number;
 
   created_at?: Date;
   updated_at?: Date;
-  deleted_at?: Date;
   last_commented_on?: Date;
 
   // associations
@@ -40,20 +38,16 @@ export default (
       prompt: { type: dataTypes.TEXT, allowNull: false },
       options: { type: dataTypes.STRING, allowNull: true },
       ends_at: { type: dataTypes.DATE, allowNull: true },
-      votes: { type: dataTypes.INTEGER, allowNull: true },
 
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      deletedAt: 'deleted_at',
       underscored: true,
       tableName: 'OffchainPolls',
-      paranoid: true,
       indexes: [{ fields: ['thread_id'] }, { fields: ['chain'] }],
     }
   );
@@ -69,6 +63,7 @@ export default (
     });
     models.OffchainPoll.hasMany(models.OffchainVote, {
       foreignKey: 'poll_id',
+      as: 'votes',
     });
   };
 

@@ -5,8 +5,11 @@ import $ from 'jquery';
 import app from 'state';
 import PollStore from 'stores/PollStore';
 import OffchainPoll from 'models/OffchainPoll';
+import { OffchainPollInstance } from 'server/models/offchain_poll';
+import { OffchainVote } from 'client/scripts/models';
+import moment from 'moment';
 
-export const modelFromServer = (poll) => {
+export const modelFromServer = (poll: OffchainPollInstance) => {
   const {
     id,
     thread_id,
@@ -23,10 +26,10 @@ export const modelFromServer = (poll) => {
     threadId: thread_id,
     chainId: chain_id,
     prompt,
-    options,
-    endsAt: ends_at,
-    votes,
-    createdAt: created_at,
+    options: JSON.parse(options),
+    endsAt: moment(ends_at),
+    votes: votes.map((v) => new OffchainVote(v)),
+    createdAt: moment(created_at),
   });
 };
 
@@ -69,8 +72,12 @@ class PollsController {
     prompt: string;
     options: string[];
     customDuration?: string;
+    authorChain: string;
+    address: string;
   }) {
-    const { threadId, prompt, options, customDuration } = args;
+    const { threadId, prompt, options, customDuration, authorChain, address } =
+      args;
+
     await $.ajax({
       url: `${app.serverUrl()}/createPoll`,
       type: 'POST',
@@ -78,8 +85,10 @@ class PollsController {
         chain: app.activeChainId(),
         thread_id: threadId,
         prompt,
-        'options[]': options,
+        options: JSON.stringify(options),
         custom_duration: customDuration?.split(' ')[0],
+        author_chain: authorChain,
+        address,
         jwt: app.user.jwt,
       },
       success: (response) => {

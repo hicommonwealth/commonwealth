@@ -1,3 +1,4 @@
+import moment from 'moment';
 import app from '../state';
 import OffchainVote from './OffchainVote';
 
@@ -10,14 +11,13 @@ class OffchainPoll {
   public readonly prompt: string;
   public readonly options: string[];
 
-  private _votesNum: number;
-  public get votesNum() {
-    return this._votesNum;
-  }
-
   private _votes: OffchainVote[];
   public get votes() {
     return this._votes;
+  }
+
+  public get votesNum() {
+    return this._votes.length;
   }
 
   constructor({
@@ -29,6 +29,15 @@ class OffchainPoll {
     prompt,
     options,
     votes,
+  }: {
+    id: number;
+    threadId: number;
+    chainId: string;
+    createdAt: moment.Moment;
+    endsAt: moment.Moment;
+    prompt: string;
+    options: string[];
+    votes: OffchainVote[];
   }) {
     this.id = id;
     this.threadId = threadId;
@@ -81,8 +90,6 @@ class OffchainPoll {
       );
       if (existingVoteIndex !== -1) {
         this.votes.splice(existingVoteIndex, 1);
-      } else {
-        this._votesNum += 1;
       }
       // Add new or updated vote
       this.votes.push(vote);

@@ -34,11 +34,6 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
-      votes: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
