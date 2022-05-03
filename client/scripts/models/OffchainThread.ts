@@ -11,6 +11,7 @@ import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
 import { ChainEntity } from '.';
+import OffchainPoll from './OffchainPoll';
 
 // field names copied from snapshot
 interface IOffchainVotingOptions {
@@ -55,6 +56,8 @@ class OffchainThread implements IUniqueId {
   public readonly community: string;
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
+  public readonly hasPoll: boolean;
+  public readonly polls: OffchainPoll[];
   public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
 
@@ -85,11 +88,7 @@ class OffchainThread implements IUniqueId {
     chainEntities,
     lastEdited,
     snapshotProposal,
-    offchainVotingEnabled,
-    offchainVotingOptions,
-    offchainVotingEndsAt,
-    offchainVotingNumVotes,
-    offchainVotes,
+    hasPoll,
     lastCommentedOn,
     linkedThreads,
   }: {
@@ -115,12 +114,9 @@ class OffchainThread implements IUniqueId {
     chainEntities?: any[];
     lastEdited?: moment.Moment;
     snapshotProposal: string;
-    offchainVotingEnabled?: boolean;
-    offchainVotingOptions?: string;
-    offchainVotingEndsAt?: string | moment.Moment | null;
-    offchainVotingNumVotes?: number;
-    offchainVotes?: OffchainVote[];
+    hasPoll: boolean;
     linkedThreads: LinkedThreadRelation[];
+    polls?: OffchainPoll[];
   }) {
     this.author = author;
     this.title = title;
@@ -154,16 +150,8 @@ class OffchainThread implements IUniqueId {
           };
         })
       : [];
-    this.offchainVotingEnabled = offchainVotingEnabled;
-    try {
-      this.offchainVotingOptions = JSON.parse(offchainVotingOptions);
-    } catch (e) {}
+    this.hasPoll = hasPoll;
     this.snapshotProposal = snapshotProposal;
-    this.offchainVotingEndsAt = offchainVotingEndsAt
-      ? moment(offchainVotingEndsAt)
-      : null;
-    this.offchainVotingNumVotes = offchainVotingNumVotes;
-    this.offchainVotes = offchainVotes || [];
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
   }

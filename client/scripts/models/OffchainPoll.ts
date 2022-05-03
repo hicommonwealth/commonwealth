@@ -42,7 +42,7 @@ class OffchainPoll {
 
   public getUserVote(chain: string, address: string) {
     return (this.votes || []).find(
-      (vote) => vote.address === address && vote.author_chain === chain
+      (vote) => vote.address === address && vote.authorChain === chain
     );
   }
 
@@ -50,13 +50,14 @@ class OffchainPoll {
     return null;
   }
 
-  public setVotes(voteData) {
-    const votes = voteData.map((data) => {
-      const { address, author_chain, thread_id, option } = data;
-      return new OffchainVote({ address, author_chain, thread_id, option });
-    });
-    this._votes = votes;
-  }
+  // TODO: Unused, could be cut?
+  // public setVotes(voteData) {
+  //   const votes = voteData.map((data) => {
+  //     const { address, author_chain, poll_id, option } = data;
+  //     return new OffchainVote({ address, author_chain, poll_id, option });
+  //   });
+  //   this._votes = votes;
+  // }
 
   public async submitOffchainVote(
     authorChain: string,
