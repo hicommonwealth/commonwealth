@@ -9,12 +9,12 @@ import { DB } from '../database';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  AlreadyPolling: 'There is already an active offchain poll for this thread',
   NoThreadId: 'Must provide thread_id',
   NoThread: 'Cannot find thread',
   InvalidContent: 'Invalid poll content',
-  NotAuthor: 'Only the thread author can start polling',
   InvalidDuration: 'Invalid poll duration',
+  NotAuthor: 'Only the thread author can start polling',
+  MustBeAdmin: 'Must be admin to create poll',
 };
 
 const createPoll = async (
@@ -62,6 +62,19 @@ const createPoll = async (
     // TODO Graham 22-05-02: We should allow collaborators to start polling too
     if (!req.user || !userOwnedAddressIds.includes(thread.address_id)) {
       return next(new Error(Errors.NotAuthor));
+    }
+
+    // check if admin_only flag is set
+    if (thread.Chain?.admin_only_polling) {
+      const role = await models.Role.findOne({
+        where: {
+          address_id: thread.address_id,
+          chain_id: thread.Chain.id,
+        },
+      });
+      if (role?.permission !== 'admin' && !req.user.isAdmin) {
+        return next(new Error(Errors.MustBeAdmin));
+      }
     }
 
     const finalPoll = await models.OffchainPoll.create({
