@@ -9,12 +9,13 @@ import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
+import bcrypt from "bcrypt";
+import Rollbar from 'rollbar';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 import { JWT_SECRET, REDIS_URL, WEBSOCKET_ADMIN_USERNAME, WEBSOCKET_ADMIN_PASSWORD } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
-import bcrypt from "bcrypt";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -40,7 +41,10 @@ export const authenticate = (
   }
 };
 
-export function setupWebSocketServer(httpServer: http.Server) {
+export async function setupWebSocketServer(
+  httpServer: http.Server,
+  rollbar: Rollbar
+) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
   const io = new Server(httpServer, {
@@ -79,34 +83,48 @@ export function setupWebSocketServer(httpServer: http.Server) {
 
   log.info(`Connecting to Redis at: ${REDIS_URL}`);
   const pubClient = createClient({ url: REDIS_URL });
-
   const subClient = pubClient.duplicate();
 
-  Promise.all([pubClient.connect(), subClient.connect()])
-    .then(() => {
-      io.adapter(<any>createAdapter(pubClient, subClient));
-    })
-    .then(() => {
-      // create the chain-events namespace
-      const ceNamespace = createCeNamespace(io);
+  try {
+    await Promise.all([pubClient.connect(), subClient.connect()]);
+  } catch (e) {
+    // local env may not have redis so don't do anything if they don't
+    if (!origin.includes('localhost')) {
+      log.error('Failed to connect to Redis!', e);
+      rollbar.critical(
+        'Socket.io server failed to connect to Redis. Servers will NOT share socket messages' +
+          'between rooms on different servers!',
+        e
+      );
+    }
+  }
+  // provide the redis connection instances to the socket.io adapters
+  await io.adapter(<any>createAdapter(pubClient, subClient));
 
-      try {
-        const rabbitController = new RabbitMQController(
-          <BrokerConfig>RabbitMQConfig
-        );
-        rabbitController.init().then(() => {
-          return rabbitController.startSubscription(
-            publishToCERoom.bind(ceNamespace),
-            'ChainEventsNotificationsSubscription'
-          );
-        });
-      } catch (e) {
-        log.warn(
-          `Failure connecting to ${
-            `${process.env.NODE_ENV} ` || ''
-          }RabbitMQ server. Please fix the RabbitMQ server configuration`
-        );
-        log.error(e);
-      }
-    });
+  // create the chain-events namespace
+  const ceNamespace = createCeNamespace(io);
+
+  try {
+    const rabbitController = new RabbitMQController(
+      <BrokerConfig>RabbitMQConfig
+    );
+
+    await rabbitController.init();
+    await rabbitController.startSubscription(
+      publishToCERoom.bind(ceNamespace),
+      'ChainEventsNotificationsSubscription'
+    );
+  } catch (e) {
+    log.error(
+      `Failure connecting to ${process.env.NODE_ENV || 'local'}` +
+        'RabbitMQ server. Please fix the RabbitMQ server configuration',
+      e
+    );
+    if (!origin.includes('localhost'))
+      rollbar.critical(
+        'Failed to connect to RabbitMQ so the chain-evens notification consumer is DISABLED.' +
+          'Handle immediately to avoid notifications queue backlog.',
+        e
+      );
+  }
 }
