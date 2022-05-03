@@ -34,9 +34,6 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
   view(vnode) {
     const { proposal, injectedContent } = vnode.attrs;
 
-    console.log('injectedContent ', injectedContent);
-    console.log('proposal.isPassing ', proposal.isPassing);
-
     return (
       <CWCard
         elevation="elevation-2"

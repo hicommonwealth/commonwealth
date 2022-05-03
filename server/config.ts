@@ -85,3 +85,6 @@ export const DEFAULT_COMMONWEALTH_LOGO =
   'https://commonwealth.im/static/img/logo.png';
 
 export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
+
+export const WEBSOCKET_ADMIN_USERNAME = process.env.WEBSOCKET_ADMIN_USERNAME;
+export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
