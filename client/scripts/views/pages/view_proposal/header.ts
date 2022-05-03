@@ -23,13 +23,16 @@ import {
 import { ProposalType } from 'types';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { getStatusClass, getStatusText } from 'views/components/proposal_card';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import {
+  getStatusClass,
+  getStatusText,
+} from '../../components/proposal_card/helpers';
 
 export const ProposalHeaderExternalLink: m.Component<{
   proposal: AnyProposal | OffchainThread;
@@ -235,7 +238,7 @@ export const ProposalHeaderOnchainStatus: m.Component<{
     return m(
       '.ProposalHeaderOnchainStatus',
       { class: getStatusClass(proposal) },
-      getStatusText(proposal, true)
+      getStatusText(proposal)
     );
   },
 };
