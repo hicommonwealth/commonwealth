@@ -10,7 +10,7 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import BN from 'bn.js';
 
-import { SESSION_SECRET } from './server/config';
+import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
 import models from './server/database';
@@ -24,6 +24,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
+import Rollbar from "rollbar";
 
 require('express-async-errors');
 
@@ -353,7 +354,15 @@ const setupServer = () => {
 
 setupPassport(models);
 setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
-setupErrorHandlers(app);
+
+const rollbar = new Rollbar({
+  accessToken: ROLLBAR_SERVER_TOKEN,
+  environment: process.env.NODE_ENV,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
+
+setupErrorHandlers(app, rollbar);
 
 setupServer();
 
