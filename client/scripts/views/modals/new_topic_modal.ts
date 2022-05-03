@@ -16,7 +16,7 @@ import { ChainNetwork } from 'types';
 import QuillEditor from 'views/components/quill_editor';
 import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
-import TokenDecimalInput from 'views/components/token_decimal_input';
+import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import {
   CWTextInput,
   ValidationStatus,
@@ -87,7 +87,9 @@ const NewTopicModal: m.Component<
 
     const decimals = app.chain?.meta.chain?.decimals
       ? app.chain.meta.chain.decimals
-      : (app.chain.network === ChainNetwork.ERC721) ? 0 : 18;
+      : app.chain.network === ChainNetwork.ERC721
+      ? 0
+      : 18;
 
     return m('.NewTopicModal', [
       m('.compact-modal-title', [

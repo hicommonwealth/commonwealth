@@ -38,7 +38,6 @@ import {
   DynamicTemplate,
   ChainBase,
   NotificationCategories,
-  ChainNetwork,
   WalletId,
 } from '../../shared/types';
 import AddressSwapper from '../util/addressSwapper';
@@ -116,11 +115,10 @@ const verifySignature = async (
     }
   } else if (
     chain.base === ChainBase.CosmosSDK &&
-    (chain.network === ChainNetwork.Injective ||
-      chain.network === ChainNetwork.InjectiveTestnet)
+    addressModel.wallet_id === WalletId.CosmosEvmMetamask
   ) {
     //
-    // ethereum address handling
+    // ethereum address handling on cosmos chains
     //
     const msgBuffer = Buffer.from(addressModel.verification_token.trim());
     // toBuffer() doesn't work if there is a newline
@@ -140,7 +138,10 @@ const verifySignature = async (
       const injAddrBuf = ethUtil.Address.fromString(
         lowercaseAddress.toString()
       ).toBuffer();
-      const injAddress = bech32.encode('inj', bech32.toWords(injAddrBuf));
+      const injAddress = bech32.encode(
+        chain.bech32_prefix,
+        bech32.toWords(injAddrBuf)
+      );
       if (addressModel.address === injAddress) isValid = true;
     } catch (e) {
       isValid = false;

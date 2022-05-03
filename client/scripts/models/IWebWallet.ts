@@ -14,7 +14,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   chain: ChainBase;
 
   // optional parameter used to specify the exact chain that a wallet is associated with (if any)
-  specificChain?: string;
+  specificChains?: string[];
 }
 
 export default IWebWallet;

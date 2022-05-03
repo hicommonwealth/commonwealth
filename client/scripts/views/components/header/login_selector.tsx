@@ -276,7 +276,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       if (addressExists) return false;
 
       // filter additionally by chain network if in list of non-interop, unless we are on that chain
-      // TODO: make this related to wallet.specificChain
+      // TODO: make this related to wallet.specificChains
       if (
         NON_INTEROP_NETWORKS.includes(addressChainInfo?.network) &&
         activeChainInfo?.network !== addressChainInfo?.network

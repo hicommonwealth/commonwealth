@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import 'pages/proposals.scss';
+/* @jsx m */
 
 import m from 'mithril';
 import { Button, Tag } from 'construct-ui';
 import BN from 'bn.js';
+
+import 'pages/proposals.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -18,20 +19,19 @@ import Aave from 'controllers/chain/ethereum/aave/adapter';
 
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import ProposalCard from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 
 import { PageNotFound } from 'views/pages/404';
-import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
+import { CardsCollection } from '../components/cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
-  view: (vnode) => {
+  view: () => {
     if (!app.chain) return;
-    const activeAccount = app.user.activeAccount;
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),
@@ -68,10 +68,10 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
 };
 
 const CompoundProposalStats: m.Component<{}, {}> = {
-  view: (vnode) => {
+  view: () => {
     if (!app.chain) return;
     if (!(app.chain instanceof Compound)) return;
-    const activeAccount = app.user.activeAccount;
+
     const symbol = app.chain.meta.chain.symbol;
 
     return m('.stats-box', [
@@ -104,7 +104,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
         ]),
         m(Button, {
           intent: 'primary',
-          onclick: (e) => navigateToSubpage('/new/proposal'),
+          onclick: () => navigateToSubpage('/new/proposal'),
           label: 'New proposal',
         }),
       ]),
@@ -149,7 +149,7 @@ const ProposalsPage: m.Component<{}> = {
       }, 100);
     }
   },
-  view: (vnode) => {
+  view: () => {
     if (!app.chain || !app.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
@@ -248,43 +248,41 @@ const ProposalsPage: m.Component<{}> = {
       !activeSputnikProposals?.length
         ? [m('.no-proposals', 'No active proposals')]
         : [
-            m('.active-proposals', [
-              (activeDemocracyProposals || [])
-                .map((proposal) => m(ProposalCard, { proposal }))
-                .concat(
-                  (activeCouncilProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                )
-                .concat(
-                  (activeCosmosProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                )
-                .concat(
-                  (activeMolochProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                )
-                .concat(
-                  (activeCompoundProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                )
-                .concat(
-                  (activeAaveProposals || []).map((proposal) =>
-                    m(ProposalCard, {
-                      proposal,
-                      injectedContent: AaveProposalCardDetail,
-                    })
-                  )
-                )
-                .concat(
-                  (activeSputnikProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                ),
-            ]),
+            (activeDemocracyProposals || [])
+              .map((proposal) => <ProposalCard proposal={proposal} />)
+              .concat(
+                (activeCouncilProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (activeCosmosProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (activeMolochProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (activeCompoundProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (activeAaveProposals || []).map((proposal) => (
+                  <ProposalCard
+                    proposal={proposal}
+                    injectedContent={AaveProposalCardDetail}
+                  />
+                ))
+              )
+              .concat(
+                (activeSputnikProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              ),
           ];
 
     // inactive proposals
@@ -340,51 +338,42 @@ const ProposalsPage: m.Component<{}> = {
       !inactiveSputnikProposals?.length
         ? [m('.no-proposals', 'No past proposals')]
         : [
-            m('.inactive-proposals', [
-              (inactiveDemocracyProposals || [])
-                .map((proposal) => m(ProposalCard, { proposal }))
-                .concat(
-                  (inactiveCouncilProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                )
-                .concat(
-                  (inactiveCosmosProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                )
-                .concat(
-                  (inactiveMolochProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                )
-                .concat(
-                  (inactiveCompoundProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                )
-                .concat(
-                  (inactiveAaveProposals || []).map((proposal) =>
-                    m(ProposalCard, {
-                      proposal,
-                      injectedContent: AaveProposalCardDetail,
-                    })
-                  )
-                )
-                .concat(
-                  (inactiveSputnikProposals || []).map((proposal) =>
-                    m(ProposalCard, { proposal })
-                  )
-                ),
-            ]),
+            (inactiveDemocracyProposals || [])
+              .map((proposal) => <ProposalCard proposal={proposal} />)
+              .concat(
+                (inactiveCouncilProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (inactiveCosmosProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (inactiveMolochProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (inactiveCompoundProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              )
+              .concat(
+                (inactiveAaveProposals || []).map((proposal) => (
+                  <ProposalCard
+                    proposal={proposal}
+                    injectedContent={AaveProposalCardDetail}
+                  />
+                ))
+              )
+              .concat(
+                (inactiveSputnikProposals || []).map((proposal) => (
+                  <ProposalCard proposal={proposal} />
+                ))
+              ),
           ];
-
-    // XXX: display these
-    const visibleTechnicalCommitteeProposals =
-      app.chain &&
-      (app.chain.network === ChainNetwork.Kusama ||
-        app.chain.network === ChainNetwork.Polkadot) &&
-      (app.chain as Substrate).technicalCommittee.store.getAll();
 
     return m(
       Sublayout,
@@ -402,17 +391,14 @@ const ProposalsPage: m.Component<{}> = {
       m('.ProposalsPage', [
         onSubstrate && m(SubstrateProposalStats),
         onCompound && m(CompoundProposalStats),
-        m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: activeProposalContent,
-          columnHeader: 'Active',
+          header: 'Active',
         }),
-        m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: inactiveProposalContent,
-          columnHeader: 'Inactive',
+          header: 'Inactive',
         }),
-        m('.clear'),
       ])
     );
   },
