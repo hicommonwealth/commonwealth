@@ -19,15 +19,7 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-import {
-  mixpanelBrowserIdentify,
-  mixpanelBrowserTrack,
-} from 'analytics/mixpanel_browser_util';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-  MixpanelUserSignupEntryPoint,
-} from 'analytics/types';
+import { MixpanelUserSignupEntryPoint } from 'analytics/types';
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(

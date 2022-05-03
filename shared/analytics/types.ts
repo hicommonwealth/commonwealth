@@ -73,6 +73,19 @@ export interface MixpanelCommunityCreationPayload extends BaseMixpanelPayload {
 }
 // END NEW COMMUNITY CREATION EVENT
 
+// CHAT EVENTS
+export const enum MixpanelChatEvents {
+  NEW_CHAT_SENT = 'New Chat Sent',
+  CHAT_PAGE_VISIT = 'Chat Page Visit',
+  NEW_CHANNEL_CREATED = 'New Chat Channel Created',
+  CHANNEL_NAME_CHANGED = 'Chat Channel Name Changed',
+}
+
+export interface MixpanelChatEventsPayload extends BaseMixpanelPayload {
+  community: string;
+  event: MixpanelChatEvents;
+}
+
 // --------- END EVENT DEFINITIONS --------- //
 
 // Include All Event Enums
@@ -81,7 +94,8 @@ export type MixpanelEvents =
   | MixpanelUserSignupEvent
   | MixpanelCommunityCreationEvent
   | MixpanelPageViewEvent
-  | MixpanelCommunityInteractionEvent;
+  | MixpanelCommunityInteractionEvent
+  | MixpanelChatEvents;
 
 // Base Payload - Required for All Events
 export interface BaseMixpanelPayload {
@@ -94,4 +108,5 @@ export type MixpanelPayload =
   | BaseMixpanelPayload
   | MixpanelCommunityCreationPayload
   | MixpanelPageViewPayload
-  | MixpanelCommunityInteractionPayload;
+  | MixpanelCommunityInteractionPayload
+  | MixpanelChatEventsPayload;
