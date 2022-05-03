@@ -15,6 +15,7 @@ import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
+import { CWIconButton } from './cw_icon_button';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -58,6 +59,8 @@ const radioGroupOptions = [
 ];
 
 export class ComponentShowcase implements m.ClassComponent {
+  private selectedIconButton: number;
+
   view() {
     return (
       <div class="ComponentShowcase">
@@ -180,6 +183,38 @@ export class ComponentShowcase implements m.ClassComponent {
           <div class="icon-row">
             Disabled Large
             <CWIcon iconName="views" iconSize="large" disabled={true} />
+          </div>
+        </div>
+        <h1>Icon Buttons</h1>
+        <div class="icon-button-gallery">
+          <div class="icon-button-subheader">Click to see selected state</div>
+          <div class="icon-button-row">
+            <CWIconButton
+              iconName="views"
+              iconSize="large"
+              iconButtonTheme="primary"
+              selected={this.selectedIconButton === 1}
+              onclick={() => {
+                this.selectedIconButton = 1;
+              }}
+            />
+            {this.selectedIconButton === 1 && (
+              <div class="icon-button-selected">is selected</div>
+            )}
+          </div>
+          <div class="icon-button-row">
+            <CWIconButton
+              iconName="views"
+              iconSize="large"
+              iconButtonTheme="neutral"
+              selected={this.selectedIconButton === 2}
+              onclick={() => {
+                this.selectedIconButton = 2;
+              }}
+            />
+            {this.selectedIconButton === 2 && (
+              <div class="icon-button-selected">is selected</div>
+            )}
           </div>
         </div>
         <h1>Buttons</h1>
