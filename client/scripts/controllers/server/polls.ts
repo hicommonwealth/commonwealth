@@ -21,7 +21,6 @@ export const modelFromServer = (poll) => {
 
   let pollOptions;
   try {
-    console.log(options);
     pollOptions = JSON.parse(options);
   } catch (e) {
     pollOptions = [];
@@ -58,7 +57,6 @@ class PollsController {
         for (const poll of response.result) {
           const modeledPoll = modelFromServer(poll);
           const existingPoll = this._store.getById(modeledPoll.id);
-          console.log({ existingPoll });
           if (existingPoll) {
             this._store.remove(existingPoll);
           }

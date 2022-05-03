@@ -1329,7 +1329,7 @@ const ViewProposalPage: m.Component<
       (proposal as OffchainThread).linkedThreads?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
-    console.log(vnode.state.polls);
+
     return m(
       Sublayout,
       {

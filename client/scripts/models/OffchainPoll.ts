@@ -81,7 +81,6 @@ class OffchainPoll {
     // TODO Graham 5/3/22: We should have a dedicated controller + store
     // to handle logic like this
     const vote = new OffchainVote(response.result);
-    console.log(vote);
     // Remove existing vote
     const existingVoteIndex = this.votes.findIndex(
       (v) => v.address === address && v.authorChain === authorChain
