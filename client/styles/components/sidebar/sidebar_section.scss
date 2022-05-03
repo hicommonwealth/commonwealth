@@ -34,12 +34,13 @@
     padding: 0 8px;
 
     .title-text {
+      font-size: 14px;
+      font-weight: 400;
       overflow: hidden;
-      padding-right: 8px;
+      padding-right: 16px;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-weight: 400;
-      font-size: 14px;
+      width: 100%;
     }
 
     &.section-title-text-active {

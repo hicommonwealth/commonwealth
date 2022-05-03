@@ -13,6 +13,7 @@ export const Errors = {
   InvalidContent: 'Invalid poll content',
   NotAuthor: 'Only the thread author can start polling',
   InvalidDuration: 'Invalid poll duration',
+  MustBeAdmin: 'Must be admin to create poll',
 };
 
 const updateThreadPolling = async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -32,6 +33,7 @@ const updateThreadPolling = async (models: DB, req: Request, res: Response, next
       where: {
         id: thread_id,
       },
+      include: models.Chain,
     });
     if (!thread) return next(new Error(Errors.NoThread));
     const userOwnedAddressIds = (await req.user.getAddresses())
@@ -39,6 +41,19 @@ const updateThreadPolling = async (models: DB, req: Request, res: Response, next
     // We should allow collaborators to start polling too
     if (!req.user || !userOwnedAddressIds.includes(thread.address_id)) {
       return next(new Error(Errors.NotAuthor));
+    }
+
+    // check if admin_only flag is set
+    if (thread.Chain?.admin_only_polling) {
+      const role = await models.Role.findOne({
+        where: {
+          address_id: thread.address_id,
+          chain_id: thread.Chain.id,
+        }
+      });
+      if (role?.permission !== 'admin' && !req.user.isAdmin) {
+        return next(new Error(Errors.MustBeAdmin));
+      }
     }
 
     // Check that req.body.content is valid JSON, matching { name: string, choices: string[] }
