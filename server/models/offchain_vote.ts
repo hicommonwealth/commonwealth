@@ -9,7 +9,7 @@ export type OffchainVoteAttributes = {
   option: string;
   address: string;
   author_chain: string;
-  chain: string;
+  chain_id: string;
   id?: number;
   created_at?: Date;
   updated_at?: Date;
@@ -34,7 +34,7 @@ export default (
       option: { type: dataTypes.STRING, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
       author_chain: { type: Sequelize.STRING, allowNull: true },
-      chain: { type: Sequelize.STRING, allowNull: true },
+      chain_id: { type: Sequelize.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },

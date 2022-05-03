@@ -37,7 +37,7 @@ const viewOffchainVotes = async (
     const votes = await models.OffchainVote.findAll({
       where: {
         poll_id: req.query.poll_id,
-        chain: chain.id,
+        chain_id: chain.id,
       },
     });
     return success(

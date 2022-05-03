@@ -15,6 +15,7 @@ export const Errors = {
   NoPoll: 'No corresponding poll found',
   NoThread: 'No corresponding thread found',
   InvalidUser: 'Invalid user',
+  InvalidOption: 'Invalid response option',
   PollingClosed: 'Polling already finished',
   BalanceCheckFailed: 'Could not verify user token balance',
 };
@@ -36,7 +37,6 @@ const updateOffchainVote = async (
   res: TypedResponse<UpdateOffchainVoteResp>,
   next: NextFunction
 ) => {
-  console.log('hitting');
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -51,10 +51,19 @@ const updateOffchainVote = async (
   const poll = await models.OffchainPoll.findOne({
     where: { id: poll_id, chain_id: chain.id },
   });
-  console.log(poll);
   if (!poll) return next(new Error(Errors.NoPoll));
   if (!poll.ends_at && moment(poll.ends_at).utc().isBefore(moment().utc())) {
     return next(new Error(Errors.PollingClosed));
+  }
+
+  // Ensure user has passed a valid poll response
+  let selected_option;
+  try {
+    const pollOptions = JSON.parse(poll.options);
+    selected_option = pollOptions.find((o: string) => o === option);
+    if (!option) throw new Error();
+  } catch (e) {
+    return next(new Error(Errors.InvalidOption));
   }
 
   const thread = await models.OffchainThread.findOne({
@@ -79,23 +88,21 @@ const updateOffchainVote = async (
         poll_id: poll.id,
         address,
         author_chain,
-        chain: chain.id,
+        chain_id: chain.id,
       },
       transaction: t,
     });
-    console.log('destroyed');
     // create new vote
     vote = await models.OffchainVote.create(
       {
         poll_id: poll.id,
         address,
         author_chain,
-        chain: chain.id,
-        option,
+        chain_id: chain.id,
+        option: selected_option,
       },
       { transaction: t }
     );
-    console.log(vote);
   });
 
   return success(res, vote.toJSON());
