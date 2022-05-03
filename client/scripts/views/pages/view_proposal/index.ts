@@ -1202,7 +1202,7 @@ const ViewProposalPage: m.Component<
         role: 'moderator',
         chain: app.activeChainId(),
       });
-    const isAdminOnly = app.user.isRoleOfCommunity({
+    const isAdmin = app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
     });
@@ -1409,7 +1409,7 @@ const ViewProposalPage: m.Component<
               }),
             proposal instanceof OffchainThread &&
               isAuthor &&
-              (!app.chain?.meta?.chain?.adminOnlyPolling || isAdminOnly) &&
+              (!app.chain?.meta?.chain?.adminOnlyPolling || isAdmin) &&
               m(PollEditorCard, {
                 proposal,
                 proposalAlreadyHasPolling: !vnode.state.polls?.length,
