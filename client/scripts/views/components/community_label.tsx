@@ -48,7 +48,10 @@ export class CommunityLabel implements m.ClassComponent<CommunityLabelAttrs> {
               onclick={hasLink ? () => m.route.set(`/${token.id}`) : null}
             />
           )}
-          <div class="community-label-name">
+          <div
+            class="community-label-name"
+            title={chain ? chain.name : token.name}
+          >
             {chain ? chain.name : token.name}
           </div>
           {showStatus && getCommunityNameIcon(chain, token)}
