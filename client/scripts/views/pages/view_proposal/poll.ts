@@ -9,19 +9,16 @@ import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
 
-const vote = async (poll, option, isSelected) => {
-  if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
+const vote = async (poll: OffchainPoll, option, isSelected: boolean) => {
+  const { activeAccount } = app.user;
+  if (!app.isLoggedIn() || !activeAccount || isSelected) return;
 
   const confirmationText = `Submit your vote for '${option}'?`;
   const confirmed = await confirmationModalWithText(confirmationText)();
   if (!confirmed) return;
   // submit vote
   poll
-    .submitOffchainVote(
-      app.user.activeAccount.chain.id,
-      app.user.activeAccount.address,
-      option
-    )
+    .submitOffchainVote(activeAccount.chain.id, activeAccount.address, option)
     .catch(async () => {
       await alertModalWithText(
         'Error submitting vote. Maybe the poll has already ended?'

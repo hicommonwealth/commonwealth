@@ -21,7 +21,7 @@ export const Errors = {
 
 type UpdateOffchainVoteReq = {
   poll_id: number;
-  chain: string;
+  chain_id: string;
   address: string;
   author_chain: string;
   option: string;
@@ -77,7 +77,7 @@ const updateOffchainVote = async (
         poll_id: poll.id,
         address,
         author_chain,
-        chain_id: chain.id,
+        chain: chain.id,
       },
       transaction: t,
     });
@@ -88,7 +88,7 @@ const updateOffchainVote = async (
         poll_id: poll.id,
         address,
         author_chain,
-        chain_id: chain.id,
+        chain: chain.id,
         option,
       },
       { transaction: t }

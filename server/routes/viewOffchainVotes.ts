@@ -5,10 +5,10 @@ import { OffchainVoteAttributes } from '../models/offchain_vote';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 
 export const Errors = {
-  InvalidThread: 'Invalid thread',
+  NoPollSpecified: 'No poll has been specified',
 };
 
-type ViewOffchainVotesReq = { thread_id: string, chain: string };
+type ViewOffchainVotesReq = { poll_id: string; chain_id: string };
 type ViewOffchainVotesResp = OffchainVoteAttributes[];
 
 const viewOffchainVotes = async (
@@ -29,15 +29,21 @@ const viewOffchainVotes = async (
     throw new AppError(error);
   }
 
-  if (!req.query.thread_id) {
-    throw new AppError(Errors.InvalidThread);
+  if (!req.query.poll_id) {
+    throw new AppError(Errors.NoPollSpecified);
   }
 
   try {
     const votes = await models.OffchainVote.findAll({
-      where: { thread_id: req.query.thread_id, chain: chain.id },
+      where: {
+        poll_id: req.query.poll_id,
+        chain: chain.id,
+      },
     });
-    return success(res, votes.map((v) => v.toJSON()));
+    return success(
+      res,
+      votes.map((v) => v.toJSON())
+    );
   } catch (err) {
     throw new ServerError(err);
   }

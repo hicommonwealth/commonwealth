@@ -63,30 +63,27 @@ class OffchainPoll {
     address: string,
     option: string
   ) {
-    const thread_id = this.id;
     return $.post(`${app.serverUrl()}/updateOffchainVote`, {
-      thread_id,
+      poll_id: this.id,
+      chain_id: this.chainId,
+      author_chain: authorChain,
       option,
       address,
-      author_chain: authorChain,
       jwt: app.user.jwt,
-    }).then(() => {
-      const vote = new OffchainVote({
-        address,
-        author_chain: authorChain,
-        thread_id,
-        option,
-      });
-      // remove any existing vote
+    }).then((response) => {
+      // TODO Graham 5/3/22: We should have a dedicated controller + store
+      // to handle logic like this
+      const vote = new OffchainVote(response.result);
+      // Remove existing vote
       const existingVoteIndex = this.votes.findIndex(
-        (v) => v.address === address && v.author_chain === authorChain
+        (v) => v.address === address && v.authorChain === authorChain
       );
       if (existingVoteIndex !== -1) {
         this.votes.splice(existingVoteIndex, 1);
       } else {
         this._votesNum += 1;
       }
-      // add new vote
+      // Add new or updated vote
       this.votes.push(vote);
       return vote;
     });
