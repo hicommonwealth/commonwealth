@@ -10,11 +10,11 @@ import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
 
-function encodeEthAddress(address: string): string {
-  return bech32.encode('inj', bech32.toWords(Address.fromString(address).toBuffer()));
+function encodeEthAddress(bech32Prefix: string, address: string): string {
+  return bech32.encode(bech32Prefix, bech32.toWords(Address.fromString(address).toBuffer()));
 }
 
-class InjectiveWebWalletController implements IWebWallet<string> {
+class CosmosEvmWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling = false;
@@ -23,10 +23,10 @@ class InjectiveWebWalletController implements IWebWallet<string> {
   private _provider: provider;
   private _web3: Web3;
 
-  public readonly name = WalletId.InjectiveMetamask;
-  public readonly label = 'Metamask (Injective)';
+  public readonly name = WalletId.CosmosEvmMetamask;
+  public readonly label = 'Metamask (Cosmos)';
   public readonly chain = ChainBase.CosmosSDK;
-  public readonly specificChain = 'injective';
+  public readonly specificChains = ['injective', 'evmos'];
 
   public get available() {
     return !!(window.ethereum);
@@ -74,7 +74,7 @@ class InjectiveWebWalletController implements IWebWallet<string> {
         throw new Error('Could not fetch accounts from Metamask');
       } else {
         for (const acc of this._ethAccounts) {
-          this._accounts.push(encodeEthAddress(acc));
+          this._accounts.push(encodeEthAddress(app.chain?.meta.chain.bech32Prefix || 'inj', acc));
         }
       }
 
@@ -89,7 +89,7 @@ class InjectiveWebWalletController implements IWebWallet<string> {
 
   public async initAccountsChanged() {
     await this._web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
-      const encodedAccounts = accounts.map((a) => encodeEthAddress(a));
+      const encodedAccounts = accounts.map((a) => encodeEthAddress(app.chain?.meta.chain.bech32Prefix || 'inj', a));
       const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === encodedAccounts[0]);
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
@@ -100,4 +100,4 @@ class InjectiveWebWalletController implements IWebWallet<string> {
   // TODO: disconnect
 }
 
-export default InjectiveWebWalletController;
+export default CosmosEvmWebWalletController;

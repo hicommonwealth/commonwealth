@@ -62,7 +62,7 @@ export enum WalletId {
   Keplr = 'keplr',
   NearWallet = 'near',
   TerraStation = 'terrastation',
-  InjectiveMetamask = 'inj-metamask',
+  CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Ronin = 'ronin',
 }
@@ -112,6 +112,7 @@ export enum ChainNetwork {
   Solana = 'solana',
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
+  Evmos = 'evmos',
 }
 
 export enum WebsocketMessageNames {
