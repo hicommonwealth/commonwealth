@@ -33,7 +33,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
-      chain_id: { type: dataTypes.INTEGER, allowNull: false },
+      chain_id: { type: dataTypes.STRING, allowNull: false },
 
       prompt: { type: dataTypes.TEXT, allowNull: false },
       options: { type: dataTypes.STRING, allowNull: true },
@@ -48,7 +48,7 @@ export default (
       updatedAt: 'updated_at',
       underscored: true,
       tableName: 'OffchainPolls',
-      indexes: [{ fields: ['thread_id'] }, { fields: ['chain'] }],
+      indexes: [{ fields: ['thread_id'] }, { fields: ['chain_id'] }],
     }
   );
 
