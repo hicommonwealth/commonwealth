@@ -1058,18 +1058,16 @@ const ViewProposalPage: m.Component<
     if (!vnode.state.prefetch[proposalIdAndType]['pollsStarted']) {
       app.polls
         .fetchPolls(app.activeChainId(), (proposal as OffchainThread).id)
-        .then(async () => {
-          vnode.state.polls = app.polls.getByThreadId(
-            (proposal as OffchainThread).id
-          );
-          m.redraw();
-        })
         .catch(() => {
           notifyError('Failed to load comments');
           vnode.state.comments = [];
           m.redraw();
         });
       vnode.state.prefetch[proposalIdAndType]['pollsStarted'] = true;
+    } else {
+      vnode.state.polls = app.polls.getByThreadId(
+        (proposal as OffchainThread).id
+      );
     }
 
     // load view count
@@ -1214,7 +1212,7 @@ const ViewProposalPage: m.Component<
         data: { who, reason },
       } = proposal;
       const contributors = proposal.getVotes();
-
+      console.log(vnode.state.polls);
       return m(
         Sublayout,
         {
@@ -1420,7 +1418,7 @@ const ViewProposalPage: m.Component<
             proposal instanceof OffchainThread &&
               [
                 ...new Map(
-                  vnode.state.polls.map((poll) => [poll.id, poll])
+                  vnode.state.polls?.map((poll) => [poll.id, poll])
                 ).values(),
               ].map((poll) => {
                 return m(ProposalPoll, { poll, thread: proposal });

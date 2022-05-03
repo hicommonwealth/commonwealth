@@ -186,8 +186,18 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
                     notifyError('Must set poll prompt');
                     return;
                   }
-                  if (!this.options[0]?.length || !this.options[1]?.length) {
+                  if (
+                    !this.options?.length ||
+                    !this.options[0]?.length ||
+                    !this.options[1]?.length
+                  ) {
                     notifyError('Must set poll options');
+                    return;
+                  }
+                  if (
+                    this.options.length !== [...new Set(this.options)].length
+                  ) {
+                    notifyError('Poll options must be unique');
                     return;
                   }
                   try {
