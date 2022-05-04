@@ -119,10 +119,9 @@ export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
   NewSubscriptions = 'new-subscriptions',
   DeleteSubscriptions = 'delete-subscriptions',
-}
-
-export enum WebsocketNamespaces {
-  ChainEvents = 'chain-events',
+  ChatMessage = 'chat-message',
+  JoinChatChannel = 'join-chat-channel',
+  LeaveChatChannel = 'leave-chat-channel',
 }
 
 export type ChainEventNotification = {
@@ -135,6 +134,11 @@ export type ChainEventNotification = {
   created_at: moment.Moment;
   ChainEvent: ChainEventAttributes;
 };
+
+export enum WebsocketNamespaces {
+  ChainEvents = 'chain-events',
+  Chat = 'chat',
+}
 
 export enum WebsocketEngineEvents {
   CreateRoom = 'create-room',
