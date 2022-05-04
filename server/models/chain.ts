@@ -147,6 +147,7 @@ export default (
     models.Chain.hasMany(models.OffchainThread, { foreignKey: 'chain' });
     models.Chain.hasMany(models.OffchainComment, { foreignKey: 'chain' });
     models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
+    models.Chain.hasMany(models.ChatChannel);
     models.Chain.belongsToMany(models.User, {
       through: models.WaitlistRegistration,
     });
