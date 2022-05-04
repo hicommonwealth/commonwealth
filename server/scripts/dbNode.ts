@@ -122,7 +122,7 @@ async function mainProcess(
     );
 
   let query =
-    'SELECT "Chains"."id", "substrate_spec", "url", "private_url", "address", "base", "type", "network", "ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
+    'SELECT "Chains"."id", "substrate_spec", "url", "private_url", "Chains"."address", "base", "type", "network", "Chains"."ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
   const allChains = (await pool.query(query)).rows;
 
   // gets the chains specific to this node
