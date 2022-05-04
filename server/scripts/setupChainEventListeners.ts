@@ -136,16 +136,7 @@ const setupChainEventListeners = async (
       },
     ],
   });
-  const nodesChain = await models.Chain.findAll({
-    include: [
-      {
-        model: models.Chain,
-        where: whereOptions,
-        required: true,
-      },
-    ],
-  });
-  const [nodeChain] = nodesChain;
+
   if (nodes.length === 0) {
     log.info('No event listeners found.');
     return [];
@@ -158,6 +149,8 @@ const setupChainEventListeners = async (
         node,
       ): Promise<[ChainNodeInstance, IEventSubscriber<any, any>]> => {
         let subscriber: IEventSubscriber<any, any>;
+        const nodesChain = await models.Chain.findAll({ where: { id: node.chain } });
+        const [nodeChain] = nodesChain;
         if (node.Chain.base === ChainBase.Substrate) {
           const nodeUrl = constructSubstrateUrl(node.url);
           const api = await SubstrateEvents.createApi(
