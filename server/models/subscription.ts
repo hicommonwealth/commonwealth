@@ -5,7 +5,7 @@ import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
-import { ModelStatic, ModelInstance } from './types';
+import { ModelStatic } from './types';
 import {
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType,
 } from '../../shared/types';
@@ -151,7 +151,10 @@ export default (
     }
 
     // get all relevant subscriptions
-    const subscribers = await models.Subscription.findAll({ where: findOptions });
+    const subscribers = await models.Subscription.findAll({
+      where: findOptions,
+      include: models.User,
+    });
 
     // get notification if it already exists
     let notification: NotificationInstance;
@@ -189,21 +192,14 @@ export default (
     }
 
     // create NotificationsRead instances
-    const nReads = await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
+    await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
       subscription_id: subscription.id,
       notification_id: notification.id,
       is_read: false
-    })), {
-      include: {
-        model: models.Subscription,
-        include: [{
-          model: models.User,
-        }]
-      }
-    });
+    })));
 
     // send emails
-    for (const nRead of nReads) {
+    for (const subscription of subscribers) {
       if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
         msg.dynamic_template_data.notification.path = `${
           SERVER_URL
@@ -213,9 +209,9 @@ export default (
           notification.id
         }`;
       }
-      if (msg && nRead.Subscription?.immediate_email && nRead.Subscription?.User) {
+      if (msg && subscription?.immediate_email && subscription?.User) {
         // kick off async call and immediately return
-        sendImmediateNotificationEmail(nRead.Subscription.User, msg);
+        sendImmediateNotificationEmail(subscription.User, msg);
       }
     }
 
@@ -228,6 +224,7 @@ export default (
 
     // send data to relevant webhooks
     if (webhook_data && (
+      // TODO: this OR clause seems redundant?
       webhook_data.chainEventType?.chain || !erc20Tokens.includes(webhook_data.chainEventType?.chain)
     )) {
       await send(models, {
