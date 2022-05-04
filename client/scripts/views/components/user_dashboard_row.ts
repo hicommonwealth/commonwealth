@@ -249,7 +249,14 @@ const ActivityContent: m.Component<{
 
     const communityName =
       app.config.chains.getById(chain_id)?.name || 'Unknown chain';
-    const decodedTitle = decodeURIComponent(root_title).trim();
+
+    let decodedTitle;
+    try {
+      decodedTitle = decodeURIComponent(root_title).trim();
+    } catch {
+      decodedTitle = root_title.trim();
+    }
+
     const titleText =
       decodedTitle.length < 1
         ? `${capitalize(root_type)} ${root_id}`
