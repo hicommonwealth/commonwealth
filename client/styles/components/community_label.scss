@@ -4,15 +4,16 @@
   align-items: center;
   display: flex;
   justify-content: left;
+  width: 100%;
 
   .community-label-name {
     @include header;
 
-    align-items: center;
     color: $neutral-800;
-    display: flex;
-    justify-content: left;
     margin: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .visible-sm {
