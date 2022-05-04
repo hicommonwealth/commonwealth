@@ -85,7 +85,8 @@ export async function setupWebSocketServer(
   });
 
   log.info(`Connecting to Redis at: ${REDIS_URL}`);
-  const pubClient = createClient({ url: REDIS_URL });
+  const pubClient = createClient({ url: REDIS_URL, socket: { tls: true, rejectUnauthorized: false } });
+
   const subClient = pubClient.duplicate();
 
   try {
