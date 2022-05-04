@@ -19,18 +19,18 @@ module.exports = {
         transaction: t,
       });
       await threads[0].map(async (thread) => {
-        try {
-          const { id } = thread;
-          const getPollsQuery = `SELECT id FROM "OffchainPolls" WHERE thread_id=?`;
-          const res = await queryInterface.sequelize.query(
-            getPollsQuery,
-            {
-              replacements: [id],
-            },
-            { transaction: t }
-          );
-          const poll_id = res[0][0].id;
-          const updatePollsQuery = `UPDATE "OffchainVotes" SET poll_id=? WHERE thread_id=?`;
+        const { id } = thread;
+        const getPollsQuery = `SELECT id FROM "OffchainPolls" WHERE thread_id = ?`;
+        const res = await queryInterface.sequelize.query(
+          getPollsQuery,
+          {
+            replacements: [id],
+          },
+          { transaction: t }
+        );
+        const poll_id = res[0][0]?.id;
+        if (id && poll_id) {
+          const updatePollsQuery = `UPDATE "OffchainVotes" SET poll_id = ? WHERE thread_id = ?`;
           await queryInterface.sequelize.query(
             updatePollsQuery,
             {
@@ -38,32 +38,14 @@ module.exports = {
             },
             { transaction: t }
           );
-        } catch (e) {
-          console.log(thread);
-          throw new Error();
         }
-      });
-      await queryInterface.removeColumn('OffchainVotes', 'thread_id', {
-        transaction: t,
       });
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
-    // TODO: Complete data transfer
-    return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn('OffchainVotes', 'poll_id', {
-        transaction: t,
-      });
-      await queryInterface.addColumn(
-        'OffchainVotes',
-        'thread_id',
-        {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
-        { transaction: t }
-      );
-    });
+  down: async (queryInterface) => {
+    // TODO: Do we want to take the time to do a complete reversal transfer?
+    // Would run into some issues b/c going backwards, there isn't a 1:1 thread:poll ratio
+    return queryInterface.removeColumn('OffchainVotes', 'poll_id');
   },
 };
