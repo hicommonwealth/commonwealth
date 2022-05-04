@@ -102,6 +102,28 @@ $width: 360px;
     }
   }
 
+  .icon-button-gallery {
+    display: flex;
+    flex-direction: column;
+
+    .icon-button-subheader {
+      margin-bottom: 8px;
+    }
+
+    .icon-button-row {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      height: 32px;
+      justify-content: space-between;
+      width: 120px;
+
+      .icon-button-selected {
+        display: flex;
+      }
+    }
+  }
+
   .button-gallery {
     align-items: center;
     display: flex;
