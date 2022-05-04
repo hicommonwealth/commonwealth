@@ -1,85 +1,101 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ProposalCard {
-  @include card;
-  padding: 0;
-  height: initial;
-  .proposal-card-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 260px;
+  padding: 24px;
+  width: 260px;
+
+  .proposal-card-metadata {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding: 24px;
-    min-height: 260px;
     width: 100%;
   }
+
   .proposal-injected {
+    display: flex;
     margin-bottom: 4px;
     padding: 0 2px;
+    width: 100%;
   }
+
   .card-subheader {
     color: $neutral-600;
-    margin-bottom: 5px;
     font-size: 14px;
+    margin-bottom: 8px;
   }
+
   .cui-tag {
-    background: $neutral-25;
-    border-radius: 4px;
-    height: 30px;
-    color: $black;
+    background: $neutral-50;
     border-color: transparent;
+    border-radius: 4px;
+    color: $black;
     font-weight: 500;
+    height: 32px;
+    margin-bottom: 4px;
+    width: fit-content;
   }
+
   .cui-tag.proposal-became-tag {
     background: $neutral-200;
     border-color: $neutral-200;
   }
+
   .proposal-title {
     font-size: 18px;
     font-weight: 500;
     margin: 8px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
+
   .proposal-amount,
   .proposal-comments {
     color: $neutral-500;
   }
+
   .proposal-action {
-    display: inline-block;
     color: $neutral-500;
-    font-weight: 500;
+    display: inline-block;
     font-size: 80%;
+    font-weight: 500;
     text-transform: uppercase;
   }
+
   .proposal-thread-link {
-    font-weight: 500;
-    //
-    padding: 8px 16px;
     background: $neutral-100;
     border-radius: 6px;
     font-size: 92%;
-    margin-top: 11px;
-    position: absolute;
-    bottom: 60px;
-    margin-right: 32px;
+    font-weight: 500;
+    padding: 8px 16px;
+
     &:hover {
       background: $neutral-200;
     }
+
     a:hover {
       text-decoration: none;
     }
 
     svg {
-      display: inline;
       position: relative;
+      display: inline;
       right: 8px;
       top: 4px;
     }
   }
+
   .proposal-status {
-    font-weight: 500;
     color: $neutral-800;
+    font-weight: 500;
+
     &.pass {
       color: $green-600;
     }
+
     &.fail {
       color: $rorange-600;
     }

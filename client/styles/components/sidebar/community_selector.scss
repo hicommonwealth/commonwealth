@@ -64,9 +64,7 @@
     }
 
     .cui-list-item-content-right {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      display: flex;
 
       .community-star-toggle {
         display: flex;

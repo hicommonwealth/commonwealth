@@ -40,6 +40,7 @@ export type ChainAttributes = {
   has_chain_events_listener?: boolean;
   default_summary_view?: boolean;
   terms?: string;
+  admin_only_polling?: boolean;
   snapshot?: string[];
   bech32_prefix?: string;
 
@@ -126,6 +127,7 @@ export default (
       },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
+      admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
     },
     {
       tableName: 'Chains',
