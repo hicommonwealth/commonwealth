@@ -8,7 +8,7 @@ import { DB } from "../database";
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const setupServer = (app: Express, models: DB, rollbar: Rollbar,) => {
+const setupServer = (app: Express, rollbar: Rollbar, models: DB) => {
   const port = process.env.PORT || DEFAULT_PORT;
   app.set('port', port);
   const server = http.createServer(app);
