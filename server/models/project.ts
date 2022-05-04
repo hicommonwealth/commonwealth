@@ -10,6 +10,7 @@ export type ProjectAttributes = {
   // populated immediately
   id?: number;
   chain_id?: string; // Chains fk, null if created by event
+  project_id: number; // on-chain id of the project, used to reference entity
   created_at?: Date;
   updated_at?: Date;
 
