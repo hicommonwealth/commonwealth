@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'pages/gov_explainer.scss';
+import 'components/gov_explainer.scss';
 
 type StatHeader = {
   statName: string;
