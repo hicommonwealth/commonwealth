@@ -296,12 +296,9 @@ async function main() {
       process.exit(exitCode);
     }
   }
-<<<<<<< HEAD
-  setupServer(app);
-  snapshotListener(app);
-=======
+
   setupServer(app, rollbar, models);
->>>>>>> 1c34d88459d4f28e2b1e467690e78546e8906abe
+  snapshotListener(app);
 }
 
 main();
