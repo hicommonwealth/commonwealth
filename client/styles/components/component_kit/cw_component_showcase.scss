@@ -136,6 +136,15 @@ $width: 360px;
     }
   }
 
+  .radio-button-gallery {
+    display: flex;
+    flex-direction: column;
+
+    .RadioButton {
+      margin-bottom: 8px;
+    }
+  }
+
   .card-gallery {
     display: flex;
     flex-direction: column;
