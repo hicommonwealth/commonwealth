@@ -42,6 +42,7 @@ const NoAddressFoundError = "No address found"
 const NoProfileFoundError = "No profile found"
 
 const requiredProfileData = ['name', 'avatarUrl', 'bio']
+
 class NewProfile implements m.Component<{}, ProfileState> {
 
   oninit(vnode) {
@@ -49,6 +50,18 @@ class NewProfile implements m.Component<{}, ProfileState> {
     vnode.state.loading = true
     vnode.state.error = ProfileError.None
     this.getProfile(vnode, vnode.state.address)
+    
+    // TODO: Insufficient data cases for owning user and visiting user
+    const sufficientProfileData = requiredProfileData.every(field => 
+      field in vnode.state.profile && vnode.state.profile[field]
+    )
+    if (!sufficientProfileData) {
+      if (app.isLoggedIn() && 
+        app.user.addresses.map(addressInfo => addressInfo.address).includes(vnode.state.address)) {
+
+      }
+      vnode.state.error = ProfileError.InsufficientProfileData
+    }
   }
 
   getProfile = async (vnode, address: String) => {
@@ -65,19 +78,10 @@ class NewProfile implements m.Component<{}, ProfileState> {
       vnode.state.loading = false
       m.redraw()
     });
-
-    if (vnode.state.error != ProfileError.None)
-      return
+    if (vnode.state.error != ProfileError.None) return
 
     vnode.state.loading = false
     vnode.state.profile = Profile.fromJSON(response.profile)    
-    const sufficientProfileData = requiredProfileData.every(field => 
-      field in vnode.state.profile && vnode.state.profile[field]
-    )
-    if (!sufficientProfileData) {
-      vnode.state.error = ProfileError.InsufficientProfileData
-    }
-
     vnode.state.threads = response.threads
     vnode.state.comments = response.comments.map(c => OffchainComment.fromJSON(c))
     vnode.state.chains = response.chains.map(c => ChainInfo.fromJSON(c))
