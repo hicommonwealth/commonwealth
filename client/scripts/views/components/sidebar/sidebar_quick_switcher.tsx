@@ -78,12 +78,11 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
               label={<CWIcon iconName="plus" iconSize="small" />}
               onclick={(e) => {
                 e.preventDefault();
-                const mixpanelData: MixpanelCommunityCreationPayload = {
+                mixpanelBrowserTrack({
                   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
                   chainBase: null,
                   communityType: null,
-                };
-                mixpanelBrowserTrack(mixpanelData);
+                });
                 m.route.set('/createCommunity');
               }}
             />

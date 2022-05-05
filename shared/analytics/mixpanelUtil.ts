@@ -1,5 +1,5 @@
 import { BaseMixpanelPayload } from './types';
-import Mixpanel from 'mixpanel';
+var Mixpanel = require('mixpanel');
 import { mixpanel as mixpanelBrowser } from 'mixpanel-browser';
 
 var mixpanelNode;
