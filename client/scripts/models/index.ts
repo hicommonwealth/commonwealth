@@ -2,6 +2,7 @@ export { default as AbridgedThread } from './AbridgedThread';
 export { default as Account } from './Account';
 export { default as AddressInfo } from './AddressInfo';
 export { default as ChainInfo } from './ChainInfo';
+export { default as ChatMessage } from './ChatMessage';
 export { default as ContractCategory } from './ContractCategory';
 export { default as ContractItem } from './ContractItem';
 export { default as DiscussionDraft } from './DiscussionDraft';

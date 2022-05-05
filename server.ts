@@ -295,7 +295,7 @@ async function main() {
       process.exit(exitCode);
     }
   }
-  setupServer(app, rollbar);
+  setupServer(app, rollbar, models);
 }
 
 main();

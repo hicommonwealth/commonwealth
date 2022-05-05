@@ -97,7 +97,7 @@ export interface IApp {
 }
 
 const app: IApp = {
-  socket: null,
+  socket: new WebSocketController(),
   chain: null,
 
   chainPreloading: false,

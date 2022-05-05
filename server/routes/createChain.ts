@@ -289,7 +289,13 @@ const createChain = async (
   });
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
-
+  
+  const chatChannels = await models.ChatChannel.create({
+    name: 'General',
+    chain_id: chain.id,
+    category: 'General',
+  });
+  
   mixpanelTrack({
     chainBase: req.body.base,
     isCustomDomain: null,
@@ -297,7 +303,7 @@ const createChain = async (
     event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
   });
 
-  return success(res, { chain: chain.toJSON(), node: nodeJSON });
+  return success(res, { chain: chain.toJSON(), node: node.toJSON() });
 };
 
 export default createChain;
