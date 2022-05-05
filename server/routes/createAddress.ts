@@ -194,13 +194,15 @@ const createAddress = async (
         });
       }
 
-      mixpanelTrack({
+      const mixpanel_data: MixpanelUserSignupPayload = {
         event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
         entryPoint: req.body.mixpanel_entry_point
           ? req.body.mixpanel_entry_point
           : null,
         chain: req.body.chain,
-      });
+      };
+
+      mixpanelTrack(mixpanel_data);
 
       return success(res, newObj.toJSON());
     } catch (e) {

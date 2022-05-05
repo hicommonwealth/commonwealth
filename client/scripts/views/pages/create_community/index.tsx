@@ -24,7 +24,7 @@ import {
   MixpanelPageViewEvent,
   MixpanelPageViewPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -77,9 +77,10 @@ class CreateCommunity implements m.ClassComponent {
   }
 
   oncreate() {
-    mixpanelBrowserTrack({
+    const mixpanelData: MixpanelPageViewPayload = {
       event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
-    });
+    };
+    mixpanelBrowserTrack(mixpanelData);
   }
 
   view() {
@@ -126,12 +127,13 @@ class CreateCommunity implements m.ClassComponent {
                       active={this.state.activeForm === t}
                       onclick={() => {
                         this.state.activeForm = t;
-                        mixpanelBrowserTrack({
+                        const mixpanelData: MixpanelCommunityCreationPayload = {
                           event:
                             MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
                           chainBase: null,
                           communityType: t,
-                        });
+                        };
+                        mixpanelBrowserTrack(mixpanelData);
                       }}
                       style="text-align: center"
                     />

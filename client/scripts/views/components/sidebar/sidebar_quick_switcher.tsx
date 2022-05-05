@@ -11,7 +11,7 @@ import { ChainInfo } from 'models';
 import { ChainIcon } from 'views/components/chain_icon';
 import { CommunitySelector } from 'views/components/sidebar/community_selector';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
@@ -78,11 +78,12 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
               label={<CWIcon iconName="plus" iconSize="small" />}
               onclick={(e) => {
                 e.preventDefault();
-                mixpanelBrowserTrack({
+                const mixpanelData: MixpanelCommunityCreationPayload = {
                   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
                   chainBase: null,
                   communityType: null,
-                });
+                };
+                mixpanelBrowserTrack(mixpanelData);
                 m.route.set('/createCommunity');
               }}
             />

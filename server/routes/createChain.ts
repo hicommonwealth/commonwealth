@@ -290,11 +290,13 @@ const createChain = async (
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
-  mixpanelTrack({
+  const mixpanelData: MixpanelCommunityCreationPayload = {
     chainBase: req.body.base,
     communityType: null,
     event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
-  });
+  };
+
+  mixpanelTrack(mixpanelData);
 
   return success(res, { chain: chain.toJSON(), node: nodeJSON });
 };

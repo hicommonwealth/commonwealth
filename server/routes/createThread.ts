@@ -409,10 +409,11 @@ const createThread = async (
   // TODO: this blocks the event loop -- need to dispatch to a worker so we can continue listening to web queries
   dispatchHooks(models, req, finalThread);
 
-  mixpanelTrack({
+  const mixpanelData: MixpanelCommunityInteractionPayload = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
     community: chain.id,
-  });
+  };
+  mixpanelTrack(mixpanelData);
 
   return res.json({ status: 'Success', result: finalThread.toJSON() });
 };

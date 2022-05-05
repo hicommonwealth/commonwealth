@@ -67,9 +67,10 @@ const finishOAuthLogin = async (
     req.login(existingUser, async (err) => {
       if (err)
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
-      mixpanelTrack({
+      const mixpanelData: MixpanelLoginPayload = {
         event: MixpanelLoginEvent.LOGIN,
-      });
+      };
+      mixpanelTrack(mixpanelData);
       return res.redirect('/?loggedin=true&confirmation=success');
     });
   } else {
@@ -96,9 +97,10 @@ const finishOAuthLogin = async (
     req.login(newUser, (err) => {
       if (err)
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
-      mixpanelTrack({
+      const mixpanelData: MixpanelLoginPayload = {
         event: MixpanelLoginEvent.LOGIN,
-      });
+      };
+      mixpanelTrack(mixpanelData);
       return res.redirect('/?loggedin=true&confirmation=success');
     });
   }

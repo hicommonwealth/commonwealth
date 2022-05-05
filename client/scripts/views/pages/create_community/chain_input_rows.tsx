@@ -15,7 +15,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 import { CommunityType } from '.';
 import { ChainBase } from 'types';
 
@@ -81,11 +81,12 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
       placeholder="https://example.com"
       onChangeHandler={(v) => {
         state.website = v;
-        mixpanelBrowserTrack({
+        const mixpanelData: MixpanelCommunityCreationPayload = {
           event: MixpanelCommunityCreationEvent.WEBSITE_ADDED,
           chainBase: this.state.form.base,
           communityType: null, // TODO: Find a way for this to be accessed?
-        });
+        };
+        mixpanelBrowserTrack(mixpanelData);
       }}
     />,
     <InputRow
@@ -157,11 +158,12 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
           state.altWalletUrl = '';
         }
         state.loaded = false;
-        mixpanelBrowserTrack({
+        const mixpanelData: MixpanelCommunityCreationPayload = {
           event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
           chainBase: value,
           communityType: CommunityType.Erc20Community,
-        });
+        };
+        mixpanelBrowserTrack(mixpanelData);
       }}
     />,
     state.chainString === 'Custom' && (
@@ -204,11 +206,12 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
       onChangeHandler={(v) => {
         state.address = v;
         state.loaded = false;
-        mixpanelBrowserTrack({
+        const mixpanelData: MixpanelCommunityCreationPayload = {
           event: MixpanelCommunityCreationEvent.ADDRESS_ADDED,
           chainBase: ChainBase.Ethereum,
           communityType: null,
-        });
+        };
+        mixpanelBrowserTrack(mixpanelData);
       }}
     />,
   ];

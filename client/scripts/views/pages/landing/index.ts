@@ -24,7 +24,7 @@ import {
   MixpanelPageViewEvent,
   MixpanelPageViewPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 
 export interface Chain {
   img: string;
@@ -53,9 +53,10 @@ interface IState {
 const LandingPage: m.Component<{}, IState> = {
   oncreate: () => {
     if (!app.isLoggedIn()) {
-      mixpanelBrowserTrack({
+      const mixpanelData: MixpanelPageViewPayload = {
         event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
-      });
+      };
+      mixpanelBrowserTrack(mixpanelData);
     }
   },
   oninit: (vnode) => {

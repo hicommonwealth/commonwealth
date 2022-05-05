@@ -41,7 +41,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
@@ -199,11 +199,12 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
             const { chainString, ethChainId, nodeUrl, tokenName } =
               this.state.form;
             this.state.saving = true;
-            mixpanelBrowserTrack({
+            const mixpanelData: MixpanelCommunityCreationPayload = {
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
               communityType: null,
-            });
+            };
+            mixpanelBrowserTrack(mixpanelData);
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 base: ChainBase.Ethereum,

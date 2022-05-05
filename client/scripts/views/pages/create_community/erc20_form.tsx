@@ -31,7 +31,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
 
 type CreateERC20Form = ChainFormFields & EthFormFields & { decimals: number };
 
@@ -189,11 +189,12 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             const { altWalletUrl, chainString, ethChainId, nodeUrl } =
               this.state.form;
             this.state.saving = true;
-            mixpanelBrowserTrack({
+            const mixpanelData: MixpanelCommunityCreationPayload = {
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
               communityType: null,
-            });
+            };
+            mixpanelBrowserTrack(mixpanelData);
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 alt_wallet_url: altWalletUrl,

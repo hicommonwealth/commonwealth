@@ -205,10 +205,11 @@ const createReaction = async (
   author.last_active = new Date();
   author.save();
 
-  mixpanelTrack({
+  const mixpanelData: MixpanelCommunityInteractionPayload = {
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
     community: chain.id,
-  });
+  };
+  mixpanelTrack(mixpanelData);
 
   return res.json({ status: 'Success', result: finalReaction.toJSON() });
 };

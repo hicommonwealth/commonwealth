@@ -429,10 +429,11 @@ const createComment = async (
     proposal.save();
   }
 
-  mixpanelTrack({
+  const mixpanelData: MixpanelCommunityInteractionPayload = {
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
     community: chain.id,
-  });
+  };
+  mixpanelTrack(mixpanelData);
 
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };
