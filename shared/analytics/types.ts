@@ -101,12 +101,3 @@ export type MixpanelEvents =
 export interface BaseMixpanelPayload {
   event: MixpanelEvents;
 }
-
-// Include all Payload Options
-export type MixpanelPayload =
-  | MixpanelLoginPayload
-  | BaseMixpanelPayload
-  | MixpanelCommunityCreationPayload
-  | MixpanelPageViewPayload
-  | MixpanelCommunityInteractionPayload
-  | MixpanelChatEventsPayload;

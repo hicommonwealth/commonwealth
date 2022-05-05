@@ -19,7 +19,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
+import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
 import { CommunityType } from '.';
 
 // TODO: ChainFormState contains "uploadInProgress" which is technically
@@ -70,12 +70,11 @@ export class StarterCommunityForm implements m.ClassComponent {
           value={this.state.form.base}
           onchange={(value) => {
             this.state.form.base = value;
-            const mixpanelData: MixpanelCommunityCreationPayload = {
+            mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
               chainBase: value,
               communityType: CommunityType.StarterCommunity,
-            };
-            mixpanelBrowserTrack(mixpanelData);
+            });
           }}
         />
         {...defaultChainRows(this.state.form)}
@@ -91,12 +90,11 @@ export class StarterCommunityForm implements m.ClassComponent {
               bech32_prefix?: string;
               alt_wallet_url?: string;
             } = {};
-            const mixpanelData: MixpanelCommunityCreationPayload = {
+            mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: this.state.form.base,
               communityType: CommunityType.StarterCommunity,
-            };
-            mixpanelBrowserTrack(mixpanelData);
+            });
 
             // defaults to be overridden when chain is no longer "starter" type
             switch (this.state.form.base) {
