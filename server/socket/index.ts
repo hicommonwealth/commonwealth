@@ -90,6 +90,8 @@ export async function setupWebSocketServer(
 
   try {
     await Promise.all([pubClient.connect(), subClient.connect()]);
+    // provide the redis connection instances to the socket.io adapters
+    await io.adapter(<any>createAdapter(pubClient, subClient));
   } catch (e) {
     // local env may not have redis so don't do anything if they don't
     if (!origin.includes('localhost')) {
@@ -101,8 +103,6 @@ export async function setupWebSocketServer(
       );
     }
   }
-  // provide the redis connection instances to the socket.io adapters
-  await io.adapter(<any>createAdapter(pubClient, subClient));
 
   // create the chain-events namespace
   const ceNamespace = createCeNamespace(io);
