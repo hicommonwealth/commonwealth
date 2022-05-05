@@ -288,7 +288,7 @@ async function main() {
     }
   }
   setupServer(app);
-  snapshotListener();
+  snapshotListener(app);
 }
 
 main();
