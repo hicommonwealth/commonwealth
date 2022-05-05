@@ -24,6 +24,7 @@ import { NewProposalMenu } from 'views/components/new_proposal_button';
 import { LoginModal } from '../modals/login_modal';
 import { ExternalLinksModule } from '../components/sidebar/external_links_module';
 import { CommunitySelector } from '../components/sidebar/community_selector';
+import { ChatSection } from '../components/chat/chat_section';
 
 enum MenuTabs {
   CurrentCommunity = 'currentCommunity',
@@ -119,6 +120,7 @@ export class MobileSidebar implements m.ClassComponent {
         <MenuDivider />
         {app.chain && <DiscussionSection mobile={true} />}
         {app.chain && <GovernanceSection mobile={true} />}
+        {app.chain && <ChatSection mobile={true} />}
         {app.chain && <ExternalLinksModule />}
       </Menu>
     );

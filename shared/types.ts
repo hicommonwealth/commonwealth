@@ -63,7 +63,7 @@ export enum WalletId {
   Keplr = 'keplr',
   NearWallet = 'near',
   TerraStation = 'terrastation',
-  InjectiveMetamask = 'inj-metamask',
+  CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Ronin = 'ronin',
 }
@@ -113,16 +113,16 @@ export enum ChainNetwork {
   Solana = 'solana',
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
+  Evmos = 'evmos',
 }
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
   NewSubscriptions = 'new-subscriptions',
   DeleteSubscriptions = 'delete-subscriptions',
-}
-
-export enum WebsocketNamespaces {
-  ChainEvents = 'chain-events',
+  ChatMessage = 'chat-message',
+  JoinChatChannel = 'join-chat-channel',
+  LeaveChatChannel = 'leave-chat-channel',
 }
 
 export type ChainEventNotification = {
@@ -135,6 +135,11 @@ export type ChainEventNotification = {
   created_at: moment.Moment;
   ChainEvent: ChainEventAttributes;
 };
+
+export enum WebsocketNamespaces {
+  ChainEvents = 'chain-events',
+  Chat = 'chat',
+}
 
 export enum WebsocketEngineEvents {
   CreateRoom = 'create-room',

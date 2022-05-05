@@ -36,6 +36,7 @@ class ChainInfo {
   public readonly bech32Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
+  public adminOnlyPolling: boolean;
 
   constructor({
     id,
@@ -65,6 +66,7 @@ class ChainInfo {
     type,
     decimals,
     substrateSpec,
+    adminOnlyPolling,
   }) {
     this.id = id;
     this.network = network;
@@ -94,6 +96,7 @@ class ChainInfo {
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
+    this.adminOnlyPolling = adminOnlyPolling;
   }
 
   public static fromJSON({
@@ -124,6 +127,7 @@ class ChainInfo {
     type,
     decimals,
     substrate_spec,
+    admin_only_polling,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -160,6 +164,7 @@ class ChainInfo {
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
+      adminOnlyPolling: admin_only_polling,
     });
   }
 

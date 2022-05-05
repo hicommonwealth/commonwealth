@@ -26,7 +26,7 @@ import IdentityFetchCache, {
   IdentityFetchCacheNew,
 } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
-import { SESSION_SECRET } from './server/config';
+import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
@@ -40,6 +40,7 @@ import setupChainEventListeners from './server/scripts/setupChainEventListeners'
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import snapshotListener from './server/util/snapshotListener'
+import Rollbar from "rollbar";
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -276,7 +277,15 @@ async function main() {
   );
   setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
-  setupErrorHandlers(app);
+
+  const rollbar = new Rollbar({
+    accessToken: ROLLBAR_SERVER_TOKEN,
+    environment: process.env.NODE_ENV,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+  });
+
+  setupErrorHandlers(app, rollbar);
 
   if (CHAIN_EVENTS) {
     const exitCode = await listenChainEvents();
@@ -287,8 +296,12 @@ async function main() {
       process.exit(exitCode);
     }
   }
+<<<<<<< HEAD
   setupServer(app);
   snapshotListener(app);
+=======
+  setupServer(app, rollbar, models);
+>>>>>>> 1c34d88459d4f28e2b1e467690e78546e8906abe
 }
 
 main();

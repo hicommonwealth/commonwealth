@@ -29,19 +29,7 @@ class RecentListingStore extends IdStore<OffchainThread> {
     return this._threads;
   }
 
-  private _fetchState: IListingFetchState = {
-    allThreadsInitialized: false,
-    topicInitialized: {},
-    stageInitialized: {},
-
-    allThreadsCutoffDate: moment(),
-    topicCutoffDate: {},
-    stageCutoffDate: {},
-
-    allThreadsDepleted: false,
-    topicDepleted: {},
-    stageDepleted: {},
-  };
+  private _fetchState: IListingFetchState = this._resetFetchState();
 
   public add(thread: OffchainThread) {
     const existingThread = this.getById(thread.id);
@@ -66,6 +54,7 @@ class RecentListingStore extends IdStore<OffchainThread> {
   public clear() {
     super.clear();
     this._threads = [];
+    this._fetchState = this._resetFetchState();
   }
 
   // Getters
@@ -199,6 +188,24 @@ class RecentListingStore extends IdStore<OffchainThread> {
       .forEach((t) => {
         t.topic = null;
       });
+  }
+
+  // Helper function
+
+  private _resetFetchState(): IListingFetchState {
+    return {
+      allThreadsInitialized: false,
+      topicInitialized: {},
+      stageInitialized: {},
+
+      allThreadsCutoffDate: moment(),
+      topicCutoffDate: {},
+      stageCutoffDate: {},
+
+      allThreadsDepleted: false,
+      topicDepleted: {},
+      stageDepleted: {},
+    };
   }
 }
 
