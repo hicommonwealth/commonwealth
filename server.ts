@@ -5,6 +5,7 @@ import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import fs from 'fs';
+import Rollbar from 'rollbar';
 
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
@@ -39,7 +40,7 @@ import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
-import Rollbar from "rollbar";
+import generateActiveUserScores from './server/scripts/generateActiveUserScores';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -65,6 +66,7 @@ async function main() {
   const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
   const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
   const USE_NEW_IDENTITY_CACHE = process.env.USE_NEW_IDENTITY_CACHE === 'true';
+  const GENERATE_ACTIVE_USER_SCORES = process.env.GENERATE_ACTIVE_USER_SCORES === 'true';
 
   // if running in old mode then use old identityCache but if running with dbNode.ts use the new db identityCache
   let identityFetchCache: IdentityFetchCacheNew | IdentityFetchCache;
@@ -141,6 +143,8 @@ async function main() {
       );
       rc = 1;
     }
+  } else if (GENERATE_ACTIVE_USER_SCORES) {
+    rc = await generateActiveUserScores(models);
   }
 
   // exit if we have performed a one-off event
