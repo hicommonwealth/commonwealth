@@ -41,16 +41,8 @@ export interface MixpanelLoginPayload extends BaseMixpanelPayload {
 export const enum MixpanelUserSignupEvent {
   NEW_USER_SIGNUP = 'New User Signup',
 }
-
-export const enum MixpanelUserSignupEntryPoint {
-  CUSTOM_DOMAIN = 'Custom Domain',
-  LINKED_THREAD = 'Linked Thread',
-  LANDING_PAGE = 'Landing Page',
-}
-
 export interface MixpanelUserSignupPayload extends BaseMixpanelPayload {
   chain: string;
-  entryPoint: MixpanelUserSignupEntryPoint;
   event: MixpanelUserSignupEvent;
 }
 // END NEW USER SIGNUP EVENT
@@ -100,4 +92,5 @@ export type MixpanelEvents =
 // Base Payload - Required for All Events
 export interface BaseMixpanelPayload {
   event: MixpanelEvents;
+  isCustomDomain: boolean;
 }

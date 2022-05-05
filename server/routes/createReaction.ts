@@ -208,6 +208,7 @@ const createReaction = async (
   mixpanelTrack({
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
     community: chain.id,
+    isCustomDomain: null,
   });
 
   return res.json({ status: 'Success', result: finalReaction.toJSON() });

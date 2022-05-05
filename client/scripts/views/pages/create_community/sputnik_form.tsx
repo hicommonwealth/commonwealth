@@ -55,6 +55,7 @@ export class SputnikForm implements m.ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
               chainBase: ChainBase.CosmosSDK,
+              isCustomDomain: app.isCustomDomain(),
               communityType: CommunityType.SputnikDao,
             });
           }}
@@ -101,6 +102,7 @@ export class SputnikForm implements m.ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
+              isCustomDomain: app.isCustomDomain(),
               communityType: null,
             });
 

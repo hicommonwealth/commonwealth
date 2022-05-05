@@ -79,6 +79,7 @@ class CreateCommunity implements m.ClassComponent {
   oncreate() {
     mixpanelBrowserTrack({
       event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
+      isCustomDomain: app.isCustomDomain(),
     });
   }
 
@@ -130,6 +131,7 @@ class CreateCommunity implements m.ClassComponent {
                           event:
                             MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
                           chainBase: null,
+                          isCustomDomain: app.isCustomDomain(),
                           communityType: t,
                         });
                       }}

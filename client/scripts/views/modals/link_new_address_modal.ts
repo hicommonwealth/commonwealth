@@ -23,7 +23,6 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
-import { MixpanelUserSignupEntryPoint } from 'analytics/types';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithWebWallet,
@@ -67,19 +66,6 @@ interface ILinkNewAddressModalState {
   isEd25519?: boolean;
   initializingWallet: boolean;
   onpopstate;
-}
-
-export function getMixpanelEntryPoint(): MixpanelUserSignupEntryPoint {
-  let mixpanelEntryPoint = MixpanelUserSignupEntryPoint.LANDING_PAGE;
-  if (m.route.get() !== '/') {
-    // TODO: This is not comprehensive I dont think
-    mixpanelEntryPoint = MixpanelUserSignupEntryPoint.LINKED_THREAD;
-  }
-  if (!app.isCustomDomain()) {
-    mixpanelEntryPoint = MixpanelUserSignupEntryPoint.CUSTOM_DOMAIN;
-  }
-
-  return mixpanelEntryPoint;
 }
 
 const LinkAccountItem: m.Component<
@@ -168,13 +154,10 @@ const LinkAccountItem: m.Component<
             }
           }
 
-          const mixpanelEntryPoint = getMixpanelEntryPoint();
-
           try {
             const signerAccount = await createUserWithAddress(
               address,
               webWallet.name,
-              mixpanelEntryPoint,
               undefined,
               targetCommunity
             );
@@ -424,7 +407,6 @@ const LinkNewAddressModal: m.Component<
           vnode.state.newAddress = await createUserWithAddress(
             address,
             webWallet.name,
-            getMixpanelEntryPoint(),
             vnode.state.isEd25519 ? 'ed25519' : undefined,
             targetCommunity
           );

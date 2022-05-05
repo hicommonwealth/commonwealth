@@ -106,6 +106,7 @@ const finishEmailLogin = async (
       }
       mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
       });
       return redirectWithLoginSuccess(
         res,
@@ -127,6 +128,7 @@ const finishEmailLogin = async (
         );
       mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
       });
       return redirectWithLoginSuccess(
         res,
@@ -165,6 +167,7 @@ const finishEmailLogin = async (
         );
       mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
       });
       return redirectWithLoginSuccess(
         res,

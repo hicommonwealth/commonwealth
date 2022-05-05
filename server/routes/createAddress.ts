@@ -12,11 +12,7 @@ import { factory, formatFilename } from '../../shared/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelUserSignupEvent,
-  MixpanelUserSignupPayload,
-  MixpanelUserSignupEntryPoint,
-} from '../../shared/analytics/types';
+import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -33,7 +29,6 @@ type CreateAddressReq = {
   wallet_id: WalletId;
   community?: string;
   keytype?: string;
-  mixpanel_entry_point?: MixpanelUserSignupEntryPoint;
 };
 
 type CreateAddressResp = AddressAttributes;
@@ -196,10 +191,8 @@ const createAddress = async (
 
       mixpanelTrack({
         event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-        entryPoint: req.body.mixpanel_entry_point
-          ? req.body.mixpanel_entry_point
-          : null,
         chain: req.body.chain,
+        isCustomDomain: null,
       });
 
       return success(res, newObj.toJSON());

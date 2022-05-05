@@ -55,6 +55,7 @@ const LandingPage: m.Component<{}, IState> = {
     if (!app.isLoggedIn()) {
       mixpanelBrowserTrack({
         event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
+        isCustomDomain: app.isCustomDomain(),
       });
     }
   },

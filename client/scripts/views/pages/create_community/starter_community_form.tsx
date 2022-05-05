@@ -73,6 +73,7 @@ export class StarterCommunityForm implements m.ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
               chainBase: value,
+              isCustomDomain: app.isCustomDomain(),
               communityType: CommunityType.StarterCommunity,
             });
           }}
@@ -93,6 +94,7 @@ export class StarterCommunityForm implements m.ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: this.state.form.base,
+              isCustomDomain: app.isCustomDomain(),
               communityType: CommunityType.StarterCommunity,
             });
 

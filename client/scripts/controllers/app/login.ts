@@ -19,14 +19,12 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-import { MixpanelUserSignupEntryPoint } from 'analytics/types';
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(
   account: Account<any>,
   walletId: WalletId,
-  community?: string,
-  mixpanelEntryPoint?: MixpanelUserSignupEntryPoint
+  community?: string
 ) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
@@ -38,7 +36,6 @@ function createAccount(
     community,
     jwt: app.user.jwt,
     wallet_id: walletId,
-    mixpanel_entry_point: mixpanelEntryPoint,
   });
 }
 
@@ -217,17 +214,11 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  mixpanelEntryPoint?: MixpanelUserSignupEntryPoint,
   keytype?: string,
   community?: string
 ): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
-  const response = await createAccount(
-    account,
-    walletId,
-    community,
-    mixpanelEntryPoint
-  );
+  const response = await createAccount(account, walletId, community);
   const token = response.result.verification_token;
   const newAccount = app.chain.accounts.get(response.result.address, keytype);
   newAccount.setValidationToken(token);

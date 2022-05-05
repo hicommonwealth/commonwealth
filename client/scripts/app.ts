@@ -43,6 +43,9 @@ const APPLICATION_UPDATE_MESSAGE =
   'A new version of the application has been released. Please save your work and refresh.';
 const APPLICATION_UPDATE_ACTION = 'Okay';
 
+const MIXPANEL_DEV_TOKEN = '312b6c5fadb9a88d98dc1fb38de5d900';
+const MIXPANEL_PROD_TOKEN = '993ca6dd7df2ccdc2a5d2b116c0e18c5';
+
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
@@ -1078,10 +1081,11 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         document.location.host.startsWith('localhost') ||
         document.location.host.startsWith('127.0.0.1')
       ) {
-        mixpanel.init('312b6c5fadb9a88d98dc1fb38de5d900', { debug: true });
+        mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
       } else {
         // Production Mixpanel Project
-        mixpanel.init('993ca6dd7df2ccdc2a5d2b116c0e18c5', { debug: true });
+        // TODO: Swap this for the prod token after we make sure everything is working
+        mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
       }
     } catch (e) {
       console.error('Mixpanel initialization error');

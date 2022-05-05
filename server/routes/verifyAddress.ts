@@ -455,6 +455,7 @@ const verifyAddress = async (
       if (err) return next(err);
       mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
       });
       //mixpanelPeopleSet(req.user.id.toString());
       return res.json({

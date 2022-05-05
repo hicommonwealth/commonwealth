@@ -230,6 +230,7 @@ const finishSsoLogin = async (
           );
         mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
         });
       });
       return success(res, { user });
@@ -334,6 +335,7 @@ const finishSsoLogin = async (
           );
         mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
         });
       });
       return success(res, { user: newUser });

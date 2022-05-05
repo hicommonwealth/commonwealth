@@ -84,6 +84,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
         mixpanelBrowserTrack({
           event: MixpanelCommunityCreationEvent.WEBSITE_ADDED,
           chainBase: this.state.form.base,
+          isCustomDomain: app.isCustomDomain(),
           communityType: null, // TODO: Find a way for this to be accessed?
         });
       }}
@@ -160,6 +161,7 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
         mixpanelBrowserTrack({
           event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
           chainBase: value,
+          isCustomDomain: app.isCustomDomain(),
           communityType: CommunityType.Erc20Community,
         });
       }}
@@ -207,6 +209,7 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
         mixpanelBrowserTrack({
           event: MixpanelCommunityCreationEvent.ADDRESS_ADDED,
           chainBase: ChainBase.Ethereum,
+          isCustomDomain: app.isCustomDomain(),
           communityType: null,
         });
       }}

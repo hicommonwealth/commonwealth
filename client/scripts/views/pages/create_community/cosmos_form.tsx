@@ -108,6 +108,7 @@ export class CosmosForm implements m.ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
+              isCustomDomain: app.isCustomDomain(),
               communityType: null,
             });
             try {

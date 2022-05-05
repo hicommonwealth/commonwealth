@@ -202,6 +202,7 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
+              isCustomDomain: app.isCustomDomain(),
               communityType: null,
             });
             try {

@@ -81,6 +81,7 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
                 mixpanelBrowserTrack({
                   event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
                   chainBase: null,
+                  isCustomDomain: app.isCustomDomain(),
                   communityType: null,
                 });
                 m.route.set('/createCommunity');

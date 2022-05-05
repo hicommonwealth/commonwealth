@@ -69,6 +69,7 @@ const finishOAuthLogin = async (
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
       mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
       });
       return res.redirect('/?loggedin=true&confirmation=success');
     });
@@ -98,6 +99,7 @@ const finishOAuthLogin = async (
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
       mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
+        isCustomDomain: null,
       });
       return res.redirect('/?loggedin=true&confirmation=success');
     });

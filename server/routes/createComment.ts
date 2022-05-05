@@ -432,6 +432,7 @@ const createComment = async (
   mixpanelTrack({
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
     community: chain.id,
+    isCustomDomain: null,
   });
 
   return res.json({ status: 'Success', result: finalComment.toJSON() });
