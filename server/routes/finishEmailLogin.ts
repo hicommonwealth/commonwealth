@@ -3,7 +3,7 @@ import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { getStatsDInstance } from '../util/metrics';
 import { DB } from '../database';
-import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelLoginEvent,
   MixpanelLoginPayload,

@@ -13,7 +13,7 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,

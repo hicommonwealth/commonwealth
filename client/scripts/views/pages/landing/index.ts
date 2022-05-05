@@ -24,7 +24,7 @@ import {
   MixpanelPageViewEvent,
   MixpanelPageViewPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 export interface Chain {
   img: string;

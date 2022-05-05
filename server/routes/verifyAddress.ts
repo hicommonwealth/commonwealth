@@ -42,7 +42,7 @@ import {
 } from '../../shared/types';
 import AddressSwapper from '../util/addressSwapper';
 import { AppError, ServerError } from '../util/errors';
-import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelLoginEvent,
   MixpanelLoginPayload,

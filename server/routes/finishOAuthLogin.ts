@@ -6,7 +6,7 @@ import {
   redirectWithLoginError,
 } from './finishEmailLogin';
 import { DB } from '../database';
-import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelLoginEvent,
   MixpanelLoginPayload,

@@ -14,7 +14,7 @@ import { getUrlsForEthChainId } from '../util/supportedEthChains';
 
 import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
-import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,

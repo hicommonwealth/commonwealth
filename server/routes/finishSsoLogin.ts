@@ -20,7 +20,7 @@ import {
   redirectWithLoginError,
   redirectWithLoginSuccess,
 } from './finishEmailLogin';
-import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelLoginEvent,
   MixpanelLoginPayload,

@@ -19,7 +19,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { CommunityType } from '.';
 
 type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };

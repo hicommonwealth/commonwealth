@@ -22,7 +22,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 type SplTokenFormFields = {
   cluster: solw3.Cluster;

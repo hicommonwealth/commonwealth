@@ -11,7 +11,7 @@ import { ChainInfo } from 'models';
 import { ChainIcon } from 'views/components/chain_icon';
 import { CommunitySelector } from 'views/components/sidebar/community_selector';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,

@@ -11,7 +11,7 @@ import { ChainBase, WalletId } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
-import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelUserSignupEvent,
   MixpanelUserSignupPayload,

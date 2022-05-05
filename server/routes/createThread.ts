@@ -15,7 +15,7 @@ import { DB, sequelize } from '../database';
 import { factory, formatFilename } from '../../shared/logging';
 import { OffchainThreadInstance } from '../models/offchain_thread';
 import { ServerError } from '../util/errors';
-import { mixpanelTrack } from '../../shared/analytics/mixpanelUtil';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
