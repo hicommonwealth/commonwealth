@@ -31,8 +31,6 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
-import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
-import { MixpanelLoginEvent, MixpanelLoginPayload } from 'analytics/types';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');

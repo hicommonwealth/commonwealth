@@ -228,10 +228,9 @@ const finishSsoLogin = async (
             res,
             `Could not log in with ronin wallet`
           );
-        const mixpanelData: MixpanelLoginPayload = {
+        mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
-        };
-        mixpanelTrack(mixpanelData);
+        });
       });
       return success(res, { user });
     }
@@ -333,10 +332,9 @@ const finishSsoLogin = async (
             res,
             `Could not log in with ronin wallet`
           );
-        const mixpanelData: MixpanelLoginPayload = {
+        mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
-        };
-        mixpanelTrack(mixpanelData);
+        });
       });
       return success(res, { user: newUser });
     }

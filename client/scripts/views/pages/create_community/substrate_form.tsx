@@ -20,7 +20,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'analytics/mixpanel_browser_util';
+import { mixpanelBrowserTrack } from 'analytics/mixpanelUtil';
 
 type SubstrateFormFields = {
   nodeUrl: string;
@@ -116,12 +116,11 @@ export class SubstrateForm implements m.ClassComponent {
           disabled={this.state.saving}
           onclick={async () => {
             const { name, nodeUrl, iconUrl, substrateSpec } = this.state.form;
-            const mixpanelData: MixpanelCommunityCreationPayload = {
+            mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
               communityType: null,
-            };
-            mixpanelBrowserTrack(mixpanelData);
+            });
             try {
               JSON.parse(substrateSpec);
             } catch (err) {

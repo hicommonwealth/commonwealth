@@ -104,10 +104,9 @@ const finishEmailLogin = async (
         existingUser.emailVerified = true;
         await existingUser.save();
       }
-      const mixpanelData: MixpanelLoginPayload = {
+      mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
-      };
-      mixpanelTrack(mixpanelData);
+      });
       return redirectWithLoginSuccess(
         res,
         email,
@@ -126,10 +125,9 @@ const finishEmailLogin = async (
           res,
           `Could not log in with user at ${email}`
         );
-      const mixpanelData: MixpanelLoginPayload = {
+      mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
-      };
-      mixpanelTrack(mixpanelData);
+      });
       return redirectWithLoginSuccess(
         res,
         email,
@@ -165,10 +163,9 @@ const finishEmailLogin = async (
           res,
           `Could not log in with user at ${email}`
         );
-      const mixpanelData: MixpanelLoginPayload = {
+      mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
-      };
-      mixpanelTrack(mixpanelData);
+      });
       return redirectWithLoginSuccess(
         res,
         email,

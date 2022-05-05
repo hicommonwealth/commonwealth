@@ -453,10 +453,9 @@ const verifyAddress = async (
     });
     req.login(user, (err) => {
       if (err) return next(err);
-      const mixpanelData: MixpanelLoginPayload = {
+      mixpanelTrack({
         event: MixpanelLoginEvent.LOGIN,
-      };
-      mixpanelTrack(mixpanelData);
+      });
       //mixpanelPeopleSet(req.user.id.toString());
       return res.json({
         status: 'Success',
