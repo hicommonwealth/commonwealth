@@ -10,6 +10,7 @@ import { factory, formatFilename } from '../../shared/logging';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
 import { IPostNotificationData, NotificationCategories, DynamicTemplate } from '../../shared/types';
 import { DB } from '../database';
+import { UserAttributes } from '../models/user';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -156,8 +157,10 @@ const createNotificationDigestEmailObject = async (user, notifications, models: 
   };
 };
 
-export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
-  const user = await subscription.getUser();
+export const sendImmediateNotificationEmail = async (
+  user: UserAttributes,
+  emailObject
+) => {
   if (!emailObject) {
     console.log('attempted to send empty immediate notification email');
     return;
