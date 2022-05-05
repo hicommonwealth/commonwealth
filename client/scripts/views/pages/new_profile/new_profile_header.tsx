@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import app from 'state';
 
 import { NewProfile as Profile } from 'client/scripts/models'
 import { SocialAccount } from 'client/scripts/models';
@@ -51,7 +52,7 @@ class NewProfileHeader implements m.Component<ProfileHeaderAttrs, ProfileHeaderS
   }
 
   view(vnode) {
-    const { profile, socialAccounts } = vnode.attrs;
+    const { profile, socialAccounts, address } = vnode.attrs;
 
     return(
       <div className="ProfileHeader">
@@ -89,13 +90,18 @@ class NewProfileHeader implements m.Component<ProfileHeaderAttrs, ProfileHeaderS
             { 
               renderSocialAccounts(socialAccounts)
             }
-            <div className="edit-button">
-              <CWButton
-                label="Edit"
-                buttonType="primary"
-                onclick={() => m.route.set(`/profile/${m.route.param('address')}/edit`)}
-              />
-            </div>
+            {
+              app.isLoggedIn() && 
+              app.user.addresses.map(addressInfo => addressInfo.address).includes(address) ? 
+              <div className="edit-button">
+                <CWButton
+                  label="Edit"
+                  buttonType="primary"
+                  onclick={() => m.route.set(`/profile/${m.route.param('address')}/edit`)}
+                />
+              </div>
+              : <div />
+            }
           </section>
         </CWCard>
 

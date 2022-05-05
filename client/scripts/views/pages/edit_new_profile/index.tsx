@@ -47,6 +47,13 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
     vnode.state.address = m.route.param("address")
     vnode.state.error = EditProfileError.None
     this.getProfile(vnode, vnode.state.address)
+
+    // If not logged in or address not owned by logged in user
+    if (!app.isLoggedIn() || 
+      !app.user.addresses.map(addressInfo => addressInfo.address).includes(vnode.state.address)) {
+      m.route.set(`/profile/${vnode.state.address}`)
+    }
+
     vnode.state.profileUpdate = {}
     vnode.state.saved = false
     vnode.state.failed = false
@@ -103,7 +110,6 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
         m.redraw()
       }, 2500)
     }
-
   }
 
   handleInputChange = (vnode, value, formField: InputFormField) => {

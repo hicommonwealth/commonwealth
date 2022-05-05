@@ -17,7 +17,7 @@
     margin: 30px 0;
 
     .profile-info {
-      height: 215px;
+      min-height: 215px;
       &.expand {
         height: auto;
       }
@@ -282,7 +282,7 @@
     .ProfileHeader {
 
       .profile-info {
-        height: 260px;
+        min-height: 260px;
         grid-template-columns: 20% 80%;
         grid-template-rows: 80% 20%;  
 

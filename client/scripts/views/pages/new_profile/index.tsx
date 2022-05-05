@@ -68,7 +68,7 @@ class NewProfile implements m.Component<{}, ProfileState> {
 
     if (vnode.state.error != ProfileError.None)
       return
-      
+
     vnode.state.loading = false
     vnode.state.profile = Profile.fromJSON(response.profile)    
     const sufficientProfileData = requiredProfileData.every(field => 
@@ -103,6 +103,7 @@ class NewProfile implements m.Component<{}, ProfileState> {
       return (
         <div className="ProfilePage">
           <NewProfileHeader 
+            address={vnode.state.address}
             profile={vnode.state.profile} 
             socialAccounts={vnode.state.socialAccounts}
           />
