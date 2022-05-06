@@ -17,6 +17,8 @@ export const Errors = {
   MustBeAdmin: 'Must be admin to create poll',
 };
 
+// TODO Graham 22-05-06: delete and update functionality should eventually be supported
+
 const createPoll = async (
   models: DB,
   req: Request,
