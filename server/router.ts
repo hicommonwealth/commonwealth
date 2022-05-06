@@ -123,6 +123,8 @@ import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
+import getProjects from './routes/getProjects';
+import setProjectChain from './routes/setProjectChain';
 
 function setupRouter(
   app: Express,
@@ -436,6 +438,14 @@ function setupRouter(
 
   // fetch addresses (e.g. for mentions)
   router.get('/bulkAddresses', bulkAddresses.bind(this, models));
+
+  // projects related routes
+  router.get('/getProjects', getProjects.bind(this, models));
+  router.get(
+    '/setProjectChain',
+    passport.authenticate('jwt', { session: false }),
+    setProjectChain.bind(this, models)
+  );
 
   // third-party webhooks
   router.post(

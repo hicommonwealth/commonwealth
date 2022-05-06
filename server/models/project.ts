@@ -8,24 +8,25 @@ export type Permission = 'admin' | 'moderator' | 'member';
 
 export type ProjectAttributes = {
   // populated immediately
-  id?: number;
+  id: number;
   chain_id?: string; // Chains fk, null if created by event
-  project_id: number; // on-chain id of the project, used to reference entity
   created_at?: Date;
   updated_at?: Date;
 
   // populated by creation event
-  entity_id?: number; // ChainEntities fk
+  entity_id: number; // ChainEntities fk
+  creator: string;
+  ipfs_hash_id?: number;
 
   // populated from contract queries
-  token?: string;
-  curator_fee?: string;
-  threshold?: string;
-  deadline?: number;
-  funding_amount?: string;
+  token: string;
+  curator_fee: string;
+  threshold: string;
+  deadline: number;
+  funding_amount: string;
 
   Chain?: ChainAttributes;
-  Entity?: ChainEntityAttributes;
+  ChainEntity?: ChainEntityAttributes;
 }
 
 export type ProjectInstance = ModelInstance<ProjectAttributes>;
@@ -37,14 +38,16 @@ export default (
   dataTypes: typeof DataTypes,
 ): ProjectModelStatic => {
   const Project = <ProjectModelStatic>sequelize.define('Project', {
-    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    id: { type: dataTypes.INTEGER, primaryKey: true, allowNull: false },
     chain_id: { type: dataTypes.STRING, allowNull: true },
-    entity_id: { type: dataTypes.INTEGER, allowNull: true },
-    token: { type: dataTypes.STRING, allowNull: true },
-    curator_fee: { type: dataTypes.STRING, allowNull: true },
-    threshold: { type: dataTypes.STRING, allowNull: true },
-    deadline: { type: dataTypes.STRING, allowNull: true },
-    funding_amount: { type: dataTypes.INTEGER, allowNull: true },
+    entity_id: { type: dataTypes.INTEGER, allowNull: false },
+    creator: { type: dataTypes.STRING, allowNull: false },
+    ipfs_hash_id: { type: dataTypes.NUMBER, allowNull: true },
+    token: { type: dataTypes.STRING, allowNull: false },
+    curator_fee: { type: dataTypes.STRING, allowNull: false },
+    threshold: { type: dataTypes.STRING, allowNull: false },
+    deadline: { type: dataTypes.STRING, allowNull: false },
+    funding_amount: { type: dataTypes.INTEGER, allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
@@ -61,6 +64,7 @@ export default (
   Project.associate = (models) => {
     models.Project.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
     models.Project.belongsTo(models.ChainEntity, { foreignKey: 'entity_id', targetKey: 'id' });
+    models.Project.belongsTo(models.IpfsPins, { foreignKey: 'ipfs_pin_hash', targetKey: 'id' });
   };
 
   return Project;

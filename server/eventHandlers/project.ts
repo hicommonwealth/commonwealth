@@ -9,7 +9,7 @@ import {
 } from '@commonwealth/chain-events';
 import { ICuratedProject__factory } from '../../shared/eth/types';
 import { addPrefix, factory } from '../../shared/logging';
-import { DB, sequelize } from '../database';
+import { DB } from '../database';
 import { ChainNodeAttributes } from '../models/chain_node';
 export default class extends IEventHandler {
   public readonly name = 'Project';
@@ -37,6 +37,16 @@ export default class extends IEventHandler {
         return; // oops, should not happen
       }
       const index = event.data.index;
+      const creator = event.data.creator;
+      const ipfsHash = event.data.ipfsHash;
+
+      const projectRow = await this._models.Project.findOne({
+        where: { id: +index },
+      });
+      if (projectRow) {
+        log.error(`Project ${index} already exists in db.`);
+        return;
+      }
 
       // first, query data from contract
       const url = this._node.private_url;
@@ -53,34 +63,22 @@ export default class extends IEventHandler {
       const funding_amount = '0'; // TODO: should we query from contract?
       provider.disconnect(1000, 'finished');
 
-      // then, create or update project row as needed,
-      // transactionalized to ensure the find+create/update is atomic
-      await sequelize.transaction(async (t) => {
-        const projectRow = await this._models.Project.findOne({
-          where: { project_id: +index },
-          transaction: t
-        });
-        if (projectRow) {
-          // update
-          projectRow.entity_id = entityId;
-          projectRow.token = token;
-          projectRow.curator_fee = curator_fee;
-          projectRow.threshold = threshold.toString();
-          projectRow.deadline = deadline.toNumber();
-          projectRow.funding_amount = funding_amount;
-          await projectRow.save({ transaction: t });
-        } else {
-          // create
-          await this._models.Project.create({
-            project_id: +index,
-            entity_id: entityId,
-            token,
-            curator_fee,
-            threshold: threshold.toString(),
-            deadline: deadline.toNumber(),
-            funding_amount,
-          }, { transaction: t });
-        }
+      const ipfsHashId = await this._models.IpfsPins.findOne({
+        where: { ipfs_hash: ipfsHash }
+      });
+      const ipfsParams = ipfsHashId ? { ipfs_hash_id: ipfsHashId.id } : {};
+
+      // create new project (this should be the only place Projects are created)
+      await this._models.Project.create({
+        id: +index,
+        entity_id: entityId,
+        creator,
+        token,
+        curator_fee,
+        threshold: threshold.toString(),
+        deadline: deadline.toNumber(),
+        funding_amount,
+        ...ipfsParams,
       });
     } else if (
       event.data.kind === CommonwealthTypes.EventKind.ProjectBacked ||
