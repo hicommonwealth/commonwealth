@@ -18,11 +18,11 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
 
-import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
 
 const enum VotingError {
   NOT_VALIDATED = 'Insufficient Voting Power',
