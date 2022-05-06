@@ -31,16 +31,14 @@ export class GovExplainer implements m.ClassComponent<GovExplainerAttrs> {
           <div class="stat-headers-container">
             {statHeaders.map((s) => (
               <div class="stat-header">
-                <strong>{s.statName}</strong>
-                <span>{s.statDescription}</span>
+                <strong>{s.statName}</strong> <span>{s.statDescription}</span>
               </div>
             ))}
           </div>
           <div class="stats-container">
             {stats.map((s) => (
               <div class="stat">
-                {s.statHeader}
-                {s.stat}
+                {s.statHeading} {s.stat}
               </div>
             ))}
           </div>

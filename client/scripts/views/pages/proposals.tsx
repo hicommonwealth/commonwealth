@@ -29,44 +29,7 @@ import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 import { CardsCollection } from '../components/cards_collection';
-
-const SubstrateProposalStats: m.Component<{}, {}> = {
-  view: () => {
-    if (!app.chain) return;
-
-    return m('.stats-box', [
-      m('.stats-box-left', '💭'),
-      m('.stats-box-right', [
-        m('', [
-          m('strong', 'Democracy Proposals'),
-          m('span', [
-            ' can be introduced by anyone. ',
-            'At a regular interval, the top ranked proposal will become a supermajority-required referendum.',
-          ]),
-          m('p', [
-            m('strong', 'Council Motions'),
-            m('span', [
-              ' can be introduced by councillors. They can directly approve/reject treasury proposals, ',
-              'propose simple-majority referenda, or create fast-track referenda.',
-            ]),
-          ]),
-        ]),
-        m('', [
-          m('.stats-box-stat', [
-            'Next proposal or motion becomes a referendum: ',
-            (app.chain as Substrate).democracyProposals.nextLaunchBlock
-              ? m(CountdownUntilBlock, {
-                  block: (app.chain as Substrate).democracyProposals
-                    .nextLaunchBlock,
-                  includeSeconds: false,
-                })
-              : '--',
-          ]),
-        ]),
-      ]),
-    ]);
-  },
-};
+import { GovExplainer } from '../components/gov_explainer';
 
 const CompoundProposalStats: m.Component<{}, {}> = {
   view: () => {
@@ -391,7 +354,35 @@ const ProposalsPage: m.Component<{}> = {
         showNewProposalButton: true,
       },
       m('.ProposalsPage', [
-        onSubstrate && m(SubstrateProposalStats),
+        onSubstrate && (
+          <GovExplainer
+            statHeaders={[
+              {
+                statName: 'Democracy Proposals',
+                statDescription: `can be introduced by anyone. At a regular interval, the \
+               top ranked proposal will become a supermajority-required referendum.`,
+              },
+              {
+                statName: 'Council Motions',
+                statDescription: `can be introduced by councillors. They can directly approve/reject \
+              treasury proposals, propose simple-majority referenda, or create fast-track referenda.`,
+              },
+            ]}
+            stats={[
+              {
+                statHeading: 'Next proposal or motion becomes a referendum:',
+                stat: (app.chain as Substrate).democracyProposals
+                  .nextLaunchBlock
+                  ? m(CountdownUntilBlock, {
+                      block: (app.chain as Substrate).democracyProposals
+                        .nextLaunchBlock,
+                      includeSeconds: false,
+                    })
+                  : '--',
+              },
+            ]}
+          />
+        ),
         onCompound && m(CompoundProposalStats),
         m(CardsCollection, {
           content: activeProposalContent,
