@@ -16,6 +16,7 @@ import { CWTextInput, ValidationStatus } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
+import { CWRadioButton } from './cw_radio_button';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -60,6 +61,7 @@ const radioGroupOptions = [
 
 export class ComponentShowcase implements m.ClassComponent {
   private selectedIconButton: number;
+  private radioButtonSelected: boolean;
 
   view() {
     return (
@@ -276,6 +278,22 @@ export class ComponentShowcase implements m.ClassComponent {
             label="Inline external link"
             target="https://edgewa.re/"
             linkType="inline"
+          />
+        </div>
+        <h1>Radio Button</h1>
+        <div class="radio-button-gallery">
+          <CWRadioButton
+            value="Radio Button"
+            label="Radio Button"
+            selected={this.radioButtonSelected === true}
+            onchange={() => {
+              this.radioButtonSelected = true;
+            }}
+          />
+          <CWRadioButton
+            value="Disabled Radio Button"
+            label="Disabled Radio Button"
+            disabled={true}
           />
         </div>
         <h1>Radio Group</h1>
