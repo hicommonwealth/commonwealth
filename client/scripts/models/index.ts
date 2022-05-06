@@ -2,6 +2,7 @@ export { default as AbridgedThread } from './AbridgedThread';
 export { default as Account } from './Account';
 export { default as AddressInfo } from './AddressInfo';
 export { default as ChainInfo } from './ChainInfo';
+export { default as ChatMessage } from './ChatMessage';
 export { default as ContractCategory } from './ContractCategory';
 export { default as ContractItem } from './ContractItem';
 export { default as DiscussionDraft } from './DiscussionDraft';
@@ -19,14 +20,15 @@ export { default as OffchainComment } from './OffchainComment';
 export { default as OffchainReaction } from './OffchainReaction';
 export { default as OffchainTopic } from './OffchainTopic';
 export { default as OffchainThread } from './OffchainThread';
+export { default as OffchainPoll } from './OffchainPoll';
 export { default as OffchainVote } from './OffchainVote';
 export { default as Profile } from './Profile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
 export { default as RoleInfo } from './RoleInfo';
 export { default as RolePermission } from './RolePermission';
-export { default as SearchQuery } from './SearchQuery'
-export { default as SearchResult } from './SearchResult'
+export { default as SearchQuery } from './SearchQuery';
+export { default as SearchResult } from './SearchResult';
 export { default as SocialAccount } from './SocialAccount';
 export { default as StorageModule } from './StorageModule';
 export { default as ChainEventType } from './ChainEventType';
