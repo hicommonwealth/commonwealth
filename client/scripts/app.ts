@@ -689,7 +689,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/chat': importRoute('views/pages/chat.tsx', {
+            '/chat/:channel': importRoute('views/pages/chat.tsx', {
               scoped: true,
               deferChain: true,
             }),

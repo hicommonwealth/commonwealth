@@ -1,6 +1,4 @@
-import WebSocket from 'ws';
 import http from 'http';
-import express from 'express';
 import { Express } from 'express-serve-static-core';
 import Rollbar from "rollbar";
 import { DEFAULT_PORT } from '../config';

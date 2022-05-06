@@ -1,5 +1,6 @@
 /* @jsx m */
 
+import { navigateToSubpage } from 'app';
 import m from 'mithril';
 
 import 'pages/chat.scss';
@@ -14,7 +15,7 @@ const ChatPage: m.Component<never, never> = {
     const activeEntity = app.chain;
     if (!activeEntity) return <PageLoading />;
 
-    if (!app.socket) m.route.set(`/${app.activeChainId()}`); // Stops un-logged in access
+    if (!app.socket) navigateToSubpage('/'); // Stops un-logged in access
 
     const channel_id = m.route.param()['channel'];
 

@@ -47,7 +47,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
       fontStyle,
       fontWeight = 'regular',
       noWrap = true, // parent must be flex container for this to work
-      type,
+      type = 'b1',
     } = vnode.attrs;
 
     return (
