@@ -1,7 +1,23 @@
-// --------- EVENT DEFINITIONS --------- //
-
 import { CommunityType } from 'client/scripts/views/pages/create_community';
 import { ChainBase } from 'shared/types';
+
+// Base Payload - Required for All Events
+export interface BaseMixpanelPayload {
+  event: MixpanelEvents;
+  isCustomDomain: boolean;
+}
+
+// Include All Event Enums
+export type MixpanelEvents =
+  | MixpanelLoginEvent
+  | MixpanelUserSignupEvent
+  | MixpanelCommunityCreationEvent
+  | MixpanelPageViewEvent
+  | MixpanelCommunityInteractionEvent
+  | MixpanelChatEvents
+  | MixpanelSnapshotEvents;
+
+// --------- EVENT DEFINITIONS --------- //
 
 // PAGE VIEW EVENTS
 export const enum MixpanelPageViewEvent {
@@ -77,20 +93,17 @@ export interface MixpanelChatEventsPayload extends BaseMixpanelPayload {
   community: string;
   event: MixpanelChatEvents;
 }
+// END CHAT EVENTS
 
-// --------- END EVENT DEFINITIONS --------- //
-
-// Include All Event Enums
-export type MixpanelEvents =
-  | MixpanelLoginEvent
-  | MixpanelUserSignupEvent
-  | MixpanelCommunityCreationEvent
-  | MixpanelPageViewEvent
-  | MixpanelCommunityInteractionEvent
-  | MixpanelChatEvents;
-
-// Base Payload - Required for All Events
-export interface BaseMixpanelPayload {
-  event: MixpanelEvents;
-  isCustomDomain: boolean;
+// SNAPSHOT EVENTS
+export const enum MixpanelSnapshotEvents {
+  SNAPSHOT_PAGE_VISIT = 'Snapshot Page Visited',
+  SNAPSHOT_PROPOSAL_VIEWED = 'Snapshot Proposal Viewed',
+  SNAPSHOT_VOTE_OCCURRED = 'Snapshot Vote Occurred',
 }
+
+export interface MixpanelSnapshotEventsPayload extends BaseMixpanelPayload {
+  event: MixpanelSnapshotEvents;
+  space: string;
+}
+// END SNAPSHOT EVENTS

@@ -23,6 +23,8 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { MixpanelSnapshotEvents } from 'analytics/types';
+import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 
 const enum VotingError {
   NOT_VALIDATED = 'Insufficient Voting Power',
@@ -305,6 +307,13 @@ const ViewProposalPage: m.Component<
     threads: Array<{ id: string; title: string }> | null;
   }
 > = {
+  oncreate: (vnode) => {
+    mixpanelBrowserTrack({
+      event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
+      isCustomDomain: app.isCustomDomain(),
+      space: app.snapshot.space.id,
+    });
+  },
   oninit: (vnode) => {
     vnode.state.activeTab = 'Proposals';
     vnode.state.votes = [];
