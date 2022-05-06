@@ -104,10 +104,12 @@ const finishEmailLogin = async (
         existingUser.emailVerified = true;
         await existingUser.save();
       }
-      mixpanelTrack({
-        event: MixpanelLoginEvent.LOGIN,
-        isCustomDomain: null,
-      });
+      if (process.env.NODE_ENV === 'production') {
+        mixpanelTrack({
+          event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
+        });
+      }
       return redirectWithLoginSuccess(
         res,
         email,
@@ -126,10 +128,12 @@ const finishEmailLogin = async (
           res,
           `Could not log in with user at ${email}`
         );
-      mixpanelTrack({
-        event: MixpanelLoginEvent.LOGIN,
-        isCustomDomain: null,
-      });
+      if (process.env.NODE_ENV === 'production') {
+        mixpanelTrack({
+          event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
+        });
+      }
       return redirectWithLoginSuccess(
         res,
         email,
@@ -165,10 +169,12 @@ const finishEmailLogin = async (
           res,
           `Could not log in with user at ${email}`
         );
-      mixpanelTrack({
-        event: MixpanelLoginEvent.LOGIN,
-        isCustomDomain: null,
-      });
+      if (process.env.NODE_ENV === 'production') {
+        mixpanelTrack({
+          event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
+        });
+      }
       return redirectWithLoginSuccess(
         res,
         email,

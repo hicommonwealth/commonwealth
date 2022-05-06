@@ -429,11 +429,13 @@ const createComment = async (
     proposal.save();
   }
 
-  mixpanelTrack({
-    event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-    community: chain.id,
-    isCustomDomain: null,
-  });
+  if (process.env.NODE_ENV === 'production') {
+    mixpanelTrack({
+      event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
+      community: chain.id,
+      isCustomDomain: null,
+    });
+  }
 
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };

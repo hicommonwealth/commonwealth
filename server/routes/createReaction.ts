@@ -205,11 +205,13 @@ const createReaction = async (
   author.last_active = new Date();
   author.save();
 
-  mixpanelTrack({
-    event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
-    community: chain.id,
-    isCustomDomain: null,
-  });
+  if (process.env.NODE_ENV === 'production') {
+    mixpanelTrack({
+      event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
+      community: chain.id,
+      isCustomDomain: null,
+    });
+  }
 
   return res.json({ status: 'Success', result: finalReaction.toJSON() });
 };

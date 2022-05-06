@@ -189,11 +189,13 @@ const createAddress = async (
         });
       }
 
-      mixpanelTrack({
-        event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-        chain: req.body.chain,
-        isCustomDomain: null,
-      });
+      if (process.env.NODE_ENV === 'production') {
+        mixpanelTrack({
+          event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
+          chain: req.body.chain,
+          isCustomDomain: null,
+        });
+      }
 
       return success(res, newObj.toJSON());
     } catch (e) {

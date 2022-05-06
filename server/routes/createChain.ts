@@ -289,19 +289,21 @@ const createChain = async (
   });
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
-  
+
   const chatChannels = await models.ChatChannel.create({
     name: 'General',
     chain_id: chain.id,
     category: 'General',
   });
-  
-  mixpanelTrack({
-    chainBase: req.body.base,
-    isCustomDomain: null,
-    communityType: null,
-    event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
-  });
+
+  if (process.env.NODE_ENV === 'production') {
+    mixpanelTrack({
+      chainBase: req.body.base,
+      isCustomDomain: null,
+      communityType: null,
+      event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+    });
+  }
 
   return success(res, { chain: chain.toJSON(), node: node.toJSON() });
 };

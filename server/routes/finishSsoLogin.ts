@@ -228,10 +228,12 @@ const finishSsoLogin = async (
             res,
             `Could not log in with ronin wallet`
           );
-        mixpanelTrack({
-          event: MixpanelLoginEvent.LOGIN,
-          isCustomDomain: null,
-        });
+        if (process.env.NODE_ENV === 'production') {
+          mixpanelTrack({
+            event: MixpanelLoginEvent.LOGIN,
+            isCustomDomain: null,
+          });
+        }
       });
       return success(res, { user });
     }
@@ -333,10 +335,12 @@ const finishSsoLogin = async (
             res,
             `Could not log in with ronin wallet`
           );
-        mixpanelTrack({
-          event: MixpanelLoginEvent.LOGIN,
-          isCustomDomain: null,
-        });
+        if (process.env.NODE_ENV === 'production') {
+          mixpanelTrack({
+            event: MixpanelLoginEvent.LOGIN,
+            isCustomDomain: null,
+          });
+        }
       });
       return success(res, { user: newUser });
     }

@@ -67,10 +67,12 @@ const finishOAuthLogin = async (
     req.login(existingUser, async (err) => {
       if (err)
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
-      mixpanelTrack({
-        event: MixpanelLoginEvent.LOGIN,
-        isCustomDomain: null,
-      });
+      if (process.env.NODE_ENV === 'production') {
+        mixpanelTrack({
+          event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
+        });
+      }
       return res.redirect('/?loggedin=true&confirmation=success');
     });
   } else {
@@ -97,10 +99,12 @@ const finishOAuthLogin = async (
     req.login(newUser, (err) => {
       if (err)
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
-      mixpanelTrack({
-        event: MixpanelLoginEvent.LOGIN,
-        isCustomDomain: null,
-      });
+      if (process.env.NODE_ENV === 'production') {
+        mixpanelTrack({
+          event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
+        });
+      }
       return res.redirect('/?loggedin=true&confirmation=success');
     });
   }
