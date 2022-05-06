@@ -10,30 +10,6 @@ import { getProposalUrlPath } from 'identifiers';
 import { ProposalType } from 'types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
-// m('.proposal-body-link', [
-//     proposal instanceof OffchainThread &&
-//       proposal.kind === OffchainThreadKind.Link && [
-//         vnode.state.editing
-//           ? m(ProposalLinkEditor, {
-//               item: proposal,
-//               parentState: vnode.state,
-//             })
-//           : m(ProposalHeaderExternalLink, { proposal }),
-//       ],
-//     !(proposal instanceof OffchainThread) &&
-//       (proposal['blockExplorerLink'] ||
-//         proposal['votingInterfaceLink'] ||
-//         proposal.threadId) &&
-//       m('.proposal-body-link', [
-//         proposal.threadId &&
-//           m(ProposalHeaderThreadLink, { proposal }),
-//         proposal['blockExplorerLink'] &&
-//           m(ProposalHeaderBlockExplorerLink, { proposal }),
-//         proposal['votingInterfaceLink'] &&
-//           m(ProposalHeaderVotingInterfaceLink, { proposal }),
-//       ]),
-//   ]),
-
 // if you add a link when you create the thread
 export class ProposalHeaderExternalLink
   implements
