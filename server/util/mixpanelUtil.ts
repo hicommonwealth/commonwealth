@@ -3,7 +3,7 @@ var Mixpanel = require('mixpanel');
 var mixpanelNode;
 if (process.env.NODE_ENV === 'production') {
   mixpanelNode = Mixpanel.init(process.env.MIXPANEL_DEV_TOKEN); //TODO: Swap with prod token when tested
-} else {
+} else if (process.env.NODE_ENV === 'development') {
   mixpanelNode = Mixpanel.init(process.env.MIXPANEL_DEV_TOKEN);
 }
 // TODO: Figure out how to change to production
