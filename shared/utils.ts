@@ -66,7 +66,7 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 
 /* eslint-disable import/prefer-default-export */
 export const getProposalUrl = (type, proposal, comment?) => {
-  const aId = proposal.community ? proposal.community : proposal.chain;
+  const aId = proposal.chain;
   const tId = proposal.type_id || proposal.id;
   const tTitle = proposal.title ? `-${slugify(proposal.title)}` : '';
   const cId = comment ? `?comment=${comment.id}` : '';

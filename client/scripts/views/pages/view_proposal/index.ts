@@ -67,11 +67,11 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
+import OffchainPoll from 'client/scripts/models/OffchainPoll';
 import {
   ProposalHeaderExternalLink,
   ProposalHeaderBlockExplorerLink,
   ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderOffchainPoll,
   ProposalHeaderThreadLink,
   ProposalHeaderTopics,
   ProposalHeaderTitle,
@@ -119,12 +119,14 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { ProposalPoll } from './poll';
 
 const MAX_THREAD_LEVEL = 2;
 
 interface IPrefetch {
   [identifier: string]: {
     commentsStarted: boolean;
+    pollsStarted: boolean;
     viewCountStarted: boolean;
     profilesStarted: boolean;
     profilesFinished: boolean;
@@ -132,7 +134,8 @@ interface IPrefetch {
 }
 
 export interface IProposalPageState {
-  comments;
+  comments: OffchainComment<OffchainThread>[];
+  polls: OffchainPoll[];
   editing: boolean;
   highlightedComment: boolean;
   parentCommentId: number; // if null or undefined, reply is thread-scoped
@@ -872,6 +875,7 @@ const ViewProposalPage: m.Component<
       vnode.state.prefetch = {};
       vnode.state.prefetch[proposalIdAndType] = {
         commentsStarted: false,
+        pollsStarted: false,
         viewCountStarted: false,
         profilesStarted: false,
         profilesFinished: false,
@@ -1050,6 +1054,22 @@ const ViewProposalPage: m.Component<
       m.redraw();
     };
 
+    // load polls
+    if (!vnode.state.prefetch[proposalIdAndType]['pollsStarted']) {
+      app.polls
+        .fetchPolls(app.activeChainId(), (proposal as OffchainThread).id)
+        .catch(() => {
+          notifyError('Failed to load comments');
+          vnode.state.comments = [];
+          m.redraw();
+        });
+      vnode.state.prefetch[proposalIdAndType]['pollsStarted'] = true;
+    } else {
+      vnode.state.polls = app.polls.getByThreadId(
+        (proposal as OffchainThread).id
+      );
+    }
+
     // load view count
     if (
       !vnode.state.prefetch[proposalIdAndType]['viewCountStarted'] &&
@@ -1095,7 +1115,6 @@ const ViewProposalPage: m.Component<
     }
 
     // load profiles
-    // TODO: recursively fetch child comments as well (prevent reloading flash for threads with child comments)
     if (
       vnode.state.prefetch[proposalIdAndType]['profilesStarted'] === undefined
     ) {
@@ -1181,7 +1200,7 @@ const ViewProposalPage: m.Component<
         role: 'moderator',
         chain: app.activeChainId(),
       });
-    const isAdminOnly = app.user.isRoleOfCommunity({
+    const isAdmin = app.user.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
     });
@@ -1193,7 +1212,6 @@ const ViewProposalPage: m.Component<
         data: { who, reason },
       } = proposal;
       const contributors = proposal.getVotes();
-
       return m(
         Sublayout,
         {
@@ -1371,19 +1389,6 @@ const ViewProposalPage: m.Component<
         ]),
         m('.right-content-container', [
           [
-            proposal instanceof OffchainThread &&
-              proposal.hasOffchainPoll &&
-              m(ProposalHeaderOffchainPoll, { proposal }),
-            proposal instanceof OffchainThread &&
-              isAuthor &&
-              (!app.chain?.meta?.chain?.adminOnlyPolling || isAdminOnly) &&
-              !proposal.offchainVotingEnabled &&
-              m(PollEditorCard, {
-                proposal,
-                openPollEditor: () => {
-                  vnode.state.pollEditorIsOpen = true;
-                },
-              }),
             showLinkedSnapshotOptions &&
               proposal instanceof OffchainThread &&
               m(LinkedProposalsCard, {
@@ -1398,6 +1403,24 @@ const ViewProposalPage: m.Component<
               m(LinkedThreadsCard, {
                 proposalId: proposal.id,
                 allowLinking: isAuthor || isAdminOrMod,
+              }),
+            proposal instanceof OffchainThread &&
+              isAuthor &&
+              (!app.chain?.meta?.chain?.adminOnlyPolling || isAdmin) &&
+              m(PollEditorCard, {
+                proposal,
+                proposalAlreadyHasPolling: !vnode.state.polls?.length,
+                openPollEditor: () => {
+                  vnode.state.pollEditorIsOpen = true;
+                },
+              }),
+            proposal instanceof OffchainThread &&
+              [
+                ...new Map(
+                  vnode.state.polls?.map((poll) => [poll.id, poll])
+                ).values(),
+              ].map((poll) => {
+                return m(ProposalPoll, { poll, thread: proposal });
               }),
           ],
         ]),
