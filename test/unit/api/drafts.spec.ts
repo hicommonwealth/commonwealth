@@ -32,17 +32,14 @@ describe('Draft Tests', () => {
     console.log('Database reset');
 
     let res = await modelUtils.createAndVerifyAddress({ chain });
-    console.log('address verified');
     user2Address = res.address;
     user2JWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    console.log('jwt signed');
     expect(user2Address).to.not.be.null;
     expect(user2JWT).to.not.be.null;
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    console.log('repeated');
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
   });
