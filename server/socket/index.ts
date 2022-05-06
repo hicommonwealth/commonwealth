@@ -16,6 +16,8 @@ import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 import { JWT_SECRET, REDIS_URL, WEBSOCKET_ADMIN_USERNAME, WEBSOCKET_ADMIN_PASSWORD } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+import {createChatNamespace} from "./chatNs";
+import {DB} from "../database";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -43,7 +45,8 @@ export const authenticate = (
 
 export async function setupWebSocketServer(
   httpServer: http.Server,
-  rollbar: Rollbar
+  rollbar: Rollbar,
+  models: DB
 ) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
@@ -82,11 +85,14 @@ export async function setupWebSocketServer(
   });
 
   log.info(`Connecting to Redis at: ${REDIS_URL}`);
-  const pubClient = createClient({ url: REDIS_URL });
+  const pubClient = createClient({ url: REDIS_URL, socket: { tls: true, rejectUnauthorized: false } });
+
   const subClient = pubClient.duplicate();
 
   try {
     await Promise.all([pubClient.connect(), subClient.connect()]);
+    // provide the redis connection instances to the socket.io adapters
+    await io.adapter(<any>createAdapter(pubClient, subClient));
   } catch (e) {
     // local env may not have redis so don't do anything if they don't
     if (!origin.includes('localhost')) {
@@ -98,11 +104,10 @@ export async function setupWebSocketServer(
       );
     }
   }
-  // provide the redis connection instances to the socket.io adapters
-  await io.adapter(<any>createAdapter(pubClient, subClient));
 
   // create the chain-events namespace
   const ceNamespace = createCeNamespace(io);
+  const chatNamespace = createChatNamespace(io, models);
 
   try {
     const rabbitController = new RabbitMQController(

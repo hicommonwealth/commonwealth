@@ -22,6 +22,7 @@ import ChainEventTypeFactory, {
   ChainEventTypeModelStatic,
 } from './models/chain_event_type';
 import ChainNodeFactory, { ChainNodeModelStatic } from './models/chain_node';
+import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channel';
 import ChatMessageFactory, {
   ChatMessageModelStatic,
 } from './models/chat_message';
@@ -111,6 +112,7 @@ export type Models = {
   ChainEvent: ChainEventModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
   ChainNode: ChainNodeModelStatic;
+  ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;
   Collaboration: CollaborationModelStatic;
   ContractCategory: ContractCategoryModelStatic;
@@ -189,6 +191,7 @@ const models: Models = {
   ChainEvent: ChainEventFactory(sequelize, DataTypes),
   ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
+  ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
