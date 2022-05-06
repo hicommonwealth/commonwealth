@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import $ from 'jquery';
 import m from 'mithril';
-import moment from 'moment';
-import { Button, Icons, Tag, MenuItem, Input } from 'construct-ui';
+import { Button, Tag, MenuItem, Input } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -24,15 +22,12 @@ import {
 } from 'models';
 import { ProposalType } from 'types';
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifySuccess } from 'controllers/app/notifications';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { alertModalWithText } from 'views/modals/alert_modal';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { activeQuillEditorHasText, GlobalStatus } from './body';
 import { IProposalPageState } from '.';
-import OffchainVotingModal from '../../modals/offchain_voting_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import {
   getStatusClass,
@@ -51,175 +46,6 @@ export const ProposalHeaderExternalLink: m.Component<{
       externalLink('a.external-link', proposal.url, [
         extractDomain(proposal.url),
         m(CWIcon, { iconName: 'externalLink' }),
-      ]),
-    ]);
-  },
-};
-
-interface IProposalScopedVotes {
-  proposalId?: boolean;
-}
-
-export const ProposalHeaderOffchainPoll: m.Component<
-  { proposal: OffchainThread },
-  { offchainVotes: IProposalScopedVotes }
-> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal.offchainVotingEnabled) return;
-
-    if (
-      vnode.state.offchainVotes === undefined ||
-      vnode.state.offchainVotes[proposal.id] === undefined
-    ) {
-      // initialize or reset offchain votes
-      vnode.state.offchainVotes = {};
-      vnode.state.offchainVotes[proposal.id] = true;
-      // fetch from backend, and then set
-      $.get(
-        `/api/viewOffchainVotes?thread_id=${proposal.id}${
-          app.activeChainId() ? `&chain=${app.activeChainId()}` : ''
-        }`
-      )
-        .then((result) => {
-          if (result.result.length === 0) return;
-          if (result.result[0].thread_id !== proposal.id) return;
-          proposal.setOffchainVotes(result.result);
-          m.redraw();
-        })
-        .catch(async (err) => {
-          notifyError('Unexpected error loading offchain votes');
-        });
-    }
-
-    const pollingEnded =
-      proposal.offchainVotingEndsAt &&
-      proposal.offchainVotingEndsAt?.isBefore(moment().utc());
-
-    const tokenThresholdFailed = TopicGateCheck.isGatedTopic(
-      proposal.topic.name
-    );
-
-    const vote = async (option, hasVoted, isSelected) => {
-      if (!app.isLoggedIn() || !app.user.activeAccount || isSelected) return;
-
-      const confirmationText = `Submit your vote for '${option}'?`;
-      const confirmed = await confirmationModalWithText(confirmationText)();
-      if (!confirmed) return;
-      // submit vote
-      proposal
-        .submitOffchainVote(
-          proposal.chain,
-          proposal.community,
-          app.user.activeAccount.chain.id,
-          app.user.activeAccount.address,
-          option
-        )
-        .catch(async () => {
-          await alertModalWithText(
-            'Error submitting vote. Maybe the poll has already ended?'
-          )();
-        });
-    };
-
-    const optionScopedVotes = proposal.offchainVotingOptions.choices.map(
-      (option) => {
-        return {
-          option,
-          votes: proposal.offchainVotes.filter((v) => v.option === option),
-        };
-      }
-    );
-
-    const totalVoteCount = proposal.offchainVotes.length;
-    const voteSynopsis = m('.vote-synopsis', [
-      optionScopedVotes.map((optionWithVotes) => {
-        const optionVoteCount = optionWithVotes.votes.length;
-        const optionVotePercentage = optionVoteCount / totalVoteCount;
-        return m('.option-with-votes', [
-          m('.option-results-label', [
-            m(
-              'div',
-              { style: 'font-weight: 500; margin-right: 5px;' },
-              `${optionWithVotes.option}`
-            ),
-            m('div', `(${optionVoteCount})`),
-          ]),
-          m('.poll-bar', {
-            style: `width: ${Math.round(optionVotePercentage * 10000) / 100}%`,
-          }),
-        ]);
-      }),
-      m(
-        'a',
-        {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({
-              modal: OffchainVotingModal,
-              data: { votes: proposal.offchainVotes },
-            });
-          },
-        },
-        'See all votes'
-      ),
-    ]);
-
-    return m('.ProposalHeaderOffchainPoll', [
-      m('.offchain-poll-header', [
-        proposal.offchainVotingOptions?.name ||
-          (pollingEnded ? 'Poll closed' : 'Poll open'),
-      ]),
-      !proposal.offchainVotingOptions?.choices &&
-        m('.offchain-poll-invalid', '[Error loading poll]'),
-      m(
-        '.offchain-poll-options',
-        proposal.offchainVotingOptions?.choices?.map((option) => {
-          const hasVoted =
-            app.user.activeAccount &&
-            proposal.getOffchainVoteFor(
-              app.user.activeAccount.chain.id,
-              app.user.activeAccount.address
-            );
-          const isSelected = hasVoted?.option === option;
-          return m('.offchain-poll-option', [
-            m('.offchain-poll-option-left', option),
-            m('.offchain-poll-option-right', [
-              m(Button, {
-                onclick: vote.bind(this, option, hasVoted, isSelected),
-                label: isSelected ? 'Voted' : 'Vote',
-                size: 'sm',
-                rounded: true,
-                disabled: pollingEnded || isSelected || tokenThresholdFailed,
-                style: pollingEnded || isSelected ? 'pointer-events: none' : '',
-                iconLeft: isSelected ? Icons.CHECK : null,
-                compact: true,
-              }),
-            ]),
-          ]);
-        })
-      ),
-      m('.offchain-poll-caption', [
-        proposal.offchainVotingEndsAt
-          ? [
-              !pollingEnded &&
-                moment()
-                  .from(proposal.offchainVotingEndsAt)
-                  .replace(' ago', ''),
-              !pollingEnded && ' left',
-              m('br'),
-              !pollingEnded && 'Ends ',
-              pollingEnded && 'Ended ',
-              proposal.offchainVotingEndsAt?.format('lll'),
-            ]
-          : 'Poll does not expire.',
-      ]),
-      m('.offchain-poll-header', 'Voters'),
-      m('.offchain-poll-voters', [
-        proposal.offchainVotes.length === 0
-          ? m('.offchain-poll-no-voters', 'Nobody has voted')
-          : voteSynopsis,
       ]),
     ]);
   },
@@ -369,9 +195,7 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
     return m(
       'a.ProposalHeaderStage',
       {
-        href: `/${proposal.chain || proposal.community}?stage=${
-          proposal.stage
-        }`,
+        href: `/${proposal.chain}?stage=${proposal.stage}`,
         onclick: (e) => {
           e.preventDefault();
           navigateToSubpage(`?stage=${proposal.stage}`);

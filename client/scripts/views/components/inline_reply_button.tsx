@@ -12,12 +12,7 @@ export class InlineReplyButton
   view(vnode) {
     const { commentReplyCount, onclick } = vnode.attrs;
     return (
-      <div
-        class={`InlineReplyButton${
-          commentReplyCount > 0 ? ' has-reacted' : ''
-        }`}
-        onclick={onclick}
-      >
+      <div class="InlineReplyButton" onclick={onclick}>
         <CWIcon iconName="feedback" />
         <div class="reply-count">{commentReplyCount}</div>
       </div>

@@ -8,8 +8,12 @@ import { factory, formatFilename } from '../shared/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
 import ChainFactory, { ChainModelStatic } from './models/chain';
-import ChainCategoryFactory, { ChainCategoryModelStatic } from './models/chain_category';
-import ChainCategoryTypeFactory, { ChainCategoryTypeModelStatic } from './models/chain_category_type';
+import ChainCategoryFactory, {
+  ChainCategoryModelStatic,
+} from './models/chain_category';
+import ChainCategoryTypeFactory, {
+  ChainCategoryTypeModelStatic,
+} from './models/chain_category_type';
 import ChainEntityFactory, {
   ChainEntityModelStatic,
 } from './models/chain_entity';
@@ -18,6 +22,7 @@ import ChainEventTypeFactory, {
   ChainEventTypeModelStatic,
 } from './models/chain_event_type';
 import ChainNodeFactory, { ChainNodeModelStatic } from './models/chain_node';
+import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channel';
 import ChatMessageFactory, {
   ChatMessageModelStatic,
 } from './models/chat_message';
@@ -69,14 +74,15 @@ import OffchainViewCountFactory, {
 import OffchainVoteFactory, {
   OffchainVoteModelStatic,
 } from './models/offchain_vote';
+import OffchainPollFactory, {
+  OffchainPollModelStatic,
+} from './models/offchain_poll';
 import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
 } from './models/social_account';
-import SsoTokenFactory, {
-  SsoTokenModelStatic,
-} from './models/sso_token';
+import SsoTokenFactory, { SsoTokenModelStatic } from './models/sso_token';
 import StarredCommunityFactory, {
   StarredCommunityModelStatic,
 } from './models/starred_community';
@@ -106,6 +112,7 @@ export type Models = {
   ChainEvent: ChainEventModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
   ChainNode: ChainNodeModelStatic;
+  ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;
   Collaboration: CollaborationModelStatic;
   ContractCategory: ContractCategoryModelStatic;
@@ -121,6 +128,7 @@ export type Models = {
   NotificationsRead: NotificationsReadModelStatic;
   OffchainAttachment: OffchainAttachmentModelStatic;
   OffchainComment: OffchainCommentModelStatic;
+  OffchainPoll: OffchainPollModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
   OffchainReaction: OffchainReactionModelStatic;
   OffchainThread: OffchainThreadModelStatic;
@@ -183,6 +191,7 @@ const models: Models = {
   ChainEvent: ChainEventFactory(sequelize, DataTypes),
   ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
+  ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
@@ -198,6 +207,7 @@ const models: Models = {
   NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
   OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
+  OffchainPoll: OffchainPollFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),
   OffchainThread: OffchainThreadFactory(sequelize, DataTypes),

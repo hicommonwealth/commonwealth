@@ -10,7 +10,6 @@ class AbridgedThread implements IUniqueId {
   public readonly authorChain: string;
   public readonly title: string;
   public readonly createdAt: moment.Moment;
-  public readonly community: string;
   public readonly chain: string;
   public readonly topic?: OffchainTopic;
   public readonly pinned?: boolean;
@@ -30,7 +29,6 @@ class AbridgedThread implements IUniqueId {
     author_chain: string,
     title: string,
     created_at: moment.Moment,
-    community: string,
     chain: string,
     topic: any,
     pinned?: boolean,
@@ -43,7 +41,6 @@ class AbridgedThread implements IUniqueId {
     this.authorChain = author_chain;
     this.title = title;
     this.createdAt = created_at;
-    this.community = community;
     this.chain = chain;
     this.topic = topic;
     this.pinned = pinned;
