@@ -26,7 +26,6 @@ export const modelAbridgedThreadFromServer = (
     thread.Address.chain,
     decodeURIComponent(thread.title),
     moment(thread.created_at),
-    thread.community,
     thread.chain,
     thread.topic,
     thread.pinned,
@@ -115,14 +114,14 @@ class RecentActivityController {
   // public addAddressesFromActivity(activity: any[], clear?: boolean) {
   //   if (clear) this._addressStore.clearAddresses();
   //   activity.forEach((item) => {
-  //     const parentEntity = item.community || item.chain;
+  //     const parentEntity = item.chain;
   //     this._addressStore.addAddress(item.Address, parentEntity);
   //   });
   // }
 
   // public removeAddressActivity(activity: any[]) {
   //   activity.forEach((item) => {
-  //     const parentEntity = item.community || item.chain;
+  //     const parentEntity = item.chain;
   //     const addressId = item.Address?.id || item.address_id || item.author;
   //     this._addressStore.removeAddressActivity(addressId, parentEntity);
   //   });

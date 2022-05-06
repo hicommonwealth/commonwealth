@@ -60,7 +60,8 @@ import getUploadSignature from './routes/getUploadSignature';
 import activeThreads from './routes/activeThreads';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
-import updateThreadPolling from './routes/updateThreadPolling';
+import createPoll from './routes/createPoll';
+import getPolls from './routes/getPolls';
 import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
@@ -100,6 +101,13 @@ import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
 import setTopicThreshold from './routes/setTopicThreshold';
+import getChatMessages from './routes/chat/getChatMessages';
+import createChatChannel from './routes/chat/createChatChannel';
+import deleteChatChannel from './routes/chat/deleteChatChannel';
+import deleteChatCategory from './routes/chat/deleteChatCategory';
+import renameChatChannel from './routes/chat/renameChatChannel';
+import renameChatCategory from './routes/chat/renameChatCategory';
+
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
@@ -216,7 +224,10 @@ function setupRouter(
     starCommunity.bind(this, models)
   );
 
-  router.post('/tokenBalance', tokenBalance.bind(this, models, tokenBalanceCache));
+  router.post(
+    '/tokenBalance',
+    tokenBalance.bind(this, models, tokenBalanceCache)
+  );
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
   router.get(
@@ -237,10 +248,11 @@ function setupRouter(
   );
 
   router.post(
-    '/updateThreadPolling',
+    '/createPoll',
     passport.authenticate('jwt', { session: false }),
-    updateThreadPolling.bind(this, models)
+    createPoll.bind(this, models)
   );
+  router.get('/getPolls', getPolls.bind(this, models));
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
@@ -581,6 +593,43 @@ function setupRouter(
     updateChainCategory.bind(this, models)
   );
 
+  // chat
+  router.get(
+    '/getChatMessages',
+    passport.authenticate('jwt', { session: false }),
+    getChatMessages.bind(this, models)
+  );
+
+  router.post(
+    '/createChatChannel',
+    passport.authenticate('jwt', { session: false }),
+    createChatChannel.bind(this, models)
+  );
+
+  router.delete(
+    '/deleteChatChannel',
+    passport.authenticate('jwt', { session: false }),
+    deleteChatChannel.bind(this, models)
+  );
+
+  router.delete(
+    '/deleteChatCategory',
+    passport.authenticate('jwt', { session: false }),
+    deleteChatCategory.bind(this, models)
+  );
+
+  router.put(
+    '/renameChatChannel',
+    passport.authenticate('jwt', { session: false }),
+    renameChatChannel.bind(this, models)
+  );
+
+  router.put(
+    '/renameChatCategory',
+    passport.authenticate('jwt', { session: false }),
+    renameChatCategory.bind(this, models)
+  );
+
   // settings
   router.post(
     '/writeUserSetting',
@@ -620,7 +669,7 @@ function setupRouter(
   router.post(
     '/auth/sso/callback',
     // passport.authenticate('jwt', { session: false }),
-    finishSsoLogin.bind(this, models),
+    finishSsoLogin.bind(this, models)
   );
 
   // logout

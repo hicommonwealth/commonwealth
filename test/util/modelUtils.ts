@@ -36,7 +36,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
     const data = constructTypedMessage(chain_id, token);
-    const privateKey = Buffer.from(keypair.getPrivateKey(), 'hex');
+    const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
     res = await chai.request
       .agent(app)

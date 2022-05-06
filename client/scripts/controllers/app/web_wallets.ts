@@ -8,7 +8,7 @@ import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import NearWebWalletController from './webWallets/near_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
-import InjectiveWebWalletController from './webWallets/injective_web_wallet';
+import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 import RoninWebWalletController from './webWallets/ronin_web_wallet';
 
@@ -22,13 +22,13 @@ export default class WebWalletController {
     // handle case like injective, axie, where we require a specific wallet
     const specificChain = app.chain?.meta?.chain?.id;
     if (app.chain?.meta?.chain?.id) {
-      const specificWallet = this._wallets.find((w) => w.specificChain === specificChain);
+      const specificWallet = this._wallets.find((w) => w.specificChains?.includes(specificChain));
       if (specificWallet) return [ specificWallet ];
     }
 
     // handle general case of wallet by chain base
     return this._wallets.filter((w) => w.available
-      && !w.specificChain // omit chain-specific wallets unless on correct chain
+      && !w.specificChains // omit chain-specific wallets unless on correct chain
       && (!chain || w.chain === chain));
   }
 
@@ -91,7 +91,7 @@ export default class WebWalletController {
       new KeplrWebWalletController(),
       new NearWebWalletController(),
       new TerraStationWebWalletController(),
-      new InjectiveWebWalletController(),
+      new CosmosEvmMetamaskWalletController(),
       new PhantomWebWalletController(),
       new RoninWebWalletController(),
     ];

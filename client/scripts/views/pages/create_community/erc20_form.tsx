@@ -15,6 +15,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import { IERC20Metadata__factory } from 'eth/types';
 import { IdRow, InputRow, ValidationRow } from 'views/components/metadata_rows';
+import { RoleInfo } from 'models';
 import {
   initChainForm,
   defaultChainRows,
@@ -197,6 +198,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
                 ...this.state.form,
               });
               await initAppState(false);
+              app.user.addRole(new RoleInfo(res.result.role.id,res.result.role.address_id, res.result.role.address, res.result.role.address_chain, res.result.role.chain_id, res.result.role.permission, res.result.role.is_user_default))
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(

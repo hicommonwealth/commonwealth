@@ -104,9 +104,9 @@ export class StarterCommunityForm implements m.ClassComponent {
               default: {
                 additionalArgs.eth_chain_id = 1;
                 additionalArgs.node_url =
-                  'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
+                  'wss://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_';
                 additionalArgs.alt_wallet_url =
-                  'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
+                  'https://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_';
                 break;
               }
             }

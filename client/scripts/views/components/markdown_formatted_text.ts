@@ -9,11 +9,6 @@ import smartTruncate from 'smart-truncate';
 import { marked } from 'marked';
 
 const renderer = new marked.Renderer();
-renderer.link = (href, title, text) => {
-  return `<a ${
-    href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
-  } href="${href}">${text}</a>`;
-};
 
 marked.setOptions({
   renderer,
@@ -29,6 +24,7 @@ const MarkdownFormattedText: m.Component<
     hideFormatting?: boolean;
     collapse?: boolean;
     searchTerm?: string;
+    openLinksInNewTab?: boolean;
   },
   {
     cachedDocWithHighlights: string;
@@ -36,8 +32,13 @@ const MarkdownFormattedText: m.Component<
   }
 > = {
   view: (vnode) => {
-    const { doc, hideFormatting, collapse, searchTerm } = vnode.attrs;
+    const { doc, hideFormatting, collapse, searchTerm, openLinksInNewTab } = vnode.attrs;
     if (!doc) return;
+    renderer.link = (href, title, text) => {
+      return `<a ${
+        href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
+      } ${openLinksInNewTab ? 'target="_blank"' : ''} href="${href}">${text}</a>`;
+    };
 
     // if we're showing highlighted search terms, render the doc once, and cache the result
     if (searchTerm) {

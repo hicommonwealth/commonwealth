@@ -82,17 +82,8 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                 />
               </div>
             )}
-            {proposal.offchainVotingEnabled && (
-              <Button
-                label="Poll"
-                contentRight={pluralize(
-                  proposal.offchainVotingNumVotes,
-                  'vote'
-                )}
-                intent="warning"
-                size="xs"
-                compact={true}
-              />
+            {proposal.hasPoll && (
+              <Button label="Poll" intent="warning" size="xs" compact={true} />
             )}
             {proposal.chainEntities?.length > 0 &&
               proposal.chainEntities

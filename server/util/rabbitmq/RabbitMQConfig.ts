@@ -38,7 +38,10 @@ const config = {
           'purge': purge,
           'options': {
             'x-dead-letter-exchange': 'DeadLetterExchange',
-            'dead-letter-routing-key': 'dlQueue'
+            'dead-letter-routing-key': 'dlQueue',
+            "arguments": {
+              "x-message-ttl": 600000
+            }
           }
         },
         'DeadLetterQueue': {

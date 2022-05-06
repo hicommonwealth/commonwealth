@@ -13,12 +13,12 @@ import Substrate from 'controllers/chain/substrate/main';
 
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import ProposalCard from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 
-import Listing from './listing';
 import ErrorPage from './error';
+import { CardsCollection } from '../components/cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -168,17 +168,14 @@ const ReferendaPage: m.Component<{}> = {
       },
       m('.ReferendaPage', [
         onSubstrate && m(SubstrateProposalStats),
-        m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: activeProposalContent,
-          columnHeader: 'Active Referenda',
+          header: 'Active Referenda',
         }),
-        m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: inactiveProposalContent,
-          columnHeader: 'Inactive Referenda',
+          header: 'Inactive Referenda',
         }),
-        m('.clear'),
       ])
     );
   },

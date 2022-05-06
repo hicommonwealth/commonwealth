@@ -2,8 +2,10 @@
 
 .ChainIcon {
   .chain-icon {
+    align-items: center;
     border-radius: 1000px;
     display: flex;
+    justify-content: center;
   }
 
   .chain-icon .no-image {

@@ -39,15 +39,17 @@ export class ActiveThreadsStore {
       });
     });
     allThreads.sort((threadA, threadB) => {
-      const totalActivityA = comments[threadA.id]?.length + reactions[threadA.id]?.length;
-      const totalActivityB = comments[threadB.id]?.length + reactions[threadB.id]?.length;
-      return (totalActivityB - totalActivityA);
+      const totalActivityA =
+        comments[threadA.id]?.length + reactions[threadA.id]?.length;
+      const totalActivityB =
+        comments[threadB.id]?.length + reactions[threadB.id]?.length;
+      return totalActivityB - totalActivityA;
     });
     return allThreads.slice(0, count);
   }
 
   public addThread(thread: AbridgedThread) {
-    const parentEntity = thread.community || thread.chain;
+    const parentEntity = thread.chain;
     if (!this._threadsByCommunity[parentEntity]) {
       this._threadsByCommunity[parentEntity] = [];
     }
@@ -82,16 +84,23 @@ export class ActiveAddressesStore {
       : [];
   }
 
-  public getAddressActivityByCommunity(communityId: string): IIdScopedAddressCountAndInfo {
+  public getAddressActivityByCommunity(
+    communityId: string
+  ): IIdScopedAddressCountAndInfo {
     return this._addressesByCommunity[communityId] || {};
   }
 
-  public getMostActiveUsers(communityId: string, count: number): Array<IAddressCountAndInfo> {
+  public getMostActiveUsers(
+    communityId: string,
+    count: number
+  ): Array<IAddressCountAndInfo> {
     const communityStore = this._addressesByCommunity[communityId];
     return communityStore
-      ? Object.values(communityStore).sort((a, b) => {
-        return (b['postCount'] - a['postCount']);
-      }).slice(0, count)
+      ? Object.values(communityStore)
+          .sort((a, b) => {
+            return b['postCount'] - a['postCount'];
+          })
+          .slice(0, count)
       : [];
   }
 
@@ -111,7 +120,10 @@ export class ActiveAddressesStore {
     return this;
   }
 
-  public removeAddressActivity(addressId: number | string, parentEntity: string) {
+  public removeAddressActivity(
+    addressId: number | string,
+    parentEntity: string
+  ) {
     const communityStore = this._addressesByCommunity[parentEntity];
     if (communityStore[addressId]) {
       communityStore[addressId]['postCount'] -= 1;
