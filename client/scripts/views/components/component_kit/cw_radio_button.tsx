@@ -6,6 +6,7 @@ import 'components/component_kit/cw_radio_button.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
+import { CWText } from './cw_text';
 
 type RadioButtonStyleAttrs = {
   disabled?: boolean;
@@ -51,7 +52,7 @@ export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
       >
         <input class="radio-input" {...params} />
         <div class="radio-control" />
-        <div class="radio-label">{label || value}</div>
+        <CWText>{label || value}</CWText>
       </label>
     );
   }
