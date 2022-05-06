@@ -1212,7 +1212,6 @@ const ViewProposalPage: m.Component<
         data: { who, reason },
       } = proposal;
       const contributors = proposal.getVotes();
-      console.log(vnode.state.polls);
       return m(
         Sublayout,
         {
