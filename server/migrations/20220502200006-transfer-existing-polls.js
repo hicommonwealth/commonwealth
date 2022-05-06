@@ -1,5 +1,5 @@
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     const selectQuery =
       'SELECT * FROM "OffchainThreads" WHERE offchain_voting_enabled = TRUE';
     const threadsWithPolls = await queryInterface.sequelize.query(selectQuery);
@@ -36,12 +36,12 @@ module.exports = {
           ],
         });
       } catch (e) {
-        console.log(thread);
+        console.log(`Failed to transfer poll data from thread ${thread?.id}`);
       }
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     // Do we want a proper "down" migration?
     // Writing manual SQL queries takes a lot of eng time
     return queryInterface.sequelize.query(`DELETE FROM "OffchainPolls"`);
