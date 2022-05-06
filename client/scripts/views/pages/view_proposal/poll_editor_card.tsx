@@ -4,6 +4,7 @@ import m from 'mithril';
 import { Button } from 'construct-ui';
 
 import 'pages/view_proposal/poll_editor_card.scss';
+
 import { OffchainThread } from 'models';
 
 export class PollEditorCard
