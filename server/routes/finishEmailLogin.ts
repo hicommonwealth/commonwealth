@@ -104,7 +104,7 @@ const finishEmailLogin = async (
         existingUser.emailVerified = true;
         await existingUser.save();
       }
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
           isCustomDomain: null,
@@ -128,7 +128,7 @@ const finishEmailLogin = async (
           res,
           `Could not log in with user at ${email}`
         );
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
           isCustomDomain: null,
@@ -169,7 +169,7 @@ const finishEmailLogin = async (
           res,
           `Could not log in with user at ${email}`
         );
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
           isCustomDomain: null,

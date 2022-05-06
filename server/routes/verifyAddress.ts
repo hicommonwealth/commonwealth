@@ -453,7 +453,7 @@ const verifyAddress = async (
     });
     req.login(user, (err) => {
       if (err) return next(err);
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
           isCustomDomain: null,

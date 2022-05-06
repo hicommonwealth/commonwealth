@@ -296,7 +296,7 @@ const createChain = async (
     category: 'General',
   });
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV !== 'test') {
     mixpanelTrack({
       chainBase: req.body.base,
       isCustomDomain: null,

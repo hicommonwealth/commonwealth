@@ -189,7 +189,7 @@ const createAddress = async (
         });
       }
 
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({
           event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
           chain: req.body.chain,

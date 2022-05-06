@@ -205,7 +205,7 @@ const createReaction = async (
   author.last_active = new Date();
   author.save();
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV !== 'test') {
     mixpanelTrack({
       event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
       community: chain.id,

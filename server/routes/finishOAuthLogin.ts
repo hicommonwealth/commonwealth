@@ -67,7 +67,7 @@ const finishOAuthLogin = async (
     req.login(existingUser, async (err) => {
       if (err)
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
           isCustomDomain: null,
@@ -99,7 +99,7 @@ const finishOAuthLogin = async (
     req.login(newUser, (err) => {
       if (err)
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
-      if (process.env.NODE_ENV === 'production') {
+      if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({
           event: MixpanelLoginEvent.LOGIN,
           isCustomDomain: null,

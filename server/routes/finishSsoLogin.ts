@@ -228,7 +228,7 @@ const finishSsoLogin = async (
             res,
             `Could not log in with ronin wallet`
           );
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV !== 'test') {
           mixpanelTrack({
             event: MixpanelLoginEvent.LOGIN,
             isCustomDomain: null,
@@ -335,7 +335,7 @@ const finishSsoLogin = async (
             res,
             `Could not log in with ronin wallet`
           );
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV !== 'test') {
           mixpanelTrack({
             event: MixpanelLoginEvent.LOGIN,
             isCustomDomain: null,

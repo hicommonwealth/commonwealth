@@ -429,7 +429,7 @@ const createComment = async (
     proposal.save();
   }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV !== 'test') {
     mixpanelTrack({
       event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
       community: chain.id,
