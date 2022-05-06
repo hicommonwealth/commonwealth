@@ -42,12 +42,14 @@ export default (
     chain_id: { type: dataTypes.STRING, allowNull: true },
     entity_id: { type: dataTypes.INTEGER, allowNull: false },
     creator: { type: dataTypes.STRING, allowNull: false },
-    ipfs_hash_id: { type: dataTypes.NUMBER, allowNull: true },
+    ipfs_hash_id: { type: dataTypes.INTEGER, allowNull: true },
+
     token: { type: dataTypes.STRING, allowNull: false },
     curator_fee: { type: dataTypes.STRING, allowNull: false },
     threshold: { type: dataTypes.STRING, allowNull: false },
-    deadline: { type: dataTypes.STRING, allowNull: false },
-    funding_amount: { type: dataTypes.INTEGER, allowNull: false },
+    deadline: { type: dataTypes.INTEGER, allowNull: false },
+    funding_amount: { type: dataTypes.STRING, allowNull: false },
+
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
@@ -56,9 +58,7 @@ export default (
     updatedAt: 'updated_at',
     tableName: 'Projects',
     underscored: true,
-    indexes: [
-      { fields: ['chain_id'] },
-    ],
+    indexes: [], // TODO: determine which indexes are needed
   });
 
   Project.associate = (models) => {

@@ -60,7 +60,7 @@ export default class extends IEventHandler {
       const curator_fee = await contractApi.curatorFee();
       const threshold = await contractApi.threshold();
       const deadline = await contractApi.deadline();
-      const funding_amount = '0'; // TODO: should we query from contract?
+      const funding_amount = await contractApi.totalFunding();
       provider.disconnect(1000, 'finished');
 
       const ipfsHashId = await this._models.IpfsPins.findOne({
@@ -77,7 +77,7 @@ export default class extends IEventHandler {
         curator_fee,
         threshold: threshold.toString(),
         deadline: deadline.toNumber(),
-        funding_amount,
+        funding_amount: funding_amount.toString(),
         ...ipfsParams,
       });
     } else if (
