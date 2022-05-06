@@ -77,6 +77,9 @@ const createPoll = async (
       }
     }
 
+    thread.has_poll = true;
+    await thread.save();
+
     const finalPoll = await models.OffchainPoll.create({
       thread_id,
       chain_id: chain.id,

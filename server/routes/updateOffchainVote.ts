@@ -45,9 +45,6 @@ const updateOffchainVote = async (
 
   const { poll_id, address, author_chain, option } = req.body;
 
-  // TODO: check that req.option is valid, and import options from shared/types
-  // TODO: check and validate req.signature, instead of checking for author
-
   const poll = await models.OffchainPoll.findOne({
     where: { id: poll_id, chain_id: chain.id },
   });
