@@ -4,7 +4,7 @@ var mixpanelNode;
 if (process.env.NODE_ENV === 'production') {
   mixpanelNode = Mixpanel.init(process.env.MIXPANEL_DEV_TOKEN); //TODO: Swap with prod token when tested
 } else {
-  mixpanelNode = Mixpanel.init('312b6c5fadb9a88d98dc1fb38de5d900');
+  mixpanelNode = Mixpanel.init(process.env.MIXPANEL_DEV_TOKEN);
 }
 // TODO: Figure out how to change to production
 
