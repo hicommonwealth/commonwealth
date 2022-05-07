@@ -35,6 +35,10 @@
         margin-bottom: 8px;
       }
     }
+
+    .action {
+      margin: 8px 0;
+    }
   }
 
   @include sm-max {
