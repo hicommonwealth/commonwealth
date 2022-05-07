@@ -9,4 +9,9 @@
     display: flex;
     flex-wrap: wrap;
   }
+
+  .no-proposals {
+    display: flex;
+    flex-direction: row;
+  }
 }
