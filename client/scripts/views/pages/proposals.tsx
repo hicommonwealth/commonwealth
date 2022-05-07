@@ -2,13 +2,11 @@
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Button, Tag } from 'construct-ui';
-import BN from 'bn.js';
+import { Tag } from 'construct-ui';
 
 import 'pages/proposals.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import { ChainBase, ChainNetwork } from 'types';
 import { ProposalModule } from 'models';
 
@@ -33,6 +31,7 @@ import {
   SubstrateProposalStats,
 } from '../components/proposals/proposals_explainers';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
@@ -54,8 +53,8 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
 }
 
-const ProposalsPage: m.Component<{}> = {
-  oncreate: () => {
+class ProposalsPage implements m.ClassComponent {
+  oncreate() {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');
@@ -70,42 +69,49 @@ const ProposalsPage: m.Component<{}> = {
         );
       }, 100);
     }
-  },
-  view: () => {
+  }
+
+  view() {
     if (!app.chain || !app.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut
       ) {
-        return m(ErrorPage, {
-          message: 'Could not connect to chain',
-          title: [
-            'Proposals',
-            m(Tag, {
-              size: 'xs',
-              label: 'Beta',
-              style: 'position: relative; top: -2px; margin-left: 6px',
-            }),
-          ],
-        });
+        return (
+          <ErrorPage
+            message="Could not connect to chain"
+            title={[
+              'Proposals',
+              <Tag
+                size="xs"
+                label="Beta"
+                style="position: relative; top: -2px; margin-left: 6px"
+              />,
+            ]}
+          />
+        );
       }
       if (app.chain?.failed)
-        return m(PageNotFound, {
-          title: 'Wrong Ethereum Provider Network!',
-          message: 'Change Metamask to point to Ethereum Mainnet',
-        });
-      return m(PageLoading, {
-        message: 'Connecting to chain',
-        title: [
-          'Proposals',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-        showNewProposalButton: true,
-      });
+        return (
+          <PageNotFound
+            title="Wrong Ethereum Provider Network!"
+            message="Change Metamask to point to Ethereum Mainnet"
+          />
+        );
+      return (
+        <PageLoading
+          message="Connecting to chain"
+          title={[
+            'Proposals',
+            <Tag
+              size="xs"
+              label="Beta"
+              style="position: relative; top: -2px; margin-left: 6px"
+            />,
+          ]}
+          showNewProposalButton={true}
+        />
+      );
     }
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
@@ -168,7 +174,7 @@ const ProposalsPage: m.Component<{}> = {
       !activeCompoundProposals?.length &&
       !activeAaveProposals?.length &&
       !activeSputnikProposals?.length
-        ? [m('.no-proposals', 'No active proposals')]
+        ? [<div class="no-proposals">No active proposals</div>]
         : [
             (activeDemocracyProposals || [])
               .map((proposal) => <ProposalCard proposal={proposal} />)
@@ -258,7 +264,7 @@ const ProposalsPage: m.Component<{}> = {
       !inactiveCompoundProposals?.length &&
       !inactiveAaveProposals?.length &&
       !inactiveSputnikProposals?.length
-        ? [m('.no-proposals', 'No past proposals')]
+        ? [<div class="no-proposals">No past proposals</div>]
         : [
             (inactiveDemocracyProposals || [])
               .map((proposal) => <ProposalCard proposal={proposal} />)
@@ -297,39 +303,36 @@ const ProposalsPage: m.Component<{}> = {
               ),
           ];
 
-    return m(
-      Sublayout,
-      {
-        title: [
+    return (
+      <Sublayout
+        title={[
           'Proposals',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-        showNewProposalButton: true,
-      },
-      m('.ProposalsPage', [
-        onSubstrate && (
-          <SubstrateProposalStats
-            nextLaunchBlock={
-              (app.chain as Substrate).democracyProposals.nextLaunchBlock
-            }
+          <Tag
+            size="xs"
+            label="Beta"
+            style="position: relative; top: -2px; margin-left: 6px"
+          />,
+        ]}
+        showNewProposalButton={true}
+      >
+        <div class="ProposalsPage">
+          {onSubstrate && (
+            <SubstrateProposalStats
+              nextLaunchBlock={
+                (app.chain as Substrate).democracyProposals.nextLaunchBlock
+              }
+            />
+          )}
+          {onCompound && <CompoundProposalStats chain={app.chain} />}
+          <CardsCollection content={activeProposalContent} header="Active" />
+          <CardsCollection
+            content={inactiveProposalContent}
+            header="Inactive"
           />
-        ),
-        onCompound && <CompoundProposalStats chain={app.chain} />,
-        m(CardsCollection, {
-          content: activeProposalContent,
-          header: 'Active',
-        }),
-        m(CardsCollection, {
-          content: inactiveProposalContent,
-          header: 'Inactive',
-        }),
-      ])
+        </div>
+      </Sublayout>
     );
-  },
-};
+  }
+}
 
 export default ProposalsPage;
