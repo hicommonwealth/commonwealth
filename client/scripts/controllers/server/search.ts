@@ -113,16 +113,6 @@ class SearchContoller {
       }
 
       if (scope.includes(SearchScope.Communities)){
-        const unfilteredTokens = this.getByQuery(ALL_RESULTS_QUERY).results[SearchScope.Communities];
-        const tokens = unfilteredTokens.filter((token) =>
-            token.name?.toLowerCase().includes(searchTerm)
-        );
-        searchCache.results[SearchScope.Communities] = tokens.map((token) => {
-            token.contentType = ContentType.Token;
-            token.searchType = SearchScope.Communities;
-            return token;
-        });
-
         const allComms = (app.config.chains.getAll() as any);
         const filteredComms = allComms.filter((comm) => {
             return (
@@ -130,12 +120,12 @@ class SearchContoller {
                 comm.symbol?.toLowerCase().includes(searchTerm)
             );
         });
-        searchCache.results[SearchScope.Communities] = searchCache.results[SearchScope.Communities]
-            .concat(filteredComms.map((chain) => {
-              chain.contentType = ContentType.Chain;
-              chain.searchType = SearchScope.Communities;
-              return chain;
-            })).sort(this.sortResults);
+
+        searchCache.results[SearchScope.Communities] = filteredComms.map((chain) => {
+          chain.contentType = ContentType.Chain;
+          chain.searchType = SearchScope.Communities;
+          return chain;
+        }).sort(this.sortCommunities);
       }
     } finally {
       searchCache.loaded = true
@@ -252,6 +242,10 @@ class SearchContoller {
     );
     return bCreatedAt.diff(aCreatedAt);
   };
+
+  private sortCommunities = (a, b) => {
+    return app.recentActivity.getCommunityThreadCount(b.id) - app.recentActivity.getCommunityThreadCount(a.id)
+  }
 
   public getHistory() {
     const rawHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || []
