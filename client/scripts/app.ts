@@ -80,8 +80,8 @@ export async function initAppState(
 
         // add recentActivity
         const { recentThreads } = data;
-        Object.entries(recentThreads).forEach(([comm, count]) => {
-          app.recentActivity.setCommunityThreadCounts(comm, count);
+        recentThreads.forEach(({chain, count}) => {
+          app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
       // update the login status
