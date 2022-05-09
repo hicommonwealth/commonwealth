@@ -53,9 +53,8 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
 }
 
-class ProposalsPage implements m.ClassComponent {
-  oncreate() {
-    mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
+const ProposalsPage: m.Component<{}> = {
+  oncreate: (vnode) => {
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');
     if (
@@ -69,7 +68,7 @@ class ProposalsPage implements m.ClassComponent {
         );
       }, 100);
     }
-  }
+  },
 
   view() {
     if (!app.chain || !app.chain.loaded) {

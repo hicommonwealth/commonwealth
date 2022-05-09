@@ -3,7 +3,6 @@ import 'modals/create_invite_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import mixpanel from 'mixpanel-browser';
 import {
   Button,
   Input,
@@ -324,10 +323,6 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean }> = {
               failureCallback(true, response.message);
             }
             m.redraw();
-            mixpanel.track('Invite Sent', {
-              'Step No': 2,
-              Step: 'Invite Sent (Completed)',
-            });
           },
           (err) => {
             failureCallback(true, err.responseJSON.error);
@@ -491,10 +486,6 @@ const CreateInviteModal: m.Component<
 > = {
   oncreate: (vnode) => {
     const { chainInfo } = vnode.attrs;
-    mixpanel.track('New Invite', {
-      'Step No': 1,
-      Step: 'Modal Opened',
-    });
   },
   view: (vnode) => {
     const { chainInfo } = vnode.attrs;
