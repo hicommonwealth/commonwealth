@@ -14,23 +14,29 @@ import Sublayout from 'views/sublayout';
 import DashboardExplorePreview from '../components/dashboard_explore_preview';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
-const fetchActivity = async (request: string) => {
-  const activity = await $.post(`${app.serverUrl()}/viewActivity`, {
-    request,
-    jwt: app.user.jwt,
-  });
+enum DashboardViews {
+  ForYou = 'For You',
+  Global = 'Global',
+  Chain = 'Chain',
+}
+
+const fetchActivity = async (requestType: DashboardViews) => {
+  let activity;
+  if (requestType === DashboardViews.ForYou) {
+    activity = await $.post(`${app.serverUrl()}/viewUserActivity`, {
+      jwt: app.user.jwt,
+    });
+  } else if (requestType === DashboardViews.Chain) {
+    activity = await $.post(`${app.serverUrl()}/viewChainActivity`);
+  } else if (requestType === DashboardViews.Global) {
+    activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);
+  }
   return activity;
 };
 
 const notificationsRemaining = (contentLength, count) => {
   return contentLength >= 10 && count < contentLength;
 };
-
-enum DashboardViews {
-  ForYou = 'For You',
-  Global = 'Global',
-  Chain = 'Chain',
-}
 
 class UserDashboard implements m.ClassComponent {
   private activePage: DashboardViews;
@@ -46,6 +52,7 @@ class UserDashboard implements m.ClassComponent {
   // Helper to load activity conditional on the selected tab
   handleToggle = () => {
     this.loadingData = false;
+    m.redraw();
     const tab = this.activePage;
     if (tab === DashboardViews.ForYou) {
       if (this.fyNotifications.length === 0) this.loadingData = true;
@@ -91,7 +98,6 @@ class UserDashboard implements m.ClassComponent {
   }
 
   view() {
-    console.log('howdy');
     const {
       activePage,
       fyNotifications,

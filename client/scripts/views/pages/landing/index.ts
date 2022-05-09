@@ -18,7 +18,7 @@ import ChainsCrowdfundingComponent from './crowdfunding_card_section';
 import 'pages/landing/index.scss';
 
 import { handleEmailInvites } from '../../components/header/invites_menu';
-import { UserDashboard } from '../user_dashboard';
+import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
 
 export interface Chain {
