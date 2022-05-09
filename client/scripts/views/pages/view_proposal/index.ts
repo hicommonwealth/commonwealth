@@ -1048,19 +1048,18 @@ const ViewProposalPage: m.Component<
     };
 
     // load polls
-    if (!vnode.state.prefetch[proposalIdAndType]['pollsStarted']) {
-      app.polls
-        .fetchPolls(app.activeChainId(), (proposal as OffchainThread).id)
-        .catch(() => {
-          notifyError('Failed to load comments');
-          vnode.state.comments = [];
-          m.redraw();
-        });
+    if (
+      proposal instanceof OffchainThread &&
+      !vnode.state.prefetch[proposalIdAndType]['pollsStarted']
+    ) {
+      app.polls.fetchPolls(app.activeChainId(), proposal.id).catch(() => {
+        notifyError('Failed to load comments');
+        vnode.state.comments = [];
+        m.redraw();
+      });
       vnode.state.prefetch[proposalIdAndType]['pollsStarted'] = true;
-    } else {
-      vnode.state.polls = app.polls.getByThreadId(
-        (proposal as OffchainThread).id
-      );
+    } else if (proposal instanceof OffchainThread) {
+      vnode.state.polls = app.polls.getByThreadId(proposal.id);
     }
 
     // load view count
