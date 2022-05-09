@@ -1,162 +1,162 @@
-@import '../../facelift.scss';
+@import 'shared';
 
 .ProjectCard {
-    display: flex;
-    cursor: pointer;
-    
-    .ProjectHeaderPanel {
-        height: 100%;
-        background-color: $lite-gray;
+  display: flex;
+  cursor: pointer;
+
+  .ProjectHeaderPanel {
+    height: 100%;
+    background-color: $neutral-300;
+    .ChainIcon {
+      position: relative;
+    }
+  }
+
+  .ProjectCompletionBar {
+    flex: 1;
+    background-color: $neutral-300;
+    .completed-percentage {
+      height: 100%;
+      background-color: $green-400;
+    }
+  }
+
+  .ProjectInfoPanel {
+    background-color: $neutral-200;
+    .project-info-header {
+      display: flex;
+      justify-content: space-between;
+      h3.project-title {
+        @include header;
+        font-size: 24px;
+        color: $neutral-400;
+        display: flex;
         .ChainIcon {
-            position: relative;
+          margin-right: 6px;
         }
+      }
+      .project-block-count {
+        height: 18px;
+        padding: 2px 4px 0;
+        font-size: 14px;
+        line-height: 17px;
+        color: $neutral-300;
+        background-color: $neutral-400;
+        border-radius: 6px;
+      }
     }
-
-    .ProjectCompletionBar {
-        flex: 1;
-        background-color: $disable-gray;
-        .completed-percentage {
-            height: 100%;
-            background-color: $carrib-green;
+    .project-info-body {
+      @include body;
+      color: $neutral-300;
+      font-size: 14px;
+      line-height: 17px;
+      text-overflow: ellipsis;
+      white-space: break-spaces;
+      overflow: hidden;
+      height: 48px;
+    }
+    .project-info-footer {
+      margin-top: 5px;
+      .User {
+        display: flex;
+        .user-display-name {
+          position: relative;
+          top: 3px;
+          margin-left: 4px;
+          color: $neutral-300;
+          font-size: 14px;
         }
+      }
     }
+  }
 
+  &.large {
+    flex-direction: column;
+    height: 256px;
+    width: 400px;
+    .ProjectHeaderPanel {
+      flex: 32;
+      border-radius: 16px 16px 0 0;
+      .ChainIcon {
+        top: 11px;
+        left: 342px;
+      }
+    }
     .ProjectInfoPanel {
-        background-color: $background-gray;
-        .project-info-header {
-            display: flex;
-            justify-content: space-between;
-            h3.project-title {
-                @include header;
-                font-size: 24px;
-                color: $midi-gray;
-                display: flex;
-                .ChainIcon {
-                    margin-right: 6px;
-                }
-            }
-            .project-block-count {
-                height: 18px;
-                padding: 2px 4px 0;
-                font-size: 14px;
-                line-height: 17px;
-                color: $lite-gray;
-                background-color: $disable-gray;
-                border-radius: 6px;
-            }
-        }
-        .project-info-body {
-            @include body;
-            color: $lite-gray;
-            font-size: 14px;
-            line-height: 17px;
-            text-overflow: ellipsis;
-            white-space: break-spaces;
-            overflow: hidden;
-            height: 48px;
-        }
-        .project-info-footer {
-            margin-top: 5px;
-            .User {
-                display: flex;
-                .user-display-name {
-                    position: relative;
-                    top: 3px;
-                    margin-left: 4px;
-                    color: $lite-gray;
-                    font-size: 14px;
-                }
-            }
-        }
+      flex: 32;
+      border-radius: 0 0 16px 16px;
+      padding: 12px 10px 0 20px;
+      .project-info-header {
+        justify-content: space-between;
+      }
     }
+  }
 
-    &.large {
-        flex-direction: column;
-        height: 256px;
-        width: 400px;
-        .ProjectHeaderPanel {
-            flex: 32;
-            border-radius: 16px 16px 0 0;
-            .ChainIcon {
-                top: 11px;
-                left: 342px;
-            }
-        }
-        .ProjectInfoPanel {
-            flex: 32;
-            border-radius: 0 0 16px 16px;
-            padding: 12px 10px 0 20px;
-            .project-info-header {
-                justify-content: space-between;
-            }
-        }
+  &.medium {
+    height: 114px;
+    width: 400px;
+    .ProjectHeaderPanel {
+      flex: 7;
     }
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      flex: 18;
+      background-color: $neutral-200;
+      .ProjectCompletionBar {
+        flex: 1;
+      }
+      .ProjectInfoPanel {
+        flex: 13;
+        margin: 6px 1px 0 14px;
+        .User {
+          position: relative;
+          top: -2px;
+          .user-display-name {
+            top: 1px;
+          }
+        }
+      }
+    }
+  }
 
-    &.medium {
-        height: 114px;
-        width: 400px;
-        .ProjectHeaderPanel {
-            flex: 7;
-        }
-        .right-panel {
-            display: flex;
-            flex-direction: column;
-            flex: 18;
-            background-color: $background-gray;
-            .ProjectCompletionBar {
-                flex: 1;
-            }
-            .ProjectInfoPanel {
-                flex: 13;
-                margin: 6px 1px 0 14px;
-                .User {
-                    position: relative;
-                    top: -2px;
-                    .user-display-name {
-                        top: 1px;
-                    }
-                }
-            }
-        } 
+  &.small {
+    flex-direction: column;
+    width: 272px;
+    padding: 4px;
+    &:hover {
+      background-color: $neutral-200;
     }
-
-    &.small {
-        flex-direction: column;
-        width: 272px;
-        padding: 4px;
-        &:hover {
-            background-color: $background-gray;
+    .top-panel {
+      display: flex;
+      justify-content: space-between;
+      h3 {
+        @include header;
+        color: $neutral-500;
+      }
+      .project-status {
+        font-size: 14px;
+        padding: 6px 12px 4px;
+        height: min-content;
+        border-radius: 6px;
+        &.funded {
+          background-color: $green-400;
+          color: $green-700;
         }
-        .top-panel {
-            display: flex;
-            justify-content: space-between;
-            h3 {
-                @include header;
-                color: $midi-gray;
-            }
-            .project-status {
-                font-size: 14px;
-                padding: 6px 12px 4px;
-                height: min-content;
-                border-radius: 6px;
-                &.funded {
-                    background-color: $foam-green;
-                    color: $greenery;
-                }
-            }
-        }
-        .bottom-panel {
-            display: flex;
-            justify-content: left;
-            .project-token-name {
-                @include body;
-                margin-left: 7px;
-                color: $lite-gray;
-                font-size: 14px;
-                line-height: 17px;
-                position: relative;
-                top: 1px;
-            }
-        }
+      }
     }
+    .bottom-panel {
+      display: flex;
+      justify-content: left;
+      .project-token-name {
+        @include body;
+        margin-left: 7px;
+        color: $neutral-300;
+        font-size: 14px;
+        line-height: 17px;
+        position: relative;
+        top: 1px;
+      }
+    }
+  }
 }

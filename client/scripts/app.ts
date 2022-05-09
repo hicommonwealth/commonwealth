@@ -17,8 +17,6 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
-import { WebSocketController } from 'controllers/server/socket';
-
 import {
   notifyError,
   notifyInfo,
@@ -34,7 +32,9 @@ import { pathIsDiscussion } from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
-import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
+import(
+  /* webpackPrefetch: true */ 'views/pages/commonwealth/whycommonwealth/index'
+);
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
@@ -336,15 +336,15 @@ export async function selectNode(
       )
     ).default;
     newChain = new Solana(n, app);
-  } else if (n.chain.network === ChainNetwork.Commonwealth) {
-    const Commonwealth = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "commonwealth-main" */
-        './controllers/chain/ethereum/commonwealth/adapter'
-      )
-    ).default;
-    newChain = new Commonwealth(n, app);
+    // } else if (n.chain.network === ChainNetwork.Commonwealth) {
+    //   const Commonwealth = (
+    //     await import(
+    //       /* webpackMode: "lazy" */
+    //       /* webpackChunkName: "commonwealth-main" */
+    //       './controllers/chain/ethereum/commonwealth/adapter'
+    //     )
+    //   ).default;
+    //   newChain = new Commonwealth(n, app);
   } else if (
     n.chain.base === ChainBase.Ethereum &&
     n.chain.type === ChainType.Offchain
@@ -808,9 +808,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
             ),
-            '/:scope/projects': redirectRoute(() => '/projects'),
-            '/:scope/backers': redirectRoute(() => '/backers'),
-            '/:scope/collectives': redirectRoute(() => '/collectives'),
+            '/:scope/projects': redirectRoute(() => '/projects/index'),
+            '/:scope/backers': redirectRoute(() => '/backers/index'),
+            '/:scope/collectives': redirectRoute(() => '/collectives/index'),
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
             '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
             '/:scope/home': redirectRoute(() => '/'),
@@ -892,10 +892,13 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
-            '/whyCommonwealth': importRoute('views/pages/commonwealth', {
-              scoped: false,
-              hideSidebar: true,
-            }),
+            '/whyCommonwealth': importRoute(
+              'views/pages/commonwealth/whycommonwealth',
+              {
+                scoped: false,
+                hideSidebar: true,
+              }
+            ),
             // Notifications
             '/:scope/notifications': importRoute(
               'views/pages/notifications_page',
@@ -918,11 +921,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/commonwealth/projects/view_project',
               { scoped: true }
             ),
-            '/:scope/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
+            '/:scope/backers': importRoute(
+              'views/pages/commonwealth/backers/index',
+              {
+                scoped: true,
+              }
+            ),
             '/:scope/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
+              'views/pages/commonwealth/collectives/index',
               { scoped: true }
             ),
             // NEAR
