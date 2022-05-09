@@ -34,6 +34,30 @@ $discussion-title-font-size: 1.45rem;
   flex: 1;
   flex-direction: row;
 
+  .Button {
+    margin-top: 30px;
+    height: 30px;
+  }
+  .show-more-button-label {
+    display: flex;
+  }
+
+  .show-more-button {
+    background-image: linear-gradient(to bottom, transparent, white);
+    display: flex;
+    height: 50px;
+    margin-top: -50px;
+    justify-content: center;
+    position: relative;
+  }
+
+  .show-more-button-displayed {
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    position: relative;
+  }
+
   .view-proposal-page-container {
     display: flex;
     flex-direction: column;

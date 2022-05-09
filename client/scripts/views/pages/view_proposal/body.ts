@@ -46,6 +46,10 @@ import { ChainType } from '../../../../../shared/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWButton } from '../../components/component_kit/cw_button';
+
+const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
+const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
 
 export enum GlobalStatus {
   Get = 'get',
@@ -700,14 +704,31 @@ export const ProposalBodySpacer: m.Component<{}> = {
   },
 };
 
-export const ProposalBodyText: m.Component<{
-  item: AnyProposal | OffchainThread | OffchainComment<any>;
-}> = {
-  view: (vnode) => {
+const countLinesQuill = (ops) => {
+  let count = 0;
+  for (const op of ops) {
+    try {
+      count += op.insert.split('\n').length - 1;
+    } catch (e) {}
+  }
+  return count;
+};
+
+const countLinesMarkdown = (text) => {
+  return text.split('\n').length - 1;
+};
+
+export const ProposalBodyText: m.Component<
+  {
+    item: AnyProposal | OffchainThread | OffchainComment<any>;
+  },
+  { collapsed: boolean; isLargeTextBlock: boolean; body: any }
+> = {
+  oninit: (vnode) => {
+    vnode.state.collapsed = false;
     const { item } = vnode.attrs;
     if (!item) return;
 
-    const isThread = item instanceof OffchainThread;
     const body =
       item instanceof OffchainComment
         ? item.text
@@ -716,10 +737,27 @@ export const ProposalBodyText: m.Component<{
         : item.description;
     if (!body) return;
 
+    vnode.state.body = body;
+    try {
+      const doc = JSON.parse(body);
+      if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        vnode.state.collapsed = true;
+        vnode.state.isLargeTextBlock = true;
+      }
+    } catch (e) {
+      if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        vnode.state.collapsed = true;
+        vnode.state.isLargeTextBlock = true;
+      }
+    }
+  },
+  view: (vnode) => {
+    const { body } = vnode.state;
+
     const getPlaceholder = () => {
-      if (!(item instanceof OffchainThread)) return;
+      if (!(vnode.attrs.item instanceof OffchainThread)) return;
       const author: Account<any> = app.chain
-        ? app.chain.accounts.get(item.author)
+        ? app.chain.accounts.get(vnode.attrs.item.author)
         : null;
 
       return m('.ProposalBodyText.proposal-body-placeholder', [
@@ -736,6 +774,11 @@ export const ProposalBodyText: m.Component<{
       ]);
     };
 
+    const toggleDisplay = () => {
+      vnode.state.collapsed = !vnode.state.collapsed;
+      m.redraw();
+    };
+
     return m(
       '.ProposalBodyText',
       (() => {
@@ -750,12 +793,71 @@ export const ProposalBodyText: m.Component<{
           ) {
             return getPlaceholder();
           }
-          return m(QuillFormattedText, { doc });
+
+          return m('.wrap', [
+            m(QuillFormattedText, {
+              doc: doc,
+              cutoffText: vnode.state.collapsed
+                ? QUILL_PROPOSAL_LINES_CUTOFF_LENGTH
+                : doc.ops.length,
+            }),
+            vnode.state.isLargeTextBlock &&
+              (vnode.state.collapsed
+                ? m('.show-more-button', [
+                    m(CWButton, {
+                      buttonType: 'secondary',
+                      label: m('.show-more-button-label', [
+                        'Show More',
+                        m(CWIcon, { iconName: 'chevronDown' }),
+                      ]),
+                      onclick: toggleDisplay,
+                    }),
+                  ])
+                : m('.show-more-button-displayed', [
+                    m(CWButton, {
+                      buttonType: 'secondary',
+                      label: m('.show-more-button-label', [
+                        'Show Less',
+                        m(CWIcon, { iconName: 'chevronUp' }),
+                      ]),
+                      onclick: toggleDisplay,
+                    }),
+                  ])),
+          ]);
         } catch (e) {
           if (body.toString().trim() === '') {
             return getPlaceholder();
           }
-          return m(MarkdownFormattedText, { doc: body });
+          return m('.wrap', [
+            m(MarkdownFormattedText, {
+              doc: body,
+              cutoffText: vnode.state.collapsed
+                ? MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
+                : countLinesMarkdown(body),
+            }),
+            vnode.state.isLargeTextBlock &&
+              (vnode.state.collapsed
+                ? m('.show-more-button', [
+                    m(CWButton, {
+                      buttonType: 'secondary',
+                      label: m('.show-more-button-label', [
+                        'Show More',
+                        m(CWIcon, { iconName: 'chevronDown' }),
+                      ]),
+                      onclick: toggleDisplay,
+                    }),
+                  ])
+                : m('.show-more-button-displayed', [
+                    m(CWButton, {
+                      buttonType: 'secondary',
+                      label: m('.show-more-button-label', [
+                        'Show Less',
+                        m(CWIcon, { iconName: 'chevronUp' }),
+                      ]),
+                      onclick: toggleDisplay,
+                    }),
+                  ])),
+          ]);
         }
       })()
     );

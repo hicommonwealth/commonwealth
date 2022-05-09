@@ -120,6 +120,7 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ProposalPoll } from './poll';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 const MAX_THREAD_LEVEL = 2;
 
