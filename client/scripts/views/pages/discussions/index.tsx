@@ -5,7 +5,6 @@ import 'pages/discussions/index.scss';
 import app from 'state';
 import { debounce } from 'lodash';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { PageLoading } from '../loading';
 import { SummaryListing } from './summary_listing';
 import { RecentListing } from './recent_listing';
@@ -97,11 +96,6 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
   // Lifecycle methods
 
   oncreate() {
-    mixpanel.track('PageVisit', {
-      'Page Name': 'DiscussionsPage',
-      Scope: app.activeChainId(),
-    });
-
     this.handleScrollback();
   }
 
