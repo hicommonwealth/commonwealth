@@ -639,7 +639,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     const activeAcct = app.user.activeAccount;
     m.route(document.body, '/', {
       // Sitewide pages
-      '/about': importRoute('views/pages/landing/about', { scoped: false }),
+      '/about': importRoute('views/pages/commonwealth', {
+        scoped: false,
+      }),
       '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
       '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
       '/components': importRoute('views/pages/components', {
@@ -649,6 +651,19 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       '/createCommunity': importRoute('views/pages/create_community', {
         scoped: false,
       }),
+      // Dashboard
+      '/dashboard': importRoute('views/pages/user_dashboard', {
+        scoped: false,
+      }),
+      // '/dashboard/for-you': importRoute('views/pages/user_dashboard', {
+      //   scoped: false,
+      // }),
+      // '/dashboard/global': importRoute('views/pages/user_dashboard', {
+      //   scoped: false,
+      // }),
+      // '/dashboard/chain-events': importRoute('views/pages/user_dashboard', {
+      //   scoped: false,
+      // }),
       ...(isCustomDomain
         ? {
             //
@@ -662,26 +677,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
-            // Dashboard
-            '/dashboard': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/dashboard/for-you': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/dashboard/global': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/dashboard/chain-events': importRoute(
-              'views/pages/user_dashboard',
-              {
-                scoped: false,
-                hideSidebar: false,
-              }
-            ),
             // Notifications
             '/notification-settings': importRoute(
               'views/pages/notification_settings',
@@ -724,7 +719,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/chat/:channel': importRoute('views/pages/chat.tsx', {
+            '/chat/:channel': importRoute('views/pages/chat', {
               scoped: true,
               deferChain: true,
             }),
@@ -832,16 +827,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/discussions/:topic': redirectRoute(
               (attrs) => `/discussions/${attrs.topic}/`
             ),
-            '/:scope/dashboard': redirectRoute(() => '/dashboard'),
-            '/:scope/dashboard/for-you': redirectRoute(
-              () => '/dashboard/for-you'
-            ),
-            '/:scope/dashboard/global': redirectRoute(
-              () => '/dashboard/global'
-            ),
-            '/:scope/dashboard/chain-events': redirectRoute(
-              () => '/dashboard/chain-events'
-            ),
             '/:scope/search': redirectRoute(() => '/search'),
             '/:scope/members': redirectRoute(() => '/members'),
             '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
@@ -919,27 +904,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: true,
             }),
-            // Dashboard
-            '/dashboard': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/dashboard/for-you': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/dashboard/global': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/dashboard/chain-events': importRoute(
-              'views/pages/user_dashboard',
-              {
-                scoped: false,
-                hideSidebar: false,
-              }
-            ),
-            //
             // Scoped routes
             //
 
@@ -1007,7 +971,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/:scope/chat/:channel': importRoute('views/pages/chat.tsx', {
+            '/:scope/chat/:channel': importRoute('views/pages/chat', {
               scoped: true,
               deferChain: true,
             }),

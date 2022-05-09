@@ -91,6 +91,7 @@ export class UserDashboard implements m.ClassComponent {
   }
 
   view() {
+    console.log('howdy');
     const {
       activePage,
       fyNotifications,
