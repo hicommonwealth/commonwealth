@@ -18,12 +18,12 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
 
-import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/header';
+import { MixpanelSnapshotEvents } from 'analytics/types';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { MixpanelSnapshotEvents } from 'analytics/types';
+import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 
 const enum VotingError {
