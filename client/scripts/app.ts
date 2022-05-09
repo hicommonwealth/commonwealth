@@ -5,12 +5,12 @@ import '../styles/tailwind_reset.css'; // for the landing page
 import '../styles/shared.scss';
 import 'construct.scss';
 import 'lity/dist/lity.min.css';
+import mixpanel from 'mixpanel-browser';
 
 import m from 'mithril';
 import $ from 'jquery';
 import {FocusManager} from 'construct-ui';
 import moment from 'moment';
-import mixpanel from 'mixpanel-browser';
 
 import './fragment-fix';
 import app, {ApiStatus, LoginState} from 'state';
@@ -38,6 +38,9 @@ import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 const APPLICATION_UPDATE_MESSAGE =
   'A new version of the application has been released. Please save your work and refresh.';
 const APPLICATION_UPDATE_ACTION = 'Okay';
+
+const MIXPANEL_DEV_TOKEN = '312b6c5fadb9a88d98dc1fb38de5d900';
+const MIXPANEL_PROD_TOKEN = '993ca6dd7df2ccdc2a5d2b116c0e18c5';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -144,10 +147,6 @@ export async function deinitChainOrCommunity() {
 export async function handleInviteLinkRedirect() {
   const inviteMessage = m.route.param('invitemessage');
   if (inviteMessage) {
-    mixpanel.track('Invite Link Used', {
-      'Step No': 1,
-      Step: inviteMessage,
-    });
     if (
       inviteMessage === 'failure' &&
       m.route.param('message') === 'Must be logged in to accept invites'
@@ -168,10 +167,6 @@ export async function handleInviteLinkRedirect() {
 
 export async function handleUpdateEmailConfirmation() {
   if (m.route.param('confirmation')) {
-    mixpanel.track('Update Email Verification Redirect', {
-      'Step No': 1,
-      Step: m.route.param('confirmation'),
-    });
     if (m.route.param('confirmation') === 'success') {
       notifySuccess('Email confirmed!');
     }
@@ -301,11 +296,13 @@ export async function selectNode(
     ).default;
     newChain = new ERC20(n, app);
   } else if (n.chain.network === ChainNetwork.ERC721) {
-    const ERC721 = (await import(
-    //   /* webpackMode: "lazy" */
-    //   /* webpackChunkName: "erc721-main" */
-      './controllers/chain/ethereum/NftAdapter'
-    )).default;
+    const ERC721 = (
+      await import(
+        //   /* webpackMode: "lazy" */
+        //   /* webpackChunkName: "erc721-main" */
+        './controllers/chain/ethereum/NftAdapter'
+      )
+    ).default;
     newChain = new ERC721(n, app);
   } else if (n.chain.network === ChainNetwork.SPL) {
     const SPL = (
@@ -417,7 +414,11 @@ export async function initChain(): Promise<void> {
 
 export async function initNewTokenChain(address: string) {
   const chain_network = app.chain.network;
-  const response = await $.getJSON('/api/getTokenForum', { address, chain_network, autocreate: true });
+  const response = await $.getJSON('/api/getTokenForum', {
+    address,
+    chain_network,
+    autocreate: true,
+  });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');
@@ -1078,12 +1079,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     // initialize mixpanel, before adding an alias or tracking identity
     try {
-      mixpanel.init('32c32e2c81e63e65dcdd98dc7d2c6811');
       if (
         document.location.host.startsWith('localhost') ||
         document.location.host.startsWith('127.0.0.1')
       ) {
-        mixpanel.disable();
+        mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
+      } else {
+        // Production Mixpanel Project
+        // TODO: Swap this for the prod token after we make sure everything is working
+        mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
       }
     } catch (e) {
       console.error('Mixpanel initialization error');
@@ -1104,22 +1108,13 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     */
       if (m.route.param('new') && m.route.param('new').toString() === 'true') {
         console.log('creating account');
-        mixpanel.track('Account Creation', {
-          'Step No': 1,
-          Step: 'Add Email',
-        });
+
         try {
-          mixpanel.alias(m.route.param('email').toString());
         } catch (err) {
           // Don't do anything... Just identify if there is an error
           // mixpanel.identify(m.route.param('email').toString());
         }
       } else {
-        console.log('logging in account');
-        mixpanel.track('Logged In', {
-          Step: 'Email',
-        });
-        mixpanel.identify(app.user.email);
       }
       m.route.set(m.route.param('path'), {}, { replace: true });
     } else if (
