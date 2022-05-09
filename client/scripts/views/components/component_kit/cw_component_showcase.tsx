@@ -18,6 +18,8 @@ import { iconLookup } from './cw_icons/cw_icon_lookup';
 // import { CWPopover } from './cw_popover';
 import { CWTooltip } from './cw_tooltip';
 import { CWText } from './cw_text';
+import { CWIconButton } from './cw_icon_button';
+import { CWRadioButton } from './cw_radio_button';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -50,6 +52,9 @@ const radioGroupOptions = [
 ];
 
 export class ComponentShowcase implements m.ClassComponent {
+  private selectedIconButton: number;
+  private radioButtonSelected: boolean;
+
   view() {
     return (
       <div class="ComponentShowcase">
@@ -176,6 +181,38 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWIcon iconName="views" iconSize="large" disabled={true} />
           </div>
         </div>
+        <h1>Icon Buttons</h1>
+        <div class="icon-button-gallery">
+          <div class="icon-button-subheader">Click to see selected state</div>
+          <div class="icon-button-row">
+            <CWIconButton
+              iconName="views"
+              iconSize="large"
+              iconButtonTheme="primary"
+              selected={this.selectedIconButton === 1}
+              onclick={() => {
+                this.selectedIconButton = 1;
+              }}
+            />
+            {this.selectedIconButton === 1 && (
+              <div class="icon-button-selected">is selected</div>
+            )}
+          </div>
+          <div class="icon-button-row">
+            <CWIconButton
+              iconName="views"
+              iconSize="large"
+              iconButtonTheme="neutral"
+              selected={this.selectedIconButton === 2}
+              onclick={() => {
+                this.selectedIconButton = 2;
+              }}
+            />
+            {this.selectedIconButton === 2 && (
+              <div class="icon-button-selected">is selected</div>
+            )}
+          </div>
+        </div>
         <h1>Buttons</h1>
         <div class="button-gallery">
           <CWButton
@@ -235,6 +272,22 @@ export class ComponentShowcase implements m.ClassComponent {
             label="Inline external link"
             target="https://edgewa.re/"
             linkType="inline"
+          />
+        </div>
+        <h1>Radio Button</h1>
+        <div class="radio-button-gallery">
+          <CWRadioButton
+            value="Radio Button"
+            label="Radio Button"
+            selected={this.radioButtonSelected === true}
+            onchange={() => {
+              this.radioButtonSelected = true;
+            }}
+          />
+          <CWRadioButton
+            value="Disabled Radio Button"
+            label="Disabled Radio Button"
+            disabled={true}
           />
         </div>
         <h1>Radio Group</h1>

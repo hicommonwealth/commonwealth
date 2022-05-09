@@ -108,7 +108,7 @@ const getDiscussionResult = (thread, searchTerm) => {
       label={
         <a class="search-results-item">
           <div class="search-results-thread-header disabled">
-            {`discussion - ${thread.chain || thread.community}`}
+            {`discussion - ${thread.chain}`}
           </div>
           <div class="search-results-thread-title">
             {decodeURIComponent(thread.title)}

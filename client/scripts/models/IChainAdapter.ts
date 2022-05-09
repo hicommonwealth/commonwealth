@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { ApiStatus, IApp } from 'state';
+import { ApiStatus, IApp, LoginState } from 'state';
 import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
@@ -11,6 +11,7 @@ import ChainEntityController, {
 } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { Account, NodeInfo, ProposalModule } from '.';
+import { WebSocketController } from '../controllers/server/socket';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -79,12 +80,22 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       return false;
     }
 
-    const { pinnedThreads, topics, admins, activeUsers, numVotingThreads } =
-      response.result;
+    const {
+      pinnedThreads,
+      topics,
+      admins,
+      activeUsers,
+      numVotingThreads,
+      chatChannels,
+    } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.chain.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
+
+    // parse/save the chat channels
+    await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));
+
     if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
       this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
         threads: this.app.threads.listingStore.getPinnedThreads(),
@@ -107,6 +118,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
     this.app.reactionCounts.deinit();
     this.app.threadUniqueAddressesCount.deinit();
+    if (this.app.socket) this.app.socket.chatNs.deinit();
     console.log(`${this.meta.chain.name} stopped`);
   }
 
