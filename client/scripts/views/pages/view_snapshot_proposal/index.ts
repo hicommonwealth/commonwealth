@@ -18,7 +18,6 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
 
-import { MixpanelSnapshotEvents } from 'analytics/types';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
