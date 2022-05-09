@@ -11,6 +11,7 @@ import app, { LoginState } from 'state';
 import { DashboardActivityNotification } from 'models';
 import UserDashboardRow from 'views/components/user_dashboard_row';
 import Sublayout from 'views/sublayout';
+import { notifyInfo } from 'controllers/app/notifications';
 import DashboardExplorePreview from '../components/dashboard_explore_preview';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
@@ -56,7 +57,7 @@ class UserDashboard implements m.ClassComponent {
     const tab = this.activePage;
     if (tab === DashboardViews.ForYou) {
       if (this.fyNotifications.length === 0) this.loadingData = true;
-      fetchActivity('forYou').then((activity) => {
+      fetchActivity(tab).then((activity) => {
         this.fyNotifications = activity.result
           .map((notification) =>
             DashboardActivityNotification.fromJSON(notification)
@@ -67,7 +68,7 @@ class UserDashboard implements m.ClassComponent {
       });
     } else if (tab === DashboardViews.Global) {
       if (this.globalNotifications.length === 0) this.loadingData = true;
-      fetchActivity('global').then((activity) => {
+      fetchActivity(tab).then((activity) => {
         this.globalNotifications = activity.result.map((notification) =>
           DashboardActivityNotification.fromJSON(notification)
         );
@@ -76,7 +77,7 @@ class UserDashboard implements m.ClassComponent {
       });
     } else if (tab === DashboardViews.Chain) {
       if (this.chainEvents.length === 0) this.loadingData = true;
-      fetchActivity('chainEvents').then((activity) => {
+      fetchActivity(tab).then((activity) => {
         this.chainEvents = activity.result.map((notification) =>
           DashboardActivityNotification.fromJSON(notification)
         );
@@ -107,9 +108,7 @@ class UserDashboard implements m.ClassComponent {
     } = this;
     // Load activity
     const loggedIn = app.loginState === LoginState.LoggedIn;
-    const subpage: DashboardViews = m.route.get().includes('for-you')
-      ? DashboardViews.ForYou
-      : m.route.get().includes('chain-events')
+    const subpage: DashboardViews = m.route.get().includes('chain-events')
       ? DashboardViews.Chain
       : m.route.get().includes('global')
       ? DashboardViews.Global
@@ -176,9 +175,13 @@ class UserDashboard implements m.ClassComponent {
               <TabItem
                 label={DashboardViews.ForYou}
                 active={activePage === DashboardViews.ForYou}
-                disabled={!loggedIn}
                 onclick={() => {
-                  if (!loggedIn) return;
+                  if (!loggedIn) {
+                    notifyInfo(
+                      'Log in to join a community with an invite link'
+                    );
+                    return;
+                  }
                   m.route.set('/dashboard/for-you');
                   m.redraw();
                 }}
