@@ -234,7 +234,6 @@ class ChainInfo {
     element,
     telegram,
     github,
-    hideProjects,
     stagesEnabled,
     customStages,
     customDomain,
@@ -242,6 +241,7 @@ class ChainInfo {
     snapshot,
     iconUrl,
     defaultSummaryView,
+    hideProjects,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -253,7 +253,6 @@ class ChainInfo {
       element,
       telegram,
       github,
-      hide_projects: hideProjects,
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
@@ -261,6 +260,7 @@ class ChainInfo {
       terms,
       icon_url: iconUrl,
       default_summary_view: defaultSummaryView,
+      hide_projects: hideProjects,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
