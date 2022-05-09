@@ -694,9 +694,6 @@ export class SearchBar implements m.Component {
           defaultValue={m.route.param('q') || this.searchTerm}
           value={this.searchTerm}
           autocomplete="off"
-          oncreate={() => {
-            app.search.initialize();
-          }}
           onclick={async () => {
             this.focused = true;
           }}

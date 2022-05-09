@@ -6,7 +6,6 @@ import { SearchScope, SearchParams } from '../../models/SearchQuery';
 import { OffchainThread, SearchQuery } from "../../models";
 import { modelFromServer } from './threads';
 
-export const ALL_RESULTS_QUERY = new SearchQuery('COMMONWEALTH_ALL_RESULTS');
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 const SEARCH_HISTORY_KEY = "COMMONWEALTH_SEARCH_HISTORY"
@@ -30,34 +29,7 @@ class SearchContoller {
     return null
   }
 
-  public async initialize() {
-    const allCommunitiesSearch = this._store.getOrAdd(ALL_RESULTS_QUERY)
-    if(!this.getByQuery(ALL_RESULTS_QUERY)?.loaded) {
-        try {
-            const getTokens = () =>
-                $.getJSON('/api/getTokensFromLists').then((response) => {
-                if (response.status === 'Failure') {
-                    throw response.message;
-                } else {
-                    return response.result;
-                }
-            })
-            const tokens = await getTokens();
-            allCommunitiesSearch.results[SearchScope.Communities] = tokens
-        } catch (err) {
-            allCommunitiesSearch.results[SearchScope.Communities] = []
-        } finally {
-            allCommunitiesSearch.loaded = true
-            this._store.update(allCommunitiesSearch)
-        }
-    }
-  }
-
   public async search(searchQuery: SearchQuery) {
-    if (!this.getByQuery(ALL_RESULTS_QUERY)?.loaded){
-      await this.initialize()
-    }
-
     if (this.getByQuery(searchQuery)?.loaded) {
       return this.getByQuery(searchQuery)
     }
