@@ -6,8 +6,16 @@ import InputTokensListComponent from './input_tokens_lists';
 import 'pages/landing/tokens_community_hero.scss';
 import { Chain, Token } from './index';
 
+export const placeholderChain = {
+  img: 'static/img/add.svg',
+  id: 'placeholder',
+  chainInfo: { symbol: 'PLACEHOLDER' },
+  name: 'Add your token!',
+  placeholder: true,
+}
+
 interface IState {
-  chainsAndTokens: (Chain | Token)[];
+  chainsAndTokens: (Chain | Token | typeof placeholderChain)[];
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
   inputTimeout: any;
@@ -42,13 +50,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     vnode.state.chainsAndTokens = [
-      {
-        img: 'static/img/add.svg',
-        id: 'placeholder',
-        chainInfo: { symbol: 'PLACEHOLDER' },
-        name: 'Add your token!',
-        placeholder: true,
-      },
+      placeholderChain,
       ...vnode.attrs.chains,
     ];
     const mappedCommunities = [

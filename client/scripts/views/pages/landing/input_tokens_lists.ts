@@ -2,9 +2,10 @@ import { Spinner } from 'construct-ui';
 import m from 'mithril';
 import InputTokenOptionComponent from './input_token_option';
 import { Chain, Token } from './index';
+import { placeholderChain } from './tokens_community_hero';
 
 interface IAttrs {
-  optionList: (Token | Chain)[];
+  optionList: (Token | Chain | typeof placeholderChain)[];
   maxOptions: number;
   inputValue: string;
   refilterResults: boolean;
