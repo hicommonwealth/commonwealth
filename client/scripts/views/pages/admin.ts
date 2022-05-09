@@ -4,7 +4,6 @@ import 'pages/admin.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import app from 'state';
@@ -494,10 +493,6 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
                 (response) => {
                   if (response.status === 'Success') {
                     if (!app.isLoggedIn()) {
-                      mixpanel.track('Add Admin', {
-                        'Step No': 1,
-                        Step: 'Add Admin',
-                      });
                     }
                     m.redraw();
                   } else {
@@ -527,12 +522,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
 };
 
 const AdminPage: m.Component<{}> = {
-  oncreate: () => {
-    mixpanel.track('PageVisit', {
-      'Page Name': 'AdminPage',
-      Scope: app.activeChainId(),
-    });
-  },
+  oncreate: () => {},
   view: () => {
     if (!app.user.isSiteAdmin) {
       m.route.set('/', {}, { replace: true });
