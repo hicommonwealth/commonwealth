@@ -32,7 +32,7 @@ enum DashboardViews {
   Chain = 'Chain',
 }
 
-export class UserDashboard implements m.ClassComponent {
+class UserDashboard implements m.ClassComponent {
   private activePage: DashboardViews;
   private chainEventCount: number;
   private chainEvents: DashboardActivityNotification[];
@@ -297,3 +297,5 @@ export class UserDashboard implements m.ClassComponent {
     );
   }
 }
+
+export default UserDashboard;
