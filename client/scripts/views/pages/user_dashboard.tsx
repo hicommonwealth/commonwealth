@@ -7,7 +7,7 @@ import { TabItem, Tabs, Spinner } from 'construct-ui';
 
 import 'pages/user_dashboard.scss';
 
-import app from 'state';
+import app, { LoginState } from 'state';
 import { DashboardActivityNotification } from 'models';
 import UserDashboardRow from 'views/components/user_dashboard_row';
 import Sublayout from 'views/sublayout';
@@ -33,7 +33,7 @@ enum DashboardViews {
 }
 
 export class UserDashboard implements m.ClassComponent {
-  private activeTab: DashboardViews;
+  private activePage: DashboardViews;
   private chainEventCount: number;
   private chainEvents: DashboardActivityNotification[];
   private fyCount: number;
@@ -44,8 +44,9 @@ export class UserDashboard implements m.ClassComponent {
   private onscroll;
 
   // Helper to load activity conditional on the selected tab
-  handleToggle = (tab: DashboardViews) => {
+  handleToggle = () => {
     this.loadingData = false;
+    const tab = this.activePage;
     if (tab === DashboardViews.ForYou) {
       if (this.fyNotifications.length === 0) this.loadingData = true;
       fetchActivity('forYou').then((activity) => {
@@ -76,7 +77,7 @@ export class UserDashboard implements m.ClassComponent {
         m.redraw();
       });
     }
-    this.activeTab = tab;
+    this.activePage = tab;
   };
 
   oninit() {
@@ -91,30 +92,31 @@ export class UserDashboard implements m.ClassComponent {
 
   view() {
     const {
-      activeTab,
+      activePage,
       fyNotifications,
       globalNotifications,
       chainEvents,
       loadingData,
     } = this;
-
     // Load activity
+    const loggedIn = app.loginState === LoginState.LoggedIn;
     const subpage: DashboardViews = m.route.get().includes('for-you')
       ? DashboardViews.ForYou
       : m.route.get().includes('chain-events')
       ? DashboardViews.Chain
       : m.route.get().includes('global')
       ? DashboardViews.Global
-      : app.user.activeAccount
+      : loggedIn
       ? DashboardViews.ForYou
       : DashboardViews.Global;
-    if (!this.activeTab) {
-      this.handleToggle(subpage);
+    if (!this.activePage || this.activePage !== subpage) {
+      this.activePage = subpage;
+      this.handleToggle();
     }
 
     // Scroll
     this.onscroll = _.debounce(async () => {
-      if (this.activeTab === DashboardViews.ForYou) {
+      if (this.activePage === DashboardViews.ForYou) {
         if (!notificationsRemaining(fyNotifications.length, this.fyCount))
           return;
         const scrollHeight = $(document).height();
@@ -123,7 +125,7 @@ export class UserDashboard implements m.ClassComponent {
           this.fyCount += 10;
           m.redraw();
         }
-      } else if (this.activeTab === DashboardViews.Global) {
+      } else if (this.activePage === DashboardViews.Global) {
         if (
           !notificationsRemaining(globalNotifications.length, this.globalCount)
         )
@@ -166,25 +168,27 @@ export class UserDashboard implements m.ClassComponent {
             <Tabs align="left" bordered={false} fluid={true}>
               <TabItem
                 label={DashboardViews.ForYou}
-                active={activeTab === DashboardViews.ForYou}
+                active={activePage === DashboardViews.ForYou}
+                disabled={!loggedIn}
                 onclick={() => {
-                  handleToggle(DashboardViews.ForYou);
+                  if (!loggedIn) return;
+                  m.route.set('/dashboard/for-you');
                   m.redraw();
                 }}
               />
               <TabItem
                 label={DashboardViews.Global}
-                active={activeTab === DashboardViews.Global}
+                active={activePage === DashboardViews.Global}
                 onclick={() => {
-                  handleToggle(DashboardViews.Global);
+                  m.route.set('/dashboard/global');
                   m.redraw();
                 }}
               />
               <TabItem
                 label={DashboardViews.Chain}
-                active={activeTab === DashboardViews.Chain}
+                active={activePage === DashboardViews.Chain}
                 onclick={() => {
-                  handleToggle(DashboardViews.Chain);
+                  m.route.set('/dashboard/chain-events');
                   m.redraw();
                 }}
               />
@@ -198,7 +202,7 @@ export class UserDashboard implements m.ClassComponent {
             )}
             {!loadingData && (
               <div class="dashboard-row-wrap">
-                {activeTab === DashboardViews.ForYou && (
+                {activePage === DashboardViews.ForYou && (
                   <>
                     {fyNotifications && fyNotifications.length > 0 ? (
                       <>
@@ -226,7 +230,7 @@ export class UserDashboard implements m.ClassComponent {
                     )}
                   </>
                 )}
-                {activeTab === DashboardViews.Global && [
+                {activePage === DashboardViews.Global && [
                   globalNotifications && globalNotifications.length > 0 ? (
                     <>
                       {globalNotifications
@@ -252,7 +256,7 @@ export class UserDashboard implements m.ClassComponent {
                     <div class="no-notifications">No Activity</div>
                   ),
                 ]}
-                {activeTab === DashboardViews.Chain && (
+                {activePage === DashboardViews.Chain && (
                   <>
                     {chainEvents && chainEvents.length > 0 ? (
                       <>

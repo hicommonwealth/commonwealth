@@ -663,22 +663,25 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             // Dashboard
-            '/dashboard': importRoute('views/pages/landing', {
+            '/dashboard': importRoute('views/pages/user_dashboard', {
               scoped: false,
               hideSidebar: false,
             }),
-            '/dashboard/for-you': importRoute('views/pages/landing', {
+            '/dashboard/for-you': importRoute('views/pages/user_dashboard', {
               scoped: false,
               hideSidebar: false,
             }),
-            '/dashboard/global': importRoute('views/pages/landing', {
+            '/dashboard/global': importRoute('views/pages/user_dashboard', {
               scoped: false,
               hideSidebar: false,
             }),
-            '/dashboard/chain': importRoute('views/pages/landing', {
-              scoped: false,
-              hideSidebar: false,
-            }),
+            '/dashboard/chain-events': importRoute(
+              'views/pages/user_dashboard',
+              {
+                scoped: false,
+                hideSidebar: false,
+              }
+            ),
             // Notifications
             '/notification-settings': importRoute(
               'views/pages/notification_settings',
@@ -836,7 +839,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/dashboard/global': redirectRoute(
               () => '/dashboard/global'
             ),
-            '/:scope/dashboard/chain': redirectRoute(() => '/dashboard/chain'),
+            '/:scope/dashboard/chain-events': redirectRoute(
+              () => '/dashboard/chain-events'
+            ),
             '/:scope/search': redirectRoute(() => '/search'),
             '/:scope/members': redirectRoute(() => '/members'),
             '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
@@ -915,22 +920,25 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               hideSidebar: true,
             }),
             // Dashboard
-            '/dashboard': importRoute('views/pages/landing', {
+            '/dashboard': importRoute('views/pages/user_dashboard', {
               scoped: false,
               hideSidebar: false,
             }),
-            '/dashboard/for-you': importRoute('views/pages/landing', {
+            '/dashboard/for-you': importRoute('views/pages/user_dashboard', {
               scoped: false,
               hideSidebar: false,
             }),
-            '/dashboard/global': importRoute('views/pages/landing', {
+            '/dashboard/global': importRoute('views/pages/user_dashboard', {
               scoped: false,
               hideSidebar: false,
             }),
-            '/dashboard/chain': importRoute('views/pages/landing', {
-              scoped: false,
-              hideSidebar: false,
-            }),
+            '/dashboard/chain-events': importRoute(
+              'views/pages/user_dashboard',
+              {
+                scoped: false,
+                hideSidebar: false,
+              }
+            ),
             //
             // Scoped routes
             //

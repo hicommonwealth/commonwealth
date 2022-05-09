@@ -70,6 +70,9 @@
     @include gradientTabs();
 
     .cui-tabs-item {
+      &:first-child {
+        padding-left: 0px;
+      }
       color: $neutral-100;
       font-size: 24px;
       font-weight: 500;
