@@ -2,7 +2,6 @@ import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { utils } from 'ethers';
 import {
   Input,
@@ -297,13 +296,6 @@ const NewProposalForm = {
         } else {
           throw new Error('Invalid toggle state');
         }
-
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          Step: 'Submit Proposal',
-          'Proposal Type': 'Democracy',
-          'Thread Type': 'Proposal',
-        });
       } else if (
         proposalTypeEnum === ProposalType.SubstrateCollectiveProposal &&
         vnode.state.councilMotionType === 'vetoNextExternal'
@@ -311,12 +303,6 @@ const NewProposalForm = {
         args = [author, vnode.state.nextExternalProposalHash];
         createFunc = ([a, h]) =>
           (app.chain as Substrate).council.vetoNextExternal(a, h);
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          Step: 'Submit Proposal',
-          'Proposal Type': 'Council Motion',
-          'Thread Type': 'Proposal',
-        });
       } else if (
         proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
       ) {
@@ -411,12 +397,7 @@ const NewProposalForm = {
         } else {
           throw new Error('Invalid council motion type');
         }
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          Step: 'Submit Proposal',
-          'Proposal Type': 'Council Motion',
-          'Thread Type': 'Proposal',
-        });
+
         return createTXModal(createFunc(args)).then(done);
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
         if (!vnode.state.form.beneficiary)
@@ -425,12 +406,6 @@ const NewProposalForm = {
           vnode.state.form.beneficiary
         );
         args = [author, vnode.state.form.amount, beneficiary];
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          Step: 'Submit Proposal',
-          'Proposal Type': 'Treasury',
-          'Thread Type': 'Proposal',
-        });
       } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
         if (!vnode.state.form.title) throw new Error('Invalid title');
         if (!vnode.state.form.value) throw new Error('Invalid value');
@@ -452,12 +427,6 @@ const NewProposalForm = {
           (
             app.chain as Substrate
           ).phragmenElections.activeElection.submitCandidacyTx(a);
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          Step: 'Submit Proposal',
-          'Proposal Type': 'Phragmen Council Candidacy',
-          'Thread Type': 'Proposal',
-        });
       } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
         let prop: ProtobufAny;
         const { title, description } = vnode.state.form;
@@ -674,18 +643,7 @@ const NewProposalForm = {
           vnode.state.form.beneficiary
         );
         args = [author, vnode.state.form.description, beneficiary];
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          Step: 'Submit Proposal',
-          'Proposal Type': 'Tip',
-          'Thread Type': 'Proposal',
-        });
       } else {
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          Step: 'Incorrect Proposal',
-          'Thread Type': 'Proposal',
-        });
         throw new Error('Invalid proposal type');
       }
       Promise.resolve(createFunc(args))
