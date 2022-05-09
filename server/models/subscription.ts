@@ -5,7 +5,7 @@ import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
-import { ModelStatic, ModelInstance } from './types';
+import { ModelStatic } from './types';
 import {
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType,
 } from '../../shared/types';
@@ -17,6 +17,7 @@ import { OffchainCommentAttributes } from './offchain_comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
 import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
+import { NotificationInstance } from './notification';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -52,7 +53,16 @@ extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 }
 
-export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: any; };
+export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: (
+  models: DB,
+  category_id: string,
+  object_id: string,
+  notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData,
+  webhook_data?: Partial<WebhookContent>,
+  wss?: WebSocket.Server,
+  excludeAddresses?: string[],
+  includeAddresses?: string[],
+) => Promise<NotificationInstance> };
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -93,7 +103,7 @@ export default (
     wss?: WebSocket.Server,
     excludeAddresses?: string[],
     includeAddresses?: string[],
-  ) => {
+  ): Promise<NotificationInstance> => {
     // get subscribers to send notifications to
     const findOptions: any = {
       [Op.and]: [
@@ -141,10 +151,13 @@ export default (
     }
 
     // get all relevant subscriptions
-    const subscribers = await models.Subscription.findAll({ where: findOptions });
+    const subscribers = await models.Subscription.findAll({
+      where: findOptions,
+      include: models.User,
+    });
 
     // get notification if it already exists
-    let notification;
+    let notification: NotificationInstance;
     notification = await models.Notification.findOne(isChainEventData ? {
       where: {
         chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id
@@ -165,14 +178,9 @@ export default (
       } : {
         notification_data: JSON.stringify(notification_data),
         category_id,
-        chain_id: (<IPostNotificationData>notification_data).chain_id || (<ICommunityNotificationData>notification_data).chain
+        chain_id: (<IPostNotificationData>notification_data).chain_id
+          || (<ICommunityNotificationData>notification_data).chain
       })
-    }
-
-    // create notifications (data should always exist, but we check anyway)
-    if (!notification_data) {
-      log.info('Subscription is missing notification data, will not trigger send emails or webhooks');
-      return [];
     }
 
     let msg;
@@ -184,14 +192,14 @@ export default (
     }
 
     // create NotificationsRead instances
-    const nReads = await Promise.all(subscribers.map(async (subscription) => {
-      // create NotificationsRead instance
-      const nRead = await models.NotificationsRead.create({
-        notification_id: notification.id,
-        subscription_id: subscription.id,
-        is_read: false
-      });
+    await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
+      subscription_id: subscription.id,
+      notification_id: notification.id,
+      is_read: false
+    })));
 
+    // send emails
+    for (const subscription of subscribers) {
       if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
         msg.dynamic_template_data.notification.path = `${
           SERVER_URL
@@ -201,9 +209,11 @@ export default (
           notification.id
         }`;
       }
-      if (msg && subscription.immediate_email) sendImmediateNotificationEmail(subscription, msg);
-      return nRead;
-    }));
+      if (msg && subscription?.immediate_email && subscription?.User) {
+        // kick off async call and immediately return
+        sendImmediateNotificationEmail(subscription.User, msg);
+      }
+    }
 
     const erc20Tokens = (await models.Chain.findAll({
       where: {
@@ -214,6 +224,7 @@ export default (
 
     // send data to relevant webhooks
     if (webhook_data && (
+      // TODO: this OR clause seems redundant?
       webhook_data.chainEventType?.chain || !erc20Tokens.includes(webhook_data.chainEventType?.chain)
     )) {
       await send(models, {

@@ -1,138 +1,62 @@
 @import 'client/styles/shared';
 
-.NotificationsMenuButton {
-    padding: 0 !important;
-    min-width: 38px;
-    @include xs-max {
-        width: 38px;
-    }
-    padding: 1px 6px;
-    text-align: center;
+@mixin notificationsButton {
+  .cui-button {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    flex: 1;
+    height: 40px;
+    padding: 0;
 
-    @include sm-max {
-        .cui-button-label {
-            overflow: visible;
-        }
-        &.has-notifications .cui-button-label {
-            position: relative;
-            top: -2px !important;
-        }
+    .cui-button-label {
+      color: $neutral-900;
+      text-align: center;
     }
-    .cui-icon {
-        margin-right: 0 !important;
-        position: relative;
-        top: -1px;
-        @include sm-max {
-            top: 0px;
-        }
+
+    &:hover {
+      background: $neutral-100;
     }
-    &.has-notifications {
-        padding: 0 7px !important;
-        .cui-icon {
-            display: none;
-        }
+
+    &:active {
+      background: $neutral-200;
     }
-    &.no-notifications {
-        .notification-count {
-            display: none;
-        }
-    }
-    .notification-count {
-        @include sm-max {
-            position: relative;
-            top: 4px;
-        }
-        .visible-xs {
-            @include sm-min {
-                display: none;
-            }
-        }
-        .hidden-xs {
-            @include xs-max {
-                display: none;
-            }
-        }
-    }
+  }
+
+  .cui-button:first-child {
+    border-right: 1px solid $neutral-300;
+  }
 }
 
 .NotificationsMenu {
-    .cui-popover-content {
-        @include xs-max {
-            position: relative;
-            margin: 0 9px;
-        }
-    }
-    .notification-list {
-        height: 480px;
-        background: $background-color-white;
-        width: 340px;
-        @include xs-max {
-            width: calc(100vw - 20px);
-        }
-        .UserGallery .overflow-users-wrap .overflow-users {
-            top: -27.5%;
-            font-size: 80%;
-        }
-    }
+  width: 296px;
+
+  .cui-popover-content {
+    width: 100%;
+
     .cui-menu {
-        max-width: 340px;
-        margin: 0;
-        padding: 0;
-        background: none;
-        overflow: hidden;
-        @include xs-max {
-            max-width: calc(100vw - 24px);
-        }
-        border-color: #dce1e3; // match cui-popover border color
+      width: 100%;
+
+      .NotificationsMenuHeader {
+        @include notificationsButton;
+
+        border-bottom: 1px solid $neutral-300;
+        display: flex;
+      }
+
+      .notification-list {
+        align-items: center;
+        display: flex;
+        height: 480px;
+        justify-content: center;
+      }
+
+      .NotificationsMenuFooter {
+        @include notificationsButton;
+
+        border-top: 1px solid $neutral-300;
+        display: flex;
+      }
     }
-    .cui-popover-arrow {
-        background: white;
-    }
-    .cui-list-item {
-        padding: 11px;
-    }
-    .no-notifications {
-        list-style: none;
-        text-align: center;
-        padding-top: 230px;
-        color: $text-color-black;
-        font-weight: 500;
-    }
-    .NotificationsTypeSelectorButtons,
-    .NotificationButtons {
-        .cui-button {
-            margin: 0;
-            border-radius: 0 !important;
-            .cui-button-label {
-                text-align: center;
-                color: $text-color-darker;
-            }
-            &:after {
-                // suppress button group styling
-                display: none !important;
-            }
-            border-right: 1px #d8dee0 solid;
-            &:last-child {
-                border-right: none;
-            }
-        }
-        > .cui-button:nth-child(1) {
-            border-left: none;
-        }
-    }
-    .NotificationsTypeSelectorButtons {
-        .cui-button {
-            height: 45px;
-            border-bottom: 1px #d8dee0 solid !important;
-            &.cui-active, &:hover {
-                background: $background-color-light;
-            }
-        }
-    }
-    .NotificationButtons {
-        .cui-button {
-            height: 45px;
-            border-top: 1px #d8dee0 solid !important;
-        }
-    }
+  }
 }

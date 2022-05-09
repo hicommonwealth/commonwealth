@@ -13,33 +13,44 @@ import { ChainBase } from 'types';
 import { OffchainThread, OffchainComment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
-import PageNotFound from 'views/pages/404';
-import PageLoading from 'views/pages/loading';
+import { PageNotFound } from 'views/pages/404';
+import { PageLoading } from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 
-import { decodeAddress, checkAddress, encodeAddress } from '@polkadot/util-crypto';
+import {
+  decodeAddress,
+  checkAddress,
+  encodeAddress,
+} from '@polkadot/util-crypto';
 import { bech32 } from 'bech32';
 import { setActiveAccount } from 'controllers/app/login';
-import { modelFromServer  as modelThreadFromServer } from 'controllers/server/threads';
-import { modelFromServer  as modelCommentFromServer } from 'controllers/server/comments';
+import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
+import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
 
 const getProfileStatus = (account) => {
-  const onOwnProfile = typeof app.user.activeAccount?.chain === 'string'
-    ? (account.chain === app.user.activeAccount?.chain && account.address === app.user.activeAccount?.address)
-    : (account.chain === app.user.activeAccount?.chain?.id && account.address === app.user.activeAccount?.address);
-  const onLinkedProfile = !onOwnProfile && app.user.activeAccounts.length > 0
-    && app.user.activeAccounts.filter((account_) => {
-      return app.user.getRoleInCommunity({
-        account: account_,
-        chain: app.activeChainId(),
-      });
-    }).filter((account_) => {
-      return account_.address === account.address;
-    }).length > 0;
+  const onOwnProfile =
+    typeof app.user.activeAccount?.chain === 'string'
+      ? account.chain === app.user.activeAccount?.chain &&
+        account.address === app.user.activeAccount?.address
+      : account.chain === app.user.activeAccount?.chain?.id &&
+        account.address === app.user.activeAccount?.address;
+  const onLinkedProfile =
+    !onOwnProfile &&
+    app.user.activeAccounts.length > 0 &&
+    app.user.activeAccounts
+      .filter((account_) => {
+        return app.user.getRoleInCommunity({
+          account: account_,
+          chain: app.activeChainId(),
+        });
+      })
+      .filter((account_) => {
+        return account_.address === account.address;
+      }).length > 0;
 
   // if the profile that we are visiting is in app.activeAddresses() but not the current active address,
   // then display the ProfileBanner
@@ -51,13 +62,16 @@ const getProfileStatus = (account) => {
     const communityOptions = { chain: app.activeChainId() };
     const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
     const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
-    const unjoinedJoinableAddresses = (joinableAddresses.length > communityRoles.length)
-      ? joinableAddresses.filter((addr) => {
-        return communityRoles.filter((role) => {
-          return role.address_id === addr.id;
-        }).length === 0;
-      })
-      : [];
+    const unjoinedJoinableAddresses =
+      joinableAddresses.length > communityRoles.length
+        ? joinableAddresses.filter((addr) => {
+            return (
+              communityRoles.filter((role) => {
+                return role.address_id === addr.id;
+              }).length === 0
+            );
+          })
+        : [];
     const currentAddressInfoArray = unjoinedJoinableAddresses.filter((addr) => {
       return addr.id === account.id;
     });
@@ -67,18 +81,18 @@ const getProfileStatus = (account) => {
     }
   }
 
-  return ({
+  return {
     onOwnProfile,
     onLinkedProfile,
     displayBanner: isUnjoinedJoinableAddress,
-    currentAddressInfo
-  });
+    currentAddressInfo,
+  };
 };
 
 export enum UserContent {
   All = 'posts',
   Threads = 'threads',
-  Comments = 'comments'
+  Comments = 'comments',
 }
 
 interface IProfilePageAttrs {
@@ -93,6 +107,11 @@ interface IProfilePageState {
   loaded: boolean;
   loading: boolean;
   refreshProfile: boolean;
+  tabSelected: number;
+  onscroll: any;
+  allContentCount: number;
+  proposalsContentCount: number;
+  commentsContentCount: number;
 }
 
 const checkCosmosAddress = (address: string): boolean => {
@@ -113,10 +132,14 @@ const checkSolanaAddress = (address: string): boolean => {
   } catch (e) {
     return false;
   }
-}
+};
 
-const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) => {
-  const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
+const loadProfile = async (
+  attrs: IProfilePageAttrs,
+  state: IProfilePageState
+) => {
+  const chain =
+    m.route.param('base') || app.customDomainId() || m.route.param('scope');
   const { address } = attrs;
   const chainInfo = app.config.chains.getById(chain);
   let valid = false;
@@ -165,7 +188,7 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
           a.OffchainProfile.judgements,
           a.last_active,
           a.is_councillor,
-          a.is_validator,
+          a.is_validator
         );
       } else {
         profile.initialize(
@@ -188,7 +211,7 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
       id: a.id,
       name: a.name,
       user_id: a.user_id,
-      ghost_address: a.ghost_address
+      ghost_address: a.ghost_address,
     };
     state.account = account;
     state.threads = result.threads.map((t) => modelThreadFromServer(t));
@@ -248,22 +271,30 @@ const loadProfile = async (attrs: IProfilePageAttrs, state: IProfilePageState) =
     state.loading = false;
     m.redraw();
     if (!state.account)
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to find profile');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to find profile'
+      );
   }
+};
+
+const postsRemaining = (contentLength, count) => {
+  return contentLength > 10 && count < contentLength;
 };
 
 const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
+    vnode.state.tabSelected = 0;
     vnode.state.initialized = false;
     vnode.state.loaded = false;
     vnode.state.loading = false;
     vnode.state.threads = [];
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
-    const chain = m.route.param('base') || app.customDomainId() || m.route.param('scope');
+    const chain =
+      m.route.param('base') || app.customDomainId() || m.route.param('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
     const baseSuffix = m.route.param('base');
@@ -276,7 +307,9 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       if (!valid) {
         try {
           const encoded = encodeAddress(decodedAddress, ss58Prefix);
-          navigateToSubpage(`/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+          navigateToSubpage(
+            `/account/${encoded}${baseSuffix ? `?base=${baseSuffix}` : ''}`
+          );
         } catch (e) {
           // do nothing if can't encode address
         }
@@ -287,7 +320,11 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       if (!valid) {
         try {
           const checksumAddress = toChecksumAddress(address);
-          navigateToSubpage(`/account/${checksumAddress}${baseSuffix ? `?base=${baseSuffix}` : ''}`);
+          navigateToSubpage(
+            `/account/${checksumAddress}${
+              baseSuffix ? `?base=${baseSuffix}` : ''
+            }`
+          );
         } catch (e) {
           // do nothing if can't get checksumAddress
         }
@@ -314,7 +351,20 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       return m(PageLoading, { showNewProposalButton: true });
     }
 
-    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } = getProfileStatus(account);
+    if (!vnode.state.allContentCount) {
+      vnode.state.allContentCount = 10;
+    }
+
+    if (!vnode.state.proposalsContentCount) {
+      vnode.state.proposalsContentCount = 10;
+    }
+
+    if (!vnode.state.commentsContentCount) {
+      vnode.state.commentsContentCount = 10;
+    }
+
+    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } =
+      getProfileStatus(account);
 
     if (refreshProfile) {
       loadProfile(vnode.attrs, vnode.state);
@@ -328,78 +378,156 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       }
     }
 
+    const onscroll = _.debounce(() => {
+      const tab = vnode.state.tabSelected;
+      if (tab === 0) {
+        if (!postsRemaining(allContent.length, vnode.state.allContentCount))
+          return;
+      } else if (tab === 1) {
+        if (
+          !postsRemaining(proposals.length, vnode.state.proposalsContentCount)
+        )
+          return;
+      } else {
+        if (!postsRemaining(comments.length, vnode.state.commentsContentCount))
+          return;
+      }
+      const scrollHeight = $(document).height();
+      const scrollPos = $(window).height() + $(window).scrollTop();
+      if (scrollPos > scrollHeight - 400) {
+        if (tab === 0) {
+          vnode.state.allContentCount += 20;
+          const thisUrl = m.route.get();
+          if (m.route.get() === thisUrl)
+            window.location.hash = vnode.state.allContentCount.toString();
+        } else if (tab === 1) {
+          vnode.state.proposalsContentCount += 20;
+          const thisUrl = m.route.get();
+          if (m.route.get() === thisUrl)
+            window.location.hash = vnode.state.proposalsContentCount.toString();
+        } else {
+          vnode.state.commentsContentCount += 20;
+          const thisUrl = m.route.get();
+          if (m.route.get() === thisUrl)
+            window.location.hash = vnode.state.commentsContentCount.toString();
+        }
+        m.redraw();
+      }
+    }, 400);
+
     // TODO: search for cosmos proposals, if ChainBase is Cosmos
-    const comments = vnode.state.comments
-      .sort((a, b) => +b.createdAt - +a.createdAt);
-    const proposals = vnode.state.threads
-      .sort((a, b) => +b.createdAt - +a.createdAt);
-    const allContent = [].concat(proposals || []).concat(comments || [])
+    const comments = vnode.state.comments.sort(
+      (a, b) => +b.createdAt - +a.createdAt
+    );
+    const proposals = vnode.state.threads.sort(
+      (a, b) => +b.createdAt - +a.createdAt
+    );
+    const allContent = []
+      .concat(proposals || [])
+      .concat(comments || [])
       .sort((a, b) => +b.createdAt - +a.createdAt);
 
-    const allTabTitle = (proposals && comments) ? ['All ', m('.count', (proposals.length + comments.length))] : 'All';
-    const threadsTabTitle = (proposals) ? ['Threads ', m('.count', (proposals.length))] : 'Threads';
-    const commentsTabTitle = (comments) ? ['Comments ', m('.count', (comments.length))] : 'Comments';
+    const allTabTitle =
+      proposals && comments
+        ? ['All ', m('.count', proposals.length + comments.length)]
+        : 'All';
+    const threadsTabTitle = proposals
+      ? ['Threads ', m('.count', proposals.length)]
+      : 'Threads';
+    const commentsTabTitle = comments
+      ? ['Comments ', m('.count', comments.length)]
+      : 'Comments';
 
-    return m(Sublayout, {
-      class: 'ProfilePage',
-      showNewProposalButton: true,
-    }, [
+    return m(
+      Sublayout,
+      {
+        showNewProposalButton: true,
+        onscroll,
+      },
       [
-        displayBanner
-        && m(ProfileBanner, {
-          account,
-          addressInfo: currentAddressInfo
-        }),
-        m('.row.row-narrow.forum-row', [
-          m('.col-xs-12 .col-md-8', [
-            m(ProfileHeader, {
+        m('.ProfilePage', [
+          displayBanner &&
+            m(ProfileBanner, {
               account,
-              setIdentity,
-              onOwnProfile,
-              onLinkedProfile,
-              refreshCallback: () => { vnode.state.refreshProfile = true; },
+              addressInfo: currentAddressInfo,
             }),
-            m(Tabs, [{
-              name: allTabTitle,
-              content: m(ProfileContent, {
+          m('.row.row-narrow.forum-row', [
+            m('.col-xs-12 .col-md-8', [
+              m(ProfileHeader, {
                 account,
-                type: UserContent.All,
-                content: allContent,
-                // eslint-disable-next-line max-len
-                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
-              })
-            }, {
-              name: threadsTabTitle,
-              content: m(ProfileContent, {
-                account,
-                type: UserContent.Threads,
-                content: proposals,
-                // eslint-disable-next-line max-len
-                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                setIdentity,
+                onOwnProfile,
+                onLinkedProfile,
+                refreshCallback: () => {
+                  vnode.state.refreshProfile = true;
+                },
               }),
-            }, {
-              name: commentsTabTitle,
-              content: m(ProfileContent, {
+              m(Tabs, [
+                {
+                  name: allTabTitle,
+                  onclick: () => {
+                    vnode.state.tabSelected = 0;
+                  },
+                  content: m(ProfileContent, {
+                    account,
+                    type: UserContent.All,
+                    content: allContent,
+                    count: vnode.state.allContentCount,
+                    // eslint-disable-next-line max-len
+                    localStorageScrollYKey: `profile-${
+                      vnode.attrs.address
+                    }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }),
+                },
+                {
+                  name: threadsTabTitle,
+                  onclick: () => {
+                    vnode.state.tabSelected = 1;
+                  },
+                  content: m(ProfileContent, {
+                    account,
+                    type: UserContent.Threads,
+                    content: proposals,
+                    count: vnode.state.proposalsContentCount,
+                    // eslint-disable-next-line max-len
+                    localStorageScrollYKey: `profile-${
+                      vnode.attrs.address
+                    }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }),
+                },
+                {
+                  name: commentsTabTitle,
+                  onclick: () => {
+                    vnode.state.tabSelected = 2;
+                  },
+                  content: m(ProfileContent, {
+                    account,
+                    type: UserContent.Comments,
+                    content: comments,
+                    count: vnode.state.commentsContentCount,
+                    // eslint-disable-next-line max-len
+                    localStorageScrollYKey: `profile-${
+                      vnode.attrs.address
+                    }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }),
+                },
+              ]),
+            ]),
+            m('.xs-display-none .col-md-4', [
+              m(ProfileBio, {
                 account,
-                type: UserContent.Comments,
-                content: comments,
-                // eslint-disable-next-line max-len
-                localStorageScrollYKey: `profile-${vnode.attrs.address}-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                setIdentity,
+                onOwnProfile,
+                onLinkedProfile,
+                refreshCallback: () => {
+                  vnode.state.refreshProfile = true;
+                },
               }),
-            }]),
-          ]),
-          m('.xs-display-none .col-md-4', [
-            m(ProfileBio, {
-              account,
-              setIdentity,
-              onOwnProfile,
-              onLinkedProfile,
-              refreshCallback: () => { vnode.state.refreshProfile = true; },
-            }),
+            ]),
           ]),
         ]),
-      ],
-    ]);
+      ]
+    );
   },
 };
 

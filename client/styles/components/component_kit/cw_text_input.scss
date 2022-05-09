@@ -1,11 +1,11 @@
-@import 'client/styles/facelift';
+@import 'client/styles/shared';
 
 $text-input-border: 2px solid;
 
 .TextInput {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   label {
     @include form-label;
@@ -15,12 +15,12 @@ $text-input-border: 2px solid;
   input {
     border-radius: 4px;
     border: $text-input-border $white;
-    background-color: $background-gray;
-    height: 42px;
-    padding: 8px 15px;
+    background-color: $neutral-50;
+    height: 40px;
+    padding: 4px 8px;
 
     &:hover {
-      border: $text-input-border $lite-purp;
+      border: $text-input-border $purple-200;
     }
 
     &:focus {
@@ -28,21 +28,21 @@ $text-input-border: 2px solid;
     }
 
     &:focus-within {
-      border: $text-input-border $midi-purp;
+      border: $text-input-border $purple-300;
     }
 
     &.success {
-      border: $text-input-border $dark-green;
-      background-color: $mint-green;
+      border: $text-input-border $green-600;
+      background-color: $green-50;
     }
 
     &.failure {
-      border: $text-input-border $pinky;
-      background-color: $flesh-pink;
+      border: $text-input-border $pink-200;
+      background-color: $pink-50;
     }
 
     &.disabled {
-      background-color: $background-gray;
+      background-color: $neutral-50;
       border: none;
       box-shadow: none;
       cursor: not-allowed;
@@ -60,10 +60,10 @@ $text-input-border: 2px solid;
   margin-top: 8px;
 
   &.success {
-    color: $dark-green;
+    color: $green-600;
   }
 
   &.failure {
-    color: $hype-red;
+    color: $rorange-500;
   }
 }

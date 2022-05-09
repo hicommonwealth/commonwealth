@@ -1,24 +1,40 @@
 import moment from 'moment';
-import { Request, Response, NextFunction } from 'express';
-import BN from 'bn.js';
+import { NextFunction } from 'express';
 
 import { sequelize, DB } from '../database';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import TokenBalanceCache from '../util/tokenBalanceCache';
+import { TypedRequestBody, TypedResponse, success } from '../types';
+import {
+  OffchainVoteAttributes,
+  OffchainVoteInstance,
+} from '../models/offchain_vote';
 
 export const Errors = {
-  InvalidThread: 'Invalid thread',
+  NoPoll: 'No corresponding poll found',
+  NoThread: 'No corresponding thread found',
   InvalidUser: 'Invalid user',
+  InvalidOption: 'Invalid response option',
   PollingClosed: 'Polling already finished',
   BalanceCheckFailed: 'Could not verify user token balance',
 };
 
+type UpdateOffchainVoteReq = {
+  poll_id: number;
+  chain_id: string;
+  address: string;
+  author_chain: string;
+  option: string;
+};
+
+type UpdateOffchainVoteResp = OffchainVoteAttributes;
+
 const updateOffchainVote = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<UpdateOffchainVoteReq>,
+  res: TypedResponse<UpdateOffchainVoteResp>,
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
@@ -27,54 +43,66 @@ const updateOffchainVote = async (
   if (!author) return next(new Error(Errors.InvalidUser));
   if (authorError) return next(new Error(authorError));
 
-  // TODO: check that req.option is valid, and import options from shared/types
-  // TODO: check and validate req.signature, instead of checking for author
+  const { poll_id, address, author_chain, option } = req.body;
 
-  const thread = await models.OffchainThread.findOne({
-    where: { id: req.body.thread_id, chain: chain.id }
+  const poll = await models.OffchainPoll.findOne({
+    where: { id: poll_id, chain_id: chain.id },
   });
-  if (!thread) return next(new Error(Errors.InvalidThread));
-
-  if (!thread.offchain_voting_ends_at && moment(thread.offchain_voting_ends_at).utc().isBefore(moment().utc())) {
+  if (!poll) return next(new Error(Errors.NoPoll));
+  if (!poll.ends_at && moment(poll.ends_at).utc().isBefore(moment().utc())) {
     return next(new Error(Errors.PollingClosed));
   }
 
+  // Ensure user has passed a valid poll response
+  let selected_option;
+  try {
+    const pollOptions = JSON.parse(poll.options);
+    selected_option = pollOptions.find((o: string) => o === option);
+    if (!option) throw new Error();
+  } catch (e) {
+    return next(new Error(Errors.InvalidOption));
+  }
+
+  const thread = await models.OffchainThread.findOne({
+    where: { id: poll.thread_id },
+  });
+  if (!thread) return next(new Error(Errors.NoThread));
+
   // check token balance threshold if needed
-  const canVote = await tokenBalanceCache.validateTopicThreshold(thread.topic_id, req.body.address);
+  const canVote = await tokenBalanceCache.validateTopicThreshold(
+    thread.topic_id,
+    address
+  );
   if (!canVote) {
     return next(new Error(Errors.BalanceCheckFailed));
   }
 
-  let vote;
+  let vote: OffchainVoteInstance;
   await sequelize.transaction(async (t) => {
     // delete existing votes
-    const destroyed = await models.OffchainVote.destroy({
+    await models.OffchainVote.destroy({
       where: {
-        thread_id: req.body.thread_id,
-        address: req.body.address,
-        author_chain: req.body.author_chain,
-        chain: req.body.chain,
+        poll_id: poll.id,
+        address,
+        author_chain,
+        chain_id: chain.id,
       },
-      transaction: t
+      transaction: t,
     });
-
     // create new vote
-    vote = await models.OffchainVote.create({
-      thread_id: req.body.thread_id,
-      address: req.body.address,
-      author_chain: req.body.author_chain,
-      chain: req.body.chain,
-      option: req.body.option,
-    }, { transaction: t });
-
-    // update denormalized vote count
-    if (destroyed === 0) {
-      thread.offchain_voting_votes = (thread.offchain_voting_votes ?? 0) + 1;
-      await thread.save({ transaction: t });
-    }
+    vote = await models.OffchainVote.create(
+      {
+        poll_id: poll.id,
+        address,
+        author_chain,
+        chain_id: chain.id,
+        option: selected_option,
+      },
+      { transaction: t }
+    );
   });
 
-  return res.json({ status: 'Success', result: vote.toJSON() });
+  return success(res, vote.toJSON());
 };
 
 export default updateOffchainVote;

@@ -1,11 +1,13 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes, UserInstance } from './user';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
 import { ProfileInstance } from './profile';
+import { SsoTokenInstance } from './sso_token';
+import { WalletId } from '../../shared/types';
 
 export type AddressAttributes = {
 	address: string;
@@ -22,9 +24,9 @@ export type AddressAttributes = {
 	user_id?: number;
 	is_councillor?: boolean;
 	is_validator?: boolean;
-	is_magic?: boolean;
 	ghost_address?: boolean;
 	profile_id?: number;
+	wallet_id?: WalletId;
 	// associations
 	Chain?: ChainAttributes;
 	User?: UserAttributes;
@@ -40,6 +42,7 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
 	getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
 	getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
 	getRoles: Sequelize.HasManyGetAssociationsMixin<RoleInstance>;
+	getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 }
 
 export type AddressModelStatic = ModelStatic<AddressInstance>;
@@ -63,9 +66,9 @@ export default (
 		user_id:                    { type: dataTypes.INTEGER, allowNull: true },
 		is_councillor:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		is_validator:               { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-		is_magic:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		profile_id:    						  { type: dataTypes.INTEGER, allowNull: true },
+		wallet_id:									{ type: dataTypes.STRING, allowNull: true },
 	}, {
 		timestamps: true,
 		createdAt: 'created_at',
@@ -92,6 +95,7 @@ export default (
 		models.Address.belongsTo(models.Profile, { foreignKey: 'profile_id', targetKey: 'id' });
 		models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
 		models.Address.hasOne(models.OffchainProfile);
+		models.Address.hasOne(models.SsoToken);
 		models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
 		models.Address.belongsToMany(models.OffchainThread, {
 			through: models.Collaboration,

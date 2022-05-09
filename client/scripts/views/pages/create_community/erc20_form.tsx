@@ -69,6 +69,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
       const args = {
         address: this.state.form.address,
         chain_id: this.state.form.ethChainId,
+        chain_network: ChainNetwork.ERC20,
         url: this.state.form.nodeUrl,
         allowUncached: true,
       };

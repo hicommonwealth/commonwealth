@@ -7,14 +7,8 @@ import { ServerError, AppError } from '../util/errors';
 // 401 Unauthorized errors are handled by Express' middleware and returned
 // before this handler. Errors that hit the final condition should be either
 // (1) thrown as ServerErrors or AppErrors or (2) triaged as a critical bug.
-const setupErrorHandlers = (app: Express) => {
+const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
   // Rollbar notifications
-  const rollbar = new Rollbar({
-    accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: process.env.NODE_ENV,
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-  });
   app.use(rollbar.errorHandler());
 
   // Handle 404 errors
@@ -29,6 +23,7 @@ const setupErrorHandlers = (app: Express) => {
   // Handle our ServerErrors (500), AppErrors (400), or unknown errors.
   app.use((error, req, res: Response, next) => {
     if (error instanceof ServerError) {
+      console.trace(error);
       rollbar.error(error); // expected server error
       res.status(error.status).send({
         status: error.status,
@@ -42,6 +37,7 @@ const setupErrorHandlers = (app: Express) => {
         error: error.message,
       });
     } else {
+      console.trace(error);
       rollbar.critical(error); // unexpected error
       res.status(500);
       res.json({

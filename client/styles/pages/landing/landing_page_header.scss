@@ -1,13 +1,13 @@
-@import "client/styles/shared";
+@import 'client/styles/shared';
 
 .LandingPageHeaderLinks {
   white-space: nowrap;
   a.text-gray-500.leading-none {
-    color: $text-color-black;
+    color: $neutral-800;
     text-decoration: none;
     cursor: pointer;
     // &:hover {
-    //   background-color: $background-color-black-hover;
+    //   background-color: $yellow-800;
     // }
   }
 }
@@ -76,11 +76,11 @@ li.LandingPageHeaderLoginButton.ml-10.pt-2 {
   a.btn-primary.pb-3.text-white {
     padding-top: 14px;
     padding-bottom: 9px;
-    color: $text-color-white;
+    color: $white;
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      background-color: $background-color-black-hover;
+      background-color: $yellow-800;
     }
     img {
       position: relative;
@@ -90,7 +90,7 @@ li.LandingPageHeaderLoginButton.ml-10.pt-2 {
 }
 li.LandingPageMenuButton.ml-10.pt-2 {
   white-space: nowrap;
-  background: white;
+  background: $white;
 }
 
 .HeaderLandingPage {
@@ -140,4 +140,14 @@ header {
   // @media (min-width: 1500px) {
   //   width: 90%;
   // }
+}
+
+@include sm-max {
+  .menuButton {
+    display: none;
+  }
+
+  #landing-page {
+    margin: 0;
+  }
 }

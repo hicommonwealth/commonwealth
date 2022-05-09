@@ -1,22 +1,21 @@
-@import 'client/styles/facelift';
+@import 'shared';
 
-$default-card-width: 300px;
+$default-card-width: 260px;
 $default-card-height: 100px;
 
 .Card {
   align-items: flex-start;
-  background: #ffffff;
+  background: $white;
   border-radius: 10px;
-  border: 1px solid #dddddd;
+  border: 1px solid $neutral-100;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   min-height: $default-card-height;
-  padding: 15px;
+  padding: 16px;
   width: $default-card-width;
 
-  &.full-width {
+  &.fullWidth {
     width: 100%;
   }
 

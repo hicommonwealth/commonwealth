@@ -1,11 +1,11 @@
-@import 'client/styles/facelift';
+@import 'client/styles/shared';
 
 .EngagementButton {
   display: flex;
   align-items: center;
   color: $black;
   background: $white;
-  border: 1px solid $disable-gray;
+  border: 1px solid $neutral-100;
   border-radius: 20px;
   height: 40px;
   font-weight: 500;
@@ -22,29 +22,25 @@
     margin-right: 12px;
   }
 
-  span {
-    padding-top: 5.5px;
-  }
-
   &:hover {
-    color: $dark-purp;
-    background: $xlite-purp;
-    border: 1px solid $dark-purp;
+    color: $purple-500;
+    background: $purple-50;
+    border: 1px solid $purple-500;
     box-shadow: 0px 2px 6px 0px #0000001a;
 
     svg {
-      color: $dark-purp;
+      color: $purple-500;
     }
   }
 
   &.disabled {
-    color: $disable-gray;
+    color: $neutral-100;
     background: $white;
     cursor: default;
     pointer-events: none;
 
     svg {
-      color: $disable-gray;
+      color: $neutral-100;
     }
   }
 }

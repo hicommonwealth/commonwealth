@@ -6,17 +6,17 @@ import { Tag } from 'construct-ui';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
-import { ProposalType, ChainBase } from 'types';
+import { ChainBase } from 'types';
 
 import Substrate from 'controllers/chain/substrate/main';
 
 import Sublayout from 'views/sublayout';
-import PageLoading from 'views/pages/loading';
-import ProposalCard from 'views/components/proposal_card';
+import { PageLoading } from 'views/pages/loading';
+import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
+import { CardsCollection } from '../components/cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -33,15 +33,16 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
           ]),
           m('', [
             m('.stats-box-stat', [
-              'Treasury: ', formatCoin((app.chain as Substrate).treasury.pot),
+              'Treasury: ',
+              formatCoin((app.chain as Substrate).treasury.pot),
             ]),
             m('.stats-box-stat', [
               'Next spend period: ',
               (app.chain as Substrate).treasury.nextSpendBlock
                 ? m(CountdownUntilBlock, {
-                  block: (app.chain as Substrate).treasury.nextSpendBlock,
-                  includeSeconds: false
-                })
+                    block: (app.chain as Substrate).treasury.nextSpendBlock,
+                    includeSeconds: false,
+                  })
                 : '--',
             ]),
           ]),
@@ -66,7 +67,7 @@ const SubstrateProposalStats: m.Component<{}, {}> = {
     //     `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
     //   ]),
     // ]),
-  }
+  },
 };
 
 function getModules() {
@@ -74,8 +75,13 @@ function getModules() {
     throw new Error('secondary loading cmd called before chain load');
   }
   if (app.chain.base === ChainBase.Substrate) {
-    const chain = (app.chain as Substrate);
-    return [ chain.council, chain.treasury, chain.democracyProposals, chain.democracy ];
+    const chain = app.chain as Substrate;
+    return [
+      chain.council,
+      chain.treasury,
+      chain.democracyProposals,
+      chain.democracy,
+    ];
   } else {
     throw new Error('invalid chain');
   }
@@ -84,29 +90,47 @@ function getModules() {
 const TreasuryPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'TreasuryPage' });
-    const returningFromThread = app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
-    if (returningFromThread && localStorage[`${app.activeChainId()}-proposals-scrollY`]) {
+    const returningFromThread =
+      app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
+    if (
+      returningFromThread &&
+      localStorage[`${app.activeChainId()}-proposals-scrollY`]
+    ) {
       setTimeout(() => {
-        window.scrollTo(0, Number(localStorage[`${app.activeChainId()}-proposals-scrollY`]));
+        window.scrollTo(
+          0,
+          Number(localStorage[`${app.activeChainId()}-proposals-scrollY`])
+        );
       }, 100);
     }
   },
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
-      if (app.chain?.base === ChainBase.Substrate && (app.chain as Substrate).chain?.timedOut) {
+      if (
+        app.chain?.base === ChainBase.Substrate &&
+        (app.chain as Substrate).chain?.timedOut
+      ) {
         return m(ErrorPage, {
           message: 'Could not connect to chain',
           title: [
             'Treasury',
-            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-          ]
+            m(Tag, {
+              size: 'xs',
+              label: 'Beta',
+              style: 'position: relative; top: -2px; margin-left: 6px',
+            }),
+          ],
         });
       }
       return m(PageLoading, {
         message: 'Connecting to chain',
         title: [
           'Treasury',
-          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          m(Tag, {
+            size: 'xs',
+            label: 'Beta',
+            style: 'position: relative; top: -2px; margin-left: 6px',
+          }),
         ],
         showNewProposalButton: true,
       });
@@ -116,40 +140,52 @@ const TreasuryPage: m.Component<{}> = {
     const modLoading = loadSubstrateModules('Treasury', getModules);
     if (modLoading) return modLoading;
 
-    const activeTreasuryProposals = onSubstrate
-      && (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed);
+    const activeTreasuryProposals =
+      onSubstrate &&
+      (app.chain as Substrate).treasury.store
+        .getAll()
+        .filter((p) => !p.completed);
     const activeTreasuryContent = activeTreasuryProposals.length
       ? activeTreasuryProposals.map((proposal) => m(ProposalCard, { proposal }))
-      : [ m('.no-proposals', 'None') ];
+      : [m('.no-proposals', 'None')];
 
-    const inactiveTreasuryProposals = onSubstrate
-      && (app.chain as Substrate).treasury.store.getAll().filter((p) => p.completed);
+    const inactiveTreasuryProposals =
+      onSubstrate &&
+      (app.chain as Substrate).treasury.store
+        .getAll()
+        .filter((p) => p.completed);
     const inactiveTreasuryContent = inactiveTreasuryProposals.length
-      ? inactiveTreasuryProposals.map((proposal) => m(ProposalCard, { proposal }))
-      : [ m('.no-proposals', 'None') ];
+      ? inactiveTreasuryProposals.map((proposal) =>
+          m(ProposalCard, { proposal })
+        )
+      : [m('.no-proposals', 'None')];
 
-    return m(Sublayout, {
-      class: 'TreasuryPage',
-      title: [
-        'Treasury',
-        m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
-      ],
-      showNewProposalButton: true,
-    }, [
-      onSubstrate && m(SubstrateProposalStats),
-      m('.clear'),
-      m(Listing, {
-        content: activeTreasuryContent,
-        columnHeader: 'Active Treasury Proposals',
-      }),
-      m('.clear'),
-      m(Listing, {
-        content: inactiveTreasuryContent,
-        columnHeader: 'Inactive Treasury Proposals',
-      }),
-      m('.clear'),
-    ]);
-  }
+    return m(
+      Sublayout,
+      {
+        title: [
+          'Treasury',
+          m(Tag, {
+            size: 'xs',
+            label: 'Beta',
+            style: 'position: relative; top: -2px; margin-left: 6px',
+          }),
+        ],
+        showNewProposalButton: true,
+      },
+      m('.TreasuryPage', [
+        onSubstrate && m(SubstrateProposalStats),
+        m(CardsCollection, {
+          content: activeTreasuryContent,
+          header: 'Active Treasury Proposals',
+        }),
+        m(CardsCollection, {
+          content: inactiveTreasuryContent,
+          header: 'Inactive Treasury Proposals',
+        }),
+      ])
+    );
+  },
 };
 
 export default TreasuryPage;

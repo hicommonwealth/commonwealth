@@ -29,10 +29,11 @@ describe('API Tests', () => {
       const keypair = wallet.generate();
       const address = `0x${keypair.getAddress().toString('hex')}`;
       const chain = 'ethereum';
+      const wallet_id = 'metamask';
       const res = await chai.request(app)
         .post('/api/createAddress')
         .set('Accept', 'application/json')
-        .send({ address, chain });
+        .send({ address, chain, wallet_id });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
@@ -44,19 +45,20 @@ describe('API Tests', () => {
     it('should verify an address', async () => {
       const { keypair, address } = modelUtils.generateEthAddress();
       const chain = 'ethereum';
+      const wallet_id = 'metamask';
       let res = await chai.request(app)
         .post('/api/createAddress')
         .set('Accept', 'application/json')
-        .send({ address, chain });
+        .send({ address, chain, wallet_id });
       const token = res.body.result.verification_token;
       const chain_id = 1;   // use ETH mainnet for testing
       const data = constructTypedMessage(chain_id, token);
-      const privateKey = Buffer.from(keypair.getPrivateKey(), 'hex');
+      const privateKey = keypair.getPrivateKey();
       const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
       res = await chai.request(app)
         .post('/api/verifyAddress')
         .set('Accept', 'application/json')
-        .send({ address, chain, signature });
+        .send({ address, chain, signature, wallet_id });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;

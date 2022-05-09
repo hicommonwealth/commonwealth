@@ -36,11 +36,11 @@ export type ChainAttributes = {
   custom_domain?: string;
   block_explorer_ids?: string;
   collapsed_on_homepage?: boolean;
-  featured_topics?: string[];
   substrate_spec?: RegisteredTypes;
   has_chain_events_listener?: boolean;
   default_summary_view?: boolean;
   terms?: string;
+  admin_only_polling?: boolean;
   snapshot?: string[];
   bech32_prefix?: string;
   hide_projects?: boolean;
@@ -60,7 +60,7 @@ export type ChainAttributes = {
     | OffchainCommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
-}
+};
 
 export type ChainInstance = ModelInstance<ChainAttributes> & {
   // add mixins as needed
@@ -75,7 +75,7 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
     OffchainTopicInstance,
     OffchainTopicInstance['id']
   >;
-}
+};
 
 export type ChainModelStatic = ModelStatic<ChainInstance>;
 
@@ -94,11 +94,6 @@ export default (
       element: { type: dataTypes.STRING, allowNull: true },
       telegram: { type: dataTypes.STRING, allowNull: true },
       github: { type: dataTypes.STRING, allowNull: true },
-      featured_topics: {
-        type: dataTypes.ARRAY(dataTypes.STRING),
-        allowNull: false,
-        defaultValue: [],
-      },
       symbol: { type: dataTypes.STRING, allowNull: false },
       network: { type: dataTypes.STRING, allowNull: false },
       base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
@@ -134,6 +129,7 @@ export default (
       hide_projects: { type: dataTypes.BOOLEAN, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
+      admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
     },
     {
       tableName: 'Chains',
@@ -145,7 +141,7 @@ export default (
   Chain.associate = (models) => {
     models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' })
+    models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Chain.hasMany(models.OffchainTopic, {
       as: 'topics',
       foreignKey: 'chain_id',
@@ -153,6 +149,7 @@ export default (
     models.Chain.hasMany(models.OffchainThread, { foreignKey: 'chain' });
     models.Chain.hasMany(models.OffchainComment, { foreignKey: 'chain' });
     models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
+    models.Chain.hasMany(models.ChatChannel);
     models.Chain.belongsToMany(models.User, {
       through: models.WaitlistRegistration,
     });

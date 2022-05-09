@@ -5,9 +5,12 @@ export enum ComponentType {
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',
+  Icon = 'Icon',
+  IconButton = 'IconButton',
   Modal = 'Modal',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  Text = 'Text',
   TextInput = 'TextInput',
 }
 

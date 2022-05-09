@@ -1,89 +1,89 @@
 @import 'client/styles/shared';
 
 .LinkedAddressesWell {
-    h4 {
-        margin: 0;
-        margin-bottom: 2px;
-    }
-    .address-group h4 {
-        margin: 10px 0;
-    }
-    .address-listing-explanation {
-        color: $text-color-light;
-        font-size: 14px;
-        margin-bottom: 18px;
-    }
-    .add-account {
-        margin-top: 18px;
-    }
+  h4 {
+    margin: 0;
+    margin-bottom: 2px;
+  }
+  .address-group h4 {
+    margin: 10px 0;
+  }
+  .address-listing-explanation {
+    color: $neutral-500;
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+  .add-account {
+    margin-top: 18px;
+  }
 }
 
 .AccountRow {
-    display: flex;
-    margin: 0;
-    padding: 6px 10px;
-    &.selected {
-        background: $background-color-light;
-        @include xs-max {
-            margin: 0px -22px;
-            padding-right: 22px;
-            padding-left: 22px;
-        }
+  display: flex;
+  margin: 0;
+  padding: 8px 16px;
+  &.selected {
+    background: $neutral-100;
+    @include xs-max {
+      margin: 0px -22px;
+      padding-right: 22px;
+      padding-left: 22px;
     }
+  }
+  .avatar-col {
+    width: 50px;
+    position: relative;
+    top: 4px;
+    padding-left: 4px;
+  }
+  .info-col {
+    flex: 1;
+    overflow: hidden;
+    .username {
+      font-weight: 500;
+      a {
+        color: $neutral-800;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    }
+    .address {
+      color: $neutral-500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .account-balance {
+      color: $neutral-500;
+      font-weight: 400;
+      margin-left: 10px;
+    }
+  }
+  .action-col {
+    button,
+    a {
+      margin-left: 10px;
+    }
+  }
+  @include xs-max {
+    display: block;
+    padding: 10px 0 10px 0;
     .avatar-col {
-        width: 50px;
-        position: relative;
-        top: 4px;
-        padding-left: 4px;
+      display: none;
     }
     .info-col {
-        flex: 1;
-        overflow: hidden;
-        line-height: 1.2;
-        .username {
-            font-weight: 500;
-            a {
-                color: $text-color-black;
-                text-decoration: none;
-            }
-            a:hover {
-                text-decoration: underline;
-            }
-        }
-        .address {
-            color: $text-color-light;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .account-balance {
-            color: $text-color-light;
-            font-weight: 400;
-            margin-left: 10px;
-        }
+      margin-bottom: 8px;
+      .account-balance {
+        display: none;
+      }
     }
     .action-col {
-        margin-top: 4px;
-        button, a {
-            margin-left: 10px;
-        }
+      button,
+      a {
+        margin-left: 0;
+        margin-right: 10px;
+      }
     }
-    @include xs-max {
-        display: block;
-        padding: 10px 0 10px 0;
-        .avatar-col {
-            display: none;
-        }
-        .info-col {
-            margin-bottom: 8px;
-            .account-balance {
-                display: none;
-            }
-        }
-        .action-col {
-            button, a {
-                margin-left: 0;
-                margin-right: 10px;
-            }
-        }
-    }
+  }
 }

@@ -45,9 +45,10 @@ export const slugifyPreserveDashes = (str: string): string => {
   //   .replace(/[^A-Za-z0-9]+/g, '-');
 
   return str
-    .replace(/[^a-z0-9 -]/g, '')
+    .replace(/[^A-Za-z0-9 -]/g, '')
     .replace(/(\s|-)+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/^-|-$/g, '')
+    .toLowerCase();
 };
 
 export const requiresTypeSlug = (type: ProposalType): boolean => {
@@ -65,21 +66,21 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 
 /* eslint-disable import/prefer-default-export */
 export const getProposalUrl = (type, proposal, comment?) => {
-  const aId = proposal.community ? proposal.community : proposal.chain;
+  const aId = proposal.chain;
   const tId = proposal.type_id || proposal.id;
   const tTitle = proposal.title ? `-${slugify(proposal.title)}` : '';
   const cId = comment ? `?comment=${comment.id}` : '';
 
   if (requiresTypeSlug(type)) {
-    return (process.env.NODE_ENV === 'production')
-    ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`
-    : `http://localhost:8080/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`;
+    return process.env.NODE_ENV === 'production'
+      ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`
+      : `http://localhost:8080/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`;
   } else if (type === ProposalType.OffchainThread) {
-    return (process.env.NODE_ENV === 'production')
+    return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
       : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
   } else {
-    return (process.env.NODE_ENV === 'production')
+    return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/proposal/${tId}${tTitle.toLowerCase()}${cId}`
       : `http://localhost:8080/${aId}/proposal/${tId}${tTitle.toLowerCase()}${cId}`;
   }

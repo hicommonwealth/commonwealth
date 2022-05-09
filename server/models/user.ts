@@ -7,6 +7,7 @@ import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { ProfileInstance, ProfileAttributes } from './profile';
 import { SocialAccountInstance, SocialAccountAttributes } from './social_account';
 import { DB } from '../database';
+import { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 
 export type EmailNotificationInterval = 'daily' | 'never';
 
@@ -18,15 +19,13 @@ export type UserAttributes = {
   lastVisited?: string;
   disableRichText?: boolean;
   emailNotificationInterval?: EmailNotificationInterval;
-  magicIssuer?: string;
-  lastMagicLoginAt?: number;
   created_at?: Date;
   updated_at?: Date;
 
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedNode?: ChainNodeAttributes | ChainNodeAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
-  Profiles?: ProfileAttributes[] | ProfileAttributes['id'][];
+  Profiles?: ProfileAttributes[];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
   Chains?: ChainAttributes[] | ChainAttributes['id'][];
 }
@@ -73,8 +72,6 @@ export default (
     isAdmin: { type: dataTypes.BOOLEAN, defaultValue: false },
     lastVisited: { type: dataTypes.TEXT, allowNull: false, defaultValue: '{}' },
     disableRichText: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
-    magicIssuer: { type: dataTypes.STRING, allowNull: true },
-    lastMagicLoginAt: { type: dataTypes.INTEGER, allowNull: true },
   }, {
     timestamps: true,
     createdAt: 'created_at',
@@ -88,7 +85,7 @@ export default (
       attributes: {
         exclude: [
           'email', 'emailVerified', 'emailNotificationInterval', 'isAdmin',
-          'magicIssuer', 'lastMagicLoginAt', 'created_at', 'updated_at'
+          'created_at', 'updated_at'
         ],
       }
     },

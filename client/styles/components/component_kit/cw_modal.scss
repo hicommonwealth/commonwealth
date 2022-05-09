@@ -1,5 +1,7 @@
 @import 'client/styles/shared';
 
+$modal-padding: 16px;
+
 .Modal {
   .overlay {
     align-items: center;
@@ -21,7 +23,7 @@
   .popup {
     @include popout();
 
-    background: $text-color-white;
+    background: $white;
     border-radius: 3px;
     max-height: 96%;
     max-width: 800px;
@@ -41,10 +43,12 @@
   }
 
   .compact-modal-title {
-    background: $primary-bg-color;
-    color: $text-color-white;
-    line-height: 1.2;
-    padding: 23px 27px 15px;
+    background: $purple-400;
+    color: $white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: $modal-padding;
 
     h1,
     h2,
@@ -55,48 +59,25 @@
       padding: 0;
     }
 
-    .subtitle {
-      margin-bottom: 2px;
-      margin-top: 1px;
+    svg {
+      cursor: pointer;
+      fill: currentColor;
+
+      &:hover {
+        opacity: 0.6;
+      }
     }
   }
 
   .compact-modal-body {
-    line-height: 1.2;
-    padding: 22px 28px 0;
+    padding: $modal-padding;
 
     &:last-child {
-      padding-bottom: 28px;
+      padding-bottom: 16px;
     }
   }
 
   .compact-modal-actions {
-    padding: 2px 28px 28px;
-  }
-
-  @include xs-max {
-    .compact-modal-title {
-      padding: 20px 20px 12px;
-    }
-
-    .compact-modal-body,
-    .compact-modal-actions {
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-  }
-}
-
-.CompactModalExitButton {
-  color: $text-color-white;
-  cursor: pointer;
-  font-size: 1.65rem;
-  opacity: 0.4;
-  position: absolute;
-  right: 0.75em;
-  top: 0.6em;
-
-  &:hover {
-    opacity: 0.6;
+    padding: $modal-padding;
   }
 }

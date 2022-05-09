@@ -70,7 +70,9 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     }
 
     this.app.chain.networkStatus = ApiStatus.Connected;
+    console.log('getting block #');
     const blockNumber = await this._api.eth.getBlockNumber();
+    console.log(blockNumber);
     const headers = await this._api.eth.getBlock(`${blockNumber}`);
     if (this.app.chain && this.app.chain.meta.ethChainId !== 1) {
       this.app.chain.block.height = headers.number;
@@ -82,10 +84,15 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       let totalDuration = 0;
       let lastBlockTime = +headers.timestamp;
       for (let n = 0; n < nHeadersForBlocktime; n++) {
-        const prevHeader = await this._api.eth.getBlock(`${blockNumber - 1 - n}`);
-        const duration = lastBlockTime -+prevHeader.timestamp;
-        lastBlockTime = +prevHeader.timestamp;
-        totalDuration += duration;
+        const prevBlockNumber = blockNumber - 1 - n;
+        if (prevBlockNumber > 0) {
+          const prevHeader = await this._api.eth.getBlock(`${blockNumber - 1 - n}`);
+          const duration = lastBlockTime -+prevHeader.timestamp;
+          lastBlockTime = +prevHeader.timestamp;
+          totalDuration += duration;
+        } else {
+          break;
+        }
       }
       this.app.chain.block.duration = totalDuration / nHeadersForBlocktime;
       console.log(`Computed block duration: ${this.app.chain.block.duration}`);

@@ -8,6 +8,7 @@ import {
   Label as ChainEventLabel,
   // CompoundEvents
 } from '@commonwealth/chain-events';
+import moment from 'moment';
 
 import app from 'state';
 import { NotificationCategories } from 'types';
@@ -20,9 +21,10 @@ import {
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
+import { formatTimestamp } from 'helpers/index';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { getProposalUrlPath } from '../../../../client/scripts/identifiers';
+import { getProposalUrlPath } from '../../identifiers';
 import { getProposalUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (commentText) => {
@@ -115,7 +117,7 @@ const ButtonRow: m.Component<{
     return m('.icon-row-left', [
       showDiscussion &&
         m(Button, {
-          label: 'discuss',
+          label: 'Discuss',
           buttonSize: 'sm',
           iconLeft: Icons.PLUS,
           rounded: true,
@@ -159,10 +161,9 @@ const ButtonRow: m.Component<{
               ],
               trigger: m(Button, {
                 buttonSize: 'sm',
-                label: 'share',
+                label: 'Share',
                 iconLeft: Icons.SHARE,
                 rounded: true,
-                onclick: (e) => {},
               }),
             }),
           ]
@@ -170,7 +171,7 @@ const ButtonRow: m.Component<{
       showSubscribe &&
         m(Button, {
           buttonSize: 'sm',
-          label: bothActive ? 'unsubscribe' : 'subscribe',
+          label: bothActive ? 'Unsubscribe' : 'Subscribe',
           iconLeft: Icons.BELL,
           rounded: true,
           class: bothActive ? 'subscribe-button' : '',
@@ -244,17 +245,24 @@ const ActivityContent: m.Component<{
 
     const { likeCount, viewCount, commentCount } = vnode.attrs.activityData;
 
-    const numericalCommentCount = parseInt(commentCount);
+    const numericalCommentCount = Number(commentCount);
 
     const communityName =
       app.config.chains.getById(chain_id)?.name || 'Unknown chain';
-    const decodedTitle = decodeURIComponent(root_title).trim();
+
+    let decodedTitle;
+    try {
+      decodedTitle = decodeURIComponent(root_title).trim();
+    } catch {
+      decodedTitle = root_title.trim();
+    }
+
     const titleText =
       decodedTitle.length < 1
         ? `${capitalize(root_type)} ${root_id}`
         : decodedTitle.length > 50
-          ? `${decodedTitle.slice(0, 47)}...`
-          : decodedTitle;
+        ? `${decodedTitle.slice(0, 47)}...`
+        : decodedTitle;
 
     // Get Author of Notification
     const actorName = m(User, {
@@ -266,6 +274,7 @@ const ActivityContent: m.Component<{
       ),
       hideIdentityIcon: false,
       linkify: true,
+      avatarSize: 16,
       onclick: (e: any) => {
         e.preventDefault();
         e.stopPropagation();
@@ -297,6 +306,9 @@ const ActivityContent: m.Component<{
             },
             [communityName]
           ),
+          m('span.comment-counts', [
+            ` (${formatTimestamp(moment(created_at))})`,
+          ]),
         ]),
         m('.comment-body-concat', [getCommentPreview(comment_text)]),
       ]);
@@ -318,6 +330,9 @@ const ActivityContent: m.Component<{
             },
             [communityName]
           ),
+          m('span.comment-counts', [
+            ` (${formatTimestamp(moment(created_at))})`,
+          ]),
         ]),
       ]);
     }
@@ -418,7 +433,7 @@ const UserDashboardRow: m.Component<
       root_type,
     } = JSON.parse(vnode.attrs.notification.notificationData);
 
-    const path = (getProposalUrlPath(root_type, root_id, false, chain_id));
+    const path = getProposalUrlPath(root_type, root_id, false, chain_id);
 
     return m(
       '.UserDashboardRow',

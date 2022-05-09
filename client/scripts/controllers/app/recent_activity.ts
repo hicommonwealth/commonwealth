@@ -1,10 +1,5 @@
 import moment from 'moment';
-import {
-  OffchainTopic,
-  AbridgedThread,
-  Profile,
-  OffchainThread,
-} from 'models';
+import { OffchainTopic, AbridgedThread, Profile, OffchainThread } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
@@ -31,7 +26,6 @@ export const modelAbridgedThreadFromServer = (
     thread.Address.chain,
     decodeURIComponent(thread.title),
     moment(thread.created_at),
-    thread.community,
     thread.chain,
     thread.topic,
     thread.pinned,
@@ -76,15 +70,10 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentTopicActivity(options: {
-    chainId: string;
-    threadsPerTopic?: number;
-  }): Promise<OffchainThread[]> {
-    const { chainId } = options;
-    const threadsPerTopic = options.threadsPerTopic || 3;
+  public async getRecentTopicActivity(): Promise<OffchainThread[]> {
     const params = {
-      chain: chainId,
-      threads_per_topic: threadsPerTopic
+      chain: app.activeChainId(),
+      threads_per_topic: 3,
     };
 
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
@@ -98,10 +87,12 @@ class RecentActivityController {
       if (!thread.Address) {
         console.error('OffchainThread missing address');
       }
-      try {
-        app.threads.store.add(modeledThread);
-      } catch (e) {
-        console.error(e.message);
+      if (!app.threads.summaryStore.getByIdentifier(thread.id)) {
+        try {
+          app.threads.summaryStore.add(modeledThread);
+        } catch (e) {
+          console.error(e.message);
+        }
       }
       return modeledThread;
     });
@@ -123,14 +114,14 @@ class RecentActivityController {
   // public addAddressesFromActivity(activity: any[], clear?: boolean) {
   //   if (clear) this._addressStore.clearAddresses();
   //   activity.forEach((item) => {
-  //     const parentEntity = item.community || item.chain;
+  //     const parentEntity = item.chain;
   //     this._addressStore.addAddress(item.Address, parentEntity);
   //   });
   // }
 
   // public removeAddressActivity(activity: any[]) {
   //   activity.forEach((item) => {
-  //     const parentEntity = item.community || item.chain;
+  //     const parentEntity = item.chain;
   //     const addressId = item.Address?.id || item.address_id || item.author;
   //     this._addressStore.removeAddressActivity(addressId, parentEntity);
   //   });

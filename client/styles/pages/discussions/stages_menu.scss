@@ -1,0 +1,41 @@
+@import 'client/styles/shared';
+
+.cui-menu {
+  padding: 0;
+
+  .stage-items {
+    max-width: 296px;
+
+    .cui-menu-divider {
+      margin: 0;
+    }
+
+    .cui-button {
+      font-size: 14px;
+      height: 32px;
+      min-height: 32px;
+      line-height: 32px;
+
+      .stages-item {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        .cui-icon {
+          margin-right: 8px;
+        }
+      }
+
+      .discussions-stage-count {
+        background: $primary-500;
+        border-radius: 50%;
+        color: $white;
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 16px;
+        padding: 4px 6px 5px;
+      }
+    }
+  }
+}

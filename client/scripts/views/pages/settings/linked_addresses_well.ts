@@ -12,6 +12,7 @@ import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
+import { WalletId } from 'types';
 
 const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
   view: (vnode): m.Vnode => {
@@ -46,7 +47,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
         // checking for balance to guarantee that delegate key has loaded
         m('.address', [
           `${account.address} - ${app.config.chains.getById(account.chain)?.name}`,
-          account.isMagic && [
+          account.walletId === WalletId.Magic && [
             m('br'),
             `Magically linked to ${app.user.email}`,
           ]
@@ -76,7 +77,7 @@ const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => an
             }
           },
           rounded: true,
-          disabled: vnode.state.removing || app.user.addresses.some((a) => a.isMagic),
+          disabled: vnode.state.removing || app.user.addresses.some((a) => a.walletId === WalletId.Magic),
           loading: vnode.state.removing,
           label: 'Remove',
         }),

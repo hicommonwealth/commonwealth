@@ -1,33 +1,36 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_icon.scss';
 
-import { IconName, iconLookup } from './cw_icon_lookup';
-
-export type IconSize = 'small' | 'medium' | 'large';
-
-export type IconType = 'primary' | 'secondary';
-
-export type IconStyleAttrs = {
-  iconSize?: IconSize;
-  iconType?: IconType;
-  disabled?: boolean;
-};
-
-export type IconAttrs = IconStyleAttrs & { iconName: IconName };
+import { iconLookup } from './cw_icon_lookup';
+import { IconAttrs } from './types';
+import { ComponentType } from '../types';
 
 export class CWIcon implements m.ClassComponent<IconAttrs> {
   view(vnode) {
     const {
+      className,
+      componentType = ComponentType.Icon,
       disabled = false,
       iconName,
       iconSize = 'medium',
-      iconType = 'primary',
+      onclick,
+      selected,
     } = vnode.attrs;
 
     const Icon = iconLookup[iconName];
 
-    return <Icon iconSize={iconSize} iconType={iconType} disabled={disabled} />;
+    return (
+      <Icon
+        className={className}
+        componentType={componentType}
+        disabled={disabled}
+        iconSize={iconSize}
+        onclick={onclick}
+        selected={selected}
+      />
+    );
   }
 }

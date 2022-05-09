@@ -24,10 +24,7 @@ export type OffchainThreadAttributes = {
   version_history?: string[];
   snapshot_proposal?: string;
 
-  offchain_voting_enabled?: boolean;
-  offchain_voting_options?: string;
-  offchain_voting_ends_at?: Date;
-  offchain_voting_votes?: number;
+  has_poll?: boolean;
 
   created_at?: Date;
   updated_at?: Date;
@@ -43,11 +40,11 @@ export type OffchainThreadAttributes = {
   ChainEntity?: ChainEntityAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
-}
+};
 
 export type OffchainThreadInstance = ModelInstance<OffchainThreadAttributes> & {
   // no mixins used
-}
+};
 
 export type OffchainThreadModelStatic = ModelStatic<OffchainThreadInstance>;
 
@@ -89,15 +86,12 @@ export default (
       },
       snapshot_proposal: { type: dataTypes.STRING(48), allowNull: true },
 
-      offchain_voting_enabled: { type: dataTypes.BOOLEAN, allowNull: true },
-      offchain_voting_options: { type: dataTypes.STRING, allowNull: true },
-      offchain_voting_ends_at: { type: dataTypes.DATE, allowNull: true },
-      offchain_voting_votes: { type: dataTypes.INTEGER, allowNull: true },
+      has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
-      last_commented_on: { type: dataTypes.DATE, allowNull: true }
+      last_commented_on: { type: dataTypes.DATE, allowNull: true },
     },
     {
       timestamps: true,
@@ -113,9 +107,7 @@ export default (
         { fields: ['chain', 'created_at'] },
         { fields: ['chain', 'updated_at'] },
         { fields: ['chain', 'pinned'] },
-        { fields: ['chain', 'offchain_voting_enabled'] },
-        { fields: ['chain', 'offchain_voting_ends_at'] },
-        { fields: ['chain', 'offchain_voting_votes'] },
+        { fields: ['chain', 'has_poll'] },
       ],
     }
   );
@@ -158,10 +150,6 @@ export default (
       foreignKey: 'thread_id',
       constraints: false,
     });
-    models.OffchainThread.hasMany(models.OffchainVote, {
-      foreignKey: 'thread_id',
-      constraints: false,
-    });
     models.OffchainThread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
       as: 'linking_threads',
@@ -169,6 +157,9 @@ export default (
     models.OffchainThread.hasMany(models.LinkedThread, {
       foreignKey: 'linking_thread',
       as: 'linked_threads',
+    });
+    models.OffchainThread.hasMany(models.OffchainPoll, {
+      foreignKey: 'thread_id',
     });
   };
 

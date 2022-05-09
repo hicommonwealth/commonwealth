@@ -104,19 +104,42 @@ export class StarterCommunityForm implements m.ClassComponent {
               default: {
                 additionalArgs.eth_chain_id = 1;
                 additionalArgs.node_url =
-                  'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
+                  'wss://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_';
                 additionalArgs.alt_wallet_url =
-                  'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr';
+                  'https://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_';
                 break;
               }
             }
+            const {
+              id,
+              name,
+              symbol,
+              iconUrl,
+              description,
+              website,
+              discord,
+              telegram,
+              github,
+              element,
+              base,
+             } = this.state.form;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 jwt: app.user.jwt,
                 address: '',
                 type: ChainType.Offchain,
                 network: baseToNetwork(this.state.form.base),
-                ...this.state.form,
+                icon_url: iconUrl,
+                id,
+                name,
+                symbol,
+                base,
+                description,
+                discord,
+                element,
+                github,
+                telegram,
+                website,
                 ...additionalArgs,
               });
               await initAppState(false);

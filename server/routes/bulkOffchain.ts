@@ -8,11 +8,11 @@ import { QueryTypes, Op } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
-import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../database';
 import { OffchainTopicInstance } from '../models/offchain_topic';
 import { RoleInstance } from '../models/role';
 import { OffchainThreadInstance } from '../models/offchain_thread';
+import { ChatChannelInstance } from '../models/chat_channel';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -32,7 +32,7 @@ const bulkOffchain = async (
   const replacements = { chain: chain.id };
 
   // parallelized queries
-  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting] =
+  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels] =
     await (<
       Promise<
         [
@@ -40,7 +40,8 @@ const bulkOffchain = async (
           unknown,
           RoleInstance[],
           unknown,
-          OffchainThreadInstance[]
+          OffchainThreadInstance[],
+          ChatChannelInstance[]
         ]
       >
     >Promise.all([
@@ -74,6 +75,17 @@ const bulkOffchain = async (
                 model: models.LinkedThread,
                 as: 'linked_threads',
               },
+              {
+                model: models.OffchainReaction,
+                as: 'reactions',
+                include: [
+                  {
+                    model: models.Address,
+                    as: 'Address',
+                    required: true,
+                  },
+                ],
+              },
             ],
             attributes: { exclude: ['version_history'] },
           });
@@ -104,7 +116,10 @@ const bulkOffchain = async (
             (new Date() as any) - 1000 * 24 * 60 * 60 * 30
           );
           const activeUsers = {};
-          const where = { updated_at: { [Op.gt]: thirtyDaysAgo }, chain: chain.id };
+          const where = {
+            updated_at: { [Op.gt]: thirtyDaysAgo },
+            chain: chain.id,
+          };
 
           const monthlyComments = await models.OffchainComment.findAll({
             where,
@@ -143,6 +158,15 @@ const bulkOffchain = async (
           type: QueryTypes.SELECT,
         }
       ),
+      models.ChatChannel.findAll({
+        where: {
+          chain_id: chain.id
+        },
+        include: {
+          model: models.ChatMessage,
+          required: false // should return channels with no chat messages
+        }
+      }),
     ]));
 
   const numVotingThreads = threadsInVoting.filter(
@@ -154,9 +178,10 @@ const bulkOffchain = async (
     result: {
       topics: topics.map((t) => t.toJSON()),
       numVotingThreads,
-      threads: pinnedThreads, // already converted to JSON earlier
+      pinnedThreads, // already converted to JSON earlier
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
+      chatChannels: JSON.stringify(chatChannels)
     },
   });
 };

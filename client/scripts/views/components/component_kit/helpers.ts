@@ -1,34 +1,18 @@
-import { ButtonStyleAttrs } from './cw_button';
-import { EngagementButtonStyleAttrs } from './cw_engagement_button';
-import { IconStyleAttrs } from './cw_icons/cw_icon';
-import { InputStyleAttrs } from './cw_text_input';
+import { isBoolean, isNotNil } from 'helpers/typeGuards';
 
-export const getButtonClasses = (
-  componentType: string,
-  styleAttrs: ButtonStyleAttrs | EngagementButtonStyleAttrs
-): string =>
-  `${componentType} ${Object.entries(styleAttrs)
-    .filter(([key, value]) => key && value) // filters out keys that don't have values
-    .map(
-      ([key, value]) =>
-        key === 'disabled' ? (value === true ? 'disabled' : null) : value // returns disabled string instead of boolean
+export const getClasses = <T>(
+  styleAttrs: T,
+  componentType?: string
+): string => {
+  const type = isNotNil(componentType) ? [componentType] : [];
+  const classes = Object.entries(styleAttrs)
+    .filter(
+      // filter out keys with undefined values
+      // filter out false bools since we only want the class if true
+      ([key, value]) => isNotNil(key) && isNotNil(value) && value !== false
     )
-    .join(' ')}`;
+    // return the key if value is bool, otherwise return value
+    .map(([key, value]) => (isBoolean(value) ? key : value));
 
-export const getIconClasses = (styleAttrs: IconStyleAttrs): string =>
-  `${Object.entries(styleAttrs)
-    .filter(([key, value]) => key && value) // filters out keys that don't have values
-    .map(
-      ([key, value]) =>
-        key === 'disabled' ? (value === true ? 'disabled' : null) : value // returns disabled string instead of boolean
-    )
-    .join(' ')}`;
-
-export const getTextInputClasses = (styleAttrs: InputStyleAttrs): string =>
-  `${Object.entries(styleAttrs)
-    .filter(([key, value]) => key && value) // filters out keys that don't have values
-    .map(
-      ([key, value]) =>
-        key === 'disabled' ? (value === true ? 'disabled' : null) : value // returns disabled string instead of boolean
-    )
-    .join(' ')}`;
+  return type.concat(classes).join(' ');
+};

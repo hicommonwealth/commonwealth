@@ -5,7 +5,7 @@ import {
   MAGIC_DEFAULT_CHAIN
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
-import { DynamicTemplate } from '../../shared/types';
+import { DynamicTemplate, WalletId } from '../../shared/types';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 const sgMail = require('@sendgrid/mail');
@@ -40,6 +40,11 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
     where: {
       email,
     },
+    include: [{
+      model: models.Address,
+      where: { wallet_id: WalletId.Magic },
+      required: false,
+    }]
   });
 
   // check whether to recommend magic.link registration instead
@@ -53,7 +58,7 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;
-  const isExistingMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
+  const isExistingMagicUser = previousUser && previousUser.Addresses?.length > 0;
   if (isExistingMagicUser // existing magic users should always use magic login, even if they're in the wrong community
       || (isNewRegistration && magicChain?.base && MAGIC_SUPPORTED_BASES.includes(magicChain.base)
           && !req.body.forceEmailLogin)) {

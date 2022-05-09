@@ -1,4 +1,4 @@
-@import "client/styles/shared";
+@import 'client/styles/shared';
 
 .CreateInviteModal {
   form {
@@ -12,6 +12,11 @@
     }
     .address-input-group {
       max-width: calc(66.7% - 5px);
+
+      .cui-input input {
+        height: 40px;
+        padding: 4px 8px;
+      }
     }
     h4 {
       margin-top: 0;
@@ -23,7 +28,13 @@
     .cui-form-group {
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;;
+      justify-content: flex-start;
+    }
+  }
+  .invite-email-form {
+    .cui-input input {
+      height: 40px;
+      padding: 4px 8px;
     }
   }
   form + form {
@@ -38,12 +49,12 @@
   .error-message {
     margin: 10px 0;
     font-weight: 500;
-    color: $negative-bg-color;
+    color: $rorange-500;
   }
   .success-message {
     margin: 10px 0;
     font-weight: 500;
-    color: $positive-bg-color;
+    color: $green-500;
   }
   .copy-link-line {
     display: flex;
@@ -53,11 +64,11 @@
     img {
       width: 30px;
       margin-left: 10px;
-      content: url("/static/img/copy_default.svg");
+      content: url('/static/img/copy_default.svg');
       cursor: pointer;
 
       &:hover {
-        content: url("/static/img/copy_hover.svg");
+        content: url('/static/img/copy_hover.svg');
       }
     }
   }
@@ -65,27 +76,28 @@
   .divider {
     width: calc(100% + 56px);
     height: 1px;
-    background: #ddd;
+    background: $neutral-25;
     margin-top: 20px;
     margin-left: -28px;
   }
 
   .CreateInviteLink {
     margin-top: 30px;
+    .cui-input input {
+      height: 40px;
+      padding: 4px 8px;
+    }
     .invite-link-title {
       font-size: 24px;
-      line-height: 28.8px;
       font-weight: 500;
     }
     .cui-form-label {
       font-size: 18px;
-      line-height: 21.6px;
       font-weight: 500;
     }
 
     .cui-radio {
       font-size: 18px;
-      line-height: 21.6px;
       font-weight: 400;
       padding-left: 24px;
 
@@ -113,26 +125,15 @@
       border-bottom: none;
       padding: 5px 20px !important;
       &:focus {
-        outline: #cfcbff auto 2px;
+        outline: $purple-100 auto 2px;
       }
       .search-results-item {
-        color: $text-color-black;
+        color: $neutral-800;
         text-decoration: none;
         padding: 12px 0 6px;
         font-size: 18px;
         overflow: hidden;
-        line-height: 1.2;
-        .TokenLabel {
-          display: flex;
-          justify-content: left;
-          align-items: center;
-          .token-label-left {
-            padding-right: 12px;
-          }
-          .token-label-right {
-            font-weight: 500;
-          }
-        }
+
         .search-results-thread-title {
           font-weight: 500;
           margin-bottom: 4px;
@@ -144,7 +145,7 @@
           }
         }
         mark {
-          background-color: #cfcbff;
+          background-color: $pink-50;
         }
       }
       &.disabled,
@@ -153,16 +154,15 @@
         font-size: 14px;
         letter-spacing: 0.3px;
         margin-bottom: 3px;
-        line-height: 14px;
         text-transform: uppercase;
-        color: #aaaaaa;
+        color: $neutral-400;
         margin-top: 18px;
         top: 2px;
         &:first-child {
           margin-top: 0px;
         }
         &:hover {
-          background: white;
+          background: $white;
         }
       }
       &.disabled {
@@ -182,7 +182,7 @@
         }
         span {
           width: 50%;
-          color: $primary-bg-color;
+          color: $primary-500;
           text-align: right;
         }
       }
