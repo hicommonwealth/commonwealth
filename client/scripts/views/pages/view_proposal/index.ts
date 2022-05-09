@@ -68,10 +68,6 @@ import { modelFromServer as modelReactionCountFromServer } from 'controllers/ser
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import OffchainPoll from 'client/scripts/models/OffchainPoll';
 import {
-  ProposalHeaderExternalLink,
-  ProposalHeaderBlockExplorerLink,
-  ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderThreadLink,
   ProposalHeaderTopics,
   ProposalHeaderTitle,
   ProposalHeaderStage,
@@ -119,6 +115,12 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ProposalPoll } from './poll';
+import {
+  ProposalHeaderExternalLink,
+  ProposalHeaderThreadLink,
+  ProposalHeaderBlockExplorerLink,
+  ProposalHeaderVotingInterfaceLink,
+} from './proposal_header_links';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -434,12 +436,12 @@ const ProposalHeader: m.Component<
             m('.proposal-body-link', [
               proposal instanceof OffchainThread &&
                 proposal.kind === OffchainThreadKind.Link && [
-                  !vnode.state.editing
-                    ? m(ProposalHeaderExternalLink, { proposal })
-                    : m(ProposalLinkEditor, {
+                  vnode.state.editing
+                    ? m(ProposalLinkEditor, {
                         item: proposal,
                         parentState: vnode.state,
-                      }),
+                      })
+                    : m(ProposalHeaderExternalLink, { proposal }),
                 ],
               !(proposal instanceof OffchainThread) &&
                 (proposal['blockExplorerLink'] ||
@@ -1048,19 +1050,18 @@ const ViewProposalPage: m.Component<
     };
 
     // load polls
-    if (!vnode.state.prefetch[proposalIdAndType]['pollsStarted']) {
-      app.polls
-        .fetchPolls(app.activeChainId(), (proposal as OffchainThread).id)
-        .catch(() => {
-          notifyError('Failed to load comments');
-          vnode.state.comments = [];
-          m.redraw();
-        });
+    if (
+      proposal instanceof OffchainThread &&
+      !vnode.state.prefetch[proposalIdAndType]['pollsStarted']
+    ) {
+      app.polls.fetchPolls(app.activeChainId(), proposal.id).catch(() => {
+        notifyError('Failed to load comments');
+        vnode.state.comments = [];
+        m.redraw();
+      });
       vnode.state.prefetch[proposalIdAndType]['pollsStarted'] = true;
-    } else {
-      vnode.state.polls = app.polls.getByThreadId(
-        (proposal as OffchainThread).id
-      );
+    } else if (proposal instanceof OffchainThread) {
+      vnode.state.polls = app.polls.getByThreadId(proposal.id);
     }
 
     // load view count
