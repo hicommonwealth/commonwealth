@@ -8,25 +8,29 @@ import 'lity/dist/lity.min.css';
 
 import m from 'mithril';
 import $ from 'jquery';
-import {FocusManager} from 'construct-ui';
+import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import './fragment-fix';
-import app, {ApiStatus, LoginState} from 'state';
-import {ChainBase, ChainNetwork, ChainType} from 'types';
-import {ChainInfo, NodeInfo, NotificationCategory} from 'models';
+import app, { ApiStatus, LoginState } from 'state';
+import { ChainBase, ChainNetwork, ChainType } from 'types';
+import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
-import {WebSocketController} from 'controllers/server/socket';
+import { WebSocketController } from 'controllers/server/socket';
 
-import {notifyError, notifyInfo, notifySuccess,} from 'controllers/app/notifications';
-import {updateActiveAddresses, updateActiveUser} from 'controllers/app/login';
+import {
+  notifyError,
+  notifyInfo,
+  notifySuccess,
+} from 'controllers/app/notifications';
+import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
-import {Layout} from 'views/layout';
+import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import {LoginModal} from 'views/modals/login_modal';
-import {alertModalWithText} from 'views/modals/alert_modal';
-import {pathIsDiscussion} from './identifiers';
+import { LoginModal } from 'views/modals/login_modal';
+import { alertModalWithText } from 'views/modals/alert_modal';
+import { pathIsDiscussion } from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -84,27 +88,32 @@ export async function initAppState(
           app.recentActivity.setCommunityThreadCounts(comm, count);
         });
 
-      // update the login status
-      updateActiveUser(data.user);
-      app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+        // update the login status
+        updateActiveUser(data.user);
+        app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
 
-      if (app.loginState == LoginState.LoggedIn) {
-        console.log("Initializing socket connection with JTW:", app.user.jwt)
-        // init the websocket connection and the chain-events namespace
-        app.socket.init(app.user.jwt).then(() => {
-          if (app.socket.isConnected) {
-            console.log("Websocket connected");
-          } else {
-            console.log("Websocket connection failure");
-          }
-        })
-        app.user.notifications.refresh().then(() => m.redraw());
-      } else if (app.loginState == LoginState.LoggedOut && app.socket.isConnected) {
-        // TODO: create global deinit function
-        app.socket.disconnect()
-      }
+        if (app.loginState == LoginState.LoggedIn) {
+          console.log('Initializing socket connection with JTW:', app.user.jwt);
+          // init the websocket connection and the chain-events namespace
+          app.socket.init(app.user.jwt).then(() => {
+            if (app.socket.isConnected) {
+              console.log('Websocket connected');
+            } else {
+              console.log('Websocket connection failure');
+            }
+          });
+          app.user.notifications.refresh().then(() => m.redraw());
+        } else if (
+          app.loginState == LoginState.LoggedOut &&
+          app.socket.isConnected
+        ) {
+          // TODO: create global deinit function
+          app.socket.disconnect();
+        }
 
-      app.user.setStarredCommunities(data.user ? data.user.starredCommunities : []);
+        app.user.setStarredCommunities(
+          data.user ? data.user.starredCommunities : []
+        );
 
         // update the selectedNode, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
@@ -301,11 +310,13 @@ export async function selectNode(
     ).default;
     newChain = new ERC20(n, app);
   } else if (n.chain.network === ChainNetwork.ERC721) {
-    const ERC721 = (await import(
-    //   /* webpackMode: "lazy" */
-    //   /* webpackChunkName: "erc721-main" */
-      './controllers/chain/ethereum/NftAdapter'
-    )).default;
+    const ERC721 = (
+      await import(
+        //   /* webpackMode: "lazy" */
+        //   /* webpackChunkName: "erc721-main" */
+        './controllers/chain/ethereum/NftAdapter'
+      )
+    ).default;
     newChain = new ERC721(n, app);
   } else if (n.chain.network === ChainNetwork.SPL) {
     const SPL = (
@@ -417,7 +428,11 @@ export async function initChain(): Promise<void> {
 
 export async function initNewTokenChain(address: string) {
   const chain_network = app.chain.network;
-  const response = await $.getJSON('/api/getTokenForum', { address, chain_network, autocreate: true });
+  const response = await $.getJSON('/api/getTokenForum', {
+    address,
+    chain_network,
+    autocreate: true,
+  });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');
@@ -647,6 +662,23 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
+            // Dashboard
+            '/dashboard': importRoute('views/pages/landing', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            '/dashboard/for-you': importRoute('views/pages/landing', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            '/dashboard/global': importRoute('views/pages/landing', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            '/dashboard/chain': importRoute('views/pages/landing', {
+              scoped: false,
+              hideSidebar: false,
+            }),
             // Notifications
             '/notification-settings': importRoute(
               'views/pages/notification_settings',
@@ -797,10 +829,20 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/discussions/:topic': redirectRoute(
               (attrs) => `/discussions/${attrs.topic}/`
             ),
+            '/:scope/dashboard': redirectRoute(() => '/dashboard'),
+            '/:scope/dashboard/for-you': redirectRoute(
+              () => '/dashboard/for-you'
+            ),
+            '/:scope/dashboard/global': redirectRoute(
+              () => '/dashboard/global'
+            ),
+            '/:scope/dashboard/chain': redirectRoute(() => '/dashboard/chain'),
             '/:scope/search': redirectRoute(() => '/search'),
             '/:scope/members': redirectRoute(() => '/members'),
             '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
-            '/:scope/chat/:channel': redirectRoute((attrs) => `/chat/${attrs.channel}`),
+            '/:scope/chat/:channel': redirectRoute(
+              (attrs) => `/chat/${attrs.channel}`
+            ),
             '/:scope/new/discussion': redirectRoute(() => '/new/discussion'),
             '/:scope/account/:address': redirectRoute(
               (attrs) => `/account/${attrs.address}/`
@@ -854,7 +896,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           }
         : {
             //
-            // Scoped routes
+            // Global routes
             //
             '/': importRoute('views/pages/landing', {
               scoped: false,
@@ -872,6 +914,27 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: true,
             }),
+            // Dashboard
+            '/dashboard': importRoute('views/pages/landing', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            '/dashboard/for-you': importRoute('views/pages/landing', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            '/dashboard/global': importRoute('views/pages/landing', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            '/dashboard/chain': importRoute('views/pages/landing', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            //
+            // Scoped routes
+            //
+
             // Notifications
             '/:scope/notifications': importRoute(
               'views/pages/notifications_page',

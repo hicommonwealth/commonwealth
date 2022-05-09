@@ -43,6 +43,42 @@ export class UserDashboard implements m.ClassComponent {
   private loadingData: boolean;
   private onscroll;
 
+  // Helper to load activity conditional on the selected tab
+  handleToggle = (tab: DashboardViews) => {
+    this.loadingData = false;
+    if (tab === DashboardViews.ForYou) {
+      if (this.fyNotifications.length === 0) this.loadingData = true;
+      fetchActivity('forYou').then((activity) => {
+        this.fyNotifications = activity.result
+          .map((notification) =>
+            DashboardActivityNotification.fromJSON(notification)
+          )
+          .reverse();
+        this.loadingData = false;
+        m.redraw();
+      });
+    } else if (tab === DashboardViews.Global) {
+      if (this.globalNotifications.length === 0) this.loadingData = true;
+      fetchActivity('global').then((activity) => {
+        this.globalNotifications = activity.result.map((notification) =>
+          DashboardActivityNotification.fromJSON(notification)
+        );
+        this.loadingData = false;
+        m.redraw();
+      });
+    } else if (tab === DashboardViews.Chain) {
+      if (this.chainEvents.length === 0) this.loadingData = true;
+      fetchActivity('chainEvents').then((activity) => {
+        this.chainEvents = activity.result.map((notification) =>
+          DashboardActivityNotification.fromJSON(notification)
+        );
+        this.loadingData = false;
+        m.redraw();
+      });
+    }
+    this.activeTab = tab;
+  };
+
   oninit() {
     this.fyCount = 10;
     this.globalCount = 10;
@@ -62,45 +98,18 @@ export class UserDashboard implements m.ClassComponent {
       loadingData,
     } = this;
 
-    // Helper to load activity conditional on the selected tab
-    const handleToggle = (tab: DashboardViews) => {
-      this.loadingData = false;
-      if (tab === DashboardViews.ForYou) {
-        if (fyNotifications.length === 0) this.loadingData = true;
-        fetchActivity('forYou').then((activity) => {
-          this.fyNotifications = activity.result
-            .map((notification) =>
-              DashboardActivityNotification.fromJSON(notification)
-            )
-            .reverse();
-          this.loadingData = false;
-          m.redraw();
-        });
-      } else if (tab === DashboardViews.Global) {
-        if (globalNotifications.length === 0) this.loadingData = true;
-        fetchActivity('global').then((activity) => {
-          this.globalNotifications = activity.result.map((notification) =>
-            DashboardActivityNotification.fromJSON(notification)
-          );
-          this.loadingData = false;
-          m.redraw();
-        });
-      } else if (tab === DashboardViews.Chain) {
-        if (chainEvents.length === 0) this.loadingData = true;
-        fetchActivity('chainEvents').then((activity) => {
-          this.chainEvents = activity.result.map((notification) =>
-            DashboardActivityNotification.fromJSON(notification)
-          );
-          this.loadingData = false;
-          m.redraw();
-        });
-      }
-      this.activeTab = tab;
-    };
-
     // Load activity
+    const subpage: DashboardViews = m.route.get().includes('for-you')
+      ? DashboardViews.ForYou
+      : m.route.get().includes('chain-events')
+      ? DashboardViews.Chain
+      : m.route.get().includes('global')
+      ? DashboardViews.Global
+      : app.user.activeAccount
+      ? DashboardViews.ForYou
+      : DashboardViews.Global;
     if (!this.activeTab) {
-      handleToggle(DashboardViews.ForYou);
+      this.handleToggle(subpage);
     }
 
     // Scroll
