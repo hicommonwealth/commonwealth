@@ -2,25 +2,25 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_radio_button.scss';
+import 'components/component_kit/cw_checkbox.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
-type RadioButtonStyleAttrs = {
+type CheckboxStyleAttrs = {
   disabled?: boolean;
   checked: boolean;
 };
 
-type RadioButtonAttrs = {
+type CheckboxAttrs = {
   groupName: string;
   label?: string;
   onchange: (e?: any) => void;
   value: string;
-} & RadioButtonStyleAttrs;
+} & CheckboxStyleAttrs;
 
-export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
+export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
   view(vnode) {
     const {
       disabled = false,
@@ -36,22 +36,22 @@ export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
       name: groupName,
       onchange,
       checked,
-      type: 'radio',
+      type: 'checkbox',
       value,
     };
 
     return (
       <label
-        class={getClasses<RadioButtonStyleAttrs>(
+        class={getClasses<CheckboxStyleAttrs>(
           {
             checked,
             disabled,
           },
-          ComponentType.RadioButton
+          ComponentType.Checkbox
         )}
       >
-        <input class="radio-input" {...params} />
-        <div class="radio-control" />
+        <input class="checkbox-input" {...params} />
+        <div class="checkbox-control" />
         <CWText>{label || value}</CWText>
       </label>
     );

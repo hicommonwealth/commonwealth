@@ -38,10 +38,14 @@
     border-color: $primary-300;
   }
 
-  &.selected .radio-control {
+  &.checked .radio-control {
     @include radioButtonCore($primary-500);
 
     border-color: $primary-500;
+
+    &:hover {
+      @include radioButtonCore($primary-600);
+    }
   }
 
   &.disabled .radio-control {

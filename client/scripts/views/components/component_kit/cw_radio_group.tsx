@@ -33,7 +33,7 @@ export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
             <CWRadioButton
               value={o.value}
               label={o.label}
-              selected={o.value === this.toggledValue}
+              checked={o.value === this.toggledValue}
               groupName={name}
               onchange={(e) => {
                 this.toggledValue = e?.target?.value;

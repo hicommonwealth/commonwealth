@@ -1,0 +1,63 @@
+@import 'shared';
+
+.Checkbox {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+
+  .checkbox-input {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+  }
+
+  .checkbox-control {
+    border-radius: $border-radius-checkbox;
+    border: 2px solid $neutral-300;
+    cursor: pointer;
+    height: 12px;
+    margin: auto 8px;
+    position: relative;
+    transition: all ease 150ms;
+    width: 12px;
+  }
+
+  &:hover .checkbox-control {
+    border-color: $primary-300;
+  }
+
+  &.checked .checkbox-control {
+    background-color: $primary-50;
+    border-color: $primary-500;
+    display: grid;
+    place-content: center;
+
+    &::after {
+      color: $primary-500;
+      content: '';
+      width: 8px;
+      height: 6px;
+      box-shadow: inset 12px 12px;
+      clip-path: path(
+        'M7.426.387a.5.5 0 010 .686l-4.279 4.54a.5.5 0 01-.727 0L.573 3.656a.5.5 0 01.729-.687L2.42 4.154a.5.5 0 00.727 0L6.698.386a.5.5 0 01.728 0z'
+      );
+    }
+
+    &:hover {
+      border-color: $primary-300;
+
+      &::after {
+        color: $primary-200;
+      }
+    }
+  }
+
+  &.disabled .checkbox-control {
+    pointer-events: none;
+  }
+
+  &.disabled:hover .checkbox-control {
+    border-color: $neutral-300;
+  }
+}

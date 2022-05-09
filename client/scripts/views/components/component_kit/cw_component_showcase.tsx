@@ -17,6 +17,7 @@ import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
+import { CWCheckbox } from './cw_checkbox';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -61,11 +62,20 @@ const radioGroupOptions = [
 
 export class ComponentShowcase implements m.ClassComponent {
   private selectedIconButton: number;
-  private radioButtonSelected: boolean;
+  private radioButtonChecked: boolean;
+  private checkboxChecked: boolean;
 
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Checkbox</h1>
+        <CWCheckbox
+          checked={this.checkboxChecked === true}
+          label="Click me"
+          onchange={() => {
+            this.checkboxChecked = !this.checkboxChecked;
+          }}
+        />
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
@@ -285,9 +295,9 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWRadioButton
             value="Radio Button"
             label="Radio Button"
-            selected={this.radioButtonSelected === true}
+            checked={this.radioButtonChecked === true}
             onchange={() => {
-              this.radioButtonSelected = true;
+              this.radioButtonChecked = true;
             }}
           />
           <CWRadioButton
