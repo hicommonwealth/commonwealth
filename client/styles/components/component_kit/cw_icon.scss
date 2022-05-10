@@ -1,6 +1,6 @@
-@import 'client/styles/shared';
+@import 'shared';
 
-svg {
+@mixin baseIconStyles {
   flex-shrink: 0;
   height: 1em;
   fill: currentColor;
@@ -19,6 +19,10 @@ svg {
   }
 
   &.disabled {
-    color: $neutral-100;
+    color: $neutral-200;
   }
+}
+
+.Icon {
+  @include baseIconStyles;
 }

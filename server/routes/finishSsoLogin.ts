@@ -5,14 +5,27 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
 import { sequelize, DB } from '../database';
 import { ProfileAttributes } from '../models/profile';
-import { DynamicTemplate, NotificationCategories, WalletId } from '../../shared/types';
+import {
+  DynamicTemplate,
+  NotificationCategories,
+  WalletId,
+} from '../../shared/types';
 
 import { AppError, ServerError } from '../util/errors';
 import { UserAttributes } from '../models/user';
 import { AddressAttributes } from '../models/address';
 
 import { factory, formatFilename } from '../../shared/logging';
-import { redirectWithLoginError, redirectWithLoginSuccess } from './finishEmailLogin';
+import {
+  redirectWithLoginError,
+  redirectWithLoginSuccess,
+} from './finishEmailLogin';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import {
+  MixpanelLoginEvent,
+  MixpanelLoginPayload,
+} from '../../shared/analytics/types';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -30,10 +43,12 @@ type AxieInfinityJwt = {
 };
 
 function isAxieInfinityJwt(token: any): token is AxieInfinityJwt {
-  return typeof token.iat === 'number'
-    && typeof token.iss === 'string'
-    && typeof token.jti === 'string'
-    && typeof token.roninAddress === 'string';
+  return (
+    typeof token.iat === 'number' &&
+    typeof token.iss === 'string' &&
+    typeof token.jti === 'string' &&
+    typeof token.roninAddress === 'string'
+  );
 }
 
 const AXIE_INFINITY_CHAIN_ID = 'axie-infinity';
@@ -53,8 +68,8 @@ const Errors = {
   AccountCreationFailed: 'Failed to create account',
 };
 
-type FinishSsoLoginReq = { token: string, issuer: Issuers, stateId: string };
-type FinishSsoLoginRes = { user?: UserAttributes, address?: AddressAttributes };
+type FinishSsoLoginReq = { token: string; issuer: Issuers; stateId: string };
+type FinishSsoLoginRes = { user?: UserAttributes; address?: AddressAttributes };
 
 const finishSsoLogin = async (
   models: DB,
@@ -69,7 +84,9 @@ const finishSsoLogin = async (
   }
 
   // verify request stateId (i.e. that /auth/sso was called)
-  const emptyTokenInstance = await models.SsoToken.findOne({ where: { state_id: req.body.stateId }});
+  const emptyTokenInstance = await models.SsoToken.findOne({
+    where: { state_id: req.body.stateId },
+  });
   if (!emptyTokenInstance) {
     throw new AppError(Errors.InvalidTokenState);
   }
@@ -82,7 +99,9 @@ const finishSsoLogin = async (
 
   let jwtPayload: AxieInfinityJwt;
   try {
-    const decoded = jwt.verify(tokenString, AXIE_SHARED_SECRET, { issuer: 'AxieInfinity' });
+    const decoded = jwt.verify(tokenString, AXIE_SHARED_SECRET, {
+      issuer: 'AxieInfinity',
+    });
     if (isAxieInfinityJwt(decoded)) {
       jwtPayload = decoded;
     } else {
@@ -108,17 +127,20 @@ const finishSsoLogin = async (
     throw new AppError(Errors.TokenBadAddress);
   }
 
-
   // check if this is a new signup or a login
   const reqUser = req.user;
-  const existingAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { address: jwtPayload.roninAddress },
-    include: [{
-      model: models.SsoToken,
-      where: { issuer: jwtPayload.iss },
-      required: true,
-    }],
-  });
+  const existingAddress = await models.Address.scope('withPrivateData').findOne(
+    {
+      where: { address: jwtPayload.roninAddress },
+      include: [
+        {
+          model: models.SsoToken,
+          where: { issuer: jwtPayload.iss },
+          required: true,
+        },
+      ],
+    }
+  );
   if (existingAddress) {
     // TODO: transactionalize
     // if the address was removed by /deleteAddress, we need to re-verify it
@@ -132,7 +154,7 @@ const finishSsoLogin = async (
         where: {
           id: reqUser.id,
         },
-        include: [ models.Address ],
+        include: [models.Address],
       });
       return success(res, { user: newUser });
     }
@@ -158,7 +180,7 @@ const finishSsoLogin = async (
       // TODO: factor this email code into a util
       try {
         const oldUser = await models.User.scope('withPrivateData').findOne({
-          where: { id: existingAddress.user_id }
+          where: { id: existingAddress.user_id },
         });
         if (!oldUser) {
           throw new Error('User should exist');
@@ -173,29 +195,45 @@ const finishSsoLogin = async (
           },
         };
         await sgMail.send(msg);
-        log.info(`Sent address move email: ${existingAddress} transferred to a new account`);
+        log.info(
+          `Sent address move email: ${existingAddress} transferred to a new account`
+        );
       } catch (e) {
         log.error(`Could not send address move email for: ${existingAddress}`);
       }
 
-      const newProfile = await models.Profile.findOne({ where: { user_id: reqUser.id } });
+      const newProfile = await models.Profile.findOne({
+        where: { user_id: reqUser.id },
+      });
       existingAddress.user_id = reqUser.id;
       existingAddress.profile_id = newProfile.id;
       await existingAddress.save();
 
-      const newAddress = await models.Address.findOne({ where: { id: existingAddress.id }});
-      return success(res, { address: newAddress })
+      const newAddress = await models.Address.findOne({
+        where: { id: existingAddress.id },
+      });
+      return success(res, { address: newAddress });
     } else {
       // user is not logged in, so we log them in
       const user = await models.User.findOne({
         where: {
           id: existingAddress.user_id,
         },
-        include: [ models.Address ],
+        include: [models.Address],
       });
       // TODO: should we req.login here, or not?
       req.login(user, (err) => {
-        if (err) return redirectWithLoginError(res, `Could not log in with ronin wallet`);
+        if (err)
+          return redirectWithLoginError(
+            res,
+            `Could not log in with ronin wallet`
+          );
+        if (process.env.NODE_ENV !== 'test') {
+          mixpanelTrack({
+            event: MixpanelLoginEvent.LOGIN,
+            isCustomDomain: null,
+          });
+        }
       });
       return success(res, { user });
     }
@@ -209,7 +247,11 @@ const finishSsoLogin = async (
       let profile: ProfileAttributes;
       if (!reqUser) {
         // create new user
-        user = await models.User.createWithProfile(models, { email: null }, { transaction: t });
+        user = await models.User.createWithProfile(
+          models,
+          { email: null },
+          { transaction: t }
+        );
         profile = user.Profiles[0];
       } else {
         user = reqUser;
@@ -217,39 +259,51 @@ const finishSsoLogin = async (
       }
 
       // create new address
-      const newAddress = await models.Address.create({
-        address: jwtPayload.roninAddress,
-        chain: AXIE_INFINITY_CHAIN_ID,
-        verification_token: 'SSO',
-        verification_token_expires: null,
-        verified: new Date(), // trust addresses from magic
-        last_active: new Date(),
-        user_id: user.id,
-        profile_id: profile.id,
-        wallet_id: WalletId.Ronin,
-      }, { transaction: t });
+      const newAddress = await models.Address.create(
+        {
+          address: jwtPayload.roninAddress,
+          chain: AXIE_INFINITY_CHAIN_ID,
+          verification_token: 'SSO',
+          verification_token_expires: null,
+          verified: new Date(), // trust addresses from magic
+          last_active: new Date(),
+          user_id: user.id,
+          profile_id: profile.id,
+          wallet_id: WalletId.Ronin,
+        },
+        { transaction: t }
+      );
 
-      await models.Role.create({
-        address_id: newAddress.id,
-        chain_id: AXIE_INFINITY_CHAIN_ID,
-        permission: 'member',
-      }, { transaction: t });
+      await models.Role.create(
+        {
+          address_id: newAddress.id,
+          chain_id: AXIE_INFINITY_CHAIN_ID,
+          permission: 'member',
+        },
+        { transaction: t }
+      );
 
       // Automatically create subscription to their own mentions
-      await models.Subscription.create({
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewMention,
-        object_id: `user-${user.id}`,
-        is_active: true,
-      }, { transaction: t });
+      await models.Subscription.create(
+        {
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewMention,
+          object_id: `user-${user.id}`,
+          is_active: true,
+        },
+        { transaction: t }
+      );
 
       // Automatically create a subscription to collaborations
-      await models.Subscription.create({
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${user.id}`,
-        is_active: true,
-      }, { transaction: t });
+      await models.Subscription.create(
+        {
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewCollaboration,
+          object_id: `user-${user.id}`,
+          is_active: true,
+        },
+        { transaction: t }
+      );
 
       // populate token
       emptyTokenInstance.issuer = jwtPayload.iss;
@@ -262,7 +316,9 @@ const finishSsoLogin = async (
 
     if (reqUser) {
       // re-fetch address if existing user
-      const newAddress = await models.Address.findOne({ where: { address: jwtPayload.roninAddress }});
+      const newAddress = await models.Address.findOne({
+        where: { address: jwtPayload.roninAddress },
+      });
       return success(res, { address: newAddress });
     } else {
       // re-fetch user to include address object, if freshly created
@@ -270,11 +326,21 @@ const finishSsoLogin = async (
         where: {
           id: result.id,
         },
-        include: [ models.Address ],
+        include: [models.Address],
       });
       // TODO: should we req.login here? or not?
       req.login(newUser, (err) => {
-        if (err) return redirectWithLoginError(res, `Could not log in with ronin wallet`);
+        if (err)
+          return redirectWithLoginError(
+            res,
+            `Could not log in with ronin wallet`
+          );
+        if (process.env.NODE_ENV !== 'test') {
+          mixpanelTrack({
+            event: MixpanelLoginEvent.LOGIN,
+            isCustomDomain: null,
+          });
+        }
       });
       return success(res, { user: newUser });
     }

@@ -21,9 +21,9 @@
 .AccountRow {
   display: flex;
   margin: 0;
-  padding: 6px 10px;
+  padding: 8px 16px;
   &.selected {
-    background: $primary-300;
+    background: $neutral-100;
     @include xs-max {
       margin: 0px -22px;
       padding-right: 22px;
@@ -61,7 +61,6 @@
     }
   }
   .action-col {
-    margin-top: 4px;
     button,
     a {
       margin-left: 10px;

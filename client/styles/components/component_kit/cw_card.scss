@@ -1,6 +1,6 @@
-@import 'client/styles/shared';
+@import 'shared';
 
-$default-card-width: 300px;
+$default-card-width: 260px;
 $default-card-height: 100px;
 
 .Card {
@@ -11,12 +11,11 @@ $default-card-height: 100px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   min-height: $default-card-height;
   padding: 16px;
   width: $default-card-width;
 
-  &.full-width {
+  &.fullWidth {
     width: 100%;
   }
 

@@ -1,0 +1,31 @@
+@import 'components/component_kit/cw_icon.scss';
+
+.IconButton {
+  @include baseIconStyles;
+
+  &.neutral {
+    color: $neutral-800;
+    cursor: pointer;
+
+    &.selected {
+      color: $neutral-500;
+    }
+
+    &:hover {
+      color: $neutral-600;
+    }
+  }
+
+  &.primary {
+    color: $primary-300;
+    cursor: pointer;
+
+    &:hover {
+      color: $primary-100;
+    }
+
+    &.selected {
+      color: $primary-500;
+    }
+  }
+}

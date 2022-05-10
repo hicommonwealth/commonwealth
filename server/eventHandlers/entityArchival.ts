@@ -30,7 +30,7 @@ export default class extends IEventHandler {
   //   if (!this._wss) return;
   //   const dbEventType = await dbEvent.getChainEventType();
   //   const payload: IWebsocketsPayload<any> = {
-  //     event: WebsocketMessageType.ChainEntity,
+  //     event: WebsocketMessageNames.ChainEntity,
   //     data: {
   //       object_id: dbEntity.id,
   //       chainEntity: dbEntity.toJSON(),
@@ -39,7 +39,7 @@ export default class extends IEventHandler {
   //     },
   //   };
   //   try {
-  //     this._wss.emit(WebsocketMessageType.ChainEntity, payload);
+  //     this._wss.emit(WebsocketMessageNames.ChainEntity, payload);
   //   } catch (e) {
   //     log.warn(
   //       `Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`

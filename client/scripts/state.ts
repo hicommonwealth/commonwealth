@@ -5,6 +5,8 @@ import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import { InviteCodeAttributes } from 'types';
 import { WebSocketController } from 'controllers/server/socket';
+import { ChainCategoryAttributes } from 'server/models/chain_category';
+import { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
@@ -18,9 +20,8 @@ import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
+import PollsController from './controllers/server/polls';
 import ProjectsController from './controllers/chain/ethereum/projects';
-import { ChainCategoryAttributes } from 'server/models/chain_category';
-import { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -37,6 +38,8 @@ export const enum LoginState {
 export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
+  // XXX: replace this with some app.chain helper
+  activeChainId(): string;
 
   chainPreloading: boolean;
   chainAdapterReady: EventEmitter;
@@ -45,25 +48,31 @@ export interface IApp {
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
 
-  profiles: ProfilesController;
-  comments: CommentsController;
+  // Threads
   threads: ThreadsController;
   threadUniqueAddressesCount: ThreadUniqueAddressesCount;
-  search: SearchController;
-  snapshot: SnapshotController;
+  comments: CommentsController;
   reactions: ReactionsController;
   reactionCounts: ReactionCountsController;
-  topics: TopicsController;
-  communities: CommunitiesController;
-  user: UserController;
-  wallets: WebWalletController;
-  projects: ProjectsController;
+  polls: PollsController;
 
-  recentActivity: RecentActivityController;
+  // Search
+  search: SearchController;
   searchAddressCache: any;
 
-  // XXX: replace this with some app.chain helper
-  activeChainId(): string;
+  // Community
+  topics: TopicsController;
+  communities: CommunitiesController;
+
+  // User
+  user: UserController;
+  recentActivity: RecentActivityController;
+  profiles: ProfilesController;
+
+  // Web3
+  wallets: WebWalletController;
+  snapshot: SnapshotController;
+  projects: ProjectsController;
 
   toasts: ToastStore;
   modals: ModalStore;
@@ -99,8 +108,9 @@ export interface IApp {
 }
 
 const app: IApp = {
-  socket: null,
+  socket: new WebSocketController(),
   chain: null,
+  activeChainId: () => app.chain?.id,
 
   chainPreloading: false,
   chainAdapterReady: new EventEmitter(),
@@ -113,25 +123,31 @@ const app: IApp = {
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
 
-  profiles: new ProfilesController(),
-  comments: new CommentsController(),
+  // Thread
   threads: new ThreadsController(),
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
-  search: new SearchController(),
-  snapshot: new SnapshotController(),
+  comments: new CommentsController(),
   reactions: new ReactionsController(),
   reactionCounts: new ReactionCountsController(),
-  topics: new TopicsController(),
+  polls: new PollsController(),
+
+  // Community
   communities: new CommunitiesController(),
-  user: new UserController(),
+  topics: new TopicsController(),
+
+  // Search
+  search: new SearchController(),
+  searchAddressCache: {},
+
+  // Web3
+  snapshot: new SnapshotController(),
   wallets: new WebWalletController(),
   projects: new ProjectsController(),
 
+  // User
+  user: new UserController(),
   recentActivity: new RecentActivityController(),
-
-  searchAddressCache: {},
-
-  activeChainId: () => app.chain?.id,
+  profiles: new ProfilesController(),
 
   toasts: getToastStore(),
   modals: getModalStore(),

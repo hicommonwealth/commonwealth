@@ -15,6 +15,7 @@ import {
   Profile,
   ChainEntity,
   NotificationSubscription,
+  OffchainPoll,
 } from 'models';
 import { NotificationCategories } from 'types';
 
@@ -40,7 +41,6 @@ export const modelFromServer = (thread) => {
     topic,
     kind,
     stage,
-    community,
     chain,
     read_only,
     plaintext,
@@ -49,10 +49,8 @@ export const modelFromServer = (thread) => {
     collaborators,
     chain_entities,
     ChainEntities,
-    offchain_voting_enabled,
-    offchain_voting_options,
-    offchain_voting_ends_at,
-    offchain_voting_votes,
+    has_poll,
+    polls = [], // associated OffchainPolls
     reactions,
     last_commented_on,
     linked_threads,
@@ -149,7 +147,6 @@ export const modelFromServer = (thread) => {
     topic: topicFromStore,
     kind,
     stage,
-    community,
     chain,
     readOnly: read_only,
     plaintext,
@@ -159,10 +156,8 @@ export const modelFromServer = (thread) => {
     chainEntities: chainEntitiesProcessed || ChainEntities,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
-    offchainVotingEnabled: offchain_voting_enabled,
-    offchainVotingOptions: offchain_voting_options,
-    offchainVotingEndsAt: offchain_voting_ends_at,
-    offchainVotingNumVotes: offchain_voting_votes,
+    hasPoll: has_poll,
+    polls: polls.map((p) => new OffchainPoll(p)),
     lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
     linkedThreads,
   });
@@ -377,51 +372,6 @@ class ThreadsController {
           notifyError('Could not delete thread');
           reject(e);
         });
-    });
-  }
-
-  public async setPolling(args: {
-    threadId: number;
-    name: string;
-    choices: string[];
-    customDuration?: string;
-  }) {
-    const { threadId, name, choices, customDuration } = args;
-    // start polling
-    await $.ajax({
-      url: `${app.serverUrl()}/updateThreadPolling`,
-      type: 'POST',
-      data: {
-        chain: app.activeChainId(),
-        jwt: app.user.jwt,
-        thread_id: threadId,
-        content: JSON.stringify({ name, choices }),
-        custom_duration: customDuration?.split(' ')[0],
-      },
-      success: (response) => {
-        const thread = this._store.getByIdentifier(threadId);
-        if (!thread) {
-          // TODO: sometimes the thread may not be in the store
-          location.reload();
-          return;
-        }
-        // TODO: This should be handled properly
-        // via controller/store & update method
-        thread.offchainVotingEnabled = true;
-        thread.offchainVotingOptions = { name, choices };
-        thread.offchainVotingNumVotes = 0;
-        thread.offchainVotingEndsAt = response.result.offchain_voting_ends_at
-          ? moment(response.result.offchain_voting_ends_at)
-          : null;
-      },
-      error: (err) => {
-        console.log('Failed to start polling');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to start polling'
-        );
-      },
     });
   }
 

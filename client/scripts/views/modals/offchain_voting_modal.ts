@@ -41,7 +41,7 @@ const OffchainVotingModal: m.Component<{ votes: OffchainVote[] }, {}> = {
                 user: new AddressInfo(
                   null,
                   vote.address,
-                  vote.author_chain,
+                  vote.authorChain,
                   null,
                   null
                 ),
