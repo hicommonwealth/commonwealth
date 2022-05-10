@@ -2,7 +2,6 @@
 import 'pages/referenda.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { Tag } from 'construct-ui';
 
 import app from 'state';
@@ -78,7 +77,6 @@ function getModules() {
 
 const ReferendaPage: m.Component<{}> = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'ReferendaPage' });
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
     if (
