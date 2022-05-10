@@ -16,7 +16,7 @@ import { CWTextInput, ValidationStatus } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
-import { CWRadioButton } from './cw_radio_button';
+import { CWRadioButton, RadioButton } from './cw_radio_button';
 import { CWCheckbox } from './cw_checkbox';
 
 // const displayColors = (hexList) => {
@@ -61,9 +61,14 @@ const radioGroupOptions = [
 ];
 
 export class ComponentShowcase implements m.ClassComponent {
-  private selectedIconButton: number;
-  private radioButtonChecked: boolean;
   private checkboxChecked: boolean;
+  private radioButtonChecked: boolean;
+  private radioGroupSelection: string;
+  private selectedIconButton: number;
+
+  oninit() {
+    this.radioGroupSelection = radioGroupOptions[2].value;
+  }
 
   view() {
     return (
@@ -302,9 +307,12 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="button-gallery">
           <CWRadioGroup
             options={radioGroupOptions}
-            defaultValue={radioGroupOptions[2]}
             name="RadioGroup"
-            onchange={(e) => notifySuccess(`"${e.target.value}" selected`)}
+            toggledOption={this.radioGroupSelection}
+            onchange={(e) => {
+              this.radioGroupSelection = e.target.value;
+              notifySuccess(`"${e.target.value}" selected`);
+            }}
           />
         </div>
         <h1>Checkbox</h1>

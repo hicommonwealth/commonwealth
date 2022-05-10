@@ -8,6 +8,8 @@ import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
+export type RadioButton = { label: string; value: string };
+
 type RadioButtonStyleAttrs = {
   disabled?: boolean;
   checked: boolean;
@@ -15,10 +17,9 @@ type RadioButtonStyleAttrs = {
 
 type RadioButtonAttrs = {
   groupName: string;
-  label?: string;
   onchange: (e?: any) => void;
-  value: string;
-} & RadioButtonStyleAttrs;
+} & RadioButton &
+  RadioButtonStyleAttrs;
 
 export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
   view(vnode) {
