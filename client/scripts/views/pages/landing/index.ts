@@ -20,6 +20,11 @@ import 'pages/landing/index.scss';
 import { handleEmailInvites } from '../../components/header/invites_menu';
 import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
+import {
+  MixpanelPageViewEvent,
+  MixpanelPageViewPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 export interface Chain {
   img: string;
@@ -46,6 +51,14 @@ interface IState {
 }
 
 const LandingPage: m.Component<{}, IState> = {
+  oncreate: () => {
+    if (!app.isLoggedIn()) {
+      mixpanelBrowserTrack({
+        event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
+        isCustomDomain: app.isCustomDomain(),
+      });
+    }
+  },
   oninit: (vnode) => {
     vnode.state.hiddenInputTokenList = true;
     vnode.state.inputTokenValue = '';

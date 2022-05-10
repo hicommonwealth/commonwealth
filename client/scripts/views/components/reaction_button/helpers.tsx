@@ -96,16 +96,5 @@ export const onReactionClick = (
     } else {
       like(chain, chainId, userAddress);
     }
-
-    mixpanel.track('Create Reaction ', {
-      'Step No': 1,
-      Step: 'Create Reaction',
-      'Post Name': `${post.slug}: ${post.identifier}`,
-      Scope: app.activeChainId(),
-    });
-    mixpanel.people.increment('Reaction');
-    mixpanel.people.set({
-      'Last Reaction Created': new Date().toISOString(),
-    });
   }
 };

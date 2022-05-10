@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { EmptyState, Icons } from 'construct-ui';
 
 import 'pages/error.scss';
@@ -11,9 +10,7 @@ import Sublayout from 'views/sublayout';
 type ErrorPageAttrs = { title?: any; message?: string };
 
 class ErrorPage implements m.ClassComponent<ErrorPageAttrs> {
-  oncreate() {
-    mixpanel.track('PageVisit', { 'Page Name': 'ErrorPage' });
-  }
+  oncreate() {}
 
   view(vnode) {
     const { message, title } = vnode.attrs;

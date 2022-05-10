@@ -15,6 +15,12 @@ import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ChainFormFields, ChainFormState } from './types';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityCreationPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { CommunityType } from '.';
 
 // TODO: ChainFormState contains "uploadInProgress" which is technically
 // not part of the form (what we pass to /createChain), but of the general view's state,
@@ -64,6 +70,12 @@ export class StarterCommunityForm implements m.ClassComponent {
           value={this.state.form.base}
           onchange={(value) => {
             this.state.form.base = value;
+            mixpanelBrowserTrack({
+              event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
+              chainBase: value,
+              isCustomDomain: app.isCustomDomain(),
+              communityType: CommunityType.StarterCommunity,
+            });
           }}
         />
         {...defaultChainRows(this.state.form)}
@@ -79,13 +91,20 @@ export class StarterCommunityForm implements m.ClassComponent {
               bech32_prefix?: string;
               alt_wallet_url?: string;
             } = {};
+            mixpanelBrowserTrack({
+              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+              chainBase: this.state.form.base,
+              isCustomDomain: app.isCustomDomain(),
+              communityType: CommunityType.StarterCommunity,
+            });
 
             // defaults to be overridden when chain is no longer "starter" type
             switch (this.state.form.base) {
               case ChainBase.CosmosSDK: {
                 additionalArgs.node_url = 'https://rpc-osmosis.blockapsis.com';
                 additionalArgs.bech32_prefix = 'osmo';
-                additionalArgs.alt_wallet_url = 'https://lcd-osmosis.blockapsis.com';
+                additionalArgs.alt_wallet_url =
+                  'https://lcd-osmosis.blockapsis.com';
                 break;
               }
               case ChainBase.NEAR: {
@@ -122,7 +141,7 @@ export class StarterCommunityForm implements m.ClassComponent {
               github,
               element,
               base,
-             } = this.state.form;
+            } = this.state.form;
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 jwt: app.user.jwt,
