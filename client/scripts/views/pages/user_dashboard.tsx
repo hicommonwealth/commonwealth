@@ -108,6 +108,11 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
     } = this;
     // Load activity
     const loggedIn = app.loginState === LoginState.LoggedIn;
+    if (!vnode.attrs.type) {
+      m.route.set(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
+    } else if (vnode.attrs.type === 'for-you' && !loggedIn) {
+      m.route.set('/dashboard/global');
+    }
     const subpage: DashboardViews =
       vnode.attrs.type === 'chain-events'
         ? DashboardViews.Chain
@@ -172,14 +177,19 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                 <CWIcon iconName="externalLink" iconSize="small" />
               </div>
             </div>
-            <Tabs align="left" bordered={false} fluid={true}>
+            <Tabs
+              class="dashboard-tabs"
+              align="left"
+              bordered={false}
+              fluid={true}
+            >
               <TabItem
                 label={DashboardViews.ForYou}
                 active={activePage === DashboardViews.ForYou}
                 onclick={() => {
                   if (!loggedIn) {
                     notifyInfo(
-                      'Log in to join a community with an invite link'
+                      'Log in or create an account for custom activity feed'
                     );
                     return;
                   }

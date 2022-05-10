@@ -87,7 +87,7 @@ export async function initAppState(
 
         // add recentActivity
         const { recentThreads } = data;
-        recentThreads.forEach(({chain, count}) => {
+        recentThreads.forEach(({ chain, count }) => {
           app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
@@ -631,7 +631,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     });
 
     const isCustomDomain = !!customDomain;
-    const activeAcct = app.user.activeAccount;
+    const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
       '/about': importRoute('views/pages/commonwealth', {
@@ -715,7 +715,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/account': redirectRoute((a) =>
-              activeAcct ? `/account/${activeAcct.address}` : '/'
+              activeAccount ? `/account/${activeAccount.address}` : '/'
             ),
             // Governance
             '/referenda': importRoute('views/pages/referenda', {
@@ -821,7 +821,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               (attrs) => `/account/${attrs.address}/`
             ),
             '/:scope/account': redirectRoute(() =>
-              activeAcct ? `/account/${activeAcct.address}` : '/'
+              activeAccount ? `/account/${activeAccount.address}` : '/'
             ),
             '/:scope/referenda': redirectRoute(() => '/referenda'),
             '/:scope/proposals': redirectRoute(() => '/proposals'),
@@ -887,7 +887,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: true,
             }),
-            '/dashboard/': importRoute('views/pages/user_dashboard', {
+            '/dashboard': importRoute('views/pages/user_dashboard', {
               scoped: false,
               deferChain: true,
             }),
@@ -976,8 +976,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/:scope/account': redirectRoute((a) =>
-              activeAcct
-                ? `/${a.scope}/account/${activeAcct.address}`
+              activeAccount
+                ? `/${a.scope}/account/${activeAccount.address}`
                 : `/${a.scope}/`
             ),
             // Governance
