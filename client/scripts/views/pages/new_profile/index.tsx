@@ -41,30 +41,16 @@ enum ProfileError {
 const NoAddressFoundError = "No address found"
 const NoProfileFoundError = "No profile found"
 
-const requiredProfileData = ['name', 'avatarUrl', 'bio']
-
 class NewProfile implements m.Component<{}, ProfileState> {
 
   oninit(vnode) {
     vnode.state.address = m.route.param("address")
     vnode.state.loading = true
     vnode.state.error = ProfileError.None
-    this.getProfile(vnode, vnode.state.address)
-    
-    // TODO: Insufficient data cases for owning user and visiting user
-    const sufficientProfileData = requiredProfileData.every(field => 
-      field in vnode.state.profile && vnode.state.profile[field]
-    )
-    if (!sufficientProfileData) {
-      if (app.isLoggedIn() && 
-        app.user.addresses.map(addressInfo => addressInfo.address).includes(vnode.state.address)) {
-
-      }
-      vnode.state.error = ProfileError.InsufficientProfileData
-    }
+    this.getProfileData(vnode, vnode.state.address)
   }
 
-  getProfile = async (vnode, address: String) => {
+  getProfileData = async (vnode, address: String) => {
     const response = await $.get(`${app.serverUrl()}/profile/v2`, {
       address,
       jwt: app.user.jwt,
@@ -81,6 +67,7 @@ class NewProfile implements m.Component<{}, ProfileState> {
     if (vnode.state.error != ProfileError.None) return
 
     vnode.state.loading = false
+
     vnode.state.profile = Profile.fromJSON(response.profile)    
     vnode.state.threads = response.threads
     vnode.state.comments = response.comments.map(c => OffchainComment.fromJSON(c))
@@ -136,16 +123,6 @@ class NewProfile implements m.Component<{}, ProfileState> {
           <div className="ErrorPage">
             <h3> No Profile Found </h3>
             <p> This address is not registered to Commonwealth. </p>
-          </div>
-        </div>
-      )
-
-    if (vnode.state.error === ProfileError.InsufficientProfileData)
-      return (
-        <div className="ProfilePage">
-          <div className="ErrorPage">
-            <h3> Profile Pending </h3>
-            <p> The profile for this address has not been set up yet. </p>
           </div>
         </div>
       )

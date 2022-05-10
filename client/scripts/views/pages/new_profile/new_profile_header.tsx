@@ -2,6 +2,7 @@
 
 import m from 'mithril';
 import app from 'state';
+import jdenticon from 'jdenticon';
 
 import { NewProfile as Profile } from 'client/scripts/models'
 import { SocialAccount } from 'client/scripts/models';
@@ -19,6 +20,9 @@ type ProfileHeaderAttrs = {
 type ProfileHeaderState = {
   isBioExpanded: boolean
 }
+
+const DefaultProfileName = "Anonymous"
+const DefaultProfileBio = "Happy to be on Commonwealth!"
 
 const maxBioCharCount = 190;
 // TODO: Adjust value for responsiveness
@@ -45,10 +49,22 @@ const renderSocialAccounts = (socialAccounts: Array<SocialAccount>) => {
     )
 }
 
+const renderBio = (bio: string, isExpanded: boolean) => {
+  if (!bio)
+    return DefaultProfileBio
+
+  if (bio?.length > maxBioCharCount && !isExpanded) {
+    return `${bio.slice(0, maxBioCharCount)}...`
+  } else {
+    return bio
+  }
+}
+
 class NewProfileHeader implements m.Component<ProfileHeaderAttrs, ProfileHeaderState> {
   
   oninit(vnode) {
     vnode.state.isBioExpanded = false
+    vnode.state.defaultAvatar = jdenticon.toSvg(vnode.attrs.address, 90)
   }
 
   view(vnode) {
@@ -62,19 +78,21 @@ class NewProfileHeader implements m.Component<ProfileHeaderAttrs, ProfileHeaderS
           className={vnode.state.isBioExpanded ? "profile-info expand" : "profile-info"}
         > 
           <div className="profile-image"> 
-            <img src={profile?.avatarUrl} />
+            {
+              profile?.avatarUrl ? <img src={profile?.avatarUrl} /> : 
+              <img src={`data:image/svg+xml;utf8,${encodeURIComponent(vnode.state.defaultAvatar)}`} />
+            }
           </div>
 
           <section className="profile-name-and-bio">
-            <h3 className="name"> { profile?.name } </h3>
+            <h3 className="name"> { profile?.name ? profile.name : DefaultProfileName} </h3>
             <p className="bio"> 
               { 
-                profile?.bio.length > maxBioCharCount && !vnode.state.isBioExpanded ? 
-                `${profile?.bio.slice(0, maxBioCharCount)}...`: profile?.bio 
+                renderBio(profile?.bio, vnode.state.isBioExpanded)
               } 
             </p>
             {
-              profile?.bio.length > maxBioCharCount ? 
+              profile?.bio?.length > maxBioCharCount ? 
               <div className="read-more" 
                 onclick={() => { vnode.state.isBioExpanded = !vnode.state.isBioExpanded }}
               > 
