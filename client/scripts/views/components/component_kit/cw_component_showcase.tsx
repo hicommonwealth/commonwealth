@@ -20,6 +20,12 @@ import { CWTooltip } from './cw_tooltip';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
+import { CWPortal } from './cw_portal';
+import {
+  CWPopover,
+  PopoverChildAttrs,
+  PopoverToggleAttrs,
+} from './cw_popover/cw_popover';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -59,7 +65,18 @@ export class ComponentShowcase implements m.ClassComponent {
     return (
       <div class="ComponentShowcase">
         <h1>Popover</h1>
-        <CWTooltip tooltipContent={<div>butt</div>} triggerLabel="Click" />
+        <CWPopover
+          toggle={(attrs: PopoverToggleAttrs) => (
+            <CWButton label={'button'} onclick={attrs.onClick} />
+          )}
+          popover={(attrs: PopoverChildAttrs) => (
+            <div class="tooltip-container" {...attrs}>
+              {'wtf'}
+            </div>
+          )}
+          content={<div class="tooltip-container">{'wtf'}</div>}
+          trigger={<CWButton label={'button'} />}
+        />
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">

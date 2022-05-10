@@ -24,29 +24,6 @@ export type PopoverPosition = {
   maxWidthCalc: string;
 };
 
-export type PopoverToggleAttrs = {
-  isActive: boolean;
-  onClick: (event: Event) => void;
-};
-
-export type PopoverChildAttrs = {
-  position: PopoverPosition;
-  onClick: (event: Event) => void;
-  togglePopOver: () => void;
-};
-
-export type PopoverAttrs = {
-  alwaysRender?: boolean;
-  gap?: number;
-  isOpen?: boolean;
-  onToggle?: (isOpen: boolean) => void;
-  popover: (attrs: PopoverChildAttrs) => any;
-  toggle: (attrs: PopoverToggleAttrs) => any;
-  toSide?: boolean;
-  xDirection?: dropXDirectionType;
-  yDirection?: dropYDirectionType;
-};
-
 export type GetFunctionAttrs = {
   dropXDirection: dropXDirectionType;
   dropYDirection: dropYDirectionType;
