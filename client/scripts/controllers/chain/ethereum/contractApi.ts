@@ -6,12 +6,16 @@ import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { Account } from 'models';
 
-export type ContractFactoryT<ContractT> = (address: string, provider: Provider) => ContractT;
+export type ContractFactoryT<ContractT> = (
+  address: string, provider: Provider | JsonRpcSigner
+) => ContractT;
 
 export async function attachSigner<CT extends Contract>(
   wallets: WebWalletController,
   sender: Account<any>,
-  contract: CT
+  contract?: CT,
+  factory?: ContractFactoryT<CT>,
+  address?: string,
 ): Promise<CT> {
   const signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);
   let signer: JsonRpcSigner;
@@ -28,9 +32,17 @@ export async function attachSigner<CT extends Contract>(
   if (!signer) {
     throw new Error('Could not get signer.');
   }
-  const ct = contract.connect(signer) as CT;
-  await ct.deployed();
-  return ct;
+  if (contract) {
+    const ct = contract.connect(signer) as CT;
+    await ct.deployed();
+    return ct;
+  } else if (factory && address) {
+    const ct = factory(address, signer) as CT;
+    await ct.deployed();
+    return ct;
+  } else {
+    throw new Error('Must provide contract or factory');
+  }
 }
 
 abstract class ContractApi<ContractT extends Contract> {

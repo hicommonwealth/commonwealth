@@ -51,7 +51,7 @@ export async function initAppState(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     $.get(`${app.serverUrl()}/status`)
-      .then(async (data) => {
+      .then((data) => {
         app.config.chains.clear();
         app.config.nodes.clear();
         app.user.notifications.store.clear();
@@ -114,6 +114,7 @@ export async function initAppState(
           app.setCustomDomain(customDomain);
         }
 
+        app.projects.init(app);
         resolve();
       })
       .catch((err: any) => {

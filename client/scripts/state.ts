@@ -18,6 +18,7 @@ import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
+import ProjectsController from './controllers/chain/ethereum/projects';
 import { ChainCategoryAttributes } from 'server/models/chain_category';
 import { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 
@@ -56,6 +57,7 @@ export interface IApp {
   communities: CommunitiesController;
   user: UserController;
   wallets: WebWalletController;
+  projects: ProjectsController;
 
   recentActivity: RecentActivityController;
   searchAddressCache: any;
@@ -123,6 +125,7 @@ const app: IApp = {
   communities: new CommunitiesController(),
   user: new UserController(),
   wallets: new WebWalletController(),
+  projects: new ProjectsController(),
 
   recentActivity: new RecentActivityController(),
 

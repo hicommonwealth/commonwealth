@@ -18,7 +18,7 @@ const pinIpfsBlob = async (
   userID: number,
   addressID: number,
   jsonfile: string
-) => {
+): Promise<string> => {
   const data = new FormData();
   data.append('file', JSON.stringify(jsonfile), 'userIDblob');
   if (process.env.PINATA_API_KEY && process.env.PINATA_SECRET_API_KEY) {

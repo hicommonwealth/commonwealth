@@ -56,6 +56,7 @@ export default class extends IEventHandler {
         new providers.Web3Provider(provider)
       );
       await contractApi.deployed();
+      const beneficiary = await contractApi.beneficiary();
       const token = await contractApi.acceptedToken();
       const curator_fee = await contractApi.curatorFee();
       const threshold = await contractApi.threshold();
@@ -73,6 +74,7 @@ export default class extends IEventHandler {
         id: +index,
         entity_id: entityId,
         creator,
+        beneficiary,
         token,
         curator_fee,
         threshold: threshold.toString(),

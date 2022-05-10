@@ -19,6 +19,7 @@ export type ProjectAttributes = {
   ipfs_hash_id?: number;
 
   // populated from contract queries
+  beneficiary: string;
   token: string;
   curator_fee: string;
   threshold: string;
@@ -44,6 +45,7 @@ export default (
     creator: { type: dataTypes.STRING, allowNull: false },
     ipfs_hash_id: { type: dataTypes.INTEGER, allowNull: true },
 
+    beneficiary: { type: dataTypes.STRING, allowNull: false },
     token: { type: dataTypes.STRING, allowNull: false },
     curator_fee: { type: dataTypes.STRING, allowNull: false },
     threshold: { type: dataTypes.STRING, allowNull: false },
