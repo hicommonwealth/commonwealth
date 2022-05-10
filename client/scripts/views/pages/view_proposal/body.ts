@@ -722,7 +722,7 @@ export const ProposalBodyText: m.Component<
   {
     item: AnyProposal | OffchainThread | OffchainComment<any>;
   },
-  { collapsed: boolean; isLargeTextBlock: boolean; body: any }
+  { collapsed: boolean; body: any }
 > = {
   oninit: (vnode) => {
     vnode.state.collapsed = false;
@@ -742,12 +742,10 @@ export const ProposalBodyText: m.Component<
       const doc = JSON.parse(body);
       if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
         vnode.state.collapsed = true;
-        vnode.state.isLargeTextBlock = true;
       }
     } catch (e) {
       if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
         vnode.state.collapsed = true;
-        vnode.state.isLargeTextBlock = true;
       }
     }
   },
@@ -801,28 +799,13 @@ export const ProposalBodyText: m.Component<
                 ? QUILL_PROPOSAL_LINES_CUTOFF_LENGTH
                 : doc.ops.length,
             }),
-            vnode.state.isLargeTextBlock &&
-              (vnode.state.collapsed
-                ? m('.show-more-button', [
-                    m(CWButton, {
-                      buttonType: 'secondary',
-                      label: m('.show-more-button-label', [
-                        'Show More',
-                        m(CWIcon, { iconName: 'chevronDown' }),
-                      ]),
-                      onclick: toggleDisplay,
-                    }),
-                  ])
-                : m('.show-more-button-displayed', [
-                    m(CWButton, {
-                      buttonType: 'secondary',
-                      label: m('.show-more-button-label', [
-                        'Show Less',
-                        m(CWIcon, { iconName: 'chevronUp' }),
-                      ]),
-                      onclick: toggleDisplay,
-                    }),
-                  ])),
+            vnode.state.collapsed &&
+              m('.show-more-button-wrapper', [
+                m('.show-more-button', { onclick: toggleDisplay }, [
+                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
+                  m('.show-more-text', ['Show More']),
+                ]),
+              ]),
           ]);
         } catch (e) {
           if (body.toString().trim() === '') {
@@ -835,28 +818,13 @@ export const ProposalBodyText: m.Component<
                 ? MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
                 : countLinesMarkdown(body),
             }),
-            vnode.state.isLargeTextBlock &&
-              (vnode.state.collapsed
-                ? m('.show-more-button', [
-                    m(CWButton, {
-                      buttonType: 'secondary',
-                      label: m('.show-more-button-label', [
-                        'Show More',
-                        m(CWIcon, { iconName: 'chevronDown' }),
-                      ]),
-                      onclick: toggleDisplay,
-                    }),
-                  ])
-                : m('.show-more-button-displayed', [
-                    m(CWButton, {
-                      buttonType: 'secondary',
-                      label: m('.show-more-button-label', [
-                        'Show Less',
-                        m(CWIcon, { iconName: 'chevronUp' }),
-                      ]),
-                      onclick: toggleDisplay,
-                    }),
-                  ])),
+            vnode.state.collapsed &&
+              m('.show-more-button-wrapper', [
+                m('.show-more-button', { onclick: toggleDisplay }, [
+                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
+                  m('.show-more-text', ['Show More']),
+                ]),
+              ]),
           ]);
         }
       })()
