@@ -1,7 +1,6 @@
 @import 'shared';
-@import 'cw_checkbox.scss';
 
-@mixin radioSelected($color) {
+@mixin radioCore($color) {
   display: grid;
   place-content: center;
 
@@ -32,18 +31,18 @@
   }
 
   &:hover .radio-control {
-    @include radioSelected($primary-200);
+    @include radioCore($primary-200);
     @include hoverColors;
   }
 
   &.checked .radio-control {
-    @include radioSelected($primary-500);
+    @include radioCore($primary-500);
     @include checkedColors;
   }
 
   &.disabled .radio-control {
     // same color as background, so it's invisble on hover
-    @include radioSelected($neutral-200);
+    @include radioCore($neutral-200);
     @include disabledColors;
 
     pointer-events: none;
