@@ -1,12 +1,18 @@
 @import 'shared';
+@import 'cw_checkbox.scss';
 
-@mixin radioButtonCore($color) {
-  background: radial-gradient(
-    $color 0%,
-    $color 50%,
-    transparent 50%,
-    transparent
-  );
+@mixin radioSelected($color) {
+  display: grid;
+  place-content: center;
+
+  &::after {
+    color: $color;
+    content: '';
+    width: 6px;
+    height: 6px;
+    box-shadow: inset 12px 12px;
+    clip-path: circle(50%);
+  }
 }
 
 .RadioButton {
@@ -28,33 +34,24 @@
     height: 12px;
     margin: auto 8px;
     position: relative;
-    transition: all ease 150ms;
     width: 12px;
   }
 
   &:hover .radio-control {
-    @include radioButtonCore($primary-100);
-
-    border-color: $primary-300;
+    @include radioSelected($primary-200);
+    @include hoverColors;
   }
 
   &.checked .radio-control {
-    @include radioButtonCore($primary-500);
-
-    border-color: $primary-500;
-
-    &:hover {
-      @include radioButtonCore($primary-600);
-    }
+    @include radioSelected($primary-500);
+    @include checkedColors;
   }
 
   &.disabled .radio-control {
-    @include radioButtonCore($neutral-200);
+    // same color as background, so it's invisble on hover
+    @include radioSelected($neutral-200);
+    @include disabledColors;
 
     pointer-events: none;
-  }
-
-  &.disabled:hover .radio-control {
-    border-color: $neutral-300;
   }
 }

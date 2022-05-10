@@ -76,6 +76,7 @@ export class ComponentShowcase implements m.ClassComponent {
             this.checkboxChecked = !this.checkboxChecked;
           }}
         />
+        <CWCheckbox label="Disabled" disabled={true} />
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
