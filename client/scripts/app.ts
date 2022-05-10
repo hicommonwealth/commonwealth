@@ -664,25 +664,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
-            '/dashboard/': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/dashboard/for-you': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/dashboard/global': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/dashboard/chain-events': importRoute(
-              'views/pages/user_dashboard',
-              {
-                scoped: false,
-                deferChain: true,
-              }
-            ),
             // Notifications
             '/notification-settings': importRoute(
               'views/pages/notification_settings',
@@ -818,16 +799,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
 
             // Redirects
-            '/:scope/dashboard': redirectRoute(() => '/dashboard'),
-            '/:scope/dashboard/for-you': redirectRoute(
-              () => '/dashboard/for-you'
-            ),
-            '/:scope/dashboard/global': redirectRoute(
-              () => '/dashboard/global'
-            ),
-            '/:scope/dashboard/chain-events': redirectRoute(
-              () => '/dashboard/chain-events'
-            ),
+            '/:scope/dashboard': redirectRoute(() => '/'),
             '/:scope/notifications': redirectRoute(() => '/notifications'),
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
@@ -924,21 +896,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
-            '/dashboard/for-you': importRoute('views/pages/user_dashboard', {
+            '/dashboard/:type': importRoute('views/pages/user_dashboard', {
               scoped: false,
               deferChain: true,
             }),
-            '/dashboard/global': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/dashboard/chain-events': importRoute(
-              'views/pages/user_dashboard',
-              {
-                scoped: false,
-                deferChain: true,
-              }
-            ),
             // Scoped routes
             //
 

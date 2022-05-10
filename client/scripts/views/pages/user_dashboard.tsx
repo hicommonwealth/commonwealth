@@ -39,7 +39,7 @@ const notificationsRemaining = (contentLength, count) => {
   return contentLength >= 10 && count < contentLength;
 };
 
-class UserDashboard implements m.ClassComponent {
+class UserDashboard implements m.ClassComponent<{ type: string }> {
   private activePage: DashboardViews;
   private chainEventCount: number;
   private chainEvents: DashboardActivityNotification[];
@@ -98,7 +98,7 @@ class UserDashboard implements m.ClassComponent {
     this.chainEvents = [];
   }
 
-  view() {
+  view(vnode) {
     const {
       activePage,
       fyNotifications,
@@ -108,13 +108,14 @@ class UserDashboard implements m.ClassComponent {
     } = this;
     // Load activity
     const loggedIn = app.loginState === LoginState.LoggedIn;
-    const subpage: DashboardViews = m.route.get().includes('chain-events')
-      ? DashboardViews.Chain
-      : m.route.get().includes('global')
-      ? DashboardViews.Global
-      : loggedIn
-      ? DashboardViews.ForYou
-      : DashboardViews.Global;
+    const subpage: DashboardViews =
+      vnode.attrs.type === 'chain-events'
+        ? DashboardViews.Chain
+        : vnode.attrs.type === 'global'
+        ? DashboardViews.Global
+        : loggedIn
+        ? DashboardViews.ForYou
+        : DashboardViews.Global;
     if (!this.activePage || this.activePage !== subpage) {
       this.activePage = subpage;
       this.handleToggle();
