@@ -22,19 +22,13 @@
   position: relative;
 
   .radio-input {
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
+    @include hideInput;
   }
 
   .radio-control {
+    @include controlStyles;
+
     border-radius: $border-radius-round;
-    border: 2px solid $neutral-300;
-    cursor: pointer;
-    height: 12px;
-    margin: auto 8px;
-    position: relative;
-    width: 12px;
   }
 
   &:hover .radio-control {

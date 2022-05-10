@@ -16,6 +16,21 @@
   }
 }
 
+@mixin hideInput {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+@mixin controlStyles {
+  border: 2px solid $neutral-300;
+  cursor: pointer;
+  height: 12px;
+  margin: auto 8px;
+  position: relative;
+  width: 12px;
+}
+
 @mixin hoverColors {
   background-color: $primary-50;
   border-color: $primary-300;
@@ -47,19 +62,13 @@
   position: relative;
 
   .checkbox-input {
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
+    @include hideInput;
   }
 
   .checkbox-control {
+    @include controlStyles;
+
     border-radius: $border-radius-checkbox;
-    border: 2px solid $neutral-300;
-    cursor: pointer;
-    height: 12px;
-    margin: auto 8px;
-    position: relative;
-    width: 12px;
   }
 
   &:hover .checkbox-control {
