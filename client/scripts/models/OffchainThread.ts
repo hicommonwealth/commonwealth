@@ -11,6 +11,7 @@ import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
 import { ChainEntity } from '.';
+import AddressInfo from './AddressInfo';
 
 // field names copied from snapshot
 interface IOffchainVotingOptions {
@@ -57,6 +58,7 @@ class OffchainThread implements IUniqueId {
   public readonly lastEdited: moment.Moment;
   public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
+  public readonly addressInfo: AddressInfo;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -155,6 +157,7 @@ class OffchainThread implements IUniqueId {
     offchainVotes,
     lastCommentedOn,
     linkedThreads,
+    address,
   }: {
     author: string;
     title: string;
@@ -184,6 +187,7 @@ class OffchainThread implements IUniqueId {
     offchainVotingNumVotes?: number;
     offchainVotes?: OffchainVote[];
     linkedThreads: LinkedThreadRelation[];
+    address: {};
   }) {
     this.author = author;
     this.title = title;
@@ -229,7 +233,60 @@ class OffchainThread implements IUniqueId {
     this.offchainVotes = offchainVotes || [];
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
+    this.addressInfo = new AddressInfo(
+      address.id, 
+      address.address, 
+      address.chain, 
+      address.keytype, 
+      address.wallet_id, 
+      address.ghost_address
+    )
   }
+
+  public static fromJSON({
+    title,
+    body,
+    created_at,
+    updated_at,
+    chain,
+    pinned,
+    kind,
+    url,
+    version_history,
+    read_only,
+    plaintext,
+    stage,
+    offchain_voting_ends_at,
+    offchain_voting_votes,
+    offchain_voting_options,
+    snapshot_proposal,
+    offchain_voting_enabled,
+    last_commented_on,
+    Address,
+  }) {
+    return new OffchainThread({
+      title,
+      createdAt: created_at,
+      kind,
+      stage,
+      versionHistory: version_history,
+      chain,
+      readOnly: read_only,
+      body,
+      plaintext,
+      url,
+      pinned,
+      lastEdited: updated_at,
+      snapshotProposal: snapshot_proposal,
+      offchainVotingEnabled: offchain_voting_enabled,
+      offchainVotingOptions: offchain_voting_options,
+      offchainVotingEndsAt: offchain_voting_ends_at,
+      offchainVotingNumVotes: offchain_voting_votes,
+      lastCommentedOn: last_commented_on,
+      address: Address,
+    })  
+  }
+
 }
 
 export default OffchainThread;

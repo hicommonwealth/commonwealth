@@ -58,7 +58,7 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
             <p> Commented in <span className="heavy"> { comment.chain } </span> </p>
           </div>
           <div className="comment-date">
-            <p> { transformTimestamp(comment.created_at) } </p> 
+            <p> { transformTimestamp(comment.createdAt) } </p> 
           </div>
           <div className="comment-text">
             <p> 
@@ -77,7 +77,7 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
   if (option === ProfileActivity.Threads) {  
     return attrs.threads?.map(thread => {
 
-      if (shouldFilterAddresses && !(thread.Address.address in state.addressFilters))
+      if (shouldFilterAddresses && !(thread.addressInfo.address in state.addressFilters))
         return <div />
 
       if (shouldFilterCommunities && !(thread.chain in state.communityFilters)) 
@@ -92,7 +92,7 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
             <p> Thread in <span className="heavy"> { thread.chain } </span> </p>
           </div>
           <div className="thread-date"> 
-            <p> { transformTimestamp(thread.created_at) } </p> 
+            <p> { transformTimestamp(thread.createdAt) } </p> 
           </div>
           <div className="thread-title">
             <p> { thread.title } </p> 

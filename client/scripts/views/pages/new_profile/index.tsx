@@ -69,11 +69,11 @@ class NewProfile implements m.Component<{}, ProfileState> {
     vnode.state.loading = false
 
     vnode.state.profile = Profile.fromJSON(response.profile)    
-    vnode.state.threads = response.threads
+    vnode.state.threads = response.threads.map(t => OffchainThread.fromJSON(t))
     vnode.state.comments = response.comments.map(c => OffchainComment.fromJSON(c))
     vnode.state.chains = response.chains.map(c => ChainInfo.fromJSON(c))
     vnode.state.addresses = response.addresses.map(a => 
-      new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic, a.ghost_address))
+      new AddressInfo(a.id, a.address, a.chain, a.keytype, a.wallet_id, a.ghost_address))
     vnode.state.socialAccounts = response.socialAccounts.map(a => 
       new SocialAccount(a.provider, a.provider_username))
     m.redraw()
