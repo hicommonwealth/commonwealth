@@ -68,15 +68,6 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        <h1>Checkbox</h1>
-        <CWCheckbox
-          checked={this.checkboxChecked === true}
-          label="Click me"
-          onchange={() => {
-            this.checkboxChecked = !this.checkboxChecked;
-          }}
-        />
-        <CWCheckbox label="Disabled" disabled={true} />
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
@@ -292,7 +283,7 @@ export class ComponentShowcase implements m.ClassComponent {
           />
         </div>
         <h1>Radio Button</h1>
-        <div class="radio-button-gallery">
+        <div class="choice-gallery">
           <CWRadioButton
             value="Radio Button"
             label="Radio Button"
@@ -315,6 +306,17 @@ export class ComponentShowcase implements m.ClassComponent {
             name="RadioGroup"
             onchange={(e) => notifySuccess(`"${e.target.value}" selected`)}
           />
+        </div>
+        <h1>Checkbox</h1>
+        <div class="choice-gallery">
+          <CWCheckbox
+            checked={this.checkboxChecked === true}
+            label="Click me"
+            onchange={() => {
+              this.checkboxChecked = !this.checkboxChecked;
+            }}
+          />
+          <CWCheckbox label="Disabled" disabled={true} />
         </div>
         <h1>Engagement Buttons</h1>
         <div class="button-gallery">
