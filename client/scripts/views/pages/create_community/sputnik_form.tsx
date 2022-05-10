@@ -15,6 +15,12 @@ import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityCreationPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { CommunityType } from '.';
 
 type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 
@@ -46,6 +52,12 @@ export class SputnikForm implements m.ClassComponent {
           defaultValue={this.state.form.isMainnet}
           onToggle={(checked) => {
             vnode.state.isMainnet = checked;
+            mixpanelBrowserTrack({
+              event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
+              chainBase: ChainBase.CosmosSDK,
+              isCustomDomain: app.isCustomDomain(),
+              communityType: CommunityType.SputnikDao,
+            });
           }}
           label={(checked) => {
             if (checked !== this.state.form.isMainnet) {
@@ -87,6 +99,12 @@ export class SputnikForm implements m.ClassComponent {
               type: ChainType.DAO,
               ...this.state.form,
             };
+            mixpanelBrowserTrack({
+              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+              chainBase: null,
+              isCustomDomain: app.isCustomDomain(),
+              communityType: null,
+            });
 
             try {
               // Gabe 2/14/22 Commenting this bit out because it isn't actually used, but maybe it will be someday?

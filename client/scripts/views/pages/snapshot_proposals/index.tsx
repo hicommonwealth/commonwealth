@@ -13,6 +13,8 @@ import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
 import { CardsCollection } from '../../components/cards_collection';
+import { MixpanelSnapshotEvents } from 'analytics/types';
+import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -63,6 +65,13 @@ class SnapshotProposalsPage
   implements m.ClassComponent<{ topic?: string; snapshotId: string }>
 {
   private selectedFilter: SnapshotProposalFilter;
+
+  oncreate() {
+    mixpanelBrowserTrack({
+      event: MixpanelSnapshotEvents.SNAPSHOT_PAGE_VISIT,
+      isCustomDomain: app.isCustomDomain(),
+    });
+  }
 
   oninit() {
     this.selectedFilter = SnapshotProposalFilter.Active;

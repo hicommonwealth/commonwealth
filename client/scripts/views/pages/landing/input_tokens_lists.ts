@@ -2,18 +2,18 @@ import { Spinner } from 'construct-ui';
 import m from 'mithril';
 import InputTokenOptionComponent from './input_token_option';
 import { Chain, Token } from './index';
+import { placeholderChain } from './tokens_community_hero';
 
 interface IAttrs {
-  optionList: (Token | Chain)[];
+  optionList: (Token | Chain | typeof placeholderChain)[];
   maxOptions: number;
   inputValue: string;
-  stillLoadingTokens: boolean;
   refilterResults: boolean;
 }
 
 const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> = {
   view: (vnode) => {
-    const { optionList, refilterResults, inputValue, stillLoadingTokens } = vnode.attrs;
+    const { optionList, refilterResults, inputValue } = vnode.attrs;
     if (inputValue.length < 3) return;
     const { oldValue } = vnode.state;
     const chainNameInputValue = inputValue.toLowerCase();
@@ -67,9 +67,7 @@ const InputTokenList: m.Component<IAttrs, { options: any[], oldValue: string }> 
       class: 'absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10',
       id: 'tokens-list',
       style: 'overflow-y: scroll; max-height: 16rem;'
-    }, stillLoadingTokens
-      ? [ m(Spinner, { active: true }) ]
-      : vnode.state.options.slice(0, vnode.attrs.maxOptions).map(renderResults));
+    }, vnode.state.options.slice(0, vnode.attrs.maxOptions).map(renderResults));
   },
 };
 

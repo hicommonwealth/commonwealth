@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import {
   PopoverMenu,
   MenuDivider,
@@ -69,10 +68,6 @@ import { modelFromServer as modelReactionCountFromServer } from 'controllers/ser
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import OffchainPoll from 'client/scripts/models/OffchainPoll';
 import {
-  ProposalHeaderExternalLink,
-  ProposalHeaderBlockExplorerLink,
-  ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderThreadLink,
   ProposalHeaderTopics,
   ProposalHeaderTitle,
   ProposalHeaderStage,
@@ -121,6 +116,12 @@ import { CommentReactionButton } from '../../components/reaction_button/comment_
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ProposalPoll } from './poll';
 import { CWButton } from '../../components/component_kit/cw_button';
+import {
+  ProposalHeaderExternalLink,
+  ProposalHeaderThreadLink,
+  ProposalHeaderBlockExplorerLink,
+  ProposalHeaderVotingInterfaceLink,
+} from './proposal_header_links';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -436,12 +437,12 @@ const ProposalHeader: m.Component<
             m('.proposal-body-link', [
               proposal instanceof OffchainThread &&
                 proposal.kind === OffchainThreadKind.Link && [
-                  !vnode.state.editing
-                    ? m(ProposalHeaderExternalLink, { proposal })
-                    : m(ProposalLinkEditor, {
+                  vnode.state.editing
+                    ? m(ProposalLinkEditor, {
                         item: proposal,
                         parentState: vnode.state,
-                      }),
+                      })
+                    : m(ProposalHeaderExternalLink, { proposal }),
                 ],
               !(proposal instanceof OffchainThread) &&
                 (proposal['blockExplorerLink'] ||
@@ -838,13 +839,7 @@ const ViewProposalPage: m.Component<
 > = {
   oncreate: (vnode) => {
     // writes type field if accessed as /proposal/XXX (shortcut for non-substrate chains)
-    mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
-    mixpanel.track('Proposal Funnel', {
-      'Step No': 1,
-      Step: 'Viewing Proposal',
-      'Proposal Name': `${vnode.attrs.type}: ${vnode.attrs.identifier}`,
-      Scope: app.activeChainId(),
-    });
+
     if (!vnode.state.editing) {
       vnode.state.editing = false;
     }
