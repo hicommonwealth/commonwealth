@@ -1,16 +1,21 @@
 import m from 'mithril';
-import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { ALL_RESULTS_QUERY } from 'controllers/server/search';
-import { SearchScope } from 'models/SearchQuery';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
 import 'pages/landing/tokens_community_hero.scss';
 import { Chain, Token } from './index';
 
+export const placeholderChain = {
+  img: 'static/img/add.svg',
+  id: 'placeholder',
+  chainInfo: { symbol: 'PLACEHOLDER' },
+  name: 'Add your token!',
+  placeholder: true,
+}
+
 interface IState {
-  chainsAndTokens: (Chain | Token)[];
+  chainsAndTokens: (Chain | Token | typeof placeholderChain)[];
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
   inputTimeout: any;
@@ -32,35 +37,22 @@ const initiateFullSearch = (searchTerm) => {
   if (searchTerm.length < 3) {
     notifyError('Query must be at least 3 characters');
   }
-  const params = `q=${encodeURIComponent(searchTerm.toString().trim())}`;
+  const params = `q=${encodeURIComponent(searchTerm.toString().trim())}&scope[]=Communities`;
   m.route.set(`/search?${params}`);
 };
 
 const TokensCommunityComponent: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
-    app.search.initialize();
     vnode.state.hiddenInputTokenList = true;
     vnode.state.inputTokenValue = '';
     vnode.state.refilterResults = true;
     vnode.state.chainsAndTokens = [];
   },
   view: (vnode) => {
-    const stillLoadingTokens = !app.search.getByQuery(ALL_RESULTS_QUERY).loaded;
-    if (!stillLoadingTokens) {
-      vnode.state.chainsAndTokens = [
-        {
-          img: 'static/img/add.svg',
-          id: 'placeholder',
-          chainInfo: { symbol: 'PLACEHOLDER' },
-          name: 'Add your token!',
-          placeholder: true,
-        },
-        ...vnode.attrs.chains,
-        ...app.search.getByQuery(ALL_RESULTS_QUERY).results[
-          SearchScope.Communities
-        ],
-      ];
-    }
+    vnode.state.chainsAndTokens = [
+      placeholderChain,
+      ...vnode.attrs.chains,
+    ];
     const mappedCommunities = [
       {
         variant: `absolute object-top transform sm:translate-x-16 md:translate-x-64
@@ -159,7 +151,6 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                           optionList: vnode.state.chainsAndTokens,
                           inputValue: vnode.state.inputTokenValue,
                           maxOptions: 20,
-                          stillLoadingTokens,
                           refilterResults: vnode.state.refilterResults,
                         }),
                       m(

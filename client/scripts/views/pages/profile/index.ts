@@ -2,7 +2,6 @@ import 'pages/profile.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import bs58 from 'bs58';
@@ -331,9 +330,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       }
     }
   },
-  oncreate: async (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
-  },
+  oncreate: async (vnode) => {},
   view: (vnode) => {
     const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;

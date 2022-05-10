@@ -57,7 +57,6 @@ const status = async (
       count: number;
     };
     if (!user) {
-      const threadCount = {};
       const threadCountQueryData: ThreadCountQueryData[] =
         await models.sequelize.query(
           `
@@ -70,8 +69,6 @@ const status = async (
         `,
           { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
         );
-      // eslint-disable-next-line no-return-assign
-      threadCountQueryData.forEach((ct) => (threadCount[ct.concat] = ct.count));
 
       return res.json({
         chains,
@@ -80,7 +77,7 @@ const status = async (
         notificationCategories,
         chainCategories,
         chainCategoryTypes,
-        recentThreads: threadCount,
+        recentThreads: threadCountQueryData,
         loggedIn: false,
       });
     }
@@ -120,7 +117,6 @@ const status = async (
       include: [models.Address, models.OffchainAttachment],
     });
 
-    const threadCount = {};
     const threadCountQueryData: ThreadCountQueryData[] =
       await models.sequelize.query(
         `
@@ -139,8 +135,6 @@ const status = async (
           type: QueryTypes.SELECT,
         }
       );
-    // eslint-disable-next-line no-return-assign
-    threadCountQueryData.forEach((ct) => (threadCount[ct.concat] = ct.count));
 
     // get starred communities for user
     const starredCommunities = await models.StarredCommunity.findAll({
@@ -204,7 +198,7 @@ const status = async (
       notificationCategories,
       chainCategories,
       chainCategoryTypes,
-      recentThreads: threadCount,
+      recentThreads: threadCountQueryData,
       roles,
       invites,
       loggedIn: true,

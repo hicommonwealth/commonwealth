@@ -3,7 +3,6 @@
 import 'pages/landing/privacyAndTerms.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { renderMultilineText } from 'helpers';
 import HeaderLandingPage from './landing_page_header';
 
@@ -115,23 +114,19 @@ If you have any questions about this Privacy Statement, please contact us at: he
 `;
 
 const PrivacyPage: m.Component<{}> = {
-  oncreate: (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'PrivacyPage' });
-  },
+  oncreate: (vnode) => {},
   view: (vnode) => {
     return m('.PrivacyPage', [
       m(HeaderLandingPage, {
         scrollHeader: false,
-        navs: [
-          { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-        ],
+        navs: [{ text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' }],
       }),
       m('.forum-container', [
         m('h1.page-title', 'Privacy Policy'),
         renderMultilineText(PrivacyPolicy),
       ]),
     ]);
-  }
+  },
 };
 
 export default PrivacyPage;

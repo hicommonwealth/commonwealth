@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { Button, Tag } from 'construct-ui';
 import BN from 'bn.js';
 
@@ -135,8 +134,7 @@ function getModules(): ProposalModule<any, any, any>[] {
 }
 
 const ProposalsPage: m.Component<{}> = {
-  oncreate: () => {
-    mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
+  oncreate: (vnode) => {
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');
     if (
