@@ -16,6 +16,22 @@
   }
 }
 
+@mixin indeterminate($color) {
+  display: grid;
+  place-content: center;
+
+  &::after {
+    color: $color;
+    content: '';
+    width: 8px;
+    height: 6px;
+    box-shadow: inset 12px 12px;
+    clip-path: path(
+      'M7.426.387a.5.5 0 010 .686l-4.279 4.54a.5.5 0 01-.727 0L.573 3.656a.5.5 0 01.729-.687L2.42 4.154a.5.5 0 00.727 0L6.698.386a.5.5 0 01.728 0z'
+    );
+  }
+}
+
 .Checkbox {
   align-items: center;
   display: flex;
@@ -48,5 +64,9 @@
     @include disabledColors;
 
     pointer-events: none;
+  }
+
+  &.indeterminate .checkbox-control {
+    @include indeterminate($neutral-200);
   }
 }

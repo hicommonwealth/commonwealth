@@ -16,7 +16,7 @@ import { CWTextInput, ValidationStatus } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
-import { CWRadioButton, RadioButton } from './cw_radio_button';
+import { CWRadioButton } from './cw_radio_button';
 import { CWCheckbox } from './cw_checkbox';
 
 // const displayColors = (hexList) => {
@@ -324,6 +324,7 @@ export class ComponentShowcase implements m.ClassComponent {
               this.checkboxChecked = !this.checkboxChecked;
             }}
           />
+          <CWCheckbox label="Indeterminate" indeterminate={true} />
           <CWCheckbox label="Disabled" disabled={true} />
         </div>
         <h1>Engagement Buttons</h1>

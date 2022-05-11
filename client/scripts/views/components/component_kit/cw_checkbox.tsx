@@ -8,28 +8,33 @@ import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
+type Checkbox = { label?: string; value: string };
+
 type CheckboxStyleAttrs = {
-  disabled?: boolean;
   checked: boolean;
+  disabled?: boolean;
+  indeterminate?: boolean;
 };
 
 type CheckboxAttrs = {
   groupName: string;
-  label?: string;
   onchange: (e?: any) => void;
-  value: string;
-} & CheckboxStyleAttrs;
+} & Checkbox &
+  CheckboxStyleAttrs;
 
 export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
   view(vnode) {
     const {
       disabled = false,
       groupName,
+      indeterminate = false,
       label,
       onchange,
       checked,
       value,
     } = vnode.attrs;
+
+    console.log(this);
 
     const params = {
       disabled,
@@ -40,12 +45,15 @@ export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
       value,
     };
 
+    // console.log(this);
+
     return (
       <label
         class={getClasses<CheckboxStyleAttrs>(
           {
             checked,
             disabled,
+            indeterminate,
           },
           ComponentType.Checkbox
         )}
