@@ -8,7 +8,7 @@
     justify-content: center;
   }
 
-  .chain-icon .no-image {
+  .chain-icon.no-image {
     align-items: center;
     background: $neutral-800;
     border-radius: 1000px;
@@ -19,9 +19,6 @@
       color: $white;
       font-size: 16px;
       font-weight: 500;
-      position: relative;
-      text-align: center;
-      top: 0.19em;
     }
   }
 
@@ -37,7 +34,7 @@
     display: flex;
   }
 
-  .token-icon .no-image {
+  .token-icon.no-image {
     align-items: center;
     background: $neutral-800;
     border-radius: 1000px;
@@ -48,9 +45,6 @@
       color: $white;
       font-size: 16px;
       font-weight: 500;
-      position: relative;
-      text-align: center;
-      top: 0.19em;
     }
   }
 
