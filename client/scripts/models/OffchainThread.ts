@@ -234,12 +234,12 @@ class OffchainThread implements IUniqueId {
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
     this.addressInfo = new AddressInfo(
-      address.id, 
-      address.address, 
-      address.chain, 
-      address.keytype, 
-      address.wallet_id, 
-      address.ghost_address
+      address?.id, 
+      address?.address, 
+      address?.chain, 
+      address?.keytype, 
+      address?.wallet_id, 
+      address?.ghost_address
     )
   }
 

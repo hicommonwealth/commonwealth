@@ -248,7 +248,6 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
                       vnode.state.imageUploading = false
                       files.forEach((f) => {
                         if (!f.uploadURL) return;
-                        console.log(f)
                         const url = f.uploadURL.replace(/\?.*/, '').trim();  // edit_profile_modal.ts L31
                         vnode.state.profileUpdate.avatarUrl = url
                       });

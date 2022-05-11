@@ -58,12 +58,12 @@ class OffchainComment<T extends IUniqueId> {
     this.lastEdited = lastEdited;
     this.deleted = deleted;
     this.addressInfo = new AddressInfo(
-      address.id, 
-      address.address, 
-      address.chain, 
-      address.keytype, 
-      address.wallet_id, 
-      address.ghost_address
+      address?.id, 
+      address?.address, 
+      address?.chain, 
+      address?.keytype, 
+      address?.wallet_id, 
+      address?.ghost_address
     );
   }
 
