@@ -20,7 +20,7 @@ type ProfileActivityAttrs = {
 };
 
 enum ProfileActivity {
-  All,
+  Comments,
   Threads,
 }
 
@@ -43,13 +43,13 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
   const shouldFilterCommunities = Object.keys(state.communityFilters).length > 0
   const shouldFilterAddresses = Object.keys(state.addressFilters).length > 0
 
-  if (option === ProfileActivity.All) {
-    return attrs.comments?.map(comment => {
-
-      if (shouldFilterCommunities && !(comment.chain in state.communityFilters)) 
-        return <div />
-
-      return (
+  if (option === ProfileActivity.Comments) {
+    return attrs.comments?.filter(comment => 
+      // Filter communities
+      (!shouldFilterCommunities || comment.chain in state.communityFilters) &&
+      // Filter addresses
+      (!shouldFilterAddresses || comment.addressInfo.address in state.addressFilters)
+    ).map(comment => 
         <div className="activity">
           <div className="comment-icon">
             <CWIcon iconName="feedback" iconSize="small" />
@@ -71,19 +71,15 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
           </div>
         </div>
       )
-    })
   }
 
   if (option === ProfileActivity.Threads) {  
-    return attrs.threads?.map(thread => {
-
-      if (shouldFilterAddresses && !(thread.addressInfo.address in state.addressFilters))
-        return <div />
-
-      if (shouldFilterCommunities && !(thread.chain in state.communityFilters)) 
-        return <div />
-
-      return (
+    return attrs.threads?.filter(thread => 
+      // Filter communities
+      (!shouldFilterAddresses || thread.addressInfo.address in state.addressFilters) &&
+      // Filter addresses  
+      (!shouldFilterCommunities || thread.chain in state.communityFilters)
+    ).map(thread => 
         <div className="activity"> 
           <div className="comment-icon">
             <CWIcon iconName="feedback" iconSize="small" />
@@ -107,9 +103,9 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
             </p>
           </div>
         </div>
-      )
-    })
+    )
   }
+  
 }
 
 const handleCommunityFilter = (chain: string, state: ProfileActivityState) => {
@@ -138,7 +134,7 @@ const transformTimestamp = (timestamp) => {
 class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileActivityState> {
 
   oninit(vnode) {
-    vnode.state.selectedActivity = ProfileActivity.All;
+    vnode.state.selectedActivity = ProfileActivity.Comments;
     vnode.state.isCommunitiesOpen = false;
     vnode.state.isAddressesOpen = false;
     vnode.state.communityFilters = {};
@@ -156,11 +152,11 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
     return(
       <div className="ProfileActivity">
         <div className="activity-nav">
-          <div className={vnode.state.selectedActivity == ProfileActivity.All ? 
+          <div className={vnode.state.selectedActivity == ProfileActivity.Comments ? 
               "activity-nav-option selected" : "activity-nav-option"} 
-            onclick={()=>{handleClick(ProfileActivity.All, vnode.state)}}
+            onclick={()=>{handleClick(ProfileActivity.Comments, vnode.state)}}
           >
-            <h4> All </h4>
+            <h4> Comments </h4>
             <div className="activity-count"> <p> { vnode.attrs.comments?.length } </p> </div>
           </div>
           <div className={vnode.state.selectedActivity == ProfileActivity.Threads ? 

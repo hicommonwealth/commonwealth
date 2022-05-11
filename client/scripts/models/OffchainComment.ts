@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { VersionHistory } from '../controllers/server/threads';
+import AddressInfo from './AddressInfo';
 import { IUniqueId } from './interfaces';
 import OffchainAttachment from './OffchainAttachment';
 
@@ -20,6 +21,7 @@ class OffchainComment<T extends IUniqueId> {
   public readonly versionHistory: VersionHistory[];
   public readonly lastEdited: moment.Moment;
   public readonly deleted: boolean;
+  public readonly addressInfo: AddressInfo;
 
   constructor({
     chain,
@@ -37,7 +39,8 @@ class OffchainComment<T extends IUniqueId> {
     community,
     authorChain,
     lastEdited, // moment.Moment
-    deleted
+    deleted, 
+    address
   }) {
     this.chain = chain;
     this.author = author;
@@ -54,6 +57,14 @@ class OffchainComment<T extends IUniqueId> {
     this.authorChain = authorChain;
     this.lastEdited = lastEdited;
     this.deleted = deleted;
+    this.addressInfo = new AddressInfo(
+      address.id, 
+      address.address, 
+      address.chain, 
+      address.keytype, 
+      address.wallet_id, 
+      address.ghost_address
+    );
   }
 
   public static fromJSON({
@@ -69,6 +80,7 @@ class OffchainComment<T extends IUniqueId> {
     root_id,
     plaintext,
     _search,
+    Address,
   }) {
     return new OffchainComment({
       id,
@@ -78,7 +90,8 @@ class OffchainComment<T extends IUniqueId> {
       plaintext: plaintext,
       createdAt: created_at,
       versionHistory: version_history,
-      lastEdited: updated_at
+      lastEdited: updated_at,
+      address: Address,
     })
   }
 

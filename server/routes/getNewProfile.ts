@@ -60,6 +60,7 @@ const getNewProfile = async (models: DB, req: Request, res: Response, next: Next
         [Op.in]: addressIds,  
       },  
     },
+    include: [ { model: models.Address, as: 'Address' } ],
   });
 
   const socialAccounts = await models.SocialAccount.findAll({
