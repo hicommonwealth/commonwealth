@@ -8,7 +8,7 @@ import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
-type RadioButton = { label?: string; value: string };
+export type RadioButton = { label?: string; value: string };
 
 type RadioButtonStyleAttrs = {
   disabled?: boolean;
