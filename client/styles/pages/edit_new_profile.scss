@@ -131,10 +131,6 @@
             margin: 0 20px;
             color: #999999;
           }
-
-          input[name="profile-image-form-field"] {
-            
-          }
         }
 
       }
@@ -145,6 +141,35 @@
 
       .title {
         margin-bottom: 24px;
+      }
+    }
+
+  }
+
+}
+
+@media only screen and (max-width: 768px) {
+
+  .EditProfilePage {
+
+    .edit-pane {
+      display: block;
+
+      .general-info {
+        margin-right: 0;
+
+        .profile-image-section {
+          .flex {
+            .TextInput {
+              width: 50%;
+            }
+          }
+        }
+
+      }
+
+      .social-links {
+        margin-top: 30px;
       }
     }
 

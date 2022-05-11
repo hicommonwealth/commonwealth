@@ -34,7 +34,7 @@ type ProfileActivityState = {
   threadCharLimit: number,
 }
 
-const handleClick = (option: ProfileActivity, state: ProfileActivityState) => {
+const handleActivityClick = (option: ProfileActivity, state: ProfileActivityState) => {
   state.selectedActivity = option
 }
 
@@ -141,27 +141,28 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
     vnode.state.addressFilters = {};
     vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 140;
     vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
-  }
 
-  view(vnode) {
+    // Handle text character limit
     window.addEventListener('resize', () => {
       vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 140;
       vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
-    }, { passive: true });
+    });
+  }
 
+  view(vnode) {
     return(
       <div className="ProfileActivity">
         <div className="activity-nav">
           <div className={vnode.state.selectedActivity == ProfileActivity.Comments ? 
               "activity-nav-option selected" : "activity-nav-option"} 
-            onclick={()=>{handleClick(ProfileActivity.Comments, vnode.state)}}
+            onclick={()=>{handleActivityClick(ProfileActivity.Comments, vnode.state)}}
           >
             <h4> Comments </h4>
             <div className="activity-count"> <p> { vnode.attrs.comments?.length } </p> </div>
           </div>
           <div className={vnode.state.selectedActivity == ProfileActivity.Threads ? 
               "activity-nav-option selected" : "activity-nav-option"}  
-            onclick={()=>{handleClick(ProfileActivity.Threads, vnode.state)}}
+            onclick={()=>{handleActivityClick(ProfileActivity.Threads, vnode.state)}}
           >
             <h4> Threads </h4>
             <div className="activity-count"> <p> { vnode.attrs.threads?.length } </p> </div>
