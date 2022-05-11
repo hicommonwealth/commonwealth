@@ -53,7 +53,7 @@ module.exports = {
       const ethNode = await queryInterface.sequelize.query(`
         SELECT url, alt_wallet_url, private_url FROM "ChainNodes" WHERE chain = 'ethereum'
       `, { transaction: t });
-      const { url, alt_wallet_url, private_url } = ethNode[0];
+      const { url, alt_wallet_url, private_url } = ethNode[0][0];
       await queryInterface.bulkInsert('ChainNodes', [{
         chain: 'common-protocol',
         url,
