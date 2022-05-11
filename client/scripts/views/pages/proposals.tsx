@@ -1,13 +1,12 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button, Tag } from 'construct-ui';
-import BN from 'bn.js';
+import mixpanel from 'mixpanel-browser';
+import { Tag } from 'construct-ui';
 
 import 'pages/proposals.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import { ChainBase, ChainNetwork } from 'types';
 import { ProposalModule } from 'models';
 
@@ -20,7 +19,6 @@ import Aave from 'controllers/chain/ethereum/aave/adapter';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card/proposal_card';
-import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 
 import { PageNotFound } from 'views/pages/404';
@@ -28,90 +26,12 @@ import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 import { CardsCollection } from '../components/cards_collection';
+import {
+  CompoundProposalStats,
+  SubstrateProposalStats,
+} from '../components/proposals/proposals_explainers';
 
-const SubstrateProposalStats: m.Component<{}, {}> = {
-  view: () => {
-    if (!app.chain) return;
-
-    return m('.stats-box', [
-      m('.stats-box-left', '💭'),
-      m('.stats-box-right', [
-        m('', [
-          m('strong', 'Democracy Proposals'),
-          m('span', [
-            ' can be introduced by anyone. ',
-            'At a regular interval, the top ranked proposal will become a supermajority-required referendum.',
-          ]),
-          m('p', [
-            m('strong', 'Council Motions'),
-            m('span', [
-              ' can be introduced by councillors. They can directly approve/reject treasury proposals, ',
-              'propose simple-majority referenda, or create fast-track referenda.',
-            ]),
-          ]),
-        ]),
-        m('', [
-          m('.stats-box-stat', [
-            'Next proposal or motion becomes a referendum: ',
-            (app.chain as Substrate).democracyProposals.nextLaunchBlock
-              ? m(CountdownUntilBlock, {
-                  block: (app.chain as Substrate).democracyProposals
-                    .nextLaunchBlock,
-                  includeSeconds: false,
-                })
-              : '--',
-          ]),
-        ]),
-      ]),
-    ]);
-  },
-};
-
-const CompoundProposalStats: m.Component<{}, {}> = {
-  view: () => {
-    if (!app.chain) return;
-    if (!(app.chain instanceof Compound)) return;
-
-    const symbol = app.chain.meta.chain.symbol;
-
-    return m('.stats-box', [
-      m('.stats-box-left', '💭'),
-      m('.stats-box-right', [
-        m('', [
-          m('strong', 'Compound Proposals'),
-          m('span', [
-            '', // TODO: fill in
-          ]),
-        ]),
-        m('', [
-          // TODO: We shouldn't be hardcoding these decimal amounts
-          m('.stats-box-stat', [
-            `Quorum: ${app.chain.governance?.quorumVotes
-              .div(new BN('1000000000000000000'))
-              .toString()} ${symbol}`,
-          ]),
-          app.chain.governance?.proposalThreshold &&
-            m('.stats-box-stat', [
-              `Proposal Threshold: ${app.chain.governance?.proposalThreshold
-                .div(new BN('1000000000000000000'))
-                .toString()} ${symbol}`,
-            ]),
-          m('.stats-box-stat', [
-            `Voting Period Length: ${app.chain.governance.votingPeriod.toString(
-              10
-            )}`,
-          ]),
-        ]),
-        m(Button, {
-          intent: 'primary',
-          onclick: () => navigateToSubpage('/new/proposal'),
-          label: 'New proposal',
-        }),
-      ]),
-    ]);
-  },
-};
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
@@ -149,41 +69,48 @@ const ProposalsPage: m.Component<{}> = {
       }, 100);
     }
   },
-  view: () => {
+
+  view() {
     if (!app.chain || !app.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut
       ) {
-        return m(ErrorPage, {
-          message: 'Could not connect to chain',
-          title: [
-            'Proposals',
-            m(Tag, {
-              size: 'xs',
-              label: 'Beta',
-              style: 'position: relative; top: -2px; margin-left: 6px',
-            }),
-          ],
-        });
+        return (
+          <ErrorPage
+            message="Could not connect to chain"
+            title={[
+              'Proposals',
+              <Tag
+                size="xs"
+                label="Beta"
+                style="position: relative; top: -2px; margin-left: 6px"
+              />,
+            ]}
+          />
+        );
       }
       if (app.chain?.failed)
-        return m(PageNotFound, {
-          title: 'Wrong Ethereum Provider Network!',
-          message: 'Change Metamask to point to Ethereum Mainnet',
-        });
-      return m(PageLoading, {
-        message: 'Connecting to chain',
-        title: [
-          'Proposals',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-        showNewProposalButton: true,
-      });
+        return (
+          <PageNotFound
+            title="Wrong Ethereum Provider Network!"
+            message="Change Metamask to point to Ethereum Mainnet"
+          />
+        );
+      return (
+        <PageLoading
+          message="Connecting to chain"
+          title={[
+            'Proposals',
+            <Tag
+              size="xs"
+              label="Beta"
+              style="position: relative; top: -2px; margin-left: 6px"
+            />,
+          ]}
+          showNewProposalButton={true}
+        />
+      );
     }
 
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
@@ -246,7 +173,7 @@ const ProposalsPage: m.Component<{}> = {
       !activeCompoundProposals?.length &&
       !activeAaveProposals?.length &&
       !activeSputnikProposals?.length
-        ? [m('.no-proposals', 'No active proposals')]
+        ? [<div class="no-proposals">No active proposals</div>]
         : [
             (activeDemocracyProposals || [])
               .map((proposal) => <ProposalCard proposal={proposal} />)
@@ -336,7 +263,7 @@ const ProposalsPage: m.Component<{}> = {
       !inactiveCompoundProposals?.length &&
       !inactiveAaveProposals?.length &&
       !inactiveSputnikProposals?.length
-        ? [m('.no-proposals', 'No past proposals')]
+        ? [<div class="no-proposals">No past proposals</div>]
         : [
             (inactiveDemocracyProposals || [])
               .map((proposal) => <ProposalCard proposal={proposal} />)
@@ -375,33 +302,36 @@ const ProposalsPage: m.Component<{}> = {
               ),
           ];
 
-    return m(
-      Sublayout,
-      {
-        title: [
+    return (
+      <Sublayout
+        title={[
           'Proposals',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-        showNewProposalButton: true,
-      },
-      m('.ProposalsPage', [
-        onSubstrate && m(SubstrateProposalStats),
-        onCompound && m(CompoundProposalStats),
-        m(CardsCollection, {
-          content: activeProposalContent,
-          header: 'Active',
-        }),
-        m(CardsCollection, {
-          content: inactiveProposalContent,
-          header: 'Inactive',
-        }),
-      ])
+          <Tag
+            size="xs"
+            label="Beta"
+            style="position: relative; top: -2px; margin-left: 6px"
+          />,
+        ]}
+        showNewProposalButton={true}
+      >
+        <div class="ProposalsPage">
+          {onSubstrate && (
+            <SubstrateProposalStats
+              nextLaunchBlock={
+                (app.chain as Substrate).democracyProposals.nextLaunchBlock
+              }
+            />
+          )}
+          {onCompound && <CompoundProposalStats chain={app.chain} />}
+          <CardsCollection content={activeProposalContent} header="Active" />
+          <CardsCollection
+            content={inactiveProposalContent}
+            header="Inactive"
+          />
+        </div>
+      </Sublayout>
     );
-  },
-};
+  }
+}
 
 export default ProposalsPage;
