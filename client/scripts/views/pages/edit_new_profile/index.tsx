@@ -191,8 +191,8 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
               <CWTextInput
                 name="email-form-field"
                 inputValidationFn={(val: string): [ValidationStatus, string] => {
-                  if (val.match(/\S+@\S+\.\S+/)) {
-                    return [ValidationStatus.Failure, 'Must enter characters A-Z'];
+                  if (!val.match(/\S+@\S+\.\S+/)) {
+                    return [ValidationStatus.Failure, 'Must enter valid email'];
                   } else {
                     return [ValidationStatus.Success, 'Input validated'];
                   }
@@ -259,8 +259,8 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
                   <CWTextInput
                     name="profile-image-form-field"
                     inputValidationFn={(val: string): [ValidationStatus, string] => {
-                      if (val.match(/[^A-Za-z@.0-9*#]/)) {
-                        return [ValidationStatus.Failure, 'Must enter characters A-Z'];
+                      if (!val.match(/\S+.\S+/)) {
+                        return [ValidationStatus.Failure, 'Must enter valid URL'];
                       } else {
                         return [ValidationStatus.Success, 'Input validated'];
                       }
@@ -284,8 +284,8 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
               <CWTextInput
                 name="website-form-field"
                 inputValidationFn={(val: string): [ValidationStatus, string] => {
-                  if (val.match(/[^A-Za-z0-9@.-]/)) {
-                    return [ValidationStatus.Failure, 'Must enter characters A-Z'];
+                  if (!val.match(/\S+.\S+/)) {
+                    return [ValidationStatus.Failure, 'Must enter valid website'];
                   } else {
                     return [ValidationStatus.Success, 'Input validated'];
                   }
