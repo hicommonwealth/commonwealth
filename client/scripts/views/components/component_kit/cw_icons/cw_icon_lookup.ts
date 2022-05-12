@@ -41,6 +41,7 @@ export const iconLookup = {
   infoEmpty: Icons.CWInfoEmpty,
   infoFilled: Icons.CWInfoFilled,
   jar: Icons.CWJar,
+  link: Icons.CWLink,
   lock: Icons.CWLock,
   logout: Icons.CWLogout,
   mail: Icons.CWMail,

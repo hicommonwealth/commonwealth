@@ -1,0 +1,25 @@
+@import 'shared';
+
+.AccountCreationButton {
+  align-items: center;
+  background-color: $primary-50;
+  border: 2px solid $primary-100;
+  border-radius: $border-radius-corners;
+  height: 152px;
+  justify-content: center;
+  padding: 24px 16px;
+  width: 152px;
+
+  .Icon {
+    margin-bottom: 16px;
+  }
+
+  &:hover {
+    background-color: $primary-100;
+  }
+
+  &:active {
+    background-color: $primary-200;
+    border: 2px solid $primary-300;
+  }
+}

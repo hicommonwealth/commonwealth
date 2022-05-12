@@ -18,6 +18,7 @@ import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
+import { CWAccountCreationButton } from './cw_account_creation_button';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -67,6 +68,19 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <div class="card-gallery">
+          <h1>Account Creation Button</h1>
+          <CWAccountCreationButton
+            onclick={() => notifySuccess('Account creation button clicked!')}
+          />
+        </div>
+        <div class="card-gallery">
+          <h1>Wallet Row Card</h1>
+          <CWWalletOptionRow
+            walletName="metamask"
+            onclick={() => notifySuccess('MetaMask clicked!')}
+          />
+        </div>
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
@@ -368,13 +382,6 @@ export class ComponentShowcase implements m.ClassComponent {
             <h4>Card title</h4>
             <div>Full width</div>
           </CWCard>
-        </div>
-        <div class="card-gallery">
-          <h1>Wallet Row Card</h1>
-          <CWWalletOptionRow
-            walletName="metamask"
-            onclick={() => notifySuccess('MetaMask clicked!')}
-          />
         </div>
         <h1>Form fields</h1>
         <div class="form-gallery">
