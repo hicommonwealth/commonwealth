@@ -14,6 +14,8 @@ import { notifyError } from 'controllers/app/notifications';
 
 import { formatNumberShort } from 'adapters/currency';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { MixpanelSnapshotEvents } from 'analytics/types';
+import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
 
 enum NewVoteErrors {
   SomethingWentWrong = 'Something went wrong!',
@@ -110,6 +112,11 @@ const ConfirmSnapshotVoteModal: m.Component<
                 castVote(author.address, votePayload).then(() => {
                   $(e.target).trigger('modalexit');
                   m.redraw();
+                });
+                mixpanelBrowserTrack({
+                  event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
+                  isCustomDomain: app.isCustomDomain(),
+                  space: app.snapshot.space.id,
                 });
               } catch (e) {
                 console.log(e);

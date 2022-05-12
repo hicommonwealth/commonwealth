@@ -1,5 +1,4 @@
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { WalletAccount, WalletConnection } from 'near-api-js';
 import { FunctionCallOptions } from 'near-api-js/lib/account';
 import BN from 'bn.js';
@@ -147,12 +146,7 @@ const validate = async (
 };
 
 const FinishNearLogin: m.Component<Record<string, never>, IState> = {
-  oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {
-      'Page Name': 'LoginPage',
-      Scope: app.activeChainId(),
-    });
-  },
+  oncreate: (vnode) => {},
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded || vnode.state.validating) {
       return m(PageLoading);

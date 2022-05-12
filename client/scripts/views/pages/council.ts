@@ -1,7 +1,6 @@
 import 'pages/council.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { Tag } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
@@ -103,12 +102,7 @@ function getModules() {
 }
 
 const CouncilPage: m.Component<{}> = {
-  oncreate: () => {
-    mixpanel.track('PageVisit', {
-      'Page Name': 'CouncilPage',
-      Scope: app.activeChainId(),
-    });
-  },
+  oncreate: () => {},
   view: () => {
     if (!app.chain || !app.chain.loaded) {
       if (

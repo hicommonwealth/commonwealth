@@ -3,7 +3,6 @@ import 'modals/confirm_invite_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
-import mixpanel from 'mixpanel-browser';
 import { Button } from 'construct-ui';
 
 import { orderAccountsByAddress } from 'helpers';
@@ -57,12 +56,7 @@ const ConfirmInviteModal: m.Component<
     vnode.state.accepted = [];
     vnode.state.rejected = [];
   },
-  oncreate: (vnode) => {
-    mixpanel.track('Accepting Invite', {
-      'Step No': 1,
-      Step: 'Modal Opened',
-    });
-  },
+  oncreate: (vnode) => {},
   view: (vnode) => {
     const SelectAddress = (account) => {
       const isMobile = window.innerWidth < 767.98;
@@ -179,9 +173,7 @@ const ConfirmInviteModal: m.Component<
                                     );
                                   vnode.state.accepted.push(location);
                                   vnode.state.selectedAddress = null;
-                                  mixpanel.track('Address Selected', {
-                                    Step: 'Address Selected for Invite',
-                                  });
+
                                   if (app.config.invites.length === 0) {
                                     $(e.target).trigger('modalexit');
                                   }

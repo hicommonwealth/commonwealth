@@ -17,7 +17,6 @@ import {
   link,
   externalLink,
   extractDomain,
-  pluralize,
   offchainThreadStageToLabel,
 } from 'helpers';
 import {
@@ -46,7 +45,6 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
       proposal.slug,
       `${proposal.identifier}-${slugify(proposal.title)}`
     );
-
     return (
       <div
         class="DiscussionRow"
@@ -55,7 +53,10 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             return vnode.attrs.onSelect();
           }
           if ($(e.target).hasClass('cui-tag')) return;
-          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
+          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+            window.open(discussionLink, '_blank');
+            return;
+          }
           e.preventDefault();
           const scrollEle = document.getElementsByClassName('Body')[0];
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
@@ -82,17 +83,8 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                 />
               </div>
             )}
-            {proposal.offchainVotingEnabled && (
-              <Button
-                label="Poll"
-                contentRight={pluralize(
-                  proposal.offchainVotingNumVotes,
-                  'vote'
-                )}
-                intent="warning"
-                size="xs"
-                compact={true}
-              />
+            {proposal.hasPoll && (
+              <Button label="Poll" intent="warning" size="xs" compact={true} />
             )}
             {proposal.chainEntities?.length > 0 &&
               proposal.chainEntities

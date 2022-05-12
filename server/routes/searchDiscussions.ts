@@ -8,7 +8,7 @@ const Errors = {
   UnexpectedError: 'Unexpected error',
   QueryMissing: 'Must enter query to begin searching',
   QueryTooShort: 'Query must be at least 4 characters',
-  NoCommunity: 'Title search must be community scoped'
+  NoChain: 'Title search must be chain-scoped',
 };
 
 const searchDiscussions = async (
@@ -27,8 +27,8 @@ const searchDiscussions = async (
   }
 
   if (req.query.thread_title_only === 'true') {
-    if (!req.query.chain && !req.query.community) {
-      return next(new Error(Errors.NoCommunity));
+    if (!req.query.chain) {
+      return next(new Error(Errors.NoChain));
     }
     const [chain, error] = await validateChain(models, req.query);
     if (error) return next(new Error(error));
@@ -39,7 +39,7 @@ const searchDiscussions = async (
         [Op.or]: [
           { [Op.iLike]: `%${encodedSearchTerm}%` },
           { [Op.iLike]: `%${req.query.search}%` },
-        ]
+        ],
       },
     };
 
@@ -48,9 +48,10 @@ const searchDiscussions = async (
         where: params,
         limit: req.query.results_size || 20,
         attributes: {
-          exclude: ['body', 'plaintext', 'version_history']
+          exclude: ['body', 'plaintext', 'version_history'],
         },
-        include: [{
+        include: [
+          {
             model: models.Address,
             as: 'Address',
           },
@@ -77,11 +78,12 @@ const searchDiscussions = async (
     bind = { chain: chain.id };
   }
 
-  const sort = req.query.sort === 'Newest'
-    ? 'ORDER BY "OffchainThreads".created_at DESC'
-    : req.query.sort === 'Oldest'
-    ? 'ORDER BY "OffchainThreads".created_at ASC'
-    : 'ORDER BY rank DESC'
+  const sort =
+    req.query.sort === 'Newest'
+      ? 'ORDER BY "OffchainThreads".created_at DESC'
+      : req.query.sort === 'Oldest'
+      ? 'ORDER BY "OffchainThreads".created_at ASC'
+      : 'ORDER BY rank DESC';
 
   bind['searchTerm'] = req.query.search;
   bind['limit'] = 50; // must be same as SEARCH_PAGE_SIZE on frontend
