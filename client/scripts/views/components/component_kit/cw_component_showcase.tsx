@@ -66,16 +66,24 @@ export class ComponentShowcase implements m.ClassComponent {
       <div class="ComponentShowcase">
         <h1>Popover</h1>
         <CWPopover
+          toggleTest={<CWButton label={'button'} />}
           toggle={(attrs: PopoverToggleAttrs) => (
             <CWButton label={'button'} onclick={attrs.onClick} />
           )}
           popover={(attrs: PopoverChildAttrs) => (
-            <div class="tooltip-container" {...attrs}>
-              {'wtf'}
+            <div class="ok">
+              <div
+                class="wtf"
+                onclick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('hiii');
+                }}
+              >
+                heyyy thereee
+              </div>
             </div>
           )}
-          content={<div class="tooltip-container">{'wtf'}</div>}
-          trigger={<CWButton label={'button'} />}
         />
         <h1>Text</h1>
         <div class="text-gallery">

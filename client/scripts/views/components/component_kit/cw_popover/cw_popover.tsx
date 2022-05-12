@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_popover.scss';
+import 'components/component_kit/cw_tooltip.scss';
 
 import { CWPortal } from '../cw_portal';
 import {
@@ -12,6 +12,7 @@ import {
 } from './types';
 import { getPopoverPosition } from './helpers';
 import { concatMap } from 'rxjs';
+import { MaxKeys } from 'aws-sdk/clients/s3';
 
 export type PopoverToggleAttrs = {
   isActive: boolean;
@@ -25,8 +26,6 @@ export type PopoverChildAttrs = {
 };
 
 export type PopoverAttrs = {
-  content: m.Component;
-  trigger: m.Component;
   alwaysRender?: boolean;
   gap?: number;
   isOpen?: boolean;
@@ -36,6 +35,7 @@ export type PopoverAttrs = {
   toSide?: boolean;
   xDirection?: dropXDirectionType;
   yDirection?: dropYDirectionType;
+  toggleTest: m.Component;
 };
 
 export class CWPopover implements m.ClassComponent<PopoverAttrs> {
@@ -52,7 +52,6 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     const newIsOpen = !this.isOpen;
     const newIsRendered = newIsOpen ? true : this.isRendered;
 
-    console.log('toggly');
     onToggle && onToggle(newIsOpen);
 
     this.isOpen = newIsOpen;
@@ -60,7 +59,6 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   }
 
   onClick(event, gap, toSide, onToggle, xDirection, yDirection) {
-    console.log('clicky');
     const position = getPopoverPosition({
       gap,
       target: event.currentTarget,
@@ -80,8 +78,16 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   }
 
   view(vnode) {
-    const { gap, onToggle, popover, toggle, toSide, xDirection, yDirection } =
-      vnode.attrs;
+    const {
+      gap,
+      onToggle,
+      popover,
+      toggle,
+      toSide,
+      xDirection,
+      yDirection,
+      toggleTest,
+    } = vnode.attrs;
     const { isOpen, position } = this;
     console.log('attrs', vnode.attrs);
     console.log('position', position);
@@ -94,13 +100,30 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
           },
           isActive: isOpen,
         })}
+        {
+          <div
+            onclick={(e) => {
+              this.onClick(e, gap, toSide, onToggle, xDirection, yDirection);
+            }}
+            style="display: flex; width: fit-content;"
+          >
+            {toggleTest}
+          </div>
+        }
         {isOpen ? (
           <CWPortal>
-            {popover({
-              style: 'position: fixed; top: 0; left: 0',
-              onclick: () => this.togglePopOver(onToggle),
-              togglePopOver: this.togglePopOver,
-            })}
+            <div
+              onclick={() => this.togglePopOver(onToggle)}
+              style="position: fixed; width: 100%; height: 100%; left: 0; top: 0;"
+            >
+              <div class="tooltip-container" style="width: 100px;">
+                {popover({
+                  style: `width: ${position.maxWidth}; height: ${position.maxHeight};`,
+                  onclick: () => this.togglePopOver(onToggle),
+                  togglePopOver: this.togglePopOver,
+                })}
+              </div>
+            </div>
           </CWPortal>
         ) : null}
       </>

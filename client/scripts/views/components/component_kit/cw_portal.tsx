@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ConsoleLoggerImpl } from 'typescript-logging';
 
 export class CWPortal implements m.ClassComponent {
   private rootElement: HTMLElement;
@@ -14,7 +13,6 @@ export class CWPortal implements m.ClassComponent {
     container.appendChild(rootElement);
     this.rootElement = rootElement;
     this.content = { view: () => vnode.children };
-    console.log(vnode.children);
     m.mount(this.rootElement, this.content);
   }
 
