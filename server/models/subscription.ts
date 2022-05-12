@@ -183,6 +183,7 @@ export default (
         category_id,
         chain_id: (<IPostNotificationData>notification_data).chain_id
           || (<ICommunityNotificationData>notification_data).chain
+          || (<ISnapshotNotificationData>notification_data).chain_id
       })
     }
 

@@ -190,7 +190,7 @@ export interface IChainEventNotificationData {
 
 export interface ISnapshotNotificationData {
   created_at: any;
-  category_id: 'new-snapshot';
+  chain_id: string;
   snapshotEventType: string;
 }
 
