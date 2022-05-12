@@ -1,21 +1,30 @@
 import moment from 'moment';
-import { IUniqueId } from './interfaces';
 
 class OffchainVote {
-  // public readonly id: number;
-  // public readonly createdAt: moment.Moment;
+  public readonly id: number;
+  public readonly pollId: number;
+  public readonly chainId: string;
+  public readonly authorChain: string;
   public readonly address: string;
-  public readonly author_chain: string;
-  public readonly thread_id: number;
+  public readonly createdAt: moment.Moment;
   public option: string;
 
-  constructor({ address, author_chain, thread_id, option }) {
-    // this.id = id;
-    // this.createdAt = createdAt;
+  constructor({
+    id,
+    poll_id,
+    chain_id,
+    address,
+    author_chain,
+    option,
+    created_at,
+  }) {
+    this.id = id;
+    this.pollId = poll_id;
+    this.chainId = chain_id;
     this.address = address;
-    this.author_chain = author_chain;
-    this.thread_id = thread_id;
+    this.authorChain = author_chain;
     this.option = option;
+    this.createdAt = created_at;
   }
 }
 

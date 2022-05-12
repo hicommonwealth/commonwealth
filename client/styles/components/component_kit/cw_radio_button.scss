@@ -1,89 +1,56 @@
-@import 'client/styles/shared';
+@import 'shared';
+
+@mixin radioButtonCore($color) {
+  background: radial-gradient(
+    $color 0%,
+    $color 50%,
+    transparent 50%,
+    transparent
+  );
+}
 
 .RadioButton {
+  align-items: center;
   display: flex;
+  flex-direction: row;
+  position: relative;
 
   .radio-input {
-    display: flex;
-    margin-right: 15px;
-
-    input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
   }
 
-  input {
-    display: none;
-
-    & + span {
-      display: inline-block;
-      position: relative;
-      padding-left: 20px;
-      cursor: pointer;
-
-      &:before {
-        content: '';
-        display: block;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        border-radius: 50%;
-        margin-right: 5px;
-        width: 16px;
-        height: 16px;
-        border: 1px solid $neutral-500;
-        background: $white;
-      }
-
-      &:after {
-        content: '';
-        display: block;
-        width: 10px;
-        height: 10px;
-        background: $purple-400;
-        position: absolute;
-        border-radius: 50%;
-        top: 3px;
-        left: 3px;
-        opacity: 0;
-        transform: scale(0, 0);
-      }
-    }
-
-    &:hover + span:before {
-      border: 1px solid $purple-400;
-      background: $purple-300;
-    }
-
-    &:hover + span:after {
-      opacity: 1;
-      transform: scale(1, 1);
-      background: $purple-400;
-      top: 6px;
-      left: 6px;
-      width: 4px;
-      height: 4px;
-    }
-
-    &:checked + span:before {
-      background: $white;
-      border: 1px solid $purple-400;
-    }
-
-    &:checked + span:after {
-      opacity: 1;
-      transform: scale(1, 1);
-      background: $purple-400;
-      width: 10px;
-      height: 10px;
-      top: 3px;
-      left: 3px;
-    }
+  .radio-control {
+    border-radius: $border-radius-round;
+    border: 2px solid $neutral-300;
+    cursor: pointer;
+    height: 12px;
+    margin: auto 8px;
+    position: relative;
+    transition: all ease 150ms;
+    width: 12px;
   }
 
-  .radio-label {
-    @include body;
+  &:hover .radio-control {
+    @include radioButtonCore($primary-100);
+
+    border-color: $primary-300;
+  }
+
+  &.selected .radio-control {
+    @include radioButtonCore($primary-500);
+
+    border-color: $primary-500;
+  }
+
+  &.disabled .radio-control {
+    @include radioButtonCore($neutral-200);
+
+    pointer-events: none;
+  }
+
+  &.disabled:hover .radio-control {
+    border-color: $neutral-300;
   }
 }

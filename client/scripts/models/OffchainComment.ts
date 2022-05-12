@@ -14,7 +14,6 @@ class OffchainComment<T extends IUniqueId> {
   public readonly proposal: T; // this may not be populated if the comment was loaded before the proposal!
   public readonly id: number;
   public readonly createdAt: moment.Moment;
-  public readonly community?: string;
   public readonly authorChain?: string;
   public readonly parentComment: number;
   public readonly rootProposal: string;
@@ -36,11 +35,10 @@ class OffchainComment<T extends IUniqueId> {
     rootProposal,
     // optional args
     parentComment,
-    community,
     authorChain,
     lastEdited, // moment.Moment
     deleted, 
-    address
+    address,
   }) {
     this.chain = chain;
     this.author = author;
@@ -53,7 +51,6 @@ class OffchainComment<T extends IUniqueId> {
     this.createdAt = createdAt;
     this.parentComment = parentComment;
     this.rootProposal = rootProposal;
-    this.community = community;
     this.authorChain = authorChain;
     this.lastEdited = lastEdited;
     this.deleted = deleted;

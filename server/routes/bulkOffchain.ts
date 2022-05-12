@@ -8,11 +8,11 @@ import { QueryTypes, Op } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
-import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../database';
 import { OffchainTopicInstance } from '../models/offchain_topic';
 import { RoleInstance } from '../models/role';
 import { OffchainThreadInstance } from '../models/offchain_thread';
+import { ChatChannelInstance } from '../models/chat_channel';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -32,7 +32,7 @@ const bulkOffchain = async (
   const replacements = { chain: chain.id };
 
   // parallelized queries
-  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting] =
+  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels] =
     await (<
       Promise<
         [
@@ -40,7 +40,8 @@ const bulkOffchain = async (
           unknown,
           RoleInstance[],
           unknown,
-          OffchainThreadInstance[]
+          OffchainThreadInstance[],
+          ChatChannelInstance[]
         ]
       >
     >Promise.all([
@@ -157,6 +158,15 @@ const bulkOffchain = async (
           type: QueryTypes.SELECT,
         }
       ),
+      models.ChatChannel.findAll({
+        where: {
+          chain_id: chain.id
+        },
+        include: {
+          model: models.ChatMessage,
+          required: false // should return channels with no chat messages
+        }
+      }),
     ]));
 
   const numVotingThreads = threadsInVoting.filter(
@@ -171,6 +181,7 @@ const bulkOffchain = async (
       pinnedThreads, // already converted to JSON earlier
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
+      chatChannels: JSON.stringify(chatChannels)
     },
   });
 };

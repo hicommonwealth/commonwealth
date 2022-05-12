@@ -1,16 +1,32 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .TokenDecimalInput {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  width: 100%;
+
+  .cui-input {
+    margin: 0 16px 8px 0;
+
+    // disable arrows on number
+    input[type='number'] {
+      -moz-appearance: textfield;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+  }
+
   .token-settings {
-    margin-top: 10px;
+    align-items: center;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    margin-left: 1px;
   }
 
   .switch-caption {
     color: $neutral-500;
-    font-size: 0.94rem;
   }
 }

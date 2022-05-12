@@ -6,7 +6,14 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AddressInfo, NodeInfo, OffchainThread } from 'models';
+import {
+  OffchainComment,
+  OffchainAttachment,
+  IUniqueId,
+  AddressInfo,
+  NodeInfo,
+  OffchainThread,
+} from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
@@ -25,7 +32,9 @@ export enum CommentRefreshOption {
 
 export const modelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
-    ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
+    ? comment.OffchainAttachments.map(
+        (a) => new OffchainAttachment(a.url, a.description)
+      )
     : [];
 
   const { reactions } = comment;
@@ -42,9 +51,12 @@ export const modelFromServer = (comment) => {
       let history;
       try {
         history = JSON.parse(v || '{}');
-        history.author = typeof history.author === 'string'
-          ? JSON.parse(history.author)
-          : typeof history.author === 'object' ? history.author : null;
+        history.author =
+          typeof history.author === 'string'
+            ? JSON.parse(history.author)
+            : typeof history.author === 'object'
+            ? history.author
+            : null;
         history.timestamp = moment(history.timestamp);
       } catch (e) {
         console.log(e);
@@ -56,8 +68,8 @@ export const modelFromServer = (comment) => {
   const lastEdited = comment.last_edited
     ? moment(comment.last_edited)
     : versionHistory && versionHistory?.length > 1
-      ? versionHistory[0].timestamp
-      : null;
+    ? versionHistory[0].timestamp
+    : null;
 
   let proposal;
   try {
@@ -66,40 +78,40 @@ export const modelFromServer = (comment) => {
     // no proposal
   }
 
-  const commentParams = (comment.deleted_at?.length > 0)
-    ? {
-      chain: comment.chain,
-      author: comment?.Address?.address || comment.author,
-      text: '[deleted]',
-      plaintext: '[deleted]',
-      versionHistory: [],
-      attachments: [],
-      proposal,
-      id: comment.id,
-      createdAt: moment(comment.created_at),
-      rootProposal: comment.root_id,
-      parentComment: Number(comment.parent_id) || null,
-      community: comment.community,
-      authorChain: comment?.Address?.chain || comment.authorChain,
-      lastEdited,
-      deleted: true,
-    } : {
-      chain: comment.chain,
-      author: comment?.Address?.address || comment.author,
-      text: decodeURIComponent(comment.text),
-      plaintext: comment.plaintext,
-      versionHistory,
-      attachments,
-      proposal,
-      id: comment.id,
-      createdAt: moment(comment.created_at),
-      rootProposal: comment.root_id,
-      parentComment: Number(comment.parent_id) || null,
-      community: comment.community,
-      authorChain: comment?.Address?.chain || comment.authorChain,
-      lastEdited,
-      deleted: false,
-    };
+  const commentParams =
+    comment.deleted_at?.length > 0
+      ? {
+          chain: comment.chain,
+          author: comment?.Address?.address || comment.author,
+          text: '[deleted]',
+          plaintext: '[deleted]',
+          versionHistory: [],
+          attachments: [],
+          proposal,
+          id: comment.id,
+          createdAt: moment(comment.created_at),
+          rootProposal: comment.root_id,
+          parentComment: Number(comment.parent_id) || null,
+          authorChain: comment?.Address?.chain || comment.authorChain,
+          lastEdited,
+          deleted: true,
+        }
+      : {
+          chain: comment.chain,
+          author: comment?.Address?.address || comment.author,
+          text: decodeURIComponent(comment.text),
+          plaintext: comment.plaintext,
+          versionHistory,
+          attachments,
+          proposal,
+          id: comment.id,
+          createdAt: moment(comment.created_at),
+          rootProposal: comment.root_id,
+          parentComment: Number(comment.parent_id) || null,
+          authorChain: comment?.Address?.chain || comment.authorChain,
+          lastEdited,
+          deleted: false,
+        };
 
   return new OffchainComment(commentParams);
 };
@@ -107,7 +119,9 @@ export const modelFromServer = (comment) => {
 class CommentsController {
   private _store: CommentsStore = new CommentsStore();
 
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   public getById(id: number) {
     return this._store.getById(id);
@@ -132,7 +146,9 @@ class CommentsController {
   }
 
   public commenters<T extends IUniqueId>(proposal: T) {
-    const authors = this._store.getByProposal(proposal).map((comment) => comment.author);
+    const authors = this._store
+      .getByProposal(proposal)
+      .map((comment) => comment.author);
     return _.uniq(authors);
   }
 
@@ -142,19 +158,19 @@ class CommentsController {
     chain: string,
     unescapedText: string,
     parentCommentId: any = null,
-    attachments?: string[],
+    attachments?: string[]
   ) {
     try {
       // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
-        'author_chain': app.user.activeAccount.chain.id,
-        'chain': chain,
-        'address': address,
-        'parent_id': parentCommentId,
-        'root_id': proposalIdentifier,
+        author_chain: app.user.activeAccount.chain.id,
+        chain,
+        address,
+        parent_id: parentCommentId,
+        root_id: proposalIdentifier,
         'attachments[]': attachments,
-        'text': encodeURIComponent(unescapedText),
-        'jwt': app.user.jwt,
+        text: encodeURIComponent(unescapedText),
+        jwt: app.user.jwt,
       });
       const { result } = res;
       const newComment = modelFromServer(result);
@@ -164,9 +180,11 @@ class CommentsController {
       return newComment;
     } catch (err) {
       console.log('Failed to create comment');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to create comment');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to create comment'
+      );
     }
   }
 
@@ -179,14 +197,13 @@ class CommentsController {
     try {
       // TODO: Change to PUT /comment
       const response = await $.post(`${app.serverUrl()}/editComment`, {
-        'address': app.user.activeAccount.address,
-        'author_chain': app.user.activeAccount.chain.id,
-        'id': comment.id,
-        'chain': comment.chain,
-        'community': comment.community,
-        'body': encodeURIComponent(newBody),
+        address: app.user.activeAccount.address,
+        author_chain: app.user.activeAccount.chain.id,
+        id: comment.id,
+        chain: comment.chain,
+        body: encodeURIComponent(newBody),
         'attachments[]': attachments,
-        'jwt': app.user.jwt,
+        jwt: app.user.jwt,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -196,9 +213,11 @@ class CommentsController {
       return result;
     } catch (err) {
       console.log('Failed to edit comment');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to edit comment');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to edit comment'
+      );
     }
   }
 
@@ -208,26 +227,25 @@ class CommentsController {
       $.post(`${app.serverUrl()}/deleteComment`, {
         jwt: app.user.jwt,
         comment_id: comment.id,
-      }).then((result) => {
-        const existing = this._store.getById(comment.id);
-        const revisedComment : any = Object.assign(
-          existing,
-          {
+      })
+        .then((result) => {
+          const existing = this._store.getById(comment.id);
+          const revisedComment: any = Object.assign(existing, {
             deleted: true,
             text: '[deleted]',
             plaintext: '[deleted]',
-            versionHistory: []
-          }
-        );
-        const softDeletion = new OffchainComment(revisedComment);
-        this._store.remove(existing);
-        this._store.add(softDeletion);
-        resolve(result);
-      }).catch((e) => {
-        console.error(e);
-        notifyError('Could not delete comment');
-        reject(e);
-      });
+            versionHistory: [],
+          });
+          const softDeletion = new OffchainComment(revisedComment);
+          this._store.remove(existing);
+          this._store.add(softDeletion);
+          resolve(result);
+        })
+        .catch((e) => {
+          console.error(e);
+          notifyError('Could not delete comment');
+          reject(e);
+        });
     });
   }
 
@@ -252,7 +270,13 @@ class CommentsController {
         resolve();
       } catch (err) {
         console.log('Failed to load comments');
-        reject(new Error(err.responseJSON?.error ? err.responseJSON.error : 'Error loading comments'));
+        reject(
+          new Error(
+            err.responseJSON?.error
+              ? err.responseJSON.error
+              : 'Error loading comments'
+          )
+        );
       }
     });
   }

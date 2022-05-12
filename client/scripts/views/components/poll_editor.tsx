@@ -47,19 +47,19 @@ const getPollDurationCopy = (
 };
 
 export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
-  private choices: string[];
+  private options: string[];
   private customDuration: string;
   private customDurationEnabled: boolean;
-  private name: string;
+  private prompt: string;
   private pollingEnabled: boolean;
 
   view(vnode) {
     const { onChangeHandler, thread } = vnode.attrs;
     const { pollingEnabled, customDurationEnabled, customDuration } = this;
 
-    // reset choices when initializing
-    if (!this.choices || this.choices.length === 0) {
-      this.choices = ['', ''];
+    // reset options when initializing
+    if (!this.options || this.options.length === 0) {
+      this.options = ['', ''];
     }
 
     return (
@@ -73,25 +73,25 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
             intent="positive"
             label="Enable polling"
             onchange={(e) => {
-              this.pollingEnabled = (e.target as any).checked;
+              this.pollingEnabled = (e.target as HTMLInputElement).checked;
             }}
           />,
           <h4 class={this.pollingEnabled ? '' : 'disabled'}>Question</h4>,
           <Input
-            class="poll-editor-choices-question"
+            class="poll-editor-options-question"
             name="Question"
             fluid={true}
             autocomplete="off"
             disabled={!pollingEnabled}
             placeholder="Do you support this proposal?"
             onchange={(e) => {
-              this.name = (e.target as any).value;
+              this.prompt = (e.target as HTMLInputElement).value;
             }}
           />,
-          <h4 class={this.pollingEnabled ? '' : 'disabled'}>Choices</h4>,
-          <div class="poll-editor-choices">
+          <h4 class={this.pollingEnabled ? '' : 'disabled'}>options</h4>,
+          <div class="poll-editor-options">
             <div class="poll-editor-choice-buttons">
-              {this.choices?.map((choice: string, index: number) => (
+              {this.options?.map((choice: string, index: number) => (
                 <Input
                   class="poll-editor-choice"
                   placeholder={`${index + 1}.`}
@@ -99,7 +99,7 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
                   autocomplete="off"
                   disabled={!pollingEnabled}
                   onchange={(e) => {
-                    this.choices[index] = (e.target as any).value;
+                    this.options[index] = (e.target as HTMLInputElement).value;
                   }}
                 />
               ))}
@@ -108,18 +108,18 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
               label="Add choice"
               fluid={true}
               rounded={true}
-              disabled={!pollingEnabled || this.choices.length >= 6}
+              disabled={!pollingEnabled || this.options.length >= 6}
               onclick={() => {
-                this.choices.push('');
+                this.options.push('');
               }}
             />
             <Button
               label="Remove choice"
               fluid={true}
               rounded={true}
-              disabled={!pollingEnabled || this.choices.length <= 2}
+              disabled={!pollingEnabled || this.options.length <= 2}
               onclick={() => {
-                this.choices.pop();
+                this.options.pop();
               }}
             />
           </div>,
@@ -182,22 +182,35 @@ export class PollEditor implements m.ClassComponent<PollEditorAttrs> {
               rounded={true}
               onclick={async () => {
                 if (this.pollingEnabled) {
-                  if (!this.name) {
-                    notifyError('Must set poll name');
+                  if (!this.prompt) {
+                    notifyError('Must set poll prompt');
                     return;
                   }
-                  if (!this.choices[0]?.length || !this.choices[1]?.length) {
-                    notifyError('Must set poll choices');
+                  if (
+                    !this.options?.length ||
+                    !this.options[0]?.length ||
+                    !this.options[1]?.length
+                  ) {
+                    notifyError('Must set poll options');
+                    return;
+                  }
+                  if (
+                    this.options.length !== [...new Set(this.options)].length
+                  ) {
+                    notifyError('Poll options must be unique');
                     return;
                   }
                   try {
-                    await app.threads.setPolling({
+                    await app.polls.setPolling({
                       threadId: thread.id,
-                      name: this.name,
-                      choices: this.choices,
+                      prompt: this.prompt,
+                      options: this.options,
                       customDuration: this.customDuration,
+                      address: app.user.activeAccount.address,
+                      authorChain: app.user.activeAccount.chain.id,
                     });
                     notifySuccess('Poll creation succeeded');
+                    m.redraw();
                   } catch (e) {
                     console.error(e);
                   }

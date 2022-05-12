@@ -5,32 +5,28 @@ import '../styles/tailwind_reset.css'; // for the landing page
 import '../styles/shared.scss';
 import 'construct.scss';
 import 'lity/dist/lity.min.css';
+import mixpanel from 'mixpanel-browser';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { FocusManager } from 'construct-ui';
+import {FocusManager} from 'construct-ui';
 import moment from 'moment';
-import mixpanel from 'mixpanel-browser';
 
 import './fragment-fix';
-import app, { ApiStatus, LoginState } from 'state';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+import app, {ApiStatus, LoginState} from 'state';
+import {ChainBase, ChainNetwork, ChainType} from 'types';
+import {ChainInfo, NodeInfo, NotificationCategory} from 'models';
 
-import { WebSocketController } from 'controllers/server/socket';
+import {WebSocketController} from 'controllers/server/socket';
 
-import {
-  notifyError,
-  notifyInfo,
-  notifySuccess,
-} from 'controllers/app/notifications';
-import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import {notifyError, notifyInfo, notifySuccess,} from 'controllers/app/notifications';
+import {updateActiveAddresses, updateActiveUser} from 'controllers/app/login';
 
-import { Layout } from 'views/layout';
+import {Layout} from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import { LoginModal } from 'views/modals/login_modal';
-import { alertModalWithText } from 'views/modals/alert_modal';
-import { pathIsDiscussion } from './identifiers';
+import {LoginModal} from 'views/modals/login_modal';
+import {alertModalWithText} from 'views/modals/alert_modal';
+import {pathIsDiscussion} from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -42,6 +38,9 @@ import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 const APPLICATION_UPDATE_MESSAGE =
   'A new version of the application has been released. Please save your work and refresh.';
 const APPLICATION_UPDATE_ACTION = 'Okay';
+
+const MIXPANEL_DEV_TOKEN = '312b6c5fadb9a88d98dc1fb38de5d900';
+const MIXPANEL_PROD_TOKEN = '993ca6dd7df2ccdc2a5d2b116c0e18c5';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -84,25 +83,31 @@ export async function initAppState(
 
         // add recentActivity
         const { recentThreads } = data;
-        Object.entries(recentThreads).forEach(([comm, count]) => {
-          app.recentActivity.setCommunityThreadCounts(comm, count);
+        recentThreads.forEach(({chain, count}) => {
+          app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
-        // update the login status
-        updateActiveUser(data.user);
-        app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+      // update the login status
+      updateActiveUser(data.user);
+      app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
 
-        if (!app.socket && app.loginState === LoginState.LoggedIn) {
-          app.socket = new WebSocketController(app.user.jwt);
-          app.user.notifications.refresh().then(() => m.redraw());
-        } else if (app.socket && app.loginState === LoginState.LoggedOut) {
-          app.socket.disconnect();
-          app.socket = undefined;
-        }
+      if (app.loginState == LoginState.LoggedIn) {
+        console.log("Initializing socket connection with JTW:", app.user.jwt)
+        // init the websocket connection and the chain-events namespace
+        app.socket.init(app.user.jwt).then(() => {
+          if (app.socket.isConnected) {
+            console.log("Websocket connected");
+          } else {
+            console.log("Websocket connection failure");
+          }
+        })
+        app.user.notifications.refresh().then(() => m.redraw());
+      } else if (app.loginState == LoginState.LoggedOut && app.socket.isConnected) {
+        // TODO: create global deinit function
+        app.socket.disconnect()
+      }
 
-        app.user.setStarredCommunities(
-          data.user ? data.user.starredCommunities : []
-        );
+      app.user.setStarredCommunities(data.user ? data.user.starredCommunities : []);
 
         // update the selectedNode, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
@@ -142,10 +147,6 @@ export async function deinitChainOrCommunity() {
 export async function handleInviteLinkRedirect() {
   const inviteMessage = m.route.param('invitemessage');
   if (inviteMessage) {
-    mixpanel.track('Invite Link Used', {
-      'Step No': 1,
-      Step: inviteMessage,
-    });
     if (
       inviteMessage === 'failure' &&
       m.route.param('message') === 'Must be logged in to accept invites'
@@ -166,10 +167,6 @@ export async function handleInviteLinkRedirect() {
 
 export async function handleUpdateEmailConfirmation() {
   if (m.route.param('confirmation')) {
-    mixpanel.track('Update Email Verification Redirect', {
-      'Step No': 1,
-      Step: m.route.param('confirmation'),
-    });
     if (m.route.param('confirmation') === 'success') {
       notifySuccess('Email confirmed!');
     }
@@ -299,11 +296,13 @@ export async function selectNode(
     ).default;
     newChain = new ERC20(n, app);
   } else if (n.chain.network === ChainNetwork.ERC721) {
-    const ERC721 = (await import(
-    //   /* webpackMode: "lazy" */
-    //   /* webpackChunkName: "erc721-main" */
-      './controllers/chain/ethereum/NftAdapter'
-    )).default;
+    const ERC721 = (
+      await import(
+        //   /* webpackMode: "lazy" */
+        //   /* webpackChunkName: "erc721-main" */
+        './controllers/chain/ethereum/NftAdapter'
+      )
+    ).default;
     newChain = new ERC721(n, app);
   } else if (n.chain.network === ChainNetwork.SPL) {
     const SPL = (
@@ -415,7 +414,11 @@ export async function initChain(): Promise<void> {
 
 export async function initNewTokenChain(address: string) {
   const chain_network = app.chain.network;
-  const response = await $.getJSON('/api/getTokenForum', { address, chain_network, autocreate: true });
+  const response = await $.getJSON('/api/getTokenForum', {
+    address,
+    chain_network,
+    autocreate: true,
+  });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');
@@ -687,7 +690,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/chat': importRoute('views/pages/chat', {
+            '/chat/:channel': importRoute('views/pages/chat.tsx', {
               scoped: true,
               deferChain: true,
             }),
@@ -798,7 +801,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/search': redirectRoute(() => '/search'),
             '/:scope/members': redirectRoute(() => '/members'),
             '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
-            '/:scope/chat': redirectRoute(() => '/chat'),
+            '/:scope/chat/:channel': redirectRoute((attrs) => `/chat/${attrs.channel}`),
             '/:scope/new/discussion': redirectRoute(() => '/new/discussion'),
             '/:scope/account/:address': redirectRoute(
               (attrs) => `/account/${attrs.address}/`
@@ -942,7 +945,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/:scope/chat': importRoute('views/pages/chat', {
+            '/:scope/chat/:channel': importRoute('views/pages/chat.tsx', {
               scoped: true,
               deferChain: true,
             }),
@@ -1084,12 +1087,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     // initialize mixpanel, before adding an alias or tracking identity
     try {
-      mixpanel.init('32c32e2c81e63e65dcdd98dc7d2c6811');
       if (
         document.location.host.startsWith('localhost') ||
         document.location.host.startsWith('127.0.0.1')
       ) {
-        mixpanel.disable();
+        mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
+      } else {
+        // Production Mixpanel Project
+        // TODO: Swap this for the prod token after we make sure everything is working
+        mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
       }
     } catch (e) {
       console.error('Mixpanel initialization error');
@@ -1110,22 +1116,13 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     */
       if (m.route.param('new') && m.route.param('new').toString() === 'true') {
         console.log('creating account');
-        mixpanel.track('Account Creation', {
-          'Step No': 1,
-          Step: 'Add Email',
-        });
+
         try {
-          mixpanel.alias(m.route.param('email').toString());
         } catch (err) {
           // Don't do anything... Just identify if there is an error
           // mixpanel.identify(m.route.param('email').toString());
         }
       } else {
-        console.log('logging in account');
-        mixpanel.track('Logged In', {
-          Step: 'Email',
-        });
-        mixpanel.identify(app.user.email);
       }
       m.route.set(m.route.param('path'), {}, { replace: true });
     } else if (
