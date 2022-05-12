@@ -141,7 +141,7 @@
           position: absolute;
           width: 100%;
           &.wide {
-            width: 200%;
+            width: 170%;
           }
           top: 40px;
           left: 0;
@@ -315,21 +315,54 @@
   }
 }
 
+@media only screen and (max-width: 1024px) {
+  .ProfilePage {
+    .ProfileActivity {
+      .activity-nav {
+        .activity-nav-option {
+          .drop-down.wide {
+            width: 130%;
+          }
+        }
+      }
+    }
+  }
+}
+
 @media only screen and (max-width: 768px) {
   .ProfilePage {
-
     .ProfileHeader {
-
       .profile-info {
         height: 300px;
         grid-template-columns: 30% 70%;
         grid-template-rows: 85% 15%;  
 
       }
-
     }
-
   }
+}
 
+
+@media only screen and (max-width: 530px) {
+  .ProfilePage {
+    .ProfileActivity {
+
+      .activity-nav {
+        display: block;
+
+        .activity-nav-option {
+
+          .drop-down.wide {
+            width: 100%;
+          }
+     
+        }
+
+        .divider {
+          display: none;
+        }
+      }
+    }
+  }
 }
 

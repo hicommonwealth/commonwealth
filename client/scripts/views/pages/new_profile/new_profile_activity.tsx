@@ -38,6 +38,16 @@ const handleActivityClick = (option: ProfileActivity, state: ProfileActivityStat
   state.selectedActivity = option
 }
 
+const handleCommunityFilterClick = (evt, vnode) => {
+  evt.stopPropagation()
+  vnode.state.isCommunitiesOpen = !vnode.state.isCommunitiesOpen
+}
+
+const handleAddressFilterClick = (evt, vnode) => {
+  evt.stopPropagation()
+  vnode.state.isAddressesOpen = !vnode.state.isAddressesOpen
+}
+
 const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, state: ProfileActivityState) => {
   
   const shouldFilterCommunities = Object.keys(state.communityFilters).length > 0
@@ -105,7 +115,6 @@ const renderActivity = (option: ProfileActivity, attrs: ProfileActivityAttrs, st
         </div>
     )
   }
-  
 }
 
 const handleCommunityFilter = (chain: string, state: ProfileActivityState) => {
@@ -147,6 +156,24 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
       vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 140;
       vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
     });
+
+    // Close dropdown
+    window.addEventListener('click', (evt) => {
+      // If option clicked do nothing
+      if (evt.target.classList.contains('option') ||
+        evt.target.classList.contains('option-name')) {
+          return
+      }
+
+      if (vnode.state.isCommunitiesOpen) {
+        vnode.state.isCommunitiesOpen = false;
+        m.redraw()
+      } 
+      if (vnode.state.isAddressesOpen) {
+        vnode.state.isAddressesOpen = false;
+        m.redraw()
+      }
+    })
   }
 
   view(vnode) {
@@ -169,12 +196,12 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
           </div>
           <div className="divider"></div>
           <div className="activity-nav-option">
-            <h4 onclick={()=>{vnode.state.isCommunitiesOpen = !vnode.state.isCommunitiesOpen}}> 
+            <h4 onclick={(evt)=>{handleCommunityFilterClick(evt, vnode)}}> 
               All Communities 
             </h4>
             <CWIcon iconName={vnode.state.isCommunitiesOpen ? "chevronUp" : "chevronDown"} 
               className="chevron" iconSize="medium"
-              onclick={()=>{vnode.state.isCommunitiesOpen = !vnode.state.isCommunitiesOpen}}
+              onclick={(evt)=>{handleCommunityFilterClick(evt, vnode)}}
              />
             {
               vnode.state.isCommunitiesOpen ? 
@@ -184,7 +211,7 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
                     <div className="option" onclick={()=>{
                       handleCommunityFilter(chain.name.toLowerCase(), vnode.state)
                     }}> 
-                      <p> { chain.name } </p> 
+                      <p className="option-name"> { chain.name } </p> 
                       { 
                         chain.name.toLowerCase() in vnode.state.communityFilters ?
                         <CWIcon iconName="check" iconSize="medium" className="check" />
@@ -198,12 +225,12 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
             }
           </div>
           <div className="activity-nav-option">
-            <h4 onclick={()=>{vnode.state.isAddressesOpen = !vnode.state.isAddressesOpen}}> 
+            <h4 onclick={(evt)=>{handleAddressFilterClick(evt, vnode)}}> 
               All Addresses 
             </h4>
             <CWIcon iconName={vnode.state.isAddressesOpen ? "chevronUp" : "chevronDown"} 
               className="chevron" iconSize="medium"
-              onclick={()=>{vnode.state.isAddressesOpen = !vnode.state.isAddressesOpen}}
+              onclick={(evt)=>{handleAddressFilterClick(evt, vnode)}}
             />
             {
               vnode.state.isAddressesOpen ? 
@@ -213,8 +240,8 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
                     <div className="option" onclick={()=>{
                       handleAddressFilter(address.address, vnode.state)}}
                     > 
-                      <p> 
-                        { `${address.address.slice(0, 12)}...${address.address.slice(-12)}` }
+                      <p className="option-name"> 
+                        { `${address.address.slice(0, 6)}...${address.address.slice(-6)}` }
                       </p> 
                       { 
                         address.address in vnode.state.addressFilters ?
