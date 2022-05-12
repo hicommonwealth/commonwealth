@@ -17,6 +17,7 @@ import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
+import { CWWalletRowCard } from './cw_wallet_row_card';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -367,6 +368,13 @@ export class ComponentShowcase implements m.ClassComponent {
             <h4>Card title</h4>
             <div>Full width</div>
           </CWCard>
+        </div>
+        <div class="card-gallery">
+          <h1>Wallet Row Card</h1>
+          <CWWalletRowCard
+            walletName="metamask"
+            onclick={() => notifySuccess('MetaMask clicked!')}
+          />
         </div>
         <h1>Form fields</h1>
         <div class="form-gallery">

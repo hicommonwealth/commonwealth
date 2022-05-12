@@ -49,7 +49,10 @@ export class WalletIcon implements m.ClassComponent<WalletIconAttrs> {
     const { onclick, size = 32, walletName } = vnode.attrs;
 
     return walletName ? (
-      <div class={`ChainIcon${onclick ? ' onclick' : ''}`}>
+      <div
+        class={`ChainIcon${onclick ? ' onclick' : ''}`}
+        style={`width: ${size}px; height: ${size}px;`}
+      >
         <img
           class="chain-icon"
           style={`width: ${size}px; height: ${size}px;`}
