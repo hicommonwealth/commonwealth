@@ -187,7 +187,7 @@ class OffchainThread implements IUniqueId {
     offchainVotingNumVotes?: number;
     offchainVotes?: OffchainVote[];
     linkedThreads: LinkedThreadRelation[];
-    address: {};
+    address: {[key: string]: any};
   }) {
     this.author = author;
     this.title = title;
