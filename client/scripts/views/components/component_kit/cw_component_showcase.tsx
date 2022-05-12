@@ -17,7 +17,7 @@ import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
-import { CWWalletRowCard } from './cw_wallet_row_card';
+import { CWWalletOptionRow } from './cw_wallet_option_row';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -371,7 +371,7 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <div class="card-gallery">
           <h1>Wallet Row Card</h1>
-          <CWWalletRowCard
+          <CWWalletOptionRow
             walletName="metamask"
             onclick={() => notifySuccess('MetaMask clicked!')}
           />

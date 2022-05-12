@@ -12,7 +12,7 @@ export enum ComponentType {
   RadioGroup = 'RadioGroup',
   Text = 'Text',
   TextInput = 'TextInput',
-  WalletRowCard = 'WalletRowCard',
+  WalletOptionRow = 'WalletOptionRow',
 }
 
 export type StyleAttrs = {
