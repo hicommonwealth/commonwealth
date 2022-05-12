@@ -16,6 +16,11 @@ module.exports = {
       allowNull: true,
     });
     await queryInterface.removeColumn('ChainNodes', 'token_name');
+    await queryInterface.removeColumn('ChainNodes', 'chain');
+    await queryInterface.sequelize.query(
+      // eslint-disable-next-line max-len
+      'DELETE FROM "ChainNodes" a WHERE a.id <> (SELECT min(b.id) FROM "ChainNodes" b WHERE  a.url = b.url)');
+
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -37,5 +42,8 @@ module.exports = {
       allowNull: true,
     });
     await queryInterface.removeColumn('Chains', 'token_name');
+    await queryInterface.addColumn('ChainNodes', 'chain', {
+      type: Sequelize.STRING,
+    });
   }
 };

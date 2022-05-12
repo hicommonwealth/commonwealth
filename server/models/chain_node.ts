@@ -4,7 +4,6 @@ import { ChainInstance, ChainAttributes } from './chain';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainNodeAttributes = {
-  chain: string;
   url: string;
   id?: number;
   eth_chain_id?: number;
@@ -30,7 +29,6 @@ export default (
     'ChainNode',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
       url: { type: dataTypes.STRING, allowNull: false },
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
       alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
@@ -40,7 +38,6 @@ export default (
       tableName: 'ChainNodes',
       timestamps: false,
       underscored: true,
-      indexes: [{ fields: ['chain'] }],
       defaultScope: {
         attributes: {
           exclude: [
