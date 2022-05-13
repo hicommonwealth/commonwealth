@@ -19,12 +19,16 @@
 
       h3 {
         margin-left: 15px;
-        margin-top: 4px;
       }
     }
 
     .card-bottom {
       margin-top: 10px;
+
+      .recent-activity {
+        margin-top: 10px;
+        color: $neutral-600;
+      }
     }
 
     margin-bottom: 10px;
