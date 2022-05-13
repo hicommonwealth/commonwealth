@@ -1,4 +1,5 @@
 import * as Icons from './cw_icons';
+import * as CustomIcons from './cw_custom_icons';
 
 export const iconLookup = {
   arrowLeft: Icons.CWArrowLeft,
@@ -66,4 +67,9 @@ export const iconLookup = {
   website: Icons.CWWebsite,
 };
 
+export const customIconLookup = {
+  metamask: CustomIcons.CWMetaMask,
+};
+
 export type IconName = keyof typeof iconLookup;
+export type CustomIconName = keyof typeof customIconLookup;

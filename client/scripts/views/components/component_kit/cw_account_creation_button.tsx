@@ -28,7 +28,7 @@ export class CWAccountCreationButton
       >
         <CWIcon
           iconName={creationType === 'newAccount' ? 'plusCircle' : ''}
-          iconSize="large"
+          iconSize="xxl"
         />
         <CWText type="h5" fontWeight="semiBold">
           {creationType === 'newAccount' ? 'New Account' : 'Link New Account'}

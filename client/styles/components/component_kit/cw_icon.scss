@@ -3,7 +3,6 @@
 @mixin baseIconStyles {
   flex-shrink: 0;
   height: 1em;
-  fill: currentColor;
   width: 1em;
 
   &.small {
@@ -18,11 +17,25 @@
     font-size: 32px;
   }
 
+  &.xl {
+    font-size: 48px;
+  }
+
+  &.xxl {
+    font-size: 60px;
+  }
+}
+
+.Icon {
+  @include baseIconStyles;
+
+  fill: currentColor;
+
   &.disabled {
     color: $neutral-200;
   }
 }
 
-.Icon {
+.CustomIcon {
   @include baseIconStyles;
 }

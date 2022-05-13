@@ -16,10 +16,11 @@
 
   &:hover {
     background-color: $primary-100;
+    border-color: $primary-200;
   }
 
   &:active {
     background-color: $primary-200;
-    border: 2px solid $primary-300;
+    border-color: $primary-500;
   }
 }
