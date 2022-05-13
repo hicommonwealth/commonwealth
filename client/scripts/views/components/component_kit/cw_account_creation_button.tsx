@@ -10,7 +10,7 @@ import { CWCard } from './cw_card';
 import { CWText } from './cw_text';
 
 type AccountCreationButtonAttrs = {
-  creationType: 'newAccount | linkAccount';
+  creationType: 'newAccount' | 'linkAccount';
   onclick: () => void;
 };
 
@@ -27,11 +27,13 @@ export class CWAccountCreationButton
         onclick={onclick}
       >
         <CWIcon
-          iconName={creationType === 'newAccount' ? 'plusCircle' : ''}
+          iconName={creationType === 'newAccount' ? 'plusCircle' : 'link'}
           iconSize="xxl"
         />
-        <CWText type="h5" fontWeight="semiBold">
-          {creationType === 'newAccount' ? 'New Account' : 'Link New Account'}
+        <CWText type="h5" fontWeight="semiBold" noWrap={false}>
+          {creationType === 'newAccount'
+            ? 'New Account'
+            : 'Link Existing Account'}
         </CWText>
       </CWCard>
     );

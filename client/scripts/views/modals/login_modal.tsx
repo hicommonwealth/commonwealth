@@ -21,6 +21,8 @@ export class LoginModal implements m.ClassComponent {
   }
 }
 
+const wallets = {};
+
 export class NewLoginModal implements m.ClassComponent {
   view() {
     return (
