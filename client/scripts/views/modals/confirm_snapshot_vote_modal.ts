@@ -13,7 +13,7 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 
 import { formatNumberShort } from 'adapters/currency';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
 
@@ -50,10 +50,7 @@ const ConfirmSnapshotVoteModal: m.Component<
     } = vnode.attrs;
 
     return m('.ConfirmSnapshotVoteModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Confirm vote'),
-        m(CompactModalExitButton),
-      ]),
+      m('.compact-modal-title', [m('h3', 'Confirm vote'), m(ModalExitButton)]),
       m('.compact-modal-body', [
         m('h4', [
           `Are you sure you want to vote "${proposal.choices[selectedChoice]}"?`,

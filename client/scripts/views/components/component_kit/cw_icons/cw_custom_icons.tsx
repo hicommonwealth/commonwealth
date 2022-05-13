@@ -112,3 +112,33 @@ export const CWMetaMask: m.Component<CustomIconAttrs> = {
     );
   },
 };
+
+export const CWMagic: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>(
+          { ...customIconStyleAttrs },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+      >
+        {/* fill in */}
+      </svg>
+    );
+  },
+};
+
+// Polkadot = 'polkadot',
+// WalletConnect = 'walletconnect',
+// Keplr = 'keplr',
+// NearWallet = 'near',
+// TerraStation = 'terrastation',
+// CosmosEvmMetamask = 'cosm-metamask',
+// Phantom = 'phantom',
+// Ronin = 'ronin',

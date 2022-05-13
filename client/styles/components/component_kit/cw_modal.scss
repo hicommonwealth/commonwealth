@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 $modal-padding: 16px;
 
@@ -24,12 +24,13 @@ $modal-padding: 16px;
     @include popout();
 
     background: $white;
-    border-radius: 3px;
-    max-height: 96%;
-    max-width: 800px;
-    max-width: 92%;
-    min-width: 380px;
-    overflow-y: auto;
+    border: 2px solid $neutral-800;
+    border-radius: $border-radius-corners;
+    // max-height: 96%;
+    // max-width: 800px;
+    // max-width: 92%;
+    // min-width: 380px;
+    // overflow-y: auto;
     overflow: hidden;
     position: relative;
     z-index: 20;

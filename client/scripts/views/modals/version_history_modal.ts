@@ -9,7 +9,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { VersionHistory } from 'controllers/server/threads';
 import { Spinner } from 'construct-ui';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {
@@ -94,7 +94,7 @@ const VersionHistoryModal: m.Component<IVersionHistoryAttrs, {}> = {
     return m('.VersionHistoryModal', [
       m('.compact-modal-title', [
         m('h3', 'Version History'),
-        m(CompactModalExitButton),
+        m(ModalExitButton),
       ]),
       m('.compact-modal-body', [
         item.versionHistory && item.versionHistory?.length

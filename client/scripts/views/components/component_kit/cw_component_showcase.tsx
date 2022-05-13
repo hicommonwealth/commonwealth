@@ -1,8 +1,10 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_component_showcase.scss';
 
+import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWGradientButton } from './cw_gradient_button';
@@ -19,6 +21,7 @@ import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
+import { NewLoginModal } from '../../modals/login_modal';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -68,6 +71,14 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <CWButton
+          label="Click for Login modal"
+          onclick={() =>
+            app.modals.create({
+              modal: NewLoginModal,
+            })
+          }
+        />
         <div class="card-gallery">
           <h1>Account Creation Button</h1>
           <CWAccountCreationButton

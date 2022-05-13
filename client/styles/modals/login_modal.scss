@@ -1,0 +1,49 @@
+@import 'shared';
+
+.NewLoginModal {
+  display: flex;
+  height: 424px;
+  width: 664px;
+
+  .sidebar {
+    background-image: url('/static/img/login-background.png');
+    background-size: cover;
+    height: 424px;
+    width: 264px;
+
+    .sidebar-content {
+      display: flex;
+      flex-direction: column;
+      padding: 132px 32px 132px 24px;
+
+      .Text {
+        color: $white;
+      }
+
+      .divider {
+        background-color: $yellow-500;
+        height: 4px;
+        margin: 4px 0 8px;
+        width: 205px;
+      }
+    }
+  }
+
+  .body {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+
+    .Text {
+      color: $neutral-300;
+      display: inline-block;
+      margin: 32px 60px 24px;
+      text-align: center;
+
+      .link {
+        color: $neutral-500;
+      }
+    }
+  }
+}

@@ -5,16 +5,13 @@ import m from 'mithril';
 
 import app from 'state';
 import { NewThreadForm } from 'views/components/new_thread_form';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 
 const NewThreadModal: m.Component<{}> = {
   view: (vnode) => {
     const hasTopics = !!app.chain?.meta.topics.length;
     return m('.NewThreadModal', [
-      m('.compact-modal-title', [
-        m('h3', 'New thread'),
-        m(CompactModalExitButton),
-      ]),
+      m('.compact-modal-title', [m('h3', 'New thread'), m(ModalExitButton)]),
       m('.compact-modal-body-max', [
         m(NewThreadForm, { isModal: true, hasTopics }),
       ]),

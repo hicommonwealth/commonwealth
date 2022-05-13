@@ -68,7 +68,16 @@ export const iconLookup = {
 };
 
 export const customIconLookup = {
+  magic: CustomIcons.CWMagic,
   metamask: CustomIcons.CWMetaMask,
+  // Polkadot = 'polkadot',
+  // WalletConnect = 'walletconnect',
+  // Keplr = 'keplr',
+  // NearWallet = 'near',
+  // TerraStation = 'terrastation',
+  // CosmosEvmMetamask = 'cosm-metamask',
+  // Phantom = 'phantom',
+  // Ronin = 'ronin',
 };
 
 export type IconName = keyof typeof iconLookup;

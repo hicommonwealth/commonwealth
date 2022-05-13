@@ -2,10 +2,11 @@
 
 import m from 'mithril';
 import $ from 'jquery';
+
 import 'components/component_kit/cw_modal.scss';
 
 import { ComponentType } from './types';
-import { CWIcon } from './cw_icons/cw_icon';
+import { CWIconButton } from './cw_icon_button';
 
 type ModalAttrs = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,10 +49,10 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
   }
 }
 
-export class CompactModalExitButton implements m.ClassComponent {
+export class ModalExitButton implements m.ClassComponent {
   view() {
     return (
-      <CWIcon
+      <CWIconButton
         iconName="close"
         onclick={(e) => {
           e.preventDefault();
