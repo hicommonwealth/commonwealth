@@ -1,64 +1,8 @@
 @import 'shared';
 
-.ProjectListing {
-  .sublayout-main-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .user-projects {
-    width: 900px;
-    .user-created-project-wrap {
-      margin: 32px 0;
-      .user-created-project-header {
-        display: flex;
-        justify-content: space-between;
-      }
-      .user-created-projects {
-        display: flex;
-        justify-content: space-between;
-        .ProjectCard {
-        }
-      }
-    }
-    .user-backed-project-wrap {
-      margin: 32px 0;
-      .user-backed-projects {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        .ProjectCard {
-          margin: 12px 0;
-        }
-      }
-    }
-    .user-previously-backed-project-wrap {
-      margin: 32px 0;
-      .user-previously-backed-projects {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        .ProjectCard {
-          margin: 12px;
-          border-bottom: 2px solid $neutral-300;
-        }
-      }
-    }
-  }
-  .community-projects {
-    width: 900px;
-    .project-discovery {
-      display: flex;
-      justify-content: space-between;
-      margin: 32px 0;
-      .trending-projects,
-      .recommended-projects {
-        display: flex;
-        flex-direction: column;
-        .ProjectCard {
-          margin: 12px 0;
-        }
-      }
-    }
-  }
+.ProjectsListing {
+  width: 1000px;
+  display: flex;
+  justify-content: center;
+  margin: 72px 100px;
 }

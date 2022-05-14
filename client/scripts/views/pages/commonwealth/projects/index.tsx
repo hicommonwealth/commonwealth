@@ -14,6 +14,9 @@ import ProjectCard, { ProjectCardSize } from './project_card';
 import Sublayout from '../../../sublayout';
 import { DummyProject } from './dummy_project';
 import { CWTextInput } from '../../../components/component_kit/cw_text_input';
+import ExploreProjectsPage from './explore';
+import BackedProjectsPage from './backed';
+import YourProjectsPage from './your_projects';
 
 type ProjectProgress = {
   inBlocks: number;
@@ -40,6 +43,7 @@ interface ICreateProjectForm {
   description: string;
 }
 
+// TODO: Reconcile against Jake's controller classes
 export type Project = {
   id: number;
   chain: string;
@@ -60,102 +64,60 @@ export type Project = {
   raised: ProjectFunds;
 };
 
+enum ProjectListingSubpage {
+  Yours = 'yours',
+  Explore = 'explore',
+  Backed = 'backed',
+}
+
 export default class ProjectListing
   implements m.ClassComponent<{ form: ICreateProjectForm }>
 {
+  private projects: any; // Project[];
+  private subpage: ProjectListingSubpage;
+
+  getExploreProjects(): Project[] {
+    // TODO: filter this.projects
+    return Array(6).fill(DummyProject);
+  }
+
+  getYourProjects(): Project[] {
+    // TODO: filter this.projects
+    return Array(6).fill(DummyProject);
+  }
+
+  getBackedProjects(): Project[] {
+    // TODO: filter this.projects
+    return Array(6).fill(DummyProject);
+  }
+
+  getProjectListingSubpage() {
+    if (this.subpage === ProjectListingSubpage.Yours) {
+      return <YourProjectsPage projects={this.getExploreProjects()} />;
+    } else if (this.subpage === ProjectListingSubpage.Backed) {
+      return <BackedProjectsPage projects={this.getExploreProjects()} />;
+    } else {
+      return <ExploreProjectsPage projects={this.getExploreProjects()} />;
+    }
+  }
+
   view(vnode) {
-    const projects = app.activeChainId()
+    // TODO: Reconcile local project type against controller class
+    this.projects = app.activeChainId()
       ? app.projects.store
           .getAll()
           .filter((project) => project.token === app.activeChainId())
-      : app.projects;
-    const userCreatedProjects: Project[] = Array(2).fill(DummyProject); // projects.filter(...)
-    const userBackedProjects: Project[] = Array(4).fill(DummyProject); // projects.filter(...)
-    const userPreviouslyBackedProjects: Project[] = Array(6).fill(DummyProject); // projects.filter(...)
-    const trendingProjects: Project[] = Array(2).fill(DummyProject); // projects.filter(...)
-    const recommendedProjects: Project[] = Array(4).fill(DummyProject); // projects.filter(...)
-    const showUserProjects =
-      userCreatedProjects.length ||
-      userBackedProjects.length ||
-      userPreviouslyBackedProjects.length;
-    const showTrendingProjects =
-      trendingProjects.length || recommendedProjects.length;
+      : app.projects.store.getAll();
+
     return (
       <Sublayout
-        class="ProjectListing"
         title="Projects"
+        hideSidebar={true}
         showNewProposalButton={false}
       >
-        {showUserProjects && (
-          <div class="user-projects">
-            {userCreatedProjects.length && (
-              <div class="user-created-project-wrap">
-                <div class="user-created-project-header">
-                  <CWText intent="primary" label="Create New Project" />
-                  {/* m.route.set(`${app.activeId()}/createProject`) */}
-                </div>
-                <div class="user-created-projects">
-                  {userCreatedProjects.map((project) => {
-                    return m(ProjectCard, {
-                      project,
-                      size: ProjectCardSize.Large,
-                    });
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        {m('.user-backed-project-wrap', [
-          m('h2', 'Currently Backing'),
-          m(
-            '.user-backed-projects',
-            userBackedProjects.map((project) => {
-              return m(ProjectCard, {
-                project,
-                size: ProjectCardSize.Medium,
-              });
-            })
-          ),
-        ])}
-        {m('.user-previously-backed-project-wrap', [
-          m('h3', 'Past Contributions'),
-          m(
-            '.user-previously-backed-projects',
-            userPreviouslyBackedProjects.map((project) => {
-              return m(ProjectCard, {
-                project,
-                size: ProjectCardSize.Small,
-              });
-            })
-          ),
-        ])}
-        {showTrendingProjects &&
-          m('.community-projects', [
-            m('h1', 'Discover'),
-            m('.project-discovery', [
-              m('.trending-projects', [
-                m('h2', 'Trending'),
-                trendingProjects.map((project) => {
-                  return m(ProjectCard, {
-                    project,
-                    size: ProjectCardSize.Large,
-                  });
-                }),
-              ]),
-              m('.recommended-projects', [
-                m('h2', 'Recommended'),
-                recommendedProjects.map((project) => {
-                  return m(ProjectCard, {
-                    project,
-                    size: ProjectCardSize.Medium,
-                  });
-                }),
-              ]),
-            ]),
-          ])}
-        ,
-        <div class="CreateProjectForm">
+        {/* TODO: Move towards simple tabs & URI-based toggling between various subpage */}
+        <div class="ProjectsListing">{this.getProjectListingSubpage()}</div>
+        {/* <div class="CreateProjectForm">
           <CWTextInput
             label="Name"
             name="Name"
@@ -211,7 +173,7 @@ export default class ProjectListing
             }}
           />
           ,
-        </div>
+        </div> */}
       </Sublayout>
     );
   }

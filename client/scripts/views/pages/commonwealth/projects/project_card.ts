@@ -6,6 +6,7 @@ import m from 'mithril';
 import { capitalize } from 'lodash';
 import { slugify } from 'utils';
 import { AnonymousUser } from '../../../components/widgets/user';
+import { Project } from '.';
 
 export enum ProjectCardSize {
   Small = 'small',
@@ -14,7 +15,7 @@ export enum ProjectCardSize {
 }
 
 interface ProjectCardAttrs {
-  project; // : Project;
+  project: Project;
   size: ProjectCardSize;
 }
 
