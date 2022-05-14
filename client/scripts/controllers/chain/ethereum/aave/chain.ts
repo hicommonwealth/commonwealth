@@ -1,9 +1,9 @@
 import { NodeInfo } from 'models';
 import { IAaveGovernanceV2__factory } from 'eth/types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
 import EthereumChain from '../chain';
 import AaveApi from './api';
-import { attachSigner } from '../contractApi';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
 // on the Governance module works as expected.
@@ -11,7 +11,11 @@ export default class AaveChain extends EthereumChain {
   public aaveApi: AaveApi;
 
   public coins(n: number, inDollars?: boolean) {
-    return new EthereumCoin(this.app?.chain?.meta.chain.symbol || '???', n, inDollars);
+    return new EthereumCoin(
+      this.app?.chain?.meta.chain.symbol || '???',
+      n,
+      inDollars
+    );
   }
 
   public async init(selectedNode: NodeInfo) {
@@ -34,14 +38,21 @@ export default class AaveChain extends EthereumChain {
   public async setDelegate(delegatee: string) {
     const token = this.aaveApi?.Token;
     if (!token) throw new Error('No token contract found');
-    const contract = await attachSigner(this.app.wallets, this.app.user.activeAccount, token);
+    const contract = await attachSigner(
+      this.app.wallets,
+      this.app.user.activeAccount,
+      token
+    );
     await contract.delegate(delegatee);
   }
 
   public async getDelegate(delegator: string, type: 'voting' | 'proposition') {
     const token = this.aaveApi?.Token;
     if (!token) throw new Error('No token contract found');
-    const delegate = await token.getDelegateeByType(delegator, type === 'voting' ? 0 : 1);
+    const delegate = await token.getDelegateeByType(
+      delegator,
+      type === 'voting' ? 0 : 1
+    );
     return delegate;
   }
 }

@@ -1,6 +1,9 @@
 import { IdStore } from 'stores';
 import $ from 'jquery';
-import { ICuratedProjectFactory__factory, ICuratedProject__factory } from 'eth/types';
+import {
+  ICuratedProjectFactory__factory,
+  ICuratedProject__factory,
+} from 'eth/types';
 import { NodeInfo, Project } from 'models';
 import { IApp } from 'state';
 import { ChainNetwork } from 'types';
@@ -18,23 +21,32 @@ export type IProjectCreationData = {
   threshold: BN;
   deadline: number; // unix timestamp
   curatorFee: BN;
-}
+};
 
 export default class ProjectsController {
   private _initialized = false;
-  public initialized() { return this._initialized; }
+  public initialized() {
+    return this._initialized;
+  }
 
   private _initializing = false;
-  public initializing() { return this._initializing; }
+  public initializing() {
+    return this._initializing;
+  }
 
   protected _store: IdStore<Project> = new IdStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _factoryInfo: NodeInfo;
   private _app: IApp;
 
   private async _loadProjectsFromServer(project_id?: number) {
-    const res = await $.getJSON(`${this._app.serverUrl()}/getProjects`, project_id ? { project_id } : {});
+    const res = await $.getJSON(
+      `${this._app.serverUrl()}/getProjects`,
+      project_id ? { project_id } : {}
+    );
     for (const project of res) {
       try {
         const pObj = Project.fromJSON(project);
@@ -44,7 +56,9 @@ export default class ProjectsController {
           this._store.update(pObj);
         }
       } catch (e) {
-        console.error(`Could not load project: ${JSON.stringify(project)}: ${e.message}`);
+        console.error(
+          `Could not load project: ${JSON.stringify(project)}: ${e.message}`
+        );
       }
     }
   }
@@ -54,7 +68,9 @@ export default class ProjectsController {
     this._app = app;
 
     // locate CWP community, containing factory address + node url
-    this._factoryInfo = this._app.config.nodes.getById(ChainNetwork.CommonProtocol);
+    this._factoryInfo = this._app.config.nodes.getById(
+      ChainNetwork.CommonProtocol
+    );
     if (!this._factoryInfo) {
       console.error('CWP factory info not found!');
       this._initializing = false;
@@ -66,7 +82,7 @@ export default class ProjectsController {
       await this._loadProjectsFromServer();
     } catch (e) {
       console.error(`Failed to load projects: ${e.message}`);
-      this._initializing = false
+      this._initializing = false;
       return;
     }
     this._initialized = true;
@@ -92,7 +108,17 @@ export default class ProjectsController {
     // }
     // const curatorFee = Math.min(projectData.curatorFee, 10000 - this.protocolFee);
 
-    const { beneficiary, title, cwUrl, ipfsContent, chain, token, threshold, deadline, curatorFee } = projectData;
+    const {
+      beneficiary,
+      title,
+      cwUrl,
+      ipfsContent,
+      chain,
+      token,
+      threshold,
+      deadline,
+      curatorFee,
+    } = projectData;
     const creator = this._app.user.activeAccount;
 
     // upload ipfs content
@@ -128,7 +154,7 @@ export default class ProjectsController {
       token,
       threshold.toString(),
       deadline,
-      curatorFee.toString(),
+      curatorFee.toString()
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -146,7 +172,9 @@ export default class ProjectsController {
           jwt: this._app.user.jwt,
         });
       } catch (err) {
-        console.error(`Failed to set project ${projectId.toString()} chain to ${chain}`);
+        console.error(
+          `Failed to set project ${projectId.toString()} chain to ${chain}`
+        );
       }
     }
 
@@ -166,7 +194,7 @@ export default class ProjectsController {
       backer,
       null,
       ICuratedProject__factory.connect,
-      project.address,
+      project.address
     );
 
     const tx = await contract.back(value, { from: backer.address });
@@ -192,7 +220,7 @@ export default class ProjectsController {
       curator,
       null,
       ICuratedProject__factory.connect,
-      project.address,
+      project.address
     );
 
     const tx = await contract.curate(value, { from: curator.address });
@@ -221,10 +249,12 @@ export default class ProjectsController {
       beneficiary,
       null,
       ICuratedProject__factory.connect,
-      project.address,
+      project.address
     );
 
-    const tx = await contract.beneficiaryWithdraw({ from: beneficiary.address });
+    const tx = await contract.beneficiaryWithdraw({
+      from: beneficiary.address,
+    });
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to withdraw');
@@ -250,7 +280,7 @@ export default class ProjectsController {
       backer,
       null,
       ICuratedProject__factory.connect,
-      project.address,
+      project.address
     );
 
     const tx = await contract.backersWithdraw({ from: backer.address });
@@ -269,7 +299,9 @@ export default class ProjectsController {
     if (!this._initialized) throw new Error('Projects not yet initialized');
     const curator = this._app.user.activeAccount;
     const project = this._store.getById(projectId);
-    if (!project.curateEvents.find(({ sender }) => sender === curator.address)) {
+    if (
+      !project.curateEvents.find(({ sender }) => sender === curator.address)
+    ) {
       throw new Error('Must be backer to withdraw');
     }
 
@@ -279,7 +311,7 @@ export default class ProjectsController {
       curator,
       null,
       ICuratedProject__factory.connect,
-      project.address,
+      project.address
     );
 
     const tx = await contract.curatorsWithdraw({ from: curator.address });
