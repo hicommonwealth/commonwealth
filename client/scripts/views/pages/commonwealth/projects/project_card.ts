@@ -48,17 +48,18 @@ const ProjectHeaderPanel: m.Component<{ iconSize?: number }> = {
   },
 };
 
-export const ProjectCompletionBar: m.Component<{ completionPercent: number }> =
-  {
-    view: (vnode) => {
-      const { completionPercent } = vnode.attrs;
-      return m('.ProjectCompletionBar', [
-        m('.completed-percentage', {
-          style: `width: ${completionPercent * 400}px`,
-        }),
-      ]);
-    },
-  };
+export class ProjectCompletionBar
+  implements m.ClassComponent<{ completionPercent: number }>
+{
+  view(vnode) {
+    const { completionPercent } = vnode.attrs;
+    return m('.ProjectCompletionBar', [
+      m('.completed-percentage', {
+        style: `width: ${completionPercent * 400}px`,
+      }),
+    ]);
+  }
+}
 
 const ProjectInfoPanel: m.Component<{
   project;
