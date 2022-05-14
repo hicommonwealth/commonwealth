@@ -18,8 +18,15 @@ import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityCreationPayload,
+  MixpanelPageViewEvent,
+  MixpanelPageViewPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
-enum CommunityType {
+export enum CommunityType {
   StarterCommunity = 'Starter Community',
   Erc20Community = 'ERC20',
   Erc721Community = 'ERC721',
@@ -69,6 +76,13 @@ class CreateCommunity implements m.ClassComponent {
     });
   }
 
+  oncreate() {
+    mixpanelBrowserTrack({
+      event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
+      isCustomDomain: app.isCustomDomain(),
+    });
+  }
+
   view() {
     const getActiveForm = () => {
       const { ethChains, ethChainNames } = this.state;
@@ -113,6 +127,13 @@ class CreateCommunity implements m.ClassComponent {
                       active={this.state.activeForm === t}
                       onclick={() => {
                         this.state.activeForm = t;
+                        mixpanelBrowserTrack({
+                          event:
+                            MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
+                          chainBase: null,
+                          isCustomDomain: app.isCustomDomain(),
+                          communityType: t,
+                        });
                       }}
                       style="text-align: center"
                     />

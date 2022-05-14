@@ -3,7 +3,6 @@
 /* eslint-disable max-len */
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { EmptyState, Icons } from 'construct-ui';
 
 import 'pages/404.scss';
@@ -13,9 +12,7 @@ import Sublayout from 'views/sublayout';
 type PageNotFoundAttrs = { title?: string; message?: string };
 
 export class PageNotFound implements m.ClassComponent<PageNotFoundAttrs> {
-  oncreate() {
-    mixpanel.track('PageVisit', { 'Page Name': '404Page' });
-  }
+  oncreate() {}
 
   view(vnode) {
     const { message, title } = vnode.attrs;

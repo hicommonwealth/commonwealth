@@ -14,6 +14,8 @@ import { getUrlsForEthChainId } from '../util/supportedEthChains';
 
 import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -290,6 +292,15 @@ const createChain = async (
     chain_id: chain.id,
     category: 'General',
   });
+
+  if (process.env.NODE_ENV !== 'test') {
+    mixpanelTrack({
+      chainBase: req.body.base,
+      isCustomDomain: null,
+      communityType: null,
+      event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+    });
+  }
 
   return success(res, { chain: chain.toJSON(), node: node.toJSON() });
 };

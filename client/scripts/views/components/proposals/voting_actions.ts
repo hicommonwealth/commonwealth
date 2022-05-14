@@ -1,7 +1,6 @@
 import 'components/proposals/voting_actions.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { Button, Input } from 'construct-ui';
 
 import app from 'state';
@@ -146,15 +145,7 @@ const ProposalExtensions: m.Component<{
 export const cancelProposal = (e, state, proposal, onModalClose) => {
   e.preventDefault();
   state.votingModalOpen = true;
-  mixpanel.track('Proposal Funnel', {
-    'Step No': 3,
-    Step: 'Cancel Proposal',
-    'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-    Scope: app.activeChainId(),
-  });
-  mixpanel.people.set({
-    'Last Thread Created': new Date().toISOString(),
-  });
+
   if (!onModalClose) {
     onModalClose = () => undefined;
   }
@@ -340,16 +331,7 @@ const VotingActions: m.Component<
     const voteYes = async (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 3,
-        Step: 'Vote Yes',
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        Scope: app.activeChainId(),
-      });
-      mixpanel.people.increment('Votes');
-      mixpanel.people.set({
-        'Last Vote Created': new Date().toISOString(),
-      });
+
       if (proposal instanceof SubstrateDemocracyProposal) {
         createTXModal(
           proposal.submitVoteTx(
@@ -433,16 +415,7 @@ const VotingActions: m.Component<
     const voteNo = (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 3,
-        Step: 'Vote No',
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        Scope: app.activeChainId(),
-      });
-      mixpanel.people.increment('Votes');
-      mixpanel.people.set({
-        'Last Vote Created': new Date().toISOString(),
-      });
+
       if (proposal instanceof SubstrateDemocracyReferendum) {
         if (vnode.state.conviction === undefined) {
           vnode.state.votingModalOpen = false;
@@ -502,15 +475,7 @@ const VotingActions: m.Component<
     const processProposal = (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 3,
-        Step: 'Process Proposal',
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        Scope: app.activeChainId(),
-      });
-      mixpanel.people.set({
-        'Last Thread Created': new Date().toISOString(),
-      });
+
       if (proposal instanceof MolochProposal) {
         proposal
           .processTx()
@@ -530,16 +495,7 @@ const VotingActions: m.Component<
     const voteAbstain = (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 3,
-        Step: 'Vote Abstain',
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        Scope: app.activeChainId(),
-      });
-      mixpanel.people.increment('Votes');
-      mixpanel.people.set({
-        'Last Thread Created': new Date().toISOString(),
-      });
+
       if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'Abstain'))
@@ -561,16 +517,7 @@ const VotingActions: m.Component<
     const voteVeto = (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 3,
-        Step: 'Vote Veto',
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        Scope: app.activeChainId(),
-      });
-      mixpanel.people.increment('Votes');
-      mixpanel.people.set({
-        'Last Thread Created': new Date().toISOString(),
-      });
+
       if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'NoWithVeto'))
@@ -584,16 +531,7 @@ const VotingActions: m.Component<
     const voteRemove = (e) => {
       e.preventDefault();
       vnode.state.votingModalOpen = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 3,
-        Step: 'Vote Reject',
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        Scope: app.activeChainId(),
-      });
-      mixpanel.people.increment('Votes');
-      mixpanel.people.set({
-        'Last Thread Created': new Date().toISOString(),
-      });
+
       if (proposal instanceof NearSputnikProposal) {
         proposal
           .submitVoteWebTx(
@@ -616,12 +554,6 @@ const VotingActions: m.Component<
     const voteForChoice = (e, choice) => {
       e.preventDefault();
       vnode.state.votingModalOpen = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 3,
-        Step: `Vote for choice ${choice.toString()}`,
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        Scope: app.activeChainId(),
-      });
     };
 
     let hasVotedYes;

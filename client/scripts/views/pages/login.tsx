@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -10,9 +9,7 @@ import Login from 'views/components/login';
 import Sublayout from 'views/sublayout';
 
 class LoginPage implements m.ClassComponent {
-  oncreate() {
-    mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
-  }
+  oncreate() {}
 
   view() {
     // this page requires a logged-out user
