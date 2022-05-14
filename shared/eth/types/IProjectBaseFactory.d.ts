@@ -192,27 +192,11 @@ export class IProjectBaseFactory extends Contract {
 
     protocolData(
       overrides?: CallOverrides
-    ): Promise<
-      [
-        [BigNumber, BigNumber, string] & {
-          protocolFee: BigNumber;
-          maxFee: BigNumber;
-          feeTo: string;
-        }
-      ]
-    >;
+    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
 
     "protocolData()"(
       overrides?: CallOverrides
-    ): Promise<
-      [
-        [BigNumber, BigNumber, string] & {
-          protocolFee: BigNumber;
-          maxFee: BigNumber;
-          feeTo: string;
-        }
-      ]
-    >;
+    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
 
     setFeeTo(
       _feeTo: string,
@@ -286,23 +270,11 @@ export class IProjectBaseFactory extends Contract {
 
   protocolData(
     overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, string] & {
-      protocolFee: BigNumber;
-      maxFee: BigNumber;
-      feeTo: string;
-    }
-  >;
+  ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
   "protocolData()"(
     overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, string] & {
-      protocolFee: BigNumber;
-      maxFee: BigNumber;
-      feeTo: string;
-    }
-  >;
+  ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
   setFeeTo(
     _feeTo: string,
@@ -376,23 +348,11 @@ export class IProjectBaseFactory extends Contract {
 
     protocolData(
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string] & {
-        protocolFee: BigNumber;
-        maxFee: BigNumber;
-        feeTo: string;
-      }
-    >;
+    ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
     "protocolData()"(
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string] & {
-        protocolFee: BigNumber;
-        maxFee: BigNumber;
-        feeTo: string;
-      }
-    >;
+    ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
     setFeeTo(_feeTo: string, overrides?: CallOverrides): Promise<void>;
 

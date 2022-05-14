@@ -1279,10 +1279,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@0.11.1":
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.11.1.tgz#936022282de3adfd93e0ff93119197b531dd4e6a"
-  integrity sha512-SI8Plre0BJbLi/SotPLDbGyFlNEaVz03olvUpsoW9plBmLiASviFJjt+aHYmgKIVPTVbwvuhG7TB7ktsM5vpSQ==
+"@commonwealth/chain-events@0.13.0-alpha.0":
+  version "0.13.0-alpha.0"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.13.0-alpha.0.tgz#355458c96c049a63ed6cbd6f2a41d6ef7f80f584"
+  integrity sha512-d7D5jktKLvPsLL5hypH7hm8YO2gbZRvpDl1vnzxVb21I7/lpBCMSJK3hhBj9FNKpl7mL+QM/1bALpQBjtjyBnA==
   dependencies:
     "@ethersproject/abi" "^5.0.0"
     "@ethersproject/bytes" "^5.0.0"
@@ -3625,11 +3625,6 @@
   resolved "https://registry.npmjs.org/@types/mithril/-/mithril-2.0.7.tgz"
   integrity sha512-ByD422x0GnYh5MOEAWNyqfkw2QlKkK3Yf7y5e1CobDVPG9m+/ThblfrIHENihF7VnygT6sQRObPvY1J/fUZICg==
 
-"@types/mixpanel-browser@^2.23.1":
-  version "2.33.1"
-  resolved "https://registry.npmjs.org/@types/mixpanel-browser/-/mixpanel-browser-2.33.1.tgz"
-  integrity sha512-+piPadxLwVdmFWTmaJKz/0FmQ6X/1kOvKHoH6jx4v6CVNMiR36dWKgnfnNojIA8vjLx0kCHSJ/otSiYaSrneiw==
-
 "@types/mkdirp@^0.5.2":
   version "0.5.2"
   resolved "https://registry.npmjs.org/@types/mkdirp/-/mkdirp-0.5.2.tgz"
@@ -4448,13 +4443,6 @@ agent-base@6:
   integrity sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==
   dependencies:
     debug "4"
-
-agent-base@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.npmjs.org/agent-base/-/agent-base-4.3.0.tgz"
-  integrity sha512-salcGninV0nPrwpGNn4VTXBb1SOuXQBiqbrNXoeizJsHrsL6ERFM2Ne3JUSBWRE6aeNJI2ROP/WEEIDUiDe3cg==
-  dependencies:
-    es6-promisify "^5.0.0"
 
 aggregate-error@^3.0.0:
   version "3.1.0"
@@ -10579,15 +10567,7 @@ https-browserify@^1.0.0:
   resolved "https://registry.npmjs.org/https-browserify/-/https-browserify-1.0.0.tgz"
   integrity sha1-7AbBDgo0wPL68Zn3/X/Hj//QPHM=
 
-https-proxy-agent@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-3.0.0.tgz"
-  integrity sha512-y4jAxNEihqvBI5F3SaO2rtsjIOnnNA8sEbuiP+UhJZJHeM2NRm6c09ax2tgqme+SgUUvjao2fJXF4h3D6Cb2HQ==
-  dependencies:
-    agent-base "^4.3.0"
-    debug "^3.1.0"
-
-https-proxy-agent@^5.0.0:
+https-proxy-agent@5.0.0, https-proxy-agent@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-5.0.0.tgz#e2a90542abb68a762e0a0850f6c9edadfd8506b2"
   integrity sha512-EkYm5BcKUGiduxzSt3Eppko+PiNWNEpa4ySk9vTC6wDsQJW9rHSa+UhGNJoRYp7bz6Ht1eaRIa6QaJqO5rCFbA==
@@ -12975,17 +12955,17 @@ mixin-deep@^1.2.0:
     for-in "^1.0.2"
     is-extendable "^1.0.1"
 
-mixpanel-browser@^2.27.1:
-  version "2.34.0"
-  resolved "https://registry.npmjs.org/mixpanel-browser/-/mixpanel-browser-2.34.0.tgz"
-  integrity sha512-gueIkZ+aFLcd2H5w4CYU3uw9kV88BaH7q1HRD94z2B3I9+REuJfXgRhd/DSZHKWimxl8dkR/7MnLqs9jjZX14A==
+mixpanel-browser@^2.45.0:
+  version "2.45.0"
+  resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.45.0.tgz#a2973be5b66e6d2799ef95a1e55b8ad8eede57e8"
+  integrity sha512-PQ1DaTk68yyYtLA0iejmzPA9iNDhT4uIZpqZjRTw7HWpYfl123fydHb2laKanaKjm8YDmrGGz3+xZ4Q6joogyg==
 
-mixpanel@^0.10.2:
-  version "0.10.3"
-  resolved "https://registry.npmjs.org/mixpanel/-/mixpanel-0.10.3.tgz"
-  integrity sha512-wIYr5o+1XSzJ80o3QED35K/yfPAKi5FigZXTSfcs4vltfeKbilIjNgwxdno7LrqzhjoSjmIyDWkI7D3lr7TwDw==
+mixpanel@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/mixpanel/-/mixpanel-0.14.0.tgz#5d948c30cd1ad17acb235dc084478c7b32eff04f"
+  integrity sha512-PY2zSMXCGHSEnuuFnlPeSX3R7YeU3/8IaSUgmGc9DnM2U7weg6sfdKu7s5+3euwGz0R1KHQoUJOUbIuXtHgGmA==
   dependencies:
-    https-proxy-agent "3.0.0"
+    https-proxy-agent "5.0.0"
 
 mkdirp-promise@^5.0.1:
   version "5.0.1"

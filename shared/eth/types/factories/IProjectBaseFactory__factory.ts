@@ -133,14 +133,9 @@ const _abi = [
       {
         components: [
           {
-            internalType: "uint256",
-            name: "protocolFee",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "maxFee",
-            type: "uint256",
+            internalType: "uint8",
+            name: "fee",
+            type: "uint8",
           },
           {
             internalType: "address payable",

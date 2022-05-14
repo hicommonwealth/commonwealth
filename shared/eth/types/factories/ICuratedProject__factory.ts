@@ -103,9 +103,21 @@ const _abi = [
       },
       {
         indexed: false,
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+      {
+        indexed: false,
         internalType: "uint256",
         name: "amount",
         type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "bytes32",
+        name: "withdrawalType",
+        type: "bytes32",
       },
     ],
     name: "Withdraw",
@@ -337,23 +349,30 @@ const _abi = [
           },
         ],
         internalType: "struct DataTypes.ProjectData",
-        name: "_pData",
+        name: "_projectData",
+        type: "tuple",
+      },
+      {
+        components: [
+          {
+            internalType: "uint8",
+            name: "fee",
+            type: "uint8",
+          },
+          {
+            internalType: "address payable",
+            name: "feeTo",
+            type: "address",
+          },
+        ],
+        internalType: "struct DataTypes.ProtocolData",
+        name: "_protocolData",
         type: "tuple",
       },
       {
         internalType: "uint256",
         name: "_curatorFee",
         type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_protocolFee",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_protocolFeeTo",
-        type: "address",
       },
       {
         internalType: "address",

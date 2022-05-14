@@ -33,7 +33,7 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     "curatorsWithdraw()": FunctionFragment;
     "deadline()": FunctionFragment;
     "funded()": FunctionFragment;
-    "initialize(tuple,tuple,uint256,uint256,address,address,address)": FunctionFragment;
+    "initialize(tuple,tuple,tuple,uint256,address,address)": FunctionFragment;
     "lockedWithdraw()": FunctionFragment;
     "metaData()": FunctionFragment;
     "protocolFee()": FunctionFragment;
@@ -94,9 +94,8 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
         beneficiary: string;
         acceptedToken: string;
       },
+      { fee: BigNumberish; feeTo: string },
       BigNumberish,
-      BigNumberish,
-      string,
       string,
       string
     ]
@@ -190,7 +189,7 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     "Curate(address,address,uint256)": EventFragment;
     "Failed()": EventFragment;
     "Succeeded(uint256,uint256)": EventFragment;
-    "Withdraw(address,uint256)": EventFragment;
+    "Withdraw(address,address,uint256,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Back"): EventFragment;
@@ -324,21 +323,20 @@ export class ICuratedProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _pData: {
+      _projectData: {
         threshold: BigNumberish;
         deadline: BigNumberish;
         beneficiary: string;
         acceptedToken: string;
       },
+      _protocolData: { fee: BigNumberish; feeTo: string },
       _curatorFee: BigNumberish,
-      _protocolFee: BigNumberish,
-      _protocolFeeTo: string,
       _bToken: string,
       _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -346,15 +344,14 @@ export class ICuratedProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _pData: {
+      _projectData: {
         threshold: BigNumberish;
         deadline: BigNumberish;
         beneficiary: string;
         acceptedToken: string;
       },
+      _protocolData: { fee: BigNumberish; feeTo: string },
       _curatorFee: BigNumberish,
-      _protocolFee: BigNumberish,
-      _protocolFeeTo: string,
       _bToken: string,
       _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -513,21 +510,20 @@ export class ICuratedProject extends Contract {
       cwUrl: BytesLike;
       creator: string;
     },
-    _pData: {
+    _projectData: {
       threshold: BigNumberish;
       deadline: BigNumberish;
       beneficiary: string;
       acceptedToken: string;
     },
+    _protocolData: { fee: BigNumberish; feeTo: string },
     _curatorFee: BigNumberish,
-    _protocolFee: BigNumberish,
-    _protocolFeeTo: string,
     _bToken: string,
     _cToken: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
+  "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
     _metaData: {
       id: BigNumberish;
       name: BytesLike;
@@ -535,15 +531,14 @@ export class ICuratedProject extends Contract {
       cwUrl: BytesLike;
       creator: string;
     },
-    _pData: {
+    _projectData: {
       threshold: BigNumberish;
       deadline: BigNumberish;
       beneficiary: string;
       acceptedToken: string;
     },
+    _protocolData: { fee: BigNumberish; feeTo: string },
     _curatorFee: BigNumberish,
-    _protocolFee: BigNumberish,
-    _protocolFeeTo: string,
     _bToken: string,
     _cToken: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -680,21 +675,20 @@ export class ICuratedProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _pData: {
+      _projectData: {
         threshold: BigNumberish;
         deadline: BigNumberish;
         beneficiary: string;
         acceptedToken: string;
       },
+      _protocolData: { fee: BigNumberish; feeTo: string },
       _curatorFee: BigNumberish,
-      _protocolFee: BigNumberish,
-      _protocolFeeTo: string,
       _bToken: string,
       _cToken: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -702,15 +696,14 @@ export class ICuratedProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _pData: {
+      _projectData: {
         threshold: BigNumberish;
         deadline: BigNumberish;
         beneficiary: string;
         acceptedToken: string;
       },
+      _protocolData: { fee: BigNumberish; feeTo: string },
       _curatorFee: BigNumberish,
-      _protocolFee: BigNumberish,
-      _protocolFeeTo: string,
       _bToken: string,
       _cToken: string,
       overrides?: CallOverrides
@@ -810,10 +803,17 @@ export class ICuratedProject extends Contract {
 
     Withdraw(
       sender: null,
-      amount: null
+      token: null,
+      amount: null,
+      withdrawalType: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { sender: string; amount: BigNumber }
+      [string, string, BigNumber, string],
+      {
+        sender: string;
+        token: string;
+        amount: BigNumber;
+        withdrawalType: string;
+      }
     >;
   };
 
@@ -898,21 +898,20 @@ export class ICuratedProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _pData: {
+      _projectData: {
         threshold: BigNumberish;
         deadline: BigNumberish;
         beneficiary: string;
         acceptedToken: string;
       },
+      _protocolData: { fee: BigNumberish; feeTo: string },
       _curatorFee: BigNumberish,
-      _protocolFee: BigNumberish,
-      _protocolFeeTo: string,
       _bToken: string,
       _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -920,15 +919,14 @@ export class ICuratedProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _pData: {
+      _projectData: {
         threshold: BigNumberish;
         deadline: BigNumberish;
         beneficiary: string;
         acceptedToken: string;
       },
+      _protocolData: { fee: BigNumberish; feeTo: string },
       _curatorFee: BigNumberish,
-      _protocolFee: BigNumberish,
-      _protocolFeeTo: string,
       _bToken: string,
       _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1064,21 +1062,20 @@ export class ICuratedProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _pData: {
+      _projectData: {
         threshold: BigNumberish;
         deadline: BigNumberish;
         beneficiary: string;
         acceptedToken: string;
       },
+      _protocolData: { fee: BigNumberish; feeTo: string },
       _curatorFee: BigNumberish,
-      _protocolFee: BigNumberish,
-      _protocolFeeTo: string,
       _bToken: string,
       _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),uint256,uint256,address,address,address)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -1086,15 +1083,14 @@ export class ICuratedProject extends Contract {
         cwUrl: BytesLike;
         creator: string;
       },
-      _pData: {
+      _projectData: {
         threshold: BigNumberish;
         deadline: BigNumberish;
         beneficiary: string;
         acceptedToken: string;
       },
+      _protocolData: { fee: BigNumberish; feeTo: string },
       _curatorFee: BigNumberish,
-      _protocolFee: BigNumberish,
-      _protocolFeeTo: string,
       _bToken: string,
       _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }

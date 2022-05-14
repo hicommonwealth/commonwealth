@@ -10,6 +10,7 @@ import {
   MolochEvents,
   CompoundEvents,
   AaveEvents,
+  CommonwealthEvents,
 } from '@commonwealth/chain-events';
 
 import { ChainAttributes } from '../models/chain';
@@ -21,6 +22,7 @@ import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
+import ProjectHandler from '../eventHandlers/project';
 import { default as models, sequelize } from '../database';
 import { ChainBase, ChainNetwork } from '../../shared/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
@@ -59,7 +61,7 @@ const discoverReconnectRange = async (
 export const generateHandlers = (
   node: ChainNodeInstance,
   wss?: WebSocket.Server,
-  storageConfig: StorageFilterConfig = {}
+  storageConfig: StorageFilterConfig = {},
 ) => {
   const chain = node.chain;
 
@@ -100,6 +102,12 @@ export const generateHandlers = (
     const userFlagsHandler = new UserFlagsHandler(models, node.chain);
 
     handlers.push(identityHandler, userFlagsHandler);
+  }
+
+  // only handle CWP events on Common Protocol
+  if (node.Chain.network === ChainNetwork.CommonProtocol) {
+    const projectHandler = new ProjectHandler(models, node);
+    handlers.push(projectHandler);
   }
 
   return handlers;
@@ -203,6 +211,17 @@ const setupChainEventListeners = async (
           const api = await AaveEvents.createApi(node.url, node.address);
           const handlers = generateHandlers(node, wss);
           subscriber = await AaveEvents.subscribeEvents({
+            chain: node.chain,
+            handlers,
+            skipCatchup,
+            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            api,
+            verbose: true,
+          });
+        } else if (node.Chain.network === ChainNetwork.CommonProtocol) {
+          const api = await CommonwealthEvents.createApi(node.url, node.address);
+          const handlers = generateHandlers(node, wss);
+          subscriber = await CommonwealthEvents.subscribeEvents({
             chain: node.chain,
             handlers,
             skipCatchup,

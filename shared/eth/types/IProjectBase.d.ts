@@ -128,7 +128,7 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
     "Back(address,address,uint256)": EventFragment;
     "Failed()": EventFragment;
     "Succeeded(uint256,uint256)": EventFragment;
-    "Withdraw(address,uint256)": EventFragment;
+    "Withdraw(address,address,uint256,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Back"): EventFragment;
@@ -511,10 +511,17 @@ export class IProjectBase extends Contract {
 
     Withdraw(
       sender: null,
-      amount: null
+      token: null,
+      amount: null,
+      withdrawalType: null
     ): TypedEventFilter<
-      [string, BigNumber],
-      { sender: string; amount: BigNumber }
+      [string, string, BigNumber, string],
+      {
+        sender: string;
+        token: string;
+        amount: BigNumber;
+        withdrawalType: string;
+      }
     >;
   };
 

@@ -243,27 +243,11 @@ export class ICuratedProjectFactory extends Contract {
 
     protocolData(
       overrides?: CallOverrides
-    ): Promise<
-      [
-        [BigNumber, BigNumber, string] & {
-          protocolFee: BigNumber;
-          maxFee: BigNumber;
-          feeTo: string;
-        }
-      ]
-    >;
+    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
 
     "protocolData()"(
       overrides?: CallOverrides
-    ): Promise<
-      [
-        [BigNumber, BigNumber, string] & {
-          protocolFee: BigNumber;
-          maxFee: BigNumber;
-          feeTo: string;
-        }
-      ]
-    >;
+    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
 
     setCWTokenImpl(
       _cwToken: string,
@@ -371,23 +355,11 @@ export class ICuratedProjectFactory extends Contract {
 
   protocolData(
     overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, string] & {
-      protocolFee: BigNumber;
-      maxFee: BigNumber;
-      feeTo: string;
-    }
-  >;
+  ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
   "protocolData()"(
     overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, string] & {
-      protocolFee: BigNumber;
-      maxFee: BigNumber;
-      feeTo: string;
-    }
-  >;
+  ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
   setCWTokenImpl(
     _cwToken: string,
@@ -495,23 +467,11 @@ export class ICuratedProjectFactory extends Contract {
 
     protocolData(
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string] & {
-        protocolFee: BigNumber;
-        maxFee: BigNumber;
-        feeTo: string;
-      }
-    >;
+    ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
     "protocolData()"(
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string] & {
-        protocolFee: BigNumber;
-        maxFee: BigNumber;
-        feeTo: string;
-      }
-    >;
+    ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
     setCWTokenImpl(_cwToken: string, overrides?: CallOverrides): Promise<void>;
 

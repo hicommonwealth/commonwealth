@@ -21,6 +21,7 @@ import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
+import ProjectsController from './controllers/chain/ethereum/projects';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -63,9 +64,6 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
 
-  // CMN
-  projects: any[]; // TODO ProjectsController;
-
   // User
   user: UserController;
   recentActivity: RecentActivityController;
@@ -74,6 +72,7 @@ export interface IApp {
   // Web3
   wallets: WebWalletController;
   snapshot: SnapshotController;
+  projects: ProjectsController;
 
   toasts: ToastStore;
   modals: ModalStore;
@@ -136,9 +135,6 @@ const app: IApp = {
   communities: new CommunitiesController(),
   topics: new TopicsController(),
 
-  // CMN
-  projects: [], // new ProjectsController(),
-
   // Search
   search: new SearchController(),
   searchAddressCache: {},
@@ -146,6 +142,7 @@ const app: IApp = {
   // Web3
   snapshot: new SnapshotController(),
   wallets: new WebWalletController(),
+  projects: new ProjectsController(),
 
   // User
   user: new UserController(),

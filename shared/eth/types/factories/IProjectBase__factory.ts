@@ -78,9 +78,21 @@ const _abi = [
       },
       {
         indexed: false,
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+      {
+        indexed: false,
         internalType: "uint256",
         name: "amount",
         type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "bytes32",
+        name: "withdrawalType",
+        type: "bytes32",
       },
     ],
     name: "Withdraw",
