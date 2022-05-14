@@ -93,15 +93,17 @@ export default class ProjectListing
 
   getProjectListingSubpage() {
     if (this.subpage === ProjectListingSubpage.Yours) {
-      return <YourProjectsPage projects={this.getExploreProjects()} />;
+      return <YourProjectsPage projects={this.getYourProjects()} />;
     } else if (this.subpage === ProjectListingSubpage.Backed) {
-      return <BackedProjectsPage projects={this.getExploreProjects()} />;
+      return <BackedProjectsPage projects={this.getBackedProjects()} />;
     } else {
       return <ExploreProjectsPage projects={this.getExploreProjects()} />;
     }
   }
 
   view(vnode) {
+    this.subpage = vnode.attrs.subpage;
+
     // TODO: Reconcile local project type against controller class
     this.projects = app.activeChainId()
       ? app.projects.store

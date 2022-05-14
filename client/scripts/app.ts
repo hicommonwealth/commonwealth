@@ -667,12 +667,12 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             // CMN
-            '/projects': importRoute(
+            '/:scope/projects': redirectRoute(
+              (attrs) => `/${attrs.scope}/projects/explore`
+            ),
+            '/:scope/projects/:subpage': importRoute(
               'views/pages/commonwealth/projects/index.tsx',
-              {
-                scoped: true,
-                hideSidebar: true,
-              }
+              { scoped: true, hideSidebar: true }
             ),
             '/project/:identifier': importRoute(
               'views/pages/projects/view_project.tsx',
@@ -805,7 +805,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               () => '/notification-settings'
             ),
             // TODO: ??
-            // '/:scope/projects': redirectRoute(() => '/projects/index'),
             '/:scope/backers': redirectRoute(() => '/backers/index'),
             '/:scope/collectives': redirectRoute(() => '/collectives/index'),
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
@@ -910,7 +909,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               () => '/edgeware/notification-settings'
             ),
             // CMN
-            '/:scope/projects': importRoute(
+            '/:scope/projects': redirectRoute(
+              (attrs) => `/${attrs.scope}/projects/explore`
+            ),
+            '/:scope/projects/:subpage': importRoute(
               'views/pages/commonwealth/projects/index.tsx',
               { scoped: true, hideSidebar: true }
             ),
@@ -937,6 +939,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
             }),
             // Settings
+            // TODO Graham 5.14.22: This edgeware redirect is way out of date
             '/settings': redirectRoute(() => '/edgeware/settings'),
             '/:scope/settings': importRoute('views/pages/settings', {
               scoped: true,

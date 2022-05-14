@@ -10,7 +10,7 @@ export default class BackedProjectsPage
   implements m.ClassComponent<{ backedProjects: Project[] }>
 {
   view(vnode) {
-    const backedProjects = vnode.attrs;
+    const { backedProjects } = vnode.attrs;
     const currentProjects = backedProjects
       // .filter()
       .map((project) => {
@@ -24,9 +24,9 @@ export default class BackedProjectsPage
     return (
       <div class="BackedProjectsPage">
         <CWText type="h1">Currently Backing</CWText>
-        {currentProjects}
+        <div class="projects-listing">{currentProjects}</div>
         <CWText type="h1">Past Contributions</CWText>
-        {previousProjects}
+        <div class="projects-listing">{previousProjects}</div>
       </div>
     );
   }

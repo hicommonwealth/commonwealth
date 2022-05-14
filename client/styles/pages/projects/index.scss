@@ -1,8 +1,22 @@
 @import 'shared';
 
 .ProjectsListing {
-  width: 1000px;
+  width: calc(100% - 200px);
   display: flex;
   justify-content: center;
   margin: 72px 100px;
+
+  .ExploreProjectsPage,
+  .YourProjectsPage,
+  .BackedProjectsPage {
+    width: 100%;
+    .projects-listing {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      .ProjectCard.large {
+        margin: 32px 8px;
+      }
+    }
+  }
 }

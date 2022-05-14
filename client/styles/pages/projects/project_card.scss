@@ -76,14 +76,14 @@
 
   &.large {
     flex-direction: column;
-    height: 256px;
-    width: 400px;
+    height: 336px;
+    width: 376px;
     .ProjectHeaderPanel {
       flex: 32;
       border-radius: 5px 5px 0 0;
       .ChainIcon {
-        top: 11px;
-        left: 342px;
+        top: 24px;
+        left: 296px;
       }
     }
     .ProjectInfoPanel {
