@@ -1,3 +1,5 @@
+/* @jsx m */
+
 import 'pages/projects/project_card.scss';
 
 import m from 'mithril';
@@ -16,8 +18,7 @@ interface ProjectCardAttrs {
   size: ProjectCardSize;
 }
 
-// interface ProjectCardState {
-// }
+interface ProjectCardState {}
 
 const DummyChainIcon: m.Component<{ chain; onclick; size: number }> = {
   view: (vnode) => {

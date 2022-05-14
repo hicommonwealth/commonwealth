@@ -18,7 +18,7 @@ export class ChainIcon implements m.ClassComponent<ChainIconAttrs> {
     const { onclick, size = 32 } = vnode.attrs;
     const iconUrl =
       vnode.attrs.chain.iconUrl || (vnode.attrs.chain as any).icon_url;
-
+    console.log('chainicon');
     return (
       <div class={`ChainIcon ${onclick ? 'onclick' : ''}`}>
         {iconUrl ? (

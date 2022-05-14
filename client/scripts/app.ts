@@ -87,7 +87,7 @@ export async function initAppState(
 
         // add recentActivity
         const { recentThreads } = data;
-        recentThreads.forEach(({chain, count}) => {
+        recentThreads.forEach(({ chain, count }) => {
           app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
@@ -668,14 +668,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             // CMN
             '/projects': importRoute(
-              'views/pages/commonwealth/projects/index',
+              'views/pages/commonwealth/projects/index.tsx',
               {
                 scoped: true,
+                hideSidebar: true,
               }
             ),
             '/project/:identifier': importRoute(
-              'views/pages/projects/view_project',
-              { scoped: true }
+              'views/pages/projects/view_project.tsx',
+              { scoped: true, hideSidebar: true }
             ),
             '/backers': importRoute('views/pages/commonwealth/backers/index', {
               scoped: true,
@@ -803,7 +804,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
             ),
-            '/:scope/projects': redirectRoute(() => '/projects/index'),
+            // TODO: ??
+            // '/:scope/projects': redirectRoute(() => '/projects/index'),
             '/:scope/backers': redirectRoute(() => '/backers/index'),
             '/:scope/collectives': redirectRoute(() => '/collectives/index'),
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
@@ -909,12 +911,12 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             // CMN
             '/:scope/projects': importRoute(
-              'views/pages/commonwealth/projects',
-              { scoped: true }
+              'views/pages/commonwealth/projects/index.tsx',
+              { scoped: true, hideSidebar: true }
             ),
             '/:scope/project/:identifier': importRoute(
-              'views/pages/commonwealth/projects/view_project',
-              { scoped: true }
+              'views/pages/commonwealth/projects/view_project.tsx',
+              { scoped: true, hideSidebar: true }
             ),
             '/:scope/backers': importRoute(
               'views/pages/commonwealth/backers/index',

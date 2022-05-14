@@ -19,7 +19,9 @@ import { Footer } from './footer';
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
   hideFooter?: boolean;
+  hideQuickSwitcher?: boolean;
   hideSearch?: boolean;
+  hideSidebar?: boolean;
   onscroll: () => null; // lazy loading for page content
   showNewProposalButton?: boolean;
   title?: string; // displayed at the top of the layout
@@ -54,7 +56,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const {
       alwaysShowTitle,
       hideFooter = false,
+      hideQuickSwitcher,
       hideSearch,
+      hideSidebar,
       onscroll,
       showNewProposalButton,
       title,
@@ -70,7 +74,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
 
     return (
       <div class="Sublayout">
-        {!app.isCustomDomain() && <SidebarQuickSwitcher />}
+        {!app.isCustomDomain() && !hideQuickSwitcher && (
+          <SidebarQuickSwitcher />
+        )}
         <div class="header-and-body-container">
           <MobileHeader />
           <div class="header-container">
@@ -86,7 +92,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             />
           </div>
           <div class="sidebar-and-body-container">
-            <Sidebar />
+            {!hideSidebar && <Sidebar />}
             <div class="Body" onscroll={onscroll}>
               <TokenHero chain={chain} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />

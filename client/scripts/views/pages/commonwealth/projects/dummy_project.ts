@@ -14,15 +14,15 @@ const DummyBeneficiary: AddressInfo = {
 
 export const DummyProject: Project = {
   id: 1,
-  title: 'Project Name',
+  title: 'Name of Project',
   chain: 'ethereum',
   description: `Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
     commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
     Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.`,
   shortDescription: 'Lorem ipsum dolor sit amet.',
   coverImage:
-    'https://d2w9rnfcy7mm78.cloudfront.net/15140445/original_934fcfa7b50e51b160a22542ebd14bc7.png?1644683177?bc=0',
-  token: 'Ethereum',
+    'https://d2w9rnfcy7mm78.cloudfront.net/16465542/original_01e127de59ab1b9be072a07cd8e6aeca.png?1652559364',
+  token: 'dydx',
   creator: null,
   beneficiary: DummyBeneficiary,
   backers: [
