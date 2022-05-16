@@ -16,33 +16,28 @@ export const DummyProject: Project = {
   id: 1,
   title: 'Name of Project',
   chain: 'ethereum',
-  description: `Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
-    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
-    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
-    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
-    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
-    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
-    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
-    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
-    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
-    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
-    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
-    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
-    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
-    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
-    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
-    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
-    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
-    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
-    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
-    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
-    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
-    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
-    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
-    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.`,
-  shortDescription: `Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
-  commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
-  Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.`,
+  description:
+    `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
+    `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
+    `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
+    `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
+    `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. \n` +
+    `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
+    `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
+    `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
+    `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
+    `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. \n` +
+    `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
+    `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
+    `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
+    `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
+    `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
+  shortDescription:
+    `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
+    `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
+    `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
+    `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
+    `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
   coverImage:
     'https://d2w9rnfcy7mm78.cloudfront.net/16465542/original_01e127de59ab1b9be072a07cd8e6aeca.png?1652559364',
   token: 'dydx',

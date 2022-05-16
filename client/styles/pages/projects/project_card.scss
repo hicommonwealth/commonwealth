@@ -42,21 +42,23 @@
       color: $neutral-500;
     }
     .project-info-body {
-      margin-top: 8px;
-      color: $neutral-800;
-      text-overflow: ellipsis;
-      white-space: break-spaces;
-      overflow: hidden;
+      margin: 4px 0 12px;
+      .Text {
+        height: 80px;
+        color: $neutral-800;
+        text-overflow: ellipsis;
+        white-space: break-spaces;
+        overflow: hidden;
+      }
     }
     .project-info-footer {
       margin-top: 5px;
       .User {
         display: flex;
+        align-items: center;
         .user-display-name {
-          position: relative;
-          top: 3px;
           margin-left: 4px;
-          color: $neutral-300;
+          color: $neutral-800;
           font-size: 14px;
         }
       }
@@ -82,9 +84,16 @@
     .ProjectInfoPanel {
       flex: 32;
       border-radius: 0 0 5px 5px;
-      padding: 12px 10px 0 20px;
+      padding: 8px 16px;
       .project-info-header {
         justify-content: space-between;
+      }
+    }
+    .User {
+      .user-avatar-only {
+        svg {
+          margin: 0 1px 1px 0 !important;
+        }
       }
     }
   }
