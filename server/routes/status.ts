@@ -7,6 +7,7 @@ import { factory, formatFilename } from '../../shared/logging';
 import '../types';
 import { DB } from '../database';
 import { ServerError } from '../util/errors';
+import { performance } from 'perf_hooks';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -17,6 +18,7 @@ const status = async (
   next: NextFunction
 ) => {
   try {
+    performance.mark('start');
     const [
       chains,
       nodes,
@@ -47,6 +49,7 @@ const status = async (
       models.ChainCategory.findAll(),
       models.ChainCategoryType.findAll(),
     ]);
+    performance.mark('A');
 
     const thirtyDaysAgo = new Date(
       (new Date() as any) - 1000 * 24 * 60 * 60 * 30
@@ -56,6 +59,7 @@ const status = async (
       concat: string;
       count: number;
     };
+    performance.mark('B');
     if (!user) {
       const threadCountQueryData: ThreadCountQueryData[] =
         await models.sequelize.query(
@@ -81,6 +85,7 @@ const status = async (
         loggedIn: false,
       });
     }
+    performance.mark('C');
 
     const unfilteredAddresses = await user.getAddresses();
     // TODO: fetch all this data with a single query
@@ -100,6 +105,8 @@ const status = async (
       user.lastVisited,
     ]);
 
+    performance.mark('D');
+
     // look up my roles & private communities
     const myAddressIds: number[] = Array.from(
       addresses.map((address) => address.id)
@@ -116,6 +123,8 @@ const status = async (
       },
       include: [models.Address, models.OffchainAttachment],
     });
+
+    performance.mark('E');
 
     const threadCountQueryData: ThreadCountQueryData[] =
       await models.sequelize.query(
@@ -136,6 +145,8 @@ const status = async (
         }
       );
 
+    performance.mark('F');
+
     // get starred communities for user
     const starredCommunities = await models.StarredCommunity.findAll({
       where: { user_id: user.id },
@@ -149,6 +160,7 @@ const status = async (
       },
     });
 
+    performance.mark('G');
     // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
     const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
     const unseenPosts = {};
@@ -189,6 +201,22 @@ const status = async (
         };
       })
     );
+
+    performance.mark('H');
+
+    performance.measure("measure start to A", 'start', 'A');
+    performance.measure("measure A to B", 'A', 'B');
+    performance.measure("measure B to C", 'B', 'C');
+    performance.measure("measure C to D", 'C', 'D');
+    performance.measure("measure D to E", 'D', 'E');
+    performance.measure("measure E to F", 'E', 'F');
+    performance.measure("measure F to G", 'F', 'G');
+    performance.measure("measure G to H", 'G', 'H');
+
+    log.info(JSON.stringify(performance.getEntriesByType("measure")));
+
+    performance.clearMarks();
+    performance.clearMeasures();
 
     const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
     return res.json({

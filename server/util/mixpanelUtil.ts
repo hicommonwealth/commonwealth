@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'production') {
 export function mixpanelTrack<T extends BaseMixpanelPayload>(data: T) {
   const { event, ...payload } = data;
 
-  mixpanelNode.track(event, payload);
+  mixpanelNode?.track(event, payload);
 }
 
 export function mixpanelPeopleSet(unique_id: string) {
