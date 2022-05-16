@@ -136,6 +136,7 @@ export default async (
     })
   }
 
+  // TODO: lack of toJSON() native call causing issues for front-end recognition of notifications
   const subscriptions = []
   for (const sub_id in subscriptionsObj) subscriptions.push(subscriptionsObj[sub_id]);
 
