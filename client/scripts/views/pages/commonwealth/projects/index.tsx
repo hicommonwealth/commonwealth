@@ -8,12 +8,9 @@ import {
   CWBacker,
   CWCurator,
 } from 'controllers/chain/ethereum/commonwealth/participants';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from '../../../components/component_kit/cw_button';
-import ProjectCard, { ProjectCardSize } from './project_card';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import Sublayout from '../../../sublayout';
 import { DummyProject } from './dummy_project';
-import { CWTextInput } from '../../../components/component_kit/cw_text_input';
 import ExploreProjectsPage from './explore';
 import BackedProjectsPage from './backed';
 import YourProjectsPage from './your_projects';
@@ -113,9 +110,11 @@ export default class ProjectListing
 
     return (
       <Sublayout
-        title="Projects"
+        title={<CWIcon iconName="common" />}
+        hideSearch={true}
         hideSidebar={true}
         showNewProposalButton={false}
+        alwaysShowTitle={true}
       >
         {/* TODO: Move towards simple tabs & URI-based toggling between various subpage */}
         <div class="ProjectsListing">{this.getProjectListingSubpage()}</div>

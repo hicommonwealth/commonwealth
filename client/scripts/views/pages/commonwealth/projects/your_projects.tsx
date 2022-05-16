@@ -13,14 +13,14 @@ export default class YourProjectsPage
     const { projects } = vnode.attrs;
     const currentProjects = projects
       // .filter((project) => null)
-      .map((project) => {
-        return m(ProjectCard, { project, size: ProjectCardSize.Large });
-      });
+      .map((project) => (
+        <ProjectCard project={project} size={ProjectCardSize.Large} />
+      ));
     const previousProjects = projects
       // .filter((project) => null)
-      .map((project) => {
-        return m(ProjectCard, { project, size: ProjectCardSize.Medium });
-      });
+      .map((project) => (
+        <ProjectCard project={project} size={ProjectCardSize.Medium} />
+      ));
     return (
       <div class="YourProjectsPage">
         <CWText type="h1">Current Projects</CWText>

@@ -667,16 +667,24 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             // CMN
-            '/:scope/projects': redirectRoute(
-              (attrs) => `/${attrs.scope}/projects/explore`
+
+            // TODO Graham 5-16-22: Scoped project listings postponed til v2;
+            // are replaced by redirects to scopeless URI for time being
+            '/:scope/projects': redirectRoute(() => `/projects/explore`),
+            '/projects': redirectRoute(() => `/projects/explore`),
+            '/:scope/projects/:subpage': redirectRoute(
+              (attrs) => `/projects/${attrs.subpage}`
             ),
-            '/:scope/projects/:subpage': importRoute(
+            '/projects/:subpage': importRoute(
               'views/pages/commonwealth/projects/index.tsx',
-              { scoped: true, hideSidebar: true }
+              { scoped: false, hideSidebar: true }
+            ),
+            '/:scope/project/:identifier': redirectRoute(
+              (attrs) => `/project/${attrs.identifier}`
             ),
             '/project/:identifier': importRoute(
-              'views/pages/projects/view_project.tsx',
-              { scoped: true, hideSidebar: true }
+              'views/pages/commonwealth/projects/view_project.tsx',
+              { scoped: false, hideSidebar: true }
             ),
             '/backers': importRoute('views/pages/commonwealth/backers/index', {
               scoped: true,
@@ -909,17 +917,36 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               () => '/edgeware/notification-settings'
             ),
             // CMN
-            '/:scope/projects': redirectRoute(
-              (attrs) => `/${attrs.scope}/projects/explore`
-            ),
-            '/:scope/projects/:subpage': importRoute(
+
+            // TODO Graham 5-16-22: Scoped project listings postponed til v2;
+            // are replaced by redirects to scopeless URI for time being
+            '/:scope/projects': redirectRoute(() => `/projects/explore`),
+            // '/:scope/projects': redirectRoute(
+            //   (attrs) => `/${attrs.scope}/projects/explore`
+            // ),
+            '/projects': redirectRoute(() => `/projects/explore`),
+            '/projects/:subpage': importRoute(
               'views/pages/commonwealth/projects/index.tsx',
-              { scoped: true, hideSidebar: true }
+              { scoped: false, hideSidebar: true }
             ),
-            '/:scope/project/:identifier': importRoute(
+            '/:scope/projects/:subpage': redirectRoute(
+              (attrs) => `/projects/${attrs.subpage}`
+            ),
+            // '/:scope/projects/:subpage': importRoute(
+            //   'views/pages/commonwealth/projects/index.tsx',
+            //   { scoped: true, hideSidebar: true }
+            // ),
+            '/:scope/project/:identifier': redirectRoute(
+              (attrs) => `/project/${attrs.identifier}`
+            ),
+            '/projects/:identifier': importRoute(
               'views/pages/commonwealth/projects/view_project.tsx',
-              { scoped: true, hideSidebar: true }
+              { scoped: false, hideSidebar: true }
             ),
+            // '/:scope/project/:identifier': importRoute(
+            //   'views/pages/commonwealth/projects/view_project.tsx',
+            //   { scoped: true, hideSidebar: true }
+            // ),
             '/:scope/backers': importRoute(
               'views/pages/commonwealth/backers/index',
               {

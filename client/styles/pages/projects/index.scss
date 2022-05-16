@@ -13,9 +13,9 @@
     .projects-listing {
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
+      justify-content: left;
       .ProjectCard.large {
-        margin: 32px 8px;
+        margin: 8px;
       }
     }
   }

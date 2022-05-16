@@ -10,7 +10,7 @@
   .ProjectHeaderPanel {
     height: 100%;
     background-color: $white;
-    .ChainIcon {
+    .DummyChainIcon {
       position: relative;
     }
   }
@@ -31,33 +31,22 @@
       display: flex;
       justify-content: space-between;
       h3.project-title {
-        @include header;
-        font-size: 24px;
-        color: $neutral-400;
+        color: $neutral-800;
         display: flex;
-        .ChainIcon {
+        .DummyChainIcon {
           margin-right: 6px;
         }
       }
-      .project-block-count {
-        height: 18px;
-        padding: 2px 4px 0;
-        font-size: 14px;
-        line-height: 17px;
-        color: $neutral-300;
-        background-color: $neutral-400;
-        border-radius: 6px;
-      }
+    }
+    .project-deadline {
+      color: $neutral-500;
     }
     .project-info-body {
-      @include body;
-      color: $neutral-300;
-      font-size: 14px;
-      line-height: 17px;
+      margin-top: 8px;
+      color: $neutral-800;
       text-overflow: ellipsis;
       white-space: break-spaces;
       overflow: hidden;
-      height: 48px;
     }
     .project-info-footer {
       margin-top: 5px;
@@ -76,14 +65,18 @@
 
   &.large {
     flex-direction: column;
-    height: 336px;
-    width: 376px;
+    width: 336px;
+    height: 376px;
     .ProjectHeaderPanel {
       flex: 32;
       border-radius: 5px 5px 0 0;
-      .ChainIcon {
-        top: 24px;
-        left: 296px;
+      background-size: 100%;
+      .DummyChainIcon {
+        top: 8px;
+        left: 8px;
+        .chain-icon {
+          border-radius: 100%;
+        }
       }
     }
     .ProjectInfoPanel {

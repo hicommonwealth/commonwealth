@@ -13,14 +13,14 @@ export default class BackedProjectsPage
     const { backedProjects } = vnode.attrs;
     const currentProjects = backedProjects
       // .filter()
-      .map((project) => {
-        return m(ProjectCard, { project, size: ProjectCardSize.Large });
-      });
+      .map((project) => (
+        <ProjectCard project={project} size={ProjectCardSize.Large} />
+      ));
     const previousProjects = backedProjects
       // .filter()
-      .map((project) => {
-        return m(ProjectCard, { project, size: ProjectCardSize.Medium });
-      });
+      .map((project) => (
+        <ProjectCard project={project} size={ProjectCardSize.Medium} />
+      ));
     return (
       <div class="BackedProjectsPage">
         <CWText type="h1">Currently Backing</CWText>

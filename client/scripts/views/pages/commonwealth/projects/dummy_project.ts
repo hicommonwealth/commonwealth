@@ -18,8 +18,31 @@ export const DummyProject: Project = {
   chain: 'ethereum',
   description: `Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
     commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
+    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
+    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
+    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
+    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
+    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
+    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
+    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
+    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
+    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
+    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
+    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
+    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
+    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
+    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
+    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
+    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
+    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
+    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
+    Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.
+    Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
+    commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
     Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.`,
-  shortDescription: 'Lorem ipsum dolor sit amet.',
+  shortDescription: `Suspendisse nibh eget at auctor. Massa amet, non amet, eu eros. Mattis amet mauris mattis ornare.
+  commodo eget dui dictum nec tempor, pharetra hac. Non pharetra nisl commodo eros viverra quam convallis tempus. 
+  Etiam aliquam natoque vel, eget etiam tristique. Pharetra, aliquam arcu ac tortor amet lectus dolor at ut.`,
   coverImage:
     'https://d2w9rnfcy7mm78.cloudfront.net/16465542/original_01e127de59ab1b9be072a07cd8e6aeca.png?1652559364',
   token: 'dydx',
@@ -33,7 +56,7 @@ export const DummyProject: Project = {
   curators: [null],
   createdAt: moment(),
   progress: { inBlocks: 16000, asPercent: 0.32 },
-  deadline: { inBlocks: 48000, asDate: moment() },
+  deadline: { inBlocks: 48000, asDate: moment('2022-05-29') },
   threshold: { inTokens: 12, inDollars: 30000 },
   raised: { inTokens: 3.8, inDollars: 9000 },
 };
