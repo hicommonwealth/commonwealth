@@ -213,6 +213,7 @@ const status = async (
     performance.measure("measure F to G", 'F', 'G');
     performance.measure("measure G to H", 'G', 'H');
 
+    log.info("Performance Results:");
     log.info(JSON.stringify(performance.getEntriesByType("measure")));
 
     performance.clearMarks();
