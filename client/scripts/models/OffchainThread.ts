@@ -93,17 +93,17 @@ class OffchainThread implements IUniqueId {
     linkedThreads,
     address,
   }: {
-    author: string;
+    author?: string;
     title: string;
-    attachments: OffchainAttachment[];
-    id: number;
-    createdAt: moment.Moment;
+    attachments?: OffchainAttachment[];
+    id?: number;
+    createdAt?: moment.Moment;
     lastCommentedOn: moment.Moment;
-    topic: OffchainTopic;
-    kind: OffchainThreadKind;
-    stage: OffchainThreadStage;
+    topic?: OffchainTopic;
+    kind?: OffchainThreadKind;
+    stage?: OffchainThreadStage;
     versionHistory: VersionHistory[];
-    chain: string;
+    chain?: string;
     readOnly: boolean;
     body?: string;
     plaintext?: string;
@@ -113,10 +113,10 @@ class OffchainThread implements IUniqueId {
     collaborators?: any[];
     chainEntities?: any[];
     lastEdited?: moment.Moment;
-    snapshotProposal: string;
-    hasPoll: boolean;
-    linkedThreads: LinkedThreadRelation[];
-    address: {[key: string]: any};
+    snapshotProposal?: string;
+    hasPoll?: boolean;
+    linkedThreads?: LinkedThreadRelation[];
+    address?: {[key: string]: any};
     polls?: OffchainPoll[];
   }) {
     this.author = author;
@@ -199,10 +199,6 @@ class OffchainThread implements IUniqueId {
       pinned,
       lastEdited: updated_at,
       snapshotProposal: snapshot_proposal,
-      offchainVotingEnabled: offchain_voting_enabled,
-      offchainVotingOptions: offchain_voting_options,
-      offchainVotingEndsAt: offchain_voting_ends_at,
-      offchainVotingNumVotes: offchain_voting_votes,
       lastCommentedOn: last_commented_on,
       address: Address,
     })  

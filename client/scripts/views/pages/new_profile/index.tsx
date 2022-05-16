@@ -51,7 +51,7 @@ class NewProfile implements m.Component<{}, ProfileState> {
   }
 
   getProfileData = async (vnode, address: String) => {
-    const response = await $.get(`${app.serverUrl()}/profile/v2`, {
+    const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
       address,
       jwt: app.user.jwt,
     }).catch((err) => {

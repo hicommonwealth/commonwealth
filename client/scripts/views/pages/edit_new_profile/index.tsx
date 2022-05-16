@@ -24,6 +24,10 @@ type EditProfileState = {
   error: EditProfileError,
 }
 
+type GetProfileResponse = {
+  profile: any
+}
+
 enum InputFormField {
   Email,
   ProfileName,
@@ -61,10 +65,10 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
   }
 
   getProfile = async (vnode, address: string) => {
-    const response = await $.get(`${app.serverUrl()}/profile/v2`, {
+    const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
       address,
       jwt: app.user.jwt,
-    }).catch((err) => {
+    }).catch((err: any) => {
       if (err.status == 500 && 
         (err.responseJSON.error == NoAddressFoundError || 
         err.responseJSON.error == NoProfileFoundError )
@@ -79,7 +83,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
   }
 
   updateProfile = async (vnode) => {
-    const response = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
+    const response: any = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
       address: vnode.state.address,  
       ...('email' in vnode.state.profileUpdate) && {email: vnode.state.profileUpdate.email},
       ...('name' in vnode.state.profileUpdate) && {name: vnode.state.profileUpdate.name},

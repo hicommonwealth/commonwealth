@@ -160,8 +160,8 @@ class NewProfileActivity implements m.Component<ProfileActivityAttrs, ProfileAct
     // Close dropdown
     window.addEventListener('click', (evt) => {
       // If option clicked do nothing
-      if (evt.target.classList.contains('option') ||
-        evt.target.classList.contains('option-name')) {
+      if ((evt.target as HTMLDivElement).classList.contains('option') ||
+        (evt.target as HTMLDivElement).classList.contains('option-name')) {
           return
       }
 

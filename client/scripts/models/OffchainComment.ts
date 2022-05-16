@@ -4,6 +4,10 @@ import AddressInfo from './AddressInfo';
 import { IUniqueId } from './interfaces';
 import OffchainAttachment from './OffchainAttachment';
 
+// type OffchainCommentConstructor {
+
+// }
+
 class OffchainComment<T extends IUniqueId> {
   [x: string]: any;
   public readonly chain: string;
@@ -39,6 +43,23 @@ class OffchainComment<T extends IUniqueId> {
     lastEdited, // moment.Moment
     deleted, 
     address,
+  }: {
+    chain: string,
+    author?: string,
+    text: string,
+    plaintext: string,
+    versionHistory: VersionHistory[],
+    attachments?: OffchainAttachment[],
+    proposal?: T,
+    id: number,
+    createdAt: moment.Moment,
+    parentComment: number,
+    rootProposal?: string,
+    authorChain?: string,
+    lastEdited?: moment.Moment,
+    deleted?: boolean,
+    address?: any,
+
   }) {
     this.chain = chain;
     this.author = author;
@@ -68,15 +89,11 @@ class OffchainComment<T extends IUniqueId> {
     id,
     chain, 
     parent_id,
-    address_id,
     text,
     created_at,
     updated_at,
-    deleted_at,
     version_history,
-    root_id,
     plaintext,
-    _search,
     Address,
   }) {
     return new OffchainComment({
