@@ -1094,10 +1094,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         document.location.host.startsWith('localhost') ||
         document.location.host.startsWith('127.0.0.1')
       ) {
+        // Uncomment this line to test mixpanel locally
         mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
       } else {
         // Production Mixpanel Project
-        // TODO: Swap this for the prod token after we make sure everything is working
         mixpanel.init(MIXPANEL_PROD_TOKEN, { debug: true });
       }
     } catch (e) {

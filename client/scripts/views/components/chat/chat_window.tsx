@@ -13,6 +13,8 @@ import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { WebsocketMessageNames } from 'types';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { MixpanelChatEvents } from 'analytics/types';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -44,7 +46,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     this.onIncomingMessage = (msg) => {
-      console.log("Message received")
+      console.log('Message received');
       const { chat_channel_id } = msg;
       if (chat_channel_id === vnode.attrs.channel_id) {
         this.shouldScroll = false;
@@ -106,6 +108,11 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
           now: moment().toISOString(),
         };
         app.socket.chatNs.sendMessage(message, channel);
+        mixpanelBrowserTrack({
+          event: MixpanelChatEvents.NEW_CHAT_SENT,
+          community: app.activeChainId(),
+          isCustomDomain: app.isCustomDomain(),
+        });
         $textarea.val('');
       }
     };
