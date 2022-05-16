@@ -33,7 +33,7 @@ export class NewLoginModal implements m.ClassComponent {
               Connect Your Wallet
             </CWText>
             <div class="divider" />
-            <CWText type="b2" noWrap={false}>
+            <CWText type="b2">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
               imperdiet velit fringilla lorem et. Integer accumsan lobortis
               cursus amet. Dictum sit morbi elementum.
@@ -42,7 +42,7 @@ export class NewLoginModal implements m.ClassComponent {
         </div>
         <div class="body">
           <ModalExitButton />
-          <CWText type="caption" noWrap={false}>
+          <CWText type="caption">
             By connecting to Common, you agree to our{' '}
             <span class="link">Terms of Service</span> and{' '}
             <span class="link">Privacy Policy</span>

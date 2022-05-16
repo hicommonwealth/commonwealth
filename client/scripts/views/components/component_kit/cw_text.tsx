@@ -36,7 +36,7 @@ type TextAttrs = {
   disabled?: boolean;
   fontStyle?: FontStyle;
   fontWeight: FontWeight;
-  noWrap?: boolean;
+  noWrap?: boolean; // parent must be flex container for this to work
   type: FontType;
 };
 
@@ -46,7 +46,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
       disabled = false,
       fontStyle,
       fontWeight = 'regular',
-      noWrap = true, // parent must be flex container for this to work
+      noWrap = false,
       type = 'b1',
     } = vnode.attrs;
 
