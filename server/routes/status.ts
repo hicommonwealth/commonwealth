@@ -7,7 +7,6 @@ import { factory, formatFilename } from '../../shared/logging';
 import '../types';
 import {DB, sequelize} from '../database';
 import { ServerError } from '../util/errors';
-import { performance, PerformanceObserver } from 'perf_hooks';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,7 +17,6 @@ const status = async (
   next: NextFunction
 ) => {
   try {
-    performance.mark('start');
     const [
       chains,
       nodes,
@@ -49,7 +47,6 @@ const status = async (
       models.ChainCategory.findAll(),
       models.ChainCategoryType.findAll(),
     ]);
-    performance.mark('A');
 
     const thirtyDaysAgo = new Date(
       (new Date() as any) - 1000 * 24 * 60 * 60 * 30
@@ -59,7 +56,7 @@ const status = async (
       concat: string;
       count: number;
     };
-    performance.mark('B');
+
     if (!user) {
       const threadCountQueryData: ThreadCountQueryData[] =
         await models.sequelize.query(
@@ -85,7 +82,6 @@ const status = async (
         loggedIn: false,
       });
     }
-    performance.mark('C');
 
     const unfilteredAddresses = await user.getAddresses();
     // TODO: fetch all this data with a single query
@@ -105,8 +101,6 @@ const status = async (
       user.lastVisited,
     ]);
 
-    performance.mark('D');
-
     // look up my roles & private communities
     const myAddressIds: number[] = Array.from(
       addresses.map((address) => address.id)
@@ -123,8 +117,6 @@ const status = async (
       },
       include: [models.Address, models.OffchainAttachment],
     });
-
-    performance.mark('E');
 
     const threadCountQueryData: ThreadCountQueryData[] =
       await models.sequelize.query(
@@ -145,8 +137,6 @@ const status = async (
         }
       );
 
-    performance.mark('F');
-
     // get starred communities for user
     const starredCommunities = await models.StarredCommunity.findAll({
       where: { user_id: user.id },
@@ -160,7 +150,6 @@ const status = async (
       },
     });
 
-    performance.mark('G');
     // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
     const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
     const unseenPosts = {};
@@ -169,22 +158,27 @@ const status = async (
     let query = ``;
 
     // create threads query
+    let replacements = [];
     for (let i = 0; i < commsAndChains.length; i++) {
       const name = commsAndChains[i][0];
       let time: any = commsAndChains[i][1];
       time = new Date(time as string)
       if (Number.isNaN(time.getDate())) {
-              unseenPosts[name] = {};
-              continue;
-            }23 * 2
+        unseenPosts[name] = {};
+        continue;
+      }
+
       if (i != 0) query += ' UNION '
-      query += `SELECT id, chain FROM "OffchainThreads" WHERE (kind IN ('forum', 'link') OR chain = '${name}') AND created_at > TO_TIMESTAMP(${time.getTime()})`
+      replacements.push(name, time.getTime());
+      query += `SELECT id, chain FROM "OffchainThreads" WHERE (kind IN ('forum', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`
       if (i == commsAndChains.length - 1) query += ';';
     }
-    console.log("Threads query:", query);
+
     // execute threads query
-    const threadNum: {id: string, chain: string}[] = <any>(await sequelize.query(query, {raw: true, type: QueryTypes.SELECT}));
-    console.log("Threads query result:", threadNum);
+    const threadNum: {id: string, chain: string}[] = <any>(await sequelize.query(query, {
+      raw: true, type: QueryTypes.SELECT, replacements
+    }));
+
     // process returned threads
     for (const thread of threadNum) {
       if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {}
@@ -194,6 +188,7 @@ const status = async (
 
     // create comments query
     query = ``;
+    replacements = []
     for (let i = 0; i < commsAndChains.length; i++) {
       const name = commsAndChains[i][0];
       let time: any = commsAndChains[i][1];
@@ -203,13 +198,14 @@ const status = async (
         unseenPosts[name] = {};
         continue;
       }
-      if (i != 0) query += ' UNION '
-      query += `SELECT root_id, chain FROM "OffchainComments" WHERE chain = '${name}' AND created_at > TO_TIMESTAMP(${time.getTime()})`
+      if (i != 0) query += ' UNION ';
+      replacements.push(name, time.getTime())
+      query += `SELECT root_id, chain FROM "OffchainComments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`
       if (i == commsAndChains.length - 1) query += ';';
     }
-    console.log("Comments query:", query);
-    const commentNum: {root_id: string, chain: string}[] = <any>(await sequelize.query(query, {raw: true, type: QueryTypes.SELECT}));
-    console.log("Comments query result:", commentNum);
+    const commentNum: {root_id: string, chain: string}[] = <any>(await sequelize.query(query, {
+      raw: true, type: QueryTypes.SELECT, replacements
+    }));
 
     for (const comment of commentNum) {
       if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {}
@@ -234,26 +230,6 @@ const status = async (
         unseenPosts[name].activePosts = unseenPosts[name].activePosts.size;
       }
     }
-
-    console.log(unseenPosts);
-    /////////////////////////////////////////////////////////////////////
-
-    performance.mark('H');
-
-    const obs = new PerformanceObserver((list, observer) => {
-      console.log(list.getEntriesByType('measure'));
-      observer.disconnect();
-    });
-    obs.observe({ entryTypes: ['measure'], buffered: true });
-
-    performance.measure("measure start to A", 'start', 'A');
-    performance.measure("measure A to B", 'A', 'B');
-    performance.measure("measure B to C", 'B', 'C');
-    performance.measure("measure C to D", 'C', 'D');
-    performance.measure("measure D to E", 'D', 'E');
-    performance.measure("measure E to F", 'E', 'F');
-    performance.measure("measure F to G", 'F', 'G');
-    performance.measure("measure G to H", 'G', 'H');
 
     const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
     return res.json({
