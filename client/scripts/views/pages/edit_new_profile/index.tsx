@@ -243,21 +243,23 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
                     <img src={vnode.state.profile?.avatarUrl} />
                   </div>
     
-                  <AvatarUpload 
-                    avatarScope={AvatarScope.Account} 
-                    uploadStartedCallback={() => {
-                      vnode.state.imageUploading = true
-                    }}
-                    uploadCompleteCallback={(files) => {
-                      vnode.state.imageUploading = false
-                      files.forEach((f) => {
-                        if (!f.uploadURL) return;
-                        const url = f.uploadURL.replace(/\?.*/, '').trim();  // edit_profile_modal.ts L31
-                        vnode.state.profileUpdate.avatarUrl = url
-                      });
-                      m.redraw();
-                    }}
-                    />
+                  { 
+                    m(AvatarUpload, {
+                      avatarScope: AvatarScope.Account,
+                      uploadStartedCallback: () => {
+                        vnode.state.imageUploading = true
+                      },
+                      uploadCompleteCallback: (files) => {
+                        vnode.state.imageUploading = false
+                        files.forEach((f) => {
+                          if (!f.uploadURL) return;
+                          const url = f.uploadURL.replace(/\?.*/, '').trim();
+                          vnode.state.profileUpdate.avatarUrl = url
+                        });
+                        m.redraw();
+                      },
+                    })
+                  }
 
                   <p> OR </p>
                   <CWTextInput

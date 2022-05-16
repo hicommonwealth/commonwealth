@@ -25,8 +25,8 @@ interface IState {
   uploaded: boolean;
 }
 
-class AvatarUpload implements m.Component<IAttrs, IState> {
-  oncreate = (vnode: m.VnodeDOM<IAttrs, IState>) => {
+const AvatarUpload: m.Component<IAttrs, IState> = {
+  oncreate: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     $(vnode.dom).on('cleardropzone', () => {
       vnode.state.dropzone.files.map((file) =>
         vnode.state.dropzone.removeFile(file)
@@ -92,9 +92,8 @@ class AvatarUpload implements m.Component<IAttrs, IState> {
         vnode.attrs.uploadCompleteCallback(vnode.state.dropzone.files);
       }
     });
-  }
-
-  view = (vnode) => {
+  },
+  view: (vnode) => {
     const logoURL =
       vnode.state.dropzone?.option?.url || app.chain?.meta.chain.iconUrl;
     return m('form.AvatarUpload', [
@@ -125,7 +124,7 @@ class AvatarUpload implements m.Component<IAttrs, IState> {
         class: vnode.state.uploaded ? '' : 'hidden',
       }),
     ]);
-  }
+  },
 };
 
 export default AvatarUpload;

@@ -4,10 +4,6 @@ import AddressInfo from './AddressInfo';
 import { IUniqueId } from './interfaces';
 import OffchainAttachment from './OffchainAttachment';
 
-// type OffchainCommentConstructor {
-
-// }
-
 class OffchainComment<T extends IUniqueId> {
   [x: string]: any;
   public readonly chain: string;
