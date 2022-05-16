@@ -6,7 +6,6 @@
 
 @mixin controlStyles {
   border: 2px solid $neutral-300;
-  cursor: pointer;
   height: 12px;
   margin: auto 8px;
   position: relative;
@@ -21,15 +20,6 @@
 @mixin checkedColors {
   background-color: $primary-50;
   border-color: $primary-500;
-
-  &:hover {
-    background-color: $primary-100;
-    border-color: $primary-500;
-
-    &::after {
-      color: $primary-600;
-    }
-  }
 }
 
 @mixin disabledColors {
