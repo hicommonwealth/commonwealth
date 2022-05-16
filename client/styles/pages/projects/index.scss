@@ -1,21 +1,43 @@
 @import 'shared';
 
-.ProjectsListing {
-  width: calc(100% - 200px);
-  display: flex;
-  justify-content: center;
-  margin: 72px 100px;
+.ProjectListing {
+  .listing-header {
+    background-color: $primary-50;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    .cui-tabs {
+      margin-left: 100px;
+      .cui-tabs-item {
+        .Text {
+          color: $primary-200;
+        }
+      }
+      .cui-tabs-item.cui-active {
+        border-color: $primary-500;
+        .Text {
+          color: $primary-500;
+        }
+      }
+    }
+  }
+  .listing-body {
+    width: calc(100% - 200px);
+    display: flex;
+    justify-content: center;
+    margin: 72px 100px;
 
-  .ExploreProjectsPage,
-  .YourProjectsPage,
-  .BackedProjectsPage {
-    width: 100%;
-    .projects-listing {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: left;
-      .ProjectCard.large {
-        margin: 8px;
+    .ExploreProjectsPage,
+    .YourProjectsPage,
+    .BackedProjectsPage {
+      width: 100%;
+      .projects-listing {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: left;
+        .ProjectCard.large {
+          margin: 8px;
+        }
       }
     }
   }

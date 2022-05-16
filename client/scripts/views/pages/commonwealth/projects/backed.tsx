@@ -3,20 +3,20 @@ import 'pages/projects/index.scss';
 
 import m from 'mithril';
 import { CWText } from 'views/components/component_kit/cw_text';
-import projects, { Project } from '.';
+import { Project } from '.';
 import ProjectCard, { ProjectCardSize } from './project_card';
 
 export default class BackedProjectsPage
-  implements m.ClassComponent<{ backedProjects: Project[] }>
+  implements m.ClassComponent<{ projects: Project[] }>
 {
   view(vnode) {
-    const { backedProjects } = vnode.attrs;
-    const currentProjects = backedProjects
+    const { projects } = vnode.attrs;
+    const currentProjects = projects
       // .filter()
       .map((project) => (
         <ProjectCard project={project} size={ProjectCardSize.Large} />
       ));
-    const previousProjects = backedProjects
+    const previousProjects = projects
       // .filter()
       .map((project) => (
         <ProjectCard project={project} size={ProjectCardSize.Medium} />

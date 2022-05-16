@@ -2,6 +2,7 @@
 
 import m, { Vnode } from 'mithril';
 import 'components/component_kit/cw_table.scss';
+import { CWText } from './cw_text';
 
 export type ButtonAttrs = {
   className?: string;
@@ -10,29 +11,37 @@ export type ButtonAttrs = {
   entries: Vnode<never>[][];
 };
 
-// Only styled for simple two-column table
+// TODO Graham 5-16-22: Only styled for simple two-column table; needs extending
+// Eventually should have filtering/sorting functionality added
 export class CWTable implements m.ClassComponent<ButtonAttrs> {
   view(vnode) {
-    const {
-      className,
-      tableName,
-      headers,
-      entries
-    } = vnode.attrs;
+    const { className, tableName, headers, entries } = vnode.attrs;
     return (
       <div class={`${className || ''} Table`}>
-        <h1>{tableName}</h1>
-        <table >
-            <tr>
-              {headers.map((head) => <th>{head}</th>)}
-            </tr>
-            {entries.map((row) => {
-              return <tr>
-                {row.map((col) => {
-                  return <td>{col}</td>;
+        <CWText type="h1">{tableName}</CWText>
+        <table>
+          <tr>
+            {headers.map((headerText: string) => (
+              <th>
+                <CWText type="body1" fontWeight="medium">
+                  {headerText}
+                </CWText>
+              </th>
+            ))}
+          </tr>
+          {entries.map((row) => {
+            return (
+              <tr>
+                {row.map((cellText: string) => {
+                  return (
+                    <td>
+                      <CWText type="body1">{cellText}</CWText>
+                    </td>
+                  );
                 })}
-              </tr>;
-            })}
+              </tr>
+            );
+          })}
         </table>
       </div>
     );

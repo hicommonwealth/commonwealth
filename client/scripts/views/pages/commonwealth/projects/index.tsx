@@ -9,6 +9,8 @@ import {
   CWCurator,
 } from 'controllers/chain/ethereum/commonwealth/participants';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { TabItem, Tabs } from 'construct-ui';
+import { CWText } from 'views/components/component_kit/cw_text';
 import Sublayout from '../../../sublayout';
 import { DummyProject } from './dummy_project';
 import ExploreProjectsPage from './explore';
@@ -99,7 +101,7 @@ export default class ProjectListing
   }
 
   view(vnode) {
-    this.subpage = vnode.attrs.subpage;
+    this.subpage = vnode.attrs.subpage || ProjectListingSubpage.Explore;
 
     // TODO: Reconcile local project type against controller class
     this.projects = app.activeChainId()
@@ -117,7 +119,49 @@ export default class ProjectListing
         alwaysShowTitle={true}
       >
         {/* TODO: Move towards simple tabs & URI-based toggling between various subpage */}
-        <div class="ProjectsListing">{this.getProjectListingSubpage()}</div>
+        <div class="ProjectListing">
+          <div class="listing-header">
+            <Tabs align="left" bordered={false} fluid={true}>
+              <TabItem
+                label={[
+                  <CWText type="h3" fontWeight="semibold">
+                    Explore
+                  </CWText>,
+                ]}
+                active={this.subpage === ProjectListingSubpage.Explore}
+                onclick={() => {
+                  m.route.set(`/projects/${ProjectListingSubpage.Explore}`);
+                  m.redraw();
+                }}
+              />
+              <TabItem
+                label={[
+                  <CWText type="h3" fontWeight="semibold">
+                    Your Projects
+                  </CWText>,
+                ]}
+                active={this.subpage === ProjectListingSubpage.Yours}
+                onclick={() => {
+                  m.route.set(`/projects/${ProjectListingSubpage.Yours}`);
+                  m.redraw();
+                }}
+              />
+              <TabItem
+                label={[
+                  <CWText type="h3" fontWeight="semibold">
+                    Backing
+                  </CWText>,
+                ]}
+                active={this.subpage === ProjectListingSubpage.Backed}
+                onclick={() => {
+                  m.route.set(`/projects/${ProjectListingSubpage.Backed}`);
+                  m.redraw();
+                }}
+              />
+            </Tabs>
+          </div>
+          <div class="listing-body">{this.getProjectListingSubpage()}</div>
+        </div>
         {/* <div class="CreateProjectForm">
           <CWTextInput
             label="Name"

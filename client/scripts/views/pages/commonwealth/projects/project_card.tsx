@@ -132,9 +132,8 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
         : 'failed';
 
     const onclick = () => {
-      m.route.set(
-        `/${project.chain}/project/${project.id}-${slugify(project.title)}`
-      );
+      console.log(`project/${project.id}-${slugify(project.title)}`);
+      m.route.set(`project/${project.id}-${slugify(project.title)}`);
     };
 
     const ProjectCardLarge = (

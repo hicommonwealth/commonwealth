@@ -939,7 +939,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/project/:identifier': redirectRoute(
               (attrs) => `/project/${attrs.identifier}`
             ),
-            '/projects/:identifier': importRoute(
+            '/project/:identifier': importRoute(
               'views/pages/commonwealth/projects/view_project.tsx',
               { scoped: false, hideSidebar: true }
             ),

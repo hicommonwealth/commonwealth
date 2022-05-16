@@ -37,8 +37,7 @@
       background: $green-500;
     }
   }
-  .project-funding-data,
-  .project-curator-data {
+  .project-funding-data {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -71,7 +70,12 @@
     }
   }
   .project-curator-data {
+    display: flex;
+    justify-content: left;
     margin: 40px 0;
+    .User {
+      margin-right: 112px;
+    }
     .caption {
       color: $neutral-400;
     }
@@ -87,6 +91,21 @@
   }
   .project-backers-wrap {
     .CWTable {
+    }
+  }
+
+  .User {
+    // TODO Graham 5-16-22: Our User components are jenky as hell and
+    // should be prioritized in ongoing component kit refactor
+    .user-display-name {
+      position: relative;
+      top: 1px;
+      font-size: 12px;
+    }
+    // TODO Graham 5-16-22: We should come up with global, dynamic,
+    // avatar-size-adapted adjustments for centering jdenticons
+    .user-avatar-only svg {
+      margin: 0;
     }
   }
 }

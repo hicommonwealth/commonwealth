@@ -4,8 +4,6 @@ import 'pages/projects/view_project.scss';
 import m from 'mithril';
 import { Tag } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ChainIcon, TokenIcon } from 'views/components/chain_icon';
-import { CommunityLabel } from 'views/components/community_label';
 import { ProjectCompletionBar } from './project_card';
 import Sublayout from '../../../sublayout';
 import { AnonymousUser } from '../../../components/widgets/user';
@@ -78,9 +76,9 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
             </div>
           </div>
           <div class="project-curator-data">
-            {m(AnonymousUser, { avatarSize: 32, distinguishingKey: '2' })}
+            {m(AnonymousUser, { avatarSize: 16, distinguishingKey: '2' })}
             <CWText type="caption">
-              Curator receives `${project.curatorCut * 100}`% of funds.
+              Curator receives {project.curatorCut * 100}% of funds.
             </CWText>
           </div>
           <div class="project-about">

@@ -2,6 +2,7 @@
 import 'pages/projects/index.scss';
 
 import m from 'mithril';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from '.';
 import ProjectCard, { ProjectCardSize } from './project_card';
 
@@ -20,6 +21,7 @@ export default class ExploreProjectsPage
 
     return (
       <div class="ExploreProjectsPage">
+        <CWText type="h1">Active Projects</CWText>
         {/* TODO: Implement projects filter */}
         {/* <div class="projects-filter"> */}
         {/* <CWText type="h3">Show me projects from</CWText> */}
