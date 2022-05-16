@@ -5,9 +5,9 @@ import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import '../types';
-import { DB } from '../database';
+import {DB, sequelize} from '../database';
 import { ServerError } from '../util/errors';
-import { performance } from 'perf_hooks';
+import { performance, PerformanceObserver } from 'perf_hooks';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -164,45 +164,87 @@ const status = async (
     // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
     const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
     const unseenPosts = {};
-    await Promise.all(
-      commsAndChains.map(async (c) => {
-        const [name, time] = c;
-        if (Number.isNaN(new Date(time as string).getDate())) {
-          unseenPosts[name] = {};
-          return;
-        }
-        const threadNum = await models.OffchainThread.findAndCountAll({
-          where: {
-            kind: { [Op.or]: ['forum', 'link'] },
-            [Op.or]: [{ chain: name }],
-            created_at: { [Op.gt]: new Date(time as string) },
-          },
-        });
-        const commentNum = await models.OffchainComment.findAndCountAll({
-          where: {
-            [Op.or]: [{ chain: name }],
-            created_at: { [Op.gt]: new Date(time as string) },
-          },
-        });
-        const activeThreads = [];
-        threadNum.rows.forEach((r) => {
-          if (!activeThreads.includes(r.id)) activeThreads.push(r.id);
-        });
-        commentNum.rows.forEach((r) => {
-          if (r.root_id.includes('discussion')) {
-            const id = Number(r.root_id.split('_')[1]);
-            if (!activeThreads.includes(id)) activeThreads.push(id);
-          }
-        });
+
+    //////////////////////////////////////////////////////////////////
+    let query = ``;
+
+    // create threads query
+    for (let i = 0; i < commsAndChains.length; i++) {
+      const name = commsAndChains[i][0];
+      let time: any = commsAndChains[i][1];
+      time = new Date(time as string)
+      if (Number.isNaN(time.getDate())) {
+              unseenPosts[name] = {};
+              continue;
+            }23 * 2
+      if (i != 0) query += ' UNION '
+      query += `SELECT id, chain FROM "OffchainThreads" WHERE (kind IN ('forum', 'link') OR chain = '${name}') AND created_at > TO_TIMESTAMP(${time.getTime()})`
+      if (i == commsAndChains.length - 1) query += ';';
+    }
+    console.log("Threads query:", query);
+    // execute threads query
+    const threadNum: {id: string, chain: string}[] = <any>(await sequelize.query(query, {raw: true, type: QueryTypes.SELECT}));
+    console.log("Threads query result:", threadNum);
+    // process returned threads
+    for (const thread of threadNum) {
+      if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {}
+      unseenPosts[thread.chain].activePosts ? unseenPosts[thread.chain].activePosts.add(thread.id) : unseenPosts[thread.chain].activePosts = new Set(thread.id);
+      unseenPosts[thread.chain].threads ? unseenPosts[thread.chain].threads++ : unseenPosts[thread.chain].threads = 1;
+    }
+
+    // create comments query
+    query = ``;
+    for (let i = 0; i < commsAndChains.length; i++) {
+      const name = commsAndChains[i][0];
+      let time: any = commsAndChains[i][1];
+      time = new Date(time as string)
+
+      if (Number.isNaN(time.getDate())) {
+        unseenPosts[name] = {};
+        continue;
+      }
+      if (i != 0) query += ' UNION '
+      query += `SELECT root_id, chain FROM "OffchainComments" WHERE chain = '${name}' AND created_at > TO_TIMESTAMP(${time.getTime()})`
+      if (i == commsAndChains.length - 1) query += ';';
+    }
+    console.log("Comments query:", query);
+    const commentNum: {root_id: string, chain: string}[] = <any>(await sequelize.query(query, {raw: true, type: QueryTypes.SELECT}));
+    console.log("Comments query result:", commentNum);
+
+    for (const comment of commentNum) {
+      if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {}
+      const id = comment.root_id.split('_')[1];
+      unseenPosts[comment.chain].activePosts ? unseenPosts[comment.chain].activePosts.add(id) : unseenPosts[comment.chain].activePosts = new Set(id);
+    }
+
+    // set the activePosts to num in set
+    for (const chain of commsAndChains) {
+      const [name, time] = chain;
+      if (Number.isNaN(new Date(time as string).getDate())) {
+        unseenPosts[name] = {};
+        continue;
+      }
+      if (!unseenPosts[name]) {
         unseenPosts[name] = {
-          activePosts: activeThreads.length,
-          threads: threadNum.count,
-          comments: commentNum.count,
-        };
-      })
-    );
+          activePosts: 0,
+          threads: 0,
+          comments: 0
+        }
+      } else {
+        unseenPosts[name].activePosts = unseenPosts[name].activePosts.size;
+      }
+    }
+
+    console.log(unseenPosts);
+    /////////////////////////////////////////////////////////////////////
 
     performance.mark('H');
+
+    const obs = new PerformanceObserver((list, observer) => {
+      console.log(list.getEntriesByType('measure'));
+      observer.disconnect();
+    });
+    obs.observe({ entryTypes: ['measure'], buffered: true });
 
     performance.measure("measure start to A", 'start', 'A');
     performance.measure("measure A to B", 'A', 'B');
@@ -212,14 +254,6 @@ const status = async (
     performance.measure("measure E to F", 'E', 'F');
     performance.measure("measure F to G", 'F', 'G');
     performance.measure("measure G to H", 'G', 'H');
-
-    // log.info("Performance Results:");
-    // log.info(JSON.stringify(performance.getEntriesByType("measure")));
-    console.log("Performance Results:");
-    console.log(performance.getEntriesByType("measure"));
-
-    performance.clearMarks();
-    performance.clearMeasures();
 
     const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
     return res.json({
