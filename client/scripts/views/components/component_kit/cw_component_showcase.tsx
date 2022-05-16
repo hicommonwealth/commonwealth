@@ -73,24 +73,6 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        <h1>Checkbox</h1>
-        <div class="choice-gallery">
-          <CWCheckbox
-            checked={this.checkboxChecked === true}
-            label="Click me"
-            onchange={() => {
-              this.checkboxChecked = !this.checkboxChecked;
-            }}
-          />
-          <CWCheckbox label="Disabled" disabled />
-          <CWCheckbox label="Checked and disabled" disabled checked />
-          <CWCheckbox label="Indeterminate" indeterminate />
-          <CWCheckbox
-            label="Indeterminate and disabled"
-            disabled
-            indeterminate
-          />
-        </div>
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
@@ -318,7 +300,13 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWRadioButton
             value="Disabled Radio Button"
             label="Disabled Radio Button"
-            disabled={true}
+            disabled
+          />
+          <CWRadioButton
+            value="Checked and Disabled Radio Button"
+            label="Checked and Disabled Radio Button"
+            disabled
+            checked
           />
         </div>
         <h1>Radio Group</h1>
@@ -331,6 +319,24 @@ export class ComponentShowcase implements m.ClassComponent {
               this.radioGroupSelection = e.target.value;
               notifySuccess(`"${e.target.value}" selected`);
             }}
+          />
+        </div>
+        <h1>Checkbox</h1>
+        <div class="choice-gallery">
+          <CWCheckbox
+            checked={this.checkboxChecked === true}
+            label="Click me"
+            onchange={() => {
+              this.checkboxChecked = !this.checkboxChecked;
+            }}
+          />
+          <CWCheckbox label="Disabled" disabled />
+          <CWCheckbox label="Checked and disabled" disabled checked />
+          <CWCheckbox label="Indeterminate" indeterminate />
+          <CWCheckbox
+            label="Indeterminate and disabled"
+            disabled
+            indeterminate
           />
         </div>
         <h1>Engagement Buttons</h1>

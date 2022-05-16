@@ -52,4 +52,11 @@
 
     pointer-events: none;
   }
+
+  &.checked.disabled .radio-control {
+    @include radioCore($neutral-300);
+    @include disabledColors;
+
+    pointer-events: none;
+  }
 }
