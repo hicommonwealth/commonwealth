@@ -99,7 +99,7 @@ export class NewLoginModal implements m.ClassComponent {
             </div>
             <CWText type="caption" className="no-wallet-link">
               <a
-                onclick={(e) => {
+                onclick={() => {
                   // link to where?
                 }}
               >
@@ -109,7 +109,7 @@ export class NewLoginModal implements m.ClassComponent {
           </div>
           <CWText type="b2" className="connect-another-way-link">
             <a
-              onclick={(e) => {
+              onclick={() => {
                 // link to where?
               }}
             >
