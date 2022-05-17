@@ -128,12 +128,12 @@ export default async (
     if (!subscriptionsObj[nr.subscription_id]) {
       subscriptionsObj[nr.subscription_id] = {
         ChainEventType: nr.Notification?.ChainEvent?.ChainEventType,
-        NotificationReads: [], // also contains notifications
+        NotificationsReads: [], // also contains notifications
         ...nr.Subscription
       }
     }
 
-    subscriptionsObj[nr.subscription_id].NotificationReads.push({
+    subscriptionsObj[nr.subscription_id].NotificationsReads.push({
       is_read: nr.is_read,
       notification_id: nr.notification_id,
       subscription_id: nr.subscription_id,
