@@ -52,12 +52,8 @@
     }
 
     &:hover .checkbox-control {
-      @include checkmark($primary-200);
-      @include hoverColors;
-    }
-
-    &:active .checkbox-control {
       @include checkmark($primary-600);
+      @include checkedHoverColors;
     }
 
     &.disabled .checkbox-control {
@@ -89,10 +85,6 @@
   &:hover .checkbox-control {
     @include checkmark($primary-200);
     @include hoverColors;
-  }
-
-  &:active .checkbox-control {
-    @include checkmark($primary-600);
   }
 
   &.disabled {

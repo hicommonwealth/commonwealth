@@ -31,32 +31,33 @@
     border-radius: $border-radius-round;
   }
 
-  &.checked .radio-control {
-    @include radioCore($primary-500);
-    @include checkedColors;
-  }
-
   &:hover .radio-control {
     @include radioCore($primary-200);
     @include hoverColors;
   }
 
-  &:active .radio-control {
-    @include radioCore($primary-600);
+  &.checked .radio-control {
+    @include radioCore($primary-500);
+    @include checkedColors;
   }
 
-  &.disabled .radio-control {
-    // same color as background, so it's invisble on hover
-    @include radioCore($neutral-200);
-    @include disabledColors;
-
-    pointer-events: none;
+  &.checked:hover .radio-control {
+    @include radioCore($primary-600);
+    @include checkedHoverColors;
   }
 
   &.checked.disabled .radio-control {
     @include radioCore($neutral-300);
     @include disabledColors;
+  }
 
+  &.disabled {
     pointer-events: none;
+
+    .radio-control {
+      // same color as background, so it's invisble on hover
+      @include radioCore($neutral-200);
+      @include disabledColors;
+    }
   }
 }

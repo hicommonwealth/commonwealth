@@ -22,6 +22,11 @@
   border-color: $primary-500;
 }
 
+@mixin checkedHoverColors {
+  background-color: $primary-100;
+  border-color: $primary-600;
+}
+
 @mixin disabledColors {
   background-color: $neutral-200;
   border-color: $neutral-300;
