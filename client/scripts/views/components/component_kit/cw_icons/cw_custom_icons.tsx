@@ -9,6 +9,84 @@ import 'components/component_kit/cw_icon.scss';
 import { getClasses } from '../helpers';
 import { CustomIconAttrs, CustomIconStyleAttrs } from './types';
 
+export const CWCosmosEvmMetamask: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>(
+          { ...customIconStyleAttrs },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+      >
+        <path
+          fill="#000"
+          d="M12.892 7.862c-4.84 1.865-5.283 6.642-6.67 8.873-1.404 2.258-4.62 3.503-4.181 4.654.44 1.15 3.66-.086 6.208.648 2.518.726 6.03 3.978 10.87 2.113a8.683 8.683 0 005.07-5.223.403.403 0 00-.338-.539.397.397 0 00-.393.217 6.866 6.866 0 01-12.358-.121 6.894 6.894 0 01-.217-.504 6.995 6.995 0 01-.174-.521 78.534 78.534 0 015.035-2.135 78.77 78.77 0 015.076-1.77 57.357 57.357 0 012.806-.791l.182-.046a.26.26 0 01.306.16l.001.003c.028.073.052.146.078.22.168.476.293.956.376 1.438.036.21.265.325.454.224.694-.375 1.33-.74 1.898-1.092 2.116-1.308 3.289-2.418 3.048-3.047-.24-.629-1.852-.665-4.296-.216a38.586 38.586 0 00-3.054.7c-.781.207-1.605.446-2.463.712a81.5 81.5 0 00-5.074 1.772 82.328 82.328 0 00-4.657 1.957c-.017-2.795 1.665-5.437 4.417-6.498a6.83 6.83 0 014.97.016c.152.06.325.018.436-.103a.404.404 0 00-.108-.628 8.637 8.637 0 00-7.248-.473z"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWKeplr: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>(
+          { ...customIconStyleAttrs },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+      >
+        <path
+          fill="#207afe"
+          d="M23 4h-1v2h2v19h-2v1.9h1a3 3 0 003-3V7a3 3 0 00-3-3z"
+        ></path>
+        <path fill="#06f" d="M5 21.9V9.1l10-1.7v16.2z"></path>
+        <path
+          fill="#06f"
+          d="M17 2h-.7l-14 2.5A3.1 3.1 0 000 7.6v15.8a3.1 3.1 0 002.4 3.1l14 2.5h.6a3.1 3.1 0 003-3.2V5.2A3.1 3.1 0 0017 2z"
+        ></path>
+        <path
+          fill="#207afe"
+          d="M29 6h-1v2h2v15h-2v1.9h1a3.1 3.1 0 003-3.2V9.2A3.1 3.1 0 0029 6z"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWMagic: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>(
+          { ...customIconStyleAttrs },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+      >
+        {/* fill in */}
+      </svg>
+    );
+  },
+};
+
 export const CWMetaMask: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
     const { componentType, ...customIconStyleAttrs } = vnode.attrs;
@@ -113,7 +191,31 @@ export const CWMetaMask: m.Component<CustomIconAttrs> = {
   },
 };
 
-export const CWMagic: m.Component<CustomIconAttrs> = {
+export const CWNearWallet: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>(
+          { ...customIconStyleAttrs },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+      >
+        <path
+          fill="#000"
+          d="M24.937 3.853l-5.842 8.67c-.404.59.373 1.305.932.808l5.75-5.003c.155-.124.372-.031.372.186v15.632c0 .217-.28.31-.404.155L8.342 3.48c-.559-.684-1.367-1.057-2.268-1.057h-.622C3.836 2.423 2.5 3.76 2.5 5.407v22.002a2.984 2.984 0 005.532 1.554l5.842-8.67c.404-.591-.373-1.306-.932-.809l-5.75 4.973c-.155.124-.372.03-.372-.187V8.67c0-.218.28-.311.404-.156l17.402 20.822a2.921 2.921 0 002.27 1.056h.62A2.984 2.984 0 0030.5 27.41V5.407c-.031-1.647-1.367-2.984-3.014-2.984a2.996 2.996 0 00-2.549 1.43z"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWPhantom: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
     const { componentType, ...customIconStyleAttrs } = vnode.attrs;
     return (
@@ -134,11 +236,132 @@ export const CWMagic: m.Component<CustomIconAttrs> = {
   },
 };
 
-// Polkadot = 'polkadot',
-// WalletConnect = 'walletconnect',
-// Keplr = 'keplr',
-// NearWallet = 'near',
-// TerraStation = 'terrastation',
-// CosmosEvmMetamask = 'cosm-metamask',
-// Phantom = 'phantom',
-// Ronin = 'ronin',
+export const CWPolkadot: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>(
+          { ...customIconStyleAttrs },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+      >
+        <path
+          fill="#D32D79"
+          d="M16 30c7.732 0 14-6.268 14-14S23.732 2 16 2 2 8.268 2 16s6.268 14 14 14z"
+        ></path>
+        <path
+          fill="#fff"
+          d="M16 5.94c-4.16 0-7.56 3.38-7.56 7.56 0 .84.14 1.66.4 2.46.18.54.78.84 1.34.66.54-.18.84-.78.66-1.34-.22-.62-.32-1.28-.3-1.94.08-2.82 2.36-5.14 5.18-5.28a5.455 5.455 0 015.74 5.44c0 2.9-2.28 5.28-5.14 5.44 0 0-1.06.06-1.58.14-.26.04-.46.08-.6.1-.06.02-.12-.04-.1-.1l.18-.88.98-4.52c.12-.56-.24-1.12-.8-1.24-.56-.12-1.12.24-1.24.8 0 0-2.36 11-2.38 11.12-.12.56.24 1.12.8 1.24.56.12 1.12-.24 1.24-.8.02-.12.34-1.58.34-1.58a2.657 2.657 0 012.24-2.08c.24-.04 1.18-.1 1.18-.1 3.9-.3 6.98-3.56 6.98-7.54 0-4.18-3.4-7.56-7.56-7.56zm.54 17.4c-.68-.14-1.36.28-1.5.98-.14.68.28 1.36.98 1.5.68.14 1.36-.28 1.5-.98.14-.7-.28-1.36-.98-1.5z"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWRonin: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>(
+          { ...customIconStyleAttrs },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+      >
+        {/* fill in */}
+      </svg>
+    );
+  },
+};
+
+export const CWTerraStation: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>(
+          { ...customIconStyleAttrs },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+      >
+        <path
+          fill="#0E3CA5"
+          fillRule="evenodd"
+          d="M14.371 24.214c.743 2.834 3.41 4.997 4.756 4.908.047-.003 5.108-.976 7.878-5.747 2.156-3.713 1.422-7.297-1.51-7.375-1.056.079-12.54 2.814-11.124 8.214zm2.547-21.339c-1.91 0-3.722.41-5.362 1.141a7.83 7.83 0 00-.837.411c-.185.1-.371.198-.55.304l.042.014A6.033 6.033 0 008.817 6.07c-3.793 5.021 8.919 8.671 15.714 8.684 3.128 2.249 4.006-6.335.95-8.717a13.108 13.108 0 00-8.563-3.161z"
+          clipRule="evenodd"
+        ></path>
+        <path
+          fill="#5493F7"
+          fillRule="evenodd"
+          d="M12.141 5.819c-1.718 2.524-7.444 4.304-8.386 4.026l-.004-.01.117-.228A13.574 13.574 0 017.95 4.951c.353-.253.718-.489 1.095-.709.8-.454 1.621-.481 1.891-.492 2.55.047 1.218 2.048 1.204 2.069"
+          clipRule="evenodd"
+        ></path>
+        <mask
+          id="mask0_238_29603"
+          style={{ maskType: 'alpha' }}
+          width="9"
+          height="19"
+          x="2"
+          y="11"
+          maskUnits="userSpaceOnUse"
+        >
+          <path fill="#fff" d="M2 11.624h8.75v17.5H2v-17.5z"></path>
+        </mask>
+        <g mask="url(#mask0_238_29603)">
+          <path
+            fill="#5493F7"
+            fillRule="evenodd"
+            d="M10.699 24.737c.128.83-.003 4.108-.176 4.385-.148.008-.457.027-1.35-.468a14.23 14.23 0 01-4.432-3.903A13.792 13.792 0 012 16.474a13.78 13.78 0 01.873-4.85h.002c1.025 1.345 2.21 2.56 3.217 3.918.96 1.292 2.279 3.398 2.547 3.848 1.667 2.794 1.933 4.518 2.06 5.347z"
+            clipRule="evenodd"
+          ></path>
+        </g>
+        <path
+          fill="#5493F7"
+          fillRule="evenodd"
+          d="M30 16.63c0 1.792-.341 3.505-.96 5.076-1.622 1.751-12.566-2.557-12.674-2.604-1.496-.658-6.052-2.66-6.463-5.805C9.31 8.773 18.462 5.62 22.483 5.5c.482.005 1.95.022 2.804.72A13.81 13.81 0 0130 16.629v.002zm-9.57 11.19c.655-2.317 6.376-4.69 7.64-4.819.155-.016.221.094.153.22-1.317 2.396-3.268 4.368-5.628 5.647-1.193.579-2.506.157-2.165-1.048z"
+          clipRule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWWalletConnect: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>(
+          { ...customIconStyleAttrs },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+      >
+        <path
+          fill="#3B99FC"
+          d="M8.133 10.883c4.567-4.377 11.97-4.377 16.537 0l.755.724a.273.273 0 010 .397l-2.086 2a.3.3 0 01-.413 0l-.756-.726c-3.186-3.053-8.351-3.053-11.537 0l-.81.777a.3.3 0 01-.413 0l-2.086-2a.273.273 0 010-.396l.809-.777zm20.218 3.527l1.879 1.8a.546.546 0 010 .795v.001l-7.544 7.23a.602.602 0 01-.826 0l-5.355-5.133a.15.15 0 00-.207 0l-5.355 5.133a.602.602 0 01-.826 0l-7.544-7.23a.546.546 0 01-.001-.794l.001-.001 1.879-1.8a.3.3 0 01.413 0l5.562 5.33a.15.15 0 00.206 0l5.356-5.133a.601.601 0 01.825 0l5.356 5.133a.15.15 0 00.206 0l5.562-5.33a.3.3 0 01.413 0z"
+        ></path>
+      </svg>
+    );
+  },
+};

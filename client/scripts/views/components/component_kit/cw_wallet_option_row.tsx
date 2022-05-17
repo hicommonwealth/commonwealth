@@ -40,7 +40,7 @@ export class CWWalletOptionRow
         onclick={onclick}
       >
         <CWCustomIcon size={32} iconName={walletName} iconSize="large" />
-        <CWText type="h5" fontWeight="semiBold">
+        <CWText type="h5" fontWeight="semiBold" noWrap>
           {getWalletKeyFromValue(walletName)}
         </CWText>
       </div>

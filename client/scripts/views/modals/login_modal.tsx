@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import $ from 'jquery';
 
 import 'modals/login_modal.scss';
 
@@ -17,6 +18,39 @@ export class LoginModal implements m.ClassComponent {
         </div>
         <div class="compact-modal-body">{m(Login)}</div>
       </>
+    );
+  }
+}
+
+const redirectClick = (e, route) => {
+  e.preventDefault();
+  $(e.target).trigger('modalexit');
+  m.route.set(route);
+};
+
+export class Boilerplate implements m.ClassComponent {
+  view() {
+    return (
+      <CWText type="caption">
+        By connecting to Common, you agree to our{' '}
+        <a
+          class="link"
+          onclick={(e) => {
+            redirectClick(e, '/terms');
+          }}
+        >
+          Terms of Service
+        </a>{' '}
+        and{' '}
+        <a
+          class="link"
+          onclick={(e) => {
+            redirectClick(e, '/privacy');
+          }}
+        >
+          Privacy Policy
+        </a>
+      </CWText>
     );
   }
 }
@@ -42,11 +76,7 @@ export class NewLoginModal implements m.ClassComponent {
         </div>
         <div class="body">
           <ModalExitButton />
-          <CWText type="caption">
-            By connecting to Common, you agree to our{' '}
-            <span class="link">Terms of Service</span> and{' '}
-            <span class="link">Privacy Policy</span>
-          </CWText>
+          <Boilerplate />
         </div>
       </div>
     );

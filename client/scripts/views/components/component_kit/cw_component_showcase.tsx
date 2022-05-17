@@ -88,7 +88,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="card-gallery">
           <h1>Wallet Row Card</h1>
           <CWWalletOptionRow
-            walletName="metamask"
+            walletName="phantom"
             onclick={() => notifySuccess('MetaMask clicked!')}
           />
         </div>

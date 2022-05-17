@@ -68,16 +68,16 @@ export const iconLookup = {
 };
 
 export const customIconLookup = {
-  magic: CustomIcons.CWMagic,
+  'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
+  keplr: CustomIcons.CWKeplr,
+  // magic: CustomIcons.CWMagic, // weird xlinkhref, should be 32
   metamask: CustomIcons.CWMetaMask,
-  // Polkadot = 'polkadot',
-  // WalletConnect = 'walletconnect',
-  // Keplr = 'keplr',
-  // NearWallet = 'near',
-  // TerraStation = 'terrastation',
-  // CosmosEvmMetamask = 'cosm-metamask',
-  // Phantom = 'phantom',
-  // Ronin = 'ronin',
+  near: CustomIcons.CWNearWallet,
+  // phantom: CustomIcons.CWPhantom, // weird xlinkhref
+  polkadot: CustomIcons.CWPolkadot,
+  // ronin: CustomIcons.CWRonin, // weird xlinkhref
+  terrastation: CustomIcons.CWTerraStation,
+  walletconnect: CustomIcons.CWWalletConnect,
 };
 
 export type IconName = keyof typeof iconLookup;
