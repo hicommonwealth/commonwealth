@@ -8,6 +8,7 @@ export type NotificationsReadAttributes = {
 	subscription_id: number;
 	notification_id: number;
 	is_read: boolean;
+	user_id: number;
 	Subscription?: SubscriptionAttributes;
 	Notification?: NotificationAttributes;
 }
@@ -24,6 +25,7 @@ export default (
 		subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
 		notification_id: { type: dataTypes.INTEGER, primaryKey: true },
 		is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+		user_id: { type: dataTypes.INTEGER, defaultValue: false, allowNull: false }
 	}, {
 		tableName: 'NotificationsRead',
 		underscored: true,

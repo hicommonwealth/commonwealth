@@ -195,7 +195,8 @@ export default (
     await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
       subscription_id: subscription.id,
       notification_id: notification.id,
-      is_read: false
+      is_read: false,
+      user_id: subscription.subscriber_id
     })));
 
     // send emails

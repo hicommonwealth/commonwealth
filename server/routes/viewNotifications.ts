@@ -15,6 +15,7 @@ export default async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log(req.user);
   performance.mark('start');
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
@@ -42,6 +43,7 @@ export default async (
 
   const notificationParams: any = {
     model: models.NotificationsRead,
+    where: { user_id: req.user.id },
     required: false, // send subscriptions regardless of whether user has notifications
     include: [
       {
@@ -65,9 +67,9 @@ export default async (
   }
 
   // perform the query
-  // const subscriptions = await models.Subscription.findAll({
+  // const subscriptions = (await models.Subscription.findAll({
   //   where: {
-  //     [Op.and]: searchParams
+  //     [Op.and]: searchParams,
   //   },
   //   include: [
   //     notificationParams,
@@ -75,8 +77,8 @@ export default async (
   //       model: models.ChainEventType,
   //       required: false,
   //     },
-  //   ],
-  // });
+  //   ], logging: true
+  // })).map(n => n.toJSON());
 
   // TODO: add user id to notifications read
   const notificationsRead = await models.NotificationsRead.findAll({
@@ -102,7 +104,10 @@ export default async (
         }]
       }
     ],
-    raw: true, nest: true
+    where: {
+      user_id: req.user.id
+    },
+    raw: true, nest: true, logging: true
   });
 
   performance.mark('B');
