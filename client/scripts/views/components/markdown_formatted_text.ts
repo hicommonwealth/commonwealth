@@ -25,6 +25,7 @@ const MarkdownFormattedText: m.Component<
     collapse?: boolean;
     searchTerm?: string;
     openLinksInNewTab?: boolean;
+    cutoffText?: number;
   },
   {
     cachedDocWithHighlights: string;
@@ -32,12 +33,21 @@ const MarkdownFormattedText: m.Component<
   }
 > = {
   view: (vnode) => {
-    const { doc, hideFormatting, collapse, searchTerm, openLinksInNewTab } = vnode.attrs;
+    const {
+      doc,
+      hideFormatting,
+      collapse,
+      searchTerm,
+      openLinksInNewTab,
+      cutoffText,
+    } = vnode.attrs;
     if (!doc) return;
     renderer.link = (href, title, text) => {
       return `<a ${
         href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
-      } ${openLinksInNewTab ? 'target="_blank"' : ''} href="${href}">${text}</a>`;
+      } ${
+        openLinksInNewTab ? 'target="_blank"' : ''
+      } href="${href}">${text}</a>`;
     };
 
     // if we're showing highlighted search terms, render the doc once, and cache the result
@@ -94,7 +104,13 @@ const MarkdownFormattedText: m.Component<
       );
     }
 
-    const unsanitized = marked.parse(doc.toString());
+    let truncatedDoc = doc;
+    if (cutoffText)
+      truncatedDoc = doc.slice(
+        0,
+        doc.split('\n', cutoffText).join('\n').length
+      );
+    const unsanitized = marked.parse(truncatedDoc.toString());
     const sanitized = hideFormatting
       ? DOMPurify.sanitize(unsanitized, {
           ALLOWED_TAGS: ['a'],
