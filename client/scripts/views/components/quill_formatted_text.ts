@@ -362,13 +362,15 @@ const QuillFormattedText: m.Component<
     const { doc, hideFormatting, collapse, searchTerm, cutoffText } =
       vnode.attrs;
 
-    let docCopy = { ...doc };
-    if (cutoffText) docCopy.ops = [...doc.ops.slice(0, cutoffText)];
+    let truncatedDoc = { ...doc };
+    if (cutoffText) truncatedDoc.ops = [...doc.ops.slice(0, cutoffText)];
 
     // if we're showing highlighted search terms, render the doc once, and cache the result
     if (searchTerm) {
-      if (JSON.stringify(docCopy) !== vnode.state.cachedDocWithHighlights) {
-        const vnodes = renderQuillDelta(docCopy, hideFormatting, true); // collapse = true, to inline blocks
+      if (
+        JSON.stringify(truncatedDoc) !== vnode.state.cachedDocWithHighlights
+      ) {
+        const vnodes = renderQuillDelta(truncatedDoc, hideFormatting, true); // collapse = true, to inline blocks
         const root = document.createElement('div');
         m.render(root, vnodes);
         const textToHighlight = root.innerText
@@ -378,7 +380,7 @@ const QuillFormattedText: m.Component<
           searchWords: [searchTerm.trim()],
           textToHighlight,
         });
-        vnode.state.cachedDocWithHighlights = JSON.stringify(docCopy);
+        vnode.state.cachedDocWithHighlights = JSON.stringify(truncatedDoc);
         vnode.state.cachedResultWithHighlights = chunks.map(
           ({ end, highlight, start }, index) => {
             const middle = 15;
@@ -424,7 +426,7 @@ const QuillFormattedText: m.Component<
             });
         },
       },
-      renderQuillDelta(docCopy, hideFormatting, collapse)
+      renderQuillDelta(truncatedDoc, hideFormatting, collapse)
     );
   },
 };

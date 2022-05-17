@@ -104,10 +104,13 @@ const MarkdownFormattedText: m.Component<
       );
     }
 
-    let docCopy = doc;
+    let truncatedDoc = doc;
     if (cutoffText)
-      docCopy = doc.slice(0, doc.split('\n', cutoffText).join('\n').length);
-    const unsanitized = marked.parse(docCopy.toString());
+      truncatedDoc = doc.slice(
+        0,
+        doc.split('\n', cutoffText).join('\n').length
+      );
+    const unsanitized = marked.parse(truncatedDoc.toString());
     const sanitized = hideFormatting
       ? DOMPurify.sanitize(unsanitized, {
           ALLOWED_TAGS: ['a'],

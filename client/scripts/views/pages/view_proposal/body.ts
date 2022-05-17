@@ -791,7 +791,7 @@ export const ProposalBodyText: m.Component<
             return getPlaceholder();
           }
 
-          return m('.wrap', [
+          return m('.show-more-wrap', [
             m(QuillFormattedText, {
               doc: doc,
               cutoffText: vnode.state.collapsed
@@ -810,7 +810,7 @@ export const ProposalBodyText: m.Component<
           if (body.toString().trim() === '') {
             return getPlaceholder();
           }
-          return m('.wrap', [
+          return m('.show-more-wrap', [
             m(MarkdownFormattedText, {
               doc: body,
               cutoffText: vnode.state.collapsed
