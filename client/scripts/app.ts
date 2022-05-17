@@ -9,24 +9,28 @@ import mixpanel from 'mixpanel-browser';
 
 import m from 'mithril';
 import $ from 'jquery';
-import {FocusManager} from 'construct-ui';
+import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 
 import './fragment-fix';
-import app, {ApiStatus, LoginState} from 'state';
-import {ChainBase, ChainNetwork, ChainType} from 'types';
-import {ChainInfo, NodeInfo, NotificationCategory} from 'models';
+import app, { ApiStatus, LoginState } from 'state';
+import { ChainBase, ChainNetwork, ChainType } from 'types';
+import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
-import {WebSocketController} from 'controllers/server/socket';
+import { WebSocketController } from 'controllers/server/socket';
 
-import {notifyError, notifyInfo, notifySuccess,} from 'controllers/app/notifications';
-import {updateActiveAddresses, updateActiveUser} from 'controllers/app/login';
+import {
+  notifyError,
+  notifyInfo,
+  notifySuccess,
+} from 'controllers/app/notifications';
+import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
-import {Layout} from 'views/layout';
+import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import {LoginModal} from 'views/modals/login_modal';
-import {alertModalWithText} from 'views/modals/alert_modal';
-import {pathIsDiscussion} from './identifiers';
+import { LoginModal } from 'views/modals/login_modal';
+import { alertModalWithText } from 'views/modals/alert_modal';
+import { pathIsDiscussion } from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -83,31 +87,36 @@ export async function initAppState(
 
         // add recentActivity
         const { recentThreads } = data;
-        recentThreads.forEach(({chain, count}) => {
+        recentThreads.forEach(({ chain, count }) => {
           app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
-      // update the login status
-      updateActiveUser(data.user);
-      app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+        // update the login status
+        updateActiveUser(data.user);
+        app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
 
-      if (app.loginState == LoginState.LoggedIn) {
-        console.log("Initializing socket connection with JTW:", app.user.jwt)
-        // init the websocket connection and the chain-events namespace
-        app.socket.init(app.user.jwt).then(() => {
-          if (app.socket.isConnected) {
-            console.log("Websocket connected");
-          } else {
-            console.log("Websocket connection failure");
-          }
-        })
-        app.user.notifications.refresh().then(() => m.redraw());
-      } else if (app.loginState == LoginState.LoggedOut && app.socket.isConnected) {
-        // TODO: create global deinit function
-        app.socket.disconnect()
-      }
+        if (app.loginState == LoginState.LoggedIn) {
+          console.log('Initializing socket connection with JTW:', app.user.jwt);
+          // init the websocket connection and the chain-events namespace
+          app.socket.init(app.user.jwt).then(() => {
+            if (app.socket.isConnected) {
+              console.log('Websocket connected');
+            } else {
+              console.log('Websocket connection failure');
+            }
+          });
+          app.user.notifications.refresh().then(() => m.redraw());
+        } else if (
+          app.loginState == LoginState.LoggedOut &&
+          app.socket.isConnected
+        ) {
+          // TODO: create global deinit function
+          app.socket.disconnect();
+        }
 
-      app.user.setStarredCommunities(data.user ? data.user.starredCommunities : []);
+        app.user.setStarredCommunities(
+          data.user ? data.user.starredCommunities : []
+        );
 
         // update the selectedNode, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
@@ -801,7 +810,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/search': redirectRoute(() => '/search'),
             '/:scope/members': redirectRoute(() => '/members'),
             '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
-            '/:scope/chat/:channel': redirectRoute((attrs) => `/chat/${attrs.channel}`),
+            '/:scope/chat/:channel': redirectRoute(
+              (attrs) => `/chat/${attrs.channel}`
+            ),
             '/:scope/new/discussion': redirectRoute(() => '/new/discussion'),
             '/:scope/account/:address': redirectRoute(
               (attrs) => `/account/${attrs.address}/`
@@ -1086,8 +1097,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
       } else {
         // Production Mixpanel Project
-        // TODO: Swap this for the prod token after we make sure everything is working
-        mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
+        mixpanel.init(MIXPANEL_PROD_TOKEN, { debug: true });
       }
     } catch (e) {
       console.error('Mixpanel initialization error');
