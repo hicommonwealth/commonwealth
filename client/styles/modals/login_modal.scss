@@ -3,7 +3,7 @@
 .NewLoginModal {
   display: flex;
   height: 424px;
-  width: 688px;
+  width: 664px;
 
   .sidebar {
     background-image: url('/static/img/login-background.png');
@@ -27,7 +27,7 @@
         background-color: $yellow-500;
         height: 4px;
         margin: 4px 0 8px;
-        width: 208px;
+        width: 205px;
       }
     }
   }
