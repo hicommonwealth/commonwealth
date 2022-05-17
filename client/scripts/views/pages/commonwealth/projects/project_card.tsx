@@ -8,7 +8,7 @@ import { slugify } from 'utils';
 import moment from 'moment';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { AnonymousUser } from 'views/components/widgets/user';
-import { Project } from '.';
+import { Project } from 'models';
 
 class DummyChainIcon
   implements m.ClassComponent<{ chain; onclick; size: number }>

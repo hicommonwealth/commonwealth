@@ -1,12 +1,13 @@
 import { AddressInfo } from 'client/scripts/models';
-import { CWBacker } from 'controllers/chain/ethereum/commonwealth/participants';
+import { CWParticipant } from 'controllers/chain/ethereum/commonwealth/participants';
 import moment from 'moment';
-import { Project } from '.';
+import { Project } from 'models';
+import BN from 'bn.js';
 
 const DummyBeneficiary: AddressInfo = {
   id: 1,
   address: 'FxgH3tdaeDm0b67zx',
-  chain: 'ethereum',
+  chain: 'dydx',
   keytype: 'irrelevant',
   walletId: null,
   ghostAddress: false,
@@ -14,8 +15,9 @@ const DummyBeneficiary: AddressInfo = {
 
 export const DummyProject: Project = {
   id: 1,
+  address: 'skdjfkasjkjadkvnkjdfk090912',
   title: 'Name of Project',
-  chain: 'ethereum',
+  chainId: 'dydx',
   description:
     `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
     `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
@@ -40,18 +42,34 @@ export const DummyProject: Project = {
     `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
   coverImage:
     'https://d2w9rnfcy7mm78.cloudfront.net/16465542/original_01e127de59ab1b9be072a07cd8e6aeca.png?1652559364',
-  token: 'dydx',
+  token: 'skdjfkasjkjadkvnkjdfk090912',
   creator: null,
-  beneficiary: DummyBeneficiary,
+  creatorAddressId: DummyBeneficiary.id,
+  creatorAddressInfo: DummyBeneficiary,
+  beneficiary: 'kcvkljurdslfkdjfioeioei',
   backers: [
-    new CWBacker(1, 1, 1, 'ajslkdjfkl', 10000),
-    new CWBacker(1, 1, 1, 'kcvkljurioeioei', 300000),
+    new CWParticipant(this, 'ajslkdjfkl', new BN(10000)),
+    new CWParticipant(this, 'kcvkljurioeioei', new BN(300000)),
   ],
-  curatorCut: 0.23,
-  curators: [null],
+  curatorFee: new BN(0.23),
+  curators: [
+    new CWParticipant(this, 'ajslkdjfkl', new BN(10000)),
+    new CWParticipant(this, 'kcvkljurioeioei', new BN(300000)),
+  ],
   createdAt: moment(),
-  progress: { inBlocks: 16000, asPercent: 0.32 },
-  deadline: { inBlocks: 48000, asDate: moment('2022-05-29') },
-  threshold: { inTokens: 12, inDollars: 30000 },
-  raised: { inTokens: 3.8, inDollars: 9000 },
+  deadline: moment().add('12 days'),
+  threshold: new BN(12000000),
+  fundingAmount: new BN(600000),
+
+  isBacker: () => true,
+  isCurator: () => true,
+
+  createdEvent: null,
+  curateEvents: null,
+  backEvents: null,
+  withdrawEvents: null,
+  succeededEvent: null,
+  failedEvent: null,
+
+  entity: null,
 };

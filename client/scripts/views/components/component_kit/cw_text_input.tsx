@@ -29,7 +29,6 @@ export type InputStyleAttrs = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
 };
-
 export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;

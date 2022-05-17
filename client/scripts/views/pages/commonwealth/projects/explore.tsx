@@ -3,7 +3,7 @@ import 'pages/projects/index.scss';
 
 import m from 'mithril';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { Project } from '.';
+import { Project } from 'models';
 import ProjectCard, { ProjectCardSize } from './project_card';
 
 export default class ExploreProjectsPage

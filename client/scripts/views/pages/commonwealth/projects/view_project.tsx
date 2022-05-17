@@ -4,6 +4,7 @@ import 'pages/projects/view_project.scss';
 import m from 'mithril';
 import { Tag } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { Project } from 'models';
 import { ProjectCompletionBar } from './project_card';
 import Sublayout from '../../../sublayout';
 import { AnonymousUser } from '../../../components/widgets/user';
@@ -12,7 +13,6 @@ import { PageNotFound } from '../../404';
 import { DummyProject } from './dummy_project';
 import MarkdownFormattedText from '../../../components/markdown_formatted_text';
 import { CWTable } from '../../../components/component_kit/cw_table';
-import { Project } from '.';
 
 interface ProjectPageAttrs {
   identifier: string;
@@ -78,7 +78,7 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
           <div class="project-curator-data">
             {m(AnonymousUser, { avatarSize: 16, distinguishingKey: '2' })}
             <CWText type="caption">
-              Curator receives {project.curatorCut * 100}% of funds.
+              Curator receives {project.curatorFee * 100}% of funds.
             </CWText>
           </div>
           <div class="project-about">
