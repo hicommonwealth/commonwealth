@@ -1,56 +1,63 @@
 @import 'shared';
 
-@mixin radioButtonCore($color) {
-  background: radial-gradient(
-    $color 0%,
-    $color 50%,
-    transparent 50%,
-    transparent
-  );
+@mixin radioCore($color) {
+  display: grid;
+  place-content: center;
+
+  &::after {
+    color: $color;
+    content: '';
+    width: 6px;
+    height: 6px;
+    box-shadow: inset 12px 12px;
+    clip-path: circle(50%);
+  }
 }
 
 .RadioButton {
   align-items: center;
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   position: relative;
 
   .radio-input {
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
+    @include hideInput;
   }
 
   .radio-control {
+    @include controlStyles;
+
     border-radius: $border-radius-round;
-    border: 2px solid $neutral-300;
-    cursor: pointer;
-    height: 12px;
-    margin: auto 8px;
-    position: relative;
-    transition: all ease 150ms;
-    width: 12px;
   }
 
   &:hover .radio-control {
-    @include radioButtonCore($primary-100);
-
-    border-color: $primary-300;
+    @include radioCore($primary-200);
+    @include hoverColors;
   }
 
-  &.selected .radio-control {
-    @include radioButtonCore($primary-500);
-
-    border-color: $primary-500;
+  &.checked .radio-control {
+    @include radioCore($primary-500);
+    @include checkedColors;
   }
 
-  &.disabled .radio-control {
-    @include radioButtonCore($neutral-200);
+  &.checked:hover .radio-control {
+    @include radioCore($primary-600);
+    @include checkedHoverColors;
+  }
 
+  &.checked.disabled .radio-control {
+    @include radioCore($neutral-300);
+    @include disabledColors;
+  }
+
+  &.disabled {
     pointer-events: none;
-  }
 
-  &.disabled:hover .radio-control {
-    border-color: $neutral-300;
+    .radio-control {
+      // same color as background, so it's invisble on hover
+      @include radioCore($neutral-200);
+      @include disabledColors;
+    }
   }
 }

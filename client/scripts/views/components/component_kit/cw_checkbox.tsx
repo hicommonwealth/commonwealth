@@ -2,57 +2,64 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_radio_button.scss';
+import 'components/component_kit/cw_checkbox.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
-export type RadioButton = { label?: string; value: string };
+type Checkbox = { label?: string; value: string };
 
-type RadioButtonStyleAttrs = {
-  disabled?: boolean;
+type CheckboxStyleAttrs = {
   checked: boolean;
+  disabled?: boolean;
+  indeterminate?: boolean;
 };
 
-type RadioButtonAttrs = {
+type CheckboxAttrs = {
   groupName: string;
   onchange: (e?: any) => void;
-} & RadioButton &
-  RadioButtonStyleAttrs;
+} & Checkbox &
+  CheckboxStyleAttrs;
 
-export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
+export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
   view(vnode) {
     const {
       disabled = false,
       groupName,
+      indeterminate = false,
       label,
       onchange,
       checked,
       value,
     } = vnode.attrs;
 
+    console.log(this);
+
     const params = {
       disabled,
       name: groupName,
       onchange,
       checked,
-      type: 'radio',
+      type: 'checkbox',
       value,
     };
 
+    // console.log(this);
+
     return (
       <label
-        class={getClasses<RadioButtonStyleAttrs>(
+        class={getClasses<CheckboxStyleAttrs>(
           {
             checked,
             disabled,
+            indeterminate,
           },
-          ComponentType.RadioButton
+          ComponentType.Checkbox
         )}
       >
-        <input class="radio-input" {...params} />
-        <div class="radio-control" />
+        <input class="checkbox-input" {...params} />
+        <div class="checkbox-control" />
         <CWText>{label || value}</CWText>
       </label>
     );
