@@ -4,28 +4,18 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_radio_group.scss';
 
-import { CWRadioButton } from './cw_radio_button';
+import { CWRadioButton, RadioButton } from './cw_radio_button';
 import { ComponentType } from './types';
 
-type RadioGroupOption = { label: string; value: string };
-
 type RadioGroupAttrs = {
-  options: Array<RadioGroupOption>;
-  defaultValue: RadioGroupOption;
   name: string;
   onchange: (e?: any) => void;
+  options: Array<RadioButton>;
+  toggledOption: string;
 };
 export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
-  toggledValue: string;
-
-  oninit(vnode) {
-    if (!this.toggledValue) {
-      this.toggledValue = vnode.attrs.defaultValue.value;
-    }
-  }
-
   view(vnode) {
-    const { options, onchange, name } = vnode.attrs;
+    const { options, onchange, name, toggledOption } = vnode.attrs;
     return (
       <div class={ComponentType.RadioGroup}>
         {options.map((o) => {
@@ -33,10 +23,9 @@ export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
             <CWRadioButton
               value={o.value}
               label={o.label}
-              selected={o.value === this.toggledValue}
+              checked={o.value === toggledOption}
               groupName={name}
               onchange={(e) => {
-                this.toggledValue = e?.target?.value;
                 onchange(e);
               }}
               disabled={o.disabled}
