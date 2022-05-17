@@ -24,7 +24,7 @@ $modal-padding: 16px;
     @include popout();
 
     background: $white;
-    border: 2px solid $neutral-800;
+    // border: 2px solid $neutral-800;
     border-radius: $border-radius-corners;
     // max-height: 96%;
     // max-width: 800px;
@@ -62,9 +62,10 @@ $modal-padding: 16px;
 
     svg {
       cursor: pointer;
-      fill: currentColor;
+      color: $white;
 
       &:hover {
+        color: $white;
         opacity: 0.6;
       }
     }

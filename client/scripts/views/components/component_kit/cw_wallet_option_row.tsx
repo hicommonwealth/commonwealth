@@ -16,7 +16,7 @@ type WalletOptionRowStyleAttrs = {
 };
 
 type WalletOptionRowAttrs = {
-  onclick: () => void;
+  onclick?: () => void;
   walletName: WalletId;
 } & WalletOptionRowStyleAttrs;
 

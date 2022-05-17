@@ -33,6 +33,7 @@ type FontType =
   | 'buttonLg';
 
 type TextAttrs = {
+  className?: string;
   disabled?: boolean;
   fontStyle?: FontStyle;
   fontWeight: FontWeight;
@@ -43,6 +44,7 @@ type TextAttrs = {
 export class CWText implements m.ClassComponent<TextAttrs> {
   view(vnode) {
     const {
+      className,
       disabled = false,
       fontStyle,
       fontWeight = 'regular',
@@ -59,6 +61,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
             disabled,
             fontStyle,
             noWrap,
+            className,
           },
           ComponentType.Text
         )}
