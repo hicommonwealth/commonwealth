@@ -15,7 +15,6 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
-// import { CWPopover } from './cw_popover';
 import { CWTooltip } from './cw_tooltip';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';

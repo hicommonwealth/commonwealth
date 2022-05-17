@@ -11,8 +11,6 @@ import {
   PopoverPosition,
 } from './types';
 import { getPopoverPosition } from './helpers';
-import { concatMap } from 'rxjs';
-import { MaxKeys } from 'aws-sdk/clients/s3';
 
 export type PopoverToggleAttrs = {
   isActive: boolean;

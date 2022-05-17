@@ -239,6 +239,13 @@ export async function getResults(
   try {
     let votes = await getVotes(proposal.id);
     const strategies = proposal.strategies ?? space.strategies;
+    console.log(
+      space.id,
+      strategies,
+      space.network,
+      votes.map((vote) => vote.voter),
+      parseInt(proposal.snapshot, 10)
+    );
 
     if (proposal.state !== 'pending') {
       let attempts = 0;
@@ -252,6 +259,7 @@ export async function getResults(
             parseInt(proposal.snapshot, 10)
             // provider,
           );
+          console.log('scores: ', scores);
           votes = votes
             .map((vote: any) => {
               vote.scores = strategies.map(
