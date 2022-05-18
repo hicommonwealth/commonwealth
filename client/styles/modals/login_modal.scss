@@ -5,104 +5,19 @@
   height: 424px;
   width: 664px;
 
-  .sidebar {
-    background-image: url('/static/img/login-background.png');
-    background-size: cover;
-    height: 424px;
-    width: 264px;
-
-    .sidebar-content {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      justify-content: center;
-      padding: 0 24px;
-      width: 264px;
-
-      .Text {
-        color: $white;
-      }
-
-      .divider {
-        background-color: $yellow-500;
-        height: 4px;
-        margin: 4px 0 8px;
-        width: 205px;
-      }
-    }
-  }
-
   .body {
     align-items: center;
     display: flex;
     flex-direction: column;
     padding: 12px;
+    width: 400px;
 
     svg {
       align-self: flex-end;
     }
 
-    .Boilerplate {
-      color: $neutral-300;
-      display: inline-block;
-      margin: 32px 60px 24px;
-      text-align: center;
-
-      .link {
-        color: $neutral-500;
-        cursor: pointer;
-      }
-    }
-
-    .wallets-container {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 32px;
-
-      .wallets {
-        display: grid;
-        height: 172px;
-        margin-bottom: 4px;
-        overflow-y: scroll;
-        row-gap: 4px;
-        width: 284px;
-
-        &::-webkit-scrollbar {
-          -webkit-appearance: none;
-        }
-
-        &::-webkit-scrollbar:vertical {
-          height: 88px;
-          width: 8px;
-        }
-
-        &::-webkit-scrollbar-track {
-          background: $neutral-50;
-          border-radius: $border-radius-corners;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          border-radius: $border-radius-corners;
-          background-color: $neutral-200;
-        }
-      }
-
-      .no-wallet-link {
-        align-self: flex-end;
-        margin-right: 12px;
-
-        a {
-          color: $neutral-500;
-          cursor: pointer;
-        }
-      }
-    }
-
-    .connect-another-way-link {
-      a {
-        color: $primary-500;
-        cursor: pointer;
-      }
+    .select-text {
+      color: $neutral-500;
     }
   }
 }

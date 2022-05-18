@@ -1,14 +1,17 @@
 /* @jsx m */
 
 import m from 'mithril';
-import $ from 'jquery';
 
 import 'modals/login_modal.scss';
 
 import Login from 'views/components/login';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWWalletOptionRow } from '../components/component_kit/cw_wallet_option_row';
+import {
+  LoginBoilerplate,
+  LoginSidebar,
+  WalletsList,
+} from '../pages/login/login_components';
 
 export class LoginModal implements m.ClassComponent {
   view() {
@@ -23,99 +26,37 @@ export class LoginModal implements m.ClassComponent {
   }
 }
 
-const redirectClick = (e, route) => {
-  e.preventDefault();
-  $(e.target).trigger('modalexit');
-  m.route.set(route);
-};
+export type LoginSidebarType =
+  | 'connectWallet'
+  | 'ethWallet'
+  | 'newAddressLinked'
+  | 'newOrReturning';
 
-export class Boilerplate implements m.ClassComponent {
-  view() {
-    return (
-      <CWText type="caption" className="Boilerplate">
-        By connecting to Common, you agree to our{' '}
-        <a
-          class="link"
-          onclick={(e) => {
-            redirectClick(e, '/terms');
-          }}
-        >
-          Terms of Service
-        </a>{' '}
-        and{' '}
-        <a
-          class="link"
-          onclick={(e) => {
-            redirectClick(e, '/privacy');
-          }}
-        >
-          Privacy Policy
-        </a>
-      </CWText>
-    );
-  }
-}
-
-const wallets = [
-  'cosm-metamask',
-  'keplr',
-  'metamask',
-  'near',
-  'polkadot',
-  'terrastation',
-  'walletconnect',
-];
+const type: LoginSidebarType = 'newOrReturning';
 
 export class NewLoginModal implements m.ClassComponent {
   view() {
     return (
       <div class="NewLoginModal">
-        <div class="sidebar">
-          <div class="sidebar-content">
-            <CWText type="h4" fontWeight="semiBold">
-              Connect Your Wallet
-            </CWText>
-            <div class="divider" />
-            <CWText type="b2">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-              imperdiet velit fringilla lorem et. Integer accumsan lobortis
-              cursus amet. Dictum sit morbi elementum.
-            </CWText>
-          </div>
-        </div>
+        <LoginSidebar sidebarType={type} />
         <div class="body">
           <ModalExitButton />
-          <Boilerplate />
-          <div class="wallets-container">
-            <div class="wallets">
-              {wallets.map((w) => (
-                <CWWalletOptionRow
-                  walletName={w}
-                  onclick={() => {
-                    // link to where?
-                  }}
-                />
-              ))}
-            </div>
-            <CWText type="caption" className="no-wallet-link">
-              <a
-                onclick={() => {
-                  // link to where?
-                }}
-              >
-                Don't see your wallet?
-              </a>
-            </CWText>
-          </div>
-          <CWText type="b2" className="connect-another-way-link">
-            <a
-              onclick={() => {
-                // link to where?
-              }}
-            >
-              Connect Another Way
-            </a>
-          </CWText>
+          {type === 'connectWallet' && (
+            <>
+              <LoginBoilerplate />
+              <WalletsList />
+            </>
+          )}
+          {type === 'newOrReturning' && (
+            <>
+              <CWText type="h3" fontWeight="semiBold">
+                Looks like this address hasn’t been connected before.
+              </CWText>
+              <CWText type="h5" fontWeight="semiBold" className="select-text">
+                Select Account Type
+              </CWText>
+            </>
+          )}
         </div>
       </div>
     );
