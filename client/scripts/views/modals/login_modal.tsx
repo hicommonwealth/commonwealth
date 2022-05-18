@@ -48,14 +48,14 @@ export class NewLoginModal implements m.ClassComponent {
             </>
           )}
           {type === 'newOrReturning' && (
-            <>
-              <CWText type="h3" fontWeight="semiBold">
+            <div class="new-or-returning">
+              <CWText type="h3" fontWeight="semiBold" className="address-text">
                 Looks like this address hasn’t been connected before.
               </CWText>
               <CWText type="h5" fontWeight="semiBold" className="select-text">
                 Select Account Type
               </CWText>
-            </>
+            </div>
           )}
         </div>
       </div>

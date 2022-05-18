@@ -10,14 +10,30 @@
     display: flex;
     flex-direction: column;
     padding: 12px;
+    height: 424px;
     width: 400px;
 
     svg {
       align-self: flex-end;
     }
 
-    .select-text {
-      color: $neutral-500;
+    .new-or-returning {
+      align-items: center;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 32px;
+
+      .address-text.Text {
+        margin-bottom: 24px;
+        text-align: center;
+      }
+
+      .select-text.Text {
+        color: $neutral-500;
+        margin-bottom: 24px;
+      }
     }
   }
 }

@@ -42,6 +42,7 @@ export class LoginSidebar
               }}
             />
             <CWAccountCreationButton
+              creationType="linkAccount"
               onclick={() => {
                 // fill in
               }}
