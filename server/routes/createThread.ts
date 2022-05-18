@@ -354,19 +354,17 @@ const createThread = async (
           { transaction }
         );
       } else if (req.body['attachments[]']) {
-        await Promise.all(
-          req.body['attachments[]'].map((u) =>
-            models.OffchainAttachment.create(
-              {
-                attachable: 'thread',
-                attachment_id: thread.id,
-                url: u,
-                description: 'image',
-              },
-              { transaction }
-            )
-          )
-        );
+        const data = []
+        req.body['attachments[]'].map((u) => {
+          data.push({
+            attachable: 'thread',
+            attachment_id: thread.id,
+            url: u,
+            description: 'image',
+          })
+        });
+
+        await models.OffchainAttachment.bulkCreate(data, { transaction });
       }
     } catch (err) {
       return next(err);

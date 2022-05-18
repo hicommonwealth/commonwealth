@@ -15,7 +15,8 @@ export type MixpanelEvents =
   | MixpanelPageViewEvent
   | MixpanelCommunityInteractionEvent
   | MixpanelChatEvents
-  | MixpanelSnapshotEvents;
+  | MixpanelSnapshotEvents
+  | MixpanelErrorCaptureEvent;
 
 // --------- EVENT DEFINITIONS --------- //
 
@@ -62,6 +63,18 @@ export interface MixpanelUserSignupPayload extends BaseMixpanelPayload {
   event: MixpanelUserSignupEvent;
 }
 // END NEW USER SIGNUP EVENT
+
+// ERROR CAPTURE EVENTS
+export const enum MixpanelErrorCaptureEvent {
+  ERROR_CAPTURED = 'Error Event Captured',
+}
+
+export interface MixpanelErrorCapturePayload extends BaseMixpanelPayload {
+  message: string;
+  community: string;
+  event: MixpanelErrorCaptureEvent;
+}
+// END ERROR CAPTURE EVENTS
 
 // NEW COMMUNITY CREATION EVENT
 export const enum MixpanelCommunityCreationEvent {

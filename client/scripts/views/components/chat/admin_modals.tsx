@@ -8,6 +8,8 @@ import { CWCard } from '../component_kit/cw_card';
 import { CWButton } from '../component_kit/cw_button';
 import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { MixpanelChatEvents } from 'analytics/types';
 
 export class CreateCategory
   implements m.ClassComponent<{ handleClose: () => void }>
@@ -27,6 +29,13 @@ export class CreateCategory
         app.activeChainId(),
         this.category
       );
+
+      mixpanelBrowserTrack({
+        event: MixpanelChatEvents.NEW_CHANNEL_CREATED,
+        isCustomDomain: app.isCustomDomain(),
+        community: app.activeChainId(),
+      });
+
       vnode.attrs.handleClose();
     };
 
