@@ -30,9 +30,19 @@
         text-align: center;
       }
 
-      .select-text.Text {
-        color: $neutral-500;
+      .select-row {
+        display: flex;
+        flex-direction: row;
         margin-bottom: 24px;
+
+        .Icon {
+          color: $neutral-500;
+          margin-right: 8px;
+        }
+
+        .select-text.Text {
+          color: $neutral-500;
+        }
       }
     }
   }

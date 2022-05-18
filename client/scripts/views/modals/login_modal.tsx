@@ -5,6 +5,7 @@ import m from 'mithril';
 import 'modals/login_modal.scss';
 
 import Login from 'views/components/login';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import {
@@ -50,11 +51,14 @@ export class NewLoginModal implements m.ClassComponent {
           {type === 'newOrReturning' && (
             <div class="new-or-returning">
               <CWText type="h3" fontWeight="semiBold" className="address-text">
-                Looks like this address hasn’t been connected before.
+                Looks like this address hasn't been connected before.
               </CWText>
-              <CWText type="h5" fontWeight="semiBold" className="select-text">
-                Select Account Type
-              </CWText>
+              <div class="select-row">
+                <CWIcon iconName="arrowLeft" />
+                <CWText type="h5" fontWeight="semiBold" className="select-text">
+                  Select Account Type
+                </CWText>
+              </div>
             </div>
           )}
         </div>
