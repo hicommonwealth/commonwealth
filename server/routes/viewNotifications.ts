@@ -80,6 +80,19 @@ export default async (
   //   ], logging: true
   // })).map(n => n.toJSON());
 
+  const options: any = {
+    limit: 100
+  }
+  const whereOptions: any = [
+    { user_id: req.user.id },
+  ];
+
+  if (req.body.notificationMinId) whereOptions.push({notification_id: { [Op.lte]: req.body.notificationMinId }});
+
+  options.where = {
+    [Op.and]: whereOptions
+  }
+
   // TODO: add user id to notifications read
   const notificationsRead = await models.NotificationsRead.findAll({
     include: [
@@ -104,9 +117,7 @@ export default async (
         }]
       }
     ],
-    where: {
-      user_id: req.user.id
-    },
+    ...options,
     raw: true, nest: true, logging: true
   });
 
