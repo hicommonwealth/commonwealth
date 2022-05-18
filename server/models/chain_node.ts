@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ChainInstance, ChainAttributes } from './chain';
 import { ModelStatic, ModelInstance } from './types';
 
@@ -11,12 +11,12 @@ export type ChainNodeAttributes = {
   private_url?: string;
 
   // associations
-  Chain?: ChainAttributes;
+  Chains?: ChainAttributes[];
 }
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
   // TODO: add mixins as needed
-  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getChains: Sequelize.HasManyGetAssociationsMixin<ChainInstance>;
 }
 
 export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
@@ -52,9 +52,7 @@ export default (
   );
 
   ChainNode.associate = (models) => {
-    models.ChainNode.hasMany(models.Chain, { foreignKey: 'chain' });
-    models.ChainNode.hasMany(models.Address, { foreignKey: 'chain' });
-
+    models.ChainNode.hasMany(models.Chain, { foreignKey: 'chain_node_id' });
   };
 
   return ChainNode;
