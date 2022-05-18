@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_tooltip.scss';
+//import 'components/component_kit/cw_tooltip.scss';
 
 import { ComponentType } from './types';
 import { CWButton } from './cw_button';

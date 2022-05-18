@@ -1,7 +1,9 @@
-@mixin popover-child-position {
-  margin-top: 8px;
+@import 'shared';
+
+@mixin popover-child {
   position: absolute;
   z-index: 1001;
+  padding: 8px 16px;
 }
 
 .Popover {
@@ -12,6 +14,34 @@
   //   position: fixed;
   //   right: 0;
   //   top: 0;
-  //   z-index: 1000;
+  //   z-index: 1000;@import 'shared';
+
   // }
+}
+
+.tooltip-container {
+  @include popover-child;
+  align-items: center;
+  background-color: $white;
+  border-radius: 4px;
+  box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2),
+    0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  max-width: 250px;
+}
+
+.trigger-wrapper {
+  display: flex;
+  width: fit-content;
+}
+
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
 }

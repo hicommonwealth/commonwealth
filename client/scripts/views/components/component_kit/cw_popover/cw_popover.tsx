@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_tooltip.scss';
+import 'components/component_kit/cw_popover.scss';
 
 import { CWPortal } from '../cw_portal';
 import {
@@ -10,7 +10,8 @@ import {
   dropYDirectionType,
   PopoverPosition,
 } from './types';
-import { getPopoverPosition } from './helpers';
+import { getPopoverPosition, getPopoverPosition2 } from './helpers';
+import { BooleanFlag } from 'aws-sdk/clients/directconnect';
 
 export type PopoverToggleAttrs = {
   isActive: boolean;
@@ -23,7 +24,7 @@ export type PopoverChildAttrs = {
   togglePopOver: () => void;
 };
 
-export type PopoverAttrs = {
+export type PopoverAttrs2 = {
   alwaysRender?: boolean;
   gap?: number;
   isOpen?: boolean;
@@ -36,14 +37,31 @@ export type PopoverAttrs = {
   toggleTest: m.Component;
 };
 
+export type PopoverAttrs = {
+  content: m.Children;
+  trigger: m.Vnode<any, any>;
+  closeOnContentClick?: boolean;
+  closeOnEscapeClick: boolean;
+  interactionType?: 'hover' | 'click';
+  hoverOpenDelay?: number;
+  onToggle?: (isOpen: boolean) => void;
+};
+
+function findRef(dom, ref) {
+  return dom.matches(`[ref=${ref}]`) ? dom : dom.querySelector(`[ref=${ref}]`);
+}
+
 export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   isOpen: boolean;
   isRendered: boolean;
   position: PopoverPosition;
+  inlineStyle: string;
+  triggerRef: any;
 
-  oncreate() {
+  oncreate(vnode) {
     this.isOpen = false;
     this.isRendered = false;
+    this.triggerRef = findRef(vnode.dom, 'title');
   }
 
   togglePopOver(onToggle) {
@@ -65,6 +83,12 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
       yDirection,
     });
 
+    this.inlineStyle = getPopoverPosition2({
+      target: event.currentTarget,
+      gapSize: 8,
+      toSide: false,
+    });
+
     const newIsOpen = !this.isOpen;
     const newIsRendered = newIsOpen ? true : this.isRendered;
 
@@ -75,51 +99,45 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     this.position = position;
   }
 
-  view(vnode) {
-    const {
-      gap,
-      onToggle,
-      popover,
-      toggle,
-      toSide,
-      xDirection,
-      yDirection,
-      toggleTest,
-    } = vnode.attrs;
-    const { isOpen, position } = this;
-    console.log('attrs', vnode.attrs);
-    console.log('position', position);
+  calculatePopoverPosition() {
+    this.inlineStyle = getPopoverPosition2({
+      target: this.triggerRef,
+      gapSize: 8,
+      toSide: false,
+    });
+    m.redraw();
+  }
 
+  view(vnode) {
+    const { trigger, content, onToggle } = vnode.attrs;
+    const { isOpen, position } = this;
+
+    window.onresize = () => this.calculatePopoverPosition();
+    console.log('style: ', this.inlineStyle);
     return (
       <>
-        {toggle({
-          onClick: (e) => {
-            this.onClick(e, gap, toSide, onToggle, xDirection, yDirection);
-          },
-          isActive: isOpen,
-        })}
         {
           <div
             onclick={(e) => {
-              this.onClick(e, gap, toSide, onToggle, xDirection, yDirection);
+              this.onClick(e, null, false, onToggle, null, null);
             }}
-            style="display: flex; width: fit-content;"
+            class="trigger-wrapper"
+            ref="title"
           >
-            {toggleTest}
+            {trigger}
           </div>
         }
         {isOpen ? (
           <CWPortal>
-            <div
-              onclick={() => this.togglePopOver(onToggle)}
-              style="position: fixed; width: 100%; height: 100%; left: 0; top: 0;"
-            >
-              <div class="tooltip-container" style="width: 100px;">
-                {popover({
-                  style: `width: ${position.maxWidth}; height: ${position.maxHeight};`,
+            <div onclick={() => this.togglePopOver(onToggle)} class="overlay">
+              <div class="tooltip-container" style={this.inlineStyle}>
+                {/* {content({
+                  style: `width: 20px; height: 20px;`,
                   onclick: () => this.togglePopOver(onToggle),
                   togglePopOver: this.togglePopOver,
-                })}
+                })} */}
+
+                {content}
               </div>
             </div>
           </CWPortal>

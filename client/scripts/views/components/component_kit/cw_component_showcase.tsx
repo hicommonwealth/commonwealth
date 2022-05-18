@@ -65,11 +65,9 @@ export class ComponentShowcase implements m.ClassComponent {
       <div class="ComponentShowcase">
         <h1>Popover</h1>
         <CWPopover
-          toggleTest={<CWButton label={'button'} />}
-          toggle={(attrs: PopoverToggleAttrs) => (
-            <CWButton label={'button'} onclick={attrs.onClick} />
-          )}
-          popover={(attrs: PopoverChildAttrs) => (
+          onToggle={(isOpen: boolean) => console.log(isOpen)}
+          trigger={<CWButton label={'button'} />}
+          content={
             <div class="ok">
               <div
                 class="wtf"
@@ -82,8 +80,9 @@ export class ComponentShowcase implements m.ClassComponent {
                 heyyy thereee
               </div>
             </div>
-          )}
+          }
         />
+
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">

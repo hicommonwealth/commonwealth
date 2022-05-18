@@ -38,7 +38,7 @@ const getDropYAmount: (attrs: GetFunctionYAttrs) => {
   const dropYAmountForNotToSide = () =>
     isTop
       ? boundingRect.top + boundingRect.height + gap
-      : innerHeight - boundingRect.bottom + boundingRect.height + gap;
+      : boundingRect.bottom + gap;
 
   return {
     dropYAmount: toSide ? dropYAmountForToSide() : dropYAmountForNotToSide(),
@@ -143,6 +143,81 @@ const getDropAmounts: (attrs: GetFunctionAttrs) => {
   ...getMaxWidthCalc({ dropXDirection, innerWidth, ...otherAttrs }),
 });
 
+export const getPopoverPosition2 = ({
+  target,
+  gapSize = 8,
+  toSide = false,
+}: {
+  target: Element;
+  gapSize: number;
+  toSide: boolean;
+}) => {
+  const boundingRect = target.getBoundingClientRect();
+  let popoverPlacement;
+  const innerWidth = window.innerWidth;
+  const innerHeight = window.innerHeight;
+
+  // Calculate whether to put popover above or below, or left or right
+  if (toSide) {
+    const distanceToLeft = boundingRect.left;
+    const distanceToRight = innerWidth - boundingRect.right;
+
+    if (distanceToLeft > distanceToRight) {
+      popoverPlacement = 'left';
+    } else {
+      popoverPlacement = 'right';
+    }
+  } else {
+    const distanceToTop = boundingRect.top;
+    const distanceToBottom = innerHeight - boundingRect.bottom;
+
+    if (distanceToTop > distanceToBottom) {
+      popoverPlacement = 'above';
+    } else {
+      popoverPlacement = 'below';
+    }
+  }
+  console.log('placement:', popoverPlacement);
+
+  // Calculate the inline styles for positioning
+  let inlineStyle;
+
+  switch (popoverPlacement) {
+    case 'above': {
+      // Align left with left of target (centering happens in cw_popover)
+      const leftXAmount = boundingRect.left;
+      const bottomYAmount = innerHeight - boundingRect.top + gapSize;
+
+      console.log('left', leftXAmount);
+
+      inlineStyle = `left: ${leftXAmount}px; bottom: ${bottomYAmount}px;`;
+      break;
+    }
+    case 'below': {
+      const leftXAmount = boundingRect.left;
+      const topYAmount = boundingRect.bottom + gapSize;
+
+      inlineStyle = `left: ${leftXAmount}px; top: ${topYAmount}px;`;
+      break;
+    }
+    case 'left': {
+      // Do we need this case?
+      break;
+    }
+    case 'right': {
+      const leftXAmount = boundingRect.right + gapSize;
+      const topYAmount = boundingRect.top;
+
+      inlineStyle = `left: ${leftXAmount}px; top: ${topYAmount}px;`;
+      break;
+    }
+  }
+  console.log('inlineStyle', inlineStyle);
+  return inlineStyle;
+
+  // Calculate the maximum possible height this container can have, which will constrain the content
+};
+
 export const getPopoverPosition = ({
   target,
   gap = 8,
@@ -158,6 +233,7 @@ export const getPopoverPosition = ({
 }) => {
   // Get basic dimensions about the the Toggle and the window.
   const boundingRect = target.getBoundingClientRect();
+  console.log('bounding', boundingRect);
   const innerWidth = window.innerWidth;
   const innerHeight = window.innerHeight;
 
