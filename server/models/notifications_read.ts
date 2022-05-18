@@ -25,7 +25,7 @@ export default (
 		subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
 		notification_id: { type: dataTypes.INTEGER, primaryKey: true },
 		is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
-		user_id: { type: dataTypes.INTEGER, defaultValue: false, allowNull: false }
+		user_id: { type: dataTypes.INTEGER, defaultValue: false, allowNull: false, references: {model: 'User', key: 'id'} }
 	}, {
 		tableName: 'NotificationsRead',
 		underscored: true,
