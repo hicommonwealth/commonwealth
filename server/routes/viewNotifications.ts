@@ -66,33 +66,6 @@ export default async (
     notificationParams.where = { is_read: false };
   }
 
-  // perform the query
-  // const subscriptions = (await models.Subscription.findAll({
-  //   where: {
-  //     [Op.and]: searchParams,
-  //   },
-  //   include: [
-  //     notificationParams,
-  //     {
-  //       model: models.ChainEventType,
-  //       required: false,
-  //     },
-  //   ], logging: true
-  // })).map(n => n.toJSON());
-
-  const options: any = {
-    limit: 100
-  }
-  const whereOptions: any = [
-    { user_id: req.user.id },
-  ];
-
-  if (req.body.notificationMinId) whereOptions.push({notification_id: { [Op.lte]: req.body.notificationMinId }});
-
-  options.where = {
-    [Op.and]: whereOptions
-  }
-
   // TODO: add user id to notifications read
   const notificationsRead = await models.NotificationsRead.findAll({
     include: [
@@ -106,18 +79,11 @@ export default async (
       {
         model: models.Notification,
         required: true,
-        include: [{
-          model: models.ChainEvent,
-          required: false,
-          as: 'ChainEvent',
-          include: [{
-            model: models.ChainEventType,
-            required: false
-          }]
-        }]
       }
     ],
-    ...options,
+    where: {
+      user_id: req.user.id
+    },
     raw: true, nest: true, logging: true
   });
 
@@ -136,9 +102,10 @@ export default async (
   const subscriptionsObj = {}
 
   for (const nr of notificationsRead) {
+    const chainEvent = JSON.parse(nr.Notification.notification_data);
     if (!subscriptionsObj[nr.subscription_id]) {
       subscriptionsObj[nr.subscription_id] = {
-        ChainEventType: nr.Notification?.ChainEvent?.ChainEventType,
+        ChainEventType: chainEvent.ChainEventType,
         NotificationsReads: [], // also contains notifications
         ...nr.Subscription
       }
@@ -148,7 +115,10 @@ export default async (
       is_read: nr.is_read,
       notification_id: nr.notification_id,
       subscription_id: nr.subscription_id,
-      Notification: nr.Notification
+      Notification: {
+        ...nr.Notification,
+        ChainEvent: chainEvent
+      }
     })
   }
 

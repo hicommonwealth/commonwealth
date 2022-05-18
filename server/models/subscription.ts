@@ -7,7 +7,12 @@ import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
 import { ModelStatic } from './types';
 import {
-  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType,
+  IPostNotificationData,
+  ICommunityNotificationData,
+  IChainEventNotificationData,
+  ChainBase,
+  ChainType,
+  ChainEventNotification,
 } from '../../shared/types';
 import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
@@ -18,6 +23,7 @@ import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
 import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
 import { NotificationInstance } from './notification';
+import chainEventType from "../../client/scripts/models/ChainEventType";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -169,9 +175,13 @@ export default (
     });
 
     // if the notification does not yet exist create it here
+    // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
     if (!notification) {
+      const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
+      event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
+
       notification = await models.Notification.create(isChainEventData ? {
-        notification_data: '',
+        notification_data: JSON.stringify(event),
         chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
         category_id: 'chain-event',
         chain_id: (<IChainEventNotificationData>notification_data).chain_id
