@@ -125,6 +125,7 @@ export default class ProjectsController {
     // TODO: should we check for failure vs success in result?
     let ipfsHash: string;
     try {
+      // TODO: IPFS should include all user-submitted data incl cover image, description, etc
       const response = await $.post(`${this._app.serverUrl()}/ipfsPin`, {
         address: creator.address,
         author_chain: chain || creator.chain.id,

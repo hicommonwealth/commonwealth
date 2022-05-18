@@ -182,7 +182,7 @@ class Project {
       description,
       short_description,
       cover_image,
-      new BN(curator_fee),
+      new BN(curator_fee), // TODO: This should perhaps be a % or decimal, not BN
       new BN(threshold),
       moment.unix(deadline),
       moment.unix(created_at),
