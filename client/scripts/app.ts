@@ -631,10 +631,12 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     });
 
     const isCustomDomain = !!customDomain;
-    const activeAcct = app.user.activeAccount;
+    const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
-      '/about': importRoute('views/pages/landing/about', { scoped: false }),
+      '/about': importRoute('views/pages/commonwealth', {
+        scoped: false,
+      }),
       '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
       '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
       '/components': importRoute('views/pages/components', {
@@ -699,7 +701,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/chat/:channel': importRoute('views/pages/chat.tsx', {
+            '/chat/:channel': importRoute('views/pages/chat', {
               scoped: true,
               deferChain: true,
             }),
@@ -713,7 +715,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/account': redirectRoute((a) =>
-              activeAcct ? `/account/${activeAcct.address}` : '/'
+              activeAccount ? `/account/${activeAccount.address}` : '/'
             ),
             // Governance
             '/referenda': importRoute('views/pages/referenda', {
@@ -792,6 +794,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
 
             // Redirects
+            '/:scope/dashboard': redirectRoute(() => '/'),
             '/:scope/notifications': redirectRoute(() => '/notifications'),
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
@@ -818,7 +821,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               (attrs) => `/account/${attrs.address}/`
             ),
             '/:scope/account': redirectRoute(() =>
-              activeAcct ? `/account/${activeAcct.address}` : '/'
+              activeAccount ? `/account/${activeAccount.address}` : '/'
             ),
             '/:scope/referenda': redirectRoute(() => '/referenda'),
             '/:scope/proposals': redirectRoute(() => '/proposals'),
@@ -866,7 +869,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           }
         : {
             //
-            // Scoped routes
+            // Global routes
             //
             '/': importRoute('views/pages/landing', {
               scoped: false,
@@ -892,6 +895,16 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
+            '/dashboard': importRoute('views/pages/user_dashboard', {
+              scoped: false,
+              deferChain: true,
+            }),
+            '/dashboard/:type': importRoute('views/pages/user_dashboard', {
+              scoped: false,
+              deferChain: true,
+            }),
+            // Scoped routes
+            //
             // Notifications
             '/:scope/notifications': importRoute(
               'views/pages/notifications_page',
@@ -956,7 +969,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/:scope/chat/:channel': importRoute('views/pages/chat.tsx', {
+            '/:scope/chat/:channel': importRoute('views/pages/chat', {
               scoped: true,
               deferChain: true,
             }),
@@ -970,8 +983,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/:scope/account': redirectRoute((a) =>
-              activeAcct
-                ? `/${a.scope}/account/${activeAcct.address}`
+              activeAccount
+                ? `/${a.scope}/account/${activeAccount.address}`
                 : `/${a.scope}/`
             ),
             // Governance
