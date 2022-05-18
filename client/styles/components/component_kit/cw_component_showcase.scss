@@ -136,12 +136,13 @@ $width: 360px;
     }
   }
 
-  .radio-button-gallery {
+  .choice-gallery {
     display: flex;
     flex-direction: column;
     margin-bottom: 24px;
 
-    .RadioButton {
+    .RadioButton,
+    .Checkbox {
       margin-bottom: 8px;
     }
   }

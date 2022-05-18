@@ -9,8 +9,18 @@ import app from 'state';
 import { ChatWindow } from 'views/components/chat/chat_window';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { MixpanelChatEvents } from 'analytics/types';
 
 const ChatPage: m.Component<never, never> = {
+  oncreate(vnode) {
+    mixpanelBrowserTrack({
+      event: MixpanelChatEvents.CHAT_PAGE_VISIT,
+      community: app.activeChainId(),
+      isCustomDomain: app.isCustomDomain(),
+    });
+  },
+
   view: () => {
     const activeEntity = app.chain;
     if (!activeEntity) return <PageLoading />;
