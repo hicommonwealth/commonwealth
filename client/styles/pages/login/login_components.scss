@@ -1,10 +1,16 @@
 @import 'shared';
 
-@mixin yellowDivider {
+@mixin yellowDividerText {
   border-bottom: 4px solid $yellow-500;
   color: $white;
   padding-bottom: 4px;
   width: fit-content;
+}
+
+@mixin redDividerText {
+  border-bottom: 4px solid $rorange-500;
+  padding-bottom: 4px;
+  width: 200px;
 }
 
 .LoginSidebar {
@@ -25,7 +31,7 @@
       width: 264px;
 
       .header-text {
-        @include yellowDivider;
+        @include yellowDividerText;
 
         margin-bottom: 8px;
       }
@@ -45,7 +51,7 @@
     justify-content: center;
 
     .header-text {
-      @include yellowDivider;
+      @include yellowDividerText;
 
       margin-bottom: 12px;
     }
@@ -54,12 +60,27 @@
       margin-bottom: 16px;
     }
   }
+
+  .eth-wallet {
+    background-color: $yellow-500;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    padding: 0 24px;
+
+    .header-text {
+      @include redDividerText;
+
+      margin-bottom: 12px;
+    }
+  }
 }
 
 .Text.LoginBoilerplate {
   color: $neutral-300;
   display: inline-block;
-  margin: 32px 60px 24px;
+  // margin: 32px 60px 24px;
   text-align: center;
 
   .link {

@@ -49,6 +49,18 @@ export class LoginSidebar
             />
           </div>
         )}
+        {sidebarType === 'ethWallet' && (
+          <div class="eth-wallet">
+            <CWText type="h4" fontWeight="semiBold" className="header-text">
+              This Community requires an Ethereum Wallet
+            </CWText>
+            <CWText type="b2">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+              imperdiet velit fringilla lorem et. Integer accumsan lobortis
+              cursus amet. Dictum sit morbi elementum.
+            </CWText>
+          </div>
+        )}
       </div>
     );
   }
@@ -91,8 +103,11 @@ const wallets = [
   'walletconnect',
 ];
 
-export class WalletsList implements m.ClassComponent {
-  view() {
+export class WalletsList
+  implements m.ClassComponent<{ connectAnotherWayOnclick: () => void }>
+{
+  view(vnode) {
+    const { connectAnotherWayOnclick } = vnode.attrs;
     return (
       <div class="WalletsList">
         <div class="wallets-and-link-container">
@@ -117,13 +132,7 @@ export class WalletsList implements m.ClassComponent {
           </CWText>
         </div>
         <CWText type="b2" className="connect-another-way-link">
-          <a
-            onclick={() => {
-              // link to where?
-            }}
-          >
-            Connect Another Way
-          </a>
+          <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
         </CWText>
       </div>
     );
