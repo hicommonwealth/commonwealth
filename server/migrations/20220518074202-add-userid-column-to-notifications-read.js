@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn('NotificationsRead', 'user_id', {
         type: Sequelize.INTEGER,
-        references: {model: 'User', key: 'id'}
+        references: {model: 'Users', key: 'id'}
       }, {transaction: t});
 
       await queryInterface.sequelize.query(`
