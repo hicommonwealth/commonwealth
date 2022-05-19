@@ -1109,13 +1109,11 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         document.location.host.startsWith('127.0.0.1')
       ) {
         mixpanel.init(MIXPANEL_DEV_TOKEN, {
-          debug: true,
           disable_persistence: true,
         });
       } else {
         // Production Mixpanel Project
         mixpanel.init(MIXPANEL_PROD_TOKEN, {
-          debug: true,
           disable_persistence: true,
         });
       }
