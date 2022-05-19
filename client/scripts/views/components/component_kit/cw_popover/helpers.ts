@@ -143,7 +143,7 @@ const getDropAmounts: (attrs: GetFunctionAttrs) => {
   ...getMaxWidthCalc({ dropXDirection, innerWidth, ...otherAttrs }),
 });
 
-export const getPopoverPosition2 = ({
+export const getPopoverPosition = ({
   target,
   gapSize = 8,
   toSide = false,
@@ -177,27 +177,24 @@ export const getPopoverPosition2 = ({
       popoverPlacement = 'below';
     }
   }
-  console.log('placement:', popoverPlacement);
-
   // Calculate the inline styles for positioning
-  let inlineStyle;
+  let leftXAmount;
+  let topYAmount;
+  let bottomYAmount;
 
   switch (popoverPlacement) {
     case 'above': {
       // Align left with left of target (centering happens in cw_popover)
-      const leftXAmount = boundingRect.left;
-      const bottomYAmount = innerHeight - boundingRect.top + gapSize;
+      leftXAmount = boundingRect.left;
+      bottomYAmount = innerHeight - boundingRect.top + gapSize;
 
-      console.log('left', leftXAmount);
+      // Ensure we don't overflow above
 
-      inlineStyle = `left: ${leftXAmount}px; bottom: ${bottomYAmount}px;`;
       break;
     }
     case 'below': {
-      const leftXAmount = boundingRect.left;
-      const topYAmount = boundingRect.bottom + gapSize;
-
-      inlineStyle = `left: ${leftXAmount}px; top: ${topYAmount}px;`;
+      leftXAmount = boundingRect.left;
+      topYAmount = boundingRect.bottom + gapSize;
       break;
     }
     case 'left': {
@@ -205,20 +202,34 @@ export const getPopoverPosition2 = ({
       break;
     }
     case 'right': {
-      const leftXAmount = boundingRect.right + gapSize;
-      const topYAmount = boundingRect.top;
-
-      inlineStyle = `left: ${leftXAmount}px; top: ${topYAmount}px;`;
+      leftXAmount = boundingRect.right + gapSize;
+      topYAmount = boundingRect.top;
       break;
     }
   }
-  console.log('inlineStyle', inlineStyle);
-  return inlineStyle;
+  return { leftXAmount, topYAmount, bottomYAmount };
 
   // Calculate the maximum possible height this container can have, which will constrain the content
 };
 
-export const getPopoverPosition = ({
+export const buildStyleString = ({
+  leftXAmount,
+  topYAmount,
+  bottomYAmount,
+}: {
+  leftXAmount: number;
+  topYAmount: number;
+  bottomYAmount: number;
+}) => {
+  let styleString = '';
+  if (leftXAmount) styleString += `left: ${leftXAmount}px;`;
+  if (topYAmount) styleString += `top: ${topYAmount}px;`;
+  if (bottomYAmount) styleString += `bottom: ${bottomYAmount}px;`;
+
+  return styleString;
+};
+
+export const getPopoverPositionOld = ({
   target,
   gap = 8,
   toSide = false,

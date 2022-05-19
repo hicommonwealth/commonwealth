@@ -10,8 +10,10 @@ import {
   dropYDirectionType,
   PopoverPosition,
 } from './types';
-import { getPopoverPosition, getPopoverPosition2 } from './helpers';
+import { buildStyleString, getPopoverPosition } from './helpers';
 import { BooleanFlag } from 'aws-sdk/clients/directconnect';
+import { isValueNode } from 'graphql';
+import { ConsoleLoggerImpl } from 'typescript-logging';
 
 export type PopoverToggleAttrs = {
   isActive: boolean;
@@ -44,6 +46,8 @@ export type PopoverAttrs = {
   closeOnEscapeClick: boolean;
   interactionType?: 'hover' | 'click';
   hoverOpenDelay?: number;
+  toSide?: boolean;
+  hasArrow?: boolean;
   onToggle?: (isOpen: boolean) => void;
 };
 
@@ -55,13 +59,16 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   isOpen: boolean;
   isRendered: boolean;
   position: PopoverPosition;
-  inlineStyle: string;
+  inlineStyle: any;
   triggerRef: any;
+  contentRef: any;
+  contentId: string;
 
   oncreate(vnode) {
     this.isOpen = false;
     this.isRendered = false;
-    this.triggerRef = findRef(vnode.dom, 'title');
+    this.triggerRef = findRef(vnode.dom, 'trigger-wrapper');
+    this.contentId = 'tooltip-container-' + Math.random();
   }
 
   togglePopOver(onToggle) {
@@ -74,19 +81,11 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     this.isRendered = newIsRendered;
   }
 
-  onClick(event, gap, toSide, onToggle, xDirection, yDirection) {
-    const position = getPopoverPosition({
-      gap,
-      target: event.currentTarget,
-      toSide,
-      xDirection,
-      yDirection,
-    });
-
-    this.inlineStyle = getPopoverPosition2({
+  onClick(event, onToggle, toSide, vnode) {
+    this.inlineStyle = getPopoverPosition({
       target: event.currentTarget,
       gapSize: 8,
-      toSide: false,
+      toSide,
     });
 
     const newIsOpen = !this.isOpen;
@@ -96,33 +95,62 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 
     this.isOpen = newIsOpen;
     this.isRendered = newIsRendered;
-    this.position = position;
-  }
 
-  calculatePopoverPosition() {
-    this.inlineStyle = getPopoverPosition2({
-      target: this.triggerRef,
-      gapSize: 8,
-      toSide: false,
-    });
     m.redraw();
   }
 
-  view(vnode) {
-    const { trigger, content, onToggle } = vnode.attrs;
-    const { isOpen, position } = this;
+  calculatePopoverPosition(toSide: boolean) {
+    this.inlineStyle = getPopoverPosition({
+      target: this.triggerRef,
+      gapSize: 8,
+      toSide: toSide,
+    });
+    // Apply styles in real time
+    let tooltipContainer;
+    try {
+      tooltipContainer = document.getElementById(this.contentId);
+      console.log();
+      if (this.inlineStyle.topYAmount) {
+        tooltipContainer.style.top = `${this.inlineStyle.topYAmount}px`;
+        tooltipContainer.style.bottom = null;
+      }
 
-    window.onresize = () => this.calculatePopoverPosition();
-    console.log('style: ', this.inlineStyle);
+      if (this.inlineStyle.bottomYAmount) {
+        tooltipContainer.style.bottom = `${this.inlineStyle.bottomYAmount}px`;
+        tooltipContainer.style.top = null;
+      }
+
+      if (this.inlineStyle.leftXAmount) {
+        tooltipContainer.style.left = `${this.inlineStyle.leftXAmount}px`;
+      }
+      tooltipContainer.style.visibility = 'visible';
+      console.log('okay cmon', tooltipContainer.getBoundingClientRect());
+    } catch (e) {}
+    m.redraw();
+  }
+
+  onupdate(vnode) {
+    if (this.isOpen) {
+      try {
+        this.calculatePopoverPosition(vnode.attrs.toSide);
+      } catch (e) {}
+    }
+  }
+
+  view(vnode) {
+    const { trigger, content, onToggle, toSide } = vnode.attrs;
+    const { isOpen } = this;
+    window.onresize = () => this.calculatePopoverPosition(toSide);
+
     return (
       <>
         {
           <div
             onclick={(e) => {
-              this.onClick(e, null, false, onToggle, null, null);
+              this.onClick(e, onToggle, toSide, vnode);
             }}
             class="trigger-wrapper"
-            ref="title"
+            ref="trigger-wrapper"
           >
             {trigger}
           </div>
@@ -130,7 +158,13 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
         {isOpen ? (
           <CWPortal>
             <div onclick={() => this.togglePopOver(onToggle)} class="overlay">
-              <div class="tooltip-container" style={this.inlineStyle}>
+              <div
+                class="tooltip-container"
+                id={this.contentId}
+                ref="tooltip-container"
+                style="visibility: hidden;"
+                //style={buildStyleString(this.inlineStyle)}
+              >
                 {/* {content({
                   style: `width: 20px; height: 20px;`,
                   onclick: () => this.togglePopOver(onToggle),
