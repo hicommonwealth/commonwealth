@@ -6,11 +6,15 @@ var Mixpanel = require('mixpanel');
 var mixpanelNode;
 
 if (process.env.NODE_ENV === 'production') {
-  mixpanelNode = Mixpanel.init(process.env.MIXPANEL_PROD_TOKEN); //TODO: Swap with prod token when tested
+  mixpanelNode = Mixpanel.init(process.env.MIXPANEL_PROD_TOKEN, {
+    disable_persistence: true,
+  }); //TODO: Swap with prod token when tested
 } else if (process.env.NODE_ENV === 'development') {
   // NOTE: Only works if NODE_ENV defined in .env
   // Make sure that is set to development if you want to use backend Mixpanel locally.
-  mixpanelNode = Mixpanel.init(process.env.MIXPANEL_DEV_TOKEN);
+  mixpanelNode = Mixpanel.init(process.env.MIXPANEL_DEV_TOKEN, {
+    disable_persistence: true,
+  });
 }
 
 // ----- Server Side Mixpanel Library Utils ------ //
