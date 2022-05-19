@@ -34,37 +34,99 @@ module.exports = {
         raw: true, type: 'RAW', transaction, logging: console.log
       });
 
+	  // set up cleaned and deduped ChainNodes values
+    // await queryInterface.sequelize.query(`
+    //   CREATE TABLE "tmp_ChainNodes";
+    // `, {
+    //   raw: true, type: 'RAW', transaction, logging: console.log
+    // });
+
+	  await queryInterface.sequelize.query(`
+        SELECT ROW_NUMBER() OVER (ORDER BY a.url) AS id, a.*
+        INTO "tmp_ChainNodes"
+        FROM (SELECT DISTINCT
+            cn.url,
+            CASE WHEN cn.url = 'wss://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_'
+                THEN 'https://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_'
+              WHEN cn.url = 'https://rpc-juno.itastakers.com'
+                THEN 'https://lcd-juno.itastakers.com'
+              ELSE cn.alt_wallet_url
+            END AS alt_wallet_url,
+            CASE WHEN cn.url = 'wss://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_'
+              THEN 1 ELSE cn.eth_chain_id
+            END AS eth_chain_id,
+            cn.private_url
+            FROM "ChainNodes" cn
+          ) a;
+      `, {
+        raw: true, type: 'RAW', transaction, logging: console.log
+      });
+
+	  // map new ChainNodeID to Chains
+	  await queryInterface.sequelize.query(`
+        UPDATE "Chains"
+          SET chain_node_id = tcn.id
+        FROM "ChainNodes" cn
+          INNER JOIN "tmp_ChainNodes" tcn ON cn.url = tcn.url
+        WHERE "Chains".id = cn."chain";
+      `, {
+      raw: true, type: 'RAW', transaction, logging: console.log
+		});
+
+	  // disable fkey in Users
+	  await queryInterface.sequelize.query(`
+        ALTER TABLE "Users"
+          DROP CONSTRAINT "Users_selected_node_id_fkey";
+      `, {
+      raw: true, type: 'RAW', transaction, logging: console.log
+		});
+
+	  // map new ChainNodeID to Users
+	  await queryInterface.sequelize.query(`
+        UPDATE "Users"
+          SET "selectedNodeId" = tcn.id
+        FROM "ChainNodes" cn
+          INNER JOIN "tmp_ChainNodes" tcn ON cn.url = tcn.url
+        WHERE "Users"."selectedNodeId" = cn.id;
+      `, {
+      raw: true, type: 'RAW', transaction, logging: console.log
+		});
+
       // remove duplicated rows from ChainNodes
       await queryInterface.removeColumn('ChainNodes', 'ce_verbose', { transaction });
       await queryInterface.removeColumn('ChainNodes', 'token_name', { transaction });
       await queryInterface.removeColumn('ChainNodes', 'address', { transaction });
       await queryInterface.removeColumn('ChainNodes', 'chain', { transaction });
 
-      // update ids to reference single nodes
-      // TODO: fix this query
+      // clear old ChainNodes values
       await queryInterface.sequelize.query(`
-        WITH cid AS (
-          SELECT MIN(id)
-          FROM "ChainNodes"
-          WHERE url = (
-            SELECT url
-            FROM "ChainNodes" n
-            WHERE "Chains".chain_node_id = n.id
-          )
-        )
-        UPDATE "Chains"
-        SET chain_node_id = cid;
+        TRUNCATE TABLE "ChainNodes";
       `, {
         raw: true, type: 'RAW', transaction, logging: console.log
       });
 
-      // deduplicate ChainNodes + modify chain_node_ids
-      // TODO: validate this query works
+      // insert new ChainNodes values
       await queryInterface.sequelize.query(`
-        DELETE FROM "ChainNodes" c
-        WHERE c.id <> (SELECT MIN(id)
-                       FROM "ChainNodes" n
-                       WHERE c.url = n.url);
+        INSERT INTO "ChainNodes" (id, url, alt_wallet_url, eth_chain_id, private_url)
+		    SELECT id, url, alt_wallet_url, eth_chain_id, private_url
+			  FROM "tmp_ChainNodes";
+      `, {
+        raw: true, type: 'RAW', transaction, logging: console.log
+      });
+
+	  // restore fkey in Users
+	  await queryInterface.sequelize.query(`
+      ALTER TABLE "Users"
+        ADD CONSTRAINT "Users_selected_node_id_fkey"
+        FOREIGN KEY ("selectedNodeId") REFERENCES "ChainNodes"(id)
+        ON UPDATE CASCADE ON DELETE SET NULL;
+    `, {
+      raw: true, type: 'RAW', transaction, logging: console.log
+		});
+
+      // drop temp table
+      await queryInterface.sequelize.query(`
+        DROP TABLE "tmp_ChainNodes";
       `, {
         raw: true, type: 'RAW', transaction, logging: console.log
       });
@@ -73,7 +135,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      // re-add old rows to ChainNodes
+      // re-add old rows to ChainNodes... why?
       await queryInterface.addColumn('ChainNodes', 'chain', {
         type: Sequelize.STRING,
         allowNull: true,
