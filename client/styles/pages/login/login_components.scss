@@ -80,7 +80,6 @@
 .Text.LoginBoilerplate {
   color: $neutral-300;
   display: inline-block;
-  // margin: 32px 60px 24px;
   text-align: center;
 
   .link {
@@ -97,7 +96,7 @@
   .wallets-and-link-container {
     display: flex;
     flex-direction: column;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 
     .wallets {
       display: grid;
@@ -129,7 +128,7 @@
 
     .no-wallet-link {
       align-self: flex-end;
-      margin-right: 12px;
+      margin: 0 12px 16px 0;
 
       a {
         color: $neutral-500;

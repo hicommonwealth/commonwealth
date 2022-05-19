@@ -51,8 +51,8 @@ export class NewLoginModal implements m.ClassComponent {
   private bodyType: LoginBodyType;
 
   oninit() {
-    this.sidebarType = 'connectWallet';
-    this.bodyType = 'connectWithEmail';
+    this.sidebarType = 'newOrReturning';
+    this.bodyType = 'walletList';
   }
 
   view() {
@@ -66,15 +66,15 @@ export class NewLoginModal implements m.ClassComponent {
               <LoginBoilerplate />
               <WalletsList
                 connectAnotherWayOnclick={() => {
-                  this.sidebarType = 'ethWallet';
-                  this.bodyType = 'connectWithEmail';
+                  // this.sidebarType = 'ethWallet';
+                  // this.bodyType = 'connectWithEmail';
                 }}
               />
             </div>
           )}
           {this.bodyType === 'selectAccountType' && (
             <div class="new-or-returning">
-              <CWText type="h3" fontWeight="semiBold" className="address-text">
+              <CWText type="h3" fontWeight="semiBold" className="header-text">
                 Looks like this address hasn't been connected before.
               </CWText>
               <div class="select-row">
@@ -87,7 +87,7 @@ export class NewLoginModal implements m.ClassComponent {
           )}
           {this.bodyType === 'connectWithEmail' && (
             <div class="connect-with-email">
-              <CWText type="h3" fontWeight="semiBold" className="address-text">
+              <CWText type="h3" fontWeight="semiBold" className="header-text">
                 Connect With Email?
               </CWText>
               <LoginBoilerplate />
@@ -99,6 +99,60 @@ export class NewLoginModal implements m.ClassComponent {
                 <CWButton label="Back" buttonType="secondary" />
                 <CWButton label="Connect" />
               </div>
+            </div>
+          )}
+          {this.bodyType === 'welcome' && (
+            <div class="welcome">
+              <div class="header-container">
+                <CWText type="h3" fontWeight="bold" className="header-text">
+                  Welcome to Common!
+                </CWText>
+                <CWText type="b2" className="subheader-text">
+                  Use a generated username and photo to edit later, or edit now
+                </CWText>
+              </div>
+              {/* username and avatar input here */}
+              <CWButton label="Finish" />
+            </div>
+          )}
+          {this.bodyType === 'ethWalletList' && (
+            <div class="wallet-list">
+              <div class="header-container">
+                <CWText type="h3" fontWeight="semiBold" className="header-text">
+                  Select an Ethereum Wallet
+                </CWText>
+                <CWText type="caption" className="subheader-text">
+                  Manage your profiles, addresses and communities under one
+                  account.
+                </CWText>
+              </div>
+              <WalletsList
+                connectAnotherWayOnclick={() => {
+                  // this.sidebarType = 'ethWallet';
+                  // this.bodyType = 'connectWithEmail';
+                }}
+                hasNoWalletsLink={false}
+              />
+            </div>
+          )}
+          {this.bodyType === 'selectPrevious' && (
+            <div class="wallet-list">
+              <div class="header-container">
+                <CWText type="h3" fontWeight="semiBold" className="header-text">
+                  Select a Previously Linked Address
+                </CWText>
+                <CWText type="caption" className="subheader-text">
+                  Manage your profiles, addresses and communities under one
+                  account.
+                </CWText>
+              </div>
+              <WalletsList
+                connectAnotherWayOnclick={() => {
+                  // this.sidebarType = 'ethWallet';
+                  // this.bodyType = 'connectWithEmail';
+                }}
+                hasNoWalletsLink={false}
+              />
             </div>
           )}
         </div>

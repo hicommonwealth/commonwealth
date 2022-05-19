@@ -103,11 +103,14 @@ const wallets = [
   'walletconnect',
 ];
 
-export class WalletsList
-  implements m.ClassComponent<{ connectAnotherWayOnclick: () => void }>
-{
+type WalletsListAttrs = {
+  connectAnotherWayOnclick: () => void;
+  hasNoWalletsLink?: boolean;
+};
+
+export class WalletsList implements m.ClassComponent<WalletsListAttrs> {
   view(vnode) {
-    const { connectAnotherWayOnclick } = vnode.attrs;
+    const { connectAnotherWayOnclick, hasNoWalletsLink = true } = vnode.attrs;
     return (
       <div class="WalletsList">
         <div class="wallets-and-link-container">
@@ -121,15 +124,17 @@ export class WalletsList
               />
             ))}
           </div>
-          <CWText type="caption" className="no-wallet-link">
-            <a
-              onclick={() => {
-                // link to where?
-              }}
-            >
-              Don't see your wallet?
-            </a>
-          </CWText>
+          {hasNoWalletsLink && (
+            <CWText type="caption" className="no-wallet-link">
+              <a
+                onclick={() => {
+                  // link to where?
+                }}
+              >
+                Don't see your wallet?
+              </a>
+            </CWText>
+          )}
         </div>
         <CWText type="b2" className="connect-another-way-link">
           <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
