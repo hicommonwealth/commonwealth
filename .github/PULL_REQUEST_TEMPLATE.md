@@ -20,3 +20,8 @@
 - [ ] yes, and they are not tested: [enter the % coverage here]
 - [ ] yes, but I did not run tests
 - [ ] no
+
+## Does this PR affect any server models?
+- [ ] yes, and they do not affect importing from discourse
+- [ ] yes, and they do affect importing from discourse
+- [ ] no
