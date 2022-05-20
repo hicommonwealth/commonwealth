@@ -132,17 +132,20 @@
     .wallets {
       display: grid;
       height: 172px;
-      margin-bottom: 4px;
       overflow-y: scroll;
       row-gap: 4px;
       width: 284px;
+      // preserves box shadow in scroll container
+      height: 174px;
+      margin-bottom: -4px;
+      padding-bottom: 4px;
 
       @include visibleScrollbar;
     }
 
     .no-wallet-link {
       align-self: flex-end;
-      margin: 0 12px 16px 0;
+      margin: 8px 12px 8px 0;
 
       a {
         color: $neutral-500;
@@ -174,6 +177,7 @@
 }
 
 .ProfilesList {
+  // needed to compensate for negative margin on inner container
   margin-bottom: 16px;
 
   .profile-rows-container {
@@ -207,6 +211,7 @@
       &:active {
         background-color: $neutral-100;
         border-color: $neutral-300;
+        box-shadow: none;
       }
 
       .avatar {

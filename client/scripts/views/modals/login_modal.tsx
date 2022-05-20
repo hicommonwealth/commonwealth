@@ -54,7 +54,7 @@ export class NewLoginModal implements m.ClassComponent {
 
   oninit() {
     this.sidebarType = 'newAddressLinked';
-    this.bodyType = 'selectProfile';
+    this.bodyType = 'walletList';
   }
 
   view() {
