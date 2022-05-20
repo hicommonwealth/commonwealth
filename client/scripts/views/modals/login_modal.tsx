@@ -54,7 +54,7 @@ export class NewLoginModal implements m.ClassComponent {
 
   oninit() {
     this.sidebarType = 'newAddressLinked';
-    this.bodyType = 'walletList';
+    this.bodyType = 'selectProfile';
   }
 
   view() {
@@ -64,7 +64,7 @@ export class NewLoginModal implements m.ClassComponent {
         <div class="body">
           <ModalExitButton />
           {this.bodyType === 'walletList' && (
-            <div class="wallet-list">
+            <div class="inner-body-container centered">
               <LoginBoilerplate />
               <WalletsList
                 connectAnotherWayOnclick={() => {
@@ -75,10 +75,12 @@ export class NewLoginModal implements m.ClassComponent {
             </div>
           )}
           {this.bodyType === 'selectAccountType' && (
-            <div class="new-or-returning">
-              <CWText type="h3" fontWeight="semiBold" className="header-text">
-                Looks like this address hasn't been connected before.
-              </CWText>
+            <div class="inner-body-container centered">
+              <div class="header-container">
+                <CWText type="h3" fontWeight="semiBold" className="header-text">
+                  Looks like this address hasn't been connected before.
+                </CWText>
+              </div>
               <div class="select-row">
                 <CWIcon iconName="arrowLeft" />
                 <CWText type="h5" fontWeight="semiBold" className="select-text">
@@ -88,11 +90,13 @@ export class NewLoginModal implements m.ClassComponent {
             </div>
           )}
           {this.bodyType === 'connectWithEmail' && (
-            <div class="connect-with-email">
-              <CWText type="h3" fontWeight="semiBold" className="header-text">
-                Connect With Email?
-              </CWText>
-              <LoginBoilerplate />
+            <div class="inner-body-container">
+              <div class="header-container">
+                <CWText type="h3" fontWeight="semiBold" className="header-text">
+                  Connect With Email?
+                </CWText>
+                <LoginBoilerplate />
+              </div>
               <CWTextInput
                 label="email address"
                 placeholder="your-email@email.com"
@@ -104,7 +108,7 @@ export class NewLoginModal implements m.ClassComponent {
             </div>
           )}
           {this.bodyType === 'welcome' && (
-            <div class="welcome">
+            <div class="inner-body-container">
               <div class="header-container">
                 <CWText type="h3" fontWeight="bold" className="header-text">
                   Welcome to Common!
@@ -118,7 +122,7 @@ export class NewLoginModal implements m.ClassComponent {
             </div>
           )}
           {this.bodyType === 'ethWalletList' && (
-            <div class="wallet-list">
+            <div class="inner-body-container">
               <div class="header-container">
                 <CWText type="h3" fontWeight="semiBold" className="header-text">
                   Select an Ethereum Wallet
@@ -138,7 +142,7 @@ export class NewLoginModal implements m.ClassComponent {
             </div>
           )}
           {this.bodyType === 'selectPrevious' && (
-            <div class="wallet-list">
+            <div class="inner-body-container">
               <div class="header-container">
                 <CWText type="h3" fontWeight="semiBold" className="header-text">
                   Select a Previously Linked Address
@@ -158,7 +162,7 @@ export class NewLoginModal implements m.ClassComponent {
             </div>
           )}
           {this.bodyType === 'selectProfile' && (
-            <div class="wallet-list">
+            <div class="inner-body-container">
               <div class="header-container">
                 <CWText type="h3" fontWeight="bold" className="header-text">
                   Select Profile

@@ -190,14 +190,16 @@ export class ProfilesList implements m.ClassComponent<{ onclick: () => void }> {
     const { onclick } = vnode.attrs;
     return (
       <div class="ProfilesList">
-        {profileNames.map((profileName) => (
-          <div class="profile-row" onclick={onclick}>
-            <div class="avatar" />
-            <CWText type="b1" fontWeight="bold" noWrap>
-              {profileName}
-            </CWText>
-          </div>
-        ))}
+        <div class="profile-rows-container">
+          {profileNames.map((profileName) => (
+            <div class="profile-row" onclick={onclick}>
+              <div class="avatar" />
+              <CWText type="b1" fontWeight="bold" noWrap>
+                {profileName}
+              </CWText>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

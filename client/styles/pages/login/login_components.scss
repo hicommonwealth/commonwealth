@@ -174,45 +174,48 @@
 }
 
 .ProfilesList {
-  display: grid;
-  overflow-y: auto;
-  row-gap: 4px;
-  width: 336px;
+  margin-bottom: 16px;
 
-  // preserves box shadow in scroll container
-  height: 154px;
-  margin-bottom: -2px;
-  padding-bottom: 2px;
+  .profile-rows-container {
+    display: grid;
+    overflow-y: auto;
+    row-gap: 4px;
+    width: 336px;
+    // preserves box shadow in scroll container
+    height: 154px;
+    margin-bottom: -2px;
+    padding-bottom: 2px;
 
-  @include visibleScrollbar;
+    @include visibleScrollbar;
 
-  .profile-row {
-    align-items: center;
-    border: 2px solid $neutral-100;
-    border-radius: $border-radius-corners;
-    box-shadow: $elevation-1;
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    height: 48px;
-    padding: 8px;
-    width: 324px;
+    .profile-row {
+      align-items: center;
+      border: 2px solid $neutral-100;
+      border-radius: $border-radius-corners;
+      box-shadow: $elevation-1;
+      cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      height: 48px;
+      padding: 8px;
+      width: 324px;
 
-    &:hover {
-      background-color: $neutral-50;
-    }
+      &:hover {
+        background-color: $neutral-50;
+      }
 
-    &:active {
-      background-color: $neutral-100;
-      border-color: $neutral-300;
-    }
+      &:active {
+        background-color: $neutral-100;
+        border-color: $neutral-300;
+      }
 
-    .avatar {
-      background-color: $primary-500;
-      border-radius: $border-radius-round;
-      height: 32px;
-      margin-right: 8px;
-      width: 32px;
+      .avatar {
+        background-color: $primary-500;
+        border-radius: $border-radius-round;
+        height: 32px;
+        margin-right: 8px;
+        width: 32px;
+      }
     }
   }
 }
