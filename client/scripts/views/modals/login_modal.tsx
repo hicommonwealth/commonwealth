@@ -60,7 +60,6 @@ export type LoginBodyType =
   | 'allSet'
   | 'connectWithEmail'
   | 'ethWalletList'
-  | 'newAddressLinked'
   | 'selectAccountType'
   | 'selectPrevious'
   | 'selectProfile'
@@ -74,9 +73,9 @@ export class NewLoginModal implements m.ClassComponent {
   private wallets: Array<string>;
 
   oninit() {
-    this.bodyType = 'allSet';
+    this.bodyType = 'welcome';
     this.profiles = profiles;
-    this.sidebarType = 'newAddressLinked';
+    this.sidebarType = 'newOrReturning';
     this.wallets = wallets;
   }
 
@@ -162,6 +161,7 @@ export class NewLoginModal implements m.ClassComponent {
                   // this.bodyType = 'connectWithEmail';
                 }}
                 hasNoWalletsLink={false}
+                wallets={this.wallets}
               />
             </div>
           )}
@@ -182,6 +182,7 @@ export class NewLoginModal implements m.ClassComponent {
                   // this.bodyType = 'connectWithEmail';
                 }}
                 hasNoWalletsLink={false}
+                wallets={this.wallets}
               />
             </div>
           )}
