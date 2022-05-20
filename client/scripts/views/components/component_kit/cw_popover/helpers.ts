@@ -144,23 +144,27 @@ const getDropAmounts: (attrs: GetFunctionAttrs) => {
 });
 
 export const getPopoverPosition = ({
-  target,
+  trigger,
+  container,
   gapSize = 8,
   toSide = false,
 }: {
-  target: Element;
+  trigger: Element;
+  container: Element;
   gapSize: number;
   toSide: boolean;
 }) => {
-  const boundingRect = target.getBoundingClientRect();
+  const triggerBoundingRect = trigger.getBoundingClientRect();
+  const containerBoundingRect = container.getBoundingClientRect();
+
   let popoverPlacement;
   const innerWidth = window.innerWidth;
   const innerHeight = window.innerHeight;
 
   // Calculate whether to put popover above or below, or left or right
   if (toSide) {
-    const distanceToLeft = boundingRect.left;
-    const distanceToRight = innerWidth - boundingRect.right;
+    const distanceToLeft = triggerBoundingRect.left;
+    const distanceToRight = innerWidth - triggerBoundingRect.right;
 
     if (distanceToLeft > distanceToRight) {
       popoverPlacement = 'left';
@@ -168,8 +172,8 @@ export const getPopoverPosition = ({
       popoverPlacement = 'right';
     }
   } else {
-    const distanceToTop = boundingRect.top;
-    const distanceToBottom = innerHeight - boundingRect.bottom;
+    const distanceToTop = triggerBoundingRect.top;
+    const distanceToBottom = innerHeight - triggerBoundingRect.bottom;
 
     if (distanceToTop > distanceToBottom) {
       popoverPlacement = 'above';
@@ -178,36 +182,65 @@ export const getPopoverPosition = ({
     }
   }
   // Calculate the inline styles for positioning
-  let leftXAmount;
-  let topYAmount;
-  let bottomYAmount;
+  let contentLeftXAmount;
+  let contentTopYAmount;
+  let arrowLeftXAmount;
+  let arrowTopYAmount;
+  let showArrow;
 
   switch (popoverPlacement) {
     case 'above': {
       // Align left with left of target (centering happens in cw_popover)
-      leftXAmount = boundingRect.left;
-      bottomYAmount = innerHeight - boundingRect.top + gapSize;
+      contentLeftXAmount =
+        triggerBoundingRect.left -
+        (containerBoundingRect.width - triggerBoundingRect.width) / 2;
+      contentTopYAmount = Math.max(
+        0,
+        triggerBoundingRect.top - gapSize - containerBoundingRect.height
+      );
 
-      // Ensure we don't overflow above
+      arrowLeftXAmount =
+        triggerBoundingRect.left + triggerBoundingRect.width / 2 - 8;
+      arrowTopYAmount = triggerBoundingRect.top - 8;
 
       break;
     }
     case 'below': {
-      leftXAmount = boundingRect.left;
-      topYAmount = boundingRect.bottom + gapSize;
+      contentLeftXAmount =
+        triggerBoundingRect.left -
+        (containerBoundingRect.width - triggerBoundingRect.width) / 2;
+      contentTopYAmount = triggerBoundingRect.bottom + gapSize;
+
+      arrowLeftXAmount =
+        triggerBoundingRect.left + triggerBoundingRect.width / 2 - 8;
+      arrowTopYAmount = triggerBoundingRect.bottom;
       break;
     }
     case 'left': {
-      // Do we need this case?
+      // TODO: Do we actually need this case?
       break;
     }
     case 'right': {
-      leftXAmount = boundingRect.right + gapSize;
-      topYAmount = boundingRect.top;
+      contentLeftXAmount = triggerBoundingRect.right + gapSize;
+      contentTopYAmount =
+        triggerBoundingRect.top -
+        (containerBoundingRect.height - triggerBoundingRect.height) / 2;
+
+      arrowLeftXAmount = triggerBoundingRect.right;
+      arrowTopYAmount =
+        triggerBoundingRect.top + triggerBoundingRect.height / 2 - 8;
       break;
     }
   }
-  return { leftXAmount, topYAmount, bottomYAmount };
+  showArrow = contentTopYAmount != 0 ? true : false;
+  return {
+    contentLeftXAmount,
+    contentTopYAmount,
+    arrowLeftXAmount,
+    arrowTopYAmount,
+    popoverPlacement,
+    showArrow,
+  };
 
   // Calculate the maximum possible height this container can have, which will constrain the content
 };
@@ -244,7 +277,6 @@ export const getPopoverPositionOld = ({
 }) => {
   // Get basic dimensions about the the Toggle and the window.
   const boundingRect = target.getBoundingClientRect();
-  console.log('bounding', boundingRect);
   const innerWidth = window.innerWidth;
   const innerHeight = window.innerHeight;
 

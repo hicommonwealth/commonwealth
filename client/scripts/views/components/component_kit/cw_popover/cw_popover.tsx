@@ -14,6 +14,7 @@ import { buildStyleString, getPopoverPosition } from './helpers';
 import { BooleanFlag } from 'aws-sdk/clients/directconnect';
 import { isValueNode } from 'graphql';
 import { ConsoleLoggerImpl } from 'typescript-logging';
+import e from 'express';
 
 export type PopoverToggleAttrs = {
   isActive: boolean;
@@ -63,76 +64,97 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   triggerRef: any;
   contentRef: any;
   contentId: string;
+  arrowId: string;
 
   oncreate(vnode) {
     this.isOpen = false;
     this.isRendered = false;
     this.triggerRef = findRef(vnode.dom, 'trigger-wrapper');
     this.contentId = 'tooltip-container-' + Math.random();
+    this.arrowId = this.contentId + '-arrow';
   }
 
   togglePopOver(onToggle) {
     const newIsOpen = !this.isOpen;
-    const newIsRendered = newIsOpen ? true : this.isRendered;
 
     onToggle && onToggle(newIsOpen);
 
     this.isOpen = newIsOpen;
-    this.isRendered = newIsRendered;
+    this.isRendered = !this.isRendered;
   }
 
-  onClick(event, onToggle, toSide, vnode) {
-    this.inlineStyle = getPopoverPosition({
-      target: event.currentTarget,
-      gapSize: 8,
-      toSide,
-    });
-
+  onClick(onToggle) {
     const newIsOpen = !this.isOpen;
     const newIsRendered = newIsOpen ? true : this.isRendered;
 
     onToggle && onToggle(newIsOpen);
 
     this.isOpen = newIsOpen;
-    this.isRendered = newIsRendered;
+    //   this.isRendered = newIsRendered;
 
     m.redraw();
   }
 
-  calculatePopoverPosition(toSide: boolean) {
-    this.inlineStyle = getPopoverPosition({
-      target: this.triggerRef,
-      gapSize: 8,
-      toSide: toSide,
-    });
+  calculatePopoverPosition(vnode) {
     // Apply styles in real time
-    let tooltipContainer;
     try {
-      tooltipContainer = document.getElementById(this.contentId);
-      console.log();
-      if (this.inlineStyle.topYAmount) {
-        tooltipContainer.style.top = `${this.inlineStyle.topYAmount}px`;
-        tooltipContainer.style.bottom = null;
-      }
+      const tooltipContainer = document.getElementById(this.contentId);
+      const arrow = document.getElementById(this.arrowId);
 
-      if (this.inlineStyle.bottomYAmount) {
-        tooltipContainer.style.bottom = `${this.inlineStyle.bottomYAmount}px`;
-        tooltipContainer.style.top = null;
-      }
+      const inlineStyle = getPopoverPosition({
+        trigger: this.triggerRef,
+        container: tooltipContainer,
+        gapSize: 8,
+        toSide: vnode.attrs.toSide,
+      });
+      tooltipContainer.style.top = `${inlineStyle.contentTopYAmount}px`;
+      tooltipContainer.style.left = `${inlineStyle.contentLeftXAmount}px`;
+      arrow.style.visibility = 'hidden';
+      const showArrow = vnode.attrs.showArrow && inlineStyle.showArrow;
 
-      if (this.inlineStyle.leftXAmount) {
-        tooltipContainer.style.left = `${this.inlineStyle.leftXAmount}px`;
+      switch (inlineStyle.popoverPlacement) {
+        case 'above': {
+          arrow.className = 'arrow-down';
+          break;
+        }
+        case 'below': {
+          arrow.className = 'arrow-up';
+          break;
+        }
+        case 'right': {
+          arrow.className = 'arrow-left';
+          break;
+        }
       }
-      tooltipContainer.style.visibility = 'visible';
-      console.log('okay cmon', tooltipContainer.getBoundingClientRect());
+      arrow.style.top = `${inlineStyle.arrowTopYAmount}px`;
+      arrow.style.left = `${inlineStyle.arrowLeftXAmount}px`;
+
+      if (vnode.attrs.hoverOpenDelay) {
+        setTimeout(() => {
+          tooltipContainer.style.visibility = 'visible';
+          if (showArrow) {
+            arrow.style.visibility = 'visible';
+          } else {
+            arrow.style.visibility = 'hidden';
+          }
+        }, vnode.attrs.hoverOpenDelay);
+      } else {
+        tooltipContainer.style.visibility = 'visible';
+        if (showArrow) {
+          arrow.style.visibility = 'visible';
+        } else {
+          arrow.style.visibility = 'hidden';
+        }
+      }
+      this.isRendered = true;
     } catch (e) {}
     m.redraw();
   }
 
   onupdate(vnode) {
-    if (this.isOpen) {
+    if (this.isOpen && !this.isRendered) {
       try {
-        this.calculatePopoverPosition(vnode.attrs.toSide);
+        this.calculatePopoverPosition(vnode);
       } catch (e) {}
     }
   }
@@ -140,14 +162,16 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   view(vnode) {
     const { trigger, content, onToggle, toSide } = vnode.attrs;
     const { isOpen } = this;
-    window.onresize = () => this.calculatePopoverPosition(toSide);
+
+    // Resize Listener
+    window.onresize = () => this.calculatePopoverPosition(vnode);
 
     return (
       <>
         {
           <div
             onclick={(e) => {
-              this.onClick(e, onToggle, toSide, vnode);
+              this.onClick(onToggle);
             }}
             class="trigger-wrapper"
             ref="trigger-wrapper"
@@ -162,8 +186,6 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
                 class="tooltip-container"
                 id={this.contentId}
                 ref="tooltip-container"
-                style="visibility: hidden;"
-                //style={buildStyleString(this.inlineStyle)}
               >
                 {/* {content({
                   style: `width: 20px; height: 20px;`,
@@ -173,6 +195,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 
                 {content}
               </div>
+              <div id={this.arrowId} style="visibility: hidden;"></div>
             </div>
           </CWPortal>
         ) : null}

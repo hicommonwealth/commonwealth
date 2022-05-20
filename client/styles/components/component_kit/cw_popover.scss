@@ -31,6 +31,8 @@
   justify-content: center;
   overflow: hidden;
   max-width: 250px;
+  visibility: hidden;
+  min-height: 8px;
 }
 
 .trigger-wrapper {
@@ -44,4 +46,47 @@
   height: 100%;
   left: 0;
   top: 0;
+}
+.arrow-up {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1001;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+
+  border-bottom: 8px solid black;
+}
+
+.arrow-down {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1001;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #f00;
+}
+
+.arrow-right {
+  width: 0;
+  height: 0;
+  border-top: 60px solid transparent;
+  border-bottom: 60px solid transparent;
+
+  border-left: 60px solid green;
+}
+
+.arrow-left {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1001;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+
+  border-right: 8px solid blue;
 }

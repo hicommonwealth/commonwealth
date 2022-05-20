@@ -83,6 +83,8 @@ export class ComponentShowcase implements m.ClassComponent {
             </div>
           }
           toSide={false}
+          showArrow={true}
+          hoverOpenDelay={1000}
         />
         <h1>Text</h1>
         <div class="text-gallery">
