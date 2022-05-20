@@ -75,6 +75,7 @@ const getTokenForum = async (
             chain: token.id,
             url,
             eth_chain_id: chain_id,
+            address: token.address,
             private_url: urls?.private_url,
           },
           transaction: t,

@@ -118,7 +118,7 @@ export class SubstrateForm implements m.ClassComponent {
               return;
             }
             this.state.saving = true;
-            $.post(`${app.serverUrl()}/addChainNode`, {
+            $.post(`${app.serverUrl()}/createChain`, {
               base: ChainBase.Substrate,
               icon_url: iconUrl,
               id: slugify(name),
@@ -131,7 +131,7 @@ export class SubstrateForm implements m.ClassComponent {
             })
               .then(async (res) => {
                 await initAppState(false);
-                m.route.set(`/${res.result.chain}`);
+                m.route.set(`/${res.result.chain.id}`);
               })
               .catch((err: any) => {
                 notifyError(

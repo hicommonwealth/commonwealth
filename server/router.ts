@@ -83,7 +83,6 @@ import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
 import getDrafts from './routes/drafts/getDrafts';
-import addChainNode from './routes/addChainNode';
 import deleteChain from './routes/deleteChain';
 import deleteChainNode from './routes/deleteChainNode';
 import updateChain from './routes/updateChain';
@@ -188,11 +187,6 @@ function setupRouter(
     '/createChain',
     passport.authenticate('jwt', { session: false }),
     createChain.bind(this, models)
-  );
-  router.post(
-    '/addChainNode',
-    passport.authenticate('jwt', { session: false }),
-    addChainNode.bind(this, models)
   );
   router.post(
     '/deleteChain',

@@ -18,6 +18,9 @@ export async function getSupportedEthChainIds(models: DB): Promise<{
           [Op.ne]: null,
           [Op.ne]: 0,
         }
+      },
+      address: {
+        [Op.ne]: null,
       }
     }
   });

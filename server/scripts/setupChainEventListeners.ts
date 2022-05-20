@@ -149,8 +149,6 @@ const setupChainEventListeners = async (
         node,
       ): Promise<[ChainNodeInstance, IEventSubscriber<any, any>]> => {
         let subscriber: IEventSubscriber<any, any>;
-        const nodesChain = await models.Chain.findAll({ where: { id: node.chain } });
-        const [nodeChain] = nodesChain;
         if (node.Chain.base === ChainBase.Substrate) {
           const nodeUrl = constructSubstrateUrl(node.url);
           const api = await SubstrateEvents.createApi(
@@ -181,7 +179,7 @@ const setupChainEventListeners = async (
           const api = await MolochEvents.createApi(
             node.url,
             contractVersion,
-            nodeChain.address
+            node.address
           );
           const handlers = generateHandlers(node, wss);
           subscriber = await MolochEvents.subscribeEvents({
@@ -193,7 +191,7 @@ const setupChainEventListeners = async (
             contractVersion,
           });
         } else if (node.Chain.network === ChainNetwork.Compound) {
-          const api = await CompoundEvents.createApi(node.url, nodeChain.address);
+          const api = await CompoundEvents.createApi(node.url, node.address);
           const handlers = generateHandlers(node, wss);
           subscriber = await CompoundEvents.subscribeEvents({
             chain: node.chain,
@@ -203,7 +201,7 @@ const setupChainEventListeners = async (
             api,
           });
         } else if (node.Chain.network === ChainNetwork.Aave) {
-          const api = await AaveEvents.createApi(node.url, nodeChain.address);
+          const api = await AaveEvents.createApi(node.url, node.address);
           const handlers = generateHandlers(node, wss);
           subscriber = await AaveEvents.subscribeEvents({
             chain: node.chain,

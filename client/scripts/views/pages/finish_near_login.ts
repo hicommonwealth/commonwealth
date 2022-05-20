@@ -135,11 +135,11 @@ const validate = async (
       // POST object
       const chainCreateArgs = JSON.parse(chainCreateArgString);
       const res = await $.post(
-        `${app.serverUrl()}/addChainNode`,
+        `${app.serverUrl()}/createChain`,
         chainCreateArgs
       );
       await initAppState(false);
-      m.route.set(`${window.location.origin}/${res.result.chain}`);
+      m.route.set(`${window.location.origin}/${res.result.chain.id}`);
     } catch (err) {
       vnode.state.validationError = `Failed to initialize chain node: ${err.message}`;
     }

@@ -8,6 +8,7 @@ import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { ChainAttributes } from '../models/chain';
 import { ChainNodeAttributes } from '../models/chain_node';
+import testSubstrateSpec from '../util/testSubstrateSpec';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { getUrlsForEthChainId } from '../util/supportedEthChains';
@@ -44,9 +45,10 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
-type CreateChainReq = ChainAttributes & Omit<ChainNodeAttributes, 'id'> & {
+type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
   id: string;
   node_url: string;
+  substrate_spec: string;
 };
 
 type CreateChainResp = {
@@ -97,10 +99,14 @@ const createChain = async (
   if (!existingBaseChain) {
     return next(new Error(Errors.InvalidBase));
   }
+
+  // TODO: refactor this to use existing nodes rather than always creating one
+
   let eth_chain_id: number = null;
   let url = req.body.node_url;
   let altWalletUrl = req.body.alt_wallet_url;
   let privateUrl;
+  let sanitizedSpec;
 
   // always generate a chain id
   if (req.body.base === ChainBase.Ethereum) {
@@ -117,31 +123,27 @@ const createChain = async (
     }
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
-    const urls = await getUrlsForEthChainId(models, eth_chain_id);
-    if (urls) {
-      const { url: ethChainUrl, alt_wallet_url, private_url } = urls;
-      url = ethChainUrl;
-      if (alt_wallet_url) {
-        altWalletUrl = alt_wallet_url;
-      }
-      if (private_url) {
-        privateUrl = private_url;
-      }
-    } else {
-      // If using overridden URL, then user must be admin -- we do not allow users to submit
-      // custom URLs yet.
-      if (!req.user.isAdmin) {
-        return next(new Error(Errors.NotAdmin));
-      }
+    const node = await models.ChainNode.findOne({ where: {
+      eth_chain_id,
+    }});
+    if (!node && !req.user.isAdmin) {
+      // if creating a new ETH node, must be admin -- users cannot submit custom URLs
+      return next(new Error(Errors.NotAdmin));
     }
-    if (!url) {
+    if (!node && !url) {
+      // must provide at least url to create a new node
       return next(new Error(Errors.InvalidChainIdOrUrl));
     }
+    if (node) {
+      url = node.url;
+      altWalletUrl = node.alt_wallet_url;
+      privateUrl = node.private_url;
+    }
 
-    const existingChainNode = await models.ChainNode.findOne({
-      where: { eth_chain_id }
+    const existingChain = await models.Chain.findOne({
+      where: { address: req.body.address, chain_node_id: node.id }
     });
-    if (existingChainNode) {
+    if (existingChain) {
       return next(new Error(Errors.ChainAddressExists));
     }
 
@@ -186,6 +188,16 @@ const createChain = async (
     }
 
     // TODO: test altWalletUrl if available
+  } else if (req.body.base === ChainBase.Substrate && req.body.type !== ChainType.Offchain) {
+    const spec = req.body.substrate_spec || '{}';
+    if (req.body.substrate_spec) {
+      try {
+        sanitizedSpec = await testSubstrateSpec(spec, req.body.node_url);
+      } catch (e) {
+        return next(new Error(Errors.InvalidNode));
+      }
+    }
+
   } else {
     if (!url || !url.trim()) {
       return next(new Error(Errors.InvalidNodeUrl));
@@ -238,6 +250,13 @@ const createChain = async (
     return next(new Error(Errors.ChainNameExists));
   }
 
+  const node = await models.ChainNode.create({
+    url,
+    eth_chain_id,
+    alt_wallet_url: altWalletUrl,
+    private_url: privateUrl,
+  });
+
   const chain = await models.Chain.create({
     id,
     name,
@@ -255,15 +274,12 @@ const createChain = async (
     bech32_prefix,
     decimals,
     active: true,
+    substrate_spec: sanitizedSpec || '',
+    chain_node_id: node.id,
+    address,
+    token_name,
   });
 
-  const node = await models.ChainNode.create({
-    chain: id,
-    url,
-    eth_chain_id,
-    alt_wallet_url: altWalletUrl,
-    private_url: privateUrl,
-  });
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
