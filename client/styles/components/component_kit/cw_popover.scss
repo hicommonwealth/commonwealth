@@ -50,7 +50,7 @@
 .arrow-up {
   visibility: hidden;
   position: absolute;
-  z-index: 1001;
+  z-index: 1000;
   width: 0;
   height: 0;
   border-left: 8px solid transparent;
@@ -62,7 +62,7 @@
 .arrow-down {
   visibility: hidden;
   position: absolute;
-  z-index: 1001;
+  z-index: 1000;
   width: 0;
   height: 0;
   border-left: 8px solid transparent;
@@ -82,7 +82,7 @@
 .arrow-left {
   visibility: hidden;
   position: absolute;
-  z-index: 1001;
+  z-index: 1000;
   width: 0;
   height: 0;
   border-top: 8px solid transparent;

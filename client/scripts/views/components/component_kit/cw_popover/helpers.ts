@@ -146,11 +146,13 @@ const getDropAmounts: (attrs: GetFunctionAttrs) => {
 export const getPopoverPosition = ({
   trigger,
   container,
-  gapSize = 8,
+  arrowSize = 8,
+  gapSize = 1,
   toSide = false,
 }: {
   trigger: Element;
   container: Element;
+  arrowSize: number;
   gapSize: number;
   toSide: boolean;
 }) => {
@@ -196,12 +198,15 @@ export const getPopoverPosition = ({
         (containerBoundingRect.width - triggerBoundingRect.width) / 2;
       contentTopYAmount = Math.max(
         0,
-        triggerBoundingRect.top - gapSize - containerBoundingRect.height
+        triggerBoundingRect.top -
+          arrowSize -
+          containerBoundingRect.height -
+          gapSize
       );
 
       arrowLeftXAmount =
         triggerBoundingRect.left + triggerBoundingRect.width / 2 - 8;
-      arrowTopYAmount = triggerBoundingRect.top - 8;
+      arrowTopYAmount = triggerBoundingRect.top - 8 - gapSize;
 
       break;
     }
@@ -209,11 +214,11 @@ export const getPopoverPosition = ({
       contentLeftXAmount =
         triggerBoundingRect.left -
         (containerBoundingRect.width - triggerBoundingRect.width) / 2;
-      contentTopYAmount = triggerBoundingRect.bottom + gapSize;
+      contentTopYAmount = triggerBoundingRect.bottom + arrowSize + gapSize;
 
       arrowLeftXAmount =
         triggerBoundingRect.left + triggerBoundingRect.width / 2 - 8;
-      arrowTopYAmount = triggerBoundingRect.bottom;
+      arrowTopYAmount = triggerBoundingRect.bottom + gapSize;
       break;
     }
     case 'left': {
@@ -221,18 +226,19 @@ export const getPopoverPosition = ({
       break;
     }
     case 'right': {
-      contentLeftXAmount = triggerBoundingRect.right + gapSize;
+      contentLeftXAmount = triggerBoundingRect.right + arrowSize + gapSize;
       contentTopYAmount =
         triggerBoundingRect.top -
         (containerBoundingRect.height - triggerBoundingRect.height) / 2;
 
-      arrowLeftXAmount = triggerBoundingRect.right;
+      arrowLeftXAmount = triggerBoundingRect.right + gapSize;
       arrowTopYAmount =
         triggerBoundingRect.top + triggerBoundingRect.height / 2 - 8;
       break;
     }
   }
   showArrow = contentTopYAmount != 0 ? true : false;
+
   return {
     contentLeftXAmount,
     contentTopYAmount,
@@ -260,6 +266,19 @@ export const buildStyleString = ({
   if (bottomYAmount) styleString += `bottom: ${bottomYAmount}px;`;
 
   return styleString;
+};
+
+export const checkIfCursorInBounds = (e, target: Element) => {
+  const boundingRect = target.getBoundingClientRect();
+  if (e.offsetX > boundingRect.right || e.offsetX < boundingRect.left) {
+    return false;
+  }
+
+  if (e.offsetY > boundingRect.bottom || e.offsetY < boundingRect.top) {
+    return false;
+  }
+
+  return true;
 };
 
 export const getPopoverPositionOld = ({

@@ -71,7 +71,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <div class="ok">
               <div
                 class="wtf"
-                style="height: 400px;"
+                style="height: 100px;"
                 onclick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -82,9 +82,9 @@ export class ComponentShowcase implements m.ClassComponent {
               </div>
             </div>
           }
-          toSide={false}
+          toSide={true}
           showArrow={true}
-          hoverOpenDelay={1000}
+          interactionType="click"
         />
         <h1>Text</h1>
         <div class="text-gallery">
