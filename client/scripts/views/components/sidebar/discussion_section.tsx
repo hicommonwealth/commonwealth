@@ -78,7 +78,8 @@ export class DiscussionSection
     const onSputnikDaosPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
 
-    const topics = app.topics.store.getByCommunity(app.activeChainId())
+    const topics = app.topics.store
+      .getByCommunity(app.activeChainId())
       .filter((t) => t.featuredInSidebar)
       .sort((a, b) => a.name.localeCompare(b.name))
       .sort((a, b) => a.order - b.order);

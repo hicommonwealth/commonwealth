@@ -11,20 +11,18 @@ class DiscussionDraft {
   public readonly createdAt: moment.Moment;
   // Draft topics are not created as topic objects yet, so they are just strings
   public readonly topic: string;
-  public readonly community: string;
   public readonly chain: string;
 
   constructor(
     author: string,
     id: number,
-    community: string,
     chain: string,
     title: string,
     body: string,
     topic: string,
     createdAt: moment.Moment,
     attachments: OffchainAttachment[],
-    authorChain?: string,
+    authorChain?: string
   ) {
     this.author = author;
     this.title = title;
@@ -32,7 +30,6 @@ class DiscussionDraft {
     this.attachments = attachments;
     this.id = id;
     this.topic = topic;
-    this.community = community;
     this.chain = chain;
     this.createdAt = createdAt;
     this.authorChain = authorChain;

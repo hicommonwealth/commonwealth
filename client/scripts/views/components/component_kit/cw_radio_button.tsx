@@ -1,43 +1,59 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_radio_button.scss';
 
 import { ComponentType } from './types';
+import { getClasses } from './helpers';
+import { CWText } from './cw_text';
 
-export type RadioButtonAttrs = {
-  value: string;
-  label?: string;
-  checked: boolean;
-  groupName: string;
-  // TODO: Gabe 1/14/22 type onchange for real
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onchange: (e?: any) => void;
-  className?: string;
-  // TODO: Gabe 1/14/22 disabled isn't used for anything
+export type RadioButton = { label?: string; value: string };
+
+type RadioButtonStyleAttrs = {
   disabled?: boolean;
+  checked: boolean;
 };
+
+type RadioButtonAttrs = {
+  groupName: string;
+  onchange: (e?: any) => void;
+} & RadioButton &
+  RadioButtonStyleAttrs;
 
 export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
   view(vnode) {
-    const { checked, value, label, groupName, onchange, className } =
-      vnode.attrs;
+    const {
+      disabled = false,
+      groupName,
+      label,
+      onchange,
+      checked,
+      value,
+    } = vnode.attrs;
 
     const params = {
-      type: 'radio',
+      disabled,
       name: groupName,
-      value,
       onchange,
-      checked: checked ? 'checked' : '',
+      checked,
+      type: 'radio',
+      value,
     };
 
     return (
-      <label class={`${ComponentType.RadioButton} ${checked} ${className}`}>
-        <span class="radio-input">
-          <input {...params} />
-          <span class="radio-control" />
-        </span>
-        <span class="radio-label">{label || value}</span>
+      <label
+        class={getClasses<RadioButtonStyleAttrs>(
+          {
+            checked,
+            disabled,
+          },
+          ComponentType.RadioButton
+        )}
+      >
+        <input class="radio-input" {...params} />
+        <div class="radio-control" />
+        <CWText>{label || value}</CWText>
       </label>
     );
   }

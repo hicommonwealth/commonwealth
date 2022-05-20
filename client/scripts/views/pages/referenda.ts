@@ -2,7 +2,6 @@
 import 'pages/referenda.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { Tag } from 'construct-ui';
 
 import app from 'state';
@@ -13,12 +12,12 @@ import Substrate from 'controllers/chain/substrate/main';
 
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import ProposalCard from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
 
-import Listing from './listing';
 import ErrorPage from './error';
+import { CardsCollection } from '../components/cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -78,7 +77,6 @@ function getModules() {
 
 const ReferendaPage: m.Component<{}> = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'ReferendaPage' });
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
     if (
@@ -168,17 +166,14 @@ const ReferendaPage: m.Component<{}> = {
       },
       m('.ReferendaPage', [
         onSubstrate && m(SubstrateProposalStats),
-        m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: activeProposalContent,
-          columnHeader: 'Active Referenda',
+          header: 'Active Referenda',
         }),
-        m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: inactiveProposalContent,
-          columnHeader: 'Inactive Referenda',
+          header: 'Inactive Referenda',
         }),
-        m('.clear'),
       ])
     );
   },

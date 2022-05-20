@@ -34,6 +34,31 @@ $discussion-title-font-size: 1.45rem;
   flex: 1;
   flex-direction: row;
 
+  .show-more-button {
+    align-items: center;
+    color: $primary-500;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    width: 115px;
+    margin-top: 100px;
+    .show-more-text {
+      font-weight: 600;
+      margin-top: -1px;
+    }
+  }
+
+  .show-more-button-wrapper {
+    align-items: center;
+    background-image: linear-gradient(to bottom, transparent, white);
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    margin-top: -50px;
+    margin-bottom: 30px;
+    position: relative;
+  }
+
   .view-proposal-page-container {
     display: flex;
     flex-direction: column;
@@ -124,6 +149,13 @@ $discussion-title-font-size: 1.45rem;
       .cui-input {
         width: 70%;
         padding-bottom: 10px;
+      }
+      .proposal-body-link {
+        display: flex;
+
+        > * div {
+          margin-right: 8px;
+        }
       }
       .proposal-body-meta {
         display: flex;
@@ -216,38 +248,6 @@ $discussion-title-font-size: 1.45rem;
             margin-right: 3px;
           }
         }
-      }
-    }
-    .ProposalHeaderExternalLink,
-    .ProposalHeaderBlockExplorerLink,
-    .ProposalHeaderVotingInterfaceLink,
-    .ProposalHeaderThreadLink {
-      display: inline-block;
-      margin-right: 12px;
-      margin-top: 12px;
-      font-weight: 600;
-      a:link,
-      a:visited {
-        display: block;
-        padding: 8px 16px;
-        border-radius: 99px;
-        background: $neutral-200;
-        color: $neutral-500;
-        text-decoration: none !important;
-      }
-      svg {
-        stroke: $primary-500;
-        position: relative;
-        top: -1px;
-        margin-left: 5px;
-        $size: 14px;
-        height: $size;
-        width: $size;
-        min-height: $size;
-        min-width: $size;
-      }
-      a:hover {
-        background: $neutral-300;
       }
     }
   }
@@ -402,7 +402,7 @@ $discussion-title-font-size: 1.45rem;
     }
   }
 
-  .ProposalHeaderOffchainPoll,
+  .ProposalPoll,
   .ProposalSidebarPollEditorModule,
   .ProposalLinkedThreadsEditorModule {
     border-radius: 10px;
@@ -436,7 +436,7 @@ $discussion-title-font-size: 1.45rem;
       margin-bottom: 12px;
     }
   }
-  .ProposalHeaderOffchainPoll {
+  .ProposalPoll {
     .offchain-poll-header {
       font-weight: 600;
     }

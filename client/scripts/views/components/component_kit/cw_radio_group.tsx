@@ -1,33 +1,21 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_radio_group.scss';
 
-import { CWRadioButton } from './cw_radio_button';
+import { CWRadioButton, RadioButton } from './cw_radio_button';
 import { ComponentType } from './types';
 
-type RadioGroupOption = { label: string; value: string };
-
 type RadioGroupAttrs = {
-  options: Array<RadioGroupOption>;
-  defaultValue: RadioGroupOption;
   name: string;
-  // TODO: Gabe 1/14/22 type onchange for real
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onchange: (e?: any) => void;
-  disabled?: boolean;
+  options: Array<RadioButton>;
+  toggledOption: string;
 };
 export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
-  toggledValue: string;
-
-  oninit(vnode) {
-    if (!this.toggledValue) {
-      this.toggledValue = vnode.attrs.defaultValue.value;
-    }
-  }
-
   view(vnode) {
-    const { options, onchange, name, disabled } = vnode.attrs;
+    const { options, onchange, name, toggledOption } = vnode.attrs;
     return (
       <div class={ComponentType.RadioGroup}>
         {options.map((o) => {
@@ -35,13 +23,12 @@ export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
             <CWRadioButton
               value={o.value}
               label={o.label}
-              checked={o.value === this.toggledValue}
+              checked={o.value === toggledOption}
               groupName={name}
               onchange={(e) => {
-                this.toggledValue = e?.target?.value;
                 onchange(e);
               }}
-              disabled={disabled}
+              disabled={o.disabled}
             />
           );
         })}

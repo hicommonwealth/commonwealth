@@ -9,11 +9,15 @@ export const ChainCommunityErrors = {
 };
 
 // sequelize 5.0 does not accept undefined key in where clause
-const validateChain = async (models: DB, params: { chain?: string }): Promise<[ChainInstance, string]> => {
-  if (!params.chain) return [null, ChainCommunityErrors.ChainDNE];
+const validateChain = async (
+  models: DB,
+  params: { chain?: string; chain_id?: string }
+): Promise<[ChainInstance, string]> => {
+  const chain_id = params.chain || params.chain_id;
+  if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
   const chain = await models.Chain.findOne({
     where: {
-      id: params.chain,
+      id: chain_id,
     },
     include: [
       {
@@ -25,7 +29,7 @@ const validateChain = async (models: DB, params: { chain?: string }): Promise<[C
     ],
   });
   // searching for chain that doesn't exist
-  if (params.chain && !chain) return [null, ChainCommunityErrors.ChainDNE];
+  if (chain_id && !chain) return [null, ChainCommunityErrors.ChainDNE];
   return [chain, null];
 };
 

@@ -1,15 +1,18 @@
 import http from 'http';
 import { Express } from 'express-serve-static-core';
+import Rollbar from "rollbar";
 import { DEFAULT_PORT } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { setupWebSocketServer } from '../socket';
+import { DB } from "../database";
+
 const log = factory.getLogger(formatFilename(__filename));
 
-const setupServer = (app: Express) => {
+const setupServer = (app: Express, rollbar: Rollbar, models: DB) => {
   const port = process.env.PORT || DEFAULT_PORT;
   app.set('port', port);
   const server = http.createServer(app);
-  setupWebSocketServer(server);
+  setupWebSocketServer(server, rollbar, models);
 
   const onError = (error) => {
     if (error.syscall !== 'listen') {

@@ -15,6 +15,9 @@ import { CWCard } from './cw_card';
 import { CWTextInput, ValidationStatus } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
+import { CWIconButton } from './cw_icon_button';
+import { CWRadioButton } from './cw_radio_button';
+import { CWCheckbox } from './cw_checkbox';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -58,6 +61,15 @@ const radioGroupOptions = [
 ];
 
 export class ComponentShowcase implements m.ClassComponent {
+  private checkboxChecked: boolean;
+  private radioButtonChecked: boolean;
+  private radioGroupSelection: string;
+  private selectedIconButton: number;
+
+  oninit() {
+    this.radioGroupSelection = radioGroupOptions[2].value;
+  }
+
   view() {
     return (
       <div class="ComponentShowcase">
@@ -182,6 +194,38 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWIcon iconName="views" iconSize="large" disabled={true} />
           </div>
         </div>
+        <h1>Icon Buttons</h1>
+        <div class="icon-button-gallery">
+          <div class="icon-button-subheader">Click to see selected state</div>
+          <div class="icon-button-row">
+            <CWIconButton
+              iconName="views"
+              iconSize="large"
+              iconButtonTheme="primary"
+              selected={this.selectedIconButton === 1}
+              onclick={() => {
+                this.selectedIconButton = 1;
+              }}
+            />
+            {this.selectedIconButton === 1 && (
+              <div class="icon-button-selected">is selected</div>
+            )}
+          </div>
+          <div class="icon-button-row">
+            <CWIconButton
+              iconName="views"
+              iconSize="large"
+              iconButtonTheme="neutral"
+              selected={this.selectedIconButton === 2}
+              onclick={() => {
+                this.selectedIconButton = 2;
+              }}
+            />
+            {this.selectedIconButton === 2 && (
+              <div class="icon-button-selected">is selected</div>
+            )}
+          </div>
+        </div>
         <h1>Buttons</h1>
         <div class="button-gallery">
           <CWButton
@@ -243,13 +287,56 @@ export class ComponentShowcase implements m.ClassComponent {
             linkType="inline"
           />
         </div>
+        <h1>Radio Button</h1>
+        <div class="choice-gallery">
+          <CWRadioButton
+            value="Radio Button"
+            label="Radio Button"
+            checked={this.radioButtonChecked === true}
+            onchange={() => {
+              this.radioButtonChecked = true;
+            }}
+          />
+          <CWRadioButton
+            value="Disabled Radio Button"
+            label="Disabled Radio Button"
+            disabled
+          />
+          <CWRadioButton
+            value="Checked and Disabled Radio Button"
+            label="Checked and Disabled Radio Button"
+            disabled
+            checked
+          />
+        </div>
         <h1>Radio Group</h1>
         <div class="button-gallery">
           <CWRadioGroup
             options={radioGroupOptions}
-            defaultValue={radioGroupOptions[2]}
             name="RadioGroup"
-            onchange={(e) => notifySuccess(`"${e.target.value}" selected`)}
+            toggledOption={this.radioGroupSelection}
+            onchange={(e) => {
+              this.radioGroupSelection = e.target.value;
+              notifySuccess(`"${e.target.value}" selected`);
+            }}
+          />
+        </div>
+        <h1>Checkbox</h1>
+        <div class="choice-gallery">
+          <CWCheckbox
+            checked={this.checkboxChecked === true}
+            label="Click me"
+            onchange={() => {
+              this.checkboxChecked = !this.checkboxChecked;
+            }}
+          />
+          <CWCheckbox label="Disabled" disabled />
+          <CWCheckbox label="Checked and disabled" disabled checked />
+          <CWCheckbox label="Indeterminate" indeterminate />
+          <CWCheckbox
+            label="Indeterminate and disabled"
+            disabled
+            indeterminate
           />
         </div>
         <h1>Engagement Buttons</h1>
