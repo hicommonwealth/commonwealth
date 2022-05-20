@@ -11,8 +11,10 @@ import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import {
+  LoginAddress,
   LoginBoilerplate,
   LoginSidebar,
+  ProfilesList,
   WalletsList,
 } from '../pages/login/login_components';
 
@@ -42,16 +44,16 @@ export type LoginBodyType =
   | 'newAddressLinked'
   | 'selectAccountType'
   | 'selectPrevious'
+  | 'selectProfile'
   | 'walletList'
-  | 'welcome'
-  | 'welcomeBack';
+  | 'welcome';
 
 export class NewLoginModal implements m.ClassComponent {
   private sidebarType: LoginSidebarType;
   private bodyType: LoginBodyType;
 
   oninit() {
-    this.sidebarType = 'newOrReturning';
+    this.sidebarType = 'newAddressLinked';
     this.bodyType = 'walletList';
   }
 
@@ -153,6 +155,24 @@ export class NewLoginModal implements m.ClassComponent {
                 }}
                 hasNoWalletsLink={false}
               />
+            </div>
+          )}
+          {this.bodyType === 'selectProfile' && (
+            <div class="wallet-list">
+              <div class="header-container">
+                <CWText type="h3" fontWeight="bold" className="header-text">
+                  Select Profile
+                </CWText>
+                <CWText type="h5" fontWeight="medium">
+                  Linking
+                </CWText>
+                <LoginAddress address="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq" />
+                <CWText type="h5" fontWeight="medium">
+                  to your Profile
+                </CWText>
+              </div>
+              <ProfilesList />
+              <CWButton label="Finish" />
             </div>
           )}
         </div>

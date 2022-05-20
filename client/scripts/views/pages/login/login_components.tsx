@@ -61,6 +61,29 @@ export class LoginSidebar
             </CWText>
           </div>
         )}
+        {sidebarType === 'newAddressLinked' && (
+          <div class="connect-wallet">
+            <div class="sidebar-content">
+              <CWText type="h4" fontWeight="semiBold" className="header-text">
+                New Address Linked
+              </CWText>
+              <CWText type="b2">
+                By linking a new address, you are able to switch with ease and
+                manage all of your communities, addresses and profiles under one
+                account.
+              </CWText>
+              <CWText
+                type="buttonSm"
+                className="manage-link"
+                onclick={() => {
+                  // fill in
+                }}
+              >
+                Manage Addresses
+              </CWText>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -139,6 +162,42 @@ export class WalletsList implements m.ClassComponent<WalletsListAttrs> {
         <CWText type="b2" className="connect-another-way-link">
           <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
         </CWText>
+      </div>
+    );
+  }
+}
+
+export class LoginAddress implements m.ClassComponent<{ address: string }> {
+  view(vnode) {
+    const { address } = vnode.attrs;
+    return (
+      <div class="LoginAddress">
+        <CWText type="caption">{address}</CWText>
+      </div>
+    );
+  }
+}
+
+const profileNames = [
+  'Greenpeas.eth',
+  'Blue-Cow.eth',
+  'Averyveryveryveryveryverylongname',
+  'Another-Name.eth',
+];
+
+export class ProfilesList implements m.ClassComponent<{ onclick: () => void }> {
+  view(vnode) {
+    const { onclick } = vnode.attrs;
+    return (
+      <div class="ProfilesList">
+        {profileNames.map((profileName) => (
+          <div class="profile-row" onclick={onclick}>
+            <div class="avatar" />
+            <CWText type="b1" fontWeight="bold" noWrap>
+              {profileName}
+            </CWText>
+          </div>
+        ))}
       </div>
     );
   }
