@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /* @jsx m */
 
 import m from 'mithril';
@@ -9,6 +10,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWWalletOptionRow } from '../../components/component_kit/cw_wallet_option_row';
 import { CWAccountCreationButton } from '../../components/component_kit/cw_account_creation_button';
 import { LoginSidebarType } from '../../modals/login_modal';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 export class LoginSidebar
   implements m.ClassComponent<{ sidebarType: LoginSidebarType }>
@@ -116,24 +118,19 @@ export class LoginBoilerplate implements m.ClassComponent {
   }
 }
 
-const wallets = [
-  'cosm-metamask',
-  'keplr',
-  'metamask',
-  'near',
-  'polkadot',
-  'terrastation',
-  'walletconnect',
-];
-
 type WalletsListAttrs = {
   connectAnotherWayOnclick: () => void;
   hasNoWalletsLink?: boolean;
+  wallets: Array<string>;
 };
 
 export class WalletsList implements m.ClassComponent<WalletsListAttrs> {
   view(vnode) {
-    const { connectAnotherWayOnclick, hasNoWalletsLink = true } = vnode.attrs;
+    const {
+      connectAnotherWayOnclick,
+      hasNoWalletsLink = true,
+      wallets,
+    } = vnode.attrs;
     return (
       <div class="WalletsList">
         <div class="wallets-and-link-container">
@@ -178,26 +175,47 @@ export class LoginAddress implements m.ClassComponent<{ address: string }> {
   }
 }
 
-const profileNames = [
-  'Greenpeas.eth',
-  'Blue-Cow.eth',
-  'Averyveryveryveryveryverylongname',
-  'Another-Name.eth',
-];
+export type ProfileRowAttrs = {
+  isSelected?: boolean;
+  name: string;
+  onclick?: () => void;
+};
 
-export class ProfilesList implements m.ClassComponent<{ onclick: () => void }> {
+export class ProfileRow implements m.ClassComponent<ProfileRowAttrs> {
   view(vnode) {
-    const { onclick } = vnode.attrs;
+    const { isSelected, onclick, name } = vnode.attrs;
+    return (
+      <div
+        class={`profile-row${isSelected ? ' selected' : ''}`}
+        onclick={onclick}
+      >
+        <div class="avatar-and-name">
+          <div class="avatar" />
+          <CWText type="b1" fontWeight="bold" noWrap>
+            {name}
+          </CWText>
+        </div>
+        {isSelected && <CWIcon iconName="check" />}
+      </div>
+    );
+  }
+}
+
+export class ProfilesList
+  implements
+    m.ClassComponent<{ onclick: () => void; profiles: Array<ProfileRowAttrs> }>
+{
+  view(vnode) {
+    const { onclick, profiles } = vnode.attrs;
     return (
       <div class="ProfilesList">
         <div class="profile-rows-container">
-          {profileNames.map((profileName) => (
-            <div class="profile-row" onclick={onclick}>
-              <div class="avatar" />
-              <CWText type="b1" fontWeight="bold" noWrap>
-                {profileName}
-              </CWText>
-            </div>
+          {profiles.map((profile) => (
+            <ProfileRow
+              isSelected={profile.isSelected}
+              name={profile.name}
+              onclick={onclick}
+            />
           ))}
         </div>
       </div>

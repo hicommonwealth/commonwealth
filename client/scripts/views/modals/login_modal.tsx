@@ -14,6 +14,7 @@ import {
   LoginAddress,
   LoginBoilerplate,
   LoginSidebar,
+  ProfileRowAttrs,
   ProfilesList,
   WalletsList,
 } from '../pages/login/login_components';
@@ -30,6 +31,23 @@ export class LoginModal implements m.ClassComponent {
     );
   }
 }
+
+const wallets = [
+  'cosm-metamask',
+  'keplr',
+  'metamask',
+  'near',
+  'polkadot',
+  'terrastation',
+  'walletconnect',
+];
+
+const profiles = [
+  { name: 'Greenpeas.eth', isSelected: true },
+  { name: 'Blue-Cow.eth' },
+  { name: 'Averyveryveryveryveryverylongname' },
+  { name: 'Another-Name.eth' },
+];
 
 export type LoginSidebarType =
   | 'connectWallet'
@@ -49,12 +67,16 @@ export type LoginBodyType =
   | 'welcome';
 
 export class NewLoginModal implements m.ClassComponent {
-  private sidebarType: LoginSidebarType;
   private bodyType: LoginBodyType;
+  private profiles: Array<ProfileRowAttrs>;
+  private sidebarType: LoginSidebarType;
+  private wallets: Array<string>;
 
   oninit() {
+    this.bodyType = 'selectProfile';
+    this.profiles = profiles;
     this.sidebarType = 'newAddressLinked';
-    this.bodyType = 'walletList';
+    this.wallets = wallets;
   }
 
   view() {
@@ -71,6 +93,7 @@ export class NewLoginModal implements m.ClassComponent {
                   // this.sidebarType = 'ethWallet';
                   // this.bodyType = 'connectWithEmail';
                 }}
+                wallets={this.wallets}
               />
             </div>
           )}
@@ -175,7 +198,7 @@ export class NewLoginModal implements m.ClassComponent {
                   to your Profile
                 </CWText>
               </div>
-              <ProfilesList />
+              <ProfilesList profiles={this.profiles} />
               <CWButton label="Finish" />
             </div>
           )}

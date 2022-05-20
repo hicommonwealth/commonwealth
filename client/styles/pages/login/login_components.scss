@@ -214,12 +214,31 @@
         box-shadow: none;
       }
 
-      .avatar {
-        background-color: $primary-500;
-        border-radius: $border-radius-round;
-        height: 32px;
-        margin-right: 8px;
-        width: 32px;
+      .avatar-and-name {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+
+        .avatar {
+          background-color: $primary-500;
+          border-radius: $border-radius-round;
+          height: 32px;
+          margin-right: 8px;
+          width: 32px;
+        }
+      }
+
+      &.selected {
+        background-color: $green-50;
+        border-color: $green-500;
+        box-shadow: none;
+        justify-content: space-between;
+        pointer-events: none;
+
+        .Icon {
+          color: $green-500;
+        }
       }
     }
   }
