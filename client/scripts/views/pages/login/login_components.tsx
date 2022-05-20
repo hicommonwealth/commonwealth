@@ -186,7 +186,7 @@ export class ProfileRow implements m.ClassComponent<ProfileRowAttrs> {
     const { isSelected, onclick, name } = vnode.attrs;
     return (
       <div
-        class={`profile-row${isSelected ? ' selected' : ''}`}
+        class={`ProfileRow ${isSelected ? ' selected' : ''}`}
         onclick={onclick}
       >
         <div class="avatar-and-name">

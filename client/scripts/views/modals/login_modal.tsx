@@ -14,6 +14,7 @@ import {
   LoginAddress,
   LoginBoilerplate,
   LoginSidebar,
+  ProfileRow,
   ProfileRowAttrs,
   ProfilesList,
   WalletsList,
@@ -73,7 +74,7 @@ export class NewLoginModal implements m.ClassComponent {
   private wallets: Array<string>;
 
   oninit() {
-    this.bodyType = 'selectProfile';
+    this.bodyType = 'allSet';
     this.profiles = profiles;
     this.sidebarType = 'newAddressLinked';
     this.wallets = wallets;
@@ -199,6 +200,24 @@ export class NewLoginModal implements m.ClassComponent {
                 </CWText>
               </div>
               <ProfilesList profiles={this.profiles} />
+              <CWButton label="Finish" />
+            </div>
+          )}
+          {this.bodyType === 'allSet' && (
+            <div class="inner-body-container">
+              <div class="header-container">
+                <CWText type="h3" fontWeight="bold" className="header-text">
+                  You’re All Set!
+                </CWText>
+                <CWText type="h5" fontWeight="medium">
+                  You have sucessfully linked
+                </CWText>
+                <LoginAddress address="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq" />
+                <CWText type="h5" fontWeight="medium">
+                  to your Profile
+                </CWText>
+              </div>
+              <ProfileRow {...this.profiles[0]} />
               <CWButton label="Finish" />
             </div>
           )}
