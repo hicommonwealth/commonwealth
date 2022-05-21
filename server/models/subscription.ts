@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import Sequelize, { DataTypes } from 'sequelize';
+import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
 import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
@@ -7,23 +7,27 @@ import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
 import { ModelStatic } from './types';
 import {
-  IPostNotificationData,
-  ICommunityNotificationData,
-  IChainEventNotificationData,
   ChainBase,
   ChainType,
-  ChainEventNotification,
+  IChainEventNotificationData,
+  ICommunityNotificationData,
+  IPostNotificationData,
 } from '../../shared/types';
-import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
+import {
+  createImmediateNotificationEmailObject,
+  sendImmediateNotificationEmail,
+} from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
-import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
+import {
+  NotificationsReadAttributes,
+  NotificationsReadInstance,
+} from './notifications_read';
 import { NotificationInstance } from './notification';
-import chainEventType from "../../client/scripts/models/ChainEventType";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -157,7 +161,7 @@ export default (
     }
 
     // get all relevant subscriptions
-    const subscribers = await models.Subscription.findAll({
+    const subscriptions = await models.Subscription.findAll({
       where: findOptions,
       include: models.User,
     });
@@ -202,15 +206,26 @@ export default (
     }
 
     // create NotificationsRead instances
-    await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
-      subscription_id: subscription.id,
-      notification_id: notification.id,
-      is_read: false,
-      user_id: subscription.subscriber_id
-    })));
+    // await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
+    //   subscription_id: subscription.id,
+    //   notification_id: notification.id,
+    //   is_read: false,
+    //   user_id: subscription.subscriber_id
+    // })));
+
+    let query = `INSERT INTO "NotificationsRead" VALUES `;
+    const replacements = [];
+    for (const subscription of subscriptions) {
+      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?))`
+      if (subscriptions[subscriptions.length - 1] == subscription) query += ';';
+      else query += ', ';
+      replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
+    }
+
+    await models.sequelize.query(query, { replacements, type: QueryTypes.INSERT });
 
     // send emails
-    for (const subscription of subscribers) {
+    for (const subscription of subscriptions) {
       if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
         msg.dynamic_template_data.notification.path = `${
           SERVER_URL

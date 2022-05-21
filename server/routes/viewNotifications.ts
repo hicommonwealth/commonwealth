@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import { DB} from '../database';
+import {DB, sequelize} from '../database';
 import {performance, PerformanceObserver} from "perf_hooks";
 
 const Op = Sequelize.Op;
@@ -62,11 +62,35 @@ export default async (
 
   performance.mark('A');
 
-  if (req.body.unread_only) {
-    notificationParams.where = { is_read: false };
-  }
+  let maxId;
+  // if maxId is not provided that means this is the first request so load the first 100
+  // TODO: if this is too slow create a table keeping track of maxId for each user and query that instead (increment the counters in emitNotifications)
+  // TODO: or better yet create onUpdate and onDelete triggers to update the counters
+  if (!req.body.maxId) {
+    maxId = (<any>(await models.NotificationsRead.findOne({
+      attributes: [
+          <any>models.sequelize.fn('MAX', models.sequelize.col('id')),
+      ],
+      where: { user_id: req.user.id },
+      raw: true
+    }))).max;
+  } else maxId = req.body.maxId;
 
-  // TODO: add user id to notifications read
+  performance.mark('B');
+
+  console.log(">>>>>>>>>>>>>>>>>", maxId);
+  console.log(">>>>>>>>>>>>>>>>>>", maxId - 100 > 0 ? maxId - 100 : -1);
+
+  const whereAndOptions: any = [
+    {user_id: req.user.id},
+    {id: {[Op.lte]: maxId}},
+    {id: {[Op.gt]: maxId - 100 > 0 ? maxId - 100 : -1}},
+  ]
+
+  if (req.body.unread_only) whereAndOptions.push({ is_read: false });
+
+  // TODO: handle case when maxId = 0 i.e. no more notificationReads to retrieve
+
   const notificationsRead = await models.NotificationsRead.findAll({
     include: [
       {
@@ -82,12 +106,12 @@ export default async (
       }
     ],
     where: {
-      user_id: req.user.id
+      [Op.and]: whereAndOptions
     },
     raw: true, nest: true, logging: true
   });
 
-  performance.mark('B');
+  performance.mark('C');
 
   const obs = new PerformanceObserver((list, observer) => {
     console.log(list.getEntriesByType('measure'));
@@ -97,6 +121,8 @@ export default async (
 
   performance.measure("measure start to A", 'start', 'A');
   performance.measure("measure A to B", 'A', 'B');
+  performance.measure("measure B to C", 'B', 'C');
+
 
   // console.log(subscriptions.map((s) => s.toJSON()));
   const subscriptionsObj = {}
@@ -111,7 +137,9 @@ export default async (
       }
     }
 
+    // should be able to simply push unwrapped NotificationRead
     subscriptionsObj[nr.subscription_id].NotificationsReads.push({
+      id: nr.id,
       is_read: nr.is_read,
       notification_id: nr.notification_id,
       subscription_id: nr.subscription_id,

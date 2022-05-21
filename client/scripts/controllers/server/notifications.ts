@@ -21,6 +21,9 @@ const post = (route, args, callback) => {
 
 class NotificationsController {
   private _store: NotificationStore = new NotificationStore();
+
+  private maxId: number = 0;
+
   public get store() {
     return this._store;
   }
@@ -223,9 +226,13 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
-    const options = app.isCustomDomain()
+    const options: any = app.isCustomDomain()
       ? { chain_filter: app.activeChainId() }
       : {};
+
+    // options remain undefined if maxId or minId = 0
+    options.maxId = this.maxId || undefined;
+
     // TODO: Change to GET /notifications
     return post('/viewNotifications', options, (result) => {
       this._store.clear();
@@ -252,7 +259,13 @@ class NotificationsController {
             chainEventType
           );
           this._store.add(notification);
+
+          // the minimum id is the new max id for next page
+          if (notificationsReadJSON.id < this.maxId) {
+            this.maxId = notificationsReadJSON.id;
+          }
         }
+
         if (subscription.category === 'chain-event') ceSubs.push(subscription);
       }
       app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);

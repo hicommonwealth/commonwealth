@@ -61,6 +61,13 @@ class NotificationsMenuFooter
             }}
           />
         )}
+        <Button
+          label="Next Page"
+          onclick={(e) => {
+            e.preventDefault();
+            app.user.notifications.refresh().then(() => {m.redraw});
+          }}
+        />
       </div>
     );
   }

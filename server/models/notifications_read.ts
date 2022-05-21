@@ -5,6 +5,7 @@ import { SubscriptionAttributes } from './subscription';
 import { NotificationAttributes } from './notification';
 
 export type NotificationsReadAttributes = {
+	id: number;
 	subscription_id: number;
 	notification_id: number;
 	is_read: boolean;
@@ -22,6 +23,7 @@ export default (
 	dataTypes: typeof DataTypes,
 ): NotificationsReadModelStatic => {
 	const NotificationsRead = <NotificationsReadModelStatic>sequelize.define('NotificationsRead', {
+		id: {type: dataTypes.INTEGER, allowNull: true},
 		subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
 		notification_id: { type: dataTypes.INTEGER, primaryKey: true },
 		is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
