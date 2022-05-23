@@ -15,6 +15,7 @@ import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
 import prerenderNode from 'prerender-node';
+import Rollbar from "rollbar";
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 import { ChainBase } from './shared/types';
@@ -26,6 +27,7 @@ import IdentityFetchCache, {
   IdentityFetchCacheNew,
 } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
+import SnapshotSpaceCache from './server/util/snapshotSpaceCache';
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
@@ -40,7 +42,7 @@ import setupChainEventListeners from './server/scripts/setupChainEventListeners'
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import snapshotListener from './server/util/snapshotListener'
-import Rollbar from "rollbar";
+
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -76,6 +78,7 @@ async function main() {
   }
 
   const tokenBalanceCache = new TokenBalanceCache(models);
+  const snapshotSpaceCache = new SnapshotSpaceCache(models);
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
@@ -268,12 +271,14 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start();
+  await snapshotSpaceCache.start();
   setupAPI(
     app,
     models,
     viewCountCache,
     <any>identityFetchCache,
-    tokenBalanceCache
+    tokenBalanceCache,
+    snapshotSpaceCache
   );
   setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);

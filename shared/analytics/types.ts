@@ -113,6 +113,8 @@ export const enum MixpanelSnapshotEvents {
   SNAPSHOT_PAGE_VISIT = 'Snapshot Page Visited',
   SNAPSHOT_PROPOSAL_VIEWED = 'Snapshot Proposal Viewed',
   SNAPSHOT_VOTE_OCCURRED = 'Snapshot Vote Occurred',
+  SNAPSHOT_VALID_SPACE = 'Snapshot Space Present',
+  SNAPSHOT_INVALID_SPACE = 'Snapshot Space Not Present',
 }
 
 export interface MixpanelSnapshotEventsPayload extends BaseMixpanelPayload {

@@ -1,11 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
-import { DB } from '../database';
-import { success } from '../types';
-import { NotificationCategories, ProposalType, ChainType } from '../../shared/types';
 import { USERS } from 'construct-ui/lib/esm/components/icon/generated/IconNames';
 import { Test } from 'mocha';
+import { DB } from '../database';
+import { success } from '../types';
+import SnapshotSpaceCache from '../util/snapshotSpaceCache';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import { NotificationCategories } from '../../shared/types';
+import { MixpanelSnapshotEvents } from 'shared/analytics/types';
 
-const snapListener = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+
+const snapListener = async (models: DB, cache: SnapshotSpaceCache, req: Request, res: Response, next: NextFunction) => {
+  // Check cache to see if this is a space we care about
+  const validSnapshot = await cache.check(req.body.space);
+
+  if (!validSnapshot) {
+    mixpanelTrack({
+      event: MixpanelSnapshotEvents.SNAPSHOT_INVALID_SPACE,
+      isCustomDomain: false,
+      space: req.body.space
+    });
+    return success(res, "Snapshot POST Recieved, Space not present");
+  }
 
   const chainsToNotify = await models.Chain.findAll({
     attributes: ['id'],
@@ -13,19 +28,12 @@ const snapListener = async (models: DB, req: Request, res: Response, next: NextF
       snapshot: [req.body.space]
     },
    });
-  // Don't forget this is an array
-  console.log(chainsToNotify[0]);
 
   // TODO: Figure out how to log the amount of times the listener is pinged
+  // mixpanel track
 
-  // Check that the space is one we care about
-  if (!chainsToNotify && !chainsToNotify.length) {
-    // TODO: log that this was an unnecessary ping
-    return success(res, "Snapshot POST Recieved, Space not present");
-  }
-
-  await chainsToNotify.forEach(async function (e) {
-    // call Subscription.emitNotifications here
+  await chainsToNotify.forEach(async (e) => {
+    // Send out notifications
     await models.Subscription.emitNotifications(
       models,
       NotificationCategories.NewSnapshot,
@@ -41,6 +49,11 @@ const snapListener = async (models: DB, req: Request, res: Response, next: NextF
   });
 
   // TODO: Log that the listener was pinged for a valid space
+  mixpanelTrack({
+    event: MixpanelSnapshotEvents.SNAPSHOT_VALID_SPACE,
+    isCustomDomain: false,
+    space: req.body.space
+  });
   return success(res, "Snapshot POST recieved, Space present");
 };
 

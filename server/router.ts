@@ -117,6 +117,7 @@ import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
+import SnapshotSpaceCache from './util/snapshotSpaceCache';
 import updateChainCategory from './routes/updateChainCategory';
 
 import startSsoLogin from './routes/startSsoLogin';
@@ -141,7 +142,8 @@ function setupRouter(
   models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
-  tokenBalanceCache: TokenBalanceCache
+  tokenBalanceCache: TokenBalanceCache,
+  snapshotSpaceCache: SnapshotSpaceCache,
 ) {
   const router = express.Router();
 
@@ -688,7 +690,7 @@ function setupRouter(
   router.get('/communityStats', communityStats.bind(this, models));
 
   // snapshot webhook listener
-  router.post('/snapHook', snapListener.bind(this, models));
+  router.post('/snapHook', snapListener.bind(this, models, snapshotSpaceCache));
 
 
   app.use('/api', router);
