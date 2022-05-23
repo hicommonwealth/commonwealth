@@ -3,10 +3,11 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.sequelize.query(`
-      ALTER TABLE "NotificationsRead"
-        ADD COLUMN id integer;
-    `);
+
+      await queryInterface.addColumn('NotificationsRead', 'id', {
+        type: Sequelize.Integer,
+        allowNull: true
+      }, {transaction: t});
 
       await queryInterface.sequelize.query(`
         DO $$
@@ -26,12 +27,12 @@ module.exports = {
             END LOOP;
         END;
         $$;
-    `);
+    `, {transaction: t});
 
       await queryInterface.sequelize.query(`
         ALTER TABLE "NotificationsRead"
         ALTER COLUMN id SET NOT NULL;
-      `);
+      `, {transaction: t});
     });
   },
 
