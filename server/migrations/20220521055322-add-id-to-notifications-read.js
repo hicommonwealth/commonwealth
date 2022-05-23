@@ -4,10 +4,10 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
 
-      await queryInterface.addColumn('NotificationsRead', 'id', {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      }, {transaction: t});
+      await queryInterface.sequelize.query(`
+      ALTER TABLE "NotificationsRead"
+        ADD COLUMN IF NOT EXISTS id integer;
+    `, {raw: true, transaction: t});
 
       await queryInterface.sequelize.query(`
         DO $$
