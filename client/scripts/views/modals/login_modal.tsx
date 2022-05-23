@@ -73,7 +73,7 @@ export class NewLoginModal implements m.ClassComponent {
   private wallets: Array<string>;
 
   oninit() {
-    this.bodyType = 'welcome';
+    this.bodyType = 'selectProfile';
     this.profiles = profiles;
     this.sidebarType = 'newOrReturning';
     this.wallets = wallets;

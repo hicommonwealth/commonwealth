@@ -11,6 +11,7 @@ import { CWWalletOptionRow } from '../../components/component_kit/cw_wallet_opti
 import { CWAccountCreationButton } from '../../components/component_kit/cw_account_creation_button';
 import { LoginSidebarType } from '../../modals/login_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { getClasses } from '../../components/component_kit/helpers';
 
 export class LoginSidebar
   implements m.ClassComponent<{ sidebarType: LoginSidebarType }>
@@ -186,7 +187,10 @@ export class ProfileRow implements m.ClassComponent<ProfileRowAttrs> {
     const { isSelected, onclick, name } = vnode.attrs;
     return (
       <div
-        class={`ProfileRow ${isSelected ? ' selected' : ''}`}
+        class={getClasses<{ isSelected: boolean }>(
+          { isSelected },
+          'ProfileRow'
+        )}
         onclick={onclick}
       >
         <div class="avatar-and-name">
