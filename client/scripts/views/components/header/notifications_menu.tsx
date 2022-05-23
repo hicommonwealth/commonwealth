@@ -51,7 +51,7 @@ class NotificationsMenuFooter
           />
         ) : (
           <Button
-            label="Mark all read"
+            label='Mark all read'
             onclick={(e) => {
               e.preventDefault();
               if (notifications.length < 1) return;

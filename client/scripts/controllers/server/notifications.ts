@@ -23,10 +23,15 @@ class NotificationsController {
   private _store: NotificationStore = new NotificationStore();
 
   private maxReadId: number = 0;
-  private maxUnreadId: number = 0;
+  private _maxUnreadId: number = 0;
+  private _numPages = 0;
 
   public get store() {
     return this._store;
+  }
+
+  public get numPages(): number {
+    return this._numPages;
   }
 
   public get notifications(): Notification[] {
@@ -233,14 +238,15 @@ class NotificationsController {
       : {};
 
     // options remain undefined if maxId or minId = 0
-    options.maxId = this.maxUnreadId || undefined;
+    options.maxId = this._maxUnreadId || undefined;
 
     // TODO: Change to GET /notifications
     return post('/viewNotifications', options, (result) => {
       this._store.clear();
       this._subscriptions = [];
       const ceSubs = [];
-      for (const subscriptionJSON of result) {
+      this._numPages = result._numPages;
+      for (const subscriptionJSON of result.subscriptions) {
         const subscription =
           NotificationSubscription.fromJSON(subscriptionJSON);
         this._subscriptions.push(subscription);
@@ -263,8 +269,8 @@ class NotificationsController {
           this._store.add(notification);
 
           // the minimum id is the new max id for next page
-          if (this.maxUnreadId === 0 || notificationsReadJSON.id < this.maxUnreadId) {
-            this.maxUnreadId = notificationsReadJSON.id;
+          if (this._maxUnreadId === 0 || notificationsReadJSON.id < this._maxUnreadId) {
+            this._maxUnreadId = notificationsReadJSON.id;
           }
         }
 

@@ -62,20 +62,21 @@ export default async (
 
   performance.mark('A');
 
-  let maxId;
+  let maxId, numNr;
   // if maxId is not provided that means this is the first request so load the first 100
   // TODO: if this is too slow create a table keeping track of maxId for each user and query that instead (increment the counters in emitNotifications)
   // TODO: or better yet create onUpdate and onDelete triggers to update the counters
   // TODO: should this always run so we can return number of unread or things like that?
-  if (!req.body.maxId) {
-    maxId = (<any>(await models.NotificationsRead.findOne({
-      attributes: [
-          <any>models.sequelize.fn('MAX', models.sequelize.col('id')),
-      ],
-      where: { user_id: req.user.id },
-      raw: true
-    }))).max;
-  } else maxId = req.body.maxId;
+  numNr = (<any>(await models.NotificationsRead.findOne({
+    attributes: [
+      <any>models.sequelize.fn('MAX', models.sequelize.col('id')),
+    ],
+    where: { user_id: req.user.id },
+    raw: true
+  }))).max;
+
+  if (!req.body.maxId) maxId = numNr;
+  else maxId = req.body.maxId;
 
   performance.mark('B');
 
@@ -154,5 +155,5 @@ export default async (
   const subscriptions = []
   for (const sub_id in subscriptionsObj) subscriptions.push(subscriptionsObj[sub_id]);
 
-  return res.json({ status: 'Success', result: subscriptions });
+  return res.json({ status: 'Success', result: {subscriptions, numPages: Math.ceil(numNr / 100)} });
 };
