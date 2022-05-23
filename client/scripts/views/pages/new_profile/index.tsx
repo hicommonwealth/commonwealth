@@ -50,7 +50,7 @@ class NewProfile implements m.Component<{}, ProfileState> {
     this.getProfileData(vnode, vnode.state.address)
   }
 
-  getProfileData = async (vnode, address: String) => {
+  private getProfileData = async (vnode, address: String) => {
     const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
       address,
       jwt: app.user.jwt,

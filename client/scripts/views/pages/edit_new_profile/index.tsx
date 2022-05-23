@@ -64,7 +64,7 @@ class EditNewProfile implements m.Component<{}, EditProfileState> {
     vnode.state.imageUploading = false
   }
 
-  getProfile = async (vnode, address: string) => {
+  private getProfile = async (vnode, address: string) => {
     const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
       address,
       jwt: app.user.jwt,
