@@ -5,6 +5,7 @@ import m from 'mithril';
 
 import 'pages/login/login_components.scss';
 
+import { WalletId } from 'types';
 import { modalRedirectClick } from 'helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWWalletOptionRow } from '../../components/component_kit/cw_wallet_option_row';
@@ -122,7 +123,7 @@ export class LoginBoilerplate implements m.ClassComponent {
 type WalletsListAttrs = {
   connectAnotherWayOnclick: () => void;
   hasNoWalletsLink?: boolean;
-  wallets: Array<string>;
+  wallets: Array<WalletId>;
 };
 
 export class WalletsList implements m.ClassComponent<WalletsListAttrs> {

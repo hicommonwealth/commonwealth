@@ -4,6 +4,7 @@ import m from 'mithril';
 
 import 'modals/login_modal.scss';
 
+import { WalletId } from 'types';
 import Login from 'views/components/login';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
@@ -32,16 +33,6 @@ export class LoginModal implements m.ClassComponent {
     );
   }
 }
-
-const wallets = [
-  'cosm-metamask',
-  'keplr',
-  'metamask',
-  'near',
-  'polkadot',
-  'terrastation',
-  'walletconnect',
-];
 
 const profiles = [
   { name: 'Greenpeas.eth', isSelected: true },
@@ -73,10 +64,10 @@ export class NewLoginModal implements m.ClassComponent {
   private wallets: Array<string>;
 
   oninit() {
-    this.bodyType = 'selectProfile';
+    this.bodyType = 'walletList';
     this.profiles = profiles;
     this.sidebarType = 'newOrReturning';
-    this.wallets = wallets;
+    this.wallets = Object.values(WalletId);
   }
 
   view() {

@@ -70,12 +70,12 @@ export const iconLookup = {
 export const customIconLookup = {
   'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
   keplr: CustomIcons.CWKeplr,
-  // magic: CustomIcons.CWMagic, // weird xlinkhref, should be 32
+  magic: CustomIcons.CWMagic, // weird xlinkhref, should be 32
   metamask: CustomIcons.CWMetaMask,
   near: CustomIcons.CWNearWallet,
-  // phantom: CustomIcons.CWPhantom, // weird xlinkhref
+  phantom: CustomIcons.CWPhantom, // weird xlinkhref
   polkadot: CustomIcons.CWPolkadot,
-  // ronin: CustomIcons.CWRonin, // weird xlinkhref
+  ronin: CustomIcons.CWRonin, // weird xlinkhref
   terrastation: CustomIcons.CWTerraStation,
   walletconnect: CustomIcons.CWWalletConnect,
 };
