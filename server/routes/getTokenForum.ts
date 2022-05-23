@@ -1,9 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-import Sequelize, { Op } from 'sequelize';
+import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import Web3 from 'web3';
-import { sequelize, DB } from '../database';
+import { DB } from '../database';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
-import { getUrlsForEthChainId } from '../util/supportedEthChains';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +10,6 @@ const getTokenForum = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   const address = req.query.address;
   if (!address) {
@@ -28,11 +26,9 @@ const getTokenForum = async (
       chain_id,
     }
   });
-  const urls = await getUrlsForEthChainId(models, chain_id);
-  let url;
-  if (urls) {
-    url = urls.url;
-  } else {
+  const node = await models.ChainNode.scope('withPrivateData').findOne({ where: { eth_chain_id: chain_id }});
+  let url = node.url;
+  if (!url) {
     url = req.query.url;
     if (!url) {
       return res.json({ status: 'Failure', message: 'Unsupported chain' });
@@ -44,7 +40,7 @@ const getTokenForum = async (
   }
 
   try {
-    const provider = new Web3.providers.WebsocketProvider(urls?.private_url || url);
+    const provider = new Web3.providers.WebsocketProvider(node?.private_url || url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(address);
     provider.disconnect(1000, 'finished');
@@ -53,38 +49,26 @@ const getTokenForum = async (
       return res.json({ status: 'Failure', message: 'Must provide valid contract address' });
     }
     if (req.query.autocreate) {
-      const result = await sequelize.transaction(async (t) => {
-        const [chain] = await models.Chain.findOrCreate({
-          where: { id: token.id },
-          defaults: {
-            active: true,
-            network: chain_network,
-            type: ChainType.Token,
-            icon_url: token.icon_url,
-            symbol: token.symbol,
-            name: token.name,
-            decimals: token.decimals,
-            base: ChainBase.Ethereum,
-            has_chain_events_listener: false,
-          },
-          transaction: t,
-        });
-        const [node] = await models.ChainNode.findOrCreate({
-          where: { chain: token.id },
-          defaults: {
-            chain: token.id,
-            url,
-            eth_chain_id: chain_id,
-            address: token.address,
-            private_url: urls?.private_url,
-          },
-          transaction: t,
-        });
-        const nodeJSON = node.toJSON();
-        delete nodeJSON.private_url;
-        return { chain: chain.toJSON(), node: node.toJSON() };
+      if (!node) {
+        return res.json({ status: 'Failure', message: 'Cannot autocreate custom node' });
+      }
+      const [chain] = await models.Chain.findOrCreate({
+        where: { id: token.id },
+        defaults: {
+          active: true,
+          network: chain_network,
+          type: ChainType.Token,
+          icon_url: token.icon_url,
+          symbol: token.symbol,
+          name: token.name,
+          decimals: token.decimals,
+          base: ChainBase.Ethereum,
+          has_chain_events_listener: false,
+        },
       });
-      return res.json({ status: 'Success', result });
+      const nodeJSON = node.toJSON();
+      delete nodeJSON.private_url;
+      return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: nodeJSON }});
     } else {
       // only return token data if we do not autocreate
       return res.json({ status: 'Success', token: token ? token.toJSON() : {} });

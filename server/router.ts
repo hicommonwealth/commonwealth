@@ -84,7 +84,6 @@ import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
 import getDrafts from './routes/drafts/getDrafts';
 import deleteChain from './routes/deleteChain';
-import deleteChainNode from './routes/deleteChainNode';
 import updateChain from './routes/updateChain';
 import bulkProfiles from './routes/bulkProfiles';
 import updateProfile from './routes/updateProfile';
@@ -192,11 +191,6 @@ function setupRouter(
     '/deleteChain',
     passport.authenticate('jwt', { session: false }),
     deleteChain.bind(this, models)
-  );
-  router.post(
-    '/deleteChainNode',
-    passport.authenticate('jwt', { session: false }),
-    deleteChainNode.bind(this, models)
   );
   router.post(
     '/updateChain',

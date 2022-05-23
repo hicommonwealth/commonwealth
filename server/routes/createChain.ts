@@ -11,7 +11,6 @@ import { ChainNodeAttributes } from '../models/chain_node';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { getUrlsForEthChainId } from '../util/supportedEthChains';
 
 import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -123,7 +122,7 @@ const createChain = async (
     }
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
-    const node = await models.ChainNode.findOne({ where: {
+    const node = await models.ChainNode.scope('withPrivateData').findOne({ where: {
       eth_chain_id,
     }});
     if (!node && !req.user.isAdmin) {
@@ -250,11 +249,13 @@ const createChain = async (
     return next(new Error(Errors.ChainNameExists));
   }
 
-  const node = await models.ChainNode.create({
-    url,
-    eth_chain_id,
-    alt_wallet_url: altWalletUrl,
-    private_url: privateUrl,
+  const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
+    where: { url },
+    defaults: {
+      eth_chain_id,
+      alt_wallet_url: altWalletUrl,
+      private_url: privateUrl,
+    }
   });
 
   const chain = await models.Chain.create({
