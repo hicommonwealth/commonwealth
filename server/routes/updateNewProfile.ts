@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
 
 export const Errors = {
+  NotAuthorized: 'Not authorized',
   InvalidUpdate: 'Invalid update',
   NoProfileFound: 'No profile found',
   NoAddressFound: 'No address found',
@@ -30,6 +31,10 @@ const updateNewProfile = async (
     include: [ models.OffchainProfile, ],
   });
   if (!addressModel) return next(new Error(Errors.NoAddressFound));
+
+  if (addressModel.user_id != req.user.id) {
+    return next(new Error(Errors.NotAuthorized))
+  }
 
   const profile = await models.Profile.findOne({
     where: {
