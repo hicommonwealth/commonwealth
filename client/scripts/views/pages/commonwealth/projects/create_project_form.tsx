@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { CWTextInput } from 'client/scripts/views/components/component_kit/cw_text_input';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 
 interface ICreateProjectForm {
   name: string;

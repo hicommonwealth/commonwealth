@@ -4,23 +4,28 @@ import 'pages/projects/index.scss';
 import m from 'mithril';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
+import app from 'state';
 import ProjectCard, { ProjectCardSize } from './project_card';
 
-export default class ExploreProjectsPage
+export default class ExplorePage
   implements m.ClassComponent<{ project: Project }>
 {
-  private filteredProjects: Project[];
+  getExploreProjects(): Project[] {
+    return (
+      app.projects.store
+        .getAll()
+        // TODO: Better momentjs-native sorting
+        .sort((a, b) => (a.deadline.isBefore(b.deadline) ? -1 : 1))
+    );
+  }
 
   view(vnode) {
-    this.filteredProjects = vnode.attrs.projects;
-    // .filter();
-
-    const ProjectListing = this.filteredProjects.map((project) => (
+    const exploreProjects = this.getExploreProjects().map((project) => (
       <ProjectCard project={project} size={ProjectCardSize.Large} />
     ));
 
     return (
-      <div class="ExploreProjectsPage">
+      <div class="ExplorePage">
         <CWText type="h1">Active Projects</CWText>
         {/* TODO: Implement projects filter */}
         {/* <div class="projects-filter"> */}
@@ -33,7 +38,8 @@ export default class ExploreProjectsPage
         {/* </div> */}
         {/* <hr /> */}
         {/* Sorted by toggle should sort filteredProjects in place */}
-        <div class="projects-listing">{ProjectListing}</div>
+        <div class="projects-listing">{exploreProjects}</div>
+        {/* TODO: Build in infinite scroll? */}
       </div>
     );
   }

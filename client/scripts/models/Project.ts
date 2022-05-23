@@ -101,6 +101,11 @@ class Project {
     });
   }
 
+  public isAuthor(address: string, chainId: string): boolean {
+    if (!this.chainId) return false;
+    return this.address === address && this.chainId === chainId;
+  }
+
   public isBacker(address: string, chainId: string): boolean {
     if (!this.chainId) return false;
     return this.backers.some(

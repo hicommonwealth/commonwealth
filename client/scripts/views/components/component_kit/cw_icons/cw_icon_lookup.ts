@@ -15,7 +15,6 @@ export const iconLookup = {
   close: Icons.CWClose,
   cloud: Icons.CWCloud,
   collapse: Icons.CWCollapse,
-  common: Icons.CommonLogo,
   copy: Icons.CWCopy,
   councilProposal: Icons.CWCouncilProposal,
   cow: Icons.CWCow,

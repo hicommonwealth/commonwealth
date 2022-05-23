@@ -45,24 +45,24 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
             </div>
             <div class="metadata-right">
               <Tag label={`${project.createdAt.format('MMMM D, YYYY')}`} />
-              <Tag label={`${project.deadline.inBlocks} Blocks`} />
+              {/* <Tag label={`${project.deadline.inBlocks} Blocks`} /> */}
             </div>
           </div>
           <img class="project-header-img" src={project.coverImage} />
           <ProjectCompletionBar
-            completionPercent={project.progress.asPercent}
+            completionPercent={project.fundingAmount.div(project.threshold)}
           />
           <div class="project-funding-data">
             <div class="left-panel">
               <div class="project-funds-raised">
                 <CWText type="h5">Funds raised</CWText>
-                <CWText type="h1">{project.raised.inTokens} ETH</CWText>
+                <CWText type="h1">{project.fundingAmount} ETH</CWText>
                 {/* TODO: ETH shouldn't be hardcoded */}
                 {/* TODO: We need oracles for USD conversion */}
               </div>
               <div class="project-funds-goal">
                 <CWText type="h5">Goal</CWText>
-                <CWText type="h1">{project.threshold.inTokens} ETH</CWText>
+                <CWText type="h1">{project.threshold} ETH</CWText>
                 {/* TODO: ETH shouldn't be hardcoded */}
                 {/* TODO: We need oracles for USD conversion */}
               </div>
@@ -78,7 +78,8 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
           <div class="project-curator-data">
             {m(AnonymousUser, { avatarSize: 16, distinguishingKey: '2' })}
             <CWText type="caption">
-              Curator receives {project.curatorFee * 100}% of funds.
+              Curator receives {(project.curatorFee as any) * 100}% of funds.
+              {/* TODO: Shouldn't be big number */}
             </CWText>
           </div>
           <div class="project-about">
@@ -91,9 +92,9 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
                 headers={['Backer', 'Amount']}
                 entries={project.backers.map((backer) => {
                   return [
-                    m('span', `${backer.backerAddress}`),
+                    m('span', `${backer.address}`),
                     // TODO: ETH shouldn't be hardcoded
-                    m('span', `${backer.backerAmount} ETH`),
+                    m('span', `${backer.amount} ETH`),
                   ];
                 })}
               />
