@@ -66,6 +66,7 @@ export default async (
   // if maxId is not provided that means this is the first request so load the first 100
   // TODO: if this is too slow create a table keeping track of maxId for each user and query that instead (increment the counters in emitNotifications)
   // TODO: or better yet create onUpdate and onDelete triggers to update the counters
+  // TODO: should this always run so we can return number of unread or things like that?
   if (!req.body.maxId) {
     maxId = (<any>(await models.NotificationsRead.findOne({
       attributes: [
