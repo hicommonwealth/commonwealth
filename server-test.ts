@@ -23,6 +23,7 @@ import {
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
+import SnapshotSpaceCache from './server/util/snapshotSpaceCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import Rollbar from "rollbar";
 
@@ -33,6 +34,8 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(10 * 60);
+const snapshotSpaceCache = new SnapshotSpaceCache(models);
+
 
 // always prune both token and non-token holders asap
 class MockTokenBalanceProvider extends TokenBalanceProvider {
@@ -57,6 +60,9 @@ const tokenBalanceCache = new TokenBalanceCache(
   0,
   mockTokenBalanceProvider
 );
+
+
+
 let server;
 
 const sessionStore = new SequelizeStore({
@@ -353,7 +359,7 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
+setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, snapshotSpaceCache);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,

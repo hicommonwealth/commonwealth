@@ -1,17 +1,27 @@
 import { Request, Response, NextFunction } from 'express';
-import { USERS } from 'construct-ui/lib/esm/components/icon/generated/IconNames';
-import { Test } from 'mocha';
-import { MixpanelSnapshotEvents } from 'shared/analytics/types';
+import { TypedRequestBody, TypedResponse, success } from '../types';
+import { MixpanelSnapshotEvents } from '../../shared/analytics/types';
 import { DB } from '../database';
-import { success } from '../types';
 import SnapshotSpaceCache from '../util/snapshotSpaceCache';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { NotificationCategories } from '../../shared/types';
 
 
+type SnapshotListenerReq = {
+  id: string;
+  event: string;
+  space: string;
+  expire: number;
+};
+
+type SnapshotListenerResp = string;
+
 const snapshotListener = async (
-  models: DB, cache: SnapshotSpaceCache, req: Request, res: Response, next: NextFunction
-  ) => {
+  models: DB,
+  cache: SnapshotSpaceCache,
+  req: TypedRequestBody<SnapshotListenerReq>,
+  res: TypedResponse<SnapshotListenerResp>,
+) => {
 
   // Check cache to see if this is a space we care about
   const validSnapshot = await cache.check(req.body.space);
@@ -31,9 +41,6 @@ const snapshotListener = async (
       snapshot: [req.body.space]
     },
    });
-
-  // TODO: Figure out how to log the amount of times the listener is pinged
-  // mixpanel track
 
   await chainsToNotify.forEach(async (e) => {
     // Send out notifications

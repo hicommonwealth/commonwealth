@@ -16,9 +16,9 @@ export default class SnapshotSpaceCache extends JobRunner<CacheT> {
       models: DB,
       // Update the cache every hour
       jobTimeS = 60 * 60,
-      bitch: CacheT = { snapshotCache : new Set<string>() }
+      cache: CacheT = { snapshotCache : new Set<string>() }
     ) {
-      super(bitch, jobTimeS);
+      super(cache, jobTimeS);
       this._models = models;
     }
 
