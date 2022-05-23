@@ -1187,7 +1187,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       .then(async () => {
         if (app.loginState === LoginState.LoggedIn) {
           // refresh notifications once
-          app.user.notifications.refresh().then(() => m.redraw());
           // grab all discussion drafts
           app.user.discussionDrafts.refreshAll().then(() => m.redraw());
         }
