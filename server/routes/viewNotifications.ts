@@ -79,18 +79,15 @@ export default async (
   performance.mark('B');
 
   console.log(">>>>>>>>>>>>>>>>>", maxId);
-  console.log(">>>>>>>>>>>>>>>>>>", maxId - 100 > 0 ? maxId - 100 : -1);
 
   const whereAndOptions: any = [
     {user_id: req.user.id},
-    {id: {[Op.lte]: maxId}},
-    {id: {[Op.gt]: maxId - 100 > 0 ? maxId - 100 : -1}},
+    {id: {[Op.lte]: maxId}}
   ]
 
   if (req.body.unread_only) whereAndOptions.push({ is_read: false });
 
   // TODO: handle case when maxId = 0 i.e. no more notificationReads to retrieve
-
   const notificationsRead = await models.NotificationsRead.findAll({
     include: [
       {
@@ -108,6 +105,8 @@ export default async (
     where: {
       [Op.and]: whereAndOptions
     },
+    order: [['id', 'DESC']],
+    limit: 100,
     raw: true, nest: true, logging: true
   });
 

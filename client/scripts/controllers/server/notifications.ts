@@ -22,7 +22,8 @@ const post = (route, args, callback) => {
 class NotificationsController {
   private _store: NotificationStore = new NotificationStore();
 
-  private maxId: number = 0;
+  private maxReadId: number = 0;
+  private maxUnreadId: number = 0;
 
   public get store() {
     return this._store;
@@ -222,6 +223,7 @@ class NotificationsController {
     this._subscriptions = [];
   }
 
+  // TODO: have a min_unread_id and a min_read_id and then submit the value based on request
   public refresh() {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
@@ -231,7 +233,7 @@ class NotificationsController {
       : {};
 
     // options remain undefined if maxId or minId = 0
-    options.maxId = this.maxId || undefined;
+    options.maxId = this.maxUnreadId || undefined;
 
     // TODO: Change to GET /notifications
     return post('/viewNotifications', options, (result) => {
@@ -261,8 +263,8 @@ class NotificationsController {
           this._store.add(notification);
 
           // the minimum id is the new max id for next page
-          if (notificationsReadJSON.id < this.maxId) {
-            this.maxId = notificationsReadJSON.id;
+          if (this.maxUnreadId === 0 || notificationsReadJSON.id < this.maxUnreadId) {
+            this.maxUnreadId = notificationsReadJSON.id;
           }
         }
 
