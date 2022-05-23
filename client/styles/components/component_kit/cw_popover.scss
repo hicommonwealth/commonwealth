@@ -6,19 +6,6 @@
   padding: 8px 16px;
 }
 
-.Popover {
-  // .Overlay {
-  //   bottom: 0;
-  //   display: flex;
-  //   left: 0;
-  //   position: fixed;
-  //   right: 0;
-  //   top: 0;
-  //   z-index: 1000;@import 'shared';
-
-  // }
-}
-
 .tooltip-container {
   @include popover-child;
   align-items: center;
@@ -31,8 +18,8 @@
   justify-content: center;
   overflow: hidden;
   max-width: 250px;
-  visibility: hidden;
   min-height: 8px;
+  visibility: hidden;
 }
 
 .trigger-wrapper {
@@ -48,45 +35,34 @@
   top: 0;
 }
 .arrow-up {
-  visibility: hidden;
-  position: absolute;
-  z-index: 1000;
-  width: 0;
-  height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-
-  border-bottom: 8px solid black;
+  border-bottom: 8px solid white;
+  height: 0;
+  position: absolute;
+  width: 0;
+  visibility: hidden;
+  z-index: 1001;
 }
 
 .arrow-down {
-  visibility: hidden;
-  position: absolute;
-  z-index: 1000;
-  width: 0;
-  height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 8px solid #f00;
-}
-
-.arrow-right {
-  width: 0;
+  border-top: 8px solid white;
   height: 0;
-  border-top: 60px solid transparent;
-  border-bottom: 60px solid transparent;
-
-  border-left: 60px solid green;
+  position: absolute;
+  width: 0;
+  visibility: hidden;
+  z-index: 1001;
 }
 
 .arrow-left {
-  visibility: hidden;
-  position: absolute;
-  z-index: 1000;
-  width: 0;
-  height: 0;
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
-
-  border-right: 8px solid blue;
+  border-right: 8px solid white;
+  height: 0;
+  position: absolute;
+  width: 0;
+  visibility: hidden;
+  z-index: 1001;
 }

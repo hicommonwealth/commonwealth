@@ -20,11 +20,7 @@ import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWPortal } from './cw_portal';
-import {
-  CWPopover,
-  PopoverChildAttrs,
-  PopoverToggleAttrs,
-} from './cw_popover/cw_popover';
+import { CWPopover } from './cw_popover/cw_popover';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -65,7 +61,7 @@ export class ComponentShowcase implements m.ClassComponent {
       <div class="ComponentShowcase">
         <h1>Popover</h1>
         <CWPopover
-          // onToggle={(isOpen: boolean) => console.log(isOpen)}
+          onToggle={(isOpen: boolean) => console.log(isOpen)}
           trigger={<CWButton label={'button'} />}
           content={
             <div class="ok">
@@ -78,13 +74,14 @@ export class ComponentShowcase implements m.ClassComponent {
                   console.log('hiii');
                 }}
               >
-                heyyy thereee
+                yoooo
               </div>
             </div>
           }
-          toSide={true}
+          toSide={false}
           showArrow={true}
-          interactionType="click"
+          interactionType="hover"
+          hoverOpenDelay={100}
         />
         <h1>Text</h1>
         <div class="text-gallery">
