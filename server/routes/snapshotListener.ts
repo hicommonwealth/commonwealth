@@ -1,15 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import { USERS } from 'construct-ui/lib/esm/components/icon/generated/IconNames';
 import { Test } from 'mocha';
+import { MixpanelSnapshotEvents } from 'shared/analytics/types';
 import { DB } from '../database';
 import { success } from '../types';
 import SnapshotSpaceCache from '../util/snapshotSpaceCache';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { NotificationCategories } from '../../shared/types';
-import { MixpanelSnapshotEvents } from 'shared/analytics/types';
 
 
-const snapListener = async (models: DB, cache: SnapshotSpaceCache, req: Request, res: Response, next: NextFunction) => {
+const snapshotListener = async (
+  models: DB, cache: SnapshotSpaceCache, req: Request, res: Response, next: NextFunction
+  ) => {
+
   // Check cache to see if this is a space we care about
   const validSnapshot = await cache.check(req.body.space);
 
@@ -57,7 +60,7 @@ const snapListener = async (models: DB, cache: SnapshotSpaceCache, req: Request,
   return success(res, "Snapshot POST recieved, Space present");
 };
 
-export default snapListener;
+export default snapshotListener;
 
   // Testing
   // try {

@@ -135,7 +135,7 @@ import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
 
-import snapListener from './routes/snapListener';
+import snapshotListener from './routes/snapshotListener';
 
 function setupRouter(
   app: Express,
@@ -690,7 +690,7 @@ function setupRouter(
   router.get('/communityStats', communityStats.bind(this, models));
 
   // snapshot webhook listener
-  router.post('/snapHook', snapListener.bind(this, models, snapshotSpaceCache));
+  router.post('/snapHook', snapshotListener.bind(this, models, snapshotSpaceCache));
 
 
   app.use('/api', router);

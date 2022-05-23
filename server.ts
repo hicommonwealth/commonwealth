@@ -41,7 +41,6 @@ import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
-import snapshotListener from './server/util/snapshotListener'
 
 
 // set up express async error handling hack
@@ -303,7 +302,6 @@ async function main() {
   }
 
   setupServer(app, rollbar, models);
-  snapshotListener(app);
 }
 
 main();
