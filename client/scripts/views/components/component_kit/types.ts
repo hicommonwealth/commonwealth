@@ -2,6 +2,7 @@ export enum ComponentType {
   Button = 'Button',
   ButtonGroup = 'ButtonGroup',
   Card = 'Card',
+  Checkbox = 'Checkbox',
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',

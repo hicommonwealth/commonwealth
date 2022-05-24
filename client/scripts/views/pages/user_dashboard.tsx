@@ -7,24 +7,13 @@ import { TabItem, Tabs, Spinner } from 'construct-ui';
 
 import 'pages/user_dashboard.scss';
 
-import app from 'state';
+import app, { LoginState } from 'state';
 import { DashboardActivityNotification } from 'models';
 import UserDashboardRow from 'views/components/user_dashboard_row';
 import Sublayout from 'views/sublayout';
+import { notifyInfo } from 'controllers/app/notifications';
 import DashboardExplorePreview from '../components/dashboard_explore_preview';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-
-const fetchActivity = async (request: string) => {
-  const activity = await $.post(`${app.serverUrl()}/viewActivity`, {
-    request,
-    jwt: app.user.jwt,
-  });
-  return activity;
-};
-
-const notificationsRemaining = (contentLength, count) => {
-  return contentLength >= 10 && count < contentLength;
-};
 
 enum DashboardViews {
   ForYou = 'For You',
@@ -32,8 +21,26 @@ enum DashboardViews {
   Chain = 'Chain',
 }
 
-export class UserDashboard implements m.ClassComponent {
-  private activeTab: DashboardViews;
+const fetchActivity = async (requestType: DashboardViews) => {
+  let activity;
+  if (requestType === DashboardViews.ForYou) {
+    activity = await $.post(`${app.serverUrl()}/viewUserActivity`, {
+      jwt: app.user.jwt,
+    });
+  } else if (requestType === DashboardViews.Chain) {
+    activity = await $.post(`${app.serverUrl()}/viewChainActivity`);
+  } else if (requestType === DashboardViews.Global) {
+    activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);
+  }
+  return activity;
+};
+
+const notificationsRemaining = (contentLength, count) => {
+  return contentLength >= 10 && count < contentLength;
+};
+
+class UserDashboard implements m.ClassComponent<{ type: string }> {
+  private activePage: DashboardViews;
   private chainEventCount: number;
   private chainEvents: DashboardActivityNotification[];
   private fyCount: number;
@@ -42,6 +49,44 @@ export class UserDashboard implements m.ClassComponent {
   private globalNotifications: DashboardActivityNotification[];
   private loadingData: boolean;
   private onscroll;
+
+  // Helper to load activity conditional on the selected tab
+  handleToggle = () => {
+    this.loadingData = false;
+    m.redraw();
+    const tab = this.activePage;
+    if (tab === DashboardViews.ForYou) {
+      if (this.fyNotifications.length === 0) this.loadingData = true;
+      fetchActivity(tab).then((activity) => {
+        this.fyNotifications = activity.result
+          .map((notification) =>
+            DashboardActivityNotification.fromJSON(notification)
+          )
+          .reverse();
+        this.loadingData = false;
+        m.redraw();
+      });
+    } else if (tab === DashboardViews.Global) {
+      if (this.globalNotifications.length === 0) this.loadingData = true;
+      fetchActivity(tab).then((activity) => {
+        this.globalNotifications = activity.result.map((notification) =>
+          DashboardActivityNotification.fromJSON(notification)
+        );
+        this.loadingData = false;
+        m.redraw();
+      });
+    } else if (tab === DashboardViews.Chain) {
+      if (this.chainEvents.length === 0) this.loadingData = true;
+      fetchActivity(tab).then((activity) => {
+        this.chainEvents = activity.result.map((notification) =>
+          DashboardActivityNotification.fromJSON(notification)
+        );
+        this.loadingData = false;
+        m.redraw();
+      });
+    }
+    this.activePage = tab;
+  };
 
   oninit() {
     this.fyCount = 10;
@@ -53,59 +98,37 @@ export class UserDashboard implements m.ClassComponent {
     this.chainEvents = [];
   }
 
-  view() {
+  view(vnode) {
     const {
-      activeTab,
+      activePage,
       fyNotifications,
       globalNotifications,
       chainEvents,
       loadingData,
     } = this;
-
-    // Helper to load activity conditional on the selected tab
-    const handleToggle = (tab: DashboardViews) => {
-      this.loadingData = false;
-      if (tab === DashboardViews.ForYou) {
-        if (fyNotifications.length === 0) this.loadingData = true;
-        fetchActivity('forYou').then((activity) => {
-          this.fyNotifications = activity.result
-            .map((notification) =>
-              DashboardActivityNotification.fromJSON(notification)
-            )
-            .reverse();
-          this.loadingData = false;
-          m.redraw();
-        });
-      } else if (tab === DashboardViews.Global) {
-        if (globalNotifications.length === 0) this.loadingData = true;
-        fetchActivity('global').then((activity) => {
-          this.globalNotifications = activity.result.map((notification) =>
-            DashboardActivityNotification.fromJSON(notification)
-          );
-          this.loadingData = false;
-          m.redraw();
-        });
-      } else if (tab === DashboardViews.Chain) {
-        if (chainEvents.length === 0) this.loadingData = true;
-        fetchActivity('chainEvents').then((activity) => {
-          this.chainEvents = activity.result.map((notification) =>
-            DashboardActivityNotification.fromJSON(notification)
-          );
-          this.loadingData = false;
-          m.redraw();
-        });
-      }
-      this.activeTab = tab;
-    };
-
     // Load activity
-    if (!this.activeTab) {
-      handleToggle(DashboardViews.ForYou);
+    const loggedIn = app.loginState === LoginState.LoggedIn;
+    if (!vnode.attrs.type) {
+      m.route.set(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
+    } else if (vnode.attrs.type === 'for-you' && !loggedIn) {
+      m.route.set('/dashboard/global');
+    }
+    const subpage: DashboardViews =
+      vnode.attrs.type === 'chain-events'
+        ? DashboardViews.Chain
+        : vnode.attrs.type === 'global'
+        ? DashboardViews.Global
+        : loggedIn
+        ? DashboardViews.ForYou
+        : DashboardViews.Global;
+    if (!this.activePage || this.activePage !== subpage) {
+      this.activePage = subpage;
+      this.handleToggle();
     }
 
     // Scroll
     this.onscroll = _.debounce(async () => {
-      if (this.activeTab === DashboardViews.ForYou) {
+      if (this.activePage === DashboardViews.ForYou) {
         if (!notificationsRemaining(fyNotifications.length, this.fyCount))
           return;
         const scrollHeight = $(document).height();
@@ -114,7 +137,7 @@ export class UserDashboard implements m.ClassComponent {
           this.fyCount += 10;
           m.redraw();
         }
-      } else if (this.activeTab === DashboardViews.Global) {
+      } else if (this.activePage === DashboardViews.Global) {
         if (
           !notificationsRemaining(globalNotifications.length, this.globalCount)
         )
@@ -154,28 +177,39 @@ export class UserDashboard implements m.ClassComponent {
                 <CWIcon iconName="externalLink" iconSize="small" />
               </div>
             </div>
-            <Tabs align="left" bordered={false} fluid={true}>
+            <Tabs
+              class="dashboard-tabs"
+              align="left"
+              bordered={false}
+              fluid={true}
+            >
               <TabItem
                 label={DashboardViews.ForYou}
-                active={activeTab === DashboardViews.ForYou}
+                active={activePage === DashboardViews.ForYou}
                 onclick={() => {
-                  handleToggle(DashboardViews.ForYou);
+                  if (!loggedIn) {
+                    notifyInfo(
+                      'Log in or create an account for custom activity feed'
+                    );
+                    return;
+                  }
+                  m.route.set('/dashboard/for-you');
                   m.redraw();
                 }}
               />
               <TabItem
                 label={DashboardViews.Global}
-                active={activeTab === DashboardViews.Global}
+                active={activePage === DashboardViews.Global}
                 onclick={() => {
-                  handleToggle(DashboardViews.Global);
+                  m.route.set('/dashboard/global');
                   m.redraw();
                 }}
               />
               <TabItem
                 label={DashboardViews.Chain}
-                active={activeTab === DashboardViews.Chain}
+                active={activePage === DashboardViews.Chain}
                 onclick={() => {
-                  handleToggle(DashboardViews.Chain);
+                  m.route.set('/dashboard/chain-events');
                   m.redraw();
                 }}
               />
@@ -189,7 +223,7 @@ export class UserDashboard implements m.ClassComponent {
             )}
             {!loadingData && (
               <div class="dashboard-row-wrap">
-                {activeTab === DashboardViews.ForYou && (
+                {activePage === DashboardViews.ForYou && (
                   <>
                     {fyNotifications && fyNotifications.length > 0 ? (
                       <>
@@ -217,7 +251,7 @@ export class UserDashboard implements m.ClassComponent {
                     )}
                   </>
                 )}
-                {activeTab === DashboardViews.Global && [
+                {activePage === DashboardViews.Global && [
                   globalNotifications && globalNotifications.length > 0 ? (
                     <>
                       {globalNotifications
@@ -243,7 +277,7 @@ export class UserDashboard implements m.ClassComponent {
                     <div class="no-notifications">No Activity</div>
                   ),
                 ]}
-                {activeTab === DashboardViews.Chain && (
+                {activePage === DashboardViews.Chain && (
                   <>
                     {chainEvents && chainEvents.length > 0 ? (
                       <>
@@ -283,3 +317,5 @@ export class UserDashboard implements m.ClassComponent {
     );
   }
 }
+
+export default UserDashboard;
