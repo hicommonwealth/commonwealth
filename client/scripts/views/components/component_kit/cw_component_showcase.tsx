@@ -61,7 +61,7 @@ export class ComponentShowcase implements m.ClassComponent {
       <div class="ComponentShowcase">
         <h1>Popover</h1>
         <CWPopover
-          onToggle={(isOpen: boolean) => console.log(isOpen)}
+          //          onToggle={(isOpen: boolean) => console.log('onToggle: ', isOpen)}
           trigger={<CWButton label={'button'} />}
           content={
             <div class="ok">
@@ -80,8 +80,31 @@ export class ComponentShowcase implements m.ClassComponent {
           }
           toSide={false}
           showArrow={true}
-          interactionType="hover"
-          hoverOpenDelay={100}
+          interactionType="click"
+          hoverOpenDelay={300}
+        />
+        <CWPopover
+          //          onToggle={(isOpen: boolean) => console.log('onToggle: ', isOpen)}
+          trigger={<CWButton label={'button'} />}
+          content={
+            <div class="ok">
+              <div
+                class="wtf"
+                style="height: 100px;"
+                onclick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('hiii');
+                }}
+              >
+                yoooo
+              </div>
+            </div>
+          }
+          toSide={false}
+          showArrow={true}
+          interactionType="click"
+          hoverOpenDelay={300}
         />
         <h1>Text</h1>
         <div class="text-gallery">

@@ -12,6 +12,7 @@ import { ChainBase } from 'types';
 import { Account, AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWPopover } from '../component_kit/cw_popover/cw_popover';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -332,14 +333,15 @@ const User: m.Component<
     );
 
     return popover
-      ? m(Popover, {
-          inline: true,
-          interactionType: 'hover',
+      ? m(CWPopover, {
+          interactionType: 'click',
           content: userPopover,
           trigger: userFinal,
           closeOnContentClick: true,
-          transitionDuration: 0,
-          hoverOpenDelay: 500,
+          toSide: false,
+          // transitionDuration: 0,
+          showArrow: true,
+          hoverOpenDelay: 200,
           key: profile?.address || '-',
         })
       : userFinal;
@@ -556,3 +558,18 @@ export const AnonymousUser: m.Component<
 };
 
 export default User;
+function CW_Popover(
+  CW_Popover: any,
+  arg1: {
+    inline: boolean;
+    interactionType: string;
+    content: m.Vnode<any, any>;
+    trigger: m.Vnode<any, any>;
+    closeOnContentClick: boolean;
+    transitionDuration: number;
+    hoverOpenDelay: number;
+    key: string;
+  }
+): void | m.Children {
+  throw new Error('Function not implemented.');
+}

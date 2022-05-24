@@ -31,25 +31,42 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 
   oncreate(vnode) {
     this.isOpen = false;
-    this.isRendered = true;
+    this.isRendered = false;
     this.triggerRef = findRef(vnode.dom, 'trigger-wrapper');
     this.contentId = 'tooltip-container-' + Math.random();
     this.arrowId = this.contentId + '-arrow';
   }
 
   onupdate(vnode) {
-    if (this.isOpen && !this.isRendered) {
+    if (this.isOpen && !this.isRendered && !this.isTransitioning) {
       try {
         this.applyPopoverPosition(vnode);
       } catch (e) {}
     }
   }
 
+  onClick(onToggle) {
+    const newIsOpen = !this.isOpen;
+    onToggle && onToggle(newIsOpen);
+
+    this.isOpen = newIsOpen;
+    m.redraw();
+  }
+
+  togglePopOver(onToggle) {
+    const newIsOpen = !this.isOpen;
+
+    onToggle && onToggle(newIsOpen);
+
+    this.isOpen = newIsOpen;
+    this.isRendered = !this.isRendered;
+    m.redraw();
+  }
+
   applyPopoverPosition(vnode) {
     // Apply styles in real time
     try {
       const tooltipContainer = document.getElementById(this.contentId);
-      console.log('tooltip', tooltipContainer);
       const arrow = document.getElementById(this.arrowId);
 
       const inlineStyle = getPopoverPosition({
@@ -64,8 +81,6 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
       tooltipContainer.style.left = `${inlineStyle.contentLeftXAmount}px`;
 
       const showArrow = vnode.attrs.showArrow && inlineStyle.showArrow;
-
-      console.log('popo', inlineStyle.popoverPlacement);
 
       switch (inlineStyle.popoverPlacement) {
         case 'above': {
@@ -90,33 +105,23 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 
       this.isRendered = true;
       this.isTransitioning = false;
-    } catch (e) {
-      console.log('erro', e);
-    }
-    m.redraw();
-  }
-
-  togglePopOver(onToggle) {
-    const newIsOpen = !this.isOpen;
-    onToggle && onToggle(newIsOpen);
-
-    this.isOpen = newIsOpen;
-    this.isRendered = false;
+    } catch (e) {}
     m.redraw();
   }
 
   handleHoverExit(e, onToggle, vnode) {
-    if (
-      !checkIfCursorInBounds(e.offsetX, e.offsetY, this.triggerRef) &&
-      !this.isOverContent
-    ) {
+    if (!checkIfCursorInBounds(e.offsetX, e.offsetY, this.triggerRef)) {
       if (vnode.attrs.hoverOpenDelay) {
-        setTimeout(() => {
-          // Check if curser inside content
-          if (!this.isOverContent && this.isRendered) {
-            this.togglePopOver(onToggle);
-          }
-        }, vnode.attrs.hoverOpenDelay);
+        if (!this.isTransitioning) {
+          this.isTransitioning = true;
+          setTimeout(() => {
+            // Check if curser inside content
+            if (!this.isOverContent) {
+              this.togglePopOver(onToggle);
+              this.isTransitioning = false;
+            }
+          }, vnode.attrs.hoverOpenDelay);
+        }
       } else {
         this.togglePopOver(onToggle);
       }
@@ -125,11 +130,15 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 
   handleHoverEnter(vnode, onToggle) {
     if (vnode.attrs.hoverOpenDelay) {
-      setTimeout(() => {
-        this.togglePopOver(onToggle);
-      }, vnode.attrs.hoverOpenDelay);
+      if (!this.isTransitioning) {
+        this.isTransitioning = true;
+        setTimeout(() => {
+          this.onClick(onToggle);
+          this.isTransitioning = false;
+        }, vnode.attrs.hoverOpenDelay);
+      }
     } else {
-      this.togglePopOver(onToggle);
+      this.onClick(onToggle);
     }
   }
 
@@ -144,18 +153,19 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
       <>
         {
           <div
-            class="trigger-wrapper"
-            ref="trigger-wrapper"
             onclick={(e) => {
               if (!interactionType || interactionType == 'click') {
-                this.togglePopOver(onToggle);
+                this.onClick(onToggle);
               }
             }}
             onmouseenter={() => {
               if (interactionType == 'hover') {
+                console.log('boerin');
                 this.handleHoverEnter(vnode, onToggle);
               }
             }}
+            class="trigger-wrapper"
+            ref="trigger-wrapper"
           >
             {trigger}
           </div>
@@ -163,27 +173,27 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
         {isOpen ? (
           <CWPortal>
             <div
-              class="overlay"
-              onclick={() => {
-                if (!interactionType || interactionType == 'click') {
-                  this.togglePopOver(onToggle);
-                }
-              }}
+              onclick={() => this.togglePopOver(onToggle)}
               onmousemove={(e) => {
                 if (interactionType == 'hover') {
                   this.handleHoverExit(e, onToggle, vnode);
                 }
               }}
+              class="overlay"
             >
               <div
                 class="tooltip-container"
-                ref="tooltip-container"
                 id={this.contentId}
+                ref="tooltip-container"
                 onmouseenter={() => {
                   this.isOverContent = true;
                 }}
                 onmouseleave={(e) => {
                   this.isOverContent = false;
+                  if (interactionType == 'hover') {
+                    this.togglePopOver(onToggle);
+                    this.isTransitioning = false;
+                  }
                 }}
               >
                 {content}
