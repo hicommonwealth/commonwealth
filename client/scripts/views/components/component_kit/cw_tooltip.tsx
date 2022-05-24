@@ -7,7 +7,6 @@ import m from 'mithril';
 import { ComponentType } from './types';
 import { CWButton } from './cw_button';
 import { CWPopover } from './cw_popover/cw_popover';
-import { PopoverChildAttrs, PopoverToggleAttrs } from './cw_popover/types';
 
 type TooltipAttrs = {
   tooltipContent: string | m.Vnode;
@@ -20,10 +19,10 @@ export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
     return (
       <div class={ComponentType.Tooltip}>
         <CWPopover
-          toggle={(attrs: PopoverToggleAttrs) => (
+          toggle={(attrs) => (
             <CWButton label={triggerLabel} onclick={attrs.onClick} />
           )}
-          popover={(attrs: PopoverChildAttrs) => (
+          popover={(attrs) => (
             <div position={attrs.position} class="tooltip-container">
               {tooltipContent}
             </div>
