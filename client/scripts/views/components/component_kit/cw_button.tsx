@@ -39,7 +39,7 @@ export type ButtonAttrs = {
 export class CWButton implements m.ClassComponent<ButtonAttrs> {
   view(vnode) {
     const {
-      buttonType = 'primary-red',
+      buttonType = 'primary-blue',
       className,
       disabled = false,
       iconName,

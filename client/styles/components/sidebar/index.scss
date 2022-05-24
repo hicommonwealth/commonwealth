@@ -117,14 +117,6 @@
 
       button {
         margin-left: 8px;
-
-        &.danger {
-          background-color: $rorange-500;
-        }
-
-        &.danger:hover {
-          background-color: $rorange-600;
-        }
       }
     }
   }

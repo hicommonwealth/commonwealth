@@ -7,10 +7,11 @@ import 'pages/landing/community_cards.scss';
 
 import app from 'state';
 import { NodeInfo } from 'models';
+import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWCard } from '../components/component_kit/cw_card';
 import Sublayout from '../sublayout';
-import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
+import { ChainCard } from '../components/chain_card';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -19,76 +20,16 @@ const buildCommunityString = (numCommunities: number) => {
   }
   return `${numberString} Communities`;
 };
-
-type ChainCardAttrs = { chain: string; nodeList: NodeInfo[] };
-
-class ChainCard implements m.ClassComponent<ChainCardAttrs> {
-  view(vnode) {
-    const { chain, nodeList } = vnode.attrs;
-    const chainInfo = app.config.chains.getById(chain);
-
-    const redirectFunction = (e) => {
-      e.preventDefault();
-      localStorage['home-scrollY'] = window.scrollY;
-      m.route.set(`/${chain}`);
-    };
-
-    // Potentially Temporary (could be built into create community flow)
-    let prettyDescription = '';
-    if (chainInfo.description) {
-      prettyDescription =
-        chainInfo.description[chainInfo.description.length - 1] === '.'
-          ? chainInfo.description
-          : `${chainInfo.description}.`;
-    }
-
-    const iconUrl =
-      nodeList[0].chain.iconUrl || (nodeList[0].chain as any).icon_url;
-
-    return (
-      <CWCard
-        elevation="elevation-2"
-        interactive={true}
-        className="chain-card"
-        onclick={redirectFunction}
-      >
-        <div class="card-header">
-          {iconUrl ? (
-            <img class="chain-icon" src={iconUrl} />
-          ) : (
-            <div class="chain-icon no-image" />
-          )}
-        </div>
-        <div class="card-body">
-          <div class="community-name" lang="en">
-            {chainInfo.name}
-          </div>
-          <div class="card-description" title={prettyDescription} lang="en">
-            {prettyDescription}
-          </div>
-          <div class="join-button-wrapper">
-            <CWButton
-              buttonType="secondary"
-              label="See More"
-              onclick={redirectFunction}
-            />
-          </div>
-        </div>
-      </CWCard>
-    );
-  }
-}
-
 export const buildChainToCategoriesMap = (
   categoryTypes,
   chainsAndCategories
 ) => {
   // Handle mapping provided by ChainCategories table
-  let categoryMap = {};
+  const categoryMap = {};
   for (const data of categoryTypes) {
     categoryMap[data.id] = data.category_name;
   }
-  let chainToCategoriesMap: { [chain: string]: ChainCategoryType[] } = {};
+  const chainToCategoriesMap: { [chain: string]: ChainCategoryType[] } = {};
   for (const data of chainsAndCategories) {
     if (chainToCategoriesMap[data.chain_id]) {
       chainToCategoriesMap[data.chain_id].push(
@@ -243,7 +184,7 @@ class HomepageCommunityCards implements m.ClassComponent {
         .map((entity: Array<NodeInfo | string>) => {
           if (Array.isArray(entity)) {
             const [chain, nodeList]: [string, NodeInfo] = entity as any;
-            return m(ChainCard, { chain, nodeList });
+            return <ChainCard chain={chain} nodeList={nodeList} />;
           }
           return null;
         });
@@ -264,7 +205,9 @@ class HomepageCommunityCards implements m.ClassComponent {
                 <CWButton
                   label={cat}
                   className="filter-button"
-                  buttonType={this.filterMap[cat] ? 'primary' : 'secondary'}
+                  buttonType={
+                    this.filterMap[cat] ? 'primary-black' : 'secondary-black'
+                  }
                   onclick={() => {
                     this.filterMap[cat] = !this.filterMap[cat];
                   }}
@@ -276,7 +219,11 @@ class HomepageCommunityCards implements m.ClassComponent {
                 <CWButton
                   label={network}
                   className="filter-button"
-                  buttonType={this.filterMap[network] ? 'primary' : 'secondary'}
+                  buttonType={
+                    this.filterMap[network]
+                      ? 'primary-black'
+                      : 'secondary-black'
+                  }
                   onclick={() => {
                     this.filterMap[network] = !this.filterMap[network];
                   }}
@@ -288,7 +235,9 @@ class HomepageCommunityCards implements m.ClassComponent {
                 <CWButton
                   label={base}
                   className="filter-button"
-                  buttonType={this.filterMap[base] ? 'primary' : 'secondary'}
+                  buttonType={
+                    this.filterMap[base] ? 'primary-black' : 'secondary-black'
+                  }
                   onclick={() => {
                     this.filterMap[base] = !this.filterMap[base];
                   }}

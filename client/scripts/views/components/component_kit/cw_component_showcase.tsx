@@ -76,6 +76,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="button-gallery">
           <CWButton
             iconName="person"
+            buttonType="primary-red"
             label="Primary red with icon"
             onclick={() => notifySuccess('Button clicked!')}
           />
