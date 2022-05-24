@@ -13,6 +13,7 @@ import { CWIcon } from './cw_icons/cw_icon';
 export type ButtonType =
   | 'primary-red'
   | 'primary-blue'
+  | 'primary-black'
   | 'secondary-red'
   | 'secondary-blue'
   | 'secondary-black'
@@ -65,7 +66,11 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
             className="button-icon"
           />
         )}
-        <CWText type="buttonSm" className="button-text" noWrap>
+        <CWText
+          type={buttonType.slice(0, 2) === 'lg' ? 'buttonLg' : 'buttonSm'}
+          className="button-text"
+          noWrap
+        >
           {label}
         </CWText>
       </button>

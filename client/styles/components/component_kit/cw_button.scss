@@ -1,23 +1,5 @@
 @import 'shared';
 
-@mixin iconAndText($color) {
-  .Icon.button-icon {
-    color: $color;
-    margin-right: 8px;
-  }
-
-  .Text.button-text {
-    color: $color;
-  }
-}
-
-@mixin disabled {
-  box-shadow: none;
-  pointer-events: none;
-
-  @include iconAndText($neutral-300);
-}
-
 .Button {
   align-items: center;
   border-radius: $border-radius-corners;
@@ -28,169 +10,72 @@
   width: fit-content;
 
   &.primary-red {
-    background-color: $rorange-500;
-    box-shadow: $elevation-1;
-
-    @include iconAndText($white);
-
-    &:hover {
-      background-color: $rorange-300;
-      box-shadow: none;
-    }
-
-    &:active {
-      background-color: $rorange-200;
-      box-shadow: none;
-
-      @include iconAndText($rorange-300);
-    }
-
-    &.disabled {
-      background-color: $neutral-50;
-
-      @include disabled;
-    }
+    @include primaryRed;
   }
 
   &.primary-blue {
-    background-color: $primary-500;
-    box-shadow: $elevation-1;
+    @include primaryBlue;
+  }
 
-    @include iconAndText($white);
-
-    &:hover {
-      background-color: $primary-300;
-      box-shadow: none;
-    }
-
-    &:active {
-      background-color: $primary-200;
-      box-shadow: none;
-
-      @include iconAndText($primary-300);
-    }
-
-    &.disabled {
-      background-color: $neutral-50;
-
-      @include disabled;
-    }
+  &.primary-black {
+    @include primaryBlack;
   }
 
   &.secondary-red {
-    background-color: $white;
-    border: 2px solid $rorange-500;
-
-    @include iconAndText($rorange-500);
-
-    &:hover {
-      background-color: $rorange-50;
-      border-color: $rorange-300;
-
-      @include iconAndText($rorange-300);
-    }
-
-    &:active {
-      background-color: $rorange-100;
-      border-color: $rorange-200;
-
-      @include iconAndText($rorange-200);
-    }
-
-    &.disabled {
-      border-color: $neutral-300;
-
-      @include disabled;
-    }
+    @include secondaryRed;
   }
 
   &.secondary-blue {
-    background-color: $white;
-    border: 2px solid $primary-500;
-
-    @include iconAndText($primary-500);
-
-    &:hover {
-      background-color: $primary-50;
-      border-color: $primary-300;
-
-      @include iconAndText($primary-300);
-    }
-
-    &:active {
-      background-color: $primary-100;
-      border-color: $primary-200;
-
-      @include iconAndText($primary-200);
-    }
-
-    &.disabled {
-      border-color: $neutral-300;
-
-      @include disabled;
-    }
+    @include secondaryBlue;
   }
 
   &.secondary-black {
-    background-color: $white;
-    border: 2px solid $neutral-800;
-
-    @include iconAndText($neutral-800);
-
-    &:hover {
-      background-color: $neutral-50;
-      border-color: $neutral-600;
-
-      @include iconAndText($neutral-600);
-    }
-
-    &:active {
-      background-color: $neutral-100;
-      border-color: $neutral-400;
-
-      @include iconAndText($neutral-400);
-    }
-
-    &.disabled {
-      border-color: $neutral-300;
-
-      @include disabled;
-    }
+    @include secondaryBlack;
   }
 
   &.tertiary-blue {
-    background-color: $white;
-
-    @include iconAndText($primary-500);
-
-    &:hover {
-      @include iconAndText($primary-300);
-    }
-
-    &:active {
-      @include iconAndText($primary-100);
-    }
-
-    &.disabled {
-      @include disabled;
-    }
+    @include tertiaryBlue;
   }
 
   &.tertiary-black {
-    background-color: $white;
+    @include tertiaryBlack;
+  }
 
-    @include iconAndText($neutral-800);
+  &.lg-primary-red {
+    border-radius: $border-radius-rounded-corners;
+    height: 40px;
 
-    &:hover {
-      @include iconAndText($neutral-600);
-    }
+    @include primaryRed;
+  }
 
-    &:active {
-      @include iconAndText($neutral-500);
-    }
+  &.lg-primary-blue {
+    border-radius: $border-radius-rounded-corners;
+    height: 40px;
 
-    &.disabled {
-      @include disabled;
-    }
+    @include primaryBlue;
+  }
+
+  &.lg-secondary-red {
+    height: 40px;
+
+    @include primaryRed; // large styles are off by one because primary has more border radius
+  }
+
+  &.lg-secondary-blue {
+    height: 40px;
+
+    @include primaryBlue;
+  }
+
+  &.lg-tertiary-red {
+    height: 40px;
+
+    @include secondaryRed;
+  }
+
+  &.lg-tertiary-blue {
+    height: 40px;
+
+    @include secondaryBlue;
   }
 }

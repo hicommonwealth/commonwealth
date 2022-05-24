@@ -80,12 +80,13 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Primary red"
+            buttonType="primary-blue"
+            label="Primary blue"
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            buttonType="primary-blue"
-            label="Primary blue"
+            buttonType="primary-black"
+            label="Primary black"
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
@@ -98,11 +99,6 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWButton
             iconName="person"
             label="Secondary red with icon"
-            buttonType="secondary-red"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary red"
             buttonType="secondary-red"
             onclick={() => notifySuccess('Button clicked!')}
           />
@@ -131,11 +127,6 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Tertiary blue"
-            buttonType="tertiary-blue"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
             label="Tertiary black"
             buttonType="tertiary-black"
             onclick={() => notifySuccess('Button clicked!')}
@@ -143,6 +134,63 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWButton
             label="Tertiary disabled"
             buttonType="tertiary-black"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Large primary red with icon"
+            buttonType="lg-primary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large primary blue"
+            buttonType="lg-primary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large primary blue"
+            buttonType="lg-primary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Large secondary red with icon"
+            buttonType="lg-secondary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large secondary blue"
+            buttonType="lg-secondary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large secondary disabled"
+            buttonType="lg-secondary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Large tertiary red with icon"
+            buttonType="lg-tertiary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large tertiary blue "
+            buttonType="lg-tertiary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large tertiary disabled "
+            buttonType="lg-tertiary-blue"
             disabled
             onclick={() => notifySuccess('Button clicked!')}
           />
