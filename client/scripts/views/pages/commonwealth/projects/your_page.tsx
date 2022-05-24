@@ -6,7 +6,6 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import SupportProjectModal from 'views/modals/support_project_modal';
 import ProjectCard, { ProjectCardSize } from './project_card';
 
