@@ -61,6 +61,7 @@ export const DummyProject: Project = {
   threshold: new BN(12000000),
   fundingAmount: new BN(600000),
 
+  isAuthor: () => true,
   isBacker: () => true,
   isCurator: () => true,
 

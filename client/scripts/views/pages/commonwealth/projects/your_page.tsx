@@ -7,6 +7,7 @@ import { Project } from 'models';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import SupportProjectModal from 'views/modals/support_project_modal';
 import ProjectCard, { ProjectCardSize } from './project_card';
 
 export default class YourPage implements m.ClassComponent {
@@ -81,7 +82,17 @@ export default class YourPage implements m.ClassComponent {
           {this.getUserProjects().map((project) => (
             <ProjectCard project={project} size={ProjectCardSize.Large} />
           ))}
-          <CWButton buttonType="secondary" label="Manage" />
+          <CWButton
+            buttonType="secondary"
+            label="Manage"
+            onclick={() =>
+              app.modals.create({
+                modal: SupportProjectModal,
+                // TODO: Real project attr
+                data: { project: null, supportType: 'curate' },
+              })
+            }
+          />
         </div>
         <CWText type="h1">Backed and Curated</CWText>
         <div class="projects-wrap">
