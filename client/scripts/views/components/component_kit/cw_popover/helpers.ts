@@ -26,9 +26,9 @@ export const getPopoverPosition = ({
     const distanceToRight = innerWidth - triggerBoundingRect.right;
 
     if (distanceToLeft > distanceToRight) {
-      popoverPlacement = 'left';
-    } else {
       popoverPlacement = 'right';
+    } else {
+      popoverPlacement = 'left';
     }
   } else {
     const distanceToTop = triggerBoundingRect.top;
@@ -78,7 +78,7 @@ export const getPopoverPosition = ({
       break;
     }
     case 'left': {
-      // TODO: Do we actually need this case?
+      // TODO: Do we actually need this case? I don't see a real necessity atm
       break;
     }
     case 'right': {
@@ -103,28 +103,13 @@ export const getPopoverPosition = ({
     popoverPlacement,
     showArrow,
   };
-
-  // Calculate the maximum possible height this container can have, which will constrain the content
 };
 
-export const buildStyleString = ({
-  leftXAmount,
-  topYAmount,
-  bottomYAmount,
-}: {
-  leftXAmount: number;
-  topYAmount: number;
-  bottomYAmount: number;
-}) => {
-  let styleString = '';
-  if (leftXAmount) styleString += `left: ${leftXAmount}px;`;
-  if (topYAmount) styleString += `top: ${topYAmount}px;`;
-  if (bottomYAmount) styleString += `bottom: ${bottomYAmount}px;`;
-
-  return styleString;
-};
-
-export const checkIfCursorInBounds = (offsetX, offsetY, target: Element) => {
+export const cursorInBounds = (
+  offsetX: number,
+  offsetY: number,
+  target: Element
+): boolean => {
   const targetBoundingRect = target.getBoundingClientRect();
 
   if (

@@ -5,8 +5,7 @@ import m from 'mithril';
 import 'components/component_kit/cw_popover.scss';
 
 import { CWPortal } from '../cw_portal';
-import { PopoverPosition } from './types';
-import { checkIfCursorInBounds, findRef, getPopoverPosition } from './helpers';
+import { cursorInBounds, findRef, getPopoverPosition } from './helpers';
 
 export type PopoverAttrs = {
   content: m.Children;
@@ -23,11 +22,10 @@ export type PopoverAttrs = {
 export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   isOpen: boolean;
   isRendered: boolean;
+  isOverContent: boolean;
   triggerRef: any;
   contentId: string;
   arrowId: string;
-  isTransitioning: boolean;
-  isOverContent: boolean;
 
   oncreate(vnode) {
     this.isOpen = false;
@@ -45,11 +43,20 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     }
   }
 
+  togglePopOver(onToggle) {
+    const newIsOpen = !this.isOpen;
+    onToggle && onToggle(newIsOpen);
+
+    this.isOpen = newIsOpen;
+    this.isRendered = false;
+
+    m.redraw();
+  }
+
   applyPopoverPosition(vnode) {
     // Apply styles in real time
     try {
       const tooltipContainer = document.getElementById(this.contentId);
-      console.log('tooltip', tooltipContainer);
       const arrow = document.getElementById(this.arrowId);
 
       const inlineStyle = getPopoverPosition({
@@ -65,8 +72,6 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 
       const showArrow = vnode.attrs.showArrow && inlineStyle.showArrow;
 
-      console.log('popo', inlineStyle.popoverPlacement);
-
       switch (inlineStyle.popoverPlacement) {
         case 'above': {
           arrow.className = 'arrow-down';
@@ -81,38 +86,27 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
           break;
         }
       }
+
       arrow.style.top = `${inlineStyle.arrowTopYAmount}px`;
       arrow.style.left = `${inlineStyle.arrowLeftXAmount}px`;
       tooltipContainer.style.visibility = 'visible';
+
       if (showArrow) {
         arrow.style.visibility = 'visible';
       }
 
       this.isRendered = true;
-      this.isTransitioning = false;
-    } catch (e) {
-      console.log('erro', e);
-    }
-    m.redraw();
-  }
-
-  togglePopOver(onToggle) {
-    const newIsOpen = !this.isOpen;
-    onToggle && onToggle(newIsOpen);
-
-    this.isOpen = newIsOpen;
-    this.isRendered = false;
+    } catch (e) {}
     m.redraw();
   }
 
   handleHoverExit(e, onToggle, vnode) {
     if (
-      !checkIfCursorInBounds(e.offsetX, e.offsetY, this.triggerRef) &&
+      !cursorInBounds(e.offsetX, e.offsetY, this.triggerRef) &&
       !this.isOverContent
     ) {
       if (vnode.attrs.hoverOpenDelay) {
         setTimeout(() => {
-          // Check if curser inside content
           if (!this.isOverContent && this.isRendered) {
             this.togglePopOver(onToggle);
           }
@@ -138,7 +132,9 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     const { isOpen } = this;
 
     // Resize Listener
-    window.onresize = () => this.applyPopoverPosition(vnode);
+    if (isOpen) {
+      window.onresize = () => this.applyPopoverPosition(vnode);
+    }
 
     return (
       <>

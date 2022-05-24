@@ -60,52 +60,145 @@ export class ComponentShowcase implements m.ClassComponent {
     return (
       <div class="ComponentShowcase">
         <h1>Popover</h1>
-        <CWPopover
-          //          onToggle={(isOpen: boolean) => console.log('onToggle: ', isOpen)}
-          trigger={<CWButton label={'button'} />}
-          content={
-            <div class="ok">
-              <div
-                class="wtf"
-                style="height: 100px;"
-                onclick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('hiii');
-                }}
-              >
-                yoooo
+        <div style="display: flex; width: 80%; justify-content: space-between;">
+          <CWPopover
+            onToggle={(isOpen: boolean) =>
+              console.log("I've been toggled! I am open: ", isOpen)
+            }
+            trigger={<CWButton label={'Click Toggle'} />}
+            content={
+              <div>
+                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
+                  <CWButton
+                    label="click me"
+                    onclick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Clicked!');
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          }
-          toSide={false}
-          showArrow={true}
-          interactionType="click"
-          hoverOpenDelay={300}
-        />
-        <CWPopover
-          //          onToggle={(isOpen: boolean) => console.log('onToggle: ', isOpen)}
-          trigger={<CWButton label={'button'} />}
-          content={
-            <div class="ok">
-              <div
-                class="wtf"
-                style="height: 100px;"
-                onclick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('hiii');
-                }}
-              >
-                yoooo
+            }
+            toSide={false}
+            showArrow={true}
+            interactionType="click"
+          />
+
+          <CWPopover
+            onToggle={(isOpen: boolean) =>
+              console.log("I've been toggled! I am open: ", isOpen)
+            }
+            trigger={<CWButton label={'Click Toggle (Large Content)'} />}
+            content={
+              <div>
+                <div style="height: 400px; display: flex; justify-content: center; align-items: center;">
+                  <CWButton
+                    label="click me"
+                    onclick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Clicked!');
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          }
-          toSide={false}
-          showArrow={true}
-          interactionType="click"
-          hoverOpenDelay={300}
-        />
+            }
+            toSide={false}
+            showArrow={true}
+            interactionType="click"
+          />
+
+          <CWPopover
+            onToggle={(isOpen: boolean) =>
+              console.log("I've been toggled! I am open: ", isOpen)
+            }
+            trigger={<CWButton label={'Hover Toggle'} />}
+            content={
+              <div>
+                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
+                  I do not have a delay, so I can't be moused over
+                </div>
+              </div>
+            }
+            toSide={false}
+            showArrow={true}
+            interactionType="hover"
+          />
+          <CWPopover
+            onToggle={(isOpen: boolean) =>
+              console.log("I've been toggled! I am open: ", isOpen)
+            }
+            trigger={<CWButton label={'Hover Toggle 2'} />}
+            content={
+              <div>
+                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
+                  <CWButton
+                    label="click me"
+                    onclick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Clicked!');
+                    }}
+                  />
+                </div>
+              </div>
+            }
+            toSide={false}
+            showArrow={true}
+            interactionType="hover"
+            hoverOpenDelay={200}
+          />
+          <CWPopover
+            onToggle={(isOpen: boolean) =>
+              console.log("I've been toggled! I am open: ", isOpen)
+            }
+            trigger={<CWButton label={'Side Toggle'} />}
+            content={
+              <div>
+                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
+                  <CWButton
+                    label="click me"
+                    onclick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Clicked!');
+                    }}
+                  />
+                </div>
+              </div>
+            }
+            toSide={true}
+            showArrow={true}
+            interactionType="hover"
+            hoverOpenDelay={200}
+          />
+          <CWPopover
+            onToggle={(isOpen: boolean) =>
+              console.log("I've been toggled! I am open: ", isOpen)
+            }
+            trigger={<CWButton label={'Arrowless Toggle'} />}
+            content={
+              <div>
+                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
+                  <CWButton
+                    label="click me"
+                    onclick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Clicked!');
+                    }}
+                  />
+                </div>
+              </div>
+            }
+            toSide={false}
+            showArrow={false}
+            interactionType="hover"
+            hoverOpenDelay={200}
+          />
+        </div>
+
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
