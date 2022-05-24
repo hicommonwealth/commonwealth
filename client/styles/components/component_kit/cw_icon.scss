@@ -1,9 +1,9 @@
 @import 'shared';
 
 @mixin baseIconStyles {
+  fill: currentColor;
   flex-shrink: 0;
   height: 1em;
-  fill: currentColor;
   width: 1em;
 
   &.small {
@@ -18,11 +18,25 @@
     font-size: 32px;
   }
 
-  &.disabled {
-    color: $neutral-200;
+  &.xl {
+    font-size: 48px;
+  }
+
+  &.xxl {
+    font-size: 60px;
   }
 }
 
 .Icon {
   @include baseIconStyles;
+
+  &.disabled {
+    color: $neutral-200;
+  }
+}
+
+.CustomIcon {
+  @include baseIconStyles;
+
+  fill: unset; // they will be brand assets should we shouldn't alter their colors
 }

@@ -1,8 +1,10 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_component_showcase.scss';
 
+import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWGradientButton } from './cw_gradient_button';
@@ -17,6 +19,10 @@ import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
+import { CWWalletOptionRow } from './cw_wallet_option_row';
+import { CWAccountCreationButton } from './cw_account_creation_button';
+import { NewLoginModal } from '../../modals/login_modal';
+import { CWCheckbox } from './cw_checkbox';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -60,12 +66,39 @@ const radioGroupOptions = [
 ];
 
 export class ComponentShowcase implements m.ClassComponent {
+  private checkboxChecked: boolean;
+  private radioButtonChecked: boolean;
+  private radioGroupSelection: string;
   private selectedIconButton: number;
-  private radioButtonSelected: boolean;
+
+  oninit() {
+    this.radioGroupSelection = radioGroupOptions[2].value;
+  }
 
   view() {
     return (
       <div class="ComponentShowcase">
+        <CWButton
+          label="Click for Login modal"
+          onclick={() =>
+            app.modals.create({
+              modal: NewLoginModal,
+            })
+          }
+        />
+        <div class="card-gallery">
+          <h1>Account Creation Button</h1>
+          <CWAccountCreationButton
+            onclick={() => notifySuccess('Account creation button clicked!')}
+          />
+        </div>
+        <div class="card-gallery">
+          <h1>Wallet Row Card</h1>
+          <CWWalletOptionRow
+            walletName="metamask"
+            onclick={() => notifySuccess('MetaMask clicked!')}
+          />
+        </div>
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
@@ -163,7 +196,9 @@ export class ComponentShowcase implements m.ClassComponent {
           <div class="text-row">
             <CWText type="h3">Overflow</CWText>
             <div class="ellipsis-row">
-              <CWText type="h3">Body1 noWrap</CWText>
+              <CWText type="h3" noWrap>
+                Body1 noWrap
+              </CWText>
             </div>
           </div>
         </div>
@@ -281,28 +316,55 @@ export class ComponentShowcase implements m.ClassComponent {
           />
         </div>
         <h1>Radio Button</h1>
-        <div class="radio-button-gallery">
+        <div class="choice-gallery">
           <CWRadioButton
             value="Radio Button"
             label="Radio Button"
-            selected={this.radioButtonSelected === true}
+            checked={this.radioButtonChecked === true}
             onchange={() => {
-              this.radioButtonSelected = true;
+              this.radioButtonChecked = true;
             }}
           />
           <CWRadioButton
             value="Disabled Radio Button"
             label="Disabled Radio Button"
-            disabled={true}
+            disabled
+          />
+          <CWRadioButton
+            value="Checked and Disabled Radio Button"
+            label="Checked and Disabled Radio Button"
+            disabled
+            checked
           />
         </div>
         <h1>Radio Group</h1>
         <div class="button-gallery">
           <CWRadioGroup
             options={radioGroupOptions}
-            defaultValue={radioGroupOptions[2]}
             name="RadioGroup"
-            onchange={(e) => notifySuccess(`"${e.target.value}" selected`)}
+            toggledOption={this.radioGroupSelection}
+            onchange={(e) => {
+              this.radioGroupSelection = e.target.value;
+              notifySuccess(`"${e.target.value}" selected`);
+            }}
+          />
+        </div>
+        <h1>Checkbox</h1>
+        <div class="choice-gallery">
+          <CWCheckbox
+            checked={this.checkboxChecked === true}
+            label="Click me"
+            onchange={() => {
+              this.checkboxChecked = !this.checkboxChecked;
+            }}
+          />
+          <CWCheckbox label="Disabled" disabled />
+          <CWCheckbox label="Checked and disabled" disabled checked />
+          <CWCheckbox label="Indeterminate" indeterminate />
+          <CWCheckbox
+            label="Indeterminate and disabled"
+            disabled
+            indeterminate
           />
         </div>
         <h1>Engagement Buttons</h1>

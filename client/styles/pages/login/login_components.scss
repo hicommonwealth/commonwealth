@@ -1,0 +1,245 @@
+@import 'shared';
+
+@mixin yellowDividerText {
+  border-bottom: 4px solid $yellow-500;
+  color: $white;
+  padding-bottom: 4px;
+  width: fit-content;
+}
+
+@mixin redDividerText {
+  border-bottom: 4px solid $rorange-500;
+  padding-bottom: 4px;
+  width: 200px;
+}
+
+@mixin visibleScrollbar {
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+  }
+
+  &::-webkit-scrollbar:vertical {
+    height: 88px;
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $neutral-50;
+    border-radius: $border-radius-corners;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: $border-radius-corners;
+    background-color: $neutral-200;
+  }
+}
+
+.LoginSidebar {
+  height: 424px;
+  width: 264px;
+
+  .connect-wallet {
+    background-image: url('/static/img/login-background.png');
+    background-size: cover;
+    height: 100%;
+
+    .sidebar-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: center;
+      padding: 0 24px;
+      width: 264px;
+
+      .header-text {
+        @include yellowDividerText;
+
+        margin-bottom: 8px;
+      }
+
+      .Text {
+        color: $white;
+      }
+
+      .manage-link.Text {
+        color: $primary-500;
+        cursor: pointer;
+        margin-top: 4px;
+
+        &:hover {
+          color: $primary-300;
+        }
+      }
+    }
+  }
+
+  .new-or-returning {
+    align-items: center;
+    background-color: $neutral-800;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+
+    .header-text {
+      @include yellowDividerText;
+
+      margin-bottom: 12px;
+    }
+
+    div:nth-of-type(2) {
+      margin-bottom: 16px;
+    }
+  }
+
+  .eth-wallet {
+    background-color: $yellow-500;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    padding: 0 24px;
+
+    .header-text {
+      @include redDividerText;
+
+      margin-bottom: 12px;
+    }
+  }
+}
+
+.Text.LoginBoilerplate {
+  color: $neutral-300;
+  display: inline-block;
+  text-align: center;
+
+  .link {
+    color: $neutral-500;
+    cursor: pointer;
+  }
+}
+
+.WalletsList {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  .wallets-and-link-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+
+    .wallets {
+      display: grid;
+      height: 172px;
+      overflow-y: scroll;
+      row-gap: 4px;
+      width: 284px;
+      // preserves box shadow in scroll container
+      height: 174px;
+      margin-bottom: -4px;
+      padding-bottom: 4px;
+
+      @include visibleScrollbar;
+    }
+
+    .no-wallet-link {
+      align-self: flex-end;
+      margin: 8px 12px 8px 0;
+
+      a {
+        color: $neutral-500;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .connect-another-way-link {
+    a {
+      color: $primary-500;
+      cursor: pointer;
+    }
+  }
+}
+
+.LoginAddress {
+  align-items: center;
+  background-color: $neutral-100;
+  border-radius: $border-radius-corners;
+  display: flex;
+  height: 24px;
+  justify-content: center;
+  width: 282px;
+
+  .Text {
+    color: $neutral-500;
+  }
+}
+
+.ProfileRow {
+  align-items: center;
+  border: 2px solid $neutral-100;
+  border-radius: $border-radius-corners;
+  box-shadow: $elevation-1;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  height: 48px;
+  padding: 8px;
+  width: 324px;
+
+  &:hover {
+    background-color: $neutral-50;
+  }
+
+  &:active {
+    background-color: $neutral-100;
+    border-color: $neutral-300;
+    box-shadow: none;
+  }
+
+  .avatar-and-name {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    .avatar {
+      background-color: $primary-500;
+      border-radius: $border-radius-round;
+      height: 32px;
+      margin-right: 8px;
+      width: 32px;
+    }
+  }
+
+  &.selected {
+    background-color: $green-50;
+    border-color: $green-500;
+    box-shadow: none;
+    justify-content: space-between;
+    pointer-events: none;
+
+    .Icon {
+      color: $green-500;
+    }
+  }
+}
+
+.ProfilesList {
+  // needed to compensate for negative margin on inner container
+  margin-bottom: 16px;
+
+  .profile-rows-container {
+    display: grid;
+    overflow-y: auto;
+    row-gap: 4px;
+    width: 336px;
+    // preserves box shadow in scroll container
+    height: 154px;
+    margin-bottom: -2px;
+    padding-bottom: 2px;
+
+    @include visibleScrollbar;
+  }
+}

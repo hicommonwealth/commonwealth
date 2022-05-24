@@ -1,4 +1,5 @@
 import * as Icons from './cw_icons';
+import * as CustomIcons from './cw_custom_icons';
 
 export const iconLookup = {
   arrowLeft: Icons.CWArrowLeft,
@@ -41,6 +42,7 @@ export const iconLookup = {
   infoEmpty: Icons.CWInfoEmpty,
   infoFilled: Icons.CWInfoFilled,
   jar: Icons.CWJar,
+  link: Icons.CWLink,
   lock: Icons.CWLock,
   logout: Icons.CWLogout,
   mail: Icons.CWMail,
@@ -65,4 +67,18 @@ export const iconLookup = {
   website: Icons.CWWebsite,
 };
 
+export const customIconLookup = {
+  'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
+  keplr: CustomIcons.CWKeplr,
+  magic: CustomIcons.CWMagic,
+  metamask: CustomIcons.CWMetaMask,
+  near: CustomIcons.CWNearWallet,
+  phantom: CustomIcons.CWPhantom,
+  polkadot: CustomIcons.CWPolkadot,
+  ronin: CustomIcons.CWRonin,
+  terrastation: CustomIcons.CWTerraStation,
+  walletconnect: CustomIcons.CWWalletConnect,
+};
+
 export type IconName = keyof typeof iconLookup;
+export type CustomIconName = keyof typeof customIconLookup;

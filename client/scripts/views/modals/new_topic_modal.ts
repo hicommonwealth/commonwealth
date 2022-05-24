@@ -15,7 +15,7 @@ import {
 import { ChainNetwork } from 'types';
 import QuillEditor from 'views/components/quill_editor';
 import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import {
   CWTextInput,
@@ -92,10 +92,7 @@ const NewTopicModal: m.Component<
       : 18;
 
     return m('.NewTopicModal', [
-      m('.compact-modal-title', [
-        m('h3', 'New topic'),
-        m(CompactModalExitButton),
-      ]),
+      m('.compact-modal-title', [m('h3', 'New topic'), m(ModalExitButton)]),
       m('.compact-modal-body', [
         m(Form, [
           m(CWTextInput, {

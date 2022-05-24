@@ -1,7 +1,10 @@
 export enum ComponentType {
+  AccountCreationButton = 'AccountCreationButton',
   Button = 'Button',
   ButtonGroup = 'ButtonGroup',
   Card = 'Card',
+  Checkbox = 'Checkbox',
+  CustomIcon = 'CustomIcon',
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',
@@ -12,6 +15,7 @@ export enum ComponentType {
   RadioGroup = 'RadioGroup',
   Text = 'Text',
   TextInput = 'TextInput',
+  WalletOptionRow = 'WalletOptionRow',
 }
 
 export type StyleAttrs = {

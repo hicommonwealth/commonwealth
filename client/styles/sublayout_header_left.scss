@@ -1,6 +1,7 @@
 @import 'client/styles/shared';
 
 .SublayoutHeaderLeft {
+  align-items: center;
   display: flex;
   flex-direction: row;
 
@@ -23,8 +24,6 @@
 
   svg {
     cursor: pointer;
-    position: relative;
-    top: 3px;
   }
 
   @include sm-max {

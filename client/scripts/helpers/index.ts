@@ -1,7 +1,9 @@
+import $ from 'jquery';
 import m, { RouteOptions } from 'mithril';
-import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
+
+import { ICardListItem } from 'models/interfaces';
 import app from 'state';
 import { OffchainThreadStage } from 'models';
 
@@ -38,6 +40,12 @@ export function parseCustomStages(str) {
     .map((s) => s?.toString())
     .filter((s) => s) as unknown as OffchainThreadStage[];
 }
+
+export const modalRedirectClick = (e, route) => {
+  e.preventDefault();
+  $(e.target).trigger('modalexit');
+  m.route.set(route);
+};
 
 /*
  * mithril link helper
