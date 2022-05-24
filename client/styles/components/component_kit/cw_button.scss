@@ -23,8 +23,8 @@
   border-radius: $border-radius-corners;
   display: flex;
   flex-direction: row;
-  height: 32px;
-  padding: 4px 16px;
+  height: 36px;
+  padding: 6px 20px;
   width: fit-content;
 
   &.primary-red {
@@ -127,6 +127,69 @@
     &.disabled {
       border-color: $neutral-300;
 
+      @include disabled;
+    }
+  }
+
+  &.secondary-black {
+    background-color: $white;
+    border: 2px solid $neutral-800;
+
+    @include iconAndText($neutral-800);
+
+    &:hover {
+      background-color: $neutral-50;
+      border-color: $neutral-600;
+
+      @include iconAndText($neutral-600);
+    }
+
+    &:active {
+      background-color: $neutral-100;
+      border-color: $neutral-400;
+
+      @include iconAndText($neutral-400);
+    }
+
+    &.disabled {
+      border-color: $neutral-300;
+
+      @include disabled;
+    }
+  }
+
+  &.tertiary-blue {
+    background-color: $white;
+
+    @include iconAndText($primary-500);
+
+    &:hover {
+      @include iconAndText($primary-300);
+    }
+
+    &:active {
+      @include iconAndText($primary-100);
+    }
+
+    &.disabled {
+      @include disabled;
+    }
+  }
+
+  &.tertiary-black {
+    background-color: $white;
+
+    @include iconAndText($neutral-800);
+
+    &:hover {
+      @include iconAndText($neutral-600);
+    }
+
+    &:active {
+      @include iconAndText($neutral-500);
+    }
+
+    &.disabled {
       @include disabled;
     }
   }

@@ -89,7 +89,7 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Disabled"
+            label="Primary disabled"
             disabled
             onclick={() => notifySuccess('Button clicked!')}
           />
@@ -112,8 +112,37 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Secondary"
+            label="Secondary black"
+            buttonType="secondary-black"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary disabled"
             buttonType="secondary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Tertiary blue with icon"
+            buttonType="tertiary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Tertiary blue"
+            buttonType="tertiary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Tertiary black"
+            buttonType="tertiary-black"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Tertiary disabled"
+            buttonType="tertiary-black"
             disabled
             onclick={() => notifySuccess('Button clicked!')}
           />

@@ -17,7 +17,13 @@ export type ButtonType =
   | 'secondary-blue'
   | 'secondary-black'
   | 'tertiary-blue'
-  | 'tertiary-black';
+  | 'tertiary-black'
+  | 'lg-primary-red'
+  | 'lg-primary-blue'
+  | 'lg-secondary-red'
+  | 'lg-secondary-blue'
+  | 'lg-tertiary-red'
+  | 'lg-tertiary-blue';
 
 export type ButtonStyleAttrs = {
   buttonType?: ButtonType;
