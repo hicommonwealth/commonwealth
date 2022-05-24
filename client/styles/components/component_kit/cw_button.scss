@@ -1,45 +1,133 @@
-@import 'client/styles/shared';
+@import 'shared';
+
+@mixin iconAndText($color) {
+  .Icon.button-icon {
+    color: $color;
+    margin-right: 8px;
+  }
+
+  .Text.button-text {
+    color: $color;
+  }
+}
+
+@mixin disabled {
+  box-shadow: none;
+  pointer-events: none;
+
+  @include iconAndText($neutral-300);
+}
 
 .Button {
-  border-radius: 8px;
-  font-weight: 600;
-  height: 40px;
+  align-items: center;
+  border-radius: $border-radius-corners;
+  display: flex;
+  flex-direction: row;
+  height: 32px;
   padding: 4px 16px;
   width: fit-content;
 
-  &.primary {
-    color: $white;
-    background-color: $purple-300;
+  &.primary-red {
+    background-color: $rorange-500;
+    box-shadow: $elevation-1;
+
+    @include iconAndText($white);
 
     &:hover {
-      background-color: $purple-400;
-      box-shadow: 0px 2px 6px 0px #0000001a;
+      background-color: $rorange-300;
+      box-shadow: none;
+    }
+
+    &:active {
+      background-color: $rorange-200;
+      box-shadow: none;
+
+      @include iconAndText($rorange-300);
     }
 
     &.disabled {
-      background-color: $neutral-100;
-      box-shadow: none;
-      cursor: default;
+      background-color: $neutral-50;
+
+      @include disabled;
     }
   }
 
-  &.secondary {
-    color: $neutral-500;
-    background-color: $white;
-    border: 1px solid $neutral-500;
+  &.primary-blue {
+    background-color: $primary-500;
+    box-shadow: $elevation-1;
+
+    @include iconAndText($white);
 
     &:hover {
-      color: $neutral-600;
-      background-color: $neutral-50;
-      box-shadow: 0px 2px 6px 0px #0000001a;
+      background-color: $primary-300;
+      box-shadow: none;
+    }
+
+    &:active {
+      background-color: $primary-200;
+      box-shadow: none;
+
+      @include iconAndText($primary-300);
     }
 
     &.disabled {
-      color: $neutral-100;
-      background-color: $white;
-      border: 1px solid $neutral-100;
-      box-shadow: none;
-      cursor: default;
+      background-color: $neutral-50;
+
+      @include disabled;
+    }
+  }
+
+  &.secondary-red {
+    background-color: $white;
+    border: 2px solid $rorange-500;
+
+    @include iconAndText($rorange-500);
+
+    &:hover {
+      background-color: $rorange-50;
+      border-color: $rorange-300;
+
+      @include iconAndText($rorange-300);
+    }
+
+    &:active {
+      background-color: $rorange-100;
+      border-color: $rorange-200;
+
+      @include iconAndText($rorange-200);
+    }
+
+    &.disabled {
+      border-color: $neutral-300;
+
+      @include disabled;
+    }
+  }
+
+  &.secondary-blue {
+    background-color: $white;
+    border: 2px solid $primary-500;
+
+    @include iconAndText($primary-500);
+
+    &:hover {
+      background-color: $primary-50;
+      border-color: $primary-300;
+
+      @include iconAndText($primary-300);
+    }
+
+    &:active {
+      background-color: $primary-100;
+      border-color: $primary-200;
+
+      @include iconAndText($primary-200);
+    }
+
+    &.disabled {
+      border-color: $neutral-300;
+
+      @include disabled;
     }
   }
 }

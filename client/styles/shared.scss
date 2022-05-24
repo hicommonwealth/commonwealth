@@ -1,6 +1,7 @@
 @import 'mixins/animation';
 @import 'mixins/responsive';
 @import 'mixins/dragula';
+@import 'mixins/elevation';
 @import 'mixins/colors';
 @import 'mixins/border_radius';
 @import 'mixins/choice';
@@ -215,12 +216,6 @@ $text-size-mobile-header: 22px;
     margin-right: 0;
   }
 }
-
-$elevation-1-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
-$elevation-2-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-$elevation-3-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-$elevation-4-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-$elevation-5-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
 
 title {
   font-family: $fonts;
