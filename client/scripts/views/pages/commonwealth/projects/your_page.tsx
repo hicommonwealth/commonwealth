@@ -13,7 +13,8 @@ export default class YourPage implements m.ClassComponent {
   // private supportedProjects: Project[];
   // private userProjects: Project[];
 
-  private userProjectsDisplayed = 6;
+  private totalSupportedProjects = 0;
+  private totalEndedProjects = 0;
   private supportedProjectsDisplayed = 6;
   private endedProjectsDisplayed = 6;
 
@@ -41,52 +42,82 @@ export default class YourPage implements m.ClassComponent {
         )
         .forEach((project) => allProjects.push(project));
     });
+    this.totalSupportedProjects = allProjects.length;
     // TODO filter by current
-    return allProjects;
+    return allProjects
+      .sort((a, b) => a.createdAt.diff(b.createdAt))
+      .slice(0, this.supportedProjectsDisplayed);
   }
 
   getEndedProjects() {
-    // TODO
+    const allProjects: Project[] = [];
+    app.user.addresses.forEach(({ address, chain }) => {
+      app.projects.store
+        .getAll()
+        .filter(
+          (project) =>
+            project.isBacker(address, chain) ||
+            project.isCurator(address, chain)
+        )
+        .forEach((project) => allProjects.push(project));
+    });
+    this.totalEndedProjects = allProjects.length;
+    return allProjects
+      .sort((a, b) => a.createdAt.diff(b.createdAt))
+      .slice(0, this.endedProjectsDisplayed);
     return [];
   }
 
   view() {
     if (!app.isLoggedIn()) {
       m.route.set(`/projects/explore`);
+      return;
     }
-    // TODO: Consider including in get fns above
-    const userProjectCards: JSX.Element[] = this.getUserProjects().map(
-      (project) => (
-        <ProjectCard project={project} size={ProjectCardSize.Large} />
-      )
-    );
-    const supportedProjectCards: JSX.Element[] =
-      this.getSupportedProjects().map((project) => (
-        <ProjectCard project={project} size={ProjectCardSize.Medium} />
-      ));
-    const endedProjectCards: JSX.Element[] = this.getEndedProjects().map(
-      (project) => (
-        <ProjectCard project={project} size={ProjectCardSize.Small} />
-      )
-    );
 
-    console.log('here');
     return (
       <div class="YourPage">
         <CWText type="h1">Your Projects</CWText>
         <div class="projects-listing">
-          {userProjectCards}
+          {this.getUserProjects().map((project) => (
+            <ProjectCard project={project} size={ProjectCardSize.Large} />
+          ))}
           <CWButton buttonType="secondary" label="Manage" />
         </div>
         <CWText type="h1">Backed and Curated</CWText>
-        <div class="projects-listing">
-          {supportedProjectCards}
-          <CWButton buttonType="secondary" label="Show More" />
+        <div class="projects-wrap">
+          <div class="projects-listing">
+            {this.getSupportedProjects().map((project) => (
+              <ProjectCard project={project} size={ProjectCardSize.Medium} />
+            ))}
+          </div>
+          <CWButton
+            label="Show More"
+            buttonType="secondary"
+            disable={
+              this.supportedProjectsDisplayed >= this.totalSupportedProjects
+            }
+            onclick={() => {
+              this.supportedProjectsDisplayed += 6;
+              console.log(this.supportedProjectsDisplayed);
+            }}
+          />
         </div>
         <CWText type="h1">Ended Projects</CWText>
-        <div class="projects-listing">
-          {endedProjectCards}
-          <CWButton buttonType="secondary" label="Show More" />
+        <div class="projects-wrap">
+          <div class="projects-listing">
+            {this.getEndedProjects().map((project) => (
+              <ProjectCard project={project} size={ProjectCardSize.Small} />
+            ))}
+          </div>
+          <CWButton
+            label="Show More"
+            buttonType="secondary"
+            disable={this.endedProjectsDisplayed >= this.totalEndedProjects}
+            onclick={() => {
+              this.endedProjectsDisplayed += 6;
+              console.log(this.endedProjectsDisplayed);
+            }}
+          />
         </div>
       </div>
     );
