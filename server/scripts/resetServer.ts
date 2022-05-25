@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 
-import tsmodels from '../database';
-const models = tsmodels as any;
+import models from '../database';
 import { NotificationCategories, ChainBase, ChainType, ChainNetwork } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
@@ -805,6 +804,7 @@ const resetServer = (): Promise<number> => {
       ]);
 
       // Initialize contract categories for all smart contract supporting chains
+      log.debug('Initializing contract categories...');
       await Promise.all([
         models.ContractCategory.create({
           name: 'Tokens',
@@ -819,6 +819,7 @@ const resetServer = (): Promise<number> => {
       ]);
 
       // Initialize different chain + node URLs
+      log.debug('Initializing chains...');
       const chains = await Promise.all([
         models.Chain.create({
           id: 'edgeware-local',
@@ -996,7 +997,7 @@ const resetServer = (): Promise<number> => {
         }),
         models.Chain.create({
           id: 'cosmos-local',
-          network: 'cosmos',
+          network: 'cosmos' as ChainNetwork,
           symbol: 'stake',
           name: 'Cosmos (local)',
           icon_url: '/static/img/protocols/atom.png',
@@ -1006,7 +1007,7 @@ const resetServer = (): Promise<number> => {
         }),
         models.Chain.create({
           id: 'cosmos-testnet',
-          network: 'cosmos',
+          network: 'cosmos' as ChainNetwork,
           symbol: 'muon',
           name: 'Cosmos (Gaia 13006 Testnet)',
           icon_url: '/static/img/protocols/atom.png',
@@ -1016,7 +1017,7 @@ const resetServer = (): Promise<number> => {
         }),
         models.Chain.create({
           id: 'cosmos',
-          network: 'cosmos',
+          network: 'cosmos' as ChainNetwork,
           symbol: 'uatom',
           name: 'Cosmos',
           icon_url: '/static/img/protocols/atom.png',
@@ -1203,11 +1204,11 @@ const resetServer = (): Promise<number> => {
           name: 'demos',
           icon_url: '/static/img/protocols/eth.png',
           type: ChainType.Token,
-          network: 'demos',
+          network: 'demos' as ChainNetwork,
           active: true,
           collapsed_on_homepage: false,
           base: ChainBase.Ethereum,
-          snapshot: 'polarcat.eth',
+          snapshot: ['polarcat.eth'],
         })
       ]);
 
@@ -1228,12 +1229,12 @@ const resetServer = (): Promise<number> => {
       ] = chains;
 
       // Admin roles for specific communities
+      log.debug('Initializing addresses...');
       await Promise.all([
         models.Address.create({
           user_id: 2,
           address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
           chain: 'ethereum',
-          selected: true,
           verification_token: crypto.randomBytes(18).toString('hex'),
           verification_token_expires: new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000),
           verified: new Date(),
@@ -1243,7 +1244,7 @@ const resetServer = (): Promise<number> => {
           chain: 'edgeware',
           verification_token: crypto.randomBytes(18).toString('hex'),
           verification_token_expires: new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000),
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
         models.Address.create({
@@ -1251,7 +1252,7 @@ const resetServer = (): Promise<number> => {
           chain: 'edgeware',
           verification_token: crypto.randomBytes(18).toString('hex'),
           verification_token_expires: new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000),
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
         models.Address.create({
@@ -1259,12 +1260,13 @@ const resetServer = (): Promise<number> => {
           chain: 'edgeware',
           verification_token: crypto.randomBytes(18).toString('hex'),
           verification_token_expires: new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000),
-          verified: true,
+          verified: new Date(),
           keytype: 'sr25519',
         }),
       ]);
 
       // Notification Categories
+      log.debug('Initializing notification categories...');
       await Promise.all([
         models.NotificationCategory.create({
           name: NotificationCategories.NewCommunity,
@@ -1297,6 +1299,7 @@ const resetServer = (): Promise<number> => {
       ]);
 
       // Admins need to be subscribed to mentions and collaborations
+      log.debug('Initializing subscriptions...');
       await Promise.all([
         models.Subscription.create({
           subscriber_id: dillon.id,
@@ -1343,6 +1346,7 @@ const resetServer = (): Promise<number> => {
       ]);
 
       // OffchainTopics
+      log.debug('Initializing topics...');
       await Promise.all(
         chains.map((chain) => models.OffchainTopic.create({
           name: 'General',
@@ -1358,6 +1362,7 @@ const resetServer = (): Promise<number> => {
           )
       );
 
+      log.debug('Initializing roles...');
       await Promise.all([
         models.Role.create({
           address_id: 3,
@@ -1369,18 +1374,9 @@ const resetServer = (): Promise<number> => {
           chain_id: 'edgeware',
           permission: 'admin',
         }),
-        models.Role.create({
-          address_id: 3,
-          offchain_community_id: 'staking',
-          permission: 'admin',
-        }),
-        models.Role.create({
-          address_id: 4,
-          offchain_community_id: 'staking',
-          permission: 'admin',
-        }),
       ]);
 
+      log.debug('Initializing nodes...');
       await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
 
       log.debug('Reset database and initialized default models');
