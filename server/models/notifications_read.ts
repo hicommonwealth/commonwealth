@@ -23,11 +23,11 @@ export default (
 	dataTypes: typeof DataTypes,
 ): NotificationsReadModelStatic => {
 	const NotificationsRead = <NotificationsReadModelStatic>sequelize.define('NotificationsRead', {
-		id: {type: dataTypes.INTEGER, allowNull: false},
+		id: {type: dataTypes.INTEGER},
 		subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
 		notification_id: { type: dataTypes.INTEGER, primaryKey: true },
 		is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
-		user_id: { type: dataTypes.INTEGER, defaultValue: false, allowNull: false, references: {model: 'User', key: 'id'} }
+		user_id: { type: dataTypes.INTEGER }
 	}, {
 		tableName: 'NotificationsRead',
 		underscored: true,
@@ -37,6 +37,7 @@ export default (
 	NotificationsRead.associate = (models) => {
 		models.NotificationsRead.belongsTo(models.Subscription, { foreignKey: 'subscription_id', targetKey: 'id' });
 		models.NotificationsRead.belongsTo(models.Notification, { foreignKey: 'notification_id', targetKey: 'id' });
+		models.NotificationsRead.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id'});
 	};
 
 	return NotificationsRead;
