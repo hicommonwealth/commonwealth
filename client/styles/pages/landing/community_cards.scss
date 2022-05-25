@@ -6,14 +6,6 @@
   flex-direction: column;
   padding: 24px;
 
-  .communities-number {
-    color: #333333;
-    margin-left: 10px;
-    font-size: 25px;
-    font-weight: 500;
-    margin-bottom: 10px;
-  }
-
   .header-section {
     display: flex;
     flex-direction: row;
@@ -23,37 +15,19 @@
 
     .filter-buttons {
       display: flex;
-      flex-direction: row;
       flex-wrap: wrap;
+      gap: 8px;
     }
   }
 
-  .communities-header {
-    color: $neutral-800;
-    font-size: 25px;
-    font-weight: 500;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+  .communities-count.Text {
+    margin-bottom: 16px;
   }
 
   .communities-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 240px);
     grid-gap: 24px;
+    grid-template-columns: repeat(auto-fit, 240px);
     justify-content: center;
-    align-content: flex-start;
-  }
-
-  .ChainIcon {
-    margin-bottom: 8px;
-  }
-
-  .CommunityIcon {
-    margin-bottom: 8px;
-  }
-
-  h4 {
-    margin-left: 8px;
   }
 }

@@ -11,6 +11,7 @@ import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 import { CWButton } from '../components/component_kit/cw_button';
 import Sublayout from '../sublayout';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
+import { CWText } from '../components/component_kit/cw_text';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -199,7 +200,9 @@ class HomepageCommunityCards implements m.ClassComponent {
     return (
       <div class="HomepageCommunityCards">
         <div class="header-section">
-          <div class="communities-header">{totalCommunitiesString}</div>
+          <CWText type="h3" fontWeight="semiBold" className="communities-count">
+            {totalCommunitiesString}
+          </CWText>
           <div class="filter-buttons">
             {this.chainCategories.map((cat) => {
               return (
