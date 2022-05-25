@@ -60,12 +60,20 @@ class NotificationsMenuFooter
                 ?.then(() => m.redraw());
             }}
           />
+
         )}
         <Button
-          label="Next Page"
+          label=">"
           onclick={(e) => {
             e.preventDefault();
             app.user.notifications.refresh().then(() => {m.redraw});
+          }}
+        />
+        <Button
+          label="<"
+          onclick={(e) => {
+              e.preventDefault();
+              app.user.notifications.refresh().then(() => {m.redraw});
           }}
         />
       </div>
