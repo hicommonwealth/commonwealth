@@ -1,4 +1,5 @@
 /* @jsx m */
+/* eslint-disable no-empty */
 
 import m from 'mithril';
 
@@ -23,7 +24,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   isOpen: boolean;
   isRendered: boolean;
   isOverContent: boolean;
-  triggerRef: any;
+  triggerRef: Element;
   contentId: string;
   arrowId: string;
 
@@ -31,8 +32,8 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     this.isOpen = false;
     this.isRendered = true;
     this.triggerRef = findRef(vnode.dom, 'trigger-wrapper');
-    this.contentId = 'tooltip-container-' + Math.random();
-    this.arrowId = this.contentId + '-arrow';
+    this.contentId = `tooltip-container-${Math.random()}`;
+    this.arrowId = `${this.contentId}-arrow`;
   }
 
   onupdate(vnode) {
@@ -85,6 +86,9 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
           arrow.className = 'arrow-left';
           break;
         }
+        default: {
+          break;
+        }
       }
 
       arrow.style.top = `${inlineStyle.arrowTopYAmount}px`;
@@ -96,6 +100,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
       }
 
       this.isRendered = true;
+      // eslint-disable-next-line no-empty
     } catch (e) {}
     m.redraw();
   }
@@ -143,12 +148,12 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
             class="trigger-wrapper"
             ref="trigger-wrapper"
             onclick={(e) => {
-              if (!interactionType || interactionType == 'click') {
+              if (!interactionType || interactionType === 'click') {
                 this.togglePopOver(onToggle);
               }
             }}
             onmouseenter={() => {
-              if (interactionType == 'hover') {
+              if (interactionType === 'hover') {
                 this.handleHoverEnter(vnode, onToggle);
               }
             }}
@@ -161,12 +166,12 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
             <div
               class="overlay"
               onclick={() => {
-                if (!interactionType || interactionType == 'click') {
+                if (!interactionType || interactionType === 'click') {
                   this.togglePopOver(onToggle);
                 }
               }}
               onmousemove={(e) => {
-                if (interactionType == 'hover') {
+                if (interactionType === 'hover') {
                   this.handleHoverExit(e, onToggle, vnode);
                 }
               }}
