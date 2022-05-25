@@ -2,6 +2,7 @@
 
 .Button {
   align-items: center;
+  border: 2px solid transparent;
   border-radius: $border-radius-corners;
   display: flex;
   flex-direction: row;

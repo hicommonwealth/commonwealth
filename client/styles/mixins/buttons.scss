@@ -93,7 +93,7 @@
 
 @mixin secondaryRed {
   background-color: $white;
-  border: 2px solid $rorange-500;
+  border-color: $rorange-500;
 
   @include iconAndText($rorange-500);
 
@@ -120,7 +120,7 @@
 
 @mixin secondaryBlue {
   background-color: $white;
-  border: 2px solid $primary-500;
+  border-color: $primary-500;
 
   @include iconAndText($primary-500);
 
@@ -147,7 +147,7 @@
 
 @mixin secondaryBlack {
   background-color: $white;
-  border: 2px solid $neutral-800;
+  border-color: $neutral-800;
 
   @include iconAndText($neutral-800);
 
