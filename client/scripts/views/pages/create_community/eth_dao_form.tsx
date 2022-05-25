@@ -159,7 +159,6 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
         )}
         <CWButton
           label="Test contract"
-          buttonType="primary"
           disabled={
             this.state.saving ||
             !validAddress ||
@@ -193,7 +192,6 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
         {...defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
             const { chainString, ethChainId, nodeUrl, tokenName } =

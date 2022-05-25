@@ -145,7 +145,6 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
         {...ethChainRows(vnode.attrs, this.state.form)}
         <CWButton
           label="Populate fields"
-          buttonType="primary"
           disabled={
             this.state.saving ||
             !validAddress ||
@@ -179,7 +178,6 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
         {...defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
             const { altWalletUrl, chainString, ethChainId, nodeUrl } =

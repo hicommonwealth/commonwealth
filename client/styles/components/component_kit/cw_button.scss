@@ -1,45 +1,82 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .Button {
-  border-radius: 8px;
-  font-weight: 600;
-  height: 40px;
-  padding: 4px 16px;
+  align-items: center;
+  border: 2px solid transparent;
+  border-radius: $border-radius-corners;
+  display: flex;
+  flex-direction: row;
+  height: 36px;
+  padding: 6px 20px;
   width: fit-content;
 
-  &.primary {
-    color: $white;
-    background-color: $purple-300;
-
-    &:hover {
-      background-color: $purple-400;
-      box-shadow: 0px 2px 6px 0px #0000001a;
-    }
-
-    &.disabled {
-      background-color: $neutral-100;
-      box-shadow: none;
-      cursor: default;
-    }
+  &.primary-red {
+    @include primaryRed;
   }
 
-  &.secondary {
-    color: $neutral-500;
-    background-color: $white;
-    border: 1px solid $neutral-500;
+  &.primary-blue {
+    @include primaryBlue;
+  }
 
-    &:hover {
-      color: $neutral-600;
-      background-color: $neutral-50;
-      box-shadow: 0px 2px 6px 0px #0000001a;
-    }
+  &.primary-black {
+    @include primaryBlack;
+  }
 
-    &.disabled {
-      color: $neutral-100;
-      background-color: $white;
-      border: 1px solid $neutral-100;
-      box-shadow: none;
-      cursor: default;
-    }
+  &.secondary-red {
+    @include secondaryRed;
+  }
+
+  &.secondary-blue {
+    @include secondaryBlue;
+  }
+
+  &.secondary-black {
+    @include secondaryBlack;
+  }
+
+  &.tertiary-blue {
+    @include tertiaryBlue;
+  }
+
+  &.tertiary-black {
+    @include tertiaryBlack;
+  }
+
+  &.lg-primary-red {
+    border-radius: $border-radius-rounded-corners;
+    height: 40px;
+
+    @include primaryRed;
+  }
+
+  &.lg-primary-blue {
+    border-radius: $border-radius-rounded-corners;
+    height: 40px;
+
+    @include primaryBlue;
+  }
+
+  &.lg-secondary-red {
+    height: 40px;
+
+    @include primaryRed; // large styles are off by one because primary has more border radius
+  }
+
+  &.lg-secondary-blue {
+    height: 40px;
+
+    @include primaryBlue;
+  }
+
+  &.lg-tertiary-red {
+    height: 40px;
+
+    @include secondaryRed;
+  }
+
+  &.lg-tertiary-blue {
+    height: 40px;
+
+    @include secondaryBlue;
   }
 }
