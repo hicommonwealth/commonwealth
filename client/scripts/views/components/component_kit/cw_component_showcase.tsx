@@ -8,7 +8,6 @@ import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWGradientButton } from './cw_gradient_button';
-import { CWButtonGroup } from './cw_button_group';
 import { CWExternalLink } from './cw_external_link';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
@@ -97,6 +96,175 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWWalletOptionRow
             walletName="metamask"
             onclick={() => notifySuccess('MetaMask clicked!')}
+          />
+        </div>
+        <h1>Buttons</h1>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            buttonType="primary-red"
+            label="Primary red with icon"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary-blue"
+            label="Primary blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary-black"
+            label="Primary black"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Primary disabled"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Secondary red with icon"
+            buttonType="secondary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary blue"
+            buttonType="secondary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary black"
+            buttonType="secondary-black"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary disabled"
+            buttonType="secondary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Tertiary blue with icon"
+            buttonType="tertiary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Tertiary black"
+            buttonType="tertiary-black"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Tertiary disabled"
+            buttonType="tertiary-black"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Large primary red with icon"
+            buttonType="lg-primary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large primary blue"
+            buttonType="lg-primary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large primary blue"
+            buttonType="lg-primary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Large secondary red with icon"
+            buttonType="lg-secondary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large secondary blue"
+            buttonType="lg-secondary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large secondary disabled"
+            buttonType="lg-secondary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Large tertiary red with icon"
+            buttonType="lg-tertiary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large tertiary blue "
+            buttonType="lg-tertiary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large tertiary disabled "
+            buttonType="lg-tertiary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <h1>Gradient Button</h1>
+        <div class="button-gallery">
+          <CWGradientButton
+            label="Primary"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <h1>External Link Buttons</h1>
+        <div class="button-gallery">
+          <CWExternalLink
+            label="Button external link"
+            target="https://edgewa.re/"
+            linkType="button"
+          />
+          <CWExternalLink
+            label="Inline external link"
+            target="https://edgewa.re/"
+            linkType="inline"
+          />
+        </div>
+        <h1>Engagement Buttons</h1>
+        <div class="button-gallery">
+          <CWEngagementButton
+            buttonSize="sm"
+            label="Small"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWEngagementButton
+            buttonSize="lg"
+            label="Big"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWEngagementButton
+            buttonSize="sm"
+            label="Small"
+            disabled={true}
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWEngagementButton
+            buttonSize="lg"
+            label="Big"
+            disabled={true}
+            onclick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <h1>Text</h1>
@@ -254,67 +422,6 @@ export class ComponentShowcase implements m.ClassComponent {
             )}
           </div>
         </div>
-        <h1>Buttons</h1>
-        <div class="button-gallery">
-          <CWButton
-            label="Primary"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Disabled"
-            disabled={true}
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary"
-            buttonType="secondary"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary"
-            buttonType="secondary"
-            disabled={true}
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWGradientButton
-            label="Primary"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <h1>Button Group</h1>
-        <div class="button-gallery">
-          <CWButtonGroup>
-            <CWButton
-              label="One"
-              onclick={() => notifySuccess('One clicked!')}
-            />
-            <CWButton
-              label="Two"
-              onclick={() => notifySuccess('Two clicked!')}
-            />
-            <CWButton
-              label="Three"
-              onclick={() => notifySuccess('Three clicked!')}
-            />
-            <CWButton
-              label="Four"
-              onclick={() => notifySuccess('Four clicked!')}
-            />
-          </CWButtonGroup>
-        </div>
-        <h1>External Link Buttons</h1>
-        <div class="button-gallery">
-          <CWExternalLink
-            label="Button external link"
-            target="https://edgewa.re/"
-            linkType="button"
-          />
-          <CWExternalLink
-            label="Inline external link"
-            target="https://edgewa.re/"
-            linkType="inline"
-          />
-        </div>
         <h1>Radio Button</h1>
         <div class="choice-gallery">
           <CWRadioButton
@@ -365,31 +472,6 @@ export class ComponentShowcase implements m.ClassComponent {
             label="Indeterminate and disabled"
             disabled
             indeterminate
-          />
-        </div>
-        <h1>Engagement Buttons</h1>
-        <div class="button-gallery">
-          <CWEngagementButton
-            buttonSize="sm"
-            label="Small"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWEngagementButton
-            buttonSize="lg"
-            label="Big"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWEngagementButton
-            buttonSize="sm"
-            label="Small"
-            disabled={true}
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWEngagementButton
-            buttonSize="lg"
-            label="Big"
-            disabled={true}
-            onclick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <h1>Cards</h1>
