@@ -3,9 +3,6 @@
 $large-chain-icon-size: 96px;
 $small-chain-icon-size: 40px;
 
-// Gabe 5/25/22: Ideally the mobile versions of these styles should be
-// in a separate version of the component, with a js window width conditional
-
 .community-card.Card {
   align-items: center;
   height: 336px;
