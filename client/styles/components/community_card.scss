@@ -18,7 +18,9 @@ $large-chain-icon-size: 96px;
       align-items: center;
       background: $neutral-800;
       display: flex;
+      min-height: $large-chain-icon-size;
       justify-content: center;
+      width: $large-chain-icon-size;
 
       .no-image-text.Text {
         color: $white;
@@ -78,7 +80,7 @@ $large-chain-icon-size: 96px;
     width: 100%;
 
     .new-community.Text {
-      margin-bottom: 24px;
+      margin-bottom: 48px;
       text-align: center;
     }
   }
