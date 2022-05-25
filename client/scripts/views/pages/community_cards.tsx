@@ -205,7 +205,6 @@ class HomepageCommunityCards implements m.ClassComponent {
               return (
                 <CWButton
                   label={cat}
-                  className="filter-button"
                   buttonType={
                     this.filterMap[cat] ? 'primary-black' : 'secondary-black'
                   }
@@ -219,7 +218,6 @@ class HomepageCommunityCards implements m.ClassComponent {
               return (
                 <CWButton
                   label={network}
-                  className="filter-button"
                   buttonType={
                     this.filterMap[network]
                       ? 'primary-black'
@@ -235,7 +233,6 @@ class HomepageCommunityCards implements m.ClassComponent {
               return (
                 <CWButton
                   label={base}
-                  className="filter-button"
                   buttonType={
                     this.filterMap[base] ? 'primary-black' : 'secondary-black'
                   }

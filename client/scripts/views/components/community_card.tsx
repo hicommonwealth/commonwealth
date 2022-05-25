@@ -98,12 +98,14 @@ export class NewCommunityCard implements m.ClassComponent {
         }}
       >
         <div class="new-community-card-body">
-          <h3>Create a new community</h3>
-          <p class="action">
+          <CWText type="h3" fontWeight="semiBold" className="new-community">
+            Create a new community
+          </CWText>
+          <CWText className="new-community">
             Launch and grow your decentralized community on Commonwealth
-          </p>
+          </CWText>
           <a class="learn-more" href="#">
-            {m.trust('Learn more &raquo;')}
+            Learn more
           </a>
         </div>
       </CWCard>

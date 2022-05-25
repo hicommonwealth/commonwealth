@@ -4,6 +4,7 @@ $large-chain-icon-size: 96px;
 
 .community-card.Card {
   align-items: center;
+  height: 336px;
   justify-content: flex-start;
   width: 240px;
 
@@ -66,6 +67,7 @@ $large-chain-icon-size: 96px;
 }
 
 .new-community-card.Card {
+  height: 336px;
   width: 240px;
 
   .new-community-card-body {
@@ -75,25 +77,9 @@ $large-chain-icon-size: 96px;
     height: 100%;
     width: 100%;
 
-    p.action {
+    .new-community.Text {
+      margin-bottom: 24px;
       text-align: center;
-      // width: 180px;
-      // font-size: 18px;
-      // margin-bottom: 30px;
-
-      // @include mobile-max {
-      //   font-size: 14px;
-      //   width: 110px;
-      //   text-align: center;
-      // }
-    }
-
-    a.learn-more {
-      // @include mobile-max {
-      //   font-size: 14px;
-      //   width: 110px;
-      //   text-align: center;
-      // }
     }
   }
 }
