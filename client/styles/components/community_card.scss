@@ -1,0 +1,99 @@
+@import 'shared';
+
+$large-chain-icon-size: 96px;
+
+.community-card.Card {
+  align-items: center;
+  justify-content: flex-start;
+  width: 240px;
+
+  .large-chain-icon {
+    border-radius: $border-radius-round;
+    height: $large-chain-icon-size;
+    margin-bottom: 8px;
+    width: $large-chain-icon-size;
+
+    &.no-image {
+      align-items: center;
+      background: $neutral-800;
+      display: flex;
+      justify-content: center;
+
+      .no-image-text.Text {
+        color: $white;
+      }
+    }
+  }
+
+  .card-body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 200px;
+    justify-content: space-between;
+    width: 100%;
+
+    .chain-name.Text {
+      text-align: center;
+      width: 200px;
+      // Gabe 5/24/22: not sure why I have to set this width
+      // to get noWrap to work... to be continued...
+    }
+
+    .IconButton {
+      display: none;
+    }
+
+    @include sm-max {
+      .Button {
+        display: none;
+      }
+
+      .IconButton {
+        display: flex;
+      }
+    }
+
+    .card-description.Text {
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      color: $neutral-500;
+      display: -webkit-box;
+      overflow: hidden;
+      width: 152px;
+    }
+  }
+}
+
+.new-community-card.Card {
+  width: 240px;
+
+  .new-community-card-body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+
+    p.action {
+      text-align: center;
+      // width: 180px;
+      // font-size: 18px;
+      // margin-bottom: 30px;
+
+      // @include mobile-max {
+      //   font-size: 14px;
+      //   width: 110px;
+      //   text-align: center;
+      // }
+    }
+
+    a.learn-more {
+      // @include mobile-max {
+      //   font-size: 14px;
+      //   width: 110px;
+      //   text-align: center;
+      // }
+    }
+  }
+}

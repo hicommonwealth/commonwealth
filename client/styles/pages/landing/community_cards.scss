@@ -1,13 +1,8 @@
 @import 'shared';
 
-// @mixin mobile-max {
-//   @media only screen and (max-width: 670px) {
-//     @content;
-//   }
-// }
-
 .HomepageCommunityCards {
   display: flex;
+  flex: 1;
   flex-direction: column;
   padding: 24px;
 
@@ -48,10 +43,6 @@
     grid-gap: 24px;
     justify-content: center;
     align-content: flex-start;
-
-    // @include mobile-max {
-    //   grid-template-columns: repeat(auto-fit, 135px);
-    // }
   }
 
   .ChainIcon {

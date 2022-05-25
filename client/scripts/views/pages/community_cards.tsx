@@ -9,9 +9,8 @@ import app from 'state';
 import { NodeInfo } from 'models';
 import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWCard } from '../components/component_kit/cw_card';
 import Sublayout from '../sublayout';
-import { ChainCard } from '../components/chain_card';
+import { CommunityCard, NewCommunityCard } from '../components/community_card';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -44,6 +43,7 @@ export const buildChainToCategoriesMap = (
 
   return chainToCategoriesMap;
 };
+
 class HomepageCommunityCards implements m.ClassComponent {
   private chainCategories: Array<string>;
   private chainNetworks: Array<string>;
@@ -51,6 +51,7 @@ class HomepageCommunityCards implements m.ClassComponent {
   private filterMap: { [val: string]: boolean };
   private chainToCategoriesMap: { [chain: string]: string[] };
   private myChains: Array<NodeInfo | string | any>;
+
   oninit() {
     const chainsAndCategories = app.config.chainCategories;
     const categoryTypes = app.config.chainCategoryTypes;
@@ -119,7 +120,7 @@ class HomepageCommunityCards implements m.ClassComponent {
       });
     };
 
-    const chainCategoryFilter = (list, filterMap) => {
+    const chainCategoryFilter = (list) => {
       return list.filter((data) => {
         for (const cat of this.chainCategories) {
           if (
@@ -167,7 +168,7 @@ class HomepageCommunityCards implements m.ClassComponent {
           this.chainCategories.filter((cat) => filterMap[cat]).length > 0;
 
         if (chainCategoryFilterOn) {
-          filteredList = chainCategoryFilter(filteredList, filterMap);
+          filteredList = chainCategoryFilter(filteredList);
         }
       }
       // Filter by recent thread activity
@@ -184,7 +185,7 @@ class HomepageCommunityCards implements m.ClassComponent {
         .map((entity: Array<NodeInfo | string>) => {
           if (Array.isArray(entity)) {
             const [chain, nodeList]: [string, NodeInfo] = entity as any;
-            return <ChainCard chain={chain} nodeList={nodeList} />;
+            return <CommunityCard chain={chain} nodeList={nodeList} />;
           }
           return null;
         });
@@ -248,26 +249,7 @@ class HomepageCommunityCards implements m.ClassComponent {
         </div>
         <div class="communities-list">
           {sortedChains}
-          <CWCard
-            elevation="elevation-2"
-            interactive={true}
-            className="chain-card"
-            onclick={(e) => {
-              e.preventDefault();
-              document.location =
-                'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
-            }}
-          >
-            <div class="new-community-card-body">
-              <h3>Create a new community</h3>
-              <p class="action">
-                Launch and grow your decentralized community on Commonwealth
-              </p>
-              <a class="learn-more" href="#">
-                {m.trust('Learn more &raquo;')}
-              </a>
-            </div>
-          </CWCard>
+          <NewCommunityCard />
         </div>
       </div>
     );

@@ -338,7 +338,9 @@ export class ComponentShowcase implements m.ClassComponent {
           <div class="text-row">
             <CWText type="h3">Overflow</CWText>
             <div class="ellipsis-row">
-              <CWText type="h3">Body1 noWrap</CWText>
+              <CWText type="h3" noWrap>
+                Body1 noWrap
+              </CWText>
             </div>
           </div>
         </div>
