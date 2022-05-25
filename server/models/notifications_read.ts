@@ -23,7 +23,7 @@ export default (
 	dataTypes: typeof DataTypes,
 ): NotificationsReadModelStatic => {
 	const NotificationsRead = <NotificationsReadModelStatic>sequelize.define('NotificationsRead', {
-		id: {type: dataTypes.INTEGER, allowNull: true},
+		id: {type: dataTypes.INTEGER, allowNull: false},
 		subscription_id: { type: dataTypes.INTEGER, primaryKey: true },
 		notification_id: { type: dataTypes.INTEGER, primaryKey: true },
 		is_read: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
