@@ -34,5 +34,9 @@
     grid-template-columns: repeat(auto-fit, 240px);
     justify-content: center;
     padding-bottom: 24px;
+
+    @include sm-max {
+      grid-template-columns: repeat(auto-fit, 136px);
+    }
   }
 }

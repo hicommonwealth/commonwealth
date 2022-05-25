@@ -73,11 +73,7 @@ export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
             onclick={redirectFunction}
           />
           {/* for mobile */}
-          <CWIconButton
-            iconName="expand"
-            onclick={redirectFunction}
-            iconSize="large"
-          />
+          <CWIconButton iconName="expand" onclick={redirectFunction} />
         </div>
       </CWCard>
     );
@@ -98,7 +94,11 @@ export class NewCommunityCard implements m.ClassComponent {
         }}
       >
         <div class="new-community-card-body">
-          <CWText type="h3" fontWeight="semiBold" className="new-community">
+          <CWText
+            type="h3"
+            fontWeight="semiBold"
+            className="new-community-header"
+          >
             Create a new community
           </CWText>
           <CWText className="new-community">

@@ -1,6 +1,10 @@
 @import 'shared';
 
 $large-chain-icon-size: 96px;
+$small-chain-icon-size: 40px;
+
+// Gabe 5/25/22: Ideally the mobile versions of these styles should be
+// in a separate version of the component, with a js window width conditional
 
 .community-card.Card {
   align-items: center;
@@ -8,11 +12,21 @@ $large-chain-icon-size: 96px;
   justify-content: flex-start;
   width: 240px;
 
+  @include sm-max {
+    height: 220px;
+    width: 136px;
+  }
+
   .large-chain-icon {
     border-radius: $border-radius-round;
     height: $large-chain-icon-size;
     margin-bottom: 8px;
     width: $large-chain-icon-size;
+
+    @include sm-max {
+      height: $small-chain-icon-size;
+      width: $small-chain-icon-size;
+    }
 
     &.no-image {
       align-items: center;
@@ -22,8 +36,19 @@ $large-chain-icon-size: 96px;
       justify-content: center;
       width: $large-chain-icon-size;
 
+      @include sm-max {
+        min-height: $small-chain-icon-size;
+        width: $small-chain-icon-size;
+      }
+
       .no-image-text.Text {
         color: $white;
+
+        @include sm-max {
+          font-family: $font-family-neue-haas-unica;
+          font-size: 14px;
+          line-height: 20px;
+        }
       }
     }
   }
@@ -41,6 +66,13 @@ $large-chain-icon-size: 96px;
       width: 200px;
       // Gabe 5/24/22: not sure why I have to set this width
       // to get noWrap to work... to be continued...
+
+      @include sm-max {
+        font-family: $font-family-silka;
+        font-size: 18px;
+        line-height: 24px;
+        width: 96px;
+      }
     }
 
     .IconButton {
@@ -64,6 +96,13 @@ $large-chain-icon-size: 96px;
       display: -webkit-box;
       overflow: hidden;
       width: 152px;
+
+      @include sm-max {
+        font-family: $font-family-neue-haas-unica;
+        font-size: 14px;
+        line-height: 20px;
+        width: 88px;
+      }
     }
   }
 }
@@ -72,6 +111,11 @@ $large-chain-icon-size: 96px;
   height: 336px;
   width: 240px;
 
+  @include sm-max {
+    height: 220px;
+    width: 136px;
+  }
+
   .new-community-card-body {
     align-items: center;
     display: flex;
@@ -79,9 +123,39 @@ $large-chain-icon-size: 96px;
     height: 100%;
     width: 100%;
 
+    .new-community-header.Text {
+      margin-bottom: 48px;
+      text-align: center;
+
+      @include sm-max {
+        font-family: $font-family-silka;
+        font-size: 18px;
+        line-height: 24px;
+        margin-bottom: 8px;
+        width: 96px;
+      }
+    }
+
     .new-community.Text {
       margin-bottom: 48px;
       text-align: center;
+
+      @include sm-max {
+        font-family: $font-family-neue-haas-unica;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        line-height: 16px;
+        margin-bottom: 8px;
+      }
+    }
+
+    @include sm-max {
+      a.learn-more {
+        font-family: $font-family-neue-haas-unica;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        line-height: 16px;
+      }
     }
   }
 }
