@@ -38,8 +38,10 @@ export class ChainEventsNamespace {
           this.subscriptionRoomsJoined.add(eventType);
         }
       }
-      console.log('Adding Websocket subscriptions for:', roomsToJoin);
-      this.ceNs.emit(WebsocketMessageNames.NewSubscriptions, roomsToJoin);
+      if (roomsToJoin.length > 0) {
+        console.log('Adding Websocket subscriptions for:', roomsToJoin);
+        this.ceNs.emit(WebsocketMessageNames.NewSubscriptions, roomsToJoin);
+      }
     } else {
       console.log('ChainEventsNamespace is not connected');
     }
@@ -57,8 +59,11 @@ export class ChainEventsNamespace {
           this.subscriptionRoomsJoined.delete(eventType);
         }
       }
-      console.log('Deleting Websocket subscriptions for:', roomsToLeave);
-      this.ceNs.emit(WebsocketMessageNames.DeleteSubscriptions, roomsToLeave);
+
+      if (roomsToLeave.length > 0) {
+        console.log('Deleting Websocket subscriptions for:', roomsToLeave);
+        this.ceNs.emit(WebsocketMessageNames.DeleteSubscriptions, roomsToLeave);
+      }
     } else {
       console.log('ChainEventsNamespace is not connected');
     }

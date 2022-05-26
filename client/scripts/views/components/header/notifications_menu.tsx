@@ -13,8 +13,8 @@ import { sortNotifications } from 'helpers/notifications';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 const MAX_NOTIFS = 40; // limit number of notifications shown
-let minNotification = 0;
-let maxNotification = MAX_NOTIFS;
+let minDiscussionNotification = 0;
+let minChainEventsNotification = 0;
 
 type NotificationsMenuFooterAttrs = { showingChainNotifications: boolean };
 
@@ -52,11 +52,13 @@ class NotificationsMenuFooter
           label="<"
           onclick={(e) => {
             e.preventDefault();
-            if (minNotification >= MAX_NOTIFS) {
-                minNotification -= MAX_NOTIFS;
-                maxNotification -= MAX_NOTIFS;
+            if (showingChainNotifications && minChainEventsNotification >= MAX_NOTIFS) {
+              minChainEventsNotification -= MAX_NOTIFS;
+              m.redraw()
+            } else if (minDiscussionNotification >= MAX_NOTIFS) {
+              minDiscussionNotification -= MAX_NOTIFS;
+              m.redraw()
             }
-            m.redraw()
           }}
         />
           <Button
@@ -65,15 +67,15 @@ class NotificationsMenuFooter
                   e.preventDefault();
                   if (showingChainNotifications) {
                       app.user.notifications.getChainEventNotifications().then(() => {
+                          minChainEventsNotification += MAX_NOTIFS;
                           m.redraw();
                       })
                   } else {
                       app.user.notifications.getDiscussionNotifications().then(() => {
+                          minDiscussionNotification += MAX_NOTIFS;
                           m.redraw();
                       })
                   }
-                  minNotification += MAX_NOTIFS;
-                  maxNotification += MAX_NOTIFS;
               }}
           />
       </div>
@@ -190,8 +192,8 @@ export class NotificationsMenu
                         maxPages={1} // prevents rollover/repeat
                         pageData={() =>
                           chainEventNotifications.slice(
-                            minNotification,
-                            maxNotification
+                            minChainEventsNotification,
+                            minChainEventsNotification + MAX_NOTIFS
                           )
                         } // limit the number of rows shown here
                         key={
@@ -210,8 +212,8 @@ export class NotificationsMenu
                         maxPages={1} // prevents rollover/repeat
                         pageData={() =>
                           discussionNotifications.slice(
-                            minNotification,
-                            maxNotification
+                            minDiscussionNotification,
+                            minDiscussionNotification + MAX_NOTIFS
                           )
                         } // limit the number of rows shown here
                         key={
