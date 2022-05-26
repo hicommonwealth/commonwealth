@@ -555,7 +555,7 @@ function setupRouter(
   );
 
   router.post(
-      '/viewChainEventsNotifications',
+      '/viewChainEventNotifications',
       passport.authenticate('jwt', { session: false }),
       viewNotifications.bind(this, models, NotificationCategories.ChainEvents)
   );

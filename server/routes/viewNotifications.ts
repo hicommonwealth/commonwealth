@@ -4,6 +4,7 @@ import {DB, sequelize} from '../database';
 import {performance, PerformanceObserver} from "perf_hooks";
 
 const Op = Sequelize.Op;
+const MAX_NOTIF = 40;
 
 export enum NotificationCategories {
   ChainEvents = "chain-event",
@@ -55,6 +56,16 @@ export default async (
   }
 
   performance.mark('A');
+  const numUnread = (<any>(await models.NotificationsRead.count({
+    where: {
+      [Op.and]: [
+        { user_id: req.user.id },
+        { is_read: false }
+      ]
+    }
+  })));
+
+  console.log("Number Unread:", numUnread);
 
   let maxId, numNr;
   // if maxId is not provided that means this is the first request so load the first 100
@@ -69,21 +80,21 @@ export default async (
     raw: true
   }))).max;
 
-  if (!req.body.maxId) maxId = numNr;
+  if (!req.body.maxId || req.body.maxId == 0) maxId = numNr;
   else maxId = req.body.maxId;
 
   performance.mark('B');
-
-  console.log(">>>>>>>>>>>>>>>>>", maxId);
 
   const whereAndOptions: any = [
     {user_id: req.user.id},
     {id: {[Op.lte]: maxId}}
   ]
 
+  console.log(">>>>>>>>>>>>>>>>>Max Id:", maxId);
+
   if (req.body.unread_only) whereAndOptions.push({ is_read: false });
 
-  // TODO: handle case when maxId = 0 i.e. no more notificationReads to retrieve
+  // TODO: write raw query so that all subscriptions are included
   const notificationsRead = await models.NotificationsRead.findAll({
     include: [
       {
@@ -103,7 +114,7 @@ export default async (
       [Op.and]: whereAndOptions
     },
     order: [['id', 'DESC']],
-    limit: 100,
+    limit: MAX_NOTIF,
     raw: true, nest: true, logging: true
   });
 
@@ -146,9 +157,8 @@ export default async (
     })
   }
 
-  // TODO: lack of toJSON() native call causing issues for front-end recognition of notifications
   const subscriptions = []
   for (const sub_id in subscriptionsObj) subscriptions.push(subscriptionsObj[sub_id]);
 
-  return res.json({ status: 'Success', result: {subscriptions, numPages: Math.ceil(numNr / 100)} });
+  return res.json({ status: 'Success', result: {subscriptions, numNotifications: numNr, numUnread} });
 };

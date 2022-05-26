@@ -349,7 +349,7 @@ const NotificationRow: m.Component<
                     e.preventDefault();
                     e.stopPropagation();
                     vnode.state.scrollOrStop = true;
-                    app.user.notifications.clear([notification]).then(() => {
+                    app.user.notifications.delete([notification]).then(() => {
                       m.redraw();
                     });
                   },

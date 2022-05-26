@@ -40,8 +40,11 @@ const NotificationsPage: m.Component<{}> = {
         ],
       });
 
-    const notifications = app.user.notifications?.notifications || [];
-    const sortedNotifications = sortNotifications(notifications).reverse();
+    const discussionNotifications = app.user.notifications.discussionNotifications;
+    const chainEventNotifications = app.user.notifications.chainEventNotifications;
+
+    // const sortedNotifications = sortNotifications(app.user.notifications.allNotifications).reverse();
+    // console.log("Sorted Notifications:", sortedNotifications);
 
     return m(
       Sublayout,
@@ -76,7 +79,7 @@ const NotificationsPage: m.Component<{}> = {
                 onclick: (e) => {
                   e.preventDefault();
                   app.user.notifications
-                    .markAsRead(notifications)
+                    .markAsRead(discussionNotifications.concat(chainEventNotifications))
                     .then(() => m.redraw());
                 },
               }),
@@ -93,13 +96,10 @@ const NotificationsPage: m.Component<{}> = {
                     rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
-                      const chainEventNotifications =
-                        app.user.notifications.notifications.filter(
-                          (n) => n.chainEvent
-                        );
+                      const chainEventNotifications = app.user.notifications.chainEventNotifications;
                       if (chainEventNotifications.length === 0) return;
                       app.user.notifications
-                        .clear(chainEventNotifications)
+                        .delete(chainEventNotifications)
                         .then(() => m.redraw());
                     },
                   }),
@@ -117,19 +117,23 @@ const NotificationsPage: m.Component<{}> = {
             ]
           ),
           m('.NotificationsList', [
-            sortedNotifications.length > 0
-              ? m(Infinite, {
+            (() => {
+              const totalLength = discussionNotifications.length + chainEventNotifications.length;
+              console.log('total length', totalLength);
+              if (totalLength > 0) {
+                return m(Infinite, {
                   maxPages: 1, // prevents rollover/repeat
-                  key: sortedNotifications.length,
-                  pageData: () => sortedNotifications,
+                  key: totalLength,
+                  pageData: () => discussionNotifications.concat(chainEventNotifications),
                   item: (data, opts, index) => {
                     return m(NotificationRow, {
-                      notifications: data,
+                      notifications: [data],
                       onListPage: true,
                     });
                   },
                 })
-              : m('.no-notifications', 'No Notifications'),
+              } else return m('.no-notifications', 'No Notifications')
+            })()
           ]),
         ]),
       ]

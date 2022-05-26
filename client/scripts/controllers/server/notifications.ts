@@ -20,26 +20,33 @@ const post = (route, args, callback) => {
 };
 
 class NotificationsController {
-  private _store: NotificationStore = new NotificationStore();
-
-  private maxReadId: number = 0;
-  private _maxUnreadId: number = 0;
+  private _discussionStore: NotificationStore = new NotificationStore();
+  private _chainEventStore: NotificationStore = new NotificationStore();
 
   private _maxChainEventNotificationId: number = 0;
   private _maxDiscussionNotificationId: number = 0;
 
   private _numPages = 0;
-
-  public get store() {
-    return this._store;
-  }
+  private _numUnread = 0;
 
   public get numPages(): number {
     return this._numPages;
   }
 
-  public get notifications(): Notification[] {
-    return this._store.getAll();
+  public get numUnread(): number {
+    return this._numUnread;
+  }
+
+  public get discussionNotifications(): Notification[] {
+    return this._discussionStore.getAll();
+  }
+
+  public get chainEventNotifications(): Notification[] {
+    return this._chainEventStore.getAll();
+  }
+
+  public get allNotifications(): Notification[] {
+    return this._discussionStore.getAll().concat(this._chainEventStore.getAll())
   }
 
   private _subscriptions: NotificationSubscription[] = [];
@@ -187,16 +194,26 @@ class NotificationsController {
 
   public clearAllRead() {
     return post('/clearReadNotifications', {}, (result) => {
-      const toClear = this._store.getAll().filter((n) => n.isRead);
+      const toClear = this.allNotifications.filter((n) => n.isRead);
       for (const n of toClear) {
-        this._store.remove(n);
+        this.removeFromStore(n);
       }
     });
   }
 
-  public clear(notifications: Notification[]) {
+  public clear() {
+    this._discussionStore.clear();
+    this._chainEventStore.clear();
+  }
+
+  public removeFromStore(n) {
+    if (n.chainEvent) this._chainEventStore.remove(n);
+    else this._discussionStore.remove(n);
+  }
+
+  public delete(notifications: Notification[]) {
     // TODO: Change to PUT /clearNotifications
-    const MAX_NOTIFICATIONS_CLEAR = 100; // clear up to 100 notifications at a time
+    const MAX_NOTIFICATIONS_CLEAR = 100; // delete up to 100 notifications at a time
 
     if (notifications.length === 0) return;
     return post(
@@ -209,9 +226,9 @@ class NotificationsController {
       async (result) => {
         notifications
           .slice(0, MAX_NOTIFICATIONS_CLEAR)
-          .map((n) => this._store.remove(n));
+          .map((n) => this.removeFromStore(n));
         if (notifications.slice(MAX_NOTIFICATIONS_CLEAR).length > 0) {
-          this.clear(notifications.slice(MAX_NOTIFICATIONS_CLEAR));
+          this.delete(notifications.slice(MAX_NOTIFICATIONS_CLEAR));
         }
         // TODO: post(/clearNotifications) should wait on all notifications being marked as read before redrawing
       }
@@ -219,8 +236,11 @@ class NotificationsController {
   }
 
   public update(n: Notification) {
-    if (!this._store.getById(n.id)) {
-      this._store.add(n);
+    if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
+      this._chainEventStore.add(n);
+      m.redraw();
+    } else if (!n.chainEvent && !this._discussionStore.getById(n.id)) {
+      this._discussionStore.add(n);
       m.redraw();
     }
   }
@@ -237,15 +257,15 @@ class NotificationsController {
       throw new Error('must be logged in to refresh notifications');
     }
     const options: any = app.isCustomDomain()
-        ? { chain_filter: app.activeChainId() }
-        : {};
+      ? { chain_filter: app.activeChainId() }
+      : {};
 
     options.maxId = this._maxChainEventNotificationId;
 
     return post('/viewChainEventNotifications', options, (result) => {
-      this._store.clear();
       this._subscriptions = [];
       this._numPages = result.numPages;
+      this._numUnread = result.numUnread;
       this.parseNotifications(result.subscriptions);
     });
   }
@@ -255,15 +275,15 @@ class NotificationsController {
       throw new Error('must be logged in to refresh notifications');
     }
     const options: any = app.isCustomDomain()
-        ? { chain_filter: app.activeChainId() }
-        : {};
+      ? { chain_filter: app.activeChainId() }
+      : {};
 
     options.maxId = this._maxDiscussionNotificationId;
 
     return post('/viewDiscussionNotifications', options, (result) => {
-      this._store.clear();
       this._subscriptions = [];
       this._numPages = result.numPages;
+      this._numUnread = result.numUnread;
       this.parseNotifications(result.subscriptions);
     });
   }
@@ -277,7 +297,7 @@ class NotificationsController {
       let chainEventType = null;
       if (subscriptionJSON.ChainEventType) {
         chainEventType = ChainEventType.fromJSON(
-            subscriptionJSON.ChainEventType
+          subscriptionJSON.ChainEventType
         );
       }
 
@@ -287,32 +307,39 @@ class NotificationsController {
           ...notificationsReadJSON.Notification,
         };
         const notification = Notification.fromJSON(
-            data,
-            subscription,
-            chainEventType
+          data,
+          subscription,
+          chainEventType
         );
-        this._store.add(notification);
 
         if (subscription.category === 'chain-event') {
+          this._chainEventStore.add(notification)
           // the minimum id is the new max id for next page
-          if (this._maxChainEventNotificationId === 0 || notificationsReadJSON.id < this._maxChainEventNotificationId) {
+          if (
+            this._maxChainEventNotificationId === 0 ||
+            notificationsReadJSON.id < this._maxChainEventNotificationId
+          ) {
             this._maxChainEventNotificationId = notificationsReadJSON.id;
           }
-          ceSubs.push(subscription);
         } else {
-          if (this._maxDiscussionNotificationId === 0 || notificationsReadJSON.id < this._maxDiscussionNotificationId) {
+          this._discussionStore.add(notification);
+          if (
+            this._maxDiscussionNotificationId === 0 ||
+            notificationsReadJSON.id < this._maxDiscussionNotificationId
+          ) {
             this._maxDiscussionNotificationId = notificationsReadJSON.id;
           }
         }
       }
+      if (subscription.category === 'chain-event') ceSubs.push(subscription);
     }
     app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
   }
 
   public async refresh() {
     return Promise.all([
-        this.getDiscussionNotifications(),
-        this.getChainEventNotifications()
+      this.getDiscussionNotifications(),
+      this.getChainEventNotifications(),
     ]);
   }
 }

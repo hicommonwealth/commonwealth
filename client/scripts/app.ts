@@ -57,7 +57,7 @@ export async function initAppState(
       .then(async (data) => {
         app.config.chains.clear();
         app.config.nodes.clear();
-        app.user.notifications.store.clear();
+        app.user.notifications.clear();
         app.user.notifications.clearSubscriptions();
         data.chains
           .filter((chain) => chain.active)

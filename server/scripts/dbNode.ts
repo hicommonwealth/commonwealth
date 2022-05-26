@@ -209,7 +209,7 @@ async function mainProcess(
               listeners[tokenKey].options.tokenAddresses
             )))
       ) {
-        // clear the listener if it already exists and the tokens have changed
+        // delete the listener if it already exists and the tokens have changed
         if (listeners[tokenKey]) {
           listeners[tokenKey].unsubscribe();
           delete listeners[tokenKey];
@@ -418,7 +418,7 @@ async function mainProcess(
       await producer.publish(event, 'SubstrateIdentityEventsPublication');
     }
 
-    // clear the identity cache for this chain
+    // delete the identity cache for this chain
     try {
       query = format(
         'DELETE FROM "IdentityCaches" WHERE "chain"=%L;',
@@ -426,7 +426,7 @@ async function mainProcess(
       );
       await pool.query(query);
     } catch (error) {
-      await handleFatalError(error, pool, chain.id, 'clear-identity-cache');
+      await handleFatalError(error, pool, chain.id, 'delete-identity-cache');
       continue;
     }
 
