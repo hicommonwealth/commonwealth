@@ -5,15 +5,21 @@ import {performance, PerformanceObserver} from "perf_hooks";
 
 const Op = Sequelize.Op;
 
+export enum NotificationCategories {
+  ChainEvents = "chain-event",
+  Discussion = "discussion"
+}
+
 export const Errors = {
   NotLoggedIn: 'Not logged in',
 };
 
 export default async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
+    models: DB,
+    notificationCategory: NotificationCategories,
+    req: Request,
+    res: Response,
+    next: NextFunction,
 ) => {
   console.log(req.user);
   performance.mark('start');
@@ -41,24 +47,12 @@ export default async (
     });
   }
 
-  const notificationParams: any = {
-    model: models.NotificationsRead,
-    where: { user_id: req.user.id },
-    required: false, // send subscriptions regardless of whether user has notifications
-    include: [
-      {
-        model: models.Notification,
-        required: true,
-        include: [
-          {
-            model: models.ChainEvent,
-            required: false,
-            as: 'ChainEvent',
-          },
-        ],
-      },
-    ],
-  };
+  const notificationWhereOptions = {}
+  if (notificationCategory == NotificationCategories.ChainEvents) {
+    notificationWhereOptions['category_id'] = NotificationCategories.ChainEvents
+  } else {
+    notificationWhereOptions['category_id'] = { [Op.ne]: NotificationCategories.ChainEvents }
+  }
 
   performance.mark('A');
 
@@ -102,6 +96,7 @@ export default async (
       {
         model: models.Notification,
         required: true,
+        where: notificationWhereOptions
       }
     ],
     where: {

@@ -24,6 +24,10 @@ class NotificationsController {
 
   private maxReadId: number = 0;
   private _maxUnreadId: number = 0;
+
+  private _maxChainEventNotificationId: number = 0;
+  private _maxDiscussionNotificationId: number = 0;
+
   private _numPages = 0;
 
   public get store() {
@@ -228,56 +232,88 @@ class NotificationsController {
     this._subscriptions = [];
   }
 
-  // TODO: have a min_unread_id and a min_read_id and then submit the value based on request
-  public refresh() {
+  public getChainEventNotifications() {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
     const options: any = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId() }
-      : {};
+        ? { chain_filter: app.activeChainId() }
+        : {};
 
-    // options remain undefined if maxId or minId = 0
-    options.maxId = this._maxUnreadId || undefined;
+    options.maxId = this._maxChainEventNotificationId;
 
-    // TODO: Change to GET /notifications
-    return post('/viewNotifications', options, (result) => {
+    return post('/viewChainEventNotifications', options, (result) => {
       this._store.clear();
       this._subscriptions = [];
-      const ceSubs = [];
-      this._numPages = result._numPages;
-      for (const subscriptionJSON of result.subscriptions) {
-        const subscription =
-          NotificationSubscription.fromJSON(subscriptionJSON);
-        this._subscriptions.push(subscription);
-        let chainEventType = null;
-        if (subscriptionJSON.ChainEventType) {
-          chainEventType = ChainEventType.fromJSON(
+      this._numPages = result.numPages;
+      this.parseNotifications(result.subscriptions);
+    });
+  }
+
+  public getDiscussionNotifications() {
+    if (!app.user || !app.user.jwt) {
+      throw new Error('must be logged in to refresh notifications');
+    }
+    const options: any = app.isCustomDomain()
+        ? { chain_filter: app.activeChainId() }
+        : {};
+
+    options.maxId = this._maxDiscussionNotificationId;
+
+    return post('/viewDiscussionNotifications', options, (result) => {
+      this._store.clear();
+      this._subscriptions = [];
+      this._numPages = result.numPages;
+      this.parseNotifications(result.subscriptions);
+    });
+  }
+
+  private parseNotifications(subscriptions: any) {
+    const ceSubs = [];
+
+    for (const subscriptionJSON of subscriptions) {
+      const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
+      this._subscriptions.push(subscription);
+      let chainEventType = null;
+      if (subscriptionJSON.ChainEventType) {
+        chainEventType = ChainEventType.fromJSON(
             subscriptionJSON.ChainEventType
-          );
-        }
-        for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
-          const data = {
-            is_read: notificationsReadJSON.is_read,
-                ...notificationsReadJSON.Notification,
-          };
-          const notification = Notification.fromJSON(
+        );
+      }
+
+      for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
+        const data = {
+          is_read: notificationsReadJSON.is_read,
+          ...notificationsReadJSON.Notification,
+        };
+        const notification = Notification.fromJSON(
             data,
             subscription,
             chainEventType
-          );
-          this._store.add(notification);
+        );
+        this._store.add(notification);
 
+        if (subscription.category === 'chain-event') {
           // the minimum id is the new max id for next page
-          if (this._maxUnreadId === 0 || notificationsReadJSON.id < this._maxUnreadId) {
-            this._maxUnreadId = notificationsReadJSON.id;
+          if (this._maxChainEventNotificationId === 0 || notificationsReadJSON.id < this._maxChainEventNotificationId) {
+            this._maxChainEventNotificationId = notificationsReadJSON.id;
+          }
+          ceSubs.push(subscription);
+        } else {
+          if (this._maxDiscussionNotificationId === 0 || notificationsReadJSON.id < this._maxDiscussionNotificationId) {
+            this._maxDiscussionNotificationId = notificationsReadJSON.id;
           }
         }
-
-        if (subscription.category === 'chain-event') ceSubs.push(subscription);
       }
-      app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
-    });
+    }
+    app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
+  }
+
+  public async refresh() {
+    return Promise.all([
+        this.getDiscussionNotifications(),
+        this.getChainEventNotifications()
+    ]);
   }
 }
 
