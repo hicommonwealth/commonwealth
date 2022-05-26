@@ -20,6 +20,8 @@ import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWPopover } from './cw_popover/cw_popover';
 import { CWCheckbox } from './cw_checkbox';
+import { CWTooltip } from './cw_tooltip';
+import { CWOverlay } from './cw_overlay';
 
 // const displayColors = (hexList) => {
 //   return Object.entries(hexList).map(([k, v]) => {
@@ -203,7 +205,43 @@ export class ComponentShowcase implements m.ClassComponent {
             hoverOpenDelay={200}
           />
         </div>
-
+        <h1>Tooltip</h1>
+        <div style="display: flex; width: 30%; justify-content: space-between;">
+          <CWTooltip
+            trigger={<CWButton label={'Tooltip Large'} />}
+            content={
+              <div>
+                You can hover over me and I won't disappear- an effect whose
+                necessary conditions include setting a nonzero hoverOpenDelay
+                and a value of true for persistOnHover. I am also set with
+                singleLine=false
+              </div>
+            }
+            hoverOpenDelay={100}
+            persistOnHover={true}
+          />
+          <CWTooltip
+            trigger={<CWButton label={'Tooltip Small'} />}
+            content={
+              <div
+                style="color: white; font-size: 12px;
+              "
+              >
+                0x1234567891011121314151617181920
+              </div>
+            }
+            hoverOpenDelay={100}
+            singleLine={true}
+          />
+        </div>
+        <h1>Layover</h1>
+        <div style="display: flex; width: 30%; justify-content: space-between;">
+          <CWOverlay
+            isOpen={true}
+            target={<CWButton label={'Tooltip Small'} />}
+            content={<div>0x1234567891011121314151617181920</div>}
+          />
+        </div>
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">

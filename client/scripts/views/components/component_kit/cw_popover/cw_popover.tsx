@@ -6,7 +6,7 @@ import m from 'mithril';
 import 'components/component_kit/cw_popover.scss';
 
 import { CWPortal } from '../cw_portal';
-import { cursorInBounds, findRef, getPopoverPosition } from './helpers';
+import { cursorInBounds, findRef, getPosition } from './helpers';
 
 export type PopoverAttrs = {
   content: m.Children;
@@ -32,7 +32,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     this.isOpen = false;
     this.isRendered = true;
     this.triggerRef = findRef(vnode.dom, 'trigger-wrapper');
-    this.contentId = `tooltip-container-${Math.random()}`;
+    this.contentId = `popover-container-${Math.random()}`;
     this.arrowId = `${this.contentId}-arrow`;
   }
 
@@ -57,19 +57,19 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   applyPopoverPosition(vnode) {
     // Apply styles in real time
     try {
-      const tooltipContainer = document.getElementById(this.contentId);
+      const popoverContainer = document.getElementById(this.contentId);
       const arrow = document.getElementById(this.arrowId);
 
-      const inlineStyle = getPopoverPosition({
+      const inlineStyle = getPosition({
         trigger: this.triggerRef,
-        container: tooltipContainer,
+        container: popoverContainer,
         arrowSize: 8,
         gapSize: 1,
         toSide: vnode.attrs.toSide,
       });
 
-      tooltipContainer.style.top = `${inlineStyle.contentTopYAmount}px`;
-      tooltipContainer.style.left = `${inlineStyle.contentLeftXAmount}px`;
+      popoverContainer.style.top = `${inlineStyle.contentTopYAmount}px`;
+      popoverContainer.style.left = `${inlineStyle.contentLeftXAmount}px`;
 
       const showArrow = vnode.attrs.showArrow && inlineStyle.showArrow;
 
@@ -93,7 +93,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 
       arrow.style.top = `${inlineStyle.arrowTopYAmount}px`;
       arrow.style.left = `${inlineStyle.arrowLeftXAmount}px`;
-      tooltipContainer.style.visibility = 'visible';
+      popoverContainer.style.visibility = 'visible';
 
       if (showArrow) {
         arrow.style.visibility = 'visible';
@@ -143,24 +143,22 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 
     return (
       <>
-        {
-          <div
-            class="trigger-wrapper"
-            ref="trigger-wrapper"
-            onclick={(e) => {
-              if (!interactionType || interactionType === 'click') {
-                this.togglePopOver(onToggle);
-              }
-            }}
-            onmouseenter={() => {
-              if (interactionType === 'hover') {
-                this.handleHoverEnter(vnode, onToggle);
-              }
-            }}
-          >
-            {trigger}
-          </div>
-        }
+        <div
+          class="trigger-wrapper"
+          ref="trigger-wrapper"
+          onclick={(e) => {
+            if (!interactionType || interactionType === 'click') {
+              this.togglePopOver(onToggle);
+            }
+          }}
+          onmouseenter={() => {
+            if (interactionType === 'hover') {
+              this.handleHoverEnter(vnode, onToggle);
+            }
+          }}
+        >
+          {trigger}
+        </div>
         {isOpen ? (
           <CWPortal>
             <div
@@ -177,8 +175,8 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
               }}
             >
               <div
-                class="tooltip-container"
-                ref="tooltip-container"
+                class="popover-container"
+                ref="popover-container"
                 id={this.contentId}
                 onmouseenter={() => {
                   this.isOverContent = true;

@@ -1,6 +1,6 @@
 // Source: https://github.com/Simspace/monorail/blob/master/src/metaComponents/popOver/PopOver.tsx
 
-export const getPopoverPosition = ({
+export const getPosition = ({
   trigger,
   container,
   arrowSize = 8,
@@ -45,13 +45,14 @@ export const getPopoverPosition = ({
   let contentTopYAmount;
   let arrowLeftXAmount;
   let arrowTopYAmount;
-  let showArrow;
 
   switch (popoverPlacement) {
     case 'above': {
-      contentLeftXAmount =
+      contentLeftXAmount = Math.max(
         triggerBoundingRect.left -
-        (containerBoundingRect.width - triggerBoundingRect.width) / 2;
+          (containerBoundingRect.width - triggerBoundingRect.width) / 2,
+        10
+      );
       contentTopYAmount = Math.max(
         0,
         triggerBoundingRect.top -
@@ -67,9 +68,11 @@ export const getPopoverPosition = ({
       break;
     }
     case 'below': {
-      contentLeftXAmount =
+      contentLeftXAmount = Math.max(
         triggerBoundingRect.left -
-        (containerBoundingRect.width - triggerBoundingRect.width) / 2;
+          (containerBoundingRect.width - triggerBoundingRect.width) / 2,
+        10
+      );
       contentTopYAmount = triggerBoundingRect.bottom + arrowSize + gapSize;
 
       arrowLeftXAmount =
@@ -92,8 +95,11 @@ export const getPopoverPosition = ({
         triggerBoundingRect.top + triggerBoundingRect.height / 2 - 8;
       break;
     }
+    default: {
+      break;
+    }
   }
-  showArrow = contentTopYAmount != 0 ? true : false;
+  const showArrow = contentTopYAmount !== 0;
 
   return {
     contentLeftXAmount,

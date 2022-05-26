@@ -1,34 +1,182 @@
 /* @jsx m */
+/* eslint-disable no-empty */
 
 import m from 'mithril';
 
-//import 'components/component_kit/cw_tooltip.scss';
+import 'components/component_kit/cw_tooltip.scss';
 
-import { ComponentType } from './types';
-import { CWButton } from './cw_button';
-import { CWPopover } from './cw_popover/cw_popover';
+import { CWPortal } from './cw_portal';
+import { cursorInBounds, findRef, getPosition } from './cw_popover/helpers';
 
-type TooltipAttrs = {
-  tooltipContent: string | m.Vnode;
-  triggerLabel: string;
+export type TooltipAttrs = {
+  content: m.Children;
+  trigger: m.Vnode<any, any>;
+  onToggle?: (isOpen: boolean) => void;
+  hoverOpenDelay?: number;
+  showArrow?: boolean;
+  singleLine?: boolean;
+  persistOnHover?: boolean;
 };
+
 export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
+  isOpen: boolean;
+  isRendered: boolean;
+  triggerRef: Element;
+  isOverContent: boolean;
+  contentId: string;
+  arrowId: string;
+
+  oncreate(vnode) {
+    this.isOpen = false;
+    this.isRendered = true;
+    this.triggerRef = findRef(vnode.dom, 'trigger-wrapper');
+    this.contentId = `tooltip-container-${Math.random()}`;
+    this.arrowId = `${this.contentId}-arrow`;
+  }
+
+  onupdate(vnode) {
+    if (this.isOpen && !this.isRendered) {
+      try {
+        this.applyPopoverPosition(vnode);
+      } catch (e) {}
+    }
+  }
+
+  togglePopOver(onToggle) {
+    const newIsOpen = !this.isOpen;
+    onToggle && onToggle(newIsOpen);
+
+    this.isOpen = newIsOpen;
+    this.isRendered = false;
+
+    m.redraw();
+  }
+
+  applyPopoverPosition(vnode) {
+    // Apply styles in real time
+    try {
+      const tooltipContainer = document.getElementById(this.contentId);
+      const arrow = document.getElementById(this.arrowId);
+
+      const inlineStyle = getPosition({
+        trigger: this.triggerRef,
+        container: tooltipContainer,
+        arrowSize: 8,
+        gapSize: 1,
+        toSide: vnode.attrs.toSide,
+      });
+
+      tooltipContainer.style.top = `${inlineStyle.contentTopYAmount}px`;
+      tooltipContainer.style.left = `${inlineStyle.contentLeftXAmount}px`;
+
+      const showArrow = vnode.attrs.showArrow && inlineStyle.showArrow;
+
+      switch (inlineStyle.popoverPlacement) {
+        case 'above': {
+          arrow.className = 'arrow-down';
+          break;
+        }
+        case 'below': {
+          arrow.className = 'arrow-up';
+          break;
+        }
+        case 'right': {
+          arrow.className = 'arrow-left';
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+
+      // TODO: Need to build a positioning engine for the arrow or change the positioning engine for the whole component
+      arrow.style.top = `${inlineStyle.arrowTopYAmount}px`;
+      arrow.style.left = `${inlineStyle.arrowLeftXAmount}px`;
+      tooltipContainer.style.visibility = 'visible';
+
+      if (showArrow) {
+        arrow.style.visibility = 'visible';
+      }
+
+      this.isRendered = true;
+    } catch (e) {}
+    m.redraw();
+  }
+
+  handleHoverExit(e, onToggle, vnode) {
+    if (
+      !cursorInBounds(e.offsetX, e.offsetY, this.triggerRef) &&
+      (vnode.attrs.persistOnHover ? !this.isOverContent : true)
+    ) {
+      if (vnode.attrs.hoverOpenDelay) {
+        setTimeout(() => {
+          if (
+            this.isRendered &&
+            (vnode.attrs.persistOnHover ? !this.isOverContent : true)
+          ) {
+            this.togglePopOver(onToggle);
+          }
+        }, vnode.attrs.hoverOpenDelay);
+      } else {
+        this.togglePopOver(onToggle);
+      }
+    }
+  }
+
+  handleHoverEnter(onToggle) {
+    this.togglePopOver(onToggle);
+  }
+
   view(vnode) {
-    const { triggerLabel, tooltipContent } = vnode.attrs;
+    const { trigger, content, onToggle, singleLine } = vnode.attrs;
+    const { isOpen } = this;
+
+    // Resize Listener
+    if (isOpen) {
+      window.onresize = () => this.applyPopoverPosition(vnode);
+    }
 
     return (
-      <div class={ComponentType.Tooltip}>
-        <CWPopover
-          toggle={(attrs) => (
-            <CWButton label={triggerLabel} onclick={attrs.onClick} />
-          )}
-          popover={(attrs) => (
-            <div position={attrs.position} class="tooltip-container">
-              {tooltipContent}
+      <>
+        <div
+          class="trigger-wrapper"
+          ref="trigger-wrapper"
+          onmouseenter={() => {
+            this.handleHoverEnter(onToggle);
+          }}
+        >
+          {trigger}
+        </div>
+        {isOpen ? (
+          <CWPortal>
+            <div
+              class="overlay"
+              onmousemove={(e) => {
+                this.handleHoverExit(e, onToggle, vnode);
+              }}
+            >
+              <div
+                class={
+                  singleLine
+                    ? 'tooltip-container-single'
+                    : 'tooltip-container-general'
+                }
+                ref="tooltip-container"
+                id={this.contentId}
+                onmouseenter={() => {
+                  this.isOverContent = true;
+                }}
+                onmouseleave={(e) => {
+                  this.isOverContent = false;
+                }}
+              >
+                {content}
+              </div>
+              <div id={this.arrowId}></div>
             </div>
-          )}
-        />
-      </div>
+          </CWPortal>
+        ) : null}
+      </>
     );
   }
 }
