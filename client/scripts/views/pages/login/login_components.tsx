@@ -13,6 +13,7 @@ import { CWAccountCreationButton } from '../../components/component_kit/cw_accou
 import { LoginSidebarType } from '../../modals/login_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { getClasses } from '../../components/component_kit/helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 export class LoginSidebar
   implements m.ClassComponent<{ sidebarType: LoginSidebarType }>
@@ -27,7 +28,7 @@ export class LoginSidebar
               <CWText type="h4" fontWeight="semiBold" className="header-text">
                 Connect Your Wallet
               </CWText>
-              <CWText type="b2">
+              <CWText type="b2" className="sidebar-body-text">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
                 imperdiet velit fringilla lorem et. Integer accumsan lobortis
                 cursus amet. Dictum sit morbi elementum.
@@ -58,7 +59,7 @@ export class LoginSidebar
             <CWText type="h4" fontWeight="semiBold" className="header-text">
               This Community requires an Ethereum Wallet
             </CWText>
-            <CWText type="b2">
+            <CWText type="b2" className="sidebar-body-text">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
               imperdiet velit fringilla lorem et. Integer accumsan lobortis
               cursus amet. Dictum sit morbi elementum.
@@ -71,20 +72,18 @@ export class LoginSidebar
               <CWText type="h4" fontWeight="semiBold" className="header-text">
                 New Address Linked
               </CWText>
-              <CWText type="b2">
+              <CWText type="b2" className="sidebar-body-text">
                 By linking a new address, you are able to switch with ease and
                 manage all of your communities, addresses and profiles under one
                 account.
               </CWText>
-              <CWText
-                type="buttonSm"
-                className="manage-link"
+              <CWButton
+                buttonType="tertiary-blue"
+                label="Manage Addresses"
                 onclick={() => {
                   // fill in
                 }}
-              >
-                Manage Addresses
-              </CWText>
+              />
             </div>
           </div>
         )}

@@ -64,9 +64,9 @@ export class NewLoginModal implements m.ClassComponent {
   private wallets: Array<string>;
 
   oninit() {
-    this.bodyType = 'walletList';
+    this.bodyType = 'allSet';
     this.profiles = profiles;
-    this.sidebarType = 'newOrReturning';
+    this.sidebarType = 'newAddressLinked';
     this.wallets = Object.values(WalletId);
   }
 
@@ -116,7 +116,7 @@ export class NewLoginModal implements m.ClassComponent {
                 placeholder="your-email@email.com"
               />
               <div class="buttons-row">
-                <CWButton label="Back" buttonType="secondary" />
+                <CWButton label="Back" buttonType="secondary-blue" />
                 <CWButton label="Connect" />
               </div>
             </div>
