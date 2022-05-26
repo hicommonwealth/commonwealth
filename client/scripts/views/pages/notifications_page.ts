@@ -12,6 +12,10 @@ import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 
+let minDiscussionNotificationId = 0;
+let minChainEventNotificationId = 0;
+const MAX_NOTIF = 40;
+
 const NotificationsPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.isLoggedIn())
@@ -40,8 +44,10 @@ const NotificationsPage: m.Component<{}> = {
         ],
       });
 
-    const discussionNotifications = app.user.notifications.discussionNotifications;
-    const chainEventNotifications = app.user.notifications.chainEventNotifications;
+    const discussionNotifications =
+      app.user.notifications.discussionNotifications;
+    const chainEventNotifications =
+      app.user.notifications.chainEventNotifications;
 
     // const sortedNotifications = sortNotifications(app.user.notifications.allNotifications).reverse();
     // console.log("Sorted Notifications:", sortedNotifications);
@@ -68,10 +74,23 @@ const NotificationsPage: m.Component<{}> = {
             },
             [
               m(Button, {
-                label: 'Refresh',
+                label: 'Previous Page',
+                onclick: (e) => {
+                  e.preventDefault();
+                  minDiscussionNotificationId -= MAX_NOTIF / 2;
+                  minChainEventNotificationId -= MAX_NOTIF / 2;
+                  m.redraw();
+                },
+              }),
+              m(Button, {
+                label: 'Next Page',
                 onclick: (e) => {
                   e.preventDefault();
                   app.user.notifications.refresh().then(() => m.redraw());
+                  // TODO: same checks as on notifications menu i.e. stop increase when no more notif/etc
+                  minDiscussionNotificationId += MAX_NOTIF / 2;
+                  minChainEventNotificationId += MAX_NOTIF / 2;
+                  m.redraw();
                 },
               }),
               m(Button, {
@@ -79,7 +98,9 @@ const NotificationsPage: m.Component<{}> = {
                 onclick: (e) => {
                   e.preventDefault();
                   app.user.notifications
-                    .markAsRead(discussionNotifications.concat(chainEventNotifications))
+                    .markAsRead(
+                      discussionNotifications.concat(chainEventNotifications)
+                    )
                     .then(() => m.redraw());
                 },
               }),
@@ -96,7 +117,8 @@ const NotificationsPage: m.Component<{}> = {
                     rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
-                      const chainEventNotifications = app.user.notifications.chainEventNotifications;
+                      const chainEventNotifications =
+                        app.user.notifications.chainEventNotifications;
                       if (chainEventNotifications.length === 0) return;
                       app.user.notifications
                         .delete(chainEventNotifications)
@@ -118,22 +140,32 @@ const NotificationsPage: m.Component<{}> = {
           ),
           m('.NotificationsList', [
             (() => {
-              const totalLength = discussionNotifications.length + chainEventNotifications.length;
+              const totalLength = discussionNotifications.length + chainEventNotifications.length / 2;
               console.log('total length', totalLength);
               if (totalLength > 0) {
                 return m(Infinite, {
                   maxPages: 1, // prevents rollover/repeat
                   key: totalLength,
-                  pageData: () => discussionNotifications.concat(chainEventNotifications),
+                  pageData: () => {
+                    const discussionNotif = discussionNotifications.slice(
+                      minDiscussionNotificationId,
+                      minDiscussionNotificationId + MAX_NOTIF / 2
+                    );
+                    const chainEventNotif = chainEventNotifications.slice(
+                      minChainEventNotificationId,
+                      minChainEventNotificationId + MAX_NOTIF / 2
+                    );
+                    return discussionNotif.concat(chainEventNotif);
+                  },
                   item: (data, opts, index) => {
                     return m(NotificationRow, {
                       notifications: [data],
                       onListPage: true,
                     });
                   },
-                })
-              } else return m('.no-notifications', 'No Notifications')
-            })()
+                });
+              } else return m('.no-notifications', 'No Notifications');
+            })(),
           ]),
         ]),
       ]
