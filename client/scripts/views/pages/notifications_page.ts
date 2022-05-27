@@ -12,9 +12,9 @@ import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 
-let minDiscussionNotificationId = 0;
-let minChainEventNotificationId = 0;
-const MAX_NOTIF = 40;
+let minDiscussionNotification = 0;
+let minChainEventsNotification = 0;
+const MAX_NOTIFS = 40;
 
 const NotificationsPage: m.Component<{}> = {
   view: (vnode) => {
@@ -77,8 +77,12 @@ const NotificationsPage: m.Component<{}> = {
                 label: 'Previous Page',
                 onclick: (e) => {
                   e.preventDefault();
-                  minDiscussionNotificationId -= MAX_NOTIF / 2;
-                  minChainEventNotificationId -= MAX_NOTIF / 2;
+                  if (minChainEventsNotification - MAX_NOTIFS / 2 < 0) minChainEventsNotification = 0;
+                  else minChainEventsNotification -= MAX_NOTIFS / 2;
+
+                  if (minDiscussionNotification - MAX_NOTIFS / 2 < 0) minDiscussionNotification = 0;
+                  else minDiscussionNotification -= MAX_NOTIFS / 2;
+
                   m.redraw();
                 },
               }),
@@ -86,11 +90,20 @@ const NotificationsPage: m.Component<{}> = {
                 label: 'Next Page',
                 onclick: (e) => {
                   e.preventDefault();
-                  app.user.notifications.refresh().then(() => m.redraw());
-                  // TODO: same checks as on notifications menu i.e. stop increase when no more notif/etc
-                  minDiscussionNotificationId += MAX_NOTIF / 2;
-                  minChainEventNotificationId += MAX_NOTIF / 2;
-                  m.redraw();
+                  app.user.notifications.refresh().then(() => {
+                    if (app.user.notifications.chainEventNotifications.length >= minChainEventsNotification + MAX_NOTIFS / 2) {
+                      minChainEventsNotification += MAX_NOTIFS / 2;
+                    } else {
+                      minChainEventsNotification = app.user.notifications.chainEventNotifications.length
+                    }
+
+                    if (app.user.notifications.discussionNotifications.length >= minDiscussionNotification + MAX_NOTIFS / 2) {
+                      minDiscussionNotification += MAX_NOTIFS / 2;
+                    } else {
+                      minDiscussionNotification = app.user.notifications.discussionNotifications.length;
+                    }
+                    m.redraw();
+                  });
                 },
               }),
               m(Button, {
@@ -148,12 +161,12 @@ const NotificationsPage: m.Component<{}> = {
                   key: totalLength,
                   pageData: () => {
                     const discussionNotif = discussionNotifications.slice(
-                      minDiscussionNotificationId,
-                      minDiscussionNotificationId + MAX_NOTIF / 2
+                      minDiscussionNotification,
+                      minDiscussionNotification + MAX_NOTIFS / 2
                     );
                     const chainEventNotif = chainEventNotifications.slice(
-                      minChainEventNotificationId,
-                      minChainEventNotificationId + MAX_NOTIF / 2
+                      minChainEventsNotification,
+                      minChainEventsNotification + MAX_NOTIFS / 2
                     );
                     return discussionNotif.concat(chainEventNotif);
                   },

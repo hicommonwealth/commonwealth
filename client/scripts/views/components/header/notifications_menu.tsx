@@ -65,9 +65,13 @@ class NotificationsMenuFooter
               minChainEventsNotification >= MAX_NOTIFS
             ) {
               minChainEventsNotification -= MAX_NOTIFS;
+              console.log("# CE Notifications:", app.user.notifications.chainEventNotifications.length,
+                "\trange:", minChainEventsNotification, "-", minChainEventsNotification + MAX_NOTIFS);
               m.redraw();
             } else if (minDiscussionNotification >= MAX_NOTIFS) {
               minDiscussionNotification -= MAX_NOTIFS;
+              console.log("# Discussion Notifications:", app.user.notifications.discussionNotifications.length,
+                "\trange:", minDiscussionNotification, "-", minDiscussionNotification + MAX_NOTIFS);
               m.redraw();
             }
           }}
@@ -79,13 +83,27 @@ class NotificationsMenuFooter
             // e.stopPropagation();
             if (showingChainNotifications) {
               app.user.notifications.getChainEventNotifications().then(() => {
-                // TODO: ensure minChainEventsNotification + MAX_NOTIFS doesn't go past the end of the array
-                minChainEventsNotification += MAX_NOTIFS;
+                console.log(app.user.notifications.chainEventNotifications)
+                if (app.user.notifications.chainEventNotifications.length >= minChainEventsNotification + MAX_NOTIFS) {
+                  minChainEventsNotification += MAX_NOTIFS;
+                } else {
+                  minChainEventsNotification = app.user.notifications.chainEventNotifications.length
+                }
+
+                console.log("# CE Notifications:", app.user.notifications.chainEventNotifications.length,
+                  "\trange:", minChainEventsNotification, "-", minChainEventsNotification + MAX_NOTIFS);
+
                 m.redraw();
               });
             } else {
               app.user.notifications.getDiscussionNotifications().then(() => {
-                minDiscussionNotification += MAX_NOTIFS;
+                if (app.user.notifications.discussionNotifications.length >= minDiscussionNotification + MAX_NOTIFS) {
+                  minDiscussionNotification += MAX_NOTIFS;
+                } else {
+                  minDiscussionNotification = app.user.notifications.discussionNotifications.length;
+                }
+                console.log("# Discussion Notifications:", app.user.notifications.discussionNotifications.length,
+                  "\trange:", minDiscussionNotification, "-", minDiscussionNotification + MAX_NOTIFS);
                 m.redraw();
               });
             }

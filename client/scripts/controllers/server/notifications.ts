@@ -23,8 +23,8 @@ class NotificationsController {
   private _discussionStore: NotificationStore = new NotificationStore();
   private _chainEventStore: NotificationStore = new NotificationStore();
 
-  private _maxChainEventNotificationId: number = 0;
-  private _maxDiscussionNotificationId: number = 0;
+  private _maxChainEventNotificationId: number = Number.POSITIVE_INFINITY;
+  private _maxDiscussionNotificationId: number = Number.POSITIVE_INFINITY;
 
   private _numPages = 0;
   private _numUnread = 0;
@@ -46,7 +46,9 @@ class NotificationsController {
   }
 
   public get allNotifications(): Notification[] {
-    return this._discussionStore.getAll().concat(this._chainEventStore.getAll())
+    return this._discussionStore
+      .getAll()
+      .concat(this._chainEventStore.getAll());
   }
 
   private _subscriptions: NotificationSubscription[] = [];
@@ -252,6 +254,22 @@ class NotificationsController {
     this._subscriptions = [];
   }
 
+  public sortNotificationsStore(storeType: string) {
+    if (storeType == 'chain-events') {
+      const unsortedNotifications = this.chainEventNotifications;
+      this._chainEventStore.clear();
+      unsortedNotifications.sort((a, b) => b.id - a.id);
+      for (const notif of unsortedNotifications)
+        this._chainEventStore.add(notif);
+    } else {
+      const unsortedNotifications = this.discussionNotifications;
+      this._discussionStore.clear();
+      unsortedNotifications.sort((a, b) => b.id - a.id);
+      for (const notif of unsortedNotifications)
+        this._discussionStore.add(notif);
+    }
+  }
+
   public getChainEventNotifications() {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
@@ -260,13 +278,15 @@ class NotificationsController {
       ? { chain_filter: app.activeChainId() }
       : {};
 
-    options.maxId = this._maxChainEventNotificationId;
+    if (this._maxChainEventNotificationId != Number.POSITIVE_INFINITY)
+      options.maxId = this._maxChainEventNotificationId;
 
     return post('/viewChainEventNotifications', options, (result) => {
       this._subscriptions = [];
       this._numPages = result.numPages;
       this._numUnread = result.numUnread;
       this.parseNotifications(result.subscriptions);
+      this.sortNotificationsStore('chain-events');
     });
   }
 
@@ -278,13 +298,15 @@ class NotificationsController {
       ? { chain_filter: app.activeChainId() }
       : {};
 
-    options.maxId = this._maxDiscussionNotificationId;
+    if (this._maxDiscussionNotificationId != Number.POSITIVE_INFINITY)
+      options.maxId = this._maxDiscussionNotificationId;
 
     return post('/viewDiscussionNotifications', options, (result) => {
       this._subscriptions = [];
       this._numPages = result.numPages;
       this._numUnread = result.numUnread;
       this.parseNotifications(result.subscriptions);
+      this.sortNotificationsStore('discussion');
     });
   }
 
@@ -313,21 +335,19 @@ class NotificationsController {
         );
 
         if (subscription.category === 'chain-event') {
-          this._chainEventStore.add(notification)
+          if (!this._chainEventStore.getById(notification.id))
+            this._chainEventStore.add(notification);
           // the minimum id is the new max id for next page
-          if (
-            this._maxChainEventNotificationId === 0 ||
-            notificationsReadJSON.id < this._maxChainEventNotificationId
-          ) {
+          if (notificationsReadJSON.id < this._maxChainEventNotificationId) {
             this._maxChainEventNotificationId = notificationsReadJSON.id;
+            if (notificationsReadJSON.id === 1) this._maxChainEventNotificationId = 0;
           }
         } else {
-          this._discussionStore.add(notification);
-          if (
-            this._maxDiscussionNotificationId === 0 ||
-            notificationsReadJSON.id < this._maxDiscussionNotificationId
-          ) {
+          if (!this._discussionStore.getById(notification.id))
+            this._discussionStore.add(notification);
+          if (notificationsReadJSON.id < this._maxDiscussionNotificationId) {
             this._maxDiscussionNotificationId = notificationsReadJSON.id;
+            if (notificationsReadJSON.id === 1) this._maxDiscussionNotificationId = 0;
           }
         }
       }
