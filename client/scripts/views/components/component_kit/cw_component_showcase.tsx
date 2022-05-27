@@ -11,12 +11,13 @@ import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
-import { CWTextInput, ValidationStatus } from './cw_text_input';
+import { CWTextInput } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWCheckbox } from './cw_checkbox';
+import { ValidationStatus } from './cw_validation_text';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
