@@ -34,7 +34,7 @@ function incrementAndRedraw(type: 'chain-event' | 'discussion') {
   m.redraw();
 }
 
-function forwardPage(showingChainEvents: boolean) {
+function nextPage(showingChainEvents: boolean) {
   if (showingChainEvents) {
     const numChainEventNotif =
       app.user.notifications.chainEventNotifications.length;
@@ -54,7 +54,7 @@ function forwardPage(showingChainEvents: boolean) {
   }
 }
 
-function backPage(showingChainEvents: boolean) {
+function previousPage(showingChainEvents: boolean) {
   if (showingChainEvents && minChainEventsNotification >= MAX_NOTIFS) {
     minChainEventsNotification -= MAX_NOTIFS;
     m.redraw();
@@ -105,12 +105,14 @@ class NotificationsMenuFooter
           label="<"
           onclick={(e) => {
             e.preventDefault();
-            backPage(showingChainNotifications);
+            previousPage(showingChainNotifications);
           }}
         />
         <Button
           label=">"
           onclick={(e) => {
+            e.preventDefault();
+
             // necessary since page refresh loads the first set of notifications for both but the min may not be set
             if (!init) {
               init = true;
@@ -120,8 +122,7 @@ class NotificationsMenuFooter
                 app.user.notifications.chainEventNotifications.length;
             }
 
-            e.preventDefault();
-            forwardPage(showingChainNotifications);
+            nextPage(showingChainNotifications);
           }}
         />
       </div>
