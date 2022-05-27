@@ -104,7 +104,6 @@ export class SplTokenForm implements m.ClassComponent {
         />
         <CWButton
           label="Check address"
-          buttonType="primary"
           disabled={this.state.saving || this.state.loading}
           onclick={async () => {
             await updateTokenForum();
@@ -141,7 +140,6 @@ export class SplTokenForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving || !this.state.loaded}
           onclick={async () => {
             const { cluster, iconUrl, mint } = this.state.form;

@@ -37,9 +37,13 @@ type TextAttrs = {
   disabled?: boolean;
   fontStyle?: FontStyle;
   fontWeight: FontWeight;
-  noWrap?: boolean;
+  noWrap?: boolean; // parent must be flex container and have definite width for this to work
+  title?: string;
   type: FontType;
 };
+
+const getFontWeight = (type: FontType) =>
+  type === 'buttonSm' || type === 'buttonLg' ? 'semiBold' : 'regular';
 
 export class CWText implements m.ClassComponent<TextAttrs> {
   view(vnode) {
@@ -47,9 +51,10 @@ export class CWText implements m.ClassComponent<TextAttrs> {
       className,
       disabled = false,
       fontStyle,
-      fontWeight = 'regular',
-      noWrap = true, // parent must be flex container for this to work
+      noWrap = false,
+      title,
       type = 'b1',
+      fontWeight = getFontWeight(type),
     } = vnode.attrs;
 
     return (
@@ -65,6 +70,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
           },
           ComponentType.Text
         )}
+        title={title}
       >
         {vnode.children}
       </div>
