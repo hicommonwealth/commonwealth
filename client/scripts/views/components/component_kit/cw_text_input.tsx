@@ -27,7 +27,6 @@ type TextInputAttrs = {
 
 export type InputStyleAttrs = {
   disabled?: boolean;
-  isTyping: boolean;
   size: TextInputSize;
   validationStatus?: ValidationStatus;
 };
@@ -63,7 +62,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
         <input
           autofocus={autofocus}
           autocomplete={autocomplete}
-          class={getClasses<InputStyleAttrs>({
+          class={getClasses<InputStyleAttrs & { isTyping: boolean }>({
             size,
             validationStatus: this.validationStatus,
             disabled,
