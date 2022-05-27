@@ -23,6 +23,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 enum LinkNewAddressSteps {
   Step1VerifyWithWebWallet,
@@ -610,7 +611,11 @@ const LinkNewAddressModal: m.Component<
                       ),
                     ],
               ]),
-              vnode.state.error && m('.error-message', vnode.state.error),
+              vnode.state.error &&
+                m(CWValidationText, {
+                  message: vnode.state.error,
+                  status: 'failure',
+                }),
             ]),
           ])
         : vnode.state.step === LinkNewAddressSteps.Step2CreateProfile
@@ -725,7 +730,10 @@ const LinkNewAddressModal: m.Component<
                 },
               }),
               vnode.state.error &&
-                m('.error-message', [vnode.state.error, m('br'), 'Try again?']),
+                m(CWValidationText, {
+                  message: `${vnode.state.error}. Try again?`,
+                  status: 'failure',
+                }),
               m(Button, {
                 intent: 'primary',
                 rounded: true,

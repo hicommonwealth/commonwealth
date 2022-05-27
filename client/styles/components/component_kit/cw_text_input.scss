@@ -8,11 +8,6 @@ $text-input-border: 2px solid;
   margin-bottom: 20px;
   width: 100%;
 
-  .input-label.Text {
-    color: $neutral-300;
-    margin-bottom: 4px;
-  }
-
   input {
     background-color: $neutral-50;
     border-radius: $border-radius-corners;
@@ -79,17 +74,5 @@ $text-input-border: 2px solid;
   &.success,
   &.failure {
     margin-bottom: 0px;
-  }
-
-  .validation-status.Text {
-    margin-top: 4px;
-
-    &.success {
-      color: $green-600;
-    }
-
-    &.failure {
-      color: $rorange-500;
-    }
   }
 }

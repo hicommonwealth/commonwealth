@@ -6,9 +6,8 @@ import 'components/component_kit/cw_text_input.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
-import { CWText } from './cw_text';
-
-export type ValidationStatus = 'success' | 'failure';
+import { CWLabel } from './cw_label';
+import { CWValidationText, ValidationStatus } from './cw_validation_text';
 
 type TextInputSize = 'small' | 'large';
 
@@ -54,11 +53,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
 
     return (
       <div class={ComponentType.TextInput}>
-        {label && (
-          <CWText type="caption" fontWeight="medium" className="input-label">
-            {label}
-          </CWText>
-        )}
+        {label && <CWLabel label={label} />}
         <input
           autofocus={autofocus}
           autocomplete={autocomplete}
@@ -111,13 +106,10 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
           defaultValue={defaultValue}
         />
         {this.statusMessage && (
-          <CWText
-            type="caption"
-            fontWeight="medium"
-            className={`validation-status ${this.validationStatus}`}
-          >
-            {this.statusMessage}
-          </CWText>
+          <CWValidationText
+            message={this.statusMessage}
+            status={this.validationStatus}
+          />
         )}
       </div>
     );

@@ -14,6 +14,7 @@ import { DropdownFormField } from '../components/forms';
 import Sublayout from '../sublayout';
 import { PageLoading } from './loading';
 import { PageNotFound } from './404';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 interface ISpecSettingsState {
   chain: string;
@@ -124,7 +125,11 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
               }),
 
               // error output
-              vnode.state.error && m('.warn', vnode.state.error),
+              vnode.state.error &&
+                m(CWValidationText, {
+                  message: vnode.state.error,
+                  status: 'failure',
+                }),
 
               // test button
               m(Button, {
