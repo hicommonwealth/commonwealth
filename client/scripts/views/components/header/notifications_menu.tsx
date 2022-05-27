@@ -9,7 +9,6 @@ import 'components/header/notifications_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import NotificationRow from 'views/components/notification_row';
-import { sortNotifications } from 'helpers/notifications';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 // TODO: stop when min is 1 i.e. all notifications have been retrieved
@@ -17,6 +16,53 @@ const MAX_NOTIFS = 40; // limit number of notifications shown
 let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;
 let init = false;
+
+function incrementAndRedraw(type: 'chain-event' | 'discussion') {
+  if (type === 'chain-event') {
+    if (
+      app.user.notifications.chainEventNotifications.length >=
+      minChainEventsNotification + MAX_NOTIFS
+    )
+      minChainEventsNotification += MAX_NOTIFS;
+  } else if (type === 'discussion') {
+    if (
+      app.user.notifications.discussionNotifications.length >=
+      minDiscussionNotification + MAX_NOTIFS
+    )
+      minDiscussionNotification += MAX_NOTIFS;
+  }
+  m.redraw();
+}
+
+function forwardPage(showingChainEvents: boolean) {
+  if (showingChainEvents) {
+    const numChainEventNotif =
+      app.user.notifications.chainEventNotifications.length;
+    if (numChainEventNotif < minChainEventsNotification + MAX_NOTIFS) {
+      app.user.notifications.getChainEventNotifications().then(() => {
+        incrementAndRedraw('chain-event');
+      });
+    } else incrementAndRedraw('chain-event');
+  } else {
+    const numDiscussionNotif =
+      app.user.notifications.discussionNotifications.length;
+    if (numDiscussionNotif < minDiscussionNotification + MAX_NOTIFS) {
+      app.user.notifications.getDiscussionNotifications().then(() => {
+        incrementAndRedraw('discussion');
+      });
+    } else incrementAndRedraw('discussion');
+  }
+}
+
+function backPage(showingChainEvents: boolean) {
+  if (showingChainEvents && minChainEventsNotification >= MAX_NOTIFS) {
+    minChainEventsNotification -= MAX_NOTIFS;
+    m.redraw();
+  } else if (minDiscussionNotification >= MAX_NOTIFS) {
+    minDiscussionNotification -= MAX_NOTIFS;
+    m.redraw();
+  }
+}
 
 type NotificationsMenuFooterAttrs = { showingChainNotifications: boolean };
 
@@ -59,69 +105,23 @@ class NotificationsMenuFooter
           label="<"
           onclick={(e) => {
             e.preventDefault();
-            // e.stopPropagation();
-            if (
-              showingChainNotifications &&
-              minChainEventsNotification >= MAX_NOTIFS
-            ) {
-              minChainEventsNotification -= MAX_NOTIFS;
-              console.log("# CE Notifications:", app.user.notifications.chainEventNotifications.length,
-                "\trange:", minChainEventsNotification, "-", minChainEventsNotification + MAX_NOTIFS);
-              m.redraw();
-            } else if (minDiscussionNotification >= MAX_NOTIFS) {
-              minDiscussionNotification -= MAX_NOTIFS;
-              console.log("# Discussion Notifications:", app.user.notifications.discussionNotifications.length,
-                "\trange:", minDiscussionNotification, "-", minDiscussionNotification + MAX_NOTIFS);
-              m.redraw();
-            }
+            backPage(showingChainNotifications);
           }}
         />
         <Button
           label=">"
           onclick={(e) => {
+            // necessary since page refresh loads the first set of notifications for both but the min may not be set
             if (!init) {
               init = true;
-              minDiscussionNotification = app.user.notifications.discussionNotifications.length;
-              minChainEventsNotification = app.user.notifications.chainEventNotifications.length;
+              minDiscussionNotification =
+                app.user.notifications.discussionNotifications.length;
+              minChainEventsNotification =
+                app.user.notifications.chainEventNotifications.length;
             }
 
             e.preventDefault();
-            // e.stopPropagation();
-            console.log(app.user.notifications.chainEventNotifications.length, minChainEventsNotification, MAX_NOTIFS);
-            if (showingChainNotifications) {
-              if (app.user.notifications.chainEventNotifications.length < minChainEventsNotification + MAX_NOTIFS) {
-                app.user.notifications.getChainEventNotifications().then(() => {
-                  console.log(app.user.notifications.chainEventNotifications)
-                  if (app.user.notifications.chainEventNotifications.length >= minChainEventsNotification + MAX_NOTIFS) {
-                    minChainEventsNotification += MAX_NOTIFS;
-                  }
-
-                  console.log("# CE Notifications:", app.user.notifications.chainEventNotifications.length,
-                    "\trange:", minChainEventsNotification, "-", minChainEventsNotification + MAX_NOTIFS);
-
-                  m.redraw();
-                });
-              } else {
-                if (app.user.notifications.chainEventNotifications.length >= minChainEventsNotification + MAX_NOTIFS) {
-                  minChainEventsNotification += MAX_NOTIFS;
-                }
-              }
-            } else {
-              if (app.user.notifications.discussionNotifications.length < minDiscussionNotification + MAX_NOTIFS) {
-                app.user.notifications.getDiscussionNotifications().then(() => {
-                  if (app.user.notifications.discussionNotifications.length >= minDiscussionNotification + MAX_NOTIFS) {
-                    minDiscussionNotification += MAX_NOTIFS;
-                  }
-                  console.log("# Discussion Notifications:", app.user.notifications.discussionNotifications.length,
-                    "\trange:", minDiscussionNotification, "-", minDiscussionNotification + MAX_NOTIFS);
-                  m.redraw();
-                });
-              } else {
-                if (app.user.notifications.discussionNotifications.length >= minDiscussionNotification + MAX_NOTIFS) {
-                  minDiscussionNotification += MAX_NOTIFS;
-                }
-              }
-            }
+            forwardPage(showingChainNotifications);
           }}
         />
       </div>

@@ -6,7 +6,6 @@ import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
 import app from 'state';
-import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
