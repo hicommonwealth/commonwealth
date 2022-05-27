@@ -197,7 +197,6 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ? [
               editIdentityAction(account, vnode.state.identity, vnode),
               m(CWButton, {
-                buttonType: 'primary',
                 onclick: () => {
                   app.modals.create({
                     modal: EditProfileModal,

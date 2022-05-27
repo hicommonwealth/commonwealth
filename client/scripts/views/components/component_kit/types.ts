@@ -22,5 +22,3 @@ export type StyleAttrs = {
   disabled?: boolean;
   className?: string;
 };
-
-export type ButtonType = 'primary' | 'secondary';
