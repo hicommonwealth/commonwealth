@@ -16,6 +16,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 const MAX_NOTIFS = 40; // limit number of notifications shown
 let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;
+let init = false;
 
 type NotificationsMenuFooterAttrs = { showingChainNotifications: boolean };
 
@@ -61,7 +62,6 @@ class NotificationsMenuFooter
             // e.stopPropagation();
             if (
               showingChainNotifications &&
-              // TODO: how to handle if this is false but a few notifications remain?
               minChainEventsNotification >= MAX_NOTIFS
             ) {
               minChainEventsNotification -= MAX_NOTIFS;
@@ -79,33 +79,48 @@ class NotificationsMenuFooter
         <Button
           label=">"
           onclick={(e) => {
+            if (!init) {
+              init = true;
+              minDiscussionNotification = app.user.notifications.discussionNotifications.length;
+              minChainEventsNotification = app.user.notifications.chainEventNotifications.length;
+            }
+
             e.preventDefault();
             // e.stopPropagation();
+            console.log(app.user.notifications.chainEventNotifications.length, minChainEventsNotification, MAX_NOTIFS);
             if (showingChainNotifications) {
-              app.user.notifications.getChainEventNotifications().then(() => {
-                console.log(app.user.notifications.chainEventNotifications)
+              if (app.user.notifications.chainEventNotifications.length < minChainEventsNotification + MAX_NOTIFS) {
+                app.user.notifications.getChainEventNotifications().then(() => {
+                  console.log(app.user.notifications.chainEventNotifications)
+                  if (app.user.notifications.chainEventNotifications.length >= minChainEventsNotification + MAX_NOTIFS) {
+                    minChainEventsNotification += MAX_NOTIFS;
+                  }
+
+                  console.log("# CE Notifications:", app.user.notifications.chainEventNotifications.length,
+                    "\trange:", minChainEventsNotification, "-", minChainEventsNotification + MAX_NOTIFS);
+
+                  m.redraw();
+                });
+              } else {
                 if (app.user.notifications.chainEventNotifications.length >= minChainEventsNotification + MAX_NOTIFS) {
                   minChainEventsNotification += MAX_NOTIFS;
-                } else {
-                  minChainEventsNotification = app.user.notifications.chainEventNotifications.length
                 }
-
-                console.log("# CE Notifications:", app.user.notifications.chainEventNotifications.length,
-                  "\trange:", minChainEventsNotification, "-", minChainEventsNotification + MAX_NOTIFS);
-
-                m.redraw();
-              });
+              }
             } else {
-              app.user.notifications.getDiscussionNotifications().then(() => {
+              if (app.user.notifications.discussionNotifications.length < minDiscussionNotification + MAX_NOTIFS) {
+                app.user.notifications.getDiscussionNotifications().then(() => {
+                  if (app.user.notifications.discussionNotifications.length >= minDiscussionNotification + MAX_NOTIFS) {
+                    minDiscussionNotification += MAX_NOTIFS;
+                  }
+                  console.log("# Discussion Notifications:", app.user.notifications.discussionNotifications.length,
+                    "\trange:", minDiscussionNotification, "-", minDiscussionNotification + MAX_NOTIFS);
+                  m.redraw();
+                });
+              } else {
                 if (app.user.notifications.discussionNotifications.length >= minDiscussionNotification + MAX_NOTIFS) {
                   minDiscussionNotification += MAX_NOTIFS;
-                } else {
-                  minDiscussionNotification = app.user.notifications.discussionNotifications.length;
                 }
-                console.log("# Discussion Notifications:", app.user.notifications.discussionNotifications.length,
-                  "\trange:", minDiscussionNotification, "-", minDiscussionNotification + MAX_NOTIFS);
-                m.redraw();
-              });
+              }
             }
           }}
         />
