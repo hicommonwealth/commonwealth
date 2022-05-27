@@ -1,6 +1,5 @@
 /* eslint-disable guard-for-in */
 import 'components/new_thread_form.scss';
-import 'pages/new_thread.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
