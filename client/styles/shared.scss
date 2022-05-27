@@ -257,38 +257,8 @@ h3 {
   font-weight: 400;
 }
 
-@mixin body-paragraph {
-  @include body;
-  p {
-    margin-bottom: 10px;
-  }
-}
-
-@mixin link {
-  @include body;
-  font-weight: 500;
-  color: $primary-700;
-}
-
-@mixin button-label {
-  @include body;
-  font-weight: 600;
-}
-
 @mixin form-label {
   @include body;
   font-size: 14px;
   color: $neutral-600;
-}
-
-@mixin rainbow-gradient-horizontal {
-  background: linear-gradient(90deg, #91bfff, #91ffa0, #fbff91, #ff9191);
-}
-
-@mixin rainbow-gradient-diagonal {
-  background: linear-gradient(45deg, #91bfff, #91ffa0, #fbff91, #ff9191);
-}
-
-@mixin shadow-gradient {
-  background: linear-gradient(270deg, #17161e, #07060d);
 }

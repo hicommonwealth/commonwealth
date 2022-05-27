@@ -19,28 +19,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWCheckbox } from './cw_checkbox';
 
-// const displayColors = (hexList) => {
-//   return Object.entries(hexList).map(([k, v]) => {
-//     return (
-//       <div class="color-row">
-//         {k}
-//         <div class="color" style={`background: ${v};`} />
-//       </div>
-//     );
-//   });
-// };
-
-// const displayGradients = (gradientNames: string[]) => {
-//   return gradientNames.map((gradient) => {
-//     return (
-//       <div class="color-row">
-//         {gradient}
-//         <div class={`color ${gradient}`} />
-//       </div>
-//     );
-//   });
-// };
-
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
     return (
@@ -73,6 +51,38 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Form fields</h1>
+        <div class="form-gallery">
+          <CWTextInput
+            name="Text field"
+            label="Large"
+            placeholder="Type here"
+          />
+          <CWTextInput
+            name="Text field"
+            label="Small"
+            placeholder="Type here"
+            size="small"
+          />
+          <CWTextInput
+            name="Form field"
+            inputValidationFn={(val: string): [ValidationStatus, string] => {
+              if (val.match(/[^A-Za-z]/)) {
+                return ['failure', 'Must enter characters A-Z'];
+              } else {
+                return ['success', 'Input validated'];
+              }
+            }}
+            label="This input only accepts A-Z"
+            placeholder="Type here"
+          />
+          <CWTextInput
+            name="Text field"
+            label="Disabled"
+            disabled
+            defaultValue="Some disabled text"
+          />
+        </div>
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
@@ -401,26 +411,6 @@ export class ComponentShowcase implements m.ClassComponent {
             <h4>Card title</h4>
             <div>Full width</div>
           </CWCard>
-        </div>
-        <h1>Form fields</h1>
-        <div class="form-gallery">
-          <CWTextInput
-            name="Form field"
-            inputValidationFn={(val: string): [ValidationStatus, string] => {
-              if (val.match(/[^A-Za-z]/)) {
-                return [ValidationStatus.Failure, 'Must enter characters A-Z'];
-              } else {
-                return [ValidationStatus.Success, 'Input validated'];
-              }
-            }}
-            label="This input only accepts A-Z"
-            placeholder="Placeholder"
-          />
-          <CWTextInput
-            name="Text field"
-            label="No status message or error validation"
-            placeholder="Placeholder"
-          />
         </div>
       </div>
     );

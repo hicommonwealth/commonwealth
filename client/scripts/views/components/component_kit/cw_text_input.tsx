@@ -6,11 +6,11 @@ import 'components/component_kit/cw_text_input.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
+import { CWText } from './cw_text';
 
-export enum ValidationStatus {
-  Success = 'success',
-  Failure = 'failure',
-}
+export type ValidationStatus = 'success' | 'failure';
+
+type TextInputSize = 'small' | 'large';
 
 type TextInputAttrs = {
   autocomplete?: string;
@@ -27,10 +27,14 @@ type TextInputAttrs = {
 
 export type InputStyleAttrs = {
   disabled?: boolean;
+  isTyping: boolean;
+  size: TextInputSize;
   validationStatus?: ValidationStatus;
 };
 
 export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
+  private inputTimeout: NodeJS.Timeout;
+  private isTyping: boolean;
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
@@ -45,27 +49,56 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       name,
       oninput,
       placeholder,
+      size = 'large',
       tabindex,
     } = vnode.attrs;
 
     return (
       <div class={ComponentType.TextInput}>
-        {label && <label>{label}</label>}
+        {label && (
+          <CWText type="caption" fontWeight="medium" className="input-label">
+            {label}
+          </CWText>
+        )}
         <input
           autofocus={autofocus}
           autocomplete={autocomplete}
           class={getClasses<InputStyleAttrs>({
+            size,
             validationStatus: this.validationStatus,
             disabled,
+            isTyping: this.isTyping,
           })}
           disabled={disabled}
           tabindex={tabindex}
           name={name}
           placeholder={placeholder}
-          oninput={oninput}
+          oninput={(e) => {
+            () => oninput(e);
+            if (e.target.value?.length === 0) {
+              this.isTyping = false;
+              this.validationStatus = undefined;
+              this.statusMessage = undefined;
+              m.redraw();
+            } else {
+              e.stopPropagation();
+              this.isTyping = true;
+              clearTimeout(this.inputTimeout);
+              const timeout = e.target.value?.length > 3 ? 250 : 1000;
+              this.inputTimeout = setTimeout(() => {
+                this.isTyping = false;
+                if (inputValidationFn && e.target.value?.length > 3) {
+                  [this.validationStatus, this.statusMessage] =
+                    inputValidationFn(e.target.value);
+                  m.redraw();
+                }
+              }, timeout);
+            }
+          }}
           onfocusout={(e) => {
             if (inputValidationFn) {
-              if (!e.target.value?.length) {
+              if (e.target.value?.length === 0) {
+                this.isTyping = false;
                 this.validationStatus = undefined;
                 this.statusMessage = undefined;
                 m.redraw();
@@ -79,9 +112,13 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
           defaultValue={defaultValue}
         />
         {this.statusMessage && (
-          <div class={`validation-status ${this.validationStatus}`}>
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className={`validation-status ${this.validationStatus}`}
+          >
             {this.statusMessage}
-          </div>
+          </CWText>
         )}
       </div>
     );
