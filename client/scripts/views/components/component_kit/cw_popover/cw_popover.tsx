@@ -2,7 +2,6 @@
 /* eslint-disable no-empty */
 
 import m from 'mithril';
-
 import 'components/component_kit/cw_popover.scss';
 
 import { CWPortal } from '../cw_portal';

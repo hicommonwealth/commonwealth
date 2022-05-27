@@ -12,10 +12,10 @@ export type TooltipAttrs = {
   content: m.Children;
   trigger: m.Vnode<any, any>;
   onToggle?: (isOpen: boolean) => void;
-  hoverOpenDelay?: number;
   showArrow?: boolean;
   singleLine?: boolean;
   persistOnHover?: boolean;
+  hoverOpenDelay?: number;
 };
 
 export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
@@ -61,9 +61,10 @@ export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
       const inlineStyle = getPosition({
         trigger: this.triggerRef,
         container: tooltipContainer,
-        arrowSize: 8,
+        arrowSize: 6,
         gapSize: 1,
         toSide: vnode.attrs.toSide,
+        tooltipOffset: 16,
       });
 
       tooltipContainer.style.top = `${inlineStyle.contentTopYAmount}px`;
@@ -73,15 +74,21 @@ export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
 
       switch (inlineStyle.popoverPlacement) {
         case 'above': {
-          arrow.className = 'arrow-down';
+          arrow.className = `tooltip-arrow-down${
+            !vnode.attrs.singleLine ? ' large' : ''
+          }`;
           break;
         }
         case 'below': {
-          arrow.className = 'arrow-up';
+          arrow.className = `tooltip-arrow-up${
+            !vnode.attrs.singleLine ? ' large' : ''
+          }`;
           break;
         }
         case 'right': {
-          arrow.className = 'arrow-left';
+          arrow.className = `tooltip-arrow-left${
+            !vnode.attrs.singleLine ? ' large' : ''
+          }`;
           break;
         }
         default: {

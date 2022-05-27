@@ -1,17 +1,17 @@
-// Source: https://github.com/Simspace/monorail/blob/master/src/metaComponents/popOver/PopOver.tsx
-
 export const getPosition = ({
   trigger,
   container,
   arrowSize = 8,
   gapSize = 1,
   toSide = false,
+  tooltipOffset,
 }: {
   trigger: Element;
   container: Element;
   arrowSize: number;
   gapSize: number;
   toSide: boolean;
+  tooltipOffset?: number;
 }) => {
   const triggerBoundingRect = trigger.getBoundingClientRect();
   const containerBoundingRect = container.getBoundingClientRect();
@@ -22,14 +22,7 @@ export const getPosition = ({
 
   // Calculate whether to put popover above or below, or left or right
   if (toSide) {
-    const distanceToLeft = triggerBoundingRect.left;
-    const distanceToRight = innerWidth - triggerBoundingRect.right;
-
-    if (distanceToLeft > distanceToRight) {
-      popoverPlacement = 'right';
-    } else {
-      popoverPlacement = 'left';
-    }
+    popoverPlacement = 'right';
   } else {
     const distanceToTop = triggerBoundingRect.top;
     const distanceToBottom = innerHeight - triggerBoundingRect.bottom;
@@ -40,6 +33,7 @@ export const getPosition = ({
       popoverPlacement = 'below';
     }
   }
+
   // Calculate the inline styles for positioning
   let contentLeftXAmount;
   let contentTopYAmount;
@@ -48,11 +42,24 @@ export const getPosition = ({
 
   switch (popoverPlacement) {
     case 'above': {
-      contentLeftXAmount = Math.max(
-        triggerBoundingRect.left -
-          (containerBoundingRect.width - triggerBoundingRect.width) / 2,
-        10
-      );
+      if (tooltipOffset) {
+        contentLeftXAmount = Math.max(
+          tooltipOffset,
+          triggerBoundingRect.left +
+            triggerBoundingRect.width / 2 -
+            tooltipOffset
+        );
+      } else {
+        contentLeftXAmount = Math.max(
+          triggerBoundingRect.left -
+            (containerBoundingRect.width - triggerBoundingRect.width) / 2,
+          10
+        );
+      }
+
+      arrowLeftXAmount =
+        triggerBoundingRect.left + triggerBoundingRect.width / 2 - arrowSize;
+
       contentTopYAmount = Math.max(
         0,
         triggerBoundingRect.top -
@@ -61,22 +68,29 @@ export const getPosition = ({
           gapSize
       );
 
-      arrowLeftXAmount =
-        triggerBoundingRect.left + triggerBoundingRect.width / 2 - 8;
-      arrowTopYAmount = triggerBoundingRect.top - 8 - gapSize;
+      arrowTopYAmount = triggerBoundingRect.top - arrowSize - gapSize;
 
       break;
     }
     case 'below': {
-      contentLeftXAmount = Math.max(
-        triggerBoundingRect.left -
-          (containerBoundingRect.width - triggerBoundingRect.width) / 2,
-        10
-      );
+      if (tooltipOffset) {
+        contentLeftXAmount = Math.max(
+          tooltipOffset,
+          triggerBoundingRect.left +
+            triggerBoundingRect.width / 2 -
+            tooltipOffset
+        );
+      } else {
+        contentLeftXAmount = Math.max(
+          triggerBoundingRect.left -
+            (containerBoundingRect.width - triggerBoundingRect.width) / 2,
+          10
+        );
+      }
       contentTopYAmount = triggerBoundingRect.bottom + arrowSize + gapSize;
 
       arrowLeftXAmount =
-        triggerBoundingRect.left + triggerBoundingRect.width / 2 - 8;
+        triggerBoundingRect.left + triggerBoundingRect.width / 2 - arrowSize;
       arrowTopYAmount = triggerBoundingRect.bottom + gapSize;
       break;
     }
@@ -92,7 +106,9 @@ export const getPosition = ({
 
       arrowLeftXAmount = triggerBoundingRect.right + gapSize;
       arrowTopYAmount =
-        triggerBoundingRect.top + triggerBoundingRect.height / 2 - 8;
+        triggerBoundingRect.top +
+        triggerBoundingRect.height / 2 -
+        arrowSize / 2;
       break;
     }
     default: {

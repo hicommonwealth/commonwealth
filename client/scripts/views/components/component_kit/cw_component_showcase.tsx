@@ -211,14 +211,14 @@ export class ComponentShowcase implements m.ClassComponent {
             trigger={<CWButton label={'Tooltip Large'} />}
             content={
               <div>
-                You can hover over me and I won't disappear- an effect whose
-                necessary conditions include setting a nonzero hoverOpenDelay
-                and a value of true for persistOnHover. I am also set with
-                singleLine=false
+                You can hover over me and I won't disappear, because I have a
+                hoverDelay set and persistOnHover set to true!
               </div>
             }
             hoverOpenDelay={100}
             persistOnHover={true}
+            showArrow={true}
+            toSide={true}
           />
           <CWTooltip
             trigger={<CWButton label={'Tooltip Small'} />}
@@ -230,17 +230,18 @@ export class ComponentShowcase implements m.ClassComponent {
                 0x1234567891011121314151617181920
               </div>
             }
-            hoverOpenDelay={100}
             singleLine={true}
+            showArrow={true}
+            toSide={true}
           />
         </div>
         <h1>Layover</h1>
         <div style="display: flex; width: 30%; justify-content: space-between;">
-          <CWOverlay
+          {/* <CWOverlay
             isOpen={true}
             target={<CWButton label={'Tooltip Small'} />}
             content={<div>0x1234567891011121314151617181920</div>}
-          />
+          /> */}
         </div>
         <h1>Text</h1>
         <div class="text-gallery">
