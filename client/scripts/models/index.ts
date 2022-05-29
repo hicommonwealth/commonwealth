@@ -21,7 +21,7 @@ export { default as Reaction } from './Reaction';
 export { default as Topic } from './Topic';
 export { default as OffchainThread } from './OffchainThread';
 export { default as OffchainPoll } from './OffchainPoll';
-export { default as OffchainVote } from './OffchainVote';
+export { default as Vote } from './Vote';
 export { default as Profile } from './Profile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';

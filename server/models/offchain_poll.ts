@@ -61,7 +61,7 @@ export default (
       foreignKey: 'chain_id',
       targetKey: 'id',
     });
-    models.OffchainPoll.hasMany(models.OffchainVote, {
+    models.OffchainPoll.hasMany(models.Vote, {
       foreignKey: 'poll_id',
       as: 'votes',
     });

@@ -2,7 +2,7 @@ import $ from 'jquery';
 import moment from 'moment';
 import { notifyError } from '../controllers/app/notifications';
 import app from '../state';
-import OffchainVote from './OffchainVote';
+import Vote from './Vote';
 
 class OffchainPoll {
   public readonly id: number;
@@ -13,7 +13,7 @@ class OffchainPoll {
   public readonly prompt: string;
   public readonly options: string[];
 
-  private _votes: OffchainVote[];
+  private _votes: Vote[];
   public get votes() {
     return this._votes;
   }
@@ -39,7 +39,7 @@ class OffchainPoll {
     endsAt: moment.Moment;
     prompt: string;
     options: string[];
-    votes: OffchainVote[];
+    votes: Vote[];
   }) {
     this.id = id;
     this.threadId = threadId;
@@ -57,11 +57,11 @@ class OffchainPoll {
     );
   }
 
-  public getVotes(): OffchainVote[] {
+  public getVotes(): Vote[] {
     return this.votes;
   }
 
-  public async submitOffchainVote(
+  public async submitVote(
     authorChain: string,
     address: string,
     option: string
@@ -70,7 +70,7 @@ class OffchainPoll {
     if (!selectedOption) {
       notifyError('Invalid voting option');
     }
-    const response = await $.post(`${app.serverUrl()}/updateOffchainVote`, {
+    const response = await $.post(`${app.serverUrl()}/updateVote`, {
       poll_id: this.id,
       chain_id: this.chainId,
       author_chain: authorChain,
@@ -80,7 +80,7 @@ class OffchainPoll {
     });
     // TODO Graham 5/3/22: We should have a dedicated controller + store
     // to handle logic like this
-    const vote = new OffchainVote(response.result);
+    const vote = new Vote(response.result);
     // Remove existing vote
     const existingVoteIndex = this.votes.findIndex(
       (v) => v.address === address && v.authorChain === authorChain

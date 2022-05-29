@@ -8,7 +8,7 @@ import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import Topic from './Topic';
-import OffchainVote from './OffchainVote';
+import Vote from './Vote';
 import { VersionHistory } from '../controllers/server/threads';
 import { ChainEntity } from '.';
 import OffchainPoll from './OffchainPoll';

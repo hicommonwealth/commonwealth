@@ -27,7 +27,7 @@ const vote = async (
   if (!confirmed) return;
   // submit vote
   poll
-    .submitOffchainVote(...userInfo, option)
+    .submitVote(...userInfo, option)
     .then(() => m.redraw())
     .catch(async () => {
       await alertModalWithText(
@@ -48,7 +48,7 @@ export const ProposalPoll: m.Component<
       vnode.state.votesFetched = true;
       // TODO: Is this necessary? Can I initialize elsewhere?
       poll.getVotes();
-      // `/api/viewOffchainVotes?thread_id=${proposal.id}${
+      // `/api/viewVotes?thread_id=${proposal.id}${
     }
 
     const pollingEnded = poll.endsAt && poll.endsAt?.isBefore(moment().utc());

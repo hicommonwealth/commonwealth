@@ -4,7 +4,7 @@ import { ModelStatic, ModelInstance } from './types';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainPollAttributes } from './offchain_poll';
 
-export type OffchainVoteAttributes = {
+export type VoteAttributes = {
   poll_id: number;
   option: string;
   address: string;
@@ -18,16 +18,16 @@ export type OffchainVoteAttributes = {
   poll?: OffchainPollAttributes;
 };
 
-export type OffchainVoteInstance = ModelInstance<OffchainVoteAttributes>;
+export type VoteInstance = ModelInstance<VoteAttributes>;
 
-export type OffchainVoteModelStatic = ModelStatic<OffchainVoteInstance>;
+export type VoteModelStatic = ModelStatic<VoteInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): OffchainVoteModelStatic => {
-  const OffchainVote = <OffchainVoteModelStatic>sequelize.define(
-    'OffchainVote',
+): VoteModelStatic => {
+  const Vote = <VoteModelStatic>sequelize.define(
+    'Vote',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       poll_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -39,7 +39,7 @@ export default (
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
-      tableName: 'OffchainVotes',
+      tableName: 'Votes',
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
@@ -47,13 +47,13 @@ export default (
     }
   );
 
-  OffchainVote.associate = (models) => {
-    models.OffchainVote.belongsTo(models.OffchainPoll, {
+  Vote.associate = (models) => {
+    models.Vote.belongsTo(models.OffchainPoll, {
       foreignKey: 'poll_id',
       constraints: false,
       as: 'poll',
     });
   };
 
-  return OffchainVote;
+  return Vote;
 };

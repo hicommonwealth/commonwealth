@@ -22,7 +22,7 @@ const getPolls = async (
 
   const polls = await models.OffchainPoll.findAll({
     where: { thread_id },
-    include: { model: models.OffchainVote, as: 'votes' },
+    include: { model: models.Vote, as: 'votes' },
   });
 
   return res.json({

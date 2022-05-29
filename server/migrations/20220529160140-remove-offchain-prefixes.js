@@ -12,6 +12,7 @@ module.exports = {
       // Jake
       await queryInterface.renameTable('OffchainViewCounts', 'ViewCounts', { transaction });
       await queryInterface.renameTable('OffchainTopics', 'Topics', { transaction });
+      await queryInterface.renameTable('OffchainVote', 'Vote', { transaction });
       // TODO
     });
   },
@@ -27,6 +28,7 @@ module.exports = {
       // Jake
       await queryInterface.renameTable('ViewCounts', 'OffchainViewCounts', { transaction });
       await queryInterface.renameTable('Topics', 'OffchainTopics', { transaction });
+      await queryInterface.renameTable('Vote', 'OffchainVote', { transaction });
       // TODO
     });
   }
