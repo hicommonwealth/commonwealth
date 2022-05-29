@@ -3,7 +3,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Remove offchain prefixes from all database tables
-
     return queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
         `ALTER SEQUENCE "OffchainReactions_id_seq"
@@ -27,8 +26,9 @@ module.exports = {
       );
       await queryInterface.renameTable('OffchainViewCounts', 'ViewCounts', { transaction });
 
+      // sequence was never renamed from OffchainThreadCategories
       await queryInterface.sequelize.query(
-        `ALTER SEQUENCE "OffchainTopics_id_seq"
+        `ALTER SEQUENCE "OffchainThreadCategories_id_seq"
         RENAME TO "Topics_id_seq"`,
         {
           type: Sequelize.RAW,
@@ -71,15 +71,7 @@ module.exports = {
       );
       await queryInterface.renameTable('OffchainAttachments', 'Attachments', { transaction });
 
-      await queryInterface.sequelize.query(
-        `ALTER SEQUENCE "OffchainComments_id_seq"
-        RENAME TO "Comments_id_seq"`,
-        {
-          type: Sequelize.RAW,
-          raw: true,
-          transaction,
-        },
-      );
+      // sequenze is already named Comments from previous version
       await queryInterface.renameTable('OffchainComments', 'Comments', { transaction });
 
       await queryInterface.sequelize.query(
@@ -97,7 +89,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     // Re-add offchain prefixes
-
     return queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.renameTable("Reactions", "OffchainReactions", { transaction });
       await queryInterface.sequelize.query(
@@ -122,9 +113,10 @@ module.exports = {
       );
 
       await queryInterface.renameTable('Topics', 'OffchainTopics', { transaction });
+      // restore "vintage" OffchainThreadCategories sequence name
       await queryInterface.sequelize.query(
         `ALTER SEQUENCE "Topics_id_seq"
-        RENAME TO "OffchainTopics_id_seq"`,
+        RENAME TO "OffchainThreadCategories_id_seq"`,
         {
           type: Sequelize.RAW,
           raw: true,
@@ -166,17 +158,9 @@ module.exports = {
       );
 
       await queryInterface.renameTable('Comments', 'OffchainComments', { transaction });
-      await queryInterface.sequelize.query(
-        `ALTER SEQUENCE "Comments_id_seq"
-        RENAME TO "OffchainComments_id_seq"`,
-        {
-          type: Sequelize.RAW,
-          raw: true,
-          transaction,
-        },
-      );
+      // sequence is already named Comments from previous version
 
-      await queryInterface.renameTable('Threads', 'OffchainThreadss', { transaction });
+      await queryInterface.renameTable('Threads', 'OffchainThreads', { transaction });
       await queryInterface.sequelize.query(
         `ALTER SEQUENCE "Threads_id_seq"
         RENAME TO "OffchainThreads_id_seq"`,
