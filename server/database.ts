@@ -50,8 +50,8 @@ import NotificationFactory, {
 import NotificationCategoryFactory, {
   NotificationCategoryModelStatic,
 } from './models/notification_category';
-import OffchainAttachmentFactory, {
-  OffchainAttachmentModelStatic,
+import AttachmentFactory, {
+  AttachmentModelStatic,
 } from './models/offchain_attachment';
 import OffchainCommentFactory, {
   OffchainCommentModelStatic,
@@ -126,7 +126,7 @@ export type Models = {
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
   NotificationsRead: NotificationsReadModelStatic;
-  OffchainAttachment: OffchainAttachmentModelStatic;
+  Attachment: AttachmentModelStatic;
   OffchainComment: OffchainCommentModelStatic;
   Poll: PollModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
@@ -205,7 +205,7 @@ const models: Models = {
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
   NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
-  OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
+  Attachment: AttachmentFactory(sequelize, DataTypes),
   OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
   Poll: PollFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),

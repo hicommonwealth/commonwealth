@@ -36,7 +36,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
-      await models.OffchainAttachment.create({
+      await models.Attachment.create({
         attachable: 'thread',
         attachment_id: thread_id,
         url: req.body['attachments[]'],
@@ -44,7 +44,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       });
     } else if (req.body['attachments[]']) {
       await Promise.all(req.body['attachments[]']
-        .map((url_) => models.OffchainAttachment.create({
+        .map((url_) => models.Attachment.create({
           attachable: 'thread',
           attachment_id: thread_id,
           url: url_,
@@ -138,7 +138,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
           // through: models.Collaboration,
           as: 'collaborators'
         },
-        models.OffchainAttachment,
+        models.Attachment,
         { model: models.Topic, as: 'topic' },
       ],
     });

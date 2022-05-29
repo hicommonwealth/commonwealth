@@ -9,7 +9,7 @@ import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import {
   OffchainThread,
-  OffchainAttachment,
+  Attachment,
   OffchainThreadStage,
   NodeInfo,
   Profile,
@@ -36,7 +36,7 @@ export const modelFromServer = (thread) => {
     last_edited,
     version_history,
     snapshot_proposal,
-    OffchainAttachments,
+    Attachments,
     created_at,
     topic,
     kind,
@@ -56,9 +56,9 @@ export const modelFromServer = (thread) => {
     linked_threads,
   } = thread;
 
-  const attachments = OffchainAttachments
-    ? OffchainAttachments.map(
-        (a) => new OffchainAttachment(a.url, a.description)
+  const attachments = Attachments
+    ? Attachments.map(
+        (a) => new Attachment(a.url, a.description)
       )
     : [];
 

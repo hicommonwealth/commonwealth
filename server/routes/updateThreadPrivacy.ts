@@ -62,7 +62,7 @@ const updateThreadPrivacy = async (
           // through: models.Collaboration,
           as: 'collaborators',
         },
-        models.OffchainAttachment,
+        models.Attachment,
         {
           model: models.Topic,
           as: 'topic',

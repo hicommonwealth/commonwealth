@@ -6,7 +6,7 @@ import { ProposalType } from 'types';
 import { IChainEntityKind } from '@commonwealth/chain-events';
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';
-import OffchainAttachment from './OffchainAttachment';
+import Attachment from './Attachment';
 import Topic from './Topic';
 import Vote from './Vote';
 import { VersionHistory } from '../controllers/server/threads';
@@ -40,7 +40,7 @@ class OffchainThread implements IUniqueId {
   public readonly pinned: boolean;
   public readonly kind: OffchainThreadKind;
   public stage: OffchainThreadStage;
-  public readonly attachments: OffchainAttachment[];
+  public readonly attachments: Attachment[];
   public readonly readOnly: boolean;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
@@ -92,7 +92,7 @@ class OffchainThread implements IUniqueId {
   }: {
     author: string;
     title: string;
-    attachments: OffchainAttachment[];
+    attachments: Attachment[];
     id: number;
     createdAt: moment.Moment;
     lastCommentedOn: moment.Moment;

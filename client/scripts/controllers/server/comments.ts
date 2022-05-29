@@ -8,7 +8,7 @@ import { uniqueIdToProposal } from 'identifiers';
 import { CommentsStore } from 'stores';
 import {
   OffchainComment,
-  OffchainAttachment,
+  Attachment,
   IUniqueId,
   AddressInfo,
   NodeInfo,
@@ -31,9 +31,9 @@ export enum CommentRefreshOption {
 }
 
 export const modelFromServer = (comment) => {
-  const attachments = comment.OffchainAttachments
-    ? comment.OffchainAttachments.map(
-        (a) => new OffchainAttachment(a.url, a.description)
+  const attachments = comment.Attachments
+    ? comment.Attachments.map(
+        (a) => new Attachment(a.url, a.description)
       )
     : [];
 

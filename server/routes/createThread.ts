@@ -344,7 +344,7 @@ const createThread = async (
         req.body['attachments[]'] &&
         typeof req.body['attachments[]'] === 'string'
       ) {
-        await models.OffchainAttachment.create(
+        await models.Attachment.create(
           {
             attachable: 'thread',
             attachment_id: thread.id,
@@ -364,7 +364,7 @@ const createThread = async (
           })
         });
 
-        await models.OffchainAttachment.bulkCreate(data, { transaction });
+        await models.Attachment.bulkCreate(data, { transaction });
       }
     } catch (err) {
       return next(err);
@@ -390,7 +390,7 @@ const createThread = async (
         where: { id: thread.id },
         include: [
           { model: models.Address, as: 'Address' },
-          models.OffchainAttachment,
+          models.Attachment,
           { model: models.Topic, as: 'topic' },
         ],
         transaction,

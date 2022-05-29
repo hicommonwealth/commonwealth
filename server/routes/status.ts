@@ -115,7 +115,7 @@ const status = async (
       where: {
         address_id: { [Op.in]: myAddressIds },
       },
-      include: [models.Address, models.OffchainAttachment],
+      include: [models.Address, models.Attachment],
     });
 
     const threadCountQueryData: ThreadCountQueryData[] =

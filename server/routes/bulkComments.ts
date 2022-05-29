@@ -26,7 +26,7 @@ const bulkComments = async (models: DB, req: Request, res: Response, next: NextF
   }
   const comments = await models.OffchainComment.findAll({
     where: whereOptions,
-    include: [ models.Address, models.OffchainAttachment ],
+    include: [ models.Address, models.Attachment ],
     order: [['created_at', 'DESC']],
   });
 

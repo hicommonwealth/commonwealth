@@ -15,7 +15,7 @@ export { default as Notification } from './Notification';
 export { default as DashboardActivityNotification } from './DashboardActivityNotification';
 export { default as NotificationCategory } from './NotificationCategory';
 export { default as NotificationSubscription } from './NotificationSubscription';
-export { default as OffchainAttachment } from './OffchainAttachment';
+export { default as Attachment } from './Attachment';
 export { default as OffchainComment } from './OffchainComment';
 export { default as Reaction } from './Reaction';
 export { default as Topic } from './Topic';

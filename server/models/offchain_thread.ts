@@ -3,7 +3,7 @@ import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
-import { OffchainAttachmentAttributes } from './offchain_attachment';
+import { AttachmentAttributes } from './offchain_attachment';
 import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
 
@@ -34,9 +34,9 @@ export type OffchainThreadAttributes = {
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  OffchainAttachments?:
-    | OffchainAttachmentAttributes[]
-    | OffchainAttachmentAttributes['id'][];
+  Attachments?:
+    | AttachmentAttributes[]
+    | AttachmentAttributes['id'][];
   ChainEntity?: ChainEntityAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
@@ -122,7 +122,7 @@ export default (
       foreignKey: 'address_id',
       targetKey: 'id',
     });
-    models.OffchainThread.hasMany(models.OffchainAttachment, {
+    models.OffchainThread.hasMany(models.Attachment, {
       foreignKey: 'attachment_id',
       constraints: false,
       scope: { attachable: 'thread' },

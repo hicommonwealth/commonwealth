@@ -73,7 +73,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
           // through: models.Collaboration,
           as: 'collaborators'
         },
-        models.OffchainAttachment,
+        models.Attachment,
         {
           model: models.Topic,
           as: 'topic'

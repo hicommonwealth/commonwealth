@@ -76,7 +76,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
         // through: models.Collaboration,
         as: 'collaborators'
       },
-      models.OffchainAttachment,
+      models.Attachment,
       {
         model: models.Topic,
         as: 'topic'

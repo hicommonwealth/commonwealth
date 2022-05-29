@@ -4,7 +4,7 @@ import { ModelStatic, ModelInstance } from './types';
 
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
-import { OffchainAttachmentAttributes } from './offchain_attachment';
+import { AttachmentAttributes } from './offchain_attachment';
 
 export type OffchainCommentAttributes = {
   root_id: string;
@@ -22,7 +22,7 @@ export type OffchainCommentAttributes = {
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
+  Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
 }
 
 export type OffchainCommentInstance = ModelInstance<OffchainCommentAttributes> & {
@@ -74,7 +74,7 @@ export default (
       foreignKey: 'address_id',
       targetKey: 'id'
     });
-    models.OffchainComment.hasMany(models.OffchainAttachment, {
+    models.OffchainComment.hasMany(models.Attachment, {
       foreignKey: 'attachment_id',
       constraints: false,
       scope: {

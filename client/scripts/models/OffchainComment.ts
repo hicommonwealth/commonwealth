@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { VersionHistory } from '../controllers/server/threads';
 import { IUniqueId } from './interfaces';
-import OffchainAttachment from './OffchainAttachment';
+import Attachment from './Attachment';
 
 class OffchainComment<T extends IUniqueId> {
   [x: string]: any;
@@ -9,7 +9,7 @@ class OffchainComment<T extends IUniqueId> {
   public readonly author: string;
   public readonly text: string;
   public readonly plaintext: string;
-  public readonly attachments: OffchainAttachment[];
+  public readonly attachments: Attachment[];
   public readonly proposal: T; // this may not be populated if the comment was loaded before the proposal!
   public readonly id: number;
   public readonly createdAt: moment.Moment;

@@ -28,14 +28,14 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
-      await models.OffchainAttachment.create({
+      await models.Attachment.create({
         attachable: 'comment',
         attachment_id: req.body.id,
         url: req.body['attachments[]'],
         description: 'image',
       });
     } else if (req.body['attachments[]']) {
-      await Promise.all(req.body['attachments[]'].map((u) => models.OffchainAttachment.create({
+      await Promise.all(req.body['attachments[]'].map((u) => models.Attachment.create({
         attachable: 'comment',
         attachment_id: req.body.id,
         url: u,
@@ -80,7 +80,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
     await attachFiles();
     const finalComment = await models.OffchainComment.findOne({
       where: { id: comment.id },
-      include: [models.Address, models.OffchainAttachment],
+      include: [models.Address, models.Attachment],
     });
     // get thread for crafting commonwealth url
     let proposal;

@@ -26,14 +26,14 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
-      await models.OffchainAttachment.create({
+      await models.Attachment.create({
         attachable: 'draft',
         attachment_id: id,
         url: req.body['attachments[]'],
         description: 'image',
       });
     } else if (req.body['attachments[]']) {
-      await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
+      await Promise.all(req.body['attachments[]'].map((url) => models.Attachment.create({
         attachable: 'draft',
         attachment_id: id,
         url,
@@ -51,7 +51,7 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
       },
       include: [
         models.Address,
-        models.OffchainAttachment
+        models.Attachment
       ]
     });
     if (!draft) return next(new Error(Errors.NotFound));

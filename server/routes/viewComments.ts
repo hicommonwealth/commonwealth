@@ -27,7 +27,7 @@ const viewComments = async (
     where: { chain: chain.id, root_id: req.query.root_id },
     include: [
       models.Address,
-      models.OffchainAttachment,
+      models.Attachment,
       {
         model: models.Reaction,
         as: 'reactions',

@@ -4,7 +4,7 @@ import { ModelStatic, ModelInstance } from './types';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { OffchainThreadAttributes } from './offchain_thread';
 
-export type OffchainAttachmentAttributes = {
+export type AttachmentAttributes = {
   attachable: string;
   attachment_id: number;
   url: string;
@@ -18,16 +18,16 @@ export type OffchainAttachmentAttributes = {
   thread?: OffchainThreadAttributes | OffchainThreadAttributes['id'];
 }
 
-export type OffchainAttachmentInstance = ModelInstance<OffchainAttachmentAttributes>;
+export type AttachmentInstance = ModelInstance<AttachmentAttributes>;
 
-export type OffchainAttachmentModelStatic = ModelStatic<OffchainAttachmentInstance>;
+export type AttachmentModelStatic = ModelStatic<AttachmentInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
-): OffchainAttachmentModelStatic => {
-  const OffchainAttachment = <OffchainAttachmentModelStatic>sequelize.define(
-    'OffchainAttachment', {
+): AttachmentModelStatic => {
+  const Attachment = <AttachmentModelStatic>sequelize.define(
+    'Attachment', {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       attachable: { type: dataTypes.STRING, allowNull: false },
       attachment_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -36,7 +36,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     }, {
-      tableName: 'OffchainAttachments',
+      tableName: 'Attachments',
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
@@ -46,18 +46,18 @@ export default (
     }
   );
 
-  OffchainAttachment.associate = (models) => {
-    models.OffchainAttachment.belongsTo(models.OffchainComment, {
+  Attachment.associate = (models) => {
+    models.Attachment.belongsTo(models.OffchainComment, {
       foreignKey: 'attachment_id',
       constraints: false,
       as: 'comment',
     });
-    models.OffchainAttachment.belongsTo(models.OffchainThread, {
+    models.Attachment.belongsTo(models.OffchainThread, {
       foreignKey: 'attachment_id',
       constraints: false,
       as: 'thread',
     });
   };
 
-  return OffchainAttachment;
+  return Attachment;
 };
