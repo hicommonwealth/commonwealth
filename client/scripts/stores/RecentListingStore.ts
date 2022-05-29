@@ -1,6 +1,6 @@
 import moment from 'moment';
 import IdStore from './IdStore';
-import { OffchainThread } from '../models';
+import { Thread } from '../models';
 import { orderDiscussionsbyLastComment } from '../views/pages/discussions/helpers';
 
 interface IListingParams {
@@ -23,15 +23,15 @@ interface IListingFetchState {
   stageDepleted: { [stageName: string]: boolean };
 }
 
-class RecentListingStore extends IdStore<OffchainThread> {
-  private _threads = new Array<OffchainThread>();
+class RecentListingStore extends IdStore<Thread> {
+  private _threads = new Array<Thread>();
   public get threads() {
     return this._threads;
   }
 
   private _fetchState: IListingFetchState = this._resetFetchState();
 
-  public add(thread: OffchainThread) {
+  public add(thread: Thread) {
     const existingThread = this.getById(thread.id);
     if (existingThread) this.remove(existingThread);
 
@@ -40,7 +40,7 @@ class RecentListingStore extends IdStore<OffchainThread> {
     return this;
   }
 
-  public remove(thread: OffchainThread) {
+  public remove(thread: Thread) {
     const existingThread = this.getById(thread.id);
     if (!existingThread) return;
     const proposalIndex = this._threads.indexOf(existingThread);
@@ -59,7 +59,7 @@ class RecentListingStore extends IdStore<OffchainThread> {
 
   // Getters
 
-  public getThreads(params: IListingParams): OffchainThread[] {
+  public getThreads(params: IListingParams): Thread[] {
     const { topicName, stageName, pinned } = params;
 
     let unsortedThreads;
@@ -80,7 +80,7 @@ class RecentListingStore extends IdStore<OffchainThread> {
       .sort(orderDiscussionsbyLastComment);
   }
 
-  public getPinnedThreads(): OffchainThread[] {
+  public getPinnedThreads(): Thread[] {
     return this._threads
       .filter((t) => t.pinned)
       .sort(orderDiscussionsbyLastComment);
@@ -163,7 +163,7 @@ class RecentListingStore extends IdStore<OffchainThread> {
 
   private _isBeforeCutoff(
     params: IListingParams,
-    thread: OffchainThread
+    thread: Thread
   ): boolean {
     const { topicName, stageName, pinned } = params;
     const listingCutoff = topicName

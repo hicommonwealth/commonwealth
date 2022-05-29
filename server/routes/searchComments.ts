@@ -53,7 +53,7 @@ const searchComments = async (
     comments = await models.sequelize.query(
       `
   SELECT
-      "OffchainThreads".title,
+      "Threads".title,
       "Comments".text,
       "Comments".root_id as proposalId,
       'comment' as type,
@@ -61,10 +61,10 @@ const searchComments = async (
       "Addresses".address,
       "Addresses".chain as address_chain,
       "Comments".created_at,
-      "OffchainThreads".chain,
+      "Threads".chain,
       ts_rank_cd("Comments"._search, query) as rank
     FROM "Comments"
-    JOIN "OffchainThreads" ON "OffchainThreads".id =
+    JOIN "Threads" ON "Threads".id =
         CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
     JOIN "Addresses" ON "Comments".address_id = "Addresses".id, 
     websearch_to_tsquery('english', $searchTerm) as query

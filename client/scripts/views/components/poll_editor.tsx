@@ -17,13 +17,13 @@ import 'components/poll_editor.scss';
 
 import { getNextPollEndingTime } from 'utils';
 import app from 'state';
-import { OffchainThread } from 'models';
+import { Thread } from 'models';
 import { pluralize } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 type PollEditorAttrs = {
   onChangeHandler: () => void;
-  thread: OffchainThread;
+  thread: Thread;
 };
 
 const getPollDurationCopy = (

@@ -15,7 +15,7 @@ export const pathIsDiscussion = (scope: string | null, path: string): boolean =>
 export const getProposalUrlPath = (type: ProposalType, id: string, omitActiveId = false, chainId?: string): string => {
   let basePath: string;
   const useTypeSlug = requiresTypeSlug(type);
-  if (type === ProposalType.OffchainThread) {
+  if (type === ProposalType.Thread) {
     basePath = `/discussion/${id}`;
   } else if (useTypeSlug) {
     basePath = `/proposal/${type}/${id}`;
@@ -42,7 +42,7 @@ export const proposalSlugToClass = () => {
   const mmap = new Map<
     string,
     ProposalModule<any, any, any> | ThreadsController
-  >([[ProposalType.OffchainThread, app.threads]]);
+  >([[ProposalType.Thread, app.threads]]);
   if (app.chain.base === ChainBase.Substrate) {
     mmap.set(
       ProposalType.SubstrateDemocracyReferendum,
@@ -110,7 +110,7 @@ export const proposalSlugToFriendlyName = new Map<ProposalType, string>([
   [ProposalType.PhragmenCandidacy, 'Phragmen Council Candidacy'],
   [ProposalType.SubstrateTreasuryProposal, 'Treasury Proposal'],
   [ProposalType.SubstrateTreasuryTip, 'Treasury Tip'],
-  [ProposalType.OffchainThread, 'Discussion Thread'],
+  [ProposalType.Thread, 'Discussion Thread'],
   [ProposalType.CompoundProposal, 'Proposal'],
   [ProposalType.CosmosProposal, 'Proposal'],
   [ProposalType.MolochProposal, 'Proposal'],

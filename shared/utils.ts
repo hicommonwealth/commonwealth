@@ -75,7 +75,7 @@ export const getProposalUrl = (type, proposal, comment?) => {
     return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`
       : `http://localhost:8080/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`;
-  } else if (type === ProposalType.OffchainThread) {
+  } else if (type === ProposalType.Thread) {
     return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
       : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
@@ -100,7 +100,7 @@ export const getProposalUrlWithoutObject = (
     return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${cId}`
       : `http://localhost:8080/${aId}/proposal/${type}/${tId}${cId}`;
-  } else if (type === ProposalType.OffchainThread) {
+  } else if (type === ProposalType.Thread) {
     return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
       : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;

@@ -69,7 +69,7 @@ const createComment = async (
     if (!req.user.isAdmin && isAdmin.length === 0) {
       try {
         const thread_id = root_id.substring(root_id.indexOf('_') + 1);
-        const thread = await models.OffchainThread.findOne({
+        const thread = await models.Thread.findOne({
           where: { id: thread_id },
         });
         const canReact = await tokenBalanceCache.validateTopicThreshold(
@@ -209,8 +209,8 @@ const createComment = async (
     ProposalType,
     string
   ];
-  if (prefix === ProposalType.OffchainThread) {
-    proposal = await models.OffchainThread.findOne({
+  if (prefix === ProposalType.Thread) {
+    proposal = await models.Thread.findOne({
       where: { id },
     });
   } else if (
@@ -424,7 +424,7 @@ const createComment = async (
   author.save();
 
   // update proposal updated_at timestamp
-  if (prefix === ProposalType.OffchainThread) {
+  if (prefix === ProposalType.Thread) {
     proposal.last_commented_on = Date.now();
     proposal.save();
   }

@@ -13,15 +13,15 @@ import 'pages/discussions/stages_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { OffchainThreadStage } from 'models';
+import { ThreadStage } from 'models';
 import { offchainThreadStageToLabel } from 'helpers';
 
 type StagesMenuAttrs = {
   disabled: boolean;
   parentState: any;
-  selectedStage: OffchainThreadStage;
+  selectedStage: ThreadStage;
   stage: string;
-  stages: OffchainThreadStage[];
+  stages: ThreadStage[];
 };
 
 export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
@@ -74,7 +74,7 @@ export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
                 label={
                   <div class="stages-item">
                     {offchainThreadStageToLabel(targetStage)}
-                    {targetStage === OffchainThreadStage.Voting && (
+                    {targetStage === ThreadStage.Voting && (
                       <div class="discussions-stage-count">
                         {app.threads.numVotingThreads}
                       </div>

@@ -46,7 +46,7 @@ export default async (
     case 'new-comment-creation':
     case 'new-reaction': {
       if (p_entity === 'discussion') {
-        const thread = await models.OffchainThread.findOne({
+        const thread = await models.Thread.findOne({
           where: { id: Number(p_id) },
         });
         if (!thread) return next(new Error(Errors.NoThread));

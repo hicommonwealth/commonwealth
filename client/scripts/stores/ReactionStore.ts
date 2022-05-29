@@ -2,7 +2,7 @@ import IdStore from './IdStore';
 import {
   Reaction,
   AnyProposal,
-  OffchainThread,
+  Thread,
   Comment,
   Proposal,
   AbridgedThread
@@ -62,12 +62,12 @@ class ReactionStore extends IdStore<Reaction<any>> {
     return this;
   }
 
-  public getByPost(post: OffchainThread | AbridgedThread | AnyProposal | Comment<any>): Array<Reaction<any>> {
+  public getByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>): Array<Reaction<any>> {
     const identifier = this.getPostIdentifier(post);
     return this._storePost[identifier] || [];
   }
 
-  public getPostIdentifier(rxnOrPost: Reaction<any> | OffchainThread | AbridgedThread | AnyProposal | Comment<any>) {
+  public getPostIdentifier(rxnOrPost: Reaction<any> | Thread | AbridgedThread | AnyProposal | Comment<any>) {
     if (rxnOrPost instanceof Reaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;
       return threadId
@@ -75,7 +75,7 @@ class ReactionStore extends IdStore<Reaction<any>> {
         : proposalId
           ? `${proposalId}`
           : `comment-${commentId}`;
-    } else if (rxnOrPost instanceof OffchainThread || rxnOrPost instanceof AbridgedThread) {
+    } else if (rxnOrPost instanceof Thread || rxnOrPost instanceof AbridgedThread) {
       return `discussion-${rxnOrPost.id}`;
     } else if (rxnOrPost instanceof Proposal) {
       return `${(rxnOrPost as AnyProposal).slug}_${(rxnOrPost as AnyProposal).identifier}`;

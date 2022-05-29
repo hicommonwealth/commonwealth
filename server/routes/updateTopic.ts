@@ -28,7 +28,7 @@ const updateTopic = async (
   );
   if (!userAddress) return next(new Error(UpdateTopicErrors.InvalidAddr));
 
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: {
       id: req.body.thread_id,
     },

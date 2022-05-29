@@ -5,7 +5,7 @@ import {
   AnyProposal,
   Comment,
   Reaction,
-  OffchainThread,
+  Thread,
   Proposal,
 } from 'models';
 
@@ -48,7 +48,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
   }
 
   public getByPost(
-    post: OffchainThread | AbridgedThread | AnyProposal | Comment<any>
+    post: Thread | AbridgedThread | AnyProposal | Comment<any>
   ): ReactionCount<any> {
     const identifier = this.getPostIdentifier(post);
     return this._storeRC[identifier] || null;
@@ -65,13 +65,13 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
   public getPostIdentifier(
     rxnOrPost:
       | Reaction<any>
-      | OffchainThread
+      | Thread
       | AbridgedThread
       | AnyProposal
       | Comment<any>
   ) {
     if (
-      rxnOrPost instanceof OffchainThread ||
+      rxnOrPost instanceof Thread ||
       rxnOrPost instanceof AbridgedThread
     ) {
       return `discussion-${rxnOrPost.id}`;

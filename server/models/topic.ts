@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes } from './chain';
-import { OffchainThreadAttributes } from './offchain_thread';
+import { ThreadAttributes } from './thread';
 
 export type TopicAttributes = {
   name: string;
@@ -21,7 +21,7 @@ export type TopicAttributes = {
 
   // associations
   chain?: ChainAttributes;
-  threads?: OffchainThreadAttributes[] | TopicAttributes['id'][];
+  threads?: ThreadAttributes[] | TopicAttributes['id'][];
 }
 
 export type TopicInstance = ModelInstance<TopicAttributes> & {
@@ -70,7 +70,7 @@ export default (
       foreignKey: 'chain_id',
       targetKey: 'id',
     });
-    models.Topic.hasMany(models.OffchainThread, {
+    models.Topic.hasMany(models.Thread, {
       as: 'threads',
       foreignKey: 'topic_id',
     });

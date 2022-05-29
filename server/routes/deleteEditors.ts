@@ -37,7 +37,7 @@ const deleteEditors = async (
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: {
       id: thread_id,
       address_id: { [Op.in]: userOwnedAddressIds },

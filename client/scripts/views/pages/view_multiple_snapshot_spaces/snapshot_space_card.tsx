@@ -4,7 +4,7 @@ import m from 'mithril';
 
 import 'pages/snapshot/snapshot_space_card.scss';
 
-import { OffchainThread } from 'client/scripts/models';
+import { Thread } from 'client/scripts/models';
 import app from 'state';
 import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { navigateToSubpage } from '../../../app';
@@ -18,7 +18,7 @@ function countActiveProposals(proposals: SnapshotProposal[]): number {
 export class SnapshotSpaceCard
   implements
     m.ClassComponent<{
-      proposal: null | OffchainThread;
+      proposal: null | Thread;
       proposals: SnapshotProposal[];
       redirect_action: string;
       space: SnapshotSpace;

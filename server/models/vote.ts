@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
-import { OffchainThreadAttributes } from './offchain_thread';
+import { ThreadAttributes } from './thread';
 import { PollAttributes } from './poll';
 
 export type VoteAttributes = {

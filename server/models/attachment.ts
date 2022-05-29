@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { CommentAttributes } from './comment';
-import { OffchainThreadAttributes } from './offchain_thread';
+import { ThreadAttributes } from './thread';
 
 export type AttachmentAttributes = {
   attachable: string;
@@ -15,7 +15,7 @@ export type AttachmentAttributes = {
 
   // associations
   comment?: CommentAttributes | CommentAttributes['id'];
-  thread?: OffchainThreadAttributes | OffchainThreadAttributes['id'];
+  thread?: ThreadAttributes | ThreadAttributes['id'];
 }
 
 export type AttachmentInstance = ModelInstance<AttachmentAttributes>;
@@ -52,7 +52,7 @@ export default (
       constraints: false,
       as: 'comment',
     });
-    models.Attachment.belongsTo(models.OffchainThread, {
+    models.Attachment.belongsTo(models.Thread, {
       foreignKey: 'attachment_id',
       constraints: false,
       as: 'thread',

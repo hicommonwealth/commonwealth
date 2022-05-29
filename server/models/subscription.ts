@@ -12,7 +12,7 @@ import {
 import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainAttributes } from './chain';
-import { OffchainThreadAttributes } from './offchain_thread';
+import { ThreadAttributes } from './thread';
 import { CommentAttributes } from './comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
@@ -42,7 +42,7 @@ export type SubscriptionAttributes = {
   NotificationCategory?: NotificationCategoryAttributes;
   NotificationsRead?: NotificationsReadAttributes[];
   Chain?: ChainAttributes;
-  OffchainThread?: OffchainThreadAttributes;
+  Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
   ChainEventType?: ChainEventTypeAttributes;
   ChainEntity?: ChainEntityAttributes;
@@ -241,7 +241,7 @@ export default (
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
     models.Subscription.hasMany(models.NotificationsRead, { foreignKey: 'subscription_id', onDelete: 'cascade' });
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.Thread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.Comment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.ChainEntity, { foreignKey: 'chain_entity_id', targetKey: 'id' });

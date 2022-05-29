@@ -9,7 +9,7 @@ import bs58 from 'bs58';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ChainBase } from 'types';
-import { OffchainThread, Comment, Profile } from 'models';
+import { Thread, Comment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
 import { PageNotFound } from 'views/pages/404';
@@ -100,7 +100,7 @@ interface IProfilePageAttrs {
 }
 interface IProfilePageState {
   account;
-  threads: OffchainThread[];
+  threads: Thread[];
   comments: Comment<any>[];
   initialized: boolean;
   loaded: boolean;

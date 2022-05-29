@@ -23,7 +23,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { Topic, OffchainThreadKind, OffchainThreadStage } from 'models';
+import { Topic, ThreadKind, ThreadStage } from 'models';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -105,18 +105,18 @@ const newThread = async (
   form,
   quillEditorState,
   author,
-  kind = OffchainThreadKind.Forum,
-  stage = OffchainThreadStage.Discussion,
+  kind = ThreadKind.Forum,
+  stage = ThreadStage.Discussion,
   readOnly?: boolean
 ) => {
   const topics = app.chain.meta.chain.topics;
 
-  if (kind === OffchainThreadKind.Forum) {
+  if (kind === ThreadKind.Forum) {
     if (!form.threadTitle) {
       throw new Error(NewThreadErrors.NoTitle);
     }
   }
-  if (kind === OffchainThreadKind.Link) {
+  if (kind === ThreadKind.Link) {
     if (!form.linkTitle) {
       throw new Error(NewThreadErrors.NoTitle);
     }
@@ -128,7 +128,7 @@ const newThread = async (
     throw new Error(NewThreadErrors.NoTopic);
   }
   if (
-    kind === OffchainThreadKind.Forum &&
+    kind === ThreadKind.Forum &&
     quillEditorState.editor.editor.isBlank()
   ) {
     throw new Error(NewThreadErrors.NoBody);
@@ -194,7 +194,7 @@ const newLink = async (
   form,
   quillEditorState,
   author,
-  kind = OffchainThreadKind.Link
+  kind = ThreadKind.Link
 ) => {
   const errors = await newThread(form, quillEditorState, author, kind);
   return errors;

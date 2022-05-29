@@ -27,11 +27,11 @@ import Substrate from 'controllers/chain/substrate/main';
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import {
-  OffchainThread,
-  OffchainThreadKind,
+  Thread,
+  ThreadKind,
   Comment,
   Topic,
-  OffchainThreadStage,
+  ThreadStage,
   AnyProposal,
   Account,
   ChainEntity,
@@ -135,14 +135,14 @@ interface IPrefetch {
 }
 
 export interface IProposalPageState {
-  comments: Comment<OffchainThread>[];
+  comments: Comment<Thread>[];
   polls: Poll[];
   editing: boolean;
   highlightedComment: boolean;
   parentCommentId: number; // if null or undefined, reply is thread-scoped
   pollEditorIsOpen: boolean;
   prefetch: IPrefetch;
-  proposal: AnyProposal | OffchainThread;
+  proposal: AnyProposal | Thread;
   recentlyEdited: boolean;
   recentlySubmitted: number; // comment ID for CSS highlight transitions
   replying: boolean;
@@ -188,7 +188,7 @@ const ProposalHeader: m.Component<
     viewCount: number;
     getSetGlobalEditingStatus: CallableFunction;
     proposalPageState: IProposalPageState;
-    proposal: AnyProposal | OffchainThread;
+    proposal: AnyProposal | Thread;
     isAuthor: boolean;
     isEditor: boolean;
     isAdmin: boolean;
@@ -221,8 +221,8 @@ const ProposalHeader: m.Component<
       isAdmin,
     } = vnode.attrs;
     const attachments =
-      proposal instanceof OffchainThread
-        ? (proposal as OffchainThread).attachments
+      proposal instanceof Thread
+        ? (proposal as Thread).attachments
         : false;
     const proposalLink = getProposalUrlPath(
       proposal.slug,
@@ -244,7 +244,7 @@ const ProposalHeader: m.Component<
       [
         m('.proposal-top', [
           m('.proposal-top-left', [
-            !(proposal instanceof OffchainThread) &&
+            !(proposal instanceof Thread) &&
               m('.proposal-meta-top', [
                 m('.proposal-meta-top-left', [
                   m(ProposalHeaderOnchainId, { proposal }),
@@ -265,7 +265,7 @@ const ProposalHeader: m.Component<
               }),
             m(
               '.proposal-body-meta',
-              proposal instanceof OffchainThread
+              proposal instanceof Thread
                 ? [
                     m(ProposalHeaderStage, { proposal }),
                     m(ProposalHeaderTopics, { proposal }),
@@ -298,7 +298,7 @@ const ProposalHeader: m.Component<
                               },
                             }),
                           isAdmin &&
-                            proposal instanceof OffchainThread &&
+                            proposal instanceof Thread &&
                             m(TopicEditorMenuItem, {
                               openTopicEditor: () => {
                                 vnode.state.topicEditorIsOpen = true;
@@ -336,7 +336,7 @@ const ProposalHeader: m.Component<
                           //   }),
                           (isAuthor || isAdmin) && m(MenuDivider),
                           m(ThreadSubscriptionMenuItem, {
-                            proposal: proposal as OffchainThread,
+                            proposal: proposal as Thread,
                           }),
                         ],
                         inline: true,
@@ -348,9 +348,9 @@ const ProposalHeader: m.Component<
                     !app.isCustomDomain() &&
                       m('.CommentSocialHeader', [m(SocialSharingCarat)]),
                     vnode.state.editPermissionsIsOpen &&
-                      proposal instanceof OffchainThread &&
+                      proposal instanceof Thread &&
                       m(ProposalEditorPermissions, {
-                        thread: vnode.attrs.proposal as OffchainThread,
+                        thread: vnode.attrs.proposal as Thread,
                         popoverMenu: true,
                         openStateHandler: (v) => {
                           vnode.state.editPermissionsIsOpen = v;
@@ -359,9 +359,9 @@ const ProposalHeader: m.Component<
                         onChangeHandler: () => {},
                       }),
                     vnode.state.topicEditorIsOpen &&
-                      proposal instanceof OffchainThread &&
+                      proposal instanceof Thread &&
                       m(TopicEditor, {
-                        thread: vnode.attrs.proposal as OffchainThread,
+                        thread: vnode.attrs.proposal as Thread,
                         popoverMenu: true,
                         onChangeHandler: (topic: Topic) => {
                           proposal.topic = topic;
@@ -373,12 +373,12 @@ const ProposalHeader: m.Component<
                         },
                       }),
                     vnode.attrs.stageEditorIsOpen &&
-                      proposal instanceof OffchainThread &&
+                      proposal instanceof Thread &&
                       m(StageEditor, {
-                        thread: vnode.attrs.proposal as OffchainThread,
+                        thread: vnode.attrs.proposal as Thread,
                         popoverMenu: true,
                         onChangeHandler: (
-                          stage: OffchainThreadStage,
+                          stage: ThreadStage,
                           chainEntities: ChainEntity[],
                           snapshotProposal: SnapshotProposal[]
                         ) => {
@@ -396,9 +396,9 @@ const ProposalHeader: m.Component<
                         },
                       }),
                     vnode.attrs.pollEditorIsOpen &&
-                      proposal instanceof OffchainThread &&
+                      proposal instanceof Thread &&
                       m(PollEditor, {
-                        thread: vnode.attrs.proposal as OffchainThread,
+                        thread: vnode.attrs.proposal as Thread,
                         onChangeHandler: () => {
                           vnode.attrs.closePollEditor();
                           m.redraw();
@@ -434,8 +434,8 @@ const ProposalHeader: m.Component<
                   ]
             ),
             m('.proposal-body-link', [
-              proposal instanceof OffchainThread &&
-                proposal.kind === OffchainThreadKind.Link && [
+              proposal instanceof Thread &&
+                proposal.kind === ThreadKind.Link && [
                   vnode.state.editing
                     ? m(ProposalLinkEditor, {
                         item: proposal,
@@ -443,7 +443,7 @@ const ProposalHeader: m.Component<
                       })
                     : m(ProposalHeaderExternalLink, { proposal }),
                 ],
-              !(proposal instanceof OffchainThread) &&
+              !(proposal instanceof Thread) &&
                 (proposal['blockExplorerLink'] ||
                   proposal['votingInterfaceLink'] ||
                   proposal.threadId) &&
@@ -458,7 +458,7 @@ const ProposalHeader: m.Component<
             ]),
           ]),
         ]),
-        proposal instanceof OffchainThread &&
+        proposal instanceof Thread &&
           m('.proposal-content', [
             (commentCount > 0 || app.user.activeAccount) &&
               m('.thread-connector'),
@@ -512,7 +512,7 @@ const ProposalHeader: m.Component<
               ]),
             ]),
           ]),
-        !(proposal instanceof OffchainThread) &&
+        !(proposal instanceof Thread) &&
           hasBody &&
           m('.proposal-content', [m(ProposalBodyText, { item: proposal })]),
       ]
@@ -525,8 +525,8 @@ const ProposalComment: m.Component<
     comment: Comment<any>;
     getSetGlobalEditingStatus: CallableFunction;
     proposalPageState: IProposalPageState;
-    parent: AnyProposal | Comment<any> | OffchainThread;
-    proposal: AnyProposal | OffchainThread;
+    parent: AnyProposal | Comment<any> | Thread;
+    proposal: AnyProposal | Thread;
     callback?: Function;
     isAdmin?: boolean;
     isLast: boolean;
@@ -683,7 +683,7 @@ const ProposalComment: m.Component<
 
 const ProposalComments: m.Component<
   {
-    proposal: OffchainThread | AnyProposal;
+    proposal: Thread | AnyProposal;
     comments: Array<Comment<any>>;
     createdCommentCallback: CallableFunction;
     getSetGlobalEditingStatus: CallableFunction;
@@ -769,7 +769,7 @@ const ProposalComments: m.Component<
 
     const recursivelyGatherComments = (
       comments_: Comment<any>[],
-      parent: AnyProposal | OffchainThread | Comment<any>,
+      parent: AnyProposal | Thread | Comment<any>,
       threadLevel: number
     ) => {
       const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
@@ -856,7 +856,7 @@ const ViewProposalPage: m.Component<
     const type =
       vnode.attrs.type ||
       (isDiscussion
-        ? ProposalType.OffchainThread
+        ? ProposalType.Thread
         : chainToProposalSlug(app.chain.meta.chain));
     const headerTitle = isDiscussion ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string')
@@ -906,7 +906,7 @@ const ViewProposalPage: m.Component<
         vnode.state.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {
         // proposal might be loading, if it's not an offchain thread
-        if (proposalType === ProposalType.OffchainThread) {
+        if (proposalType === ProposalType.Thread) {
           if (!vnode.state.threadFetched) {
             app.threads
               .fetchThreadsFromId([+proposalId])
@@ -1051,7 +1051,7 @@ const ViewProposalPage: m.Component<
 
     // load polls
     if (
-      proposal instanceof OffchainThread &&
+      proposal instanceof Thread &&
       !vnode.state.prefetch[proposalIdAndType]['pollsStarted']
     ) {
       app.polls.fetchPolls(app.activeChainId(), proposal.id).catch(() => {
@@ -1060,18 +1060,18 @@ const ViewProposalPage: m.Component<
         m.redraw();
       });
       vnode.state.prefetch[proposalIdAndType]['pollsStarted'] = true;
-    } else if (proposal instanceof OffchainThread) {
+    } else if (proposal instanceof Thread) {
       vnode.state.polls = app.polls.getByThreadId(proposal.id);
     }
 
     // load view count
     if (
       !vnode.state.prefetch[proposalIdAndType]['viewCountStarted'] &&
-      proposal instanceof OffchainThread
+      proposal instanceof Thread
     ) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        object_id: proposal.id, // (proposal instanceof OffchainThread) ? proposal.id : proposal.slug,
+        object_id: proposal.id, // (proposal instanceof Thread) ? proposal.id : proposal.slug,
       })
         .then((response) => {
           if (response.status !== 'Success') {
@@ -1112,7 +1112,7 @@ const ViewProposalPage: m.Component<
     if (
       vnode.state.prefetch[proposalIdAndType]['profilesStarted'] === undefined
     ) {
-      if (proposal instanceof OffchainThread) {
+      if (proposal instanceof Thread) {
         app.profiles.getProfile(proposal.authorChain, proposal.author);
       } else if (proposal.author instanceof Account) {
         // AnyProposal
@@ -1150,7 +1150,7 @@ const ViewProposalPage: m.Component<
     const viewCount: number = vnode.state.viewCount;
     const commentCount: number = app.comments.nComments(proposal);
     const voterCount: number =
-      proposal instanceof OffchainThread ? 0 : proposal.getVotes().length;
+      proposal instanceof Thread ? 0 : proposal.getVotes().length;
 
     const getSetGlobalEditingStatus = (call: string, status?: boolean) => {
       if (call === GlobalStatus.Get) return vnode.state.editing;
@@ -1168,18 +1168,18 @@ const ViewProposalPage: m.Component<
     const { activeAccount } = app.user;
 
     const authorChain =
-      proposal instanceof OffchainThread
+      proposal instanceof Thread
         ? proposal.authorChain
         : app.activeChainId();
     const authorAddress =
-      proposal instanceof OffchainThread
+      proposal instanceof Thread
         ? proposal.author
         : proposal.author?.address;
     const isAuthor =
       activeAccount?.address === authorAddress &&
       activeAccount?.chain.id === authorChain;
     const isEditor =
-      (proposal as OffchainThread).collaborators?.filter((c) => {
+      (proposal as Thread).collaborators?.filter((c) => {
         return (
           c.address === activeAccount?.address &&
           c.chain === activeAccount?.chain.id
@@ -1312,12 +1312,12 @@ const ViewProposalPage: m.Component<
       );
     }
     const showLinkedSnapshotOptions =
-      (proposal as OffchainThread).snapshotProposal?.length > 0 ||
-      (proposal as OffchainThread).chainEntities?.length > 0 ||
+      (proposal as Thread).snapshotProposal?.length > 0 ||
+      (proposal as Thread).chainEntities?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
     const showLinkedThreadOptions =
-      (proposal as OffchainThread).linkedThreads?.length > 0 ||
+      (proposal as Thread).linkedThreads?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
 
@@ -1350,15 +1350,15 @@ const ViewProposalPage: m.Component<
                 m.redraw();
               },
             }),
-            !(proposal instanceof OffchainThread) &&
+            !(proposal instanceof Thread) &&
               m(LinkedProposalsEmbed, { proposal }),
             proposal instanceof AaveProposal && [
               m(AaveViewProposalSummary, { proposal }),
               m(AaveViewProposalDetail, { proposal }),
             ],
-            !(proposal instanceof OffchainThread) &&
+            !(proposal instanceof Thread) &&
               m(ProposalVotingResults, { proposal }),
-            !(proposal instanceof OffchainThread) &&
+            !(proposal instanceof Thread) &&
               m(ProposalVotingActions, { proposal }),
             m(ProposalComments, {
               proposal,
@@ -1384,7 +1384,7 @@ const ViewProposalPage: m.Component<
         m('.right-content-container', [
           [
             showLinkedSnapshotOptions &&
-              proposal instanceof OffchainThread &&
+              proposal instanceof Thread &&
               m(LinkedProposalsCard, {
                 proposal,
                 openStageEditor: () => {
@@ -1393,12 +1393,12 @@ const ViewProposalPage: m.Component<
                 showAddProposalButton: isAuthor || isAdminOrMod,
               }),
             showLinkedThreadOptions &&
-              proposal instanceof OffchainThread &&
+              proposal instanceof Thread &&
               m(LinkedThreadsCard, {
                 proposalId: proposal.id,
                 allowLinking: isAuthor || isAdminOrMod,
               }),
-            proposal instanceof OffchainThread &&
+            proposal instanceof Thread &&
               isAuthor &&
               (!app.chain?.meta?.chain?.adminOnlyPolling || isAdmin) &&
               m(PollEditorCard, {
@@ -1408,7 +1408,7 @@ const ViewProposalPage: m.Component<
                   vnode.state.pollEditorIsOpen = true;
                 },
               }),
-            proposal instanceof OffchainThread &&
+            proposal instanceof Thread &&
               [
                 ...new Map(
                   vnode.state.polls?.map((poll) => [poll.id, poll])

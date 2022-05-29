@@ -19,7 +19,7 @@ export { default as Attachment } from './Attachment';
 export { default as Comment } from './Comment';
 export { default as Reaction } from './Reaction';
 export { default as Topic } from './Topic';
-export { default as OffchainThread } from './OffchainThread';
+export { default as Thread } from './Thread';
 export { default as Poll } from './Poll';
 export { default as Vote } from './Vote';
 export { default as Profile } from './Profile';
@@ -40,8 +40,8 @@ export { default as Webhook } from './Webhook';
 export { DepositVote, BinaryVote } from './votes';
 
 export {
-  OffchainThreadKind,
-  OffchainThreadStage,
+  ThreadKind,
+  ThreadStage,
   TransactionStatus,
   ProposalStatus,
   VotingType,

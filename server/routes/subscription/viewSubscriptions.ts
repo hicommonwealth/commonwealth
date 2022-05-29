@@ -12,8 +12,8 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
 
   const associationParams: any = [
     {
-      model: models.OffchainThread,
-      as: 'OffchainThread',
+      model: models.Thread,
+      as: 'Thread',
     }, {
       model: models.Comment,
       as: 'Comment',

@@ -3,13 +3,13 @@ import lity from 'lity';
 import { slugify } from 'utils';
 
 import app from 'state';
-import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
+import { Thread, ThreadKind, AddressInfo } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import User from 'views/components/widgets/user';
 
 const ProfileProposal: m.Component<
-  { proposal: OffchainThread },
+  { proposal: Thread },
   { revealThread: boolean }
 > = {
   view: (vnode) => {
@@ -23,9 +23,9 @@ const ProfileProposal: m.Component<
     return m('.ProfileProposal', [
       m('.summary', [
         m('', [
-          proposal.kind === OffchainThreadKind.Question
+          proposal.kind === ThreadKind.Question
             ? 'Added a question'
-            : proposal.kind === OffchainThreadKind.Request
+            : proposal.kind === ThreadKind.Request
             ? 'added a task'
             : [
                 'Created a new ',
@@ -47,8 +47,8 @@ const ProfileProposal: m.Component<
         createdAt && createdAt.fromNow(),
       ]),
       m('.activity.proposal', [
-        proposal.kind === OffchainThreadKind.Forum ||
-        proposal.kind === OffchainThreadKind.Link
+        proposal.kind === ThreadKind.Forum ||
+        proposal.kind === ThreadKind.Link
           ? link(
               'a.proposal-title',
               `/${chain}${getProposalUrlPath(

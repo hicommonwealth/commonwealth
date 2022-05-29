@@ -21,7 +21,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
   if (!req.user) return next(new Error(Errors.NotAdminOrOwner));
 
   try {
-    const thread = await models.OffchainThread.findOne({
+    const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
       },
@@ -61,7 +61,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
 
     await thread.update({ stage });
 
-    const finalThread = await models.OffchainThread.findOne({
+    const finalThread = await models.Thread.findOne({
       where: { id: thread_id, },
       include: [
         {

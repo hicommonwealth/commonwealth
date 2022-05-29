@@ -3,7 +3,7 @@ import moment from 'moment';
 import SearchStore from "stores/SearchStore";
 import app from 'state';
 import { SearchScope, SearchParams } from '../../models/SearchQuery';
-import { OffchainThread, SearchQuery } from "../../models";
+import { Thread, SearchQuery } from "../../models";
 import { modelFromServer } from './threads';
 
 const SEARCH_PREVIEW_SIZE = 6;
@@ -157,7 +157,7 @@ class SearchContoller {
   public searchThreadTitles = async (
     searchTerm: string,
     params: SearchParams
-  ): Promise<OffchainThread[]> => {
+  ): Promise<Thread[]> => {
     const { resultSize, chainScope, communityScope } = params;
     try {
       const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {

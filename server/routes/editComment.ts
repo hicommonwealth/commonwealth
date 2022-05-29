@@ -86,7 +86,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
     let proposal;
     const [prefix, id] = comment.root_id.split('_');
     if (prefix === 'discussion') {
-      proposal = await models.OffchainThread.findOne({
+      proposal = await models.Thread.findOne({
         where: { id }
       });
     } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
