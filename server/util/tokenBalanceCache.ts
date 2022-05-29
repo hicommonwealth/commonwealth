@@ -140,7 +140,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   public async validateTopicThreshold(topicId: number, userAddress: string): Promise<boolean> {
     if (!topicId || !userAddress) return true;
     try {
-      const topic = await this.models.OffchainTopic.findOne({
+      const topic = await this.models.Topic.findOne({
         where: { id: topicId },
         include: [
           {

@@ -13,12 +13,12 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
-import { OffchainThread } from 'models';
+import { Thread } from 'models';
 import { SearchParams } from 'models/SearchQuery';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from '../../../../shared/utils';
 
-const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
+const renderThreadPreview = (state, thread: Thread, idx: number) => {
   const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
   return m(ListItem, {
@@ -41,17 +41,17 @@ const renderThreadPreview = (state, thread: OffchainThread, idx: number) => {
 
 export const ThreadSelector: m.Component<
   {
-    linkingThread: OffchainThread;
-    linkedThreads: OffchainThread[];
+    linkingThread: Thread;
+    linkedThreads: Thread[];
   },
   {
-    linkedThreads: OffchainThread[];
+    linkedThreads: Thread[];
     fetchLinkedThreads: boolean;
     loading: boolean;
     showOnlyLinkedThreads: boolean;
     inputTimeout;
     searchTerm: string;
-    searchResults: OffchainThread[];
+    searchResults: Thread[];
     fetchingResults: boolean;
     selectInProgress: boolean;
   }
@@ -155,9 +155,9 @@ export const ThreadSelector: m.Component<
                 vnode.state.showOnlyLinkedThreads && !queryLength
                   ? linkedThreads
                   : searchResults,
-              itemRender: (item: OffchainThread, idx) =>
+              itemRender: (item: Thread, idx) =>
                 renderThreadPreview(vnode.state, item, idx),
-              onSelect: (thread: OffchainThread) => {
+              onSelect: (thread: Thread) => {
                 const selectedThreadIdx = linkedThreads.findIndex(
                   (linkedThread) => linkedThread.id === thread.id
                 );

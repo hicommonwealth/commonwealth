@@ -19,7 +19,7 @@ const getDiscussionDrafts = async (models, req: Request, res: Response, next: Ne
     },
     include: [
       models.Address,
-      models.OffchainAttachment
+      models.Attachment
     ],
   });
 

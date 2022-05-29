@@ -31,7 +31,7 @@ const deleteThread = async (
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
 
-    const myThread = await models.OffchainThread.findOne({
+    const myThread = await models.Thread.findOne({
       where: {
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -47,7 +47,7 @@ const deleteThread = async (
         return next(new Error(DeleteThreadErrors.NoPermission));
       }
 
-      thread = await models.OffchainThread.findOne({
+      thread = await models.Thread.findOne({
         where: {
           id: req.body.thread_id,
         },
@@ -59,9 +59,9 @@ const deleteThread = async (
       }
     }
 
-    const topic = await models.OffchainTopic.findOne({
+    const topic = await models.Topic.findOne({
       where: { id: thread.topic_id },
-      include: [{ model: models.OffchainThread, as: 'threads' }],
+      include: [{ model: models.Thread, as: 'threads' }],
     });
 
     // find and delete all associated subscriptions

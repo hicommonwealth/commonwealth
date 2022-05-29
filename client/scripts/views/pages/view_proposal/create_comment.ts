@@ -5,7 +5,7 @@ import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
+import { Thread, Comment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'types';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
@@ -26,8 +26,8 @@ const CreateComment: m.Component<
     cancellable?: boolean;
     getSetGlobalEditingStatus: CallableFunction;
     proposalPageState: IProposalPageState;
-    parentComment?: OffchainComment<any>;
-    rootProposal: AnyProposal | OffchainThread;
+    parentComment?: Comment<any>;
+    rootProposal: AnyProposal | Thread;
     tabindex?: number;
   },
   {
@@ -134,7 +134,7 @@ const CreateComment: m.Component<
     };
 
     const activeTopicName =
-      rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
+      rootProposal instanceof Thread ? rootProposal?.topic?.name : null;
 
     const isAdmin =
       app.user.isSiteAdmin ||
@@ -198,7 +198,7 @@ const CreateComment: m.Component<
             ),
           ]),
           m(User, { user: author, popover: true, hideAvatar: true }),
-          rootProposal instanceof OffchainThread && rootProposal.readOnly
+          rootProposal instanceof Thread && rootProposal.readOnly
             ? m(Callout, {
                 intent: 'primary',
                 content:

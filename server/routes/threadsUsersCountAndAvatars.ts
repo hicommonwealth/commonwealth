@@ -21,7 +21,7 @@ const fetchUniqueAddressesByRootIds = async (
   return sequelize.query<UniqueAddresses>(
     `
     SELECT distinct cts.address_id, address, root_id, cts.chain
-    FROM "OffchainComments" cts INNER JOIN "Addresses" adr
+    FROM "Comments" cts INNER JOIN "Addresses" adr
     ON adr.id = cts.address_id
     WHERE root_id IN ($root_ids)
     AND cts.chain = $chain

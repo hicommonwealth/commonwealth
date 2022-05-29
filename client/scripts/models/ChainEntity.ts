@@ -51,7 +51,7 @@ class ChainEntity {
   }
 
   public static fromJSON(json) {
-    const { chain, type, type_id, ChainEvents, created_at, updated_at, id, thread_id, OffchainThread, title, author } = json;
+    const { chain, type, type_id, ChainEvents, created_at, updated_at, id, thread_id, Thread, title, author } = json;
     return new ChainEntity({
       chain,
       type,
@@ -61,7 +61,7 @@ class ChainEntity {
       updatedAt: updated_at,
       id,
       threadId: thread_id,
-      threadTitle: OffchainThread?.title,
+      threadTitle: Thread?.title,
       title,
       author,
     });

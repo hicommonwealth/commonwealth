@@ -8,14 +8,14 @@ import 'pages/discussions/discussion_row_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'types';
-import { OffchainThread, OffchainTopic, OffchainThreadStage } from 'models';
+import { Thread, Topic, ThreadStage } from 'models';
 import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
-type ThreadMenuItemAttrs = { proposal: OffchainThread };
+type ThreadMenuItemAttrs = { proposal: Thread };
 
 type EditorMenuItemAttrs = { openTopicEditor: () => void };
 
@@ -244,7 +244,7 @@ export class DiscussionRowMenu
           <TopicEditor
             thread={vnode.attrs.proposal}
             popoverMenu={true}
-            onChangeHandler={(topic: OffchainTopic) => {
+            onChangeHandler={(topic: Topic) => {
               proposal.topic = topic;
               m.redraw();
             }}
@@ -258,7 +258,7 @@ export class DiscussionRowMenu
           <StageEditor
             thread={vnode.attrs.proposal}
             popoverMenu={true}
-            onChangeHandler={(stage: OffchainThreadStage) => {
+            onChangeHandler={(stage: ThreadStage) => {
               proposal.stage = stage;
               m.redraw();
             }}

@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { OffchainTopic, AbridgedThread, Profile, OffchainThread } from 'models';
+import { Topic, AbridgedThread, Profile, Thread } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
@@ -11,7 +11,7 @@ export interface IAbridgedThreadFromServer {
   created_at: any;
   community: string;
   chain: string;
-  topic?: OffchainTopic;
+  topic?: Topic;
   pinned?: boolean;
   url?: string;
 }
@@ -70,7 +70,7 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentTopicActivity(): Promise<OffchainThread[]> {
+  public async getRecentTopicActivity(): Promise<Thread[]> {
     const params = {
       chain: app.activeChainId(),
       threads_per_topic: 3,
@@ -85,7 +85,7 @@ class RecentActivityController {
     return threads.map((thread) => {
       const modeledThread = modelThreadFromServer(thread);
       if (!thread.Address) {
-        console.error('OffchainThread missing address');
+        console.error('Thread missing address');
       }
       if (!app.threads.summaryStore.getByIdentifier(thread.id)) {
         try {

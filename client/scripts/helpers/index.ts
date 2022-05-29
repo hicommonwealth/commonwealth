@@ -3,22 +3,22 @@ import { ICardListItem } from 'models/interfaces';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import app from 'state';
-import { OffchainThreadStage } from 'models';
+import { ThreadStage } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
 }
 
-export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
-  if (stage === OffchainThreadStage.Discussion) {
+export function offchainThreadStageToLabel(stage: ThreadStage) {
+  if (stage === ThreadStage.Discussion) {
     return 'Discussion';
-  } else if (stage === OffchainThreadStage.ProposalInReview) {
+  } else if (stage === ThreadStage.ProposalInReview) {
     return 'Pre-Voting';
-  } else if (stage === OffchainThreadStage.Voting) {
+  } else if (stage === ThreadStage.Voting) {
     return 'In Voting';
-  } else if (stage === OffchainThreadStage.Passed) {
+  } else if (stage === ThreadStage.Passed) {
     return 'Passed';
-  } else if (stage === OffchainThreadStage.Failed) {
+  } else if (stage === ThreadStage.Failed) {
     return 'Not Passed';
   } else {
     return stage;
@@ -26,7 +26,7 @@ export function offchainThreadStageToLabel(stage: OffchainThreadStage) {
 }
 
 export function parseCustomStages(str) {
-  // Parse customStages into a `string[]` and then cast to OffchainThreadStage[]
+  // Parse customStages into a `string[]` and then cast to ThreadStage[]
   // If parsing fails, return an empty array.
   let arr;
   try {
@@ -36,7 +36,7 @@ export function parseCustomStages(str) {
   }
   return arr
     .map((s) => s?.toString())
-    .filter((s) => s) as unknown as OffchainThreadStage[];
+    .filter((s) => s) as unknown as ThreadStage[];
 }
 
 /*

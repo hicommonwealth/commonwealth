@@ -8,14 +8,14 @@ import $ from 'jquery';
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
 import {
-  OffchainThread,
-  OffchainAttachment,
-  OffchainThreadStage,
+  Thread,
+  Attachment,
+  ThreadStage,
   NodeInfo,
   Profile,
   ChainEntity,
   NotificationSubscription,
-  OffchainPoll,
+  Poll,
 } from 'models';
 import { NotificationCategories } from 'types';
 
@@ -36,7 +36,7 @@ export const modelFromServer = (thread) => {
     last_edited,
     version_history,
     snapshot_proposal,
-    OffchainAttachments,
+    Attachments,
     created_at,
     topic,
     kind,
@@ -50,15 +50,15 @@ export const modelFromServer = (thread) => {
     chain_entities,
     ChainEntities,
     has_poll,
-    polls = [], // associated OffchainPolls
+    polls = [], // associated Polls
     reactions,
     last_commented_on,
     linked_threads,
   } = thread;
 
-  const attachments = OffchainAttachments
-    ? OffchainAttachments.map(
-        (a) => new OffchainAttachment(a.url, a.description)
+  const attachments = Attachments
+    ? Attachments.map(
+        (a) => new Attachment(a.url, a.description)
       )
     : [];
 
@@ -135,7 +135,7 @@ export const modelFromServer = (thread) => {
     })
   );
 
-  return new OffchainThread({
+  return new Thread({
     id,
     author: thread.Address.address,
     authorChain: thread.Address.chain,
@@ -157,7 +157,7 @@ export const modelFromServer = (thread) => {
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
     hasPoll: has_poll,
-    polls: polls.map((p) => new OffchainPoll(p)),
+    polls: polls.map((p) => new Poll(p)),
     lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
     linkedThreads,
   });
@@ -197,9 +197,9 @@ export interface VersionHistory {
 }
 
 class ThreadsController {
-  private _store = new ProposalStore<OffchainThread>();
+  private _store = new ProposalStore<Thread>();
   private _listingStore: RecentListingStore = new RecentListingStore();
-  private _summaryStore = new ProposalStore<OffchainThread>();
+  private _summaryStore = new ProposalStore<Thread>();
 
   public get store() {
     return this._store;
@@ -271,7 +271,7 @@ class ThreadsController {
       this._store.add(result);
 
       // Update stage counts
-      if (result.stage === OffchainThreadStage.Voting) this.numVotingThreads++;
+      if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
 
       // New posts are added to both the topic and allProposals sub-store
       this._listingStore.add(result);
@@ -304,7 +304,7 @@ class ThreadsController {
   }
 
   public async edit(
-    proposal: OffchainThread,
+    proposal: Thread,
     body: string,
     title: string,
     url?: string,
@@ -332,9 +332,9 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (proposal.stage === OffchainThreadStage.Voting)
+        if (proposal.stage === ThreadStage.Voting)
           this.numVotingThreads--;
-        if (result.stage === OffchainThreadStage.Voting)
+        if (result.stage === ThreadStage.Voting)
           this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
@@ -377,7 +377,7 @@ class ThreadsController {
 
   public async setStage(args: {
     threadId: number;
-    stage: OffchainThreadStage;
+    stage: ThreadStage;
   }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadStage`,
@@ -391,8 +391,8 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (args.stage === OffchainThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === OffchainThreadStage.Voting)
+        if (args.stage === ThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage === ThreadStage.Voting)
           this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
@@ -433,7 +433,7 @@ class ThreadsController {
     });
   }
 
-  public async pin(args: { proposal: OffchainThread }) {
+  public async pin(args: { proposal: Thread }) {
     return $.ajax({
       url: `${app.serverUrl()}/updateThreadPinned`,
       type: 'POST',
@@ -577,7 +577,7 @@ class ThreadsController {
 
   public async fetchThreadsFromId(
     ids: Array<number | string>
-  ): Promise<OffchainThread[]> {
+  ): Promise<Thread[]> {
     const params = {
       chain: app.activeChainId(),
       ids,
@@ -657,7 +657,7 @@ class ThreadsController {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads } = response.result;
-    const modeledThreads: OffchainThread[] = threads.map((t) => {
+    const modeledThreads: Thread[] = threads.map((t) => {
       return modelFromServer(t);
     });
 
@@ -703,7 +703,7 @@ class ThreadsController {
     for (const thread of initialThreads) {
       const modeledThread = modelFromServer(thread);
       if (!thread.Address) {
-        console.error('OffchainThread missing address');
+        console.error('Thread missing address');
       }
       try {
         this._store.add(modeledThread);

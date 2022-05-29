@@ -40,7 +40,7 @@ const createDraft = async (
     req.body['attachments[]'] &&
     typeof req.body['attachments[]'] === 'string'
   ) {
-    await models.OffchainAttachment.create({
+    await models.Attachment.create({
       attachable: 'draft',
       attachment_id: draft.id,
       url: req.body['attachments[]'],
@@ -49,7 +49,7 @@ const createDraft = async (
   } else if (req.body['attachments[]']) {
     await Promise.all(
       req.body['attachments[]'].map((u) =>
-        models.OffchainAttachment.create({
+        models.Attachment.create({
           attachable: 'draft',
           attachment_id: draft.id,
           url: u,
@@ -63,7 +63,7 @@ const createDraft = async (
   try {
     finalDraft = await models.DiscussionDraft.findOne({
       where: { id: draft.id },
-      include: [models.Address, models.OffchainAttachment],
+      include: [models.Address, models.Attachment],
     });
   } catch (err) {
     return next(err);

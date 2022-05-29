@@ -28,8 +28,8 @@ import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import {
   ITXModalData,
   ProposalModule,
-  OffchainThreadKind,
-  OffchainThreadStage,
+  ThreadKind,
+  ThreadStage,
 } from 'models';
 import { proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
@@ -165,7 +165,7 @@ const NewProposalForm = {
       hasThreshold = vnode.state.councilMotionType !== 'vetoNextExternal';
       if (hasExternalProposalSelector)
         dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
-    } else if (proposalTypeEnum === ProposalType.OffchainThread) {
+    } else if (proposalTypeEnum === ProposalType.Thread) {
       hasTitleAndDescription = true;
       hasTopics = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
@@ -228,12 +228,12 @@ const NewProposalForm = {
         ).createTx(...a);
       };
       let args = [];
-      if (proposalTypeEnum === ProposalType.OffchainThread) {
+      if (proposalTypeEnum === ProposalType.Thread) {
         app.threads
           .create(
             author.address,
-            OffchainThreadKind.Forum,
-            OffchainThreadStage.Discussion,
+            ThreadKind.Forum,
+            ThreadStage.Discussion,
             app.activeChainId(),
             vnode.state.form.title,
             vnode.state.form.topicName,
@@ -1651,7 +1651,7 @@ const NewProposalForm = {
               intent: 'primary',
               rounded: true,
               label:
-                proposalTypeEnum === ProposalType.OffchainThread
+                proposalTypeEnum === ProposalType.Thread
                   ? 'Create thread'
                   : 'Send transaction',
               onclick: (e) => {

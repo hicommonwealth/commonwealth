@@ -23,7 +23,7 @@ const updateThreadPrivacy = async (
   if (!read_only) return next(new Error(Errors.NoReadOnly));
 
   try {
-    const thread = await models.OffchainThread.findOne({
+    const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
       },
@@ -50,7 +50,7 @@ const updateThreadPrivacy = async (
 
     await thread.update({ read_only });
 
-    const finalThread = await models.OffchainThread.findOne({
+    const finalThread = await models.Thread.findOne({
       where: { id: thread_id },
       include: [
         {
@@ -62,9 +62,9 @@ const updateThreadPrivacy = async (
           // through: models.Collaboration,
           as: 'collaborators',
         },
-        models.OffchainAttachment,
+        models.Attachment,
         {
-          model: models.OffchainTopic,
+          model: models.Topic,
           as: 'topic',
         },
       ],

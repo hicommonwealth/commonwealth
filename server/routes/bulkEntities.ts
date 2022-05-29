@@ -28,7 +28,7 @@ const bulkEntities = async (models: DB, req: Request, res: Response, next: NextF
         include: [ models.ChainEventType ],
       },
       {
-        model: models.OffchainThread,
+        model: models.Thread,
         attributes: ['title'],
         // required: false,
       }

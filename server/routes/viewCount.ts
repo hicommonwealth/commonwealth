@@ -27,7 +27,7 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
   }
 
   // verify count exists before querying
-  let count = await models.OffchainViewCount.findOne({
+  let count = await models.ViewCount.findOne({
     where: {
       chain: req.body.chain,
       object_id: req.body.object_id,

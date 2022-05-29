@@ -1,11 +1,11 @@
 import 'modals/offchain_voting_modal.scss';
 
 import m from 'mithril';
-import { OffchainVote, AddressInfo } from 'models';
+import { Vote, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 
-const OffchainVotingModal: m.Component<{ votes: OffchainVote[] }, {}> = {
+const OffchainVotingModal: m.Component<{ votes: Vote[] }, {}> = {
   view: (vnode) => {
     const { votes } = vnode.attrs;
     if (!votes || votes.length === 0) return;

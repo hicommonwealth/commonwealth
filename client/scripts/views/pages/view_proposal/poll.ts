@@ -2,7 +2,7 @@ import m from 'mithril';
 import app from 'state';
 
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { OffchainThread, OffchainPoll } from 'models';
+import { Thread, Poll } from 'models';
 import { Button, Icons } from 'construct-ui';
 import moment from 'moment';
 import { alertModalWithText } from '../../modals/alert_modal';
@@ -10,7 +10,7 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 import OffchainVotingModal from '../../modals/offchain_voting_modal';
 
 const vote = async (
-  poll: OffchainPoll,
+  poll: Poll,
   option: string,
   isSelected: boolean
 ) => {
@@ -27,7 +27,7 @@ const vote = async (
   if (!confirmed) return;
   // submit vote
   poll
-    .submitOffchainVote(...userInfo, option)
+    .submitVote(...userInfo, option)
     .then(() => m.redraw())
     .catch(async () => {
       await alertModalWithText(
@@ -37,7 +37,7 @@ const vote = async (
 };
 
 export const ProposalPoll: m.Component<
-  { poll: OffchainPoll; thread: OffchainThread },
+  { poll: Poll; thread: Thread },
   { votesFetched: boolean; threadId: number }
 > = {
   view: (vnode) => {
@@ -48,7 +48,7 @@ export const ProposalPoll: m.Component<
       vnode.state.votesFetched = true;
       // TODO: Is this necessary? Can I initialize elsewhere?
       poll.getVotes();
-      // `/api/viewOffchainVotes?thread_id=${proposal.id}${
+      // `/api/viewVotes?thread_id=${proposal.id}${
     }
 
     const pollingEnded = poll.endsAt && poll.endsAt?.isBefore(moment().utc());

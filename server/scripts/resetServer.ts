@@ -1345,16 +1345,16 @@ const resetServer = (): Promise<number> => {
         }),
       ]);
 
-      // OffchainTopics
+      // Topics
       log.debug('Initializing topics...');
       await Promise.all(
-        chains.map((chain) => models.OffchainTopic.create({
+        chains.map((chain) => models.Topic.create({
           name: 'General',
           description: 'General discussion about this blockchain\'s chain development and governance',
           chain_id: chain.id,
         }))
           .concat(
-            chains.map((chain) => models.OffchainTopic.create({
+            chains.map((chain) => models.Topic.create({
               name: 'Random',
               description: 'Non-work banter and water cooler conversation',
               chain_id: chain.id,

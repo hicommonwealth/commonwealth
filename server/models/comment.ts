@@ -4,9 +4,9 @@ import { ModelStatic, ModelInstance } from './types';
 
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
-import { OffchainAttachmentAttributes } from './offchain_attachment';
+import { AttachmentAttributes } from './attachment';
 
-export type OffchainCommentAttributes = {
+export type CommentAttributes = {
   root_id: string;
   address_id: number;
   text: string;
@@ -22,20 +22,20 @@ export type OffchainCommentAttributes = {
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
+  Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
 }
 
-export type OffchainCommentInstance = ModelInstance<OffchainCommentAttributes> & {
+export type CommentInstance = ModelInstance<CommentAttributes> & {
   // no mixins used
 }
 
-export type OffchainCommentModelStatic =  ModelStatic<OffchainCommentInstance>;
+export type CommentModelStatic =  ModelStatic<CommentInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
-): OffchainCommentModelStatic => {
-  const OffchainComment = <OffchainCommentModelStatic>sequelize.define('OffchainComment', {
+): CommentModelStatic => {
+  const Comment = <CommentModelStatic>sequelize.define('Comment', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.STRING, allowNull: false },
     root_id: { type: dataTypes.STRING, allowNull: false },
@@ -52,7 +52,7 @@ export default (
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',
-    tableName: 'OffchainComments',
+    tableName: 'Comments',
     underscored: true,
     paranoid: true,
     indexes: [
@@ -65,27 +65,27 @@ export default (
     ],
   });
 
-  OffchainComment.associate = (models) => {
-    models.OffchainComment.belongsTo(models.Chain, {
+  Comment.associate = (models) => {
+    models.Comment.belongsTo(models.Chain, {
       foreignKey: 'chain',
       targetKey: 'id'
     });
-    models.OffchainComment.belongsTo(models.Address, {
+    models.Comment.belongsTo(models.Address, {
       foreignKey: 'address_id',
       targetKey: 'id'
     });
-    models.OffchainComment.hasMany(models.OffchainAttachment, {
+    models.Comment.hasMany(models.Attachment, {
       foreignKey: 'attachment_id',
       constraints: false,
       scope: {
         attachable: 'comment',
       },
     });
-    models.OffchainComment.hasMany(models.OffchainReaction, {
+    models.Comment.hasMany(models.Reaction, {
       foreignKey: 'comment_id',
       as: 'reactions'
     });
   };
 
-  return OffchainComment;
+  return Comment;
 };

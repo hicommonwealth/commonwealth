@@ -8,7 +8,7 @@ import 'pages/discussions/discussion_filter_bar.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { parseCustomStages } from 'helpers';
-import { OffchainThreadStage } from 'models';
+import { ThreadStage } from 'models';
 import { TopicsMenu } from './topics_menu';
 import { StagesMenu } from './stages_menu';
 
@@ -45,16 +45,16 @@ export class DiscussionFilterBar
 
     const stages = !customStages
       ? [
-          OffchainThreadStage.Discussion,
-          OffchainThreadStage.ProposalInReview,
-          OffchainThreadStage.Voting,
-          OffchainThreadStage.Passed,
-          OffchainThreadStage.Failed,
+          ThreadStage.Discussion,
+          ThreadStage.ProposalInReview,
+          ThreadStage.Voting,
+          ThreadStage.Passed,
+          ThreadStage.Failed,
         ]
       : parseCustomStages(customStages);
 
     const selectedStage = stages.find(
-      (s) => s === (stage as OffchainThreadStage)
+      (s) => s === (stage as ThreadStage)
     );
 
     const summaryViewEnabled = vnode.attrs.parentState.summaryView;

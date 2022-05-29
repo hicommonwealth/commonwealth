@@ -26,20 +26,20 @@ const activeThreads = async (
   const allThreads = [];
   try {
     const communityWhere = { chain_id: chain.id }
-    const communityTopics = await models.OffchainTopic.findAll({
+    const communityTopics = await models.Topic.findAll({
       where: communityWhere
     });
 
     const threadInclude = [
       { model: models.Address, as: 'Address', },
       { model: models.Address, as: 'collaborators',},
-      { model: models.OffchainTopic, as: 'topic', },
+      { model: models.Topic, as: 'topic', },
       { model: models.LinkedThread, as: 'linked_threads' },
       { model: models.ChainEntity }
     ];
 
     await Promise.all(communityTopics.map(async (topic) => {
-      const recentTopicThreads = await models.OffchainThread.findAll({
+      const recentTopicThreads = await models.Thread.findAll({
         where: {
           topic_id: topic.id,
           last_commented_on: {
@@ -54,7 +54,7 @@ const activeThreads = async (
       // In absence of X threads with recent activity (comments),
       // commentless threads are fetched and included as active
       if (!recentTopicThreads || recentTopicThreads.length < threads_per_topic) {
-        const commentlessTopicThreads = await models.OffchainThread.findAll({
+        const commentlessTopicThreads = await models.Thread.findAll({
           where: {
             topic_id: topic.id,
             last_commented_on: {

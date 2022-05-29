@@ -69,8 +69,8 @@ import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
 import updateThreadLinkedSnapshotProposal from './routes/updateThreadLinkedSnapshotProposal';
-import updateOffchainVote from './routes/updateOffchainVote';
-import viewOffchainVotes from './routes/viewOffchainVotes';
+import updateVote from './routes/updateVote';
+import viewVotes from './routes/viewVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
 import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
@@ -282,11 +282,11 @@ function setupRouter(
   );
 
   router.post(
-    '/updateOffchainVote',
+    '/updateVote',
     passport.authenticate('jwt', { session: false }),
-    updateOffchainVote.bind(this, models, tokenBalanceCache)
+    updateVote.bind(this, models, tokenBalanceCache)
   );
-  router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
+  router.get('/viewVotes', viewVotes.bind(this, models));
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
   router.get(

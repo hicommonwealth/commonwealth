@@ -173,19 +173,19 @@ const BatchedSubscriptionRow: m.Component<
       const chain = subscription.Chain || null;
       switch (subscription.category) {
         case NotificationCategories.NewComment: {
-          const threadOrComment = subscription.OffchainThread
-            ? decodeURIComponent(subscription.OffchainThread.title)
-            : subscription.OffchainComment
-            ? decodeURIComponent(subscription.OffchainComment.id)
+          const threadOrComment = subscription.Thread
+            ? decodeURIComponent(subscription.Thread.title)
+            : subscription.Comment
+            ? decodeURIComponent(subscription.Comment.id)
             : subscription.objectId;
 
-          return subscription.OffchainThread
+          return subscription.Thread
             ? [
                 link(
                   'a',
                   `/${chain}${getProposalUrlPath(
-                    ProposalType.OffchainThread,
-                    subscription.OffchainThread.id,
+                    ProposalType.Thread,
+                    subscription.Thread.id,
                     true
                   )}`,
                   threadOrComment.toString(),
@@ -193,7 +193,7 @@ const BatchedSubscriptionRow: m.Component<
                 ),
                 m(
                   'span.item-metadata',
-                  moment(subscription.OffchainThread.created_at).fromNow()
+                  moment(subscription.Thread.created_at).fromNow()
                 ),
                 m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
               ]
@@ -203,18 +203,18 @@ const BatchedSubscriptionRow: m.Component<
               ];
         }
         case NotificationCategories.NewReaction: {
-          const threadOrComment = subscription.OffchainThread
-            ? decodeURIComponent(subscription.OffchainThread.title)
-            : subscription.OffchainComment
-            ? decodeURIComponent(subscription.OffchainComment.id)
+          const threadOrComment = subscription.Thread
+            ? decodeURIComponent(subscription.Thread.title)
+            : subscription.Comment
+            ? decodeURIComponent(subscription.Comment.id)
             : subscription.objectId;
-          return subscription.OffchainThread
+          return subscription.Thread
             ? [
                 link(
                   'a',
                   `/${chain}${getProposalUrlPath(
-                    ProposalType.OffchainThread,
-                    subscription.OffchainThread.id,
+                    ProposalType.Thread,
+                    subscription.Thread.id,
                     true
                   )}`,
                   threadOrComment.toString(),
@@ -222,7 +222,7 @@ const BatchedSubscriptionRow: m.Component<
                 ),
                 m(
                   'span.item-metadata',
-                  moment(subscription.OffchainThread.created_at).fromNow()
+                  moment(subscription.Thread.created_at).fromNow()
                 ),
                 m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
               ]
@@ -242,19 +242,19 @@ const BatchedSubscriptionRow: m.Component<
       const subscription = batchLabelSubscriptions[0];
       const chain = subscription.Chain || null;
 
-      const threadOrComment = subscription.OffchainThread
-        ? decodeURIComponent(subscription.OffchainThread.title)
-        : subscription.OffchainComment
-        ? decodeURIComponent(subscription.OffchainComment.id)
+      const threadOrComment = subscription.Thread
+        ? decodeURIComponent(subscription.Thread.title)
+        : subscription.Comment
+        ? decodeURIComponent(subscription.Comment.id)
         : subscription.objectId;
 
-      return subscription.OffchainThread
+      return subscription.Thread
         ? [
             link(
               'a',
               `/${chain}${getProposalUrlPath(
-                ProposalType.OffchainThread,
-                subscription.OffchainThread.id,
+                ProposalType.Thread,
+                subscription.Thread.id,
                 true
               )}`,
               threadOrComment.toString(),
@@ -262,7 +262,7 @@ const BatchedSubscriptionRow: m.Component<
             ),
             m(
               'span.item-metadata',
-              moment(subscription.OffchainThread.created_at).fromNow()
+              moment(subscription.Thread.created_at).fromNow()
             ),
           ]
         : [threadOrComment.toString()];
@@ -273,8 +273,8 @@ const BatchedSubscriptionRow: m.Component<
       _.every(
         subscriptions,
         (s) =>
-          !s.OffchainComment &&
-          !s.OffchainThread &&
+          !s.Comment &&
+          !s.Thread &&
           (s.category === NotificationCategories.NewComment ||
             s.category === NotificationCategories.NewReaction)
       )
@@ -783,7 +783,7 @@ const IndividualCommunityNotifications: m.Component<
         s.category !== NotificationCategories.NewMention &&
         s.category !== NotificationCategories.NewCollaboration &&
         s.category !== NotificationCategories.ChainEvent &&
-        !s.OffchainComment
+        !s.Comment
     );
     const newThreads = subscriptions.find(
       (s) =>
@@ -859,7 +859,7 @@ const AllCommunitiesNotifications: m.Component<
           s.category !== NotificationCategories.NewMention &&
           s.category !== NotificationCategories.NewThread &&
           s.category !== NotificationCategories.ChainEvent &&
-          !s.OffchainComment
+          !s.Comment
         );
       }),
       'objectId'

@@ -62,7 +62,7 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     default_offchain_template
   } = req.body;
   try {
-    const topic = await models.OffchainTopic.findOne({ where: { id } });
+    const topic = await models.Topic.findOne({ where: { id } });
     if (!topic) return next(new Error(Errors.TopicNotFound));
     if (name) topic.name = name;
     if (name || description) topic.description = description || '';

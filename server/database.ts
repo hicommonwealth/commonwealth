@@ -50,33 +50,33 @@ import NotificationFactory, {
 import NotificationCategoryFactory, {
   NotificationCategoryModelStatic,
 } from './models/notification_category';
-import OffchainAttachmentFactory, {
-  OffchainAttachmentModelStatic,
-} from './models/offchain_attachment';
-import OffchainCommentFactory, {
-  OffchainCommentModelStatic,
-} from './models/offchain_comment';
+import AttachmentFactory, {
+  AttachmentModelStatic,
+} from './models/attachment';
+import CommentFactory, {
+  CommentModelStatic,
+} from './models/comment';
 import OffchainProfileFactory, {
   OffchainProfileModelStatic,
 } from './models/offchain_profile';
-import OffchainReactionFactory, {
-  OffchainReactionModelStatic,
-} from './models/offchain_reaction';
-import OffchainThreadFactory, {
-  OffchainThreadModelStatic,
-} from './models/offchain_thread';
-import OffchainTopicFactory, {
-  OffchainTopicModelStatic,
-} from './models/offchain_topic';
-import OffchainViewCountFactory, {
-  OffchainViewCountModelStatic,
-} from './models/offchain_viewcount';
-import OffchainVoteFactory, {
-  OffchainVoteModelStatic,
-} from './models/offchain_vote';
-import OffchainPollFactory, {
-  OffchainPollModelStatic,
-} from './models/offchain_poll';
+import ReactionFactory, {
+  ReactionModelStatic,
+} from './models/reaction';
+import ThreadFactory, {
+  ThreadModelStatic,
+} from './models/thread';
+import TopicFactory, {
+  TopicModelStatic,
+} from './models/topic';
+import ViewCountFactory, {
+  ViewCountModelStatic,
+} from './models/viewcount';
+import VoteFactory, {
+  VoteModelStatic,
+} from './models/vote';
+import PollFactory, {
+  PollModelStatic,
+} from './models/poll';
 import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
@@ -126,15 +126,15 @@ export type Models = {
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
   NotificationsRead: NotificationsReadModelStatic;
-  OffchainAttachment: OffchainAttachmentModelStatic;
-  OffchainComment: OffchainCommentModelStatic;
-  OffchainPoll: OffchainPollModelStatic;
+  Attachment: AttachmentModelStatic;
+  Comment: CommentModelStatic;
+  Poll: PollModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
-  OffchainReaction: OffchainReactionModelStatic;
-  OffchainThread: OffchainThreadModelStatic;
-  OffchainTopic: OffchainTopicModelStatic;
-  OffchainViewCount: OffchainViewCountModelStatic;
-  OffchainVote: OffchainVoteModelStatic;
+  Reaction: ReactionModelStatic;
+  Thread: ThreadModelStatic;
+  Topic: TopicModelStatic;
+  ViewCount: ViewCountModelStatic;
+  Vote: VoteModelStatic;
   Profile: ProfileModelStatic;
   Role: RoleModelStatic;
   SocialAccount: SocialAccountModelStatic;
@@ -205,15 +205,15 @@ const models: Models = {
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
   NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
-  OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
-  OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
-  OffchainPoll: OffchainPollFactory(sequelize, DataTypes),
+  Attachment: AttachmentFactory(sequelize, DataTypes),
+  Comment: CommentFactory(sequelize, DataTypes),
+  Poll: PollFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
-  OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),
-  OffchainThread: OffchainThreadFactory(sequelize, DataTypes),
-  OffchainTopic: OffchainTopicFactory(sequelize, DataTypes),
-  OffchainViewCount: OffchainViewCountFactory(sequelize, DataTypes),
-  OffchainVote: OffchainVoteFactory(sequelize, DataTypes),
+  Reaction: ReactionFactory(sequelize, DataTypes),
+  Thread: ThreadFactory(sequelize, DataTypes),
+  Topic: TopicFactory(sequelize, DataTypes),
+  ViewCount: ViewCountFactory(sequelize, DataTypes),
+  Vote: VoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),

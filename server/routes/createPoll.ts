@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from '../../shared/logging';
-import { getNextOffchainPollEndingTime } from '../../shared/utils';
+import { getNextPollEndingTime } from '../../shared/utils';
 import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -49,10 +49,10 @@ const createPoll = async (
       ? null
       : custom_duration
       ? moment().add(custom_duration, 'days')
-      : getNextOffchainPollEndingTime(moment());
+      : getNextPollEndingTime(moment());
 
   try {
-    const thread = await models.OffchainThread.findOne({
+    const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
       },
@@ -82,7 +82,7 @@ const createPoll = async (
     thread.has_poll = true;
     await thread.save();
 
-    const finalPoll = await models.OffchainPoll.create({
+    const finalPoll = await models.Poll.create({
       thread_id,
       chain_id: chain.id,
       prompt,

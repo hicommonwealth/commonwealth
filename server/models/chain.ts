@@ -5,11 +5,11 @@ import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
 import {
-  OffchainTopicAttributes,
-  OffchainTopicInstance,
-} from './offchain_topic';
-import { OffchainThreadAttributes } from './offchain_thread';
-import { OffchainCommentAttributes } from './offchain_comment';
+  TopicAttributes,
+  TopicInstance,
+} from './topic';
+import { ThreadAttributes } from './thread';
+import { CommentAttributes } from './comment';
 import { UserAttributes } from './user';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
@@ -50,13 +50,13 @@ export type ChainAttributes = {
   StarredCommunities?:
     | StarredCommunityAttributes[]
     | StarredCommunityAttributes['id'][];
-  topics?: OffchainTopicAttributes[] | OffchainTopicAttributes['id'][];
-  OffchainThreads?:
-    | OffchainThreadAttributes[]
-    | OffchainThreadAttributes['id'][];
-  OffchainComments?:
-    | OffchainCommentAttributes[]
-    | OffchainCommentAttributes['id'][];
+  topics?: TopicAttributes[] | TopicAttributes['id'][];
+  Threads?:
+    | ThreadAttributes[]
+    | ThreadAttributes['id'][];
+  Comments?:
+    | CommentAttributes[]
+    | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
 };
@@ -69,10 +69,10 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
     AddressInstance['id']
   >;
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
-  getTopics: Sequelize.HasManyGetAssociationsMixin<OffchainTopicInstance>;
+  getTopics: Sequelize.HasManyGetAssociationsMixin<TopicInstance>;
   removeTopics: Sequelize.HasManyRemoveAssociationsMixin<
-    OffchainTopicInstance,
-    OffchainTopicInstance['id']
+    TopicInstance,
+    TopicInstance['id']
   >;
 };
 
@@ -140,12 +140,12 @@ export default (
     models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
-    models.Chain.hasMany(models.OffchainTopic, {
+    models.Chain.hasMany(models.Topic, {
       as: 'topics',
       foreignKey: 'chain_id',
     });
-    models.Chain.hasMany(models.OffchainThread, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.OffchainComment, { foreignKey: 'chain' });
+    models.Chain.hasMany(models.Thread, { foreignKey: 'chain' });
+    models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });
     models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
     models.Chain.hasMany(models.ChatChannel);
     models.Chain.belongsToMany(models.User, {

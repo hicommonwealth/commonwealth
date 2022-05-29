@@ -21,7 +21,7 @@ const deleteComment = async (models: DB, req: Request, res: Response, next: Next
 
   try {
     const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
-    let comment = await models.OffchainComment.findOne({
+    let comment = await models.Comment.findOne({
       where: {
         id: req.body.comment_id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -29,7 +29,7 @@ const deleteComment = async (models: DB, req: Request, res: Response, next: Next
       include: [ models.Address ],
     });
     if (!comment) {
-      comment = await models.OffchainComment.findOne({
+      comment = await models.Comment.findOne({
         where: {
           id: req.body.comment_id,
         },

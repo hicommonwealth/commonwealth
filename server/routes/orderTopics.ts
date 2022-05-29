@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
-import { OffchainTopicInstance } from 'server/models/offchain_topic';
+import { TopicInstance } from 'server/models/topic';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { DB } from '../database';
@@ -39,10 +39,10 @@ const OrderTopics = async (
   }
 
   try {
-    const topics: OffchainTopicInstance[] = await Promise.all(
+    const topics: TopicInstance[] = await Promise.all(
       newTopicOrder.map((id: string, idx: number) => {
         return (async () => {
-          const topic = await models.OffchainTopic.findOne({
+          const topic = await models.Topic.findOne({
             where: { id, featured_in_sidebar: true },
           });
           if (!topic) {
