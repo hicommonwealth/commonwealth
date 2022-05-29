@@ -1,10 +1,10 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .DiscussionsPage {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 24px;
+  padding: 0 24px 24px;
   width: 100%;
 
   // content
