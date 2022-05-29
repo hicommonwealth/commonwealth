@@ -75,7 +75,7 @@ const bulkThreads = async (
         LEFT JOIN "LinkedThreads" AS linked_threads
         ON t.id = linked_threads.linking_thread
         LEFT JOIN "Collaborations" AS collaborations
-        ON t.id = collaborations.offchain_thread_id
+        ON t.id = collaborations.thread_id
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
         LEFT JOIN "ChainEntities" AS chain_entities

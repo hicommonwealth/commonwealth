@@ -37,7 +37,7 @@ describe('Thread queries', () => {
     const collaboration = await models.Collaboration.findOrCreate({
       where: {
         address_id: thread.address_id,
-        offchain_thread_id: thread.id,
+        thread_id: thread.id,
       },
     });
     const threads = await models.Thread.findAll({
