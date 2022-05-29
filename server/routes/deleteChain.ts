@@ -48,7 +48,7 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       transaction: t,
     });
 
-    await models.sequelize.query(`DELETE FROM "OffchainReactions" WHERE chain='${chain.id}';`, {
+    await models.sequelize.query(`DELETE FROM "Reactions" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });

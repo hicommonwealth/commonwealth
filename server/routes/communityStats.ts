@@ -70,7 +70,7 @@ LEFT JOIN (
   SELECT address_id, created_at FROM "OffchainComments" WHERE created_at > CURRENT_DATE - 14
     AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
   UNION
-  SELECT address_id, created_at FROM "OffchainReactions" WHERE created_at > CURRENT_DATE - 14
+  SELECT address_id, created_at FROM "Reactions" WHERE created_at > CURRENT_DATE - 14
     AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
 ) objs
 ON objs.created_at::date = seq.date

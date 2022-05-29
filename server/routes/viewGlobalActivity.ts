@@ -30,8 +30,8 @@ const viewGlobalActivity = async (
     LEFT JOIN "ViewCounts" ovc ON nt.thread_id = ovc.object_id
     LEFT JOIN "OffchainComments" oc ON 'discussion_'||CAST(nt.thread_id AS VARCHAR) = oc.root_id
       --TODO: eval execution path with alternate aggregations
-    LEFT JOIN "OffchainReactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
-    LEFT JOIN "OffchainReactions" cr ON oc.id = cr.comment_id
+    LEFT JOIN "Reactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
+    LEFT JOIN "Reactions" cr ON oc.id = cr.comment_id
     LEFT JOIN "OffchainThreads" thr ON thr.id = CAST(nt.thread_id AS int)
     WHERE nt.thread_rank <= 50
     GROUP BY nt.thread_id, nts.created_at, nts.notification_data, nts.category_id

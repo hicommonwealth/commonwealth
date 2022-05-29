@@ -7,7 +7,7 @@ import app from 'state';
 
 import { ReactionStore } from 'stores';
 import {
-  OffchainReaction,
+  Reaction,
   AnyProposal,
   OffchainComment,
   OffchainThread,
@@ -17,7 +17,7 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 
 export const modelFromServer = (reaction) => {
-  return new OffchainReaction(
+  return new Reaction(
     reaction.id,
     reaction.Address.address,
     reaction.chain,

@@ -141,7 +141,7 @@ export default (
       through: models.Collaboration,
       as: 'collaborators',
     });
-    models.OffchainThread.hasMany(models.OffchainReaction, {
+    models.OffchainThread.hasMany(models.Reaction, {
       foreignKey: 'thread_id',
       as: 'reactions',
     });

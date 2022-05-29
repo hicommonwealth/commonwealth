@@ -1,6 +1,6 @@
 import IdStore from './IdStore';
 import {
-  OffchainReaction,
+  Reaction,
   AnyProposal,
   OffchainThread,
   OffchainComment,
@@ -14,10 +14,10 @@ enum PostType {
   comment = 'comment'
 }
 
-class ReactionStore extends IdStore<OffchainReaction<any>> {
-  private _storePost: { [identifier: string]: Array<OffchainReaction<any>> } = {};
+class ReactionStore extends IdStore<Reaction<any>> {
+  private _storePost: { [identifier: string]: Array<Reaction<any>> } = {};
 
-  public add(reaction: OffchainReaction<any>) {
+  public add(reaction: Reaction<any>) {
     // TODO: Remove this once we start enforcing an ordering in stores
     const identifier = this.getPostIdentifier(reaction);
     const reactionAlreadyInStore = (this._storePost[identifier] || []).filter((rxn) => rxn.id === reaction.id).length > 0;
@@ -34,7 +34,7 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
     return this;
   }
 
-  public remove(reaction: OffchainReaction<any>) {
+  public remove(reaction: Reaction<any>) {
     super.remove(reaction);
     const identifier = this.getPostIdentifier(reaction);
     const proposalIndex = this._storePost[identifier].indexOf(reaction);
@@ -62,13 +62,13 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
     return this;
   }
 
-  public getByPost(post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>): Array<OffchainReaction<any>> {
+  public getByPost(post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>): Array<Reaction<any>> {
     const identifier = this.getPostIdentifier(post);
     return this._storePost[identifier] || [];
   }
 
-  public getPostIdentifier(rxnOrPost: OffchainReaction<any> | OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>) {
-    if (rxnOrPost instanceof OffchainReaction) {
+  public getPostIdentifier(rxnOrPost: Reaction<any> | OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>) {
+    if (rxnOrPost instanceof Reaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;
       return threadId
         ? `discussion-${threadId}`

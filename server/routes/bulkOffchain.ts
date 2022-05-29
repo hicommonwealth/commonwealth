@@ -76,7 +76,7 @@ const bulkOffchain = async (
                 as: 'linked_threads',
               },
               {
-                model: models.OffchainReaction,
+                model: models.Reaction,
                 as: 'reactions',
                 include: [
                   {

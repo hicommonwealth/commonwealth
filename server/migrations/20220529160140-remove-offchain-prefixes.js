@@ -7,6 +7,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (transaction) => {
       // Zak
       // TODO
+        await queryInterface.renameTable("OffchainReactions", "Reactions", {transaction});
 
       // Jake
       queryInterface.renameTable('OffchainViewCounts', 'ViewCounts', { transaction });
@@ -20,6 +21,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (transaction) => {
       // Zak
       // TODO
+      await queryInterface.renameTable("Reactions", "OffchainReactions", {transaction});
 
       // Jake
       queryInterface.renameTable('ViewCounts', 'OffchainViewCounts', { transaction });

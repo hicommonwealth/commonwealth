@@ -81,7 +81,7 @@ export default (
         attachable: 'comment',
       },
     });
-    models.OffchainComment.hasMany(models.OffchainReaction, {
+    models.OffchainComment.hasMany(models.Reaction, {
       foreignKey: 'comment_id',
       as: 'reactions'
     });

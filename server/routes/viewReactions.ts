@@ -24,7 +24,7 @@ const viewReactions = async (models: DB, req: Request, res: Response, next: Next
 
   let reactions;
   try {
-    reactions = await models.OffchainReaction.findAll({
+    reactions = await models.Reaction.findAll({
       where: options,
       include: [ models.Address ],
       order: [['created_at', 'DESC']],

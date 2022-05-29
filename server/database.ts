@@ -59,9 +59,9 @@ import OffchainCommentFactory, {
 import OffchainProfileFactory, {
   OffchainProfileModelStatic,
 } from './models/offchain_profile';
-import OffchainReactionFactory, {
-  OffchainReactionModelStatic,
-} from './models/offchain_reaction';
+import ReactionFactory, {
+  ReactionModelStatic,
+} from './models/reaction';
 import OffchainThreadFactory, {
   OffchainThreadModelStatic,
 } from './models/offchain_thread';
@@ -130,7 +130,7 @@ export type Models = {
   OffchainComment: OffchainCommentModelStatic;
   OffchainPoll: OffchainPollModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
-  OffchainReaction: OffchainReactionModelStatic;
+  Reaction: ReactionModelStatic;
   OffchainThread: OffchainThreadModelStatic;
   OffchainTopic: OffchainTopicModelStatic;
   ViewCount: ViewCountModelStatic;
@@ -209,7 +209,7 @@ const models: Models = {
   OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
   OffchainPoll: OffchainPollFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
-  OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),
+  Reaction: ReactionFactory(sequelize, DataTypes),
   OffchainThread: OffchainThreadFactory(sequelize, DataTypes),
   OffchainTopic: OffchainTopicFactory(sequelize, DataTypes),
   ViewCount: ViewCountFactory(sequelize, DataTypes),

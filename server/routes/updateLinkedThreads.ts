@@ -108,7 +108,7 @@ const updateLinkedThreads = async (
           model: models.ChainEntity,
         },
         {
-          model: models.OffchainReaction,
+          model: models.Reaction,
           as: 'reactions',
           include: [
             {

@@ -114,14 +114,14 @@ const createReaction = async (
   let created;
 
   try {
-    [finalReaction, created] = await models.OffchainReaction.findOrCreate({
+    [finalReaction, created] = await models.Reaction.findOrCreate({
       where: options,
       defaults: options,
       include: [models.Address],
     });
 
     if (created)
-      finalReaction = await models.OffchainReaction.findOne({
+      finalReaction = await models.Reaction.findOne({
         where: options,
         include: [models.Address],
       });

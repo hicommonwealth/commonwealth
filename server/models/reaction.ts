@@ -4,7 +4,7 @@ import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes } from './chain';
 import { AddressAttributes } from './address';
 
-export type OffchainReactionAttributes = {
+export type ReactionAttributes = {
   address_id: number;
   reaction: string;
   id?: number;
@@ -18,15 +18,15 @@ export type OffchainReactionAttributes = {
   Address?: AddressAttributes;
 }
 
-export type OffchainReactionInstance = ModelInstance<OffchainReactionAttributes>;
+export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
-export type OffchainReactionModelStatic = ModelStatic<OffchainReactionInstance>;
+export type ReactionModelStatic = ModelStatic<ReactionInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
-): OffchainReactionModelStatic => {
-  const OffchainReaction = <OffchainReactionModelStatic>sequelize.define('OffchainReaction', {
+): ReactionModelStatic => {
+  const Reaction = <ReactionModelStatic>sequelize.define('Reaction', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.STRING, allowNull: false },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -35,7 +35,7 @@ export default (
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     reaction: { type: dataTypes.STRING, allowNull: false },
   }, {
-    tableName: 'OffchainReactions',
+    tableName: 'Reactions',
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
@@ -49,12 +49,12 @@ export default (
     ],
   });
 
-  OffchainReaction.associate = (models) => {
-    models.OffchainReaction.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.OffchainComment, { foreignKey: 'comment_id', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
+  Reaction.associate = (models) => {
+    models.Reaction.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.Reaction.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
+    models.Reaction.belongsTo(models.OffchainComment, { foreignKey: 'comment_id', targetKey: 'id' });
+    models.Reaction.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
   };
 
-  return OffchainReaction;
+  return Reaction;
 };

@@ -38,7 +38,7 @@ const getThreads = async (
           model: models.ChainEntity,
         },
         {
-          model: models.OffchainReaction,
+          model: models.Reaction,
           as: 'reactions',
           include: [
             {

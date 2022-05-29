@@ -29,7 +29,7 @@ const viewComments = async (
       models.Address,
       models.OffchainAttachment,
       {
-        model: models.OffchainReaction,
+        model: models.Reaction,
         as: 'reactions',
         include: [
           {

@@ -4,7 +4,7 @@ import {
   AbridgedThread,
   AnyProposal,
   OffchainComment,
-  OffchainReaction,
+  Reaction,
   OffchainThread,
   Proposal,
 } from 'models';
@@ -64,7 +64,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
 
   public getPostIdentifier(
     rxnOrPost:
-      | OffchainReaction<any>
+      | Reaction<any>
       | OffchainThread
       | AbridgedThread
       | AnyProposal

@@ -17,7 +17,7 @@ export { default as NotificationCategory } from './NotificationCategory';
 export { default as NotificationSubscription } from './NotificationSubscription';
 export { default as OffchainAttachment } from './OffchainAttachment';
 export { default as OffchainComment } from './OffchainComment';
-export { default as OffchainReaction } from './OffchainReaction';
+export { default as Reaction } from './Reaction';
 export { default as OffchainTopic } from './OffchainTopic';
 export { default as OffchainThread } from './OffchainThread';
 export { default as OffchainPoll } from './OffchainPoll';
