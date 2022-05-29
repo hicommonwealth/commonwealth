@@ -9,7 +9,7 @@ import {
   TopicInstance,
 } from './topic';
 import { OffchainThreadAttributes } from './offchain_thread';
-import { OffchainCommentAttributes } from './offchain_comment';
+import { CommentAttributes } from './comment';
 import { UserAttributes } from './user';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
@@ -54,9 +54,9 @@ export type ChainAttributes = {
   OffchainThreads?:
     | OffchainThreadAttributes[]
     | OffchainThreadAttributes['id'][];
-  OffchainComments?:
-    | OffchainCommentAttributes[]
-    | OffchainCommentAttributes['id'][];
+  Comments?:
+    | CommentAttributes[]
+    | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
 };
@@ -145,7 +145,7 @@ export default (
       foreignKey: 'chain_id',
     });
     models.Chain.hasMany(models.OffchainThread, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.OffchainComment, { foreignKey: 'chain' });
+    models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });
     models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
     models.Chain.hasMany(models.ChatChannel);
     models.Chain.belongsToMany(models.User, {

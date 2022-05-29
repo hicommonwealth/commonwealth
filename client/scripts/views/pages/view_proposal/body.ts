@@ -14,7 +14,7 @@ import app from 'state';
 import { pluralize } from 'helpers';
 import {
   OffchainThread,
-  OffchainComment,
+  Comment,
   AnyProposal,
   Account,
   Profile,
@@ -78,7 +78,7 @@ export const activeQuillEditorHasText = () => {
 };
 
 export const ProposalBodyAvatar: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: OffchainThread | Comment<any>;
 }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
@@ -105,7 +105,7 @@ export const ProposalBodyAvatar: m.Component<{
     const author: Account<any> = app.chain.accounts.get(item.author);
 
     return m('.ProposalBodyAvatar', [
-      (item as OffchainComment<any>).deleted
+      (item as Comment<any>).deleted
         ? m(AnonymousUser, {
             avatarOnly: true,
             avatarSize: 40,
@@ -123,7 +123,7 @@ export const ProposalBodyAvatar: m.Component<{
 };
 
 export const ProposalBodyAuthor: m.Component<{
-  item: AnyProposal | OffchainThread | OffchainComment<any>;
+  item: AnyProposal | OffchainThread | Comment<any>;
 }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
@@ -133,7 +133,7 @@ export const ProposalBodyAuthor: m.Component<{
     // Check for accounts on offchain forums that originally signed up on a different base chain,
     // Render them as anonymous as the forum is unable to support them.
     if (
-      (item instanceof OffchainComment || item instanceof OffchainComment) &&
+      (item instanceof Comment || item instanceof Comment) &&
       app.chain.meta.chain.type === ChainType.Offchain
     ) {
       if (
@@ -150,12 +150,12 @@ export const ProposalBodyAuthor: m.Component<{
     }
 
     const author: Account<any> =
-      item instanceof OffchainThread || item instanceof OffchainComment
+      item instanceof OffchainThread || item instanceof Comment
         ? app.chain.accounts.get(item.author)
         : item.author;
 
     return m('.ProposalBodyAuthor', [
-      (item as OffchainComment<any>).deleted
+      (item as Comment<any>).deleted
         ? m('span', '[deleted]')
         : m(User, {
             user: author,
@@ -194,7 +194,7 @@ export const ProposalBodyAuthor: m.Component<{
 };
 
 export const ProposalBodyCreated: m.Component<{
-  item: AnyProposal | OffchainThread | OffchainComment<any>;
+  item: AnyProposal | OffchainThread | Comment<any>;
   link: string;
 }> = {
   view: (vnode) => {
@@ -203,7 +203,7 @@ export const ProposalBodyCreated: m.Component<{
     if (!item.createdAt) return;
     const isThread = item instanceof OffchainThread;
 
-    if (item instanceof OffchainThread || item instanceof OffchainComment) {
+    if (item instanceof OffchainThread || item instanceof Comment) {
       return m('.ProposalBodyCreated', [
         m(
           'a',
@@ -227,7 +227,7 @@ export const ProposalBodyCreated: m.Component<{
 };
 
 export const ProposalBodyLastEdited: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: OffchainThread | Comment<any>;
 }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
@@ -271,7 +271,7 @@ export const ProposalBodyLastEdited: m.Component<{
 };
 
 export const ProposalBodyEditMenuItem: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: OffchainThread | Comment<any>;
   parentState;
   proposalPageState: IProposalPageState;
   getSetGlobalEditingStatus;
@@ -308,7 +308,7 @@ export const ProposalBodyEditMenuItem: m.Component<{
 };
 
 export const ProposalBodyDeleteMenuItem: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: OffchainThread | Comment<any>;
   refresh?: Function;
 }> = {
   view: (vnode) => {
@@ -628,17 +628,17 @@ export const ProposalBodyCancelEdit: m.Component<{
 };
 
 export const ProposalBodySaveEdit: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: OffchainThread | Comment<any>;
   getSetGlobalEditingStatus;
   parentState;
-  callback?: Function; // required for OffchainComments
+  callback?: Function; // required for Comments
 }> = {
   view: (vnode) => {
     const { item, getSetGlobalEditingStatus, parentState, callback } =
       vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    const isComment = item instanceof OffchainComment;
+    const isComment = item instanceof Comment;
 
     return m('.ProposalBodySaveEdit', [
       m(
@@ -680,7 +680,7 @@ export const ProposalBodySaveEdit: m.Component<{
                   m.redraw();
                   notifySuccess('Thread successfully edited');
                 });
-            } else if (item instanceof OffchainComment) {
+            } else if (item instanceof Comment) {
               app.comments.edit(item, itemText).then((c) => {
                 parentState.editing = false;
                 parentState.saving = false;
@@ -719,7 +719,7 @@ const countLinesMarkdown = (text) => {
 
 export const ProposalBodyText: m.Component<
   {
-    item: AnyProposal | OffchainThread | OffchainComment<any>;
+    item: AnyProposal | OffchainThread | Comment<any>;
   },
   { collapsed: boolean; body: any }
 > = {
@@ -729,7 +729,7 @@ export const ProposalBodyText: m.Component<
     if (!item) return;
 
     const body =
-      item instanceof OffchainComment
+      item instanceof Comment
         ? item.text
         : item instanceof OffchainThread
         ? item.body
@@ -832,7 +832,7 @@ export const ProposalBodyText: m.Component<
 };
 
 export const ProposalBodyAttachments: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: OffchainThread | Comment<any>;
 }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
@@ -867,7 +867,7 @@ export const ProposalBodyAttachments: m.Component<{
 
 export const ProposalBodyEditor: m.Component<
   {
-    item: OffchainThread | OffchainComment<any>;
+    item: OffchainThread | Comment<any>;
     parentState;
   },
   {
@@ -905,8 +905,8 @@ export const ProposalBodyEditor: m.Component<
     const body =
       restoreEdits && savedEdits
         ? savedEdits
-        : item instanceof OffchainComment
-        ? (item as OffchainComment<any>).text
+        : item instanceof Comment
+        ? (item as Comment<any>).text
         : item instanceof OffchainThread
         ? (item as OffchainThread).body
         : null;

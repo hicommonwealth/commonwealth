@@ -15,8 +15,8 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       model: models.OffchainThread,
       as: 'OffchainThread',
     }, {
-      model: models.OffchainComment,
-      as: 'OffchainComment',
+      model: models.Comment,
+      as: 'Comment',
     }, {
       model: models.ChainEventType,
       as: 'ChainEventType',

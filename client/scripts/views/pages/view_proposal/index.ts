@@ -29,7 +29,7 @@ import { CommentParent } from 'controllers/server/comments';
 import {
   OffchainThread,
   OffchainThreadKind,
-  OffchainComment,
+  Comment,
   Topic,
   OffchainThreadStage,
   AnyProposal,
@@ -135,7 +135,7 @@ interface IPrefetch {
 }
 
 export interface IProposalPageState {
-  comments: OffchainComment<OffchainThread>[];
+  comments: Comment<OffchainThread>[];
   polls: Poll[];
   editing: boolean;
   highlightedComment: boolean;
@@ -522,10 +522,10 @@ const ProposalHeader: m.Component<
 
 const ProposalComment: m.Component<
   {
-    comment: OffchainComment<any>;
+    comment: Comment<any>;
     getSetGlobalEditingStatus: CallableFunction;
     proposalPageState: IProposalPageState;
-    parent: AnyProposal | OffchainComment<any> | OffchainThread;
+    parent: AnyProposal | Comment<any> | OffchainThread;
     proposal: AnyProposal | OffchainThread;
     callback?: Function;
     isAdmin?: boolean;
@@ -684,7 +684,7 @@ const ProposalComment: m.Component<
 const ProposalComments: m.Component<
   {
     proposal: OffchainThread | AnyProposal;
-    comments: Array<OffchainComment<any>>;
+    comments: Array<Comment<any>>;
     createdCommentCallback: CallableFunction;
     getSetGlobalEditingStatus: CallableFunction;
     proposalPageState: IProposalPageState;
@@ -768,12 +768,12 @@ const ProposalComments: m.Component<
     };
 
     const recursivelyGatherComments = (
-      comments_: OffchainComment<any>[],
-      parent: AnyProposal | OffchainThread | OffchainComment<any>,
+      comments_: Comment<any>[],
+      parent: AnyProposal | OffchainThread | Comment<any>,
       threadLevel: number
     ) => {
       const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
-      return comments_.map((comment: OffchainComment<any>, idx) => {
+      return comments_.map((comment: Comment<any>, idx) => {
         if (!comment) return;
         const children = app.comments
           .getByProposal(proposal)

@@ -37,7 +37,7 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
     include: [ { model: models.Address, as: 'Address' } ],
   });
 
-  const comments = await models.OffchainComment.findAll({
+  const comments = await models.Comment.findAll({
     where: {
       address_id: addressModel.id,
       [Op.or]: [{

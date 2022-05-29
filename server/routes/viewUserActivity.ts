@@ -38,7 +38,7 @@ export default async (
       ) nt
     INNER JOIN "Notifications" nts ON nt.mx_not_id = nts.id
     LEFT JOIN "ViewCounts" ovc ON nt.thread_id = ovc.object_id
-    LEFT JOIN "OffchainComments" oc ON 'discussion_'||CAST(nt.thread_id AS VARCHAR) = oc.root_id
+    LEFT JOIN "Comments" oc ON 'discussion_'||CAST(nt.thread_id AS VARCHAR) = oc.root_id
       --TODO: eval execution path with alternate aggregations
     LEFT JOIN "Reactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
     LEFT JOIN "Reactions" cr ON oc.id = cr.comment_id

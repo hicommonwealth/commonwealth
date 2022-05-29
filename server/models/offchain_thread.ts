@@ -3,7 +3,7 @@ import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
-import { AttachmentAttributes } from './offchain_attachment';
+import { AttachmentAttributes } from './attachment';
 import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
 

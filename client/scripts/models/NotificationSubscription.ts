@@ -7,7 +7,7 @@ class NotificationSubscription {
   public readonly createdAt: moment.Moment;
   public readonly Chain: string;
   public readonly ChainEventType: any;
-  public readonly OffchainComment: any;
+  public readonly Comment: any;
   public readonly OffchainThread: any;
 
   private _immediateEmail: boolean;
@@ -29,7 +29,7 @@ class NotificationSubscription {
     immediateEmail,
     Chain?,
     ChainEventType?,
-    OffchainComment?,
+    Comment?,
     OffchainCommunity?,
     OffchainThread?,
   ) {
@@ -41,7 +41,7 @@ class NotificationSubscription {
     this._immediateEmail = immediateEmail;
     this.Chain = Chain;
     this.ChainEventType = ChainEventType;
-    this.OffchainComment = OffchainComment;
+    this.Comment = Comment;
     this.OffchainThread = OffchainThread;
   }
 
@@ -55,7 +55,7 @@ class NotificationSubscription {
       json.immediate_email,
       json.chain_id,
       json.ChainEventType || json.chain_event_type_id,
-      json.OffchainComment || json.offchain_comment_id,
+      json.Comment || json.offchain_comment_id,
       json.OffchainCommunity || json.offchain_community_id, // TODO: safe to remove?
       json.OffchainThread || json.offchain_thread_id,
     );

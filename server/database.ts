@@ -52,10 +52,10 @@ import NotificationCategoryFactory, {
 } from './models/notification_category';
 import AttachmentFactory, {
   AttachmentModelStatic,
-} from './models/offchain_attachment';
-import OffchainCommentFactory, {
-  OffchainCommentModelStatic,
-} from './models/offchain_comment';
+} from './models/attachment';
+import CommentFactory, {
+  CommentModelStatic,
+} from './models/comment';
 import OffchainProfileFactory, {
   OffchainProfileModelStatic,
 } from './models/offchain_profile';
@@ -76,7 +76,7 @@ import VoteFactory, {
 } from './models/vote';
 import PollFactory, {
   PollModelStatic,
-} from './models/offchain_poll';
+} from './models/poll';
 import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
@@ -127,7 +127,7 @@ export type Models = {
   NotificationCategory: NotificationCategoryModelStatic;
   NotificationsRead: NotificationsReadModelStatic;
   Attachment: AttachmentModelStatic;
-  OffchainComment: OffchainCommentModelStatic;
+  Comment: CommentModelStatic;
   Poll: PollModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
   Reaction: ReactionModelStatic;
@@ -206,7 +206,7 @@ const models: Models = {
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
   NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   Attachment: AttachmentFactory(sequelize, DataTypes),
-  OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
+  Comment: CommentFactory(sequelize, DataTypes),
   Poll: PollFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   Reaction: ReactionFactory(sequelize, DataTypes),

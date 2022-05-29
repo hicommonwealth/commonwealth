@@ -46,7 +46,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
 
   try {
     const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const comment = await models.OffchainComment.findOne({
+    const comment = await models.Comment.findOne({
       where: {
         id: req.body.id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -78,7 +78,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
     })();
     await comment.save();
     await attachFiles();
-    const finalComment = await models.OffchainComment.findOne({
+    const finalComment = await models.Comment.findOne({
       where: { id: comment.id },
       include: [models.Address, models.Attachment],
     });

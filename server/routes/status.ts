@@ -217,7 +217,7 @@ const status = async (
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
       replacements.push(name, time.getTime())
       // append the SELECT query
-      query += `SELECT root_id, chain FROM "OffchainComments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`
+      query += `SELECT root_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`
       if (i == commsAndChains.length - 1) query += ';';
     }
 

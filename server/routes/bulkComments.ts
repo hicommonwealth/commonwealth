@@ -24,7 +24,7 @@ const bulkComments = async (models: DB, req: Request, res: Response, next: NextF
   } else if (req.query.proposals_only) {
     whereOptions.root_id = { [Op.notLike]: 'discussion%' };
   }
-  const comments = await models.OffchainComment.findAll({
+  const comments = await models.Comment.findAll({
     where: whereOptions,
     include: [ models.Address, models.Attachment ],
     order: [['created_at', 'DESC']],

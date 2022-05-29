@@ -62,7 +62,7 @@ const createReaction = async (
           });
         } else if (comment_id) {
           const root_id = (
-            await models.OffchainComment.findOne({ where: { id: comment_id } })
+            await models.Comment.findOne({ where: { id: comment_id } })
           ).root_id;
           const comment_thread_id = root_id.substring(root_id.indexOf('_') + 1);
           thread = await models.OffchainThread.findOne({
@@ -132,7 +132,7 @@ const createReaction = async (
   let comment;
   let cwUrl;
   if (comment_id) {
-    comment = await models.OffchainComment.findByPk(Number(comment_id));
+    comment = await models.Comment.findByPk(Number(comment_id));
     if (!comment) return next(new Error(Errors.NoCommentMatch));
 
     // Test on variety of comments to ensure root relation + type

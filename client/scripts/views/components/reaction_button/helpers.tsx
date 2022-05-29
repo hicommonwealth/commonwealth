@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 import app from 'state';
 import {
-  OffchainComment,
+  Comment,
   OffchainThread,
   AddressInfo,
   ChainInfo,
@@ -22,7 +22,7 @@ type ReactorAttrs = {
   reactors: any;
 };
 
-type Post = OffchainThread | OffchainComment<any>;
+type Post = OffchainThread | Comment<any>;
 
 export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
   const { reactors = [], likes = 0 } = reactorAttrs;
@@ -55,7 +55,7 @@ export const fetchReactionsByPost = async (post: Post) => {
   if (post instanceof OffchainThread) {
     thread_id = (post as OffchainThread).id;
   } else {
-    comment_id = (post as OffchainComment<any>).id;
+    comment_id = (post as Comment<any>).id;
   }
 
   const { result = [] } = await $.get(`${app.serverUrl()}/bulkReactions`, {

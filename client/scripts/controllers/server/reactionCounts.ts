@@ -7,7 +7,7 @@ import app from 'state';
 
 import { ReactionCountsStore } from 'stores';
 import ReactionCount from 'models/ReactionCount';
-import { AnyProposal, OffchainComment, OffchainThread, Proposal } from 'models';
+import { AnyProposal, Comment, OffchainThread, Proposal } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
 export const modelFromServer = (reactionCount) => {
@@ -50,8 +50,8 @@ class ReactionCountController {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier
       }`;
-    } else if (post instanceof OffchainComment) {
-      options['comment_id'] = (post as OffchainComment<any>).id;
+    } else if (post instanceof Comment) {
+      options['comment_id'] = (post as Comment<any>).id;
     }
     try {
       const response = await $.post(
