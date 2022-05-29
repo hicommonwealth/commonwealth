@@ -4,20 +4,24 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Remove offchain prefixes from all database tables
 
-    // Zak
-    // TODO
+    return queryInterface.sequelize.transaction(async (transaction) => {
+      // Zak
+      // TODO
 
-    // Jake
-    // TODO
+      // Jake
+      // TODO
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
     // Re-add offchain prefixes
 
-    // Zak
-    // TODO
+    return queryInterface.sequelize.transaction(async (transaction) => {
+      // Zak
+      // TODO
 
-    // Jake
-    // TODO
+      // Jake
+      // TODO
+    });
   }
 };
