@@ -26,7 +26,7 @@ const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) =
   }
 
   const { id } = req.body;
-  const topic = await models.OffchainTopic.findOne({ where: { id } });
+  const topic = await models.Topic.findOne({ where: { id } });
   if (!topic) return next(new Error(Errors.TopicNotFound));
 
   const chainOrCommunity = 'chain = $chain';

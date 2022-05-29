@@ -31,7 +31,7 @@ const getThreads = async (
           as: 'collaborators',
         },
         {
-          model: models.OffchainTopic,
+          model: models.Topic,
           as: 'topic',
         },
         {

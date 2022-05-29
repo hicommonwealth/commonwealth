@@ -7,7 +7,7 @@ import { IChainEntityKind } from '@commonwealth/chain-events';
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
-import OffchainTopic from './OffchainTopic';
+import Topic from './Topic';
 import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
 import { ChainEntity } from '.';
@@ -49,7 +49,7 @@ class OffchainThread implements IUniqueId {
   public readonly id: number;
   public readonly createdAt: moment.Moment;
   public readonly lastCommentedOn: moment.Moment;
-  public topic: OffchainTopic;
+  public topic: Topic;
   public readonly slug = ProposalType.OffchainThread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
@@ -96,7 +96,7 @@ class OffchainThread implements IUniqueId {
     id: number;
     createdAt: moment.Moment;
     lastCommentedOn: moment.Moment;
-    topic: OffchainTopic;
+    topic: Topic;
     kind: OffchainThreadKind;
     stage: OffchainThreadStage;
     versionHistory: VersionHistory[];

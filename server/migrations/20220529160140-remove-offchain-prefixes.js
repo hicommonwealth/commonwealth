@@ -7,10 +7,11 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (transaction) => {
       // Zak
       // TODO
-        await queryInterface.renameTable("OffchainReactions", "Reactions", {transaction});
+      await queryInterface.renameTable("OffchainReactions", "Reactions", { transaction });
 
       // Jake
-      queryInterface.renameTable('OffchainViewCounts', 'ViewCounts', { transaction });
+      await queryInterface.renameTable('OffchainViewCounts', 'ViewCounts', { transaction });
+      await queryInterface.renameTable('OffchainTopics', 'Topics', { transaction });
       // TODO
     });
   },
@@ -21,10 +22,11 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (transaction) => {
       // Zak
       // TODO
-      await queryInterface.renameTable("Reactions", "OffchainReactions", {transaction});
+      await queryInterface.renameTable("Reactions", "OffchainReactions", { transaction });
 
       // Jake
-      queryInterface.renameTable('ViewCounts', 'OffchainViewCounts', { transaction });
+      await queryInterface.renameTable('ViewCounts', 'OffchainViewCounts', { transaction });
+      await queryInterface.renameTable('Topics', 'OffchainTopics', { transaction });
       // TODO
     });
   }

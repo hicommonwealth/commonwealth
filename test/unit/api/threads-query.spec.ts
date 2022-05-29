@@ -53,7 +53,7 @@ describe('Thread queries', () => {
           through: { where: { address_id: address.id } },
         },
         {
-          model: models.OffchainTopic,
+          model: models.Topic,
           as: 'topic'
         }
       ],

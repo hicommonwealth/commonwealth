@@ -70,7 +70,7 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
       },
       models.OffchainAttachment,
       {
-        model: models.OffchainTopic,
+        model: models.Topic,
         as: 'topic'
       }
     ],

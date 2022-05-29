@@ -11,7 +11,7 @@ const bulkTopics = async (models: DB, req: Request, res: Response, next: NextFun
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
-  const topics = await models.OffchainTopic.findAll({
+  const topics = await models.Topic.findAll({
     where: { chain_id: chain.id },
   });
 

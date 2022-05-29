@@ -8,7 +8,7 @@ import 'pages/discussions/discussion_row_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'types';
-import { OffchainThread, OffchainTopic, OffchainThreadStage } from 'models';
+import { OffchainThread, Topic, OffchainThreadStage } from 'models';
 import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';
 import { notifySuccess } from 'controllers/app/notifications';
@@ -244,7 +244,7 @@ export class DiscussionRowMenu
           <TopicEditor
             thread={vnode.attrs.proposal}
             popoverMenu={true}
-            onChangeHandler={(topic: OffchainTopic) => {
+            onChangeHandler={(topic: Topic) => {
               proposal.topic = topic;
               m.redraw();
             }}

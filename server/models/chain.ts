@@ -5,9 +5,9 @@ import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
 import {
-  OffchainTopicAttributes,
-  OffchainTopicInstance,
-} from './offchain_topic';
+  TopicAttributes,
+  TopicInstance,
+} from './topic';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
@@ -50,7 +50,7 @@ export type ChainAttributes = {
   StarredCommunities?:
     | StarredCommunityAttributes[]
     | StarredCommunityAttributes['id'][];
-  topics?: OffchainTopicAttributes[] | OffchainTopicAttributes['id'][];
+  topics?: TopicAttributes[] | TopicAttributes['id'][];
   OffchainThreads?:
     | OffchainThreadAttributes[]
     | OffchainThreadAttributes['id'][];
@@ -69,10 +69,10 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
     AddressInstance['id']
   >;
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
-  getTopics: Sequelize.HasManyGetAssociationsMixin<OffchainTopicInstance>;
+  getTopics: Sequelize.HasManyGetAssociationsMixin<TopicInstance>;
   removeTopics: Sequelize.HasManyRemoveAssociationsMixin<
-    OffchainTopicInstance,
-    OffchainTopicInstance['id']
+    TopicInstance,
+    TopicInstance['id']
   >;
 };
 
@@ -140,7 +140,7 @@ export default (
     models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
-    models.Chain.hasMany(models.OffchainTopic, {
+    models.Chain.hasMany(models.Topic, {
       as: 'topics',
       foreignKey: 'chain_id',
     });

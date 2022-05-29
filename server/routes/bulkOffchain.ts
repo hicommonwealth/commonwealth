@@ -9,7 +9,7 @@ import { Response, NextFunction, Request } from 'express';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { OffchainTopicInstance } from '../models/offchain_topic';
+import { TopicInstance } from '../models/topic';
 import { RoleInstance } from '../models/role';
 import { OffchainThreadInstance } from '../models/offchain_thread';
 import { ChatChannelInstance } from '../models/chat_channel';
@@ -36,7 +36,7 @@ const bulkOffchain = async (
     await (<
       Promise<
         [
-          OffchainTopicInstance[],
+          TopicInstance[],
           unknown,
           RoleInstance[],
           unknown,
@@ -46,7 +46,7 @@ const bulkOffchain = async (
       >
     >Promise.all([
       // topics
-      models.OffchainTopic.findAll({
+      models.Topic.findAll({
         where: { chain_id: chain.id },
       }),
       // threads, comments, reactions
@@ -65,7 +65,7 @@ const bulkOffchain = async (
                 as: 'collaborators',
               },
               {
-                model: models.OffchainTopic,
+                model: models.Topic,
                 as: 'topic',
               },
               {

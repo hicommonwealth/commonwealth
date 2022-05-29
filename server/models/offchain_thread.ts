@@ -127,7 +127,7 @@ export default (
       constraints: false,
       scope: { attachable: 'thread' },
     });
-    models.OffchainThread.belongsTo(models.OffchainTopic, {
+    models.OffchainThread.belongsTo(models.Topic, {
       as: 'topic',
       foreignKey: 'topic_id',
     });

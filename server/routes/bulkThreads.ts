@@ -89,7 +89,7 @@ const bulkThreads = async (
           ORDER BY COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
-      LEFT JOIN "OffchainTopics" topics
+      LEFT JOIN "Topics" topics
       ON threads.topic_id = topics.id`;
     let preprocessedThreads;
     try {
@@ -168,7 +168,7 @@ const bulkThreads = async (
               as: 'collaborators',
             },
             {
-              model: models.OffchainTopic,
+              model: models.Topic,
               as: 'topic',
             },
             {

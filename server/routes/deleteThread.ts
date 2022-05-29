@@ -59,7 +59,7 @@ const deleteThread = async (
       }
     }
 
-    const topic = await models.OffchainTopic.findOne({
+    const topic = await models.Topic.findOne({
       where: { id: thread.topic_id },
       include: [{ model: models.OffchainThread, as: 'threads' }],
     });

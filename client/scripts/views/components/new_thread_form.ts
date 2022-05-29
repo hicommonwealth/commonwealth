@@ -23,7 +23,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, OffchainThreadStage } from 'models';
+import { Topic, OffchainThreadKind, OffchainThreadStage } from 'models';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -360,7 +360,7 @@ export const NewThreadForm: m.Component<
     hasTopics: boolean;
   },
   {
-    activeTopic: OffchainTopic | string | boolean;
+    activeTopic: Topic | string | boolean;
     autoTitleOverride;
     form: IThreadForm;
     fromDraft?: number;

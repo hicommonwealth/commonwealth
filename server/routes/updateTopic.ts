@@ -51,11 +51,11 @@ const updateTopic = async (
   if (req.body.topic_id) {
     thread.topic_id = req.body.topic_id;
     await thread.save();
-    newTopic = await models.OffchainTopic.findOne({
+    newTopic = await models.Topic.findOne({
       where: { id: req.body.topic_id },
     });
   } else {
-    [newTopic] = await models.OffchainTopic.findOrCreate({
+    [newTopic] = await models.Topic.findOrCreate({
       where: {
         name: req.body.topic_name,
         chain_id: thread.chain,

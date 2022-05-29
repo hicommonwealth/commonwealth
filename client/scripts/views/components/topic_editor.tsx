@@ -4,7 +4,7 @@ import m from 'mithril';
 import { Button, Classes, Dialog } from 'construct-ui';
 
 import app from 'state';
-import { OffchainThread, OffchainTopic } from 'models';
+import { OffchainThread, Topic } from 'models';
 import { TopicSelector } from './topic_selector';
 
 type TopicWindowAttrs = {
@@ -13,7 +13,7 @@ type TopicWindowAttrs = {
 };
 
 class TopicWindow implements m.ClassComponent<TopicWindowAttrs> {
-  private activeTopic: OffchainTopic | string;
+  private activeTopic: Topic | string;
 
   oninit(vnode) {
     this.activeTopic = vnode.attrs.thread.topic;
@@ -116,7 +116,7 @@ export class TopicEditor implements m.ClassComponent<TopicEditorAttrs> {
                   const { topicName, topicId } = this;
                   const { thread } = vnode.attrs;
                   try {
-                    const topic: OffchainTopic = await app.topics.update(
+                    const topic: Topic = await app.topics.update(
                       thread.id,
                       topicName,
                       topicId

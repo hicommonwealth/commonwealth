@@ -139,7 +139,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
           as: 'collaborators'
         },
         models.OffchainAttachment,
-        { model: models.OffchainTopic, as: 'topic' },
+        { model: models.Topic, as: 'topic' },
       ],
     });
 

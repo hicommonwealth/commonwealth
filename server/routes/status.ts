@@ -29,7 +29,7 @@ const status = async (
         where: { active: true },
         include: [
           {
-            model: models.OffchainTopic,
+            model: models.Topic,
             as: 'topics',
           },
         ],

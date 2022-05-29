@@ -75,7 +75,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
         },
         models.OffchainAttachment,
         {
-          model: models.OffchainTopic,
+          model: models.Topic,
           as: 'topic'
         }
       ],

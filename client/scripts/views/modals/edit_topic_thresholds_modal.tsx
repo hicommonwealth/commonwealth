@@ -6,7 +6,7 @@ import { Button } from 'construct-ui';
 import 'modals/edit_topic_thresholds_modal.scss';
 
 import app from 'state';
-import { OffchainTopic } from 'models';
+import { Topic } from 'models';
 import { ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
@@ -15,7 +15,7 @@ import { CompactModalExitButton } from 'views/components/component_kit/cw_modal'
 class EditTopicThresholdsRow
   implements
     m.ClassComponent<{
-      topic: OffchainTopic;
+      topic: Topic;
     }>
 {
   private newTokenThresholdInWei: string;

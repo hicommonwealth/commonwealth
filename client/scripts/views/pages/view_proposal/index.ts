@@ -30,7 +30,7 @@ import {
   OffchainThread,
   OffchainThreadKind,
   OffchainComment,
-  OffchainTopic,
+  Topic,
   OffchainThreadStage,
   AnyProposal,
   Account,
@@ -363,7 +363,7 @@ const ProposalHeader: m.Component<
                       m(TopicEditor, {
                         thread: vnode.attrs.proposal as OffchainThread,
                         popoverMenu: true,
-                        onChangeHandler: (topic: OffchainTopic) => {
+                        onChangeHandler: (topic: Topic) => {
                           proposal.topic = topic;
                           m.redraw();
                         },

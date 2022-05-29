@@ -1,13 +1,13 @@
 import IdStore from './IdStore';
-import { OffchainTopic } from '../models';
+import { Topic } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
 // TODO: Differentiate between topics associated with a chain, and topics associated with a community
-class TopicStore extends IdStore<OffchainTopic> {
-  private _topicsByCommunity: { [identifier: string]: Array<OffchainTopic> } =
+class TopicStore extends IdStore<Topic> {
+  private _topicsByCommunity: { [identifier: string]: Array<Topic> } =
     {};
 
-  public add(topic: OffchainTopic) {
+  public add(topic: Topic) {
     // TODO: Remove this once we start enforcing an ordering in stores
     super.add(topic);
     this.getAll().sort(byAscendingCreationDate);
@@ -20,7 +20,7 @@ class TopicStore extends IdStore<OffchainTopic> {
     return this;
   }
 
-  public remove(topic: OffchainTopic) {
+  public remove(topic: Topic) {
     super.remove(topic);
     const parentEntity = topic.chainId;
     const communityStore = this._topicsByCommunity[parentEntity];
@@ -38,11 +38,11 @@ class TopicStore extends IdStore<OffchainTopic> {
     this._topicsByCommunity = {};
   }
 
-  public getByCommunity(communityId): Array<OffchainTopic> {
+  public getByCommunity(communityId): Array<Topic> {
     return this._topicsByCommunity[communityId] || [];
   }
 
-  public getByName(name, communityId): OffchainTopic {
+  public getByName(name, communityId): Topic {
     return this.getByCommunity(communityId).find((t) => t.name === name);
   }
 }

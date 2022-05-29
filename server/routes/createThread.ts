@@ -289,7 +289,7 @@ const createThread = async (
     } else if (topic_name) {
       let offchainTopic;
       try {
-        [offchainTopic] = await models.OffchainTopic.findOrCreate({
+        [offchainTopic] = await models.Topic.findOrCreate({
           where: {
             name: topic_name,
             chain_id: chain?.id || null,
@@ -391,7 +391,7 @@ const createThread = async (
         include: [
           { model: models.Address, as: 'Address' },
           models.OffchainAttachment,
-          { model: models.OffchainTopic, as: 'topic' },
+          { model: models.Topic, as: 'topic' },
         ],
         transaction,
       });

@@ -5,7 +5,7 @@ import m from 'mithril';
 import 'pages/discussions/summary_listing.scss';
 
 import app from 'state';
-import { OffchainThread, OffchainTopic } from 'models';
+import { OffchainThread, Topic } from 'models';
 import { formatTimestampAsDate, link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
@@ -33,7 +33,7 @@ const getThreadCells = (sortedThreads: OffchainThread[]) => {
 type SummaryRowAttrs = {
   isMobile: boolean;
   monthlyThreads: OffchainThread[];
-  topic: OffchainTopic;
+  topic: Topic;
 };
 
 class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {

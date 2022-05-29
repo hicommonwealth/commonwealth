@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { OffchainTopic, AbridgedThread, Profile, OffchainThread } from 'models';
+import { Topic, AbridgedThread, Profile, OffchainThread } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
@@ -11,7 +11,7 @@ export interface IAbridgedThreadFromServer {
   created_at: any;
   community: string;
   chain: string;
-  topic?: OffchainTopic;
+  topic?: Topic;
   pinned?: boolean;
   url?: string;
 }

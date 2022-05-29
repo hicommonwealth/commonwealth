@@ -26,14 +26,14 @@ const activeThreads = async (
   const allThreads = [];
   try {
     const communityWhere = { chain_id: chain.id }
-    const communityTopics = await models.OffchainTopic.findAll({
+    const communityTopics = await models.Topic.findAll({
       where: communityWhere
     });
 
     const threadInclude = [
       { model: models.Address, as: 'Address', },
       { model: models.Address, as: 'collaborators',},
-      { model: models.OffchainTopic, as: 'topic', },
+      { model: models.Topic, as: 'topic', },
       { model: models.LinkedThread, as: 'linked_threads' },
       { model: models.ChainEntity }
     ];
