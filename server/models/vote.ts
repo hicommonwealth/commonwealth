@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { OffchainThreadAttributes } from './offchain_thread';
-import { OffchainPollAttributes } from './offchain_poll';
+import { PollAttributes } from './offchain_poll';
 
 export type VoteAttributes = {
   poll_id: number;
@@ -15,7 +15,7 @@ export type VoteAttributes = {
   updated_at?: Date;
 
   // associations
-  poll?: OffchainPollAttributes;
+  poll?: PollAttributes;
 };
 
 export type VoteInstance = ModelInstance<VoteAttributes>;
@@ -48,7 +48,7 @@ export default (
   );
 
   Vote.associate = (models) => {
-    models.Vote.belongsTo(models.OffchainPoll, {
+    models.Vote.belongsTo(models.Poll, {
       foreignKey: 'poll_id',
       constraints: false,
       as: 'poll',

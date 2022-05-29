@@ -158,7 +158,7 @@ export default (
       foreignKey: 'linking_thread',
       as: 'linked_threads',
     });
-    models.OffchainThread.hasMany(models.OffchainPoll, {
+    models.OffchainThread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
     });
   };

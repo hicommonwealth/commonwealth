@@ -11,7 +11,7 @@ import Topic from './Topic';
 import Vote from './Vote';
 import { VersionHistory } from '../controllers/server/threads';
 import { ChainEntity } from '.';
-import OffchainPoll from './OffchainPoll';
+import Poll from './Poll';
 
 // field names copied from snapshot
 interface IOffchainVotingOptions {
@@ -56,7 +56,7 @@ class OffchainThread implements IUniqueId {
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
   public readonly hasPoll: boolean;
-  public readonly polls: OffchainPoll[];
+  public readonly polls: Poll[];
   public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
 
@@ -113,7 +113,7 @@ class OffchainThread implements IUniqueId {
     snapshotProposal: string;
     hasPoll: boolean;
     linkedThreads: LinkedThreadRelation[];
-    polls?: OffchainPoll[];
+    polls?: Poll[];
   }) {
     this.author = author;
     this.title = title;

@@ -15,7 +15,7 @@ import {
   Profile,
   ChainEntity,
   NotificationSubscription,
-  OffchainPoll,
+  Poll,
 } from 'models';
 import { NotificationCategories } from 'types';
 
@@ -50,7 +50,7 @@ export const modelFromServer = (thread) => {
     chain_entities,
     ChainEntities,
     has_poll,
-    polls = [], // associated OffchainPolls
+    polls = [], // associated Polls
     reactions,
     last_commented_on,
     linked_threads,
@@ -157,7 +157,7 @@ export const modelFromServer = (thread) => {
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
     hasPoll: has_poll,
-    polls: polls.map((p) => new OffchainPoll(p)),
+    polls: polls.map((p) => new Poll(p)),
     lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
     linkedThreads,
   });

@@ -4,7 +4,7 @@ import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 
-export type OffchainPollAttributes = {
+export type PollAttributes = {
   id: number;
   chain_id: string;
   thread_id: number;
@@ -21,15 +21,15 @@ export type OffchainPollAttributes = {
   Chain: ChainAttributes;
 };
 
-export type OffchainPollInstance = ModelInstance<OffchainPollAttributes>;
-export type OffchainPollModelStatic = ModelStatic<OffchainPollInstance>;
+export type PollInstance = ModelInstance<PollAttributes>;
+export type PollModelStatic = ModelStatic<PollInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): OffchainPollModelStatic => {
-  const OffchainPoll = <OffchainPollModelStatic>sequelize.define(
-    'OffchainPoll',
+): PollModelStatic => {
+  const Poll = <PollModelStatic>sequelize.define(
+    'Poll',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -47,25 +47,25 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: true,
-      tableName: 'OffchainPolls',
+      tableName: 'Polls',
       indexes: [{ fields: ['thread_id'] }, { fields: ['chain_id'] }],
     }
   );
 
-  OffchainPoll.associate = (models) => {
-    models.OffchainPoll.belongsTo(models.OffchainThread, {
+  Poll.associate = (models) => {
+    models.Poll.belongsTo(models.OffchainThread, {
       foreignKey: 'thread_id',
       targetKey: 'id',
     });
-    models.OffchainPoll.belongsTo(models.Chain, {
+    models.Poll.belongsTo(models.Chain, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });
-    models.OffchainPoll.hasMany(models.Vote, {
+    models.Poll.hasMany(models.Vote, {
       foreignKey: 'poll_id',
       as: 'votes',
     });
   };
 
-  return OffchainPoll;
+  return Poll;
 };

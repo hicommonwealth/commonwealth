@@ -1,6 +1,6 @@
 import { ProposalType } from './types';
 
-export const getNextOffchainPollEndingTime = (now) => {
+export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,
   // and should always be open for at least 5 days.
   //
@@ -17,7 +17,7 @@ export const getNextOffchainPollEndingTime = (now) => {
   return t3;
 };
 
-export const getNextOffchainPollEndingTimeIsDangerouslyClose = (
+export const getNextPollEndingTimeIsDangerouslyClose = (
   now,
   endingTime
 ) => {

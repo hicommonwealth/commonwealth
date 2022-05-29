@@ -45,7 +45,7 @@ const updateVote = async (
 
   const { poll_id, address, author_chain, option } = req.body;
 
-  const poll = await models.OffchainPoll.findOne({
+  const poll = await models.Poll.findOne({
     where: { id: poll_id, chain_id: chain.id },
   });
   if (!poll) return next(new Error(Errors.NoPoll));

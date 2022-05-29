@@ -66,7 +66,7 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
-import OffchainPoll from 'client/scripts/models/OffchainPoll';
+import Poll from 'client/scripts/models/Poll';
 import {
   ProposalHeaderTopics,
   ProposalHeaderTitle,
@@ -136,7 +136,7 @@ interface IPrefetch {
 
 export interface IProposalPageState {
   comments: OffchainComment<OffchainThread>[];
-  polls: OffchainPoll[];
+  polls: Poll[];
   editing: boolean;
   highlightedComment: boolean;
   parentCommentId: number; // if null or undefined, reply is thread-scoped

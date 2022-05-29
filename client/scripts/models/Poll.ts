@@ -4,7 +4,7 @@ import { notifyError } from '../controllers/app/notifications';
 import app from '../state';
 import Vote from './Vote';
 
-class OffchainPoll {
+class Poll {
   public readonly id: number;
   public readonly threadId: number;
   public readonly chainId: string;
@@ -94,4 +94,4 @@ class OffchainPoll {
   }
 }
 
-export default OffchainPoll;
+export default Poll;

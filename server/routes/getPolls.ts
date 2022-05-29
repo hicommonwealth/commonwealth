@@ -20,7 +20,7 @@ const getPolls = async (
   const { thread_id } = req.query;
   if (!thread_id) return next(new Error(Errors.NoThreadId));
 
-  const polls = await models.OffchainPoll.findAll({
+  const polls = await models.Poll.findAll({
     where: { thread_id },
     include: { model: models.Vote, as: 'votes' },
   });
