@@ -371,7 +371,7 @@ const createThread = async (
     }
 
     // initialize view count
-    await models.OffchainViewCount.create(
+    await models.ViewCount.create(
       {
         chain: thread.chain,
         object_id: thread.id,

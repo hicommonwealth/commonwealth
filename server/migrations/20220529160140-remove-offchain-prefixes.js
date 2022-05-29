@@ -9,6 +9,7 @@ module.exports = {
       // TODO
 
       // Jake
+      queryInterface.renameTable('OffchainViewCounts', 'ViewCounts', { transaction });
       // TODO
     });
   },
@@ -21,6 +22,7 @@ module.exports = {
       // TODO
 
       // Jake
+      queryInterface.renameTable('ViewCounts', 'OffchainViewCounts', { transaction });
       // TODO
     });
   }

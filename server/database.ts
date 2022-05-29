@@ -68,9 +68,9 @@ import OffchainThreadFactory, {
 import OffchainTopicFactory, {
   OffchainTopicModelStatic,
 } from './models/offchain_topic';
-import OffchainViewCountFactory, {
-  OffchainViewCountModelStatic,
-} from './models/offchain_viewcount';
+import ViewCountFactory, {
+  ViewCountModelStatic,
+} from './models/viewcount';
 import OffchainVoteFactory, {
   OffchainVoteModelStatic,
 } from './models/offchain_vote';
@@ -133,7 +133,7 @@ export type Models = {
   OffchainReaction: OffchainReactionModelStatic;
   OffchainThread: OffchainThreadModelStatic;
   OffchainTopic: OffchainTopicModelStatic;
-  OffchainViewCount: OffchainViewCountModelStatic;
+  ViewCount: ViewCountModelStatic;
   OffchainVote: OffchainVoteModelStatic;
   Profile: ProfileModelStatic;
   Role: RoleModelStatic;
@@ -212,7 +212,7 @@ const models: Models = {
   OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),
   OffchainThread: OffchainThreadFactory(sequelize, DataTypes),
   OffchainTopic: OffchainTopicFactory(sequelize, DataTypes),
-  OffchainViewCount: OffchainViewCountFactory(sequelize, DataTypes),
+  ViewCount: ViewCountFactory(sequelize, DataTypes),
   OffchainVote: OffchainVoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
