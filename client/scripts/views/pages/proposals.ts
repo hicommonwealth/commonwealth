@@ -73,7 +73,7 @@ const CompoundProposalStats: m.Component<{}, {}> = {
     if (!app.chain) return;
     if (!(app.chain instanceof Compound)) return;
     const activeAccount = app.user.activeAccount;
-    const symbol = app.chain.meta.chain.symbol;
+    const symbol = app.chain.meta.symbol;
 
     return m('.stats-box', [
       m('.stats-box-left', '💭'),

@@ -39,7 +39,7 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
     // infer proposal type if possible
     if (!vnode.state.typeEnum) {
       try {
-        vnode.state.typeEnum = chainToProposalSlug(app.chain.meta.chain);
+        vnode.state.typeEnum = chainToProposalSlug(app.chain.meta);
       } catch (e) {
         return m(PageNotFound, {
           title: 'Invalid Page',

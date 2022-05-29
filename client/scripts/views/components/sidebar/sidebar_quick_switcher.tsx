@@ -40,11 +40,8 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
     const allCommunities = app.config.chains
       .getAll()
       .sort((a, b) => a.name.localeCompare(b.name))
-      .filter((item) =>
-        item instanceof ChainInfo
-          ? app.config.nodes.getByChain(item.id)?.length > 0
-          : true
-      ); // only chains with nodes
+      .filter((item) => !!item.node // only chains with nodes
+      );
 
     const starredCommunities = allCommunities.filter((item) => {
       // filter out non-starred communities

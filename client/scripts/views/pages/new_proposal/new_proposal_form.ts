@@ -724,7 +724,7 @@ const NewProposalForm = {
       });
     }
 
-    const activeEntityInfo = app.chain.meta.chain;
+    const activeEntityInfo = app.chain.meta;
 
     const { activeAaveTabIndex, aaveProposalState } = vnode.state;
 
@@ -758,7 +758,7 @@ const NewProposalForm = {
           hasAction && m(EdgewareFunctionPicker),
           hasTopics &&
             m(TopicSelector, {
-              topics: app.chain.meta.chain.topics,
+              topics: app.chain.meta.topics,
               updateFormData: (topicName: string, topicId?: number) => {
                 vnode.state.form.topicName = topicName;
                 vnode.state.form.topicId = topicId;

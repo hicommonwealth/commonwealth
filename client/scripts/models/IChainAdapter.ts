@@ -11,6 +11,7 @@ import ChainEntityController, {
 } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { Account, NodeInfo, ProposalModule } from '.';
+import ChainInfo from './ChainInfo';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -45,7 +46,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
   public async initServer(): Promise<boolean> {
     clearLocalStorage();
-    console.log(`Starting ${this.meta.chain.name}`);
+    console.log(`Starting ${this.meta.name}`);
     let response;
     if (this.chainEntities) {
       // if we're loading entities from chain, only pull completed
@@ -54,7 +55,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
         : EntityRefreshOption.CompletedEntities;
 
       [, response] = await Promise.all([
-        this.chainEntities.refresh(this.meta.chain.id, refresh),
+        this.chainEntities.refresh(this.meta.id, refresh),
         $.get(`${this.app.serverUrl()}/bulkOffchain`, {
           chain: this.id,
           community: null,
@@ -70,10 +71,10 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
 
     // If user is no longer on the initializing chain, abort initialization
-    // and return false, so that the invoking selectNode fn can similarly
+    // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
     if (
-      this.meta.chain.id !==
+      this.meta.id !==
       (this.app.customDomainId() || m.route.param('scope'))
     ) {
       return false;
@@ -83,7 +84,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
-    this.meta.chain.setAdmins(admins);
+    this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
       this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
@@ -107,13 +108,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
     this.app.reactionCounts.deinit();
     this.app.threadUniqueAddressesCount.deinit();
-    console.log(`${this.meta.chain.name} stopped`);
+    console.log(`${this.meta.name} stopped`);
   }
 
   public async initApi(): Promise<void> {
     this._apiInitialized = true;
     console.log(
-      `Started API for ${this.meta.chain.id} on node: ${this.meta.url}.`
+      `Started API for ${this.meta.id} on node: ${this.meta.node.url}.`
     );
   }
 
@@ -122,7 +123,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.chainModuleReady.emit('ready');
     this.app.isModuleReady = true;
     console.log(
-      `Loaded data for ${this.meta.chain.id} on node: ${this.meta.url}.`
+      `Loaded data for ${this.meta.id} on node: ${this.meta.node.url}.`
     );
   }
 
@@ -131,7 +132,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.isModuleReady = false;
     if (this.app.snapshot) this.app.snapshot.deinit();
     this._loaded = false;
-    console.log(`Stopping ${this.meta.chain.id}...`);
+    console.log(`Stopping ${this.meta.id}...`);
   }
 
   public async loadModules(modules: ProposalModule<any, any, any>[]) {
@@ -152,7 +153,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
   public networkError: string;
 
-  public readonly meta: NodeInfo;
+  public readonly meta: ChainInfo;
   public readonly block: IBlockInfo;
 
   public app: IApp;
@@ -160,7 +161,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public name: string;
   public runtimeName: string;
 
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: ChainInfo, app: IApp) {
     this.meta = meta;
     this.app = app;
     this.block = {
@@ -172,13 +173,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   }
 
   get id() {
-    return this.meta.chain.id;
+    return this.meta.id;
   }
   get network() {
-    return this.meta.chain.network;
+    return this.meta.network;
   }
   get currency() {
-    return this.meta.chain.symbol;
+    return this.meta.symbol;
   }
 }
 

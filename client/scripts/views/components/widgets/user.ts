@@ -70,7 +70,7 @@ const User: m.Component<
       typeof user.chain === 'string' ? user.chain : user.chain?.id
     )?.name;
 
-    const adminsAndMods = app.chain?.meta.chain.adminsAndMods || [];
+    const adminsAndMods = app.chain?.meta.adminsAndMods || [];
 
     if (
       app.chain?.base === ChainBase.Substrate &&

@@ -308,11 +308,11 @@ const ProposalHeader: m.Component<
                               getSetGlobalEditingStatus,
                             }),
                           (isAuthor || isAdmin) &&
-                            app.chain?.meta.chain.snapshot.length > 0 &&
+                            app.chain?.meta.snapshot.length > 0 &&
                             m(MenuItem, {
                               onclick: () => {
                                 const snapshotSpaces =
-                                  app.chain.meta.chain.snapshot;
+                                  app.chain.meta.snapshot;
                                 if (snapshotSpaces.length > 1) {
                                   navigateToSubpage('/multiple-snapshots', {
                                     action: 'create-from-thread',
@@ -380,7 +380,7 @@ const ProposalHeader: m.Component<
                         ) => {
                           proposal.stage = stage;
                           proposal.chainEntities = chainEntities;
-                          if (app.chain?.meta.chain.snapshot) {
+                          if (app.chain?.meta.snapshot) {
                             proposal.snapshotProposal = snapshotProposal[0]?.id;
                           }
                           app.threads.fetchThreadsFromId([proposal.identifier]);
@@ -859,7 +859,7 @@ const ViewProposalPage: m.Component<
       vnode.attrs.type ||
       (isDiscussion
         ? ProposalType.OffchainThread
-        : chainToProposalSlug(app.chain.meta.chain));
+        : chainToProposalSlug(app.chain.meta));
     const headerTitle = isDiscussion ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string')
       return m(PageNotFound, { title: headerTitle });

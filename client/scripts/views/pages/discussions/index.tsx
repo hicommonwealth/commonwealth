@@ -60,7 +60,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
 
   initializeSummaryView() {
     // Admin has set summary view as community default
-    if (app.chain.meta.chain.defaultSummaryView) {
+    if (app.chain.meta.defaultSummaryView) {
       this.summaryView = true;
     }
 

@@ -136,7 +136,7 @@ const verifySignature = async (
 
       if (generatedAddress === addressModel.address || generatedAddressWithCosmosPrefix === addressModel.address) {
         // query chain ID from URL
-        const [ node ] = await chain.getChainNodes();
+        const node = await chain.getChainNode();
         const client = await StargateClient.connect(node.url);
         const chainId = await client.getChainId();
         client.disconnect();
@@ -175,7 +175,7 @@ const verifySignature = async (
     // ethereum address handling
     //
     try {
-      const [ node ] = await chain.getChainNodes();
+      const node = await chain.getChainNode();
       const typedMessage = constructTypedMessage(node.eth_chain_id || 1, addressModel.verification_token.trim());
       const address = recoverTypedSignature({
         data: typedMessage,

@@ -8,7 +8,6 @@ import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
-import { ChainStatusModule } from './chain_status_module';
 import { ExternalLinksModule } from './external_links_module';
 
 export class Sidebar implements m.ClassComponent {
@@ -24,7 +23,6 @@ export class Sidebar implements m.ClassComponent {
               <SubscriptionButton />
             </div>
           )}
-          {/* app.chain && <ChainStatusModule /> */}
           {app.isCustomDomain() && (
             <div
               class="powered-by"

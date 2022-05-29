@@ -32,8 +32,8 @@ const EditTopicThresholdsRow: m.Component<
       vnode.state.newTokenThresholdInWei =
         topic.tokenThreshold?.toString() || '0';
     }
-    const decimals = app.chain?.meta.chain?.decimals
-      ? app.chain.meta.chain.decimals
+    const decimals = app.chain?.meta?.decimals
+      ? app.chain.meta.decimals
       : (app.chain.network === ChainNetwork.ERC721) ? 0 : 18;
     return m(Form, [
       m('.topic-name', [topic.name]),

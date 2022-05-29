@@ -51,7 +51,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public async signLoginToken(message: string): Promise<string> {
     const msgParams = constructTypedMessage(
-      app.chain.meta.ethChainId || 1,
+      app.chain.meta.node.ethChainId || 1,
       message
     );
     const signature = await this._web3.givenProvider.request({
@@ -77,7 +77,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // default to ETH
-      const chainId = app.chain?.meta.ethChainId || 1;
+      const chainId = app.chain?.meta.node.ethChainId || 1;
 
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
@@ -94,9 +94,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
-          const wsRpcUrl = new URL(app.chain.meta.url);
+          const wsRpcUrl = new URL(app.chain.meta.node.url);
           const rpcUrl =
-            app.chain.meta.altWalletUrl || `https://${wsRpcUrl.host}`;
+            app.chain.meta.node.altWalletUrl || `https://${wsRpcUrl.host}`;
 
           // TODO: we should cache this data!
           const chains = await $.getJSON('https://chainid.network/chains.json');
@@ -130,7 +130,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     } catch (error) {
       let errorMsg = `Failed to enable Metamask: ${error.message}`;
       if (error.code === 4902) {
-        errorMsg = `Failed to enable Metamask: Please add chain ID ${app.chain.meta.ethChainId}`;
+        errorMsg = `Failed to enable Metamask: Please add chain ID ${app.chain.meta.node.ethChainId}`;
       }
       console.error(errorMsg);
       this._enabling = false;

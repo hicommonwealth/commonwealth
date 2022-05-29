@@ -2,8 +2,7 @@ import * as Sequelize from 'sequelize';
 import { CreateOptions, DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance, AddressAttributes } from './address';
-import { ChainAttributes } from './chain';
-import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
+import { ChainAttributes, ChainInstance } from './chain';
 import { ProfileInstance, ProfileAttributes } from './profile';
 import { SocialAccountInstance, SocialAccountAttributes } from './social_account';
 import { DB } from '../database';
@@ -23,7 +22,7 @@ export type UserAttributes = {
   updated_at?: Date;
 
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
-  selectedNode?: ChainNodeAttributes | ChainNodeAttributes['id'];
+  selectedChain?: ChainAttributes | ChainAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   Profiles?: ProfileAttributes[];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
@@ -32,8 +31,8 @@ export type UserAttributes = {
 
 // eslint-disable-next-line no-use-before-define
 export type UserInstance = ModelInstance<UserAttributes> & {
-  getSelectedNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
-  setSelectedNode: Sequelize.BelongsToSetAssociationMixin<ChainNodeInstance, ChainNodeInstance['id']>;
+  getSelectedChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  setSelectedChain: Sequelize.BelongsToSetAssociationMixin<ChainInstance, ChainInstance['id']>;
 
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<AddressInstance, AddressInstance['id']>;
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
@@ -72,6 +71,7 @@ export default (
     isAdmin: { type: dataTypes.BOOLEAN, defaultValue: false },
     lastVisited: { type: dataTypes.TEXT, allowNull: false, defaultValue: '{}' },
     disableRichText: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+    selectedChain: { type: dataTypes.STRING, allowNull: true },
   }, {
     timestamps: true,
     createdAt: 'created_at',
@@ -106,7 +106,8 @@ export default (
   };
 
   User.associate = (models) => {
-    models.User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
+    // TODO: write a migration for this change
+    models.User.belongsTo(models.Chain, { as: 'selectedChain', constraints: false });
     models.User.hasMany(models.Address);
     models.User.hasMany(models.Profile);
     models.User.hasMany(models.SocialAccount);

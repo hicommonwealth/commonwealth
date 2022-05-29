@@ -158,7 +158,7 @@
 //                     const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
 //                     const message = JSON.stringify({ text: $textarea.val() });
 //                     vnode.state.chat.send(
-//                       'message', message, app.chain.meta.chain.id, app.user.activeAccount.address, app.user.jwt
+//                       'message', message, app.chain.meta.id, app.user.activeAccount.address, app.user.jwt
 //                     );
 //                     vnode.state.oninput = false; // HACK: clear the typing debounce
 //                     $textarea.val('');
@@ -175,7 +175,7 @@
 //     const activeEntity = app.chain;
 //     if (!activeEntity) return m(PageLoading);
 //     const room = activeEntity.id;
-//     const name = app.chain.meta.chain.name;
+//     const name = app.chain.meta.name;
 //
 //     return m(Sublayout, {
 //       class: 'ChatPage',

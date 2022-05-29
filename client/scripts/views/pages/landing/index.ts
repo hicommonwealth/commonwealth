@@ -52,11 +52,11 @@ const LandingPage: m.Component<{}, IState> = {
     vnode.state.chains = [];
 
     const chains = {};
-    app.config.nodes.getAll().forEach((n) => {
-      if (chains[n.chain.id]) {
-        chains[n.chain.id].push(n);
+    app.config.chains.getAll().forEach((n) => {
+      if (chains[n.id]) {
+        chains[n.id].push(n);
       } else {
-        chains[n.chain.id] = [n];
+        chains[n.id] = [n];
       }
     });
 

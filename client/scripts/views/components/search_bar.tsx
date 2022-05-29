@@ -646,7 +646,7 @@ export class SearchBar implements m.Component {
     );
 
     const chainOrCommIcon = app.activeChainId() ? (
-      <ChainIcon size={18} chain={app.chain.meta.chain} />
+      <ChainIcon size={18} chain={app.chain.meta} />
     ) : null;
 
     const cancelInputIcon = this.searchTerm ? (

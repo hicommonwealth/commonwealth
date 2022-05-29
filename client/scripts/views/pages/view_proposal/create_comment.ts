@@ -153,8 +153,8 @@ const CreateComment: m.Component<{
     const topicGated = TopicGateCheck.isGatedTopic(activeTopicName);
     disabled = disabled || (!isAdmin && topicGated);
 
-    const decimals = app.chain?.meta.chain?.decimals
-      ? app.chain.meta.chain.decimals
+    const decimals = app.chain?.meta?.decimals
+      ? app.chain.meta.decimals
       : (app.chain.network === ChainNetwork.ERC721) ? 0 : 18;
     return m('.CreateComment', {
       class: parentScopedClass
@@ -214,12 +214,12 @@ const CreateComment: m.Component<{
                 ? [
                   `Commenting in "${activeTopicName}" requires `,
                   `${weiToTokens(tokenPostingThreshold.toString(), decimals)} `,
-                  `${app.chain.meta.chain.symbol}. `,
+                  `${app.chain.meta.symbol}. `,
                     userBalance
                     && app.user.activeAccount
                     && `You have ${
                       weiToTokens(userBalance.toString(), decimals)
-                    } ${app.chain.meta.chain.symbol}.`
+                    } ${app.chain.meta.symbol}.`
                 ]
                 : null
             ]),

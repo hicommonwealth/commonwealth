@@ -58,7 +58,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       title,
     } = vnode.attrs;
 
-    const chain = app.chain ? app.chain.meta.chain : null;
+    const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 

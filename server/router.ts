@@ -9,7 +9,7 @@ import linkExistingAddressToChain from './routes/linkExistingAddressToChain';
 import verifyAddress from './routes/verifyAddress';
 import deleteAddress from './routes/deleteAddress';
 import getAddressStatus from './routes/getAddressStatus';
-import selectNode from './routes/selectNode';
+import selectChain from './routes/selectChain';
 import startEmailLogin from './routes/startEmailLogin';
 import finishEmailLogin from './routes/finishEmailLogin';
 import finishOAuthLogin from './routes/finishOAuthLogin';
@@ -176,9 +176,9 @@ function setupRouter(
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   router.post(
-    '/selectNode',
+    '/selectChain',
     passport.authenticate('jwt', { session: false }),
-    selectNode.bind(this, models)
+    selectChain.bind(this, models)
   );
 
   // chains
