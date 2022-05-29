@@ -614,7 +614,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         }
 
         // Special case to defer chain loading specifically for viewing an offchain thread. We need
-        // a special case because OffchainThreads and on-chain proposals are all viewed through the
+        // a special case because Threads and on-chain proposals are all viewed through the
         // same "/:scope/proposal/:type/:id" route.
         let deferChain = attrs.deferChain;
         const isDiscussion =

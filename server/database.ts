@@ -62,9 +62,9 @@ import OffchainProfileFactory, {
 import ReactionFactory, {
   ReactionModelStatic,
 } from './models/reaction';
-import OffchainThreadFactory, {
-  OffchainThreadModelStatic,
-} from './models/offchain_thread';
+import ThreadFactory, {
+  ThreadModelStatic,
+} from './models/thread';
 import TopicFactory, {
   TopicModelStatic,
 } from './models/topic';
@@ -131,7 +131,7 @@ export type Models = {
   Poll: PollModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
   Reaction: ReactionModelStatic;
-  OffchainThread: OffchainThreadModelStatic;
+  Thread: ThreadModelStatic;
   Topic: TopicModelStatic;
   ViewCount: ViewCountModelStatic;
   Vote: VoteModelStatic;
@@ -210,7 +210,7 @@ const models: Models = {
   Poll: PollFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   Reaction: ReactionFactory(sequelize, DataTypes),
-  OffchainThread: OffchainThreadFactory(sequelize, DataTypes),
+  Thread: ThreadFactory(sequelize, DataTypes),
   Topic: TopicFactory(sequelize, DataTypes),
   ViewCount: ViewCountFactory(sequelize, DataTypes),
   Vote: VoteFactory(sequelize, DataTypes),

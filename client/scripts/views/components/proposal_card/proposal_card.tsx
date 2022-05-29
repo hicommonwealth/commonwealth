@@ -152,7 +152,7 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
           <div class="proposal-thread-link">
             <a
               href={getProposalUrlPath(
-                ProposalType.OffchainThread,
+                ProposalType.Thread,
                 `${proposal.threadId}`
               )}
               onclick={(e) => {
@@ -162,7 +162,7 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
                   window.scrollY;
                 navigateToSubpage(
                   getProposalUrlPath(
-                    ProposalType.OffchainThread,
+                    ProposalType.Thread,
                     `${proposal.threadId}`,
                     true
                   )

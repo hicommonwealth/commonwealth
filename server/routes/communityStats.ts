@@ -43,7 +43,7 @@ ORDER BY seq.date DESC;`, {
     });
   };
   const roles = await newObjectsQuery('"Roles"');
-  const threads = await newObjectsQuery('"OffchainThreads"');
+  const threads = await newObjectsQuery('"Threads"');
   const comments = await newObjectsQuery('"Comments"');
 
   // get total number of roles, threads, and comments as of today
@@ -56,7 +56,7 @@ ORDER BY seq.date DESC;`, {
     );
   };
   const totalRoles = await totalObjectsQuery('"Roles"');
-  const totalThreads = await totalObjectsQuery('"OffchainThreads"');
+  const totalThreads = await totalObjectsQuery('"Threads"');
   const totalComments = await totalObjectsQuery('"Comments"');
 
   // get number of active accounts by day
@@ -64,7 +64,7 @@ ORDER BY seq.date DESC;`, {
 SELECT seq.date, COUNT(DISTINCT objs.address_id) AS new_items
 FROM ( SELECT CURRENT_DATE - seq.date AS date FROM generate_series(0, 14) AS seq(date) ) seq
 LEFT JOIN (
-  SELECT address_id, created_at FROM "OffchainThreads" WHERE created_at > CURRENT_DATE - 14
+  SELECT address_id, created_at FROM "Threads" WHERE created_at > CURRENT_DATE - 14
     AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Comments" WHERE created_at > CURRENT_DATE - 14

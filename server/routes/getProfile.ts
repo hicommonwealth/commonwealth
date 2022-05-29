@@ -27,7 +27,7 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
   });
   if (!addressModel) return next(new Error(Errors.NoAddressFound));
 
-  const threads = await models.OffchainThread.findAll({
+  const threads = await models.Thread.findAll({
     where: {
       address_id: addressModel.id,
       [Op.or]: [{

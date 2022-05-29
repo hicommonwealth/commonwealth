@@ -29,7 +29,7 @@ export enum ProposalType {
   SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
   PhragmenCandidacy = 'phragmenelection',
   SubstrateTreasuryProposal = 'treasuryproposal',
-  OffchainThread = 'discussion',
+  Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
   CompoundProposal = 'compoundproposal',

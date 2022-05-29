@@ -14,7 +14,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
   if (error) return next(new Error(error));
   const { thread_id } = req.body;
 
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: {
       id: thread_id,
     },
@@ -64,7 +64,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
     await entitiesToSet[i].save();
   }
 
-  const finalThread = await models.OffchainThread.findOne({
+  const finalThread = await models.Thread.findOne({
     where: { id: thread_id, },
     include: [
       {

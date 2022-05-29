@@ -6,7 +6,7 @@ import { QueryList, ListItem } from 'construct-ui';
 import 'components/snapshot_proposal_selector.scss';
 
 import app from 'state';
-import { OffchainThread } from 'models';
+import { Thread } from 'models';
 import {
   loadMultipleSpacesData,
   SnapshotProposal,
@@ -15,7 +15,7 @@ import {
 type SnapshotProposalSelectorAttrs = {
   onSelect: () => void;
   snapshotProposalsToSet: SnapshotProposal[];
-  thread: OffchainThread;
+  thread: Thread;
 };
 
 export class SnapshotProposalSelector

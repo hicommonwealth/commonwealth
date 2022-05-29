@@ -13,7 +13,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { DB, sequelize } from '../database';
 import { factory, formatFilename } from '../../shared/logging';
-import { OffchainThreadInstance } from '../models/offchain_thread';
+import { ThreadInstance } from '../models/thread';
 import { ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -38,7 +38,7 @@ export const Errors = {
 const dispatchHooks = async (
   models: DB,
   req: Request,
-  finalThread: OffchainThreadInstance
+  finalThread: ThreadInstance
 ) => {
   // auto-subscribe thread creator to comments & reactions
   try {
@@ -142,7 +142,7 @@ const dispatchHooks = async (
     {
       created_at: new Date(),
       root_id: finalThread.id,
-      root_type: ProposalType.OffchainThread,
+      root_type: ProposalType.Thread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
       chain_id: finalThread.chain,
@@ -175,7 +175,7 @@ const dispatchHooks = async (
         {
           created_at: new Date(),
           root_id: finalThread.id,
-          root_type: ProposalType.OffchainThread,
+          root_type: ProposalType.Thread,
           root_title: finalThread.title,
           comment_text: finalThread.body,
           chain_id: finalThread.chain,
@@ -330,9 +330,9 @@ const createThread = async (
       }
     }
 
-    let thread: OffchainThreadInstance;
+    let thread: ThreadInstance;
     try {
-      thread = await models.OffchainThread.create(threadContent, {
+      thread = await models.Thread.create(threadContent, {
         transaction,
       });
     } catch (err) {
@@ -386,7 +386,7 @@ const createThread = async (
 
     try {
       // re-fetch thread once created
-      return await models.OffchainThread.findOne({
+      return await models.Thread.findOne({
         where: { id: thread.id },
         include: [
           { model: models.Address, as: 'Address' },

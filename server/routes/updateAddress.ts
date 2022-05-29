@@ -37,7 +37,7 @@ const updateAddress = async (models: DB, req: Request, res: Response, next: Next
         await models.Reaction.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
 
         // update address in threads
-        await models.OffchainThread.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
+        await models.Thread.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
 
         // update address in roles
         await models.Role.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });

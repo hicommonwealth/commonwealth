@@ -52,7 +52,7 @@ const createPoll = async (
       : getNextPollEndingTime(moment());
 
   try {
-    const thread = await models.OffchainThread.findOne({
+    const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
       },

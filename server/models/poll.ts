@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes } from './chain';
-import { OffchainThreadAttributes } from './offchain_thread';
+import { ThreadAttributes } from './thread';
 
 export type PollAttributes = {
   id: number;
@@ -17,7 +17,7 @@ export type PollAttributes = {
   last_commented_on?: Date;
 
   // associations
-  Thread: OffchainThreadAttributes;
+  Thread: ThreadAttributes;
   Chain: ChainAttributes;
 };
 
@@ -53,7 +53,7 @@ export default (
   );
 
   Poll.associate = (models) => {
-    models.Poll.belongsTo(models.OffchainThread, {
+    models.Poll.belongsTo(models.Thread, {
       foreignKey: 'thread_id',
       targetKey: 'id',
     });

@@ -15,7 +15,7 @@ class AbridgedThread implements IUniqueId {
   public readonly pinned?: boolean;
   public readonly url?: string;
 
-  public readonly slug = ProposalType.OffchainThread;
+  public readonly slug = ProposalType.Thread;
   public readonly identifier: string;
 
   public get uniqueIdentifier() {

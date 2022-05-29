@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes } from './chain';
-import { OffchainThreadAttributes } from './offchain_thread';
+import { ThreadAttributes } from './thread';
 
 export type ViewCountAttributes = {
   object_id: number;
@@ -10,7 +10,7 @@ export type ViewCountAttributes = {
   id?: number;
   chain: string;
   Chain?: ChainAttributes;
-  OffchainThread?: OffchainThreadAttributes;
+  Thread?: ThreadAttributes;
 }
 
 export type ViewCountInstance = ModelInstance<ViewCountAttributes> & {
@@ -41,7 +41,7 @@ export default (
 
   ViewCount.associate = (models) => {
     models.ViewCount.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.ViewCount.belongsTo(models.OffchainThread, { foreignKey: 'object_id', targetKey: 'id' });
+    models.ViewCount.belongsTo(models.Thread, { foreignKey: 'object_id', targetKey: 'id' });
   };
 
   return ViewCount;

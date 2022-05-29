@@ -37,7 +37,7 @@ const addEditors = async (
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: {
       id: thread_id,
       address_id: { [Op.in]: userOwnedAddressIds },
@@ -129,7 +129,7 @@ const addEditors = async (
           {
             created_at: new Date(),
             root_id: +thread.id,
-            root_type: ProposalType.OffchainThread,
+            root_type: ProposalType.Thread,
             root_title: thread.title,
             comment_text: thread.body,
             chain_id: thread.chain,

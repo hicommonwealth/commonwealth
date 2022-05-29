@@ -12,7 +12,7 @@ import {
   IUniqueId,
   AddressInfo,
   NodeInfo,
-  OffchainThread,
+  Thread,
 } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';

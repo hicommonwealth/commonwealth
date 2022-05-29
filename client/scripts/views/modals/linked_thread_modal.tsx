@@ -6,13 +6,13 @@ import { Button } from 'construct-ui';
 
 import 'modals/linked_thread_modal.scss';
 
-import { OffchainThread } from 'models';
+import { Thread } from 'models';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 import { ThreadSelector } from 'views/components/thread_selector';
 
 type LinkedThreadModalAttrs = {
-  linkedThreads: OffchainThread[];
-  linkingThread: OffchainThread;
+  linkedThreads: Thread[];
+  linkingThread: Thread;
   onclose: () => null;
 };
 

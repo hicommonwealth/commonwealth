@@ -53,7 +53,7 @@ export default (
     models.Reaction.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.Reaction.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.Reaction.belongsTo(models.Comment, { foreignKey: 'comment_id', targetKey: 'id' });
-    models.Reaction.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
+    models.Reaction.belongsTo(models.Thread, { foreignKey: 'thread_id', targetKey: 'id' });
   };
 
   return Reaction;

@@ -2,7 +2,7 @@ import m from 'mithril';
 import app from 'state';
 
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { OffchainThread, Poll } from 'models';
+import { Thread, Poll } from 'models';
 import { Button, Icons } from 'construct-ui';
 import moment from 'moment';
 import { alertModalWithText } from '../../modals/alert_modal';
@@ -37,7 +37,7 @@ const vote = async (
 };
 
 export const ProposalPoll: m.Component<
-  { poll: Poll; thread: OffchainThread },
+  { poll: Poll; thread: Thread },
   { votesFetched: boolean; threadId: number }
 > = {
   view: (vnode) => {

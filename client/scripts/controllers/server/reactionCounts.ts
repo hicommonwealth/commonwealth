@@ -7,7 +7,7 @@ import app from 'state';
 
 import { ReactionCountsStore } from 'stores';
 import ReactionCount from 'models/ReactionCount';
-import { AnyProposal, Comment, OffchainThread, Proposal } from 'models';
+import { AnyProposal, Comment, Thread, Proposal } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
 export const modelFromServer = (reactionCount) => {
@@ -44,8 +44,8 @@ class ReactionCountController {
       reaction,
       jwt: app.user.jwt,
     };
-    if (post instanceof OffchainThread) {
-      options['thread_id'] = (post as OffchainThread).id;
+    if (post instanceof Thread) {
+      options['thread_id'] = (post as Thread).id;
     } else if (post instanceof Proposal) {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier

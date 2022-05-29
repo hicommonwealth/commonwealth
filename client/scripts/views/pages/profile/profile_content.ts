@@ -5,7 +5,7 @@ import { Spinner } from 'construct-ui';
 
 import app from 'state';
 import { pluralize } from 'helpers';
-import { OffchainThread, Account } from 'models';
+import { Thread, Account } from 'models';
 
 import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
@@ -51,7 +51,7 @@ const ProfileContent: m.Component<
       content?.length > 0
         ? [
             content.slice(0, vnode.attrs.count).map((data) => {
-              if (data instanceof OffchainThread) {
+              if (data instanceof Thread) {
                 return m(ProfileProposal, { proposal: data });
               } else {
                 return m(ProfileCommentGroup, {

@@ -10,7 +10,7 @@ import {
   Reaction,
   AnyProposal,
   Comment,
-  OffchainThread,
+  Thread,
   Proposal,
   AbridgedThread,
 } from 'models';
@@ -36,7 +36,7 @@ class ReactionsController {
   }
 
   public getByPost(
-    post: OffchainThread | AbridgedThread | AnyProposal | Comment<any>
+    post: Thread | AbridgedThread | AnyProposal | Comment<any>
   ) {
     return this._store.getByPost(post);
   }
@@ -54,8 +54,8 @@ class ReactionsController {
       reaction,
       jwt: app.user.jwt,
     };
-    if (post instanceof OffchainThread) {
-      options['thread_id'] = (post as OffchainThread).id;
+    if (post instanceof Thread) {
+      options['thread_id'] = (post as Thread).id;
     } else if (post instanceof Proposal) {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier
@@ -79,8 +79,8 @@ class ReactionsController {
   public async refresh(post: any, chainId: string) {
     const options = { chain: chainId };
     // TODO: ensure identifier vs id use is correct; see also create method
-    if (post instanceof OffchainThread)
-      options['thread_id'] = (post as OffchainThread).id;
+    if (post instanceof Thread)
+      options['thread_id'] = (post as Thread).id;
     else if (post instanceof Proposal) {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier

@@ -145,7 +145,7 @@ class DraftsController {
       }
       for (let draft of response.result) {
         if (!draft.Address) {
-          console.error('OffchainThread missing address');
+          console.error('Thread missing address');
         }
         draft = modelFromServer(draft);
         const existing = this._store.getById(draft.id);

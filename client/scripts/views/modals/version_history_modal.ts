@@ -3,7 +3,7 @@ import 'modals/version_history_modal.scss';
 import m from 'mithril';
 import app from 'state';
 import Quill from 'quill';
-import { OffchainThread, Comment } from 'models';
+import { Thread, Comment } from 'models';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
@@ -13,7 +13,7 @@ import { CompactModalExitButton } from 'views/components/component_kit/cw_modal'
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {
-  item: OffchainThread | Comment<any>;
+  item: Thread | Comment<any>;
 }
 
 const VersionHistoryModal: m.Component<IVersionHistoryAttrs, {}> = {
