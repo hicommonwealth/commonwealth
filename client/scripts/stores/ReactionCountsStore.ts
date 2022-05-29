@@ -3,7 +3,7 @@ import ReactionCount from 'models/ReactionCount';
 import {
   AbridgedThread,
   AnyProposal,
-  OffchainComment,
+  Comment,
   Reaction,
   OffchainThread,
   Proposal,
@@ -48,7 +48,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
   }
 
   public getByPost(
-    post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>
+    post: OffchainThread | AbridgedThread | AnyProposal | Comment<any>
   ): ReactionCount<any> {
     const identifier = this.getPostIdentifier(post);
     return this._storeRC[identifier] || null;
@@ -68,7 +68,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
       | OffchainThread
       | AbridgedThread
       | AnyProposal
-      | OffchainComment<any>
+      | Comment<any>
   ) {
     if (
       rxnOrPost instanceof OffchainThread ||
@@ -79,7 +79,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
       return `${(rxnOrPost as AnyProposal).slug}_${
         (rxnOrPost as AnyProposal).identifier
       }`;
-    } else if (rxnOrPost instanceof OffchainComment) {
+    } else if (rxnOrPost instanceof Comment) {
       return `comment-${rxnOrPost.id}`;
     }
   }

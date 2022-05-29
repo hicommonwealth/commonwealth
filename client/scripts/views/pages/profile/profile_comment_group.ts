@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import app from 'state';
 import { link } from 'helpers';
-import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
+import { OffchainThread, Comment, AddressInfo, Account } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 
 import User from 'views/components/widgets/user';
@@ -12,7 +12,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 
 interface IProfileCommentGroupAttrs {
   proposal: OffchainThread | any;
-  comments: Array<OffchainComment<any>>;
+  comments: Array<Comment<any>>;
   account: Account<any>;
 }
 

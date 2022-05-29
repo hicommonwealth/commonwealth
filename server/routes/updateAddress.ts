@@ -31,7 +31,7 @@ const updateAddress = async (models: DB, req: Request, res: Response, next: Next
 
       if (ghostAddressId && newAddressId) {
         // update address in comments
-        await models.OffchainComment.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
+        await models.Comment.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
 
         // update address in reactions
         await models.Reaction.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });

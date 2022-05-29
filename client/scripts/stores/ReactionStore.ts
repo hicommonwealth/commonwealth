@@ -3,7 +3,7 @@ import {
   Reaction,
   AnyProposal,
   OffchainThread,
-  OffchainComment,
+  Comment,
   Proposal,
   AbridgedThread
 } from '../models';
@@ -62,12 +62,12 @@ class ReactionStore extends IdStore<Reaction<any>> {
     return this;
   }
 
-  public getByPost(post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>): Array<Reaction<any>> {
+  public getByPost(post: OffchainThread | AbridgedThread | AnyProposal | Comment<any>): Array<Reaction<any>> {
     const identifier = this.getPostIdentifier(post);
     return this._storePost[identifier] || [];
   }
 
-  public getPostIdentifier(rxnOrPost: Reaction<any> | OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>) {
+  public getPostIdentifier(rxnOrPost: Reaction<any> | OffchainThread | AbridgedThread | AnyProposal | Comment<any>) {
     if (rxnOrPost instanceof Reaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;
       return threadId
@@ -79,7 +79,7 @@ class ReactionStore extends IdStore<Reaction<any>> {
       return `discussion-${rxnOrPost.id}`;
     } else if (rxnOrPost instanceof Proposal) {
       return `${(rxnOrPost as AnyProposal).slug}_${(rxnOrPost as AnyProposal).identifier}`;
-    } else if (rxnOrPost instanceof OffchainComment) {
+    } else if (rxnOrPost instanceof Comment) {
       return `comment-${rxnOrPost.id}`;
     }
   }

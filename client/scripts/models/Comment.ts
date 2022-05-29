@@ -3,7 +3,7 @@ import { VersionHistory } from '../controllers/server/threads';
 import { IUniqueId } from './interfaces';
 import Attachment from './Attachment';
 
-class OffchainComment<T extends IUniqueId> {
+class Comment<T extends IUniqueId> {
   [x: string]: any;
   public readonly chain: string;
   public readonly author: string;
@@ -54,4 +54,4 @@ class OffchainComment<T extends IUniqueId> {
   }
 }
 
-export default OffchainComment;
+export default Comment;

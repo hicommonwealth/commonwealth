@@ -52,7 +52,7 @@ export default async (
         if (!thread) return next(new Error(Errors.NoThread));
         obj = { offchain_thread_id: Number(p_id), chain_id: thread.chain };
       } else if (p_entity === 'comment') {
-        const comment = await models.OffchainComment.findOne({
+        const comment = await models.Comment.findOne({
           where: { id: Number(p_id) },
         });
         if (!comment) return next(new Error(Errors.NoComment));

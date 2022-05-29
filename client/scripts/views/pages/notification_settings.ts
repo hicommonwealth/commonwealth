@@ -175,8 +175,8 @@ const BatchedSubscriptionRow: m.Component<
         case NotificationCategories.NewComment: {
           const threadOrComment = subscription.OffchainThread
             ? decodeURIComponent(subscription.OffchainThread.title)
-            : subscription.OffchainComment
-            ? decodeURIComponent(subscription.OffchainComment.id)
+            : subscription.Comment
+            ? decodeURIComponent(subscription.Comment.id)
             : subscription.objectId;
 
           return subscription.OffchainThread
@@ -205,8 +205,8 @@ const BatchedSubscriptionRow: m.Component<
         case NotificationCategories.NewReaction: {
           const threadOrComment = subscription.OffchainThread
             ? decodeURIComponent(subscription.OffchainThread.title)
-            : subscription.OffchainComment
-            ? decodeURIComponent(subscription.OffchainComment.id)
+            : subscription.Comment
+            ? decodeURIComponent(subscription.Comment.id)
             : subscription.objectId;
           return subscription.OffchainThread
             ? [
@@ -244,8 +244,8 @@ const BatchedSubscriptionRow: m.Component<
 
       const threadOrComment = subscription.OffchainThread
         ? decodeURIComponent(subscription.OffchainThread.title)
-        : subscription.OffchainComment
-        ? decodeURIComponent(subscription.OffchainComment.id)
+        : subscription.Comment
+        ? decodeURIComponent(subscription.Comment.id)
         : subscription.objectId;
 
       return subscription.OffchainThread
@@ -273,7 +273,7 @@ const BatchedSubscriptionRow: m.Component<
       _.every(
         subscriptions,
         (s) =>
-          !s.OffchainComment &&
+          !s.Comment &&
           !s.OffchainThread &&
           (s.category === NotificationCategories.NewComment ||
             s.category === NotificationCategories.NewReaction)
@@ -783,7 +783,7 @@ const IndividualCommunityNotifications: m.Component<
         s.category !== NotificationCategories.NewMention &&
         s.category !== NotificationCategories.NewCollaboration &&
         s.category !== NotificationCategories.ChainEvent &&
-        !s.OffchainComment
+        !s.Comment
     );
     const newThreads = subscriptions.find(
       (s) =>
@@ -859,7 +859,7 @@ const AllCommunitiesNotifications: m.Component<
           s.category !== NotificationCategories.NewMention &&
           s.category !== NotificationCategories.NewThread &&
           s.category !== NotificationCategories.ChainEvent &&
-          !s.OffchainComment
+          !s.Comment
         );
       }),
       'objectId'

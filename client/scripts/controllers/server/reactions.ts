@@ -9,7 +9,7 @@ import { ReactionStore } from 'stores';
 import {
   Reaction,
   AnyProposal,
-  OffchainComment,
+  Comment,
   OffchainThread,
   Proposal,
   AbridgedThread,
@@ -36,7 +36,7 @@ class ReactionsController {
   }
 
   public getByPost(
-    post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>
+    post: OffchainThread | AbridgedThread | AnyProposal | Comment<any>
   ) {
     return this._store.getByPost(post);
   }
@@ -60,8 +60,8 @@ class ReactionsController {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier
       }`;
-    } else if (post instanceof OffchainComment) {
-      options['comment_id'] = (post as OffchainComment<any>).id;
+    } else if (post instanceof Comment) {
+      options['comment_id'] = (post as Comment<any>).id;
     }
     try {
       // TODO: Change to POST /reaction
@@ -85,8 +85,8 @@ class ReactionsController {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier
       }`;
-    } else if (post instanceof OffchainComment)
-      options['comment_id'] = (post as OffchainComment<any>).id;
+    } else if (post instanceof Comment)
+      options['comment_id'] = (post as Comment<any>).id;
 
     try {
       // TODO: Remove any verbs from these route names '/reactions'

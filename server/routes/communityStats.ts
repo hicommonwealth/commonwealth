@@ -44,7 +44,7 @@ ORDER BY seq.date DESC;`, {
   };
   const roles = await newObjectsQuery('"Roles"');
   const threads = await newObjectsQuery('"OffchainThreads"');
-  const comments = await newObjectsQuery('"OffchainComments"');
+  const comments = await newObjectsQuery('"Comments"');
 
   // get total number of roles, threads, and comments as of today
   const totalObjectsQuery = async (table) => {
@@ -57,7 +57,7 @@ ORDER BY seq.date DESC;`, {
   };
   const totalRoles = await totalObjectsQuery('"Roles"');
   const totalThreads = await totalObjectsQuery('"OffchainThreads"');
-  const totalComments = await totalObjectsQuery('"OffchainComments"');
+  const totalComments = await totalObjectsQuery('"Comments"');
 
   // get number of active accounts by day
   const activeAccounts = await models.sequelize.query(`
@@ -67,7 +67,7 @@ LEFT JOIN (
   SELECT address_id, created_at FROM "OffchainThreads" WHERE created_at > CURRENT_DATE - 14
     AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
   UNION
-  SELECT address_id, created_at FROM "OffchainComments" WHERE created_at > CURRENT_DATE - 14
+  SELECT address_id, created_at FROM "Comments" WHERE created_at > CURRENT_DATE - 14
     AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Reactions" WHERE created_at > CURRENT_DATE - 14

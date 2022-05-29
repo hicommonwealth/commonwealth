@@ -5,7 +5,7 @@ import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
+import { OffchainThread, Comment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'types';
 import { CommentParent } from 'controllers/server/comments';
 import EditProfileModal from 'views/modals/edit_profile_modal';
@@ -26,7 +26,7 @@ const CreateComment: m.Component<
     cancellable?: boolean;
     getSetGlobalEditingStatus: CallableFunction;
     proposalPageState: IProposalPageState;
-    parentComment?: OffchainComment<any>;
+    parentComment?: Comment<any>;
     rootProposal: AnyProposal | OffchainThread;
     tabindex?: number;
   },

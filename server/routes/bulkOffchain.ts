@@ -121,7 +121,7 @@ const bulkOffchain = async (
             chain: chain.id,
           };
 
-          const monthlyComments = await models.OffchainComment.findAll({
+          const monthlyComments = await models.Comment.findAll({
             where,
             include: [models.Address],
           });

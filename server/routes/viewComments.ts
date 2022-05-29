@@ -23,7 +23,7 @@ const viewComments = async (
     return next(new Error(Errors.NoRootId));
   }
 
-  const comments = await models.OffchainComment.findAll({
+  const comments = await models.Comment.findAll({
     where: { chain: chain.id, root_id: req.query.root_id },
     include: [
       models.Address,

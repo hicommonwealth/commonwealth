@@ -97,7 +97,7 @@ const createComment = async (
   let parentComment;
   if (parent_id) {
     // check that parent comment is in the same community
-    parentComment = await models.OffchainComment.findOne({
+    parentComment = await models.Comment.findOne({
       where: {
         id: parent_id,
         chain: chain.id,
@@ -108,7 +108,7 @@ const createComment = async (
     // Backend check to ensure comments are never nested more than three levels deep:
     // top-level, child, and grandchild
     if (parentComment.parent_id) {
-      const grandparentComment = await models.OffchainComment.findOne({
+      const grandparentComment = await models.Comment.findOne({
         where: {
           id: parentComment.parent_id,
           chain: chain.id,
@@ -162,7 +162,7 @@ const createComment = async (
 
   let comment;
   try {
-    comment = await models.OffchainComment.create(commentContent);
+    comment = await models.Comment.create(commentContent);
   } catch (err) {
     return next(err);
   }
@@ -197,7 +197,7 @@ const createComment = async (
 
   // fetch attached objects to return to user
   // TODO: we should be able to assemble the object without another query
-  const finalComment = await models.OffchainComment.findOne({
+  const finalComment = await models.Comment.findOne({
     where: { id: comment.id },
     include: [models.Address, models.Attachment],
   });
