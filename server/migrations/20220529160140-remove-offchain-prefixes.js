@@ -12,6 +12,7 @@ module.exports = {
       await queryInterface.renameTable('OffchainAttachments', 'Attachments', { transaction });
       await queryInterface.renameTable('OffchainComments', 'Comments', { transaction });
       await queryInterface.renameTable('OffchainThreads', 'Threads', { transaction });
+      await queryInterface.renameColumn('Collaborations', 'offchain_thread_id', 'thread_id', { transaction });
     });
   },
 
@@ -26,6 +27,8 @@ module.exports = {
       await queryInterface.renameTable('Attachments', 'OffchainAttachments', { transaction });
       await queryInterface.renameTable('Comments', 'OffchainComments', { transaction });
       await queryInterface.renameTable('Threads', 'OffchainThreads', { transaction });
+      await queryInterface.renameColumn('Collaborations', 'thread_id', 'offchain_thread_id', { transaction });
+
     });
   }
 };

@@ -47,7 +47,7 @@ const updateLinkedThreads = async (
     if (!isAuthor) {
       const collaboration = await models.Collaboration.findOne({
         where: {
-          offchain_thread_id: linking_thread_id,
+          thread_id: linking_thread_id,
           address_id: { [Op.in]: userOwnedAddressIds },
         },
       });

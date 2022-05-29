@@ -55,7 +55,7 @@ const deleteEditors = async (
       });
       const collaboration = await models.Collaboration.findOne({
         where: {
-          offchain_thread_id: thread.id,
+          thread_id: thread.id,
           address_id: address.id,
         },
       });
@@ -66,7 +66,7 @@ const deleteEditors = async (
   );
 
   const finalCollaborations = await models.Collaboration.findAll({
-    where: { offchain_thread_id: thread.id },
+    where: { thread_id: thread.id },
     include: [
       {
         model: models.Address,

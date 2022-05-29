@@ -80,7 +80,7 @@ const addEditors = async (
 
         await models.Collaboration.findOrCreate({
           where: {
-            offchain_thread_id: thread.id,
+            thread_id: thread.id,
             address_id: collaborator.id,
           },
         });
@@ -151,7 +151,7 @@ const addEditors = async (
     );
 
   const finalCollaborations = await models.Collaboration.findAll({
-    where: { offchain_thread_id: thread.id },
+    where: { thread_id: thread.id },
     include: [
       {
         model: models.Address,
