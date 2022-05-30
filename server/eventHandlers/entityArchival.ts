@@ -20,7 +20,7 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models,
-    private readonly _chain?: string,
+    private readonly _community?: string,
     private readonly _wss?: WebSocket.Server
   ) {
     super();
@@ -55,11 +55,11 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.community_id]));
 
     // if chain is stored in the event then that will override the class property
     // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
-    const chain = event.chain || this._chain;
+    const community_id = event.community_id || this._community;
     if (!dbEvent) {
       log.trace('no db event found!');
       return;
@@ -86,8 +86,8 @@ export default class extends IEventHandler {
         completed = true;
       }
       const params = author
-        ? { type: type.toString(), type_id, chain, author }
-        : { type: type.toString(), type_id, chain };
+        ? { type: type.toString(), type_id, community_id, author }
+        : { type: type.toString(), type_id, community_id };
       const [dbEntity, created] = await this._models.ChainEntity.findOrCreate({
         where: params,
         default: { completed },
@@ -125,7 +125,7 @@ export default class extends IEventHandler {
         where: {
           type: type.toString(),
           type_id,
-          chain,
+          community_id,
         },
       });
       if (!dbEntity) {

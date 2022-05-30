@@ -6,7 +6,6 @@ import {
   CWEvent,
   IChainEventKind,
   SubstrateTypes,
-  Erc20Types,
 } from '@commonwealth/chain-events';
 import Sequelize from 'sequelize';
 import { addPrefix, factory, formatFilename } from '../../shared/logging';
@@ -23,7 +22,7 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models,
-    private readonly _chain?: string,
+    private readonly _community_id?: string,
     private readonly _filterConfig: StorageFilterConfig = {}
   ) {
     super();
@@ -44,7 +43,7 @@ export default class extends IEventHandler {
   }
 
   private async _shouldSkip(event: CWEvent): Promise<boolean> {
-    const chain = event.chain || this._chain
+    const community_id = event.community_id || this._community_id
 
     if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return true;
     const addressesExist = async (addresses: string[]) => {
@@ -54,7 +53,7 @@ export default class extends IEventHandler {
             // TODO: we need to ensure the chain prefixes are correct here
             [Op.in]: addresses,
           },
-          chain,
+          community_id,
         },
       });
       return !!addressModels?.length;
@@ -77,8 +76,8 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
-    const chain = event.chain || this._chain;
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.community_id]));
+    const community_id = event.community_id || this._community_id;
 
     event = this.truncateEvent(event);
     const shouldSkip = await this._shouldSkip(event);
@@ -90,8 +89,8 @@ export default class extends IEventHandler {
     // locate event type and add event (and event type if needed) to database
     const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
       where: {
-        id: `${chain}-${event.data.kind.toString()}`,
-        chain,
+        id: `${community_id}-${event.data.kind.toString()}`,
+        community_id,
         event_network: event.network,
         event_name: event.data.kind.toString(),
       }

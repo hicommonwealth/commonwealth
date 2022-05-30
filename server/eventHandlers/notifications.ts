@@ -30,7 +30,7 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent, dbEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.community_id]));
 
     if (!dbEvent) {
       log.trace(`No db event received! Ignoring.`);
@@ -52,8 +52,8 @@ export default class extends IEventHandler {
         this._models,
         NotificationCategories.ChainEvent,
         dbEventType.id,
-        { chainEvent: dbEvent, chainEventType: dbEventType, chain_id: event.chain },
-        { chainEvent: dbEvent, chainEventType: dbEventType, chain: event.chain }, // TODO: add webhook data once specced out
+        { chainEvent: dbEvent, chainEventType: dbEventType, chain_id: event.community_id }, // TODO: @Jake @Zak @Tim should this be community_id, community, not chain_id?
+        { chainEvent: dbEvent, chainEventType: dbEventType, chain: event.community_id }, // TODO: add webhook data once specced out
         this._wss,
         event.excludeAddresses,
         event.includeAddresses

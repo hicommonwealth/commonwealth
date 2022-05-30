@@ -25,7 +25,7 @@ const createPoll = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
+  const [community, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -67,11 +67,11 @@ const createPoll = async (
     }
 
     // check if admin_only flag is set
-    if (thread.Chain?.admin_only_polling) {
+    if (thread.Community?.admin_only_polling) {
       const role = await models.Role.findOne({
         where: {
           address_id: thread.address_id,
-          chain_id: thread.Chain.id,
+          community_id: thread.Community.id,
         },
       });
       if (role?.permission !== 'admin' && !req.user.isAdmin) {
@@ -84,7 +84,7 @@ const createPoll = async (
 
     const finalPoll = await models.Poll.create({
       thread_id,
-      chain_id: chain.id,
+      community_id: community.id,
       prompt,
       options,
       ends_at,

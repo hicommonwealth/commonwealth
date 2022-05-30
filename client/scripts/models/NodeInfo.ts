@@ -1,8 +1,8 @@
-import ChainInfo from './ChainInfo';
+import CommunityInfo from './CommunityInfo';
 
 class NodeInfo {
   public readonly id: number;
-  public readonly chain: ChainInfo;
+  public readonly community: CommunityInfo;
   public readonly url: string;
   public readonly address?: string;
   public readonly tokenName?: string;
@@ -11,7 +11,7 @@ class NodeInfo {
 
   constructor({
     id,
-    chain,
+    community,
     url,
     address,
     token_name,
@@ -19,7 +19,7 @@ class NodeInfo {
     alt_wallet_url,
   }) {
     this.id = id;
-    this.chain = chain;
+    this.community = community;
     this.url = url;
     this.address = address;
     this.tokenName = token_name;
@@ -31,7 +31,7 @@ class NodeInfo {
   }
 
   public get topics() {
-    return this.chain.topics;
+    return this.community.topics;
   }
 }
 

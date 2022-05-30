@@ -47,7 +47,7 @@ const dispatchHooks = async (
       category_id: NotificationCategories.NewComment,
       object_id: `discussion_${finalThread.id}`,
       offchain_thread_id: finalThread.id,
-      chain_id: finalThread.chain,
+      community_id: finalThread.community_id,
       is_active: true,
     });
     await models.Subscription.create({
@@ -55,7 +55,7 @@ const dispatchHooks = async (
       category_id: NotificationCategories.NewReaction,
       object_id: `discussion_${finalThread.id}`,
       offchain_thread_id: finalThread.id,
-      chain_id: finalThread.chain,
+      community_id: finalThread.community_id,
       is_active: true,
     });
   } catch (err) {
@@ -64,7 +64,7 @@ const dispatchHooks = async (
 
   // auto-subscribe NewThread subscribers to NewComment as well
   // findOrCreate because redundant creation if author is also subscribed to NewThreads
-  const location = finalThread.chain;
+  const location = finalThread.community_id;
   try {
     await sequelize.query(
       `
@@ -73,10 +73,10 @@ const dispatchHooks = async (
       FROM "Subscriptions"
       WHERE subscriber_id IN (
         SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
-      ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND chain_id = ? AND is_active = true
+      ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND community_id = ? AND is_active = true
     )
-    INSERT INTO "Subscriptions"(subscriber_id, category_id, object_id, offchain_thread_id, chain_id, is_active, created_at, updated_at)
-    SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
+    INSERT INTO "Subscriptions"(subscriber_id, category_id, object_id, offchain_thread_id, community_id, is_active, created_at, updated_at)
+    SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as community_id, true as is_active, NOW() as created_at, NOW() as updated_at
     FROM "Subscriptions"
     WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
   `,
@@ -89,11 +89,11 @@ const dispatchHooks = async (
           NotificationCategories.NewComment,
           `discussion_${finalThread.id}`,
           finalThread.id,
-          finalThread.chain,
+          finalThread.community_id,
           NotificationCategories.NewComment,
           `discussion_${finalThread.id}`,
           finalThread.id,
-          finalThread.chain,
+          finalThread.community_id,
           NotificationCategories.NewThread,
           location,
         ],
@@ -114,7 +114,7 @@ const dispatchHooks = async (
           try {
             return models.Address.findOne({
               where: {
-                chain: mention[0] || null,
+                community_id: mention[0] || null,
                 address: mention[1] || null,
               },
               include: [models.User, models.Role],
@@ -145,17 +145,17 @@ const dispatchHooks = async (
       root_type: ProposalType.Thread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
-      chain_id: finalThread.chain,
+      community_id: finalThread.community_id,
       author_address: finalThread.Address.address,
-      author_chain: finalThread.Address.chain,
+      author_community: finalThread.Address.community_id,
     },
     {
       user: finalThread.Address.address,
-      author_chain: finalThread.Address.chain,
+      author_community: finalThread.Address.community_id,
       url: getProposalUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
-      chain: finalThread.chain,
+      community_id: finalThread.community_id,
       body: finalThread.body,
     },
     req.wss,
@@ -178,16 +178,16 @@ const dispatchHooks = async (
           root_type: ProposalType.Thread,
           root_title: finalThread.title,
           comment_text: finalThread.body,
-          chain_id: finalThread.chain,
+          community_id: finalThread.community_id,
           author_address: finalThread.Address.address,
-          author_chain: finalThread.Address.chain,
+          author_community: finalThread.Address.community_id,
         },
         {
           user: finalThread.Address.address,
           url: getProposalUrl('discussion', finalThread),
           title: req.body.title,
           bodyUrl: req.body.url,
-          chain: finalThread.chain,
+          community_id: finalThread.community_id,
           body: finalThread.body,
         },
         req.wss,
@@ -203,7 +203,7 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
+  const [community, error] = await validateChain(models, req.body);
 
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -269,7 +269,7 @@ const createThread = async (
   const version_history: string[] = [JSON.stringify(firstVersion)];
 
   const threadContent = {
-    chain: chain.id,
+    community_id: community.id,
     address_id: author.id,
     title,
     body,
@@ -292,7 +292,7 @@ const createThread = async (
         [offchainTopic] = await models.Topic.findOrCreate({
           where: {
             name: topic_name,
-            chain_id: chain?.id || null,
+            community_id: community?.id || null,
           },
           transaction,
         });
@@ -302,19 +302,19 @@ const createThread = async (
         return next(err);
       }
     } else {
-      if (chain.topics?.length) {
+      if (community.topics?.length) {
         return next(
           Error('Must pass a topic_name string and/or a numeric topic_id')
         );
       }
     }
 
-    if (chain && chain.type === ChainType.Token) {
+    if (community && community.type === ChainType.Token) {
       // skip check for admins
       const isAdmin = await models.Role.findAll({
         where: {
           address_id: author.id,
-          chain_id: chain.id,
+          community_id: community.id,
           permission: ['admin'],
         },
         transaction,
@@ -373,7 +373,7 @@ const createThread = async (
     // initialize view count
     await models.ViewCount.create(
       {
-        chain: thread.chain,
+        community_id: thread.community_id,
         object_id: thread.id,
         view_count: 0,
       },
@@ -410,7 +410,7 @@ const createThread = async (
   if (process.env.NODE_ENV !== 'test') {
     mixpanelTrack({
       event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
-      community: chain.id,
+      community: community.id,
       isCustomDomain: null,
     });
   }

@@ -14,18 +14,18 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models,
-    private readonly _chain?: string,
+    private readonly _community_id?: string,
   ) {
     super();
   }
 
-  private async syncAddressFlags(flag: string, newList: string[], chain?: string) {
-    const newChain = chain || this._chain
+  private async syncAddressFlags(flag: string, newList: string[], community_id?: string) {
+    const newCommunity = community_id || this._community_id
 
     // clear existing flags
     const oldInstances = await this._models.Address.findAll({
       where: {
-        chain: newChain,
+        community_id: newCommunity,
         [flag]: true,
       }
     });
@@ -37,7 +37,7 @@ export default class extends IEventHandler {
     // add new councillor flags
     const newInstances = await this._models.Address.findAll({
       where: {
-        chain: newChain,
+        community_id: newCommunity,
         address: {
           [Op.in]: newList,
         }
@@ -51,7 +51,7 @@ export default class extends IEventHandler {
   }
 
   public async forceSync(councillors?: string[], validators?: string[], chain?: string) {
-    const newChain = chain || this._chain
+    const newChain = chain || this._community_id
 
     if (councillors instanceof Array) {
       await this.syncAddressFlags('is_councillor', councillors, newChain);
@@ -62,7 +62,7 @@ export default class extends IEventHandler {
   }
 
   public async handle(event: CWEvent, dbEvent) {
-    const chain = event.chain || this._chain
+    const chain = event.community_id || this._community_id
 
     // handle new councillors
     if (event.data.kind === SubstrateTypes.EventKind.ElectionNewTerm

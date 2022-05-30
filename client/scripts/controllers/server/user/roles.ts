@@ -7,6 +7,7 @@ import {
   Account,
   RolePermission,
   ChainInfo,
+  CommunityInfo,
 } from 'models';
 import Base from './base';
 
@@ -215,20 +216,19 @@ export default class extends Base {
    */
   public isMember(options: {
     account: AddressInfo | Account<any> | undefined,
-    chain?: string,
     community?: string
   }): boolean {
     const addressinfo: AddressInfo | undefined = (options.account instanceof Account)
       ? this.addresses.find((a) => (
         options.account.address === a.address
-          && (options.account.chain as ChainInfo).id === a.chain
+          && (options.account.community as CommunityInfo).id === a.community
       ))
       : options.account;
     const roles = this.roles.filter((role) => addressinfo
       ? role.address_id === addressinfo.id
       : true);
-    if (options.chain) {
-      return roles.map((r) => r.chain_id).indexOf(options.chain) !== -1;
+    if (options.community) {
+      return roles.map((r) => r.community_id).indexOf(options.community) !== -1;
     } else {
       return false;
     }

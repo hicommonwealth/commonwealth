@@ -20,9 +20,9 @@ export default class WebWalletController {
 
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
     // handle case like injective, axie, where we require a specific wallet
-    const specificChain = app.chain?.meta?.chain?.id;
-    if (app.chain?.meta?.chain?.id) {
-      const specificWallet = this._wallets.find((w) => w.specificChains?.includes(specificChain));
+    const specificCommunities = app.chain?.meta?.community?.id;
+    if (app.chain?.meta?.community?.id) {
+      const specificWallet = this._wallets.find((w) => w.specificChains?.includes(specificCommunities));
       if (specificWallet) return [ specificWallet ];
     }
 
@@ -47,7 +47,7 @@ export default class WebWalletController {
     try {
       await $.post(`${app.serverUrl()}/setAddressWallet`, {
         address: account.address,
-        author_chain: account.chain.id,
+        author_community: account.community.id,
         wallet_id: wallet,
         jwt: app.user.jwt
       });

@@ -3,13 +3,13 @@ import app, { IApp } from 'state';
 import { Coin } from 'adapters/currency';
 import { ChainBase, ChainType, WalletId } from 'types';
 
-import ChainInfo from './ChainInfo';
+import CommunityInfo from './CommunityInfo';
 import Profile from './Profile';
 
 abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
   public readonly address: string;
-  public readonly chain: ChainInfo;
+  public readonly community: CommunityInfo;
   public readonly chainBase: ChainBase;
   public readonly ghost_address: ChainBase;
   public get freeBalance() { return this.balance; }
@@ -29,14 +29,14 @@ abstract class Account<C extends Coin> {
 
   public app: IApp;
 
-  constructor(_app: IApp, chain: ChainInfo, address: string, encoding?: number) {
+  constructor(_app: IApp, community: CommunityInfo, address: string, encoding?: number) {
     // Check if the account is being initialized from an offchain Community
     // Because there won't be any chain base or chain class
     this.app = _app;
-    this.chain = chain;
+    this.community = community;
     this.chainBase = (_app.chain) ? _app.chain.base : null;
     this.address = address;
-    this._profile = _app.profiles.getProfile(chain.id, address);
+    this._profile = _app.profiles.getProfile(community.id, address);
     this._encoding = encoding;
   }
 
@@ -72,8 +72,8 @@ abstract class Account<C extends Coin> {
 
     const params : any = {
       address: this.address,
-      chain: this.chain.id,
-      isToken: this.chain.type === ChainType.Token,
+      community: this.community.id,
+      isToken: this.community.type === ChainType.Token,
       jwt: this.app.user.jwt,
       signature,
       wallet_id: this.walletId,
@@ -81,8 +81,8 @@ abstract class Account<C extends Coin> {
     const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {
       // update ghost address for discourse users
-      const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, chain }) => (
-          ghostAddress && this.chain.id === chain &&
+      const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, community }) => (
+          ghostAddress && this.community.id === community &&
           app.user.activeAccounts.some((account) => account.address === address)
       ))
       if (hasGhostAddress) {

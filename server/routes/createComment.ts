@@ -50,19 +50,19 @@ const createComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
+  const [community, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
   const { parent_id, root_id, text } = req.body;
 
-  if (chain && chain.type === ChainType.Token) {
+  if (community && community.type === ChainType.Token) {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
       where: {
         address_id: author.id,
-        chain_id: chain.id,
+        community_id: community.id,
         permission: ['admin'],
       },
     });
@@ -100,7 +100,7 @@ const createComment = async (
     parentComment = await models.Comment.findOne({
       where: {
         id: parent_id,
-        chain: chain.id,
+        community_id: community.id,
       },
     });
     if (!parentComment) return next(new Error(Errors.InvalidParent));
@@ -111,7 +111,7 @@ const createComment = async (
       const grandparentComment = await models.Comment.findOne({
         where: {
           id: parentComment.parent_id,
-          chain: chain.id,
+          community_id: community.id,
         },
       });
       if (grandparentComment?.parent_id) {
@@ -155,7 +155,7 @@ const createComment = async (
     plaintext,
     version_history,
     address_id: author.id,
-    chain: chain.id,
+    community_: community.id,
     parent_id: null,
   };
   if (parent_id) Object.assign(commentContent, { parent_id });
@@ -221,7 +221,7 @@ const createComment = async (
     // TODO: better check for on-chain proposal types
     const chainEntity = await proposalIdToEntity(
       models,
-      chain.id,
+      community.id,
       finalComment.root_id
     );
     if (!chainEntity) {
@@ -230,18 +230,18 @@ const createComment = async (
         to: 'founders@commonwealth.im',
         from: 'Commonwealth <no-reply@commonwealth.im>',
         subject: 'Missing ChainEntity',
-        text: `Comment created on a missing ChainEntity ${finalComment.root_id} on ${chain.id}`,
+        text: `Comment created on a missing ChainEntity ${finalComment.root_id} on ${community.id}`,
       };
       sgMail
         .send(msg)
         .then((result) => {
           log.error(
-            `Sent notification: missing ChainEntity ${finalComment.root_id} on ${chain.id}`
+            `Sent notification: missing ChainEntity ${finalComment.root_id} on ${community.id}`
           );
         })
         .catch((e) => {
           log.error(
-            `Could not send notification: missing chainEntity ${finalComment.root_id} on ${chain.id}`
+            `Could not send notification: missing chainEntity ${finalComment.root_id} on ${community.id}`
           );
         });
       // await finalComment.destroy();
@@ -268,7 +268,7 @@ const createComment = async (
     typeof proposal === 'string'
       ? getProposalUrlWithoutObject(
           prefix,
-          finalComment.chain,
+          finalComment.community,
           proposal,
           finalComment
         )
@@ -280,7 +280,7 @@ const createComment = async (
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewReaction,
     object_id: `comment-${finalComment.id}`,
-    chain_id: finalComment.chain || null,
+    community_id: finalComment.community || null,
     offchain_comment_id: finalComment.id,
     is_active: true,
   });
@@ -289,7 +289,7 @@ const createComment = async (
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewComment,
     object_id: `comment-${finalComment.id}`,
-    chain_id: finalComment.chain || null,
+    community_id: finalComment.community || null,
     offchain_comment_id: finalComment.id,
     is_active: true,
   });
@@ -304,7 +304,7 @@ const createComment = async (
         mentions.map(async (mention) => {
           const user = await models.Address.findOne({
             where: {
-              chain: mention[0] || null,
+              community_id: mention[0] || null,
               address: mention[1],
             },
             include: [models.User, models.Role],
@@ -333,16 +333,16 @@ const createComment = async (
       root_type: prefix,
       comment_id: +finalComment.id,
       comment_text: finalComment.text,
-      chain_id: finalComment.chain,
+      community_id: finalComment.community_id,
       author_address: finalComment.Address.address,
-      author_chain: finalComment.Address.chain,
+      author_community: finalComment.Address.community_id,
     },
     {
       user: finalComment.Address.address,
-      author_chain: finalComment.Address.chain,
+      author_community: finalComment.Address.community_id,
       url: cwUrl,
       title: root_title,
-      chain: finalComment.chain,
+      community_id: finalComment.community_id,
       body: finalComment.text,
     },
     req.wss,
@@ -364,16 +364,16 @@ const createComment = async (
         comment_text: finalComment.text,
         parent_comment_id: +parent_id,
         parent_comment_text: parentComment.text,
-        chain_id: finalComment.chain,
+        community_id: finalComment.community_id,
         author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+        author_community: finalComment.Address.community_id,
       },
       {
         user: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+        author_community: finalComment.Address.community_id,
         url: cwUrl,
         title: proposal.title || '',
-        chain: finalComment.chain,
+        community_id: finalComment.community_id,
         body: finalComment.text,
       },
       req.wss,
@@ -400,16 +400,16 @@ const createComment = async (
               root_type: prefix,
               comment_id: +finalComment.id,
               comment_text: finalComment.text,
-              chain_id: finalComment.chain,
+              community_id: finalComment.community_id,
               author_address: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
+              author_community: finalComment.Address.community_id,
             },
             {
               user: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
+              author_community: finalComment.Address.community_id,
               url: cwUrl,
               title: proposal.title || '',
-              chain: finalComment.chain,
+              community_id: finalComment.community_id,
               body: finalComment.text,
             }, // TODO: add webhook data for mentions
             req.wss,
@@ -432,7 +432,7 @@ const createComment = async (
   if (process.env.NODE_ENV !== 'test') {
     mixpanelTrack({
       event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-      community: chain.id,
+      community: community.id,
       isCustomDomain: null,
     });
   }

@@ -20,7 +20,7 @@ export const Errors = {
 };
 
 const createInvite = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, error] = await validateChain(models, req.body);
+  const [community, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.invitedAddress && !req.body.invitedEmail) {
@@ -41,7 +41,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
 
   const requesterIsAdminOrMod = await models.Role.findAll({
     where: {
-      chain_id: chain.id,
+      community_id: community.id,
       address_id: address.id,
       permission: ['admin', 'moderator']
     },
@@ -58,13 +58,13 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
     if (!existingAddress) return next(new Error(Errors.AddressNotFound));
     const existingRole = await models.Role.findOne({
       where: {
-        chain_id: chain.id,
+        community_id: community.id,
         address_id: existingAddress.id,
       },
     });
     if (existingRole) return next(new Error(Errors.IsAlreadyMember));
     const role = await models.Role.create({
-      chain_id: chain.id,
+      community_id: community.id,
       address_id: existingAddress.id,
       permission: 'member',
     });
@@ -84,7 +84,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
     },
   });
 
-  const inviteChain = { chain_id: chain.id, community_name: chain.name }
+  const inviteChain = { community_id: community.id, community_name: community.name }
 
   const previousInvite = await models.InviteCode.findOne({
     where: {
@@ -108,10 +108,10 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
 
   // create and email the link
   const joinOrLogIn = user ? 'Log in' : 'Sign up';
-  const chainRoute = `/${chain.id}`
+  const communityRoute = `/${community.id}`
   // todo: inviteComm param may only be necesssary if no communityRoute present
-  const params = `?triggerInvite=t&inviteComm=${chain.id}&inviteEmail=${invitedEmail}`;
-  const signupLink = `${SERVER_URL}${chainRoute}${params}`;
+  const params = `?triggerInvite=t&inviteComm=${community.id}&inviteEmail=${invitedEmail}`;
+  const signupLink = `${SERVER_URL}${communityRoute}${params}`;
 
   const msg = {
     to: invitedEmail,

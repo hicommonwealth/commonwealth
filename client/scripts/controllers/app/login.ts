@@ -11,7 +11,7 @@ import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
 import { ChainBase, WalletId } from 'types';
 import {
-  ChainInfo,
+  CommunityInfo,
   SocialAccount,
   Account,
   AddressInfo,
@@ -74,7 +74,7 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   try {
     const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
-      author_chain: account.chain.id,
+      author_community: account.chain.id,
       chain,
       jwt: app.user.jwt,
       auth: true,
@@ -102,7 +102,7 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
 }
 
 export async function updateLastVisited(
-  activeEntity: ChainInfo,
+  activeEntity: CommunityInfo,
   updateFrontend?: boolean
 ) {
   if (!app.isLoggedIn()) return;
@@ -123,19 +123,19 @@ export async function updateLastVisited(
   }
 }
 
-export async function updateActiveAddresses(chain?: ChainInfo) {
+export async function updateActiveAddresses(community?: CommunityInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
     app.user.addresses
-      .filter((a) => a.chain === chain.id)
+      .filter((a) => a.community_id === community.id)
       .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
       .filter((addr) => addr)
   );
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.user.isMember({ chain: chain.id, account });
+    return app.user.isMember({ community: community.id, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -145,13 +145,13 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
     // no addresses - preview the community
   } else {
     const existingAddress = app.user.getDefaultAddressInCommunity({
-      chain: chain.id,
+      community: community.id,
     });
 
     if (existingAddress) {
       const account = app.user.activeAccounts.find((a) => {
         return (
-          a.chain.id === existingAddress.chain &&
+          a.community.id === existingAddress.community_id &&
           a.address === existingAddress.address
         );
       });
@@ -282,8 +282,8 @@ export async function loginWithMagicLink(email: string) {
     await initAppState(false);
     if (app.chain) {
       const c = app.user.selectedNode
-        ? app.user.selectedNode.chain
-        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+        ? app.user.selectedNode.community
+        : app.config.nodes.getByChain(app.activeChainId())[0].community;
       await updateActiveAddresses(c);
     }
   } else {

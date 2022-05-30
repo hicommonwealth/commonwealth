@@ -11,7 +11,7 @@ import { addPrefix, factory } from '../../shared/logging';
 export default class extends IEventHandler {
   public readonly name = 'Identity';
 
-  constructor(private readonly _models, private readonly _chain?: string) {
+  constructor(private readonly _models, private readonly _community_id?: string) {
     super();
   }
 
@@ -21,9 +21,9 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.community_id]));
 
-    const chain = event.chain || this._chain;
+    const community_id = event.community_id || this._community_id;
 
     // do nothing if wrong type of event
     if (
@@ -45,7 +45,7 @@ export default class extends IEventHandler {
             where: {
               // TODO: do we need to modify address case?
               address: who,
-              chain,
+              community_id,
             },
             required: true,
           },

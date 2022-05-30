@@ -62,7 +62,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     parent_comment_text,
     community_id,
     author_address,
-    author_chain,
+    author_community,
   } = data;
 
   const community_name =
@@ -79,7 +79,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   }
 
   const actorName = m(User, {
-    user: new AddressInfo(null, author_address, author_chain, null),
+    user: new AddressInfo(null, author_address, author_community, null),
     hideAvatar: true,
     hideIdentityIcon: true,
   });
@@ -142,7 +142,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     : () => jumpHighlightComment('parent');
 
   return {
-    authorInfo: [[author_chain, author_address]],
+    authorInfo: [[author_community, author_address]],
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
@@ -170,11 +170,11 @@ const getBatchNotificationFields = (
     parent_comment_text,
     community_id,
     author_address,
-    author_chain,
+    author_community,
   } = data[0];
 
   const authorInfo = _.uniq(
-    data.map((d) => `${d.author_chain}#${d.author_address}`)
+    data.map((d) => `${d.author_community}#${d.author_address}`)
   ).map((u) => u.split('#'));
   const length = authorInfo.length - 1;
   const community_name =
@@ -191,7 +191,7 @@ const getBatchNotificationFields = (
   }
 
   const actorName = m(User, {
-    user: new AddressInfo(null, author_address, author_chain, null),
+    user: new AddressInfo(null, author_address, author_community, null),
     hideAvatar: true,
     hideIdentityIcon: true,
   });

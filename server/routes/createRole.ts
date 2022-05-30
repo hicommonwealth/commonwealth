@@ -17,7 +17,7 @@ const createRole = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
+  const [community, error] = await validateChain(models, req.body);
 
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
@@ -34,15 +34,15 @@ const createRole = async (
 
   const [ role ] = await models.Role.findOrCreate({ where: {
     address_id: validAddress.id,
-    chain_id: chain.id,
+    community_id: community.id,
   }});
 
   const [ subscription ] = await models.Subscription.findOrCreate({
     where: {
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewThread,
-      chain_id: chain.id,
-      object_id: chain.id,
+      community_id: community.id,
+      object_id: community.id,
       is_active: true,
     }
   });
