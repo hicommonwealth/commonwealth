@@ -1400,7 +1400,7 @@ const ViewProposalPage: m.Component<
               }),
             proposal instanceof OffchainThread &&
               isAuthor &&
-              (!app.chain?.meta?.chain?.adminOnlyPolling || isAdmin) &&
+              (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
               m(PollEditorCard, {
                 proposal,
                 proposalAlreadyHasPolling: !vnode.state.polls?.length,
