@@ -1,6 +1,5 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { DataTypes } from 'sequelize';
-import { ChainInstance, ChainAttributes } from './chain';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainNodeAttributes = {
@@ -9,14 +8,10 @@ export type ChainNodeAttributes = {
   eth_chain_id?: number;
   alt_wallet_url?: string;
   private_url?: string;
-
-  // associations
-  Chains?: ChainAttributes[];
 }
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
   // TODO: add mixins as needed
-  getChains: Sequelize.HasManyGetAssociationsMixin<ChainInstance>;
 }
 
 export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
