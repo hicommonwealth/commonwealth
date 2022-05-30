@@ -9,13 +9,18 @@ import { SubscriptionButton } from 'views/components/subscription_button';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
 import { ExternalLinksModule } from './external_links_module';
+import { ChatSection } from '../chat/chat_section';
 
 export class Sidebar implements m.ClassComponent {
   view() {
+
     return app.chain ? (
       <div class="Sidebar">
         <DiscussionSection />
         <GovernanceSection />
+        {app.socket && (
+          <ChatSection />
+        )}
         <ExternalLinksModule />
         <div class="buttons-container">
           {app.isLoggedIn() && app.chain && (

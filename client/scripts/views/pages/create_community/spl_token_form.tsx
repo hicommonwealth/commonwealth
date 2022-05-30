@@ -18,6 +18,11 @@ import {
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityCreationPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 type SplTokenFormFields = {
   cluster: solw3.Cluster;
@@ -99,7 +104,6 @@ export class SplTokenForm implements m.ClassComponent {
         />
         <CWButton
           label="Check address"
-          buttonType="primary"
           disabled={this.state.saving || this.state.loading}
           onclick={async () => {
             await updateTokenForum();
@@ -136,11 +140,16 @@ export class SplTokenForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving || !this.state.loaded}
           onclick={async () => {
             const { cluster, iconUrl, mint } = this.state.form;
             this.state.saving = true;
+            mixpanelBrowserTrack({
+              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+              chainBase: null,
+              isCustomDomain: app.isCustomDomain(),
+              communityType: null,
+            });
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 address: mint,

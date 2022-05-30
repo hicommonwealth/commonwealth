@@ -3,8 +3,6 @@ import 'pages/new_thread.scss';
 
 import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
-import mixpanel from 'mixpanel-browser';
-
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { notifyInfo } from 'controllers/app/notifications';
@@ -13,9 +11,7 @@ import { PageLoading } from 'views/pages/loading';
 import { NewThreadForm } from '../components/new_thread_form';
 
 const NewThreadPage: m.Component<{}> = {
-  oncreate: (vnode: VnodeDOM) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'NewThreadPage' });
-  },
+  oncreate: (vnode: VnodeDOM) => {},
   view: (vnode: VnodeDOM) => {
     if (!app.isLoggedIn()) {
       notifyInfo('You need to log in first');

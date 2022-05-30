@@ -1,11 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
-import { redirectWithLoginSuccess, redirectWithLoginError } from './finishEmailLogin';
+import {
+  redirectWithLoginSuccess,
+  redirectWithLoginError,
+} from './finishEmailLogin';
 import { DB } from '../database';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import {
+  MixpanelLoginEvent,
+  MixpanelLoginPayload,
+} from '../../shared/analytics/types';
 
 const log = factory.getLogger(formatFilename(__filename));
-const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const finishOAuthLogin = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const token = req.query.token;
   if (!token) {
     return redirectWithLoginError(res, 'Missing token');
@@ -17,7 +30,9 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: N
   }
 
   // Validate login token
-  const tokenObj = await models.LoginToken.findOne({ where: { token, email: '' } });
+  const tokenObj = await models.LoginToken.findOne({
+    where: { token, email: '' },
+  });
   if (!tokenObj || !tokenObj.social_account) {
     return redirectWithLoginError(res, 'Invalid token');
   }
@@ -30,7 +45,9 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: N
   // to the correct domain
   const hostname = req.headers['x-forwarded-host'] || req.hostname;
   if (tokenObj.domain !== hostname) {
-    return res.redirect(`https://${tokenObj.domain}/api/finishOAuthLogin?token=${token}`);
+    return res.redirect(
+      `https://${tokenObj.domain}/api/finishOAuthLogin?token=${token}`
+    );
   }
 
   // Mark LoginToken as used
@@ -39,16 +56,29 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: N
 
   // Log in the user associated with the verified email,
   // or create a new user if none exists
-  const socialAccount = await models.SocialAccount.findOne({ where: { id: tokenObj.social_account } });
-  const existingUser = await socialAccount.getUser({ scope: 'withPrivateData' });
+  const socialAccount = await models.SocialAccount.findOne({
+    where: { id: tokenObj.social_account },
+  });
+  const existingUser = await socialAccount.getUser({
+    scope: 'withPrivateData',
+  });
 
   if (existingUser) {
     req.login(existingUser, async (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with OAuth user');
+      if (err)
+        return redirectWithLoginError(res, 'Could not log in with OAuth user');
+      if (process.env.NODE_ENV !== 'test') {
+        mixpanelTrack({
+          event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
+        });
+      }
       return res.redirect('/?loggedin=true&confirmation=success');
     });
   } else {
-    const newUser = await models.User.createWithProfile(models, { email: null });
+    const newUser = await models.User.createWithProfile(models, {
+      email: null,
+    });
 
     // Automatically create subscription to their own mentions
     await models.Subscription.create({
@@ -67,7 +97,14 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response, next: N
     });
 
     req.login(newUser, (err) => {
-      if (err) return redirectWithLoginError(res, 'Could not log in with OAuth user');
+      if (err)
+        return redirectWithLoginError(res, 'Could not log in with OAuth user');
+      if (process.env.NODE_ENV !== 'test') {
+        mixpanelTrack({
+          event: MixpanelLoginEvent.LOGIN,
+          isCustomDomain: null,
+        });
+      }
       return res.redirect('/?loggedin=true&confirmation=success');
     });
   }

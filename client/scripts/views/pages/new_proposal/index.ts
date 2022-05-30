@@ -1,7 +1,6 @@
 import 'pages/new_proposal_page.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 
@@ -91,19 +90,6 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
                 proposal &&
                 vnode.state.typeEnum !== ProposalType.PhragmenCandidacy
               ) {
-                mixpanel.track('Create Thread', {
-                  'Step No': 3,
-                  Step: 'Transaction Signed',
-                  'Thread Type': 'Proposal',
-                  ProposalID:
-                    typeof proposal === 'object' ? proposal.slug : proposal,
-                  Scope: app.activeChainId(),
-                  user: app.user.activeAccount.address,
-                });
-                mixpanel.people.increment('Thread');
-                mixpanel.people.set({
-                  'Last Thread Created': new Date().toISOString(),
-                });
               }
             },
           }),

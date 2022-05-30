@@ -27,6 +27,11 @@ import {
   EthFormFields,
 } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelCommunityCreationPayload,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 type CreateERC721Form = ChainFormFields & EthFormFields;
 
@@ -140,7 +145,6 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
         {...ethChainRows(vnode.attrs, this.state.form)}
         <CWButton
           label="Populate fields"
-          buttonType="primary"
           disabled={
             this.state.saving ||
             !validAddress ||
@@ -174,12 +178,18 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
         {...defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
             const { altWalletUrl, chainString, ethChainId, nodeUrl } =
               this.state.form;
             this.state.saving = true;
+            mixpanelBrowserTrack({
+              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+              chainBase: null,
+              isCustomDomain: app.isCustomDomain(),
+              communityType: null,
+            });
+
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 alt_wallet_url: altWalletUrl,
@@ -196,7 +206,8 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || 'Creating new ERC721 community failed'
+                err.responseJSON?.error ||
+                  'Creating new ERC721 community failed'
               );
             } finally {
               this.state.saving = false;

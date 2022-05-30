@@ -2,7 +2,6 @@ import 'modals/link_new_address_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import mixpanel from 'mixpanel-browser';
 
 import { Button, Input, TextArea, Spinner } from 'construct-ui';
 
@@ -160,7 +159,7 @@ const LinkAccountItem: m.Component<
               address,
               webWallet.name,
               undefined,
-              targetCommunity,
+              targetCommunity
             );
             vnode.state.linking = true;
             m.redraw();
@@ -310,7 +309,7 @@ const LinkNewAddressModal: m.Component<
               account.addressId,
               account.address,
               account.chain.id,
-              account.walletId,
+              account.walletId
             );
             app.user.addresses.push(addressInfo);
           }
@@ -355,16 +354,7 @@ const LinkNewAddressModal: m.Component<
         vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
         vnode.state.error = null;
         m.redraw();
-        mixpanel.track('Account Creation', {
-          'Step No': 2,
-          Step: 'Add Address',
-          Option: 'Wallet',
-          Scope: app.activeChainId(),
-        });
-        mixpanel.people.increment('Addresses');
-        mixpanel.people.set({
-          'Last Address Created': new Date().toISOString(),
-        });
+
         $('.LinkNewAddressModal').trigger('modalforceexit');
         if (vnode.attrs.successCallback) vnode.attrs.successCallback();
         m.redraw();
@@ -449,34 +439,35 @@ const LinkNewAddressModal: m.Component<
       m.redraw();
     };
     return m('.LinkNewAddressModal', [
-      vnode.state.step === LinkNewAddressSteps.Step1VerifyWithWebWallet ? m('.link-address-step', [
-        linkAddressHeader,
-        m('.link-address-step-narrow', [
-          webWallet?.accounts?.length === 0 &&
-            app.chain.base !== ChainBase.NEAR &&
-            app.chain.network !== ChainNetwork.AxieInfinity &&
-            m(Button, {
-              class: 'account-adder',
-              intent: 'primary',
-              rounded: true,
-              disabled: !webWallet?.available // disable if unavailable
-                || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
-              oncreate: async (vvnode) => {
-                // avoid oninit because it may be called multiple times
-                await initWebWallet();
-              },
-              onclick: async (vvnode) => {
-                await initWebWallet();
-              },
-              label:
-                !webWallet?.available
-                  ? 'No wallet detected'
-                  : (vnode.state.initializingWallet !== false &&
-                    app.chain.networkStatus !== ApiStatus.Disconnected)
-                  ? [
-                      m(Spinner, { size: 'xs', active: true }),
-                      ' Connecting to chain...'
-                    ]
+      vnode.state.step === LinkNewAddressSteps.Step1VerifyWithWebWallet
+        ? m('.link-address-step', [
+            linkAddressHeader,
+            m('.link-address-step-narrow', [
+              webWallet?.accounts?.length === 0 &&
+                app.chain.base !== ChainBase.NEAR &&
+                app.chain.network !== ChainNetwork.AxieInfinity &&
+                m(Button, {
+                  class: 'account-adder',
+                  intent: 'primary',
+                  rounded: true,
+                  disabled:
+                    !webWallet?.available || // disable if unavailable
+                    vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
+                  oncreate: async (vvnode) => {
+                    // avoid oninit because it may be called multiple times
+                    await initWebWallet();
+                  },
+                  onclick: async (vvnode) => {
+                    await initWebWallet();
+                  },
+                  label: !webWallet?.available
+                    ? 'No wallet detected'
+                    : vnode.state.initializingWallet !== false &&
+                      app.chain.networkStatus !== ApiStatus.Disconnected
+                    ? [
+                        m(Spinner, { size: 'xs', active: true }),
+                        ' Connecting to chain...',
+                      ]
                     : app.chain.networkStatus === ApiStatus.Disconnected
                     ? [
                         m(Spinner, { size: 'xs', active: true }),
@@ -567,32 +558,36 @@ const LinkNewAddressModal: m.Component<
                         label: 'Continue to NEAR wallet',
                       }),
                     ]
-                : app.chain.network === ChainNetwork.AxieInfinity
+                  : app.chain.network === ChainNetwork.AxieInfinity
                   ? [
                       m(Button, {
-                          intent: 'primary',
-                          rounded: true,
-                          onclick: async (e) => {
-                            // get a state id from the server
-                            const result = await $.post(
-                              `${app.serverUrl()}/auth/sso`,
-                              { issuer: 'AxieInfinity' },
-                            );
-                            if (result.status === 'Success' && result.result.stateId) {
-                              const stateId = result.result.stateId;
+                        intent: 'primary',
+                        rounded: true,
+                        onclick: async (e) => {
+                          // get a state id from the server
+                          const result = await $.post(
+                            `${app.serverUrl()}/auth/sso`,
+                            { issuer: 'AxieInfinity' }
+                          );
+                          if (
+                            result.status === 'Success' &&
+                            result.result.stateId
+                          ) {
+                            const stateId = result.result.stateId;
 
-                              // redirect to axie page for login
-                              window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
-                            } else {
-                              vnode.state.error(result.error || 'Could not login');
-                            }
-                          },
-                          label: 'Continue to Ronin wallet'
-                        }
-                      )
+                            // redirect to axie page for login
+                            window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+                          } else {
+                            vnode.state.error(
+                              result.error || 'Could not login'
+                            );
+                          }
+                        },
+                        label: 'Continue to Ronin wallet',
+                      }),
                     ]
-                : app.chain.networkStatus !== ApiStatus.Connected &&
-                  app.chain.base === ChainBase.Substrate
+                  : app.chain.networkStatus !== ApiStatus.Connected &&
+                    app.chain.base === ChainBase.Substrate
                   ? []
                   : [
                       webWallet?.accounts.map((addressOrAccount) =>

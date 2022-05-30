@@ -1,7 +1,6 @@
 import 'pages/treasury.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import { Tag } from 'construct-ui';
 
 import app from 'state';
@@ -12,11 +11,11 @@ import Substrate from 'controllers/chain/substrate/main';
 
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import ProposalCard from 'views/components/proposal_card';
+import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import Listing from 'views/pages/listing';
 import ErrorPage from 'views/pages/error';
 import loadSubstrateModules from 'views/components/load_substrate_modules';
+import { CardsCollection } from '../components/cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -89,7 +88,6 @@ function getModules() {
 
 const TreasuryPage: m.Component<{}> = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'TreasuryPage' });
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
     if (
@@ -175,17 +173,14 @@ const TreasuryPage: m.Component<{}> = {
       },
       m('.TreasuryPage', [
         onSubstrate && m(SubstrateProposalStats),
-        m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: activeTreasuryContent,
-          columnHeader: 'Active Treasury Proposals',
+          header: 'Active Treasury Proposals',
         }),
-        m('.clear'),
-        m(Listing, {
+        m(CardsCollection, {
           content: inactiveTreasuryContent,
-          columnHeader: 'Inactive Treasury Proposals',
+          header: 'Inactive Treasury Proposals',
         }),
-        m('.clear'),
       ])
     );
   },

@@ -44,7 +44,7 @@ export class CommentReactionButton
       parseInt(comment.rootProposal.toString().split('_')[1], 10)
     );
 
-    const topicName = parentThread.topic.name;
+    const topicName = parentThread?.topic?.name;
 
     this.loading =
       this.loading || (!isAdmin && TopicGateCheck.isGatedTopic(topicName));

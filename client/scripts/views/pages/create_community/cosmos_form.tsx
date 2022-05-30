@@ -6,6 +6,8 @@ import $ from 'jquery';
 import 'pages/create_community.scss';
 
 import app from 'state';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'types';
@@ -89,7 +91,6 @@ export class CosmosForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
             const {
@@ -100,6 +101,12 @@ export class CosmosForm implements m.ClassComponent {
               nodeUrl,
             } = this.state.form;
             this.state.saving = true;
+            mixpanelBrowserTrack({
+              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
+              chainBase: null,
+              isCustomDomain: app.isCustomDomain(),
+              communityType: null,
+            });
             try {
               const res = await $.post(`${app.serverUrl()}/createChain`, {
                 alt_wallet_url: altWalletUrl,

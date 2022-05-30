@@ -37,17 +37,28 @@ const Login: m.Component<{}, {
 }> = {
   view: (vnode) => {
     const defaultEmail = m.route.param('inviteEmail');
-    // only provide wallet dropdown on Axie
+    // only provide single wallet button on Axie
     if (app?.chain?.network === ChainNetwork.AxieInfinity) {
-      return m(Form, { gutter: 10 }, [
-        m(FormGroup, { span: 12 }, [
-          m(LoginWithWalletDropdown, {
-            label: 'Continue with wallet',
-            joiningChain: null,
-            loggingInWithAddress: true,
-          }),
-        ]),
-      ]);
+      return m(Button, {
+        intent: 'primary',
+        rounded: true,
+        onclick: async (e) => {
+          // get a state id from the server
+          const result = await $.post(
+            `${app.serverUrl()}/auth/sso`,
+            { issuer: 'AxieInfinity' },
+          );
+          if (result.status === 'Success' && result.result.stateId) {
+            const stateId = result.result.stateId;
+
+            // redirect to axie page for login
+            window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+          } else {
+            vnode.state.error = result.error || 'Could not login';
+          }
+        },
+        label: 'Continue to Ronin wallet'
+      });
     }
     return m('.Login', {
       onclick: (e) => {

@@ -310,6 +310,10 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
   // TODO: using chainScope instead of communityScope OK?
   const { chainScope } = searchQuery;
   const types = searchQuery.getSearchScope();
+  if(types.indexOf(SearchScope.Communities) > 0) {
+    types.splice(types.indexOf(SearchScope.Communities), 1);
+    types.unshift(SearchScope.Communities)
+  }
   const results = getBalancedContentListing(
     app.search.getByQuery(searchQuery).results,
     types
@@ -690,9 +694,6 @@ export class SearchBar implements m.Component {
           defaultValue={m.route.param('q') || this.searchTerm}
           value={this.searchTerm}
           autocomplete="off"
-          oncreate={() => {
-            app.search.initialize();
-          }}
           onclick={async () => {
             this.focused = true;
           }}

@@ -26,23 +26,20 @@ describe('Draft Tests', () => {
   let user2Address;
   let user2JWT;
 
-  before(async function() {
+  before(async function () {
     this.timeout(300000);
     await resetDatabase();
-    console.log('Database reset')
+    console.log('Database reset');
 
     let res = await modelUtils.createAndVerifyAddress({ chain });
-    console.log('address verified')
     user2Address = res.address;
     user2JWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    console.log('jwt signed')
     expect(user2Address).to.not.be.null;
     expect(user2JWT).to.not.be.null;
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    console.log('repeated')
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
   });
@@ -148,7 +145,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
           title,
           topic,
           body,

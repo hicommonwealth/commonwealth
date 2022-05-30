@@ -1,6 +1,6 @@
-@import 'client/styles/shared';
+@import 'shared';
 
-$default-card-width: 300px;
+$default-card-width: 260px;
 $default-card-height: 100px;
 
 .Card {
@@ -11,48 +11,47 @@ $default-card-height: 100px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   min-height: $default-card-height;
   padding: 16px;
   width: $default-card-width;
 
-  &.full-width {
+  &.fullWidth {
     width: 100%;
   }
 
   &.elevation-1 {
-    box-shadow: $elevation-1-shadow;
+    box-shadow: $elevation-1;
 
     &.interactive {
       &:hover {
-        box-shadow: $elevation-3-shadow;
+        box-shadow: $elevation-3;
       }
     }
   }
 
   &.elevation-2 {
-    box-shadow: $elevation-2-shadow;
+    box-shadow: $elevation-2;
 
     &.interactive {
       &:hover {
-        box-shadow: $elevation-4-shadow;
+        box-shadow: $elevation-4;
       }
     }
   }
 
   &.elevation-3 {
-    box-shadow: $elevation-3-shadow;
+    box-shadow: $elevation-3;
 
     &.interactive {
       &:hover {
-        box-shadow: $elevation-5-shadow;
+        box-shadow: $elevation-5;
       }
     }
   }
 
   &.interactive {
     &:hover {
-      box-shadow: $elevation-1-shadow;
+      box-shadow: $elevation-1;
     }
   }
 }

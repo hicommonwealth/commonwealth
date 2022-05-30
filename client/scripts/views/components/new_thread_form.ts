@@ -3,7 +3,6 @@ import 'components/new_thread_form.scss';
 import 'pages/new_thread.scss';
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import _ from 'lodash';
 import $ from 'jquery';
 import Quill from 'quill-2.0-dev/quill';
@@ -24,11 +23,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import {
-  OffchainTopic,
-  OffchainThreadKind,
-  OffchainThreadStage,
-} from 'models';
+import { OffchainTopic, OffchainThreadKind, OffchainThreadStage } from 'models';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -90,10 +85,6 @@ const saveDraft = async (form, quillEditorState, author, existingDraft?) => {
     } catch (err) {
       throw new Error(err);
     }
-    mixpanel.track('Update discussion draft', {
-      'Step No': 2,
-      Step: 'Filled in Proposal and Discussion',
-    });
   } else {
     let result;
     try {
@@ -107,10 +98,6 @@ const saveDraft = async (form, quillEditorState, author, existingDraft?) => {
       notifyError(err);
       throw new Error(err);
     }
-    mixpanel.track('Save discussion draft', {
-      'Step No': 2,
-      Step: 'Filled in Proposal and Discussion',
-    });
   }
 };
 
@@ -201,12 +188,6 @@ const newThread = async (
       console.log(`Error adding new topic to ${activeEntity}.`);
     }
   }
-
-  mixpanel.track('Create Thread', {
-    'Step No': 2,
-    Step: 'Filled in Proposal and Discussion',
-    'Thread Type': kind,
-  });
 };
 
 const newLink = async (
@@ -678,11 +659,17 @@ export const NewThreadForm: m.Component<
                         localStorage.getItem(
                           `${app.activeChainId()}-active-topic`
                         ),
-                      topics: app.topics && app.topics.getByCommunity(app.activeChainId()).filter((t) => {
-                        return isAdmin
-                          || t.tokenThreshold.isZero()
-                          || !TopicGateCheck.isGatedTopic(t.name);
-                      }),
+                      topics:
+                        app.topics &&
+                        app.topics
+                          .getByCommunity(app.activeChainId())
+                          .filter((t) => {
+                            return (
+                              isAdmin ||
+                              t.tokenThreshold.isZero() ||
+                              !TopicGateCheck.isGatedTopic(t.name)
+                            );
+                          }),
                       updateFormData: updateTopicState,
                       tabindex: 1,
                     }),

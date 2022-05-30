@@ -40,6 +40,7 @@ class ChainInfo {
   public readonly bech32Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
+  public adminOnlyPolling: boolean;
 
   public get node() { return this.ChainNode; }
 
@@ -73,7 +74,8 @@ class ChainInfo {
     substrateSpec,
     ChainNode,
     tokenName,
-    address
+    address,
+    adminOnlyPolling,
   }) {
     this.id = id;
     this.network = network;
@@ -106,6 +108,7 @@ class ChainInfo {
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
     this.address = address;
+    this.adminOnlyPolling = adminOnlyPolling;
   }
 
   public static fromJSON({
@@ -139,6 +142,7 @@ class ChainInfo {
     token_name,
     address,
     ChainNode,
+    admin_only_polling,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -178,6 +182,7 @@ class ChainInfo {
       tokenName: token_name,
       address,
       ChainNode,
+      adminOnlyPolling: admin_only_polling,
     });
   }
 

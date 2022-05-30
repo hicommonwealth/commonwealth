@@ -5,12 +5,12 @@ import '../styles/tailwind_reset.css'; // for the landing page
 import '../styles/shared.scss';
 import 'construct.scss';
 import 'lity/dist/lity.min.css';
+import mixpanel from 'mixpanel-browser';
 
 import m from 'mithril';
 import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 import moment from 'moment';
-import mixpanel from 'mixpanel-browser';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
@@ -42,6 +42,9 @@ import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 const APPLICATION_UPDATE_MESSAGE =
   'A new version of the application has been released. Please save your work and refresh.';
 const APPLICATION_UPDATE_ACTION = 'Okay';
+
+const MIXPANEL_DEV_TOKEN = '312b6c5fadb9a88d98dc1fb38de5d900';
+const MIXPANEL_PROD_TOKEN = '993ca6dd7df2ccdc2a5d2b116c0e18c5';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -79,20 +82,31 @@ export async function initAppState(
 
         // add recentActivity
         const { recentThreads } = data;
-        Object.entries(recentThreads).forEach(([comm, count]) => {
-          app.recentActivity.setCommunityThreadCounts(comm, count);
+        recentThreads.forEach(({ chain, count }) => {
+          app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
         // update the login status
         updateActiveUser(data.user);
         app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
 
-        if (!app.socket && app.loginState === LoginState.LoggedIn) {
-          app.socket = new WebSocketController(app.user.jwt);
+        if (app.loginState == LoginState.LoggedIn) {
+          console.log('Initializing socket connection with JTW:', app.user.jwt);
+          // init the websocket connection and the chain-events namespace
+          app.socket.init(app.user.jwt).then(() => {
+            if (app.socket.isConnected) {
+              console.log('Websocket connected');
+            } else {
+              console.log('Websocket connection failure');
+            }
+          });
           app.user.notifications.refresh().then(() => m.redraw());
-        } else if (app.socket && app.loginState === LoginState.LoggedOut) {
+        } else if (
+          app.loginState == LoginState.LoggedOut &&
+          app.socket.isConnected
+        ) {
+          // TODO: create global deinit function
           app.socket.disconnect();
-          app.socket = undefined;
         }
 
         app.user.setStarredCommunities(
@@ -137,10 +151,6 @@ export async function deinitChainOrCommunity() {
 export async function handleInviteLinkRedirect() {
   const inviteMessage = m.route.param('invitemessage');
   if (inviteMessage) {
-    mixpanel.track('Invite Link Used', {
-      'Step No': 1,
-      Step: inviteMessage,
-    });
     if (
       inviteMessage === 'failure' &&
       m.route.param('message') === 'Must be logged in to accept invites'
@@ -161,10 +171,6 @@ export async function handleInviteLinkRedirect() {
 
 export async function handleUpdateEmailConfirmation() {
   if (m.route.param('confirmation')) {
-    mixpanel.track('Update Email Verification Redirect', {
-      'Step No': 1,
-      Step: m.route.param('confirmation'),
-    });
     if (m.route.param('confirmation') === 'success') {
       notifySuccess('Email confirmed!');
     }
@@ -294,11 +300,13 @@ export async function selectChain(
     ).default;
     newChain = new ERC20(chain, app);
   } else if (chain.network === ChainNetwork.ERC721) {
-    const ERC721 = (await import(
-    //   /* webpackMode: "lazy" */
-    //   /* webpackChunkName: "erc721-main" */
-      './controllers/chain/ethereum/NftAdapter'
-    )).default;
+    const ERC721 = (
+      await import(
+        //   /* webpackMode: "lazy" */
+        //   /* webpackChunkName: "erc721-main" */
+        './controllers/chain/ethereum/NftAdapter'
+      )
+    ).default;
     newChain = new ERC721(chain, app);
   } else if (chain.network === ChainNetwork.SPL) {
     const SPL = (
@@ -409,7 +417,11 @@ export async function initChain(): Promise<void> {
 
 export async function initNewTokenChain(address: string) {
   const chain_network = app.chain.network;
-  const response = await $.getJSON('/api/getTokenForum', { address, chain_network, autocreate: true });
+  const response = await $.getJSON('/api/getTokenForum', {
+    address,
+    chain_network,
+    autocreate: true,
+  });
   if (response.status !== 'Success') {
     // TODO: better custom 404
     m.route.set('/404');
@@ -614,10 +626,12 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     });
 
     const isCustomDomain = !!customDomain;
-    const activeAcct = app.user.activeAccount;
+    const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
-      '/about': importRoute('views/pages/landing/about', { scoped: false }),
+      '/about': importRoute('views/pages/commonwealth', {
+        scoped: false,
+      }),
       '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
       '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
       '/components': importRoute('views/pages/components', {
@@ -682,7 +696,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/chat': importRoute('views/pages/chat', {
+            '/chat/:channel': importRoute('views/pages/chat', {
               scoped: true,
               deferChain: true,
             }),
@@ -696,7 +710,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/account': redirectRoute((a) =>
-              activeAcct ? `/account/${activeAcct.address}` : '/'
+              activeAccount ? `/account/${activeAccount.address}` : '/'
             ),
             // Governance
             '/referenda': importRoute('views/pages/referenda', {
@@ -775,6 +789,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
 
             // Redirects
+            '/:scope/dashboard': redirectRoute(() => '/'),
             '/:scope/notifications': redirectRoute(() => '/notifications'),
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
@@ -793,13 +808,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/search': redirectRoute(() => '/search'),
             '/:scope/members': redirectRoute(() => '/members'),
             '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
-            '/:scope/chat': redirectRoute(() => '/chat'),
+            '/:scope/chat/:channel': redirectRoute(
+              (attrs) => `/chat/${attrs.channel}`
+            ),
             '/:scope/new/discussion': redirectRoute(() => '/new/discussion'),
             '/:scope/account/:address': redirectRoute(
               (attrs) => `/account/${attrs.address}/`
             ),
             '/:scope/account': redirectRoute(() =>
-              activeAcct ? `/account/${activeAcct.address}` : '/'
+              activeAccount ? `/account/${activeAccount.address}` : '/'
             ),
             '/:scope/referenda': redirectRoute(() => '/referenda'),
             '/:scope/proposals': redirectRoute(() => '/proposals'),
@@ -847,7 +864,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           }
         : {
             //
-            // Scoped routes
+            // Global routes
             //
             '/': importRoute('views/pages/landing', {
               scoped: false,
@@ -865,6 +882,17 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: true,
             }),
+            '/dashboard': importRoute('views/pages/user_dashboard', {
+              scoped: false,
+              deferChain: true,
+            }),
+            '/dashboard/:type': importRoute('views/pages/user_dashboard', {
+              scoped: false,
+              deferChain: true,
+            }),
+            // Scoped routes
+            //
+
             // Notifications
             '/:scope/notifications': importRoute(
               'views/pages/notifications_page',
@@ -929,7 +957,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/:scope/chat': importRoute('views/pages/chat', {
+            '/:scope/chat/:channel': importRoute('views/pages/chat', {
               scoped: true,
               deferChain: true,
             }),
@@ -943,8 +971,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/:scope/account': redirectRoute((a) =>
-              activeAcct
-                ? `/${a.scope}/account/${activeAcct.address}`
+              activeAccount
+                ? `/${a.scope}/account/${activeAccount.address}`
                 : `/${a.scope}/`
             ),
             // Governance
@@ -1071,12 +1099,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     // initialize mixpanel, before adding an alias or tracking identity
     try {
-      mixpanel.init('32c32e2c81e63e65dcdd98dc7d2c6811');
       if (
         document.location.host.startsWith('localhost') ||
         document.location.host.startsWith('127.0.0.1')
       ) {
-        mixpanel.disable();
+        mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
+      } else {
+        // Production Mixpanel Project
+        mixpanel.init(MIXPANEL_PROD_TOKEN, { debug: true });
       }
     } catch (e) {
       console.error('Mixpanel initialization error');
@@ -1097,22 +1127,13 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     */
       if (m.route.param('new') && m.route.param('new').toString() === 'true') {
         console.log('creating account');
-        mixpanel.track('Account Creation', {
-          'Step No': 1,
-          Step: 'Add Email',
-        });
+
         try {
-          mixpanel.alias(m.route.param('email').toString());
         } catch (err) {
           // Don't do anything... Just identify if there is an error
           // mixpanel.identify(m.route.param('email').toString());
         }
       } else {
-        console.log('logging in account');
-        mixpanel.track('Logged In', {
-          Step: 'Email',
-        });
-        mixpanel.identify(app.user.email);
       }
       m.route.set(m.route.param('path'), {}, { replace: true });
     } else if (

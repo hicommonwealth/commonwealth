@@ -1,0 +1,107 @@
+@import 'shared';
+
+@mixin checkmark($color) {
+  display: grid;
+  place-content: center;
+
+  &::after {
+    color: $color;
+    content: '';
+    width: 8px;
+    height: 6px;
+    box-shadow: inset 12px 12px;
+    clip-path: path(
+      'M7.426.387a.5.5 0 010 .686l-4.279 4.54a.5.5 0 01-.727 0L.573 3.656a.5.5 0 01.729-.687L2.42 4.154a.5.5 0 00.727 0L6.698.386a.5.5 0 01.728 0z'
+    );
+  }
+}
+
+@mixin indeterminate($color) {
+  display: grid;
+  place-content: center;
+
+  &::after {
+    border-radius: $border-radius-corners;
+    color: $color;
+    content: '';
+    width: 6px;
+    height: 1px;
+    box-shadow: inset 6px 6px;
+  }
+}
+
+@mixin iconAndColors($indeterminate: false) {
+  @if $indeterminate {
+    .checkbox-control {
+      @include indeterminate($primary-500);
+      @include checkedColors;
+    }
+
+    &:hover .checkbox-control {
+      @include indeterminate($primary-500);
+    }
+
+    &.disabled .checkbox-control {
+      @include indeterminate($neutral-300);
+      @include disabledColors;
+    }
+  } @else {
+    .checkbox-control {
+      @include checkmark($primary-500);
+      @include checkedColors;
+    }
+
+    &:hover .checkbox-control {
+      @include checkmark($primary-600);
+      @include checkedHoverColors;
+    }
+
+    &.disabled .checkbox-control {
+      pointer-events: none;
+
+      @include checkmark($neutral-300);
+      @include disabledColors;
+    }
+  }
+}
+
+.Checkbox {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+
+  .checkbox-input {
+    @include hideInput;
+  }
+
+  .checkbox-control {
+    @include controlStyles;
+
+    border-radius: $border-radius-checkbox;
+  }
+
+  &:hover .checkbox-control {
+    @include checkmark($primary-200);
+    @include hoverColors;
+  }
+
+  &.disabled {
+    pointer-events: none;
+
+    .checkbox-control {
+      @include disabledColors;
+    }
+  }
+
+  &.checked {
+    @include iconAndColors();
+  }
+
+  &.indeterminate {
+    pointer-events: none;
+
+    @include iconAndColors($indeterminate: true);
+  }
+}
