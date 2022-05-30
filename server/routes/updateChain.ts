@@ -4,7 +4,7 @@ import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 import { ChainBase } from '../../shared/types';
-import { ChainAttributes } from '../models/chain';
+import { CommunityAttributes } from '../models/community';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -26,13 +26,13 @@ export const Errors = {
   InvalidTerms: 'Terms of Service must begin with https://',
 };
 
-type UpdateChainReq = ChainAttributes & {
+type UpdateChainReq = CommunityAttributes & {
   id: string;
   'featured_topics[]'?: string[];
   'snapshot[]'?: string[];
 };
 
-type UpdateChainResp = ChainAttributes;
+type UpdateChainResp = CommunityAttributes;
 
 const updateChain = async (
   models: DB,

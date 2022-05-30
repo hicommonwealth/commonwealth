@@ -2,7 +2,7 @@ import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
-import { ChainInstance } from '../models/chain';
+import { ChainInstance } from '../models/community';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { AddressInstance } from '../models/address';
 import TokenBalanceCache from '../util/tokenBalanceCache';

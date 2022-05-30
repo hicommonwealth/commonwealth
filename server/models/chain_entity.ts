@@ -1,12 +1,12 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { ThreadAttributes } from './thread';
 import { ChainEventAttributes } from './chain_event';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainEntityAttributes = {
-  chain: string;
+  community_id: string;
   type: string;
   type_id: string;
   id?: number;
@@ -17,7 +17,7 @@ export type ChainEntityAttributes = {
   created_at?: Date;
   updated_at?: Date;
 
-  Chain?: ChainAttributes;
+  Community?: CommunityAttributes;
   Thread?: ThreadAttributes;
   ChainEvents?: ChainEventAttributes[];
 }
@@ -32,7 +32,7 @@ export default (
 ): ChainEntityModelStatic => {
   const ChainEntity = <ChainEntityModelStatic>sequelize.define<ChainEntityInstance, ChainEntityAttributes>('ChainEntity', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    chain: { type: dataTypes.STRING, allowNull: false },
+    community_id: { type: dataTypes.STRING, allowNull: false },
     type: { type: dataTypes.STRING, allowNull: false },
     type_id: { type: dataTypes.STRING, allowNull: false },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -51,12 +51,12 @@ export default (
     indexes: [
       { fields: ['id'] },
       { fields: ['thread_id'] },
-      { fields: ['chain', 'type', 'id' ] },
+      { fields: ['community_id', 'type', 'id' ] },
     ],
   });
 
   ChainEntity.associate = (models) => {
-    models.ChainEntity.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.ChainEntity.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
     models.ChainEntity.belongsTo(models.Thread, { foreignKey: 'thread_id', targetKey: 'id' });
     models.ChainEntity.hasMany(models.ChainEvent, { foreignKey: 'entity_id' });
   };

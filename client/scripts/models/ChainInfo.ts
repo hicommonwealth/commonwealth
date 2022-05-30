@@ -3,10 +3,10 @@ import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'types';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/community';
 import Topic from './Topic';
 
-class ChainInfo {
+class CommunityInfo {
   public readonly id: string;
   public readonly symbol: string;
   public name: string;
@@ -136,7 +136,7 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
-    return new ChainInfo({
+    return new CommunityInfo({
       id,
       network,
       symbol,
@@ -195,7 +195,7 @@ class ChainInfo {
           r.address_id,
           r.Address.address,
           r.Address.chain,
-          r.chain_id,
+          r.community_id,
           r.permission,
           r.is_user_default
         )
@@ -212,7 +212,7 @@ class ChainInfo {
           r.address_id,
           r.Address.address,
           r.Address.chain,
-          r.chain_id,
+          r.community_id,
           r.permission,
           r.is_user_default
         )
@@ -221,7 +221,7 @@ class ChainInfo {
   }
 
   // TODO: change to accept an object
-  public async updateChainData({
+  public async updateCommunityData({
     name,
     description,
     website,
@@ -256,22 +256,22 @@ class ChainInfo {
       default_summary_view: defaultSummaryView,
       jwt: app.user.jwt,
     });
-    const updatedChain: ChainInstance = r.result;
-    this.name = updatedChain.name;
-    this.description = updatedChain.description;
-    this.website = updatedChain.website;
-    this.discord = updatedChain.discord;
-    this.element = updatedChain.element;
-    this.telegram = updatedChain.telegram;
-    this.github = updatedChain.github;
-    this.stagesEnabled = updatedChain.stages_enabled;
-    this.customStages = updatedChain.custom_stages;
-    this.customDomain = updatedChain.custom_domain;
-    this.snapshot = updatedChain.snapshot;
-    this.terms = updatedChain.terms;
-    this.iconUrl = updatedChain.icon_url;
-    this.defaultSummaryView = updatedChain.default_summary_view;
+    const updatedCommunity: CommunityInstance = r.result;
+    this.name = updatedCommunity.name;
+    this.description = updatedCommunity.description;
+    this.website = updatedCommunity.website;
+    this.discord = updatedCommunity.discord;
+    this.element = updatedCommunity.element;
+    this.telegram = updatedCommunity.telegram;
+    this.github = updatedCommunity.github;
+    this.stagesEnabled = updatedCommunity.stages_enabled;
+    this.customStages = updatedCommunity.custom_stages;
+    this.customDomain = updatedCommunity.custom_domain;
+    this.snapshot = updatedCommunity.snapshot;
+    this.terms = updatedCommunity.terms;
+    this.iconUrl = updatedCommunity.icon_url;
+    this.defaultSummaryView = updatedCommunity.default_summary_view;
   }
 }
 
-export default ChainInfo;
+export default CommunityInfo;

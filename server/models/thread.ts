@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressAttributes } from './address';
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { AttachmentAttributes } from './attachment';
 import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
@@ -18,7 +18,7 @@ export type ThreadAttributes = {
   url?: string;
   topic_id?: number;
   pinned?: boolean;
-  chain: string;
+  community_id: string;
 
   read_only?: boolean;
   version_history?: string[];
@@ -32,7 +32,7 @@ export type ThreadAttributes = {
   last_commented_on?: Date;
 
   // associations
-  Chain?: ChainAttributes;
+  Community?: CommunityAttributes;
   Address?: AddressAttributes;
   Attachments?:
     | AttachmentAttributes[]
@@ -73,7 +73,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -103,18 +103,18 @@ export default (
       paranoid: true,
       indexes: [
         { fields: ['address_id'] },
-        { fields: ['chain'] },
-        { fields: ['chain', 'created_at'] },
-        { fields: ['chain', 'updated_at'] },
-        { fields: ['chain', 'pinned'] },
-        { fields: ['chain', 'has_poll'] },
+        { fields: ['community_id'] },
+        { fields: ['community_id', 'created_at'] },
+        { fields: ['community_id', 'updated_at'] },
+        { fields: ['community_id', 'pinned'] },
+        { fields: ['community_id', 'has_poll'] },
       ],
     }
   );
 
   Thread.associate = (models) => {
-    models.Thread.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.Thread.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Thread.belongsTo(models.Address, {

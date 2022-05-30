@@ -14,7 +14,7 @@ import { UserAttributes } from './user';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 
-export type ChainAttributes = {
+export type CommunityAttributes = {
   name: string;
   symbol: string;
   network: ChainNetwork;
@@ -61,7 +61,7 @@ export type ChainAttributes = {
   ChainObjectVersion?; // TODO
 };
 
-export type ChainInstance = ModelInstance<ChainAttributes> & {
+export type CommunityInstance = ModelInstance<CommunityAttributes> & {
   // add mixins as needed
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<
@@ -76,14 +76,14 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
   >;
 };
 
-export type ChainModelStatic = ModelStatic<ChainInstance>;
+export type CommunityModelStatic = ModelStatic<CommunityInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): ChainModelStatic => {
-  const Chain = <ChainModelStatic>sequelize.define(
-    'Chain',
+): CommunityModelStatic => {
+  const Community = <CommunityModelStatic>sequelize.define(
+    'Community',
     {
       id: { type: dataTypes.STRING, primaryKey: true },
       name: { type: dataTypes.STRING, allowNull: false },
@@ -130,28 +130,28 @@ export default (
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
     },
     {
-      tableName: 'Chains',
+      tableName: 'Communities',
       timestamps: false,
       underscored: false,
     }
   );
 
-  Chain.associate = (models) => {
-    models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
-    models.Chain.hasMany(models.Topic, {
+  Community.associate = (models) => {
+    models.Community.hasMany(models.ChainNode, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.Address, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.Notification, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.Topic, {
       as: 'topics',
       foreignKey: 'chain_id',
     });
-    models.Chain.hasMany(models.Thread, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.ChatChannel);
-    models.Chain.belongsToMany(models.User, {
+    models.Community.hasMany(models.Thread, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.Comment, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.StarredCommunity, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.ChatChannel);
+    models.Community.belongsToMany(models.User, {
       through: models.WaitlistRegistration,
     });
   };
 
-  return Chain;
+  return Community;
 };

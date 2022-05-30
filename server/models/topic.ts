@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { ThreadAttributes } from './thread';
 
 export type TopicAttributes = {
@@ -10,7 +10,7 @@ export type TopicAttributes = {
   featured_in_new_post: boolean;
   order?: number;
   id?: number;
-  chain_id: string;
+  community_id: string;
   description?: string;
   telegram?: string;
   created_at?: Date;
@@ -20,7 +20,7 @@ export type TopicAttributes = {
   default_offchain_template?: string;
 
   // associations
-  chain?: ChainAttributes;
+  community?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
 }
 
@@ -40,7 +40,7 @@ export default (
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
     telegram: { type: dataTypes.STRING, allowNull: true },
-    chain_id: { type: dataTypes.STRING, allowNull: false },
+    community_id: { type: dataTypes.STRING, allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -65,9 +65,9 @@ export default (
   });
 
   Topic.associate = (models) => {
-    models.Topic.belongsTo(models.Chain, {
-      as: 'chain',
-      foreignKey: 'chain_id',
+    models.Topic.belongsTo(models.Community, {
+      as: 'community',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Topic.hasMany(models.Thread, {

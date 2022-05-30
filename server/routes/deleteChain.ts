@@ -29,7 +29,7 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
   }
 
   await models.sequelize.transaction(async (t) => {
-    const chain = await models.Chain.findOne({
+    const chain = await models.Community.findOne({
       where: {
         id: req.body.id,
       }
@@ -48,17 +48,17 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       transaction: t,
     });
 
-    await models.sequelize.query(`DELETE FROM "Reactions" WHERE chain='${chain.id}';`, {
+    await models.sequelize.query(`DELETE FROM "OffchainReactions" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
 
-    await models.sequelize.query(`DELETE FROM "Comments" WHERE chain='${chain.id}';`, {
+    await models.sequelize.query(`DELETE FROM "OffchainComments" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
 
-    await models.sequelize.query(`DELETE FROM "Topics" WHERE chain_id='${chain.id}';`, {
+    await models.sequelize.query(`DELETE FROM "OffchainTopics" WHERE chain_id='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
@@ -85,8 +85,8 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
 
     await models.sequelize.query(`DELETE FROM "Collaborations"
         USING "Collaborations" AS c
-        LEFT JOIN "Threads" t ON offchain_thread_id = t.id
-        WHERE t.chain = '${chain.id}'
+        LEFT JOIN "OffchainThreads" t ON offchain_thread_id = t.id
+        WHERE t.community_id = '${chain.id}'
         AND c.offchain_thread_id  = "Collaborations".offchain_thread_id 
         AND c.address_id = "Collaborations".address_id;`, {
       raw: true,
@@ -96,13 +96,13 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
 
     await models.sequelize.query(`DELETE FROM "LinkedThreads"
         USING "LinkedThreads" AS l
-        LEFT JOIN "Threads" t ON linked_thread = t.id
-        WHERE t.chain = '${chain.id}';`, {
+        LEFT JOIN "OffchainThreads" t ON linked_thread = t.id
+        WHERE t.community_id = '${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
 
-    await models.sequelize.query(`DELETE FROM "Threads" WHERE chain='${chain.id}';`, {
+    await models.sequelize.query(`DELETE FROM "OffchainThreads" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
@@ -115,7 +115,7 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
     await models.sequelize.query(`DELETE FROM "OffchainProfiles" AS profilesGettingDeleted
         USING "OffchainProfiles" AS profilesBeingUsedAsReferences
         LEFT JOIN "Addresses" a ON profilesBeingUsedAsReferences.address_id = a.id
-        WHERE a.chain = '${chain.id}'
+        WHERE a.community_id = '${chain.id}'
         AND profilesGettingDeleted.address_id  = profilesBeingUsedAsReferences.address_id;`, {
       type: QueryTypes.DELETE,
       transaction: t,
@@ -138,7 +138,7 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       transaction: t,
     });
 
-    await models.sequelize.query(`DELETE FROM "Chains" WHERE id='${chain.id}';`, {
+    await models.sequelize.query(`DELETE FROM "Communities" WHERE id='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });

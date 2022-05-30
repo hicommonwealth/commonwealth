@@ -15,7 +15,7 @@ const getProfile = async (models: DB, req: Request, res: Response, next: NextFun
   if (!chain) return next(new Error(Errors.NoChain));
   if (!address) return next(new Error(Errors.NoAddress));
 
-  const chains = await models.Chain.findAll();
+  const chains = await models.Community.findAll();
   const chainIds = chains.map((c) => c.id);
 
   const addressModel = await models.Address.findOne({

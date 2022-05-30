@@ -12,7 +12,7 @@ import {
   AaveEvents,
 } from '@commonwealth/chain-events';
 
-import { ChainAttributes } from '../models/chain';
+import { ChainAttributes } from '../models/community';
 import EventStorageHandler, {
   StorageFilterConfig,
 } from '../eventHandlers/storage';

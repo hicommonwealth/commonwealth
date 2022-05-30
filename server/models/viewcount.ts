@@ -1,15 +1,15 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { ThreadAttributes } from './thread';
 
 export type ViewCountAttributes = {
   object_id: number;
   view_count: number;
   id?: number;
-  chain: string;
-  Chain?: ChainAttributes;
+  community_id: string;
+  Community?: CommunityAttributes;
   Thread?: ThreadAttributes;
 }
 
@@ -25,7 +25,7 @@ export default (
 ): ViewCountModelStatic => {
   const ViewCount = <ViewCountModelStatic>sequelize.define('ViewCount', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: dataTypes.STRING, allowNull: false },
+    community_id: { type: dataTypes.STRING, allowNull: false },
     object_id: { type: dataTypes.INTEGER, allowNull: false },
     view_count: { type: dataTypes.INTEGER, allowNull: false },
   }, {
@@ -40,7 +40,7 @@ export default (
   });
 
   ViewCount.associate = (models) => {
-    models.ViewCount.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.ViewCount.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
     models.ViewCount.belongsTo(models.Thread, { foreignKey: 'object_id', targetKey: 'id' });
   };
 

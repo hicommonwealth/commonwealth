@@ -11,7 +11,7 @@ import { ERC20__factory, ERC721__factory } from '../../shared/eth/types';
 
 import JobRunner from './cacheJobRunner';
 
-import { ChainAttributes } from '../models/chain';
+import { CommunityAttributes } from '../models/community';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
@@ -144,14 +144,14 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
         where: { id: topicId },
         include: [
           {
-            model: this.models.Chain,
+            model: this.models.Community,
             required: true,
-            as: 'chain',
+            as: 'community', // TODO: is this right?
             where: {
               // only support thresholds on token forums
               // TODO: can we support for token-backed DAOs as well?
               type: ChainType.Token,
-            } as WhereOptions<ChainAttributes>
+            } as WhereOptions<CommunityAttributes>
           },
         ]
       });
@@ -177,8 +177,8 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async getBalance(chain: ChainAttributes, address: string): Promise<BN> {
-    const nodes = await this.models.ChainNode.findAll({ where: { chain: chain.id } });
+  public async getBalance(chain: CommunityAttributes, address: string): Promise<BN> {
+    const nodes = await this.models.ChainNode.findAll({ where: { community_id: community.id } });
     if (!nodes || (chain.base === ChainBase.Ethereum && !nodes[0].eth_chain_id)) {
       throw new Error('Could not find chain node.');
     }

@@ -11,7 +11,7 @@ import {
 } from '../../shared/types';
 import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { ThreadAttributes } from './thread';
 import { CommentAttributes } from './comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
@@ -41,7 +41,7 @@ export type SubscriptionAttributes = {
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   NotificationsRead?: NotificationsReadAttributes[];
-  Chain?: ChainAttributes;
+  Community?: CommunityAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
   ChainEventType?: ChainEventTypeAttributes;
@@ -77,7 +77,7 @@ export default (
       is_active: { type: dataTypes.BOOLEAN, defaultValue: true, allowNull: false },
       immediate_email: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
       // TODO: change allowNull to false once subscription refactor is implemented
-      chain_id: { type: dataTypes.STRING, allowNull: true },
+      community_id: { type: dataTypes.STRING, allowNull: true },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
       offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
       chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
@@ -174,12 +174,12 @@ export default (
         notification_data: '',
         chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
         category_id: 'chain-event',
-        chain_id: (<IChainEventNotificationData>notification_data).chain_id
+        community_id: (<IChainEventNotificationData>notification_data).community_id
       } : {
         notification_data: JSON.stringify(notification_data),
         category_id,
-        chain_id: (<IPostNotificationData>notification_data).chain_id
-          || (<ICommunityNotificationData>notification_data).chain
+        community_id: (<IPostNotificationData>notification_data).community_id
+          || (<ICommunityNotificationData>notification_data).community_id
       })
     }
 
@@ -200,11 +200,11 @@ export default (
 
     // send emails
     for (const subscription of subscribers) {
-      if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
+      if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.community_id) {
         msg.dynamic_template_data.notification.path = `${
           SERVER_URL
         }/${
-          (<IChainEventNotificationData>notification_data).chainEventType.chain
+          (<IChainEventNotificationData>notification_data).chainEventType.community_id
         }/notifications?id=${
           notification.id
         }`;
@@ -215,7 +215,7 @@ export default (
       }
     }
 
-    const erc20Tokens = (await models.Chain.findAll({
+    const erc20Tokens = (await models.Community.findAll({
       where: {
         base: ChainBase.Ethereum,
         type: ChainType.Token,
@@ -225,7 +225,7 @@ export default (
     // send data to relevant webhooks
     if (webhook_data && (
       // TODO: this OR clause seems redundant?
-      webhook_data.chainEventType?.chain || !erc20Tokens.includes(webhook_data.chainEventType?.chain)
+      webhook_data.chainEventType?.community_id || !erc20Tokens.includes(webhook_data.chainEventType?.community_id)
     )) {
       await send(models, {
         notificationCategory: category_id,
@@ -240,7 +240,7 @@ export default (
     models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
     models.Subscription.hasMany(models.NotificationsRead, { foreignKey: 'subscription_id', onDelete: 'cascade' });
-    models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.Thread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.Comment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });

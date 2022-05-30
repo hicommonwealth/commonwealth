@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize';
 import { CreateOptions, DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance, AddressAttributes } from './address';
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { ProfileInstance, ProfileAttributes } from './profile';
 import { SocialAccountInstance, SocialAccountAttributes } from './social_account';
@@ -27,7 +27,7 @@ export type UserAttributes = {
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   Profiles?: ProfileAttributes[];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
-  Chains?: ChainAttributes[] | ChainAttributes['id'][];
+  Communities?: CommunityAttributes[] | CommunityAttributes['id'][];
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -111,7 +111,7 @@ export default (
     models.User.hasMany(models.Profile);
     models.User.hasMany(models.SocialAccount);
     models.User.hasMany(models.StarredCommunity);
-    models.User.belongsToMany(models.Chain, { through: models.WaitlistRegistration });
+    models.User.belongsToMany(models.Community, { through: models.WaitlistRegistration });
   };
 
   return User;

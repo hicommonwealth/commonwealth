@@ -1,10 +1,10 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { Model, DataTypes } from 'sequelize';
-import { ChainInstance, ChainAttributes } from './chain';
+import { CommunityInstance, CommunityAttributes } from './community';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainNodeAttributes = {
-  chain: string;
+  community_id: string;
   url: string;
   id?: number;
   address?: string;
@@ -15,12 +15,12 @@ export type ChainNodeAttributes = {
   private_url?: string;
 
   // associations
-  Chain?: ChainAttributes;
+  Community?: CommunityAttributes;
 }
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
   // TODO: add mixins as needed
-  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getCommunity: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
 }
 
 export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
@@ -33,7 +33,7 @@ export default (
     'ChainNode',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       url: { type: dataTypes.STRING, allowNull: false },
       address: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
@@ -46,7 +46,7 @@ export default (
       tableName: 'ChainNodes',
       timestamps: false,
       underscored: true,
-      indexes: [{ fields: ['chain'] }],
+      indexes: [{ fields: ['community_id'] }],
       defaultScope: {
         attributes: {
           exclude: [
@@ -61,7 +61,7 @@ export default (
   );
 
   ChainNode.associate = (models) => {
-    models.ChainNode.belongsTo(models.Chain, { foreignKey: 'chain' });
+    models.ChainNode.belongsTo(models.Community, { foreignKey: 'community_id' });
   };
 
   return ChainNode;

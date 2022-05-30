@@ -1,4 +1,4 @@
-import { ChainAttributes } from 'server/models/chain';
+import { CommunityAttributes } from 'server/models/community';
 import { ChainEventAttributes } from 'server/models/chain_event';
 import moment from 'moment';
 
@@ -129,7 +129,7 @@ export type ChainEventNotification = {
   notification_data: '';
   chain_event_id: string;
   category_id: 'chain-event';
-  chain_id: string;
+  community_id: string;
   updated_at: moment.Moment;
   created_at: moment.Moment;
   ChainEvent: ChainEventAttributes;
@@ -148,13 +148,13 @@ export enum WebsocketEngineEvents {
 export interface InviteCodeAttributes {
   id?: string;
   community_name?: string;
-  chain_id?: string;
+  community_id?: string;
   creator_id: number;
   invited_email?: string;
   used?: boolean;
   created_at?: Date;
   updated_at?: Date;
-  Chain?: ChainAttributes;
+  Community?: CommunityAttributes;
 }
 
 export interface IPostNotificationData {
@@ -166,7 +166,7 @@ export interface IPostNotificationData {
   comment_text?: string;
   parent_comment_id?: number;
   parent_comment_text?: string;
-  chain_id: string;
+  community_id: string;
   author_address: string;
   author_chain: string;
   view_count?: number;
@@ -178,13 +178,13 @@ export interface ICommunityNotificationData {
   created_at: any;
   role_id: string | number;
   author_address: string;
-  chain: string;
+  community_id: string;
 }
 
 export interface IChainEventNotificationData {
   chainEvent: any;
   chainEventType: any;
-  chain_id: string;
+  community_id: string;
 }
 
 export const PROFILE_NAME_MAX_CHARS = 40;

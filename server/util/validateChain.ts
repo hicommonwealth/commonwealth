@@ -2,7 +2,7 @@
 // If a community is found, also check that the user is allowed to see it.
 
 import { DB } from '../database';
-import { ChainInstance } from '../models/chain';
+import { CommunityInstance } from '../models/community';
 
 export const ChainCommunityErrors = {
   ChainDNE: 'Chain does not exist',
@@ -11,25 +11,25 @@ export const ChainCommunityErrors = {
 // sequelize 5.0 does not accept undefined key in where clause
 const validateChain = async (
   models: DB,
-  params: { chain?: string; chain_id?: string }
-): Promise<[ChainInstance, string]> => {
-  const chain_id = params.chain || params.chain_id;
-  if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
-  const chain = await models.Chain.findOne({
+  params: { community?: string; community_id?: string }
+): Promise<[CommunityInstance, string]> => {
+  const community_id = params.community || params.community_id;
+  if (!community_id) return [null, ChainCommunityErrors.ChainDNE];
+  const chain = await models.Community.findOne({
     where: {
-      id: chain_id,
+      id: community_id,
     },
     include: [
       {
         model: models.Topic,
         as: 'topics',
         required: false,
-        attributes: ['id', 'name', 'chain_id'],
+        attributes: ['id', 'name', 'community_id'],
       },
     ],
   });
   // searching for chain that doesn't exist
-  if (chain_id && !chain) return [null, ChainCommunityErrors.ChainDNE];
+  if (community_id && !chain) return [null, ChainCommunityErrors.ChainDNE];
   return [chain, null];
 };
 

@@ -4,7 +4,7 @@ import { ChainBase, ChainType } from '../../shared/types';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { ChainAttributes } from '../models/chain';
+import { ChainAttributes } from '../models/community';
 import { ChainNodeAttributes } from '../models/chain_node';
 
 import { factory, formatFilename } from '../../shared/logging';

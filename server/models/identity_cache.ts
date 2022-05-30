@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 
 export type IdentityCacheAttributes = {
-  chain: string;
+  community_id: string;
   address: string;
 }
 
@@ -20,7 +20,7 @@ export default (
   const IdentityCache = <IdentityCacheStatic>sequelize.define(
     'IdentityCache',
     {
-      chain: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       address: { type: dataTypes.STRING, allowNull: false }
     },
     { timestamps: false }
@@ -30,7 +30,7 @@ export default (
   IdentityCache.removeAttribute('id');
 
   IdentityCache.associate = (models) => {
-    models.IdentityCache.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.IdentityCache.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
   };
 
   return IdentityCache;

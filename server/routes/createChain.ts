@@ -6,7 +6,7 @@ import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
-import { ChainAttributes } from '../models/chain';
+import { CommunityAttributes } from '../models/community';
 import { ChainNodeAttributes } from '../models/chain_node';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
@@ -49,20 +49,20 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
-type CreateChainReq = ChainAttributes &
+type CreateCommunityReq = CommunityAttributes &
   Omit<ChainNodeAttributes, 'id'> & {
     id: string;
     node_url: string;
   };
 
 type CreateChainResp = {
-  chain: ChainAttributes;
+  community: CommunityAttributes;
   node: ChainNodeAttributes;
 };
 
 const createChain = async (
   models: DB,
-  req: TypedRequestBody<CreateChainReq>,
+  req: TypedRequestBody<CreateCommunityReq>,
   res: TypedResponse<CreateChainResp>,
   next: NextFunction
 ) => {
@@ -256,7 +256,7 @@ const createChain = async (
     return next(new Error(Errors.ChainNameExists));
   }
 
-  const chain = await models.Chain.create({
+  const community = await models.Community.create({
     id,
     name,
     symbol,
@@ -276,7 +276,7 @@ const createChain = async (
   });
 
   const node = await models.ChainNode.create({
-    chain: id,
+    community_id: id,
     url,
     address,
     eth_chain_id,
@@ -289,7 +289,7 @@ const createChain = async (
 
   const chatChannels = await models.ChatChannel.create({
     name: 'General',
-    chain_id: chain.id,
+    community_id: community.id,
     category: 'General',
   });
 
@@ -302,7 +302,7 @@ const createChain = async (
     });
   }
 
-  return success(res, { chain: chain.toJSON(), node: node.toJSON() });
+  return success(res, { community: community.toJSON(), node: node.toJSON() });
 };
 
 export default createChain;

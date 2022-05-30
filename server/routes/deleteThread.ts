@@ -36,7 +36,7 @@ const deleteThread = async (
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [models.Chain],
+      include: [models.Community],
     });
 
     let thread = myThread;
@@ -51,7 +51,7 @@ const deleteThread = async (
         where: {
           id: req.body.thread_id,
         },
-        include: [models.Chain],
+        include: [models.Community],
       });
 
       if (!thread) {

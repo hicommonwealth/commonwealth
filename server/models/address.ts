@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
-import { ChainAttributes, ChainInstance } from './chain';
+import { CommunityAttributes, CommunityInstance } from './community';
 import { UserAttributes, UserInstance } from './user';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
@@ -11,7 +11,7 @@ import { WalletId } from '../../shared/types';
 
 export type AddressAttributes = {
 	address: string;
-	chain: string;
+	community_id: string;
 	verification_token: string;
 	id?: number;
 	verification_token_expires?: Date;
@@ -28,7 +28,7 @@ export type AddressAttributes = {
 	profile_id?: number;
 	wallet_id?: WalletId;
 	// associations
-	Chain?: ChainAttributes;
+	Community?: CommunityAttributes;
 	User?: UserAttributes;
 	OffchainProfile?: OffchainProfileAttributes;
 	Roles?: RoleAttributes[];
@@ -37,7 +37,7 @@ export type AddressAttributes = {
 // eslint-disable-next-line no-use-before-define
 export type AddressInstance = ModelInstance<AddressAttributes> & {
 	// no mixins used yet
-	getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+	getCommunity: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
 	getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
 	getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
 	getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
@@ -54,7 +54,7 @@ export default (
 	const Address: AddressModelStatic = <AddressModelStatic>sequelize.define('Address', {
 		id:                         { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
 		address:                    { type: dataTypes.STRING, allowNull: false },
-		chain:                      { type: dataTypes.STRING, allowNull: false },
+		community_id:               { type: dataTypes.STRING, allowNull: false },
 		verification_token:         { type: dataTypes.STRING, allowNull: false },
 		verification_token_expires: { type: dataTypes.DATE, allowNull: true },
 		verified:                   { type: dataTypes.DATE, allowNull: true },
@@ -76,7 +76,7 @@ export default (
 		underscored: true,
 		tableName: 'Addresses',
 		indexes: [
-			{ fields: ['address', 'chain'], unique: true },
+			{ fields: ['address', 'community_id'], unique: true },
 			{ fields: ['user_id'] },
 			{ fields: ['name'] }
 		],
@@ -91,7 +91,7 @@ export default (
 	});
 
 	Address.associate = (models) => {
-		models.Address.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+		models.Address.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
 		models.Address.belongsTo(models.Profile, { foreignKey: 'profile_id', targetKey: 'id' });
 		models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
 		models.Address.hasOne(models.OffchainProfile);

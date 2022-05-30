@@ -20,7 +20,7 @@ export default (
 ): WaitlistRegistrationModelStatic => {
   const WaitlistRegistration = <WaitlistRegistrationModelStatic>sequelize.define(
     'WaitlistRegistration', {
-      user_id: { type: dataTypes.INTEGER, allowNull: false },
+      community_id: { type: dataTypes.INTEGER, allowNull: false },
       chain_id: { type: dataTypes.STRING, allowNull: false },
       address: { type: dataTypes.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },

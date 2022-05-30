@@ -3,7 +3,7 @@ import { Model, DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 
 import { AddressAttributes } from './address';
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { AttachmentAttributes } from './attachment';
 
 export type CommentAttributes = {
@@ -12,7 +12,7 @@ export type CommentAttributes = {
   text: string;
   plaintext: string;
   id?: number;
-  chain: string;
+  community_id: string;
   parent_id?: string;
   version_history?: string[];
   created_at?: Date;
@@ -20,7 +20,7 @@ export type CommentAttributes = {
   deleted_at?: Date;
 
   // associations
-  Chain?: ChainAttributes;
+  Community?: CommunityAttributes;
   Address?: AddressAttributes;
   Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
 }
@@ -37,7 +37,7 @@ export default (
 ): CommentModelStatic => {
   const Comment = <CommentModelStatic>sequelize.define('Comment', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: dataTypes.STRING, allowNull: false },
+    community_id: { type: dataTypes.STRING, allowNull: false },
     root_id: { type: dataTypes.STRING, allowNull: false },
     parent_id: { type: dataTypes.STRING, allowNull: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -57,17 +57,17 @@ export default (
     paranoid: true,
     indexes: [
       { fields: ['id'] },
-      { fields: ['chain', 'root_id'] },
+      { fields: ['community_id', 'root_id'] },
       { fields: ['address_id'] },
-      { fields: ['chain', 'created_at'] },
-      { fields: ['chain', 'updated_at'] },
+      { fields: ['community_id', 'created_at'] },
+      { fields: ['community_id', 'updated_at'] },
       { fields: ['root_id'] },
     ],
   });
 
   Comment.associate = (models) => {
-    models.Comment.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.Comment.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id'
     });
     models.Comment.belongsTo(models.Address, {

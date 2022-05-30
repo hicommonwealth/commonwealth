@@ -2,11 +2,11 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { ContractCategoryAttributes } from './contract_category';
 
 export type ContractItemAttributes = {
-  chain: string;
+  community_id: string;
   name: string;
   description: string;
   color: string;
@@ -14,7 +14,7 @@ export type ContractItemAttributes = {
   id?: number;
   created_at?: Date;
   updated_at?: Date;
-  Chain?: ChainAttributes;
+  Community?: CommunityAttributes;
   ContractCategory?: ContractCategoryAttributes;
 }
 
@@ -28,7 +28,7 @@ export default (
 ): ContractItemModelStatic => {
   const ContractItem = <ContractItemModelStatic>sequelize.define('ContractItem', {
     id:          { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
-    chain:       { type: dataTypes.STRING, allowNull: false },
+    community_id:       { type: dataTypes.STRING, allowNull: false },
     name:        { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false },
     color:       { type: dataTypes.STRING, allowNull: false },
@@ -41,7 +41,7 @@ export default (
   });
 
   ContractItem.associate = (models) => {
-    models.ContractItem.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.ContractItem.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
     models.ContractItem.belongsTo(models.ContractCategory, { foreignKey: 'category_id', targetKey: 'id' });
   };
   return ContractItem;

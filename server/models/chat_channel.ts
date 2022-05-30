@@ -6,7 +6,7 @@ import { ChatMessageAttributes, ChatMessageInstance } from './chat_message';
 export interface ChatChannelAttributes {
   id?: number;
   name: string;
-  chain_id: string;
+  community_id: string;
   category: string;
   chat_messages?: ChatMessageAttributes[] | ChatMessageAttributes['id'][];
   created_at?: Date;
@@ -37,12 +37,12 @@ export default (
         type: Sequelize.STRING(255),
         allowNull: false,
       },
-      chain_id: {
+      community_id: {
         type: Sequelize.STRING,
         allowNull: false,
         onDelete: 'CASCADE',
         references: {
-          model: 'Chains',
+          model: 'Communities',
           key: 'id',
         },
       },
@@ -72,7 +72,7 @@ export default (
     models.ChatChannel.hasMany(models.ChatMessage, {
       foreignKey: 'chat_channel_id',
     });
-    models.ChatChannel.belongsTo(models.Chain, {
+    models.ChatChannel.belongsTo(models.Community, {
         onDelete: 'CASCADE'
     })
   };

@@ -26,7 +26,7 @@ export default (
     title: { type: DataTypes.TEXT, allowNull: true },
     topic: { type: DataTypes.STRING, allowNull: true },
     body: { type: DataTypes.TEXT, allowNull: true },
-    chain: { type: DataTypes.STRING, allowNull: false },
+    community_id: { type: DataTypes.STRING, allowNull: false },
     attachment: { type: DataTypes.INTEGER, allowNull: true },
   }, {
     tableName: 'DiscussionDrafts',
@@ -40,7 +40,7 @@ export default (
   });
 
   DiscussionDraft.associate = (models) => {
-    models.DiscussionDraft.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.DiscussionDraft.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
     models.DiscussionDraft.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.DiscussionDraft.hasMany(models.Attachment, {
       foreignKey: 'attachment_id',

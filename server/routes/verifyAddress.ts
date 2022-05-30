@@ -27,7 +27,7 @@ import {
 
 import nacl from 'tweetnacl';
 
-import { ChainInstance } from '../models/chain';
+import { CommunityInstance } from '../models/community';
 import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
@@ -69,18 +69,18 @@ export const Errors = {
 // Address.verifySignature
 const verifySignature = async (
   models: DB,
-  chain: ChainInstance,
+  community: CommunityInstance,
   addressModel: AddressInstance,
   user_id: number,
   signatureString: string
 ): Promise<boolean> => {
-  if (!chain) {
-    log.error('no chain provided to verifySignature');
+  if (!community) {
+    log.error('no community provided to verifySignature');
     return false;
   }
 
   let isValid: boolean;
-  if (chain.base === ChainBase.Substrate) {
+  if (community.base === ChainBase.Substrate) {
     //
     // substrate address handling
     //
@@ -94,7 +94,7 @@ const verifySignature = async (
       if (addressModel.keytype) {
         keyringOptions.type = addressModel.keytype as KeypairType;
       }
-      keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
+      keyringOptions.ss58Format = community.ss58_prefix ?? 42;
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
       const signedMessageNewline = stringToU8a(
         `${addressModel.verification_token}\n`
@@ -114,7 +114,7 @@ const verifySignature = async (
       isValid = false;
     }
   } else if (
-    chain.base === ChainBase.CosmosSDK &&
+    community.base === ChainBase.CosmosSDK &&
     addressModel.wallet_id === WalletId.CosmosEvmMetamask
   ) {
     //
@@ -139,14 +139,14 @@ const verifySignature = async (
         lowercaseAddress.toString()
       ).toBuffer();
       const injAddress = bech32.encode(
-        chain.bech32_prefix,
+        community.bech32_prefix,
         bech32.toWords(injAddrBuf)
       );
       if (addressModel.address === injAddress) isValid = true;
     } catch (e) {
       isValid = false;
     }
-  } else if (chain.base === ChainBase.CosmosSDK) {
+  } else if (community.base === ChainBase.CosmosSDK) {
     //
     // cosmos-sdk address handling
     //
@@ -159,7 +159,7 @@ const verifySignature = async (
     // this prevents people from using a different key to sign the message than
     // the account they registered with.
     // TODO: ensure ion works
-    const bech32Prefix = chain.bech32_prefix;
+    const bech32Prefix = community.bech32_prefix;
     if (!bech32Prefix) {
       log.error('No bech32 prefix found.');
       isValid = false;
@@ -178,7 +178,7 @@ const verifySignature = async (
         generatedAddressWithCosmosPrefix === addressModel.address
       ) {
         // query chain ID from URL
-        const [node] = await chain.getChainNodes();
+        const [node] = await community.getChainNodes();
         const client = await StargateClient.connect(node.url);
         const chainId = await client.getChainId();
         client.disconnect();
@@ -225,12 +225,12 @@ const verifySignature = async (
         isValid = false;
       }
     }
-  } else if (chain.base === ChainBase.Ethereum) {
+  } else if (community.base === ChainBase.Ethereum) {
     //
     // ethereum address handling
     //
     try {
-      const [node] = await chain.getChainNodes();
+      const [node] = await community.getChainNodes();
       const typedMessage = constructTypedMessage(
         node.eth_chain_id || 1,
         addressModel.verification_token.trim()
@@ -252,7 +252,7 @@ const verifySignature = async (
       );
       isValid = false;
     }
-  } else if (chain.base === ChainBase.NEAR) {
+  } else if (community.base === ChainBase.NEAR) {
     //
     // near address handling
     //
@@ -264,7 +264,7 @@ const verifySignature = async (
       Buffer.from(sigObj, 'base64'),
       Buffer.from(publicKey, 'base64')
     );
-  } else if (chain.base === ChainBase.Solana) {
+  } else if (community.base === ChainBase.Solana) {
     //
     // solana address handling
     //
@@ -286,7 +286,7 @@ const verifySignature = async (
     }
   } else {
     // invalid network
-    log.error(`invalid network: ${chain.network}`);
+    log.error(`invalid network: ${community.network}`);
     isValid = false;
   }
 
@@ -327,7 +327,7 @@ const verifySignature = async (
 
 const processAddress = async (
   models: DB,
-  chain: ChainInstance,
+  community: CommunityInstance,
   address: string,
   wallet_id: WalletId,
   signature?: string,
@@ -335,7 +335,7 @@ const processAddress = async (
 ): Promise<void> => {
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { chain: chain.id, address },
+      where: { community_id: community.id, address },
     }
   );
   if (!existingAddress) {
@@ -358,7 +358,7 @@ const processAddress = async (
   try {
     const valid = await verifySignature(
       models,
-      chain,
+      community,
       existingAddress,
       user ? user.id : null,
       signature
@@ -388,7 +388,7 @@ const processAddress = async (
         templateId: DynamicTemplate.VerifyAddress,
         dynamic_template_data: {
           address,
-          chain: chain.name,
+          chain: community.name,
         },
       };
       await sgMail.send(msg);
@@ -410,8 +410,8 @@ const verifyAddress = async (
   if (!req.body.chain) {
     throw new AppError(Errors.NoChain);
   }
-  const chain = await models.Chain.findOne({
-    where: { id: req.body.chain },
+  const chain = await models.Community.findOne({
+    where: { id: req.body.community },
   });
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
@@ -446,7 +446,7 @@ const verifyAddress = async (
   } else {
     // if user isn't logged in, log them in now
     const newAddress = await models.Address.findOne({
-      where: { chain: req.body.chain, address },
+      where: { community_id: req.body.community_id, address },
     });
     const user = await models.User.scope('withPrivateData').findOne({
       where: { id: newAddress.user_id },

@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { AddressAttributes } from './address';
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { ModelStatic, ModelInstance } from './types';
 
 export type Permission = 'admin' | 'moderator' | 'member';
@@ -10,14 +10,14 @@ export type RoleAttributes = {
   address_id: number;
   permission: Permission;
   id?: number;
-  chain_id: string;
+  community_id: string;
   is_user_default?: boolean;
   created_at?: Date;
   updated_at?: Date;
 
   // associations
   Address?: AddressAttributes;
-  Chain?: ChainAttributes;
+  Community?: CommunityAttributes;
 }
 
 export type RoleInstance = ModelInstance<RoleAttributes>;
@@ -31,7 +31,7 @@ export default (
   const Role = <RoleModelStatic>sequelize.define('Role', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
-    chain_id: { type: dataTypes.STRING, allowNull: false },
+    community_id: { type: dataTypes.STRING, allowNull: false },
     is_user_default: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false, },
     permission: {
       type: dataTypes.ENUM,
@@ -49,14 +49,14 @@ export default (
     underscored: true,
     indexes: [
       { fields: ['address_id'] },
-      { fields: ['chain_id'] },
-      { fields: ['address_id', 'chain_id'], unique: true },
+      { fields: ['community_id'] },
+      { fields: ['address_id', 'community_id'], unique: true },
     ],
   });
 
   Role.associate = (models) => {
     models.Role.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
-    models.Role.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
+    models.Role.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
   };
 
   return Role;

@@ -1,7 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
-import { ThreadAttributes } from './thread';
 import { PollAttributes } from './poll';
 
 export type VoteAttributes = {
@@ -9,7 +8,7 @@ export type VoteAttributes = {
   option: string;
   address: string;
   author_chain: string;
-  chain_id: string;
+  community_id: string;
   id?: number;
   created_at?: Date;
   updated_at?: Date;
@@ -33,8 +32,8 @@ export default (
       poll_id: { type: dataTypes.INTEGER, allowNull: false },
       option: { type: dataTypes.STRING, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
-      author_chain: { type: Sequelize.STRING, allowNull: true },
-      chain_id: { type: Sequelize.STRING, allowNull: true },
+      author_community: { type: Sequelize.STRING, allowNull: true },
+      community_id: { type: Sequelize.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
