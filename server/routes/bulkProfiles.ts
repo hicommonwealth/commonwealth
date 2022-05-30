@@ -5,12 +5,12 @@ import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  let chains;
+  let communities;
   let addrs;
-  if (req.body['chains[]'] && typeof req.body['chains[]'] === 'string') {
-    chains = [ req.body['chains[]'] ];
-  } else if (req.body['chains[]']) {
-    chains = req.body['chains[]'];
+  if (req.body['communities[]'] && typeof req.body['communities[]'] === 'string') {
+    communities = [ req.body['communities[]'] ];
+  } else if (req.body['communities[]']) {
+    communities = req.body['communities[]'];
   } else {
     return next(new Error('Must specify chain'));
   }
@@ -23,27 +23,27 @@ const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextF
     return next(new Error('Must specify addresses'));
   }
 
-  if (chains.length !== addrs.length) {
+  if (communities.length !== addrs.length) {
     return next(new Error('Must specify exactly one address for each one chain'));
   }
 
   let addrObjs;
   // if all profiles are on the same chain, make a fast query, otherwise, make multiple queries
-  if (_.uniq(chains).length === 1) {
+  if (_.uniq(communities).length === 1) {
     addrObjs = await models.Address.findAll({
       where: {
-        chain: chains[0],
+        community_id: communities[0],
         address: addrs,
       }
     });
   } else {
     let query;
     addrObjs = [];
-    for (const chain in chains) {
-      if (chains[chain]) {
+    for (const community in communities) {
+      if (communities[community]) {
         query = await models.Address.findAll({
           where: {
-            chain: chains[chain],
+            community_id: communities[community],
             address: addrs,
           }
         });

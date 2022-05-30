@@ -12,7 +12,7 @@ const activeThreads = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const [chain, error] = await validateChain(models, req.query);
+  const [community, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
   let { threads_per_topic } = req.query;
@@ -25,7 +25,7 @@ const activeThreads = async (
 
   const allThreads = [];
   try {
-    const communityWhere = { chain_id: chain.id }
+    const communityWhere = { community_id: community.id }
     const communityTopics = await models.Topic.findAll({
       where: communityWhere
     });

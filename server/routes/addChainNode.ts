@@ -4,7 +4,7 @@ import { ChainBase, ChainType } from '../../shared/types';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { ChainAttributes } from '../models/community';
+import { CommunityAttributes } from '../models/community';
 import { ChainNodeAttributes } from '../models/chain_node';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -19,7 +19,7 @@ export const Errors = {
   InvalidJSON: 'Substrate spec supplied has invalid JSON'
 };
 
-type AddChainNodeReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
+type AddChainNodeReq = Omit<CommunityAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
   id: string;
   node_url: string;
   substrate_spec: string;
@@ -59,23 +59,23 @@ const addChainNode = async (
     }
   }
 
-  let chain = await models.Chain.findOne({ where: {
+  let community = await models.Community.findOne({ where: {
     // TODO: should we only check id?
     [Op.or]: [
       { id: req.body.id },
       { name: req.body.name }
     ]
   } });
-  if (chain) {
+  if (community) {
     const existingNode = await models.ChainNode.findOne({ where: {
-      chain: chain.id,
+      community_id: community.id,
       url: req.body.node_url,
     } });
     if (existingNode) {
       return next(new Error(Errors.NodeExists));
     }
   } else {
-    chain = await models.Chain.create({
+    community = await models.Community.create({
       id: req.body.id,
       name: req.body.name,
       symbol: req.body.symbol,
@@ -97,12 +97,12 @@ const addChainNode = async (
     });
   }
 
-  if (chain.type === ChainType.DAO && !req.body.address && req.body.base !== ChainBase.NEAR) {
+  if (community.type === ChainType.DAO && !req.body.address && req.body.base !== ChainBase.NEAR) {
     return next(new Error(Errors.MustSpecifyContract));
   }
 
   const node = await models.ChainNode.create({
-    chain: chain.id,
+    community_id: community.id,
     url: req.body.node_url,
     address: req.body.address || '',
     token_name: req.body.token_name || null,

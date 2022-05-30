@@ -16,7 +16,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
         return next(new Error(Errors.NotAdmin))
     }
 
-    if (!req.body.chain_id) {
+    if (!req.body.community_id) {
         return next(new Error(Errors.NoCommunityId))
     }
 
@@ -24,7 +24,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     await models.ChatChannel.destroy({
         where: {
             id: req.body.channel_id,
-            chain_id: req.body.chain_id
+            community_id: req.body.community_id
         }
     });
 

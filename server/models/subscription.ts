@@ -32,7 +32,7 @@ export type SubscriptionAttributes = {
   immediate_email?: boolean;
   created_at?: Date;
   updated_at?: Date;
-  chain_id?: string;
+  community_id?: string;
   offchain_thread_id?: number;
   offchain_comment_id?: number;
   chain_event_type_id?: string;

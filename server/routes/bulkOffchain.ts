@@ -24,12 +24,12 @@ const bulkOffchain = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
+  const [community, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
   // globally shared SQL replacements
-  const communityOptions = 'chain = :chain';
-  const replacements = { chain: chain.id };
+  const communityOptions = 'community_id = :community_id'; // @JAKE @TODO IS this right?
+  const replacements = { community_id: community.id };
 
   // parallelized queries
   const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels] =
@@ -47,7 +47,7 @@ const bulkOffchain = async (
     >Promise.all([
       // topics
       models.Topic.findAll({
-        where: { chain_id: chain.id },
+        where: { community_id: community.id },
       }),
       // threads, comments, reactions
       new Promise(async (resolve, reject) => {
@@ -103,7 +103,7 @@ const bulkOffchain = async (
       // admins
       models.Role.findAll({
         where: {
-          chain_id: chain.id,
+          community_id: community.id,
           permission: { [Op.in]: ['admin', 'moderator'] },
         },
         include: [models.Address],
@@ -118,7 +118,7 @@ const bulkOffchain = async (
           const activeUsers = {};
           const where = {
             updated_at: { [Op.gt]: thirtyDaysAgo },
-            chain: chain.id,
+            community_id: community.id,
           };
 
           const monthlyComments = await models.Comment.findAll({
@@ -160,7 +160,7 @@ const bulkOffchain = async (
       ),
       models.ChatChannel.findAll({
         where: {
-          chain_id: chain.id
+          community_id: community.id
         },
         include: {
           model: models.ChatMessage,

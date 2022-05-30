@@ -115,7 +115,7 @@ const resetServer = (debug = false): Promise<void> => {
       });
 
       // Initialize different chain + node URLs
-      const edgMain = await models.Chain.create({
+      const edgMain = await models.Community.create({
         id: 'edgeware',
         network: ChainNetwork.Edgeware,
         symbol: 'EDG',
@@ -127,7 +127,7 @@ const resetServer = (debug = false): Promise<void> => {
         ss58_prefix: 7,
         has_chain_events_listener: false,
       });
-      const eth = await models.Chain.create({
+      const eth = await models.Community.create({
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
         symbol: 'ETH',
@@ -138,7 +138,7 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
       });
-      const alex = await models.Chain.create({
+      const alex = await models.Community.create({
         id: 'alex',
         network: ChainNetwork.ERC20,
         symbol: 'ALEX',
@@ -149,7 +149,7 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
       });
-      const yearn = await models.Chain.create({
+      const yearn = await models.Community.create({
         id: 'yearn',
         network: ChainNetwork.ERC20,
         symbol: 'YFI',
@@ -160,7 +160,7 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
       });
-      const sushi = await models.Chain.create({
+      const sushi = await models.Community.create({
         id: 'sushi',
         network: ChainNetwork.ERC20,
         symbol: 'SUSHI',
@@ -177,7 +177,7 @@ const resetServer = (debug = false): Promise<void> => {
         models.Address.create({
           user_id: 1,
           address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
-          chain: 'ethereum',
+          community_id: 'ethereum',
           // selected: true,
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
@@ -185,7 +185,7 @@ const resetServer = (debug = false): Promise<void> => {
         }),
         models.Address.create({
           address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',
-          chain: 'edgeware',
+          community_id: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -193,7 +193,7 @@ const resetServer = (debug = false): Promise<void> => {
         }),
         models.Address.create({
           address: 'ik52qFh92pboSctWPSFKtQwGEpypzz2m6D5ZRP8AYxqjHpM',
-          chain: 'edgeware',
+          community_id: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -201,7 +201,7 @@ const resetServer = (debug = false): Promise<void> => {
         }),
         models.Address.create({
           address: 'js4NB7G3bqEsSYq4ruj9Lq24QHcoKaqauw6YDPD7hMr1Roj',
-          chain: 'edgeware',
+          community_id: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -298,9 +298,9 @@ const resetServer = (debug = false): Promise<void> => {
       ];
 
       await Promise.all(
-        nodes.map(([url, chain, address, eth_chain_id]) =>
+        nodes.map(([url, community_id, address, eth_chain_id]) =>
           models.ChainNode.create({
-            chain,
+            community_id,
             url,
             address,
             eth_chain_id: +eth_chain_id || null,

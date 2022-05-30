@@ -15,7 +15,7 @@ const validateChain = async (
 ): Promise<[CommunityInstance, string]> => {
   const community_id = params.community || params.community_id;
   if (!community_id) return [null, ChainCommunityErrors.ChainDNE];
-  const chain = await models.Community.findOne({
+  const community = await models.Community.findOne({
     where: {
       id: community_id,
     },
@@ -29,8 +29,8 @@ const validateChain = async (
     ],
   });
   // searching for chain that doesn't exist
-  if (community_id && !chain) return [null, ChainCommunityErrors.ChainDNE];
-  return [chain, null];
+  if (community_id && !community) return [null, ChainCommunityErrors.ChainDNE];
+  return [community, null];
 };
 
 export default validateChain;

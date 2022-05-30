@@ -29,7 +29,7 @@ const addEditors = async (
   } catch (e) {
     return next(new Error(Errors.InvalidEditorFormat));
   }
-  const [chain, error] = await validateChain(models, req.body);
+  const [community, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -74,7 +74,7 @@ const addEditors = async (
           return null;
         }
         const isMember = collaborator.Roles.find(
-          (role) => role.chain_id === chain.id
+          (role) => role.community_id === community.id
         );
         if (!isMember) throw new Error(Errors.InvalidEditor);
 
@@ -93,7 +93,7 @@ const addEditors = async (
             category_id: NotificationCategories.NewComment,
             object_id: `discussion_${thread.id}`,
             offchain_thread_id: thread.id,
-            chain_id: thread.chain,
+            community_id: thread.community_id,
             is_active: true,
           },
         });
@@ -103,7 +103,7 @@ const addEditors = async (
             category_id: NotificationCategories.NewReaction,
             object_id: `discussion_${thread.id}`,
             offchain_thread_id: thread.id,
-            chain_id: thread.chain,
+            community_id: thread.community_id,
             is_active: true,
           },
         });
@@ -132,16 +132,16 @@ const addEditors = async (
             root_type: ProposalType.Thread,
             root_title: thread.title,
             comment_text: thread.body,
-            chain_id: thread.chain,
+            community_id: thread.community_id,
             author_address: author.address,
-            author_chain: author.chain,
+            author_community: author.community_id,
           },
           {
             user: author.address,
             url: getProposalUrl('discussion', thread),
             title: req.body.title,
             bodyUrl: req.body.url,
-            chain: thread.chain,
+            community_id: thread.community_id,
             body: thread.body,
           },
           req.wss,

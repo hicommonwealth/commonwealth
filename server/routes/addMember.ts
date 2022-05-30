@@ -15,9 +15,9 @@ export const Errors = {
 };
 
 const addMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, error] = await validateChain(models, req.body);
+  const [community, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
-  if (!chain) return next(new Error(Errors.InvalidCommunity));
+  if (!community) return next(new Error(Errors.InvalidCommunity));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));
 
@@ -31,7 +31,7 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
   const requesterIsAdminOrMod = await models.Role.findAll({
     where: {
       address_id: adminAddress.id,
-      chain_id: chain.id,
+      community_id: community.id,
       permission: ['admin', 'moderator'],
     },
   });
@@ -40,14 +40,14 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
   const existingAddress = await models.Address.findOne({
     where: {
       address: req.body.invitedAddress,
-      chain: req.body.invitedAddressChain,
+      community_id: req.body.invitedAddressChain,
     },
   });
   if (!existingAddress) return next(new Error(Errors.AddressNotFound));
   const existingRole = await models.Role.findOne({
     where: {
       address_id: existingAddress.id,
-      chain_id: chain.id,
+      community_id: community.id,
     },
   });
 
@@ -55,7 +55,7 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
 
   const role = await models.Role.create({
     address_id: existingAddress.id,
-    chain_id: chain.id,
+    community_id: community.id,
     permission: 'member',
   });
 

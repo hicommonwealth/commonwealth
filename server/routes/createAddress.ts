@@ -25,7 +25,7 @@ export const Errors = {
 
 type CreateAddressReq = {
   address: string;
-  chain: string;
+  community_id: string;
   wallet_id: WalletId;
   community?: string;
   keytype?: string;
@@ -45,7 +45,7 @@ const createAddress = async (
   if (!req.body.address) {
     return next(new Error(Errors.NeedAddress));
   }
-  if (!req.body.chain) {
+  if (!req.body.community_id) {
     return next(new Error(Errors.NeedChain));
   }
   if (
@@ -55,36 +55,36 @@ const createAddress = async (
     return next(new Error(Errors.NeedWallet));
   }
 
-  const chain = await models.Chain.findOne({
-    where: { id: req.body.chain },
+  const community = await models.Community.findOne({
+    where: { id: req.body.community_id },
   });
 
-  if (!chain) {
+  if (!community) {
     return next(new Error(Errors.InvalidChain));
   }
 
   // test / convert address as needed
   let encodedAddress = (req.body.address as string).trim();
   try {
-    if (chain.base === ChainBase.Substrate) {
+    if (community.base === ChainBase.Substrate) {
       encodedAddress = AddressSwapper({
         address: req.body.address,
-        currentPrefix: chain.ss58_prefix,
+        currentPrefix: community.ss58_prefix,
       });
-    } else if (chain.bech32_prefix) {
+    } else if (community.bech32_prefix) {
       // cosmos or injective
       const { words } = bech32.decode(req.body.address, 50);
-      encodedAddress = bech32.encode(chain.bech32_prefix, words);
-    } else if (chain.base === ChainBase.Ethereum) {
+      encodedAddress = bech32.encode(community.bech32_prefix, words);
+    } else if (community.base === ChainBase.Ethereum) {
       if (!Web3.utils.isAddress(encodedAddress)) {
         throw new Error('Eth address is not valid');
       }
-    } else if (chain.base === ChainBase.NEAR) {
+    } else if (community.base === ChainBase.NEAR) {
       const nearRegex = /^[a-z0-9_\-.]*$/;
       if (!nearRegex.test(encodedAddress)) {
         throw new Error('NEAR address is not valid');
       }
-    } else if (chain.base === ChainBase.Solana) {
+    } else if (community.base === ChainBase.Solana) {
       const key = new PublicKey(encodedAddress);
       if (key.toBase58() !== encodedAddress) {
         throw new Error(`Solana address is not valid: ${key.toBase58()}`);
@@ -97,7 +97,7 @@ const createAddress = async (
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { chain: req.body.chain, address: encodedAddress },
+      where: { community_id: req.body.community_id, address: encodedAddress },
     }
   );
 
@@ -138,12 +138,12 @@ const createAddress = async (
     // if req.body.community is valid, then we should create a role between this community vs address
     if (req.body.community) {
       const role = await models.Role.findOne({
-        where: { address_id: updatedObj.id, chain_id: req.body.community },
+        where: { address_id: updatedObj.id, community_id: req.body.community_id },
       });
       if (!role) {
         await models.Role.create({
           address_id: updatedObj.id,
-          chain_id: req.body.community,
+          community_id: req.body.community_id,
           permission: 'member',
         });
       }
@@ -170,7 +170,7 @@ const createAddress = async (
       const newObj = await models.Address.create({
         user_id,
         profile_id,
-        chain: req.body.chain,
+        community_id: req.body.community_id,
         address: encodedAddress,
         verification_token,
         verification_token_expires,
@@ -184,7 +184,7 @@ const createAddress = async (
       if (!req.user) {
         await models.Role.create({
           address_id: newObj.id,
-          chain_id: req.body.chain,
+          community_id: req.body.community_id,
           permission: 'member',
         });
       }
@@ -192,7 +192,7 @@ const createAddress = async (
       if (process.env.NODE_ENV !== 'test') {
         mixpanelTrack({
           event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-          chain: req.body.chain,
+          community_id: req.body.community,
           isCustomDomain: null,
         });
       }

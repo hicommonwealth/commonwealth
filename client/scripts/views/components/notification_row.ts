@@ -60,13 +60,13 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     comment_text,
     parent_comment_id,
     parent_comment_text,
-    chain_id,
+    community_id,
     author_address,
     author_chain,
   } = data;
 
   const community_name =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;
@@ -131,7 +131,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const pseudoProposal = {
     id: root_id,
     title: root_title,
-    chain: chain_id,
+    community_id,
   };
   const args = comment_id
     ? [root_type, pseudoProposal, { id: comment_id }]
@@ -168,7 +168,7 @@ const getBatchNotificationFields = (
     comment_text,
     parent_comment_id,
     parent_comment_text,
-    chain_id,
+    community_id,
     author_address,
     author_chain,
   } = data[0];
@@ -178,7 +178,7 @@ const getBatchNotificationFields = (
   ).map((u) => u.split('#'));
   const length = authorInfo.length - 1;
   const community_name =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+    app.config.chains.getById(community_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;
@@ -250,14 +250,14 @@ const getBatchNotificationFields = (
   const pseudoProposal = {
     id: root_id,
     title: root_title,
-    chain: chain_id,
+    community_id,
   };
   const args = comment_id
     ? [root_type, pseudoProposal, { id: comment_id }]
     : [root_type, pseudoProposal];
   const path =
     category === NotificationCategories.NewThread
-      ? (getCommunityUrl as any)(chain_id)
+      ? (getCommunityUrl as any)(community_id)
       : (getProposalUrl as any)(...args);
   const pageJump = comment_id
     ? () => jumpHighlightComment(comment_id)

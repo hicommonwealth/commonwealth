@@ -168,7 +168,7 @@ export interface IPostNotificationData {
   parent_comment_text?: string;
   community_id: string;
   author_address: string;
-  author_chain: string;
+  author_community: string;
   view_count?: number;
   like_count?: number;
   comment_count?: number;

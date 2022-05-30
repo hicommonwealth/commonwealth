@@ -5,7 +5,7 @@ import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../database';
-import { ThreadInstance } from '../models/thread';
+import { OffchainThreadInstance } from '../models/offchain_thread';
 
 const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
@@ -71,11 +71,11 @@ const bulkThreads = async (
                   "linking_thread": "', linked_threads.linking_thread, '" }'
             )
           ) AS linked_threads 
-        FROM "Threads" t
+        FROM "OffchainThreads" t
         LEFT JOIN "LinkedThreads" AS linked_threads
         ON t.id = linked_threads.linking_thread
         LEFT JOIN "Collaborations" AS collaborations
-        ON t.id = collaborations.thread_id
+        ON t.id = collaborations.offchain_thread_id
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
         LEFT JOIN "ChainEntities" AS chain_entities
@@ -156,7 +156,7 @@ const bulkThreads = async (
     threads =
       // TODO: May need to include last_commented_on in order, if this else is used
       (
-        await models.Thread.findAll({
+        await models.OffchainThread.findAll({
           where: { chain: chain.id },
           include: [
             {
@@ -191,10 +191,10 @@ const bulkThreads = async (
   }
 
   const countsQuery = `
-     SELECT id, title, stage FROM "Threads"
+     SELECT id, title, stage FROM "OffchainThreads"
      WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
-  const threadsInVoting: ThreadInstance[] =
+  const threadsInVoting: OffchainThreadInstance[] =
     await models.sequelize.query(countsQuery, {
       bind,
       type: QueryTypes.SELECT,

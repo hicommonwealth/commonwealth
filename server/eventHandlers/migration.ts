@@ -21,7 +21,7 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler<ChainEventInstance> {
-  constructor(private readonly _models: DB, private readonly _chain?: string) {
+  constructor(private readonly _models: DB, private readonly _community_id?: string) {
     super();
   }
 
@@ -30,7 +30,7 @@ export default class extends IEventHandler<ChainEventInstance> {
    * events depending whether we've seen them before.
    */
   public async handle(event: CWEvent<IChainEventData>) {
-    const chain = event.chain || this._chain;
+    const community = event.community_id || this._community_id;
 
     // case by entity type to determine what value to look for
     const createOrUpdateModel = async (
@@ -41,8 +41,8 @@ export default class extends IEventHandler<ChainEventInstance> {
       const [dbEventType, created] =
         await this._models.ChainEventType.findOrCreate({
           where: {
-            id: `${chain}-${event.data.kind.toString()}`,
-            chain,
+            id: `${community}-${event.data.kind.toString()}`,
+            community_id: community,
             event_network: event.network,
             event_name: event.data.kind.toString(),
           },

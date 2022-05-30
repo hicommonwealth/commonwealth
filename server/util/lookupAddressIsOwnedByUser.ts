@@ -20,7 +20,7 @@ const lookupAddressIsOwnedByUser = async (
   }
 
   const author = await models.Address.findOne({ where: {
-    chain: req.body.author_chain,
+    community_id: req.body.author_chain,
     address: req.body.address,
     user_id: req.user.id,
   } });

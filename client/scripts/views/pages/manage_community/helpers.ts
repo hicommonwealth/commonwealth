@@ -18,12 +18,12 @@ export const sortAdminsAndModsFirst = (a, b) => {
 
 export const setChainCategories = async (
   category_type_id: number,
-  chain_id: string,
+  community_id: string,
   create: boolean
 ) => {
   return new Promise<void>((resolve, reject) => {
     const params = {
-      chain_id,
+      community_id,
       category_type_id,
       create,
       auth: true,
@@ -35,7 +35,7 @@ export const setChainCategories = async (
           app.config.chainCategories = app.config.chainCategories.concat([
             {
               id: response.result.id,
-              chain_id: response.result.chain_id,
+              community_id: response.result.community_id,
               category_type_id: response.result.category_type_id,
             },
           ]);

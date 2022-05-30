@@ -26,7 +26,7 @@ export function useMagicAuth(models: DB) {
       // determine login location
       let chain, error;
       if (req.body.chain || req.body.community) {
-        [ chain, error ] = await validateChain(models, req.body);
+        [ chain , error ] = await validateChain(models, req.body);
         if (error) return cb(error);
       }
       const registrationChain = chain;
@@ -95,7 +95,7 @@ export function useMagicAuth(models: DB) {
           if (registrationChain.base === ChainBase.Substrate) {
             newAddress = await models.Address.create({
               address: polkadotAddress,
-              chain: registrationChain.id,
+              community_id: registrationChain.id,
               verification_token: 'MAGIC',
               verification_token_expires: null,
               verified: new Date(), // trust addresses from magic
@@ -109,7 +109,7 @@ export function useMagicAuth(models: DB) {
             // and auto-add them to the eth forum
             const ethAddressInstance = await models.Address.create({
               address: ethAddress,
-              chain: 'ethereum',
+              community_id: 'ethereum',
               verification_token: 'MAGIC',
               verification_token_expires: null,
               verified: new Date(), // trust addresses from magic
@@ -121,13 +121,13 @@ export function useMagicAuth(models: DB) {
 
             await models.Role.create({
               address_id: ethAddressInstance.id,
-              chain_id: 'ethereum',
+              community_id: 'ethereum',
               permission: 'member',
             });
           } else {
             newAddress = await models.Address.create({
               address: ethAddress,
-              chain: registrationChain.id,
+              community_id: registrationChain.id,
               verification_token: 'MAGIC',
               verification_token_expires: null,
               verified: new Date(), // trust addresses from magic
@@ -141,7 +141,7 @@ export function useMagicAuth(models: DB) {
             // and auto-add them to the forum
             const edgewareAddressInstance = await models.Address.create({
               address: polkadotAddress,
-              chain: 'edgeware',
+              community_id: 'edgeware',
               verification_token: 'MAGIC',
               verification_token_expires: null,
               verified: new Date(), // trust addresses from magic
@@ -153,14 +153,14 @@ export function useMagicAuth(models: DB) {
 
             await models.Role.create({
               address_id: edgewareAddressInstance.id,
-              chain_id: 'edgeware',
+              community_id: 'edgeware',
               permission: 'member',
             }, { transaction: t });
           }
 
           if (req.body.chain) await models.Role.create({
             address_id: newAddress.id,
-            chain_id: req.body.chain,
+            community_id: req.body.chain,
             permission: 'member',
           }, { transaction: t });
 

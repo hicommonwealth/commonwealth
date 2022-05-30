@@ -100,7 +100,7 @@ const ConfirmInviteModal: m.Component<
         .map((account) => SelectAddress(account));
     }
 
-    const activeInvite = app.config.chains.getById(invites[location].chain_id);
+    const activeInvite = app.config.chains.getById(invites[location].community_id);
     const hasTermsOfService = !!activeInvite?.terms;
 
     return m('.ConfirmInviteModal', [
@@ -177,7 +177,7 @@ const ConfirmInviteModal: m.Component<
                                   if (app.config.invites.length === 0) {
                                     $(e.target).trigger('modalexit');
                                   }
-                                  const chainId = invites[location].chain_id;
+                                  const chainId = invites[location].community_id;
                                   console.log({ chainId });
                                   // if private community, re-init app
                                   m.route.set(`/${chainId}`);
@@ -238,7 +238,7 @@ const ConfirmInviteModal: m.Component<
                           // TODO: let the user select between different crypto wallets for linking an address
                           const defaultChainId = 'edgeware';
                           const joiningCommunity =
-                            invites[vnode.state.location].chain_id;
+                            invites[vnode.state.location].community_id;
                           const targetCommunity = joiningCommunity;
                           const prev = m.route.get();
                           const next = `/${joiningCommunity}`;
@@ -278,7 +278,7 @@ const ConfirmInviteModal: m.Component<
                       onSuccess: (e) => {
                         // $('.ConfirmInviteModal').trigger('modalexit');
                         m.route.set(
-                          `/${invites[vnode.state.location].chain_id}`
+                          `/${invites[vnode.state.location].community_id}`
                         );
                       },
                     }),

@@ -11,10 +11,10 @@ const bulkEntities = async (models: DB, req: Request, res: Response, next: NextF
     return next(new Error(Errors.NeedChain));
   }
 
-  const chain = await models.Chain.findOne({
+  const community = await models.Community.findOne({
     where: { id: req.query.chain }
   });
-  if (!chain) {
+  if (!community) {
     return next(new Error(Errors.InvalidChain));
   }
 
