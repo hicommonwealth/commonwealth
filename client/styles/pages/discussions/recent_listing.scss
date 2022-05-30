@@ -1,6 +1,8 @@
 @import 'client/styles/shared';
 
 .RecentListing {
+  padding: 0 24px;
+
   .infinite-scroll-reached-end {
     color: $neutral-500;
     font-size: 0.94rem;

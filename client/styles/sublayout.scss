@@ -39,12 +39,18 @@
       margin-top: 88px;
     }
 
-    .Body {
+    .body-and-sticky-headers-container {
       display: flex;
       flex-direction: column;
-      height: 100%;
-      overflow-y: auto;
       width: 100%;
+
+      .Body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow-y: auto;
+        width: 100%;
+      }
     }
   }
 }

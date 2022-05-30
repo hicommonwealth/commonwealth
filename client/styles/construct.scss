@@ -28,6 +28,7 @@ $cui-base-height: floor($cui-base-size * 2.8);
 
 .cui-button {
   font-size: inherit;
+  position: unset;
 }
 
 .cui-button.cui-sm,
@@ -285,6 +286,8 @@ button,
 
 // reduce tag padding
 .cui-tag {
+  position: unset;
+
   @include cui-tag-sizing(
     $cui-base-height * 0.5,
     $cui-base-padding,
@@ -380,8 +383,9 @@ button,
   }
 
   .cui-button-label {
-    width: 100%;
+    position: unset;
     text-align: left;
+    width: 100%;
   }
 
   button.cui-button.cui-menu-item {
