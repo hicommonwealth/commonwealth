@@ -18,6 +18,7 @@ export type UserAttributes = {
   lastVisited?: string;
   disableRichText?: boolean;
   emailNotificationInterval?: EmailNotificationInterval;
+  selected_chain_id?: number;
   created_at?: Date;
   updated_at?: Date;
 
@@ -71,7 +72,7 @@ export default (
     isAdmin: { type: dataTypes.BOOLEAN, defaultValue: false },
     lastVisited: { type: dataTypes.TEXT, allowNull: false, defaultValue: '{}' },
     disableRichText: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
-    selectedChain: { type: dataTypes.STRING, allowNull: true },
+    selected_chain_id: { type: dataTypes.STRING, allowNull: true },
   }, {
     timestamps: true,
     createdAt: 'created_at',
@@ -106,8 +107,7 @@ export default (
   };
 
   User.associate = (models) => {
-    // TODO: write a migration for this change
-    models.User.belongsTo(models.Chain, { as: 'selectedChain', constraints: false });
+    models.User.belongsTo(models.Chain, { as: 'selectedChain', foreignKey: 'selected_chain_id', constraints: false });
     models.User.hasMany(models.Address);
     models.User.hasMany(models.Profile);
     models.User.hasMany(models.SocialAccount);
