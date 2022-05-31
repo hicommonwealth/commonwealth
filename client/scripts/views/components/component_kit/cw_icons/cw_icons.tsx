@@ -1640,10 +1640,10 @@ export const CWWebsite: m.Component<IconAttrs> = {
       <svg
         class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
-        width="30"
-        height="30"
+        width="32"
+        height="32"
         fill="none"
-        viewBox="0 0 30 30"
+        viewBox="0 0 32 32"
         onclick={onclick}
       >
         <path
