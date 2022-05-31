@@ -17,21 +17,8 @@ import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
-import { CWPopover } from './cw_popover/cw_popover';
 import { CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_tooltip';
-import { CWOverlay } from './cw_overlay';
-
-// const displayColors = (hexList) => {
-//   return Object.entries(hexList).map(([k, v]) => {
-//     return (
-//       <div class="color-row">
-//         {k}
-//         <div class="color" style={`background: ${v};`} />
-//       </div>
-//     );
-//   });
-// };
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -65,171 +52,43 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        <h1>Popover</h1>
-        <div style="display: flex; width: 90%; justify-content: space-between;">
-          <CWPopover
-            onToggle={(isOpen: boolean) =>
-              console.log("I've been toggled! I am open: ", isOpen)
-            }
-            trigger={<CWButton label={'Click Toggle'} />}
-            content={
-              <div>
-                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
-                  <CWButton
-                    label="click me"
-                    onclick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Clicked!');
-                    }}
-                  />
-                </div>
-              </div>
-            }
-            toSide={false}
-            showArrow={true}
-            interactionType="click"
-          />
-
-          <CWPopover
-            onToggle={(isOpen: boolean) =>
-              console.log("I've been toggled! I am open: ", isOpen)
-            }
-            trigger={<CWButton label={'Click Toggle (Large Content)'} />}
-            content={
-              <div>
-                <div style="height: 400px; display: flex; justify-content: center; align-items: center;">
-                  <CWButton
-                    label="click me"
-                    onclick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Clicked!');
-                    }}
-                  />
-                </div>
-              </div>
-            }
-            toSide={false}
-            showArrow={true}
-            interactionType="click"
-          />
-
-          <CWPopover
-            onToggle={(isOpen: boolean) =>
-              console.log("I've been toggled! I am open: ", isOpen)
-            }
-            trigger={<CWButton label={'Hover Toggle'} />}
-            content={
-              <div>
-                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
-                  I do not have a delay, so I can't be moused over
-                </div>
-              </div>
-            }
-            toSide={false}
-            showArrow={true}
-            interactionType="hover"
-          />
-          <CWPopover
-            onToggle={(isOpen: boolean) =>
-              console.log("I've been toggled! I am open: ", isOpen)
-            }
-            trigger={<CWButton label={'Hover Toggle 2'} />}
-            content={
-              <div>
-                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
-                  <CWButton
-                    label="click me"
-                    onclick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Clicked!');
-                    }}
-                  />
-                </div>
-              </div>
-            }
-            toSide={false}
-            showArrow={true}
-            interactionType="hover"
-            hoverOpenDelay={200}
-          />
-          <CWPopover
-            onToggle={(isOpen: boolean) =>
-              console.log("I've been toggled! I am open: ", isOpen)
-            }
-            trigger={<CWButton label={'Side Toggle'} />}
-            content={
-              <div>
-                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
-                  <CWButton
-                    label="click me"
-                    onclick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Clicked!');
-                    }}
-                  />
-                </div>
-              </div>
-            }
-            toSide={true}
-            showArrow={true}
-            interactionType="hover"
-            hoverOpenDelay={200}
-          />
-          <CWPopover
-            onToggle={(isOpen: boolean) =>
-              console.log("I've been toggled! I am open: ", isOpen)
-            }
-            trigger={<CWButton label={'Arrowless Toggle'} />}
-            content={
-              <div>
-                <div style="height: 100px; display: flex; justify-content: center; align-items: center;">
-                  <CWButton
-                    label="click me"
-                    onclick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Clicked!');
-                    }}
-                  />
-                </div>
-              </div>
-            }
-            toSide={false}
-            showArrow={false}
-            interactionType="hover"
-            hoverOpenDelay={200}
-          />
-        </div>
         <h1>Tooltip</h1>
-        <div style="display: flex; width: 30%; justify-content: space-between;">
-          <CWTooltip
-            trigger={<CWButton label={'Tooltip Large'} />}
-            content={
-              <div>
-                You can hover over me and I won't disappear, because I have a
-                hoverDelay set and persistOnHover set to true! I also have
-                "toSide" set.
-              </div>
-            }
-            hoverOpenDelay={100}
-            persistOnHover={true}
-            showArrow={true}
-            toSide={true}
-          />
-          <CWTooltip
-            trigger={<CWButton label={'Tooltip Small'} />}
-            content={
-              <div style="color: white;">
-                I have singleLine set which changes my styles!
-              </div>
-            }
-            singleLine={true}
-            showArrow={true}
-          />
+        <div class="tooltip-gallery">
+          <div class="tooltip-row">
+            <CWText>Hover</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              content={<>Some content</>}
+              interactionType="hover"
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Hover to side</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              content={<>Some content</>}
+              interactionType="hover"
+              toSide
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Click</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              content={<>Some content</>}
+              interactionType="click"
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Hover, to side, single line</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              content={<>Some content</>}
+              interactionType="hover"
+              toSide
+              singleLine
+            />
+          </div>
         </div>
         <h1>Buttons</h1>
         <div class="button-gallery">

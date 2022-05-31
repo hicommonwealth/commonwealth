@@ -5,6 +5,7 @@ export const getPosition = ({
   gapSize = 1,
   toSide = false,
   tooltipOffset,
+  borderOffset = 4, // 2px on either side
 }: {
   trigger: Element;
   container: Element;
@@ -12,6 +13,7 @@ export const getPosition = ({
   gapSize: number;
   toSide: boolean;
   tooltipOffset?: number;
+  borderOffset?: number;
 }) => {
   const triggerBoundingRect = trigger.getBoundingClientRect();
   const containerBoundingRect = container.getBoundingClientRect();

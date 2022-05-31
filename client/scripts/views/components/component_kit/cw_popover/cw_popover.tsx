@@ -1,45 +1,52 @@
 /* @jsx m */
-/* eslint-disable no-empty */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_popover.scss';
 
 import { CWPortal } from '../cw_portal';
 import { cursorInBounds, findRef, getPosition } from './helpers';
+import { ComponentType } from '../types';
+import { getClasses } from '../helpers';
+
+export type PopoverInteractionType = 'click' | 'hover';
+
+type PopoverStyleAttrs = { singleLine?: boolean };
 
 export type PopoverAttrs = {
   content: m.Children;
-  trigger: m.Vnode<any, any>;
-  closeOnContentClick?: boolean;
-  closeOnEscapeClick: boolean;
-  interactionType?: 'hover' | 'click';
-  hoverOpenDelay?: number;
-  toSide?: boolean;
   hasArrow?: boolean;
+  hoverOpenDelay?: number;
+  interactionType?: PopoverInteractionType;
   onToggle?: (isOpen: boolean) => void;
-};
+  persistOnHover?: boolean;
+  toSide?: boolean;
+  trigger: m.Vnode;
+} & PopoverStyleAttrs;
 
 export class CWPopover implements m.ClassComponent<PopoverAttrs> {
-  isOpen: boolean;
-  isRendered: boolean;
-  isOverContent: boolean;
-  triggerRef: Element;
-  contentId: string;
-  arrowId: string;
+  private arrowId: string;
+  private contentId: string;
+  private isOpen: boolean;
+  private isOverContent: boolean;
+  private isRendered: boolean;
+  private triggerRef: Element;
 
   oncreate(vnode) {
+    this.contentId = `popover-container-ref-${Math.random()}`;
+    this.arrowId = `${this.contentId}-arrow`;
     this.isOpen = false;
     this.isRendered = true;
-    this.triggerRef = findRef(vnode.dom, 'trigger-wrapper');
-    this.contentId = `popover-container-${Math.random()}`;
-    this.arrowId = `${this.contentId}-arrow`;
+    this.triggerRef = findRef(vnode.dom, 'trigger-wrapper-ref');
   }
 
   onupdate(vnode) {
     if (this.isOpen && !this.isRendered) {
       try {
         this.applyPopoverPosition(vnode);
-      } catch (e) {}
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
@@ -74,15 +81,21 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
 
       switch (inlineStyle.popoverPlacement) {
         case 'above': {
-          arrow.className = 'arrow-down';
+          arrow.className = `arrow-down${
+            vnode.attrs.singleLine ? ' singleLine' : ''
+          }`;
           break;
         }
         case 'below': {
-          arrow.className = 'arrow-up';
+          arrow.className = `arrow-up${
+            vnode.attrs.singleLine ? ' singleLine' : ''
+          }`;
           break;
         }
         case 'right': {
-          arrow.className = 'arrow-left';
+          arrow.className = `arrow-left${
+            vnode.attrs.singleLine ? ' singleLine' : ''
+          }`;
           break;
         }
         default: {
@@ -99,19 +112,23 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
       }
 
       this.isRendered = true;
-      // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
     m.redraw();
   }
 
   handleHoverExit(e, onToggle, vnode) {
     if (
       !cursorInBounds(e.offsetX, e.offsetY, this.triggerRef) &&
-      !this.isOverContent
+      (vnode.attrs.persistOnHover ? !this.isOverContent : true)
     ) {
       if (vnode.attrs.hoverOpenDelay) {
         setTimeout(() => {
-          if (!this.isOverContent && this.isRendered) {
+          if (
+            this.isRendered &&
+            (vnode.attrs.persistOnHover ? !this.isOverContent : true)
+          ) {
             this.togglePopOver(onToggle);
           }
         }, vnode.attrs.hoverOpenDelay);
@@ -132,7 +149,8 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   }
 
   view(vnode) {
-    const { trigger, content, onToggle, interactionType } = vnode.attrs;
+    const { trigger, content, onToggle, interactionType, singleLine } =
+      vnode.attrs;
     const { isOpen } = this;
 
     // Resize Listener
@@ -144,8 +162,8 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
       <>
         <div
           class="trigger-wrapper"
-          ref="trigger-wrapper"
-          onclick={(e) => {
+          ref="trigger-wrapper-ref"
+          onclick={() => {
             if (!interactionType || interactionType === 'click') {
               this.togglePopOver(onToggle);
             }
@@ -174,13 +192,18 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
               }}
             >
               <div
-                class="popover-container"
-                ref="popover-container"
+                class={getClasses<PopoverStyleAttrs>(
+                  {
+                    singleLine,
+                  },
+                  ComponentType.Popover
+                )}
+                ref="popover-container-ref"
                 id={this.contentId}
                 onmouseenter={() => {
                   this.isOverContent = true;
                 }}
-                onmouseleave={(e) => {
+                onmouseleave={() => {
                   this.isOverContent = false;
                 }}
               >

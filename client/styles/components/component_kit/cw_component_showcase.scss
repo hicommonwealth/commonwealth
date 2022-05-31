@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 $margin-bottom: 32px;
 $width: 360px;
@@ -11,37 +11,18 @@ $width: 360px;
     margin-bottom: 16px;
   }
 
-  // .color-gallery {
-  //   display: flex;
-  //   flex-direction: column;
-  //   margin-bottom: $margin-bottom;
-  //   width: $width;
+  .tooltip-gallery {
+    display: flex;
+    flex-direction: column;
 
-  //   .color-row {
-  //     align-items: center;
-  //     display: flex;
-  //     height: 24px;
-  //     justify-content: space-between;
-
-  //     .color {
-  //       border-radius: 6px;
-  //       height: 16px;
-  //       width: 88px;
-  //     }
-
-  //     .rainbow-gradient-horizontal {
-  //       @include rainbow-gradient-horizontal;
-  //     }
-
-  //     .rainbow-gradient-diagonal {
-  //       @include rainbow-gradient-diagonal;
-  //     }
-
-  //     .shadow-gradient {
-  //       @include shadow-gradient;
-  //     }
-  //   }
-  // }
+    .tooltip-row {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 200px;
+    }
+  }
 
   .text-gallery {
     display: flex;
