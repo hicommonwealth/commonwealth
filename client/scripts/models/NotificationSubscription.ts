@@ -53,7 +53,7 @@ class NotificationSubscription {
       json.is_active,
       json.created_at,
       json.immediate_email,
-      json.chain_id,
+      json.community_id,
       json.ChainEventType || json.chain_event_type_id,
       json.Comment || json.offchain_comment_id,
       json.OffchainCommunity || json.offchain_community_id, // TODO: safe to remove?

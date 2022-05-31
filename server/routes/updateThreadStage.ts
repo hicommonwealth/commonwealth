@@ -36,14 +36,14 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
         }
       });
       const role = roles.find((r) => {
-        return r.chain_id === thread.chain;
+        return r.community_id === thread.community_id;
       });
       if (!role) return next(new Error(Errors.NotAdminOrOwner));
     }
 
     // fetch available stages
     let custom_stages = [];
-    const entity = await models.Chain.findOne({ where: { id: thread.chain } });
+    const entity = await models.Community.findOne({ where: { id: thread.community_id } });
     try {
       custom_stages = Array.from(JSON.parse(entity.custom_stages)).map((s) => s.toString()).filter((s) => s);
     } catch (e) {

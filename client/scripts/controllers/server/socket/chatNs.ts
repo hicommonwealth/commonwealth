@@ -13,7 +13,7 @@ export interface IChannel {
     id: number,
     name: string,
     category: string,
-    chain_id: string,
+    community_id: string,
     created_at: string,
     updated_at: string,
     unread: number,
@@ -154,16 +154,16 @@ export class ChatNamespace {
     }
 
     private static channelToRoomId(channel: IChannel) {
-        return `${channel.chain_id}-${channel.id}`
+        return `${channel.community_id}-${channel.id}`
     }
 
-    public async createChatChannel(name, chain_id, category) {
+    public async createChatChannel(name, community_id, category) {
         // this call will fail unless its an admin
         try {
             const res = await $.post(`${app.serverUrl()}/createChatChannel`, {
                 jwt: app.user.jwt,
                 name,
-                chain_id,
+                community_id,
                 category
             })
 
@@ -186,7 +186,7 @@ export class ChatNamespace {
             const res = await $.get(`${app.serverUrl()}/getChatMessages`, {
                 jwt: app.user.jwt,
                 address: app.user.activeAccount.address,
-                chain_id: app.activeChainId()
+                community_id: app.activeChainId()
             })
 
             if(res.status !== "200") {
@@ -207,7 +207,7 @@ export class ChatNamespace {
                 url: `${app.serverUrl()}/deleteChatChannel`,
                 data: {
                     channel_id,
-                    chain_id: app.activeChainId(),
+                    community_id: app.activeChainId(),
                     jwt: app.user.jwt
                 },
                 type: 'DELETE'
@@ -231,7 +231,7 @@ export class ChatNamespace {
                 url: `${app.serverUrl()}/deleteChatCategory`,
                 data: {
                     category,
-                    chain_id: app.activeChainId(),
+                    community_id: app.activeChainId(),
                     jwt: app.user.jwt,
                 },
                 type: 'DELETE'
@@ -255,7 +255,7 @@ export class ChatNamespace {
                 data: {
                     category,
                     new_category,
-                    chain_id: app.activeChainId(),
+                    community_id: app.activeChainId(),
                     jwt: app.user.jwt
                 },
                 type: 'PUT'
@@ -279,7 +279,7 @@ export class ChatNamespace {
                 data: {
                     channel_id,
                     name,
-                    chain_id: app.activeChainId(),
+                    community_id: app.activeChainId(),
                     jwt: app.user.jwt
                 },
                 type: 'PUT'

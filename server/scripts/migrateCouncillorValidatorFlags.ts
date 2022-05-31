@@ -14,15 +14,15 @@ import { factory, formatFilename } from '../../shared/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default async function (models, chain?: string): Promise<void> {
+export default async function (models, community_id?: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info('Fetching node info for chain entity migrations...');
-  const whereOption = chain ? { chain } : {};
+  const whereOption = community_id ? { community_id } : {};
   const nodes = await models.ChainNode.findAll({
     where: whereOption,
     include: [
       {
-        model: models.Chain,
+        model: models.Community,
         where: {
           active: true,
           has_chain_events_listener: true,
@@ -38,8 +38,8 @@ export default async function (models, chain?: string): Promise<void> {
 
   // 2. for each node, fetch councillors and validators
   for (const node of nodes) {
-    log.info(`Fetching and migrating councillor/validator flags for ${node.chain}.`);
-    const flagsHandler = new UserFlagsHandler(models, node.chain);
+    log.info(`Fetching and migrating councillor/validator flags for ${node.community_id}.`);
+    const flagsHandler = new UserFlagsHandler(models, node.community_id);
 
     const nodeUrl = constructSubstrateUrl(node.url);
     try {
@@ -54,7 +54,7 @@ export default async function (models, chain?: string): Promise<void> {
         validators ? validators.validators.map((v) => v.toString()) : [],
       );
     } catch (e) {
-      log.error(`Failed to migrate flags for ${node.chain}: ${e.message}`);
+      log.error(`Failed to migrate flags for ${node.community_id}: ${e.message}`);
     }
   }
 }

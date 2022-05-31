@@ -25,18 +25,18 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
 
-export async function migrateChainEntity(chain: string): Promise<void> {
+export async function migrateChainEntity(community_id: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
-  log.info(`Fetching node info for ${chain}...`);
-  if (!chain) {
+  log.info(`Fetching node info for ${community_id}...`);
+  if (!community_id) {
     throw new Error('must provide chain');
   }
 
   // query one node for each supported chain
   const node: ChainNodeInstance = await models['ChainNode'].scope('withPrivateData').findOne({
-    where: { chain },
+    where: { community_id },
     include: {
-      model: models.Chain,
+      model: models.Community,
       required: true,
     },
   });
@@ -45,28 +45,28 @@ export async function migrateChainEntity(chain: string): Promise<void> {
   }
 
   // 2. for each node, fetch and migrate chain entities
-  log.info(`Fetching and migrating chain entities for: ${chain}`);
+  log.info(`Fetching and migrating chain entities for: ${community_id}`);
   try {
-    const migrationHandler = new MigrationHandler(models, chain);
-    const entityArchivalHandler = new EntityArchivalHandler(models, chain);
+    const migrationHandler = new MigrationHandler(models, community_id);
+    const entityArchivalHandler = new EntityArchivalHandler(models, community_id);
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
-    if (node.Chain.base === ChainBase.Substrate) {
+    if (node.Community.base === ChainBase.Substrate) {
       const nodeUrl = constructSubstrateUrl(node.private_url || node.url);
       const api = await SubstrateEvents.createApi(
         nodeUrl,
-        node.Chain.substrate_spec
+        node.Community.substrate_spec
       );
       fetcher = new SubstrateEvents.StorageFetcher(api);
-    } else if (node.Chain.network === ChainNetwork.Moloch) {
+    } else if (node.Community.network === ChainNetwork.Moloch) {
       // TODO: determine moloch API version
       // TODO: construct dater
       throw new Error('Moloch migration not yet implemented.');
-    } else if (node.Chain.network === ChainNetwork.Compound) {
+    } else if (node.Community.network === ChainNetwork.Compound) {
       const api = await CompoundEvents.createApi(node.private_url || node.url, node.address);
       fetcher = new CompoundEvents.StorageFetcher(api);
       range.startBlock = 0;
-    } else if (node.Chain.network === ChainNetwork.Aave) {
+    } else if (node.Community.network === ChainNetwork.Aave) {
       const api = await AaveEvents.createApi(node.private_url || node.url, node.address);
       fetcher = new AaveEvents.StorageFetcher(api);
       range.startBlock = 0;
@@ -88,12 +88,12 @@ export async function migrateChainEntity(chain: string): Promise<void> {
       }
     }
   } catch (e) {
-    log.error(`Failed to fetch events for ${chain}: ${e.message}`);
+    log.error(`Failed to fetch events for ${community_id}: ${e.message}`);
   }
 }
 
 export async function migrateChainEntities(): Promise<void> {
-  const chains = await models.Chain.findAll({
+  const chains = await models.Community.findAll({
     where: {
       active: true,
       has_chain_events_listener: true,

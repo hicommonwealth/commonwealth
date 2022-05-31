@@ -71,7 +71,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   private _tmClient: Tendermint34Client;
   public async init(node: NodeInfo, reset = false) {
-    const url = `${window.location.origin}/cosmosAPI/${node.chain.id}`;
+    const url = `${window.location.origin}/cosmosAPI/${node.community.id}`;
     console.log(`Starting Tendermint RPC API at ${url}...`);
     // TODO: configure broadcast mode
     this._tmClient = await Tendermint34Client.connect(url);

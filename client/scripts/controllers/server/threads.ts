@@ -276,7 +276,7 @@ class ThreadsController {
       // New posts are added to both the topic and allProposals sub-store
       this._listingStore.add(result);
       const activeEntity = app.chain;
-      updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
+      updateLastVisited((activeEntity.meta as NodeInfo).community, true);
 
       // synthesize new subscription rather than hitting backend
       const subscriptionJSON = {
@@ -286,7 +286,7 @@ class ThreadsController {
         is_active: true,
         created_at: Date.now(),
         immediate_email: false,
-        chain_id: result.chain,
+        community_id: result.chain,
         offchain_thread_id: result.id,
       };
       app.user.notifications.subscriptions.push(
@@ -358,7 +358,7 @@ class ThreadsController {
       $.post(`${app.serverUrl()}/deleteThread`, {
         jwt: app.user.jwt,
         thread_id: proposal.id,
-        chain_id: app.activeChainId(),
+        community_id: app.activeChainId(),
       })
         .then((result) => {
           // Deleted posts are removed from all stores containing them

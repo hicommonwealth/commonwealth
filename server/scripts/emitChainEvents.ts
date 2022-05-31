@@ -19,7 +19,7 @@ const handleEventFn = async (handlers: IEventHandler[], event: CWEvent<any>): Pr
   }
 };
 
-async function main(chain: string, eventsPath: string) {
+async function main(community_id: string, eventsPath: string) {
   // load event from file
   let events: CWEvent<any>[];
   try {
@@ -50,15 +50,15 @@ async function main(chain: string, eventsPath: string) {
   try {
     await sequelize.authenticate();
     const node = await models.ChainNode.findOne({
-      where: { chain },
+      where: { community_id },
       include: [{
-        model: models.Chain,
+        model: models.Community,
         where: { active: true },
         required: true,
       }],
     });
     if (!node) {
-      throw new Error(`Chain not found: ${chain}`);
+      throw new Error(`Chain not found: ${community_id}`);
     }
     handlers = generateHandlers(node);
   } catch (err) {

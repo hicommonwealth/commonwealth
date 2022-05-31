@@ -12,7 +12,7 @@ import {
   AaveEvents,
 } from '@commonwealth/chain-events';
 
-import { ChainAttributes } from '../models/community';
+import { CommunityAttributes } from '../models/community';
 import EventStorageHandler, {
   StorageFilterConfig,
 } from '../eventHandlers/storage';
@@ -61,7 +61,7 @@ export const generateHandlers = (
   wss?: WebSocket.Server,
   storageConfig: StorageFilterConfig = {}
 ) => {
-  const chain = node.chain;
+  const chain = node.community_id;
 
   // writes events into the db as ChainEvents rows
   const storageHandler = new EventStorageHandler(models, chain, storageConfig);
@@ -80,7 +80,7 @@ export const generateHandlers = (
 
   // creates empty Address and OffchainProfile models for users who perform certain
   // actions, like voting on proposals or registering an identity
-  const profileCreationHandler = new ProfileCreationHandler(models, node.chain);
+  const profileCreationHandler = new ProfileCreationHandler(models, node.community_id);
 
   // the set of handlers, run sequentially on all incoming chain events
   const handlers: IEventHandler[] = [
@@ -91,13 +91,13 @@ export const generateHandlers = (
   ];
 
   // only handle identities and user flags on substrate chains
-  if (node.Chain.base === ChainBase.Substrate) {
+  if (node.Community.base === ChainBase.Substrate) {
     // populates identity information in OffchainProfiles when received (Substrate only)
-    const identityHandler = new IdentityHandler(models, node.chain);
+    const identityHandler = new IdentityHandler(models, node.community_id);
 
     // populates is_validator and is_councillor flags on Addresses when validator and
     // councillor sets are updated (Substrate only)
-    const userFlagsHandler = new UserFlagsHandler(models, node.chain);
+    const userFlagsHandler = new UserFlagsHandler(models, node.community_id);
 
     handlers.push(identityHandler, userFlagsHandler);
   }
@@ -116,7 +116,7 @@ const setupChainEventListeners = async (
     log.info('No event listeners configured.');
     return [];
   }
-  const whereOptions: WhereOptions<ChainAttributes> =
+  const whereOptions: WhereOptions<CommunityAttributes> =
     chains === 'all'
       ? {
           active: true,
@@ -148,11 +148,11 @@ const setupChainEventListeners = async (
         node
       ): Promise<[ChainNodeInstance, IEventSubscriber<any, any>]> => {
         let subscriber: IEventSubscriber<any, any>;
-        if (node.Chain.base === ChainBase.Substrate) {
+        if (node.Community.base === ChainBase.Substrate) {
           const nodeUrl = constructSubstrateUrl(node.url);
           const api = await SubstrateEvents.createApi(
             nodeUrl,
-            node.Chain.substrate_spec
+            node.Community.substrate_spec
           );
           const excludedEvents = [
             SubstrateTypes.EventKind.Reward,
@@ -163,17 +163,17 @@ const setupChainEventListeners = async (
 
           const handlers = generateHandlers(node, wss, { excludedEvents });
           subscriber = await SubstrateEvents.subscribeEvents({
-            chain: node.chain,
+            chain: node.community_id,
             handlers,
             skipCatchup,
-            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            discoverReconnectRange: () => discoverReconnectRange(node.community_id),
             api,
             enricherConfig: {
               balanceTransferThresholdPermill:
                 BALANCE_TRANSFER_THRESHOLD_PERMILL,
             },
           });
-        } else if (node.Chain.network === ChainNetwork.Moloch) {
+        } else if (node.Community.network === ChainNetwork.Moloch) {
           const contractVersion = 1;
           const api = await MolochEvents.createApi(
             node.url,
@@ -182,31 +182,31 @@ const setupChainEventListeners = async (
           );
           const handlers = generateHandlers(node, wss);
           subscriber = await MolochEvents.subscribeEvents({
-            chain: node.chain,
+            chain: node.community_id,
             handlers,
             skipCatchup,
-            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            discoverReconnectRange: () => discoverReconnectRange(node.community_id),
             api,
             contractVersion,
           });
-        } else if (node.Chain.network === ChainNetwork.Compound) {
+        } else if (node.Community.network === ChainNetwork.Compound) {
           const api = await CompoundEvents.createApi(node.url, node.address);
           const handlers = generateHandlers(node, wss);
           subscriber = await CompoundEvents.subscribeEvents({
-            chain: node.chain,
+            chain: node.community_id,
             handlers,
             skipCatchup,
-            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            discoverReconnectRange: () => discoverReconnectRange(node.community_id),
             api,
           });
-        } else if (node.Chain.network === ChainNetwork.Aave) {
+        } else if (node.Community.network === ChainNetwork.Aave) {
           const api = await AaveEvents.createApi(node.url, node.address);
           const handlers = generateHandlers(node, wss);
           subscriber = await AaveEvents.subscribeEvents({
-            chain: node.chain,
+            chain: node.community_id,
             handlers,
             skipCatchup,
-            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            discoverReconnectRange: () => discoverReconnectRange(node.community_id),
             api,
             verbose: true,
           });

@@ -7,7 +7,7 @@ import Vote from './Vote';
 class Poll {
   public readonly id: number;
   public readonly threadId: number;
-  public readonly chainId: string;
+  public readonly communityId: string;
   public readonly createdAt: moment.Moment;
   public readonly endsAt: moment.Moment;
   public readonly prompt: string;
@@ -25,7 +25,7 @@ class Poll {
   constructor({
     id,
     threadId,
-    chainId,
+    communityId,
     createdAt,
     endsAt,
     prompt,
@@ -34,7 +34,7 @@ class Poll {
   }: {
     id: number;
     threadId: number;
-    chainId: string;
+    communityId: string;
     createdAt: moment.Moment;
     endsAt: moment.Moment;
     prompt: string;
@@ -43,7 +43,7 @@ class Poll {
   }) {
     this.id = id;
     this.threadId = threadId;
-    this.chainId = chainId;
+    this.communityId = communityId;
     this.createdAt = createdAt;
     this.endsAt = endsAt;
     this.prompt = prompt;
@@ -72,7 +72,7 @@ class Poll {
     }
     const response = await $.post(`${app.serverUrl()}/updateVote`, {
       poll_id: this.id,
-      chain_id: this.chainId,
+      chain_id: this.communityId,
       author_chain: authorChain,
       option: selectedOption,
       address,

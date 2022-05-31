@@ -8,9 +8,9 @@ const viewChainActivity = async (
   next: NextFunction
 ) => {
   const query = `
-    SELECT ce.*, cet.chain, cet.event_network, c.icon_url FROM "ChainEvents" ce
+    SELECT ce.*, cet.community_id, cet.event_network, c.icon_url FROM "ChainEvents" ce
     INNER JOIN "ChainEventTypes" cet ON ce.chain_event_type_id = cet.id 
-    INNER JOIN "Chains" c ON c.id = cet.chain 
+    INNER JOIN "Communities" c ON c.id = cet.community_id 
     ORDER BY ce.created_at DESC 
     LIMIT 50;
   `;

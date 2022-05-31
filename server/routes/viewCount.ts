@@ -19,7 +19,7 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
   if (!req.body.chain) {
     return next(new Error(Errors.NoChainOrComm));
   }
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain || null }
   });
   if (!chain) {
@@ -29,7 +29,7 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
   // verify count exists before querying
   let count = await models.ViewCount.findOne({
     where: {
-      chain: req.body.chain,
+      community_id: req.body.chain,
       object_id: req.body.object_id,
     }
   });

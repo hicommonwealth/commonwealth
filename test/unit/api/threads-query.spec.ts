@@ -12,12 +12,12 @@ describe('Thread queries', () => {
     await resetDatabase();
   });
   it('query_thread_through_collabo', async () => {
-    const chain = await models.Chain.findOne();
+    const chain = await models.Community.findOne();
     expect(chain.id).to.not.be.null;
     const address = (await models.Address.findOrCreate({
       where: {
         address: 'JhgYcbJOdWHLVFHJKLPhC12',
-        chain: chain.id,
+        community_id: chain.id,
         verification_token: 'fgdfgd'
       },
     }))[0];
@@ -25,7 +25,7 @@ describe('Thread queries', () => {
     expect(address.id).to.be.greaterThan(0);
     const thread = (await models.Thread.findOrCreate({
       where: {
-        chain: chain.id,
+        community_id: chain.id,
         address_id: address.id,
         title: 'title',
         kind: 'kind',

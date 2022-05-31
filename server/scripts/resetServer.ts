@@ -821,7 +821,7 @@ const resetServer = (): Promise<number> => {
       // Initialize different chain + node URLs
       log.debug('Initializing chains...');
       const chains = await Promise.all([
-        models.Chain.create({
+        models.Community.create({
           id: 'edgeware-local',
           network: ChainNetwork.Edgeware,
           symbol: 'EDG',
@@ -832,7 +832,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.Substrate,
           ss58_prefix: 7,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'edgeware-testnet',
           network: ChainNetwork.Edgeware,
           symbol: 'EDG',
@@ -843,7 +843,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.Substrate,
           ss58_prefix: 7,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'edgeware',
           network: ChainNetwork.Edgeware,
           symbol: 'EDG',
@@ -856,7 +856,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['edgeware'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'kusama-local',
           network: ChainNetwork.Kusama,
           symbol: 'KSM',
@@ -867,7 +867,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.Substrate,
           ss58_prefix: 42,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'kusama',
           network: ChainNetwork.Kusama,
           symbol: 'KSM',
@@ -880,7 +880,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['kusama'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'polkadot-local',
           network: ChainNetwork.Polkadot,
           symbol: 'DOT',
@@ -891,7 +891,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.Substrate,
           ss58_prefix: 42,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'polkadot',
           network: ChainNetwork.Polkadot,
           symbol: 'DOT',
@@ -904,7 +904,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['polkadot'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'kulupu',
           network: ChainNetwork.Kulupu,
           symbol: 'KLP',
@@ -917,7 +917,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['kulupu'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'plasm',
           network: ChainNetwork.Plasm,
           symbol: 'PLM',
@@ -930,7 +930,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['plasm'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'stafi',
           network: ChainNetwork.Stafi,
           symbol: 'FIS',
@@ -943,7 +943,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['stafi'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'crust',
           network: ChainNetwork.Crust,
           symbol: 'CRUST',
@@ -956,7 +956,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['crust'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'darwinia',
           network: ChainNetwork.Darwinia,
           symbol: 'RING',
@@ -969,7 +969,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['darwinia'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'phala',
           network: ChainNetwork.Phala,
           symbol: 'PHA',
@@ -982,7 +982,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['phala'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'centrifuge',
           network: ChainNetwork.Centrifuge,
           symbol: 'RAD',
@@ -995,7 +995,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['centrifuge'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'cosmos-local',
           network: 'cosmos' as ChainNetwork,
           symbol: 'stake',
@@ -1005,7 +1005,7 @@ const resetServer = (): Promise<number> => {
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'cosmos-testnet',
           network: 'cosmos' as ChainNetwork,
           symbol: 'muon',
@@ -1015,7 +1015,7 @@ const resetServer = (): Promise<number> => {
           type: ChainType.Chain,
           base: ChainBase.CosmosSDK,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'cosmos',
           network: 'cosmos' as ChainNetwork,
           symbol: 'uatom',
@@ -1026,7 +1026,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.CosmosSDK,
           collapsed_on_homepage: false,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'straightedge',
           network: ChainNetwork.Straightedge,
           symbol: 'str',
@@ -1037,7 +1037,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.CosmosSDK,
           collapsed_on_homepage: false,
         }),
-        // models.Chain.create({
+        // models.Community.create({
         //   id: 'ethereum-ropsten',
         //   network: 'ethereum',
         //   symbol: 'ETH',
@@ -1047,7 +1047,7 @@ const resetServer = (): Promise<number> => {
         //   type: ChainType.Chain,
         //   base: ChainBase.Ethereum,
         // }),
-        models.Chain.create({
+        models.Community.create({
           id: 'ethereum-local',
           network: ChainNetwork.Ethereum,
           symbol: 'ETH',
@@ -1057,7 +1057,7 @@ const resetServer = (): Promise<number> => {
           type: ChainType.Chain,
           base: ChainBase.Ethereum,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'ethereum',
           network: ChainNetwork.Ethereum,
           symbol: 'ETH',
@@ -1068,7 +1068,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.Ethereum,
           collapsed_on_homepage: false,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'near-local',
           network: ChainNetwork.NEAR,
           symbol: 'NEAR',
@@ -1078,7 +1078,7 @@ const resetServer = (): Promise<number> => {
           type: ChainType.Chain,
           base: ChainBase.NEAR,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'near',
           network: ChainNetwork.NEAR,
           symbol: 'NEAR',
@@ -1089,7 +1089,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.NEAR,
           collapsed_on_homepage: false,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'moloch',
           network: ChainNetwork.Moloch,
           symbol: 'SHARE',
@@ -1101,7 +1101,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
         }),
         // This is the same exact as Moloch, but I want to show the picture on the front end
-        models.Chain.create({
+        models.Community.create({
           id: 'metacartel',
           network: ChainNetwork.Metacartel,
           symbol: 'SHARE',
@@ -1112,7 +1112,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.Ethereum,
           collapsed_on_homepage: false,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'moloch-local',
           network: ChainNetwork.Moloch,
           symbol: 'SHARE',
@@ -1122,7 +1122,7 @@ const resetServer = (): Promise<number> => {
           type: ChainType.DAO,
           base: ChainBase.Ethereum,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'marlin',
           network: ChainNetwork.Compound,
           symbol: 'LIN',
@@ -1133,7 +1133,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.Ethereum,
           collapsed_on_homepage: false,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'marlin-local',
           network: ChainNetwork.Compound,
           symbol: 'LIN',
@@ -1143,7 +1143,7 @@ const resetServer = (): Promise<number> => {
           type: ChainType.DAO,
           base: ChainBase.Ethereum,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'aave',
           network: ChainNetwork.Aave,
           symbol: 'AAVE',
@@ -1154,7 +1154,7 @@ const resetServer = (): Promise<number> => {
           base: ChainBase.Ethereum,
           collapsed_on_homepage: false,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'aave-local',
           network: ChainNetwork.Aave,
           symbol: 'AAVE',
@@ -1164,7 +1164,7 @@ const resetServer = (): Promise<number> => {
           type: ChainType.DAO,
           base: ChainBase.Ethereum,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'clover',
           network: ChainNetwork.Clover,
           symbol: 'CLOV',
@@ -1176,7 +1176,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['clover'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'hydradx',
           network: ChainNetwork.HydraDX,
           symbol: 'HDX',
@@ -1188,7 +1188,7 @@ const resetServer = (): Promise<number> => {
           collapsed_on_homepage: false,
           substrate_spec: specs['hydradx'],
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'alex-ropsten',
           network: ChainNetwork.ALEX,
           symbol: 'ALEX',
@@ -1198,7 +1198,7 @@ const resetServer = (): Promise<number> => {
           type: ChainType.Token,
           base: ChainBase.Ethereum,
         }),
-        models.Chain.create({
+        models.Community.create({
           id: 'demos',
           symbol: 'demos',
           name: 'demos',

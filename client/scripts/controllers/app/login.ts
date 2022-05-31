@@ -11,7 +11,7 @@ import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
 import { ChainBase, WalletId } from 'types';
 import {
-  CommunityInfo,
+  ChainInfo,
   SocialAccount,
   Account,
   AddressInfo,
@@ -32,7 +32,7 @@ function createAccount(
       account.chainBase === ChainBase.Substrate && (account as any).isEd25519
         ? 'ed25519'
         : undefined,
-    chain: account.chain.id,
+    chain: account.community.id,
     community,
     jwt: app.user.jwt,
     wallet_id: walletId,
@@ -41,13 +41,13 @@ function createAccount(
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
-  chain: string,
+  community_id: string,
   originChain: string
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     address: address,
     chain: chain,
-    originChain: originChain,
+    originChain,
     jwt: app.user.jwt,
   });
 }
@@ -102,7 +102,7 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
 }
 
 export async function updateLastVisited(
-  activeEntity: CommunityInfo,
+  activeEntity: ChainInfo,
   updateFrontend?: boolean
 ) {
   if (!app.isLoggedIn()) return;
@@ -123,7 +123,7 @@ export async function updateLastVisited(
   }
 }
 
-export async function updateActiveAddresses(community?: CommunityInfo) {
+export async function updateActiveAddresses(community?: ChainInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.user.setActiveAccounts(

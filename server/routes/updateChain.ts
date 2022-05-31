@@ -44,7 +44,7 @@ const updateChain = async (
   if (!req.body.id) return next(new Error(Errors.NoChainId));
   if (req.body.network) return next(new Error(Errors.CantChangeNetwork));
 
-  const chain = await models.Chain.findOne({ where: { id: req.body.id } });
+  const chain = await models.Community.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new Error(Errors.NoChainFound));
   else {
     const userAddressIds = (await req.user.getAddresses())
@@ -53,7 +53,7 @@ const updateChain = async (
     const userMembership = await models.Role.findOne({
       where: {
         address_id: { [Op.in]: userAddressIds },
-        chain_id: chain.id || null,
+        community_id: chain.id || null,
         permission: 'admin',
       },
     });

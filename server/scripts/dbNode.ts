@@ -44,7 +44,7 @@ const generalLogger = new LoggingHandler();
 async function handleFatalError(
   error: Error,
   pool,
-  chain?: string,
+  community_id?: string,
   type?: string
 ): Promise<void> {
   switch (type) {
@@ -54,23 +54,23 @@ async function handleFatalError(
       process.exit(1);
       break;
     default:
-      log.error(`${chain ? `[${chain}]: ` : ''} ${error.message}`);
+      log.error(`${community_id ? `[${community_id}]: ` : ''} ${error.message}`);
 
-      if (chain && chain.indexOf('erc20') === -1 && chainErrors[chain] >= 4) {
-        listeners[chain].unsubscribe();
-        delete listeners[chain];
+      if (community_id && community_id.indexOf('erc20') === -1 && chainErrors[community_id] >= 4) {
+        listeners[community_id].unsubscribe();
+        delete listeners[community_id];
 
         // TODO: email notification for this
         const query = format(
-          'UPDATE "Chains" SET "has_chain_events_listener"=\'false\' WHERE "id"=%L',
-          chain
+          'UPDATE "Communities" SET "has_chain_events_listener"=\'false\' WHERE "id"=%L',
+          community_id
         );
         try {
           pool.query(query);
         } catch (err) {
-          log.fatal(`Unable to disable ${chain}`);
+          log.fatal(`Unable to disable ${community_id}`);
         }
-      } else if (chain) ++chainErrors[chain];
+      } else if (community_id) ++chainErrors[community_id];
       break;
   }
 }
@@ -81,12 +81,12 @@ class Erc20LoggingHandler extends IEventHandler {
     super();
   }
   public async handle(event: CWEvent): Promise<undefined> {
-    if (this.tokenNames.includes(event.chain)) {
+    if (this.tokenNames.includes(event.community_id)) {
       // if logger for this specific token doesn't exist, create it - decreases computational cost of logging
-      if (!this.logger[event.chain])
-        this.logger[event.chain] = factory.getLogger(addPrefix(__filename, ['Erc20', event.chain]));
+      if (!this.logger[event.community_id])
+        this.logger[event.community_id] = factory.getLogger(addPrefix(__filename, ['Erc20', event.community_id]));
 
-      this.logger[event.chain].info(`Received event: ${JSON.stringify(event, null, 2)}`);
+      this.logger[event.community_id].info(`Received event: ${JSON.stringify(event, null, 2)}`);
     }
     return null;
   }
@@ -122,7 +122,7 @@ async function mainProcess(
     );
 
   let query =
-    'SELECT "Chains"."id", "substrate_spec", "url", "private_url", "address", "base", "type", "network", "ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
+    'SELECT "Communities"."id", "substrate_spec", "url", "private_url", "address", "base", "type", "network", "ce_verbose" FROM "Communities" JOIN "ChainNodes" ON "Communities"."id"="ChainNodes"."community_id" WHERE "Communities"."has_chain_events_listener"=\'true\';';
   const allChains = (await pool.query(query)).rows;
 
   // gets the chains specific to this node
@@ -179,23 +179,23 @@ async function mainProcess(
 
   // group erc20 tokens together by URL in order to minimize number of listeners
   const erc20Tokens = myChainData.filter(
-    (chain) =>
-      chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
-  ).map((chain) => {
+    (community) =>
+      community.type === ChainType.Token && community.base === ChainBase.Ethereum
+  ).map((community) => {
     // replace url with private_url if available
-    chain.url = chain.private_url || chain.url;
-    return chain;
+    community.url = community.private_url || community.url;
+    return community;
   });
   const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
   for (const [url, tokens] of Object.entries(erc20ByUrl)) {
     const tokenKey = `erc20_${url}`;
-    const erc20TokenAddresses = tokens.map((chain) => chain.address);
-    const erc20TokenNames = tokens.map((chain) => chain.id);
+    const erc20TokenAddresses = tokens.map((community) => community.address);
+    const erc20TokenNames = tokens.map((community) => community.id);
 
     // update the names of the tokens whose events should be logged by the erc20Logger
     erc20Logger.tokenNames = tokens
-      .filter((chain) => chain.ce_verbose)
-      .map((chain) => chain.id);
+      .filter((community) => community.ce_verbose)
+      .map((community) => community.id);
 
     // don't start a new erc20 listener if it is causing errors
     if (!chainErrors[tokenKey] || chainErrors[tokenKey] < 4) {
@@ -261,53 +261,53 @@ async function mainProcess(
 
   // remove erc20 tokens from myChainData
   myChainData = myChainData.filter(
-    (chain) =>
-      chain.type !== ChainType.Token || chain.base !== ChainBase.Ethereum
+    (community) =>
+      community.type !== ChainType.Token || community.base !== ChainBase.Ethereum
   );
 
   // delete listeners for chains that are no longer assigned to this node (skip erc20)
   const myChains = myChainData.map((row) => row.id);
-  Object.keys(listeners).forEach((chain) => {
-    if (!myChains.includes(chain) && !chain.startsWith('erc20')) {
-      log.info(`[${chain}]: Deleting chain...`);
-      if (listeners[chain]) listeners[chain].unsubscribe();
-      delete listeners[chain];
+  Object.keys(listeners).forEach((community) => {
+    if (!myChains.includes(community) && !community.startsWith('erc20')) {
+      log.info(`[${community}]: Deleting chain...`);
+      if (listeners[community]) listeners[community].unsubscribe();
+      delete listeners[community];
     }
   });
 
   // initialize listeners first (before dealing with identity)
-  for (const chain of myChainData) {
+  for (const community of myChainData) {
     // start listeners that aren't already created or subscribed - this means for any duplicate chain nodes
     // it will start a listener for the first successful chain node url in the db
-    if (!listeners[chain.id] || !listeners[chain.id].subscribed) {
-      log.info(`Starting listener for ${chain.id}...`);
+    if (!listeners[community.id] || !listeners[community.id].subscribed) {
+      log.info(`Starting listener for ${community.id}...`);
 
       // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
       // NOTE: All erc20 tokens (type='token' base='ethereum') are removed at this point
       let network: SupportedNetwork;
-      if (chain.base === ChainBase.Substrate)
+      if (community.base === ChainBase.Substrate)
         network = SupportedNetwork.Substrate;
-      else if (chain.network === ChainNetwork.Compound)
+      else if (community.network === ChainNetwork.Compound)
         network = SupportedNetwork.Compound;
-      else if (chain.network === ChainNetwork.Aave)
+      else if (community.network === ChainNetwork.Aave)
         network = SupportedNetwork.Aave;
-      else if (chain.network === ChainNetwork.Moloch)
+      else if (community.network === ChainNetwork.Moloch)
         network = SupportedNetwork.Moloch;
 
       try {
-        listeners[chain.id] = await createListener(chain.id, network, {
-          address: chain.address,
+        listeners[community.id] = await createListener(community.id, network, {
+          address: community.address,
           archival: false,
-          url: chain.private_url || chain.url,
-          spec: chain.substrate_spec,
+          url: community.private_url || community.url,
+          spec: community.substrate_spec,
           skipCatchup: false,
           verbose: false, // using this will print event before chain is added to it
           enricherConfig: { balanceTransferThresholdPermill: 10_000 },
           discoverReconnectRange
         });
       } catch (error) {
-        delete listeners[chain.id];
-        await handleFatalError(error, pool, chain.id, 'listener-startup');
+        delete listeners[community.id];
+        await handleFatalError(error, pool, community.id, 'listener-startup');
         continue;
       }
 
@@ -322,99 +322,99 @@ async function mainProcess(
         ];
 
       // add the rabbitmq handler for this chain
-      listeners[chain.id].eventHandlers['rabbitmq'] = {
+      listeners[community.id].eventHandlers['rabbitmq'] = {
         handler: producer,
         excludedEvents,
       };
 
       try {
         // subscribe to the chain to begin listening for events
-        await listeners[chain.id].subscribe();
+        await listeners[community.id].subscribe();
       } catch (error) {
-        await handleFatalError(error, pool, chain.id, 'listener-subscribe');
+        await handleFatalError(error, pool, community.id, 'listener-subscribe');
       }
     } else if (
-      chain.base === ChainBase.Substrate &&
+      community.base === ChainBase.Substrate &&
       !_.isEqual(
-        chain.substrate_spec,
-        (<SubstrateEvents.Listener>listeners[chain.id]).options.spec
+        community.substrate_spec,
+        (<SubstrateEvents.Listener>listeners[community.id]).options.spec
       )
     ) {
       // restart the listener if specs were updated (only substrate chains)
-      log.info(`Spec for ${chain.id} changed... restarting listener`);
+      log.info(`Spec for ${community.id} changed... restarting listener`);
       try {
-        await (<SubstrateEvents.Listener>listeners[chain.id]).updateSpec(
-          chain.substrate_spec
+        await (<SubstrateEvents.Listener>listeners[community.id]).updateSpec(
+          community.substrate_spec
         );
       } catch (error) {
-        await handleFatalError(error, pool, chain.id, 'update-spec');
+        await handleFatalError(error, pool, community.id, 'update-spec');
       }
     }
 
     // add the logger if it is needed and isn't already added
-    if (chain.ce_verbose && !listeners[chain.id].eventHandlers['logger']) {
-      listeners[chain.id].eventHandlers['logger'] = {
+    if (community.ce_verbose && !listeners[community.id].eventHandlers['logger']) {
+      listeners[community.id].eventHandlers['logger'] = {
         handler: generalLogger,
       };
     }
 
     // delete the logger if it is active but ce_verbose is false
-    if (listeners[chain.id].eventHandlers['logger'] && !chain.ce_verbose)
-      listeners[chain.id].eventHandlers['logger'] = null;
+    if (listeners[community.id].eventHandlers['logger'] && !community.ce_verbose)
+      listeners[community.id].eventHandlers['logger'] = null;
   }
 
   // loop through chains that have active listeners again this time dealing with identity
-  for (const chain of myChainData) {
+  for (const community of myChainData) {
     // skip chains that aren't Substrate chains
-    if (chain.base !== ChainBase.Substrate) continue;
+    if (community.base !== ChainBase.Substrate) continue;
 
-    if (!listeners[chain.id]) {
+    if (!listeners[community.id]) {
       log.warn(
-        `There is no active listener for ${chain.id} - cannot fetch identity`
+        `There is no active listener for ${community.id} - cannot fetch identity`
       );
       continue;
     }
 
-    log.info(`Fetching identities on ${chain.id}`);
+    log.info(`Fetching identities on ${community.id}`);
 
     let identitiesToFetch;
     try {
       // fetch identities to fetch on this chain
       query = format(
         'SELECT * FROM "IdentityCaches" WHERE "chain"=%L;',
-        chain.id
+        community.id
       );
       identitiesToFetch = (await pool.query(query)).rows.map((c) => c.address);
     } catch (error) {
-      await handleFatalError(error, pool, chain.id, 'get-identity-cache');
+      await handleFatalError(error, pool, community.id, 'get-identity-cache');
       continue;
     }
 
     // if no identities are cached go to next chain
     if (identitiesToFetch.length === 0) {
-      log.info(`No identities to fetch for ${chain.id}`);
+      log.info(`No identities to fetch for ${community.id}`);
       continue;
     }
 
     let identityEvents;
     try {
       // get identity events using the storage fetcher
-      identityEvents = await listeners[chain.id].storageFetcher.fetchIdentities(
+      identityEvents = await listeners[community.id].storageFetcher.fetchIdentities(
         identitiesToFetch
       );
     } catch (error) {
-      await handleFatalError(error, pool, chain.id, 'fetch-chain-identities');
+      await handleFatalError(error, pool, community.id, 'fetch-chain-identities');
       continue;
     }
 
     // if no identity events are found the go to next chain
     if (identityEvents.length === 0) {
-      log.info(`No identity events for ${chain.id}`);
+      log.info(`No identity events for ${community.id}`);
       continue;
     }
 
     for (const event of identityEvents) {
-      event.chain = chain.id; // augment event with chain
+      event.community_id = community.id; // augment event with chain
       await producer.publish(event, 'SubstrateIdentityEventsPublication');
     }
 
@@ -422,15 +422,15 @@ async function mainProcess(
     try {
       query = format(
         'DELETE FROM "IdentityCaches" WHERE "chain"=%L;',
-        chain.id
+        community.id
       );
       await pool.query(query);
     } catch (error) {
-      await handleFatalError(error, pool, chain.id, 'clear-identity-cache');
+      await handleFatalError(error, pool, community.id, 'clear-identity-cache');
       continue;
     }
 
-    log.info(`Identity cache for ${chain.id} cleared`);
+    log.info(`Identity cache for ${community.id} cleared`);
   }
 
   log.info('Finished scheduled process.');

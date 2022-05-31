@@ -305,7 +305,7 @@ async function getChains(
 > {
   // eslint-disable-next-line max-len
   const query =
-    'SELECT "Chains"."id", "substrate_spec", "url", "base" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
+    'SELECT "Communities"."id", "substrate_spec", "url", "base" FROM "Communities" JOIN "ChainNodes" ON "Communities"."id"="ChainNodes"."community_id" WHERE "Communities"."has_chain_events_listener"=\'true\';';
   return (await pool.query(query)).rows;
 }
 

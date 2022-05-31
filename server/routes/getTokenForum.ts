@@ -54,7 +54,7 @@ const getTokenForum = async (
     }
     if (req.query.autocreate) {
       const result = await sequelize.transaction(async (t) => {
-        const [chain] = await models.Chain.findOrCreate({
+        const [chain] = await models.Community.findOrCreate({
           where: { id: token.id },
           defaults: {
             active: true,
@@ -70,9 +70,9 @@ const getTokenForum = async (
           transaction: t,
         });
         const [node] = await models.ChainNode.findOrCreate({
-          where: { chain: token.id },
+          where: { community_id: token.id },
           defaults: {
-            chain: token.id,
+            community_id: token.id,
             url,
             address: token.address,
             eth_chain_id: chain_id,

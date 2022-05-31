@@ -23,7 +23,7 @@ const deleteChainNode = async (models: DB, req: Request, res: Response, next: Ne
     return next(new Error(Errors.NeedParams));
   }
 
-  const chain = await models.Chain.findOne({ where: {
+  const chain = await models.Community.findOne({ where: {
     id: req.body.id
   } });
   if (!chain) {
@@ -32,7 +32,7 @@ const deleteChainNode = async (models: DB, req: Request, res: Response, next: Ne
 
   const node = await models.ChainNode.findOne({
     where: {
-      chain: chain.id,
+      community_id: chain.id,
       url: req.body.node_url,
     },
   });

@@ -22,7 +22,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
     async (event: CWEvent) => {
       assert.equal(event.blockNumber, 10);
       assert.deepEqual(event.data, {} as any);
-      assert.equal(event.chain, 'polkadot');
+      assert.equal(event.community_id, 'polkadot');
       assert.equal(event.network, 'substrate');
       assert.equal(event.received, 123);
     }, 'ChainEventsHandlersSubscription');
@@ -42,7 +42,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       async (event: CWEvent) => {
       assert.equal(event.blockNumber, 10);
       assert.equal(event.data, {} as any);
-      assert.equal(event.chain, 'polkadot');
+      assert.equal(event.community_id, 'polkadot');
       assert.equal(event.network, 'substrate');
       assert.equal(event.received, 123);
     }, 'ChainEventsHandlersSubscription');

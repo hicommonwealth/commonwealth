@@ -90,11 +90,11 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   public async init(node: NodeInfo, accounts: NearAccounts): Promise<void> {
-    const decimalPlaces = node.chain.decimals || 24;
+    const decimalPlaces = node.community.decimals || 24;
     this._decimals = new BN(10).pow(new BN(decimalPlaces));
-    const networkSuffix = node.chain.id.split('.').pop();
+    const networkSuffix = node.community.id.split('.').pop();
     this._networkId =
-      node.chain.id === 'near-testnet' || networkSuffix === 'testnet'
+      node.community.id === 'near-testnet' || networkSuffix === 'testnet'
         ? 'testnet'
         : 'mainnet';
     this._config = {

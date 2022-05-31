@@ -39,7 +39,7 @@ const linkExistingAddressToChain = async (
   }
   const userId = req.user.id;
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain }
   });
 
@@ -49,7 +49,7 @@ const linkExistingAddressToChain = async (
 
   // check if the original address is verified and is owned by the user
   const originalAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.originChain, address: req.body.address, user_id: userId, verified: { [Op.ne]: null } }
+    where: { community_id: req.body.originChain, address: req.body.address, user_id: userId, verified: { [Op.ne]: null } }
   });
 
   if (!originalAddress) {
@@ -68,7 +68,7 @@ const linkExistingAddressToChain = async (
   const isOriginalTokenValid = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
 
   if (!isOriginalTokenValid) {
-    const chains = await models.Chain.findAll({
+    const chains = await models.Community.findAll({
       where: { base: chain.base }
     });
 
@@ -82,7 +82,7 @@ const linkExistingAddressToChain = async (
       where: {
         user_id: originalAddress.user_id,
         address: req.body.address,
-        chain: { [Op.in]: chains.map((ch) => ch.id) }
+        community_id: { [Op.in]: chains.map((ch) => ch.id) }
       }
     });
   }
@@ -93,7 +93,7 @@ const linkExistingAddressToChain = async (
       : req.body.address;
 
     const existingAddress = await models.Address.scope('withPrivateData').findOne({
-      where: { chain: req.body.chain, address: encodedAddress }
+      where: { community_id: req.body.chain, address: encodedAddress }
     });
 
     let addressId: number;
@@ -114,7 +114,7 @@ const linkExistingAddressToChain = async (
         user_id: originalAddress.user_id,
         profile_id: originalAddress.profile_id,
         address: encodedAddress,
-        chain: req.body.chain,
+        community_id: req.body.chain,
         verification_token: verificationToken,
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,
@@ -153,14 +153,14 @@ const linkExistingAddressToChain = async (
     const role = await models.Role.findOne({
       where: {
         address_id: addressId,
-        chain_id: req.body.chain,
+        community_id: req.body.chain,
       }
     });
 
     if (!role) {
       await models.Role.create({
         address_id: addressId,
-        chain_id: req.body.chain,
+        community_id: req.body.chain,
         permission: 'member',
       });
     }

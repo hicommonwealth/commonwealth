@@ -100,7 +100,7 @@ const createChain = async (
     return next(new Error(Errors.NoBase));
   }
 
-  const existingBaseChain = await models.Chain.findOne({
+  const existingBaseChain = await models.Community.findOne({
     where: { base: req.body.base },
   });
   if (!existingBaseChain) {
@@ -246,7 +246,7 @@ const createChain = async (
     return next(new Error(Errors.InvalidIconUrl));
   }
 
-  const oldChain = await models.Chain.findOne({
+  const oldChain = await models.Community.findOne({
     where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
   });
   if (oldChain && oldChain.id === req.body.id) {

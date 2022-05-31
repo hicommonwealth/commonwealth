@@ -11,7 +11,7 @@ export const modelFromServer = (poll) => {
   const {
     id,
     thread_id,
-    chain_id,
+    community_id,
     prompt,
     options,
     ends_at,
@@ -29,7 +29,7 @@ export const modelFromServer = (poll) => {
   return new Poll({
     id,
     threadId: thread_id,
-    chainId: chain_id,
+    communityId: community_id,
     prompt,
     options: pollOptions,
     endsAt: moment(ends_at),
@@ -45,12 +45,12 @@ class PollsController {
     return this._store;
   }
 
-  public async fetchPolls(chainId: string, threadId: number) {
+  public async fetchPolls(communityId: string, threadId: number) {
     await $.ajax({
       url: `${app.serverUrl()}/getPolls`,
       type: 'GET',
       data: {
-        chain: chainId,
+        community_id: communityId,
         thread_id: threadId,
       },
       success: (response) => {
@@ -89,7 +89,7 @@ class PollsController {
       url: `${app.serverUrl()}/createPoll`,
       type: 'POST',
       data: {
-        chain: app.activeChainId(),
+        community_id: app.activeChainId(),
         thread_id: threadId,
         prompt,
         options: JSON.stringify(options),

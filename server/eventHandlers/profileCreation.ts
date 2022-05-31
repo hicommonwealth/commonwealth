@@ -34,8 +34,8 @@ export default class extends IEventHandler {
   }
 
   public async handle(event: CWEvent, dbEvent) {
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
-    const chain = event.chain || this._chain;
+    const log = factory.getLogger(addPrefix(__filename, [event.network, event.community_id]));
+    const chain = event.community_id || this._chain;
 
     const fields = SUPPORTED_KIND_FIELDS[event.data.kind];
     if (!fields) {

@@ -10,7 +10,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   // unpack notification_data
   const {
     created_at, root_id, root_title, root_type, comment_id, comment_text,
-    chain_id, author_address, author_chain
+    community_id, author_address, author_community
   } = notification_data;
 
   // title
@@ -27,19 +27,19 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   const authorProfile = await models.OffchainProfile.findOne({
     include: [{
       model: models.Address,
-      where: { address: author_address, chain: author_chain || null },
+      where: { address: author_address, community_id: author_community || null },
       required: true,
     }]
   });
   let authorName;
-  const author_addr_short = formatAddressShort(author_address, author_chain, true);
+  const author_addr_short = formatAddressShort(author_address, author_community, true);
   try {
     authorName = authorProfile.Address.name || JSON.parse(authorProfile.data).name || author_addr_short;
   } catch (e) {
     authorName = author_addr_short;
   }
   // author profile link
-  const authorPath = `https://commonwealth.im/${author_chain}/account/${author_address}?base=${author_chain}`;
+  const authorPath = `https://commonwealth.im/${author_community}/account/${author_address}?base=${author_community}`;
 
   // action and community
   const actionCopy = (([NotificationCategories.NewComment, NotificationCategories.CommentEdit].includes(category_id)) ? 'commented on'
@@ -48,7 +48,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
         : [NotificationCategories.ThreadEdit, NotificationCategories.NewThread].includes(category_id) ? 'created a new thread'
           : null);
   const objectCopy = decodeURIComponent(root_title).trim();
-  const communityObject = await models.Chain.findOne({ where: { id: chain_id } })
+  const communityObject = await models.Community.findOne({ where: { id: community_id } })
   const communityCopy = communityObject ? `in ${communityObject.name}` : '';
   const excerpt = (() => {
     const text = decodeURIComponent(comment_text);
@@ -68,7 +68,7 @@ export const getForumNotificationCopy = async (models, notification_data: IPostN
   const pseudoProposal = {
     id: root_id,
     title: root_title,
-    chain: chain_id,
+    community_id,
   };
   const proposalUrlArgs = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
   const proposalPath = (getProposalUrl as any)(...proposalUrlArgs);

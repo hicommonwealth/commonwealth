@@ -6,7 +6,7 @@ import { ChainNetwork, ChainBase } from 'types';
 import { CommunityInstance } from 'server/models/community';
 import Topic from './Topic';
 
-class CommunityInfo {
+class ChainInfo {
   public readonly id: string;
   public readonly symbol: string;
   public name: string;
@@ -136,7 +136,7 @@ class CommunityInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
-    return new CommunityInfo({
+    return new ChainInfo({
       id,
       network,
       symbol,
@@ -171,7 +171,7 @@ class CommunityInfo {
   // TODO: get operation should not have side effects, and either way this shouldn't be here
   public async getMembers(id: string) {
     try {
-      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id });
+      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { community_id: id });
       this.setMembers(res.result);
       const roles = res.result.filter((r) => {
         return (
@@ -274,4 +274,4 @@ class CommunityInfo {
   }
 }
 
-export default CommunityInfo;
+export default ChainInfo;

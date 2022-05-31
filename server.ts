@@ -92,8 +92,8 @@ async function main() {
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
       for (const [node, subscriber] of subscribers) {
-        if (node.Chain.base === ChainBase.Substrate) {
-          fetchers[node.chain] = new SubstrateEvents.StorageFetcher(
+        if (node.Community.base === ChainBase.Substrate) {
+          fetchers[node.community_id] = new SubstrateEvents.StorageFetcher(
             subscriber.api
           );
         }

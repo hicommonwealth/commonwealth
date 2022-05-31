@@ -3,13 +3,13 @@ import app, { IApp } from 'state';
 import { Coin } from 'adapters/currency';
 import { ChainBase, ChainType, WalletId } from 'types';
 
-import CommunityInfo from './CommunityInfo';
+import ChainInfo from './ChainInfo';
 import Profile from './Profile';
 
 abstract class Account<C extends Coin> {
   public readonly serverUrl : string;
   public readonly address: string;
-  public readonly community: CommunityInfo;
+  public readonly community: ChainInfo;
   public readonly chainBase: ChainBase;
   public readonly ghost_address: ChainBase;
   public get freeBalance() { return this.balance; }
@@ -29,7 +29,7 @@ abstract class Account<C extends Coin> {
 
   public app: IApp;
 
-  constructor(_app: IApp, community: CommunityInfo, address: string, encoding?: number) {
+  constructor(_app: IApp, community: ChainInfo, address: string, encoding?: number) {
     // Check if the account is being initialized from an offchain Community
     // Because there won't be any chain base or chain class
     this.app = _app;
@@ -81,8 +81,8 @@ abstract class Account<C extends Coin> {
     const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {
       // update ghost address for discourse users
-      const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, community }) => (
-          ghostAddress && this.community.id === community &&
+      const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, community_id }) => (
+          ghostAddress && this.community.id === community_id &&
           app.user.activeAccounts.some((account) => account.address === address)
       ))
       if (hasGhostAddress) {

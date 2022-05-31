@@ -1,8 +1,8 @@
-import CommunityInfo from './CommunityInfo';
+import ChainInfo from './ChainInfo';
 
 class NodeInfo {
   public readonly id: number;
-  public readonly community: CommunityInfo;
+  public readonly community: ChainInfo;
   public readonly url: string;
   public readonly address?: string;
   public readonly tokenName?: string;

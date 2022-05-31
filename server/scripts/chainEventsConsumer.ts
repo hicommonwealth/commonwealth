@@ -66,7 +66,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
   const substrateEventHandlers = [identityHandler, userFlagsHandler];
 
   const substrateChains = (
-    await models.Chain.findAll({
+    await models.Community.findAll({
       attributes: ['id'],
       where: {
         base: ChainBase.Substrate,
@@ -92,7 +92,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
         break;
       }
     }
-    if (substrateChains.includes(event.chain)) {
+    if (substrateChains.includes(event.community_id)) {
       for (const handler of substrateEventHandlers) {
         try {
           prevResult = await handler.handle(event, prevResult);

@@ -28,8 +28,8 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
 
   public async init(node: NodeInfo, reset = false) {
     // default to 9 decimals
-    this._decimals = new BN(10).pow(new BN(node.chain.decimals || 9));
-    this._denom = node.chain.symbol;
+    this._decimals = new BN(10).pow(new BN(node.community.decimals || 9));
+    this._denom = node.community.symbol;
 
     let url: string;
     try {

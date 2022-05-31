@@ -16,7 +16,7 @@ const startOAuthLogin = async (
   if (req.query.from) {
     // Validate that req.query.from matches an existing Chain
     try {
-      const chain = await models.Chain.findOne({ where: { custom_domain: req.query.from } });
+      const chain = await models.Community.findOne({ where: { custom_domain: req.query.from } });
       if (chain) {
         const tokenObj = await models.LoginToken.createForOAuth(req.query.from);
         successRedirect = `https://${req.query.from}/api/finishOAuthLogin?token=${tokenObj.token}`;
