@@ -10,6 +10,41 @@ import 'components/component_kit/cw_icon_button.scss';
 import { getClasses } from '../helpers';
 import { IconAttrs, IconStyleAttrs } from './types';
 
+// ADDING ICONS: INSTRUCTIONS
+//
+// (1) New icon components should be added to this page alphabetically.
+// (2) All icons should extend the boilerplate/template provided below.
+// (3) Use an SVG to JSX converter such as https://svg2jsx.com/
+// (4) Ensure that path and svg tag property casings conform with Mozilla docs
+//     For instance:
+//       - "fill-rule" over "fillRule"
+//       - "clip-rule" over "clipRule"
+//       - "onclick" over "onClick"
+//       - "viewBox" over "view-box"
+// (5) Icons must be added to the cw_icon_lookup.ts registry
+//
+// If added properly, the icon should auto-display in the component kit.
+
+// ICON TEMPLATE
+// export const CWIconName: m.Component<IconAttrs> = {
+//   view: (vnode) => {
+//     const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+//     return (
+//       <svg
+//         class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+//         xmlns="http://www.w3.org/2000/svg"
+//         width="32"
+//         height="32"
+//         fill="none"
+//         viewBox="0 0 32 32"
+//         onclick={onclick}
+//       >
+//       {/* INSERT PATH HERE */}
+//       </svg>
+//     );
+//   },
+// };
+
 export const CWArrowLeft: m.Component<IconAttrs> = {
   view: (vnode) => {
     const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
