@@ -393,6 +393,11 @@ button,
   }
 }
 
+.cui-button .cui-button-label,
+.cui-button .cui-button-sublabel {
+  position: unset;
+}
+
 // position items relatively inside cards
 .cui-card {
   position: relative;
