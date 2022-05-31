@@ -21,7 +21,8 @@ import { IconAttrs, IconStyleAttrs } from './types';
 //       - "clip-rule" over "clipRule"
 //       - "onclick" over "onClick"
 //       - "viewBox" over "view-box"
-// (5) Icons must be added to the cw_icon_lookup.ts registry
+// (5) Remove all "fill" properties from path tags, to allow SCSS coloration
+// (6) Icons must be added to the cw_icon_lookup.ts registry
 //
 // If added properly, the icon should auto-display in the component kit.
 
