@@ -112,7 +112,6 @@ export class SubstrateForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
             const { name, nodeUrl, iconUrl, substrateSpec } = this.state.form;

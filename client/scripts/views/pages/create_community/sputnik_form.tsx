@@ -70,7 +70,6 @@ export class SputnikForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
             const { iconUrl, name } = this.state.form;

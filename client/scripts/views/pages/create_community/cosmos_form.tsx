@@ -6,6 +6,8 @@ import $ from 'jquery';
 import 'pages/create_community.scss';
 
 import app from 'state';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'types';
@@ -13,11 +15,6 @@ import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState, EthFormFields } from './types';
 import { IdRow, InputRow, ValidationRow } from '../../components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 // TODO: populate additional fields
 
@@ -94,7 +91,6 @@ export class CosmosForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
             const {

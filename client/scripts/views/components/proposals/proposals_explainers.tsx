@@ -83,7 +83,7 @@ export class CompoundProposalStats
         ]}
         statAction={
           <CWButton
-            buttonType="primary"
+            buttonType="primary-blue"
             onclick={() => navigateToSubpage('/new/proposal')}
             label="New proposal"
           />

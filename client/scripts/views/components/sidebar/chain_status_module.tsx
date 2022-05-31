@@ -61,7 +61,7 @@ export class ChainStatusModule implements m.ClassComponent {
       <div class="ChainStatusModule">
         {app.chain.deferred ? (
           <CWButton
-            buttonType="primary"
+            buttonType="primary-blue"
             label={this.initializing ? 'Connecting...' : 'Connect to chain'}
             disabled={this.initializing}
             onclick={async (e) => {
