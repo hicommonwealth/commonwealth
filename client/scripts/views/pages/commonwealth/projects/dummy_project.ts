@@ -58,8 +58,8 @@ export const DummyProject: Project = {
   ],
   createdAt: moment('2022-05-05'),
   deadline: moment('2022-06-15'),
-  threshold: new BN(12000000),
-  fundingAmount: new BN(600000),
+  threshold: new BN('4000000000000000000'),
+  fundingAmount: new BN('3000000000000000000'),
   completionPercent: 0.75,
 
   isAuthor: () => true,

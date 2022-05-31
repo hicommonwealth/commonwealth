@@ -1,5 +1,4 @@
 /* @jsx m */
-import 'pages/projects/index.scss';
 
 import m from 'mithril';
 import { CWText } from 'views/components/component_kit/cw_text';

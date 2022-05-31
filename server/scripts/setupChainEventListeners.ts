@@ -61,7 +61,7 @@ const discoverReconnectRange = async (
 export const generateHandlers = (
   node: ChainNodeInstance,
   wss?: WebSocket.Server,
-  storageConfig: StorageFilterConfig = {},
+  storageConfig: StorageFilterConfig = {}
 ) => {
   const chain = node.chain;
 
@@ -219,7 +219,10 @@ const setupChainEventListeners = async (
             verbose: true,
           });
         } else if (node.Chain.network === ChainNetwork.CommonProtocol) {
-          const api = await CommonwealthEvents.createApi(node.url, node.address);
+          const api = await CommonwealthEvents.createApi(
+            node.url,
+            node.address
+          );
           const handlers = generateHandlers(node, wss);
           subscriber = await CommonwealthEvents.subscribeEvents({
             chain: node.chain,

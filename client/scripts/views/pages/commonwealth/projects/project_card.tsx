@@ -11,6 +11,13 @@ import { AnonymousUser } from 'views/components/widgets/user';
 import { Project } from 'models';
 import { Tag } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { weiToTokens } from 'helpers';
+
+enum ProjectSupporter {
+  Curator = 'curator',
+  Backer = 'backer',
+  Author = 'author',
+}
 
 class DummyChainIcon
   implements m.ClassComponent<{ chain; onclick; size: number }>
@@ -36,16 +43,18 @@ class ProjectHeaderPanel
     m.ClassComponent<{
       iconSize?: number;
       coverImage: string;
+      userRole?: ProjectSupporter;
     }>
 {
   view(vnode) {
     const iconSize = vnode.attrs.iconSize || 32;
-    const { coverImage } = vnode.attrs;
+    const { coverImage, userRole } = vnode.attrs;
     return (
       <div
         class="ProjectHeaderPanel"
         style={`background-image: url("${coverImage}");`}
       >
+        {userRole && null}
         {iconSize && (
           <DummyChainIcon chain={null} onclick={null} size={iconSize} />
         )}
@@ -80,14 +89,15 @@ class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
     // 40px tall funding data, 100px description, 40px recipient data
     // <tag with left-icon clock> <funding amount eth h5 bold and regular>
     // caption regular
-    console.log(project.deadline);
+    console.log(weiToTokens(project.fundingAmount.toString(), 18));
     return (
       <div class="ProjectInfoPanel">
-        <div class="project-funding-data">
+        <div class="funding-data">
           <Tag
+            intent="none"
             label={
               <>
-                <CWIcon iconName="clock" size="small" />
+                <CWIcon iconName="clock" iconSize="small" />
                 <CWText type="caption" fontWeight="medium">
                   <div class="project-deadline">
                     {`${project.deadline.fromNow(true)}`}
@@ -96,10 +106,26 @@ class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
               </>
             }
           />
-          <CWText type="h5" fontWeight="bold">
-            {project.fundingAmount.toNumber()} ETH
+          <div class="funding-state">
+            <CWText type="h5" fontWeight="bold">
+              {weiToTokens(project.fundingAmount.toString(), 18)} ETH
+            </CWText>
+            <CWText type="h5">
+              of {weiToTokens(project.threshold.toString(), 18)} ETH
+            </CWText>
+          </div>
+        </div>
+        <div class="description">
+          <CWText type="h5">{project.title}</CWText>
+          <CWText type="caption">
+            {project.shortDescription || project.description}
           </CWText>
-          <CWText type="h5">of {project.threshold.toNumber()} ETH</CWText>
+        </div>
+        <div class="beneficiary-data">
+          {m(AnonymousUser, {
+            avatarSize,
+            distinguishingKey: '123',
+          })}
         </div>
       </div>
     );
