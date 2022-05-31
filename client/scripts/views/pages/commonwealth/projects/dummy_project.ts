@@ -56,10 +56,11 @@ export const DummyProject: Project = {
     new CWParticipant(this, 'ajslkdjfkl', new BN(10000)),
     new CWParticipant(this, 'kcvkljurioeioei', new BN(300000)),
   ],
-  createdAt: moment(),
-  deadline: moment().add('12 days'),
+  createdAt: moment('2022-05-05'),
+  deadline: moment('2022-06-15'),
   threshold: new BN(12000000),
   fundingAmount: new BN(600000),
+  completionPercent: 0.75,
 
   isAuthor: () => true,
   isBacker: () => true,

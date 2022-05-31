@@ -9,6 +9,8 @@ import moment from 'moment';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { AnonymousUser } from 'views/components/widgets/user';
 import { Project } from 'models';
+import { Tag } from 'construct-ui';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 class DummyChainIcon
   implements m.ClassComponent<{ chain; onclick; size: number }>
@@ -68,43 +70,36 @@ export class ProjectCompletionBar
   }
 }
 
-class ProjectInfoPanel
-  implements
-    m.ClassComponent<{
-      project;
-      avatarSize: number;
-      iconSize?: number;
-    }>
-{
-  view(vnode) {
-    const { project, avatarSize, iconSize } = vnode.attrs;
+interface ProjectInfoAttrs {
+  project: Project;
+  avatarSize: number;
+}
+class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
+  view(vnode: m.Vnode<ProjectInfoAttrs>) {
+    const { project, avatarSize } = vnode.attrs;
+    // 40px tall funding data, 100px description, 40px recipient data
+    // <tag with left-icon clock> <funding amount eth h5 bold and regular>
+    // caption regular
+    console.log(project.deadline);
     return (
       <div class="ProjectInfoPanel">
-        <div class="project-info-header">
-          {iconSize && (
-            <DummyChainIcon chain={null} onclick={null} size={iconSize} />
-          )}
-          <CWText type="h5">{project.title}</CWText>
-        </div>
-        <div class="project-deadline-wrap">
-          <CWText type="caption" fontWeight="medium">
-            <div class="project-deadline">
-              {`${(project.deadline.asDate as moment.Moment).toNow(
-                true
-              )} remaining`}
-            </div>
+        <div class="project-funding-data">
+          <Tag
+            label={
+              <>
+                <CWIcon iconName="clock" size="small" />
+                <CWText type="caption" fontWeight="medium">
+                  <div class="project-deadline">
+                    {`${project.deadline.fromNow(true)}`}
+                  </div>
+                </CWText>
+              </>
+            }
+          />
+          <CWText type="h5" fontWeight="bold">
+            {project.fundingAmount.toNumber()} ETH
           </CWText>
-        </div>
-        <div class="project-info-body">
-          <CWText type="caption">
-            {project.shortDescription || project.description}
-          </CWText>
-        </div>
-        <div class="project-info-footer">
-          {m(AnonymousUser, {
-            avatarSize,
-            distinguishingKey: '123',
-          })}
+          <CWText type="h5">of {project.threshold.toNumber()} ETH</CWText>
         </div>
       </div>
     );
@@ -123,59 +118,49 @@ interface ProjectCardAttrs {
 }
 
 export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ProjectCardAttrs>) {
     const { project, size } = vnode.attrs;
+    console.log(project);
 
-    const projectStatus =
-      project.raised.inTokens > project.threshold.inTokens
-        ? 'succeeded'
-        : 'failed';
+    const projectStatus = project.fundingAmount.gt(project.threshold)
+      ? 'succeeded'
+      : 'failed';
 
     const onclick = () => {
       console.log(`project/${project.id}-${slugify(project.title)}`);
       m.route.set(`project/${project.id}-${slugify(project.title)}`);
     };
 
-    const ProjectCardLarge = (
+    // const ProjectCardMedium = (
+    //   <div class="ProjectCard medium" onclick={onclick}>
+    //     <ProjectHeaderPanel />
+    //     <ProjectCompletionBar completionPercent={project.completionPercent} />
+    //     <ProjectInfoPanel project={project} avatarSize={16} iconSize={24} />
+    //   </div>
+    // );
+
+    // const ProjectCardSmall = (
+    //   <div class="ProjectCard small" onclick={onclick}>
+    //     <div class="top-panel">
+    //       <CWText type="h3">{project.title}</CWText>
+    //       {/* TODO: Implement label in kit */}
+    //     </div>
+    //     <div class={`.project-status.${projectStatus}`}>
+    //       {capitalize(projectStatus)}
+    //     </div>
+    //     <div class="bottom-panel">
+    //       <DummyChainIcon chain={null} onclick={null} size={12} />
+    //       <div class="project-token-name">{project.token}</div>
+    //     </div>
+    //   </div>
+    // );
+
+    return (
       <div class="ProjectCard large" onclick={onclick}>
         <ProjectHeaderPanel iconSize={32} coverImage={project.coverImage} />
-        <ProjectCompletionBar completionPercent={project.progress.asPercent} />
+        <ProjectCompletionBar completionPercent={project.completionPercent} />
         <ProjectInfoPanel project={project} avatarSize={16} />
       </div>
     );
-
-    const ProjectCardMedium = (
-      <div class="ProjectCard medium" onclick={onclick}>
-        <ProjectHeaderPanel />
-        <ProjectCompletionBar completionPercent={project.progress.asPercent} />
-        <ProjectInfoPanel project={project} avatarSize={16} iconSize={24} />
-      </div>
-    );
-
-    const ProjectCardSmall = (
-      <div class="ProjectCard small" onclick={onclick}>
-        <div class="top-panel">
-          <CWText type="h3">{project.title}</CWText>
-          {/* TODO: Implement label in kit */}
-        </div>
-        <div class={`.project-status.${projectStatus}`}>
-          {capitalize(projectStatus)}
-        </div>
-        <div class="bottom-panel">
-          <DummyChainIcon chain={null} onclick={null} size={12} />
-          <div class="project-token-name">{project.token}</div>
-        </div>
-      </div>
-    );
-
-    switch (size) {
-      case ProjectCardSize.Large:
-        return ProjectCardLarge;
-      case ProjectCardSize.Medium:
-        return ProjectCardMedium;
-      case ProjectCardSize.Small:
-        return ProjectCardSmall;
-      default:
-    }
   }
 }

@@ -6,16 +6,26 @@ import { CWParticipant } from '../controllers/chain/ethereum/commonwealth/partic
 import AddressInfo from './AddressInfo';
 
 class Project {
+  // Helper getters
+  public get address(): string {
+    return this.createdEvent.id;
+  }
+
+  public get completionPercent(): number {
+    return this.threshold.div(this.fundingAmount).toNumber();
+  }
+
+  public get creatorAddressInfo(): AddressInfo {
+    // TODO: Address lookup
+    return null;
+  }
+
+  // Event getters
   public get createdEvent(): CommonwealthTypes.IProjectCreated {
     return this.entity.chainEvents.find(
       ({ type }) =>
         type.eventName === CommonwealthTypes.EventKind.ProjectCreated
     ).data as CommonwealthTypes.IProjectCreated;
-  }
-
-  // address of Project contract
-  public get address(): string {
-    return this.createdEvent.id;
   }
 
   public get backEvents(): CommonwealthTypes.IProjectBacked[] {
@@ -66,10 +76,7 @@ class Project {
       .map(({ data }) => data as CommonwealthTypes.IProjectWithdraw);
   }
 
-  public get creatorAddressInfo(): AddressInfo {
-    // TODO: Address lookup
-    return null;
-  }
+  // Role getters
 
   public get backers(): CWParticipant[] {
     const backerAmounts: { [address: string]: BN } = {};
@@ -100,6 +107,8 @@ class Project {
       );
     });
   }
+
+  // Role checks
 
   public isAuthor(address: string, chainId: string): boolean {
     if (!this.chainId) return false;

@@ -6,20 +6,23 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import app from 'state';
 import ProjectCard, { ProjectCardSize } from './project_card';
+import { DummyProject } from './dummy_project';
 
 export default class ExplorePage
   implements m.ClassComponent<{ project: Project }>
 {
   getExploreProjects(): Project[] {
-    return (
-      app.projects.store
-        .getAll()
-        // TODO: Better momentjs-native sorting
-        .sort((a, b) => (a.deadline.isBefore(b.deadline) ? -1 : 1))
-    );
+    return new Array(5).fill(DummyProject);
+    // return (
+    //   app.projects.store
+    //     .getAll()
+    //     // TODO: Better momentjs-native sorting
+    //     .sort((a, b) => (a.deadline.isBefore(b.deadline) ? -1 : 1))
+    // );
   }
 
   view(vnode) {
+    console.log(this.getExploreProjects());
     const exploreProjects = this.getExploreProjects().map((project) => (
       <ProjectCard project={project} size={ProjectCardSize.Large} />
     ));
