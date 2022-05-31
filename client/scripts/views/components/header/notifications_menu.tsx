@@ -11,124 +11,7 @@ import { navigateToSubpage } from 'app';
 import NotificationRow from 'views/components/notification_row';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
-// TODO: stop when min is 1 i.e. all notifications have been retrieved
-const MAX_NOTIFS = 40; // limit number of notifications shown
-let minDiscussionNotification = 0;
-let minChainEventsNotification = 0;
-let init = false;
-
-function incrementAndRedraw(type: 'chain-event' | 'discussion') {
-  if (type === 'chain-event') {
-    if (
-      app.user.notifications.chainEventNotifications.length >=
-      minChainEventsNotification + MAX_NOTIFS
-    )
-      minChainEventsNotification += MAX_NOTIFS;
-  } else if (type === 'discussion') {
-    if (
-      app.user.notifications.discussionNotifications.length >=
-      minDiscussionNotification + MAX_NOTIFS
-    )
-      minDiscussionNotification += MAX_NOTIFS;
-  }
-  m.redraw();
-}
-
-function nextPage(showingChainEvents: boolean) {
-  if (showingChainEvents) {
-    const numChainEventNotif =
-      app.user.notifications.chainEventNotifications.length;
-    if (numChainEventNotif < minChainEventsNotification + MAX_NOTIFS) {
-      app.user.notifications.getChainEventNotifications().then(() => {
-        incrementAndRedraw('chain-event');
-      });
-    } else incrementAndRedraw('chain-event');
-  } else {
-    const numDiscussionNotif =
-      app.user.notifications.discussionNotifications.length;
-    if (numDiscussionNotif < minDiscussionNotification + MAX_NOTIFS) {
-      app.user.notifications.getDiscussionNotifications().then(() => {
-        incrementAndRedraw('discussion');
-      });
-    } else incrementAndRedraw('discussion');
-  }
-}
-
-function previousPage(showingChainEvents: boolean) {
-  if (showingChainEvents && minChainEventsNotification >= MAX_NOTIFS) {
-    minChainEventsNotification -= MAX_NOTIFS;
-    m.redraw();
-  } else if (minDiscussionNotification >= MAX_NOTIFS) {
-    minDiscussionNotification -= MAX_NOTIFS;
-    m.redraw();
-  }
-}
-
-type NotificationsMenuFooterAttrs = { showingChainNotifications: boolean };
-
-class NotificationsMenuFooter
-  implements m.ClassComponent<NotificationsMenuFooterAttrs>
-{
-  view(vnode) {
-    const { showingChainNotifications } = vnode.attrs;
-
-    const discussionNotifications =
-      app.user.notifications.discussionNotifications;
-    const chainEventNotifications =
-      app.user.notifications.chainEventNotifications;
-
-    return (
-      <div class="NotificationsMenuFooter">
-        <Button
-          label="See all"
-          onclick={() =>
-            app.activeChainId()
-              ? navigateToSubpage('/notifications')
-              : m.route.set('/notifications')
-          }
-        />
-        <Button
-          label="Mark all read"
-          onclick={(e) => {
-            e.preventDefault();
-            // e.stopPropagation();
-            const typeNotif = showingChainNotifications
-              ? chainEventNotifications
-              : discussionNotifications;
-            if (typeNotif.length < 1) return;
-            app.user.notifications
-              .markAsRead(typeNotif)
-              ?.then(() => m.redraw());
-          }}
-        />
-        <Button
-          label="<"
-          onclick={(e) => {
-            e.preventDefault();
-            previousPage(showingChainNotifications);
-          }}
-        />
-        <Button
-          label=">"
-          onclick={(e) => {
-            e.preventDefault();
-
-            // necessary since page refresh loads the first set of notifications for both but the min may not be set
-            if (!init) {
-              init = true;
-              minDiscussionNotification =
-                app.user.notifications.discussionNotifications.length;
-              minChainEventsNotification =
-                app.user.notifications.chainEventNotifications.length;
-            }
-
-            nextPage(showingChainNotifications);
-          }}
-        />
-      </div>
-    );
-  }
-}
+const MAX_NOTIFS = 40;
 
 type NotificationsMenuAttrs = { small?: boolean };
 
@@ -136,6 +19,56 @@ export class NotificationsMenu
   implements m.ClassComponent<NotificationsMenuAttrs>
 {
   private selectedChainEvents: boolean;
+  private minDiscussionNotification = 0;
+  private minChainEventsNotification = 0;
+  private init = false;
+
+  private _incrementAndRedraw(type: 'chain-event' | 'discussion') {
+    if (type === 'chain-event') {
+      if (
+        app.user.notifications.chainEventNotifications.length >=
+        this.minChainEventsNotification + MAX_NOTIFS
+      )
+        this.minChainEventsNotification += MAX_NOTIFS;
+    } else if (type === 'discussion') {
+      if (
+        app.user.notifications.discussionNotifications.length >=
+        this.minDiscussionNotification + MAX_NOTIFS
+      )
+        this.minDiscussionNotification += MAX_NOTIFS;
+    }
+    m.redraw();
+  }
+
+  private _nextPage(showingChainEvents: boolean) {
+    if (showingChainEvents) {
+      const numChainEventNotif =
+        app.user.notifications.chainEventNotifications.length;
+      if (numChainEventNotif < this.minChainEventsNotification + MAX_NOTIFS) {
+        app.user.notifications.getChainEventNotifications().then(() => {
+          this._incrementAndRedraw('chain-event');
+        });
+      } else this._incrementAndRedraw('chain-event');
+    } else {
+      const numDiscussionNotif =
+        app.user.notifications.discussionNotifications.length;
+      if (numDiscussionNotif < this.minDiscussionNotification + MAX_NOTIFS) {
+        app.user.notifications.getDiscussionNotifications().then(() => {
+          this._incrementAndRedraw('discussion');
+        });
+      } else this._incrementAndRedraw('discussion');
+    }
+  }
+
+  private _previousPage(showingChainEvents: boolean) {
+    if (showingChainEvents && this.minChainEventsNotification >= MAX_NOTIFS) {
+      this.minChainEventsNotification -= MAX_NOTIFS;
+      m.redraw();
+    } else if (this.minDiscussionNotification >= MAX_NOTIFS) {
+      this.minDiscussionNotification -= MAX_NOTIFS;
+      m.redraw();
+    }
+  }
 
   view(vnode) {
     // TODO: Add helper directly on controller
@@ -146,6 +79,8 @@ export class NotificationsMenu
       app.user.notifications.discussionNotifications;
     const chainEventNotifications =
       app.user.notifications.chainEventNotifications;
+    console.log(this);
+    console.log(chainEventNotifications);
 
     const unreadDiscussionNotifications = discussionNotifications.filter(
       (n) => !n.isRead
@@ -245,14 +180,15 @@ export class NotificationsMenu
                         maxPages={1} // prevents rollover/repeat
                         pageData={() =>
                           chainEventNotifications.slice(
-                            minChainEventsNotification,
-                            minChainEventsNotification + MAX_NOTIFS
+                            this.minChainEventsNotification,
+                            this.minChainEventsNotification + MAX_NOTIFS
                           )
                         } // limit the number of rows shown here
                         key={
                           // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
                           // sortedFilteredNotifications.length
-                          'chain' // TODO: add the length/num of total chain-events once notifications and notifications read table are split
+                          'chain'
+                          // TODO: add the length/num of total chain-events once notifications and notifications read table are split
                         }
                         item={(data) => {
                           return m(NotificationRow, { notifications: [data] });
@@ -267,8 +203,8 @@ export class NotificationsMenu
                         maxPages={1} // prevents rollover/repeat
                         pageData={() =>
                           discussionNotifications.slice(
-                            minDiscussionNotification,
-                            minDiscussionNotification + MAX_NOTIFS
+                            this.minDiscussionNotification,
+                            this.minDiscussionNotification + MAX_NOTIFS
                           )
                         } // limit the number of rows shown here
                         key={
@@ -285,9 +221,55 @@ export class NotificationsMenu
                 }
               })()}
             </div>
-            <NotificationsMenuFooter
-              showingChainNotifications={this.selectedChainEvents}
-            />
+            <div class="NotificationsMenuFooter">
+              <Button
+                label="See all"
+                onclick={() =>
+                  app.activeChainId()
+                    ? navigateToSubpage('/notifications')
+                    : m.route.set('/notifications')
+                }
+              />
+              <Button
+                label="Mark all read"
+                onclick={(e) => {
+                  e.preventDefault();
+                  // e.stopPropagation();
+                  const typeNotif = this.selectedChainEvents
+                    ? chainEventNotifications
+                    : discussionNotifications;
+                  if (typeNotif.length < 1) return;
+                  app.user.notifications
+                    .markAsRead(typeNotif)
+                    ?.then(() => m.redraw());
+                }}
+              />
+              <Button
+                label="<"
+                onclick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  this._previousPage(this.selectedChainEvents);
+                }}
+              />
+              <Button
+                label=">"
+                onclick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // necessary since page refresh loads the first set of notifications for both but the min may not be set
+                  if (!this.init) {
+                    this.init = true;
+                    this.minDiscussionNotification =
+                      app.user.notifications.discussionNotifications.length;
+                    this.minChainEventsNotification =
+                      app.user.notifications.chainEventNotifications.length;
+                  }
+
+                  this._nextPage(this.selectedChainEvents);
+                }}
+              />
+            </div>
           </>
         }
       />

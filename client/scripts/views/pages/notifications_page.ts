@@ -33,8 +33,10 @@ function increment(type: 'chain-event' | 'discussion') {
 }
 
 function nextPage() {
-  const numChainEventNotif = app.user.notifications.chainEventNotifications.length;
-  const numDiscussionNotif = app.user.notifications.discussionNotifications.length;
+  const numChainEventNotif =
+    app.user.notifications.chainEventNotifications.length;
+  const numDiscussionNotif =
+    app.user.notifications.discussionNotifications.length;
 
   const flag = false;
 
@@ -43,7 +45,7 @@ function nextPage() {
     app.user.notifications.getChainEventNotifications().then(() => {
       increment('chain-event');
       m.redraw();
-    })
+    });
   } else {
     increment('chain-event');
     m.redraw();
@@ -53,7 +55,7 @@ function nextPage() {
     app.user.notifications.getDiscussionNotifications().then(() => {
       increment('discussion');
       m.redraw();
-    })
+    });
   } else {
     increment('discussion');
     m.redraw();
@@ -217,10 +219,7 @@ const NotificationsPage: m.Component<{}> = {
               // TODO: sort this?
               const allNotifications = discussionNotif.concat(chainEventNotif);
 
-              console.log(allNotifications)
-
               const totalLength = allNotifications.length;
-              console.log("TotalLength:", totalLength);
               if (totalLength > 0) {
                 return m(Infinite, {
                   maxPages: 1, // prevents rollover/repeat
