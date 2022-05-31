@@ -121,8 +121,22 @@ async function mainProcess(
       `Starting scheduled process. Active chains: ${JSON.stringify(activeChains.flat())}`
     );
 
-  let query =
-    'SELECT "Chains"."id", "substrate_spec", "url", "private_url", "Chains"."address", "base", "type", "network", "Chains"."ce_verbose" FROM "Chains" JOIN "ChainNodes" ON "Chains"."id"="ChainNodes"."chain" WHERE "Chains"."has_chain_events_listener"=\'true\';';
+  let query =`
+    SELECT
+      "Chains"."id",
+      "Chains"."substrate_spec",
+      "url",
+      "private_url",
+      "Chains"."address",
+      "Chains"."base",
+      "Chains"."type",
+      "Chains"."network",
+      "Chains"."ce_verbose"
+    FROM "Chains"
+    JOIN "ChainNodes"
+    ON "Chains".chain_node_id = "ChainNodes".id
+    WHERE "Chains"."has_chain_events_listener" = true;
+  `;
   const allChains = (await pool.query(query)).rows;
 
   // gets the chains specific to this node

@@ -32,16 +32,12 @@ const status = async (
             model: models.OffchainTopic,
             as: 'topics',
           },
-        ],
-      }),
-      models.ChainNode.findAll({
-        include: [
           {
-            model: models.Chain,
-            where: { active: true },
-          },
+            model: models.ChainNode,
+          }
         ],
       }),
+      models.ChainNode.findAll(),
       models.ContractCategory.findAll(),
       models.NotificationCategory.findAll(),
       models.ChainCategory.findAll(),
