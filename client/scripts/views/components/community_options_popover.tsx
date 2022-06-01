@@ -55,7 +55,7 @@ export class CommunityOptionsPopover implements m.ClassComponent {
             />
           ),
           isAdmin &&
-            app.chain.meta.chain.topics.filter(
+            app.chain.meta.topics.filter(
               (topic) => topic.featuredInSidebar
             ).length > 0 && (
               <MenuItem
@@ -73,7 +73,7 @@ export class CommunityOptionsPopover implements m.ClassComponent {
               label="Invite members"
               onclick={(e) => {
                 e.preventDefault();
-                const data = { chainInfo: app.chain.meta.chain };
+                const data = { chainInfo: app.chain.meta };
                 app.modals.create({
                   modal: CreateInviteModal,
                   data,

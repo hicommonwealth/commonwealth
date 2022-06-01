@@ -109,7 +109,7 @@ const newThread = async (
   stage = OffchainThreadStage.Discussion,
   readOnly?: boolean
 ) => {
-  const topics = app.chain.meta.chain.topics;
+  const topics = app.chain.meta.topics;
 
   if (kind === OffchainThreadKind.Forum) {
     if (!form.threadTitle) {
@@ -451,7 +451,7 @@ export const NewThreadForm: m.Component<
   view: (vnode) => {
     if (!app.chain) return;
     const author = app.user.activeAccount;
-    const activeEntityInfo = app.chain.meta.chain;
+    const activeEntityInfo = app.chain.meta;
     const { isModal, hasTopics } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;

@@ -103,14 +103,14 @@ const LinkAccountItem: m.Component<
     const isPrepopulated =
       account.address === linkNewAddressModalVnode.attrs.prepopulateAddress ||
       address === linkNewAddressModalVnode.attrs.prepopulateAddress;
-    const baseName = app.chain.meta.chain.base;
+    const baseName = app.chain.meta.base;
     const capitalizedBaseName = `${baseName
       .charAt(0)
       .toUpperCase()}${baseName.slice(1)}`;
     const name =
       account.meta?.name ||
       (base === ChainBase.CosmosSDK
-        ? `${app.chain.meta.chain.name} address ${account.address.slice(
+        ? `${app.chain.meta.name} address ${account.address.slice(
             0,
             6
           )}...`
@@ -364,9 +364,7 @@ const LinkNewAddressModal: m.Component<
         // load addresses for the current chain/community
         if (app.chain) {
           // TODO: this breaks when the user action creates a new token forum
-          const chain = app.user.selectedNode
-            ? app.user.selectedNode.chain
-            : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+          const chain = app.user.selectedChain || app.config.chains.getById(app.activeChainId());
           await updateActiveAddresses(chain);
         } else {
           notifyError('Signed in, but no chain or community found');
@@ -523,7 +521,7 @@ const LinkNewAddressModal: m.Component<
                         ),
                         webWallet.chain === ChainBase.CosmosSDK && // keplr wallet, terra station
                           m('p.small-text', [
-                            `Because ${app.chain.meta.chain.name} does not support signed verification messages, `,
+                            `Because ${app.chain.meta.name} does not support signed verification messages, `,
                             'you will be asked to sign a transaction that does nothing. It will not be submitted to the chain.',
                           ]),
                       ],

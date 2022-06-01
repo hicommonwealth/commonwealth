@@ -60,12 +60,12 @@ class ProposalSidebarLinkedSnapshot
   view(vnode) {
     const { proposal } = vnode.attrs;
     if (!proposal.snapshotProposal) return;
-    if (!app.chain?.meta.chain.snapshot) return;
+    if (!app.chain?.meta?.snapshot) return;
 
     if (!this.initialized) {
       this.initialized = true;
 
-      loadMultipleSpacesData(app.chain.meta.chain.snapshot).then((data) => {
+      loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
         for (const { space, proposals } of data) {
           const matching_snapshot = proposals.find(
             (sn) => sn.id === proposal.snapshotProposal

@@ -28,7 +28,6 @@ export class Sidebar implements m.ClassComponent {
               <SubscriptionButton />
             </div>
           )}
-          {/* app.chain && <ChainStatusModule /> */}
           {app.isCustomDomain() && (
             <div
               class="powered-by"

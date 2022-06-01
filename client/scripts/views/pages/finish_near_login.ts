@@ -73,9 +73,7 @@ const validate = async (
     await acct.validate(signature);
     if (!app.isLoggedIn()) {
       await initAppState();
-      const chain = app.user.selectedNode
-        ? app.user.selectedNode.chain
-        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+      const chain = app.user.selectedChain || app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses(chain);
     }
     await setActiveAccount(acct);
@@ -134,11 +132,11 @@ const validate = async (
       // POST object
       const chainCreateArgs = JSON.parse(chainCreateArgString);
       const res = await $.post(
-        `${app.serverUrl()}/addChainNode`,
+        `${app.serverUrl()}/createChain`,
         chainCreateArgs
       );
       await initAppState(false);
-      m.route.set(`${window.location.origin}/${res.result.chain}`);
+      m.route.set(`${window.location.origin}/${res.result.chain.id}`);
     } catch (err) {
       vnode.state.validationError = `Failed to initialize chain node: ${err.message}`;
     }

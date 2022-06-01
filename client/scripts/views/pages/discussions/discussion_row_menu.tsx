@@ -135,9 +135,9 @@ class StageEditorMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
   view(vnode) {
     const { openStageEditor } = vnode.attrs;
 
-    if (!app.chain?.meta?.chain) return;
+    if (!app.chain?.meta) return;
 
-    const { stagesEnabled } = app.chain?.meta?.chain;
+    const { stagesEnabled } = app.chain?.meta;
 
     if (!stagesEnabled) return;
 
