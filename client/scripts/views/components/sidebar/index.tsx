@@ -10,6 +10,7 @@ import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
 import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
+import TwitterAttestationModal from '../../modals/twitter_attestation_modal'
 
 export class Sidebar implements m.ClassComponent {
   view() {
@@ -37,6 +38,17 @@ export class Sidebar implements m.ClassComponent {
               }}
             />
           )}
+          <div onclick={()=>{
+            const account = app.user.activeAccount
+            const twitter = app.user.socialAccounts.find((acct) => acct.provider === 'twitter')
+            const refreshCallback = () => { console.log("REFRESH CALLBACK :)")}
+            app.modals.create({
+              modal: TwitterAttestationModal,
+              data: { account, twitter, refreshCallback },
+            });
+          }}>
+            <p>T.A.M</p>
+          </div>
         </div>
       </div>
     ) : null;
