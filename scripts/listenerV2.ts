@@ -34,6 +34,11 @@ const { argv } = yargs.options({
     description:
       'Name of the token if network is erc20 and contractAddress is a erc20 token address',
   },
+  reconnectSince: {
+    alias: 'R',
+    type: 'number',
+    description: 'Block number to query from',
+  },
 });
 
 const shortcuts = {
@@ -71,6 +76,12 @@ const shortcuts = {
     url: networkUrls.moloch,
     address: contracts.moloch,
   },
+  commonwealth: {
+    chain: 'commonwealth',
+    network: SupportedNetwork.Commonwealth,
+    url: networkUrls['eth-local'],
+    address: contracts['commonwealth-local'],
+  },
 };
 
 async function main(): Promise<any> {
@@ -93,6 +104,9 @@ async function main(): Promise<any> {
         enricherConfig: sc.enricherConfig || {
           balanceTransferThreshold: 500_000,
         },
+        discoverReconnectRange: argv.reconnectSince
+          ? () => Promise.resolve({ startBlock: argv.reconnectSince })
+          : undefined,
       }
     );
 

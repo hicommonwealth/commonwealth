@@ -8,27 +8,31 @@ import * as CompoundTypes from './chains/compound/types';
 import * as Erc20Types from './chains/erc20/types';
 import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
+import * as CommonwealthTypes from './chains/commonwealth/types';
 
 // add other events here as union types
 export type IChainEntityKind =
   | SubstrateTypes.EntityKind
   | MolochTypes.EntityKind
   | CompoundTypes.EntityKind
-  | AaveTypes.EntityKind;
+  | AaveTypes.EntityKind
+  | CommonwealthTypes.EntityKind;
 export type IChainEventData =
   | SubstrateTypes.IEventData
   | MolochTypes.IEventData
   | CompoundTypes.IEventData
   | AaveTypes.IEventData
   | Erc20Types.IEventData
-  | Erc721Types.IEventData;
+  | Erc721Types.IEventData
+  | CommonwealthTypes.IEventData;
 export type IChainEventKind =
   | SubstrateTypes.EventKind
   | MolochTypes.EventKind
   | CompoundTypes.EventKind
   | AaveTypes.EventKind
   | Erc20Types.EventKind
-  | Erc721Types.EventKind;
+  | Erc721Types.EventKind
+  | CommonwealthTypes.EventKind;
 export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
   ...MolochTypes.EventKinds,
@@ -36,6 +40,7 @@ export const ChainEventKinds = [
   ...AaveTypes.EventKinds,
   ...Erc20Types.EventKinds,
   ...Erc721Types.EventKinds,
+  ...CommonwealthTypes.EventKinds,
 ];
 
 // eslint-disable-next-line no-shadow
@@ -46,6 +51,7 @@ export enum SupportedNetwork {
   Moloch = 'moloch',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
+  Commonwealth = 'commonwealth',
 }
 
 // eslint-disable-next-line no-shadow
@@ -183,6 +189,9 @@ export function entityToFieldName(
   if (network === SupportedNetwork.Moloch) {
     return 'proposalIndex';
   }
+  if (network === SupportedNetwork.Commonwealth) {
+    return 'id';
+  }
   switch (entity) {
     case SubstrateTypes.EntityKind.DemocracyProposal: {
       return 'proposalIndex';
@@ -274,6 +283,26 @@ export function eventToEntity(
       }
       default:
         return null;
+    }
+  }
+  if (network === SupportedNetwork.Commonwealth) {
+    switch (event) {
+      case CommonwealthTypes.EventKind.ProjectCreated: {
+        return [CommonwealthTypes.EntityKind.Project, EntityEventKind.Create];
+      }
+      // TODO: verify vote is correct here
+      case CommonwealthTypes.EventKind.ProjectBacked:
+      case CommonwealthTypes.EventKind.ProjectCurated:
+      case CommonwealthTypes.EventKind.ProjectWithdraw: {
+        return [CommonwealthTypes.EntityKind.Project, EntityEventKind.Vote];
+      }
+      case CommonwealthTypes.EventKind.ProjectSucceeded:
+      case CommonwealthTypes.EventKind.ProjectFailed: {
+        return [CommonwealthTypes.EntityKind.Project, EntityEventKind.Update];
+      }
+      default: {
+        return null;
+      }
     }
   }
   if (network === SupportedNetwork.Substrate) {

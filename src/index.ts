@@ -11,6 +11,8 @@ export * as Erc721Events from './chains/erc721/index';
 export * as Erc721Types from './chains/erc721/types';
 export * as AaveEvents from './chains/aave/index';
 export * as AaveTypes from './chains/aave/types';
+export * as CommonwealthEvents from './chains/commonwealth/index';
+export * as CommonwealthTypes from './chains/commonwealth/types';
 
 export { Listener } from './Listener';
 export * from './handlers';

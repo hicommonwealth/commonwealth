@@ -39,6 +39,11 @@ import {
   Title as AaveTitle,
   Label as AaveLabel,
 } from './chains/aave';
+import {
+  Listener as CommonwealthListener,
+  Title as CommonwealthTitle,
+  Label as CommonwealthLabel,
+} from './chains/commonwealth';
 import { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
 
@@ -59,6 +64,8 @@ export function Title(
       return Erc721Title(kind);
     case SupportedNetwork.Moloch:
       return MolochTitle(kind);
+    case SupportedNetwork.Commonwealth:
+      return CommonwealthTitle(kind);
     default:
       throw new Error(`Invalid network: ${network}`);
   }
@@ -78,6 +85,8 @@ export function Label(chain: string, event: CWEvent): IEventLabel {
       return Erc721Label(event.blockNumber, chain, event.data);
     case SupportedNetwork.Moloch:
       return MolochLabel(event.blockNumber, chain, event.data);
+    case SupportedNetwork.Commonwealth:
+      return CommonwealthLabel(event.blockNumber, chain, event.data);
     default:
       throw new Error(`Invalid network: ${event.network}`);
   }
@@ -175,6 +184,15 @@ export async function createListener(
     );
   } else if (network === SupportedNetwork.Aave) {
     listener = new AaveListener(
+      chain,
+      options.address,
+      options.url,
+      !!options.skipCatchup,
+      !!options.verbose,
+      options.discoverReconnectRange
+    );
+  } else if (network === SupportedNetwork.Commonwealth) {
+    listener = new CommonwealthListener(
       chain,
       options.address,
       options.url,
