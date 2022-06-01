@@ -94,7 +94,7 @@ const send = async (models, content: WebhookContent) => {
     // pass nothing if no matching address is found
   }
 
-  // if a community is passed with the content, we know that it is from an offchain community
+  // if a community is passed with the content, we know that it is from a community
   const chainOrCommObj = (content.chain) ? { chain_id: content.chain } : null;
   const notificationCategory = (content.chainEvent)
     ? content.chainEvent.chain_event_type_id : content.notificationCategory;
@@ -135,7 +135,7 @@ const send = async (models, content: WebhookContent) => {
 
   // First case
   if (!isChainEvent) {
-    // if offchain event (thread or comment), need to show embedded image as preview
+    // if event (thread or comment), need to show embedded image as preview
     if (notificationPreviewImageUrl) {
       previewImageUrl = notificationPreviewImageUrl;
       previewAltText = 'Embedded';

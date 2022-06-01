@@ -156,7 +156,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
         ]
       });
       if (!topic?.chain) {
-        // if associated with an offchain community, or if not token forum, always allow
+        // if associated with a community, or if not token forum, always allow
         return true;
       }
       const threshold = topic.token_threshold;

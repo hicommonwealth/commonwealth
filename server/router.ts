@@ -237,7 +237,7 @@ function setupRouter(
     getSupportedEthChains.bind(this, models)
   );
 
-  // offchain threads
+  // threads
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
@@ -327,7 +327,7 @@ function setupRouter(
 
   router.get('/profile', getProfile.bind(this, models));
 
-  // offchain discussion drafts
+  // discussion drafts
   router.post(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
@@ -347,7 +347,7 @@ function setupRouter(
 
   router.get('/bulkOffchain', bulkOffchain.bind(this, models));
 
-  // offchain comments
+  // comments
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
@@ -366,7 +366,7 @@ function setupRouter(
   router.get('/viewComments', viewComments.bind(this, models));
   router.get('/bulkComments', bulkComments.bind(this, models));
 
-  // offchain topics
+  // topics
   router.post(
     '/createTopic',
     passport.authenticate('jwt', { session: false }),
@@ -399,7 +399,7 @@ function setupRouter(
     setTopicThreshold.bind(this, models)
   );
 
-  // offchain reactions
+  // reactions
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
@@ -490,7 +490,7 @@ function setupRouter(
     setDefaultRole.bind(this, models)
   );
 
-  // offchain profiles
+  // profiles
   router.post(
     '/updateProfile',
     passport.authenticate('jwt', { session: false }),
@@ -511,7 +511,7 @@ function setupRouter(
     deleteSocialAccount.bind(this, models, 'discord')
   );
 
-  // offchain viewCount
+  // viewCount
   router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
 
   // attachments

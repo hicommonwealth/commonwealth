@@ -109,7 +109,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
     chain = chain || (await models.Chain.findOne({ where: { id: scope } }));
 
     if (proposalType === 'discussion' && proposalId !== null) {
-      // Retrieve offchain discussion
+      // Retrieve discussions
       const proposal = await models.Thread.findOne({
         where: { id: proposalId },
         include: [{

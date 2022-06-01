@@ -9,7 +9,7 @@ export const Errors = {
   NoObjectId: 'Must provide object ID',
   NoChainOrComm: 'Must provide chain or community',
   InvalidChainOrComm: 'Invalid chain or community',
-  InvalidThread: 'Invalid offchain thread',
+  InvalidThread: 'Invalid thread',
 };
 
 const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {

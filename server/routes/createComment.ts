@@ -202,7 +202,7 @@ const createComment = async (
     include: [models.Address, models.Attachment],
   });
 
-  // get parent entity if the comment is on an offchain thread
+  // get parent entity if the comment is on a thread
   // no parent entity if the comment is on an onchain entity
   let proposal;
   const [prefix, id] = finalComment.root_id.split('_') as [

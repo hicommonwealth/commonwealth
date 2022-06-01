@@ -85,7 +85,7 @@ export const ProposalBodyAvatar: m.Component<{
     if (!item) return;
     if (!item.author) return;
 
-    // Check for accounts on offchain forums that originally signed up on a different base chain,
+    // Check for accounts on forums that originally signed up on a different base chain,
     // Render them as anonymous as the forum is unable to support them.
 
     if (
@@ -130,7 +130,7 @@ export const ProposalBodyAuthor: m.Component<{
     if (!item) return;
     if (!item.author) return;
 
-    // Check for accounts on offchain forums that originally signed up on a different base chain,
+    // Check for accounts on forums that originally signed up on a different base chain,
     // Render them as anonymous as the forum is unable to support them.
     if (
       (item instanceof Comment || item instanceof Comment) &&

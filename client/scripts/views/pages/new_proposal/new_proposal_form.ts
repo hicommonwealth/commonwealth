@@ -1268,7 +1268,7 @@ const NewProposalForm = {
                   )
                 ),
               ]),
-              // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
+              // TODO: display copy re AIPs and ARCs from https://docs.aave.com/governance/
               m('.tab-selector', [
                 m(
                   Tabs,

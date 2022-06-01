@@ -88,7 +88,7 @@ export const ThreadSelector: m.Component<
               m(Spinner, {
                 active: true,
                 fill: true,
-                message: 'Loading offchain threads...',
+                message: 'Loading threads...',
               }),
             ]),
           ])
@@ -148,7 +148,7 @@ export const ThreadSelector: m.Component<
               filterable: false,
               checkmark: true,
               inputAttrs: {
-                placeholder: 'Search for offchain thread to link...',
+                placeholder: 'Search for thread to link...',
               },
               emptyContent: emptyContentMessage,
               items:

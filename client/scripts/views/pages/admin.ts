@@ -129,7 +129,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
             m.route.set('/createCommunity');
           },
         },
-        'Add a new offchain community'
+        'Add a new starter community'
       ),
       (app.config.chains.getAll() || []).map((chain) =>
         m('.chain-row', [

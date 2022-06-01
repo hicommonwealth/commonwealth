@@ -20,7 +20,7 @@ export class PollEditorCard
     return (
       <div class="PollEditorCard">
         <h4>
-          Add {proposalAlreadyHasPolling ? 'an' : 'another'} offchain poll to
+          Add {proposalAlreadyHasPolling ? 'an' : 'another'} poll to
           this thread?
         </h4>
         <Button

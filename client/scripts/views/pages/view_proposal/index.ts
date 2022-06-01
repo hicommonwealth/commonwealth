@@ -905,7 +905,7 @@ const ViewProposalPage: m.Component<
       try {
         vnode.state.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {
-        // proposal might be loading, if it's not an offchain thread
+        // proposal might be loading, if it's not an thread
         if (proposalType === ProposalType.Thread) {
           if (!vnode.state.threadFetched) {
             app.threads
