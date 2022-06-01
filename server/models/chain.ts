@@ -93,7 +93,6 @@ export default (
       chain_node_id: { type: dataTypes.INTEGER, allowNull: true }, // only null if starter community
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.STRING, allowNull: true },
-      address: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
       ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
@@ -101,7 +100,7 @@ export default (
       element: { type: dataTypes.STRING, allowNull: true },
       telegram: { type: dataTypes.STRING, allowNull: true },
       github: { type: dataTypes.STRING, allowNull: true },
-      symbol: { type: dataTypes.STRING, allowNull: false },
+      default_symbol: { type: dataTypes.STRING, allowNull: true },
       network: { type: dataTypes.STRING, allowNull: false },
       base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
       ss58_prefix: { type: dataTypes.INTEGER, allowNull: true },
@@ -121,7 +120,6 @@ export default (
         defaultValue: true,
       },
       type: { type: dataTypes.STRING, allowNull: false },
-      decimals: { type: dataTypes.INTEGER, allowNull: true },
       substrate_spec: { type: dataTypes.JSONB, allowNull: true },
       has_chain_events_listener: {
         type: dataTypes.BOOLEAN,
@@ -159,6 +157,7 @@ export default (
     models.Chain.belongsToMany(models.User, {
       through: models.WaitlistRegistration,
     });
+    models.Chain.hasMany(models.CommunityContract, { foreignKey: 'community_id'}); // @TODO: Is this right?
   };
 
   return Chain;

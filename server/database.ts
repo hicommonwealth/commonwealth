@@ -102,6 +102,8 @@ import NotificationsReadFactory, {
   NotificationsReadModelStatic,
 } from './models/notifications_read';
 import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
+import { ContractModelStatic } from './models/contract';
+import { CommunityContractModelStatic } from './models/community_contract';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -115,6 +117,8 @@ export type Models = {
   ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;
   Collaboration: CollaborationModelStatic;
+  Contract: ContractModelStatic;
+  CommunityContract: CommunityContractModelStatic;
   ContractCategory: ContractCategoryModelStatic;
   ContractItem: ContractItemModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
