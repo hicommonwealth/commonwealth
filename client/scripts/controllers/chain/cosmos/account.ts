@@ -21,7 +21,7 @@ export default class CosmosAccount extends Account<CosmosToken> {
   public get balance() { return this.updateBalance().then(() => this._balance); }
 
   constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
-    super(app, app.chain.meta.chain, address);
+    super(app, app.chain.meta, address);
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

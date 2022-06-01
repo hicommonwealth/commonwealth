@@ -189,7 +189,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       );
       const yesBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(yesBalance.toString())
-      )} ${app.chain.meta.chain.symbol}`;
+      )} ${app.chain.meta.symbol}`;
       const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
       const noBalance = noVotes.reduce(
         (total, v) => total.add(v.power),
@@ -197,7 +197,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       );
       const noBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(noBalance.toString())
-      )} ${app.chain.meta.chain.symbol}`;
+      )} ${app.chain.meta.symbol}`;
       return m('.VotingResults', [
         m('.results-column.yes-votes', [
           m('.results-header', `Yes (${yesBalanceString}) (${yesVotes.length} voters)`),
@@ -309,8 +309,8 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
 
         // TODO: move this marshalling into controller
         const formatCurrency = (n: BN) => {
-          const decimals = new BN(10).pow(new BN(app.chain.meta.chain.decimals || 6));
-          const denom = app.chain.meta.chain.symbol;
+          const decimals = new BN(10).pow(new BN(app.chain.meta.decimals || 6));
+          const denom = app.chain.meta.symbol;
           const coin = new Coin(denom, n, false, decimals);
           return coin.format();
         }

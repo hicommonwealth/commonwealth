@@ -5,7 +5,7 @@ import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import ChainEntityController from 'controllers/server/chain_entities';
-import { IChainAdapter, NodeInfo } from 'models';
+import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
 import { ChainBase, ChainNetwork } from 'types';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -36,7 +36,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   }
 
   constructor(
-    meta: NodeInfo,
+    meta: ChainInfo,
     app: IApp,
   ) {
     super(meta, app);
@@ -55,7 +55,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
   public async initApi(additionalOptions?) {
     if (this.apiInitialized) return;
-    await this.chain.resetApi(this.meta, additionalOptions || this.meta.chain.substrateSpec);
+    await this.chain.resetApi(this.meta, additionalOptions || this.meta.substrateSpec);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     await this.identities.init(this.chain, this.accounts);

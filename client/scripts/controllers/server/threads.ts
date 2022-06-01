@@ -276,7 +276,7 @@ class ThreadsController {
       // New posts are added to both the topic and allProposals sub-store
       this._listingStore.add(result);
       const activeEntity = app.chain;
-      updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
+      updateLastVisited(activeEntity.meta, true);
 
       // synthesize new subscription rather than hitting backend
       const subscriptionJSON = {

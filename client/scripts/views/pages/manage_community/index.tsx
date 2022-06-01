@@ -92,7 +92,7 @@ class ManageCommunityPage implements m.ClassComponent {
       this.roleData.splice(this.roleData.indexOf(oldRole), 1, newRole);
       app.user.addRole(newRole);
       app.user.removeRole(predicate);
-      const { adminsAndMods } = app.chain.meta.chain;
+      const { adminsAndMods } = app.chain.meta;
       if (
         oldRole.permission === 'admin' ||
         oldRole.permission === 'moderator'
