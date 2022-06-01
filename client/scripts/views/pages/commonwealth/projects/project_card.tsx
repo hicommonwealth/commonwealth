@@ -3,7 +3,7 @@
 import 'pages/projects/project_card.scss';
 
 import m from 'mithril';
-import { capitalize } from 'lodash';
+import _, { capitalize } from 'lodash';
 import { slugify } from 'utils';
 import moment from 'moment';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -12,6 +12,7 @@ import { Project } from 'models';
 import { Tag } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { weiToTokens } from 'helpers';
+import { BN } from 'ethereumjs-util';
 
 enum ProjectSupporter {
   Curator = 'curator',
@@ -44,17 +45,36 @@ class ProjectHeaderPanel
       iconSize?: number;
       coverImage: string;
       userRole?: ProjectSupporter;
+      supportAmount?: BN;
     }>
 {
   view(vnode) {
     const iconSize = vnode.attrs.iconSize || 32;
-    const { coverImage, userRole } = vnode.attrs;
+    const { coverImage, userRole, supportAmount } = vnode.attrs;
+    const isSupporter = userRole !== ProjectSupporter.Author;
     return (
       <div
         class="ProjectHeaderPanel"
         style={`background-image: url("${coverImage}");`}
       >
-        {userRole && null}
+        {userRole && (
+          <div class="user-role-banner">
+            <div class="banner-left">
+              <CWText type="caption" fontWeight="uppercase">
+                {_.capitalize(userRole)}
+              </CWText>
+              {isSupporter && (
+                <CWIcon iconName={userRole} iconSize="small"></CWIcon>
+              )}
+            </div>
+            <div class="banner-right">
+              <CWText type="caption" fontWeight="uppercase">
+                {' '}
+                {weiToTokens(supportAmount.toString(), 18)} ETH
+              </CWText>
+            </div>
+          </div>
+        )}
         {iconSize && (
           <DummyChainIcon chain={null} onclick={null} size={iconSize} />
         )}
@@ -86,10 +106,7 @@ interface ProjectInfoAttrs {
 class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
   view(vnode: m.Vnode<ProjectInfoAttrs>) {
     const { project, avatarSize } = vnode.attrs;
-    // 40px tall funding data, 100px description, 40px recipient data
-    // <tag with left-icon clock> <funding amount eth h5 bold and regular>
-    // caption regular
-    console.log(weiToTokens(project.fundingAmount.toString(), 18));
+
     return (
       <div class="ProjectInfoPanel">
         <div class="funding-data">
@@ -180,6 +197,8 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
     //     </div>
     //   </div>
     // );
+
+    project.isAuthor();
 
     return (
       <div class="ProjectCard large" onclick={onclick}>

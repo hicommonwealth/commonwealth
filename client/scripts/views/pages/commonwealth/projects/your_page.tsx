@@ -18,7 +18,7 @@ export default class YourPage implements m.ClassComponent {
   private supportedProjectsDisplayed = 6;
   private endedProjectsDisplayed = 6;
 
-  getUserProjects(): Project[] {
+  getAuthoredProjects(): Project[] {
     const allProjects: Project[] = [];
     app.user.addresses.forEach(({ address, chain }) => {
       app.projects.store
@@ -78,7 +78,7 @@ export default class YourPage implements m.ClassComponent {
       <div class="YourPage">
         <CWText type="h1">Your Projects</CWText>
         <div class="projects-listing">
-          {this.getUserProjects().map((project) => (
+          {this.getAuthoredProjects().map((project) => (
             <ProjectCard project={project} size={ProjectCardSize.Large} />
           ))}
           <CWButton
