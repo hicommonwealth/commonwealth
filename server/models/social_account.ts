@@ -9,6 +9,7 @@ export type SocialAccountAttributes = {
   provider_userid: string;
   access_token: string;
   refresh_token: string;
+  attested?: boolean;
   id?: number;
   created_at?: Date;
   updated_at?: Date;
@@ -35,6 +36,7 @@ export default (
     provider_userid: { type: dataTypes.STRING },
     access_token: { type: dataTypes.STRING },
     refresh_token: { type: dataTypes.STRING },
+    attested: { type: dataTypes.STRING, allowNull: false, defaultValue: false},
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {

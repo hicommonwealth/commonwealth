@@ -27,6 +27,8 @@ export type AddressAttributes = {
 	ghost_address?: boolean;
 	profile_id?: number;
 	wallet_id?: WalletId;
+	twitter_verified?: boolean;
+  twitter_verification_msg?: string;
 	// associations
 	Chain?: ChainAttributes;
 	User?: UserAttributes;
@@ -69,6 +71,8 @@ export default (
 		ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		profile_id:    						  { type: dataTypes.INTEGER, allowNull: true },
 		wallet_id:									{ type: dataTypes.STRING, allowNull: true },
+		twitter_verified:           { type: dataTypes.BOOLEAN, allowNull: true },
+    twitter_verification_msg:   { type: dataTypes.STRING, allowNull: true },
 	}, {
 		timestamps: true,
 		createdAt: 'created_at',
