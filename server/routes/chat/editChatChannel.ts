@@ -1,34 +1,55 @@
-import {NextFunction, Request, Response} from "express";
-import {DB} from "../../database";
+import { NextFunction, Request } from 'express';
+import validateRoles from '../../util/validateRoles';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { DB } from '../../database';
 
 export const Errors = {
-    NotLoggedIn: 'Not logged in',
-    NotAdmin: 'Must be an admin to edit a chat channel',
-    NoChainId: 'No chain id given',
-    NoChannelId: 'No channel id given',
-    NoNewName: 'No new name given'
+  NotLoggedIn: 'Not logged in',
+  NotAdmin: 'Must be an admin to edit a chat channel',
+  NoChainId: 'No chain id given',
+  NoChannelId: 'No channel id given',
+  RuleNotFound: 'Rule not found',
 };
 
-export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) return next(new Error(Errors.NotLoggedIn));
+type EditChatChannelReq = {
+  chain_id: string;
+  channel_id: string;
+  name?: string;
+  rule_id?: number;
+};
 
-    if (!req.user.isAdmin) return next(new Error(Errors.NotAdmin))
+export default async (
+  models: DB,
+  req: TypedRequestBody<EditChatChannelReq>,
+  res: TypedResponse<Record<string, never>>,
+  next: NextFunction
+) => {
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
 
-    if (!req.body.chain_id) return next(new Error(Errors.NoChainId))
+  if (!req.body.chain_id) return next(new Error(Errors.NoChainId));
 
-    if (!req.body.channel_id) return next(new Error(Errors.NoChannelId))
+  if (!req.body.channel_id) return next(new Error(Errors.NoChannelId));
 
-    if (!req.body.name) return next(new Error(Errors.NoNewName))
+  const requesterIsAdmin = validateRoles(models, req as Request, 'admin', req.body.chain_id);
+  if (requesterIsAdmin === null) {
+    return next(new Error(Errors.NotAdmin));
+  }
 
-    // finds and renames the channel
-    const channel = await models.ChatChannel.findOne({
-        where: {
-            id: req.body.channel_id,
-            chain_id: req.body.chain_id
-        }
-    });
-    channel.name = req.body.name
-    await channel.save()
+  const channel = await models.ChatChannel.findOne({
+    where: {
+      id: req.body.channel_id,
+      chain_id: req.body.chain_id
+    }
+  });
+  if (req.body.name) {
+    channel.name = req.body.name;
+  }
+  if (req.body.rule_id) {
+    const rule = await models.Rule.findOne({ where: { id: req.body.rule_id }});
+    if (!rule) return next(new Error(Errors.RuleNotFound));
+    channel.rule_id = req.body.rule_id;
+  }
+  await channel.save();
 
-    return res.json({ status: 'Success' });
+  return success(res, {});
 }
