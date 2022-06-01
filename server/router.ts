@@ -108,6 +108,9 @@ import deleteChatCategory from './routes/chat/deleteChatCategory';
 import editChatChannel from './routes/chat/editChatChannel';
 import editChatCategory from './routes/chat/editChatCategory';
 
+import createRule from './routes/rules/createRule';
+import deleteRule from './routes/rules/deleteRule';
+
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
@@ -620,6 +623,18 @@ function setupRouter(
     '/editChatCategory',
     passport.authenticate('jwt', { session: false }),
     editChatCategory.bind(this, models)
+  );
+
+  // rules
+  router.post(
+    '/createRule',
+    passport.authenticate('jwt', { session: false }),
+    createRule.bind(this, models)
+  );
+  router.post(
+    '/deleteRule',
+    passport.authenticate('jwt', { session: false }),
+    deleteRule.bind(this, models)
   );
 
   // settings

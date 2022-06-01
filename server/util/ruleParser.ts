@@ -81,6 +81,12 @@ export abstract class RuleType<SchemaT extends DefaultSchemaT = DefaultSchemaT> 
   abstract check(ruleSchema: SchemaT, address: string, chain: string, models?: DB): Promise<boolean>;
 }
 
+export function validateRule(ruleSchema: any): DefaultSchemaT {
+  const [ ruleId ] = Object.keys(ruleSchema);
+  const ruleDef = RuleTypes[ruleId];
+  return ruleDef.validateRule(ruleSchema);
+}
+
 export async function checkRule(
   models: DB,
   ruleFk: number,
