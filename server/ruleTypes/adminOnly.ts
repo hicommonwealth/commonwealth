@@ -3,17 +3,12 @@ import { RuleType } from '../util/ruleParser';
 
 type SchemaT = { AdminOnlyRule: [] };
 
-export default class AdminOnlyRule implements RuleType<SchemaT> {
+export default class AdminOnlyRule extends RuleType<SchemaT> {
   public readonly identifier = 'AdminOnlyRule';
   public readonly metadata = {
     name: 'Admin Only Rule',
     description: 'Only admins can perform the gated action',
     arguments: [],
-  }
-
-  public validateRule(ruleSchema: SchemaT): SchemaT {
-    if (!ruleSchema?.AdminOnlyRule) throw new Error('Invalid identifier');
-    return { AdminOnlyRule: [] };
   }
 
   public async check(
