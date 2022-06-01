@@ -107,26 +107,33 @@ export class ProjectCompletionBar
 interface ProjectInfoAttrs {
   project: Project;
   avatarSize: number;
+  projectStatus: 'succeeded' | 'failed';
 }
 class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
+  _viewLabel(status, deadline) {
+    return status ? (
+      <CWText type="caption" fontWeight="medium">
+        {_.capitalize(status)}
+      </CWText>
+    ) : (
+      <>
+        <CWIcon iconName="clock" iconSize="small" />
+        <CWText type="caption" fontWeight="medium">
+          <div class="project-deadline">{`${deadline.fromNow(true)}`}</div>
+        </CWText>
+      </>
+    );
+  }
   view(vnode: m.Vnode<ProjectInfoAttrs>) {
-    const { project, avatarSize } = vnode.attrs;
+    const { project, projectStatus, avatarSize } = vnode.attrs;
 
     return (
       <div class="ProjectInfoPanel">
         <div class="funding-data">
           <Tag
             intent="none"
-            label={
-              <>
-                <CWIcon iconName="clock" iconSize="small" />
-                <CWText type="caption" fontWeight="medium">
-                  <div class="project-deadline">
-                    {`${project.deadline.fromNow(true)}`}
-                  </div>
-                </CWText>
-              </>
-            }
+            class={projectStatus}
+            label={this._viewLabel(projectStatus, project.deadline)}
           />
           <div class="funding-state">
             <CWText type="h5" fontWeight="bold">
@@ -234,10 +241,16 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
           coverImage={project.coverImage}
           userRole={userRole}
           supportAmount={supportAmount}
+        />
+        <ProjectCompletionBar
+          completionPercent={project.completionPercent}
           projectStatus={projectStatus}
         />
-        <ProjectCompletionBar completionPercent={project.completionPercent} />
-        <ProjectInfoPanel project={project} avatarSize={16} />
+        <ProjectInfoPanel
+          project={project}
+          avatarSize={16}
+          projectStatus={projectStatus}
+        />
       </div>
     );
   }

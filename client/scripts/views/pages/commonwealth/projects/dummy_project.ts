@@ -13,65 +13,73 @@ const DummyBeneficiary: AddressInfo = {
   ghostAddress: false,
 };
 
-export const DummyProject: Project = {
-  id: 1,
-  address: 'skdjfkasjkjadkvnkjdfk090912',
-  title: 'Name of Project',
-  chainId: 'dydx',
-  description:
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
-    `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
-    `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
-    `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
-    `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. \n` +
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
-    `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
-    `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
-    `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
-    `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. \n` +
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
-    `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
-    `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
-    `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
-    `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
-  shortDescription:
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
-    `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
-    `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
-    `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
-    `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
-  coverImage:
-    'https://d2w9rnfcy7mm78.cloudfront.net/16465542/original_01e127de59ab1b9be072a07cd8e6aeca.png?1652559364',
-  token: 'skdjfkasjkjadkvnkjdfk090912',
-  creator: null,
-  creatorAddressId: DummyBeneficiary.id,
-  creatorAddressInfo: DummyBeneficiary,
-  beneficiary: 'kcvkljurdslfkdjfioeioei',
-  backers: [
-    new CWParticipant(this, 'ajslkdjfkl', new BN(10000)),
-    new CWParticipant(this, 'kcvkljurioeioei', new BN(300000)),
-  ],
-  curatorFee: new BN(0.23),
-  curators: [
-    new CWParticipant(this, 'ajslkdjfkl', new BN(10000)),
-    new CWParticipant(this, 'kcvkljurioeioei', new BN(300000)),
-  ],
-  createdAt: moment('2022-05-05'),
-  deadline: moment('2022-06-15'),
-  threshold: new BN('4000000000000000000'),
-  fundingAmount: new BN('3000000000000000000'),
-  completionPercent: 0.75,
+export function createNewDummyProject(params): Project {
+  const { isAuthor, isCurator, isBacker, isFailed, isSucceeded } = params;
+  return {
+    id: Math.floor(Math.random() * 10),
+    address: 'skdjfkasjkjadkvnkjdfk090912',
+    title: 'Name of Project',
+    chainId: 'dydx',
+    description:
+      `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
+      `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
+      `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
+      `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
+      `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. \n` +
+      `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
+      `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
+      `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
+      `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
+      `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. \n` +
+      `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
+      `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
+      `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
+      `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
+      `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
+    shortDescription:
+      `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor` +
+      `incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation` +
+      `ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit ` +
+      `in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat ` +
+      `non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
+    coverImage:
+      'https://d2w9rnfcy7mm78.cloudfront.net/16465542/original_01e127de59ab1b9be072a07cd8e6aeca.png?1652559364',
+    token: 'skdjfkasjkjadkvnkjdfk090912',
+    creator: null,
+    creatorAddressId: DummyBeneficiary.id,
+    creatorAddressInfo: DummyBeneficiary,
+    beneficiary: 'kcvkljurdslfkdjfioeioei',
+    backers: [
+      new CWParticipant(this, 'ajslkdjfkl', new BN(10000)),
+      new CWParticipant(this, 'kcvkljurioeioei', new BN(300000)),
+    ],
+    curatorFee: new BN(0.23),
+    curators: [
+      new CWParticipant(this, 'ajslkdjfkl', new BN(10000)),
+      new CWParticipant(this, 'kcvkljurioeioei', new BN(300000)),
+    ],
+    createdAt: moment('2022-05-05'),
+    deadline: isFailed ? moment().subtract('1 day') : moment('2022-06-15'),
+    threshold: new BN('4000000000000000000'),
+    fundingAmount: isSucceeded
+      ? new BN('4000000000000000000')
+      : new BN('3000000000000000000'),
+    completionPercent: 0.75,
 
-  isAuthor: () => true,
-  isBacker: () => true,
-  isCurator: () => true,
+    isAuthor: () => isAuthor,
+    isBacker: () => isBacker,
+    isCurator: () => isCurator,
 
-  createdEvent: null,
-  curateEvents: null,
-  backEvents: null,
-  withdrawEvents: null,
-  succeededEvent: null,
-  failedEvent: null,
+    getBackedAmount: () => new BN('1000000'),
+    getCuratedAmount: () => new BN('200000000'),
 
-  entity: null,
-};
+    createdEvent: null,
+    curateEvents: null,
+    backEvents: null,
+    withdrawEvents: null,
+    succeededEvent: null,
+    failedEvent: null,
+
+    entity: null,
+  };
+}

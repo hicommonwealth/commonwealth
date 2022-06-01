@@ -5,13 +5,20 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import app from 'state';
 import ProjectCard, { ProjectCardSize } from './project_card';
-import { DummyProject } from './dummy_project';
+import { createNewDummyProject, DummyProject } from './dummy_project';
 
 export default class ExplorePage
   implements m.ClassComponent<{ project: Project }>
 {
   getExploreProjects(): Project[] {
-    return new Array(5).fill(DummyProject);
+    return [
+      createNewDummyProject({}),
+      createNewDummyProject({ isAuthor: true }),
+      createNewDummyProject({ isBacker: true }),
+      createNewDummyProject({ isCurator: true }),
+      createNewDummyProject({ isFailed: true }),
+      createNewDummyProject({ isSucceeded: true }),
+    ];
     // return (
     //   app.projects.store
     //     .getAll()
