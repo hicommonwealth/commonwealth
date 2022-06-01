@@ -31,7 +31,7 @@ export default class SolanaAccount extends Account<SolanaToken> {
   });
 
   constructor(app: IApp, ChainInfo: SolanaChain, Accounts: SolanaAccounts, address: string) {
-    super(app, app.chain.meta.chain, address);
+    super(app, app.chain.meta, address);
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

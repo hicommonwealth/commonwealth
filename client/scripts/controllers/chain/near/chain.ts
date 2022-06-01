@@ -12,7 +12,7 @@ import {
 import { FunctionCallOptions } from 'near-api-js/lib/account';
 import { Action, FunctionCall } from 'near-api-js/lib/transaction';
 import { uuidv4 } from 'lib/util';
-import { IChainModule, ITXModalData, NodeInfo } from 'models';
+import { ChainInfo, IChainModule, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
@@ -89,17 +89,17 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     this._app = app;
   }
 
-  public async init(node: NodeInfo, accounts: NearAccounts): Promise<void> {
-    const decimalPlaces = node.chain.decimals || 24;
+  public async init(chain: ChainInfo, accounts: NearAccounts): Promise<void> {
+    const decimalPlaces = chain.decimals || 24;
     this._decimals = new BN(10).pow(new BN(decimalPlaces));
-    const networkSuffix = node.chain.id.split('.').pop();
+    const networkSuffix = chain.id.split('.').pop();
     this._networkId =
-      node.chain.id === 'near-testnet' || networkSuffix === 'testnet'
+      chain.id === 'near-testnet' || networkSuffix === 'testnet'
         ? 'testnet'
         : 'mainnet';
     this._config = {
       networkId: this.isMainnet ? 'mainnet' : 'testnet',
-      nodeUrl: node.url,
+      nodeUrl: chain.node.url,
       walletUrl: this.isMainnet
         ? 'https://wallet.near.org/'
         : 'https://wallet.testnet.near.org/',

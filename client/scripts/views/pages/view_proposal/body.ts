@@ -134,7 +134,7 @@ export const ProposalBodyAuthor: m.Component<{
     // Render them as anonymous as the forum is unable to support them.
     if (
       (item instanceof OffchainComment || item instanceof OffchainComment) &&
-      app.chain.meta.chain.type === ChainType.Offchain
+      app.chain.meta.type === ChainType.Offchain
     ) {
       if (
         item.authorChain !== app.chain.id &&

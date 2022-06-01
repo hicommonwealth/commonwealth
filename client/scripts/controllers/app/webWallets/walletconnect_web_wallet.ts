@@ -40,7 +40,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   }
 
   public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(app.chain.meta.ethChainId || 1, message);
+    const msgParams = constructTypedMessage(app.chain.meta.node.ethChainId || 1, message);
     const signature = await this._provider.wc.signTypedData([
       this.accounts[0],
       JSON.stringify(msgParams),
@@ -59,10 +59,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // Create WalletConnect Provider
-      const chainId = app.chain?.meta.ethChainId || 1;
+      const chainId = app.chain?.meta.node.ethChainId || 1;
 
       // use alt wallet url if available
-      const rpc = { [chainId]: app.chain.meta.altWalletUrl || app.chain.meta.url };
+      const rpc = { [chainId]: app.chain.meta.node.altWalletUrl || app.chain.meta.node.url };
       console.log(rpc);
       this._provider = new WalletConnectProvider({ rpc, chainId });
 

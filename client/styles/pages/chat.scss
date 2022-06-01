@@ -50,6 +50,20 @@
           color: $neutral-400;
           margin-left: 8px;
         }
+
+        .cui-icon-link {
+          color: $neutral-400;
+          cursor: pointer;
+          margin-left: 4px;
+
+          &:hover {
+            color: $neutral-600;
+          }
+        }
+      }
+
+      &#highlighted{
+        animation: pulse 2s 0.3s;
       }
     }
 
@@ -110,5 +124,14 @@
 
   .chat-composer-unavailable {
     color: $neutral-500;
+  }
+}
+
+@keyframes pulse {
+	0%, 100% {
+    background-color: #fff;
+  }
+  50% {
+    background-color: $purple-50;
   }
 }
