@@ -1,4 +1,4 @@
-import { NodeInfo } from 'models';
+import { ChainInfo, NodeInfo } from 'models';
 import { IAaveGovernanceV2__factory } from 'eth/types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumChain from '../chain';
@@ -11,15 +11,15 @@ export default class AaveChain extends EthereumChain {
   public aaveApi: AaveApi;
 
   public coins(n: number, inDollars?: boolean) {
-    return new EthereumCoin(this.app?.chain?.meta.chain.symbol || '???', n, inDollars);
+    return new EthereumCoin(this.app?.chain?.meta.symbol || '???', n, inDollars);
   }
 
-  public async init(selectedNode: NodeInfo) {
-    await super.resetApi(selectedNode);
+  public async init(selectedChain: ChainInfo) {
+    await super.resetApi(selectedChain);
     await super.initMetadata();
     this.aaveApi = new AaveApi(
       IAaveGovernanceV2__factory.connect,
-      selectedNode.address,
+      selectedChain.address,
       this.api.currentProvider as any
     );
     await this.aaveApi.init();

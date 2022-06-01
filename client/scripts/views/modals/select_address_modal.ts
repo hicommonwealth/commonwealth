@@ -24,7 +24,7 @@ const SelectAddressModal: m.Component<
   view: (vnode) => {
     const activeAccountsByRole: Array<[Account<any>, RoleInfo]> =
       app.user.getActiveAccountsByRole();
-    const activeEntityInfo = app.chain?.meta?.chain;
+    const activeEntityInfo = app.chain?.meta;
     const createRole = (e) => {
       vnode.state.loading = true;
 
@@ -100,10 +100,10 @@ const SelectAddressModal: m.Component<
     };
 
     const chainbase = app.chain
-      ? app.chain?.meta?.chain?.base
+      ? app.chain?.meta?.base
       : ChainBase.Ethereum;
 
-    const activeCommunityMeta = app.chain.meta?.chain;
+    const activeCommunityMeta = app.chain.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     return m('.SelectAddressModal', [
