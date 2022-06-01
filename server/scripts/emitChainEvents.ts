@@ -50,10 +50,9 @@ async function main(chain: string, eventsPath: string) {
   try {
     await sequelize.authenticate();
     const chainInstance = await models.Chain.findOne({
-      where: { id: chain },
+      where: { id: chain, active: true },
       include: [{
-        model: models.Chain,
-        where: { active: true },
+        model: models.ChainNode,
         required: true,
       }],
     });
