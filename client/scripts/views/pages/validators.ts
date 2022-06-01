@@ -146,12 +146,12 @@ const ValidatorsPage: m.Component<
                 `Total Staked: ${vnode.state.totalStaked.format(true)} / `,
                 `${(app.chain as Substrate).chain.totalbalance.format(true)}`,
               ]),
-              app.chain?.meta?.url &&
+              app.chain?.meta?.node.url &&
                 m('.stats-box-action', [
                   externalLink(
                     'a',
                     `https://polkadot.js.org/apps/?rpc=${encodeURIComponent(
-                      app.chain?.meta?.url
+                      app.chain?.meta?.node.url
                     )}#/staking`,
                     'Nominate on polkadot-js'
                   ),
