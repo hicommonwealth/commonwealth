@@ -3,18 +3,19 @@
 import 'pages/projects/project_card.scss';
 
 import m from 'mithril';
-import _, { capitalize } from 'lodash';
+import _ from 'lodash';
 import { slugify } from 'utils';
-import moment from 'moment';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { AnonymousUser } from 'views/components/widgets/user';
 import { Project } from 'models';
 import { Tag } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { weiToTokens } from 'helpers';
-import { BN } from 'ethereumjs-util';
+import BN from 'bn.js';
+import app from 'state';
+import moment from 'moment';
 
-enum ProjectSupporter {
+enum ProjectRole {
   Curator = 'curator',
   Backer = 'backer',
   Author = 'author',
@@ -44,21 +45,21 @@ class ProjectHeaderPanel
     m.ClassComponent<{
       iconSize?: number;
       coverImage: string;
-      userRole?: ProjectSupporter;
+      userRole?: ProjectRole;
       supportAmount?: BN;
     }>
 {
   view(vnode) {
     const iconSize = vnode.attrs.iconSize || 32;
     const { coverImage, userRole, supportAmount } = vnode.attrs;
-    const isSupporter = userRole !== ProjectSupporter.Author;
+    const isSupporter = userRole !== ProjectRole.Author;
     return (
       <div
         class="ProjectHeaderPanel"
         style={`background-image: url("${coverImage}");`}
       >
         {userRole && (
-          <div class="user-role-banner">
+          <div class={`user-role-banner ${userRole}`}>
             <div class="banner-left">
               <CWText type="caption" fontWeight="uppercase">
                 {_.capitalize(userRole)}
@@ -84,14 +85,18 @@ class ProjectHeaderPanel
 }
 
 export class ProjectCompletionBar
-  implements m.ClassComponent<{ completionPercent: number }>
+  implements
+    m.ClassComponent<{
+      completionPercent: number;
+      projectStatus?: 'succeeded' | 'failed';
+    }>
 {
   view(vnode) {
-    const { completionPercent } = vnode.attrs;
+    const { completionPercent, projectStatus } = vnode.attrs;
     return (
       <div class="ProjectCompletionBar">
         <div
-          class="completed-percentage"
+          class={`completed-percentage ${projectStatus}`}
           style={`width: ${completionPercent * 400}px`}
         />
       </div>
@@ -163,11 +168,12 @@ interface ProjectCardAttrs {
 export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
   view(vnode: m.Vnode<ProjectCardAttrs>) {
     const { project, size } = vnode.attrs;
-    console.log(project);
 
-    const projectStatus = project.fundingAmount.gt(project.threshold)
-      ? 'succeeded'
-      : 'failed';
+    const projectStatus = project.deadline.isBefore(moment())
+      ? project.fundingAmount.gt(project.threshold)
+        ? 'succeeded'
+        : 'failed'
+      : null;
 
     const onclick = () => {
       console.log(`project/${project.id}-${slugify(project.title)}`);
@@ -198,11 +204,38 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
     //   </div>
     // );
 
-    project.isAuthor();
+    const { activeAccount } = app.user;
+    let userRole: ProjectRole;
+    let supportAmount: BN;
+    if (activeAccount) {
+      const addressInfo: [string, string] = [
+        activeAccount.address,
+        activeAccount.chain.id,
+      ];
+      userRole = project.isAuthor(...addressInfo)
+        ? ProjectRole.Author
+        : project.isCurator(...addressInfo)
+        ? ProjectRole.Curator
+        : project.isBacker(...addressInfo)
+        ? ProjectRole.Backer
+        : null;
+      supportAmount =
+        userRole === ProjectRole.Curator
+          ? project.getCuratedAmount(...addressInfo)
+          : userRole === ProjectRole.Backer
+          ? project.getBackedAmount(...addressInfo)
+          : null;
+    }
 
     return (
       <div class="ProjectCard large" onclick={onclick}>
-        <ProjectHeaderPanel iconSize={32} coverImage={project.coverImage} />
+        <ProjectHeaderPanel
+          iconSize={32}
+          coverImage={project.coverImage}
+          userRole={userRole}
+          supportAmount={supportAmount}
+          projectStatus={projectStatus}
+        />
         <ProjectCompletionBar completionPercent={project.completionPercent} />
         <ProjectInfoPanel project={project} avatarSize={16} />
       </div>

@@ -123,12 +123,34 @@ class Project {
     );
   }
 
+  public getBackedAmount(address: string, chainId: string): BN {
+    if (!this.isBacker(address, chainId)) return null;
+    let totalAmount = new BN(0);
+    this.backers.forEach((backer: CWParticipant) => {
+      if (backer.address === address && this.chainId === chainId) {
+        totalAmount = totalAmount.add(backer.amount);
+      }
+    });
+    return totalAmount;
+  }
+
   public isCurator(address: string, chainId: string): boolean {
     if (!this.chainId) return false;
     return this.curators.some(
       (curator: CWParticipant) =>
         curator.address === address && this.chainId === chainId
     );
+  }
+
+  public getCuratedAmount(address: string, chainId: string): BN {
+    if (!this.isCurator(address, chainId)) return null;
+    let totalAmount = new BN(0);
+    this.curators.forEach((curator: CWParticipant) => {
+      if (curator.address === address && this.chainId === chainId) {
+        totalAmount = totalAmount.add(curator.amount);
+      }
+    });
+    return totalAmount;
   }
 
   constructor(

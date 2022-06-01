@@ -3,7 +3,7 @@
 import 'modals/support_project_modal.scss';
 
 import { Project } from 'models';
-import { BN } from 'ethereumjs-util/node_modules/@types/bn.js';
+import BN from 'bn.js';
 import m from 'mithril';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';

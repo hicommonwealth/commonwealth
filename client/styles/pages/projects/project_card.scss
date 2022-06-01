@@ -10,18 +10,42 @@
   height: 376px;
   width: 336px;
 
+  // TODO: Mockup only
+  .DummyChainIcon {
+    left: 8px;
+    position: relative;
+    top: 8px;
+    .chain-icon {
+      border-radius: 100%;
+    }
+  }
+
   .ProjectHeaderPanel {
     background-color: $white;
     background-size: 100%;
     border-radius: 5px 5px 0 0;
     flex: 32;
     height: 100%;
-    .DummyChainIcon {
-      left: 8px;
-      position: relative;
-      top: 8px;
-      .chain-icon {
-        border-radius: 100%;
+    .user-role-banner {
+      height: 40px;
+      width: 100%;
+      &.author {
+        background-color: $primary-50;
+        .Text {
+          color: $primary-300;
+        }
+      }
+      &.curator {
+        background-color: $purple-50;
+        .Text {
+          color: $purple-200;
+        }
+      }
+      &.backer {
+        background-color: $pink-50;
+        .Text {
+          color: $pink-300;
+        }
       }
     }
   }
@@ -33,6 +57,9 @@
     .completed-percentage {
       height: 100%;
       background-color: $green-400;
+      &.failed {
+        background-color: $rorange-500;
+      }
     }
   }
 
