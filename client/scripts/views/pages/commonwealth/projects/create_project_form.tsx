@@ -40,11 +40,10 @@ export class InformationSlide
         {/* TODO: Caption */}
         {m(QuillEditor, {
           oncreateBind: (state) => {
-            vnode.attrs.form.description = state;
+            vnode.attrs.form.shortDescription = state;
           },
-          editorNamespace: 'project-description',
-          placeholder:
-            'Write a short 2 or 3 sentence description of your project,',
+          editorNamespace: 'project-short-description',
+          placeholder: 'Write a short 2 or 3 sentence summary of your project,',
         })}
         {/* TODO: Image upload */}
       </div>
@@ -119,22 +118,14 @@ export class DescriptionSlide
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. iaculis donec
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
-        <CWTextInput
-          defaultValue="Your Summary Here"
-          label="Short Description (Optional)"
-          name="Short Description"
-          oninput={(e) => {
-            vnode.attrs.form.shortDescription = e.target.value;
-          }}
-        />
-        ,
-        <CWTextInput
-          label="Description"
-          name="Description"
-          oninput={(e) => {
-            vnode.attrs.form.description = e.target.value;
-          }}
-        />
+        {m(QuillEditor, {
+          oncreateBind: (state) => {
+            vnode.attrs.form.description = state;
+          },
+          editorNamespace: 'project-description',
+          placeholder:
+            'Write a full-length description of your project proposal,',
+        })}
       </div>
     );
   }
@@ -144,8 +135,18 @@ export default class CreateProjectForm implements m.ClassComponent {
   private form: ICreateProjectForm;
   private stage: 'information' | 'fundraising' | 'description';
   view() {
-    debugger;
     if (!this.stage) this.stage = 'information';
+    if (!this.form)
+      this.form = {
+        name: null,
+        token: null,
+        threshold: null,
+        fundraiseLength: null,
+        beneficiary: null,
+        curatorFee: null,
+        description: null,
+        shortDescription: null,
+      };
     console.log(this.stage);
     return (
       <div class="CreateProjectForm">
@@ -169,7 +170,7 @@ export default class CreateProjectForm implements m.ClassComponent {
           },
           [
             m(Button, {
-              disabled: this.stage === 'description',
+              disabled: this.stage === 'information',
               label: 'Previous Page',
               onclick: (e) => {
                 e.preventDefault();
@@ -181,6 +182,7 @@ export default class CreateProjectForm implements m.ClassComponent {
               },
             }),
             m(Button, {
+              disabled: this.stage === 'description',
               label: 'Next Page',
               onclick: (e) => {
                 e.preventDefault();
