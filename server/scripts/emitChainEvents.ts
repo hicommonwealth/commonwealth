@@ -49,18 +49,18 @@ async function main(chain: string, eventsPath: string) {
   let handlers: IEventHandler[];
   try {
     await sequelize.authenticate();
-    const node = await models.ChainNode.findOne({
-      where: { chain },
+    const chainInstance = await models.Chain.findOne({
+      where: { id: chain },
       include: [{
         model: models.Chain,
         where: { active: true },
         required: true,
       }],
     });
-    if (!node) {
+    if (!chainInstance) {
       throw new Error(`Chain not found: ${chain}`);
     }
-    handlers = generateHandlers(node);
+    handlers = generateHandlers(chainInstance);
   } catch (err) {
     log.error(`Failed to load event handlers: ${err.message}`);
     process.exit(1);
