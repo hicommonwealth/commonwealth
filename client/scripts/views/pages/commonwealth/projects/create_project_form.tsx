@@ -1,9 +1,11 @@
 /* @jsx m */
 
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import QuillEditor from 'client/scripts/views/components/quill_editor';
+import { CWText } from 'views/components/component_kit/cw_text';
+import QuillEditor from 'views/components/quill_editor';
 import m from 'mithril';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import { ButtonGroup, Button, Popover } from 'construct-ui';
+import app from 'state';
 
 interface ICreateProjectForm {
   name: string;
@@ -142,6 +144,9 @@ export default class CreateProjectForm implements m.ClassComponent {
   private form: ICreateProjectForm;
   private stage: 'information' | 'fundraising' | 'description';
   view() {
+    debugger;
+    if (!this.stage) this.stage = 'information';
+    console.log(this.stage);
     return (
       <div class="CreateProjectForm">
         <div class="left-sidebar"></div>
@@ -156,6 +161,38 @@ export default class CreateProjectForm implements m.ClassComponent {
             <DescriptionSlide form={this.form} />
           )}
         </div>
+        {m(
+          ButtonGroup,
+          {
+            class: 'NotificationButtons',
+            outlined: true,
+          },
+          [
+            m(Button, {
+              disabled: this.stage === 'description',
+              label: 'Previous Page',
+              onclick: (e) => {
+                e.preventDefault();
+                if (this.stage === 'fundraising') {
+                  this.stage = 'information';
+                } else if (this.stage === 'description') {
+                  this.stage = 'fundraising';
+                }
+              },
+            }),
+            m(Button, {
+              label: 'Next Page',
+              onclick: (e) => {
+                e.preventDefault();
+                if (this.stage === 'information') {
+                  this.stage = 'fundraising';
+                } else if (this.stage === 'fundraising') {
+                  this.stage = 'description';
+                }
+              },
+            }),
+          ]
+        )}
       </div>
     );
   }

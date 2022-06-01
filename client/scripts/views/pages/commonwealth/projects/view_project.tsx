@@ -10,9 +10,9 @@ import Sublayout from '../../../sublayout';
 import { AnonymousUser } from '../../../components/widgets/user';
 import { CWButton } from '../../../components/component_kit/cw_button';
 import { PageNotFound } from '../../404';
-import { DummyProject } from './dummy_project';
 import MarkdownFormattedText from '../../../components/markdown_formatted_text';
 import { CWTable } from '../../../components/component_kit/cw_table';
+import { createNewDummyProject } from './dummy_project';
 
 interface ProjectPageAttrs {
   identifier: string;
@@ -25,7 +25,7 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
       return m(PageNotFound, { title: 'Projects' });
     }
     // const projectId = identifier.split('-')[0];
-    const project: Project = DummyProject; // TODO: Fetch via controller
+    const project: Project = createNewDummyProject({}); // TODO: Fetch via controller
 
     return (
       <Sublayout
