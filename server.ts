@@ -27,6 +27,7 @@ import IdentityFetchCache, {
   IdentityFetchCacheNew,
 } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
+import RuleCache from './server/util/ruleCache';
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
@@ -75,6 +76,7 @@ async function main() {
   }
 
   const tokenBalanceCache = new TokenBalanceCache(models);
+  const ruleCache = new RuleCache();
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
@@ -267,12 +269,14 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start();
+  await ruleCache.start();
   setupAPI(
     app,
     models,
     viewCountCache,
     <any>identityFetchCache,
-    tokenBalanceCache
+    tokenBalanceCache,
+    ruleCache,
   );
   setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);

@@ -26,6 +26,7 @@ import {
 } from '../../shared/analytics/types';
 import { SENDGRID_API_KEY } from '../config';
 import { checkRule } from '../util/ruleParser';
+import RuleCache from '../util/ruleCache';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -48,6 +49,7 @@ export const Errors = {
 const createComment = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  ruleCache: RuleCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -73,7 +75,7 @@ const createComment = async (
       },
       attributes: ['rule_id'],
     });
-    const passesRules = await checkRule(models, rule_id, author.address);
+    const passesRules = await checkRule(ruleCache, models, rule_id, author.address);
     if (!passesRules) {
       return next(new Error(Errors.RuleCheckFailed));
     }

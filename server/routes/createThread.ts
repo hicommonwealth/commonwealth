@@ -21,6 +21,7 @@ import {
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
 import { checkRule } from '../util/ruleParser';
+import RuleCache from '../util/ruleCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -201,6 +202,7 @@ const dispatchHooks = async (
 const createThread = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  ruleCache: RuleCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -338,7 +340,7 @@ const createThread = async (
       },
       attributes: ['rule_id'],
     });
-    const passesRules = await checkRule(models, rule_id, author.address, transaction);
+    const passesRules = await checkRule(ruleCache, models, rule_id, author.address, transaction);
     if (!passesRules) {
       return next(new Error(Errors.RuleCheckFailed));
     }

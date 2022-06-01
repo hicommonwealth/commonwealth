@@ -134,13 +134,15 @@ import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
+import RuleCache from './util/ruleCache';
 
 function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
-  tokenBalanceCache: TokenBalanceCache
+  tokenBalanceCache: TokenBalanceCache,
+  ruleCache: RuleCache
 ) {
   const router = express.Router();
 
@@ -232,7 +234,7 @@ function setupRouter(
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
-    createThread.bind(this, models, tokenBalanceCache)
+    createThread.bind(this, models, tokenBalanceCache, ruleCache)
   );
   router.put(
     '/editThread',
@@ -275,7 +277,7 @@ function setupRouter(
   router.post(
     '/updateOffchainVote',
     passport.authenticate('jwt', { session: false }),
-    updateOffchainVote.bind(this, models, tokenBalanceCache)
+    updateOffchainVote.bind(this, models, tokenBalanceCache, ruleCache)
   );
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 
@@ -342,7 +344,7 @@ function setupRouter(
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
-    createComment.bind(this, models, tokenBalanceCache)
+    createComment.bind(this, models, tokenBalanceCache, ruleCache)
   );
   router.post(
     '/editComment',
@@ -394,7 +396,7 @@ function setupRouter(
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
-    createReaction.bind(this, models, tokenBalanceCache)
+    createReaction.bind(this, models, tokenBalanceCache, ruleCache)
   );
   router.post(
     '/deleteReaction',

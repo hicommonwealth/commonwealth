@@ -11,6 +11,7 @@ import {
   OffchainVoteInstance,
 } from '../models/offchain_vote';
 import { checkRule } from '../util/ruleParser';
+import RuleCache from '../util/ruleCache';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -35,6 +36,7 @@ type UpdateOffchainVoteResp = OffchainVoteAttributes;
 const updateOffchainVote = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  ruleCache: RuleCache,
   req: TypedRequestBody<UpdateOffchainVoteReq>,
   res: TypedResponse<UpdateOffchainVoteResp>,
   next: NextFunction
@@ -83,7 +85,7 @@ const updateOffchainVote = async (
     where: { id: thread.topic_id },
     attributes: ['rule_id'],
   });
-  const passesRules = await checkRule(models, rule_id, author.address);
+  const passesRules = await checkRule(ruleCache, models, rule_id, author.address);
   if (!passesRules) {
     return next(new Error(Errors.RuleCheckFailed));
   }
