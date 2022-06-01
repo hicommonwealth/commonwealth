@@ -33,7 +33,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   private triggerRef: Element;
 
   oncreate(vnode) {
-    this.contentId = `popover-container-ref-${Math.random()}`;
+    this.contentId = `popover-container-ref-${Math.random()}`; // has to be set first
     this.arrowId = `${this.contentId}-arrow`;
     this.isOpen = false;
     this.isRendered = true;
@@ -77,7 +77,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
       popoverContainer.style.top = `${inlineStyle.contentTopYAmount}px`;
       popoverContainer.style.left = `${inlineStyle.contentLeftXAmount}px`;
 
-      const showArrow = vnode.attrs.showArrow && inlineStyle.showArrow;
+      const showArrow = vnode.attrs.hasArrow && inlineStyle.showArrow;
 
       switch (inlineStyle.popoverPlacement) {
         case 'above': {

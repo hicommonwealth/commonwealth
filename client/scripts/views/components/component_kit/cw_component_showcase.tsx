@@ -87,6 +87,8 @@ export class ComponentShowcase implements m.ClassComponent {
               interactionType="hover"
               toSide
               singleLine
+              persistOnHover
+              hoverOpenDelay={100}
             />
           </div>
         </div>
