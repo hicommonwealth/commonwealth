@@ -3,7 +3,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase } from 'types';
-import { IChainAdapter, NodeInfo } from 'models';
+import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
@@ -19,7 +19,7 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
   public governance: CommonwealthGovernance;
   public readonly chainEntities = new ChainEntityController();
 
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.chain = new CommonwealthChain(this.app);
     this.accounts = new EthereumAccounts(this.app);

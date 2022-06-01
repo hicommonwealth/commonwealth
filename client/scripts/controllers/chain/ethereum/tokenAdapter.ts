@@ -1,6 +1,6 @@
 import Ethereum from 'controllers/chain/ethereum/main';
 
-import { NodeInfo, ITokenAdapter } from 'models';
+import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
 import $ from 'jquery';
 import { IApp } from 'state';
 import BN from 'bn.js';
@@ -17,7 +17,7 @@ export default class Token extends Ethereum implements ITokenAdapter {
 
     // query balance
     const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
-      chain: this.meta.chain.id,
+      chain: this.meta.id,
       address: account.address,
       author_chain: account.chain.id,
     });
@@ -32,7 +32,7 @@ export default class Token extends Ethereum implements ITokenAdapter {
   }
 
   // Extensions of Ethereum
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.contractAddress = meta.address;
   }

@@ -281,9 +281,9 @@ export async function loginWithMagicLink(email: string) {
     // log in as the new user (assume all verification done server-side)
     await initAppState(false);
     if (app.chain) {
-      const c = app.user.selectedNode
-        ? app.user.selectedNode.chain
-        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+      const c = app.user.selectedChain
+        ? app.user.selectedChain
+        : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses(c);
     }
   } else {

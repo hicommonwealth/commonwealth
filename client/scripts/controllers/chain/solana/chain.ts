@@ -1,4 +1,4 @@
-import { ITXModalData, NodeInfo, IChainModule } from 'models';
+import { ITXModalData, NodeInfo, IChainModule, ChainInfo } from 'models';
 import { ApiStatus, IApp } from 'state';
 import m from 'mithril';
 import moment from 'moment';
@@ -26,16 +26,16 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
     this._app = app;
   }
 
-  public async init(node: NodeInfo, reset = false) {
+  public async init(chain: ChainInfo, reset = false) {
     // default to 9 decimals
-    this._decimals = new BN(10).pow(new BN(node.chain.decimals || 9));
-    this._denom = node.chain.symbol;
+    this._decimals = new BN(10).pow(new BN(chain.decimals || 9));
+    this._denom = chain.symbol;
 
     let url: string;
     try {
-      url = solw3.clusterApiUrl(node.url as solw3.Cluster);
+      url = solw3.clusterApiUrl(chain.node.url as solw3.Cluster);
     } catch (e) {
-      url = node.url;
+      url = chain.node.url;
       // TODO: test if custom url is valid
     }
     // TODO: validate config here -- maybe we want ws?

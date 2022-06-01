@@ -1,5 +1,5 @@
 import { ChainBase } from 'types';
-import { IChainAdapter, NodeInfo } from 'models';
+import { ChainInfo, IChainAdapter } from 'models';
 import { IApp } from 'state';
 import { CosmosToken } from './types';
 import CosmosAccount from './account';
@@ -14,7 +14,7 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public readonly base = ChainBase.CosmosSDK;
 
   constructor(
-    meta: NodeInfo,
+    meta: ChainInfo,
     app: IApp,
   ) {
     super(meta, app);

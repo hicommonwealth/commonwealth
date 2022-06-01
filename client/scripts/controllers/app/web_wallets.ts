@@ -20,8 +20,8 @@ export default class WebWalletController {
 
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
     // handle case like injective, axie, where we require a specific wallet
-    const specificChain = app.chain?.meta?.chain?.id;
-    if (app.chain?.meta?.chain?.id) {
+    const specificChain = app.chain?.meta?.id;
+    if (app.chain?.meta?.id) {
       const specificWallet = this._wallets.find((w) => w.specificChains?.includes(specificChain));
       if (specificWallet) return [ specificWallet ];
     }
