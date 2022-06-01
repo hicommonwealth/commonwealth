@@ -13,7 +13,14 @@ export type RuleMetadata = {
 
 type DefaultSchemaT = Record<string, Array<unknown>>;
 
-export abstract class RuleType<SchemaT extends DefaultSchemaT = DefaultSchemaT> {
+// the type that must be implemented by a RuleType
+export type IRuleType<SchemaT extends DefaultSchemaT> = {
+  identifier: string,
+  metadata: RuleMetadata,
+  check: (ruleSchema: SchemaT, address: string, chain: string, models?: DB) => Promise<boolean>,
+};
+
+export abstract class RuleType<SchemaT extends DefaultSchemaT = DefaultSchemaT> implements IRuleType<SchemaT> {
   // parser-used identifier for a rule, e.g. "ThresholdRule"
   abstract get identifier(): string;
 

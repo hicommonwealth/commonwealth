@@ -3,7 +3,7 @@ import {DB} from "../../database";
 
 export const Errors = {
     NotLoggedIn: 'Not logged in',
-    NotAdmin: 'Must be an admin to rename a chat channel',
+    NotAdmin: 'Must be an admin to edit a chat channel',
     NoChainId: 'No chain id given',
     NoChannelId: 'No channel id given',
     NoNewName: 'No new name given'

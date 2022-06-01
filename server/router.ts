@@ -105,8 +105,8 @@ import getChatMessages from './routes/chat/getChatMessages';
 import createChatChannel from './routes/chat/createChatChannel';
 import deleteChatChannel from './routes/chat/deleteChatChannel';
 import deleteChatCategory from './routes/chat/deleteChatCategory';
-import renameChatChannel from './routes/chat/renameChatChannel';
-import renameChatCategory from './routes/chat/renameChatCategory';
+import editChatChannel from './routes/chat/editChatChannel';
+import editChatCategory from './routes/chat/editChatCategory';
 
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
@@ -611,15 +611,15 @@ function setupRouter(
   );
 
   router.put(
-    '/renameChatChannel',
+    '/editChatChannel',
     passport.authenticate('jwt', { session: false }),
-    renameChatChannel.bind(this, models)
+    editChatChannel.bind(this, models)
   );
 
   router.put(
-    '/renameChatCategory',
+    '/editChatCategory',
     passport.authenticate('jwt', { session: false }),
-    renameChatCategory.bind(this, models)
+    editChatCategory.bind(this, models)
   );
 
   // settings
