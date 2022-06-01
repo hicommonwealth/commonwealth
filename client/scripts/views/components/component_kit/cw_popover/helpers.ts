@@ -9,8 +9,8 @@ export const getPosition = ({
 }: {
   trigger: Element;
   container: Element;
-  arrowSize: number;
-  gapSize: number;
+  arrowSize?: number;
+  gapSize?: number;
   toSide: boolean;
   tooltipOffset?: number;
   borderOffset?: number;
@@ -19,7 +19,6 @@ export const getPosition = ({
   const containerBoundingRect = container.getBoundingClientRect();
 
   let popoverPlacement;
-  const innerWidth = window.innerWidth;
   const innerHeight = window.innerHeight;
 
   // Calculate whether to put popover above or below, or left or right
@@ -60,7 +59,10 @@ export const getPosition = ({
       }
 
       arrowLeftXAmount =
-        triggerBoundingRect.left + triggerBoundingRect.width / 2 - arrowSize;
+        triggerBoundingRect.left +
+        triggerBoundingRect.width / 2 -
+        arrowSize +
+        borderOffset;
 
       contentTopYAmount = Math.max(
         0,
@@ -92,7 +94,11 @@ export const getPosition = ({
       contentTopYAmount = triggerBoundingRect.bottom + arrowSize + gapSize;
 
       arrowLeftXAmount =
-        triggerBoundingRect.left + triggerBoundingRect.width / 2 - arrowSize;
+        triggerBoundingRect.left +
+        triggerBoundingRect.width / 2 -
+        arrowSize +
+        borderOffset;
+
       arrowTopYAmount = triggerBoundingRect.bottom + gapSize;
       break;
     }
@@ -102,11 +108,13 @@ export const getPosition = ({
     }
     case 'right': {
       contentLeftXAmount = triggerBoundingRect.right + arrowSize + gapSize;
+
       contentTopYAmount =
         triggerBoundingRect.top -
         (containerBoundingRect.height - triggerBoundingRect.height) / 2;
 
       arrowLeftXAmount = triggerBoundingRect.right + gapSize;
+
       arrowTopYAmount =
         triggerBoundingRect.top +
         triggerBoundingRect.height / 2 -

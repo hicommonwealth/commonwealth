@@ -20,9 +20,15 @@ export type PopoverAttrs = {
   interactionType?: PopoverInteractionType;
   onToggle?: (isOpen: boolean) => void;
   persistOnHover?: boolean;
+  // Gabe 6/1/22 TODO: persistOnHover won't work without a hoverOpenDelay of at least 50
   toSide?: boolean;
   trigger: m.Vnode;
 } & PopoverStyleAttrs;
+
+// Gabe 6/1/22 TODO: We probably need a hoverCloseDelay too,
+// but maybe hardcoded as opposed to an attr. Via Aden:
+// "[tooltip] should only exist for 1.5 seconds on hover
+// otherwise disappearing until they hover again"
 
 export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   private arrowId: string;
@@ -63,15 +69,15 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   applyPopoverPosition(vnode) {
     // Apply styles in real time
     try {
+      // TODO Gabe 6/1/22 - Figure out how to avoid these both being null at first
       const popoverContainer = document.getElementById(this.contentId);
       const arrow = document.getElementById(this.arrowId);
 
       const inlineStyle = getPosition({
         trigger: this.triggerRef,
         container: popoverContainer,
-        arrowSize: 8,
-        gapSize: 1,
         toSide: vnode.attrs.toSide,
+        tooltipOffset: vnode.attrs.hasArrow ? 16 : undefined,
       });
 
       popoverContainer.style.top = `${inlineStyle.contentTopYAmount}px`;
