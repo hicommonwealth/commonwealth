@@ -25,6 +25,7 @@ import {
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
 import { SENDGRID_API_KEY } from '../config';
+import { checkRule } from '../util/ruleParser';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -41,6 +42,7 @@ export const Errors = {
     "Users need to hold some of the community's tokens to comment",
   BalanceCheckFailed: 'Could not verify user token balance',
   NestingTooDeep: 'Comments can only be nested 2 levels deep',
+  RuleCheckFailed: 'Rule check failed',
 };
 
 const createComment = async (
@@ -57,6 +59,26 @@ const createComment = async (
 
   const { parent_id, root_id, text } = req.body;
 
+  const thread_id = root_id.substring(root_id.indexOf('_') + 1);
+  const thread = await models.OffchainThread.findOne({
+    where: { id: thread_id },
+  });
+
+  if (thread) {
+    const { rule_id } = await models.OffchainTopic.findOne({
+      include: {
+        model: models.OffchainThread,
+        where: { id: thread.id },
+        required: true,
+      },
+      attributes: ['rule_id'],
+    });
+    const passesRules = await checkRule(models, rule_id, author.address);
+    if (!passesRules) {
+      return next(new Error(Errors.RuleCheckFailed));
+    }
+  }
+
   if (chain && chain.type === ChainType.Token) {
     // skip check for admins
     const isAdmin = await models.Role.findAll({
@@ -66,12 +88,8 @@ const createComment = async (
         permission: ['admin'],
       },
     });
-    if (!req.user.isAdmin && isAdmin.length === 0) {
+    if (thread && !req.user.isAdmin && isAdmin.length === 0) {
       try {
-        const thread_id = root_id.substring(root_id.indexOf('_') + 1);
-        const thread = await models.OffchainThread.findOne({
-          where: { id: thread_id },
-        });
         const canReact = await tokenBalanceCache.validateTopicThreshold(
           thread.topic_id,
           req.body.address

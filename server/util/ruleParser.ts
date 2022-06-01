@@ -1,3 +1,4 @@
+import { Transaction } from 'sequelize/types';
 import RuleTypes from '../ruleTypes';
 import { DB } from '../database';
 
@@ -17,7 +18,13 @@ type DefaultSchemaT = Record<string, Array<unknown>>;
 export type IRuleType<SchemaT extends DefaultSchemaT> = {
   identifier: string,
   metadata: RuleMetadata,
-  check: (ruleSchema: SchemaT, address: string, chain: string, models?: DB) => Promise<boolean>,
+  check: (
+    ruleSchema: SchemaT,
+    address: string,
+    chain: string,
+    models?: DB,
+    transaction?: Transaction,
+  ) => Promise<boolean>,
 };
 
 export abstract class RuleType<SchemaT extends DefaultSchemaT = DefaultSchemaT> implements IRuleType<SchemaT> {
@@ -78,7 +85,13 @@ export abstract class RuleType<SchemaT extends DefaultSchemaT = DefaultSchemaT> 
   }
 
   // check that the provided arguments pass the rule (i.e. do balance check)
-  abstract check(ruleSchema: SchemaT, address: string, chain: string, models?: DB): Promise<boolean>;
+  public abstract check(
+    ruleSchema: SchemaT,
+    address: string,
+    chain: string,
+    models?: DB,
+    transaction?: Transaction,
+  ): Promise<boolean>;
 }
 
 export function validateRule(ruleSchema: any): DefaultSchemaT {
@@ -91,6 +104,7 @@ export async function checkRule(
   models: DB,
   ruleFk: number,
   address: string,
+  transaction?: Transaction,
 ): Promise<boolean> {
   // fetch the rule from the database by id
   // always pass non-configured rules
@@ -102,6 +116,6 @@ export async function checkRule(
   // parse and run the rule according to its type
   const [[ruleId, ruleSchema]] = Object.entries(ruleJson);
   const ruleDef: RuleType = RuleTypes[ruleId];
-  const isValid = await ruleDef.check(ruleSchema, address, ruleInstance.chain_id, models);
+  const isValid = await ruleDef.check(ruleSchema, address, ruleInstance.chain_id, models, transaction);
   return isValid;
 }

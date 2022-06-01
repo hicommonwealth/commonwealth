@@ -1,3 +1,4 @@
+import { Transaction } from 'sequelize/types';
 import { DB } from '../database';
 import { RuleType } from '../util/ruleParser';
 
@@ -15,7 +16,8 @@ export default class AdminOnlyRule extends RuleType<SchemaT> {
     ruleSchema: SchemaT,
     address: string,
     chain: string,
-    models: DB
+    models: DB,
+    transaction: Transaction,
   ): Promise<boolean> {
     const role = await models.Role.findOne({
       where: {
@@ -25,7 +27,8 @@ export default class AdminOnlyRule extends RuleType<SchemaT> {
         model: models.Address,
         where: { address },
         required: true,
-      }
+      },
+      transaction,
     });
     return role?.permission === 'admin';
   }

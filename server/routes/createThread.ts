@@ -20,6 +20,7 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
+import { checkRule } from '../util/ruleParser';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -33,6 +34,7 @@ export const Errors = {
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to post",
   BalanceCheckFailed: 'Could not verify user token balance',
+  RuleCheckFailed: 'Rule check failed',
 };
 
 const dispatchHooks = async (
@@ -328,6 +330,17 @@ const createThread = async (
           return next(new Error(Errors.BalanceCheckFailed));
         }
       }
+    }
+
+    const { rule_id } = await models.OffchainTopic.findOne({
+      where: {
+        id: topic_id
+      },
+      attributes: ['rule_id'],
+    });
+    const passesRules = await checkRule(models, rule_id, author.address, transaction);
+    if (!passesRules) {
+      return next(new Error(Errors.RuleCheckFailed));
     }
 
     let thread: OffchainThreadInstance;
