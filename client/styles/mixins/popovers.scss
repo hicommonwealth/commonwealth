@@ -1,0 +1,77 @@
+@mixin popoverChild {
+  padding: 8px 16px;
+  position: absolute;
+  z-index: 1001;
+}
+
+@mixin baseArrowStyles {
+  height: 0;
+  position: absolute;
+  width: 0;
+  visibility: hidden;
+  z-index: 1001;
+}
+
+@mixin borderedArrowStyles($direction) {
+  @if $direction == up {
+    @include baseArrowStyles;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      top: 2px;
+    }
+
+    &::before {
+      border-bottom: 8px solid $neutral-400;
+    }
+
+    &::after {
+      border-bottom: 8px solid $white;
+      margin-top: 4px;
+    }
+  } @else if $direction == down {
+    @include baseArrowStyles;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      top: -4px;
+    }
+
+    &::before {
+      border-top: 8px solid $neutral-400;
+      margin-top: 2px;
+    }
+
+    &::after {
+      border-top: 8px solid $white;
+      margin-top: -2px;
+    }
+  } @else {
+    @include baseArrowStyles;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+    }
+
+    &::before {
+      border-right: 8px solid $neutral-400;
+    }
+
+    &::after {
+      border-right: 8px solid $white;
+      margin-left: 4px;
+    }
+  }
+}
