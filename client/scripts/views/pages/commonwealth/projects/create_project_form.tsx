@@ -30,7 +30,7 @@ export class InformationSlide
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
         <CWTextInput
-          defaultValue="Your Project Name Here"
+          placeholder="Your Project Name Here"
           label="Name Your Crowdfund"
           name="Name"
           oninput={(e) => {
@@ -63,7 +63,7 @@ export class FundraisingSlide
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
         <CWTextInput
-          defaultValue="Select Token Type"
+          placeholder="Select Token Type"
           label="Raise In"
           name="Raise In"
           oninput={(e) => {
@@ -71,7 +71,7 @@ export class FundraisingSlide
           }}
         />
         <CWTextInput
-          defaultValue="Your Project Name Here"
+          placeholder="Your Project Name Here"
           label="Goal"
           name="Goal"
           oninput={(e) => {
@@ -79,7 +79,7 @@ export class FundraisingSlide
           }}
         />
         <CWTextInput
-          defaultValue="Select Fundraise Length"
+          placeholder="Select Fundraise Length"
           label="Fundraising Period"
           name="Fundraising Period"
           oninput={(e) => {
@@ -87,7 +87,7 @@ export class FundraisingSlide
           }}
         />
         <CWTextInput
-          defaultValue="Address"
+          placeholder="Address"
           label="Beneficiary Address"
           name="Beneficiary Address"
           oninput={(e) => {
@@ -95,7 +95,7 @@ export class FundraisingSlide
           }}
         />
         <CWTextInput
-          defaultValue="Set Quantity"
+          placeholder="Set Quantity"
           label="Curator Fee"
           name="Curator Fee"
           oninput={(e) => {
