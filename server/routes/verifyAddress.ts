@@ -177,12 +177,23 @@ const verifySignature = async (
         generatedAddress === addressModel.address ||
         generatedAddressWithCosmosPrefix === addressModel.address
       ) {
-        // query chain ID from URL
-        const node = await chain.getChainNode();
-        const client = await StargateClient.connect(node.url);
-        const chainId = await client.getChainId();
-        client.disconnect();
 
+        let chainId;
+
+        try {
+          // query chain ID from URL
+          const node = await chain.getChainNode();
+          console.log("Node:", node);
+          const client = await StargateClient.connect(node.url);
+          console.log("client:", client);
+          chainId = await client.getChainId();
+          console.log("chain id:", chainId);
+          client.disconnect();
+        } catch (e) {
+          console.log(e);
+        }
+
+        console.log("Failure before signdoc")
         const generatedSignDoc = validationTokenToSignDoc(
           chainId,
           addressModel.verification_token.trim(),
@@ -191,6 +202,9 @@ const verifySignature = async (
           <any>signed.msgs
         );
 
+
+        console.log("SignDoc:", generatedSignDoc);
+
         // ensure correct document was signed
         if (
           serializeSignDoc(signed).toString() ===
@@ -198,18 +212,24 @@ const verifySignature = async (
         ) {
           // ensure valid signature
           const { pubkey, signature } = decodeSignature(stdSignature);
+
+          console.log("Signature:", signature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new Sha256(
             serializeSignDoc(generatedSignDoc)
           ).digest();
+
+
           isValid = await Secp256k1.verifySignature(
             secpSignature,
             messageHash,
             pubkey
           );
+
           if (!isValid) {
             log.error('Signature verification failed.');
           }
+          console.log("isValid:", isValid);
         } else {
           log.error(
             `Sign doc not matched. Generated: ${JSON.stringify(
