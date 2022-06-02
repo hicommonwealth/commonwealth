@@ -3,6 +3,19 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
+      // Add Base to ChainNode
+      await queryInterface.addColumn('ChainNodes', 'chain_base',
+        { type: Sequelize.STRING, allowNull: false, defaultValue: '' }, { transaction: t });
+
+      const chainz = await queryInterface.sequelize.query(
+        `SELECT c.id as cid, c.base, cn.* FROM "Chains" c LEFT JOIN "ChainNodes" cn ON cn.id = c.chain_node_id;`,
+        { transaction: t });
+
+      await Promise.all(chainz[0].map(async (c) => {
+        const quer = `UPDATE "ChainNodes" SET chain_base='${c.base}' WHERE id=${c.id};`
+        await queryInterface.sequelize.query(quer, { transaction: t });
+      }));
+
       // Create Contracts Table
       await queryInterface.createTable('Contracts', {
         id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
@@ -39,7 +52,7 @@ module.exports = {
           symbol: c.symbol,
           type: c.network,
         }], {transaction: t});
-        console.log('2')
+
         const contract = await queryInterface.sequelize.query(
           `SELECT * FROM "Contracts" WHERE address='${c.address}';`,
           { transaction: t});
@@ -87,6 +100,8 @@ module.exports = {
           {transaction: t });
       }));
 
+      // DELETE column
+      await queryInterface.removeColumn('ChainNodes', 'chain_base', { transaction: t });
 
       // Delete Tables
       await queryInterface.dropTable('CommunityContracts', { transaction: t });
