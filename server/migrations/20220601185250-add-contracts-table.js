@@ -48,7 +48,6 @@ module.exports = {
           community_id: c.cid,
           contract_id: contract[0][0].id,
         }], {transaction: t });
-        console.log('3');
       }));
 
 
@@ -84,7 +83,7 @@ module.exports = {
       await Promise.all(contracts[0].map(async (c) => {
         // Add contract stuff back on Chains model
         await queryInterface.sequelize.query(
-          `UPDATE "Chains" c SET decimals=${c.decimals}, address='${c.address}' WHERE c.id = ${c.community_id};`,
+          `UPDATE "Chains" c SET decimals=${c.decimals}, address='${c.address}' WHERE c.id = '${c.community_id}';`,
           {transaction: t });
       }));
 
