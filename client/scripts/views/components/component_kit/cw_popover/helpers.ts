@@ -1,8 +1,8 @@
 export const getPosition = ({
   trigger,
   container,
-  arrowSize = 8,
-  gapSize = 1,
+  arrowSize = 0,
+  gapSize = 0,
   toSide = false,
   tooltipOffset,
   borderOffset = 4, // 2px on either side
@@ -158,3 +158,37 @@ export const cursorInBounds = (
 export function findRef(dom, ref) {
   return dom.matches(`[ref=${ref}]`) ? dom : dom.querySelector(`[ref=${ref}]`);
 }
+
+export const applyArrowStyles = (
+  arrowId: string,
+  inlineStyle: any,
+  singleLine?: boolean,
+  hasArrow?: boolean
+) => {
+  const arrow = document.getElementById(arrowId);
+
+  switch (inlineStyle.popoverPlacement) {
+    case 'above': {
+      arrow.className = `arrow-down${singleLine ? ' singleLine' : ''}`;
+      break;
+    }
+    case 'below': {
+      arrow.className = `arrow-up${singleLine ? ' singleLine' : ''}`;
+      break;
+    }
+    case 'right': {
+      arrow.className = `arrow-left${singleLine ? ' singleLine' : ''}`;
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+
+  arrow.style.top = `${inlineStyle.arrowTopYAmount}px`;
+  arrow.style.left = `${inlineStyle.arrowLeftXAmount}px`;
+
+  if (hasArrow && inlineStyle.showArrow) {
+    arrow.style.visibility = 'visible';
+  }
+};

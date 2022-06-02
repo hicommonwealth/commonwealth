@@ -2,14 +2,42 @@
 
 import m from 'mithril';
 
-// import 'components/component_kit/cw_tooltip.scss';
+import { CWPopover, SharedPopoverAttrs } from './cw_popover/cw_popover';
+import { CWText } from './cw_text';
 
-import { CWPopover, PopoverAttrs } from './cw_popover/cw_popover';
+export type TooltipType =
+  | 'bordered'
+  | 'solidArrow'
+  | 'solidNoArrow'
+  | 'singleLine';
 
-export class CWTooltip implements m.ClassComponent<PopoverAttrs> {
+type TooltipAttrs = {
+  tooltipText: string;
+  tooltipType: TooltipType;
+} & SharedPopoverAttrs;
+
+export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
   view(vnode) {
-    const { content, ...otherAttrs } = vnode.attrs;
+    const {
+      hoverOpenDelay,
+      interactionType,
+      persistOnHover,
+      tooltipText,
+      tooltipType,
+      toSide,
+      trigger,
+    } = vnode.attrs;
 
-    return <CWPopover {...otherAttrs} content={content} hasArrow />;
+    return (
+      <CWPopover
+        content={<CWText type="caption">{tooltipText}</CWText>}
+        hoverOpenDelay={hoverOpenDelay}
+        interactionType={interactionType}
+        persistOnHover={persistOnHover}
+        tooltipType={tooltipType}
+        toSide={toSide}
+        trigger={trigger}
+      />
+    );
   }
 }

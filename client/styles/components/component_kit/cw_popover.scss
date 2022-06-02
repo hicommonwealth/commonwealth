@@ -24,39 +24,42 @@
   flex-direction: column;
   justify-content: center;
   overflow: hidden;
-  max-width: 248px;
+  max-width: 196px;
   min-height: 8px;
   visibility: hidden;
 
-  &.singleLine {
-    background-color: $neutral-800;
-    border-color: $neutral-800;
-    height: 24px;
-    max-width: 400px;
-    padding: 4px 8px;
+  &.bordered {
+    .Text {
+      color: $neutral-500;
+    }
   }
+
+  &.solidArrow {
+    background-color: $primary-100;
+    border-color: $primary-100;
+
+    .Text {
+      color: $neutral-800;
+    }
+  }
+
+  // &.singleLine {
+  //   background-color: $neutral-800;
+  //   border-color: $neutral-800;
+  //   height: 24px;
+  //   max-width: 400px;
+  //   padding: 4px 8px;
+  // }
 }
 
 .arrow-up {
   @include borderedArrowStyles(up);
-
-  // &.singleLine {
-  //   border-bottom: 8px solid $neutral-800;
-  // }
 }
 
 .arrow-down {
   @include borderedArrowStyles(down);
-
-  // &.singleLine {
-  //   border-top: 8px solid $neutral-800;
-  // }
 }
 
 .arrow-left {
   @include borderedArrowStyles(left);
-
-  // &.singleLine {
-  //   border-right: 8px solid $neutral-800;
-  // }
 }

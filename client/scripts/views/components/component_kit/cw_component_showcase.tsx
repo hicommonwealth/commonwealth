@@ -19,6 +19,7 @@ import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_tooltip';
+// import { CWPopover } from './cw_popover/cw_popover';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -57,40 +58,74 @@ export class ComponentShowcase implements m.ClassComponent {
           <div class="tooltip-row">
             <CWText>Hover</CWText>
             <CWTooltip
-              trigger={<CWIcon iconName="infoEmpty" />}
-              content={<>Some content</>}
               interactionType="hover"
+              tooltipText={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              trigger={<CWIcon iconName="infoEmpty" />}
             />
           </div>
           <div class="tooltip-row">
             <CWText>Hover to side</CWText>
             <CWTooltip
-              trigger={<CWIcon iconName="infoEmpty" />}
-              content={<>Some content</>}
               interactionType="hover"
+              tooltipText={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
               toSide
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Persist on hover</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              tooltipText={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              interactionType="hover"
+              persistOnHover
+              hoverOpenDelay={100}
             />
           </div>
           <div class="tooltip-row">
             <CWText>Click</CWText>
             <CWTooltip
-              trigger={<CWIcon iconName="infoEmpty" />}
-              content={<>Some content</>}
               interactionType="click"
+              tooltipText={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              trigger={<CWIcon iconName="infoEmpty" />}
             />
           </div>
           <div class="tooltip-row">
-            <CWText>Hover, to side, single line</CWText>
+            <CWText>Hover</CWText>
             <CWTooltip
-              trigger={<CWIcon iconName="infoEmpty" />}
-              content={<>Some content</>}
               interactionType="hover"
-              toSide
-              singleLine
-              persistOnHover
-              hoverOpenDelay={100}
+              tooltipText={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="solidArrow"
+              trigger={<CWIcon iconName="infoEmpty" />}
             />
           </div>
+          {/* <div class="tooltip-row">
+            <CWText>Popover</CWText>
+            <CWPopover
+              trigger={<CWButton label="Click me" />}
+              content={<>Some content</>}
+              interactionType="click"
+            />
+          </div> */}
         </div>
         <h1>Buttons</h1>
         <div class="button-gallery">

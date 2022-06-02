@@ -5,25 +5,32 @@ import m from 'mithril';
 import 'components/component_kit/cw_popover.scss';
 
 import { CWPortal } from '../cw_portal';
-import { cursorInBounds, findRef, getPosition } from './helpers';
+import {
+  applyArrowStyles,
+  cursorInBounds,
+  findRef,
+  getPosition,
+} from './helpers';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
+import { TooltipType } from '../cw_tooltip';
 
 export type PopoverInteractionType = 'click' | 'hover';
 
-type PopoverStyleAttrs = { singleLine?: boolean };
-
-export type PopoverAttrs = {
-  content: m.Children;
-  hasArrow?: boolean;
+export type SharedPopoverAttrs = {
   hoverOpenDelay?: number;
   interactionType?: PopoverInteractionType;
-  onToggle?: (isOpen: boolean) => void;
   persistOnHover?: boolean;
-  // Gabe 6/1/22 TODO: persistOnHover won't work without a hoverOpenDelay of at least 50
   toSide?: boolean;
   trigger: m.Vnode;
-} & PopoverStyleAttrs;
+};
+
+type PopoverAttrs = {
+  content: m.Children;
+  tooltipType?: TooltipType;
+  onToggle?: (isOpen: boolean) => void;
+  // Gabe 6/1/22 TODO: persistOnHover won't work without a hoverOpenDelay of at least 50
+} & SharedPopoverAttrs;
 
 // Gabe 6/1/22 TODO: We probably need a hoverCloseDelay too,
 // but maybe hardcoded as opposed to an attr. Via Aden:
@@ -71,51 +78,26 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     try {
       // TODO Gabe 6/1/22 - Figure out how to avoid these both being null at first
       const popoverContainer = document.getElementById(this.contentId);
-      const arrow = document.getElementById(this.arrowId);
 
       const inlineStyle = getPosition({
-        trigger: this.triggerRef,
+        arrowSize: vnode.attrs.tooltipType ? 8 : undefined,
         container: popoverContainer,
+        gapSize: vnode.attrs.tooltipType ? 1 : undefined,
+        tooltipOffset: vnode.attrs.tooltipType ? 16 : undefined,
         toSide: vnode.attrs.toSide,
-        tooltipOffset: vnode.attrs.hasArrow ? 16 : undefined,
+        trigger: this.triggerRef,
       });
 
       popoverContainer.style.top = `${inlineStyle.contentTopYAmount}px`;
       popoverContainer.style.left = `${inlineStyle.contentLeftXAmount}px`;
-
-      const showArrow = vnode.attrs.hasArrow && inlineStyle.showArrow;
-
-      switch (inlineStyle.popoverPlacement) {
-        case 'above': {
-          arrow.className = `arrow-down${
-            vnode.attrs.singleLine ? ' singleLine' : ''
-          }`;
-          break;
-        }
-        case 'below': {
-          arrow.className = `arrow-up${
-            vnode.attrs.singleLine ? ' singleLine' : ''
-          }`;
-          break;
-        }
-        case 'right': {
-          arrow.className = `arrow-left${
-            vnode.attrs.singleLine ? ' singleLine' : ''
-          }`;
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-
-      arrow.style.top = `${inlineStyle.arrowTopYAmount}px`;
-      arrow.style.left = `${inlineStyle.arrowLeftXAmount}px`;
       popoverContainer.style.visibility = 'visible';
 
-      if (showArrow) {
-        arrow.style.visibility = 'visible';
-      }
+      applyArrowStyles(
+        this.arrowId,
+        inlineStyle,
+        vnode.attrs.singleLine,
+        vnode.attrs.tooltipType
+      );
 
       this.isRendered = true;
     } catch (e) {
@@ -155,8 +137,9 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   }
 
   view(vnode) {
-    const { trigger, content, onToggle, interactionType, singleLine } =
+    const { content, interactionType, onToggle, tooltipType, trigger } =
       vnode.attrs;
+
     const { isOpen } = this;
 
     // Resize Listener
@@ -198,9 +181,9 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
               }}
             >
               <div
-                class={getClasses<PopoverStyleAttrs>(
+                class={getClasses<{ tooltipType: TooltipType }>(
                   {
-                    singleLine,
+                    tooltipType,
                   },
                   ComponentType.Popover
                 )}
