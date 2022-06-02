@@ -19,7 +19,7 @@ import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_tooltip';
-// import { CWPopover } from './cw_popover/cw_popover';
+import { CWPopover } from './cw_popover/cw_popover';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -53,6 +53,14 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Popover</h1>
+        <div class="tooltip-gallery">
+          <CWPopover
+            trigger={<CWButton label="Click me" />}
+            content={<>Some content</>}
+            interactionType="click"
+          />
+        </div>
         <h1>Tooltip</h1>
         <div class="tooltip-gallery">
           <div class="tooltip-row">
@@ -107,7 +115,7 @@ export class ComponentShowcase implements m.ClassComponent {
             />
           </div>
           <div class="tooltip-row">
-            <CWText>Hover</CWText>
+            <CWText>Solid background</CWText>
             <CWTooltip
               interactionType="hover"
               tooltipText={`
@@ -118,14 +126,6 @@ export class ComponentShowcase implements m.ClassComponent {
               trigger={<CWIcon iconName="infoEmpty" />}
             />
           </div>
-          {/* <div class="tooltip-row">
-            <CWText>Popover</CWText>
-            <CWPopover
-              trigger={<CWButton label="Click me" />}
-              content={<>Some content</>}
-              interactionType="click"
-            />
-          </div> */}
         </div>
         <h1>Buttons</h1>
         <div class="button-gallery">

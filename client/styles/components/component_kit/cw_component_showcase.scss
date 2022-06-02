@@ -14,12 +14,14 @@ $width: 360px;
   .tooltip-gallery {
     display: flex;
     flex-direction: column;
+    margin-bottom: $margin-bottom;
 
     .tooltip-row {
       align-items: center;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+      margin-bottom: 8px;
       width: 240px;
     }
   }

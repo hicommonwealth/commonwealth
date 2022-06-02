@@ -92,12 +92,14 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
       popoverContainer.style.left = `${inlineStyle.contentLeftXAmount}px`;
       popoverContainer.style.visibility = 'visible';
 
-      applyArrowStyles(
-        this.arrowId,
-        inlineStyle,
-        vnode.attrs.singleLine,
-        vnode.attrs.tooltipType
-      );
+      if (vnode.attrs.tooltipType) {
+        applyArrowStyles(
+          this.arrowId,
+          inlineStyle,
+          vnode.attrs.singleLine,
+          vnode.attrs.tooltipType
+        );
+      }
 
       this.isRendered = true;
     } catch (e) {
@@ -198,7 +200,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
               >
                 {content}
               </div>
-              <div id={this.arrowId}></div>
+              {tooltipType && <div id={this.arrowId}></div>}
             </div>
           </CWPortal>
         ) : null}
