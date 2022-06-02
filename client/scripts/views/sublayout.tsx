@@ -64,7 +64,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       title,
     } = vnode.attrs;
 
-    const chain = app.chain ? app.chain.meta.chain : null;
+    const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
@@ -93,13 +93,15 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           </div>
           <div class="sidebar-and-body-container">
             {!hideSidebar && <Sidebar />}
-            <div class="Body" onscroll={onscroll}>
+            <div class="body-and-sticky-headers-container">
               <TokenHero chain={chain} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
-              {vnode.children}
-              {!app.isCustomDomain() && !hideFooter && (
-                <Footer list={footercontents} />
-              )}
+              <div class="Body" onscroll={onscroll}>
+                {vnode.children}
+                {!app.isCustomDomain() && !hideFooter && (
+                  <Footer list={footercontents} />
+                )}
+              </div>
             </div>
           </div>
         </div>

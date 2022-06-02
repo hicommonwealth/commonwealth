@@ -161,12 +161,12 @@ export default class MolochGovernance extends ProposalModule<
       const processor = new MolochEvents.Processor(api.Contract as any, 1);
       await this.app.chain.chainEntities.fetchEntities(
         this.app.chain.id,
-        chainToEventNetwork(this.app.chain.meta.chain),
+        chainToEventNetwork(this.app.chain.meta),
         () => fetcher.fetch()
       );
       await this.app.chain.chainEntities.subscribeEntities(
         this.app.chain.id,
-        chainToEventNetwork(this.app.chain.meta.chain),
+        chainToEventNetwork(this.app.chain.meta),
         subscriber,
         processor
       );

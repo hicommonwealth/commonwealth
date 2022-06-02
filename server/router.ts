@@ -9,7 +9,7 @@ import linkExistingAddressToChain from './routes/linkExistingAddressToChain';
 import verifyAddress from './routes/verifyAddress';
 import deleteAddress from './routes/deleteAddress';
 import getAddressStatus from './routes/getAddressStatus';
-import selectNode from './routes/selectNode';
+import selectChain from './routes/selectChain';
 import startEmailLogin from './routes/startEmailLogin';
 import finishEmailLogin from './routes/finishEmailLogin';
 import finishOAuthLogin from './routes/finishOAuthLogin';
@@ -86,9 +86,7 @@ import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
 import getDrafts from './routes/drafts/getDrafts';
-import addChainNode from './routes/addChainNode';
 import deleteChain from './routes/deleteChain';
-import deleteChainNode from './routes/deleteChainNode';
 import updateChain from './routes/updateChain';
 import bulkProfiles from './routes/bulkProfiles';
 import updateProfile from './routes/updateProfile';
@@ -190,9 +188,9 @@ function setupRouter(
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   router.post(
-    '/selectNode',
+    '/selectChain',
     passport.authenticate('jwt', { session: false }),
-    selectNode.bind(this, models)
+    selectChain.bind(this, models)
   );
 
   // chains
@@ -202,19 +200,9 @@ function setupRouter(
     createChain.bind(this, models)
   );
   router.post(
-    '/addChainNode',
-    passport.authenticate('jwt', { session: false }),
-    addChainNode.bind(this, models)
-  );
-  router.post(
     '/deleteChain',
     passport.authenticate('jwt', { session: false }),
     deleteChain.bind(this, models)
-  );
-  router.post(
-    '/deleteChainNode',
-    passport.authenticate('jwt', { session: false }),
-    deleteChainNode.bind(this, models)
   );
   router.post(
     '/updateChain',

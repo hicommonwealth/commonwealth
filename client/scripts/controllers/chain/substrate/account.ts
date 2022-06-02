@@ -167,7 +167,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   ) {
     if (!app.isModuleReady) {
       // defer chain initialization
-      super(app, app.chain.meta.chain, address, null);
+      super(app, app.chain.meta, address, null);
       app.chainModuleReady.once('ready', () => {
         if (app.chain.chain instanceof SubstrateChain) {
           this._Chain = app.chain.chain;
@@ -177,7 +177,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
         }
       });
     } else {
-      super(app, app.chain.meta.chain, address, ChainInfo.ss58Format);
+      super(app, app.chain.meta, address, ChainInfo.ss58Format);
       this._Chain = ChainInfo;
       this.setEncoding(this._Chain.ss58Format);
     }

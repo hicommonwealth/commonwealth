@@ -3,7 +3,7 @@ import { ERC721, ERC721__factory } from 'eth/types';
 import ContractApi from 'controllers/chain/ethereum/commonwealth/contractApi';
 import Ethereum from 'controllers/chain/ethereum/main';
 
-import { NodeInfo, ITokenAdapter } from 'models';
+import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
 import { IApp } from 'state';
 import BN from 'bn.js';
 
@@ -34,7 +34,7 @@ export default class Nft extends Ethereum implements ITokenAdapter {
   }
 
   // Extensions of Ethereum
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.contractAddress = meta.address;
   }

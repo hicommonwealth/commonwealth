@@ -1,4 +1,4 @@
-import { ITXModalData, NodeInfo, IChainModule, ITXData } from 'models';
+import { ITXModalData, NodeInfo, IChainModule, ITXData, ChainInfo } from 'models';
 import { ChainNetwork, WalletId } from 'types';
 import m from 'mithril';
 import _ from 'lodash';
@@ -70,8 +70,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _tmClient: Tendermint34Client;
-  public async init(node: NodeInfo, reset = false) {
-    const url = `${window.location.origin}/cosmosAPI/${node.chain.id}`;
+  public async init(chain: ChainInfo, reset = false) {
+    const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
     console.log(`Starting Tendermint RPC API at ${url}...`);
     // TODO: configure broadcast mode
     this._tmClient = await Tendermint34Client.connect(url);
@@ -119,7 +119,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (!wallet.enabled) {
       await wallet.enable();
     }
-    const client = await SigningStargateClient.connectWithSigner(this._app.chain.meta.url, wallet.offlineSigner);
+    const client = await SigningStargateClient.connectWithSigner(this._app.chain.meta.node.url, wallet.offlineSigner);
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?

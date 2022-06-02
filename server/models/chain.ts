@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { RegisteredTypes } from '@polkadot/types/types';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
@@ -16,6 +16,7 @@ import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 
 export type ChainAttributes = {
   name: string;
+  chain_node_id: number;
   symbol: string;
   network: ChainNetwork;
   base: ChainBase;
@@ -44,9 +45,12 @@ export type ChainAttributes = {
   snapshot?: string[];
   bech32_prefix?: string;
   hide_projects?: boolean;
+  address?: string;
+  token_name?: string;
+  ce_verbose?: boolean;
 
   // associations
-  ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
+  ChainNode?: ChainNodeAttributes;
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   StarredCommunities?:
     | StarredCommunityAttributes[]
@@ -64,7 +68,7 @@ export type ChainAttributes = {
 
 export type ChainInstance = ModelInstance<ChainAttributes> & {
   // add mixins as needed
-  getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
+  getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<
     AddressInstance,
     AddressInstance['id']
@@ -87,8 +91,12 @@ export default (
     'Chain',
     {
       id: { type: dataTypes.STRING, primaryKey: true },
+      chain_node_id: { type: dataTypes.INTEGER, allowNull: true }, // only null if starter community
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.STRING, allowNull: true },
+      address: { type: dataTypes.STRING, allowNull: true },
+      token_name: { type: dataTypes.STRING, allowNull: true },
+      ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       discord: { type: dataTypes.STRING, allowNull: true },
       element: { type: dataTypes.STRING, allowNull: true },
@@ -139,7 +147,7 @@ export default (
   );
 
   Chain.associate = (models) => {
-    models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
+    models.Chain.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Chain.hasMany(models.OffchainTopic, {

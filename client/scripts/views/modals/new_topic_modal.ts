@@ -85,8 +85,8 @@ const NewTopicModal: m.Component<
       disabled = true;
     }
 
-    const decimals = app.chain?.meta.chain?.decimals
-      ? app.chain.meta.chain.decimals
+    const decimals = app.chain?.meta?.decimals
+      ? app.chain.meta.decimals
       : app.chain.network === ChainNetwork.ERC721
       ? 0
       : 18;
@@ -105,7 +105,7 @@ const NewTopicModal: m.Component<
             inputValidationFn: (text) => {
               let errorMsg;
               const currentCommunityTopicNames =
-                app.chain.meta.chain.topics.map((t) => t.name.toLowerCase());
+                app.chain.meta.topics.map((t) => t.name.toLowerCase());
               if (currentCommunityTopicNames.includes(text.toLowerCase())) {
                 errorMsg = 'Topic name already used within community.';
                 vnode.state.error = errorMsg;
@@ -153,7 +153,7 @@ const NewTopicModal: m.Component<
                 {
                   for: 'tokenThreshold',
                 },
-                `Number of tokens needed to post (${app.chain?.meta.chain.symbol})`
+                `Number of tokens needed to post (${app.chain?.meta.symbol})`
               ),
               m(TokenDecimalInput, {
                 decimals,

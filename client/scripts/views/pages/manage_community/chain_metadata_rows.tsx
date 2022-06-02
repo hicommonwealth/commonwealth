@@ -206,7 +206,7 @@ export class ChainMetadataRows
           }}
           disabled={true} // Custom domains should be admin configurable only
         />
-        {app.chain?.meta.chain.base === ChainBase.Ethereum && (
+        {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
             title="Snapshot(s)"
             defaultValue={this.snapshot}

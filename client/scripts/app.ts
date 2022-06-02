@@ -51,7 +51,7 @@ const MIXPANEL_PROD_TOKEN = '993ca6dd7df2ccdc2a5d2b116c0e18c5';
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
-  updateSelectedNode = true,
+  updateSelectedChain = true,
   customDomain = null
 ): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -61,24 +61,21 @@ export async function initAppState(
         app.config.nodes.clear();
         app.user.notifications.store.clear();
         app.user.notifications.clearSubscriptions();
-        data.chains
-          .filter((chain) => chain.active)
-          .map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
         data.nodes
           .sort((a, b) => a.id - b.id)
           .map((node) => {
-            return app.config.nodes.add(
-              NodeInfo.fromJSON({
-                id: node.id,
-                url: node.url,
-                chain: app.config.chains.getById(node.chain),
-                address: node.address,
-                token_name: node.token_name,
-                eth_chain_id: node.eth_chain_id,
-                alt_wallet_url: node.alt_wallet_url,
-              })
-            );
+            return app.config.nodes.add(NodeInfo.fromJSON(node));
           });
+        data.chains
+          .filter((chain) => chain.active)
+          .map((chain) =>
+            app.config.chains.add(
+              ChainInfo.fromJSON({
+                ChainNode: app.config.nodes.getById(chain.chain_node_id),
+                ...chain,
+              })
+            )
+          );
         app.user.setRoles(data.roles);
         app.config.notificationCategories = data.notificationCategories.map(
           (json) => NotificationCategory.fromJSON(json)
@@ -120,10 +117,12 @@ export async function initAppState(
           data.user ? data.user.starredCommunities : []
         );
 
-        // update the selectedNode, unless we explicitly want to avoid
+        // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
-        if (updateSelectedNode && data.user && data.user.selectedNode) {
-          app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
+        if (updateSelectedChain && data.user && data.user.selectedChain) {
+          app.user.setSelectedChain(
+            ChainInfo.fromJSON(data.user.selectedChain)
+          );
         }
 
         if (customDomain) {
@@ -149,7 +148,7 @@ export async function deinitChainOrCommunity() {
     console.log('Finished deinitializing chain');
     app.chain = null;
   }
-  app.user.setSelectedNode(null);
+  app.user.setSelectedChain(null);
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
   document.title = 'Commonwealth';
@@ -187,37 +186,37 @@ export async function handleUpdateEmailConfirmation() {
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
-export async function selectNode(
-  n?: NodeInfo,
+export async function selectChain(
+  chain?: ChainInfo,
   deferred = false
 ): Promise<boolean> {
   // Select the default node, if one wasn't provided
-  if (!n) {
-    if (app.user.selectedNode) {
-      n = app.user.selectedNode;
+  if (!chain) {
+    if (app.user.selectedChain) {
+      chain = app.user.selectedChain;
     } else {
-      n = app.config.nodes.getByChain(app.config.defaultChain)[0];
+      chain = app.config.chains.getById(app.config.defaultChain);
     }
-    if (!n) {
-      throw new Error('no nodes available');
+    if (!chain) {
+      throw new Error('no chain available');
     }
   }
 
   // Check for valid chain selection, and that we need to switch
-  if (app.chain && n === app.chain.meta) {
+  if (app.chain && chain === app.chain.meta) {
     return;
   }
 
   // Shut down old chain if applicable
   await deinitChainOrCommunity();
   app.chainPreloading = true;
-  document.title = `Commonwealth – ${n.chain.name}`;
+  document.title = `Commonwealth – ${chain.name}`;
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
   let initApi; // required for NEAR
-  if (n.chain.base === ChainBase.Substrate) {
+  if (chain.base === ChainBase.Substrate) {
     const Substrate = (
       await import(
         /* webpackMode: "lazy" */
@@ -225,8 +224,8 @@ export async function selectNode(
         './controllers/chain/substrate/main'
       )
     ).default;
-    newChain = new Substrate(n, app);
-  } else if (n.chain.base === ChainBase.CosmosSDK) {
+    newChain = new Substrate(chain, app);
+  } else if (chain.base === ChainBase.CosmosSDK) {
     const Cosmos = (
       await import(
         /* webpackMode: "lazy" */
@@ -234,8 +233,8 @@ export async function selectNode(
         './controllers/chain/cosmos/main'
       )
     ).default;
-    newChain = new Cosmos(n, app);
-  } else if (n.chain.network === ChainNetwork.Ethereum) {
+    newChain = new Cosmos(chain, app);
+  } else if (chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (
       await import(
         /* webpackMode: "lazy" */
@@ -243,10 +242,10 @@ export async function selectNode(
         './controllers/chain/ethereum/main'
       )
     ).default;
-    newChain = new Ethereum(n, app);
+    newChain = new Ethereum(chain, app);
   } else if (
-    n.chain.network === ChainNetwork.NEAR ||
-    n.chain.network === ChainNetwork.NEARTestnet
+    chain.network === ChainNetwork.NEAR ||
+    chain.network === ChainNetwork.NEARTestnet
   ) {
     const Near = (
       await import(
@@ -255,9 +254,9 @@ export async function selectNode(
         './controllers/chain/near/main'
       )
     ).default;
-    newChain = new Near(n, app);
+    newChain = new Near(chain, app);
     initApi = true;
-  } else if (n.chain.network === ChainNetwork.Sputnik) {
+  } else if (chain.network === ChainNetwork.Sputnik) {
     const Sputnik = (
       await import(
         /* webpackMode: "lazy" */
@@ -265,9 +264,9 @@ export async function selectNode(
         './controllers/chain/near/sputnik/adapter'
       )
     ).default;
-    newChain = new Sputnik(n, app);
+    newChain = new Sputnik(chain, app);
     initApi = true;
-  } else if (n.chain.network === ChainNetwork.Moloch) {
+  } else if (chain.network === ChainNetwork.Moloch) {
     const Moloch = (
       await import(
         /* webpackMode: "lazy" */
@@ -275,8 +274,8 @@ export async function selectNode(
         './controllers/chain/ethereum/moloch/adapter'
       )
     ).default;
-    newChain = new Moloch(n, app);
-  } else if (n.chain.network === ChainNetwork.Compound) {
+    newChain = new Moloch(chain, app);
+  } else if (chain.network === ChainNetwork.Compound) {
     const Compound = (
       await import(
         /* webpackMode: "lazy" */
@@ -284,8 +283,8 @@ export async function selectNode(
         './controllers/chain/ethereum/compound/adapter'
       )
     ).default;
-    newChain = new Compound(n, app);
-  } else if (n.chain.network === ChainNetwork.Aave) {
+    newChain = new Compound(chain, app);
+  } else if (chain.network === ChainNetwork.Aave) {
     const Aave = (
       await import(
         /* webpackMode: "lazy" */
@@ -293,10 +292,10 @@ export async function selectNode(
         './controllers/chain/ethereum/aave/adapter'
       )
     ).default;
-    newChain = new Aave(n, app);
+    newChain = new Aave(chain, app);
   } else if (
-    n.chain.network === ChainNetwork.ERC20 ||
-    n.chain.network === ChainNetwork.AxieInfinity
+    chain.network === ChainNetwork.ERC20 ||
+    chain.network === ChainNetwork.AxieInfinity
   ) {
     const ERC20 = (
       await import(
@@ -305,8 +304,8 @@ export async function selectNode(
         './controllers/chain/ethereum/tokenAdapter'
       )
     ).default;
-    newChain = new ERC20(n, app);
-  } else if (n.chain.network === ChainNetwork.ERC721) {
+    newChain = new ERC20(chain, app);
+  } else if (chain.network === ChainNetwork.ERC721) {
     const ERC721 = (
       await import(
         //   /* webpackMode: "lazy" */
@@ -314,8 +313,8 @@ export async function selectNode(
         './controllers/chain/ethereum/NftAdapter'
       )
     ).default;
-    newChain = new ERC721(n, app);
-  } else if (n.chain.network === ChainNetwork.SPL) {
+    newChain = new ERC721(chain, app);
+  } else if (chain.network === ChainNetwork.SPL) {
     const SPL = (
       await import(
         //   /* webpackMode: "lazy" */
@@ -323,8 +322,8 @@ export async function selectNode(
         './controllers/chain/solana/tokenAdapter'
       )
     ).default;
-    newChain = new SPL(n, app);
-  } else if (n.chain.base === ChainBase.Solana) {
+    newChain = new SPL(chain, app);
+  } else if (chain.base === ChainBase.Solana) {
     const Solana = (
       await import(
         /* webpackMode: "lazy" */
@@ -332,19 +331,19 @@ export async function selectNode(
         './controllers/chain/solana/main'
       )
     ).default;
-    newChain = new Solana(n, app);
-    // } else if (n.chain.network === ChainNetwork.Commonwealth) {
-    //   const Commonwealth = (
-    //     await import(
-    //       /* webpackMode: "lazy" */
-    //       /* webpackChunkName: "commonwealth-main" */
-    //       './controllers/chain/ethereum/commonwealth/adapter'
-    //     )
-    //   ).default;
-    //   newChain = new Commonwealth(n, app);
+    newChain = new Solana(chain, app);
+  } else if (chain.network === ChainNetwork.Commonwealth) {
+    const Commonwealth = (
+      await import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "commonwealth-main" */
+        './controllers/chain/ethereum/commonwealth/adapter'
+      )
+    ).default;
+    newChain = new Commonwealth(chain, app);
   } else if (
-    n.chain.base === ChainBase.Ethereum &&
-    n.chain.type === ChainType.Offchain
+    chain.base === ChainBase.Ethereum &&
+    chain.type === ChainType.Offchain
   ) {
     const Ethereum = (
       await import(
@@ -353,7 +352,7 @@ export async function selectNode(
         './controllers/chain/ethereum/main'
       )
     ).default;
-    newChain = new Ethereum(n, app);
+    newChain = new Ethereum(chain, app);
   } else {
     throw new Error('Invalid chain');
   }
@@ -381,13 +380,12 @@ export async function selectNode(
   app.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
-  await updateActiveAddresses(n.chain);
+  await updateActiveAddresses(chain);
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
-    await app.user.selectNode({
-      url: n.url,
-      chain: n.chain.id,
+    await app.user.selectChain({
+      chain: chain.id,
     });
   }
 
@@ -408,16 +406,16 @@ export async function initChain(): Promise<void> {
     await app.chain.initApi();
   }
   app.chain.deferred = false;
-  const n = app.chain.meta;
+  const chain = app.chain.meta;
   await app.chain.initData();
 
   // Emit chain as updated
   app.chainAdapterReady.emit('ready');
   app.isAdapterReady = true;
-  console.log(`${n.chain.network.toUpperCase()} started.`);
+  console.log(`${chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses(n.chain);
+  await updateActiveAddresses(chain);
 
   // Finish redraw to remove loading dialog
   m.redraw();
@@ -434,6 +432,7 @@ export async function initNewTokenChain(address: string) {
     // TODO: better custom 404
     m.route.set('/404');
   }
+  // TODO: check if this is valid
   const { chain, node } = response.result;
   const chainInfo = ChainInfo.fromJSON(chain);
   const nodeInfo = new NodeInfo(node);
@@ -441,7 +440,7 @@ export async function initNewTokenChain(address: string) {
     app.config.chains.add(chainInfo);
     app.config.nodes.add(nodeInfo);
   }
-  await selectNode(nodeInfo);
+  await selectChain(chainInfo);
 }
 
 // set up route navigation
@@ -604,13 +603,13 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           const scopeIsEthereumAddress =
             scope.startsWith('0x') && scope.length === 42;
           if (scopeIsEthereumAddress) {
-            const nodes = app.config.nodes.getAll();
-            const node = nodes.find((o) => o.address === scope);
-            if (node) {
+            const chains = app.config.chains.getAll();
+            const chain = chains.find((o) => o.address === scope);
+            if (chain) {
               const pagePath = window.location.href.substr(
                 window.location.href.indexOf(scope) + scope.length
               );
-              m.route.set(`/${node.chain.id}${pagePath}`);
+              m.route.set(`/${chain.id}${pagePath}`);
             }
           }
         }
@@ -625,7 +624,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         if (path === 'views/pages/view_proposal/index' && isDiscussion) {
           deferChain = true;
         }
-        if (app.chain?.meta.chain.type === ChainType.Token) {
+        if (app.chain?.meta.type === ChainType.Token) {
           deferChain = false;
         }
         return m(Layout, { scope, deferChain, hideSidebar }, [vnode]);

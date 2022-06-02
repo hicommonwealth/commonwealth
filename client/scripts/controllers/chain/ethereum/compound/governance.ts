@@ -211,7 +211,7 @@ export default class CompoundGovernance extends ProposalModule<
     const processor = new CompoundEvents.Processor(this._api.Contract as any);
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta.chain),
+      chainToEventNetwork(this.app.chain.meta),
       subscriber,
       processor
     );

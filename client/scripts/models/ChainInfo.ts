@@ -5,9 +5,13 @@ import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'types';
 import { ChainInstance } from 'server/models/chain';
 import OffchainTopic from './OffchainTopic';
+import NodeInfo from './NodeInfo';
 
 class ChainInfo {
   public readonly id: string;
+  public readonly ChainNode: NodeInfo;
+  public readonly address: string;
+  public readonly tokenName: string;
   public readonly symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
@@ -39,6 +43,10 @@ class ChainInfo {
   public hideProjects: boolean;
   public adminOnlyPolling: boolean;
 
+  public get node() {
+    return this.ChainNode;
+  }
+
   constructor({
     id,
     network,
@@ -68,6 +76,9 @@ class ChainInfo {
     decimals,
     substrateSpec,
     hideProjects,
+    ChainNode,
+    tokenName,
+    address,
     adminOnlyPolling,
   }) {
     this.id = id;
@@ -99,6 +110,9 @@ class ChainInfo {
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
     this.hideProjects = hideProjects;
+    this.ChainNode = ChainNode;
+    this.tokenName = tokenName;
+    this.address = address;
     this.adminOnlyPolling = adminOnlyPolling;
   }
 
@@ -131,6 +145,9 @@ class ChainInfo {
     decimals,
     substrate_spec,
     hide_projects,
+    token_name,
+    address,
+    ChainNode,
     admin_only_polling,
   }) {
     let blockExplorerIdsParsed;
@@ -169,6 +186,9 @@ class ChainInfo {
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       hideProjects: hide_projects,
+      tokenName: token_name,
+      address,
+      ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
   }
