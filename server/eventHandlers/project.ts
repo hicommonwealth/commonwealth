@@ -1,22 +1,18 @@
-import Web3 from 'web3';
 import BN from 'bn.js';
-import { providers } from 'ethers';
 import {
   IEventHandler,
   CWEvent,
   IChainEventData,
   CommonwealthTypes,
 } from '@commonwealth/chain-events';
-import { ICuratedProject__factory } from '../../shared/eth/types';
 import { addPrefix, factory } from '../../shared/logging';
 import { DB } from '../database';
-import { ChainNodeAttributes } from '../models/chain_node';
+
 export default class extends IEventHandler {
   public readonly name = 'Project';
 
   constructor(
-    private readonly _models: DB,
-    private readonly _node: ChainNodeAttributes
+    private readonly _models: DB
   ) {
     super();
   }
@@ -37,7 +33,6 @@ export default class extends IEventHandler {
         return; // oops, should not happen
       }
       const index = event.data.index;
-      const creator = event.data.creator;
       const ipfsHash = event.data.ipfsHash;
 
       const projectRow = await this._models.Project.findOne({
@@ -48,22 +43,6 @@ export default class extends IEventHandler {
         return;
       }
 
-      // first, query data from contract
-      const url = this._node.private_url;
-      const provider = new Web3.providers.WebsocketProvider(url);
-      const contractApi = ICuratedProject__factory.connect(
-        event.data.id,
-        new providers.Web3Provider(provider)
-      );
-      await contractApi.deployed();
-      const beneficiary = await contractApi.beneficiary();
-      const token = await contractApi.acceptedToken();
-      const curator_fee = await contractApi.curatorFee();
-      const threshold = await contractApi.threshold();
-      const deadline = await contractApi.deadline();
-      const funding_amount = await contractApi.totalFunding();
-      provider.disconnect(1000, 'finished');
-
       const ipfsHashId = await this._models.IpfsPins.findOne({
         where: { ipfs_hash: ipfsHash }
       });
@@ -73,13 +52,13 @@ export default class extends IEventHandler {
       await this._models.Project.create({
         id: +index,
         entity_id: entityId,
-        creator,
-        beneficiary,
-        token,
-        curator_fee,
-        threshold: threshold.toString(),
-        deadline: deadline.toNumber(),
-        funding_amount: funding_amount.toString(),
+        creator: event.data.creator,
+        beneficiary: event.data.beneficiary,
+        token: event.data.acceptedToken,
+        curator_fee: event.data.curatorFee,
+        threshold: event.data.threshold,
+        deadline: event.data.deadline,
+        funding_amount: event.data.fundingAmount,
         ...ipfsParams,
       });
     } else if (

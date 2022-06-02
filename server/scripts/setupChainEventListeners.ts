@@ -104,7 +104,7 @@ export const generateHandlers = (
 
   // only handle CWP events on Common Protocol
   if (chain.network === ChainNetwork.CommonProtocol) {
-    const projectHandler = new ProjectHandler(models, chain.ChainNode);
+    const projectHandler = new ProjectHandler(models);
     handlers.push(projectHandler);
   }
 
