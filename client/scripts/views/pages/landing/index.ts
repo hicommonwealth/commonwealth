@@ -18,7 +18,7 @@ import ChainsCrowdfundingComponent from './crowdfunding_card_section';
 import 'pages/landing/index.scss';
 
 import { handleEmailInvites } from '../../components/header/invites_menu';
-import { UserDashboard } from '../user_dashboard';
+import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
 import {
   MixpanelPageViewEvent,
@@ -64,57 +64,21 @@ const LandingPage: m.Component<{}, IState> = {
     vnode.state.inputTokenValue = '';
     vnode.state.chains = [];
 
-    const chains = {};
-    app.config.nodes.getAll().forEach((n) => {
-      if (chains[n.chain.id]) {
-        chains[n.chain.id].push(n);
-      } else {
-        chains[n.chain.id] = [n];
-      }
+    const sortedChains = app.config.chains.getAll().sort((a, b) => {
+      const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
+      const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
+      return threadCountB - threadCountA;
+    }).map((chain) => {
+      return {
+        img: chain.iconUrl,
+        id: chain.id,
+        chainInfo: chain,
+        name: chain.name,
+      };
     });
 
-    const myChains: any = Object.entries(chains);
-    const sortChains = (list: any[]) =>
-      list
-        .sort((a, b) => {
-          const threadCountA = app.recentActivity.getCommunityThreadCount(
-            Array.isArray(a) ? a[0] : a.id
-          );
-          const threadCountB = app.recentActivity.getCommunityThreadCount(
-            Array.isArray(b) ? b[0] : b.id
-          );
-          return threadCountB - threadCountA;
-        })
-        // eslint-disable-next-line array-callback-return
-        .map((entity) => {
-          if (Array.isArray(entity)) {
-            const [chain, nodeList]: [string, any] = entity as any;
-            const chainInfo = nodeList[0].chain;
-            return {
-              img: chainInfo.iconUrl,
-              id: chain,
-              chainInfo,
-              name: chainInfo.name,
-            };
-          } else {
-            // Should never be used
-            return {
-              img: entity.defaultChain.iconUrl,
-              id: entity.id,
-              chainInfo: entity.defaultChain,
-              description: entity.description,
-              name: entity.defaultChain.name,
-            };
-          }
-        })
-        .filter((chain: any) => chain);
-
-    const sortedChainsAndCommunities = sortChains(
-      myChains.filter((c) => c[1][0] && !c[1][0].chain.collapsedOnHomepage)
-    );
-    const betaChainsAndCommunities = sortChains(
-      myChains.filter((c) => c[1][0] && c[1][0].chain.collapsedOnHomepage)
-    );
+    const sortedChainsAndCommunities = sortedChains.filter((c) => !c.chainInfo.collapsedOnHomepage)
+    const betaChainsAndCommunities = sortedChains.filter((c) => c.chainInfo.collapsedOnHomepage)
 
     vnode.state.chains = [
       ...sortedChainsAndCommunities,

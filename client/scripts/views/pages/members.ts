@@ -59,7 +59,7 @@ const MembersPage: m.Component<
       });
 
     // get members once
-    const activeInfo = app.chain.meta.chain;
+    const activeInfo = app.chain.meta;
     if (!vnode.state.membersRequested) {
       vnode.state.membersRequested = true;
       activeInfo.getMembers(activeInfo.id).then(() => {

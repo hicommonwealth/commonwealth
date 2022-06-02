@@ -9,6 +9,8 @@ export interface ChatChannelAttributes {
   chain_id: string;
   category: string;
   chat_messages?: ChatMessageAttributes[] | ChatMessageAttributes['id'][];
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface ChatChannelInstance

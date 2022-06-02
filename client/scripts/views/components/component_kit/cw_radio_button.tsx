@@ -8,17 +8,18 @@ import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
+export type RadioButton = { label?: string; value: string };
+
 type RadioButtonStyleAttrs = {
   disabled?: boolean;
-  selected: boolean;
+  checked: boolean;
 };
 
 type RadioButtonAttrs = {
   groupName: string;
-  label?: string;
   onchange: (e?: any) => void;
-  value: string;
-} & RadioButtonStyleAttrs;
+} & RadioButton &
+  RadioButtonStyleAttrs;
 
 export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
   view(vnode) {
@@ -27,7 +28,7 @@ export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
       groupName,
       label,
       onchange,
-      selected,
+      checked,
       value,
     } = vnode.attrs;
 
@@ -35,7 +36,7 @@ export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
       disabled,
       name: groupName,
       onchange,
-      selected: selected ? 'selected' : '',
+      checked,
       type: 'radio',
       value,
     };
@@ -44,7 +45,7 @@ export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
       <label
         class={getClasses<RadioButtonStyleAttrs>(
           {
-            selected,
+            checked,
             disabled,
           },
           ComponentType.RadioButton

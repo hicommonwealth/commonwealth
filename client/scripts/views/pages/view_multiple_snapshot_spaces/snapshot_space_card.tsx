@@ -42,7 +42,7 @@ export class SnapshotSpaceCard
       } else if (redirect_action === REDIRECT_ACTIONS.NEW_FROM_THREAD) {
         app.snapshot.init(space.id).then(() => {
           navigateToSubpage(
-            `/new/snapshot/${app.chain.meta.chain.snapshot}` +
+            `/new/snapshot/${app.chain.meta.snapshot}` +
               `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
           );
         });

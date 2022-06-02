@@ -48,10 +48,10 @@ export class GovernanceSection
         app.chain.network === ChainNetwork.Moloch ||
         app.chain.network === ChainNetwork.Compound ||
         app.chain.network === ChainNetwork.Aave ||
-        app.chain.meta.chain.snapshot);
+        app.chain.meta.snapshot);
     if (!hasProposals) return;
 
-    const isNotOffchain = app.chain?.meta.chain.type !== ChainType.Offchain;
+    const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
     const showMolochMenuOptions =
       isNotOffchain &&
@@ -70,7 +70,7 @@ export class GovernanceSection
       app.user.activeAccount &&
       app.chain?.network === ChainNetwork.Aave;
     const showSnapshotOptions =
-      isNotOffchain && app.chain?.meta.chain.snapshot?.length > 0;
+      isNotOffchain && app.chain?.meta.snapshot?.length > 0;
     const showReferenda =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
@@ -276,7 +276,7 @@ export class GovernanceSection
         e.preventDefault();
         setGovernanceToggleTree('children.Snapshots.toggledState', toggle);
         // Check if we have multiple snapshots for conditional redirect
-        const snapshotSpaces = app.chain.meta.chain.snapshot;
+        const snapshotSpaces = app.chain.meta.snapshot;
         if (snapshotSpaces.length > 1) {
           navigateToSubpage('/multiple-snapshots', { action: 'select-space' });
         } else {

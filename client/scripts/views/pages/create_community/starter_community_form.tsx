@@ -81,7 +81,6 @@ export class StarterCommunityForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving || this.state.form.id.length < 1}
           onclick={async () => {
             this.state.saving = true;

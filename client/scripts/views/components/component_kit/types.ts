@@ -2,6 +2,7 @@ export enum ComponentType {
   Button = 'Button',
   ButtonGroup = 'ButtonGroup',
   Card = 'Card',
+  Checkbox = 'Checkbox',
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',
@@ -18,5 +19,3 @@ export type StyleAttrs = {
   disabled?: boolean;
   className?: string;
 };
-
-export type ButtonType = 'primary' | 'secondary';

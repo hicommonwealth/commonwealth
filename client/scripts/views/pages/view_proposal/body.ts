@@ -47,6 +47,9 @@ import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
+const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
+const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
+
 export enum GlobalStatus {
   Get = 'get',
   Set = 'set',
@@ -131,7 +134,7 @@ export const ProposalBodyAuthor: m.Component<{
     // Render them as anonymous as the forum is unable to support them.
     if (
       (item instanceof OffchainComment || item instanceof OffchainComment) &&
-      app.chain.meta.chain.type === ChainType.Offchain
+      app.chain.meta.type === ChainType.Offchain
     ) {
       if (
         item.authorChain !== app.chain.id &&
@@ -700,14 +703,31 @@ export const ProposalBodySpacer: m.Component<{}> = {
   },
 };
 
-export const ProposalBodyText: m.Component<{
-  item: AnyProposal | OffchainThread | OffchainComment<any>;
-}> = {
-  view: (vnode) => {
+const countLinesQuill = (ops) => {
+  let count = 0;
+  for (const op of ops) {
+    try {
+      count += op.insert.split('\n').length - 1;
+    } catch (e) {}
+  }
+  return count;
+};
+
+const countLinesMarkdown = (text) => {
+  return text.split('\n').length - 1;
+};
+
+export const ProposalBodyText: m.Component<
+  {
+    item: AnyProposal | OffchainThread | OffchainComment<any>;
+  },
+  { collapsed: boolean; body: any }
+> = {
+  oninit: (vnode) => {
+    vnode.state.collapsed = false;
     const { item } = vnode.attrs;
     if (!item) return;
 
-    const isThread = item instanceof OffchainThread;
     const body =
       item instanceof OffchainComment
         ? item.text
@@ -716,10 +736,25 @@ export const ProposalBodyText: m.Component<{
         : item.description;
     if (!body) return;
 
+    vnode.state.body = body;
+    try {
+      const doc = JSON.parse(body);
+      if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        vnode.state.collapsed = true;
+      }
+    } catch (e) {
+      if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        vnode.state.collapsed = true;
+      }
+    }
+  },
+  view: (vnode) => {
+    const { body } = vnode.state;
+
     const getPlaceholder = () => {
-      if (!(item instanceof OffchainThread)) return;
+      if (!(vnode.attrs.item instanceof OffchainThread)) return;
       const author: Account<any> = app.chain
-        ? app.chain.accounts.get(item.author)
+        ? app.chain.accounts.get(vnode.attrs.item.author)
         : null;
 
       return m('.ProposalBodyText.proposal-body-placeholder', [
@@ -736,6 +771,11 @@ export const ProposalBodyText: m.Component<{
       ]);
     };
 
+    const toggleDisplay = () => {
+      vnode.state.collapsed = !vnode.state.collapsed;
+      m.redraw();
+    };
+
     return m(
       '.ProposalBodyText',
       (() => {
@@ -750,12 +790,41 @@ export const ProposalBodyText: m.Component<{
           ) {
             return getPlaceholder();
           }
-          return m(QuillFormattedText, { doc });
+
+          return m('.show-more-wrap', [
+            m(QuillFormattedText, {
+              doc: doc,
+              cutoffText: vnode.state.collapsed
+                ? QUILL_PROPOSAL_LINES_CUTOFF_LENGTH
+                : doc.ops.length,
+            }),
+            vnode.state.collapsed &&
+              m('.show-more-button-wrapper', [
+                m('.show-more-button', { onclick: toggleDisplay }, [
+                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
+                  m('.show-more-text', ['Show More']),
+                ]),
+              ]),
+          ]);
         } catch (e) {
           if (body.toString().trim() === '') {
             return getPlaceholder();
           }
-          return m(MarkdownFormattedText, { doc: body });
+          return m('.show-more-wrap', [
+            m(MarkdownFormattedText, {
+              doc: body,
+              cutoffText: vnode.state.collapsed
+                ? MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
+                : countLinesMarkdown(body),
+            }),
+            vnode.state.collapsed &&
+              m('.show-more-button-wrapper', [
+                m('.show-more-button', { onclick: toggleDisplay }, [
+                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
+                  m('.show-more-text', ['Show More']),
+                ]),
+              ]),
+          ]);
         }
       })()
     );
