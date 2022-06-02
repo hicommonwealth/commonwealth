@@ -239,17 +239,13 @@ const verifySignature = async (
         try {
           // query chain ID from URL
           const node = await chain.getChainNode();
-          console.log("Node:", node);
           const client = await StargateClient.connect(node.url);
-          console.log("client:", client);
           chainId = await client.getChainId();
-          console.log("chain id:", chainId);
           client.disconnect();
         } catch (e) {
           console.log(e);
         }
 
-        console.log("Failure before signdoc")
         const generatedSignDoc = validationTokenToSignDoc(
           chainId,
           addressModel.verification_token.trim(),
@@ -257,9 +253,6 @@ const verifySignature = async (
           signed.memo,
           <any>signed.msgs
         );
-
-
-        console.log("SignDoc:", generatedSignDoc);
 
         // ensure correct document was signed
         if (
