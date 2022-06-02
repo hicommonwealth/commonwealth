@@ -110,6 +110,7 @@ import editChatCategory from './routes/chat/editChatCategory';
 
 import createRule from './routes/rules/createRule';
 import deleteRule from './routes/rules/deleteRule';
+import getRuleTypes from './routes/rules/getRuleTypes';
 
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
@@ -637,6 +638,10 @@ function setupRouter(
     '/deleteRule',
     passport.authenticate('jwt', { session: false }),
     deleteRule.bind(this, models)
+  );
+  router.get(
+    '/getRuleTypes',
+    getRuleTypes.bind(this, models)
   );
 
   // settings

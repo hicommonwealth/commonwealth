@@ -88,6 +88,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       activeUsers,
       numVotingThreads,
       chatChannels,
+      rules, // TODO: store in rules controller
     } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
