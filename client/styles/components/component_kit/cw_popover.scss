@@ -48,6 +48,10 @@
     height: 24px;
     max-width: 400px;
     padding: 4px 8px;
+
+    .Text {
+      color: $white;
+    }
   }
 }
 
@@ -57,7 +61,11 @@
   @include borderedArrowStyles(up);
 
   &.solidArrow {
-    @include solidArrowStyles(up);
+    @include solidArrowStyles(up, $primary-100);
+  }
+
+  &.singleLine {
+    @include solidArrowStyles(up, $neutral-800);
   }
 }
 
@@ -65,7 +73,11 @@
   @include borderedArrowStyles(down);
 
   &.solidArrow {
-    @include solidArrowStyles(down);
+    @include solidArrowStyles(down, $primary-100);
+  }
+
+  &.singleLine {
+    @include solidArrowStyles(down, $neutral-800);
   }
 }
 
@@ -73,6 +85,10 @@
   @include borderedArrowStyles(left);
 
   &.solidArrow {
-    @include solidArrowStyles(left);
+    @include solidArrowStyles(left, $primary-100);
+  }
+
+  &.singleLine {
+    @include solidArrowStyles(down, $neutral-800);
   }
 }

@@ -18,7 +18,7 @@ import { TooltipType } from '../cw_tooltip';
 export type PopoverInteractionType = 'click' | 'hover';
 
 export type SharedPopoverAttrs = {
-  hoverOpenDelay?: number;
+  hoverCloseDelay?: number;
   interactionType?: PopoverInteractionType;
   persistOnHover?: boolean;
   tooltipType?: TooltipType;
@@ -29,8 +29,9 @@ export type SharedPopoverAttrs = {
 type PopoverAttrs = {
   content: m.Children;
   onToggle?: (isOpen: boolean) => void;
-  // Gabe 6/1/22 TODO: persistOnHover won't work without a hoverOpenDelay of at least 50
 } & SharedPopoverAttrs;
+
+const defaultHoverCloseDelay = 100;
 
 export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   private arrowId: string;
@@ -99,19 +100,25 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   }
 
   handleHoverExit(e, onToggle, vnode) {
+    const { persistOnHover } = vnode.attrs;
+
+    const hoverCloseDelay = vnode.attrs.hoverCloseDelay
+      ? vnode.attrs.hoverCloseDelay
+      : defaultHoverCloseDelay;
+
     if (
       !cursorInBounds(e.offsetX, e.offsetY, this.triggerRef) &&
-      (vnode.attrs.persistOnHover ? !this.isOverContent : true)
+      (persistOnHover ? !this.isOverContent : true)
     ) {
-      if (vnode.attrs.hoverOpenDelay) {
+      if (hoverCloseDelay) {
         setTimeout(() => {
           if (
             this.isRendered &&
-            (vnode.attrs.persistOnHover ? !this.isOverContent : true)
+            (persistOnHover ? !this.isOverContent : true)
           ) {
             this.togglePopOver(onToggle);
           }
-        }, vnode.attrs.hoverOpenDelay);
+        }, hoverCloseDelay);
       } else {
         this.togglePopOver(onToggle);
       }
@@ -119,10 +126,15 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   }
 
   handleHoverEnter(vnode, onToggle) {
-    if (vnode.attrs.hoverOpenDelay) {
+    const hoverCloseDelay =
+      vnode.attrs.persistOnHover && vnode.attrs.persistOnHover
+        ? vnode.attrs.hoverCloseDelay
+        : defaultHoverCloseDelay;
+
+    if (hoverCloseDelay) {
       setTimeout(() => {
         this.togglePopOver(onToggle);
-      }, vnode.attrs.hoverOpenDelay);
+      }, hoverCloseDelay);
     } else {
       this.togglePopOver(onToggle);
     }

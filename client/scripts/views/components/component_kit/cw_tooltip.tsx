@@ -23,7 +23,7 @@ type TooltipAttrs = {
 export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
   view(vnode) {
     const {
-      hoverOpenDelay,
+      hoverCloseDelay,
       interactionType,
       persistOnHover,
       tooltipText,
@@ -35,7 +35,7 @@ export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
     return (
       <CWPopover
         content={<CWText type="caption">{tooltipText}</CWText>}
-        hoverOpenDelay={hoverOpenDelay}
+        hoverCloseDelay={hoverCloseDelay}
         interactionType={interactionType}
         persistOnHover={persistOnHover}
         tooltipType={tooltipType}

@@ -85,30 +85,30 @@
   }
 }
 
-@mixin solidArrowStyles($direction) {
+@mixin solidArrowStyles($direction, $color) {
   @if $direction == up {
     &::before {
-      border-bottom: 8px solid $primary-100;
+      border-bottom: 8px solid $color;
     }
 
     &::after {
-      border-bottom: 8px solid $primary-100;
+      border-bottom: 8px solid $color;
     }
   } @else if $direction == down {
     &::before {
-      border-top: 8px solid $primary-100;
+      border-top: 8px solid $color;
     }
 
     &::after {
-      border-top: 8px solid $primary-100;
+      border-top: 8px solid $color;
     }
   } @else {
     &::before {
-      border-right: 8px solid $primary-100;
+      border-right: 8px solid $color;
     }
 
     &::after {
-      border-right: 8px $primary-100;
+      border-right: 8px $color;
     }
   }
 }
