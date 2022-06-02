@@ -12,22 +12,17 @@ export type TooltipType =
   | 'solidNoArrow';
 
 type TooltipAttrs = {
-  tooltipText: string;
+  tooltipContents: string | m.Vnode;
 } & SharedPopoverAttrs;
-
-// Gabe 6/1/22 TODO: We probably need a hoverCloseDelay too,
-// but maybe hardcoded as opposed to an attr. Via Aden:
-// "[tooltip] should only exist for 1.5 seconds on hover
-// otherwise disappearing until they hover again"
 
 export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
   view(vnode) {
     const {
-      hoverCloseDelay,
+      hoverCloseDelay = 1500,
       hoverOpenDelay,
       interactionType,
       persistOnHover,
-      tooltipText,
+      tooltipContents,
       tooltipType,
       toSide,
       trigger,
@@ -35,7 +30,13 @@ export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
 
     return (
       <CWPopover
-        content={<CWText type="caption">{tooltipText}</CWText>}
+        content={
+          typeof tooltipContents === 'string' ? (
+            <CWText type="caption">{tooltipContents}</CWText>
+          ) : (
+            tooltipContents
+          )
+        }
         hoverCloseDelay={hoverCloseDelay}
         hoverOpenDelay={hoverOpenDelay}
         interactionType={interactionType}

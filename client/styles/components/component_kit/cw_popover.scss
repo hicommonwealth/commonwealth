@@ -89,6 +89,6 @@
   }
 
   &.singleLine {
-    @include solidArrowStyles(down, $neutral-800);
+    @include solidArrowStyles(left, $neutral-800);
   }
 }
