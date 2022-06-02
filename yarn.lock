@@ -3347,10 +3347,10 @@
     long "^4.0.0"
     protobufjs "~6.11.2"
 
-"@terra-money/terra.js@3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@terra-money/terra.js/-/terra.js-3.1.1.tgz#cc74165eb0e61a4f9ceee4cd1ecbb42b8af00579"
-  integrity sha512-VrzGLkIDT5Ig/OH5yj4pRdVUZTGV53FgpJrYZJXCULc3LEhpb4eO/oN8+mg5cmvqZ0zcw53GLCE4rdP2tLExPg==
+"@terra-money/terra.js@3.1.2":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@terra-money/terra.js/-/terra.js-3.1.2.tgz#adf77a981bd0b09a22a347387706d8ac23a74f53"
+  integrity sha512-jEvgujX/gbXzq6aTlYORw4chuk8b46weIArThDmpvQN8c3P3GrcMZYsI7uPUFtoWhcKO8+qI++dWzIIFoNhmMQ==
   dependencies:
     "@terra-money/legacy.proto" "npm:@terra-money/terra.proto@^0.1.7"
     "@terra-money/terra.proto" "^0.2.0-beta.4"
