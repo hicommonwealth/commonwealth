@@ -99,10 +99,11 @@ export class ComponentShowcase implements m.ClassComponent {
               tooltipType="bordered"
               interactionType="hover"
               persistOnHover
+              hoverCloseDelay={1500}
             />
           </div>
           <div class="tooltip-row">
-            <CWText>Hover close delay</CWText>
+            <CWText>Hover open and close delay</CWText>
             <CWTooltip
               trigger={<CWIcon iconName="infoEmpty" />}
               tooltipText={`
@@ -111,6 +112,7 @@ export class ComponentShowcase implements m.ClassComponent {
               `}
               tooltipType="bordered"
               interactionType="hover"
+              hoverOpenDelay={1500}
               hoverCloseDelay={1500}
             />
           </div>

@@ -19,6 +19,7 @@ export type PopoverInteractionType = 'click' | 'hover';
 
 export type SharedPopoverAttrs = {
   hoverCloseDelay?: number;
+  hoverOpenDelay?: number;
   interactionType?: PopoverInteractionType;
   persistOnHover?: boolean;
   tooltipType?: TooltipType;
@@ -125,24 +126,25 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     }
   }
 
-  handleHoverEnter(vnode, onToggle) {
-    const hoverCloseDelay =
-      vnode.attrs.persistOnHover && vnode.attrs.persistOnHover
-        ? vnode.attrs.hoverCloseDelay
-        : defaultHoverCloseDelay;
-
-    if (hoverCloseDelay) {
+  handleHoverEnter(hoverOpenDelay, onToggle) {
+    if (hoverOpenDelay) {
       setTimeout(() => {
         this.togglePopOver(onToggle);
-      }, hoverCloseDelay);
+      }, hoverOpenDelay);
     } else {
       this.togglePopOver(onToggle);
     }
   }
 
   view(vnode) {
-    const { content, interactionType, onToggle, tooltipType, trigger } =
-      vnode.attrs;
+    const {
+      content,
+      hoverOpenDelay,
+      interactionType,
+      onToggle,
+      tooltipType,
+      trigger,
+    } = vnode.attrs;
 
     const { isOpen } = this;
 
@@ -163,7 +165,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
           }}
           onmouseenter={() => {
             if (interactionType === 'hover') {
-              this.handleHoverEnter(vnode, onToggle);
+              this.handleHoverEnter(hoverOpenDelay, onToggle);
             }
           }}
         >
