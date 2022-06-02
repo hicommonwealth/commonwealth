@@ -12,7 +12,6 @@ import { ChainBase } from 'types';
 import { Account, AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWPopover } from '../component_kit/cw_popover/cw_popover';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
