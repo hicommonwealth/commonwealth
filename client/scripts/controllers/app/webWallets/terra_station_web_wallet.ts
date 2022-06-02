@@ -1,6 +1,6 @@
 import { ChainBase, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
-import { Extension, Msg, MsgStoreCode, StdFee } from '@terra-money/terra.js';
+import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
 
 class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -55,17 +55,22 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
+    let payloadBytes;
     this._extension.on('onSign', (payload) => {
       console.log(payload);
+      payloadBytes = payload;
     });
-    const msgs: Msg[] = [
-      new MsgStoreCode(this._accounts[0], account.validationToken)
-    ];
+    // const msgs: Msg[] = [
+    //   new MsgStoreCode(this._accounts[0], account.validationToken)
+    // ];
     try {
-      this._extension.sign({
-        fee: new StdFee(0, '0ust'),
-        msgs
-      });
+      // this._extension.sign({
+      //   fee: new StdFee(0, '0ust'),
+      //   msgs
+      // });
+      this._extension.signBytes({
+        bytes: Buffer.from(account.validationToken)
+      })
     } catch (error) {
       console.log(error);
     }
@@ -77,9 +82,10 @@ class TerraStationWebWalletController implements IWebWallet<string> {
         else reject();
       });
     });
+    console.log(result)
 
     const signature = {
-      signed: result.stdSignMsgData,
+      signed: payloadBytes.bytes,
       signature: {
         pub_key: {
           type: 'tendermint/PubKeySecp256k1',
@@ -88,6 +94,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
         signature: result.signature
       }
     };
+    console.log(signature)
     return account.validate(JSON.stringify(signature));
   }
 }
