@@ -333,15 +333,14 @@ const User: m.Component<
     );
 
     return popover
-      ? m(CWPopover, {
-          interactionType: 'click',
+      ? m(Popover, {
+          inline: true,
+          interactionType: 'hover',
           content: userPopover,
           trigger: userFinal,
           closeOnContentClick: true,
-          toSide: false,
-          // transitionDuration: 0,
-          showArrow: true,
-          hoverOpenDelay: 200,
+          transitionDuration: 0,
+          hoverOpenDelay: 500,
           key: profile?.address || '-',
         })
       : userFinal;
@@ -558,18 +557,3 @@ export const AnonymousUser: m.Component<
 };
 
 export default User;
-function CW_Popover(
-  CW_Popover: any,
-  arg1: {
-    inline: boolean;
-    interactionType: string;
-    content: m.Vnode<any, any>;
-    trigger: m.Vnode<any, any>;
-    closeOnContentClick: boolean;
-    transitionDuration: number;
-    hoverOpenDelay: number;
-    key: string;
-  }
-): void | m.Children {
-  throw new Error('Function not implemented.');
-}
