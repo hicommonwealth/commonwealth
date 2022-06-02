@@ -4,7 +4,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import QuillEditor from 'views/components/quill_editor';
 import m from 'mithril';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ButtonGroup, Button, Popover } from 'construct-ui';
+import { ButtonGroup, Button, Input, InputSelect } from 'construct-ui';
 import app from 'state';
 
 interface ICreateProjectForm {
@@ -62,27 +62,25 @@ export class FundraisingSlide
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. iaculis donec
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
-        <CWTextInput
-          placeholder="Select Token Type"
+        <InputSelect
+          items={['WETH', 'DAI', 'ALEX']}
+          itemRender={(i) => {
+            <CWText type="body1">{i}</CWText>;
+          }}
           label="Raise In"
           name="Raise In"
-          oninput={(e) => {
+          onSelect={(e) => {
             vnode.attrs.form.token = e.target.value;
           }}
         />
-        <CWTextInput
-          placeholder="Your Project Name Here"
-          label="Goal"
-          name="Goal"
-          oninput={(e) => {
-            vnode.attrs.form.threshold = Number(e.target.value);
+        <InputSelect
+          items={['1 wk', '2 wk', '3 wk', '4wk']}
+          itemRender={(i) => {
+            <CWText type="body1">{i}</CWText>;
           }}
-        />
-        <CWTextInput
-          placeholder="Select Fundraise Length"
           label="Fundraising Period"
           name="Fundraising Period"
-          oninput={(e) => {
+          onSelect={(e) => {
             vnode.attrs.form.fundraiseLength = e.target.value;
           }}
         />
@@ -191,6 +189,14 @@ export default class CreateProjectForm implements m.ClassComponent {
                 } else if (this.stage === 'fundraising') {
                   this.stage = 'description';
                 }
+              },
+            }),
+            m(Button, {
+              disabled: this.stage !== 'description',
+              label: 'Submit',
+              onclick: (e) => {
+                e.preventDefault();
+                console.log(this.form);
               },
             }),
           ]
