@@ -65,6 +65,7 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
+    // TODO FIX THIS
     return queryInterface.sequelize.transaction(async (t) => {
       // Update Chains back
       await queryInterface.changeColumn('Chains', 'default_symbol',
