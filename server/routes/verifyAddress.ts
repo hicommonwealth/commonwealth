@@ -26,6 +26,7 @@ import {
   pubkeyToAddress,
   serializeSignDoc,
   decodeSignature,
+  StdSignDoc,
 } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
@@ -155,7 +156,7 @@ const verifySignature = async (
     //
 
     // provided string should be serialized AminoSignResponse object
-    const { signed, signature: stdSignature } =
+    const { signature: stdSignature } =
       JSON.parse(signatureString);
 
     // we generate an address from the actual public key and verify that it matches,
@@ -171,19 +172,10 @@ const verifySignature = async (
         stdSignature.pub_key,
         bech32Prefix
       );
-      const generatedAddressWithCosmosPrefix = pubkeyToAddress(
-        stdSignature.pub_key,
-        'cosmos'
-      );
 
-      if (
-        generatedAddress === addressModel.address ||
-        generatedAddressWithCosmosPrefix === addressModel.address
-      ) {
-
+      if (generatedAddress === addressModel.address) {
         try {
-
-          /* instead of writing to Chain, just directly verify the generated signature, generated via SignBytes */
+          // directly verify the generated signature, generated via SignBytes
           const { pubkey, signature } = decodeSignature(stdSignature)
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new Sha256(
@@ -195,10 +187,8 @@ const verifySignature = async (
             messageHash,
             pubkey
           );
-
         } catch (e) {
-          console.log(e);
-          isValid = false; 
+          isValid = false;
         }
       }
     }
@@ -234,35 +224,35 @@ const verifySignature = async (
         generatedAddressWithCosmosPrefix === addressModel.address
       ) {
 
-        let chainId;
+        let generatedSignDoc: StdSignDoc;
 
         try {
           // query chain ID from URL
           const node = await chain.getChainNode();
           const client = await StargateClient.connect(node.url);
-          chainId = await client.getChainId();
+          const chainId = await client.getChainId();
           client.disconnect();
-        } catch (e) {
-          console.log(e);
-        }
 
-        const generatedSignDoc = validationTokenToSignDoc(
-          chainId,
-          addressModel.verification_token.trim(),
-          signed.fee,
-          signed.memo,
-          <any>signed.msgs
-        );
+          generatedSignDoc = validationTokenToSignDoc(
+            chainId,
+            addressModel.verification_token.trim(),
+            signed.fee,
+            signed.memo,
+            <any>signed.msgs
+          );
+        } catch (e) {
+          log.info(e.message);
+        }
 
         // ensure correct document was signed
         if (
+          generatedSignDoc &&
           serializeSignDoc(signed).toString() ===
           serializeSignDoc(generatedSignDoc).toString()
         ) {
           // ensure valid signature
           const { pubkey, signature } = decodeSignature(stdSignature);
 
-          console.log("Signature:", signature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new Sha256(
             serializeSignDoc(generatedSignDoc)
@@ -278,7 +268,6 @@ const verifySignature = async (
           if (!isValid) {
             log.error('Signature verification failed.');
           }
-          console.log("isValid:", isValid);
         } else {
           log.error(
             `Sign doc not matched. Generated: ${JSON.stringify(
