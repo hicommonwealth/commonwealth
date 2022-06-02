@@ -10,13 +10,11 @@ export enum ComponentType {
   Icon = 'Icon',
   IconButton = 'IconButton',
   Modal = 'Modal',
-  Overlay = 'Overlay',
   Popover = 'Popover',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   Text = 'Text',
   TextInput = 'TextInput',
-  Tooltip = 'Tooltip',
 }
 
 export type StyleAttrs = {
