@@ -7,6 +7,7 @@ import {
   IChainEventData,
   CommonwealthTypes,
 } from '@commonwealth/chain-events';
+import { ChainInstance } from 'server/models/chain';
 import { ICuratedProject__factory } from '../../shared/eth/types';
 import { addPrefix, factory } from '../../shared/logging';
 import { DB } from '../database';
@@ -16,7 +17,7 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models: DB,
-    private readonly _node: ChainNodeAttributes
+    private readonly _node: ChainInstance
   ) {
     super();
   }
@@ -27,7 +28,9 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(
+      addPrefix(__filename, [event.network, event.chain])
+    );
 
     if (event.data.kind === CommonwealthTypes.EventKind.ProjectCreated) {
       // handle creation event by checking against projects table
@@ -65,7 +68,7 @@ export default class extends IEventHandler {
       provider.disconnect(1000, 'finished');
 
       const ipfsHashId = await this._models.IpfsPins.findOne({
-        where: { ipfs_hash: ipfsHash }
+        where: { ipfs_hash: ipfsHash },
       });
       const ipfsParams = ipfsHashId ? { ipfs_hash_id: ipfsHashId.id } : {};
 
@@ -94,7 +97,7 @@ export default class extends IEventHandler {
       }
       const amount = new BN(event.data.amount);
       const projectRow = await this._models.Project.findOne({
-        where: { entity_id: entityId }
+        where: { entity_id: entityId },
       });
       if (!projectRow) {
         log.error(`Entity not found for id: ${entityId}`);
