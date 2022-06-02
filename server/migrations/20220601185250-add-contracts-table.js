@@ -40,7 +40,9 @@ module.exports = {
           type: c.network,
         }], {transaction: t});
         console.log('2')
-        const contract = await queryInterface.sequelize.query(`SELECT * FROM "Contracts" WHERE address='${c.address}';`, { transaction: t});
+        const contract = await queryInterface.sequelize.query(
+          `SELECT * FROM "Contracts" WHERE address='${c.address}';`,
+          { transaction: t});
         if (!contract[0][0].id) console.log('null!', contract[0]);
         await queryInterface.bulkInsert('CommunityContracts', [{
           community_id: c.cid,
@@ -68,14 +70,21 @@ module.exports = {
       await queryInterface.changeColumn('Chains', 'default_symbol',
         { type: Sequelize.STRING, allowNull: false }, { transaction: t });
       await queryInterface.renameColumn('Chains', 'default_symbol', 'symbol', { transaction: t });
-      await queryInterface.addColumn('Chains', 'decimals', { type: Sequelize.INTEGER, allowNull: true }, { transaction: t });
-      await queryInterface.addColumn('Chains', 'address', { type: Sequelize.STRING, allowNull: true }, { transaction: t });
+      await queryInterface.addColumn('Chains', 'decimals',
+        { type: Sequelize.INTEGER, allowNull: true }, { transaction: t });
+      await queryInterface.addColumn('Chains', 'address',
+        { type: Sequelize.STRING, allowNull: true }, { transaction: t });
 
-      const contracts = await queryInterface.sequelize.query(`SELECT c.decimals, c.address, cc.community_id FROM "Contracts" c LEFT JOIN "CommunityContracts" cc ON c.id = cc.contract_id;`, { transaction: t });
+      const contracts = await queryInterface.sequelize.query(
+        `SELECT c.decimals, c.address, cc.community_id FROM "Contracts" c 
+        LEFT JOIN "CommunityContracts" cc ON c.id = cc.contract_id;`,
+        { transaction: t });
 
       await Promise.all(contracts[0].map(async (c) => {
         // Add contract stuff back on Chains model
-        await queryInterface.sequelize.query(`UPDATE "Chains" c SET decimals=${c.decimals}, address='${c.address}' WHERE c.id = ${c.community_id};`, {transaction: t });
+        await queryInterface.sequelize.query(
+          `UPDATE "Chains" c SET decimals=${c.decimals}, address='${c.address}' WHERE c.id = ${c.community_id};`,
+          {transaction: t });
       }));
 
 
