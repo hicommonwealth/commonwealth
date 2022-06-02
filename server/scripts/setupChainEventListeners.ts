@@ -103,8 +103,8 @@ export const generateHandlers = (
   }
 
   // only handle CWP events on Common Protocol
-  if (node.Chain.network === ChainNetwork.CommonProtocol) {
-    const projectHandler = new ProjectHandler(models, node);
+  if (chain.network === ChainNetwork.CommonProtocol) {
+    const projectHandler = new ProjectHandler(models, chain.ChainNode);
     handlers.push(projectHandler);
   }
 
@@ -217,14 +217,14 @@ const setupChainEventListeners = async (
             api,
             verbose: true,
           });
-        } else if (node.Chain.network === ChainNetwork.CommonProtocol) {
-          const api = await CommonwealthEvents.createApi(node.url, node.address);
+        } else if (node.network === ChainNetwork.CommonProtocol) {
+          const api = await CommonwealthEvents.createApi(node.ChainNode.url, node.address);
           const handlers = generateHandlers(node, wss);
           subscriber = await CommonwealthEvents.subscribeEvents({
-            chain: node.chain,
+            chain: node.id,
             handlers,
             skipCatchup,
-            discoverReconnectRange: () => discoverReconnectRange(node.chain),
+            discoverReconnectRange: () => discoverReconnectRange(node.id),
             api,
             verbose: true,
           });
