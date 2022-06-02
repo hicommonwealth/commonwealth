@@ -102,8 +102,9 @@ import NotificationsReadFactory, {
   NotificationsReadModelStatic,
 } from './models/notifications_read';
 import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
-import { ContractModelStatic } from './models/contract';
-import { CommunityContractModelStatic } from './models/community_contract';
+import ContractFactory, { ContractModelStatic } from './models/contract';
+import CommunityContractFactory, { CommunityContractModelStatic } from './models/community_contract';
+
 
 export type Models = {
   Address: AddressModelStatic;
@@ -197,6 +198,8 @@ const models: Models = {
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
+  Contract: ContractFactory(sequelize, DataTypes),
+  CommunityContract: CommunityContractFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
   ContractItem: ContractItemFactory(sequelize, DataTypes),
