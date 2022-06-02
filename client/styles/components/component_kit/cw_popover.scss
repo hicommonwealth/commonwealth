@@ -35,31 +35,44 @@
   }
 
   &.solidArrow {
-    background-color: $primary-100;
-    border-color: $primary-100;
-
-    .Text {
-      color: $neutral-800;
-    }
+    @include solidTooltipStyles;
   }
 
-  // &.singleLine {
-  //   background-color: $neutral-800;
-  //   border-color: $neutral-800;
-  //   height: 24px;
-  //   max-width: 400px;
-  //   padding: 4px 8px;
-  // }
+  &.solidNoArrow {
+    @include solidTooltipStyles;
+  }
+
+  &.singleLine {
+    background-color: $neutral-800;
+    border-color: $neutral-800;
+    height: 24px;
+    max-width: 400px;
+    padding: 4px 8px;
+  }
 }
+
+// no styles for solidNoArrow since we don't want an arrow, duh
 
 .arrow-up {
   @include borderedArrowStyles(up);
+
+  &.solidArrow {
+    @include solidArrowStyles(up);
+  }
 }
 
 .arrow-down {
   @include borderedArrowStyles(down);
+
+  &.solidArrow {
+    @include solidArrowStyles(down);
+  }
 }
 
 .arrow-left {
   @include borderedArrowStyles(left);
+
+  &.solidArrow {
+    @include solidArrowStyles(left);
+  }
 }

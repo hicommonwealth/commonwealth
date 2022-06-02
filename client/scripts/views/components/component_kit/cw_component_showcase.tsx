@@ -126,6 +126,30 @@ export class ComponentShowcase implements m.ClassComponent {
               trigger={<CWIcon iconName="infoEmpty" />}
             />
           </div>
+          <div class="tooltip-row">
+            <CWText>Solid background, no arrow</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipText={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="solidNoArrow"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Single line</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipText={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="singleLine"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
         </div>
         <h1>Buttons</h1>
         <div class="button-gallery">

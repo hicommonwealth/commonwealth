@@ -7,14 +7,18 @@ import { CWText } from './cw_text';
 
 export type TooltipType =
   | 'bordered'
+  | 'singleLine'
   | 'solidArrow'
-  | 'solidNoArrow'
-  | 'singleLine';
+  | 'solidNoArrow';
 
 type TooltipAttrs = {
   tooltipText: string;
-  tooltipType: TooltipType;
 } & SharedPopoverAttrs;
+
+// Gabe 6/1/22 TODO: We probably need a hoverCloseDelay too,
+// but maybe hardcoded as opposed to an attr. Via Aden:
+// "[tooltip] should only exist for 1.5 seconds on hover
+// otherwise disappearing until they hover again"
 
 export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
   view(vnode) {

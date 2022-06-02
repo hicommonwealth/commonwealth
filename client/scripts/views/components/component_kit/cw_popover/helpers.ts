@@ -1,3 +1,5 @@
+import { TooltipType } from '../cw_tooltip';
+
 export const getPosition = ({
   trigger,
   container,
@@ -161,23 +163,22 @@ export function findRef(dom, ref) {
 
 export const applyArrowStyles = (
   arrowId: string,
-  inlineStyle: any,
-  singleLine?: boolean,
-  hasArrow?: boolean
+  inlineStyle: any, // Gabe 6/1/22 TODO - Type for real
+  tooltipType?: TooltipType
 ) => {
   const arrow = document.getElementById(arrowId);
 
   switch (inlineStyle.popoverPlacement) {
     case 'above': {
-      arrow.className = `arrow-down${singleLine ? ' singleLine' : ''}`;
+      arrow.className = `arrow-down ${tooltipType}`;
       break;
     }
     case 'below': {
-      arrow.className = `arrow-up${singleLine ? ' singleLine' : ''}`;
+      arrow.className = `arrow-up ${tooltipType}`;
       break;
     }
     case 'right': {
-      arrow.className = `arrow-left${singleLine ? ' singleLine' : ''}`;
+      arrow.className = `arrow-left ${tooltipType}`;
       break;
     }
     default: {
@@ -188,7 +189,7 @@ export const applyArrowStyles = (
   arrow.style.top = `${inlineStyle.arrowTopYAmount}px`;
   arrow.style.left = `${inlineStyle.arrowLeftXAmount}px`;
 
-  if (hasArrow && inlineStyle.showArrow) {
+  if (tooltipType !== 'solidNoArrow' && inlineStyle.showArrow) {
     arrow.style.visibility = 'visible';
   }
 };

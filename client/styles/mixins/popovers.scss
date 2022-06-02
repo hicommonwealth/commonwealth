@@ -75,3 +75,40 @@
     }
   }
 }
+
+@mixin solidTooltipStyles {
+  background-color: $primary-100;
+  border-color: $primary-100;
+
+  .Text {
+    color: $neutral-800;
+  }
+}
+
+@mixin solidArrowStyles($direction) {
+  @if $direction == up {
+    &::before {
+      border-bottom: 8px solid $primary-100;
+    }
+
+    &::after {
+      border-bottom: 8px solid $primary-100;
+    }
+  } @else if $direction == down {
+    &::before {
+      border-top: 8px solid $primary-100;
+    }
+
+    &::after {
+      border-top: 8px solid $primary-100;
+    }
+  } @else {
+    &::before {
+      border-right: 8px solid $primary-100;
+    }
+
+    &::after {
+      border-right: 8px $primary-100;
+    }
+  }
+}

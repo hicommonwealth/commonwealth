@@ -21,21 +21,16 @@ export type SharedPopoverAttrs = {
   hoverOpenDelay?: number;
   interactionType?: PopoverInteractionType;
   persistOnHover?: boolean;
+  tooltipType?: TooltipType;
   toSide?: boolean;
   trigger: m.Vnode;
 };
 
 type PopoverAttrs = {
   content: m.Children;
-  tooltipType?: TooltipType;
   onToggle?: (isOpen: boolean) => void;
   // Gabe 6/1/22 TODO: persistOnHover won't work without a hoverOpenDelay of at least 50
 } & SharedPopoverAttrs;
-
-// Gabe 6/1/22 TODO: We probably need a hoverCloseDelay too,
-// but maybe hardcoded as opposed to an attr. Via Aden:
-// "[tooltip] should only exist for 1.5 seconds on hover
-// otherwise disappearing until they hover again"
 
 export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   private arrowId: string;
@@ -93,12 +88,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
       popoverContainer.style.visibility = 'visible';
 
       if (vnode.attrs.tooltipType) {
-        applyArrowStyles(
-          this.arrowId,
-          inlineStyle,
-          vnode.attrs.singleLine,
-          vnode.attrs.tooltipType
-        );
+        applyArrowStyles(this.arrowId, inlineStyle, vnode.attrs.tooltipType);
       }
 
       this.isRendered = true;
