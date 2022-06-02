@@ -33,7 +33,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
-  MissingRootId: 'Must provide root_id',
+  MissingRootId: 'Must provide valid root_id',
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
@@ -61,58 +61,15 @@ const createComment = async (
 
   const { parent_id, root_id, text } = req.body;
 
-  const thread_id = root_id.substring(root_id.indexOf('_') + 1);
-  const thread = await models.OffchainThread.findOne({
-    where: { id: thread_id },
-  });
-
-  if (thread) {
-    const { rule_id } = await models.OffchainTopic.findOne({
-      include: {
-        model: models.OffchainThread,
-        where: { id: thread.id },
-        required: true,
-      },
-      attributes: ['rule_id'],
-    });
-    const passesRules = await checkRule(ruleCache, models, rule_id, author.address);
-    if (!passesRules) {
-      return next(new Error(Errors.RuleCheckFailed));
-    }
+  if (!root_id || root_id.indexOf('_') === -1) {
+    return next(new Error(Errors.MissingRootId));
   }
-
-  if (chain && chain.type === ChainType.Token) {
-    // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
-    if (thread && !req.user.isAdmin && isAdmin.length === 0) {
-      try {
-        const canReact = await tokenBalanceCache.validateTopicThreshold(
-          thread.topic_id,
-          req.body.address
-        );
-        if (!canReact) {
-          return next(new Error(Errors.BalanceCheckFailed));
-        }
-      } catch (e) {
-        log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.BalanceCheckFailed));
-      }
-    }
+  if (
+    (!text || !text.trim()) &&
+    (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
+  ) {
+    return next(new Error(Errors.MissingTextOrAttachment));
   }
-
-  const plaintext = (() => {
-    try {
-      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(text)));
-    } catch (e) {
-      return decodeURIComponent(text);
-    }
-  })();
 
   let parentComment;
   if (parent_id) {
@@ -140,15 +97,62 @@ const createComment = async (
     }
   }
 
-  if (!root_id) {
-    return next(new Error(Errors.MissingRootId));
+  const thread_id = root_id.substring(root_id.indexOf('_') + 1);
+  const thread = await models.OffchainThread.findOne({
+    where: { id: thread_id },
+  });
+
+  if (thread?.id) {
+    const topic = await models.OffchainTopic.findOne({
+      include: {
+        model: models.OffchainThread,
+        where: { id: thread.id },
+        required: true,
+        as: 'threads',
+      },
+      attributes: ['rule_id'],
+    });
+    if (topic?.rule_id) {
+      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+      if (!passesRules) {
+        return next(new Error(Errors.RuleCheckFailed));
+      }
+    }
   }
-  if (
-    (!text || !text.trim()) &&
-    (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
-  ) {
-    return next(new Error(Errors.MissingTextOrAttachment));
+
+  if (chain && chain.type === ChainType.Token) {
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (thread?.topic_id && !req.user.isAdmin && isAdmin.length === 0) {
+      try {
+        const canReact = await tokenBalanceCache.validateTopicThreshold(
+          thread.topic_id,
+          req.body.address
+        );
+        if (!canReact) {
+          return next(new Error(Errors.BalanceCheckFailed));
+        }
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.BalanceCheckFailed));
+      }
+    }
   }
+
+  const plaintext = (() => {
+    try {
+      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(text)));
+    } catch (e) {
+      return decodeURIComponent(text);
+    }
+  })();
+
   try {
     const quillDoc = JSON.parse(decodeURIComponent(text));
     if (

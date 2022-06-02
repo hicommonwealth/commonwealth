@@ -81,13 +81,15 @@ const updateOffchainVote = async (
     return next(new Error(Errors.BalanceCheckFailed));
   }
 
-  const { rule_id } = await models.OffchainTopic.findOne({
+  const topic = await models.OffchainTopic.findOne({
     where: { id: thread.topic_id },
     attributes: ['rule_id'],
   });
-  const passesRules = await checkRule(ruleCache, models, rule_id, author.address);
-  if (!passesRules) {
-    return next(new Error(Errors.RuleCheckFailed));
+  if (topic?.rule_id) {
+    const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+    if (!passesRules) {
+      return next(new Error(Errors.RuleCheckFailed));
+    }
   }
 
   let vote: OffchainVoteInstance;

@@ -71,17 +71,20 @@ const createReaction = async (
   }
 
   if (thread) {
-    const { rule_id } = await models.OffchainTopic.findOne({
+    const topic = await models.OffchainTopic.findOne({
       include: {
         model: models.OffchainThread,
         where: { id: thread.id },
         required: true,
+        as: 'threads',
       },
       attributes: ['rule_id'],
     });
-    const passesRules = await checkRule(ruleCache, models, rule_id, author.address);
-    if (!passesRules) {
-      return next(new Error(Errors.RuleCheckFailed));
+    if (topic?.rule_id) {
+      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+      if (!passesRules) {
+        return next(new Error(Errors.RuleCheckFailed));
+      }
     }
   }
 
