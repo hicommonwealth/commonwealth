@@ -20,7 +20,7 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
-import { checkRule } from '../util/ruleParser';
+import checkRule from '../util/checkRule';
 import RuleCache from '../util/ruleCache';
 
 const log = factory.getLogger(formatFilename(__filename));

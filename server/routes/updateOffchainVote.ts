@@ -10,7 +10,7 @@ import {
   OffchainVoteAttributes,
   OffchainVoteInstance,
 } from '../models/offchain_vote';
-import { checkRule } from '../util/ruleParser';
+import checkRule from '../util/checkRule';
 import RuleCache from '../util/ruleCache';
 
 export const Errors = {
