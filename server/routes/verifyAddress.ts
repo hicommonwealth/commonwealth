@@ -7,6 +7,9 @@ import { StargateClient } from '@cosmjs/stargate';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 
+import jscrypto from 'jscrypto';
+import secp256k1 from 'secp256k1';
+
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringOptions } from '@polkadot/keyring/types';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
@@ -145,6 +148,59 @@ const verifySignature = async (
       if (addressModel.address === injAddress) isValid = true;
     } catch (e) {
       isValid = false;
+    }
+  } else if (chain.base === ChainBase.CosmosSDK && chain.bech32_prefix === 'terra') {
+        //
+    // cosmos-sdk address handling
+    //
+
+    // provided string should be serialized AminoSignResponse object
+    const { signed, signature: stdSignature } =
+      JSON.parse(signatureString);
+
+    // we generate an address from the actual public key and verify that it matches,
+    // this prevents people from using a different key to sign the message than
+    // the account they registered with.
+    // TODO: ensure ion works
+    const bech32Prefix = chain.bech32_prefix;
+    if (!bech32Prefix) {
+      log.error('No bech32 prefix found.');
+      isValid = false;
+    } else {
+      const generatedAddress = pubkeyToAddress(
+        stdSignature.pub_key,
+        bech32Prefix
+      );
+      const generatedAddressWithCosmosPrefix = pubkeyToAddress(
+        stdSignature.pub_key,
+        'cosmos'
+      );
+
+      if (
+        generatedAddress === addressModel.address ||
+        generatedAddressWithCosmosPrefix === addressModel.address
+      ) {
+
+        try {
+
+          /* instead of writing to Chain, just directly verify the generated signature, generated via SignBytes */
+          const { pubkey, signature } = decodeSignature(stdSignature)
+          const secpSignature = Secp256k1Signature.fromFixedLength(signature);
+          const messageHash = new Sha256(
+            Buffer.from(addressModel.verification_token.trim())
+          ).digest();
+
+          isValid = await Secp256k1.verifySignature(
+            secpSignature,
+            messageHash,
+            pubkey
+          );
+
+        } catch (e) {
+          console.log(e);
+          isValid = false; 
+        }
+      }
     }
   } else if (chain.base === ChainBase.CosmosSDK) {
     //
