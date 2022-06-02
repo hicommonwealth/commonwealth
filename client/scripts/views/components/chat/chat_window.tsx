@@ -9,14 +9,15 @@ import 'pages/chat.scss';
 import app from 'state';
 import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
-import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { WebsocketMessageNames } from 'types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
 import { Icons, Icon } from 'construct-ui';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import QuillEditor from '../quill_editor';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import QuillFormattedText from '../quill_formatted_text';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -41,6 +42,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
   private scrollToBottom: () => void;
   private shouldScroll: boolean;
   private shouldScrollToHighlight: boolean;
+  private quillEditorState: any;
 
   oninit(vnode) {
     this.shouldScroll = true;
@@ -93,36 +95,50 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       return acc;
     }, []);
 
-    const handleSubmitMessage = (e) => {
-      if (e.type === 'click' || (e.keyCode === 13 && !e.shiftKey)) {
-        e.preventDefault();
-        if (!app.socket.chatNs.isConnected) return;
-        const $textarea = $(e.target)
-          .closest('form')
-          .find('textarea.ResizableTextarea');
+    const handleSubmitMessage = () => {
+      if (this.quillEditorState.editor.editor.isBlank()) {
+        notifyError("Cannot send a blank message")
+        return;
+      }
 
-        if ($textarea.val().toString().length === 0) {
-          return;
-        }
+      const { quillEditorState } = vnode.state;
 
-        const message = {
-          message: $textarea.val(),
+      app.socket.chatNs.sendMessage(
+        {
+          message: JSON.stringify(quillEditorState.editor.getContents()),
           address: app.user.activeAccount.address,
           chat_channel_id: channel.id,
           now: moment().toISOString(),
-        };
-        app.socket.chatNs.sendMessage(message, channel);
-        mixpanelBrowserTrack({
-          event: MixpanelChatEvents.NEW_CHAT_SENT,
-          community: app.activeChainId(),
-          isCustomDomain: app.isCustomDomain(),
-        });
-        $textarea.val('');
+        }, channel);
+
+      if (quillEditorState.editor) {
+        quillEditorState.editor.enable();
+        quillEditorState.editor.setContents();
+        quillEditorState.clearUnsavedChanges();
       }
-    };
+
+      mixpanelBrowserTrack({
+        event: MixpanelChatEvents.NEW_CHAT_SENT,
+        community: app.activeChainId(),
+        isCustomDomain: app.isCustomDomain(),
+      });
+    }
 
     const messageIsHighlighted = (message: any): boolean => {
       return m.route.param('message') && Number(m.route.param('message')) === message.id
+    }
+
+    const messageToText = (msg: any) => {
+      try {
+        const doc = JSON.parse(msg.message);
+        if (!doc.ops) throw new Error();
+        return m(QuillFormattedText, { doc })
+      } catch {
+        return m(MarkdownFormattedText, {
+          doc: msg.message,
+          openLinksInNewTab: true,
+        })
+      }
     }
 
     return (
@@ -167,10 +183,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
               <div class="clear" />
               {grp.messages.map((msg) => (
                 <div class="chat-message-text">
-                  {m(MarkdownFormattedText, {
-                    doc: msg.message,
-                    openLinksInNewTab: true,
-                  })}
+                  {messageToText(msg)}
                 </div>
               ))}
             </div>
@@ -185,24 +198,25 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
           </div>
         ) : !app.socket.chatNs.isConnected ? (
           <div class="chat-composer-unavailable">Waiting for connection</div>
-        ) : (
-          <form
-            class={`chat-composer${
+        ) :
+          <div
+          class={`chat-composer${
               app.socket.chatNs.isConnected ? '' : ' disabled'
             }`}
           >
-            {m(ResizableTextarea, {
-              name: 'chat',
-              rows: 1,
-              disabled: !app.socket.chatNs.isConnected,
-              placeholder: app.socket.chatNs.isConnected
-                ? 'Enter a message...'
-                : 'Disconnected',
-              onkeypress: handleSubmitMessage,
+            {m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+              },
+              editorNamespace: `${document.location.pathname}-chatting`,
+              onkeyboardSubmit: () => {
+                handleSubmitMessage();
+              },
             })}
             <CWIcon iconName="send" onclick={handleSubmitMessage} />
-          </form>
-        )}
+          </div>
+        }
       </div>
     );
   }
