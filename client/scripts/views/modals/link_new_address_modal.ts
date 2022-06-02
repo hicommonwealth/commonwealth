@@ -3,18 +3,18 @@ import 'modals/link_new_address_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 
-import { Button, Input, TextArea, Spinner } from 'construct-ui';
+import { Button, Input, Spinner, TextArea } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
 import { ChainBase, ChainNetwork } from 'types';
-import { AddressInfo, Account, IWebWallet } from 'models';
+import { Account, AddressInfo, IWebWallet } from 'models';
 import app, { ApiStatus } from 'state';
 
 import {
-  updateActiveAddresses,
   createUserWithAddress,
   setActiveAccount,
+  updateActiveAddresses,
 } from 'controllers/app/login';
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import Substrate from 'controllers/chain/substrate/main';
@@ -36,6 +36,7 @@ enum LinkNewAddressWallets {
   NEARWallet,
   CLIWallet,
 }
+
 interface ILinkNewAddressModalAttrs {
   loggingInWithAddress?: boolean; // determines whether the header says "Connect address" or "Login with address"
   joiningCommunity: string; // join community after verification
@@ -111,10 +112,7 @@ const LinkAccountItem: m.Component<
     const name =
       account.meta?.name ||
       (base === ChainBase.CosmosSDK
-        ? `${app.chain.meta.name} address ${account.address.slice(
-            0,
-            6
-          )}...`
+        ? `${app.chain.meta.name} address ${account.address.slice(0, 6)}...`
         : `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`);
     return m(
       '.LinkAccountItem.account-item',
@@ -365,7 +363,9 @@ const LinkNewAddressModal: m.Component<
         // load addresses for the current chain/community
         if (app.chain) {
           // TODO: this breaks when the user action creates a new token forum
-          const chain = app.user.selectedChain || app.config.chains.getById(app.activeChainId());
+          const chain =
+            app.user.selectedChain ||
+            app.config.chains.getById(app.activeChainId());
           await updateActiveAddresses(chain);
         } else {
           notifyError('Signed in, but no chain or community found');
@@ -461,20 +461,28 @@ const LinkNewAddressModal: m.Component<
                   onclick: async (vvnode) => {
                     await initWebWallet();
                   },
-                  label: !webWallet?.available
-                    ? 'No wallet detected'
-                    : vnode.state.initializingWallet !== false &&
+                  label: (() => {
+                    if (!webWallet?.available) return 'No wallet detected';
+                    else if (
+                      vnode.state.initializingWallet !== false &&
                       app.chain.networkStatus !== ApiStatus.Disconnected
-                    ? [
+                    ) {
+                      return [
                         m(Spinner, { size: 'xs', active: true }),
                         ' Connecting to chain...',
-                      ]
-                    : app.chain.networkStatus === ApiStatus.Disconnected
-                    ? [
-                        m(Spinner, { size: 'xs', active: true }),
-                        ' Connecting to chain...',
-                      ]
-                    : 'Connect to wallet',
+                      ];
+                    } else if (
+                      app.chain.networkStatus === ApiStatus.Disconnected
+                    ) {
+                      if (app.chain.network === ChainNetwork.Terra) {
+                        m.redraw();
+                      } else
+                        return [
+                          m(Spinner, { size: 'xs', active: true }),
+                          ' Connecting to chain...',
+                        ];
+                    } else return 'Connect to wallet';
+                  })(),
                 }),
               !webWallet?.available &&
                 m('.get-wallet-text', [
@@ -498,38 +506,49 @@ const LinkNewAddressModal: m.Component<
                 ]),
               webWallet?.enabled &&
                 m('.accounts-caption', [
-                  webWallet?.accounts.length === 0
-                    ? [
+                  (() => {
+                    if (webWallet?.accounts.length === 0) {
+                      return [
                         m('br'),
                         m(
                           'p',
                           'Wallet connected, but no accounts were found. Please make sure you are signed in to your wallet and try again.'
                         ),
-                      ]
-                    : webWallet.chain === ChainBase.Ethereum
-                    ? [
+                      ];
+                    } else if (webWallet.chain === ChainBase.Ethereum) {
+                      return [
                         // metamask + walletconnect
                         m(
                           'p.small-text',
                           'Use your wallet to switch between accounts.'
                         ),
-                      ]
-                    : [
+                      ];
+                    } else {
+                      return [
                         m('p', 'Select an address:'),
                         m(
                           'p.small-text',
                           'Look for a popup, or check your wallet/browser extension.'
                         ),
-                        webWallet.chain === ChainBase.CosmosSDK && // keplr wallet, terra station
-                          m('p.small-text', [
-                            `Because ${app.chain.meta.name} does not support signed verification messages, `,
-                            'you will be asked to sign a transaction that does nothing. It will not be submitted to the chain.',
-                          ]),
-                      ],
+                        (() => {
+                          if (
+                            webWallet.chain === ChainBase.CosmosSDK &&
+                            app.chain.network !== ChainNetwork.Terra
+                          ) {
+                            return m('p.small-text', [
+                              `Because ${app.chain.meta.name} does not support signed verification messages, `,
+                              'you will be asked to sign a transaction that does nothing. It will not be submitted to the chain.',
+                            ]);
+                          }
+                        })(),
+                      ];
+                    }
+                  })(),
                 ]),
               m('.accounts-list', [
-                app.chain.base === ChainBase.NEAR
-                  ? [
+                (() => {
+                  if (app.chain.base === ChainBase.NEAR) {
+                    return [
                       m(Button, {
                         intent: 'primary',
                         rounded: true,
@@ -558,9 +577,9 @@ const LinkNewAddressModal: m.Component<
                         },
                         label: 'Continue to NEAR wallet',
                       }),
-                    ]
-                  : app.chain.network === ChainNetwork.AxieInfinity
-                  ? [
+                    ];
+                  } else if (app.chain.network === ChainNetwork.AxieInfinity) {
+                    return [
                       m(Button, {
                         intent: 'primary',
                         rounded: true,
@@ -586,11 +605,14 @@ const LinkNewAddressModal: m.Component<
                         },
                         label: 'Continue to Ronin wallet',
                       }),
-                    ]
-                  : app.chain.networkStatus !== ApiStatus.Connected &&
+                    ];
+                  } else if (
+                    app.chain.networkStatus !== ApiStatus.Connected &&
                     app.chain.base === ChainBase.Substrate
-                  ? []
-                  : [
+                  ) {
+                    return [];
+                  } else {
+                    return [
                       webWallet?.accounts.map((addressOrAccount) =>
                         m(LinkAccountItem, {
                           account:
@@ -607,7 +629,9 @@ const LinkNewAddressModal: m.Component<
                           webWallet,
                         })
                       ),
-                    ],
+                    ];
+                  }
+                })(),
               ]),
               vnode.state.error &&
                 m(CWValidationText, {
