@@ -40,7 +40,7 @@ module.exports = {
         FROM "Chains" c 
         LEFT JOIN "ChainNodes" cn 
         ON c.chain_node_id = cn.id 
-        WHERE base='ethereum' AND address LIKE '0x%';`
+        WHERE base='ethereum' AND address LIKE '0x%';`; // TODO: INCLUDE SOLANA AND SOLANA TOKENS IN THIS QUERY TOO
       const chains = await queryInterface.sequelize.query(query, { transaction: t });
       await Promise.all(chains[0].map(async (c) => {
         // create Contract and CommuntiyContract
