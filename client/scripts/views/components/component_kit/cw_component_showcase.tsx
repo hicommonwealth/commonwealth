@@ -196,13 +196,6 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Button clicked!')}
           />
         </div>
-        <h1>Gradient Button</h1>
-        <div class="button-gallery">
-          <CWGradientButton
-            label="Primary"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
         <h1>External Link Buttons</h1>
         <div class="button-gallery">
           <CWExternalLink
