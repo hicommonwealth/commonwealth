@@ -167,7 +167,7 @@ $text-size-mobile-header: 22px;
     color: $neutral-500;
     margin: 0 24px 0 0;
 
-    @include small {
+    @include smallInclusive {
       margin: 0 16px 0 0;
     }
   }

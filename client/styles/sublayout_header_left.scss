@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .SublayoutHeaderLeft {
   display: flex;
@@ -27,7 +27,7 @@
     top: 3px;
   }
 
-  @include small {
+  @include smallInclusive {
     display: none;
   }
 }

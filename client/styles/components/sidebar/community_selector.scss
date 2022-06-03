@@ -1,10 +1,10 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .CommunitySelectList {
   transform: none !important; // override any scrolling effects
   left: $quick-switcher-width !important;
 
-  @include small {
+  @include smallInclusive {
     overflow-y: scroll;
   }
 

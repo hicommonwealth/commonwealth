@@ -7,7 +7,7 @@
   margin-right: 60px;
   border-bottom-width: 2px;
 
-  @include mediumSmall {
+  @include mediumSmallInclusive {
     margin-right: 0;
   }
 
@@ -109,7 +109,7 @@
       display: flex;
       margin-left: 20px;
 
-      @include mediumSmall {
+      @include mediumSmallInclusive {
         display: none;
       }
 
@@ -117,7 +117,7 @@
         border: 1px solid $neutral-100;
         margin-right: 25px;
 
-        @include small {
+        @include smallInclusive {
           // For temporary break point behavior
           margin-top: 5px;
         }

@@ -9,7 +9,7 @@ $small-chain-icon-size: 40px;
   justify-content: flex-start;
   width: 240px;
 
-  @include small {
+  @include smallInclusive {
     height: 220px;
     width: 136px;
   }
@@ -20,7 +20,7 @@ $small-chain-icon-size: 40px;
     margin-bottom: 8px;
     width: $large-chain-icon-size;
 
-    @include small {
+    @include smallInclusive {
       height: $small-chain-icon-size;
       width: $small-chain-icon-size;
     }
@@ -33,7 +33,7 @@ $small-chain-icon-size: 40px;
       justify-content: center;
       width: $large-chain-icon-size;
 
-      @include small {
+      @include smallInclusive {
         min-height: $small-chain-icon-size;
         width: $small-chain-icon-size;
       }
@@ -41,7 +41,7 @@ $small-chain-icon-size: 40px;
       .no-image-text.Text {
         color: $white;
 
-        @include small {
+        @include smallInclusive {
           font-family: $font-family-neue-haas-unica;
           font-size: 14px;
           line-height: 20px;
@@ -64,7 +64,7 @@ $small-chain-icon-size: 40px;
       // Gabe 5/24/22: not sure why I have to set this width
       // to get noWrap to work... to be continued...
 
-      @include small {
+      @include smallInclusive {
         font-family: $font-family-silka;
         font-size: 18px;
         line-height: 24px;
@@ -76,7 +76,7 @@ $small-chain-icon-size: 40px;
       display: none;
     }
 
-    @include small {
+    @include smallInclusive {
       .Button {
         display: none;
       }
@@ -94,7 +94,7 @@ $small-chain-icon-size: 40px;
       overflow: hidden;
       width: 152px;
 
-      @include small {
+      @include smallInclusive {
         font-family: $font-family-neue-haas-unica;
         font-size: 14px;
         line-height: 20px;
@@ -108,7 +108,7 @@ $small-chain-icon-size: 40px;
   height: 336px;
   width: 240px;
 
-  @include small {
+  @include smallInclusive {
     height: 220px;
     width: 136px;
   }
@@ -124,7 +124,7 @@ $small-chain-icon-size: 40px;
       margin-bottom: 48px;
       text-align: center;
 
-      @include small {
+      @include smallInclusive {
         font-family: $font-family-silka;
         font-size: 18px;
         line-height: 24px;
@@ -137,7 +137,7 @@ $small-chain-icon-size: 40px;
       margin-bottom: 48px;
       text-align: center;
 
-      @include small {
+      @include smallInclusive {
         font-family: $font-family-neue-haas-unica;
         font-size: 12px;
         letter-spacing: 0.02em;
@@ -146,7 +146,7 @@ $small-chain-icon-size: 40px;
       }
     }
 
-    @include small {
+    @include smallInclusive {
       a.learn-more {
         font-family: $font-family-neue-haas-unica;
         font-size: 12px;

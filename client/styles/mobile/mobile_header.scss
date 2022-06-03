@@ -1,9 +1,9 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .MobileHeader {
   display: none;
 
-  @include small {
+  @include smallInclusive {
     display: flex;
     left: 0;
     padding: 8px 16px;
@@ -101,7 +101,7 @@
       }
     }
 
-    @include small {
+    @include smallInclusive {
       .cui-icon {
         margin: auto;
       }
