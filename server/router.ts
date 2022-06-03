@@ -134,6 +134,10 @@ import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
 
+import getLatestTweet from './routes/getLatestTweet';
+import postTweet from './routes/postTweet';
+
+
 function setupRouter(
   app: Express,
   models: DB,
@@ -675,6 +679,38 @@ function setupRouter(
     // passport.authenticate('jwt', { session: false }),
     finishSsoLogin.bind(this, models)
   );
+
+  router.get('/auth/twitter', (req, res, next) => {
+    req.session.redirect = req.query.redirect;
+    const authenticator = passport.authenticate('twitter');
+    authenticator(req, res, next);
+  });
+
+  // TODO: Refactor
+  router.get('/auth/twitter/callback', (req, res, next) => {
+    passport.authenticate('twitter', (err) => {
+      const redirectUrl = req.session.redirect;
+      if (err || req.query.denied) {
+        console.warn('Error', err);
+        if (redirectUrl) {
+          res.redirect(
+            redirectUrl.substring(
+              0,
+              redirectUrl.indexOf('continueTwitterAttestation=true') - 1
+            )
+          );
+        } else {
+          res.redirect('/');
+        }
+      } else {
+        res.redirect(redirectUrl || '/');
+        delete req.session.redirect;
+      }
+    })(req, res, next);
+  });
+
+  router.get('/latest-tweet', getLatestTweet.bind(this, models));
+  router.post('/post-tweet', postTweet.bind(this, models));
 
   // logout
   router.get('/logout', logout.bind(this, models));

@@ -8,6 +8,7 @@ export type SocialAccountAttributes = {
   provider_username: string;
   provider_userid: string;
   access_token: string;
+  access_token_secret?: string;
   refresh_token: string;
   attested?: boolean;
   id?: number;
@@ -35,6 +36,7 @@ export default (
     provider_username: { type: dataTypes.STRING },
     provider_userid: { type: dataTypes.STRING },
     access_token: { type: dataTypes.STRING },
+    access_token_secret: { type: dataTypes.STRING, allowNull: true},
     refresh_token: { type: dataTypes.STRING },
     attested: { type: dataTypes.STRING, allowNull: false, defaultValue: false},
     created_at: { type: dataTypes.DATE, allowNull: false },
@@ -49,6 +51,13 @@ export default (
       { fields: ['user_id'] },
       { fields: ['user_id', 'provider'] },
     ],
+    defaultScope: {
+      attributes: {
+        exclude: [
+          'access_token_secret', 'access_token', 'refresh_token'
+        ],
+      }
+    }
   });
 
   SocialAccount.associate = (models) => {

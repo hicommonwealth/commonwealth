@@ -88,3 +88,11 @@ export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
 
 export const WEBSOCKET_ADMIN_USERNAME = process.env.WEBSOCKET_ADMIN_USERNAME;
 export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
+
+export const TWITTER_CLIENT_ID = process.env.TWITTER_CLIENT_ID;
+export const TWITTER_CLIENT_SECRET = process.env.TWITTER_CLIENT_SECRET;
+export const TWITTER_BEARER = process.env.TWITTER_BEARER;
+export const TWITTER_OAUTH_CALLBACK = process.env.TWITTER_OAUTH_CALLBACK
+  || (process.env.NODE_ENV === 'production'
+    ? 'https://commonwealth.im'
+    : 'http://127.0.0.1:8080') + '/api/auth/twitter/callback';
