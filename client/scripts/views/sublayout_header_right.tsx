@@ -31,18 +31,6 @@ export class SublayoutHeaderRight
 
     return (
       <div class="SublayoutHeaderRight">
-        {!app.isCustomDomain() && (
-          <CWGradientButton
-            buttonType="secondary"
-            label="We're hiring!"
-            onclick={() => {
-              window.open(
-                'https://angel.co/company/commonwealth-labs',
-                '_blank'
-              );
-            }}
-          />
-        )}
         {/* threadOnly option assumes all chains have proposals beyond threads */}
         {showNewProposalButton &&
           (narrowBrowserWidth ? (
