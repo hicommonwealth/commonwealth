@@ -113,9 +113,8 @@ const SelectAddressModal: m.Component<
           ? m('.select-address-placeholder', [
               m('p', [
                 `Connect ${
-                  (chainbase) ? 
-                    (app.chain.network === ChainNetwork.Terra) ? 
-                      'Terra' : chainbase[0].toUpperCase() + chainbase.slice(1) : 'Web3'
+                  (chainbase && app.chain.network === ChainNetwork.Terra) ? 'Terra' :
+                    (chainbase) ? chainbase[0].toUpperCase() + chainbase.slice(1) : 'Web3'
                 } address to join this community: `,
               ]),
             ])
