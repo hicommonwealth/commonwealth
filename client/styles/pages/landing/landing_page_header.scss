@@ -142,7 +142,7 @@ header {
   // }
 }
 
-@include sm-max {
+@include small {
   .menuButton {
     display: none;
   }

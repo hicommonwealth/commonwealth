@@ -27,7 +27,7 @@
     top: 3px;
   }
 
-  @include sm-max {
+  @include small {
     display: none;
   }
 }

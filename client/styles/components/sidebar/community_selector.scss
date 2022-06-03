@@ -4,7 +4,7 @@
   transform: none !important; // override any scrolling effects
   left: $quick-switcher-width !important;
 
-  @include sm-max {
+  @include small {
     overflow-y: scroll;
   }
 

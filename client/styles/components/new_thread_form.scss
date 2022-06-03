@@ -18,7 +18,7 @@
 
   .ql-editor {
     min-height: calc(100vh - 360px);
-    @include xs-max {
+    @include extraSmall {
       min-height: calc(100vh - 440px);
     }
   }
@@ -28,7 +28,7 @@
   &.is-modal.link-post .ql-editor {
     min-height: 115px;
   }
-  @include xs-max {
+  @include extraSmall {
     .ql-editor {
       max-height: calc(100vh - 310px) !important;
     }
@@ -69,7 +69,7 @@
 
   &.has-drafts .new-thread-form-body {
     max-width: calc(100% - 205px);
-    @include xs-max {
+    @include extraSmall {
       max-width: 100%;
       padding: 16px;
     }
@@ -91,7 +91,7 @@
         margin-left: 24px !important;
       }
       // center tabs on mobile
-      @include xs-max {
+      @include extraSmall {
         justify-content: center;
         padding-right: 0;
         .cui-tabs-item {
@@ -109,14 +109,14 @@
       a {
         font-weight: 500;
       }
-      @include xs-max {
+      @include extraSmall {
         width: 100%;
       }
     }
     .cui-form {
       margin: 0;
       margin-right: 28px;
-      @include xs-max {
+      @include extraSmall {
         margin-right: 0;
       }
       // space between title and topic
@@ -124,7 +124,7 @@
         padding: 18.8px 15.6px;
         margin-right: 12px;
         width: calc(100% - 12px);
-        @include xs-max {
+        @include extraSmall {
           margin-right: 0;
           width: 100%;
         }
@@ -151,7 +151,7 @@
     .cui-form {
       margin-left: 28px;
     }
-    @include xs-max {
+    @include extraSmall {
       .cui-tabs {
         padding: 0;
       }

@@ -121,12 +121,12 @@
       color: $neutral-900;
     }
   }
-  @include sm-max {
+  @include small {
     .info-row {
       flex-direction: column;
     }
   }
-  @include xxs-max {
+  @include extraSmall {
     .ProfileHeader,
     .Tabs {
       padding: 0 17px 12px 17px !important;
@@ -143,7 +143,7 @@
 }
 
 .xs-display-none {
-  @include md-max {
+  @include mediumSmall {
     display: none;
   }
 }
@@ -315,7 +315,7 @@
   }
   .bio-actions-breakpoint {
     display: none;
-    @include lg-max {
+    @include mediumSmall {
       display: block;
       flex-basis: 100%;
       height: 0;
@@ -327,7 +327,7 @@
     justify-content: space-between;
     margin-top: 12px;
 
-    @include md-max {
+    @include mediumSmall {
       a.btn,
       .cui-button {
         margin-right: 16px;
@@ -341,12 +341,12 @@
         text-transform: uppercase;
       }
     }
-    @include lg-min {
+    @include mediumSmall {
       display: none;
     }
   }
   .address-block-left {
-    @include md-max {
+    @include mediumSmall {
       display: flex;
       align-items: center;
 
@@ -355,7 +355,7 @@
         margin-right: 8px;
       }
     }
-    @include lg-min {
+    @include mediumSmall {
       display: none;
     }
   }
@@ -410,7 +410,7 @@
     }
   }
   .info-row {
-    @include md-max {
+    @include mediumSmall {
       margin-bottom: 16px;
       display: flex;
       span,
@@ -440,7 +440,7 @@
       }
     }
 
-    @include lg-min {
+    @include mediumSmall {
       display: none;
     }
   }

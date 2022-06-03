@@ -1,9 +1,9 @@
-@import "client/styles/shared";
+@import 'client/styles/shared';
 
 .SpecSettingsPage {
   height: 100%;
 
-  @include xs-max {
+  @include extraSmall {
     width: initial;
   }
 }

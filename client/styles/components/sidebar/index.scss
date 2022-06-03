@@ -28,7 +28,7 @@
     }
   }
 
-  @include sm-max {
+  @include small {
     display: none;
     left: 0;
     max-height: calc(100vh - 60px); // $mobile-header-height

@@ -3,7 +3,7 @@
 .MobileHeader {
   display: none;
 
-  @include sm-max {
+  @include small {
     display: flex;
     left: 0;
     padding: 8px 16px;
@@ -93,7 +93,7 @@
       }
     }
 
-    @include xs-max {
+    @include extraSmall {
       .MobileNewProposalButton .cui-button {
         .cui-button-label {
           top: 0 !important;
@@ -101,7 +101,7 @@
       }
     }
 
-    @include sm-max {
+    @include small {
       .cui-icon {
         margin: auto;
       }

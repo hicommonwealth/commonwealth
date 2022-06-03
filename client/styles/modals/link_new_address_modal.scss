@@ -90,7 +90,7 @@
     color: $neutral-500;
     margin: 26px auto 4px;
     max-width: 480px;
-    @include xs-max {
+    @include extraSmall {
       margin: 20px auto 10px;
     }
   }
@@ -106,7 +106,7 @@
     .link-address-combined-warning-icon {
       margin-right: 6px;
     }
-    @include xs-max {
+    @include extraSmall {
       margin-left: 20px;
       margin-right: 20px;
     }
@@ -135,7 +135,7 @@
       &.selected {
         border-color: $primary-500;
       }
-      @include xs-max {
+      @include extraSmall {
         height: initial;
         margin: 8px 8px;
       }
@@ -145,7 +145,7 @@
       background: $primary-400;
       padding: 15px 0 0;
       border-radius: 4px 4px 0 0;
-      @include xs-max {
+      @include extraSmall {
         padding-top: 12px;
       }
     }
@@ -361,7 +361,7 @@
       height: 92px;
     }
   }
-  @include xs-max {
+  @include extraSmall {
     min-width: 0;
     .link-address-step-narrow {
       width: 100%;

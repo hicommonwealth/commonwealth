@@ -8,7 +8,7 @@
   overflow: hidden;
   min-width: $quick-switcher-width;
 
-  @include sm-max {
+  @include small {
     display: none;
   }
 

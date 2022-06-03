@@ -7,7 +7,7 @@
   margin: 0 auto;
   width: 904px;
 
-  @include sm-max {
+  @include small {
     width: 100%;
   }
 
