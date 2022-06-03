@@ -1,11 +1,11 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_component_showcase.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
-import { CWGradientButton } from './cw_gradient_button';
 import { CWExternalLink } from './cw_external_link';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
