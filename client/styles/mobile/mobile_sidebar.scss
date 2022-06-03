@@ -15,6 +15,11 @@
     margin-bottom: 16px;
     width: 100%;
 
+    @include extraSmall {
+      display: flex;
+      flex-direction: column;
+    }
+
     @include gradientTabs();
 
     .cui-tabs-item.cui-active {

@@ -25,7 +25,7 @@ export class SublayoutHeaderRight
   view(vnode) {
     const { chain, showNewProposalButton } = vnode.attrs;
 
-    const narrowBrowserWidth = window.innerWidth < 904;
+    const narrowBrowserWidth = window.innerWidth < 1239;
 
     return (
       <div class="SublayoutHeaderRight">

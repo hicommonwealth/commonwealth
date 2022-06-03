@@ -23,7 +23,7 @@
     .email-interval-configuration-right {
       padding-right: 30px;
     }
-    @include small {
+    @include smallInclusive {
       .email-interval-configuration-left {
         margin-bottom: 20px;
       }

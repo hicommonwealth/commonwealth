@@ -152,6 +152,8 @@ $discussion-title-font-size: 1.45rem;
       }
       .proposal-body-link {
         display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
 
         > * div {
           margin-right: 8px;

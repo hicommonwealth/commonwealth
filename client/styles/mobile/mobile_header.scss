@@ -3,7 +3,7 @@
 .MobileHeader {
   display: none;
 
-  @include smallInclusive {
+  @include mediumSmallInclusive {
     display: flex;
     left: 0;
     padding: 8px 16px;
@@ -93,7 +93,7 @@
       }
     }
 
-    @include extraSmall {
+    @include smallInclusive {
       .MobileNewProposalButton .cui-button {
         .cui-button-label {
           top: 0 !important;
@@ -174,6 +174,8 @@
 
   .cui-menu {
     border: none;
+    display: flex;
+    width: 100%;
   }
 
   .sidebar-spacer {

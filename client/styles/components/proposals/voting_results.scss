@@ -66,7 +66,7 @@
       }
     }
   }
-  @include mediumSmall {
+  @include mediumSmallInclusive {
     display: block;
     width: 100%;
     .results-column,
