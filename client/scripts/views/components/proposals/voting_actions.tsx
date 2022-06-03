@@ -53,30 +53,31 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ProposalExtensions } from './proposal_extensions';
 import { CannotVote, CancelButton } from './voting_actions_components';
 
-export const VotingActions: m.Component<
-  { proposal: AnyProposal },
-  {
-    conviction: number;
-    amount: number;
-    votingModalOpen: boolean;
-  }
-> = {
-  view: (vnode) => {
+export class VotingActions
+  implements m.ClassComponent<{ proposal: AnyProposal }>
+{
+  private amount: number;
+  private conviction: number;
+  private votingModalOpen: boolean;
+
+  view(vnode) {
     const { proposal } = vnode.attrs;
-    const { votingModalOpen } = vnode.state;
+    const { votingModalOpen } = this;
+
     if (proposal instanceof SubstrateTreasuryProposal) {
       return;
       // TODO: Set up actions to create a council or democracy proposal
       // return m(CannotVote, { action: 'Send to council or democracy' });
     } else if (!app.isLoggedIn()) {
-      return m(CannotVote, { label: 'Log in to vote' });
+      return <CannotVote label="Log in to vote" />;
     } else if (!app.user.activeAccount) {
-      return m(CannotVote, { label: 'Connect an address to vote' });
+      return <CannotVote label="Connect an address to vote" />;
     } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
-      return m(CannotVote, { label: 'Cannot vote from this address' });
+      return <CannotVote label="Cannot vote from this address" />;
     }
 
     let user;
+
     if (
       proposal instanceof SubstrateDemocracyProposal ||
       proposal instanceof SubstrateDemocracyReferendum ||
@@ -95,17 +96,17 @@ export const VotingActions: m.Component<
     } else if (proposal instanceof NearSputnikProposal) {
       user = app.user.activeAccount as NearAccount;
     } else {
-      return m(CannotVote, { action: 'Unrecognized proposal type' });
+      return <CannotVote label="Unrecognized proposal type" />;
     }
 
     const onModalClose = () => {
-      vnode.state.votingModalOpen = false;
+      this.votingModalOpen = false;
       m.redraw();
     };
 
     const voteYes = async (e) => {
       e.preventDefault();
-      vnode.state.votingModalOpen = true;
+      this.votingModalOpen = true;
 
       if (proposal instanceof SubstrateDemocracyProposal) {
         createTXModal(
@@ -116,12 +117,12 @@ export const VotingActions: m.Component<
         );
         // TODO: new code, test
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
-        if (vnode.state.conviction === undefined) {
-          vnode.state.votingModalOpen = false;
+        if (this.conviction === undefined) {
+          this.votingModalOpen = false;
           return notifyError('Must select a conviction');
         }
-        if (vnode.state.amount === 0) {
-          vnode.state.votingModalOpen = false;
+        if (this.amount === 0) {
+          this.votingModalOpen = false;
           return notifyError('Must select a valid amount');
         }
         createTXModal(
@@ -129,8 +130,8 @@ export const VotingActions: m.Component<
             new BinaryVote(
               user,
               true,
-              vnode.state.amount,
-              convictionToWeight(vnode.state.conviction)
+              this.amount,
+              convictionToWeight(this.conviction)
             ),
             onModalClose
           )
@@ -145,7 +146,7 @@ export const VotingActions: m.Component<
           proposal
             .submitDepositTx(
               user,
-              (app.chain as Cosmos).chain.coins(vnode.state.amount)
+              (app.chain as Cosmos).chain.coins(this.amount)
             )
             .then(() => m.redraw())
             .catch((err) => notifyError(err.toString()));
@@ -178,26 +179,27 @@ export const VotingActions: m.Component<
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
-        vnode.state.votingModalOpen = false;
+        this.votingModalOpen = false;
         return notifyError(
           'Unimplemented proposal type - use election voting modal'
         );
       } else {
-        vnode.state.votingModalOpen = false;
+        this.votingModalOpen = false;
         return notifyError('Invalid proposal type');
       }
     };
+
     const voteNo = (e) => {
       e.preventDefault();
-      vnode.state.votingModalOpen = true;
+      this.votingModalOpen = true;
 
       if (proposal instanceof SubstrateDemocracyReferendum) {
-        if (vnode.state.conviction === undefined) {
-          vnode.state.votingModalOpen = false;
+        if (this.conviction === undefined) {
+          this.votingModalOpen = false;
           return notifyError('Must select a conviction'); // TODO: new code, test
         }
-        if (vnode.state.amount === 0) {
-          vnode.state.votingModalOpen = false;
+        if (this.amount === 0) {
+          this.votingModalOpen = false;
           return notifyError('Must select a valid amount');
         }
         createTXModal(
@@ -205,8 +207,8 @@ export const VotingActions: m.Component<
             new BinaryVote(
               user,
               false,
-              vnode.state.amount,
-              convictionToWeight(vnode.state.conviction)
+              this.amount,
+              convictionToWeight(this.conviction)
             ),
             onModalClose
           )
@@ -242,14 +244,14 @@ export const VotingActions: m.Component<
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
-        vnode.state.votingModalOpen = false;
+        this.votingModalOpen = false;
         return notifyError('Invalid proposal type');
       }
     };
 
     const processProposal = (e) => {
       e.preventDefault();
-      vnode.state.votingModalOpen = true;
+      this.votingModalOpen = true;
 
       if (proposal instanceof MolochProposal) {
         proposal
@@ -263,13 +265,14 @@ export const VotingActions: m.Component<
             notifyError(err.toString());
           });
       } else {
-        vnode.state.votingModalOpen = false;
+        this.votingModalOpen = false;
         return notifyError('Invalid proposal type');
       }
     };
+
     const voteAbstain = (e) => {
       e.preventDefault();
-      vnode.state.votingModalOpen = true;
+      this.votingModalOpen = true;
 
       if (proposal instanceof CosmosProposal) {
         proposal
@@ -285,13 +288,14 @@ export const VotingActions: m.Component<
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
-        vnode.state.votingModalOpen = false;
+        this.votingModalOpen = false;
         return notifyError('Invalid proposal type');
       }
     };
+
     const voteVeto = (e) => {
       e.preventDefault();
-      vnode.state.votingModalOpen = true;
+      this.votingModalOpen = true;
 
       if (proposal instanceof CosmosProposal) {
         proposal
@@ -299,13 +303,14 @@ export const VotingActions: m.Component<
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
-        vnode.state.votingModalOpen = false;
+        this.votingModalOpen = false;
         return notifyError('Invalid proposal type');
       }
     };
+
     const voteRemove = (e) => {
       e.preventDefault();
-      vnode.state.votingModalOpen = true;
+      this.votingModalOpen = true;
 
       if (proposal instanceof NearSputnikProposal) {
         proposal
@@ -321,7 +326,7 @@ export const VotingActions: m.Component<
             notifyError(err.toString());
           });
       } else {
-        vnode.state.votingModalOpen = false;
+        this.votingModalOpen = false;
         return notifyError('Invalid proposal type');
       }
     };
@@ -338,6 +343,7 @@ export const VotingActions: m.Component<
         proposal.getVotes().filter((vote) => {
           return vote.account.address === user.address;
         }).length > 0;
+
       hasVotedForAnyChoice = hasVotedYes;
     } else if (proposal instanceof CosmosProposal) {
       hasVotedYes =
@@ -348,6 +354,7 @@ export const VotingActions: m.Component<
             (vote) =>
               vote.choice === 'Yes' && vote.account.address === user.address
           ).length > 0;
+
       hasVotedNo =
         user &&
         proposal
@@ -356,6 +363,7 @@ export const VotingActions: m.Component<
             (vote) =>
               vote.choice === 'No' && vote.account.address === user.address
           ).length > 0;
+
       hasVotedAbstain =
         user &&
         proposal
@@ -364,6 +372,7 @@ export const VotingActions: m.Component<
             (vote) =>
               vote.choice === 'Abstain' && vote.account.address === user.address
           ).length > 0;
+
       hasVotedVeto =
         user &&
         proposal
@@ -383,6 +392,7 @@ export const VotingActions: m.Component<
               vote.choice === MolochVote.YES &&
               vote.account.address === user.address
           ).length > 0;
+
       hasVotedNo =
         user &&
         proposal
@@ -402,6 +412,7 @@ export const VotingActions: m.Component<
               vote.choice === BravoVote.YES &&
               vote.account.address === user.address
           ).length > 0;
+
       hasVotedNo =
         user &&
         proposal
@@ -411,6 +422,7 @@ export const VotingActions: m.Component<
               vote.choice === BravoVote.NO &&
               vote.account.address === user.address
           ).length > 0;
+
       hasVotedAbstain =
         user &&
         proposal
@@ -426,6 +438,7 @@ export const VotingActions: m.Component<
         proposal
           .getVotes()
           .find((vote) => vote.choice && vote.account.address === user.address);
+
       hasVotedNo =
         user &&
         proposal
@@ -444,6 +457,7 @@ export const VotingActions: m.Component<
               vote.choice === NearSputnikVoteString.Approve &&
               vote.account.address === user.address
           );
+
       hasVotedNo =
         user &&
         proposal
@@ -453,6 +467,7 @@ export const VotingActions: m.Component<
               vote.choice === NearSputnikVoteString.Reject &&
               vote.account.address === user.address
           );
+
       hasVotedRemove =
         user &&
         proposal
@@ -462,10 +477,12 @@ export const VotingActions: m.Component<
               vote.choice === NearSputnikVoteString.Remove &&
               vote.account.address === user.address
           );
+
       hasVotedForAnyChoice = hasVotedYes || hasVotedNo || hasVotedRemove;
     }
 
     let canVote = true;
+
     if (proposal.completed) {
       canVote = false;
     } else if (
@@ -503,6 +520,7 @@ export const VotingActions: m.Component<
     }
 
     let buttons;
+
     const yesButton = m('.yes-button', [
       m(Button, {
         disabled: !canVote || hasVotedYes || votingModalOpen,
@@ -512,6 +530,7 @@ export const VotingActions: m.Component<
         rounded: true,
       }),
     ]);
+
     const noButton = m('.no-button', [
       m(Button, {
         disabled: !canVote || hasVotedNo || votingModalOpen,
@@ -611,10 +630,10 @@ export const VotingActions: m.Component<
         <ProposalExtensions
           proposal={proposal}
           setDemocracyVoteConviction={(c) => {
-            vnode.state.conviction = c;
+            this.conviction = c;
           }}
           setDemocracyVoteAmount={(c) => {
-            vnode.state.amount = c;
+            this.amount = c;
           }}
         />,
       ];
@@ -624,7 +643,7 @@ export const VotingActions: m.Component<
         <ProposalExtensions
           proposal={proposal}
           setCosmosDepositAmount={(c) => {
-            vnode.state.amount = c;
+            this.amount = c;
           }}
         />,
       ];
@@ -696,5 +715,5 @@ export const VotingActions: m.Component<
       }`,
       [m('h3', 'Cast Your Vote'), votingActionObj]
     );
-  },
-};
+  }
+}
