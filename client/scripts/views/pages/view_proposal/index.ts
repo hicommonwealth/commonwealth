@@ -47,11 +47,7 @@ import {
   TopicEditorMenuItem,
   ThreadSubscriptionMenuItem,
 } from 'views/pages/discussions/discussion_row_menu';
-import ProposalVotingActions, {
-  CancelButton,
-  ExecuteButton,
-  QueueButton,
-} from 'views/components/proposals/voting_actions';
+import { VotingActions } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
@@ -121,6 +117,11 @@ import {
   ProposalHeaderBlockExplorerLink,
   ProposalHeaderVotingInterfaceLink,
 } from './proposal_header_links';
+import {
+  QueueButton,
+  ExecuteButton,
+  CancelButton,
+} from '../../components/proposals/voting_actions_components';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -315,8 +316,7 @@ const ProposalHeader: m.Component<
                             app.chain?.meta.snapshot.length > 0 &&
                             m(MenuItem, {
                               onclick: () => {
-                                const snapshotSpaces =
-                                  app.chain.meta.snapshot;
+                                const snapshotSpaces = app.chain.meta.snapshot;
                                 if (snapshotSpaces.length > 1) {
                                   navigateToSubpage('/multiple-snapshots', {
                                     action: 'create-from-thread',
@@ -808,7 +808,6 @@ const ProposalComments: m.Component<
     return m(
       '.ProposalComments',
       {
-        class: app.user.activeAccount ? '' : 'no-active-account',
         oncreate: (vvnode) => {
           vnode.state.dom = vvnode.dom;
         },
@@ -1359,7 +1358,7 @@ const ViewProposalPage: m.Component<
             !(proposal instanceof OffchainThread) &&
               m(ProposalVotingResults, { proposal }),
             !(proposal instanceof OffchainThread) &&
-              m(ProposalVotingActions, { proposal }),
+              m(VotingActions, { proposal }),
             m(ProposalComments, {
               proposal,
               comments,

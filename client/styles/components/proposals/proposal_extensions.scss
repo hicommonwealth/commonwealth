@@ -1,0 +1,14 @@
+@import 'shared';
+
+.ProposalExtensions {
+  margin-top: 18px;
+
+  .cui-overlay {
+    width: 100%;
+    position: relative;
+    top: -14px;
+  }
+  .cui-custom-select .cui-popover-content {
+    min-width: 200px;
+  }
+}
