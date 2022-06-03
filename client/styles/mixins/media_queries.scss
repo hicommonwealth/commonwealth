@@ -11,7 +11,7 @@
 }
 
 @mixin mediumSmall {
-  @media only screen and (min-width: 905px) and (min-width: 1239px) {
+  @media only screen and (min-width: 905px) and (max-width: 1239px) {
     @content;
   }
 }
