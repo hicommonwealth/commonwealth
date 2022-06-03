@@ -8,6 +8,7 @@ export type ChainNodeAttributes = {
   eth_chain_id?: number;
   alt_wallet_url?: string;
   private_url?: string;
+  chain_base: string;
 }
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
@@ -28,6 +29,7 @@ export default (
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
       alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
       private_url: { type: dataTypes.STRING, allowNull: true },
+      chain_base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
     },
     {
       tableName: 'ChainNodes',

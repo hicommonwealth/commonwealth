@@ -53,6 +53,9 @@ type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAt
   id: string;
   node_url: string;
   substrate_spec: string;
+  decimals: number;
+  symbol?: string;
+  address?: string;
 };
 
 type CreateChainResp = {
@@ -150,13 +153,6 @@ const createChain = async (
       privateUrl = node.private_url;
     }
 
-    const existingChain = await models.Chain.findOne({
-      where: { address: req.body.address, chain_node_id: node.id }
-    });
-    if (existingChain) {
-      return next(new Error(Errors.ChainAddressExists));
-    }
-
     const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
@@ -226,7 +222,7 @@ const createChain = async (
   const {
     id,
     name,
-    symbol,
+    default_symbol,
     icon_url,
     description,
     network,
@@ -272,13 +268,14 @@ const createChain = async (
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
+      chain_base: base,
     }
   });
 
   const chain = await models.Chain.create({
     id,
     name,
-    symbol,
+    default_symbol,
     icon_url,
     description,
     network,
@@ -290,13 +287,33 @@ const createChain = async (
     element,
     base,
     bech32_prefix,
-    decimals,
     active: true,
     substrate_spec: sanitizedSpec || '',
     chain_node_id: node.id,
-    address,
     token_name,
   });
+
+  // Make and Associate Contracts
+  let contract;
+  if (address) {
+    [contract] = await models.Contract.findOrCreate({
+      where: {
+        address,
+        chain_node_id: node.id,
+      },
+      defaults: {
+        address,
+        chain_node_id: node.id,
+        decimals,
+        token_name,
+        type: network, // TODO: Make better query param and validation for this
+      }
+    });
+    await models.CommunityContract.create({
+      community_id: chain.id,
+      contract_id: contract.id,
+    })
+  }
 
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;

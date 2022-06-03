@@ -8,6 +8,7 @@ import { AddressInstance } from '../models/address';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 
 import { factory, formatFilename } from '../../shared/logging';
+import { ContractInstance } from 'server/models/contract';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -15,7 +16,7 @@ export const Errors = {
   QueryFailed: 'Balance query failed',
 };
 
-type TokenBalanceReq = { address: string, author_chain: string, chain: string };
+type TokenBalanceReq = { address: string, author_chain: string, chain: string, contract_address: string };
 type TokenBalanceResp = string;
 
 const tokenBalance = async (
@@ -31,6 +32,8 @@ const tokenBalance = async (
   let chain: ChainInstance;
   let author: AddressInstance;
   let error: string;
+  let contract: ContractInstance;
+
   try {
     [chain, error] = await validateChain(models, req.body);
     if (error) throw new Error(error);
@@ -45,7 +48,20 @@ const tokenBalance = async (
   }
 
   try {
-    const balance = await tokenBalanceCache.getBalance(chain, author.address);
+    const { contract_address } = req.body;
+    contract = await models.Contract.findOne({
+      where: {
+        address: contract_address,
+      }
+    });
+  } catch (err) {
+    throw new AppError(err);
+  }
+
+
+
+  try {
+    const balance = await tokenBalanceCache.getBalance(contract, author.address);
     return success(res, balance.toString());
   } catch (err) {
     log.info(`Failed to query token balance: ${err.message}`);

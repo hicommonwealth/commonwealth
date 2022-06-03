@@ -6,6 +6,7 @@ import BN from 'bn.js';
 import { providers } from 'ethers';
 import { WhereOptions } from 'sequelize/types';
 
+import { ContractAttributes } from 'server/models/contract';
 import { ERC20__factory, ERC721__factory } from '../../shared/eth/types';
 
 import JobRunner from './cacheJobRunner';
@@ -13,7 +14,7 @@ import JobRunner from './cacheJobRunner';
 import { ChainAttributes } from '../models/chain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
+import { ChainBase, ChainNetwork, ChainType, ContractTypes } from '../../shared/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -73,14 +74,14 @@ export class TokenBalanceProvider {
     return new BN(axsBalanceBigNum.toString()).add(new BN(stakingPoolBalance.toString()));
   }
 
-  public async getEthTokenBalance(url: string, network: string,
+  public async getEthTokenBalance(url: string, type: string,
   tokenAddress: string, userAddress: string): Promise<BN> {
     const provider = new Web3.providers.WebsocketProvider(url);
     let api;
-    if(network === ChainNetwork.ERC20) {
+    if(type === ContractTypes.ERC20) {
       api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
     }
-    else if(network === ChainNetwork.ERC721) {
+    else if(type === ContractTypes.ERC721) {
       api = ERC721__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
     }
     else {
@@ -153,14 +154,23 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
           },
         ]
       });
+      // TODO: Remove this once we have RULES doing the queries by contract.
+      const communityContract = await this.models.CommunityContract.findOne({
+        where: { community_id: topic.chain_id, },
+        include: [{
+          model: this.models.Contract,
+          required: true,
+        }],
+      });
       if (!topic?.chain) {
         // if associated with an offchain community, or if not token forum, always allow
         return true;
       }
       const threshold = topic.token_threshold;
       if (threshold && threshold > 0) {
+        // TODO: FIX
         const tokenBalance = await this.getBalance(
-          topic.chain,
+          communityContract.Contract,
           userAddress,
         );
         log.info(`Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`);
@@ -175,14 +185,16 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async getBalance(chain: ChainAttributes, address: string): Promise<BN> {
-    const node = await this.models.ChainNode.scope('withPrivateData').findOne({ where: { id: chain.chain_node_id } });
-    if (!node || (chain.base === ChainBase.Ethereum && !node.eth_chain_id)) {
+  public async getBalance(contract: ContractAttributes, address: string): Promise<BN> {
+    const node = await this.models.ChainNode.scope('withPrivateData')
+      .findOne({
+        where: { id: contract.chain_node_id }});
+    if (!node) {
       throw new Error('Could not find chain node.');
     }
 
     // check the cache for the token balance
-    const cacheKey = getKey(chain.base, node.eth_chain_id, chain.address, address);
+    const cacheKey = getKey(node.chain_base, node.eth_chain_id, contract.address, address);
     const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
       if (c[cacheKey]) {
         return c[cacheKey].balance;
@@ -196,20 +208,21 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     let balance: BN;
     const fetchedAt = moment();
     // TODO: add cosmos and other chains
-    let contractAddress = chain.address;
-    if (chain.network === ChainNetwork.AxieInfinity) {
+    let contractAddress = contract.address;
+    // TODO: Fix this axie hack
+    if (node.id == 47) {
       // special case for axie query using covalent
       try {
         balance = await this._balanceProvider.getRoninTokenBalance(address);
       } catch (e) {
         throw new Error(`Could not fetch token balance: ${e.message}`);
       }
-    } else if (chain.base === ChainBase.Ethereum) {
-      if (!chain.address) {
+    } else if (node.chain_base === ChainBase.Ethereum) {
+      if (!contract.address) {
         // if token is not in the database, then query against the Token list
         const tokenMeta = await this.models.Token.findOne({
           where: {
-            id: chain.address,
+            id: contract.address,
             chain_id: node.eth_chain_id,
           }
         });
@@ -221,11 +234,11 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
       const url = node.private_url || node.url;
       try {
-        balance = await this._balanceProvider.getEthTokenBalance(url, chain.network, contractAddress, address);
+        balance = await this._balanceProvider.getEthTokenBalance(url, contract.type, contractAddress, address);
       } catch (e) {
         throw new Error(`Could not fetch token balance: ${e.message}`);
       }
-    } else if (chain.base === ChainBase.Solana) {
+    } else if (node.chain_base === ChainBase.Solana) {
       try {
         balance = await this._balanceProvider.getSplTokenBalance(node.url as solw3.Cluster, contractAddress, address);
       } catch (e) {

@@ -72,6 +72,11 @@ export enum ChainCategoryType {
   DAO = 'DAO',
 }
 
+export enum ContractTypes {
+  ERC20 = 'erc20',
+  ERC721 = 'erc721',
+}
+
 // TODO: remove many of these chain networks, esp substrate (make them all "Substrate"),
 // and just use id to identify specific chains for conditionals
 export enum ChainNetwork {

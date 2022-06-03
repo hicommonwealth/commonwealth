@@ -17,7 +17,7 @@ import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 export type ChainAttributes = {
   name: string;
   chain_node_id: number;
-  symbol: string;
+  default_symbol: string;
   network: ChainNetwork;
   base: ChainBase;
   icon_url: string;
@@ -31,7 +31,6 @@ export type ChainAttributes = {
   telegram?: string;
   github?: string;
   ss58_prefix?: number;
-  decimals?: number;
   stages_enabled?: boolean;
   custom_stages?: string;
   custom_domain?: string;
@@ -44,7 +43,6 @@ export type ChainAttributes = {
   admin_only_polling?: boolean;
   snapshot?: string[];
   bech32_prefix?: string;
-  address?: string;
   token_name?: string;
   ce_verbose?: boolean;
 

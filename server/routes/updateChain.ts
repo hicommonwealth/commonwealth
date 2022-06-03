@@ -65,7 +65,7 @@ const updateChain = async (
   const {
     active,
     icon_url,
-    symbol,
+    default_symbol,
     type,
     name,
     description,
@@ -118,7 +118,7 @@ const updateChain = async (
 
   if (name) chain.name = name;
   if (description) chain.description = description;
-  if (symbol) chain.symbol = symbol;
+  if (default_symbol) chain.default_symbol = default_symbol;
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
