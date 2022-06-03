@@ -6,11 +6,12 @@ import numeral from 'numeral';
 import 'pages/landing/community_cards.scss';
 
 import app from 'state';
-import { NodeInfo } from 'models';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWCard } from '../components/component_kit/cw_card';
-import Sublayout from '../sublayout';
+import { ChainInfo, NodeInfo } from 'models';
 import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
+import { CWButton } from '../components/component_kit/cw_button';
+import Sublayout from '../sublayout';
+import { CommunityCard, NewCommunityCard } from '../components/community_card';
+import { CWText } from '../components/component_kit/cw_text';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -19,76 +20,16 @@ const buildCommunityString = (numCommunities: number) => {
   }
   return `${numberString} Communities`;
 };
-
-type ChainCardAttrs = { chain: string; nodeList: NodeInfo[] };
-
-class ChainCard implements m.ClassComponent<ChainCardAttrs> {
-  view(vnode) {
-    const { chain, nodeList } = vnode.attrs;
-    const chainInfo = app.config.chains.getById(chain);
-
-    const redirectFunction = (e) => {
-      e.preventDefault();
-      localStorage['home-scrollY'] = window.scrollY;
-      m.route.set(`/${chain}`);
-    };
-
-    // Potentially Temporary (could be built into create community flow)
-    let prettyDescription = '';
-    if (chainInfo.description) {
-      prettyDescription =
-        chainInfo.description[chainInfo.description.length - 1] === '.'
-          ? chainInfo.description
-          : `${chainInfo.description}.`;
-    }
-
-    const iconUrl =
-      nodeList[0].chain.iconUrl || (nodeList[0].chain as any).icon_url;
-
-    return (
-      <CWCard
-        elevation="elevation-2"
-        interactive={true}
-        className="chain-card"
-        onclick={redirectFunction}
-      >
-        <div class="card-header">
-          {iconUrl ? (
-            <img class="chain-icon" src={iconUrl} />
-          ) : (
-            <div class="chain-icon no-image" />
-          )}
-        </div>
-        <div class="card-body">
-          <div class="community-name" lang="en">
-            {chainInfo.name}
-          </div>
-          <div class="card-description" title={prettyDescription} lang="en">
-            {prettyDescription}
-          </div>
-          <div class="join-button-wrapper">
-            <CWButton
-              buttonType="secondary"
-              label="See More"
-              onclick={redirectFunction}
-            />
-          </div>
-        </div>
-      </CWCard>
-    );
-  }
-}
-
 export const buildChainToCategoriesMap = (
   categoryTypes,
   chainsAndCategories
 ) => {
   // Handle mapping provided by ChainCategories table
-  let categoryMap = {};
+  const categoryMap = {};
   for (const data of categoryTypes) {
     categoryMap[data.id] = data.category_name;
   }
-  let chainToCategoriesMap: { [chain: string]: ChainCategoryType[] } = {};
+  const chainToCategoriesMap: { [chain: string]: ChainCategoryType[] } = {};
   for (const data of chainsAndCategories) {
     if (chainToCategoriesMap[data.chain_id]) {
       chainToCategoriesMap[data.chain_id].push(
@@ -103,13 +44,14 @@ export const buildChainToCategoriesMap = (
 
   return chainToCategoriesMap;
 };
+
 class HomepageCommunityCards implements m.ClassComponent {
   private chainCategories: Array<string>;
   private chainNetworks: Array<string>;
   private chainBases: Array<string>;
   private filterMap: { [val: string]: boolean };
   private chainToCategoriesMap: { [chain: string]: string[] };
-  private myChains: Array<NodeInfo | string | any>;
+
   oninit() {
     const chainsAndCategories = app.config.chainCategories;
     const categoryTypes = app.config.chainCategoryTypes;
@@ -139,35 +81,24 @@ class HomepageCommunityCards implements m.ClassComponent {
       categoryTypes,
       chainsAndCategories
     );
-
-    // Load Chains
-    const chains = {};
-    app.config.nodes.getAll().forEach((n) => {
-      if (chains[n.chain.id]) {
-        chains[n.chain.id].push(n);
-      } else {
-        chains[n.chain.id] = [n];
-      }
-    });
-    this.myChains = Object.entries(chains);
   }
   view() {
-    const chainBaseFilter = (list, filterMap) => {
+    const chainBaseFilter = (list: ChainInfo[], filterMap) => {
       return list.filter((data) => {
         const chainBase =
           Object.keys(ChainBase)[
-            Object.values(ChainBase).indexOf(data[1][0].chain.base)
+            Object.values(ChainBase).indexOf(data.base)
           ]; // Converts chain.base into a ChainBase key to match our filterMap keys
 
         return filterMap[chainBase];
       });
     };
 
-    const chainNetworkFilter = (list, filterMap) => {
+    const chainNetworkFilter = (list: ChainInfo[], filterMap) => {
       return list.filter((data) => {
         const chainNetwork =
           Object.keys(ChainNetwork)[
-            Object.values(ChainNetwork).indexOf(data[1][0].chain.network)
+            Object.values(ChainNetwork).indexOf(data.network)
           ]; // Converts chain.base into a ChainBase key to match our filterMap keys
 
         if (this.chainNetworks.includes(chainNetwork)) {
@@ -178,13 +109,13 @@ class HomepageCommunityCards implements m.ClassComponent {
       });
     };
 
-    const chainCategoryFilter = (list, filterMap) => {
+    const chainCategoryFilter = (list) => {
       return list.filter((data) => {
         for (const cat of this.chainCategories) {
           if (
             this.filterMap[cat] &&
-            (!this.chainToCategoriesMap[data[0]] ||
-              !this.chainToCategoriesMap[data[0]].includes(cat))
+            (!this.chainToCategoriesMap[data.id] ||
+              !this.chainToCategoriesMap[data.id].includes(cat))
           ) {
             return false;
           }
@@ -193,7 +124,7 @@ class HomepageCommunityCards implements m.ClassComponent {
       });
     };
 
-    const sortChains = (list, filterMap) => {
+    const sortChains = (list: ChainInfo[], filterMap) => {
       let filteredList = list;
 
       if (Object.values(filterMap).includes(true)) {
@@ -226,45 +157,40 @@ class HomepageCommunityCards implements m.ClassComponent {
           this.chainCategories.filter((cat) => filterMap[cat]).length > 0;
 
         if (chainCategoryFilterOn) {
-          filteredList = chainCategoryFilter(filteredList, filterMap);
+          filteredList = chainCategoryFilter(filteredList);
         }
       }
       // Filter by recent thread activity
       const res = filteredList
         .sort((a, b) => {
-          const threadCountA = app.recentActivity.getCommunityThreadCount(
-            Array.isArray(a) ? a[0] : a.id
-          );
-          const threadCountB = app.recentActivity.getCommunityThreadCount(
-            Array.isArray(b) ? b[0] : b.id
-          );
+          const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
+          const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
           return threadCountB - threadCountA;
         })
-        .map((entity: Array<NodeInfo | string>) => {
-          if (Array.isArray(entity)) {
-            const [chain, nodeList]: [string, NodeInfo] = entity as any;
-            return m(ChainCard, { chain, nodeList });
-          }
-          return null;
+        .map((chain: ChainInfo) => {
+          return m(NewCommunityCard, { chain });
         });
       return res;
     };
 
-    const sortedChains = sortChains(this.myChains, this.filterMap);
+    const sortedChains = sortChains(app.config.chains.getAll(), this.filterMap);
 
     const totalCommunitiesString = buildCommunityString(sortedChains.length);
 
     return (
       <div class="HomepageCommunityCards">
         <div class="header-section">
-          <div class="communities-header">{totalCommunitiesString}</div>
+          <CWText type="h3" fontWeight="semiBold" className="communities-count">
+            {totalCommunitiesString}
+          </CWText>
           <div class="filter-buttons">
             {this.chainCategories.map((cat) => {
               return (
                 <CWButton
                   label={cat}
-                  className="filter-button"
-                  buttonType={this.filterMap[cat] ? 'primary' : 'secondary'}
+                  buttonType={
+                    this.filterMap[cat] ? 'primary-black' : 'secondary-black'
+                  }
                   onclick={() => {
                     this.filterMap[cat] = !this.filterMap[cat];
                   }}
@@ -275,8 +201,11 @@ class HomepageCommunityCards implements m.ClassComponent {
               return (
                 <CWButton
                   label={network}
-                  className="filter-button"
-                  buttonType={this.filterMap[network] ? 'primary' : 'secondary'}
+                  buttonType={
+                    this.filterMap[network]
+                      ? 'primary-black'
+                      : 'secondary-black'
+                  }
                   onclick={() => {
                     this.filterMap[network] = !this.filterMap[network];
                   }}
@@ -287,8 +216,9 @@ class HomepageCommunityCards implements m.ClassComponent {
               return (
                 <CWButton
                   label={base}
-                  className="filter-button"
-                  buttonType={this.filterMap[base] ? 'primary' : 'secondary'}
+                  buttonType={
+                    this.filterMap[base] ? 'primary-black' : 'secondary-black'
+                  }
                   onclick={() => {
                     this.filterMap[base] = !this.filterMap[base];
                   }}
@@ -299,26 +229,7 @@ class HomepageCommunityCards implements m.ClassComponent {
         </div>
         <div class="communities-list">
           {sortedChains}
-          <CWCard
-            elevation="elevation-2"
-            interactive={true}
-            className="chain-card"
-            onclick={(e) => {
-              e.preventDefault();
-              document.location =
-                'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
-            }}
-          >
-            <div class="new-community-card-body">
-              <h3>Create a new community</h3>
-              <p class="action">
-                Launch and grow your decentralized community on Commonwealth
-              </p>
-              <a class="learn-more" href="#">
-                {m.trust('Learn more &raquo;')}
-              </a>
-            </div>
-          </CWCard>
+          <NewCommunityCard />
         </div>
       </div>
     );

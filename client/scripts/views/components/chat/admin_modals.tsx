@@ -2,14 +2,15 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import app from 'state';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { MixpanelChatEvents } from 'analytics/types';
 import { IChannel } from 'client/scripts/controllers/server/socket/chatNs';
 import { CWCard } from '../component_kit/cw_card';
 import { CWButton } from '../component_kit/cw_button';
 import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { MixpanelChatEvents } from 'analytics/types';
 
 export class CreateCategory
   implements m.ClassComponent<{ handleClose: () => void }>
@@ -65,11 +66,12 @@ export class CreateCategory
         />
         <div class="button-bar">
           <CWButton
-            buttonType="secondary"
+            buttonType="secondary-black"
             label="Cancel"
             onclick={vnode.attrs.handleClose}
           />
           <CWButton
+            buttonType="primary-blue"
             disabled={!this.category.length || !this.channel.length}
             label="Submit"
             onclick={handleSubmit}
@@ -118,11 +120,12 @@ export class CreateChannel
         />
         <div class="button-bar">
           <CWButton
-            buttonType="secondary"
+            buttonType="secondary-black"
             label="Cancel"
             onclick={vnode.attrs.handleClose}
           />
           <CWButton
+            buttonType="primary-blue"
             disabled={!this.channel.length}
             label="Submit"
             onclick={handleSubmit}
@@ -169,11 +172,12 @@ export class RenameChannel
         />
         <div class="button-bar">
           <CWButton
-            buttonType="secondary"
+            buttonType="secondary-black"
             label="Cancel"
             onclick={vnode.attrs.handleClose}
           />
           <CWButton
+            buttonType="primary-blue"
             disabled={!this.channel_name.length}
             label="Submit"
             onclick={handleSubmit}
@@ -220,11 +224,12 @@ export class RenameCategory
         />
         <div class="button-bar">
           <CWButton
-            buttonType="secondary"
+            buttonType="secondary-black"
             label="Cancel"
             onclick={vnode.attrs.handleClose}
           />
           <CWButton
+            buttonType="primary-blue"
             disabled={!this.new_category.length}
             label="Submit"
             onclick={handleSubmit}
@@ -256,12 +261,12 @@ export class DeleteChannel
         </h4>
         <div class="button-bar">
           <CWButton
-            buttonType="secondary"
+            buttonType="secondary-black"
             label="Cancel"
             onclick={vnode.attrs.handleClose}
           />
           <CWButton
-            className="danger"
+            buttonType="primary-red"
             label="Yes, Delete"
             onclick={handleSubmit}
           />
@@ -293,12 +298,12 @@ export class DeleteCategory
         </h4>
         <div class="button-bar">
           <CWButton
-            buttonType="secondary"
+            buttonType="secondary-black"
             label="Cancel"
             onclick={vnode.attrs.handleClose}
           />
           <CWButton
-            className="danger"
+            buttonType="primary-red"
             label="Yes, Delete"
             onclick={handleSubmit}
           />

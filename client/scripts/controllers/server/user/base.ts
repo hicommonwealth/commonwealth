@@ -4,12 +4,12 @@ import $ from 'jquery';
 import app from 'state';
 
 import {
-  NodeInfo,
   AddressInfo,
   RoleInfo,
   SocialAccount,
   Account,
   StarredCommunity,
+  ChainInfo,
 } from 'models';
 
 import NotificationsController from '../notifications';
@@ -88,12 +88,12 @@ export default class {
     this._socialAccounts = socialAccounts;
   }
 
-  private _selectedNode: NodeInfo;
-  public get selectedNode(): NodeInfo {
-    return this._selectedNode;
+  private _selectedChain: ChainInfo;
+  public get selectedChain(): ChainInfo {
+    return this._selectedChain;
   }
-  private _setSelectedNode(selectedNode: NodeInfo): void {
-    this._selectedNode = selectedNode;
+  private _setSelectedChain(selectedChain: ChainInfo): void {
+    this._selectedChain = selectedChain;
   }
 
   private _isSiteAdmin: boolean;
@@ -230,15 +230,13 @@ export default class {
     );
   }
 
-  public setSelectedNode(selectedNode: NodeInfo): void {
-    this._setSelectedNode(selectedNode);
+  public setSelectedChain(selectedChain: ChainInfo): void {
+    this._setSelectedChain(selectedChain);
   }
-  public selectNode(options: {
-    url: string;
+  public selectChain(options: {
     chain: string;
   }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/selectNode`, {
-      url: options.url,
+    return $.post(`${app.serverUrl()}/selectChain`, {
       chain: options.chain,
       auth: true,
       jwt: this._jwt,
@@ -247,11 +245,9 @@ export default class {
         if (res.status !== 'Success') {
           throw new Error(`got unsuccessful status: ${res.status}`);
         } else {
-          const node = app.config.nodes
-            .getAll()
-            .find((n) => n.url === options.url && n.chain.id === options.chain);
-          if (!node) throw new Error('unexpected node');
-          this.setSelectedNode(node);
+          const chain = app.config.chains.getById(options.chain);
+          if (!chain) throw new Error('unexpected chain');
+          this.setSelectedChain(chain);
         }
       })
       .catch((e) => console.error('Failed to select node on server'));

@@ -22,9 +22,10 @@ This should give you a Postgres server installed and running with user
 
 *Installing RabbitMQ is only necessary if you intend to run chain-event listeners locally.*
 
-Install RabbitMQ using the guide for your OS: https://www.rabbitmq.com/download.html
+Install RabbitMQ using the guide for your OS: `https://www.rabbitmq.com/download.html`
 
 Once installed run the following commands to create a user:
+
 ```bash
 sudo rabbitmqctl add_user commonwealth edgeware
 sudo rabbitmqctl set_user_tags commonwealth administrator
@@ -72,6 +73,26 @@ the number of possible errors you might run into.
 
 You should also download a copy of the production database if possible.
 following the Production Database instructions afterwards.
+
+## Trouble Shooting for M1 Mac Users**
+
+For development, you should follow the same steps as in the **nvm** section, except you must make sure you are using the Rosetta2 Terminal. Follow these steps to enable Rosetta 2 `https://www.courier.com/blog/tips-and-tricks-to-setup-your-apple-m1-for-development/`.
+
+ALL TIMES you will need to install using this following in front of brew. For example for python: `arch -arm64 brew install python@3.9`. This will allow you to install using the M1 homebrew with Rosetta. This is crucial.
+
+If errors occur try these steps:
+
+- Make sure homebrew is installed in the /opt/ directory
+- If `yarn` stalls out at node-sass, like such:
+
+```node
+  env: python: No such file or directory
+  make: *** [Release/sass.a] Error 127
+  gyp ERR! build error 
+  gyp ERR! stack Error: `make` failed with exit code: 2
+```
+
+Make sure you have python installed in your Rosetta Terminal path. See: `https://stackoverflow.com/questions/71468590/env-python-no-such-file-or-directory-when-building-app-with-xcode`. You need to be able to call `python` in the terminal.
 
 ## Environment Variables
 

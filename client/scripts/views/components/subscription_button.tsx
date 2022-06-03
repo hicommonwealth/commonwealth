@@ -39,7 +39,9 @@ export class SubscriptionButton implements m.ClassComponent {
             : 'Notifications off'
         }
         buttonType={
-          isNotUndefined(communitySubscription) ? 'primary' : 'secondary'
+          isNotUndefined(communitySubscription)
+            ? 'primary-blue'
+            : 'secondary-blue'
         }
       />
     );

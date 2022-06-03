@@ -26,12 +26,12 @@ const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: 
   });
   if (!requesterIsAdmin && !req.user.isAdmin) return next(new Error('Must be admin to edit'));
 
-  const nodes = await chain.getChainNodes();
-  if (!nodes.length) return next(new Error('no chain nodes found'));
+  const node = await chain.getChainNode();
+  if (!node) return next(new Error('no chain nodes found'));
 
   let sanitizedSpec;
   try {
-    sanitizedSpec = await testSubstrateSpec(req.body.spec, nodes[0].url);
+    sanitizedSpec = await testSubstrateSpec(req.body.spec, node.url);
   } catch (e) {
     return next(new Error('Failed to validate Substrate Spec'));
   }

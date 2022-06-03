@@ -159,7 +159,7 @@ export class SubstrateDemocracyReferendum
 
   // BLOCK EXPLORER LINK
   public get blockExplorerLink() {
-    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const chainInfo = this._Chain.app.chain?.meta;
     const blockExplorerIds = chainInfo?.blockExplorerIds;
     if (blockExplorerIds && blockExplorerIds['subscan']) {
       const subdomain = blockExplorerIds['subscan'];
@@ -169,14 +169,14 @@ export class SubstrateDemocracyReferendum
   }
 
   public get blockExplorerLinkLabel() {
-    const chainInfo = this._Chain.app.chain?.meta?.chain;
+    const chainInfo = this._Chain.app.chain?.meta;
     const blockExplorerIds = chainInfo?.blockExplorerIds;
     if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
     return undefined;
   }
 
   public get votingInterfaceLink() {
-    const rpcUrl = encodeURIComponent(this._Chain.app.chain?.meta?.url);
+    const rpcUrl = encodeURIComponent(this._Chain.app.chain?.meta?.node.url);
     return `https://polkadot.js.org/apps/?rpc=${rpcUrl}#/democracy`;
   }
 
