@@ -52,6 +52,7 @@ import { NearAccount } from 'controllers/chain/near/account';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ProposalExtensions } from './proposal_extensions';
 import { CannotVote, CancelButton } from './voting_actions_components';
+import { getClasses } from '../component_kit/helpers';
 
 export class VotingActions
   implements m.ClassComponent<{ proposal: AnyProposal }>
@@ -67,7 +68,7 @@ export class VotingActions
     if (proposal instanceof SubstrateTreasuryProposal) {
       return;
       // TODO: Set up actions to create a council or democracy proposal
-      // return m(CannotVote, { action: 'Send to council or democracy' });
+      // return <CannotVote label="Send to council or democracy" />;
     } else if (!app.isLoggedIn()) {
       return <CannotVote label="Log in to vote" />;
     } else if (!app.user.activeAccount) {
@@ -521,199 +522,264 @@ export class VotingActions
 
     let buttons;
 
-    const yesButton = m('.yes-button', [
-      m(Button, {
-        disabled: !canVote || hasVotedYes || votingModalOpen,
-        onclick: voteYes,
-        label: hasVotedYes ? 'Voted yes' : 'Vote yes',
-        compact: true,
-        rounded: true,
-      }),
-    ]);
+    const yesButton = (
+      <div class="yes-button">
+        <Button
+          disabled={!canVote || hasVotedYes || votingModalOpen}
+          onclick={voteYes}
+          label={hasVotedYes ? 'Voted yes' : 'Vote yes'}
+          compact
+          rounded
+        />
+      </div>
+    );
 
-    const noButton = m('.no-button', [
-      m(Button, {
-        disabled: !canVote || hasVotedNo || votingModalOpen,
-        onclick: voteNo,
-        label: hasVotedNo ? 'Voted no' : 'Vote no',
-        compact: true,
-        rounded: true,
-      }),
-    ]);
+    const noButton = (
+      <div class="no-button">
+        <Button
+          disabled={!canVote || hasVotedNo || votingModalOpen}
+          onclick={voteNo}
+          label={hasVotedNo ? 'Voted no' : 'Vote no'}
+          compact
+          rounded
+        />
+      </div>
+    );
     // substrate: multi-deposit approve
-    const multiDepositApproveButton = m('.approve-button', [
-      m(Button, {
-        intent: 'positive',
-        disabled: !canVote || votingModalOpen,
-        onclick: voteYes,
-        label: hasVotedYes && !canVote ? 'Already approved' : 'Second',
-        compact: true,
-        rounded: true,
-      }),
-    ]);
+    const multiDepositApproveButton = (
+      <div class="approve-button">
+        <Button
+          intent="positive"
+          disabled={!canVote || votingModalOpen}
+          onclick={voteYes}
+          label={hasVotedYes && !canVote ? 'Already approved' : 'Second'}
+          compact
+          rounded
+        />
+      </div>
+    );
     // cosmos: abstain
-    const abstainButton = m('.abstain-button', [
-      m(Button, {
-        intent: 'warning',
-        disabled: !canVote || hasVotedAbstain || votingModalOpen,
-        onclick: voteAbstain,
-        label: hasVotedAbstain ? 'Abstained' : 'Abstain',
-        compact: true,
-        rounded: true,
-      }),
-    ]);
+    const abstainButton = (
+      <div class="abstain-button">
+        <Button
+          intent="warning"
+          disabled={!canVote || hasVotedAbstain || votingModalOpen}
+          onclick={voteAbstain}
+          label={hasVotedAbstain ? 'Abstained' : 'Abstain'}
+          compact
+          rounded
+        />
+      </div>
+    );
     // cosmos: veto
-    const noWithVetoButton = m('.veto-button', [
-      m(Button, {
-        intent: 'warning',
-        disabled: !canVote || hasVotedVeto || votingModalOpen,
-        onclick: voteVeto,
-        label: hasVotedVeto ? 'Vetoed' : 'Veto',
-        compact: true,
-        rounded: true,
-      }),
-    ]);
+    const noWithVetoButton = (
+      <div class="veto-button">
+        <Button
+          intent="warning"
+          disabled={!canVote || hasVotedVeto || votingModalOpen}
+          onclick={voteVeto}
+          label={hasVotedVeto ? 'Vetoed' : 'Veto'}
+          compact
+          rounded
+        />
+      </div>
+    );
     // V2 only: moloch: sponsor
-    // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
-    //  m(Button, {
-    //    intent: 'positive',
-    //    disabled: (proposal as MolochProposal).state.sponsored
-    //      || (proposal as MolochProposal).state.processed
-    //      || votingModalOpen
-    //    onclick: sponsorProposal,
-    //    label: (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor',
-    //    compact: true,
-    //    rounded: true,
-    //  }),
-    // ]);
+    // const sponsorButton = proposal.votingType === VotingType.MolochYesNo && (
+    //   <div class="yes-button">
+    //     <Button
+    //       intent="positive"
+    //       disabled={
+    //         (proposal as MolochProposal).state.sponsored ||
+    //         (proposal as MolochProposal).state.processed ||
+    //         votingModalOpen
+    //       }
+    //       onclick={sponsorProposal}
+    //       label={
+    //         (proposal as MolochProposal).state.sponsored
+    //           ? 'Sponsered'
+    //           : 'Sponsor'
+    //       }
+    //       compact
+    //       rounded
+    //     />
+    //   </div>
+    // );
     // moloch: process
-    const processButton =
-      proposal instanceof MolochProposal &&
-      m('.yes-button', [
-        m(Button, {
-          intent: 'none',
-          disabled:
+    const processButton = proposal instanceof MolochProposal && (
+      <div class="yes-button">
+        <Button
+          intent="none"
+          disabled={
             proposal.state !== MolochProposalState.ReadyToProcess ||
-            votingModalOpen,
-          onclick: processProposal,
-          label: proposal.data.processed ? 'Processed' : 'Process',
-          compact: true,
-          rounded: true,
-        }),
-      ]);
+            votingModalOpen
+          }
+          onclick={processProposal}
+          label={proposal.data.processed ? 'Processed' : 'Process'}
+          compact
+          rounded
+        />
+      </div>
+    );
     // near: remove
-    const removeButton =
-      proposal instanceof NearSputnikProposal &&
-      m('.no-button', [
-        m(Button, {
-          intent: 'none',
-          disabled: !canVote || votingModalOpen,
-          onclick: voteRemove,
-          label: hasVotedRemove ? 'Voted remove' : 'Vote remove',
-          compact: true,
-          rounded: true,
-        }),
-      ]);
+    const removeButton = proposal instanceof NearSputnikProposal && (
+      <div class="no-button">
+        <Button
+          intent="none"
+          disabled={!canVote || votingModalOpen}
+          onclick={voteRemove}
+          label={hasVotedRemove ? 'Voted remove' : 'Vote remove'}
+          compact
+          rounded
+        />
+      </div>
+    );
 
     let votingActionObj;
     // TODO: other specialized proposals go at top
     if (proposal instanceof AaveProposal) {
-      votingActionObj = [m('.button-row', [yesButton, noButton])];
+      votingActionObj = (
+        <div class="button-row">
+          {yesButton}
+          {noButton}
+        </div>
+      );
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
-      votingActionObj = [
-        m('.button-row', [yesButton, noButton]),
-        <ProposalExtensions proposal={proposal} />,
-      ];
+      votingActionObj = (
+        <>
+          <div class="button-row">
+            {yesButton}
+            {noButton}
+          </div>
+          <ProposalExtensions proposal={proposal} />
+        </>
+      );
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
-      votingActionObj = [
-        m('.button-row', [yesButton, noButton]),
-        <ProposalExtensions
-          proposal={proposal}
-          setDemocracyVoteConviction={(c) => {
-            this.conviction = c;
-          }}
-          setDemocracyVoteAmount={(c) => {
-            this.amount = c;
-          }}
-        />,
-      ];
+      votingActionObj = (
+        <>
+          <div class="button-row">
+            {yesButton}
+            {noButton}
+          </div>
+          <ProposalExtensions
+            proposal={proposal}
+            setDemocracyVoteConviction={(c) => {
+              this.conviction = c;
+            }}
+            setDemocracyVoteAmount={(c) => {
+              this.amount = c;
+            }}
+          />
+        </>
+      );
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
-      votingActionObj = [
-        m('.button-row', multiDepositApproveButton),
-        <ProposalExtensions
-          proposal={proposal}
-          setCosmosDepositAmount={(c) => {
-            this.amount = c;
-          }}
-        />,
-      ];
+      votingActionObj = (
+        <>
+          <div class="button-row">{multiDepositApproveButton}</div>
+          <ProposalExtensions
+            proposal={proposal}
+            setCosmosDepositAmount={(c) => {
+              this.amount = c;
+            }}
+          />
+        </>
+      );
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
-      votingActionObj = [
-        m('.button-row', [
-          yesButton,
-          noButton,
-          abstainButton,
-          noWithVetoButton,
-        ]),
-        <ProposalExtensions proposal={proposal} />,
-      ];
+      votingActionObj = (
+        <>
+          <div class="button-row">
+            {yesButton}
+            {noButton}
+            {abstainButton}
+            {noWithVetoButton}
+          </div>
+          <ProposalExtensions proposal={proposal} />
+        </>
+      );
     } else if (
       proposal.votingType === VotingType.MultiOptionVoting &&
       buttons.length > 0
     ) {
-      votingActionObj = [
-        m('button-row', buttons),
-        <ProposalExtensions proposal={proposal} />,
-      ];
+      votingActionObj = (
+        <>
+          <div class="button-row">{buttons}</div>
+          <ProposalExtensions proposal={proposal} />
+        </>
+      );
     } else if (proposal.votingType === VotingType.MolochYesNo) {
-      votingActionObj = [
-        [
-          m('.button-row', [
-            yesButton,
-            noButton,
-            /* sponsorButton, */
-            processButton,
-            m(CancelButton, { proposal, votingModalOpen, user, onModalClose }),
-          ]),
-          <ProposalExtensions proposal={proposal} />,
-        ],
-      ];
+      votingActionObj = (
+        <>
+          <div class="button-row">
+            {yesButton}
+            {noButton}
+            {/* {sponsorButton} */}
+            {processButton}
+            <CancelButton
+              onModalClose={onModalClose}
+              proposal={proposal}
+              user={user}
+              votingModalOpen={votingModalOpen}
+            />
+          </div>
+          <ProposalExtensions proposal={proposal} />
+        </>
+      );
     } else if (proposal.votingType === VotingType.CompoundYesNo) {
-      votingActionObj = [
-        m('.button-row', [
-          yesButton,
-          noButton,
-          // m(QueueButton, { proposal, votingModalOpen }),
-          // m(ExecuteButton, { proposal, votingModalOpen }),
-          m(CancelButton, { proposal, votingModalOpen, user, onModalClose }),
-        ]),
-      ];
+      votingActionObj = (
+        <div class="button-row">
+          {yesButton}
+          {/* <QueueButton proposal={proposal} votingModalOpen={votingModalOpen} />
+           <ExecuteButton proposal={proposal} votingModalOpen={votingModalOpen} /> */}
+          <CancelButton
+            onModalClose={onModalClose}
+            proposal={proposal}
+            user={user}
+            votingModalOpen={votingModalOpen}
+          />
+        </div>
+      );
     } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
-      votingActionObj = [
-        m('.button-row', [
-          yesButton,
-          noButton,
-          abstainButton,
-          // m(QueueButton, { proposal, votingModalOpen }),
-          // m(ExecuteButton, { proposal, votingModalOpen }),
-          m(CancelButton, { proposal, votingModalOpen, user, onModalClose }),
-        ]),
-      ];
+      votingActionObj = (
+        <div class="button-row">
+          {yesButton}
+          {noButton}
+          {abstainButton}
+          {/* <QueueButton proposal={proposal} votingModalOpen={votingModalOpen} />
+           <ExecuteButton proposal={proposal} votingModalOpen={votingModalOpen} /> */}
+          <CancelButton
+            onModalClose={onModalClose}
+            proposal={proposal}
+            user={user}
+            votingModalOpen={votingModalOpen}
+          />
+        </div>
+      );
     } else if (proposal.votingType === VotingType.YesNoReject) {
-      votingActionObj = [m('.button-row', [yesButton, noButton, removeButton])];
+      votingActionObj = (
+        <div class="button-row">
+          {yesButton}
+          {noButton}
+          {removeButton}
+        </div>
+      );
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
-      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
+      votingActionObj = <CannotVote label="Unsupported proposal type" />;
     } else if (proposal.votingType === VotingType.None) {
-      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
+      votingActionObj = <CannotVote label="Unsupported proposal type" />;
     } else {
-      votingActionObj = m(CannotVote, { action: 'Unsupported proposal type' });
+      votingActionObj = <CannotVote label="Unsupported proposal type" />;
     }
 
-    return m(
-      `.VotingActions${
-        proposal instanceof AaveProposal ? '.AaveProposal' : ''
-      }`,
-      [m('h3', 'Cast Your Vote'), votingActionObj]
+    return (
+      <div
+        class={getClasses<{ isAaveProposal: boolean }>(
+          { isAaveProposal: proposal instanceof AaveProposal },
+          'VotingActions'
+        )}
+      >
+        <h3>Cast Your Vote</h3>
+        {votingActionObj}
+      </div>
     );
   }
 }
