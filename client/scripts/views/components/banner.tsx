@@ -2,12 +2,10 @@
 
 import m from 'mithril';
 
-import 'token_terms.scss';
+import 'banner.scss';
 
 import app from 'state';
 import { isNonEmptyString } from '../../helpers/typeGuards';
-import { CWText } from './component_kit/cw_text';
-
 
 type BannerAttrs = {
   bannerText?: string;
@@ -19,9 +17,11 @@ export class Banner implements m.ClassComponent<BannerAttrs> {
     console.log("Rendering Banner:", bannerText);
     if (isNonEmptyString(bannerText)) {
       return (
-        // <CWText fontWeight="semiBold" type="d1">
-        //   {bannerText}
-        // </CWText>
+        <div class="Banner">
+          <div class="banner-text">
+            {bannerText}
+          </div>
+        </div>
       );
     } else {
       return null;
