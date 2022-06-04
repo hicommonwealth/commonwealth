@@ -15,6 +15,7 @@ import { TokenHero } from './token_hero';
 import { TokenTerms } from './token_terms';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
+import { Banner } from './components/banner';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
@@ -62,6 +63,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
 
     const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
+    const banner = app.chain ? chain.communityBanner : null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
     if (m.route.param('triggerInvite') === 't') {
@@ -90,6 +92,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             <div class="body-and-sticky-headers-container">
               <TokenHero chain={chain} />
               <TokenTerms terms={terms} tosStatus={tosStatus} />
+              <Banner bannerText={banner} />
               <div class="Body" onscroll={onscroll}>
                 {vnode.children}
                 {!app.isCustomDomain() && !hideFooter && (

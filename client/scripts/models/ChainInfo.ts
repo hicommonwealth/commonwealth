@@ -241,7 +241,6 @@ class ChainInfo {
   }
 
   public setBanner(banner_text: string) {
-    console.log(banner_text);
     this.communityBanner = banner_text;
   }
 
