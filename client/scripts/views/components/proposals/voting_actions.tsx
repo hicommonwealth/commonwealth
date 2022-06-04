@@ -8,13 +8,7 @@ import 'components/proposals/voting_actions.scss';
 import app from 'state';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import {
-  ProposalStatus,
-  BinaryVote,
-  DepositVote,
-  VotingType,
-  AnyProposal,
-} from 'models';
+import { BinaryVote, DepositVote, VotingType, AnyProposal } from 'models';
 import {
   SubstrateDemocracyReferendum,
   convictionToWeight,
@@ -38,12 +32,10 @@ import { notifyError } from 'controllers/app/notifications';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
-import { CompoundTypes } from '@commonwealth/chain-events';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import {
-  NearSputnikProposalStatus,
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
@@ -53,6 +45,7 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ProposalExtensions } from './proposal_extensions';
 import { CannotVote, CancelButton } from './voting_actions_components';
 import { getClasses } from '../component_kit/helpers';
+import { getCanVote, getVotingResults } from './helpers';
 
 export class VotingActions
   implements m.ClassComponent<{ proposal: AnyProposal }>
@@ -332,193 +325,16 @@ export class VotingActions
       }
     };
 
-    let hasVotedYes;
-    let hasVotedNo;
-    let hasVotedAbstain;
-    let hasVotedVeto;
-    let hasVotedForAnyChoice;
-    let hasVotedRemove;
+    const {
+      hasVotedYes,
+      hasVotedNo,
+      hasVotedAbstain,
+      hasVotedVeto,
+      hasVotedForAnyChoice,
+      hasVotedRemove,
+    } = getVotingResults(proposal, user);
 
-    if (proposal instanceof SubstrateDemocracyProposal) {
-      hasVotedYes =
-        proposal.getVotes().filter((vote) => {
-          return vote.account.address === user.address;
-        }).length > 0;
-
-      hasVotedForAnyChoice = hasVotedYes;
-    } else if (proposal instanceof CosmosProposal) {
-      hasVotedYes =
-        user &&
-        proposal
-          .getVotes()
-          .filter(
-            (vote) =>
-              vote.choice === 'Yes' && vote.account.address === user.address
-          ).length > 0;
-
-      hasVotedNo =
-        user &&
-        proposal
-          .getVotes()
-          .filter(
-            (vote) =>
-              vote.choice === 'No' && vote.account.address === user.address
-          ).length > 0;
-
-      hasVotedAbstain =
-        user &&
-        proposal
-          .getVotes()
-          .filter(
-            (vote) =>
-              vote.choice === 'Abstain' && vote.account.address === user.address
-          ).length > 0;
-
-      hasVotedVeto =
-        user &&
-        proposal
-          .getVotes()
-          .filter(
-            (vote) =>
-              vote.choice === 'NoWithVeto' &&
-              vote.account.address === user.address
-          ).length > 0;
-    } else if (proposal instanceof MolochProposal) {
-      hasVotedYes =
-        user &&
-        proposal
-          .getVotes()
-          .filter(
-            (vote) =>
-              vote.choice === MolochVote.YES &&
-              vote.account.address === user.address
-          ).length > 0;
-
-      hasVotedNo =
-        user &&
-        proposal
-          .getVotes()
-          .filter(
-            (vote) =>
-              vote.choice === MolochVote.NO &&
-              vote.account.address === user.address
-          ).length > 0;
-    } else if (proposal instanceof CompoundProposal) {
-      hasVotedYes =
-        user &&
-        proposal
-          .getVotes()
-          .filter(
-            (vote) =>
-              vote.choice === BravoVote.YES &&
-              vote.account.address === user.address
-          ).length > 0;
-
-      hasVotedNo =
-        user &&
-        proposal
-          .getVotes()
-          .filter(
-            (vote) =>
-              vote.choice === BravoVote.NO &&
-              vote.account.address === user.address
-          ).length > 0;
-
-      hasVotedAbstain =
-        user &&
-        proposal
-          .getVotes()
-          .filter(
-            (vote) =>
-              vote.choice === BravoVote.ABSTAIN &&
-              vote.account.address === user.address
-          ).length > 0;
-    } else if (proposal instanceof AaveProposal) {
-      hasVotedYes =
-        user &&
-        proposal
-          .getVotes()
-          .find((vote) => vote.choice && vote.account.address === user.address);
-
-      hasVotedNo =
-        user &&
-        proposal
-          .getVotes()
-          .find(
-            (vote) => !vote.choice && vote.account.address === user.address
-          );
-      hasVotedForAnyChoice = hasVotedYes || hasVotedNo;
-    } else if (proposal instanceof NearSputnikProposal) {
-      hasVotedYes =
-        user &&
-        proposal
-          .getVotes()
-          .find(
-            (vote) =>
-              vote.choice === NearSputnikVoteString.Approve &&
-              vote.account.address === user.address
-          );
-
-      hasVotedNo =
-        user &&
-        proposal
-          .getVotes()
-          .find(
-            (vote) =>
-              vote.choice === NearSputnikVoteString.Reject &&
-              vote.account.address === user.address
-          );
-
-      hasVotedRemove =
-        user &&
-        proposal
-          .getVotes()
-          .find(
-            (vote) =>
-              vote.choice === NearSputnikVoteString.Remove &&
-              vote.account.address === user.address
-          );
-
-      hasVotedForAnyChoice = hasVotedYes || hasVotedNo || hasVotedRemove;
-    }
-
-    let canVote = true;
-
-    if (proposal.completed) {
-      canVote = false;
-    } else if (
-      proposal.isPassing !== ProposalStatus.Passing &&
-      proposal.isPassing !== ProposalStatus.Failing
-    ) {
-      canVote = false;
-    } else if (
-      proposal instanceof MolochProposal &&
-      proposal.state !== MolochProposalState.Voting
-    ) {
-      canVote = false;
-    } else if (
-      proposal instanceof CompoundProposal &&
-      proposal.state !== CompoundTypes.ProposalState.Active
-    ) {
-      canVote = false;
-    } else if (
-      proposal instanceof NearSputnikProposal &&
-      (proposal.data.status !== NearSputnikProposalStatus.InProgress ||
-        hasVotedForAnyChoice)
-    ) {
-      canVote = false;
-    } else if (hasVotedForAnyChoice) {
-      // enable re-voting for particular types
-      if (
-        proposal instanceof SubstratePhragmenElection ||
-        proposal instanceof SubstrateDemocracyProposal ||
-        proposal instanceof SubstrateCollectiveProposal
-      ) {
-        canVote = true;
-      } else {
-        canVote = false;
-      }
-    }
+    const canVote = getCanVote(proposal, hasVotedForAnyChoice);
 
     let buttons;
 
@@ -545,6 +361,7 @@ export class VotingActions
         />
       </div>
     );
+
     // substrate: multi-deposit approve
     const multiDepositApproveButton = (
       <div class="approve-button">
@@ -558,6 +375,7 @@ export class VotingActions
         />
       </div>
     );
+
     // cosmos: abstain
     const abstainButton = (
       <div class="abstain-button">
@@ -571,6 +389,7 @@ export class VotingActions
         />
       </div>
     );
+
     // cosmos: veto
     const noWithVetoButton = (
       <div class="veto-button">
@@ -584,27 +403,7 @@ export class VotingActions
         />
       </div>
     );
-    // V2 only: moloch: sponsor
-    // const sponsorButton = proposal.votingType === VotingType.MolochYesNo && (
-    //   <div class="yes-button">
-    //     <Button
-    //       intent="positive"
-    //       disabled={
-    //         (proposal as MolochProposal).state.sponsored ||
-    //         (proposal as MolochProposal).state.processed ||
-    //         votingModalOpen
-    //       }
-    //       onclick={sponsorProposal}
-    //       label={
-    //         (proposal as MolochProposal).state.sponsored
-    //           ? 'Sponsered'
-    //           : 'Sponsor'
-    //       }
-    //       compact
-    //       rounded
-    //     />
-    //   </div>
-    // );
+
     // moloch: process
     const processButton = proposal instanceof MolochProposal && (
       <div class="yes-button">
@@ -621,6 +420,7 @@ export class VotingActions
         />
       </div>
     );
+
     // near: remove
     const removeButton = proposal instanceof NearSputnikProposal && (
       <div class="no-button">
@@ -636,7 +436,7 @@ export class VotingActions
     );
 
     let votingActionObj;
-    // TODO: other specialized proposals go at top
+
     if (proposal instanceof AaveProposal) {
       votingActionObj = (
         <div class="button-row">
@@ -712,7 +512,6 @@ export class VotingActions
           <div class="button-row">
             {yesButton}
             {noButton}
-            {/* {sponsorButton} */}
             {processButton}
             <CancelButton
               onModalClose={onModalClose}
@@ -728,8 +527,6 @@ export class VotingActions
       votingActionObj = (
         <div class="button-row">
           {yesButton}
-          {/* <QueueButton proposal={proposal} votingModalOpen={votingModalOpen} />
-           <ExecuteButton proposal={proposal} votingModalOpen={votingModalOpen} /> */}
           <CancelButton
             onModalClose={onModalClose}
             proposal={proposal}
@@ -744,8 +541,6 @@ export class VotingActions
           {yesButton}
           {noButton}
           {abstainButton}
-          {/* <QueueButton proposal={proposal} votingModalOpen={votingModalOpen} />
-           <ExecuteButton proposal={proposal} votingModalOpen={votingModalOpen} /> */}
           <CancelButton
             onModalClose={onModalClose}
             proposal={proposal}

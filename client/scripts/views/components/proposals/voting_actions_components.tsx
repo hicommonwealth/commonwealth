@@ -93,7 +93,7 @@ export class CancelButton
             !(proposal.canAbort(user) && !proposal.completed) || votingModalOpen
           }
           onclick={(e) =>
-            cancelProposal(e, vnode.state, proposal, onModalClose)
+            cancelProposal(e, votingModalOpen, proposal, onModalClose)
           }
           label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
           compact
@@ -106,7 +106,7 @@ export class CancelButton
           intent="negative"
           disabled={proposal.completed || votingModalOpen}
           onclick={(e) =>
-            cancelProposal(e, vnode.state, proposal, onModalClose)
+            cancelProposal(e, votingModalOpen, proposal, onModalClose)
           }
           label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
           compact
@@ -117,7 +117,7 @@ export class CancelButton
         <Button
           disabled={!proposal.isCancellable || votingModalOpen}
           onclick={(e) =>
-            cancelProposal(e, vnode.state, proposal, onModalClose)
+            cancelProposal(e, votingModalOpen, proposal, onModalClose)
           }
           label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
           compact
