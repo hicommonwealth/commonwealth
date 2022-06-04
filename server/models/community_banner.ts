@@ -4,9 +4,8 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type CommunityBannerAttributes = {
   id?: number;
-  address: string;
-  message: string;
-  chat_channel_id: number;
+  banner_text: string;
+  chain_id: string;
   created_at?: Date;
   updated_at?: Date;
 }
