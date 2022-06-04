@@ -16,12 +16,12 @@ type BannerAttrs = {
 export class Banner implements m.ClassComponent<BannerAttrs> {
   view(vnode) {
     const { bannerText } = vnode.attrs;
-    console.log("Rendering Banner")
+    console.log("Rendering Banner:", bannerText);
     if (isNonEmptyString(bannerText)) {
-      return ( null
-        // <div class="Banner">
-        //  {bannerText}
-        // </div>
+      return (
+        // <CWText fontWeight="semiBold" type="d1">
+        //   {bannerText}
+        // </CWText>
       );
     } else {
       return null;
