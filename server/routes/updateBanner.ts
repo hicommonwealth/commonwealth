@@ -3,6 +3,8 @@ import { CommunityBannerInstance } from 'server/models/chain_category';
 import { success, TypedRequestBody } from '../types';
 import { DB } from '../database';
 import validateChain from '../util/validateChain';
+import validateRoles from '../util/validateRoles';
+
 
 type UpdateBannerReq = Omit<CommunityBannerInstance, 'id'> & {
   create: string;
@@ -18,6 +20,8 @@ const updateBanner = async (
 ) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
+  const admin = validateRoles(models, req, 'admin', chain.id);
+
   const { banner_text } = req.body;
   // find or create
   const [banner] = await models.CommunityBanner.findOrCreate({
