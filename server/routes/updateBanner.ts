@@ -1,9 +1,9 @@
 import { Response, NextFunction } from 'express';
-import { CommunityBannerInstance } from 'server/models/chain_category';
-import { success, TypedRequestBody } from '../types';
+import { TypedRequestBody } from '../types';
 import { DB } from '../database';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
+import { CommunityBannerInstance } from '../models/community_banner';
 
 enum UpdateBannerErrors {
   NoChain = 'Must supply a chain ID',
