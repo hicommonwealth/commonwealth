@@ -5,6 +5,13 @@ import { DB } from '../database';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 
+enum UpdateBannerErrors {
+  NoUser = 'Not logged in',
+  NoIds = 'Must supply ordered array of topic IDs',
+  NoChain = 'Must supply a chain ID',
+  NoPermission = `You do not have permission to update banner`,
+}
+
 
 type UpdateBannerReq = Omit<CommunityBannerInstance, 'id'> & {
   create: string;
@@ -20,7 +27,8 @@ const updateBanner = async (
 ) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
-  const admin = validateRoles(models, req, 'admin', chain.id);
+  const isAdmin = validateRoles(models, req, 'admin', chain.id);
+  if (!isAdmin) return next(new Error(UpdateBannerErrors.NoPermission));
 
   const { banner_text } = req.body;
   // find or create

@@ -10,11 +10,10 @@ import { Request } from 'express';
 
 const validateRoles = async (
   models,
-  req: Request,
+  user: any,
   minimum_role: 'admin' | 'moderator' | 'member',
   chain_id: string
 ): Promise<boolean> => {
-  const user = req.user as any;
 
   if (!user) return false;
 
