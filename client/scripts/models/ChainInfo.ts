@@ -41,6 +41,7 @@ class ChainInfo {
   public decimals: number;
   public substrateSpec: RegisteredTypes;
   public adminOnlyPolling: boolean;
+  public communityBanner?: string;
 
   public get node() { return this.ChainNode; }
 
@@ -109,6 +110,7 @@ class ChainInfo {
     this.tokenName = tokenName;
     this.address = address;
     this.adminOnlyPolling = adminOnlyPolling;
+    this.communityBanner = null;
   }
 
   public static fromJSON({
@@ -236,6 +238,11 @@ class ChainInfo {
         )
       );
     });
+  }
+
+  public setBanner(banner_text: string) {
+    console.log(banner_text);
+    this.communityBanner = banner_text;
   }
 
   // TODO: change to accept an object
