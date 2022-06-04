@@ -336,8 +336,6 @@ export class VotingActions
 
     const canVote = getCanVote(proposal, hasVotedForAnyChoice);
 
-    let buttons;
-
     const yesButton = (
       <div class="yes-button">
         <Button
@@ -493,16 +491,6 @@ export class VotingActions
             {abstainButton}
             {noWithVetoButton}
           </div>
-          <ProposalExtensions proposal={proposal} />
-        </>
-      );
-    } else if (
-      proposal.votingType === VotingType.MultiOptionVoting &&
-      buttons.length > 0
-    ) {
-      votingActionObj = (
-        <>
-          <div class="button-row">{buttons}</div>
           <ProposalExtensions proposal={proposal} />
         </>
       );
