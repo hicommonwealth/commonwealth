@@ -23,6 +23,8 @@ export default (
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     banner_text: { type: dataTypes.TEXT, allowNull: false },
     chain_id: { type: dataTypes.STRING, allowNull: false },
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
     tableName: 'CommunityBanners',
     underscored: true,
