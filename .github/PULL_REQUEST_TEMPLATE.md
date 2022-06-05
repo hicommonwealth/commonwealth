@@ -15,6 +15,9 @@
 ## Have proper tags been added (for bug, enhancement, breaking change)?
 - [ ] yes
 
+## Does this have any security implications?
+- [ ] yes
+
 ## Does this PR affect any server routes?
 - [ ] yes, and they are tested: [enter the % coverage here]
 - [ ] yes, and they are not tested: [enter the % coverage here]
