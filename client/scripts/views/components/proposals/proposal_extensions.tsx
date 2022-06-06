@@ -78,8 +78,8 @@ export class ProposalExtensions
       return (
         <div class="ProposalExtensions">
           Voting on councillor candidacies requires a voting bond of{' '}
-          <strong>{votingBond ? votingBond.format() : '--'}</strong>
-          which is returned when the election is completed.
+          <strong>{votingBond ? votingBond.format() : '--'}</strong> which is
+          returned when the election is completed.
           {/* TODO XXX: check whether user has deposited a voting bond
         m('.proposal-bond', 'You have not deposited a voting bond for the current election.'),
         m('.proposal-bond', 'You have already deposited a voting bond for the current election.'), */}

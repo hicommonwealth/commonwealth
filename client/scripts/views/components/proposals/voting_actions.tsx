@@ -58,10 +58,13 @@ export class VotingActions
     const { proposal } = vnode.attrs;
     const { votingModalOpen } = this;
 
+    const onModalClose = () => {
+      this.votingModalOpen = false;
+      m.redraw();
+    };
+
     if (proposal instanceof SubstrateTreasuryProposal) {
       return;
-      // TODO: Set up actions to create a council or democracy proposal
-      // return <CannotVote label="Send to council or democracy" />;
     } else if (!app.isLoggedIn()) {
       return <CannotVote label="Log in to vote" />;
     } else if (!app.user.activeAccount) {
@@ -93,11 +96,6 @@ export class VotingActions
       return <CannotVote label="Unrecognized proposal type" />;
     }
 
-    const onModalClose = () => {
-      this.votingModalOpen = false;
-      m.redraw();
-    };
-
     const voteYes = async (e) => {
       e.preventDefault();
       this.votingModalOpen = true;
@@ -109,7 +107,6 @@ export class VotingActions
             onModalClose
           )
         );
-        // TODO: new code, test
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
         if (this.conviction === undefined) {
           this.votingModalOpen = false;
@@ -190,7 +187,7 @@ export class VotingActions
       if (proposal instanceof SubstrateDemocracyReferendum) {
         if (this.conviction === undefined) {
           this.votingModalOpen = false;
-          return notifyError('Must select a conviction'); // TODO: new code, test
+          return notifyError('Must select a conviction');
         }
         if (this.amount === 0) {
           this.votingModalOpen = false;

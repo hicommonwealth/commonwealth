@@ -9,17 +9,17 @@ import CompoundProposal, {
 } from 'controllers/chain/ethereum/compound/proposal';
 import { notifyError } from 'controllers/app/notifications';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { AnyProposal, ProposalStatus } from 'client/scripts/models/types';
+import { AnyProposal, ProposalStatus } from 'models/types';
 import { CompoundTypes } from '@commonwealth/chain-events';
-import NearSputnikProposal from 'client/scripts/controllers/chain/near/sputnik/proposal';
+import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
   NearSputnikProposalStatus,
   NearSputnikVoteString,
-} from 'client/scripts/controllers/chain/near/sputnik/types';
-import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/substrate/collective_proposal';
-import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
-import { SubstratePhragmenElection } from 'client/scripts/controllers/chain/substrate/phragmen_election';
-import { CosmosProposal } from 'client/scripts/controllers/chain/cosmos/proposal';
+} from 'controllers/chain/near/sputnik/types';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
+import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 
 export const cancelProposal = (
   e: Event,
@@ -67,7 +67,7 @@ export const cancelProposal = (
         console.error(err.toString());
       });
   } else {
-    votingModalOpen = false;
+    onModalClose();
     return notifyError('Invalid proposal type');
   }
 };
