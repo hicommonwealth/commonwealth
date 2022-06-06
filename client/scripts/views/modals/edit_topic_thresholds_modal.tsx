@@ -27,8 +27,8 @@ class EditTopicThresholdsRow
       this.newTokenThresholdInWei = topic.tokenThreshold?.toString() || '0';
     }
 
-    const decimals = app.chain?.meta.chain?.decimals
-      ? app.chain.meta.chain.decimals
+    const decimals = app.chain?.meta?.decimals
+      ? app.chain.meta.decimals
       : app.chain.network === ChainNetwork.ERC721
       ? 0
       : 18;

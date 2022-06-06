@@ -6,7 +6,7 @@ import $ from 'jquery';
 import { Tag, Button } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, ChainNetwork, WalletId } from 'types';
 import { Account, RoleInfo } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
@@ -24,7 +24,7 @@ const SelectAddressModal: m.Component<
   view: (vnode) => {
     const activeAccountsByRole: Array<[Account<any>, RoleInfo]> =
       app.user.getActiveAccountsByRole();
-    const activeEntityInfo = app.chain?.meta?.chain;
+    const activeEntityInfo = app.chain?.meta;
     const createRole = (e) => {
       vnode.state.loading = true;
 
@@ -100,10 +100,10 @@ const SelectAddressModal: m.Component<
     };
 
     const chainbase = app.chain
-      ? app.chain?.meta?.chain?.base
+      ? app.chain?.meta?.base
       : ChainBase.Ethereum;
 
-    const activeCommunityMeta = app.chain.meta?.chain;
+    const activeCommunityMeta = app.chain.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     return m('.SelectAddressModal', [
@@ -113,7 +113,8 @@ const SelectAddressModal: m.Component<
           ? m('.select-address-placeholder', [
               m('p', [
                 `Connect ${
-                  chainbase[0].toUpperCase() + chainbase.slice(1) || 'Web3'
+                  (chainbase && app.chain.network === ChainNetwork.Terra) ? 'Terra' :
+                    (chainbase) ? chainbase[0].toUpperCase() + chainbase.slice(1) : 'Web3'
                 } address to join this community: `,
               ]),
             ])
