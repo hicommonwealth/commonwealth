@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 import { factory, formatFilename } from '../../shared/logging';
-import {REDIS_URL} from "../config";
-import {RedisNamespaces} from "../../shared/types";
+import { REDIS_URL } from '../config';
+import { RedisNamespaces } from '../../shared/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -23,7 +23,10 @@ export class RedisCache {
     log.info(`Connecting to Redis at: ${REDIS_URL}`);
 
     if (!this.client) {
-      this.client = createClient({ url: REDIS_URL, socket: { tls: true, rejectUnauthorized: false } });
+      this.client = createClient({
+        url: REDIS_URL,
+        socket: { tls: true, rejectUnauthorized: false },
+      });
     }
 
     this.client.on('error', (err) => log.error('Redis Client Error', err));
@@ -46,21 +49,36 @@ export class RedisCache {
    * @param key The actual key you want to store (can be any valid string).
    * @param value The value to associate with the namespace and key
    */
-  public async setKey(namespace: RedisNamespaces, key: string, value: string) {
+  public async setKey(
+    namespace: RedisNamespaces,
+    key: string,
+    value: string
+  ): Promise<boolean> {
     if (!this.initialized) {
-      log.error("Redis client is not initialized. Run RedisCache.init() first!")
-      return;
+      log.error(
+        'Redis client is not initialized. Run RedisCache.init() first!'
+      );
+      return false;
     }
     const finalKey = namespace + '_' + key;
 
     try {
       await this.client.set(finalKey, value);
     } catch (e) {
-      log.error(`An error occurred while setting the following key value pair '${finalKey}: ${value}'`, e);
+      log.error(
+        `An error occurred while setting the following key value pair '${finalKey}: ${value}'`,
+        e
+      );
+      return false;
     }
+
+    return true;
   }
 
-  public async getKey(namespace: RedisNamespaces, key: string) {
+  public async getKey(
+    namespace: RedisNamespaces,
+    key: string
+  ): Promise<string> {
     const finalKey = namespace + '_' + 'key';
     return this.client.get(finalKey);
   }
@@ -71,10 +89,57 @@ export class RedisCache {
    * @param namespace
    * @param data
    */
-  public async setKeys(namespace: string, data: {[key: string]: string}) {
+  public async setKeys(
+    namespace: RedisNamespaces,
+    data: { [key: string]: string }
+  ): Promise<boolean> {
     if (!this.initialized) {
-      log.error("Redis client is not initialized. Run RedisCache.init() first!")
-      return;
+      log.error(
+        'Redis client is not initialized. Run RedisCache.init() first!'
+      );
+      return false;
+    }
+
+    try {
+      this.client.MSET(data);
+    } catch (e) {
+      log.error(
+        `An error occurred while setting the following data: ${data}`,
+        e
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Get all the key-value pairs of a specific namespace.
+   * @param namespace The name of the namespace to retrieve keys from
+   * @param maxResults The maximum number of keys to retrieve from the given namespace
+   */
+  public async getNamespaceKeys(
+    namespace: RedisNamespaces,
+    maxResults?: number
+  ): Promise<{ [key: string]: string } | boolean> {
+    if (!this.initialized) {
+      log.error(
+        'Redis client is not initialized. Run RedisCache.init() first!'
+      );
+      return false;
+    }
+
+    const data = {};
+    try {
+      for await (const { field, value } of this.client.scanIterator({
+        MATCH: `${namespace}*`,
+        COUNT: maxResults,
+      })) {
+        data[field] = value;
+      }
+      return data;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -84,8 +149,9 @@ export class RedisCache {
    * every API route. Instead, if you need the Redis client in an API route you should initialize a RedisCache instance
    * alongside the server initialization so that the instance can be used by all routes.
    */
-  public async closeClient() {
+  public async closeClient(): Promise<boolean> {
     await this.client.quit();
     this.initialized = false;
+    return true;
   }
 }
