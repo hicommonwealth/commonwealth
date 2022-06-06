@@ -34,8 +34,6 @@ export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
       value,
     } = vnode.attrs;
 
-    console.log(this);
-
     const params = {
       disabled,
       name: groupName,
@@ -44,8 +42,6 @@ export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
       type: 'checkbox',
       value,
     };
-
-    // console.log(this);
 
     return (
       <label

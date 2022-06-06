@@ -1,6 +1,6 @@
 import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
-import { NodeInfo, ITokenAdapter } from 'models';
+import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
 import { IApp } from 'state';
 
 import Solana from './main';
@@ -16,7 +16,7 @@ export default class Token extends Solana implements ITokenAdapter {
 
 
     const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
-      chain: this.meta.chain.id,
+      chain: this.meta.id,
       address: account.address,
       author_chain: account.chain.id,
     });
@@ -30,7 +30,7 @@ export default class Token extends Solana implements ITokenAdapter {
   }
 
   // Extensions of Solana
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.contractAddress = meta.address;
   }

@@ -15,7 +15,7 @@ import {
 import { ChainNetwork } from 'types';
 import QuillEditor from 'views/components/quill_editor';
 import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import {
   CWTextInput,
@@ -85,17 +85,14 @@ const NewTopicModal: m.Component<
       disabled = true;
     }
 
-    const decimals = app.chain?.meta.chain?.decimals
-      ? app.chain.meta.chain.decimals
+    const decimals = app.chain?.meta?.decimals
+      ? app.chain.meta.decimals
       : app.chain.network === ChainNetwork.ERC721
       ? 0
       : 18;
 
     return m('.NewTopicModal', [
-      m('.compact-modal-title', [
-        m('h3', 'New topic'),
-        m(CompactModalExitButton),
-      ]),
+      m('.compact-modal-title', [m('h3', 'New topic'), m(ModalExitButton)]),
       m('.compact-modal-body', [
         m(Form, [
           m(CWTextInput, {
@@ -108,7 +105,7 @@ const NewTopicModal: m.Component<
             inputValidationFn: (text) => {
               let errorMsg;
               const currentCommunityTopicNames =
-                app.chain.meta.chain.topics.map((t) => t.name.toLowerCase());
+                app.chain.meta.topics.map((t) => t.name.toLowerCase());
               if (currentCommunityTopicNames.includes(text.toLowerCase())) {
                 errorMsg = 'Topic name already used within community.';
                 vnode.state.error = errorMsg;
@@ -156,7 +153,7 @@ const NewTopicModal: m.Component<
                 {
                   for: 'tokenThreshold',
                 },
-                `Number of tokens needed to post (${app.chain?.meta.chain.symbol})`
+                `Number of tokens needed to post (${app.chain?.meta.symbol})`
               ),
               m(TokenDecimalInput, {
                 decimals,

@@ -1,8 +1,10 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_component_showcase.scss';
 
+import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWGradientButton } from './cw_gradient_button';
@@ -16,6 +18,9 @@ import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
+import { CWWalletOptionRow } from './cw_wallet_option_row';
+import { CWAccountCreationButton } from './cw_account_creation_button';
+import { NewLoginModal } from '../../modals/login_modal';
 import { CWCheckbox } from './cw_checkbox';
 
 // const displayColors = (hexList) => {
@@ -72,6 +77,27 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <CWButton
+          label="Click for Login modal"
+          onclick={() =>
+            app.modals.create({
+              modal: NewLoginModal,
+            })
+          }
+        />
+        <div class="card-gallery">
+          <h1>Account Creation Button</h1>
+          <CWAccountCreationButton
+            onclick={() => notifySuccess('Account creation button clicked!')}
+          />
+        </div>
+        <div class="card-gallery">
+          <h1>Wallet Row Card</h1>
+          <CWWalletOptionRow
+            walletName="metamask"
+            onclick={() => notifySuccess('MetaMask clicked!')}
+          />
+        </div>
         <h1>Buttons</h1>
         <div class="button-gallery">
           <CWButton

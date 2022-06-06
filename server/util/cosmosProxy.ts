@@ -12,16 +12,15 @@ function setupCosmosProxy(app: Express, models: DB) {
     log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`)
     try {
       log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
-      const chainNode = await models.ChainNode.findOne({
-        where: {
-          chain: req.params.chain,
-        }
+      const chain = await models.Chain.findOne({
+        where: { id: req.params.chain },
+        include: models.ChainNode
       });
-      if (!chainNode) {
+      if (!chain) {
         throw new Error('Invalid chain');
       }
-      log.trace(`Found cosmos endpoint: ${chainNode.url}`);
-      const response = await axios.post(chainNode.url, req.body, {
+      log.trace(`Found cosmos endpoint: ${chain.ChainNode.url}`);
+      const response = await axios.post(chain.ChainNode.url, req.body, {
         headers: {
           origin: 'https://commonwealth.im'
         }

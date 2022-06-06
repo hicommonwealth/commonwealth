@@ -5,6 +5,7 @@ import m from 'mithril';
 import 'components/chain_icon.scss';
 
 import { ChainInfo } from 'models';
+import { getClasses } from './component_kit/helpers';
 
 type BaseChainIconAttrs = {
   onclick?: () => void;
@@ -20,7 +21,12 @@ export class ChainIcon implements m.ClassComponent<ChainIconAttrs> {
       vnode.attrs.chain.iconUrl || (vnode.attrs.chain as any).icon_url;
 
     return (
-      <div class={`ChainIcon ${onclick ? 'onclick' : ''}`}>
+      <div
+        class={getClasses<{ onclick: boolean }>(
+          { onclick: !!onclick },
+          'ChainIcon'
+        )}
+      >
         {iconUrl ? (
           <img
             class="chain-icon"
@@ -30,7 +36,7 @@ export class ChainIcon implements m.ClassComponent<ChainIconAttrs> {
           />
         ) : (
           <div
-            class="chain-icon .no-image"
+            class="chain-icon no-image"
             style={`width: ${size}px; height: ${size}px;`}
             onclick={onclick}
           >
@@ -49,7 +55,13 @@ export class WalletIcon implements m.ClassComponent<WalletIconAttrs> {
     const { onclick, size = 32, walletName } = vnode.attrs;
 
     return walletName ? (
-      <div class={`ChainIcon ${onclick ? 'onclick' : ''}`}>
+      <div
+        class={getClasses<{ onclick: boolean }>(
+          { onclick: !!onclick },
+          'ChainIcon'
+        )}
+        style={`width: ${size}px; height: ${size}px;`}
+      >
         <img
           class="chain-icon"
           style={`width: ${size}px; height: ${size}px;`}
@@ -68,7 +80,12 @@ export class TokenIcon implements m.ClassComponent<TokenIconAttrs> {
     const { onclick, size = 32, token } = vnode.attrs;
 
     return (
-      <div class={`TokenIcon ${onclick ? 'onclick' : ''}`}>
+      <div
+        class={getClasses<{ onclick: boolean }>(
+          { onclick: !!onclick },
+          'TokenIcon'
+        )}
+      >
         {token.logoURI ? (
           <img
             class="token-icon"
@@ -78,7 +95,7 @@ export class TokenIcon implements m.ClassComponent<TokenIconAttrs> {
           />
         ) : (
           <div
-            class="token-icon.no-image"
+            class="token-icon no-image"
             style={`width: ${size}px;`}
             onclick={onclick}
           >

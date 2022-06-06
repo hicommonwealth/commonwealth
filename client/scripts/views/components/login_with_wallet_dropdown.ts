@@ -58,7 +58,7 @@ const LoginWithWalletDropdown: m.Component<{
           m.route.get().replace(/\?.*/, '') !== '/'
         ? m.route.get()
         : app.chain
-        ? `/${app.chain.meta.chain.id}`
+        ? `/${app.chain.meta.id}`
         : '/?';
     // only redirect to home as an absolute last resort
 
@@ -125,7 +125,7 @@ const LoginWithWalletDropdown: m.Component<{
       return wallets.map((w) => createItem(w));
     };
 
-    let chainbase = app.chain?.meta?.chain?.base;
+    let chainbase = app.chain?.meta?.base;
     if (
       !chainbase &&
       app.customDomainId() &&

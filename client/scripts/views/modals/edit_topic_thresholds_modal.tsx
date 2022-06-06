@@ -10,7 +10,7 @@ import { OffchainTopic } from 'models';
 import { ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 
 class EditTopicThresholdsRow
   implements
@@ -27,8 +27,8 @@ class EditTopicThresholdsRow
       this.newTokenThresholdInWei = topic.tokenThreshold?.toString() || '0';
     }
 
-    const decimals = app.chain?.meta.chain?.decimals
-      ? app.chain.meta.chain.decimals
+    const decimals = app.chain?.meta?.decimals
+      ? app.chain.meta.decimals
       : app.chain.network === ChainNetwork.ERC721
       ? 0
       : 18;
@@ -108,7 +108,7 @@ export class EditTopicThresholdsModal
       <div class="EditTopicThresholdsModal">
         <div class="compact-modal-title">
           <h3>Edit topic thresholds</h3>
-          <CompactModalExitButton />
+          <ModalExitButton />
         </div>
         <div class="compact-modal-body">
           {topics.length > 0
