@@ -122,6 +122,7 @@ import {
   ExecuteButton,
   CancelButton,
 } from '../../components/proposals/voting_actions_components';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -822,7 +823,10 @@ const ProposalComments: m.Component<
         // create comment
         // errors
         vnode.state.commentError &&
-          m('.comments-error', vnode.state.commentError),
+          m(CWValidationText, {
+            message: vnode.state.commentError,
+            status: 'failure',
+          }),
       ]
     );
   },

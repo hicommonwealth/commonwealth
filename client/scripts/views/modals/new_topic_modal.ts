@@ -17,10 +17,7 @@ import QuillEditor from 'views/components/quill_editor';
 import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
-import {
-  CWTextInput,
-  ValidationStatus,
-} from 'views/components/component_kit/cw_text_input';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 
 interface INewTopicModalForm {
   id: number;
@@ -113,7 +110,7 @@ const NewTopicModal: m.Component<
                 errorMsg = 'Topic name already used within community.';
                 vnode.state.error = errorMsg;
                 m.redraw();
-                return [ValidationStatus.Failure, errorMsg];
+                return ['failure', errorMsg];
               }
               const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
               if (disallowedCharMatches) {
@@ -124,10 +121,10 @@ const NewTopicModal: m.Component<
                 ${disallowedCharMatches.join(', ')} are not permitted`;
                 vnode.state.error = errorMsg;
                 m.redraw();
-                return [ValidationStatus.Failure, errorMsg];
+                return ['failure', errorMsg];
               }
               if (vnode.state.error) delete vnode.state.error;
-              return [ValidationStatus.Success, 'Valid topic name'];
+              return ['success', 'Valid topic name'];
             },
             autocomplete: 'off',
             autofocus: true,

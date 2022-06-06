@@ -87,10 +87,6 @@
   flex: 1;
   padding: 24px;
 
-  .error-message {
-    @include error-text();
-    margin-top: 20px;
-  }
   .forum-row {
     margin-top: 14px;
     min-height: 100%;
