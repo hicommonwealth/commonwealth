@@ -7,6 +7,8 @@ import Web3 from 'web3';
 import 'pages/create_community.scss';
 
 import app from 'state';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
@@ -14,12 +16,7 @@ import { isAddress } from 'web3-utils';
 
 import { IAaveGovernanceV2__factory } from 'eth/types';
 import { notifyError } from 'controllers/app/notifications';
-import {
-  IdRow,
-  InputRow,
-  SelectRow,
-  ValidationRow,
-} from 'views/components/metadata_rows';
+import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
 import CompoundAPI, {
   GovernorTokenType,
   GovernorType,
@@ -37,11 +34,7 @@ import {
   EthFormFields,
 } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
@@ -54,11 +47,11 @@ type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
 
 export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
   private state: CreateEthDaoState = {
-    error: '',
+    message: '',
     loaded: false,
     loading: false,
     saving: false,
-    status: '',
+    status: undefined,
     form: {
       address: '',
       chainString: 'Ethereum Mainnet',
@@ -89,8 +82,8 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
       )
         return;
       this.state.loading = true;
-      this.state.status = '';
-      this.state.error = '';
+      this.state.status = undefined;
+      this.state.message = '';
       try {
         if (this.state.form.network === ChainNetwork.Compound) {
           const provider = new Web3.providers.WebsocketProvider(
@@ -109,7 +102,8 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
           }
           const govType = GovernorType[compoundApi.govType];
           const tokenType = GovernorTokenType[compoundApi.tokenType];
-          this.state.status = `Found ${govType} with token type ${tokenType}`;
+          this.state.status = 'success';
+          this.state.message = `Found ${govType} with token type ${tokenType}`;
         } else if (this.state.form.network === ChainNetwork.Aave) {
           const provider = new Web3.providers.WebsocketProvider(
             this.state.form.nodeUrl
@@ -120,12 +114,14 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
             provider
           );
           await aaveApi.init();
-          this.state.status = `Found Aave type DAO`;
+          this.state.status = 'success';
+          this.state.message = `Found Aave type DAO`;
         } else {
           throw new Error('invalid chain network');
         }
       } catch (e) {
-        this.state.error = e.message;
+        this.state.status = 'failure';
+        this.state.message = e.message;
         this.state.loading = false;
         m.redraw();
         return;
@@ -169,7 +165,10 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
             await updateDAO();
           }}
         />
-        <ValidationRow error={this.state.error} status={this.state.status} />
+        <CWValidationText
+          message={this.state.message}
+          status={this.state.status}
+        />
         <InputRow
           title="Name"
           defaultValue={this.state.form.name}
