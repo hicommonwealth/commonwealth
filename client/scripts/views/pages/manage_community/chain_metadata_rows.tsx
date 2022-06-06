@@ -308,7 +308,7 @@ export class ChainMetadataRows
                 auth: true,
                 jwt: app.user.jwt,
               }).then(({ result }) => {
-                notifySuccess('Banner Updated');
+                app.chain.meta.setBanner(this.communityBanner);
               });
             } catch (err) {
               console.log(err);
