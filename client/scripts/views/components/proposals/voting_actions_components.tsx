@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'components/proposals/voting_actions_components.scss';
 
@@ -34,8 +33,7 @@ export class QueueButton
         proposal instanceof CompoundProposal) &&
       proposal.isQueueable && (
         <div class="QueueButton">
-          <Button
-            intent="none"
+          <CWButton
             disabled={!proposal.isQueueable || votingModalOpen}
             onclick={() => proposal.queueTx().then(() => m.redraw())}
             label={
@@ -43,8 +41,6 @@ export class QueueButton
                 ? 'Queued'
                 : 'Queue'
             }
-            compact
-            rounded
           />
         </div>
       )
@@ -63,13 +59,10 @@ export class ExecuteButton
         proposal instanceof CompoundProposal) &&
       proposal.isExecutable && (
         <div class="ExecuteButton">
-          <Button
-            intent="none"
+          <CWButton
             disabled={!proposal.isExecutable || votingModalOpen}
             onclick={() => proposal.executeTx().then(() => m.redraw())}
             label={proposal.data.executed ? 'Executed' : 'Execute'}
-            compact
-            rounded
           />
         </div>
       )
@@ -87,8 +80,8 @@ export class CancelButton
 
     return proposal instanceof MolochProposal ? (
       <div class="VetoButton">
-        <Button
-          intent="negative"
+        <CWButton
+          buttonType="primary-red"
           disabled={
             !(proposal.canAbort(user) && !proposal.completed) || votingModalOpen
           }
@@ -96,31 +89,28 @@ export class CancelButton
             cancelProposal(e, votingModalOpen, proposal, onModalClose)
           }
           label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
-          compact
-          rounded
         />
       </div>
     ) : proposal instanceof CompoundProposal ? (
       <div class="VetoButton">
-        <Button
-          intent="negative"
+        <CWButton
+          buttonType="primary-red"
           disabled={proposal.completed || votingModalOpen}
           onclick={(e) =>
             cancelProposal(e, votingModalOpen, proposal, onModalClose)
           }
           label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
-          compact
         />
       </div>
     ) : proposal instanceof AaveProposal && proposal.isCancellable ? (
       <div class="CancelButton">
-        <Button
+        <CWButton
+          buttonType="secondary-red"
           disabled={!proposal.isCancellable || votingModalOpen}
           onclick={(e) =>
             cancelProposal(e, votingModalOpen, proposal, onModalClose)
           }
           label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
-          compact
         />
       </div>
     ) : null;

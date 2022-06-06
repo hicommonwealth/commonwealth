@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'components/proposals/voting_actions.scss';
 
@@ -46,6 +45,7 @@ import { ProposalExtensions } from './proposal_extensions';
 import { CannotVote, CancelButton } from './voting_actions_components';
 import { getClasses } from '../component_kit/helpers';
 import { getCanVote, getVotingResults } from './helpers';
+import { CWButton } from '../component_kit/cw_button';
 
 export class VotingActions
   implements m.ClassComponent<{ proposal: AnyProposal }>
@@ -335,24 +335,21 @@ export class VotingActions
 
     const yesButton = (
       <div class="yes-button">
-        <Button
+        <CWButton
           disabled={!canVote || hasVotedYes || votingModalOpen}
           onclick={voteYes}
           label={hasVotedYes ? 'Voted yes' : 'Vote yes'}
-          compact
-          rounded
         />
       </div>
     );
 
     const noButton = (
       <div class="no-button">
-        <Button
+        <CWButton
+          buttonType="primary-red"
           disabled={!canVote || hasVotedNo || votingModalOpen}
           onclick={voteNo}
           label={hasVotedNo ? 'Voted no' : 'Vote no'}
-          compact
-          rounded
         />
       </div>
     );
@@ -360,13 +357,10 @@ export class VotingActions
     // substrate: multi-deposit approve
     const multiDepositApproveButton = (
       <div class="approve-button">
-        <Button
-          intent="positive"
+        <CWButton
           disabled={!canVote || votingModalOpen}
           onclick={voteYes}
           label={hasVotedYes && !canVote ? 'Already approved' : 'Second'}
-          compact
-          rounded
         />
       </div>
     );
@@ -374,13 +368,11 @@ export class VotingActions
     // cosmos: abstain
     const abstainButton = (
       <div class="abstain-button">
-        <Button
-          intent="warning"
+        <CWButton
+          buttonType="primary-red"
           disabled={!canVote || hasVotedAbstain || votingModalOpen}
           onclick={voteAbstain}
           label={hasVotedAbstain ? 'Abstained' : 'Abstain'}
-          compact
-          rounded
         />
       </div>
     );
@@ -388,13 +380,11 @@ export class VotingActions
     // cosmos: veto
     const noWithVetoButton = (
       <div class="veto-button">
-        <Button
-          intent="warning"
+        <CWButton
+          buttonType="primary-red"
           disabled={!canVote || hasVotedVeto || votingModalOpen}
           onclick={voteVeto}
           label={hasVotedVeto ? 'Vetoed' : 'Veto'}
-          compact
-          rounded
         />
       </div>
     );
@@ -402,16 +392,13 @@ export class VotingActions
     // moloch: process
     const processButton = proposal instanceof MolochProposal && (
       <div class="yes-button">
-        <Button
-          intent="none"
+        <CWButton
           disabled={
             proposal.state !== MolochProposalState.ReadyToProcess ||
             votingModalOpen
           }
           onclick={processProposal}
           label={proposal.data.processed ? 'Processed' : 'Process'}
-          compact
-          rounded
         />
       </div>
     );
@@ -419,13 +406,10 @@ export class VotingActions
     // near: remove
     const removeButton = proposal instanceof NearSputnikProposal && (
       <div class="no-button">
-        <Button
-          intent="none"
+        <CWButton
           disabled={!canVote || votingModalOpen}
           onclick={voteRemove}
           label={hasVotedRemove ? 'Voted remove' : 'Vote remove'}
-          compact
-          rounded
         />
       </div>
     );
