@@ -27,9 +27,7 @@ export class CWBanner implements m.ClassComponent<BannerAttrs> {
         )}
       >
         {isString(bannerContent) ? (
-          <CWText type="caption" noWrap>
-            {bannerContent}
-          </CWText>
+          <CWText type="caption">{bannerContent}</CWText>
         ) : (
           bannerContent
         )}
