@@ -4,7 +4,11 @@ pragma solidity ^0.8.0;
 import './DataTypes.sol';
 
 interface IProjectBaseFactory {
-    event ProjectCreated(uint256 projectIndex, address newProject);
+    event ProjectCreated(uint256 projectIndex, address projectAddress);
+    event ProtocolFeeToChange(address oldAddr, address newAddr);
+    event ProtocolFeeChange(uint8 oldFee, uint8 newFee);
+    event ProjectImplChange(address oldAddr, address newAddr);
+    event ProtocolTokenImplChange(address oldAddr, address newAddr);
 
     function protocolData() external view returns (DataTypes.ProtocolData memory);
 
@@ -16,13 +20,13 @@ interface IProjectBaseFactory {
 
     function isAcceptedToken(address token) external view returns (bool);
 
-    function numProjects() external view returns (uint256);
+    function numProjects() external view returns (uint32);
 
     function addAcceptedTokens(address[] memory _tokens) external;
 
-    function setFeeTo(address payable _feeTo) external;
+    function setFeeTo(address _feeTo) external;
 
-    function setProtocolFee(uint256 _protocolFee) external;
+    function setProtocolFee(uint8 _protocolFee) external;
 
     function setProjectImpl(address _projectImpl) external;
 }

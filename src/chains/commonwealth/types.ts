@@ -67,6 +67,14 @@ export interface IProjectCreated extends IEvent {
   ipfsHash: string;
   cwUrl: string;
   creator: Address;
+
+  // contract init info
+  beneficiary: Address;
+  acceptedToken: Address;
+  curatorFee: Balance;
+  threshold: Balance;
+  deadline: number;
+  fundingAmount: Balance;
 }
 
 export interface IProjectBacked extends IEvent {

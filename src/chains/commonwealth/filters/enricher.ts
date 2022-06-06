@@ -5,7 +5,8 @@ import { TypedEventFilter } from '../../../contractTypes/commons';
 import {
   ICuratedProjectFactory,
   ICuratedProject,
-  IProjectBase__factory,
+  // eslint-disable-next-line camelcase
+  ICuratedProject__factory,
 } from '../../../contractTypes';
 import { CWEvent, SupportedNetwork } from '../../../interfaces';
 import { EventKind, RawEvent, IEventData, Api } from '../types';
@@ -28,31 +29,46 @@ export async function Enrich(
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     case EventKind.ProjectCreated: {
-      const { projectIndex, newProject } = rawData.args as GetArgType<
+      const { projectIndex, projectAddress } = rawData.args as GetArgType<
         'ProjectCreated'
       >;
-      const projectContract = IProjectBase__factory.connect(
-        newProject,
+      const projectContract = ICuratedProject__factory.connect(
+        projectAddress,
         api.factory.provider
       );
       const {
+        id,
         name,
         ipfsHash,
-        cwUrl,
+        url,
         creator,
       } = await projectContract.metaData();
+      const {
+        threshold,
+        deadline,
+        beneficiary,
+        acceptedToken,
+      } = await projectContract.projectData();
+      const curatorFee = await projectContract.curatorFee();
+      const fundingAmount = await projectContract.totalFunding();
       return {
         blockNumber,
         excludeAddresses: [],
         network: SupportedNetwork.Commonwealth,
         data: {
           kind,
-          id: newProject,
+          id: projectAddress,
           index: projectIndex.toString(),
           name: hexToAscii(name).replace(/\0/g, ''),
           ipfsHash: hexToAscii(ipfsHash).replace(/\0/g, ''),
-          cwUrl: hexToAscii(cwUrl).replace(/\0/g, ''),
+          cwUrl: hexToAscii(url).replace(/\0/g, ''),
           creator,
+          beneficiary,
+          acceptedToken,
+          curatorFee: curatorFee.toString(),
+          threshold: threshold.toString(),
+          deadline: +deadline,
+          fundingAmount: fundingAmount.toString(),
         },
       };
     }

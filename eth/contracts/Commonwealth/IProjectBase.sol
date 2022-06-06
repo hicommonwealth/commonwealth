@@ -4,29 +4,22 @@ pragma solidity ^0.8.0;
 import {DataTypes} from './DataTypes.sol';
 
 interface IProjectBase {
-    event Back(address sender, address token, uint256 amount);
-    event Withdraw(address sender, address token, uint256 amount, bytes32 withdrawalType);
+    event Back(address indexed sender, address indexed token, uint256 amount);
+    event Withdraw(address indexed sender, address indexed token, uint256 amount, bytes32 withdrawalType);
     event Succeeded(uint256 timestamp, uint256 amount);
     event Failed();
+    event ProjectDataChange(bytes32 name, bytes32 oldData, bytes32 newData);
 
     ///////////////////////////////////////////
     // Getters - view functions
     //////////////////////////////////////////
     function metaData() external view returns (DataTypes.ProjectMetaData memory);
 
-    function threshold() external view returns (uint256); // backing threshold in native token
+    function projectData() external view returns (DataTypes.ProjectData memory);
 
-    function deadline() external view returns (uint256); // deadline in blocktime
+    function protocolData() external view returns (DataTypes.ProtocolData memory);
 
     function totalFunding() external view returns (uint256);
-
-    function protocolFee() external view returns (uint256);
-
-    function protocolFeeTo() external view returns (address);
-
-    function acceptedToken() external view returns (address);
-
-    function beneficiary() external view returns (address);
 
     function lockedWithdraw() external view returns (bool);
 
@@ -39,6 +32,8 @@ interface IProjectBase {
     function setName(bytes32 _name) external;
 
     function setIpfsHash(bytes32 _ipfsHash) external;
+
+    function setUrl(bytes32 _url) external;
 
     function back(uint256 _amount) external returns (bool);
 

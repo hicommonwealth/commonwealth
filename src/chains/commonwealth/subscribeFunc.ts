@@ -50,7 +50,7 @@ export async function createApi(
 
       // create subscriptions for all existing projects
       const nProjects = await api.factory.numProjects();
-      for (let projectN = 1; projectN <= nProjects.toNumber(); projectN++) {
+      for (let projectN = 1; projectN <= nProjects; projectN++) {
         const projectAddress = await api.factory.projects(projectN);
         const project = await constructProjectApi(api.factory, projectAddress);
         api.projects.push(project);

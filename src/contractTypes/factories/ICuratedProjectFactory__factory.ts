@@ -33,11 +33,87 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
-        name: "newProject",
+        name: "projectAddress",
         type: "address",
       },
     ],
     name: "ProjectCreated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "oldAddr",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newAddr",
+        type: "address",
+      },
+    ],
+    name: "ProjectImplChange",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "oldFee",
+        type: "uint8",
+      },
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "newFee",
+        type: "uint8",
+      },
+    ],
+    name: "ProtocolFeeChange",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "oldAddr",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newAddr",
+        type: "address",
+      },
+    ],
+    name: "ProtocolFeeToChange",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "oldAddr",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newAddr",
+        type: "address",
+      },
+    ],
+    name: "ProtocolTokenImplChange",
     type: "event",
   },
   {
@@ -67,11 +143,11 @@ const _abi = [
       },
       {
         internalType: "bytes32",
-        name: "_cwUrl",
+        name: "_url",
         type: "bytes32",
       },
       {
-        internalType: "address payable",
+        internalType: "address",
         name: "_beneficiary",
         type: "address",
       },
@@ -131,9 +207,9 @@ const _abi = [
     name: "numProjects",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "uint32",
         name: "",
-        type: "uint256",
+        type: "uint32",
       },
     ],
     stateMutability: "view",
@@ -196,7 +272,7 @@ const _abi = [
             type: "uint8",
           },
           {
-            internalType: "address payable",
+            internalType: "address",
             name: "feeTo",
             type: "address",
           },
@@ -213,11 +289,11 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_cwToken",
+        name: "_cmnProjTokenImpl",
         type: "address",
       },
     ],
-    name: "setCWTokenImpl",
+    name: "setCmnProjTokenImpl",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -225,7 +301,7 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address payable",
+        internalType: "address",
         name: "_feeTo",
         type: "address",
       },
@@ -251,9 +327,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
+        internalType: "uint8",
         name: "_protocolFee",
-        type: "uint256",
+        type: "uint8",
       },
     ],
     name: "setProtocolFee",

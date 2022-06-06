@@ -4,15 +4,15 @@ pragma solidity ^0.8.0;
 import "./IProjectBase.sol";
 
 interface ICuratedProject is IProjectBase {
-    event Curate(address sender, address token, uint256 amount);
+    event Curate(address indexed sender, address indexed token, uint256 amount);
 
     function bToken() external view returns (address);
 
     function cToken() external view returns (address);
 
-    function totalCuratorFunding() external view returns (address);
+    function totalCuratorFunding() external view returns (uint256);
 
-    function curatorFee() external view returns (address);
+    function curatorFee() external view returns (uint256);
 
     function initialize(
         DataTypes.ProjectMetaData memory _metaData,
