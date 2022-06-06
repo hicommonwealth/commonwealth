@@ -138,7 +138,11 @@ const CouncilVotingModal: m.Component<
           }),
           candidates.length === 0 &&
             m('.no-candidates', 'No candidates to vote for'),
-          vnode.state.error && m('.voting-error', vnode.state.error),
+          vnode.state.error &&
+            m('failure', {
+              message: vnode.state.error,
+              status: 'failure',
+            }),
         ]),
       ]),
       m('.compact-modal-actions', [

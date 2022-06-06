@@ -58,7 +58,6 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
             disabled={disabled}
           />
         }
-        inline={true}
         hasArrow={false}
         transitionDuration={0}
         closeOnContentClick={true}

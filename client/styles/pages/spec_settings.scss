@@ -1,4 +1,4 @@
-@import "client/styles/shared";
+@import 'shared';
 
 .SpecSettingsPage {
   height: 100%;
@@ -27,6 +27,7 @@
 
   .cui-grid {
     width: 100%;
+
     .form-col {
       display: flex;
       flex-direction: column;
@@ -38,10 +39,5 @@
         display: block;
       }
     }
-  }
-
-  .warn {
-    @include error-text();
-    margin: 6px 0 12px;
   }
 }

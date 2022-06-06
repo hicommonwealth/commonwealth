@@ -10,12 +10,14 @@ export enum ComponentType {
   GradientButton = 'GradientButton',
   Icon = 'Icon',
   IconButton = 'IconButton',
+  Label = 'Label',
   Modal = 'Modal',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   Text = 'Text',
   TextInput = 'TextInput',
   WalletOptionRow = 'WalletOptionRow',
+  ValidationText = 'ValidationText',
 }
 
 export type StyleAttrs = {
