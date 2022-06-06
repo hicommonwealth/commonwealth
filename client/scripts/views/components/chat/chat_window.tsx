@@ -124,10 +124,6 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       });
     }
 
-    const messageIsHighlighted = (message: any): boolean => {
-      return m.route.param('message') && Number(m.route.param('message')) === message.id
-    }
-
     const messageToText = (msg: any) => {
       try {
         const doc = JSON.parse(msg.message);
@@ -139,6 +135,10 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
           openLinksInNewTab: true,
         })
       }
+    }
+
+    const messageIsHighlighted = (message: any): boolean => {
+      return m.route.param('message') && Number(m.route.param('message')) === message.id
     }
 
     return (

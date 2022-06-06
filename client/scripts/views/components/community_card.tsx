@@ -5,38 +5,35 @@ import m from 'mithril';
 import 'components/community_card.scss';
 
 import app from 'state';
-import { NodeInfo } from 'models';
+import { ChainInfo, NodeInfo } from 'models';
 import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWText } from './component_kit/cw_text';
 
-type CommunityCardAttrs = { chain: string; nodeList: NodeInfo[] };
+type CommunityCardAttrs = { chain: ChainInfo };
 
 export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
   view(vnode) {
-    const { chain, nodeList } = vnode.attrs;
-
-    const chainInfo = app.config.chains.getById(chain);
+    const { chain } = vnode.attrs as CommunityCardAttrs;
 
     const redirectFunction = (e) => {
       e.preventDefault();
       localStorage['home-scrollY'] = window.scrollY;
-      m.route.set(`/${chain}`);
+      m.route.set(`/${chain.id}`);
     };
 
     // Potentially Temporary (could be built into create community flow)
     let prettyDescription = '';
 
-    if (chainInfo.description) {
+    if (chain.description) {
       prettyDescription =
-        chainInfo.description[chainInfo.description.length - 1] === '.'
-          ? chainInfo.description
-          : `${chainInfo.description}.`;
+        chain.description[chain.description.length - 1] === '.'
+          ? chain.description
+          : `${chain.description}.`;
     }
 
-    const iconUrl =
-      nodeList[0].chain.iconUrl || (nodeList[0].chain as any).icon_url;
+    const iconUrl = chain.iconUrl;
 
     return (
       <CWCard
@@ -50,7 +47,7 @@ export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
         ) : (
           <div class="large-chain-icon no-image">
             <CWText type="h2" fontWeight="bold" className="no-image-text">
-              {chainInfo.name.slice(0, 1)}
+              {chain.name.slice(0, 1)}
             </CWText>
           </div>
         )}
@@ -59,10 +56,10 @@ export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
             type="h3"
             fontWeight="semiBold"
             className="chain-name"
-            title={chainInfo.name}
+            title={chain.name}
             noWrap
           >
-            {chainInfo.name}
+            {chain.name}
           </CWText>
           <CWText className="card-description" title={prettyDescription}>
             {prettyDescription}

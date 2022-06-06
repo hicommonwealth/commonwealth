@@ -10,7 +10,7 @@ import {
   initChain,
   initNewTokenChain,
   deinitChainOrCommunity,
-  selectNode,
+  selectChain,
 } from 'app';
 import app from 'state';
 import { AppToasts } from 'views/toast';
@@ -44,9 +44,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
 
-    const scopeMatchesChain = app.config.nodes
-      .getAll()
-      .find((n) => n.chain.id === scope);
+    const scopeMatchesChain = app.config.chains.getById(scope);
 
     if (app.loadingError) {
       return (
@@ -92,7 +90,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       this.loadingScope = scope;
       if (scopeMatchesChain) {
         this.deferred = deferChain;
-        selectNode(scopeMatchesChain, deferChain).then((response) => {
+        selectChain(scopeMatchesChain, deferChain).then((response) => {
           if (!deferChain && response) {
             initChain();
           }

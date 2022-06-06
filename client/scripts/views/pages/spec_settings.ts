@@ -2,7 +2,7 @@ import 'pages/spec_settings.scss';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
-import { initChain, selectNode } from 'app';
+import { initChain, selectChain } from 'app';
 import { ChainBase } from 'types';
 import { ChainInfo, RolePermission } from 'models';
 import { Button, TextArea, Form, Grid, Col } from 'construct-ui';
@@ -62,7 +62,7 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
       vnode.state.chain =
         app.chain.base === ChainBase.Substrate &&
         (isAdmin || substrateAdminChainIds.includes(app.chain.id))
-          ? app.chain?.meta?.chain.id
+          ? app.chain?.meta?.id
           : vnode.state.chains[0];
       vnode.state.spec =
         app.config.chains.getById(vnode.state.chain).substrateSpec || {};
@@ -140,8 +140,8 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
                   }
 
                   // get URL as needed
-                  const nodes = app.config.nodes.getByChain(vnode.state.chain);
-                  if (!nodes.length) {
+                  const node = app.chain.meta.node;
+                  if (!node) {
                     vnode.state.error = 'Chain has no nodes!';
                     return;
                   }
@@ -149,7 +149,7 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
                   // create new API
                   vnode.state.isLoading = true;
                   const provider = new WsProvider(
-                    constructSubstrateUrl(nodes[0].url),
+                    constructSubstrateUrl(node.url),
                     false
                   );
                   try {
@@ -212,11 +212,8 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
 
                     // reinitialize chain with new spec if editing current chain
                     if (app.chain?.id === newChain.id) {
-                      const n = app.config.nodes.getByChain(newChain.id);
-                      if (n.length) {
-                        await selectNode(n[0]);
-                        await initChain();
-                      }
+                      await selectChain(newChain);
+                      await initChain();
                     }
                   }
 

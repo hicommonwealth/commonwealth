@@ -6,7 +6,7 @@ import numeral from 'numeral';
 import 'pages/landing/community_cards.scss';
 
 import app from 'state';
-import { NodeInfo } from 'models';
+import { ChainInfo } from 'models';
 import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 import { CWButton } from '../components/component_kit/cw_button';
 import Sublayout from '../sublayout';
@@ -51,7 +51,6 @@ class HomepageCommunityCards implements m.ClassComponent {
   private chainBases: Array<string>;
   private filterMap: { [val: string]: boolean };
   private chainToCategoriesMap: { [chain: string]: string[] };
-  private myChains: Array<NodeInfo | string | any>;
 
   oninit() {
     const chainsAndCategories = app.config.chainCategories;
@@ -82,35 +81,23 @@ class HomepageCommunityCards implements m.ClassComponent {
       categoryTypes,
       chainsAndCategories
     );
-
-    // Load Chains
-    const chains = {};
-    app.config.nodes.getAll().forEach((n) => {
-      if (chains[n.chain.id]) {
-        chains[n.chain.id].push(n);
-      } else {
-        chains[n.chain.id] = [n];
-      }
-    });
-    this.myChains = Object.entries(chains);
   }
   view() {
-    const chainBaseFilter = (list, filterMap) => {
+    const chainBaseFilter = (list: ChainInfo[], filterMap) => {
       return list.filter((data) => {
         const chainBase =
-          Object.keys(ChainBase)[
-            Object.values(ChainBase).indexOf(data[1][0].chain.base)
-          ]; // Converts chain.base into a ChainBase key to match our filterMap keys
+          Object.keys(ChainBase)[Object.values(ChainBase).indexOf(data.base)];
+        // Converts chain.base into a ChainBase key to match our filterMap keys
 
         return filterMap[chainBase];
       });
     };
 
-    const chainNetworkFilter = (list, filterMap) => {
+    const chainNetworkFilter = (list: ChainInfo[], filterMap) => {
       return list.filter((data) => {
         const chainNetwork =
           Object.keys(ChainNetwork)[
-            Object.values(ChainNetwork).indexOf(data[1][0].chain.network)
+            Object.values(ChainNetwork).indexOf(data.network)
           ]; // Converts chain.base into a ChainBase key to match our filterMap keys
 
         if (this.chainNetworks.includes(chainNetwork)) {
@@ -126,8 +113,8 @@ class HomepageCommunityCards implements m.ClassComponent {
         for (const cat of this.chainCategories) {
           if (
             this.filterMap[cat] &&
-            (!this.chainToCategoriesMap[data[0]] ||
-              !this.chainToCategoriesMap[data[0]].includes(cat))
+            (!this.chainToCategoriesMap[data.id] ||
+              !this.chainToCategoriesMap[data.id].includes(cat))
           ) {
             return false;
           }
@@ -136,7 +123,7 @@ class HomepageCommunityCards implements m.ClassComponent {
       });
     };
 
-    const sortChains = (list, filterMap) => {
+    const sortChains = (list: ChainInfo[], filterMap) => {
       let filteredList = list;
 
       if (Object.values(filterMap).includes(true)) {
@@ -175,25 +162,18 @@ class HomepageCommunityCards implements m.ClassComponent {
       // Filter by recent thread activity
       const res = filteredList
         .sort((a, b) => {
-          const threadCountA = app.recentActivity.getCommunityThreadCount(
-            Array.isArray(a) ? a[0] : a.id
-          );
-          const threadCountB = app.recentActivity.getCommunityThreadCount(
-            Array.isArray(b) ? b[0] : b.id
-          );
+          const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
+          const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
           return threadCountB - threadCountA;
         })
-        .map((entity: Array<NodeInfo | string>) => {
-          if (Array.isArray(entity)) {
-            const [chain, nodeList]: [string, NodeInfo] = entity as any;
-            return <CommunityCard chain={chain} nodeList={nodeList} />;
-          }
-          return null;
+        .map((chain: ChainInfo) => {
+          return m(CommunityCard, { chain });
         });
+
       return res;
     };
 
-    const sortedChains = sortChains(this.myChains, this.filterMap);
+    const sortedChains = sortChains(app.config.chains.getAll(), this.filterMap);
 
     const totalCommunitiesString = buildCommunityString(sortedChains.length);
 
