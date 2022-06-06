@@ -10,33 +10,3 @@
   padding: 8px;
   width: 100%;
 }
-
-.ExecuteButton,
-.QueueButton {
-  button {
-    background: linear-gradient(268.96deg, #00db8c 2.02%, #1bdebb 94.68%);
-    color: $white;
-  }
-}
-
-.CancelButton {
-  button {
-    background: $white;
-    border: 1px solid $rorange-500;
-    color: $rorange-500;
-  }
-}
-
-.VetoButton {
-  border-radius: $border-radius-corners;
-  display: inline-block;
-  padding: 0 5px;
-  width: 50%;
-
-  button {
-    display: block;
-    width: 100%;
-    padding-right: 2px;
-    padding-left: 2px;
-  }
-}

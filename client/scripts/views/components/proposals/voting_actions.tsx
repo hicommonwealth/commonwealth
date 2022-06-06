@@ -43,9 +43,9 @@ import { NearAccount } from 'controllers/chain/near/account';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ProposalExtensions } from './proposal_extensions';
 import { CannotVote, CancelButton } from './voting_actions_components';
-import { getClasses } from '../component_kit/helpers';
 import { getCanVote, getVotingResults } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
+import { CWText } from '../component_kit/cw_text';
 
 export class VotingActions
   implements m.ClassComponent<{ proposal: AnyProposal }>
@@ -334,84 +334,70 @@ export class VotingActions
     const canVote = getCanVote(proposal, hasVotedForAnyChoice);
 
     const yesButton = (
-      <div class="yes-button">
-        <CWButton
-          disabled={!canVote || hasVotedYes || votingModalOpen}
-          onclick={voteYes}
-          label={hasVotedYes ? 'Voted yes' : 'Vote yes'}
-        />
-      </div>
+      <CWButton
+        disabled={!canVote || hasVotedYes || votingModalOpen}
+        onclick={voteYes}
+        label={hasVotedYes ? 'Voted yes' : 'Vote yes'}
+      />
     );
 
     const noButton = (
-      <div class="no-button">
-        <CWButton
-          buttonType="primary-red"
-          disabled={!canVote || hasVotedNo || votingModalOpen}
-          onclick={voteNo}
-          label={hasVotedNo ? 'Voted no' : 'Vote no'}
-        />
-      </div>
+      <CWButton
+        buttonType="primary-red"
+        disabled={!canVote || hasVotedNo || votingModalOpen}
+        onclick={voteNo}
+        label={hasVotedNo ? 'Voted no' : 'Vote no'}
+      />
     );
 
     // substrate: multi-deposit approve
     const multiDepositApproveButton = (
-      <div class="approve-button">
-        <CWButton
-          disabled={!canVote || votingModalOpen}
-          onclick={voteYes}
-          label={hasVotedYes && !canVote ? 'Already approved' : 'Second'}
-        />
-      </div>
+      <CWButton
+        disabled={!canVote || votingModalOpen}
+        onclick={voteYes}
+        label={hasVotedYes && !canVote ? 'Already approved' : 'Second'}
+      />
     );
 
     // cosmos: abstain
     const abstainButton = (
-      <div class="abstain-button">
-        <CWButton
-          buttonType="primary-red"
-          disabled={!canVote || hasVotedAbstain || votingModalOpen}
-          onclick={voteAbstain}
-          label={hasVotedAbstain ? 'Abstained' : 'Abstain'}
-        />
-      </div>
+      <CWButton
+        buttonType="primary-red"
+        disabled={!canVote || hasVotedAbstain || votingModalOpen}
+        onclick={voteAbstain}
+        label={hasVotedAbstain ? 'Abstained' : 'Abstain'}
+      />
     );
 
     // cosmos: veto
     const noWithVetoButton = (
-      <div class="veto-button">
-        <CWButton
-          buttonType="primary-red"
-          disabled={!canVote || hasVotedVeto || votingModalOpen}
-          onclick={voteVeto}
-          label={hasVotedVeto ? 'Vetoed' : 'Veto'}
-        />
-      </div>
+      <CWButton
+        buttonType="primary-red"
+        disabled={!canVote || hasVotedVeto || votingModalOpen}
+        onclick={voteVeto}
+        label={hasVotedVeto ? 'Vetoed' : 'Veto'}
+      />
     );
 
     // moloch: process
     const processButton = proposal instanceof MolochProposal && (
-      <div class="yes-button">
-        <CWButton
-          disabled={
-            proposal.state !== MolochProposalState.ReadyToProcess ||
-            votingModalOpen
-          }
-          onclick={processProposal}
-          label={proposal.data.processed ? 'Processed' : 'Process'}
-        />
-      </div>
+      <CWButton
+        disabled={
+          proposal.state !== MolochProposalState.ReadyToProcess ||
+          votingModalOpen
+        }
+        onclick={processProposal}
+        label={proposal.data.processed ? 'Processed' : 'Process'}
+      />
     );
 
     // near: remove
     const removeButton = proposal instanceof NearSputnikProposal && (
-      <div class="no-button">
-        <CWButton
-          disabled={!canVote || votingModalOpen}
-          onclick={voteRemove}
-          label={hasVotedRemove ? 'Voted remove' : 'Vote remove'}
-        />
-      </div>
+      <CWButton
+        disabled={!canVote || votingModalOpen}
+        onclick={voteRemove}
+        label={hasVotedRemove ? 'Voted remove' : 'Vote remove'}
+      />
     );
 
     let votingActionObj;
@@ -535,13 +521,10 @@ export class VotingActions
     }
 
     return (
-      <div
-        class={getClasses<{ isAaveProposal: boolean }>(
-          { isAaveProposal: proposal instanceof AaveProposal },
-          'VotingActions'
-        )}
-      >
-        <h3>Cast Your Vote</h3>
+      <div class="VotingActions">
+        <CWText type="h3" className="voting-actions-header">
+          Cast Your Vote
+        </CWText>
         {votingActionObj}
       </div>
     );

@@ -32,17 +32,13 @@ export class QueueButton
       (proposal instanceof AaveProposal ||
         proposal instanceof CompoundProposal) &&
       proposal.isQueueable && (
-        <div class="QueueButton">
-          <CWButton
-            disabled={!proposal.isQueueable || votingModalOpen}
-            onclick={() => proposal.queueTx().then(() => m.redraw())}
-            label={
-              proposal.data.queued || proposal.data.executed
-                ? 'Queued'
-                : 'Queue'
-            }
-          />
-        </div>
+        <CWButton
+          disabled={!proposal.isQueueable || votingModalOpen}
+          onclick={() => proposal.queueTx().then(() => m.redraw())}
+          label={
+            proposal.data.queued || proposal.data.executed ? 'Queued' : 'Queue'
+          }
+        />
       )
     );
   }
@@ -58,13 +54,11 @@ export class ExecuteButton
       (proposal instanceof AaveProposal ||
         proposal instanceof CompoundProposal) &&
       proposal.isExecutable && (
-        <div class="ExecuteButton">
-          <CWButton
-            disabled={!proposal.isExecutable || votingModalOpen}
-            onclick={() => proposal.executeTx().then(() => m.redraw())}
-            label={proposal.data.executed ? 'Executed' : 'Execute'}
-          />
-        </div>
+        <CWButton
+          disabled={!proposal.isExecutable || votingModalOpen}
+          onclick={() => proposal.executeTx().then(() => m.redraw())}
+          label={proposal.data.executed ? 'Executed' : 'Execute'}
+        />
       )
     );
   }
@@ -79,40 +73,34 @@ export class CancelButton
     const { proposal, votingModalOpen, user, onModalClose } = vnode.attrs;
 
     return proposal instanceof MolochProposal ? (
-      <div class="VetoButton">
-        <CWButton
-          buttonType="primary-red"
-          disabled={
-            !(proposal.canAbort(user) && !proposal.completed) || votingModalOpen
-          }
-          onclick={(e) =>
-            cancelProposal(e, votingModalOpen, proposal, onModalClose)
-          }
-          label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
-        />
-      </div>
+      <CWButton
+        buttonType="primary-red"
+        disabled={
+          !(proposal.canAbort(user) && !proposal.completed) || votingModalOpen
+        }
+        onclick={(e) =>
+          cancelProposal(e, votingModalOpen, proposal, onModalClose)
+        }
+        label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
+      />
     ) : proposal instanceof CompoundProposal ? (
-      <div class="VetoButton">
-        <CWButton
-          buttonType="primary-red"
-          disabled={proposal.completed || votingModalOpen}
-          onclick={(e) =>
-            cancelProposal(e, votingModalOpen, proposal, onModalClose)
-          }
-          label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
-        />
-      </div>
+      <CWButton
+        buttonType="primary-red"
+        disabled={proposal.completed || votingModalOpen}
+        onclick={(e) =>
+          cancelProposal(e, votingModalOpen, proposal, onModalClose)
+        }
+        label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
+      />
     ) : proposal instanceof AaveProposal && proposal.isCancellable ? (
-      <div class="CancelButton">
-        <CWButton
-          buttonType="secondary-red"
-          disabled={!proposal.isCancellable || votingModalOpen}
-          onclick={(e) =>
-            cancelProposal(e, votingModalOpen, proposal, onModalClose)
-          }
-          label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
-        />
-      </div>
+      <CWButton
+        buttonType="secondary-red"
+        disabled={!proposal.isCancellable || votingModalOpen}
+        onclick={(e) =>
+          cancelProposal(e, votingModalOpen, proposal, onModalClose)
+        }
+        label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
+      />
     ) : null;
   }
 }
