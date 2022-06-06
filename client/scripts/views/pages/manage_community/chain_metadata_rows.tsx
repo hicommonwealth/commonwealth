@@ -18,6 +18,7 @@ import {
   buildCategoryMap,
   setChainCategories,
 } from './helpers';
+import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -214,13 +215,15 @@ export class ChainMetadataRows
           }}
         />
         <div class="tag-row">
-          <label>Community Tags</label>
+          <CWLabel label="Community Tags" />
           <div class="tag-group">
             {Object.keys(this.selectedTags).map((key) => {
               return (
                 <CWButton
                   label={key}
-                  buttonType={this.selectedTags[key] ? 'primary' : 'secondary'}
+                  buttonType={
+                    this.selectedTags[key] ? 'primary-black' : 'secondary-black'
+                  }
                   onclick={() => {
                     this.selectedTags[key] = !this.selectedTags[key];
                   }}

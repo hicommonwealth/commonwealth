@@ -4,11 +4,6 @@
   flex: 1;
   padding: 24px;
 
-  .error {
-    @include error-text();
-    margin-bottom: 15px;
-  }
-
   h3 {
     margin-top: 0;
     margin-bottom: 20px;

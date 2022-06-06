@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 @import './index';
 
 .CreateComment {
@@ -8,16 +8,20 @@
     @include extraSmall {
       margin: 0;
     }
+
     flex: 1;
     margin-left: 26px;
+
     .form-bottom {
       display: flex;
       flex-direction: row-reverse;
       justify-content: space-between;
       width: 100%;
+
       .form-buttons {
         display: flex;
         flex-direction: row-reverse;
+
         .cui-button {
           box-sizing: border-box;
           border-radius: 8px;
@@ -25,6 +29,7 @@
           font-size: 18px;
           text-transform: uppercase;
         }
+
         .cui-button[type='submit'] {
           // background: linear-gradient(50.49deg, #91BFFF -6.12%, #91FFA0 30.17%, #FBFF91 62.49%, #FF9191 102.75%);
           // color: $black;
@@ -33,18 +38,18 @@
           border: none;
           margin-left: 20px;
         }
+
         .cui-button[type='cancel'] {
           background: $white;
           border: 2px solid $neutral-100;
           color: $neutral-500;
         }
       }
-      .new-comment-error {
-        @include error-text;
-      }
     }
+
     > .User {
       font-size: $discussion-meta-font-size;
+
       &,
       a.user-display-name {
         color: $discussion-meta-color;
@@ -54,18 +59,22 @@
 
   .QuillEditor {
     margin: 14px 0 18px;
+
     .ql-toolbar,
     .ql-editor {
       background: $white;
     }
+
     .ql-editor {
       min-height: 100px;
       border-radius: 2px;
     }
   }
+
   .cui-callout {
     margin-top: 20px;
   }
+
   .token-requirement {
     color: $neutral-500;
     margin-bottom: 10px;

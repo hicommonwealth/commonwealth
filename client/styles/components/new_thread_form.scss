@@ -135,10 +135,6 @@
       margin-right: 12px;
       // no margin-bottom here because it breaks button alignment
     }
-    .error-message {
-      @include error-text;
-      margin: 10px 0 20px;
-    }
   }
   &.is-modal .new-thread-form-body {
     .cui-tabs {
