@@ -34,6 +34,7 @@ export const authenticate = (
       (err, decodedUser) => {
         if (err)
           return next(new Error('Authentication Error: incorrect JWT token'));
+        console.log(decodedUser);
         (<any>socket).user = decodedUser;
         next();
       }
