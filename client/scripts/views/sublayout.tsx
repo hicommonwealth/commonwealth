@@ -11,11 +11,13 @@ import { MobileHeader } from 'views/mobile/mobile_header';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './sublayout_header_left';
 import { SublayoutHeaderRight } from './sublayout_header_right';
-import { TokenHero } from './token_hero';
-import { TokenTerms } from './token_terms';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
-import { Banner } from './components/banner';
+import { CWBanner } from './components/component_kit/cw_banner';
+import { ITokenAdapter } from '../models';
+import { isNonEmptyString } from '../helpers/typeGuards';
+import { CWText } from './components/component_kit/cw_text';
+import { SublayoutBanners } from './sublayout_banners';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
@@ -90,9 +92,12 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           <div class="sidebar-and-body-container">
             <Sidebar />
             <div class="body-and-sticky-headers-container">
-              <TokenHero chain={chain} />
-              <TokenTerms terms={terms} tosStatus={tosStatus} />
-              <Banner bannerText={banner} />
+              <SublayoutBanners
+                banner={banner}
+                chain={chain}
+                terms={terms}
+                tosStatus={tosStatus}
+              />
               <div class="Body" onscroll={onscroll}>
                 {vnode.children}
                 {!app.isCustomDomain() && !hideFooter && (

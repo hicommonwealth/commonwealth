@@ -18,8 +18,6 @@ import {
   buildCategoryMap,
   setChainCategories,
 } from './helpers';
-import { CWTextInput, ValidationStatus } from '../../components/component_kit/cw_text_input';
-import { chain } from 'underscore';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -218,10 +216,10 @@ export class ChainMetadataRows
           }}
         />
         <InputRow
-          title='Banner'
+          title="Banner"
           name="Banner Text"
           label="Banner"
-          placeholder='Text for across the top of your community'
+          placeholder="Text for across the top of your community"
           defaultValue={this.communityBanner}
           onChangeHandler={(v) => {
             this.communityBanner = v;
@@ -234,7 +232,9 @@ export class ChainMetadataRows
               return (
                 <CWButton
                   label={key}
-                  buttonType={this.selectedTags[key] ? 'primary-red' : 'secondary-red'}
+                  buttonType={
+                    this.selectedTags[key] ? 'primary-red' : 'secondary-red'
+                  }
                   onclick={() => {
                     this.selectedTags[key] = !this.selectedTags[key];
                   }}
@@ -302,13 +302,15 @@ export class ChainMetadataRows
             try {
               // if (!!this.communityBanner) {
               $.post(`${app.serverUrl()}/updateBanner`, {
-                chain_id: vnode.attrs.chain.id, 
+                chain_id: vnode.attrs.chain.id,
                 banner_text: this.communityBanner,
                 auth: true,
                 jwt: app.user.jwt,
-              }).then(({ result }) => { notifySuccess('Banner Updated') });
+              }).then(({ result }) => {
+                notifySuccess('Banner Updated');
+              });
             } catch (err) {
-              console.log(err)
+              console.log(err);
             }
 
             try {
