@@ -6,7 +6,6 @@ import 'components/component_kit/cw_component_showcase.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
-import { CWGradientButton } from './cw_gradient_button';
 import { CWExternalLink } from './cw_external_link';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
@@ -282,13 +281,6 @@ export class ComponentShowcase implements m.ClassComponent {
             label="Large tertiary disabled "
             buttonType="lg-tertiary-blue"
             disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <h1>Gradient Button</h1>
-        <div class="button-gallery">
-          <CWGradientButton
-            label="Primary"
             onclick={() => notifySuccess('Button clicked!')}
           />
         </div>

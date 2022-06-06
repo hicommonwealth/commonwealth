@@ -9,7 +9,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   private _extension = new Extension()
 
   public readonly name = WalletId.TerraStation;
-  public readonly label = 'TerraStation';
+  public readonly label = 'Terra Station';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly specificChains = ['terra'];
 
