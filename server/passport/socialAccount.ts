@@ -2,12 +2,14 @@ import passport from 'passport';
 import passportGithub from 'passport-github';
 import passportDiscord from 'passport-discord';
 import { Request } from 'express';
+import { Strategy as TwitterStrategy } from 'passport-twitter';
 
 import '../types';
 import { DB } from '../database';
 import {
   GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK,
-  DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_OAUTH_CALLBACK, DISCORD_OAUTH_SCOPES
+  DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_OAUTH_CALLBACK, DISCORD_OAUTH_SCOPES,
+  TWITTER_CLIENT_ID, TWITTER_BEARER, TWITTER_CLIENT_SECRET, TWITTER_OAUTH_CALLBACK
 } from '../config';
 import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -154,4 +156,109 @@ export function useSocialAccountAuth(models: DB) {
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     await authenticateSocialAccount(Providers.DISCORD,  req, accessToken, refreshToken, profile, cb, models)
   }))
+}
+
+export function twitterAuth(models) {
+  return new TwitterStrategy({
+    consumerKey: TWITTER_CLIENT_ID,
+    consumerSecret: TWITTER_CLIENT_SECRET,
+    callbackURL: TWITTER_OAUTH_CALLBACK,
+    passReqToCallback: true,
+  }, async (req, token, tokenSecret, profile, cb) => {
+    const twitterAccount = await models.SocialAccount.findOne({
+      where: { provider: 'twitter', provider_userid: profile.id }
+    });
+
+    // Existing Twitter account. If there is already a user logged-in,
+    // transfer the Twitter link to the current user.
+    if (twitterAccount !== null) {
+      // Handle OAuth for custom domains.
+      //
+      // If req.query.from is a valid custom domain for a community,
+      // associate our LoginToken with this Twitter account. We will
+      // redirect to [customdomain] afterwards and consume this
+      // LoginToken to get a new login session.
+      if ((req as any).loginTokenForRedirect) {
+        const tokenObj = await models.LoginToken.findOne({
+          where: { id: (req as any).loginTokenForRedirect }
+        });
+        tokenObj.social_account = twitterAccount.id;
+        await tokenObj.save();
+      }
+
+      // Update profile data on the SocialAccount.
+      if (token !== twitterAccount.access_token
+        || tokenSecret !== twitterAccount.access_token_secret
+        || profile.username !== twitterAccount.provider_username) {
+        twitterAccount.access_token = token;
+        twitterAccount.access_token_secret = tokenSecret;
+        twitterAccount.provider_username = profile.username;
+        await twitterAccount.save();
+      }
+
+      // Check associations and log in the correct user.
+      const user = await twitterAccount.getUser();
+      if (req.user === null && user === null) {
+        const newUser = await models.User.create({ email: null });
+        await twitterAccount.setUser(newUser);
+        return cb(null, newUser);
+      } else if (req.user && req.user !== user) {
+        // Github user has a user attached, and we're logged in to
+        // a different user. Log out the previous user.
+        req.logout();
+        return cb(null, user);
+      } else {
+        // Github account has a user attached, and we either aren't
+        // logged in, or we're already logged in to that account.
+        return cb(null, user);
+      }
+    }
+
+    // New Twitter account. Either link it to the existing user, or
+    // create a new user. As a result it's possible that we end up
+    // with a user with multiple Twitter accounts linked.
+    const newTwitterAccount = await models.SocialAccount.create({
+      provider: 'twitter',
+      provider_userid: profile.id,
+      provider_username: profile.username,
+      access_token: token,
+      access_token_secret: tokenSecret,
+    });
+
+    // Handle OAuth for custom domains.
+    //
+    // If req.query.from is a valid custom domain for a community,
+    // associate our LoginToken with this Twitter account. We will
+    // redirect to [customdomain] afterwards and consume this
+    // LoginToken to get a new login session.
+    if ((req as any).loginTokenForRedirect) {
+      const tokenObj = await models.LoginToken.findOne({
+        where: { id: (req as any).loginTokenForRedirect }
+      });
+      tokenObj.social_account = newTwitterAccount.id;
+      await tokenObj.save();
+    }
+
+    if (req.user) {
+      // @ts-ignore
+      await newTwitterAccount.setUser(req.user);
+      return cb(null, req.user);
+    } else {
+      const newUser = await models.User.create({ email: null });
+      await models.Subscription.create({
+        subscriber_id: newUser.id,
+        category_id: NotificationCategories.NewMention,
+        object_id: `user-${newUser.id}`,
+        is_active: true,
+      });
+      await models.Subscription.create({
+        subscriber_id: newUser.id,
+        category_id: NotificationCategories.NewCollaboration,
+        object_id: `user-${newUser.id}`,
+        is_active: true,
+      });
+      await newTwitterAccount.setUser(newUser);
+      return cb(null, newUser);
+    }
+  })
 }

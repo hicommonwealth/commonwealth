@@ -192,6 +192,7 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "passport-magic": "^1.0.0",
+    "passport-twitter": "^1.0.4",
     "pg": "^8.7.1",
     "postcss": "^8.2.13",
     "postcss-import": "^14.0.1",

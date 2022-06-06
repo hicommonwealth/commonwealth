@@ -144,8 +144,11 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
                 <div className="action">
                   {
                     m('button.primary-button', {
-                      onclick: async (e) => {
-                        window.location.href = `/api/auth/twitter?redirect=${encodeURIComponent(window.location.pathname)}${window.location.search ? `${encodeURIComponent(window.location.search)}%26` : '%3F'}continueTwitterAttestation=true`
+                      onclick: async () => {
+                        window.location.href = `/api/auth/twitter?redirect=${
+                          encodeURIComponent(window.location.pathname)}${window.location.search ? 
+                          `${encodeURIComponent(window.location.search)}%26` 
+                          : '%3F'}continueTwitterAttestation=true`
                       }
                     }, 'Link')
                   }
@@ -158,7 +161,33 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
                 <div className="title"> Sign message </div>
                 <div className="description"> Sign and tweet a message that will be used to link your wallet address and Twitter handle for interactions on Commonwealth </div>
                 <div className="action">
-
+                  {
+                     m('.twitter-handle', [
+                      m('.flex.items-baseline', [
+                        m('.mr-10', `@${twitterAcct.username}`),
+                        m('.unverfied-label', 'Unverified'),
+                      ]),
+                      m('img.close-button', { 
+                        src:'/static/img/close.svg', 
+                        onclick: async (e) => {
+                          $.ajax({
+                            url: `${app.serverUrl()}/socialAccount`,
+                            data: { jwt: app.user.jwt, provider : 'twitter' },
+                            type: 'DELETE',
+                            success: (result) => {
+                              vnode.state.step -= 1;
+                              vnode.state.twitterAcct = null;
+                              m.redraw();
+                            },
+                            error: (err) => {
+                              console.dir(err);
+                              m.redraw();
+                            },
+                          });
+                        }
+                      }),
+                    ])
+                  }
                 </div>                  
               </div> :
 

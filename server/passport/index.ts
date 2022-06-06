@@ -4,7 +4,7 @@ import passportJWT from 'passport-jwt';
 import { DB } from '../database';
 import { factory, formatFilename } from '../../shared/logging';
 import { JWT_SECRET } from '../config';
-import { useSocialAccountAuth } from './socialAccount';
+import { useSocialAccountAuth, twitterAuth } from './socialAccount';
 import { useMagicAuth } from './magic';
 import '../types';
 
@@ -42,6 +42,8 @@ function setupPassport(models: DB) {
   useDefaultUserAuth(models);
   useSocialAccountAuth(models);
   useMagicAuth(models);
+
+  passport.use(twitterAuth(models));
 
   passport.serializeUser<any>((user, done) => {
     getStatsDInstance().increment('cw.users.logged_in');
