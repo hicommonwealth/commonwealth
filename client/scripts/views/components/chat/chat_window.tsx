@@ -173,7 +173,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                     ? m.route.get().slice(0, m.route.get().indexOf("?"))
                     : m.route.get()
                   navigator.clipboard.writeText(
-                    `https://commonwealth.im${route}?message=${grp.messages[0].id}`
+                    `${window.location.protocol}//${window.location.host}${route}?message=${grp.messages[0].id}`
                   )
                     .then(() => notifySuccess("Message link copied to clipboard"))
                     .catch(() => notifyError("Could not copy link to keyboard"))
