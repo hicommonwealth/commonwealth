@@ -44,7 +44,7 @@ export class SublayoutBanners
             }
           />
         )}
-        <CWBanner bannerContent={banner} />
+        {banner && <CWBanner bannerContent={banner} />}
       </>
     );
   }
