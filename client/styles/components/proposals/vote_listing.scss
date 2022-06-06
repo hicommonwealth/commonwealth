@@ -1,0 +1,33 @@
+@import 'shared';
+
+.VoteListing {
+  .no-votes {
+    color: $neutral-500;
+  }
+
+  .vote {
+    display: flex;
+    margin-bottom: 4px;
+
+    .vote-voter {
+      flex: 1;
+    }
+
+    .vote-choice {
+      display: inline-block;
+      padding: 2px 6px;
+      background: $primary-300;
+      border-radius: 9999px;
+      margin-left: 4px;
+    }
+
+    .vote-weight {
+      margin-left: 4px;
+    }
+
+    .vote-deposit {
+      text-align: right;
+      margin-left: 4px;
+    }
+  }
+}

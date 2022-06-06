@@ -52,7 +52,7 @@ import ProposalVotingActions, {
   ExecuteButton,
   QueueButton,
 } from 'views/components/proposals/voting_actions';
-import ProposalVotingResults from 'views/components/proposals/voting_results';
+import { VotingResults } from 'views/components/proposals/voting_results';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 
@@ -315,8 +315,7 @@ const ProposalHeader: m.Component<
                             app.chain?.meta.snapshot.length > 0 &&
                             m(MenuItem, {
                               onclick: () => {
-                                const snapshotSpaces =
-                                  app.chain.meta.snapshot;
+                                const snapshotSpaces = app.chain.meta.snapshot;
                                 if (snapshotSpaces.length > 1) {
                                   navigateToSubpage('/multiple-snapshots', {
                                     action: 'create-from-thread',
@@ -1357,7 +1356,7 @@ const ViewProposalPage: m.Component<
               m(AaveViewProposalDetail, { proposal }),
             ],
             !(proposal instanceof OffchainThread) &&
-              m(ProposalVotingResults, { proposal }),
+              m(VotingResults, { proposal }),
             !(proposal instanceof OffchainThread) &&
               m(ProposalVotingActions, { proposal }),
             m(ProposalComments, {
