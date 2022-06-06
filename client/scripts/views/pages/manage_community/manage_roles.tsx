@@ -11,6 +11,7 @@ import { AddressInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ManageRoleRowAttrs = {
   label: string;
@@ -26,7 +27,7 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
 
     return (
       <div class="ManageRoles">
-        <label>{vnode.attrs.label}</label>
+        <CWLabel label={vnode.attrs.label} />
         <div class="roles-container">
           {vnode.attrs.roledata?.map((role) => {
             const addr = role.Address;

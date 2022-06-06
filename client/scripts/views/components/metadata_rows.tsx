@@ -4,6 +4,7 @@ import m from 'mithril';
 import { Select, Switch, TextArea } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
+import { CWLabel } from './component_kit/cw_label';
 
 type InputRowAttrs = {
   defaultValue: string;
@@ -29,7 +30,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
 
     return (
       <div class="InputRow">
-        {textarea && <label>{title}</label>}
+        {textarea && <CWLabel label={title} />}
         {textarea ? (
           <TextArea
             defaultValue={defaultValue}
@@ -48,7 +49,6 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
             defaultValue={defaultValue}
             value={value}
             placeholder={placeholder}
-            fluid={true}
             disabled={disabled || false}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
@@ -80,7 +80,7 @@ export class ToggleRow implements m.ClassComponent<ToggleRowAttrs> {
 
     return (
       <div class="ToggleRow">
-        <label>{title}</label>
+        <CWLabel label={title} />
         <div class="toggle-and-label">
           <Switch
             checked={this.checked}
@@ -110,7 +110,7 @@ export class SelectRow implements m.ClassComponent<SelectRowAttrs> {
 
     return (
       <div class="SelectRow">
-        <label>{title}</label>
+        <CWLabel label={title} />
         <Select
           options={options}
           onchange={(e) => {
@@ -131,28 +131,10 @@ export class IdRow implements m.ClassComponent<IdRowAttrs> {
 
     return (
       <div class="IDRow">
-        <label>ID</label>
+        <CWLabel label="ID" />
         <div class={`id ${!id.length && 'placeholder'}`}>
           {!id.length ? 'ID will show up here based on your name' : id}
         </div>
-      </div>
-    );
-  }
-}
-
-type ValidationRowAttrs = {
-  error?: string;
-  status?: string;
-};
-
-export class ValidationRow implements m.ClassComponent<ValidationRowAttrs> {
-  view(vnode) {
-    const { error, status } = vnode.attrs;
-
-    return (
-      <div class="validation-container">
-        {error && <div class="error">{error}</div>}
-        {status && <div class="status">{status}</div>}
       </div>
     );
   }
