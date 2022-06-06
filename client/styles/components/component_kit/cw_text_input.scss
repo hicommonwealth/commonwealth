@@ -1,26 +1,36 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 $text-input-border: 2px solid;
 
 .TextInput {
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
-
-  label {
-    @include form-label;
-    margin-bottom: 4px;
-  }
+  margin-bottom: 20px;
+  width: 100%;
 
   input {
-    border-radius: 4px;
-    border: $text-input-border $white;
     background-color: $neutral-50;
-    height: 40px;
-    padding: 4px 8px;
+    border-radius: $border-radius-corners;
+    border: 2px solid $neutral-200;
+    color: $neutral-800;
 
-    &:hover {
-      border: $text-input-border $purple-200;
+    &.small {
+      font-size: 14px;
+      height: 32px;
+      line-height: 20px;
+      padding: 8px;
+    }
+
+    &.large {
+      font-size: 16px;
+      height: 40px;
+      letter-spacing: 0.02em;
+      line-height: 24px;
+      padding: 6px 8px;
+    }
+
+    &::placeholder {
+      color: $neutral-300;
     }
 
     &:focus {
@@ -28,42 +38,41 @@ $text-input-border: 2px solid;
     }
 
     &:focus-within {
-      border: $text-input-border $purple-300;
+      border-color: $primary-200;
+
+      &::placeholder {
+        color: $neutral-500;
+      }
+    }
+
+    &.isTyping {
+      border-color: $primary-500;
     }
 
     &.success {
-      border: $text-input-border $green-600;
+      border-color: $green-500;
       background-color: $green-50;
     }
 
     &.failure {
-      border: $text-input-border $pink-200;
-      background-color: $pink-50;
+      border-color: $rorange-500;
+      background-color: $rorange-50;
     }
 
     &.disabled {
-      background-color: $neutral-50;
-      border: none;
-      box-shadow: none;
+      background-color: $neutral-200;
+      border-color: $neutral-200;
+      color: $white;
       cursor: not-allowed;
+
+      &::placeholder {
+        color: $white;
+      }
     }
   }
 
   &.success,
   &.failure {
     margin-bottom: 0px;
-  }
-}
-
-.validation-status {
-  @include form-label;
-  margin-top: 8px;
-
-  &.success {
-    color: $green-600;
-  }
-
-  &.failure {
-    color: $rorange-500;
   }
 }
