@@ -6,11 +6,9 @@ import $ from 'jquery';
 import app from 'state';
 import QuillEditor from 'views/components/quill_editor';
 import Dropzone from 'dropzone';
-import User from 'views/components/widgets/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ButtonGroup, Button, InputSelect } from 'construct-ui';
-import { AvatarScope } from 'views/components/avatar_upload';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 interface ICreateProjectForm {
@@ -32,7 +30,6 @@ interface ICoverImageUploadAttrs {
   form: ICreateProjectForm;
   uploadStartedCallback?: CallableFunction;
   uploadCompleteCallback?: CallableFunction;
-  avatarScope: AvatarScope;
 }
 
 class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
@@ -107,34 +104,19 @@ class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
 
   view(vnode: m.Vnode<ICoverImageUploadAttrs>) {
     const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
-    return m('form.AvatarUpload', [
-      m(
-        '.dropzone-attach',
-        {
-          class: this.uploaded ? 'hidden' : '',
-          style:
-            vnode.attrs.avatarScope === AvatarScope.Chain ||
-            vnode.attrs.avatarScope === AvatarScope.Community
-              ? `background-image: url(${logoURL}); background-size: 92px;`
-              : '',
-        },
-        [
-          m('div.attach-button', [
-            m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-          ]),
-        ]
-      ),
-      !this.uploaded &&
-        vnode.attrs.avatarScope === AvatarScope.Account &&
-        m(User, {
-          user: app.user.activeAccount,
-          avatarOnly: true,
-          avatarSize: 100,
-        }),
-      m('.dropzone-previews', {
-        class: this.uploaded ? '' : 'hidden',
-      }),
-    ]);
+    return (
+      <div class="CoverImageUpload">
+        <div
+          class={`dropzone-attach ${this.uploaded ? 'hidden' : ''}`}
+          style={`background-image: url(${logoURL}); background-size: 92px;`}
+        >
+          <div class="attach-button">
+            <CWIcon iconName="plus" iconSize="small" />
+          </div>
+        </div>
+        <div class={`dropzone-previews ${this.uploaded ? 'hidden' : ''}`}></div>
+      </div>
+    );
   }
 }
 

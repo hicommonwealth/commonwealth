@@ -108,7 +108,7 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
               : '',
         },
         [
-          m('div.attach-button', [
+          m('attach-button', [
             m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
           ]),
         ]
