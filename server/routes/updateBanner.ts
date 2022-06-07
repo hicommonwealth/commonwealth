@@ -1,9 +1,10 @@
 import { Response, NextFunction } from 'express';
-import { TypedRequestBody } from '../types';
+import { success, TypedRequestBody } from '../types';
 import { DB } from '../database';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { CommunityBannerInstance } from '../models/community_banner';
+import { AppError } from 'server/util/errors';
 
 enum UpdateBannerErrors {
   NoChain = 'Must supply a chain ID',
@@ -20,14 +21,14 @@ const updateBanner = async (
   models: DB,
   req: TypedRequestBody<UpdateBannerReq>,
   res: Response,
-  next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(UpdateBannerErrors.NoChain));
+  if (error) throw new AppError(UpdateBannerErrors.NoChain);
   const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
-  if (!isAdmin) return next(new Error(UpdateBannerErrors.NoPermission));
+  if (!isAdmin) throw new AppError(UpdateBannerErrors.NoPermission);
 
-  const { banner_text } = req.body;
+  const { banner_text } = req.body || {banner_text: ''};
+
   // find or create
   const [banner] = await models.CommunityBanner.findOrCreate({
     where: {
@@ -43,7 +44,7 @@ const updateBanner = async (
     banner.banner_text = banner_text;
     banner.save();
   }
-  return res.json({ status: 'Success', result: banner.toJSON(), });
+  return success(res, banner.toJSON());
 };
 
 export default updateBanner;

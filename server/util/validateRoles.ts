@@ -10,7 +10,7 @@ import { Request } from 'express';
 
 const validateRoles = async (
   models,
-  user: any,
+  user: Express.User,
   minimum_role: 'admin' | 'moderator' | 'member',
   chain_id: string
 ): Promise<boolean> => {
