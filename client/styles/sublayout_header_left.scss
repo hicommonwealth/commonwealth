@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .SublayoutHeaderLeft {
   align-items: center;
@@ -26,7 +26,7 @@
     cursor: pointer;
   }
 
-  @include sm-max {
+  @include smallInclusive {
     display: none;
   }
 }

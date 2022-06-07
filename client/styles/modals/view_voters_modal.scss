@@ -49,7 +49,7 @@
 
 //   .proposal-pre {
 //     margin-top: 4px;
-//     @include xs-max {
+//     @include extraSmall {
 //       display: none;
 //     }
 //   }
@@ -60,7 +60,7 @@
 //       position: relative;
 //       top: 2px;
 //     }
-//     @include xs-max {
+//     @include extraSmall {
 //       display: block;
 //     }
 //   }
@@ -89,7 +89,7 @@
 //   .proposal-row-main.container {
 //     display: flex;
 
-//     @include xs-max {
+//     @include extraSmall {
 //       display: block;
 //     }
 
@@ -113,7 +113,7 @@
 //     .proposal-row-metadata {
 //       font-weight: 500;
 
-//       @include xs-max {
+//       @include extraSmall {
 //         display: block;
 //       }
 
@@ -148,7 +148,7 @@
 //   }
 
 //   // responsive
-//   @include sm-max {
+//   @include small {
 //     .proposal-row-right {
 //       display: block;
 //       width: initial;
@@ -160,7 +160,7 @@
 //       padding-left: 0px;
 //     }
 //   }
-//   @include xs-max {
+//   @include extraSmall {
 //     display: block;
 //     padding: 20px 22px;
 //     margin: 15px 0;

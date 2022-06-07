@@ -22,7 +22,7 @@ section.ChainsCrowdfunding {
   .ChainsImage {
     margin-top: -2.3rem;
 
-    @media (min-width: 0px) and (max-width: 1200px) {
+    @include mediumSmall {
       margin-top: 0rem;
     }
   }

@@ -16,7 +16,7 @@
     padding: 24px;
     width: 736px;
 
-    @include sm-max {
+    @include small {
       width: unset;
     }
   }
