@@ -4,7 +4,7 @@ import {
   ICuratedProjectFactory__factory,
   ICuratedProject__factory,
 } from 'eth/types';
-import { NodeInfo, Project } from 'models';
+import { ChainInfo, NodeInfo, Project } from 'models';
 import { IApp } from 'state';
 import { ChainNetwork } from 'types';
 import BN from 'bn.js';
@@ -42,7 +42,7 @@ export default class ProjectsController {
     return this._store;
   }
 
-  private _factoryInfo: NodeInfo;
+  private _factoryInfo: ChainInfo;
   private _app: IApp;
 
   private async _loadProjectsFromServer(project_id?: number) {
@@ -71,7 +71,7 @@ export default class ProjectsController {
     this._app = app;
 
     // locate CWP community, containing factory address + node url
-    this._factoryInfo = this._app.config.nodes.getById(
+    this._factoryInfo = this._app.config.chains.getById(
       ChainNetwork.CommonProtocol
     );
     if (!this._factoryInfo) {

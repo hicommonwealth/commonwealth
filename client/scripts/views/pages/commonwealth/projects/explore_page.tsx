@@ -5,7 +5,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import app from 'state';
 import ProjectCard, { ProjectCardSize } from './project_card';
-import { createNewDummyProject, DummyProject } from './dummy_project';
+import { createNewDummyProject } from './dummy_project';
 
 export default class ExplorePage
   implements m.ClassComponent<{ project: Project }>
