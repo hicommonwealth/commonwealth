@@ -8,14 +8,26 @@ import { ButtonGroup, Button, InputSelect } from 'construct-ui';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 
 interface ICreateProjectForm {
+  // Descriptive
   name: string;
-  token: string;
-  threshold: number;
-  fundraiseLength: number;
-  beneficiary: string;
-  curatorFee: string;
   description: string;
   shortDescription: string;
+  coverImage: string;
+
+  // Mechanical
+  token: string;
+  threshold: number;
+  beneficiary: string;
+  fundraiseLength: number;
+  curatorFee: number;
+}
+
+class CoverImageUpload
+  implements m.ClassComponent<{ form: ICreateProjectForm }>
+{
+  view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
+    return null;
+  }
 }
 
 export class InformationSlide
@@ -36,15 +48,34 @@ export class InformationSlide
           oninput={(e) => {
             vnode.attrs.form.name = e.target.value;
           }}
+          inputValidationFn={(value) => {
+            const { length } = value;
+            if (length < 8 || length > 64) {
+              return [
+                'failed',
+                `Name must be between 8-64 characters. Current count: ${length}`,
+              ];
+            }
+          }}
         />
-        {/* TODO: Caption */}
-        {m(QuillEditor, {
-          oncreateBind: (state) => {
-            vnode.attrs.form.shortDescription = state;
-          },
-          editorNamespace: 'project-short-description',
-          placeholder: 'Write a short 2 or 3 sentence summary of your project,',
-        })}
+        {/* TODO: The below should be a textarea */}
+        <CWTextInput
+          placeholder="Write a short 2 or 3 sentence description of your project,"
+          label="Brief Description"
+          name="Brief Description"
+          oninput={(e) => {
+            vnode.attrs.form.name = e.target.value;
+          }}
+          inputValidationFn={(value) => {
+            const { length } = value;
+            if (length > 215) {
+              return [
+                'failed',
+                `Input limit is 215 characters. Current count: ${length}`,
+              ];
+            }
+          }}
+        />
         {/* TODO: Image upload */}
       </div>
     );
@@ -70,18 +101,21 @@ export class FundraisingSlide
           label="Raise In"
           name="Raise In"
           onSelect={(e) => {
+            // TODO: Conversion to token address
             vnode.attrs.form.token = e.target.value;
           }}
         />
         <InputSelect
-          items={['1 wk', '2 wk', '3 wk', '4wk']}
+          items={['1 wk', '2 wk', '3 wk', '4 wk']}
           itemRender={(i) => {
             <CWText type="body1">{i}</CWText>;
           }}
           label="Fundraising Period"
           name="Fundraising Period"
           onSelect={(e) => {
-            vnode.attrs.form.fundraiseLength = e.target.value;
+            // TODO: Real length options & conversion to time
+            const lengthInSeconds = +e.target.value.split(' ')[0] * 604800;
+            vnode.attrs.form.fundraiseLength = lengthInSeconds;
           }}
         />
         <CWTextInput
@@ -89,6 +123,7 @@ export class FundraisingSlide
           label="Beneficiary Address"
           name="Beneficiary Address"
           oninput={(e) => {
+            // TODO: Address validation
             vnode.attrs.form.beneficiary = e.target.value;
           }}
         />
@@ -97,13 +132,13 @@ export class FundraisingSlide
           label="Curator Fee"
           name="Curator Fee"
           oninput={(e) => {
-            vnode.attrs.form.curatorFee = e.target.value;
+            vnode.attrs.form.curatorFee = Math.round(e.target.value * 100);
           }}
           inputValidationFn={(value) => {
             const isNotNumber = Number.isNaN(+value);
             const isNotPercent = +value > 100 || +value < 0;
             if (isNotNumber || isNotPercent) {
-              return [ValidationStatus, string];
+              return ['failed', 'Input must be valid number between 0 and 100'];
             }
           }}
         />
@@ -143,14 +178,15 @@ export default class CreateProjectForm implements m.ClassComponent {
     if (!this.stage) this.stage = 'information';
     if (!this.form)
       this.form = {
-        name: null,
-        token: null,
-        threshold: null,
-        fundraiseLength: null,
-        beneficiary: null,
-        curatorFee: null,
-        description: null,
-        shortDescription: null,
+        name: '',
+        token: '',
+        beneficiary: '',
+        description: '',
+        shortDescription: '',
+        coverImage: '',
+        curatorFee: 0,
+        threshold: 0,
+        fundraiseLength: 0,
       };
     console.log(this.stage);
     return (
