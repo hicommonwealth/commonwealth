@@ -14,7 +14,10 @@ export type IProjectCreationData = {
   ipfsContent: string;
   cwUrl: string;
   title: string; // TODO length limits for contract side
-  chain: string;
+  shortDescription: string;
+  description: string;
+  coverImage: string;
+  chainId: string;
   token: string;
   creator: string;
   beneficiary: string;
@@ -113,7 +116,7 @@ export default class ProjectsController {
       title,
       cwUrl,
       ipfsContent,
-      chain,
+      chainId,
       token,
       threshold,
       deadline,
@@ -128,7 +131,7 @@ export default class ProjectsController {
       // TODO: IPFS should include all user-submitted data incl cover image, description, etc
       const response = await $.post(`${this._app.serverUrl()}/ipfsPin`, {
         address: creator.address,
-        author_chain: chain || creator.chain.id,
+        author_chain: chainId || creator.chain.id,
         blob: ipfsContent,
         jwt: this._app.user.jwt,
       });
@@ -165,16 +168,16 @@ export default class ProjectsController {
 
     // on success, hit server to update chain
     // TODO: should we check for failure vs success in result?
-    if (chain) {
+    if (chainId) {
       try {
         await $.get(`${this._app.serverUrl()}/setProjectChain`, {
-          chain_id: chain,
+          chain_id: chainId,
           project_id: projectId,
           jwt: this._app.user.jwt,
         });
       } catch (err) {
         console.error(
-          `Failed to set project ${projectId.toString()} chain to ${chain}`
+          `Failed to set project ${projectId.toString()} chain to ${chainId}`
         );
       }
     }

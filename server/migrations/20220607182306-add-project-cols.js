@@ -3,20 +3,26 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.addColumn(
         'Projects',
+        'title',
+        { type: Sequelize.STRING(64) },
+        { transaction }
+      );
+      await queryInterface.addColumn(
+        'Projects',
         'description',
-        { type: Sequelize.STRING },
+        { type: Sequelize.STRING(224) },
         { transaction }
       );
       await queryInterface.addColumn(
         'Projects',
         'short_description',
-        { type: Sequelize.STRING },
+        { type: Sequelize.TEXT },
         { transaction }
       );
       await queryInterface.addColumn(
         'Projects',
         'cover_image',
-        { type: Sequelize.STRING },
+        { type: Sequelize.TEXT },
         { transaction }
       );
     });
@@ -24,6 +30,9 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.addColumn('Projects', 'title', {
+        transaction,
+      });
       await queryInterface.addColumn('Projects', 'description', {
         transaction,
       });

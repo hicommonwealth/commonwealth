@@ -158,10 +158,10 @@ export class InformationSlide
           }}
           inputValidationFn={(value) => {
             const { length } = value;
-            if (length > 215) {
+            if (length > 224) {
               return [
                 'failed',
-                `Input limit is 215 characters. Current count: ${length}`,
+                `Input limit is 224 characters. Current count: ${length}`,
               ];
             }
           }}

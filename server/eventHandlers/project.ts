@@ -56,6 +56,8 @@ export default class extends IEventHandler {
       await this._models.Project.create({
         id: +index,
         entity_id: entityId,
+        chain_id: (event.data as any).chainId,
+        ...ipfsParams,
         creator: (event.data as any).creator,
         beneficiary: (event.data as any).beneficiary,
         token: (event.data as any).acceptedToken,
@@ -63,8 +65,10 @@ export default class extends IEventHandler {
         threshold: (event.data as any).threshold,
         deadline: (event.data as any).deadline,
         funding_amount: (event.data as any).fundingAmount,
+        title: (event.data as any).title,
+        short_description: (event.data as any).shortDescription,
+        description: (event.data as any).description,
         cover_image: (event.data as any).coverImage,
-        ...ipfsParams,
       });
     } else if (
       event.data.kind === CommonwealthTypes.EventKind.ProjectBacked ||

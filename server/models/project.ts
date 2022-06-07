@@ -21,6 +21,7 @@ export type ProjectAttributes = {
   creator: string;
   ipfs_hash_id?: number;
 
+  // TODO: This organizational schema no longer up to date
   // populated from contract queries
   beneficiary: string;
   token: string;
@@ -28,6 +29,11 @@ export type ProjectAttributes = {
   threshold: string;
   deadline: number;
   funding_amount: string;
+
+  title: string;
+  short_description: string;
+  description: string;
+  cover_image: string;
 
   Chain?: ChainAttributes;
   ChainEntity?: ChainEntityAttributes;
@@ -45,8 +51,8 @@ export default (
     'Project',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, allowNull: false },
-      chain_id: { type: dataTypes.STRING, allowNull: true },
       entity_id: { type: dataTypes.INTEGER, allowNull: false },
+      chain_id: { type: dataTypes.STRING, allowNull: true },
       ipfs_hash_id: { type: dataTypes.INTEGER, allowNull: true },
 
       creator: { type: dataTypes.STRING, allowNull: false },
@@ -58,9 +64,10 @@ export default (
       deadline: { type: dataTypes.INTEGER, allowNull: false },
       funding_amount: { type: dataTypes.STRING, allowNull: false },
 
-      cover_image: { type: dataTypes.STRING, allowNull: false },
-      description: { type: dataTypes.STRING, allowNull: false },
-      short_description: { type: dataTypes.STRING, allowNull: false },
+      title: { type: dataTypes.STRING(64), allowNull: false },
+      short_description: { type: dataTypes.STRING(224), allowNull: false },
+      description: { type: dataTypes.TEXT, allowNull: false },
+      cover_image: { type: dataTypes.TEXT, allowNull: false },
 
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
