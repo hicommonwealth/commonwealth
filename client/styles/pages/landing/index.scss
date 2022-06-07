@@ -42,7 +42,7 @@
     p {
       margin: 6px 0;
     }
-    @include sm-max {
+    @include small {
       .layout-container {
         display: block;
         text-align: center;
