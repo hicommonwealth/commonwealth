@@ -6,7 +6,7 @@ import $ from 'jquery';
 import { Tag, Button } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, ChainNetwork, WalletId } from 'types';
 import { Account, RoleInfo } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
@@ -113,7 +113,8 @@ const SelectAddressModal: m.Component<
           ? m('.select-address-placeholder', [
               m('p', [
                 `Connect ${
-                  chainbase[0].toUpperCase() + chainbase.slice(1) || 'Web3'
+                  (chainbase && app.chain.network === ChainNetwork.Terra) ? 'Terra' :
+                    (chainbase) ? chainbase[0].toUpperCase() + chainbase.slice(1) : 'Web3'
                 } address to join this community: `,
               ]),
             ])

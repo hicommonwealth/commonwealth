@@ -16,10 +16,11 @@ type CommunityCardAttrs = { chain: ChainInfo };
 export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
   view(vnode) {
     const { chain } = vnode.attrs as CommunityCardAttrs;
+
     const redirectFunction = (e) => {
       e.preventDefault();
       localStorage['home-scrollY'] = window.scrollY;
-      m.route.set(`/${chain}`);
+      m.route.set(`/${chain.id}`);
     };
 
     // Potentially Temporary (could be built into create community flow)
@@ -27,7 +28,7 @@ export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
 
     if (chain.description) {
       prettyDescription =
-      chain.description[chain.description.length - 1] === '.'
+        chain.description[chain.description.length - 1] === '.'
           ? chain.description
           : `${chain.description}.`;
     }

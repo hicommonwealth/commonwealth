@@ -15,6 +15,7 @@ import { MultipleButtonSelectorFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 const CouncilVotingModal: m.Component<
   { candidates },
@@ -138,7 +139,11 @@ const CouncilVotingModal: m.Component<
           }),
           candidates.length === 0 &&
             m('.no-candidates', 'No candidates to vote for'),
-          vnode.state.error && m('.voting-error', vnode.state.error),
+          vnode.state.error &&
+            m(CWValidationText, {
+              message: vnode.state.error,
+              status: 'failure',
+            }),
         ]),
       ]),
       m('.compact-modal-actions', [

@@ -18,6 +18,7 @@ import { OffchainTopic } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 interface IEditTopicModalForm {
   description: string;
@@ -268,7 +269,11 @@ const EditTopicModal: m.Component<
             }),
           ]),
         ]),
-        vnode.state.error && m('.error-message', vnode.state.error),
+        vnode.state.error &&
+          m(CWValidationText, {
+            message: vnode.state.error,
+            status: 'failure',
+          }),
       ]),
     ]);
   },
