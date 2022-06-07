@@ -143,7 +143,6 @@ async function mainProcess(
   let myChainData = allChains.filter(
     (chain, index) => index % numWorkers === workerNumber
   );
-
   console.log(myChainData);
   // passed to listeners that support it
   const discoverReconnectRange = async (chain: string) => {
@@ -308,7 +307,8 @@ async function mainProcess(
         network = SupportedNetwork.Aave;
       else if (chain.network === ChainNetwork.Moloch)
         network = SupportedNetwork.Moloch;
-
+      else if (chain.network === ChainNetwork.CommonProtocol)
+        network = SupportedNetwork.Commonwealth;
       try {
         listeners[chain.id] = await createListener(chain.id, network, {
           address: chain.address,
