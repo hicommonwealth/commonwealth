@@ -16,6 +16,13 @@ module.exports = {
     }, {
       transaction: t
     });
+    await queryInterface.bulkUpdate('Chain', {
+      type: 'token',
+    }, {
+      id: 'terra',
+    }, {
+      transaction: t
+    });
     /**
      * Add altering commands here.
      *
@@ -34,6 +41,13 @@ module.exports = {
     });
     await queryInterface.bulkUpdate('Chain', {
       decimals: null,
+    }, {
+      id: 'terra',
+    }, {
+      transaction: t
+    });
+    await queryInterface.bulkUpdate('Chain', {
+      type: 'chain',
     }, {
       id: 'terra',
     }, {
