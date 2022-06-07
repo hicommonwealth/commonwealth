@@ -1,11 +1,14 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .CommunitySelectList {
+  display: flex;
+  flex-direction: column;
   transform: none !important; // override any scrolling effects
   left: $quick-switcher-width !important;
 
-  @include sm-max {
+  @include smallInclusive {
     overflow-y: scroll;
+    width: 100%;
   }
 
   span {

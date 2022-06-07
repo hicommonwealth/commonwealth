@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .Sublayout {
   display: flex;
@@ -22,7 +22,7 @@
       min-height: 88px;
       padding: 0 24px;
 
-      @include sm-max {
+      @include smallInclusive {
         display: none;
       }
     }
@@ -35,7 +35,7 @@
     overflow: hidden;
     width: 100%;
 
-    @include sm-max {
+    @include smallInclusive {
       margin-top: 88px;
     }
 
