@@ -9,6 +9,15 @@ import 'components/component_kit/cw_icon.scss';
 import { getClasses } from '../helpers';
 import { CustomIconAttrs, CustomIconStyleAttrs } from './types';
 
+// ADDING CUSTOM ICONS: INSTRUCTIONS
+//
+// Base instructions + template for adding CWIcons can be found in cw_icons.tsx
+// However, "custom" icons—defined as having static, predefined coloration—
+// require slightly different handling:
+// (1) The "fill" properties in path tags should be left in, to preserve coloration
+// (2) Extra attention must be paid to the JSX conversion output, since distortions
+//     of width, height, and coloration have been observed with some regularity
+
 export const CWCosmosEvmMetamask: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
     const { componentType, ...customIconStyleAttrs } = vnode.attrs;
