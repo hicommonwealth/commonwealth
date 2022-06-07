@@ -12,7 +12,7 @@ import { loadScript } from '../../helpers';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../components/component_kit/cw_button'
 
-enum TwitterAttestationModalSteps {
+enum TwitterAttestationSteps {
   Step0ChooseAddress,
   Step1LinkTwitter,
   Step2Sign,
@@ -27,9 +27,10 @@ type TwitterAttestationModalAttrs = {
 }
 
 type TwitterAttestationModalState = {
-  step: TwitterAttestationModalSteps, // steps for modal
+  step: TwitterAttestationSteps, // steps for modal
   addressSelected: AddressInfo,
   error,
+  tweetText,
   tweet: string, // id for tweet
   tweetLoaded: boolean,
   userProvidedSignature: string;
@@ -37,13 +38,14 @@ type TwitterAttestationModalState = {
   posted: boolean, // Step 3 Posted to Twitter
   attested: boolean, // Step 4 Verified
 }
-
 class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttrs, TwitterAttestationModalState> {
 
     oninit(vnode) {
-      vnode.state.step = TwitterAttestationModalSteps.Step0ChooseAddress
+      // vnode.state.step = TwitterAttestationSteps.Step0ChooseAddress
+      vnode.state.step = TwitterAttestationSteps.Step2Sign
       console.log(vnode.attrs.addresses)
       console.log(vnode.attrs.twitterAccount)
+
     }
 
     view(vnode) {
@@ -51,57 +53,60 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
       return (
         <div className="TwitterAttestationModal">
           <div>
-            <img className="modal-close-button" src="/static/img/close.svg" onclick={() => {
-              $('.TwitterAttestationModal').trigger('modalforceexit');
-              m.redraw();
+            <img className="modal-close-button" src="/static/img/close.svg" 
+              onclick={() => {
+                $('.TwitterAttestationModal').trigger('modalforceexit');
+                m.redraw();
             }}/>
           </div>
 
+          {/*     MODAL STEPS HEADER   */}
           <div className="form-steps">
             <p onclick={()=>{
-              if (TwitterAttestationModalSteps.Step0ChooseAddress < currentStep) {
-                vnode.state.step = TwitterAttestationModalSteps.Step0ChooseAddress
+              if (TwitterAttestationSteps.Step0ChooseAddress < currentStep) {
+                vnode.state.step = TwitterAttestationSteps.Step0ChooseAddress
               }}}> 
               Address 
             </p>
 
             <p onclick={()=>{
-              if (TwitterAttestationModalSteps.Step1LinkTwitter < currentStep) {
-                vnode.state.step = TwitterAttestationModalSteps.Step1LinkTwitter
+              if (TwitterAttestationSteps.Step1LinkTwitter < currentStep) {
+                vnode.state.step = TwitterAttestationSteps.Step1LinkTwitter
               }}}
-              className={currentStep < TwitterAttestationModalSteps.Step1LinkTwitter ? 
+              className={currentStep < TwitterAttestationSteps.Step1LinkTwitter ? 
                 "disabled-step" : ""}>
               Link
             </p>
 
             <p onclick={()=>{
-              if (TwitterAttestationModalSteps.Step2Sign < currentStep) {
-                vnode.state.step = TwitterAttestationModalSteps.Step2Sign
+              if (TwitterAttestationSteps.Step2Sign < currentStep) {
+                vnode.state.step = TwitterAttestationSteps.Step2Sign
               }}}
-              className={currentStep < TwitterAttestationModalSteps.Step2Sign ? 
+              className={currentStep < TwitterAttestationSteps.Step2Sign ? 
                 "disabled-step" : ""}>
               Sign
             </p>
 
             <p onclick={()=>{
-              if (TwitterAttestationModalSteps.Step3Publicize < currentStep) {
-                vnode.state.step = TwitterAttestationModalSteps.Step3Publicize
+              if (TwitterAttestationSteps.Step3Publicize < currentStep) {
+                vnode.state.step = TwitterAttestationSteps.Step3Publicize
               }}}
-              className={currentStep < TwitterAttestationModalSteps.Step3Publicize ? 
+              className={currentStep < TwitterAttestationSteps.Step3Publicize ? 
                 "disabled-step" : ""}>
               Publicize
             </p>
 
             <p onclick={()=>{
-              if (TwitterAttestationModalSteps.Step4Verify < currentStep) {
-                vnode.state.step = TwitterAttestationModalSteps.Step4Verify
+              if (TwitterAttestationSteps.Step4Verify < currentStep) {
+                vnode.state.step = TwitterAttestationSteps.Step4Verify
               }}}
-              className={currentStep < TwitterAttestationModalSteps.Step4Verify ? 
+              className={currentStep < TwitterAttestationSteps.Step4Verify ? 
                 "disabled-step" : ""}>
               Verify
             </p>
           </div>
-
+          
+          {/*     PROGRESS BAR    */}
           { 
             m('progress.gradient-progress-bar', { value: currentStep / 5 })
           }
@@ -110,9 +115,10 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
             <CWIcon iconName="twitter" iconSize="large" />
           </div>
 
+          {/*     MODAL STEPS     */}
           {
             // Step 0
-            vnode.state.step === TwitterAttestationModalSteps.Step0ChooseAddress ?
+            vnode.state.step === TwitterAttestationSteps.Step0ChooseAddress ?
               <div>
                 <div className="title"> Choose an address </div>
                 <div className="description"> Choose an address to link to your Twitter account. </div>
@@ -125,7 +131,8 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
                         buttonType="secondary"
                         onclick={()=>{
                           vnode.state.addressSelected = address
-                          vnode.state.step += TwitterAttestationModalSteps.Step1LinkTwitter
+                          vnode.state.step += TwitterAttestationSteps.Step1LinkTwitter
+                          m.redraw()
                         }}
                       />
                     )
@@ -134,7 +141,7 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
               </div> :
 
             // Step 1
-            vnode.state.step === TwitterAttestationModalSteps.Step1LinkTwitter ?
+            vnode.state.step === TwitterAttestationSteps.Step1LinkTwitter ?
               <div>
                 <div className="title"> Link your twitter account </div>
                 <div className="description"> Authorize Commonwealth to post a tweet on your behalf for the following address: </div>
@@ -142,41 +149,40 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
                   { vnode.state.addressSelected.address }
                 </div>
                 <div className="action">
-                  {
-                    m('button.primary-button', {
-                      onclick: async () => {
-                        window.location.href = `/api/auth/twitter?redirect=${
-                          encodeURIComponent(window.location.pathname)}${window.location.search ? 
-                          `${encodeURIComponent(window.location.search)}%26` 
-                          : '%3F'}continueTwitterAttestation=true`
-                      }
-                    }, 'Link')
-                  }
+                  <CWButton
+                    label="Link"
+                    buttonType="primary-blue"
+                    onclick={ async () => {
+                      window.location.href = `/api/auth/twitter?redirect=${
+                        encodeURIComponent(window.location.pathname)}${window.location.search ? 
+                        `${encodeURIComponent(window.location.search)}%26` 
+                        : '%3F'}continueTwitterAttestation=true`
+                    }}
+                  />
                 </div>
               </div> :
 
             // Step 2
-            vnode.state.step === TwitterAttestationModalSteps.Step2Sign ?
+            vnode.state.step === TwitterAttestationSteps.Step2Sign ?
               <div>
                 <div className="title"> Sign message </div>
                 <div className="description"> Sign and tweet a message that will be used to link your wallet address and Twitter handle for interactions on Commonwealth </div>
                 <div className="action">
-                  {
-                     m('.twitter-handle', [
-                      m('.flex.items-baseline', [
-                        m('.mr-10', `@${twitterAcct.username}`),
-                        m('.unverfied-label', 'Unverified'),
-                      ]),
-                      m('img.close-button', { 
-                        src:'/static/img/close.svg', 
-                        onclick: async (e) => {
+
+                  <div className="twitter-handle">
+                    <div className="flex items-baseline">
+                      <div className="mr-10"> { `@${vnode.attrs.twitterAccount.username}` } </div>    
+                      <div className="unverified-label">Unverified</div>   
+                    </div>
+                    <img className="close-button" src="/static/img/close.svg" 
+                        onclick={async () => {
                           $.ajax({
                             url: `${app.serverUrl()}/socialAccount`,
                             data: { jwt: app.user.jwt, provider : 'twitter' },
                             type: 'DELETE',
                             success: (result) => {
                               vnode.state.step -= 1;
-                              vnode.state.twitterAcct = null;
+                              // vnode.state.twitterAcct = null;
                               m.redraw();
                             },
                             error: (err) => {
@@ -184,25 +190,48 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
                               m.redraw();
                             },
                           });
-                        }
-                      }),
-                    ])
-                  }
+                        }}
+                      />
+                  </div>
+
+                  <CWButton
+                    label="Link"
+                    buttonType="primary-blue"
+                    onclick={async () => {
+                      try {
+                        const wallet = await app.wallets.locateWallet(vnode.state.selectedAddress, app.chain.base);
+                        /* ensure that this will work for non ETH cxhains*/
+                        wallet.signMessage(`0x${this.constructSignature(vnode.state.twitterAccount.username)}`)
+                          .then((signedResult) => {
+                            vnode.state.step += 1;
+                            vnode.state.userProvidedSignature = signedResult;
+                            /* save unfinished signature to server */
+                            // $.post(`${app.serverUrl()}/updateAddress`, params)
+                            m.redraw();
+                          });
+                      } catch (err) {
+                        console.log(err);
+                      }
+                    }}
+                  />
+
                 </div>                  
               </div> :
 
             // Step 3 
-            vnode.state.step === TwitterAttestationModalSteps.Step3Publicize ?
+            vnode.state.step === TwitterAttestationSteps.Step3Publicize ?
               <div>
                 <div className="title"> Publicize </div>
                 <div className="description"> </div>
                 <div className="action">
 
+                    
+
                 </div>  
               </div> :
               
             // Step 4
-            vnode.state.step === TwitterAttestationModalSteps.Step4Verify ?
+            vnode.state.step === TwitterAttestationSteps.Step4Verify ?
               <div>
                 <div className="title"> Verify </div>
                 <div className="description"> Verify your tweet and add it to the list of verified mappings. </div>
@@ -243,10 +272,10 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
       return Buffer.from(data).toString('hex');
     }
 
-    constructTweet = () => {
+    constructTweet = (vnode, address, userProvidedSignature) => {
       // eslint-disable-next-line max-len
-      const tweetText = `Verifying myself as a @hicommonwealth member 🐮🌝%0Aaddr:${account.address}%0Asig:${vnode.state.userProvidedSignature}`;
-      return tweetText;
+      const tweetText = `Verifying myself as a @hicommonwealth member 🐮🌝%0Aaddr:${address}%0Asig:${userProvidedSignature}`;
+      vnode.state.tweetText = tweetText
     };
 
     tweetPreview = () => {

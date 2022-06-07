@@ -79,6 +79,10 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     };
     return account.validate(JSON.stringify(signature));
   }
+
+  public async signMessage(message: string): Promise<string> {
+    throw new Error('Unimplemented');
+  }
 }
 
 export default TerraStationWebWalletController;

@@ -150,6 +150,11 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       this._enabling = false;
     }
   }
+
+  public async signMessage(message: string): Promise<string> {
+    throw new Error('Unimplemented');
+  }
+
 }
 
 export default KeplrWebWalletController;

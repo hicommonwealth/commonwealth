@@ -55,6 +55,10 @@ class PhantomWebWalletController implements IWebWallet<string> {
       throw new Error('Could not connect to Phantom wallet!');
     }
   }
+
+  public async signMessage(message: string): Promise<string> {
+    throw new Error('Unimplemented');
+  }
 }
 
 export default PhantomWebWalletController;
