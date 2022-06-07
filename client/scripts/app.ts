@@ -56,7 +56,7 @@ export async function initAppState(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     $.get(`${app.serverUrl()}/status`)
-      .then(async (data) => {
+      .then((data) => {
         app.config.chains.clear();
         app.config.nodes.clear();
         app.user.notifications.store.clear();
@@ -129,6 +129,7 @@ export async function initAppState(
           app.setCustomDomain(customDomain);
         }
 
+        app.projects.init(app);
         resolve();
       })
       .catch((err: any) => {
@@ -332,15 +333,6 @@ export async function selectChain(
       )
     ).default;
     newChain = new Solana(chain, app);
-  } else if (chain.network === ChainNetwork.Commonwealth) {
-    const Commonwealth = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "commonwealth-main" */
-        './controllers/chain/ethereum/commonwealth/adapter'
-      )
-    ).default;
-    newChain = new Commonwealth(chain, app);
   } else if (
     chain.base === ChainBase.Ethereum &&
     chain.type === ChainType.Offchain

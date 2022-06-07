@@ -48,7 +48,6 @@ export class GovernanceSection
         app.chain.network === ChainNetwork.Moloch ||
         app.chain.network === ChainNetwork.Compound ||
         app.chain.network === ChainNetwork.Aave ||
-        app.chain.network === ChainNetwork.Commonwealth ||
         app.chain.meta.snapshot);
     if (!hasProposals) return;
 

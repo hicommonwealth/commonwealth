@@ -8,6 +8,7 @@ import EventStorageHandler from '../eventHandlers/storage';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
+import ProjectHandler from '../eventHandlers/project';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { ChainBase } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -49,11 +50,14 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
   // actions, like voting on proposals or registering an identity
   const profileCreationHandler = new ProfileCreationHandler(models, null);
 
+  const projectHandler = new ProjectHandler(models);
+
   const allChainEventHandlers = [
     storageHandler,
     notificationHandler,
     entityArchivalHandler,
     profileCreationHandler,
+    projectHandler,
   ];
 
   // populates identity information in OffchainProfiles when received (Substrate only)
