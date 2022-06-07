@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .AvatarUpload {
   border-radius: 9999px;
@@ -10,12 +10,14 @@
   background-color: $white;
   border: 1px solid $neutral-300;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
+
   > .User,
   .ChainIcon,
   .CommunityIcon {
     position: absolute;
     z-index: 0;
   }
+
   .dropzone-attach {
     display: flex;
     justify-content: center;
@@ -24,10 +26,12 @@
     width: 100%;
     color: $neutral-600;
     z-index: 1;
+
     &.hidden {
       display: none;
     }
   }
+
   .attach-button {
     display: flex;
     justify-content: center;
@@ -43,12 +47,14 @@
       color: $neutral-800;
     }
   }
+
   .dropzone-previews {
     flex: 1;
     text-align: right;
     height: 100%;
     width: 100%;
     z-index: 2;
+
     &.hidden {
       display: none;
     }
@@ -176,6 +182,7 @@
 .AvatarUpload {
   $image-size: 30px;
   $image-border-radius: 4px;
+
   &.dz-clickable {
     cursor: pointer;
 
@@ -202,6 +209,7 @@
     border-radius: 5px;
     margin: -8px -2px;
   }
+
   .dz-message {
     text-align: center;
     margin: 2em 0;
@@ -211,10 +219,12 @@
     position: relative;
     display: inline-block;
     vertical-align: top;
+
     &:hover {
       // Making sure that always the hovered preview element is on top
       z-index: 1000;
     }
+
     &.dz-file-preview {
       .dz-image {
         height: 100%;
@@ -223,14 +233,17 @@
         background: $neutral-500;
         background: linear-gradient(to bottom, $primary-300, $neutral-100);
       }
+
       .dz-details {
         opacity: 1;
       }
     }
+
     &.dz-image-preview {
       height: 100%;
       width: 100%;
       background: $white;
+
       .dz-details {
         @include prefix(
           (
@@ -246,19 +259,23 @@
       display: block;
       cursor: pointer;
       border: none;
+
       &:hover {
         text-decoration: underline;
       }
     }
+
     .dz-details {
       display: none;
     }
+
     .dz-image {
       border-radius: $image-border-radius;
       overflow: hidden;
       position: relative;
       display: block;
       z-index: 10;
+
       img {
         display: block;
         height: 100%;
@@ -275,6 +292,7 @@
         );
       }
     }
+
     &.dz-error {
       .dz-error-mark {
         opacity: 1;
@@ -298,6 +316,7 @@
       left: 50%;
       margin-left: -($image-width/2);
       margin-top: -($image-height/2);
+
       svg {
         display: block;
         width: $image-width;
@@ -313,6 +332,7 @@
         )
       );
     }
+
     &.dz-complete .dz-progress {
       opacity: 0;
       @include prefix(
@@ -331,6 +351,7 @@
         );
       }
     }
+
     .dz-progress {
       opacity: 1;
       z-index: 1000;
@@ -348,6 +369,7 @@
       -webkit-transform: scale(1);
       border-radius: 8px;
       overflow: hidden;
+
       .dz-upload {
         background: $primary-600;
         background: linear-gradient(to bottom, $primary-600, $primary-800);
@@ -356,6 +378,7 @@
         left: 0;
         bottom: 0;
         width: 0;
+
         @include prefix(
           (
             transition: width 300ms ease-in-out,

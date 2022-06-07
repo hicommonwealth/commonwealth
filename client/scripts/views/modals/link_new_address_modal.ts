@@ -21,7 +21,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Near from 'controllers/chain/near/main';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
-import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
+import { AvatarScope, AvatarUpload } from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 

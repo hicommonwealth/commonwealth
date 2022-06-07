@@ -1,11 +1,13 @@
-import 'components/avatar_upload.scss';
+/* @jsx m */
 
 import $ from 'jquery';
 import m from 'mithril';
 import Dropzone from 'dropzone';
 
-import User from 'views/components/widgets/user';
+import 'components/avatar_upload.scss';
+
 import app from 'state';
+import User from 'views/components/widgets/user';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 export enum AvatarScope {
@@ -14,25 +16,22 @@ export enum AvatarScope {
   Community = 'community',
 }
 
-interface IAttrs {
-  uploadStartedCallback?: CallableFunction;
-  uploadCompleteCallback?: CallableFunction;
+type AvatarUploadAttrs = {
   avatarScope: AvatarScope;
-}
+  uploadCompleteCallback?: CallableFunction;
+  uploadStartedCallback?: CallableFunction;
+};
 
-interface IState {
-  dropzone?: any;
-  uploaded: boolean;
-}
+export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
+  private dropzone?: any;
+  private uploaded: boolean;
 
-const AvatarUpload: m.Component<IAttrs, IState> = {
-  oncreate: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+  oncreate(vnode) {
     $(vnode.dom).on('cleardropzone', () => {
-      vnode.state.dropzone.files.map((file) =>
-        vnode.state.dropzone.removeFile(file)
-      );
+      this.dropzone.files.map((file) => this.dropzone.removeFile(file));
     });
-    vnode.state.dropzone = new Dropzone(vnode.dom, {
+
+    this.dropzone = new Dropzone(vnode.dom, {
       // configuration for textarea dropzone
       clickable: '.AvatarUpload .attach-button',
       previewsContainer: '.AvatarUpload .dropzone-previews',
@@ -63,9 +62,9 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
               );
             }
             file.uploadURL = response.result;
-            vnode.state.uploaded = true;
+            this.uploaded = true;
             done();
-            setTimeout(() => vnode.state.dropzone.processFile(file));
+            setTimeout(() => this.dropzone.processFile(file));
           })
           .catch((err: any) => {
             done(
@@ -81,26 +80,29 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
         };
       },
     });
-    vnode.state.dropzone.on('processing', (file) => {
-      vnode.state.dropzone.options.url = file.uploadURL;
+
+    this.dropzone.on('processing', (file) => {
+      this.dropzone.options.url = file.uploadURL;
       if (vnode.attrs.uploadStartedCallback) {
         vnode.attrs.uploadStartedCallback();
       }
     });
-    vnode.state.dropzone.on('complete', (file) => {
+
+    this.dropzone.on('complete', () => {
       if (vnode.attrs.uploadCompleteCallback) {
-        vnode.attrs.uploadCompleteCallback(vnode.state.dropzone.files);
+        vnode.attrs.uploadCompleteCallback(this.dropzone.files);
       }
     });
-  },
-  view: (vnode) => {
-    const logoURL =
-      vnode.state.dropzone?.option?.url || app.chain?.meta.iconUrl;
+  }
+
+  view(vnode) {
+    const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
+
     return m('form.AvatarUpload', [
       m(
         '.dropzone-attach',
         {
-          class: vnode.state.uploaded ? 'hidden' : '',
+          class: this.uploaded ? 'hidden' : '',
           style:
             vnode.attrs.avatarScope === AvatarScope.Chain ||
             vnode.attrs.avatarScope === AvatarScope.Community
@@ -113,7 +115,7 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
           ]),
         ]
       ),
-      !vnode.state.uploaded &&
+      !this.uploaded &&
         vnode.attrs.avatarScope === AvatarScope.Account &&
         m(User, {
           user: app.user.activeAccount,
@@ -121,10 +123,8 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
           avatarSize: 100,
         }),
       m('.dropzone-previews', {
-        class: vnode.state.uploaded ? '' : 'hidden',
+        class: this.uploaded ? '' : 'hidden',
       }),
     ]);
-  },
-};
-
-export default AvatarUpload;
+  }
+}

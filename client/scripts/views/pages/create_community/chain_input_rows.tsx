@@ -5,7 +5,7 @@ import m from 'mithril';
 import app from 'state';
 
 import { InputRow, SelectRow } from 'views/components/metadata_rows';
-import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
+import { AvatarScope, AvatarUpload } from 'views/components/avatar_upload';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { ChainBase } from 'types';

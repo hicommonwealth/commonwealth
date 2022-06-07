@@ -5,16 +5,14 @@ import $ from 'jquery';
 import app from 'state';
 import { Button, Input, TextArea, FormLabel } from 'construct-ui';
 
-import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
+import { AvatarScope, AvatarUpload } from 'views/components/avatar_upload';
 
 const EditProfileModal = {
   view: (vnode) => {
     const { account, refreshCallback } = vnode.attrs;
 
     return m('.EditProfileModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Edit profile')
-      ]),
+      m('.compact-modal-title', [m('h3', 'Edit profile')]),
       m('.form', [
         m('.avatar', [
           m(AvatarUpload, {
@@ -38,7 +36,8 @@ const EditProfileModal = {
         m('input', {
           type: 'hidden',
           name: 'avatarUrl',
-          oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.avatarUrl)
+          oncreate: (vvnode) =>
+            account.profile && $(vvnode.dom).val(account.profile.avatarUrl),
         }),
         m('.text-input-wrapper', [
           m(FormLabel, 'Name'),
@@ -61,7 +60,8 @@ const EditProfileModal = {
             placeholder: 'Add a headline',
             fluid: true,
             autocomplete: 'off',
-            oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.headline),
+            oncreate: (vvnode) =>
+              account.profile && $(vvnode.dom).val(account.profile.headline),
           }),
           m(FormLabel, 'Bio'),
           m(TextArea, {
@@ -69,7 +69,8 @@ const EditProfileModal = {
             defaultValue: account.profile.bio,
             placeholder: 'Add a bio',
             fluid: true,
-            oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.bio)
+            oncreate: (vvnode) =>
+              account.profile && $(vvnode.dom).val(account.profile.bio),
           }),
         ]),
         m('.form-bottom', [
@@ -82,23 +83,32 @@ const EditProfileModal = {
                 e.preventDefault();
                 const data = {
                   bio: `${$(vnode.dom).find('textarea[name=bio]').val()}`,
-                  headline: `${$(vnode.dom).find('input[name=headline]').val()}`,
+                  headline: `${$(vnode.dom)
+                    .find('input[name=headline]')
+                    .val()}`,
                   name: `${$(vnode.dom).find('input[name=name]').val()}`,
-                  avatarUrl: `${$(vnode.dom).find('input[name=avatarUrl]').val()}`,
+                  avatarUrl: `${$(vnode.dom)
+                    .find('input[name=avatarUrl]')
+                    .val()}`,
                 };
                 vnode.state.saving = true;
-                app.profiles.updateProfileForAccount(account, data).then((result) => {
-                  vnode.state.saving = false;
-                  m.redraw();
-                  refreshCallback();
-                  $(vnode.dom).trigger('modalexit');
-                }).catch((error: any) => {
-                  vnode.state.saving = false;
-                  vnode.state.error = error.responseJSON ? error.responseJSON.error : error.responseText;
-                  m.redraw();
-                });
+                app.profiles
+                  .updateProfileForAccount(account, data)
+                  .then((result) => {
+                    vnode.state.saving = false;
+                    m.redraw();
+                    refreshCallback();
+                    $(vnode.dom).trigger('modalexit');
+                  })
+                  .catch((error: any) => {
+                    vnode.state.saving = false;
+                    vnode.state.error = error.responseJSON
+                      ? error.responseJSON.error
+                      : error.responseText;
+                    m.redraw();
+                  });
               },
-              label: 'Save Changes'
+              label: 'Save Changes',
             }),
             m(Button, {
               rounded: true,
@@ -106,14 +116,14 @@ const EditProfileModal = {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
               },
-              label: 'Cancel'
+              label: 'Cancel',
             }),
           ]),
           vnode.state.error && m('.error-message', vnode.state.error),
-        ])
-      ])
+        ]),
+      ]),
     ]);
-  }
+  },
 };
 
 export default EditProfileModal;
