@@ -2,6 +2,14 @@ import moment from 'moment';
 import Web3 from 'web3';
 import { StateMutabilityType, AbiType } from 'web3-utils';
 import * as solw3 from '@solana/web3.js';
+import {
+  QueryClient,
+  BankExtension,
+  setupBankExtension,
+  setupStakingExtension,
+} from '@cosmjs/stargate';
+import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
+
 import BN from 'bn.js';
 import { providers } from 'ethers';
 import { WhereOptions } from 'sequelize/types';
@@ -90,6 +98,31 @@ export class TokenBalanceProvider {
     const balanceBigNum = await api.balanceOf(userAddress);
     provider.disconnect(1000, 'finished');
     return new BN(balanceBigNum.toString());
+  }
+
+  public async getCosmosTokenBalance(url: string, userAddress: string): Promise<BN> {
+    /* Not sure how we want to handle token balance things */ 
+
+    const tmClient = await Tendermint34Client.connect(url);
+    const api = QueryClient.withExtensions(
+      tmClient,
+      setupBankExtension,
+      setupStakingExtension,
+    );
+
+    const { params: { bondDenom } } = await api.staking.params();
+    const denom = bondDenom;
+
+    let balance;
+    try {
+      const bal = await api.bank.balance(userAddress, denom);
+      console.log(bal);
+      return balance = new BN(bal.amount);
+    } catch (e) {
+      // if coins is null, they have a zero balance
+      balance = new BN(0);
+      throw new Error(`no balance found: ${e.message}`); 
+    }
   }
 
   public async getSplTokenBalance(cluster: solw3.Cluster, mint: string, user: string): Promise<BN> {
@@ -228,6 +261,12 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     } else if (chain.base === ChainBase.Solana) {
       try {
         balance = await this._balanceProvider.getSplTokenBalance(node.url as solw3.Cluster, contractAddress, address);
+      } catch (e) {
+        throw new Error(`Could not fetch token balance: ${e.message}`);
+      }
+    } else if (chain.base === ChainBase.CosmosSDK) {
+      try {
+        balance = await this._balanceProvider.getCosmosTokenBalance(node.url, address);
       } catch (e) {
         throw new Error(`Could not fetch token balance: ${e.message}`);
       }
