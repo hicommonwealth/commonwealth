@@ -1,5 +1,6 @@
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
+  AddressTooltip = 'AddressTooltip',
   Button = 'Button',
   ButtonGroup = 'ButtonGroup',
   Card = 'Card',
@@ -12,6 +13,7 @@ export enum ComponentType {
   IconButton = 'IconButton',
   Label = 'Label',
   Modal = 'Modal',
+  Popover = 'Popover',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   Text = 'Text',
