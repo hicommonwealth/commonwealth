@@ -117,12 +117,12 @@
       color: $neutral-900;
     }
   }
-  @include sm-max {
+  @include smallInclusive {
     .info-row {
       flex-direction: column;
     }
   }
-  @include xxs-max {
+  @include smallInclusive {
     .ProfileHeader,
     .Tabs {
       padding: 0 17px 12px 17px !important;
@@ -139,7 +139,7 @@
 }
 
 .xs-display-none {
-  @include md-max {
+  @include mediumSmallInclusive {
     display: none;
   }
 }
@@ -311,7 +311,7 @@
   }
   .bio-actions-breakpoint {
     display: none;
-    @include lg-max {
+    @include mediumSmallInclusive {
       display: block;
       flex-basis: 100%;
       height: 0;
@@ -323,7 +323,7 @@
     justify-content: space-between;
     margin-top: 12px;
 
-    @include md-max {
+    @include mediumSmallInclusive {
       a.btn,
       .cui-button {
         margin-right: 16px;
@@ -337,12 +337,12 @@
         text-transform: uppercase;
       }
     }
-    @include lg-min {
+    @include mediumSmallInclusive {
       display: none;
     }
   }
   .address-block-left {
-    @include md-max {
+    @include mediumSmallInclusive {
       display: flex;
       align-items: center;
 
@@ -351,7 +351,7 @@
         margin-right: 8px;
       }
     }
-    @include lg-min {
+    @include mediumSmallInclusive {
       display: none;
     }
   }
@@ -406,7 +406,7 @@
     }
   }
   .info-row {
-    @include md-max {
+    @include mediumSmallInclusive {
       margin-bottom: 16px;
       display: flex;
       span,
@@ -436,7 +436,7 @@
       }
     }
 
-    @include lg-min {
+    @include mediumSmallInclusive {
       display: none;
     }
   }

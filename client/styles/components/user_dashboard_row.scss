@@ -1,10 +1,4 @@
-@import 'client/styles/shared';
-
-@mixin mobile-max {
-  @media only screen and (max-width: 670px) {
-    @content;
-  }
-}
+@import 'shared';
 
 .UserDashboardRow {
   display: flex;
@@ -13,7 +7,7 @@
   margin-right: 60px;
   border-bottom-width: 2px;
 
-  @include md-max {
+  @include mediumSmallInclusive {
     margin-right: 0;
   }
 
@@ -115,7 +109,7 @@
       display: flex;
       margin-left: 20px;
 
-      @include lg-max {
+      @include mediumSmallInclusive {
         display: none;
       }
 
@@ -123,7 +117,7 @@
         border: 1px solid $neutral-100;
         margin-right: 25px;
 
-        @include sm-max {
+        @include smallInclusive {
           // For temporary break point behavior
           margin-top: 5px;
         }
