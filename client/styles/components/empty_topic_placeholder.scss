@@ -1,13 +1,15 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 $size: 46px;
 
 .EmptyStagePlaceholder {
   color: $neutral-500;
-  padding: 40px 0;
+  padding: 40px 24px;
 }
 
 .EmptyListingPlaceholder {
+  padding: 40px 24px;
+
   .icon-circle {
     align-items: center;
     background: $primary-200;

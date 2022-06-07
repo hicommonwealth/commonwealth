@@ -4,7 +4,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase } from 'types';
-import { IChainAdapter, NodeInfo } from 'models';
+import { ChainInfo, IChainAdapter } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
@@ -22,7 +22,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
   public governance: MolochGovernance;
   public readonly chainEntities = new ChainEntityController();
 
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.chain = new MolochChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);

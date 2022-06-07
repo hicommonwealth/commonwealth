@@ -115,13 +115,13 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { ProposalPoll } from './poll';
-import { CWButton } from '../../components/component_kit/cw_button';
 import {
   ProposalHeaderExternalLink,
   ProposalHeaderThreadLink,
   ProposalHeaderBlockExplorerLink,
   ProposalHeaderVotingInterfaceLink,
 } from './proposal_header_links';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -313,11 +313,11 @@ const ProposalHeader: m.Component<
                               getSetGlobalEditingStatus,
                             }),
                           (isAuthor || isAdmin) &&
-                            app.chain?.meta.chain.snapshot.length > 0 &&
+                            app.chain?.meta.snapshot.length > 0 &&
                             m(MenuItem, {
                               onclick: () => {
                                 const snapshotSpaces =
-                                  app.chain.meta.chain.snapshot;
+                                  app.chain.meta.snapshot;
                                 if (snapshotSpaces.length > 1) {
                                   navigateToSubpage('/multiple-snapshots', {
                                     action: 'create-from-thread',
@@ -385,7 +385,7 @@ const ProposalHeader: m.Component<
                         ) => {
                           proposal.stage = stage;
                           proposal.chainEntities = chainEntities;
-                          if (app.chain?.meta.chain.snapshot) {
+                          if (app.chain?.meta.snapshot) {
                             proposal.snapshotProposal = snapshotProposal[0]?.id;
                           }
                           app.threads.fetchThreadsFromId([proposal.identifier]);
@@ -824,7 +824,10 @@ const ProposalComments: m.Component<
         // create comment
         // errors
         vnode.state.commentError &&
-          m('.comments-error', vnode.state.commentError),
+          m(CWValidationText, {
+            message: vnode.state.commentError,
+            status: 'failure',
+          }),
       ]
     );
   },
@@ -858,7 +861,7 @@ const ViewProposalPage: m.Component<
       vnode.attrs.type ||
       (isDiscussion
         ? ProposalType.OffchainThread
-        : chainToProposalSlug(app.chain.meta.chain));
+        : chainToProposalSlug(app.chain.meta));
     const headerTitle = isDiscussion ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string')
       return m(PageNotFound, { title: headerTitle });
@@ -1401,7 +1404,7 @@ const ViewProposalPage: m.Component<
               }),
             proposal instanceof OffchainThread &&
               isAuthor &&
-              (!app.chain?.meta?.chain?.adminOnlyPolling || isAdmin) &&
+              (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
               m(PollEditorCard, {
                 proposal,
                 proposalAlreadyHasPolling: !vnode.state.polls?.length,

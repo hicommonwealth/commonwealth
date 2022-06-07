@@ -6,7 +6,7 @@ export type ChatMessageAttributes = {
   id?: number;
   address: string;
   message: string;
-  chat_channel_id;
+  chat_channel_id: number;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -24,16 +24,13 @@ export default (
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     address: { type: dataTypes.STRING, allowNull: false },
     message: { type: dataTypes.TEXT, allowNull: false },
-    chat_channel_id: { type: dataTypes.INTEGER, allowNull: false, references: { model: 'ChatChannel', key: 'id' } },
+    chat_channel_id: { type: dataTypes.INTEGER, allowNull: false },
   }, {
     tableName: 'ChatMessages',
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     timestamps: true,
-    indexes: [
-      { fields: ['created_at'] },
-    ],
   });
 
   ChatMessage.associate = (models) => {

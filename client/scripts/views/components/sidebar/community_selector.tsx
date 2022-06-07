@@ -86,9 +86,7 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((item) => {
         // only show chains with nodes
-        return item instanceof ChainInfo
-          ? app.config.nodes.getByChain(item.id)?.length
-          : true;
+        return !!item.node;
       });
 
     const isInCommunity = (item) => {
@@ -125,10 +123,7 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
     );
 
     return isMobile ? (
-      <div class="CommunitySelectList">
-        {homeButton}
-        {app.isLoggedIn() && communityList}
-      </div>
+      <div class="CommunitySelectList">{app.isLoggedIn() && communityList}</div>
     ) : (
       <div class="CommunitySelector">
         <div class="title-selector">

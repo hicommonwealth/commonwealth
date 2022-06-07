@@ -12,16 +12,19 @@
 <!--- Include details of your testing environment, tests ran to see how -->
 <!--- your change affects other areas of the code, etc. -->
 
-## Have proper tags been added (for bug, enhancement, breaking change)?
-- [ ] yes
-
 ## Does this PR affect any server routes?
-- [ ] yes, and they are tested: [enter the % coverage here]
-- [ ] yes, and they are not tested: [enter the % coverage here]
-- [ ] yes, but I did not run tests
+- [ ] yes
 - [ ] no
 
 ## Does this PR affect any server models?
 - [ ] yes, and they do not affect importing from discourse
 - [ ] yes, and they do affect importing from discourse
 - [ ] no
+
+## If this PR affects server routes, what are the security implications?
+<!--- Please describe which security concerns were considered, -->
+<!--- such as argument validation, private data leaking, etc. -->
+
+## Have proper tags been added (for bug, enhancement, breaking change)?
+- [ ] yes
+

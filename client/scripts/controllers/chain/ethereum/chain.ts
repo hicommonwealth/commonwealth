@@ -7,7 +7,8 @@ import {
   NodeInfo,
   ITXModalData,
   ITXData,
-  IChainModule
+  IChainModule,
+  ChainInfo
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
@@ -74,7 +75,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     const blockNumber = await this._api.eth.getBlockNumber();
     console.log(blockNumber);
     const headers = await this._api.eth.getBlock(`${blockNumber}`);
-    if (this.app.chain && this.app.chain.meta.ethChainId !== 1) {
+    if (this.app.chain && this.app.chain.meta.node.ethChainId !== 1) {
       this.app.chain.block.height = headers.number;
       this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
 
@@ -101,8 +102,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return this._api;
   }
 
-  public async resetApi(selectedNode: NodeInfo) {
-    await this.initApi(selectedNode);
+  public async resetApi(selectedChain: ChainInfo) {
+    await this.initApi(selectedChain.node);
     return this._api;
   }
 
