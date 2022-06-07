@@ -42,6 +42,7 @@ class ChainInfo {
   public substrateSpec: RegisteredTypes;
   public hideProjects: boolean;
   public adminOnlyPolling: boolean;
+  public communityBanner?: string;
 
   public get node() {
     return this.ChainNode;
@@ -114,6 +115,7 @@ class ChainInfo {
     this.tokenName = tokenName;
     this.address = address;
     this.adminOnlyPolling = adminOnlyPolling;
+    this.communityBanner = null;
   }
 
   public static fromJSON({
@@ -243,6 +245,10 @@ class ChainInfo {
         )
       );
     });
+  }
+
+  public setBanner(banner_text: string) {
+    this.communityBanner = banner_text;
   }
 
   // TODO: change to accept an object

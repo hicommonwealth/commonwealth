@@ -29,6 +29,7 @@ import starCommunity from './routes/starCommunity';
 import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
+import updateBanner from './routes/updateBanner';
 import communityStats from './routes/communityStats';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
@@ -436,6 +437,13 @@ function setupRouter(
     '/updateEmail',
     passport.authenticate('jwt', { session: false }),
     updateEmail.bind(this, models)
+  );
+
+  // community banners (update or create)
+  router.post(
+    '/updateBanner',
+    passport.authenticate('jwt', { session: false }),
+    updateBanner.bind(this, models)
   );
 
   // fetch addresses (e.g. for mentions)

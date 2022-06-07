@@ -5,24 +5,17 @@ import $ from 'jquery';
 import * as solw3 from '@solana/web3.js';
 
 import app from 'state';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
-import {
-  IdRow,
-  InputRow,
-  SelectRow,
-  ValidationRow,
-} from 'views/components/metadata_rows';
+import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 type SplTokenFormFields = {
   cluster: solw3.Cluster;
@@ -36,11 +29,11 @@ type CreateSplTokenState = ChainFormState & { form: CreateERC20Form };
 
 export class SplTokenForm implements m.ClassComponent {
   private state: CreateSplTokenState = {
-    error: '',
+    message: '',
     loaded: false,
     loading: false,
     saving: false,
-    status: '',
+    status: undefined,
     form: {
       cluster: 'mainnet-beta',
       decimals: 6,
@@ -56,13 +49,14 @@ export class SplTokenForm implements m.ClassComponent {
     const disableField = !this.state.loaded;
 
     const updateTokenForum = async () => {
-      this.state.status = '';
-      this.state.error = '';
+      this.state.status = undefined;
+      this.state.message = '';
       let mintPubKey: solw3.PublicKey;
       try {
         mintPubKey = new solw3.PublicKey(this.state.form.mint);
       } catch (e) {
-        this.state.error = 'Invalid mint address';
+        this.state.status = 'failure';
+        this.state.message = 'Invalid mint address';
         return false;
       }
       if (!mintPubKey) return;
@@ -74,9 +68,11 @@ export class SplTokenForm implements m.ClassComponent {
         const { decimals, amount } = supply.value;
         this.state.form.decimals = decimals;
         this.state.loaded = true;
-        this.state.status = `Found ${amount} supply!`;
+        this.state.status = 'success';
+        this.state.message = `Found ${amount} supply!`;
       } catch (err) {
-        this.state.error = `Error: ${err.message}` || 'Failed to load token';
+        this.state.status = 'failure';
+        this.state.message = `Error: ${err.message}` || 'Failed to load token';
       }
       this.state.loading = false;
       m.redraw();
@@ -109,7 +105,10 @@ export class SplTokenForm implements m.ClassComponent {
             await updateTokenForum();
           }}
         />
-        <ValidationRow error={this.state.error} status={this.state.status} />
+        <CWValidationText
+          message={this.state.message}
+          status={this.state.status}
+        />
         <InputRow
           title="Name"
           defaultValue={this.state.form.name}

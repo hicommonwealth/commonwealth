@@ -68,14 +68,15 @@ export async function initAppState(
           });
         data.chains
           .filter((chain) => chain.active)
-          .map((chain) =>
-            app.config.chains.add(
+          .map((chain) => {
+            delete chain.ChainNode;
+            return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(chain.chain_node_id),
                 ...chain,
               })
-            )
-          );
+            );
+          });
         app.user.setRoles(data.roles);
         app.config.notificationCategories = data.notificationCategories.map(
           (json) => NotificationCategory.fromJSON(json)

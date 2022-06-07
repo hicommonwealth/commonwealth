@@ -13,7 +13,6 @@ import { ChainInfo } from 'client/scripts/models';
 import { NotificationsMenu } from 'views/components/header/notifications_menu';
 import { InvitesMenu } from 'views/components/header/invites_menu';
 import { LoginSelector } from 'views/components/header/login_selector';
-import { CWGradientButton } from './components/component_kit/cw_gradient_button';
 
 type SublayoutHeaderRightAttrs = {
   chain: ChainInfo;
@@ -26,23 +25,10 @@ export class SublayoutHeaderRight
   view(vnode) {
     const { chain, showNewProposalButton } = vnode.attrs;
 
-    const narrowBrowserWidth =
-      window.innerWidth > 767.98 && window.innerWidth < 850;
+    const narrowBrowserWidth = window.innerWidth < 1239;
 
     return (
       <div class="SublayoutHeaderRight">
-        {!app.isCustomDomain() && (
-          <CWGradientButton
-            buttonType="secondary"
-            label="We're hiring!"
-            onclick={() => {
-              window.open(
-                'https://angel.co/company/commonwealth-labs',
-                '_blank'
-              );
-            }}
-          />
-        )}
         {/* threadOnly option assumes all chains have proposals beyond threads */}
         {showNewProposalButton &&
           (narrowBrowserWidth ? (
