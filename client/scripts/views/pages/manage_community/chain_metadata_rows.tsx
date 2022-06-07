@@ -81,7 +81,6 @@ export class ChainMetadataRows
       <div class="ChainMetadataRows">
         <div class="AvatarUploadRow">
           <AvatarUpload
-            avatarScope="chain"
             uploadStartedCallback={() => {
               this.uploadInProgress = true;
               m.redraw();

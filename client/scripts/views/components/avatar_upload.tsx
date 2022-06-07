@@ -7,13 +7,10 @@ import Dropzone from 'dropzone';
 import 'components/avatar_upload.scss';
 
 import app from 'state';
-import User from 'views/components/widgets/user';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
-
-type AvatarScope = 'account' | 'chain' | 'community';
+import { CWIconButton } from './component_kit/cw_icon_button';
+import { getClasses } from './component_kit/helpers';
 
 type AvatarUploadAttrs = {
-  avatarScope: AvatarScope;
   uploadCompleteCallback?: CallableFunction;
   uploadStartedCallback?: CallableFunction;
 };
@@ -29,7 +26,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
 
     this.dropzone = new Dropzone(vnode.dom, {
       // configuration for textarea dropzone
-      clickable: '.AvatarUpload .attach-button',
+      clickable: '.AvatarUpload .dropzone-attach .IconButton',
       previewsContainer: '.AvatarUpload .dropzone-previews',
       // configuration for direct upload to s3
       url: '/', // overwritten when we get the target URL back from s3
@@ -42,10 +39,8 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
       maxFilesize: 10, // MB
       // request a signed upload URL when a file is accepted from the user
       accept: (file, done) => {
-        // TODO: Change to POST /uploadSignature
-        // TODO: Reuse code as this is used in other places
         $.post(`${app.serverUrl()}/getUploadSignature`, {
-          name: file.name, // tokyo.png
+          name: file.name, // imageName.png
           mimetype: file.type, // image/png
           auth: true,
           jwt: app.user.jwt,
@@ -91,36 +86,26 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     });
   }
 
-  view(vnode) {
+  view() {
     const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
 
-    return m('form.AvatarUpload', [
-      m(
-        '.dropzone-attach',
-        {
-          class: this.uploaded ? 'hidden' : '',
-          style:
-            vnode.attrs.avatarScope === 'chain' ||
-            vnode.attrs.avatarScope === 'community'
-              ? `background-image: url(${logoURL}); background-size: 92px;`
-              : '',
-        },
-        [
-          m('div.attach-button', [
-            m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-          ]),
-        ]
-      ),
-      !this.uploaded &&
-        vnode.attrs.avatarScope === 'account' &&
-        m(User, {
-          user: app.user.activeAccount,
-          avatarOnly: true,
-          avatarSize: 100,
-        }),
-      m('.dropzone-previews', {
-        class: this.uploaded ? '' : 'hidden',
-      }),
-    ]);
+    return (
+      <form class="AvatarUpload">
+        {!this.uploaded && (
+          <>
+            <CWIconButton
+              iconButtonTheme="primary"
+              iconName="plusCircle"
+              iconSize="small"
+            />
+            <div
+              class="dropzone-attach"
+              style={`background-image: url(${logoURL}); background-size: 92px;`}
+            />
+          </>
+        )}
+        <div class="dropzone-previews" />
+      </form>
+    );
   }
 }

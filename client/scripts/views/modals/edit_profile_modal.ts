@@ -16,7 +16,6 @@ const EditProfileModal = {
       m('.form', [
         m('.avatar', [
           m(AvatarUpload, {
-            avatarScope: 'account',
             uploadStartedCallback: () => {
               vnode.state.uploadsInProgress++;
               m.redraw();

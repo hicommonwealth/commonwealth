@@ -499,13 +499,15 @@ const LinkNewAddressModal: m.Component<
                     link('a', 'https://metamask.io/', 'Get Metamask', {
                       target: '_blank',
                     }),
-                  app.chain.base === ChainBase.CosmosSDK && app.chain.network !== ChainNetwork.Terra &&
+                  app.chain.base === ChainBase.CosmosSDK &&
+                    app.chain.network !== ChainNetwork.Terra &&
                     link('a', 'https://wallet.keplr.app/', 'Get Keplr', {
                       target: '_blank',
                     }),
                   app.chain.network === ChainNetwork.Terra &&
                     link('a', 'https://www.terra.money/', 'Get Terra', {
-                      target: '_blank',}),
+                      target: '_blank',
+                    }),
                 ]),
               webWallet?.enabled &&
                 m('.accounts-caption', [
@@ -667,7 +669,6 @@ const LinkNewAddressModal: m.Component<
               ),
               m('.avatar-wrap', [
                 m(AvatarUpload, {
-                  avatarScope: 'account',
                   uploadStartedCallback: () => {
                     vnode.state.uploadsInProgress = true;
                     m.redraw();

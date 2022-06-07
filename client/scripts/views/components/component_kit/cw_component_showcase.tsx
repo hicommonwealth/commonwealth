@@ -25,6 +25,7 @@ import { CWTooltip } from './cw_tooltip';
 import { CWPopover } from './cw_popover/cw_popover';
 import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
+import { AvatarUpload } from '../avatar_upload';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -46,10 +47,12 @@ const radioGroupOptions = [
 ];
 
 export class ComponentShowcase implements m.ClassComponent {
+  private avatarUrl: string;
   private checkboxChecked: boolean;
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;
   private selectedIconButton: number;
+  private uploadInProgress: boolean;
 
   oninit() {
     this.radioGroupSelection = radioGroupOptions[2].value;
@@ -66,6 +69,23 @@ export class ComponentShowcase implements m.ClassComponent {
             })
           }
         />
+        <AvatarUpload
+          uploadStartedCallback={() => {
+            this.uploadInProgress = true;
+            m.redraw();
+          }}
+          uploadCompleteCallback={(files) => {
+            console.log('files', files);
+            files.forEach((f) => {
+              if (!f.uploadURL) return;
+              const url = f.uploadURL.replace(/\?.*/, '');
+              this.avatarUrl = url;
+            });
+            this.uploadInProgress = false;
+            m.redraw();
+          }}
+        />
+        <img style={`width: 32px; height: 32px;`} src={this.avatarUrl} />
         <div class="card-gallery">
           <h1>Account Creation Button</h1>
           <CWAccountCreationButton
